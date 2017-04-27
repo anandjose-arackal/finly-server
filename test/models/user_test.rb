@@ -44,6 +44,7 @@
 #  mothers_maiden_name    :string(255)
 #  verified               :boolean          default(FALSE)
 #  otp_request_type_id    :integer
+#  default_password       :boolean          default(FALSE)
 #
 
 require 'test_helper'

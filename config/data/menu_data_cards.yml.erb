@@ -2,7 +2,9 @@ cards_enabled: <%= (current_company.feature_subscription.benefits_enabled and cu
 company:
   name: <%= current_company.name %>
   logo:
-    url: <%= current_company.configuration.logo.present? ? current_company.configuration.logo.url(:thumb) : nil %>
+  <% if current_company.configuration.logo.present? %>
+    url: <%= current_company.configuration.logo.url(:thumb)%>
+  <% end %>
 user:
  name: <%= current_user.name %>
  id: <%= current_user.id %>

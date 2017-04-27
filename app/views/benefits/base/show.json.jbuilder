@@ -33,6 +33,9 @@ json.data do
         json.id payment.payment_status.id
         json.name payment.payment_status.name.humanize
       end
+      json.system_messages do
+        json.array! payment.system_messages
+      end
     end
   end
   json.actions @result.actions

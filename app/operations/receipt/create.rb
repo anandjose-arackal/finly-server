@@ -22,9 +22,18 @@ class Receipt::Create < Receipt::Base
   def post_process
     add_message :success, 'Receipt added'
 
-    # if the company has receipt transcription enabled, it will be marked on the receipt
-    if user.company.configuration.ocr_enabled
+    # if the company has receipt transcription enabled, it will be marked on the receipt and trigger a mailer
+    # to notify us about  receipt being uploaded
+    if user.company.ocr_enabled?
       receipt.update(to_be_transcribed: true)
+
+      ########## Mailer being triggered ###########
+      if Rails.env.production?
+        Constants::TRANSCRIBER_EMAILS.each do |email|
+          ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+        end
+      end
+      #############################################
     end
   end
 

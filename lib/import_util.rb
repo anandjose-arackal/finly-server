@@ -1,5 +1,7 @@
 class ImportUtil
 
+  JUNK_CHARACTER_LIST = %w(<html> </html> <b> </b> <u> </u> <i> </i>)
+
   def self.open_spreadsheet(file)
     case File.extname(file.original_filename)
       when '.csv' then
@@ -61,6 +63,19 @@ class ImportUtil
         csv << values[i]
       end
     end
+  end
+
+  def self.create_response_csv(header, values)
+
+
+  end
+
+  def self.cleanup_email(raw_email, character_array = JUNK_CHARACTER_LIST)
+    clean_email = raw_email
+    character_array.each do |character|
+      clean_email = clean_email.sub(character, '')
+    end
+    return clean_email
   end
 
 end

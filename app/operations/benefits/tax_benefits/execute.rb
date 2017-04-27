@@ -41,11 +41,11 @@ class Benefits::TaxBenefits::Execute < BackgroundOperation
         next
       end
       process = Payment::ProcessPayment.(user, payment: payment)
-      if process.success?
+      if process.success? and payment.completed?
         has_success = true
         processed_amount_value += payment.amount.value
       else
-        has_success = false
+        has_failure = true
       end
     end
 

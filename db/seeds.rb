@@ -52,8 +52,8 @@ if ReportStatus.count == 0
   ReportStatus.create(id: 3, name: 'Retracted', order: 2)
   ReportStatus.create(id: 4, name: 'Rejected', order: 4)
   ReportStatus.create(id: 5, name: 'Approved', order: 5)
-  ReportStatus.create(id: 6, name: 'Reimbursed', order: 6)
-  ReportStatus.create(id: 7, name: 'Reimbursement Confirmed', order: 7)
+  ReportStatus.create(id: 6, name: 'Settlement', order: 6)
+  ReportStatus.create(id: 7, name: 'Settlement Confirmed', order: 7)
   ReportStatus.create(id: 8, name: 'Closed', order: 8)
 end
 
@@ -66,8 +66,8 @@ if ReportTrackingAction.count == 0
   ReportTrackingAction.create id: 6, name: 'Reject'
   ReportTrackingAction.create id: 7, name: 'Unapprove'
   ReportTrackingAction.create id: 8, name: 'Take Control'
-  ReportTrackingAction.create id: 9, name: 'Reimbursed'
-  ReportTrackingAction.create id: 10, name: 'Reimbursement Confirmed'
+  ReportTrackingAction.create id: 9, name: 'Settled'
+  ReportTrackingAction.create id: 10, name: 'Settlement Confirmed'
   ReportTrackingAction.create id: 11, name: 'Closed'
 end
 
@@ -228,6 +228,8 @@ PaymentOrderType.seed_data
 PaymentOrderStatus.seed_data
 
 SystemMessageType.seed_data
+
+ItzCashCardProgram.seed_data
 
 ItzCashDmtBeneficiaryType.seed_data
 

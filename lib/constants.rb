@@ -34,6 +34,12 @@ module Constants
 
   #########################
 
+  if Rails.env.production?
+    TRANSCRIBER_EMAILS = ['veekshith.rai@finly.io', 'vivek.a@finly.io']
+  else
+    TRANSCRIBER_EMAILS = ['sreeram.nr@finly.io']
+  end
+
   #### Date before which statements won't be accurate
   BEGINNING_OF_TIME = '10-03-2017'
   ###################################################
@@ -81,6 +87,8 @@ module Constants
       MERCHANT_TYPE_KEY_CREDIT = 'OLCEXP_CARDTOPUP'
       MERCHANT_TYPE_KEY_DEBIT = 'OLCEXP_CARDDEBIT'
       PRODUCT_CODE = 'HDFFIN'
+      PRODUCT_CODE_HDFC_EXPENSE_CARD = 'HDFFIN'
+      PRODUCT_CODE_RBL_EXPENSE_CARD = 'RBLRFN'
     else
       MERCHANT_TYPE_KEY_CREDIT = 'DEFAULT_ITIL'
       MERCHANT_TYPE_KEY_DEBIT = 'DEFAULT_ITIL'
