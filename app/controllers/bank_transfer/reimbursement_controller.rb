@@ -42,6 +42,18 @@ class BankTransfer::ReimbursementController < ApplicationController
         @result = BankTransfer::Sender::VerifyOtp.(current_user, params)
       when 'set_default'
 
+      when 'resend_otp'
+        otp_type = params&.dig(:otp_type)
+        unless otp_type
+          respond response: :failure, message: 'OTP Action not found'
+          return
+        end
+        case otp_type
+          when 'beneficiary_add'
+            @result = BankTransfer::Sender
+          when 'enable'
+
+        end
     end
     if @result&.success?
       respond response: :success
