@@ -18,19 +18,22 @@ class Expense::Personal::Unmark < Expense::Personal::Mark
     end
 
     if selected_expense.card_expense?
-      if selected_expense.user.balance_sheet.cash_in_hand < selected_expense.amount_value
+      if selected_expense.user.balance_sheet.cash_in_hand&.value < selected_expense.amount_value
         add_message :error, "You do not have enough cash on hand to unmark this expense as personal"
       end
     end
   end
 
   def process
-    unless selected_expense.update(persona: false)
+    unless selected_expense.update(personal: false)
       add_message :error, selected_expense.errors.full_messages
     end
   end
 
   def post_process
+    if selected_expense.card_expense?
+      user.balance_sheet.subtract_cash_in_hand(selected_expense.amount_value)
+    end
     add_message :error, "Expense unmarked as personal"
   end
 end
