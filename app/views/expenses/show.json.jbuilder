@@ -43,5 +43,5 @@ json.custom_fields do
 end
 
 json.system_messages do
-  json.array!(@result.expense.system_messages)
+  json.array!(@result.expense.system_messages.pluck(:content))
 end
