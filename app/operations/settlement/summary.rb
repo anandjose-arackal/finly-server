@@ -99,10 +99,7 @@ class Settlement::Summary < Settlement::Base
     to_user_reimbursement_account = selected_user.itz_cash_dmt_sender&.beneficiaries&.active&.reimbursement_accounts&.default&.first
     reimbursement = {associated_reimbursement_card: !!to_user_reimbursable_card&.active,
                      card: {},
-                     associated_reimbursement_bank_account: {
-                         active: !!to_user_reimbursement_account&.active?,
-                         id: to_user_reimbursement_account&.id
-                     },
+                     associated_reimbursement_bank_account: !!to_user_reimbursement_account&.active?,
                      initiating_accounts: []
                     }
 
