@@ -30,6 +30,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -110,7 +111,19 @@ class Expense < ActiveRecord::Base
     self.with_id(non_cancelled_ids)
   }
 
-  scope :include_cancelled, -> {}
+  scope :cancelled, -> {
+    ids = pluck(:id)
+    card_expenses = CardExpense.with_expense_id(ids)
+    cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
+    self.with_id(cancelled_expense_ids)
+  }
+
+  scope :reimbursable, -> {where reimbursable: true}
+  scope :non_reimbursable, -> {where reimbursable: false}
+
+  scope :include_cancelled, -> (flag) {
+
+  }
   scope :include_personal, -> {}
 
   scope :with_amount, -> { joins :amount }
