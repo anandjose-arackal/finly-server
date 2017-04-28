@@ -12,16 +12,22 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
   include MathUtil
   attr_accessor :reports, :role, :report_total, :cash_deduction, :report_names, :reimbursement_card, :reimbursement_card_id,
                 :reimbursement_amount, :cash_in_hand_deduction_amount, :outside_settlement_amount,
-                :initiating_account, :initiating_account_type, :initiating_account_id, :reimbursement_type_id
+                :initiating_account, :initiating_account_type, :initiating_account_id, :reimbursement_type_id, :reimbursement_bank_account
 
-  REIMBURSEMENT_TYPE = {:none => 1, :outside_finly => 2, :reimbursement_card => 3}
+  REIMBURSEMENT_TYPE = {:none => 1, :outside_finly => 2, :reimbursement_card => 3, :reimbursement_bank_account => 4}
 
   def authorized_user_types
     [:finance_manager, :admin]
   end
 
   def pre_validate
+    # todo remove as this is for test purpose only
+    if params
+      params[:payment][:reimbursement_type_id] = REIMBURSEMENT_TYPE[:reimbursement_bank_account]
+      params[:payment][:reimbursement_bank_account] = {amount: 100}
+    end
     super()
+    return if has_errors?
     from_cash_in_hand = params[:payment][:from_cash_in_hand].to_f rescue 0
     from_outside_finly = params[:payment][:from_outside_finly].to_f rescue 0
     from_reimbursement_card = params[:payment][:from_reimburesement_card][:amount] rescue 0
@@ -38,18 +44,19 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       add_message :error, 'No reports to reimburse'
     end
 
-    if params[:payment].blank? or params[:payment][:reimbursement_type_id].blank?
+    if params.dig(:payment, :reimbursement_type_id).blank?
       add_message :error, 'Reimbursement Type not found'
       return
     end
 
-    if params[:payment][:reimbursement_type_id] == REIMBURSEMENT_TYPE[:reimbursement_card]
-      initiating_account_id = params[:payment][:initiating_account_id].to_sym rescue nil
-      initiating_account_type = params[:payment][:initiating_account_type].to_sym rescue nil
-      if initiating_account_type.blank? or (initiating_account_type == :card and initiating_account_id.blank?)
-        add_message :error, 'Account not found to initiate the transfer'
-        return
-      end
+    case params.dig(:payment, :reimbursement_type_id)
+      when REIMBURSEMENT_TYPE[:reimbursement_card], REIMBURSEMENT_TYPE[:reimbursement_bank_account]
+        initiating_account_id = params&.dig(:payment, :initiating_account_id)&.to_sym
+        initiating_account_type = params&.dig(:payment, :initiating_account_type)&.to_sym
+        if initiating_account_type.blank? or (initiating_account_type == :card and initiating_account_id.blank?)
+          add_message :error, 'Account not found to initiate the transfer'
+          return
+        end
     end
   end
 
@@ -81,12 +88,36 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
           self.outside_settlement_amount = payment_params[:from_outside_finly].to_f rescue nil
         end
       when REIMBURSEMENT_TYPE[:reimbursement_card]
-        return unless payment_params[:from_reimbursement_card].present? and payment_params[:from_reimbursement_card][:id].present?
+        return unless payment_params.dig(:from_reimbursement_card, :id).present?
         self.reimbursement_card_id = payment_params[:from_reimbursement_card][:id] rescue nil
         self.reimbursement_card = to_user.cards.with_id(reimbursement_card_id).first rescue nil
 
         if self.reimbursement_card.present?
           self.reimbursement_amount = payment_params[:from_reimbursement_card][:amount].to_f rescue 0
+
+          self.initiating_account_type = payment_params[:initiating_account_type]
+
+          case self.initiating_account_type.to_sym
+            when :virtual_account
+              self.initiating_account_id = user.company_id
+              self.initiating_account = user.company
+            when :wallet
+              self.initiating_account_id = user.wallet.id
+              self.initiating_account = user.wallet
+            when :card
+              self.initiating_account_id = payment_params[:initiating_account_id].to_i rescue nil
+              if self.initiating_account_id.present?
+                self.initiating_account = user.cards.with_id(self.initiating_account_id).first rescue nil
+              end
+          end
+        end
+      when REIMBURSEMENT_TYPE[:reimbursement_bank_account]
+        return unless payment_params.dig(:reimbursement_bank_account, :amount).present?
+
+        self.reimbursement_bank_account = to_user.itz_cash_dmt_sender&.beneficiaries&.active&.reimbursement_accounts&.default&.first
+
+        if self.reimbursement_bank_account.present?
+          self.reimbursement_amount = payment_params.dig(:reimbursement_bank_account, :amount).to_f rescue 0
 
           self.initiating_account_type = payment_params[:initiating_account_type]
 
@@ -152,6 +183,9 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       when REIMBURSEMENT_TYPE[:reimbursement_card]
         validate_reimbursement_card
         validate_initiating_account
+      when REIMBURSEMENT_TYPE[:reimbursement_bank_account]
+        validate_reimbursement_bank_account
+        validate_initiating_account
     end
 
     # # Removed the check to ensure cash in hand deduction + settlement amount matches up as we would also be considering Reimbursements
@@ -188,10 +222,10 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       add_message :error, 'Cannot use the selected card for processing reimbursements'
       return
     end
-    
+
     if initiating_account_type == :wallet || initiating_account_type == 'wallet'
       unless user.wallet.balance_value > reimbursement_amount
-        add_message :error, "Not enough funds in your wallet to initiate transfer"
+        add_message :error, 'Not enough funds in your wallet to initiate transfer'
         return
       end
     end
@@ -221,6 +255,30 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
 
     if outside_settlement_amount.present?
       add_message :error, 'Invalid Entry. You can either settle outside Finly or process the reimbursement through Finly Reimbursement Card but not both'
+      return
+    end
+  end
+
+  def validate_reimbursement_bank_account
+    if self.reimbursement_bank_account.blank?
+      add_message :error, 'Reimbursement Account not found to process reimbursement'
+      return
+    end
+
+    return if has_errors?
+
+    if self.reimbursement_amount.blank?
+      add_message :error, 'Reimbursement Amount cannot be blank'
+      return
+    end
+
+    if self.reimbursement_amount < 0
+      add_message :error, 'Reimbursement amount has to be greater than 0'
+      return
+    end
+
+    if outside_settlement_amount.present?
+      add_message :error, 'Invalid Entry. You can either settle outside Finly or process the reimbursement through Finly Reimbursement Account but not both'
       return
     end
   end
@@ -277,6 +335,47 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       end
 
       result = ItzCash::Credit.(to_user, card_id: reimbursement_card.id, amount: self.reimbursement_amount)
+      unless result.success?
+        add_message :error, result.messages[:error]
+        return
+      end
+
+      self.payment.save
+
+    elsif self.reimbursement_type_id == REIMBURSEMENT_TYPE[:reimbursement_bank_account] and reimbursement_amount.present?
+    self.payment = to_user.payments.build initiating_user: user, receiving_user: to_user,
+                                          payment_type_id: PaymentType.id_for(:reimbursement),
+                                          date: Date.today, note: payment_params[:note],
+                                          initiating_account: self.initiating_account,
+                                          receiving_account: self.reimbursement_bank_account,
+                                          amount_attributes: {value: reimbursement_amount,
+                                                              currency_id: payment_params[:currency_id]},
+                                          payment_status_id: PaymentStatus.id_for(:completed)
+      unless self.payment.valid?
+        add_message :error, self.payment.errors.full_messages
+        return
+      end
+
+      case initiating_account_type
+        when :virtual_account
+          # Do nothing
+        when :wallet
+          # Subtract the reimbursement amount from wallet
+          wallet = user.wallet
+          unless wallet.subtract_funds(self.reimbursement_amount)
+            add_message :error, wallet.errors.full_messages
+            return
+          end
+        when :card
+          # Debit the reimbursement amount from card
+          debit_result = ItzCash::Debit.(user, card_id: initiating_account_id, amount: self.reimbursement_amount)
+          unless debit_result.success?
+            add_message :error, debit_result.messages[:error]
+            return
+          end
+      end
+
+      result = ItzCash::Dmt::Transfer::Create.(to_user, amount: self.reimbursement_amount, beneficiary_id: reimbursement_bank_account.beneficiary_id) #Credit.(to_user, card_id: reimbursement_card.id, amount: self.reimbursement_amount)
       unless result.success?
         add_message :error, result.messages[:error]
         return

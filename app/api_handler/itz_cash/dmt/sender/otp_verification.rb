@@ -1,4 +1,3 @@
-require 'securerandom'
 class ItzCash::Dmt::Sender::OtpVerification < ItzCash::Dmt::Base
   attr_accessor :password
 
@@ -35,6 +34,11 @@ class ItzCash::Dmt::Sender::OtpVerification < ItzCash::Dmt::Base
         wallet_id: Constants::ItzCash::EASY_WALLET_ID,
         wallet_type: Constants::ItzCash::EASY_WALLET_TYPE
     }
+  end
+
+  def success
+    user.itz_cash_dmt_sender.update(otp_verified: true)
+    super
   end
 
 end

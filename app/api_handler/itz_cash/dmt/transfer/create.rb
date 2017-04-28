@@ -43,8 +43,4 @@ class ItzCash::Dmt::Transfer::Create < ItzCash::Dmt::Base
     }
   end
 
-  def success
-
-  end
-
 end

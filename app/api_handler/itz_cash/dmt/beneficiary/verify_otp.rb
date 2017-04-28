@@ -20,7 +20,7 @@ class ItzCash::Dmt::Beneficiary::VerifyOtp < ItzCash::Dmt::Base
         icw_code: Constants::ItzCash::ICW_CODE,
         sender_mobile_number: user.mobile_number,
         sender_id: user.itz_cash_dmt_sender.registration_id,
-        otp: params[:otp]
+        sender_otp: params[:otp]
     }
   end
 
