@@ -21,11 +21,11 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
   end
 
   def pre_validate
-    # todo remove as this is for test purpose only
-    if params
-      params[:payment][:reimbursement_type_id] = REIMBURSEMENT_TYPE[:reimbursement_bank_account]
-      params[:payment][:reimbursement_bank_account] = {amount: 100}
-    end
+    # # todo remove as this is for test purpose only
+    # if params
+    #   params[:payment][:reimbursement_type_id] = REIMBURSEMENT_TYPE[:reimbursement_bank_account]
+    #   params[:payment][:reimbursement_bank_account] = {amount: 100}
+    # end
     super()
     return if has_errors?
     from_cash_in_hand = params[:payment][:from_cash_in_hand].to_f rescue 0
