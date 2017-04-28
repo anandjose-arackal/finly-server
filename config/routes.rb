@@ -431,6 +431,7 @@
 #                    admin_users_set_role POST   /admin_users/users/set_role(.:format)                       admin_users/users#set_role
 #                      admin_users_lookup GET    /admin_users/lookup(.:format)                               admin_users/users#lookup
 #                      admin_users_import POST   /admin_users/import(.:format)                               admin_users/users#import
+#                 admin_users_temp_import GET    /admin_users/temp_import(.:format)                          admin_users/users#temp_import
 #                    admin_users_expenses GET    /admin_users/expenses(.:format)                             admin_users/expenses#index
 #                                         POST   /admin_users/expenses(.:format)                             admin_users/expenses#create
 #                 new_admin_users_expense GET    /admin_users/expenses/new(.:format)                         admin_users/expenses#new
