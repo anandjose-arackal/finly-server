@@ -726,6 +726,8 @@ Rails.application.routes.draw do
 
   resources :receipts do
     post 'add_note', to: 'receipts#add_note', as: :add_note
+    patch 'enable', to: 'receipts#enable_transcription', as: :enable_transcription
+    patch 'disable', to: 'receipts#disable_transcription', as: :disable_transcription
   end
 
   post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt

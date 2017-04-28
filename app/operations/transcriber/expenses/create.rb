@@ -56,17 +56,26 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
   end
 
   def process
-    self.expense = selected_user.expenses.build(expense_params)
-    if expense.save
-      receipt.update(parent: expense)
+    if receipt_legible?
+      self.expense = selected_user.expenses.build(expense_params)
+      if expense.save
+        receipt.update(parent: expense)
+      else
+        messages[:error] = expense.errors.full_messages
+      end
     else
-      messages[:error] = expense.errors.full_messages
+      receipt.update(to_be_transcribed: false)
+      add_message :notice, "Receipt marked as illegible"
     end
   end
 
   def post_process
-    expense.update(transcribed: true)
-    add_message :success, "Receipt transcribed"
+    if receipt_legible?
+      expense.update(transcribed: true)
+      add_message :success, "Receipt processed"
+    else
+      receipt.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error), content: "Expense could not be generated because receipt was illegible / blurry").save
+    end
   end
 
   private
@@ -94,6 +103,13 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
       expense_params[:date] = DateUtils.local_date # setting the date as today by default
     end
     expense_params.permit!
+  end
+
+  def receipt_legible?
+    if params[:illegible] == "1"
+      return false
+    end
+    true
   end
 
 end

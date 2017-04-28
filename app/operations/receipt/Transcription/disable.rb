@@ -1,9 +1,11 @@
-class Receipt::ToBeTranscribed::Remove < Receipt::Base
+class Receipt::Transcription::Disable < Receipt::Base
 
   attr_accessor :receipt
 
   def pre_validate
-
+    if user.blank? || params.blank?
+      add_message :error, "Invalid parameters, try again"
+    end
   end
 
   def init

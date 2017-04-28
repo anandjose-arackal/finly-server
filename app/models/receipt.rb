@@ -30,6 +30,8 @@ class Receipt < ActiveRecord::Base
   belongs_to :user
   belongs_to :receipt_email
 
+  has_many :system_messages, as: :messagable, dependent: :destroy
+
   validates :user_id, presence: true
 
   validates :image, presence: true
