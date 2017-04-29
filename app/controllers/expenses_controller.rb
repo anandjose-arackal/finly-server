@@ -84,9 +84,9 @@ class ExpensesController < ApplicationController
         @result = Expense::Personal::Mark.(current_user, params)
       when 3, '3'
         # insert logic for marking expense as non-reimbursable - because by defualt all expenses are reimbursable
-        @result = Expense::Reimbursable::Unmark.(current_user, params)
+        @result = Expense::Reimbursable::Mark.(current_user, params)
       else
-        @result = Expense::Reimbursable::Unmark.(current_user, params)
+        @result = Expense::Reimbursable::Mark.(current_user, params)
     end
     if @result.success?
       respond response: :success, message: @result.messages[:success]
@@ -105,9 +105,9 @@ class ExpensesController < ApplicationController
         @result = Expense::Personal::Unmark.(current_user, params)
       when 3, '3'
         # insert logic for marking expense as non-reimbursable - because by defualt all expenses are reimbursable
-        @result = Expense::Reimbursable::Mark.(current_user, params)
+        @result = Expense::Reimbursable::Unmark.(current_user, params)
       else
-        @result = Expense::Reimbursable::Mark.(current_user, params)
+        @result = Expense::Reimbursable::Unmark.(current_user, params)
     end
     if @result.success?
       respond response: :success, message: @result.messages[:success]

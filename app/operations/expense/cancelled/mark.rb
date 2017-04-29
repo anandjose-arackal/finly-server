@@ -68,8 +68,7 @@ class Expense::Cancelled::Mark < Expense::Base
   end
 
   def success
-    params[:expense] = selected_expense
-    Expense::ExCard::Base::CardExpensePresenter.new(user, params, messages)
+    BaseOperation::BasePresenter::SuccessPresenter.new(user, params, messages)
   end
 
 end

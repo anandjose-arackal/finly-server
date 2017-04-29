@@ -28,7 +28,7 @@ class Expense::Index < Expense::Base
   end
 
   def pre_process
-    # removing all 'filter_*' because we son't them applied on the user index screen
+    # removing all 'filter_*' because we don't want them applied on the user index screen
     params.each do |key, value|
       if key.to_s.include?("filter_")
         expense_filters << {key => value}
@@ -85,11 +85,12 @@ class Expense::Index < Expense::Base
     has_scope :filter_amount, using: [:type, :value], type: :hash
     has_scope :filter_status_id
     has_scope :filter_date, using: [:from, :to], type: :hash
-    has_scope :only_cancelled
-    has_scope :only_personal
+    has_scope :filter_expense_cancelled
+    has_scope :filter_expense_personal
 
     def init
       self.expenses = params[:expenses]
+      # debugger
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
         self.unreported_expenses = expenses.unreported_and_rejected&.non_personal&.non_cancelled

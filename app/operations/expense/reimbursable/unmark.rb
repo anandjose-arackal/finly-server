@@ -12,15 +12,15 @@ class Expense::Reimbursable::Unmark < Expense::Base
   end
 
   def validate
-    unless expense.unreported?
+    unless selected_expense.unreported?
       add_message :error, "This expense cannot be edited at this stage"
       return
     end
-    if expense.card_expense?
+    if selected_expense.card_expense?
       add_message :error, "Card expenses are non-reimbursable by default"
       return
     end
-    unless expense.reimbursable
+    unless selected_expense.reimbursable
       add_message :error, "This expense is already marked as non-reimbursable"
     end
   end
@@ -33,5 +33,9 @@ class Expense::Reimbursable::Unmark < Expense::Base
 
   def post_process
     add_message :success, "Expense marked as non-reimbursable"
+  end
+
+  def success
+    BaseOperation::BasePresenter::SuccessPresenter.new(user, params, messages)
   end
 end
