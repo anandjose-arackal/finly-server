@@ -320,6 +320,8 @@
 #                                         DELETE /expenses/:id(.:format)                                     expenses#destroy
 #                     expenses_unreported POST   /expenses/unreported(.:format)                              expenses#unreported
 #                        receipt_add_note POST   /receipts/:receipt_id/add_note(.:format)                    receipts#add_note
+#            receipt_enable_transcription PATCH  /receipts/:receipt_id/enable(.:format)                      receipts#enable_transcription
+#           receipt_disable_transcription PATCH  /receipts/:receipt_id/disable(.:format)                     receipts#disable_transcription
 #                                receipts GET    /receipts(.:format)                                         receipts#index
 #                                         POST   /receipts(.:format)                                         receipts#create
 #                             new_receipt GET    /receipts/new(.:format)                                     receipts#new

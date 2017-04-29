@@ -166,16 +166,16 @@ class Report::Violation < Report::Base
     total_expenses = 0
     # all user reports with the associated budget
     user.reports.processed.with_policy_id(rule.policy_id).where.not(id: report.id).each do |budget_report|
-      if category
+      if rule.include_reimbursable_expenses?
         total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(:value), :precision => 2).to_f
       else
-        total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(:value), :precision => 2).to_f
       end
     end
-    if category
-      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(:value), :precision => 2).to_f
+    if rule.include_reimbursable_expenses?
+      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(:value), :precision => 2).to_f
     else
-      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(:value), :precision => 2).to_f
     end
     if total_expenses > rule.amount_value
       return true

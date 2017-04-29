@@ -85,6 +85,8 @@ class Expense::Index < Expense::Base
     has_scope :filter_amount, using: [:type, :value], type: :hash
     has_scope :filter_status_id
     has_scope :filter_date, using: [:from, :to], type: :hash
+    has_scope :only_cancelled
+    has_scope :only_personal
 
     def init
       self.expenses = params[:expenses]

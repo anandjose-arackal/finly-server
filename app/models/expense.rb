@@ -31,6 +31,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -121,10 +122,22 @@ class Expense < ActiveRecord::Base
   scope :reimbursable, -> {where reimbursable: true}
   scope :non_reimbursable, -> {where reimbursable: false}
 
-  scope :include_cancelled, -> (flag) {
+  scope :only_cancelled, -> (flag) {
+    if flag == '1'
+      cancelled
+    else
+      # do nothing, ha
+    end
+  }
+
+  scope :only_personal, -> (flag) {
+    if flag == '1'
+      personal
+    else
+      # do nothing, ha
+    end
 
   }
-  scope :include_personal, -> {}
 
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
@@ -163,7 +176,11 @@ class Expense < ActiveRecord::Base
       where(expenses[type_val].gteq(date_from).and(expenses[type_val].lteq(date_to)))
     end
   end
-  scope :filter_category_id, -> (category_id) { where category_id: category_id }
+  scope :filter_category_id, -> (category_id) {
+    if category_id
+      where category_id: category_id
+    end
+  }
 
   scope :filter_merchant, -> (merchant_name) do
     expense_ids = ManualExpense.where('merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
@@ -241,8 +258,15 @@ class Expense < ActiveRecord::Base
   # this method is to purely show the amount values for the carious expenses
   def amount_value
     case self.expense_type_id
-      when ExpenseType.id_for(:manual), ExpenseType.id_for(:card)
+      when ExpenseType.id_for(:manual)
         return precision_value self.amount.value
+      when ExpenseType.id_for(:card)
+        if self.card_expense.cancelled_against_transactions.present?
+          cancelled_total = self.card_expense.cancelled_against_transactions.joins(:billing_amount).sum(:value)
+          return precision_value(self.amount.value - cancelled_total)
+        else
+          return precision_value self.amount.value
+        end
       when ExpenseType.id_for(:distance), ExpenseType.id_for(:time), ExpenseType.id_for(:per_diem)
         if self.amount.blank?
           return nil

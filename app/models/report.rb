@@ -234,7 +234,7 @@ class Report < ActiveRecord::Base
 
   def total_amount(options=[])
     return 0 unless self.expenses.present?
-    temp_expenses = self.expenses&.non_personal&.non_cancelled
+    temp_expenses = self.expenses&.non_personal&.non_cancelled&.reimbursable
     if options.present?
       options = [options] unless options.kind_of?(Array)
       if options.present?

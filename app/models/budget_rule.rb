@@ -2,15 +2,17 @@
 #
 # Table name: budget_rules
 #
-#  id           :integer          not null, primary key
-#  category_id  :integer
-#  amount_id    :integer
-#  period_id    :integer
-#  policy_id    :integer
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
-#  rule_type_id :integer
+#  id                   :integer          not null, primary key
+#  category_id          :integer
+#  amount_id            :integer
+#  period_id            :integer
+#  policy_id            :integer
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  rule_type_id         :integer
+#  include_reimbursable :boolean          default(TRUE)
 #
+
 
 
 
@@ -39,6 +41,10 @@ class BudgetRule < ActiveRecord::Base
   before_destroy :update_parent_version
 
   has_paper_trail
+
+  def include_reimbursable_expenses?
+    self.include_reimbursable
+  end
 
   private
   def update_parent_version

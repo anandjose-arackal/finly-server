@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170427035504) do
+ActiveRecord::Schema.define(version: 20170429080353) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -101,13 +101,14 @@ ActiveRecord::Schema.define(version: 20170427035504) do
   add_index "balance_sheets", ["user_id"], name: "index_balance_sheets_on_user_id", using: :btree
 
   create_table "budget_rules", force: :cascade do |t|
-    t.integer  "category_id",  limit: 4
-    t.integer  "amount_id",    limit: 4
-    t.integer  "period_id",    limit: 4
-    t.integer  "policy_id",    limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.integer  "rule_type_id", limit: 4
+    t.integer  "category_id",          limit: 4
+    t.integer  "amount_id",            limit: 4
+    t.integer  "period_id",            limit: 4
+    t.integer  "policy_id",            limit: 4
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
+    t.integer  "rule_type_id",         limit: 4
+    t.boolean  "include_reimbursable",           default: true
   end
 
   add_index "budget_rules", ["amount_id"], name: "index_budget_rules_on_amount_id", using: :btree

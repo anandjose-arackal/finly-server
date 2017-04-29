@@ -47,7 +47,6 @@ class Expense::Cancelled::Mark < Expense::Base
         add_message :error, "One of these transactions has already been marked as cancelled"
       end
     end
-
   end
 
   def authorize
