@@ -42,11 +42,17 @@ class Expense::Destroy < Expense::Base
   end
 
   def process
-    unless expense.destroy
-      messages[:error] = expense.errors.full_messages
-      return false
+    if expense.report.present?
+      unless expense.update(report_id: nil)
+        add_message :error, expense.errors.full_messages
+        return false
+      end
+    else
+      unless expense.destroy
+        messages[:error] = expense.errors.full_messages
+        return false
+      end
     end
-    return true
   end
 
   def post_process
