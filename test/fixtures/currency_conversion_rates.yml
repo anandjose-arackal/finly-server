@@ -35,6 +35,7 @@
 #  THB        :decimal(10, 5)
 #  TRY        :decimal(10, 5)
 #  ZAR        :decimal(10, 5)
+#  AUD        :decimal(10, 5)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #

@@ -499,6 +499,7 @@ ActiveRecord::Schema.define(version: 20170429102541) do
     t.decimal  "THB",        precision: 10, scale: 5
     t.decimal  "TRY",        precision: 10, scale: 5
     t.decimal  "ZAR",        precision: 10, scale: 5
+    t.decimal  "AUD",        precision: 10, scale: 5
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
   end

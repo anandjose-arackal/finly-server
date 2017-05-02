@@ -34,6 +34,7 @@ class CreateCurrencyConversionRates < ActiveRecord::Migration
       t.decimal "THB", precision: 10, scale: 5
       t.decimal "TRY", precision: 10, scale: 5
       t.decimal "ZAR", precision: 10, scale: 5
+      t.decimal "AUD", precision: 10, scale: 5
 
       t.timestamps null: false
     end
