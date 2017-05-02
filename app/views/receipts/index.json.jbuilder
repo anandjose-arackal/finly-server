@@ -10,4 +10,7 @@ json.array!(@result.receipts) do |receipt|
     json.original receipt.image.url
     json.thumb receipt.image.url(:thumb)
   end
+  json.system_messages do
+    json.array!(receipt.system_messages.pluck(:content))
+  end
 end
