@@ -45,3 +45,14 @@ end
 json.system_messages do
   json.array!(@result.expense.system_messages.pluck(:content))
 end
+
+if @result.expense.card_expense? && @result.expense.cancelled?
+  json.cancelled_against_transactions do
+    json.array!(@result.expense.card_expense&.cancelled_against_transactions) do |transaction|
+      json.timestamp transaction.transaction_timestamp
+      json.amount_value transaction.billing_amount_value
+      json.type "Refund"
+      json.card_number "XXXXXXXXXXXX#{transaction.card.ending_number}"
+    end
+  end
+end
