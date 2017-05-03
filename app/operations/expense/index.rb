@@ -90,14 +90,15 @@ class Expense::Index < Expense::Base
 
     def init
       self.expenses = params[:expenses]
-      # debugger
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
 
-        ## excluding personal and cancelled expenses
-        exclude_personal
-        exclude_cancelled
-        ############################################
+        ## excluding personal and cancelled expenses if it's an expense/index action
+        if params[:action].include?('index')
+          exclude_personal
+          exclude_cancelled
+        end
+        ############################################################################
 
         if params[:view] == 'personal' or params[:view].nil?
           self.paginated_expenses = self.expenses&.unreported_and_rejected.paginate(page: params[:page], per_page: 30)
