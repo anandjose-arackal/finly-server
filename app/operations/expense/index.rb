@@ -85,23 +85,43 @@ class Expense::Index < Expense::Base
     has_scope :filter_amount, using: [:type, :value], type: :hash
     has_scope :filter_status_id
     has_scope :filter_date, using: [:from, :to], type: :hash
-    has_scope :filter_expense_cancelled
-    has_scope :filter_expense_personal
+    has_scope :filter_expense_cancelled # shows only cancelled expenses
+    has_scope :filter_expense_personal # shows only personal expenses
 
     def init
       self.expenses = params[:expenses]
       # debugger
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
-        debugger
-        self.unreported_expenses = expenses.unreported_and_rejected&.non_personal&.non_cancelled
+
+        ## excluding personal and cancelled expenses
+        exclude_personal
+        exclude_cancelled
+        ############################################
+
         if params[:view] == 'personal' or params[:view].nil?
-          self.paginated_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
+          self.paginated_expenses = self.expenses&.unreported_and_rejected.paginate(page: params[:page], per_page: 30)
         else
           self.paginated_expenses = expenses.paginate(page: params[:page], per_page: 30)
         end
       end
       self.categories = user.company.active_categories
+    end
+
+    def exclude_cancelled
+      if params[:filter_expense_cancelled] == '1'
+        self.expenses
+      else
+        self.expenses = expenses&.non_cancelled
+      end
+    end
+
+    def exclude_personal
+      if params[:filter_expense_personal] == '1'
+        self.expenses
+      else
+        self.expenses = expenses&.non_personal
+      end
     end
   end
 

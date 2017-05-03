@@ -108,15 +108,14 @@ class Expense < ActiveRecord::Base
     ids = pluck(:id)
     card_expenses = CardExpense.with_expense_id(ids)
     cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
-    # non_cancelled_ids = ids - cancelled_expense_ids
-    with_id(ids)
+    non_cancelled_ids = ids - cancelled_expense_ids
+    with_id(non_cancelled_ids)
   }
 
   scope :cancelled, -> {
     ids = pluck(:id)
     card_expenses = CardExpense.with_expense_id(ids)
     cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
-    # debugger
     with_id(cancelled_expense_ids)
   }
 
