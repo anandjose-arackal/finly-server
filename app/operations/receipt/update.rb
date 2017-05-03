@@ -34,6 +34,6 @@ class Receipt::Update < Receipt::Base
 
   private
   def update_params
-    params.require(:receipt).permit(:image, :note)
+    params.require(:receipt).permit(:image, :note, :to_be_transcribed)
   end
 end
