@@ -108,8 +108,8 @@ class Expense < ActiveRecord::Base
     ids = pluck(:id)
     card_expenses = CardExpense.with_expense_id(ids)
     cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
-    non_cancelled_ids = ids - cancelled_expense_ids
-    self.with_id(non_cancelled_ids)
+    # non_cancelled_ids = ids - cancelled_expense_ids
+    with_id(ids)
   }
 
   scope :cancelled, -> {
@@ -117,7 +117,7 @@ class Expense < ActiveRecord::Base
     card_expenses = CardExpense.with_expense_id(ids)
     cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
     # debugger
-    self.with_id(cancelled_expense_ids)
+    with_id(cancelled_expense_ids)
   }
 
   scope :reimbursable, -> {where reimbursable: true}

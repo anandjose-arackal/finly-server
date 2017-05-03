@@ -93,6 +93,7 @@ class Expense::Index < Expense::Base
       # debugger
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
+        debugger
         self.unreported_expenses = expenses.unreported_and_rejected&.non_personal&.non_cancelled
         if params[:view] == 'personal' or params[:view].nil?
           self.paginated_expenses = self.unreported_expenses.paginate(page: params[:page], per_page: 30)
