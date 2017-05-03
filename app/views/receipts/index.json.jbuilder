@@ -20,4 +20,5 @@ json.array!(@result.receipts) do |receipt|
   end
 
   json.ocr_enabled receipt.user.company.ocr_enabled?
+  json.to_be_transcribed receipt.to_be_transcribed
 end
