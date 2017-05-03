@@ -4,7 +4,7 @@ json.array!(@result.receipts) do |receipt|
   # json.url receipt.image.url
   json.image_updated_at receipt.image_updated_at.strftime("%b %d, %Y")
   # json.file_type receipt.file_format
-  json.categories @result.categories
+  json.categories @result.categories.pluck(:id, :name)
   json.image do
     json.file_type receipt.file_format
     json.original receipt.image.url
@@ -13,4 +13,6 @@ json.array!(@result.receipts) do |receipt|
   json.system_messages do
     json.array!(receipt.system_messages.pluck(:content))
   end
+
+  json.ocr_enabled receipt.user.company.ocr_enabled?
 end
