@@ -520,9 +520,9 @@ class Expense < ActiveRecord::Base
       return false
     end
     if self.card_expense.cancelled
-      return false
+      return true
     end
-    true
+    false
   end
 
   private
