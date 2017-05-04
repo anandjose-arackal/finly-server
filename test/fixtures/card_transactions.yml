@@ -30,6 +30,7 @@
 #  api_reference_id             :string(255)
 #  cancelled                    :boolean          default(FALSE)
 #  cancelled_against_expense_id :integer
+#  type_of_details              :string(255)
 #
 
 

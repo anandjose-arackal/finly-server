@@ -13,4 +13,9 @@ class CardTransactionsController < ApplicationController
 
   end
 
+  def cancelled_transactions
+    @result = Expense::Cancelled::CancelledTransactions.(current_user, params)
+    respond
+  end
+
 end
