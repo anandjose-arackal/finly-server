@@ -28,11 +28,24 @@ class Expense::Cancelled::Mark < Expense::Base
 
     unless selected_expense.card_expense?
       add_message :error, "Only card expenses can be cancelled"
+      return
     end
 
     # check if the expense is cancellable
     unless selected_expense.cancellable?
       add_message :error, "This expense cannot be cancelled"
+      return
+    end
+
+
+    if cancelled_transactions.empty?
+      add_message :error, "Refund transactions not found"
+      return
+    end
+
+    # check if the cancelled transactions total is greater than the
+    if precision_value(cancelled_transactions.joins_billing_amount.sum(:value).to_f) > selected_expense.amount_value
+      add_message :error, "Transactions total cannot be greater than the expense amount"
       return
     end
 

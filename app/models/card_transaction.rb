@@ -65,6 +65,8 @@ class CardTransaction < ActiveRecord::Base
 
   scope :on_date, -> (date) {where('DATE(transaction_timestamp) = ?', date)}
 
+  scope :joins_billing_amount, -> {joins(:billing_amount)}
+
   # scope for timestamp range
   scope :with_transaction_timestamp_range, -> (start_time, end_time) {where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_time, end_time)}
 
