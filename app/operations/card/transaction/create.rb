@@ -71,11 +71,14 @@ class Card::Transaction::Create < BaseOperation
             # first check if it's the withdrawal transaction or the surcharge transaction for ATM withdrawals
             if CardTransaction.find_by(reference_id: params[:reference_id])
               # i.e. it's the ATM surcharge, so add it as an expense
+              # prepending ATM SURCHARGE to the merchant name for clarity
+              params[:merchant_name].insert(0, "ATM SURCHARGE - ") rescue nil
               self.transaction = CardTransaction.new(params)
               unless transaction.save
                 add_message :error, transaction.errors.full_messages
                 return false
               end
+
               # add the associated surcharge as a card expense
               @result = Expense::ExCard::Create.(transaction, card)
               unless @result.success?
@@ -85,6 +88,10 @@ class Card::Transaction::Create < BaseOperation
                 transaction.save
                 return false
               end
+              # adding a system message to the card expene indicating that it was a surcharge
+              system_message = @result.expense.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info), content: "This expense is an ATM surcharge incurred while withdrawing money").save
+              ###############################################################################
+
               transaction.card_expense = @result.expense.card_expense
               transaction.expensed = true
               transaction.save
