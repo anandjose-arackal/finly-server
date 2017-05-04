@@ -29,6 +29,7 @@
 #  api_reference_id             :string(255)
 #  cancelled                    :boolean          default(FALSE)
 #  cancelled_against_expense_id :integer
+#  type_of_details              :string(255)
 #
 
 class CardTransaction < ActiveRecord::Base
@@ -40,7 +41,7 @@ class CardTransaction < ActiveRecord::Base
 
   has_one :card_expense, dependent: :destroy
 
-  validates :reference_id, uniqueness: { scope: [:transaction_type] }
+  validates :reference_id, uniqueness: { scope: [:transaction_type, :type_of_details] }
 
   belongs_to :transaction_amount, class_name: 'Amount', dependent: :destroy
   belongs_to :card_amount, class_name: 'Amount', dependent: :destroy
@@ -51,7 +52,7 @@ class CardTransaction < ActiveRecord::Base
   delegate :card_amount_value, to: :card_amount
 
   # i.e. a combination of reference ID and transaction type should be unique
-  validates_uniqueness_of :reference_id, scope: [:transaction_type]
+  # validates_uniqueness_of :reference_id, scope: [:transaction_type]
 
   accepts_nested_attributes_for :transaction_amount
   accepts_nested_attributes_for :card_amount

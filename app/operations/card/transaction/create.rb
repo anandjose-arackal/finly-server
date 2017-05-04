@@ -68,28 +68,50 @@ class Card::Transaction::Create < BaseOperation
             return true
 
           when 'ATM'
-            # create a transaction out of it
-            self.transaction = CardTransaction.new(params)
-            unless transaction.save
-              add_message :error, transaction.errors.full_messages
-              return false
-            end
-            # add to cash on hand
-            if user.payments.create(amount_attributes: {value: params[:billing_amount_attributes][:value], currency_id: 1},
-                                    date: DateUtils.local_date,
-                                    payment_type_id: PaymentType.id_for(:atm_withdrawal),
-                                    note: "Atm Withdrawal",
-                                    initiating_user: user,
-                                    receiving_user: user,
-                                    payment_status_id: PaymentStatus.id_for(:completed))
-              user.balance_sheet.add_cash_in_hand(params[:billing_amount_attributes][:value])
-              return true
+            # first check if it's the withdrawal transaction or the surcharge transaction for ATM withdrawals
+            if CardTransaction.find_by(reference_id: params[:reference_id])
+              # create a transaction out of it, if it's the ATM withdrawal amount
+              self.transaction = CardTransaction.new(params)
+              unless transaction.save
+                add_message :error, transaction.errors.full_messages
+                return false
+              end
+              # add to cash on hand
+              if user.payments.create(amount_attributes: {value: params[:billing_amount_attributes][:value], currency_id: 1},
+                                      date: DateUtils.local_date,
+                                      payment_type_id: PaymentType.id_for(:atm_withdrawal),
+                                      note: "Atm Withdrawal",
+                                      initiating_user: user,
+                                      receiving_user: user,
+                                      payment_status_id: PaymentStatus.id_for(:completed))
+                user.balance_sheet.add_cash_in_hand(params[:billing_amount_attributes][:value])
+                return true
+              else
+                add_message :error, "Could not add credited amount to cash on hand"
+                transaction.expensed = false
+                transaction.error_message = @result.messages[:error]
+                transaction.save
+                return false
+              end
             else
-              add_message :error, "Could not add credited amount to cash on hand"
-              transaction.expensed = false
-              transaction.error_message = @result.messages[:error]
+              # if it's the surcharge, create an expense out of it
+              self.transaction = CardTransaction.new(params)
+              unless transaction.save
+                add_message :error, transaction.errors.full_messages
+                return false
+              end
+              # add the associated card expense for this transaction
+              @result = Expense::ExCard::Create.(transaction, card)
+              unless @result.success?
+                add_message :error, @result.messages[:error]
+                transaction.expensed = false
+                transaction.error_message = @result.messages[:error]
+                transaction.save
+                return false
+              end
+              transaction.card_expense = @result.expense.card_expense
+              transaction.expensed = true
               transaction.save
-              return false
             end
           else
             # In this case it's a manual debit, so do nothing
