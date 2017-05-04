@@ -30,7 +30,7 @@ json.reimbursable @result.expense.reimbursable
 
 json.personal @result.expense.personal
 
-json.cancelled @result.cancelled?
+json.cancelled @result.expense.cancelled?
 
 json.custom_fields do
   expense = @result.expense
