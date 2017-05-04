@@ -26,6 +26,12 @@ json.editable @result.editable
 
 json.deletable ((params[:view].nil? || params[:view] == 'personal') && @result.expense.deletable_expense? && @result.expense.report_id.nil?)
 
+json.reimbursable @result.expense.reimbursable
+
+json.personal @result.expense.personal
+
+json.cancelled @result.cancelled?
+
 json.custom_fields do
   expense = @result.expense
   case expense.expense_type_id
