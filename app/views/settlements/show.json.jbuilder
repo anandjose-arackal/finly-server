@@ -6,9 +6,9 @@ json.array! @result.items do |item|
     if item.final_approver
       json.final_approver item.final_approver.name
     end
-    json.reimbursement_amount item.cash_expenses_total.value rescue 0
+    json.reimbursement_amount item.reimbursable_expenses_total.value rescue 0
     json.card_expenses_total item.card_expenses_total.value rescue 0
-    json.cash_expenses_total item.cash_expenses_total.value rescue 0
+    json.cash_expenses_total item.reimbursable_expenses_total.value rescue 0
     json.reimbursable_expenses_total item.reimbursable_expenses_total.value rescue 0
     json.non_reimbursable_expenses_total item.non_reimbursable_expenses_total.value rescue 0
     json.status item.status_name
