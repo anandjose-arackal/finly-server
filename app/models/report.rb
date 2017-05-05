@@ -2,32 +2,36 @@
 #
 # Table name: reports
 #
-#  id                           :integer          not null, primary key
-#  name                         :string(255)      not null
-#  user_id                      :integer          not null
-#  report_status_id             :integer          not null
-#  policy_id                    :integer
-#  submitted_at                 :datetime
-#  controlling_user_id          :integer
-#  controlling_user_role_id     :integer
-#  controlling_for_user_id      :integer
-#  controlling_for_user_role_id :integer
-#  memo                         :string(255)
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
-#  reimbursement_id             :integer
-#  accounted                    :boolean          default(FALSE), not null
-#  archived                     :boolean          default(FALSE), not null
-#  is_deleted                   :boolean          default(FALSE), not null
-#  auto_submit                  :boolean          default(FALSE), not null
-#  auto_approve                 :boolean          default(FALSE), not null
-#  accounted_at                 :date
-#  approved_at                  :datetime
-#  cash_in_hand_deduction_id    :integer
-#  submitted_amount_id          :integer
-#  cash_expenses_total_id       :integer
-#  card_expenses_total_id       :integer
+#  id                                 :integer          not null, primary key
+#  name                               :string(255)      not null
+#  user_id                            :integer          not null
+#  report_status_id                   :integer          not null
+#  policy_id                          :integer
+#  submitted_at                       :datetime
+#  controlling_user_id                :integer
+#  controlling_user_role_id           :integer
+#  controlling_for_user_id            :integer
+#  controlling_for_user_role_id       :integer
+#  memo                               :string(255)
+#  created_at                         :datetime         not null
+#  updated_at                         :datetime         not null
+#  reimbursement_id                   :integer
+#  accounted                          :boolean          default(FALSE), not null
+#  archived                           :boolean          default(FALSE), not null
+#  is_deleted                         :boolean          default(FALSE), not null
+#  auto_submit                        :boolean          default(FALSE), not null
+#  auto_approve                       :boolean          default(FALSE), not null
+#  accounted_at                       :date
+#  approved_at                        :datetime
+#  cash_in_hand_deduction_id          :integer
+#  submitted_amount_id                :integer
+#  reimbursable_expenses_total_id     :integer
+#  card_expenses_total_id             :integer
+#  non_reimbursable_expenses_total_id :integer
 #
+
+
+
 
 
 
@@ -50,7 +54,8 @@ class Report < ActiveRecord::Base
   # Payment made as reimbursement
   belongs_to :report_status
   belongs_to :reimbursement, class_name: 'Payment'
-  belongs_to :cash_expenses_total, class_name: 'Amount'
+  belongs_to :reimbursable_expenses_total, class_name: 'Amount'
+  belongs_to :non_reimbursable_expenses_total, class_name: "Amount"
   belongs_to :card_expenses_total, class_name: 'Amount'
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
@@ -60,7 +65,8 @@ class Report < ActiveRecord::Base
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, class_name: 'Amount'
   accepts_nested_attributes_for :submitted_amount
-  accepts_nested_attributes_for :cash_expenses_total
+  accepts_nested_attributes_for :reimbursable_expenses_total
+  accepts_nested_attributes_for :non_reimbursable_expenses_total
   accepts_nested_attributes_for :card_expenses_total
   accepts_nested_attributes_for :custom_fields
 
@@ -79,8 +85,9 @@ class Report < ActiveRecord::Base
   scope :with_user_id, ->(user_id) { where user_id: user_id }
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
-  scope :with_amount, -> { joins :cash_expenses_total }
-  scope :with_cash_expenses_total, -> { joins :cash_expenses_total }
+  scope :with_amount, -> { joins :reimbursable_expenses_total }
+  scope :with_reimbursable_expenses_total, -> { joins :reimbursable_expenses_total }
+  scope :with_non_reimbursable_expenses_total, -> { joins :non_reimbursable_expenses_total }
   scope :with_card_expenses_total, -> { joins :card_expenses_total }
   scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
@@ -190,7 +197,7 @@ class Report < ActiveRecord::Base
   end
 
   def settlement_pending?
-    approved? and cash_expenses_total.present? and cash_expenses_total.value > 0
+    approved? and reimbursable_expenses_total.present? and reimbursable_expenses_total.value > 0
   end
 
   def can_submit?
@@ -238,7 +245,7 @@ class Report < ActiveRecord::Base
       options = [options] unless options.kind_of?(Array)
       if options.present?
         options.each do |item|
-          temp_expenses = self.expenses.send(item.to_sym) if item.present? and self.expenses.respond_to?(item.to_sym)
+          temp_expenses = temp_expenses.send(item.to_sym) if item.present? and temp_expenses.respond_to?(item.to_sym)
         end
       end
     end

@@ -16,6 +16,7 @@
 
 
 
+
 class BudgetRule < ActiveRecord::Base
   belongs_to :category
   belongs_to :amount
@@ -40,6 +41,10 @@ class BudgetRule < ActiveRecord::Base
   before_destroy :update_parent_version
 
   has_paper_trail
+
+  def include_reimbursable_expenses?
+    self.include_reimbursable
+  end
 
   private
   def update_parent_version

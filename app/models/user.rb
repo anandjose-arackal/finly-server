@@ -49,6 +49,9 @@
 
 
 
+
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -425,6 +428,7 @@ class User < ActiveRecord::Base
 
   # Checks the cash in hand on the date given and current date and responds with whichever is lower
   def cash_in_hand(date = nil)
+    date_obj = date
     unless date.kind_of?(Date)
       date_obj = date.to_date rescue nil
     end
@@ -432,7 +436,7 @@ class User < ActiveRecord::Base
     return cash if date_obj.blank? or date_obj == DateUtils.local_date
     history = self.user_balance_histories.find_by(date: date_obj)
     if history.blank?
-      return 0
+      return Amount.new(value: 0, currency_id: 1)
     else
       cash_on_hand = history.cash_on_hand_balance
       return cash_on_hand
