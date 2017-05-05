@@ -25,7 +25,6 @@ class Company < ActiveRecord::Base
   has_one :itz_cash_property
   has_many :company_transactions
 
-
   has_one :distance_expense_config, as: :parent
   has_one :time_expense_config, as: :parent
   has_one :per_diem_expense_config, as: :parent
@@ -42,6 +41,8 @@ class Company < ActiveRecord::Base
   has_many :receiving_payments, as: :receiving_account
 
   has_many :payment_orders
+
+  has_many :user_groups
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property

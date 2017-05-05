@@ -520,6 +520,10 @@
 
 Rails.application.routes.draw do
 
+  get 'user_groups/create'
+
+  get 'user_group/create'
+
   namespace :transcriber do
     post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create
     patch 'expenses/:id/update', to: 'receipts#update_expense', as: :transcribed_expenses_update
@@ -866,6 +870,7 @@ Rails.application.routes.draw do
   get 'cards/medical/orders/:id' => 'benefits/medical#show'
   delete 'cards/medical/orders/:id' => 'benefits/medical#destroy'
 
+  resources :groups, controller: 'user_groups', only: [:create]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
