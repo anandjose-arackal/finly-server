@@ -1,6 +1,5 @@
 class AdminUsers::UsersController < ApplicationController
 
-  # todo - temporary
   before_action :authenticate_user!
   allow_oauth!
 
@@ -82,6 +81,44 @@ class AdminUsers::UsersController < ApplicationController
     @result = Admin::Users::Team::Mappings::Destroy.(current_user, params)
     if @result.success?
       respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def admin_welcome
+    @result = Admin::Users::WelcomeMail.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def temp_import
+
+  end
+
+  def import
+    import_op = Admin::Users::Import.new(current_user, params)
+    @result = import_op.run
+    if @result.success?
+      @response = {
+          success: true,
+          file_url: @result.file_url,
+          messages: {
+              error: [],
+              failure: [],
+              success: [],
+              message: [],
+              notice: []
+          }
+      }
+      respond_to do |format|
+        format.json {
+          render json: @response.as_json
+        }
+      end
     else
       respond response: :failure, message: @result.messages[:error]
     end

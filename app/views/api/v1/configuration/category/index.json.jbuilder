@@ -1,1 +1,1 @@
-json.merge! json.array! @result.categories, :id, :name, :active
+json.array! @result.categories, :id, :name, :active

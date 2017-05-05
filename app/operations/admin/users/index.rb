@@ -33,6 +33,7 @@ class Admin::Users::Index < Admin::Users::Base
 
     attr_accessor :users, :companies
 
+    has_scope :company_id
     has_scope :filter_company_id
     has_scope :filter_search
     has_scope :filter_date_from

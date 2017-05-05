@@ -31,8 +31,7 @@ class Admin::Cards::Create < Admin::Cards::Base
   end
 
   def pre_process
-    # todo - temporary, will be replaced with actual production product code once we get it
-    card_create_params[:product_code] = "NGPRHD"
+
   end
 
   def process

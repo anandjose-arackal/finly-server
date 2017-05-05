@@ -143,6 +143,7 @@ class UsersController < ApplicationController
     respond
   end
 
+
   private
 
   def update_handler(type = nil)

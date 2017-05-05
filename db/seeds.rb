@@ -229,6 +229,8 @@ PaymentOrderStatus.seed_data
 
 SystemMessageType.seed_data
 
+ItzCashCardProgram.seed_data
+
 ##########################
 
 if Amount.count == 0

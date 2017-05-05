@@ -48,6 +48,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
   end
 
   def pre_process
+    set_system_messages
     expense_params[:expense_type_id] = ExpenseType.manual_expense_id
     expense_params[:expense_status_id] = ExpenseStatus.unreported_id
     expense_params[:amount_attributes][:currency_id] = Currency.first.id
@@ -66,6 +67,33 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
   def post_process
     expense.update(transcribed: true)
     add_message :success, "Receipt transcribed"
+  end
+
+  private
+
+  def set_system_messages
+    expense_params[:system_messages_attributes] = []
+    if expense_params[:amount_attributes][:value] == "--"
+      expense_params[:system_messages_attributes] << {
+        content: "Amount is illegible",
+        system_message_type_id: SystemMessageType.id_for(:error)
+      }
+      expense_params[:amount_attributes][:value] = 0
+    end
+    if expense_params[:manual_expense_attributes][:merchant] == "--"
+      expense_params[:system_messages_attributes] << {
+        content: "Merchant is illegible",
+        system_message_type_id: SystemMessageType.id_for(:error)
+      }
+    end
+    if expense_params[:date] == "--"
+      expense_params[:system_messages_attributes] << {
+        content: "Date is illegible",
+        system_message_type_id: SystemMessageType.id_for(:error)
+      }
+      expense_params[:date] = DateUtils.local_date # setting the date as today by default
+    end
+    expense_params.permit!
   end
 
 end
