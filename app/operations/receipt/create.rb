@@ -11,6 +11,12 @@ class Receipt::Create < Receipt::Base
     self.receipt_params = create_params
   end
 
+  def validate
+    unless user.company.ocr_enabled?
+      receipt_params.delete(:to_be_transcribed)
+    end
+  end
+
 
   def process
     self.receipt = user.receipts.build(create_params)
@@ -24,8 +30,7 @@ class Receipt::Create < Receipt::Base
 
     # if the company has receipt transcription enabled, it will be marked on the receipt and trigger a mailer
     # to notify us about  receipt being uploaded
-    if user.company.ocr_enabled?
-      receipt.update(to_be_transcribed: true)
+    if user.company.ocr_enabled? && receipt.reload.to_be_transcribed
 
       ########## Mailer being triggered ###########
       if Rails.env.production?
