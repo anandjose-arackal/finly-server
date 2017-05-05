@@ -19,7 +19,7 @@ class Receipt::Create < Receipt::Base
 
 
   def process
-    self.receipt = user.receipts.build(create_params)
+    self.receipt = user.receipts.build(receipt_params)
     unless receipt.save
       add_message :error, receipt.errors.full_messages
     end
