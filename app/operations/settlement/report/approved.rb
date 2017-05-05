@@ -41,8 +41,7 @@ class Settlement::Report::Approved < Report::Base
 
     total_card_amount = report.total_amount(:only_card_expenses)
 
-    total_non_reimbursable_amount = total_card_amount
-                                    + report.total_amount([:only_manual_expenses, :non_reimbursable])
+    total_non_reimbursable_amount = total_card_amount + report.total_amount([:only_manual_expenses, :non_reimbursable])
                                     + report.total_amount([:only_distance_expenses, :non_reimbursable])
                                     + report.total_amount([:only_time_expenses, :non_reimbursable])
                                     + report.total_amount([:only_per_diem_expenses, :non_reimbursable])

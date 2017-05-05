@@ -77,7 +77,6 @@ class Report::Expenses::Add < Report::Base
         return false
       end
     end
-
   end
 
   def process
