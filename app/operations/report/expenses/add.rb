@@ -72,8 +72,8 @@ class Report::Expenses::Add < Report::Base
     end
 
     expenses.each do |expense|
-      if expense.cancelled?
-        add_message :error, "Cancelled expenses cannot be added to a report"
+      if expense.personal
+        add_message :error, "Personal expenses cannot be added to a report"
         return false
       end
     end

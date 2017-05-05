@@ -3,9 +3,11 @@ class Expense::Reimbursable::Mark < Expense::Reimbursable::Unmark
   attr_accessor :selected_expense
 
   def validate
-    unless selected_expense.unreported?
-      add_message :error, "This expense cannot be edited at this stage"
-      return
+    if selected_expense.report.present?
+      unless selected_expense.report.editable?
+        add_message :error, "This expense cannot be edited at this stage"
+        return
+      end
     end
     if selected_expense.card_expense?
       add_message :error, "Card expenses are non-reimbursable by default"

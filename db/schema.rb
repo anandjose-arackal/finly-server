@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170429080353) do
+ActiveRecord::Schema.define(version: 20170505113523) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -256,6 +256,7 @@ ActiveRecord::Schema.define(version: 20170429080353) do
     t.string   "api_reference_id",             limit: 255
     t.boolean  "cancelled",                                  default: false
     t.integer  "cancelled_against_expense_id", limit: 4
+    t.string   "type_of_details",              limit: 255
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
@@ -465,6 +466,46 @@ ActiveRecord::Schema.define(version: 20170429080353) do
     t.datetime "updated_at",               null: false
     t.string   "symbol",       limit: 255
   end
+
+  create_table "currency_conversion_rates", force: :cascade do |t|
+    t.date     "date",                                null: false
+    t.decimal  "INR",        precision: 10, scale: 5
+    t.decimal  "USD",        precision: 10, scale: 5
+    t.decimal  "GBP",        precision: 10, scale: 5
+    t.decimal  "EUR",        precision: 10, scale: 5
+    t.decimal  "CAD",        precision: 10, scale: 5
+    t.decimal  "HRK",        precision: 10, scale: 5
+    t.decimal  "RUB",        precision: 10, scale: 5
+    t.decimal  "BGN",        precision: 10, scale: 5
+    t.decimal  "BRL",        precision: 10, scale: 5
+    t.decimal  "CHF",        precision: 10, scale: 5
+    t.decimal  "CNY",        precision: 10, scale: 5
+    t.decimal  "CZK",        precision: 10, scale: 5
+    t.decimal  "DKK",        precision: 10, scale: 5
+    t.decimal  "HKD",        precision: 10, scale: 5
+    t.decimal  "HUF",        precision: 10, scale: 5
+    t.decimal  "IDR",        precision: 10, scale: 5
+    t.decimal  "ILS",        precision: 10, scale: 5
+    t.decimal  "JPY",        precision: 10, scale: 5
+    t.decimal  "KRW",        precision: 10, scale: 5
+    t.decimal  "MXN",        precision: 10, scale: 5
+    t.decimal  "MYR",        precision: 10, scale: 5
+    t.decimal  "NOK",        precision: 10, scale: 5
+    t.decimal  "NZD",        precision: 10, scale: 5
+    t.decimal  "PHP",        precision: 10, scale: 5
+    t.decimal  "PLN",        precision: 10, scale: 5
+    t.decimal  "RON",        precision: 10, scale: 5
+    t.decimal  "SEK",        precision: 10, scale: 5
+    t.decimal  "SGD",        precision: 10, scale: 5
+    t.decimal  "THB",        precision: 10, scale: 5
+    t.decimal  "TRY",        precision: 10, scale: 5
+    t.decimal  "ZAR",        precision: 10, scale: 5
+    t.decimal  "AUD",        precision: 10, scale: 5
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+  end
+
+  add_index "currency_conversion_rates", ["date"], name: "index_currency_conversion_rates_on_date", using: :btree
 
   create_table "custom_fields", force: :cascade do |t|
     t.integer  "field_configuration_id", limit: 4,   null: false
@@ -1306,30 +1347,31 @@ ActiveRecord::Schema.define(version: 20170429080353) do
   add_index "report_tracks", ["report_tracking_action_id"], name: "index_report_tracks_on_report_tracking_action_id", using: :btree
 
   create_table "reports", force: :cascade do |t|
-    t.string   "name",                         limit: 255,                               null: false
-    t.integer  "user_id",                      limit: 4,                                 null: false
-    t.integer  "report_status_id",             limit: 4,                                 null: false
-    t.integer  "policy_id",                    limit: 4
-    t.datetime "submitted_at",                             precision: 6
-    t.integer  "controlling_user_id",          limit: 4
-    t.integer  "controlling_user_role_id",     limit: 4
-    t.integer  "controlling_for_user_id",      limit: 4
-    t.integer  "controlling_for_user_role_id", limit: 4
-    t.string   "memo",                         limit: 255
-    t.datetime "created_at",                                                             null: false
-    t.datetime "updated_at",                                                             null: false
-    t.integer  "reimbursement_id",             limit: 4
-    t.boolean  "accounted",                                              default: false, null: false
-    t.boolean  "archived",                                               default: false, null: false
-    t.boolean  "is_deleted",                                             default: false, null: false
-    t.boolean  "auto_submit",                                            default: false, null: false
-    t.boolean  "auto_approve",                                           default: false, null: false
+    t.string   "name",                               limit: 255,                               null: false
+    t.integer  "user_id",                            limit: 4,                                 null: false
+    t.integer  "report_status_id",                   limit: 4,                                 null: false
+    t.integer  "policy_id",                          limit: 4
+    t.datetime "submitted_at",                                   precision: 6
+    t.integer  "controlling_user_id",                limit: 4
+    t.integer  "controlling_user_role_id",           limit: 4
+    t.integer  "controlling_for_user_id",            limit: 4
+    t.integer  "controlling_for_user_role_id",       limit: 4
+    t.string   "memo",                               limit: 255
+    t.datetime "created_at",                                                                   null: false
+    t.datetime "updated_at",                                                                   null: false
+    t.integer  "reimbursement_id",                   limit: 4
+    t.boolean  "accounted",                                                    default: false, null: false
+    t.boolean  "archived",                                                     default: false, null: false
+    t.boolean  "is_deleted",                                                   default: false, null: false
+    t.boolean  "auto_submit",                                                  default: false, null: false
+    t.boolean  "auto_approve",                                                 default: false, null: false
     t.date     "accounted_at"
     t.datetime "approved_at"
-    t.integer  "cash_in_hand_deduction_id",    limit: 4
-    t.integer  "submitted_amount_id",          limit: 4
-    t.integer  "cash_expenses_total_id",       limit: 4
-    t.integer  "card_expenses_total_id",       limit: 4
+    t.integer  "cash_in_hand_deduction_id",          limit: 4
+    t.integer  "submitted_amount_id",                limit: 4
+    t.integer  "reimbursable_expenses_total_id",     limit: 4
+    t.integer  "card_expenses_total_id",             limit: 4
+    t.integer  "non_reimbursable_expenses_total_id", limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree

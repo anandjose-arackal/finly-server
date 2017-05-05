@@ -34,27 +34,55 @@ class Settlement::Report::Approved < Report::Base
 
   def process
     balance_sheet = report.user.balance_sheet
-    total_cash_amount = report.total_amount(:only_manual_expenses) + report.total_amount(:only_distance_expenses) + report.total_amount(:only_time_expenses) + report.total_amount(:only_per_diem_expenses)
+    total_reimbursable_amount = report.total_amount([:only_manual_expenses, :reimbursable])
+                      + report.total_amount([:only_distance_expenses, :reimbursable])
+                      + report.total_amount([:only_time_expenses, :reimbursable])
+                      + report.total_amount([:only_per_diem_expenses, :reimbursable])
 
     total_card_amount = report.total_amount(:only_card_expenses)
-    currency = Currency.first
-    balance_sheet.add_approved_reports_total total_cash_amount, currency
 
-    # adding report's total cash amount
-    if report.cash_expenses_total.blank?
-      cash_amount = Amount.new(value: total_cash_amount, currency: Currency.first)
-      unless cash_amount.save
-        messages[:error] = cash_amount.errors.full_messages
+    total_non_reimbursable_amount = report.total_amount([:only_manual_expenses, :non_reimbursable])
+                            + report.total_amount([:only_distance_expenses, :non_reimbursable])
+                            + report.total_amount([:only_time_expenses, :non_reimbursable])
+                            + report.total_amount([:only_per_diem_expenses, :non_reimbursable])
+
+    currency = Currency.first
+    balance_sheet.add_approved_reports_total total_reimbursable_amount, currency
+
+    # adding report's total reimbursable amount
+    if report.reimbursable_expenses_total.blank?
+      reimbursable_amount = Amount.new(value: total_reimbursable_amount, currency: Currency.first)
+      unless reimbursable_amount.save
+        messages[:error] = reimbursable_amount.errors.full_messages
         return
       end
-      unless report.update_attributes(cash_expenses_total: cash_amount)
+      unless report.update_attributes(reimbursable_expenses_total: reimbursable_amount)
         messages[:error] = report.errors.full_messages
         return
       end
     else
-      cash_amount = report.cash_expenses_total
-      unless cash_amount.update_attributes(value: total_cash_amount, currency: Currency.first)
-        messages[:error] = report_amount.errors.full_messages
+      reimbursable_amount = report.reimbursable_expenses_total
+      unless reimbursable_amount.update_attributes(value: total_reimbursable_amount, currency: Currency.first)
+        messages[:error] = reimbursable_amount.errors.full_messages
+        return
+      end
+    end
+
+    # adding report's total non reimbursable amount
+    if report.non_reimbursable_expenses_total.blank?
+      non_reimbursable_amount = Amount.new(value: total_non_reimbursable_amount, currency: Currency.first)
+      unless non_reimbursable_amount.save
+        messages[:error] = non_reimbursable_amount.errors.full_messages
+        return
+      end
+      unless report.update_attributes(non_reimbursable_expenses_total: non_reimbursable_amount)
+        messages[:error] = report.errors.full_messages
+        return
+      end
+    else
+      non_reimbursable_amount = report.non_reimbursable_expenses_total
+      unless non_reimbursable_amount.update_attributes(value: non_reimbursable_amount, currency: Currency.first)
+        messages[:error] = non_reimbursable_amount.errors.full_messages
         return
       end
     end
