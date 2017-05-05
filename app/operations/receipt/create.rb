@@ -56,7 +56,7 @@ class Receipt::Create < Receipt::Base
 
   private
   def create_params
-    p = params.require(:receipt).permit(:image, :note)
+    p = params.require(:receipt).permit(:image, :note, :to_be_transcribed)
     p[:image] = params[:receipt][:image] rescue nil
     p.permit!
   end
