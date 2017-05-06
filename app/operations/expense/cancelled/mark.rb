@@ -69,6 +69,9 @@ class Expense::Cancelled::Mark < Expense::Base
   def process
     if selected_expense.card_expense.update(cancelled: true)
       cancelled_transactions.update_all(cancelled_against_expense_id: selected_expense.card_expense.id, cancelled: true)
+      original_amount = selected_expense.amount_value
+      cancelled_total = cancelled_transactions.joins(:billing_amount).sum(:value)
+      selected_expense.amount.update(value: (original_amount - cancelled_total))
     else
       add_message :error, selected_expense.card_expense.errors.full_messages
     end

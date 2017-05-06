@@ -258,15 +258,8 @@ class Expense < ActiveRecord::Base
   # this method is to purely show the amount values for the carious expenses
   def amount_value
     case self.expense_type_id
-      when ExpenseType.id_for(:manual)
+      when ExpenseType.id_for(:manual), ExpenseType.id_for(:card)
         return precision_value self.amount.value
-      when ExpenseType.id_for(:card)
-        if self.card_expense.cancelled_against_transactions.present?
-          cancelled_total = self.card_expense.cancelled_against_transactions.joins(:billing_amount).sum(:value)
-          return precision_value(self.amount.value - cancelled_total)
-        else
-          return precision_value self.amount.value
-        end
       when ExpenseType.id_for(:distance), ExpenseType.id_for(:time), ExpenseType.id_for(:per_diem)
         if self.amount.blank?
           return nil
