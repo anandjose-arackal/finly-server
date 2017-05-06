@@ -67,7 +67,7 @@ class Expense::ExCard::Create < Expense::ExCard::Base
     #######################################################################################
 
 
-    params.permit(:expense_type_id, :expense_status_id, :note, :category_id, :date,
+    params.permit(:expense_type_id, :expense_status_id, :note, :category_id, :date, :reimbursable,
                   amount_attributes: [:value, :currency_id],
                   card_expense_attributes: [:editable_merchant, :card_transaction_id, surcharge_attributes: [:value, :currency_id]])
   end
