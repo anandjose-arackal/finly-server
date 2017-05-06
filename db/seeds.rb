@@ -52,7 +52,7 @@ if ReportStatus.count == 0
   ReportStatus.create(id: 3, name: 'Retracted', order: 2)
   ReportStatus.create(id: 4, name: 'Rejected', order: 4)
   ReportStatus.create(id: 5, name: 'Approved', order: 5)
-  ReportStatus.create(id: 6, name: 'Settlement', order: 6)
+  ReportStatus.create(id: 6, name: 'Settled', order: 6)
   ReportStatus.create(id: 7, name: 'Settlement Confirmed', order: 7)
   ReportStatus.create(id: 8, name: 'Closed', order: 8)
 end
