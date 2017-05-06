@@ -27,7 +27,7 @@ json.array!(@result.receipts) do |receipt|
       json.category_id expense.category_id
       json.category_name expense.category_name
       json.system_messages do
-        json.array!(expense.system_messages)
+        json.array!(expense.system_messages.pluck(:content))
       end
     end
   end

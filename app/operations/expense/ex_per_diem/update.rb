@@ -122,7 +122,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     # if the expense has an associated amount, update the amount
     if expense.amount.present?
       amount = expense.amount
-      amount.update(value: expense.calculate_amount_value(expense.report.policy))
+      amount.update(value: expense.calculate_amount_value(per_diem.configurable))
     else
       amount = Amount.create(value: expense.calculate_amount_value(per_diem.configurable), currency: Currency.first)
       expense.update(amount: amount)
