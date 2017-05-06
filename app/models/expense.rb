@@ -223,6 +223,7 @@ class Expense < ActiveRecord::Base
   scope :card, -> { joins(:card_expense) }
 
   scope :only_card_expenses, -> { where(expense_type_id: ExpenseType.id_for(:card)) }
+  scope :except_card_expenses, -> {where.not(expense_type_id: ExpenseType.id_for(:card))}
   scope :only_manual_expenses, -> { where(expense_type_id: ExpenseType.id_for(:manual)) }
   scope :only_distance_expenses, -> { where(expense_type_id: ExpenseType.id_for(:distance)) }
   scope :only_time_expenses, -> { where(expense_type_id: ExpenseType.id_for(:time)) }

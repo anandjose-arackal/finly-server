@@ -60,6 +60,7 @@ class Expense::ExCard::Create < Expense::ExCard::Base
     params[:expense_type_id] = ExpenseType.card_expense_id
     params[:expense_status_id] = ExpenseStatus.unreported_id
     params[:date] = transaction[:transaction_timestamp]
+    params[:reimbursable] = false
 
     # todo - temporary, category will be extracted from the mcc-category mapping henceforth
     params[:category_id] = user.company.categories.find_by(name: "Other").id
