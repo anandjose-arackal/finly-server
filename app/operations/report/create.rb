@@ -24,7 +24,7 @@ class Report::Create < Report::Base
       self.policy_id = for_user.policies.non_default.first.id rescue nil
     end
 
-    self.expenses = params[:expenses] || (for_user.expenses.where(id: params[:expense_ids].split(',')))
+    self.expenses = params[:expenses] || (for_user.expenses.where(id: params[:expense_ids].split(',')) rescue [])
   end
 
   def authorize
@@ -35,10 +35,12 @@ class Report::Create < Report::Base
   end
 
   def validate
-    expenses.each do |expense|
-      if expense.personal
-        add_message :error, "Personal expenses cannot be added to reports"
-        return
+    if expenses.present?
+      expenses.each do |expense|
+        if expense.personal
+          add_message :error, "Personal expenses cannot be added to reports"
+          return
+        end
       end
     end
   end
