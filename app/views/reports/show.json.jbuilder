@@ -12,6 +12,9 @@ json.export_xls export_report_path(report_id: @result.report.id, view: params[:v
 json.export_pdf export_report_path(report_id: @result.report.id, view: params[:view], :format => :pdf)
 json.enforce_policy_enabled @result.report.user.enforce_policy_enabled?
 json.deleted @result.report.is_deleted
+json.non_reimbursable_expenses_total @result.non_reimbursable_expenses_total
+json.reimbursable_expenses_total @result.reimbursable_expenses_total
+json.card_expenses_total @result.card_expenses_total
 
 policy_id = nil
 policy_name = nil
