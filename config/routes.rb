@@ -870,7 +870,7 @@ Rails.application.routes.draw do
   get 'cards/medical/orders/:id' => 'benefits/medical#show'
   delete 'cards/medical/orders/:id' => 'benefits/medical#destroy'
 
-  resources :groups, controller: 'user_groups', only: [:create]
+  resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

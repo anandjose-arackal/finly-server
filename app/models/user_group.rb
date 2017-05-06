@@ -19,4 +19,6 @@ class UserGroup < ActiveRecord::Base
   accepts_nested_attributes_for :user_group_items
 
   validates :name, uniqueness: {scope: :company_id, :case_sensitive => false}
+
+  scope :include_items, -> { includes(:user_group_items) }
 end
