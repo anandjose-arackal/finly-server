@@ -1,0 +1,34 @@
+company:
+  name: <%= current_company.name %>
+  logo:
+  <% if current_company.configuration.logo.present? %>
+    url: <%= current_company.configuration.logo.url(:thumb)%>
+  <% end %>
+user:
+ name: <%= current_user.name %>
+ id: <%= current_user.id %>
+views:
+  admin:
+    menus:
+      navbar:
+      - name: Expenses
+        url: expenses
+        id: expenses
+      - name: Users
+        url: users
+        id: users
+      - name: Analytics
+        url: analytics
+        id: analytics
+  finance:
+    menus:
+      navbar:
+      - name: Expenses
+        url: expenses
+        id: expenses
+      - name: Users
+        url: users
+        id: users
+      - name: Analytics
+        url: analytics
+        id: analytics

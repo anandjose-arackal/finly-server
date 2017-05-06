@@ -849,6 +849,7 @@ Rails.application.routes.draw do
   # Cards Module APIS
   # Getting Menu Data for Cards module
   get 'menu_data_cards' => 'expense_types_configuration#menu_data_cards'
+  get 'menu_data_disburse' => 'expense_types_configuration#menu_data_disburse'
 
   # Meal Cards
   post 'cards/meal/process_file' => 'benefits/meal#process_file'
