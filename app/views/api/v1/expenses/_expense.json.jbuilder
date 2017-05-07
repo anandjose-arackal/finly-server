@@ -1,4 +1,6 @@
-json.extract! expense, :id, :date, :note, :report_id
+json.extract! expense, :id, :date, :note, :report_id, :expense_type_id,
+              :distance_value, :time_value, :per_diem_name, :per_diem_rate_value, :per_diem_quantity_value,
+              :distance_rate_value, :time_rate_value, :transcribed, :merchant_name
 json.user do
   json.id expense.user.id
   json.name expense.user.name
@@ -11,11 +13,11 @@ json.amount do
   json.partial! 'api/v1/shared/amount', amount: expense.amount
 end
 json.type expense.expense_type_id
-if expense.manual_expense?
-  json.merchant_name expense.manual_expense.merchant_name
-elsif expense.card_expense?
-  json.merchant_name expense.card_expense.editable_merchant
-end
+# if expense.manual_expense?
+#   json.merchant_name expense.manual_expense.merchant_name
+# elsif expense.card_expense?
+#   json.merchant_name expense.card_expense.editable_merchant
+# end
 json.category do
   json.id expense.category.id
   json.name expense.category.name

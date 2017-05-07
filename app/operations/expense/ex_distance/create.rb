@@ -24,7 +24,7 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
   def pre_validate
     super()
     if user.blank? || params.blank?
-      add_message :error, "Invalid parameters passed"
+      add_message :error, 'Invalid parameters passed'
     end
     if params[:expense].blank?
       messages[:error] << 'You have not provided any details to create an expense'
