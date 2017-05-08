@@ -662,8 +662,8 @@ if CardTransaction.filter_refunds(1).count == 0
     card = user.cards.first
     10.times do
 
-      trans_types = ["null"]
-      trans_modes = ["Credit"]
+      trans_types = ["Credit"]
+      trans_modes = ["null"]
       from_date = DateTime.parse("01-01-2017 12:00:00")
       to_date = DateTime.now
       random_amount = random_integer(50, 200) + 0.1234

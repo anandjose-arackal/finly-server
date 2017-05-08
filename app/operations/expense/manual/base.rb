@@ -12,7 +12,7 @@ class Expense::Manual::Base < Expense::Base
       end
     end
     receipts = params[:expense][:receipts_attributes] if params[:expense].present?
-    p = params.require(:expense).permit(:expense_type_id, :expense_status_id, :note, :receipt, :receipt_id, :report_id, :category_id, :date,
+    p = params.require(:expense).permit(:expense_type_id, :expense_status_id, :note, :receipt, :receipt_id, :report_id, :category_id, :date, :reimbursable,
                                         amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id, :id])
     # Hack as image upload from API is failing in strong params
     receipts = [receipts] unless receipts.is_a?(Array)
