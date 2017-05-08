@@ -49,6 +49,7 @@ class Expense::ExCard::Create < Expense::ExCard::Base
   end
 
   private
+
   # this will be called when the expense is being created - i.e. the moment the card is used, parameters will be created from the transaction object
   def card_expense_params
 
@@ -60,15 +61,19 @@ class Expense::ExCard::Create < Expense::ExCard::Base
     params[:expense_type_id] = ExpenseType.card_expense_id
     params[:expense_status_id] = ExpenseStatus.unreported_id
     params[:date] = transaction[:transaction_timestamp]
+    params[:reimbursable] = false
+    if params[:merchant_name].include?('ATM SURCHARGE')
+      params[:card_expense_attributes][:atm_surcharge] = true
+    end
 
     # todo - temporary, category will be extracted from the mcc-category mapping henceforth
     params[:category_id] = user.company.categories.find_by(name: "Other").id
     #######################################################################################
 
 
-    params.permit(:expense_type_id, :expense_status_id, :note, :category_id, :date,
+    params.permit(:expense_type_id, :expense_status_id, :note, :category_id, :date, :reimbursable,
                   amount_attributes: [:value, :currency_id],
-                  card_expense_attributes: [:editable_merchant, :card_transaction_id, surcharge_attributes: [:value, :currency_id]])
+                  card_expense_attributes: [:editable_merchant, :card_transaction_id, :atm_surcharge, surcharge_attributes: [:value, :currency_id]])
   end
 
 

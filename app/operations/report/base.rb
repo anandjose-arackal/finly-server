@@ -44,7 +44,8 @@ class Report::Base < BaseOperation
 
   class Report::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
-                  :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present
+                  :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present,
+                  :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total
 
     def init
       self.report = params[:report]
@@ -62,6 +63,9 @@ class Report::Base < BaseOperation
       self.finance_manager = User::Team::Approver.(report.user, report: report, type: :finance_manager)
       self.violations = Report::Violation.(user, report: self.report)
       self.violations_present = has_warning? || has_blocking?
+      self.reimbursable_expenses_total = reimbursable_expenses
+      self.non_reimbursable_expenses_total = non_reimbursable_expenses
+      self.card_expenses_total = report.total_amount(:only_card_expenses)
     end
 
     def retrieve_policies
@@ -79,6 +83,14 @@ class Report::Base < BaseOperation
       else
         report.status_name
       end
+    end
+
+    def reimbursable_expenses
+      report.total_amount([:reimbursable])
+    end
+
+    def non_reimbursable_expenses
+      report.total_amount(:non_reimbursable)
     end
 
     def expenses_category_sorted

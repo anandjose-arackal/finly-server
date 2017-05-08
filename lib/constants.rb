@@ -35,7 +35,7 @@ module Constants
   #########################
 
   if Rails.env.production?
-    TRANSCRIBER_EMAILS = ['veekshith.rai@finly.io', 'vivek.a@finly.io']
+    TRANSCRIBER_EMAILS = %w(veekshith.rai@finly.io vivek.a@finly.io)
   else
     TRANSCRIBER_EMAILS = ['sreeram.nr@finly.io']
   end

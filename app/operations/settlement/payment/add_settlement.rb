@@ -162,7 +162,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     # end
     return if has_errors?
 
-    self.report_total = precision_value(reports.with_cash_expenses_total.sum(:value)).to_f
+    self.report_total = precision_value(reports.with_reimbursable_expenses_total.sum(:value)).to_f
 
     cia_deduction_amount = cash_in_hand_deduction_amount.present? ? cash_in_hand_deduction_amount : 0
     outside_amount = outside_settlement_amount.present? ? outside_settlement_amount : 0

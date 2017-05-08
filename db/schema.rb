@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(version: 20170429102541) do
     t.integer  "surcharge_id",        limit: 4
     t.boolean  "is_deleted",                        default: false
     t.boolean  "cancelled",                         default: false
+    t.boolean  "atm_surcharge",                     default: false
   end
 
   add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
@@ -256,6 +257,7 @@ ActiveRecord::Schema.define(version: 20170429102541) do
     t.string   "api_reference_id",             limit: 255
     t.boolean  "cancelled",                                  default: false
     t.integer  "cancelled_against_expense_id", limit: 4
+    t.string   "type_of_details",              limit: 255
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
@@ -610,8 +612,8 @@ ActiveRecord::Schema.define(version: 20170429102541) do
     t.integer  "category_id",          limit: 4
     t.boolean  "is_deleted",                         default: false, null: false
     t.boolean  "transcribed",                        default: false
-    t.boolean  "personal",                           default: false
     t.boolean  "reimbursable",                       default: true
+    t.boolean  "personal",                           default: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -1346,30 +1348,31 @@ ActiveRecord::Schema.define(version: 20170429102541) do
   add_index "report_tracks", ["report_tracking_action_id"], name: "index_report_tracks_on_report_tracking_action_id", using: :btree
 
   create_table "reports", force: :cascade do |t|
-    t.string   "name",                         limit: 255,                               null: false
-    t.integer  "user_id",                      limit: 4,                                 null: false
-    t.integer  "report_status_id",             limit: 4,                                 null: false
-    t.integer  "policy_id",                    limit: 4
-    t.datetime "submitted_at",                             precision: 6
-    t.integer  "controlling_user_id",          limit: 4
-    t.integer  "controlling_user_role_id",     limit: 4
-    t.integer  "controlling_for_user_id",      limit: 4
-    t.integer  "controlling_for_user_role_id", limit: 4
-    t.string   "memo",                         limit: 255
-    t.datetime "created_at",                                                             null: false
-    t.datetime "updated_at",                                                             null: false
-    t.integer  "reimbursement_id",             limit: 4
-    t.boolean  "accounted",                                              default: false, null: false
-    t.boolean  "archived",                                               default: false, null: false
-    t.boolean  "is_deleted",                                             default: false, null: false
-    t.boolean  "auto_submit",                                            default: false, null: false
-    t.boolean  "auto_approve",                                           default: false, null: false
+    t.string   "name",                               limit: 255,                               null: false
+    t.integer  "user_id",                            limit: 4,                                 null: false
+    t.integer  "report_status_id",                   limit: 4,                                 null: false
+    t.integer  "policy_id",                          limit: 4
+    t.datetime "submitted_at",                                   precision: 6
+    t.integer  "controlling_user_id",                limit: 4
+    t.integer  "controlling_user_role_id",           limit: 4
+    t.integer  "controlling_for_user_id",            limit: 4
+    t.integer  "controlling_for_user_role_id",       limit: 4
+    t.string   "memo",                               limit: 255
+    t.datetime "created_at",                                                                   null: false
+    t.datetime "updated_at",                                                                   null: false
+    t.integer  "reimbursement_id",                   limit: 4
+    t.boolean  "accounted",                                                    default: false, null: false
+    t.boolean  "archived",                                                     default: false, null: false
+    t.boolean  "is_deleted",                                                   default: false, null: false
+    t.boolean  "auto_submit",                                                  default: false, null: false
+    t.boolean  "auto_approve",                                                 default: false, null: false
     t.date     "accounted_at"
     t.datetime "approved_at"
-    t.integer  "cash_in_hand_deduction_id",    limit: 4
-    t.integer  "submitted_amount_id",          limit: 4
-    t.integer  "cash_expenses_total_id",       limit: 4
-    t.integer  "card_expenses_total_id",       limit: 4
+    t.integer  "cash_in_hand_deduction_id",          limit: 4
+    t.integer  "submitted_amount_id",                limit: 4
+    t.integer  "reimbursable_expenses_total_id",     limit: 4
+    t.integer  "card_expenses_total_id",             limit: 4
+    t.integer  "non_reimbursable_expenses_total_id", limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree

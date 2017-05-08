@@ -17,9 +17,11 @@
 #  category_id          :integer
 #  is_deleted           :boolean          default(FALSE), not null
 #  transcribed          :boolean          default(FALSE)
-#  personal             :boolean          default(FALSE)
 #  reimbursable         :boolean          default(TRUE)
+#  personal             :boolean          default(FALSE)
 #
+
+
 
 
 
@@ -98,6 +100,49 @@ class Expense < ActiveRecord::Base
 
   default_scope { order('expenses.created_at DESC') }
 
+  scope :with_id, -> (ids) {where id: ids}
+
+  scope :non_personal, -> {
+    where(personal: false)
+  }
+  scope :personal, -> {
+    where personal: true
+  }
+
+  scope :non_cancelled, -> {
+    ids = pluck(:id)
+    card_expenses = CardExpense.with_expense_id(ids)
+    cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
+    non_cancelled_ids = ids - cancelled_expense_ids
+    with_id(non_cancelled_ids)
+  }
+
+  scope :cancelled, -> {
+    ids = pluck(:id)
+    card_expenses = CardExpense.with_expense_id(ids)
+    cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
+    with_id(cancelled_expense_ids)
+  }
+
+  scope :reimbursable, -> {where reimbursable: true}
+  scope :non_reimbursable, -> {where reimbursable: false}
+
+  scope :filter_expense_cancelled, -> (flag) {
+    if flag == '1'
+      cancelled
+    else
+      # do nothing, ha
+    end
+  }
+
+  scope :filter_expense_personal, -> (flag) {
+    if flag == '1'
+      personal
+    else
+      # do nothing, ha
+    end
+
+  }
 
   scope :with_amount, -> { joins :amount }
   scope :with_report, ->(report_id) { where report_id: report_id }
@@ -136,7 +181,11 @@ class Expense < ActiveRecord::Base
       where(expenses[type_val].gteq(date_from).and(expenses[type_val].lteq(date_to)))
     end
   end
-  scope :filter_category_id, -> (category_id) { where category_id: category_id }
+  scope :filter_category_id, -> (category_id) {
+    if category_id
+      where category_id: category_id
+    end
+  }
 
   scope :filter_merchant, -> (merchant_name) do
     expense_ids = ManualExpense.where('merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
@@ -177,6 +226,7 @@ class Expense < ActiveRecord::Base
   scope :card, -> { joins(:card_expense) }
 
   scope :only_card_expenses, -> { where(expense_type_id: ExpenseType.id_for(:card)) }
+  scope :except_card_expenses, -> {where.not(expense_type_id: ExpenseType.id_for(:card))}
   scope :only_manual_expenses, -> { where(expense_type_id: ExpenseType.id_for(:manual)) }
   scope :only_distance_expenses, -> { where(expense_type_id: ExpenseType.id_for(:distance)) }
   scope :only_time_expenses, -> { where(expense_type_id: ExpenseType.id_for(:time)) }
@@ -446,6 +496,35 @@ class Expense < ActiveRecord::Base
 
   def rejected?
     expense_status_id == ExpenseStatus.rejected_id
+  end
+
+  def cancellable?
+    unless self.expense_status_id == ExpenseStatus.id_for(:unreported)
+      return false
+    end
+    # i.e. check if the expense is a card expense
+    unless self.expense_type_id == ExpenseType.id_for(:card)
+      return false
+    end
+    # i.e. if it has already been cancelled
+    if self.card_expense.cancelled
+      return false
+    end
+    # i.e. if it is an atm surcharge
+    if self.card_expense.atm_surcharge?
+      return false
+    end
+    true
+  end
+
+  def cancelled?
+    unless self.expense_type_id == ExpenseType.id_for(:card)
+      return false
+    end
+    if self.card_expense.cancelled
+      return true
+    end
+    false
   end
 
   private
