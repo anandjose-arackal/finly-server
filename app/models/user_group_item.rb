@@ -18,4 +18,6 @@ class UserGroupItem < ActiveRecord::Base
   has_many :users, through: :user_group_item_mappings
 
   validates :name, uniqueness: {scope: :user_group_id}
+
+  scope :with_user_group, ->(user_group_id) { where user_group_id: user_group_id }
 end

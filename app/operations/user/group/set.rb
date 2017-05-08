@@ -33,12 +33,14 @@ class User::Group::Set < User::Base
       end
     end
 
-    self.group_config = params[:group_config]&.with_indifferent_access
+    self.group_config = (params[:group_config]&.with_indifferent_access or {})
     self.groups = user.company.user_groups.include_items
   end
 
   def validate
-
+    if self.group.nil?
+      add_message :error, 'Error loading configuration. Please try again'
+    end
   end
 
   def process
