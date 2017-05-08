@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170505131820) do
+ActiveRecord::Schema.define(version: 20170508085244) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -150,6 +150,7 @@ ActiveRecord::Schema.define(version: 20170505131820) do
     t.integer  "surcharge_id",        limit: 4
     t.boolean  "is_deleted",                        default: false
     t.boolean  "cancelled",                         default: false
+    t.boolean  "atm_surcharge",                     default: false
   end
 
   add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
@@ -571,8 +572,8 @@ ActiveRecord::Schema.define(version: 20170505131820) do
     t.integer  "category_id",          limit: 4
     t.boolean  "is_deleted",                         default: false, null: false
     t.boolean  "transcribed",                        default: false
-    t.boolean  "personal",                           default: false
     t.boolean  "reimbursable",                       default: true
+    t.boolean  "personal",                           default: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree

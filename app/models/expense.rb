@@ -17,9 +17,11 @@
 #  category_id          :integer
 #  is_deleted           :boolean          default(FALSE), not null
 #  transcribed          :boolean          default(FALSE)
-#  personal             :boolean          default(FALSE)
 #  reimbursable         :boolean          default(TRUE)
+#  personal             :boolean          default(FALSE)
 #
+
+
 
 
 
@@ -100,8 +102,12 @@ class Expense < ActiveRecord::Base
 
   scope :with_id, -> (ids) {where id: ids}
 
-  scope :non_personal, -> {where(personal: false)}
-  scope :personal, -> {where personal: true}
+  scope :non_personal, -> {
+    where(personal: false)
+  }
+  scope :personal, -> {
+    where personal: true
+  }
 
   scope :non_cancelled, -> {
     ids = pluck(:id)
@@ -502,6 +508,10 @@ class Expense < ActiveRecord::Base
     end
     # i.e. if it has already been cancelled
     if self.card_expense.cancelled
+      return false
+    end
+    # i.e. if it is an atm surcharge
+    if self.card_expense.atm_surcharge?
       return false
     end
     true

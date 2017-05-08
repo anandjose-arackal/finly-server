@@ -2,7 +2,7 @@
 
 class Expense::Personal::Mark < Expense::Base
 
-  attr_accessor :selected_expense
+  attr_accessor :selected_expense, :personal_category_id
 
   def pre_validate
     if user.blank? || params.blank?
@@ -13,6 +13,7 @@ class Expense::Personal::Mark < Expense::Base
   def init
     id = params[:id] || params[:expense_id]
     self.selected_expense = user.expenses.find_by(id: id)
+    self.personal_category_id = user.company.categories.find_by(name: 'Personal')
   end
 
   def validate
@@ -20,10 +21,6 @@ class Expense::Personal::Mark < Expense::Base
       add_message :error, "Expense not found"
     end
 
-    if selected_expense.personal
-      add_message :error, "This expense is already marked as personal"
-      return
-    end
     unless selected_expense.unreported?
       add_message :error, "This expense cannot be marked as personal"
     end
@@ -34,7 +31,7 @@ class Expense::Personal::Mark < Expense::Base
   end
 
   def process
-    unless selected_expense.update(personal: true)
+    unless selected_expense.update(category_id: personal_category_id, personal: true)
       add_message :error, selected_expense.errors.full_messages
     end
   end

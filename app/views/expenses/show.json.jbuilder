@@ -32,6 +32,8 @@ json.reimbursable @result.expense.reimbursable
 
 json.personal @result.expense.personal
 
+json.cancellable? @result.expense.cancellable?
+
 json.cancelled @result.expense.cancelled?
 
 json.custom_fields do

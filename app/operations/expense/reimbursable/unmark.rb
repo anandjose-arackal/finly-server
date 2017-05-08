@@ -8,7 +8,7 @@ class Expense::Reimbursable::Unmark < Expense::Base
 
   def init
     id = params[:id] || params[:expense_id]
-    self.selected_expense = user.expenses.find_by(id: id)
+    self.selected_expense = Expense::Index.(user, params).expenses.with_id(id).first rescue nil
   end
 
   def validate

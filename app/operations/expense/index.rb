@@ -96,7 +96,6 @@ class Expense::Index < Expense::Base
         ## excluding personal and cancelled expenses if it's an expense/index action
         if params[:action].include?('index')
           exclude_personal
-          exclude_cancelled
         end
         ############################################################################
 
