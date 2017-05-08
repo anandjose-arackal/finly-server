@@ -1,5 +1,11 @@
 class Expense::Personal::Unmark < Expense::Personal::Mark
 
+  attr_accessor :other_category_id
+
+  def init
+    super()
+    self.other_category_id = user.categories.find_by(name: 'Other')
+  end
 
   def validate
     unless selected_expense
@@ -25,7 +31,7 @@ class Expense::Personal::Unmark < Expense::Personal::Mark
   end
 
   def process
-    unless selected_expense.update(personal: false)
+    unless selected_expense.update(personal: false, category_id: other_category_id)
       add_message :error, selected_expense.errors.full_messages
     end
   end
