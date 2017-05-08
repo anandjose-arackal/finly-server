@@ -51,7 +51,13 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     if expense.report_id and personal_view?
       unless expense.report.editable?
         messages[:error] << "Expense cannot be edited at this stage"
+        return
       end
+    end
+
+    if params[:expense][:reimbursable] == '1'
+      add_message :error, "Card expenses are non-reimbursable by default"
+      return
     end
   end
 

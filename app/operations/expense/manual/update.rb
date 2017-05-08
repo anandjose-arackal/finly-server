@@ -73,6 +73,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     if expense.report_id and personal_view?
       unless expense.report.editable?
         messages[:error] << 'Expense cannot be edited at this stage'
+        return
       end
     end
   end
