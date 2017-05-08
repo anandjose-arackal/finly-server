@@ -114,6 +114,19 @@ class User::Show < User::Base
       self.mcc_groups = MccGroup.all
     end
 
+    def groups
+      group_item_mappings = user.user_group_item_mappings
+      groups = user.company.user_groups
+      map = []
+      groups.each do |group|
+        map << {
+            name: group.name,
+            id: group.id,
+            items: []
+        }
+      end
+    end
+
     private
 
     def get_managers

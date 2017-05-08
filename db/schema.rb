@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170505173008) do
+ActiveRecord::Schema.define(version: 20170508120010) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -730,6 +730,57 @@ ActiveRecord::Schema.define(version: 20170505173008) do
     t.datetime "updated_at",               null: false
     t.string   "bank",         limit: 255
   end
+
+  create_table "itz_cash_dmt_beneficiaries", force: :cascade do |t|
+    t.string   "first_name",             limit: 255,                 null: false
+    t.string   "middle_name",            limit: 255
+    t.string   "last_name",              limit: 255,                 null: false
+    t.string   "mobile_number",          limit: 255,                 null: false
+    t.string   "relation",               limit: 255,                 null: false
+    t.string   "ifsc_option",            limit: 255,                 null: false
+    t.string   "ifsc_code",              limit: 255,                 null: false
+    t.string   "bank_name",              limit: 255
+    t.string   "branch_name",            limit: 255
+    t.string   "bank_city",              limit: 255
+    t.string   "bank_state",             limit: 255
+    t.string   "account_number",         limit: 255,                 null: false
+    t.string   "beneficiary_name",       limit: 255,                 null: false
+    t.string   "beneficiary_id",         limit: 255,                 null: false
+    t.boolean  "is_updatable",                                       null: false
+    t.integer  "itz_cash_dmt_sender_id", limit: 4,                   null: false
+    t.integer  "status_id",              limit: 4,                   null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.boolean  "default"
+    t.boolean  "reimbursement",                      default: false
+  end
+
+  add_index "itz_cash_dmt_beneficiaries", ["itz_cash_dmt_sender_id"], name: "index_itz_cash_dmt_beneficiaries_on_itz_cash_dmt_sender_id", using: :btree
+  add_index "itz_cash_dmt_beneficiaries", ["status_id"], name: "index_itz_cash_dmt_beneficiaries_on_status_id", using: :btree
+
+  create_table "itz_cash_dmt_beneficiary_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "itz_cash_dmt_sender_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "itz_cash_dmt_senders", force: :cascade do |t|
+    t.string   "mobile_number",   limit: 255,                 null: false
+    t.string   "registration_id", limit: 255,                 null: false
+    t.integer  "user_id",         limit: 4,                   null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.integer  "status_id",       limit: 4,                   null: false
+    t.boolean  "otp_verified",                default: false, null: false
+  end
+
+  add_index "itz_cash_dmt_senders", ["user_id"], name: "index_itz_cash_dmt_senders_on_user_id", using: :btree
 
   create_table "itz_cash_properties", force: :cascade do |t|
     t.string   "d_code",          limit: 255
@@ -1456,8 +1507,12 @@ ActiveRecord::Schema.define(version: 20170505173008) do
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.boolean  "is_deleted",                   default: false
+    t.integer  "group_id",           limit: 4
+    t.integer  "user_group_id",      limit: 4
   end
 
+  add_index "user_group_item_mappings", ["group_id"], name: "index_user_group_item_mappings_on_group_id", using: :btree
+  add_index "user_group_item_mappings", ["user_group_id"], name: "index_user_group_item_mappings_on_user_group_id", using: :btree
   add_index "user_group_item_mappings", ["user_group_item_id"], name: "index_user_group_item_mappings_on_user_group_item_id", using: :btree
   add_index "user_group_item_mappings", ["user_id"], name: "index_user_group_item_mappings_on_user_id", using: :btree
 
@@ -1712,6 +1767,8 @@ ActiveRecord::Schema.define(version: 20170505173008) do
   add_foreign_key "field_configurations", "field_parent_types"
   add_foreign_key "field_configurations", "field_types"
   add_foreign_key "field_drop_down_items", "field_configurations"
+  add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
+  add_foreign_key "itz_cash_dmt_senders", "users"
   add_foreign_key "itz_cash_properties", "companies"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "mcc_category_mappings", "categories"
@@ -1768,6 +1825,7 @@ ActiveRecord::Schema.define(version: 20170505173008) do
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
   add_foreign_key "user_group_item_mappings", "user_group_items"
+  add_foreign_key "user_group_item_mappings", "user_groups"
   add_foreign_key "user_group_item_mappings", "users"
   add_foreign_key "user_group_items", "user_groups"
   add_foreign_key "user_groups", "companies"
