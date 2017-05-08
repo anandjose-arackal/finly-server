@@ -111,8 +111,6 @@ class Expense::Manual::Update < Expense::Manual::Base
     # add comment in report if expense is added within report
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
-    add_message :success, 'Expense updated'
-
     # marking the expense as non-transcribed after the first edit
     if expense.transcribed
       expense.update(transcribed: false)
@@ -122,6 +120,12 @@ class Expense::Manual::Update < Expense::Manual::Base
         end
       end
     end
+
+    # if the new category is personal, mark the expense as personal
+    Expense::Personal::Mark.(user, {expense_id: expense.id})
+    ###############################################################
+
+    add_message :success, 'Expense updated'
   end
 
   private

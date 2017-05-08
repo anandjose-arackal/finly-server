@@ -128,6 +128,10 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
       expense.update(amount: amount)
     end
 
+    # if the new category is personal, mark the expense as personal
+    Expense::Personal::Mark.(user, {expense_id: expense.id})
+    ###############################################################
+
     add_message :success, 'Expense updated'
   end
 
