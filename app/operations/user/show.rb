@@ -40,7 +40,8 @@ class User::Show < User::Base
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
-                  :periods, :auto_submit_config, :mcc_groups, :card_periods, :cards, :balances
+                  :periods, :auto_submit_config, :mcc_groups, :card_periods, :cards, :balances,
+                  :user_group_item_mappings, :user_groups
 
     def init
       self.selected_user = params[:selected_user]
@@ -112,19 +113,8 @@ class User::Show < User::Base
       self.periods = Period.all
       self.card_periods = Period.limit(3)
       self.mcc_groups = MccGroup.all
-    end
-
-    def groups
-      group_item_mappings = user.user_group_item_mappings
-      groups = user.company.user_groups
-      map = []
-      groups.each do |group|
-        map << {
-            name: group.name,
-            id: group.id,
-            items: []
-        }
-      end
+      self.user_groups = selected_user.company.user_groups
+      self.user_group_item_mappings = selected_user.user_group_item_mappings
     end
 
     private
