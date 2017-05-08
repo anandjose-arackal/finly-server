@@ -10,13 +10,13 @@ class UserGroup::Base < BaseOperation
       add_message :error, 'User not found'
       return
     end
-    unless params&.dig(:id).present?
+    unless params&.dig(:id).present? or params&.dig(:group_id).present?
       add_message :error, 'Group not found'
     end
   end
 
   def init
-    id = params&.dig(:id)
+    id = (params&.dig(:id) or params&.dig(:group_id))
     if id.present?
       self.user_group = user.company.user_groups.find_by(id: id)
     end

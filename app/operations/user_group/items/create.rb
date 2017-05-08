@@ -6,7 +6,10 @@ class UserGroup::Items::Create < UserGroup::Items::Base
       add_message :error, 'User not found'
       return
     end
-    unless params&.dig(:names).blank?
+    unless params&.dig(:group_id).present?
+      add_message :error, 'Group not found'
+    end
+    unless params&.dig(:names).present?
       add_message :error, 'Name cannot be blank'
     end
   end
