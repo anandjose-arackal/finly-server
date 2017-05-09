@@ -26,9 +26,10 @@ class UserGroup::Users < UserGroup::Base
     group_ids = groups.pluck(:id)
     group_items = UserGroupItem.with_user_group(group_ids)
     group_items_ids = group_items.pluck(:id)
-    # exclude_item_ids = group_items_ids - self.filter_group_items
-    # exclude_users = UserGroupItemMapping.with_group_item(exclude_item_ids).pluck(:user_id)
-    # self.selected_users = users.without_id(exclude_users)
+    exclude_item_ids = group_items_ids - self.filter_group_items
+    include_users =  UserGroupItemMapping.with_group_item(self.filter_group_items).pluck(:user_id)
+    exclude_users = UserGroupItemMapping.with_group_item(exclude_item_ids).pluck(:user_id)
+    self.selected_users = users.without_id(exclude_users).with_id(include_users)
 
     mappings = UserGroupItemMapping.with_user(user_ids)
     self.filter_group_items.each do |item|
