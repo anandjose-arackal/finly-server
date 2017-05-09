@@ -157,7 +157,7 @@ class Company < ActiveRecord::Base
   end
 
   def d_code_assigned?
-    self.itz_cash_property&.d_code.present?
+    !!self.itz_cash_property&.d_code.present?
   end
 
 

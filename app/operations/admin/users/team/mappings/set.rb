@@ -8,6 +8,10 @@ class Admin::Users::Team::Mappings::Set < User::Team::Mappings::Set
 
   end
 
+  def pre_authorize
+
+  end
+
 
   def init
     id = (params[:id] || params[:user_id])
