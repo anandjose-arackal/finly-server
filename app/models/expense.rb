@@ -511,7 +511,7 @@ class Expense < ActiveRecord::Base
       return false
     end
     # i.e. if it is an atm surcharge
-    if self.card_expense.atm_surcharge?
+    if self.card_expense.atm_surcharge
       return false
     end
     true
