@@ -21,7 +21,7 @@ class UserGroup::Users < UserGroup::Base
 
   def process
     users = user.company.users
-    user_ids = users.pluck(:id)
+    # user_ids = users.pluck(:id)
     groups = user.company.user_groups
     group_ids = groups.pluck(:id)
     group_items = UserGroupItem.with_user_group(group_ids)
@@ -30,12 +30,6 @@ class UserGroup::Users < UserGroup::Base
     include_users =  UserGroupItemMapping.with_group_item(self.filter_group_items).pluck(:user_id)
     exclude_users = UserGroupItemMapping.with_group_item(exclude_item_ids).pluck(:user_id)
     self.selected_users = users.without_id(exclude_users).with_id(include_users)
-
-    mappings = UserGroupItemMapping.with_user(user_ids)
-    self.filter_group_items.each do |item|
-      mappings = mappings.with_group_item(item)
-    end
-
   end
 
   def success
