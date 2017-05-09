@@ -93,9 +93,11 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
     # if the new category is personal, mark the expense as personal
-    Expense::Personal::Mark.(user, {expense_id: expense.id})
+    if expense.category_name == 'Personal'
+      Expense::Personal::Mark.(user, {expense_id: expense.id})
+    end
     ###############################################################
-
+    
     messages[:success] << 'Expense updated'
   end
 

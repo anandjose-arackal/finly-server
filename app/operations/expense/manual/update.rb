@@ -114,6 +114,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     # marking the expense as non-transcribed after the first edit
     if expense.transcribed
       expense.update(transcribed: false)
+      expense.system_messages.destroy_all
       if expense.receipts.present?
         expense.receipts.each do |receipt|
           receipt.update(to_be_transcribed: false)
@@ -122,7 +123,9 @@ class Expense::Manual::Update < Expense::Manual::Base
     end
 
     # if the new category is personal, mark the expense as personal
-    Expense::Personal::Mark.(user, {expense_id: expense.id})
+    if expense.category_name == 'Personal'
+      Expense::Personal::Mark.(user, {expense_id: expense.id})
+    end
     ###############################################################
 
     add_message :success, 'Expense updated'
