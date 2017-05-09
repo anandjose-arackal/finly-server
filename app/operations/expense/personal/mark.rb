@@ -13,7 +13,7 @@ class Expense::Personal::Mark < Expense::Base
   def init
     id = params[:id] || params[:expense_id]
     self.selected_expense = user.expenses.find_by(id: id)
-    self.personal_category_id = user.company.categories.find_by(name: 'Personal')
+    self.personal_category_id = user.company.categories.find_by(name: 'Personal').id
   end
 
   def validate

@@ -120,6 +120,12 @@ class Expense::ExTime::Update < Expense::ExTime::Base
       amount.update(value: expense.calculate_amount_value(expense.report.policy))
     end
 
+    # if the new category is personal, mark the expense as personal
+    if expense.category_name == 'Personal'
+      Expense::Personal::Mark.(user, {expense_id: expense.id})
+    end
+    ###############################################################
+
     add_message :success, 'Expense updated'
   end
 

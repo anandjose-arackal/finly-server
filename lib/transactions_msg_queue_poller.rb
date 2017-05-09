@@ -82,7 +82,7 @@ class TransactionsMsgQueuePoller
       trans_params.delete(:transaction)
 
       # if the creation of an entry on the transaction table fails, log it in a file
-      if !rescued && @result.success? && @result.transaction.nil?
+      if !rescued && @result&.success? && @result&.transaction.nil?
         begin
           trans = CardTransaction.new(trans_params)
           unless trans.save
@@ -91,7 +91,7 @@ class TransactionsMsgQueuePoller
         rescue => error
           error_logger.error("Following transaction could not be created : #{message.body} because of following errors: #{error.message}")
         end
-      elsif @result.failure?
+      elsif @result&.failure?
         error_logger.error("Following transaction : #{message.body} couldn't be created because of the following errors: #{@result.messages[:error].to_sentence}")
       end
     end

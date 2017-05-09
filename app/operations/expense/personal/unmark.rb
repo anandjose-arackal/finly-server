@@ -4,7 +4,7 @@ class Expense::Personal::Unmark < Expense::Personal::Mark
 
   def init
     super()
-    self.other_category_id = user.categories.find_by(name: 'Other')
+    self.other_category_id = user.company.categories.find_by(name: 'Other').id
   end
 
   def validate
