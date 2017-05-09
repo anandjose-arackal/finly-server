@@ -62,7 +62,7 @@ class Expense::ExCard::Create < Expense::ExCard::Base
     params[:expense_status_id] = ExpenseStatus.unreported_id
     params[:date] = transaction[:transaction_timestamp]
     params[:reimbursable] = false
-    if params[:merchant_name].include?('ATM SURCHARGE')
+    if transaction.merchant_name&.include?('ATM SURCHARGE')
       params[:card_expense_attributes][:atm_surcharge] = true
     end
 
