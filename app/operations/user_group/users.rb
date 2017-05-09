@@ -29,7 +29,8 @@ class UserGroup::Users < UserGroup::Base
     exclude_item_ids = group_items_ids - self.filter_group_items
     include_users =  UserGroupItemMapping.with_group_item(self.filter_group_items).pluck(:user_id)
     exclude_users = UserGroupItemMapping.with_group_item(exclude_item_ids).pluck(:user_id)
-    self.selected_users = users.without_id(exclude_users).with_id(include_users)
+    # Include users assigned to the selected group items. Exclude other users who belong to other groups items
+    self.selected_users = users.with_id(include_users).without_id(exclude_users)
   end
 
   def success
