@@ -5,8 +5,15 @@ company:
     url: <%= current_company.configuration.logo.url(:thumb)%>
   <% end %>
 user:
- name: <%= current_user.name %>
- id: <%= current_user.id %>
+  name: <%= current_user.name %>
+  id: <%= current_user.id %>
+  roles:
+  <% if current_user.admin? %>
+  - admin
+  <% end %>
+  <% if current_user.finance_manager? %>
+  - finance_manager
+  <% end %>
 views:
   admin:
     menus:
@@ -17,6 +24,9 @@ views:
       - name: Users
         url: users
         id: users
+      - name: Orders
+        id: orders
+        url: orders
       - name: Analytics
         url: analytics
         id: analytics

@@ -43,4 +43,10 @@ class CardsController < ApplicationController
     respond response: :success
   end
 
+  # For Mass Crediting accounts
+  def process_file
+    
+  end
+
+
 end
