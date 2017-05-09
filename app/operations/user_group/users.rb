@@ -2,7 +2,7 @@ class UserGroup::Users < UserGroup::Base
   attr_accessor :filter_group_items, :selected_users
 
   def pre_validate
-    if user.blank? or params.blank?
+    if user.blank?
       add_message :error, 'User not found'
       return
     end
@@ -27,10 +27,15 @@ class UserGroup::Users < UserGroup::Base
     group_items = UserGroupItem.with_user_group(group_ids)
     group_items_ids = group_items.pluck(:id)
     exclude_item_ids = group_items_ids - self.filter_group_items
-    include_users =  UserGroupItemMapping.with_group_item(self.filter_group_items).pluck(:user_id)
     exclude_users = UserGroupItemMapping.with_group_item(exclude_item_ids).pluck(:user_id)
+
+    if filter_group_items.present?
+      include_users =  UserGroupItemMapping.with_group_item(self.filter_group_items).pluck(:user_id)
+      users = users.with_id(include_users)
+    end
+
     # Include users assigned to the selected group items. Exclude other users who belong to other groups items
-    self.selected_users = users.with_id(include_users).without_id(exclude_users)
+    self.selected_users = users.without_id(exclude_users)
   end
 
   def success
