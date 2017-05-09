@@ -24,25 +24,18 @@ class Company < ActiveRecord::Base
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
   has_one :itz_cash_property
   has_many :company_transactions
-
   has_one :distance_expense_config, as: :parent
   has_one :time_expense_config, as: :parent
   has_one :per_diem_expense_config, as: :parent
-
   has_many :per_diems, as: :configurable
-
   has_many :company_balance_histories
-
   has_many :field_configurations, as: :configurable
-
   has_one :feature_subscription, as: :subscribable
-
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
-
   has_many :payment_orders
-
   has_many :user_groups
+  has_many :user_group_configurations
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
