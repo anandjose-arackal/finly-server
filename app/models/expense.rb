@@ -36,6 +36,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -530,6 +531,7 @@ class Expense < ActiveRecord::Base
     false
   end
 
+  # method that updates all the currency values for a particular expense - todo - possibly should be moved to an operation
   def update_other_currencies
     # i.e. if the expense is today's and the currency conversion data is not present
     if self.date == DateUtils.local_date
@@ -541,8 +543,11 @@ class Expense < ActiveRecord::Base
     end
     date = self.date.strftime("%Y-%m-%d")
     update_hash = {}
-    currencies = CurrencyConversionRate.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id'].include?(el)}
     rate = CurrencyConversionRate.find_by(date: date)
+    if rate.nil?
+      return
+    end
+    currencies = CurrencyConversionRate.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id'].include?(el)}
     orig_curr = self.amount.currency.country_code
     currencies.each do |curr|
       if Amount.column_names.include?(curr)

@@ -23,7 +23,7 @@
 
 class Report::Violation < Report::Base
   include ActionView::Helpers::NumberHelper
-  attr_accessor :no_policy, :warning_messages, :policy
+  attr_accessor :no_policy, :warning_messages, :policy, :base_currency
 
   def authorized_user_types
     nil
@@ -39,6 +39,7 @@ class Report::Violation < Report::Base
     self.warning_messages = {}
     self.report = params[:report]
     self.policy = report.versioned_policy
+    self.base_currency = policy.nil? ? (user.company.base_currency.country_code) : (policy.base_currency.country_code)
     report.expenses.each do |expense|
       self.warning_messages[expense.id] = {}
       self.warning_messages[expense.id]['expense_warning'] = []
@@ -83,8 +84,8 @@ class Report::Violation < Report::Base
   def check_expense_rule_violation(expense, rule, manager = nil)
     message = ''
     if rule.amount_value && rule.amount_value != 0
-      if expense.amount_value >= rule.amount_value
-        message += ' above ' + rule.amount_value.to_s
+      if expense.amount.send(base_currency.to_sym) >= rule.amount.send(base_currency.to_sym)
+        message += ' above ' + rule.amount_with_currency(base_currency.to_sym).to_s
       else
         return false
       end
@@ -167,17 +168,17 @@ class Report::Violation < Report::Base
     # all user reports with the associated budget
     user.reports.processed.with_policy_id(rule.policy_id).where.not(id: report.id).each do |budget_report|
       if rule.include_reimbursable_expenses?
-        total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(:value), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(base_currency.to_sym), :precision => 2).to_f
       else
-        total_expenses += number_with_precision(budget_report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(:value), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(base_currency.to_sym), :precision => 2).to_f
       end
     end
     if rule.include_reimbursable_expenses?
-      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(:value), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency.to_sym), :precision => 2).to_f
     else
-      total_expenses += number_with_precision(report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(:value), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency.to_sym), :precision => 2).to_f
     end
-    if total_expenses > rule.amount_value
+    if total_expenses > rule.amount.send(base_currency.to_sym)
       return true
     end
     false
