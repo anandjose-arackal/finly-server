@@ -13,6 +13,7 @@
 class Company < ActiveRecord::Base
   include Constants
 
+  belongs_to :base_currency, class_name: "Currency"
   has_many :users
   has_many :cards
   has_many :contacts, as: :contactable
