@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170510131742) do
+ActiveRecord::Schema.define(version: 20170510144346) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -67,37 +67,37 @@ ActiveRecord::Schema.define(version: 20170510131742) do
     t.integer  "currency_id", limit: 4,                           null: false
     t.datetime "created_at",                                      null: false
     t.datetime "updated_at",                                      null: false
-    t.decimal  "INR",                   precision: 10, scale: 5
-    t.decimal  "USD",                   precision: 10, scale: 5
-    t.decimal  "GBP",                   precision: 10, scale: 5
-    t.decimal  "CAD",                   precision: 10, scale: 5
-    t.decimal  "EUR",                   precision: 10, scale: 5
-    t.decimal  "HRK",                   precision: 10, scale: 5
-    t.decimal  "RUB",                   precision: 10, scale: 5
-    t.decimal  "BGN",                   precision: 10, scale: 5
-    t.decimal  "BRL",                   precision: 10, scale: 5
-    t.decimal  "CHF",                   precision: 10, scale: 5
-    t.decimal  "CNY",                   precision: 10, scale: 5
-    t.decimal  "CZK",                   precision: 10, scale: 5
-    t.decimal  "DKK",                   precision: 10, scale: 5
-    t.decimal  "HKD",                   precision: 10, scale: 5
-    t.decimal  "HUF",                   precision: 10, scale: 5
-    t.decimal  "IDR",                   precision: 10, scale: 5
-    t.decimal  "ILS",                   precision: 10, scale: 5
-    t.decimal  "JPY",                   precision: 10, scale: 5
-    t.decimal  "KRW",                   precision: 10, scale: 5
-    t.decimal  "MXN",                   precision: 10, scale: 5
-    t.decimal  "NOK",                   precision: 10, scale: 5
-    t.decimal  "NZD",                   precision: 10, scale: 5
-    t.decimal  "PHP",                   precision: 10, scale: 5
-    t.decimal  "PLN",                   precision: 10, scale: 5
-    t.decimal  "RON",                   precision: 10, scale: 5
-    t.decimal  "SEK",                   precision: 10, scale: 5
-    t.decimal  "SGD",                   precision: 10, scale: 5
-    t.decimal  "THB",                   precision: 10, scale: 5
-    t.decimal  "TRY",                   precision: 10, scale: 5
-    t.decimal  "ZAR",                   precision: 10, scale: 5
-    t.decimal  "AUD",                   precision: 10, scale: 5
+    t.decimal  "INR",                   precision: 20, scale: 5
+    t.decimal  "USD",                   precision: 20, scale: 5
+    t.decimal  "GBP",                   precision: 20, scale: 5
+    t.decimal  "CAD",                   precision: 20, scale: 5
+    t.decimal  "EUR",                   precision: 20, scale: 5
+    t.decimal  "HRK",                   precision: 20, scale: 5
+    t.decimal  "RUB",                   precision: 20, scale: 5
+    t.decimal  "BGN",                   precision: 20, scale: 5
+    t.decimal  "BRL",                   precision: 20, scale: 5
+    t.decimal  "CHF",                   precision: 20, scale: 5
+    t.decimal  "CNY",                   precision: 20, scale: 5
+    t.decimal  "CZK",                   precision: 20, scale: 5
+    t.decimal  "DKK",                   precision: 20, scale: 5
+    t.decimal  "HKD",                   precision: 20, scale: 5
+    t.decimal  "HUF",                   precision: 20, scale: 5
+    t.decimal  "IDR",                   precision: 20, scale: 5
+    t.decimal  "ILS",                   precision: 20, scale: 5
+    t.decimal  "JPY",                   precision: 20, scale: 5
+    t.decimal  "KRW",                   precision: 20, scale: 5
+    t.decimal  "MXN",                   precision: 20, scale: 5
+    t.decimal  "NOK",                   precision: 20, scale: 5
+    t.decimal  "NZD",                   precision: 20, scale: 5
+    t.decimal  "PHP",                   precision: 20, scale: 5
+    t.decimal  "PLN",                   precision: 20, scale: 5
+    t.decimal  "RON",                   precision: 20, scale: 5
+    t.decimal  "SEK",                   precision: 20, scale: 5
+    t.decimal  "SGD",                   precision: 20, scale: 5
+    t.decimal  "THB",                   precision: 20, scale: 5
+    t.decimal  "TRY",                   precision: 20, scale: 5
+    t.decimal  "ZAR",                   precision: 20, scale: 5
+    t.decimal  "AUD",                   precision: 20, scale: 5
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
