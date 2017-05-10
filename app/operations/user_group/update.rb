@@ -14,7 +14,7 @@ class UserGroup::Update < UserGroup::Base
     return unless self.user_group.present?
     user_group.name = params[:name]
     self.items = user_group.user_group_items
-    params&.dig(:items).each do |item_map|
+    params&.dig(:items).each do |key, item_map|
       id = item_map[:id]
       name = item_map[:name]
       # If id is present, update the item name or else create a new item
