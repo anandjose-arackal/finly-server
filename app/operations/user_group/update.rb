@@ -13,12 +13,17 @@ class UserGroup::Update < UserGroup::Base
     super
     return unless self.user_group.present?
     user_group.name = params[:name]
-    self.items = user_group.items
+    self.items = user_group.user_group_items
     params&.dig(:items).each do |item_map|
       id = item_map[:id]
       name = item_map[:name]
+      # If id is present, update the item name or else create a new item
       if id.present?
-        items.find_by(id: id)&.name = name
+        items.each do |item|
+          if item.id == id
+            item.name = name
+          end
+        end
       else
         items.build(name: name)
       end
@@ -30,13 +35,15 @@ class UserGroup::Update < UserGroup::Base
     return if has_errors?
     unless user_group.valid?
       add_message :error, user_group.errors.full_messages
+      return
+    end
+    unless user_group.user_group_items.map{|item| item = item.name}.uniq.size == user_group.user_group_items.size
+      add_message :error, 'A Group cannot have multiple items with the same name'
     end
   end
 
   def process
-    unless user_group.update(name: params[:name])
-      add_message :error, user_group.errors.full_messages
-    end
+    user_group.save
   end
 
 end

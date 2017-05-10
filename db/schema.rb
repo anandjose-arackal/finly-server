@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170508120010) do
+ActiveRecord::Schema.define(version: 20170509123037) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -721,6 +721,19 @@ ActiveRecord::Schema.define(version: 20170508120010) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "group_item_configuration_mappings", force: :cascade do |t|
+    t.integer  "configuration_id",   limit: 4, null: false
+    t.integer  "user_group_id",      limit: 4, null: false
+    t.integer  "user_group_item_id", limit: 4, null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.integer  "type_id",            limit: 4, null: false
+  end
+
+  add_index "group_item_configuration_mappings", ["configuration_id"], name: "index_group_item_configuration_mappings_on_configuration_id", using: :btree
+  add_index "group_item_configuration_mappings", ["user_group_id"], name: "index_group_item_configuration_mappings_on_user_group_id", using: :btree
+  add_index "group_item_configuration_mappings", ["user_group_item_id"], name: "index_group_item_configuration_mappings_on_user_group_item_id", using: :btree
 
   create_table "itz_cash_card_programs", force: :cascade do |t|
     t.string   "product_code", limit: 255
@@ -1501,6 +1514,21 @@ ActiveRecord::Schema.define(version: 20170508120010) do
   add_index "user_balance_histories", ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id", using: :btree
   add_index "user_balance_histories", ["user_id"], name: "index_user_balance_histories_on_user_id", using: :btree
 
+  create_table "user_group_configuration_types", force: :cascade do |t|
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "name",       limit: 255, null: false
+  end
+
+  create_table "user_group_configurations", force: :cascade do |t|
+    t.integer  "company_id", limit: 4, null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.integer  "type_id",    limit: 4, null: false
+  end
+
+  add_index "user_group_configurations", ["company_id"], name: "index_user_group_configurations_on_company_id", using: :btree
+
   create_table "user_group_item_mappings", force: :cascade do |t|
     t.integer  "user_id",            limit: 4
     t.integer  "user_group_item_id", limit: 4
@@ -1767,6 +1795,8 @@ ActiveRecord::Schema.define(version: 20170508120010) do
   add_foreign_key "field_configurations", "field_parent_types"
   add_foreign_key "field_configurations", "field_types"
   add_foreign_key "field_drop_down_items", "field_configurations"
+  add_foreign_key "group_item_configuration_mappings", "user_group_items"
+  add_foreign_key "group_item_configuration_mappings", "user_groups"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
   add_foreign_key "itz_cash_dmt_senders", "users"
   add_foreign_key "itz_cash_properties", "companies"

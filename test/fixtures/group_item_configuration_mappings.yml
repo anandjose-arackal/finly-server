@@ -1,3 +1,16 @@
+# == Schema Information
+#
+# Table name: group_item_configuration_mappings
+#
+#  id                 :integer          not null, primary key
+#  configuration_id   :integer          not null
+#  user_group_id      :integer          not null
+#  user_group_item_id :integer          not null
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  type_id            :integer          not null
+#
+
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 # This model initially had no columns defined.  If you add columns to the

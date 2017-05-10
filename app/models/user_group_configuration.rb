@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: user_group_configurations
+#
+#  id         :integer          not null, primary key
+#  company_id :integer          not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  type_id    :integer          not null
+#
+
 class UserGroupConfiguration < ActiveRecord::Base
 
   validates :company_id, presence: true
