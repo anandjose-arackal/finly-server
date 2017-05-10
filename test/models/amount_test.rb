@@ -7,10 +7,10 @@
 #  currency_id :integer          not null
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
-#  USD         :string(255)
-#  GBP         :string(255)
-#  CAD         :string(255)
-#  EUR         :string(255)
+#  USD         :decimal(10, 5)
+#  GBP         :decimal(10, 5)
+#  CAD         :decimal(10, 5)
+#  EUR         :decimal(10, 5)
 #
 
 

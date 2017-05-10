@@ -2,11 +2,12 @@
 #
 # Table name: companies
 #
-#  id         :integer          not null, primary key
-#  name       :string(255)
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  active     :boolean          default(TRUE), not null
+#  id               :integer          not null, primary key
+#  name             :string(255)
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  active           :boolean          default(TRUE), not null
+#  base_currency_id :integer          default(1)
 #
 
 class Company < ActiveRecord::Base

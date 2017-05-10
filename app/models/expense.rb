@@ -34,6 +34,8 @@
 
 
 
+
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -526,6 +528,33 @@ class Expense < ActiveRecord::Base
       return true
     end
     false
+  end
+
+  def update_other_currencies
+    # i.e. if the expense is today's and the currency conversion data is not present
+    if self.date == DateUtils.local_date
+      return
+    end
+    # i.e. if the expense doesn't have an amounts object
+    if self.amount.blank?
+      return
+    end
+    date = self.date.strftime("%Y-%m-%d")
+    update_hash = {}
+    currencies = CurrencyConversionRate.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id'].include?(el)}
+    rate = CurrencyConversionRate.find_by(date: date)
+    orig_curr = self.amount.currency.country_code
+    currencies.each do |curr|
+      if Amount.column_names.include?(curr)
+        # todo - no effing idea why this is failing :(
+        currency_rate = rate.send(curr.to_sym).to_f
+        # debugger
+        normalized_amt = self.amount_value * currency_rate
+        # normalized_amt = BigDecimal.new(((self.amount_value) * rate.send(curr.to_sym)).to_f, 10)
+        update_hash[curr.to_sym] = (normalized_amt/rate.send(orig_curr.to_sym))
+      end
+    end
+    self.amount.update(update_hash)
   end
 
   private

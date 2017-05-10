@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170508131943) do
+ActiveRecord::Schema.define(version: 20170510082155) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -63,14 +63,14 @@ ActiveRecord::Schema.define(version: 20170508131943) do
   add_index "admin_users", ["reset_password_token"], name: "index_admin_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "amounts", force: :cascade do |t|
-    t.decimal  "value",                   precision: 64, scale: 12
-    t.integer  "currency_id", limit: 4,                             null: false
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
-    t.string   "USD",         limit: 255
-    t.string   "GBP",         limit: 255
-    t.string   "CAD",         limit: 255
-    t.string   "EUR",         limit: 255
+    t.decimal  "value",                 precision: 64, scale: 12
+    t.integer  "currency_id", limit: 4,                           null: false
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.decimal  "USD",                   precision: 10, scale: 5
+    t.decimal  "GBP",                   precision: 10, scale: 5
+    t.decimal  "CAD",                   precision: 10, scale: 5
+    t.decimal  "EUR",                   precision: 10, scale: 5
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
@@ -316,10 +316,11 @@ ActiveRecord::Schema.define(version: 20170508131943) do
   end
 
   create_table "companies", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.boolean  "active",                 default: true, null: false
+    t.string   "name",             limit: 255
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.boolean  "active",                       default: true, null: false
+    t.integer  "base_currency_id", limit: 4,   default: 1
   end
 
   create_table "company_accounts", force: :cascade do |t|
@@ -1167,14 +1168,15 @@ ActiveRecord::Schema.define(version: 20170508131943) do
   end
 
   create_table "policies", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.integer  "company_id",  limit: 4
-    t.integer  "owner_id",    limit: 4
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
-    t.boolean  "default",                   default: false, null: false
-    t.boolean  "is_deleted",                default: false, null: false
-    t.text     "description", limit: 65535
+    t.string   "name",             limit: 255
+    t.integer  "company_id",       limit: 4
+    t.integer  "owner_id",         limit: 4
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "default",                        default: false, null: false
+    t.boolean  "is_deleted",                     default: false, null: false
+    t.text     "description",      limit: 65535
+    t.integer  "base_currency_id", limit: 4,     default: 1
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree

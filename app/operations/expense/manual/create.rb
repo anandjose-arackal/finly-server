@@ -79,6 +79,12 @@ class Expense::Manual::Create < Expense::Manual::Base
         add_message :error, comment.errors.full_messages
       end
     end
+
+    # calculate the equivalent amount in all currencies in the amounts table
+    unless expense.date == DateUtils.local_date
+      expense.update_other_currencies
+    end
+
     add_message :success, 'Expense created'
   end
 
