@@ -15,7 +15,8 @@ class User::Lookup < User::Base
   end
 
   def init
-    self.selected_user = User.find_by_email(params[:email_mobile]) || User.find_by(mobile_number: params[:email_mobile])
+    email_mobile = params[:email_mobile]&.delete(' ')
+    self.selected_user = User.find_for_database_authentication(email: email_mobile)
   end
 
   def process
