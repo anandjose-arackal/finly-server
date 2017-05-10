@@ -872,11 +872,6 @@ Rails.application.routes.draw do
 
   resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]
 
-  resources :groups, controller: 'user_groups' do
-    post 'items', to: 'user_groups#create_item'
-    patch 'items', to: 'user_groups#update_item'
-  end
-
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
