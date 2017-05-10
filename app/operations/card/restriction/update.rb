@@ -1,4 +1,4 @@
-class User::CardRestrictions::Update < User::Base
+class Card::Restriction::Update < User::Base
 
   attr_accessor :selected_user, :selected_card, :card_restriction, :update_params, :limit_types_enable, :limit_types_disable,
                 :atm_limit_params, :atm_limits_present, :ecom_pos_limit_params, :ecom_pos_limits_present, :card_limits,

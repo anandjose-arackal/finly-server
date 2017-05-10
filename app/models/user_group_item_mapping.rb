@@ -19,7 +19,7 @@ class UserGroupItemMapping < ActiveRecord::Base
   belongs_to :user_group_item
 
   scope :with_user, ->(user_id) { where user_id: user_id }
-  scope :with_group, ->(group_id) { where group_id: group_id }
+  scope :with_group, ->(group_id) { where user_group_id: group_id }
   scope :with_group_item, ->(group_item_id) { where user_group_item_id: group_item_id }
   # scope :users_having_group_items, ->(group_item_id)
 
