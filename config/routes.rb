@@ -868,6 +868,9 @@ Rails.application.routes.draw do
   get 'cards/medical/orders/:id' => 'benefits/medical#show'
   delete 'cards/medical/orders/:id' => 'benefits/medical#destroy'
 
+  # Mass Credit
+  post 'cards/process_file' => 'cards#process_file'
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
