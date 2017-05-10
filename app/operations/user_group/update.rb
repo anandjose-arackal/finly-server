@@ -20,7 +20,7 @@ class UserGroup::Update < UserGroup::Base
       # If id is present, update the item name or else create a new item
       if id.present?
         items.each do |item|
-          if item.id == id.to_i
+          if item.id == id&.to_i
             item.name = name
           end
         end
