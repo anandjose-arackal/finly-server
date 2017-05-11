@@ -106,7 +106,8 @@ class User::Show < User::Base
                                 eligibility: eligibility,
                                 disabled_by: disabled_by,
                                 active: active, name: name, id: id},
-                         actions: actions, card_restriction: card.card_restriction}
+                         actions: actions,
+                         card_restriction: card.card_restriction}
         end
       end
       self.auto_submit_config = self.selected_user.auto_submit_config
