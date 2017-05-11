@@ -23,7 +23,7 @@
 
 class Report::Violation < Report::Base
   include ActionView::Helpers::NumberHelper
-  attr_accessor :no_policy, :warning_messages, :policy, :base_currency
+  attr_accessor :no_policy, :warning_messages, :policy, :base_currency_code, :base_currency_id
 
   def authorized_user_types
     nil
@@ -39,7 +39,8 @@ class Report::Violation < Report::Base
     self.warning_messages = {}
     self.report = params[:report]
     self.policy = report.versioned_policy
-    self.base_currency = policy.nil? ? (user.company.base_currency.country_code) : (policy.base_currency.country_code)
+    self.base_currency_code = policy.nil? ? (user.company.base_currency.country_code) : (policy.base_currency.country_code)
+    self.base_currency_id = policy.nil? ? (user.company.base_currency.id) : (policy.base_currency.id)
     report.expenses.each do |expense|
       self.warning_messages[expense.id] = {}
       self.warning_messages[expense.id]['expense_warning'] = []
@@ -61,6 +62,16 @@ class Report::Violation < Report::Base
   def process
 
     report.expenses.each do |expense|
+      # because the incompatible expense violation needs to be calculated irrespective of the
+      # existence of a policy
+      check_compatible_expenses(expense)
+      check_non_base_currency(expense)
+
+      # i.e. if the expense does not have a possible currency computation skip rule checking because the amount isn't clear
+      if expense.amount&.currency_id != base_currency_id && expense.date == DateUtils.local_date
+        next
+      end
+
       unless no_policy
         policy.expense_rules.each do |rule|
           check_expense_rule rule, expense
@@ -69,9 +80,7 @@ class Report::Violation < Report::Base
           check_budget rule, expense
         end
       end
-      # because the incompatible expense violation needs to be calculated irrespective of the
-      # existence of a policy
-      check_compatible_expenses(expense)
+
     end
     self.response = warning_messages
   end
@@ -83,9 +92,9 @@ class Report::Violation < Report::Base
   private
   def check_expense_rule_violation(expense, rule, manager = nil)
     message = ''
-    if rule.amount_value && rule.amount_value != 0
-      if expense.amount.send(base_currency.to_sym) >= rule.amount.send(base_currency.to_sym)
-        message += ' above ' + rule.amount_with_currency(base_currency.to_sym).to_s
+    if rule.greater_than_amount_value && rule.greater_than_amount_value != 0
+      if expense.amount.send(base_currency_code.to_sym) >= rule.greater_than_amount_value
+        message += ' above ' + rule.greater_than_amount_value.to_s
       else
         return false
       end
@@ -168,17 +177,17 @@ class Report::Violation < Report::Base
     # all user reports with the associated budget
     user.reports.processed.with_policy_id(rule.policy_id).where.not(id: report.id).each do |budget_report|
       if rule.include_reimbursable_expenses?
-        total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(base_currency.to_sym), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
       else
-        total_expenses += number_with_precision(budget_report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(base_currency.to_sym), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
       end
     end
     if rule.include_reimbursable_expenses?
-      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency.to_sym), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
     else
-      total_expenses += number_with_precision(report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency.to_sym), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
     end
-    if total_expenses > rule.amount.send(base_currency.to_sym)
+    if total_expenses > rule.amount.send(base_currency_code.to_sym)
       return true
     end
     false
@@ -295,6 +304,17 @@ class Report::Violation < Report::Base
         end
       else
         # do nothing
+    end
+  end
+
+  def check_non_base_currency(expense)
+
+    if expense.date == DateUtils.local_date
+      if expense&.amount.currency_id == base_currency_id
+        return
+      else
+        self.warning_messages[expense.id]['expense_blocking'] << {type: 'non_base_currency', message: "Expenses that are reported in a different currency from #{base_currency_code} can only be submitted the next day"}
+      end
     end
   end
 end
