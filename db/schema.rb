@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170510123132) do
+ActiveRecord::Schema.define(version: 20170511083104) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1541,11 +1541,9 @@ ActiveRecord::Schema.define(version: 20170510123132) do
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.boolean  "is_deleted",                   default: false
-    t.integer  "group_id",           limit: 4
     t.integer  "user_group_id",      limit: 4
   end
 
-  add_index "user_group_item_mappings", ["group_id"], name: "index_user_group_item_mappings_on_group_id", using: :btree
   add_index "user_group_item_mappings", ["user_group_id"], name: "index_user_group_item_mappings_on_user_group_id", using: :btree
   add_index "user_group_item_mappings", ["user_group_item_id"], name: "index_user_group_item_mappings_on_user_group_item_id", using: :btree
   add_index "user_group_item_mappings", ["user_id"], name: "index_user_group_item_mappings_on_user_id", using: :btree

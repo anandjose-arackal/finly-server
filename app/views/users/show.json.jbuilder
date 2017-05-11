@@ -180,11 +180,12 @@ json.periods do
     json.extract! period, :id, :name
   end
 end
+debugger
 json.groups do
   json.array! @result.user_groups.each do |group|
     json.id group.id
     json.name group.name
-    set_item = @result.user_group_item_mappings.with_group(group.id)&.first
+    set_item = @result.user_group_item_mappings.with_group(group.id)&.first&.user_group_item
     json.set_item do
       json.id set_item&.id
       json.name set_item&.name

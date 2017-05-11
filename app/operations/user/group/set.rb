@@ -47,7 +47,7 @@ class User::Group::Set < User::Base
     self.groups.each do |group|
       group_id = group.id
       group_item_id = group_config&.dig(group_id&.to_s)
-      user_group_mapping = user.user_group_item_mappings.with_user(selected_user.id).with_group(group_id)&.first
+      user_group_mapping = selected_user.user_group_item_mappings.with_group(group_id)&.first
       if group_item_id.blank?
         if user_group_mapping.present?
           # User Group Item has been set to None
@@ -59,7 +59,7 @@ class User::Group::Set < User::Base
           user_group_mapping.update(user_group_item_id: group_item_id)
         else
           # User Group Mapping has been created
-          user.user_group_item_mappings.create user_group_item_id: group_item_id, group_id: group_id
+          selected_user.user_group_item_mappings.create user_group_item_id: group_item_id, user_group_id: group_id
         end
       end
     end

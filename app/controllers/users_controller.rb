@@ -186,6 +186,10 @@ class UsersController < ApplicationController
       return
     end
     @result = operation.run
-    respond(response: :success, message: success_message)
+    if @result&.success?
+      respond(response: :success, message: success_message)
+    else
+      response response: :failure, message: (@result&.messages[:error] || 'Error while updating data')
+    end
   end
 end
