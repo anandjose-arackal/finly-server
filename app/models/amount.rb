@@ -156,7 +156,6 @@ class Amount < ActiveRecord::Base
         currency_rate = rate.send(curr.to_sym).to_f
         # debugger
         normalized_amt = self.amount_value * currency_rate
-        # normalized_amt = BigDecimal.new(((self.amount_value) * rate.send(curr.to_sym)).to_f, 10)
         update_hash[curr.to_sym] = (normalized_amt/rate.send(orig_curr.to_sym))
       end
     end

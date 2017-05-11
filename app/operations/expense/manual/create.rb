@@ -81,7 +81,9 @@ class Expense::Manual::Create < Expense::Manual::Base
     end
 
     # calculate the equivalent amount in all currencies in the amounts table
-    unless expense.date == DateUtils.local_date
+    if expense.date == DateUtils.local_date
+      expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+    else
       expense.update_other_currencies
     end
 
