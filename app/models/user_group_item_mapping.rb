@@ -22,7 +22,7 @@ class UserGroupItemMapping < ActiveRecord::Base
   scope :with_group_item, ->(group_item_id) { where user_group_item_id: group_item_id }
   # scope :users_having_group_items, ->(group_item_id)
 
-  validates :user_id, presence: true, uniqueness: {scope: :user_group_id}
+  validates :user_id, presence: true
   validates :user_group_id, presence: true
   validates :user_group_item_id, presence: true
 end

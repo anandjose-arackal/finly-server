@@ -190,9 +190,11 @@ json.groups do
       json.name set_item&.name
     end
     json.items do
-      json.array group.user_group_items.each do |item|
-        json.id item.id
-        json.name item.name
+      items = group.user_group_items.map{|m| m = {id: m.id, name: m.name}}
+      items.unshift({id: 0, name: 'None'})
+      json.array items.each do |item|
+        json.id item[:id]
+        json.name item[:name]
       end
     end
   end

@@ -48,7 +48,7 @@ class User::Group::Set < User::Base
       group_id = group.id
       group_item_id = group_config&.dig(group_id&.to_s)
       user_group_mapping = selected_user.user_group_item_mappings.with_group(group_id)&.first
-      if group_item_id.blank?
+      if group_item_id.blank? or [0, '0'].include?(group_item_id)
         if user_group_mapping.present?
           # User Group Item has been set to None
           user_group_mapping.destroy
