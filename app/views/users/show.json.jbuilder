@@ -180,7 +180,6 @@ json.periods do
     json.extract! period, :id, :name
   end
 end
-debugger
 json.groups do
   json.array! @result.user_groups.each do |group|
     json.id group.id
