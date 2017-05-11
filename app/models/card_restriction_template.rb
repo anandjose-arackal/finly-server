@@ -9,4 +9,9 @@
 #
 
 class CardRestrictionTemplate < ActiveRecord::Base
+
+  has_one :card_restriction
+
+  validates :name, presence: true
+
 end

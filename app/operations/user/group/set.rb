@@ -38,7 +38,7 @@ class User::Group::Set < User::Base
   end
 
   def validate
-    if self.group.nil?
+    if self.groups.nil?
       add_message :error, 'Error loading configuration. Please try again'
     end
   end
