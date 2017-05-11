@@ -27,6 +27,9 @@ gem 'figaro', '1.1.1'
 gem 'puma', '3.6.2'
 
 gem 'crono', '1.0.3'
+gem 'haml'
+gem 'sinatra', require: nil
+
 
 # gem to import from excel
 gem 'roo', '2.5.1'

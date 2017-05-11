@@ -37,6 +37,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -263,6 +264,7 @@ class Expense < ActiveRecord::Base
   scope :unverified, -> {where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]}
 
   delegate :category_name, to: :category
+  delegate :amount_with_currency, to: :amount
 
 
   # this method is to purely show the amount values for the carious expenses
@@ -533,33 +535,11 @@ class Expense < ActiveRecord::Base
 
   # method that updates all the currency values for a particular expense - todo - possibly should be moved to an operation
   def update_other_currencies
-    # i.e. if the expense is today's and the currency conversion data is not present
-    if self.date == DateUtils.local_date
+    unless self.amount.present?
       return
     end
-    # i.e. if the expense doesn't have an amounts object
-    if self.amount.blank?
-      return
-    end
-    date = self.date.strftime("%Y-%m-%d")
-    update_hash = {}
-    rate = CurrencyConversionRate.find_by(date: date)
-    if rate.nil?
-      return
-    end
-    currencies = CurrencyConversionRate.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id'].include?(el)}
-    orig_curr = self.amount.currency.country_code
-    currencies.each do |curr|
-      if Amount.column_names.include?(curr)
-        # todo - no effing idea why this is failing :(
-        currency_rate = rate.send(curr.to_sym).to_f
-        # debugger
-        normalized_amt = self.amount_value * currency_rate
-        # normalized_amt = BigDecimal.new(((self.amount_value) * rate.send(curr.to_sym)).to_f, 10)
-        update_hash[curr.to_sym] = (normalized_amt/rate.send(orig_curr.to_sym))
-      end
-    end
-    self.amount.update(update_hash)
+    # calls the respective method in the amounts model to update the currencies
+    self.amount.update_currencies(self.date)
   end
 
   private

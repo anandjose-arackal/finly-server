@@ -138,6 +138,31 @@ class Amount < ActiveRecord::Base
          symbol: self.currency.symbol}}
   end
 
+  def update_currencies(date)
+    # i.e. if the expense is today's and the currency conversion data is not present
+    if date == DateUtils.local_date
+      return
+    end
+    date = date.strftime("%Y-%m-%d")
+    update_hash = {}
+    rate = CurrencyConversionRate.find_by(date: date)
+    if rate.nil?
+      return
+    end
+    currencies = CurrencyConversionRate.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id'].include?(el)}
+    orig_curr = self.currency.country_code
+    currencies.each do |curr|
+      if Amount.column_names.include?(curr)
+        currency_rate = rate.send(curr.to_sym).to_f
+        # debugger
+        normalized_amt = self.amount_value * currency_rate
+        # normalized_amt = BigDecimal.new(((self.amount_value) * rate.send(curr.to_sym)).to_f, 10)
+        update_hash[curr.to_sym] = (normalized_amt/rate.send(orig_curr.to_sym))
+      end
+    end
+    self.update(update_hash)
+  end
+
   private
 
   def no_negative_amount

@@ -19,5 +19,4 @@ Crono.perform(UpdateUserBalances).every 1.day, at: {hour: 00, min: 10}
 Crono.perform(UpdateCompanyBalances).every 1.day, at: {hour: 00, min: 20}
 Crono.perform(TaxBenefitProcess).every 1.day, at: {hour: 00, min: 25}
 Crono.perform(FetchCurrencyConversionRates).every 1.day, at: {hour: 00, min: 5}
-
-# todo - job to update all expenses created the previous day once the respective currency conversion rates are updated
+Crono.perform(UpdateConvertedAmountValues).every 1.day, at: {hour: 00, min: 30}

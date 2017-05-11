@@ -67,6 +67,8 @@ class Currency::FetchData < BaseHandler
     parsed_response['rates'].each do |key, value|
       result_hash[key] = value
     end
+    # also adding the base currency so that the database has the value of GBP too
+    result_hash['GBP'] = 1
   end
 
   def success

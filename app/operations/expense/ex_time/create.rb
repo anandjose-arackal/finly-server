@@ -103,6 +103,8 @@ class Expense::ExTime::Create < Expense::ExTime::Base
         amount.update(value: expense.calculate_amount_value(report.policy))
       end
       expense.update_attributes(amount_id: amount.id)
+
+      # also update the amount for all
     end
 
     add_message :success, 'Expense created'

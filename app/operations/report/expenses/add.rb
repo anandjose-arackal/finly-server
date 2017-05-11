@@ -115,6 +115,7 @@ class Report::Expenses::Add < Report::Base
           amount.update(value: expense.calculate_amount_value(report.policy))
         end
         expense.update_attributes(amount_id: amount.id)
+        expense.update_other_currencies unless expense.date == DateUtils.local_date
       end
     end
   end

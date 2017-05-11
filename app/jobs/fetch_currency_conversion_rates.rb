@@ -1,4 +1,6 @@
-class FetchCurrencyConversionRates
+# fetches the conversion rates for all the currencies from the fixer.io API
+
+class FetchCurrencyConversionRates < ActiveJob::Base
 
   def perform
     # update the currency conversion table with details of the conversion rates
