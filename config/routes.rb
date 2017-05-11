@@ -852,25 +852,42 @@ Rails.application.routes.draw do
   get 'menu_data_cards' => 'expense_types_configuration#menu_data_cards'
   get 'menu_data_disburse' => 'expense_types_configuration#menu_data_disburse'
 
+  # Orders
+  get 'cards/orders' => 'orders/order_cards#index'
+  get 'cards/orders/:id' => 'orders/order_cards#show'
+  delete 'cards/orders/:id' => 'orders/order_cards#destroy'
+
   # Meal Cards
-  post 'cards/meal/process_file' => 'benefits/meal#process_file'
-  post 'cards/meal/orders' => 'benefits/meal#create'
-  patch 'cards/meal/orders' => 'benefits/meal#update'
-  get 'cards/meal/orders' => 'benefits/meal#index'
-  get 'cards/meal/orders/:id' => 'benefits/meal#show'
-  delete 'cards/meal/orders/:id' => 'benefits/meal#destroy'
+  post 'cards/meal/process_file' => 'benefits/meal_cards#process_file'
+  post 'cards/meal/orders' => 'benefits/meal_cards#create'
+  patch 'cards/meal/orders' => 'benefits/meal_cards#update'
+  get 'cards/meal/orders' => 'benefits/meal_cards#index'
+  get 'cards/meal/orders/:id' => 'benefits/meal_cards#show'
+  delete 'cards/meal/orders/:id' => 'benefits/meal_cards#destroy'
 
   # Medical Cards
-  post 'cards/medical/process_file' => 'benefits/medical#process_file'
-  post 'cards/medical/orders' => 'benefits/medical#create'
-  patch 'cards/medical/orders' => 'benefits/medical#update'
-  get 'cards/medical/orders' => 'benefits/medical#index'
-  get 'cards/medical/orders/:id' => 'benefits/medical#show'
-  delete 'cards/medical/orders/:id' => 'benefits/medical#destroy'
+  post 'cards/medical/process_file' => 'benefits/medical_cards#process_file'
+  post 'cards/medical/orders' => 'benefits/medical_cards#create'
+  patch 'cards/medical/orders' => 'benefits/medical_cards#update'
+  get 'cards/medical/orders' => 'benefits/medical_cards#index'
+  get 'cards/medical/orders/:id' => 'benefits/medical_cards#show'
+  delete 'cards/medical/orders/:id' => 'benefits/medical_cards#destroy'
 
-  # Mass Credit
-  post 'cards/process_file' => 'cards#process_file'
+  # Mass Credit for Expense Cards
+  post 'cards/expense/process_file' => 'benefits/expense_cards#process_file'
+  post 'cards/expense/orders' => 'benefits/expense_cards#create'
+  patch 'cards/expense/orders' => 'benefits/expense_cards#update'
+  get 'cards/expense/orders' => 'benefits/expense_cards#index'
+  get 'cards/expense/orders/:id' => 'benefits/expense_cards#show'
+  delete 'cards/expense/orders/:id' => 'benefits/expense_cards#destroy'
 
+  # Mass Credit for Expense Cards
+  post 'cards/reimbursement/process_file' => 'benefits/reimbursement_cards#process_file'
+  post 'cards/reimbursement/orders' => 'benefits/reimbursement_cards#create'
+  patch 'cards/reimbursement/orders' => 'benefits/reimbursement_cards#update'
+  get 'cards/reimbursement/orders' => 'benefits/reimbursement_cards#index'
+  get 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#show'
+  delete 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#destroy'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
