@@ -4,6 +4,24 @@ company:
   <% if current_company.configuration.logo.present? %>
     url: <%= current_company.configuration.logo.url(:thumb)%>
   <% end %>
+  features:
+    <% if current_company.feature_subscription.expense_card_enabled %>
+    expense_card: true
+    <% end %>
+    <% if current_company.feature_subscription.meal_card_enabled %>
+    meal_card: true
+    <% end %>
+    <% if current_company.feature_subscription.medical_card_enabled %>
+    medical_card: true
+    <% end %>
+    <% if current_company.feature_subscription.reimbursement_card_enabled %>
+    reimbursement_card: true
+    <% end %>
+    <% if current_company.feature_subscription.expense_management_enabled %>
+    expense_management: true
+    <% end %>
+
+
 user:
   name: <%= current_user.name %>
   id: <%= current_user.id %>
@@ -27,9 +45,9 @@ views:
       - name: Orders
         id: orders
         url: orders
-      - name: Analytics
-        url: analytics
-        id: analytics
+      # - name: Analytics
+      #   url: analytics
+      #   id: analytics
   finance:
     menus:
       navbar:
@@ -39,6 +57,6 @@ views:
       - name: Users
         url: users
         id: users
-      - name: Analytics
-        url: analytics
-        id: analytics
+      # - name: Analytics
+      #   url: analytics
+      #   id: analytics
