@@ -321,6 +321,14 @@ class Report < ActiveRecord::Base
     end
   end
 
+  def base_currency_code
+    if self.policy.present?
+      self.policy.base_currency.country_code
+    else
+      self.user.company.base_currency.country_code
+    end
+  end
+
 
   private
 

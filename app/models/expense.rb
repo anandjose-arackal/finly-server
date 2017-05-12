@@ -280,12 +280,22 @@ class Expense < ActiveRecord::Base
   def amount_value
     case self.expense_type_id
       when ExpenseType.id_for(:manual), ExpenseType.id_for(:card)
-        return precision_value self.amount.value
+        if self.report_id.blank?
+          return precision_value self.amount.value
+        else
+          base_currency_code = self.report.base_currency_code
+          return precision_value self.amount.send(base_currency_code.to_sym)
+        end
       when ExpenseType.id_for(:distance), ExpenseType.id_for(:time), ExpenseType.id_for(:per_diem)
         if self.amount.blank?
           return nil
         else
-          return precision_value self.amount.value
+          if self.report_id.blank?
+            return precision_value self.amount.value
+          else
+            base_currency_code = self.report.base_currency_code
+            return precision_value self.amount.send(base_currency_code.to_sym)
+          end
         end
       else
         return nil
@@ -302,21 +312,21 @@ class Expense < ActiveRecord::Base
         return self.amount.value
       when ExpenseType.id_for(:distance)
         if policy.blank?
-          rate = self.user.company.distance_expense_config.rate rescue nil
+          rate = self.user.company.distance_expense_config.rate_value rescue nil
           amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
           return amount
         else
-          rate = policy.distance_expense_config.rate rescue nil
+          rate = policy.distance_expense_config.rate_value rescue nil
           amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
           return amount
         end
       when ExpenseType.id_for(:time)
         if policy.blank?
-          rate = self.user.company.time_expense_config.rate rescue nil
+          rate = self.user.company.time_expense_config.rate_value rescue nil
           amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
           return amount
         else
-          rate = policy.time_expense_config.rate rescue nil
+          rate = policy.time_expense_config.rate_value rescue nil
           amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
           return amount
         end
@@ -381,6 +391,14 @@ class Expense < ActiveRecord::Base
         return 0
       when ExpenseType.id_for(:card)
         return self.card_expense.surcharge_amount
+    end
+  end
+
+  def original_amount_value
+    if self.amount.present?
+      self.amount.value
+    else
+      nil
     end
   end
 
