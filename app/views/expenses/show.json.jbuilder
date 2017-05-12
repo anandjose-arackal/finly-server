@@ -7,7 +7,6 @@ json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
 json.currency_id @result.expense.currency_id rescue nil
 json.original_currency_id @result.expense.currency_id rescue nil
 
-debugger
 if @result.expense.report_id.present?
   json.original_amount_value @result.expense.original_amount_value
   json.base_currency_id @result.expense.report.base_currency_id
