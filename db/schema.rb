@@ -645,8 +645,8 @@ ActiveRecord::Schema.define(version: 20170511135241) do
     t.integer  "category_id",          limit: 4
     t.boolean  "is_deleted",                         default: false, null: false
     t.boolean  "transcribed",                        default: false
-    t.boolean  "reimbursable",                       default: true
     t.boolean  "personal",                           default: false
+    t.boolean  "reimbursable",                       default: true
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree

@@ -313,6 +313,14 @@ class Report < ActiveRecord::Base
     cash.value - report_total < 0
   end
 
+  def base_currency_id
+    if self.policy.present?
+      self.policy.base_currency_id
+    else
+      self.user.company.base_currency_id
+    end
+  end
+
 
   private
 

@@ -15,5 +15,6 @@ json.array!(@result.paginated_reports) do |report|
   end
   json.status @result.status_name(report)
   json.total(('%.2f' % report.total_amount))
+  json.currency_id report.base_currency_id
   json.date report.created_at.strftime("%d %b")
 end

@@ -32,6 +32,7 @@ json.policies @result.report.user.policies do |policy|
 end
 
 json.total @result.report.total_amount
+json.base_currency_id @result.report.base_currency_id
 json.date @result.report.created_at.strftime('%d %b %Y')
 
 json.comments @result.comments do |comment|
