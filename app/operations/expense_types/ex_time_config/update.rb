@@ -46,11 +46,10 @@ class ExpenseTypes::ExTimeConfig::Update < ExpenseTypes::Base
 
   end
 
-  # def pre_process
-  #   if update_params[:enabled] == '0'
-  #     update_params[:rate_per_hour] = nil
-  #   end
-  # end
+  def pre_process
+    base_currency_id = time_config.parent.base_currency_id
+    update_params[:rate_attributes][:currency_id] = base_currency_id
+  end
 
   def process
     unless time_config.update(update_params)
@@ -61,7 +60,7 @@ class ExpenseTypes::ExTimeConfig::Update < ExpenseTypes::Base
   private
 
   def time_expense_config_params
-    params.require(:time_expense_config).permit(:rate_per_hour, :default_category_id, :enabled)
+    params.require(:time_expense_config).permit(:default_category_id, :enabled, rate_attributes: [:value, :currency_id])
   end
 
 end

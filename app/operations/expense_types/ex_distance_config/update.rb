@@ -46,6 +46,11 @@ class ExpenseTypes::ExDistanceConfig::Update < ExpenseTypes::Base
 
   end
 
+  def pre_process
+    base_currency_id = time_config.parent.base_currency_id
+    update_params[:rate_attributes][:currency_id] = base_currency_id
+  end
+
   def process
     unless distance_config.update(update_params)
       messages[:error] = distance_config.errors.full_messages
@@ -55,7 +60,7 @@ class ExpenseTypes::ExDistanceConfig::Update < ExpenseTypes::Base
   private
 
   def distance_expense_config_params
-    params.require(:distance_expense_config).permit(:rate_per_km, :default_category_id, :enabled)
+    params.require(:distance_expense_config).permit(:default_category_id, :enabled, rate_attributes: [:value, :currency_id])
   end
 
 end
