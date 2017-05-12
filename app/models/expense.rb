@@ -76,6 +76,7 @@ class Expense < ActiveRecord::Base
   delegate :expense_type_name, to: :expense_type
   delegate :expense_status_name, to: :expense_status
   delegate :user_name, to: :user
+  delegate :currency_id, to: :amount
 
   validates :date, presence: true
   validates :category_id, presence: true
