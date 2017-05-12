@@ -104,6 +104,11 @@ class Amount < ActiveRecord::Base
 
   scope :with_id, -> (id) { where id: id }
 
+  after_create {
+    # i.e. updating the respective currency' column with value
+    self.update((self.currency.country_code) => self.value)
+  }
+
   def greater_than_amount_value
     self.value
   end

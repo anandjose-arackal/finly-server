@@ -76,7 +76,6 @@ class Expense < ActiveRecord::Base
   delegate :expense_type_name, to: :expense_type
   delegate :expense_status_name, to: :expense_status
   delegate :user_name, to: :user
-  delegate :currency_id, to: :amount
 
   validates :date, presence: true
   validates :category_id, presence: true
@@ -266,6 +265,15 @@ class Expense < ActiveRecord::Base
 
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount
+
+
+  def currency_id
+    if self.amount.present?
+      return self.amount.currency_id
+    else
+      return nil
+    end
+  end
 
 
   # this method is to purely show the amount values for the carious expenses
