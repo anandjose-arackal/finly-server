@@ -1,9 +1,10 @@
-json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :amount_value, :currency_id, :category_name, :category_id, :expense_type_id,
+json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :amount_value, :category_name, :category_id, :expense_type_id,
                                :distance_value, :time_value, :per_diem_name, :per_diem_rate_value, :per_diem_quantity_value,
                                :distance_rate_value, :time_rate_value, :transcribed, :reimbursable
 
 json.date @result.expense.date.strftime("%d %b %Y")
 json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
+json.currency_id @result.expense.currency_id rescue nil
 
 json.receipts @result.expense.receipts do |receipt|
   json.id receipt.id
