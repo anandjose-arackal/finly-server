@@ -33,9 +33,9 @@ class TimeExpenseConfig < ActiveRecord::Base
     end
   end
 
-  def rate
+  def rate_value
     if self.enabled
-      return self.rate.send(self.parent.base_currency.currency_code)
+      return self.rate.send(self.parent.base_currency.country_code)
     else
       return nil
     end

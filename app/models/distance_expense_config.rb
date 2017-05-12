@@ -24,7 +24,6 @@ class DistanceExpenseConfig < ActiveRecord::Base
   validates :parent, presence: true
 
   accepts_nested_attributes_for :rate
-  delegate :rate_value, to: :rate
 
   def default_category_name
     if self.default_category_id
@@ -36,7 +35,7 @@ class DistanceExpenseConfig < ActiveRecord::Base
 
   def rate_value
     if self.enabled
-      return self.rate.send(self.parent.base_currency.currency_code)
+      return self.rate.send(self.parent.base_currency.country_code)
     else
       return nil
     end

@@ -12,6 +12,9 @@ if @result.expense.report_id.present?
   json.base_currency_id @result.expense.report.base_currency_id
 end
 
+# flag to show whether a particular expense has been converted or not
+json.converted @result.converted
+
 json.receipts @result.expense.receipts do |receipt|
   json.id receipt.id
   json.image do
