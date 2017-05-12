@@ -35,8 +35,12 @@ class ItzCashCardProgram < ActiveRecord::Base
   ]
 
   def self.seed_data
-    PROGRAM_DETAILS.each do |detail|
-      ItzCashCardProgram.create(detail)
+    if Rails.env.production?
+      PROGRAM_DETAILS.each do |detail|
+        ItzCashCardProgram.create(detail)
+      end
+    else
+      ItzCashCardProgram.create(name: "Test Expense Card", product_code: "NGPRHD")
     end
   end
 
