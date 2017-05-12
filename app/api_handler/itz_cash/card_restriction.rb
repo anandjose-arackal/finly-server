@@ -93,12 +93,12 @@ class ItzCash::CardRestriction < ItzCash::Base
   private
 
   def post_initialize
-    self.day_trans_limit = Constants::ItzCash::RESTRICTION_CONSTANT if day_trans_limit == 0
-    self.day_amount_limit = Constants::ItzCash::RESTRICTION_CONSTANT if day_amount_limit == 0
-    self.week_trans_limit = Constants::ItzCash::RESTRICTION_CONSTANT if week_trans_limit == 0
-    self.week_amount_limit = Constants::ItzCash::RESTRICTION_CONSTANT if week_amount_limit == 0
-    self.month_trans_limit = Constants::ItzCash::RESTRICTION_CONSTANT if month_trans_limit == 0
-    self.month_amount_limit = Constants::ItzCash::RESTRICTION_CONSTANT if month_amount_limit == 0
+    self.day_trans_limit = Constants::ItzCash::RESTRICTION_TRANS_CONSTANT if day_trans_limit == 0
+    self.day_amount_limit = Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT if day_amount_limit == 0
+    self.week_trans_limit = Constants::ItzCash::RESTRICTION_TRANS_CONSTANT if week_trans_limit == 0
+    self.week_amount_limit = Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT if week_amount_limit == 0
+    self.month_trans_limit = Constants::ItzCash::RESTRICTION_TRANS_CONSTANT if month_trans_limit == 0
+    self.month_amount_limit = Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT if month_amount_limit == 0
   end
 
 end

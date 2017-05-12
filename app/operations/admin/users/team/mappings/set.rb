@@ -8,6 +8,10 @@ class Admin::Users::Team::Mappings::Set < User::Team::Mappings::Set
 
   end
 
+  def pre_authorize
+    # overriding the parent method of the same name
+  end
+
 
   def init
     id = (params[:id] || params[:user_id])

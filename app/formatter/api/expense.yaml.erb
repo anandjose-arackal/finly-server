@@ -11,6 +11,16 @@ expense:
   <% elsif type == '2' or type == 2 %>
   card_expense_attributes:
     editable_merchant: <%= params[:merchant] %>
+  <% elsif type == '3' or type == 3 %>
+  distance_expense_attributes:
+    distance_attributes:
+      value: <%= params[:distance] %>
+      physical_unit_id: <%= PhysicalUnit.kilometre_id %>
+  <% elsif type == '4' or type == 4 %>
+  time_expense_attributes:
+    time_object_attributes:
+      value: <%= params[:time] %>
+      physical_unit_id: <%= PhysicalUnit.hour_id %>
   <% end %>
   <% if params[:amount].present? %>
   amount_attributes:

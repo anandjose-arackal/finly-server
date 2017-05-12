@@ -32,6 +32,12 @@ class Policy::Rules::Create < Policy::Rules::Base
     end
   end
 
+  def pre_process
+    if params[:expense_rule] && rule_params[:greater_than_amount_attributes][:value] == ""
+      rule_params[:greater_than_amount_attributes][:value] = 0
+    end
+  end
+
   def process
     if params[:expense_rule]
       self.rule = policy.expense_rules.create(rule_params)

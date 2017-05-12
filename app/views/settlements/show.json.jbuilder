@@ -6,23 +6,25 @@ json.array! @result.items do |item|
     if item.final_approver
       json.final_approver item.final_approver.name
     end
-    json.reimbursement_amount item.cash_expenses_total.value rescue 0
+    json.reimbursement_amount item.reimbursable_expenses_total.value rescue 0
     json.card_expenses_total item.card_expenses_total.value rescue 0
-    json.cash_expenses_total item.cash_expenses_total.value rescue 0
+    json.cash_expenses_total item.reimbursable_expenses_total.value rescue 0
+    json.reimbursable_expenses_total item.reimbursable_expenses_total.value rescue 0
+    json.non_reimbursable_expenses_total item.non_reimbursable_expenses_total.value rescue 0
     json.status item.status_name
     json.total_amount item.total_amount
   elsif item.is_a?(Payment)
     payment_type_id = item.payment_type_id
     payment_type_s = PaymentType.name_for(payment_type_id)
-    if([PaymentType.id_for(:credit_from_virtual_account_to_wallet),
+    if [PaymentType.id_for(:credit_from_virtual_account_to_wallet),
         PaymentType.id_for(:credit_from_virtual_account_to_card),
         PaymentType.id_for(:credit_from_wallet_to_wallet),
         PaymentType.id_for(:credit_from_wallet_to_card),
         PaymentType.id_for(:debit_from_wallet_to_wallet),
-        PaymentType.id_for(:debit_from_wallet_to_virtual_account)].include?(payment_type_id))
+        PaymentType.id_for(:debit_from_wallet_to_virtual_account)].include?(payment_type_id)
       if @result.selected_user == item.receiving_user
         payment_type_s = "Receive #{PaymentType.name_for(payment_type_id).downcase}"
-      elsif(@result.selected_user == item.initiating_user)
+      elsif @result.selected_user == item.initiating_user
         next if [PaymentType.id_for(:credit_from_virtual_account_to_wallet),
                   PaymentType.id_for(:credit_from_virtual_account_to_card),
                   PaymentType.id_for(:debit_from_wallet_to_virtual_account)].include?(payment_type_id)

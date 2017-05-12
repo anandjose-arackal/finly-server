@@ -17,6 +17,7 @@
 #  category_id          :integer
 #  is_deleted           :boolean          default(FALSE), not null
 #  transcribed          :boolean          default(FALSE)
+#  reimbursable         :boolean          default(TRUE)
 #  personal             :boolean          default(FALSE)
 #
 

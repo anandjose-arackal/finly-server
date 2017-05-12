@@ -12,5 +12,6 @@ json.data do
   json.company do
     json.id @auth_grant.user.company.id
     json.name @auth_grant.user.company.name
+    json.d_code_assigned @auth_grant.user.company.d_code_assigned?
   end
 end

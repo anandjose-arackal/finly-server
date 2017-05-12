@@ -71,7 +71,12 @@ class Report::Expenses::Add < Report::Base
       add_message :error, 'Cannot add expenses to report unless report is in open or retracted state'
     end
 
-
+    expenses.each do |expense|
+      if expense.personal
+        add_message :error, "Personal expenses cannot be added to a report"
+        return false
+      end
+    end
   end
 
   def process

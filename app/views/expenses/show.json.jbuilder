@@ -1,6 +1,6 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :amount_value, :category_name, :category_id, :expense_type_id,
                                :distance_value, :time_value, :per_diem_name, :per_diem_rate_value, :per_diem_quantity_value,
-                               :distance_rate_value, :time_rate_value, :transcribed
+                               :distance_rate_value, :time_rate_value, :transcribed, :reimbursable
 
 json.date @result.expense.date.strftime("%d %b %Y")
 json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
@@ -24,7 +24,17 @@ json.violations @result.violation
 
 json.editable @result.editable
 
+json.show_options @result.expense.report.blank? && (params[:view] == 'personal' || params[:view].nil?)
+
 json.deletable ((params[:view].nil? || params[:view] == 'personal') && @result.expense.deletable_expense? && @result.expense.report_id.nil?)
+
+json.reimbursable @result.expense.reimbursable
+
+json.personal @result.expense.personal
+
+json.cancellable @result.expense.cancellable?
+
+json.cancelled @result.expense.cancelled?
 
 json.custom_fields do
   expense = @result.expense
@@ -43,5 +53,16 @@ json.custom_fields do
 end
 
 json.system_messages do
-  json.array!(@result.expense.system_messages)
+  json.array!(@result.expense.system_messages.pluck(:content))
+end
+
+if @result.expense.card_expense? && @result.expense.cancelled?
+  json.cancelled_against_transactions do
+    json.array!(@result.expense.card_expense&.cancelled_against_transactions) do |transaction|
+      json.timestamp transaction.transaction_timestamp
+      json.amount_value transaction.billing_amount_value
+      json.type "Refund"
+      json.card_number "XXXXXXXXXXXX#{transaction.card.ending_number}"
+    end
+  end
 end
