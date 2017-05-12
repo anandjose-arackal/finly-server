@@ -1,0 +1,19 @@
+# == Schema Information
+#
+# Table name: auto_reload_configs
+#
+#  id                 :integer          not null, primary key
+#  minimum_balance_id :integer
+#  parent_id          :integer
+#  parent_type        :string(255)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  minimum_balance_id: 1
+
+two:
+  minimum_balance_id: 1
