@@ -128,6 +128,10 @@ class Expense::Manual::Update < Expense::Manual::Base
     end
     ###############################################################
 
+    unless expense.date == DateUtils.local_date
+      expense.update_other_currencies
+    end
+
     add_message :success, 'Expense updated'
   end
 
