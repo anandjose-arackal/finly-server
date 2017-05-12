@@ -159,10 +159,18 @@ class Amount < ActiveRecord::Base
     currencies.each do |curr|
       if Amount.column_names.include?(curr)
         currency_rate = rate.send(curr.to_sym).to_f
-        # debugger
         normalized_amt = self.amount_value * currency_rate
         update_hash[curr.to_sym] = (normalized_amt/rate.send(orig_curr.to_sym))
       end
+    end
+    self.update(update_hash)
+  end
+
+  def destroy_currencies
+    update_hash = {}
+    currencies = Amount.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id', "#{self.currency.country_code}", 'value', 'currency_id'].include?(el)}
+    currencies.each do |curr|
+      update_hash[curr.to_sym] = nil
     end
     self.update(update_hash)
   end

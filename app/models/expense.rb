@@ -569,6 +569,14 @@ class Expense < ActiveRecord::Base
     self.amount.update_currencies(self.date)
   end
 
+  def destroy_other_currencies
+    unless self.amount.present?
+      return
+    end
+    # calls the respective method in the amounts model to update the currencies
+    self.amount.destroy_currencies
+  end
+
   private
 
   # cannot add an expense with future date

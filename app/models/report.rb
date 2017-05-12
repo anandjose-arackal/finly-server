@@ -250,7 +250,7 @@ class Report < ActiveRecord::Base
         end
       end
     end
-    precision_value(temp_expenses.with_amount.sum(:value))
+    precision_value(temp_expenses.with_amount.sum(self.base_currency_code.to_sym))
   end
 
   def controlling_user?(user)
