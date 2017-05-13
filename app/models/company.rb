@@ -35,7 +35,7 @@ class Company < ActiveRecord::Base
   has_many :receiving_payments, as: :receiving_account
   has_many :payment_orders
   has_many :user_groups
-  has_many :teams
+  has_many :user_teams
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property

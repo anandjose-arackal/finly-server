@@ -12,14 +12,10 @@
 class UserTeam < ActiveRecord::Base
 
   validates :company_id, presence: true
-  validate :uniqueness_check
+  validates :name, presence: true, uniqueness: {scope: :company_id, :case_sensitive => false}
 
   has_many :user_team_group_item_mappings
 
   accepts_nested_attributes_for :user_team_group_item_mappings
-
-  def uniqueness_check
-
-  end
 
 end
