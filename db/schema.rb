@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170512092807) do
+ActiveRecord::Schema.define(version: 20170512165116) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -101,6 +101,14 @@ ActiveRecord::Schema.define(version: 20170512092807) do
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
+
+  create_table "auto_reload_configs", force: :cascade do |t|
+    t.integer  "minimum_balance_id", limit: 4
+    t.integer  "parent_id",          limit: 4
+    t.string   "parent_type",        limit: 255
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
 
   create_table "auto_submit_configs", force: :cascade do |t|
     t.boolean  "enabled",                              default: false, null: false

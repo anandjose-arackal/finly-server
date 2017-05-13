@@ -10,7 +10,7 @@
 #  enabled             :boolean
 #  default_category_id :integer
 #  rate_id             :integer
-#  period_id           :integer
+#  distance_unit_id    :integer
 #
 
 require 'test_helper'
