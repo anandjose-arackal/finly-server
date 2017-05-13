@@ -1,12 +1,12 @@
 # == Schema Information
 #
-# Table name: user_group_configurations
+# Table name: user_teams
 #
 #  id         :integer          not null, primary key
 #  company_id :integer          not null
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
-#  type_id    :integer          not null
+#  name       :string(255)      not null
 #
 
 class UserTeam < ActiveRecord::Base

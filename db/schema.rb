@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170513122726) do
+ActiveRecord::Schema.define(version: 20170513123714) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1558,16 +1558,16 @@ ActiveRecord::Schema.define(version: 20170513122726) do
   add_index "user_tags", ["user_id"], name: "index_user_tags_on_user_id", using: :btree
 
   create_table "user_team_group_item_mappings", force: :cascade do |t|
-    t.integer  "configuration_id",   limit: 4, null: false
     t.integer  "user_group_id",      limit: 4, null: false
     t.integer  "user_group_item_id", limit: 4, null: false
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+    t.integer  "user_team_id",       limit: 4
   end
 
-  add_index "user_team_group_item_mappings", ["configuration_id"], name: "index_user_team_group_item_mappings_on_configuration_id", using: :btree
   add_index "user_team_group_item_mappings", ["user_group_id"], name: "index_user_team_group_item_mappings_on_user_group_id", using: :btree
   add_index "user_team_group_item_mappings", ["user_group_item_id"], name: "index_user_team_group_item_mappings_on_user_group_item_id", using: :btree
+  add_index "user_team_group_item_mappings", ["user_team_id"], name: "index_user_team_group_item_mappings_on_user_team_id", using: :btree
 
   create_table "user_teams", force: :cascade do |t|
     t.integer  "company_id", limit: 4,   null: false
@@ -1803,6 +1803,7 @@ ActiveRecord::Schema.define(version: 20170513122726) do
   add_foreign_key "user_tags", "users"
   add_foreign_key "user_team_group_item_mappings", "user_group_items"
   add_foreign_key "user_team_group_item_mappings", "user_groups"
+  add_foreign_key "user_team_group_item_mappings", "user_teams"
   add_foreign_key "user_wallet_tracks", "amounts"
   add_foreign_key "user_wallet_tracks", "user_wallet_track_actions"
   add_foreign_key "user_wallet_tracks", "user_wallets"
