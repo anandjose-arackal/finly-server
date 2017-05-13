@@ -14,7 +14,7 @@
 # Crono.perform(TestJob).every 2.days, at: '15:30'
 #
 
-Crono.perform(ReportAutoSubmit).with_options(truncate_log: 100).every 1.day, at: {hour: 00, min: 1}
-Crono.perform(UpdateUserBalances).with_options(truncate_log: 100).every 1.day, at: {hour: 00, min: 10}
-Crono.perform(UpdateCompanyBalances).with_options(truncate_log: 100).every 1.day, at: {hour: 00, min: 20}
-Crono.perform(TaxBenefitProcess).with_options(truncate_log: 100).every 1.day, at: {hour: 00, min: 25}
+Crono.perform(ReportAutoSubmit).with_options(truncate_log: 10).every 1.day, at: {hour: 00, min: 1}
+Crono.perform(UpdateUserBalances).with_options(truncate_log: 10).every 1.day, at: {hour: 00, min: 10}
+Crono.perform(UpdateCompanyBalances).with_options(truncate_log: 10).every 1.day, at: {hour: 00, min: 20}
+Crono.perform(TaxBenefitProcess).with_options(truncate_log: 10).every 1.day, at: {hour: 00, min: 25}
