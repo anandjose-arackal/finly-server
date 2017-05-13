@@ -231,8 +231,6 @@ SystemMessageType.seed_data
 
 ItzCashCardProgram.seed_data
 
-UserGroupConfigurationType.seed_data
-
 ##########################
 
 if Amount.count == 0

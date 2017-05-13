@@ -11,9 +11,9 @@
 #  type_id            :integer          not null
 #
 
-class GroupItemConfigurationMapping < ActiveRecord::Base
+class TeamGroupItemMapping < ActiveRecord::Base
 
-  belongs_to :configuration, class_name: 'UserGroupConfiguration'
+  belongs_to :configuration, class_name: 'Team'
   belongs_to :user_group
   belongs_to :user_group_item
 

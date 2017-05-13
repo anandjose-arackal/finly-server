@@ -31,7 +31,7 @@ class UserGroup::Configuration::Create < UserGroup::Configuration::Base
       add_message :error, 'Error creating Group Configuration. Invalid Type'
       return
     end
-    if GroupItemConfigurationMapping.with_type(group_type).with_user_group_item(item_ids).count == self.item_ids.size
+    if TeamGroupItemMapping.with_type(group_type).with_user_group_item(item_ids).count == self.item_ids.size
       add_message :error, 'Group Item Configuration already exists'
       return
     end
