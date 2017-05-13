@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170425072600) do
+ActiveRecord::Schema.define(version: 20170513110709) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -67,9 +67,48 @@ ActiveRecord::Schema.define(version: 20170425072600) do
     t.integer  "currency_id", limit: 4,                           null: false
     t.datetime "created_at",                                      null: false
     t.datetime "updated_at",                                      null: false
+    t.decimal  "INR",                   precision: 20, scale: 5
+    t.decimal  "USD",                   precision: 20, scale: 5
+    t.decimal  "GBP",                   precision: 20, scale: 5
+    t.decimal  "CAD",                   precision: 20, scale: 5
+    t.decimal  "EUR",                   precision: 20, scale: 5
+    t.decimal  "HRK",                   precision: 20, scale: 5
+    t.decimal  "RUB",                   precision: 20, scale: 5
+    t.decimal  "BGN",                   precision: 20, scale: 5
+    t.decimal  "BRL",                   precision: 20, scale: 5
+    t.decimal  "CHF",                   precision: 20, scale: 5
+    t.decimal  "CNY",                   precision: 20, scale: 5
+    t.decimal  "CZK",                   precision: 20, scale: 5
+    t.decimal  "DKK",                   precision: 20, scale: 5
+    t.decimal  "HKD",                   precision: 20, scale: 5
+    t.decimal  "HUF",                   precision: 20, scale: 5
+    t.decimal  "IDR",                   precision: 20, scale: 5
+    t.decimal  "ILS",                   precision: 20, scale: 5
+    t.decimal  "JPY",                   precision: 20, scale: 5
+    t.decimal  "KRW",                   precision: 20, scale: 5
+    t.decimal  "MXN",                   precision: 20, scale: 5
+    t.decimal  "NOK",                   precision: 20, scale: 5
+    t.decimal  "NZD",                   precision: 20, scale: 5
+    t.decimal  "PHP",                   precision: 20, scale: 5
+    t.decimal  "PLN",                   precision: 20, scale: 5
+    t.decimal  "RON",                   precision: 20, scale: 5
+    t.decimal  "SEK",                   precision: 20, scale: 5
+    t.decimal  "SGD",                   precision: 20, scale: 5
+    t.decimal  "THB",                   precision: 20, scale: 5
+    t.decimal  "TRY",                   precision: 20, scale: 5
+    t.decimal  "ZAR",                   precision: 20, scale: 5
+    t.decimal  "AUD",                   precision: 20, scale: 5
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
+
+  create_table "auto_reload_configs", force: :cascade do |t|
+    t.integer  "minimum_balance_id", limit: 4
+    t.integer  "parent_id",          limit: 4
+    t.string   "parent_type",        limit: 255
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
 
   create_table "auto_submit_configs", force: :cascade do |t|
     t.boolean  "enabled",                              default: false, null: false
@@ -101,13 +140,14 @@ ActiveRecord::Schema.define(version: 20170425072600) do
   add_index "balance_sheets", ["user_id"], name: "index_balance_sheets_on_user_id", using: :btree
 
   create_table "budget_rules", force: :cascade do |t|
-    t.integer  "category_id",  limit: 4
-    t.integer  "amount_id",    limit: 4
-    t.integer  "period_id",    limit: 4
-    t.integer  "policy_id",    limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.integer  "rule_type_id", limit: 4
+    t.integer  "category_id",          limit: 4
+    t.integer  "amount_id",            limit: 4
+    t.integer  "period_id",            limit: 4
+    t.integer  "policy_id",            limit: 4
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
+    t.integer  "rule_type_id",         limit: 4
+    t.boolean  "include_reimbursable",           default: true
   end
 
   add_index "budget_rules", ["amount_id"], name: "index_budget_rules_on_amount_id", using: :btree
@@ -148,6 +188,8 @@ ActiveRecord::Schema.define(version: 20170425072600) do
     t.datetime "updated_at",                                        null: false
     t.integer  "surcharge_id",        limit: 4
     t.boolean  "is_deleted",                        default: false
+    t.boolean  "cancelled",                         default: false
+    t.boolean  "atm_surcharge",                     default: false
   end
 
   add_index "card_expenses", ["card_transaction_id"], name: "index_card_expenses_on_card_transaction_id", using: :btree
@@ -228,30 +270,33 @@ ActiveRecord::Schema.define(version: 20170425072600) do
   end
 
   create_table "card_transactions", force: :cascade do |t|
-    t.integer  "user_id",               limit: 4
-    t.integer  "card_id",               limit: 4
-    t.string   "merchant_name",         limit: 255
-    t.string   "transaction_type",      limit: 255
-    t.text     "post_data",             limit: 65535
-    t.integer  "transaction_amount_id", limit: 4
-    t.datetime "created_at",                                          null: false
-    t.datetime "updated_at",                                          null: false
-    t.string   "reference_id",          limit: 255
-    t.string   "auth_transaction_id",   limit: 255
-    t.string   "transaction_mode",      limit: 255
-    t.string   "itzcash_merchant_key",  limit: 255
-    t.string   "merchant_city",         limit: 255
-    t.string   "response_code",         limit: 255
-    t.string   "serial_id",             limit: 255
-    t.string   "product_code",          limit: 255
+    t.integer  "user_id",                      limit: 4
+    t.integer  "card_id",                      limit: 4
+    t.string   "merchant_name",                limit: 255
+    t.string   "transaction_type",             limit: 255
+    t.text     "post_data",                    limit: 65535
+    t.integer  "transaction_amount_id",        limit: 4
+    t.datetime "created_at",                                                 null: false
+    t.datetime "updated_at",                                                 null: false
+    t.string   "reference_id",                 limit: 255
+    t.string   "auth_transaction_id",          limit: 255
+    t.string   "transaction_mode",             limit: 255
+    t.string   "itzcash_merchant_key",         limit: 255
+    t.string   "merchant_city",                limit: 255
+    t.string   "response_code",                limit: 255
+    t.string   "serial_id",                    limit: 255
+    t.string   "product_code",                 limit: 255
     t.datetime "transaction_timestamp"
-    t.boolean  "expensed",                            default: false
-    t.text     "error_message",         limit: 65535
-    t.integer  "billing_amount_id",     limit: 4
-    t.boolean  "is_deleted",                          default: false
-    t.string   "mcc_code",              limit: 255
-    t.string   "transaction_status",    limit: 255
-    t.string   "api_reference_id",      limit: 255
+    t.boolean  "expensed",                                   default: false
+    t.text     "error_message",                limit: 65535
+    t.integer  "billing_amount_id",            limit: 4
+    t.boolean  "is_deleted",                                 default: false
+    t.string   "mcc_code",                     limit: 255
+    t.string   "transaction_status",           limit: 255
+    t.string   "api_reference_id",             limit: 255
+    t.boolean  "cancelled",                                  default: false
+    t.integer  "cancelled_against_expense_id", limit: 4
+    t.string   "type_of_details",              limit: 255
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
@@ -306,10 +351,11 @@ ActiveRecord::Schema.define(version: 20170425072600) do
   end
 
   create_table "companies", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.boolean  "active",                 default: true, null: false
+    t.string   "name",             limit: 255
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.boolean  "active",                       default: true, null: false
+    t.integer  "base_currency_id", limit: 4,   default: 1
   end
 
   create_table "company_accounts", force: :cascade do |t|
@@ -444,12 +490,12 @@ ActiveRecord::Schema.define(version: 20170425072600) do
   end
 
   create_table "crono_jobs", force: :cascade do |t|
-    t.string   "job_id",            limit: 255,   null: false
-    t.text     "log",               limit: 65535
+    t.string   "job_id",            limit: 255,      null: false
+    t.text     "log",               limit: 16777215
     t.datetime "last_performed_at"
     t.boolean  "healthy"
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
   end
 
   add_index "crono_jobs", ["job_id"], name: "index_crono_jobs_on_job_id", unique: true, using: :btree
@@ -461,6 +507,46 @@ ActiveRecord::Schema.define(version: 20170425072600) do
     t.datetime "updated_at",               null: false
     t.string   "symbol",       limit: 255
   end
+
+  create_table "currency_conversion_rates", force: :cascade do |t|
+    t.date     "date",                                null: false
+    t.decimal  "INR",        precision: 10, scale: 5
+    t.decimal  "USD",        precision: 10, scale: 5
+    t.decimal  "GBP",        precision: 10, scale: 5
+    t.decimal  "EUR",        precision: 10, scale: 5
+    t.decimal  "CAD",        precision: 10, scale: 5
+    t.decimal  "HRK",        precision: 10, scale: 5
+    t.decimal  "RUB",        precision: 10, scale: 5
+    t.decimal  "BGN",        precision: 10, scale: 5
+    t.decimal  "BRL",        precision: 10, scale: 5
+    t.decimal  "CHF",        precision: 10, scale: 5
+    t.decimal  "CNY",        precision: 10, scale: 5
+    t.decimal  "CZK",        precision: 10, scale: 5
+    t.decimal  "DKK",        precision: 10, scale: 5
+    t.decimal  "HKD",        precision: 10, scale: 5
+    t.decimal  "HUF",        precision: 10, scale: 5
+    t.decimal  "IDR",        precision: 10, scale: 5
+    t.decimal  "ILS",        precision: 10, scale: 5
+    t.decimal  "JPY",        precision: 10, scale: 5
+    t.decimal  "KRW",        precision: 10, scale: 5
+    t.decimal  "MXN",        precision: 10, scale: 5
+    t.decimal  "MYR",        precision: 10, scale: 5
+    t.decimal  "NOK",        precision: 10, scale: 5
+    t.decimal  "NZD",        precision: 10, scale: 5
+    t.decimal  "PHP",        precision: 10, scale: 5
+    t.decimal  "PLN",        precision: 10, scale: 5
+    t.decimal  "RON",        precision: 10, scale: 5
+    t.decimal  "SEK",        precision: 10, scale: 5
+    t.decimal  "SGD",        precision: 10, scale: 5
+    t.decimal  "THB",        precision: 10, scale: 5
+    t.decimal  "TRY",        precision: 10, scale: 5
+    t.decimal  "ZAR",        precision: 10, scale: 5
+    t.decimal  "AUD",        precision: 10, scale: 5
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+  end
+
+  add_index "currency_conversion_rates", ["date"], name: "index_currency_conversion_rates_on_date", using: :btree
 
   create_table "custom_fields", force: :cascade do |t|
     t.integer  "field_configuration_id", limit: 4,   null: false
@@ -479,11 +565,12 @@ ActiveRecord::Schema.define(version: 20170425072600) do
   create_table "distance_expense_configs", force: :cascade do |t|
     t.integer  "parent_id",           limit: 4
     t.string   "parent_type",         limit: 255
-    t.decimal  "rate_per_km",                     precision: 10, scale: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
+    t.integer  "rate_id",             limit: 4
+    t.integer  "distance_unit_id",    limit: 4
   end
 
   create_table "distance_expenses", force: :cascade do |t|
@@ -566,6 +653,8 @@ ActiveRecord::Schema.define(version: 20170425072600) do
     t.integer  "category_id",          limit: 4
     t.boolean  "is_deleted",                         default: false, null: false
     t.boolean  "transcribed",                        default: false
+    t.boolean  "personal",                           default: false
+    t.boolean  "reimbursable",                       default: true
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -1115,14 +1204,15 @@ ActiveRecord::Schema.define(version: 20170425072600) do
   end
 
   create_table "policies", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.integer  "company_id",  limit: 4
-    t.integer  "owner_id",    limit: 4
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
-    t.boolean  "default",                   default: false, null: false
-    t.boolean  "is_deleted",                default: false, null: false
-    t.text     "description", limit: 65535
+    t.string   "name",             limit: 255
+    t.integer  "company_id",       limit: 4
+    t.integer  "owner_id",         limit: 4
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "default",                        default: false, null: false
+    t.boolean  "is_deleted",                     default: false, null: false
+    t.text     "description",      limit: 65535
+    t.integer  "base_currency_id", limit: 4,     default: 1
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
@@ -1300,30 +1390,31 @@ ActiveRecord::Schema.define(version: 20170425072600) do
   add_index "report_tracks", ["report_tracking_action_id"], name: "index_report_tracks_on_report_tracking_action_id", using: :btree
 
   create_table "reports", force: :cascade do |t|
-    t.string   "name",                         limit: 255,                               null: false
-    t.integer  "user_id",                      limit: 4,                                 null: false
-    t.integer  "report_status_id",             limit: 4,                                 null: false
-    t.integer  "policy_id",                    limit: 4
-    t.datetime "submitted_at",                             precision: 6
-    t.integer  "controlling_user_id",          limit: 4
-    t.integer  "controlling_user_role_id",     limit: 4
-    t.integer  "controlling_for_user_id",      limit: 4
-    t.integer  "controlling_for_user_role_id", limit: 4
-    t.string   "memo",                         limit: 255
-    t.datetime "created_at",                                                             null: false
-    t.datetime "updated_at",                                                             null: false
-    t.integer  "reimbursement_id",             limit: 4
-    t.boolean  "accounted",                                              default: false, null: false
-    t.boolean  "archived",                                               default: false, null: false
-    t.boolean  "is_deleted",                                             default: false, null: false
-    t.boolean  "auto_submit",                                            default: false, null: false
-    t.boolean  "auto_approve",                                           default: false, null: false
+    t.string   "name",                               limit: 255,                               null: false
+    t.integer  "user_id",                            limit: 4,                                 null: false
+    t.integer  "report_status_id",                   limit: 4,                                 null: false
+    t.integer  "policy_id",                          limit: 4
+    t.datetime "submitted_at",                                   precision: 6
+    t.integer  "controlling_user_id",                limit: 4
+    t.integer  "controlling_user_role_id",           limit: 4
+    t.integer  "controlling_for_user_id",            limit: 4
+    t.integer  "controlling_for_user_role_id",       limit: 4
+    t.string   "memo",                               limit: 255
+    t.datetime "created_at",                                                                   null: false
+    t.datetime "updated_at",                                                                   null: false
+    t.integer  "reimbursement_id",                   limit: 4
+    t.boolean  "accounted",                                                    default: false, null: false
+    t.boolean  "archived",                                                     default: false, null: false
+    t.boolean  "is_deleted",                                                   default: false, null: false
+    t.boolean  "auto_submit",                                                  default: false, null: false
+    t.boolean  "auto_approve",                                                 default: false, null: false
     t.date     "accounted_at"
     t.datetime "approved_at"
-    t.integer  "cash_in_hand_deduction_id",    limit: 4
-    t.integer  "submitted_amount_id",          limit: 4
-    t.integer  "cash_expenses_total_id",       limit: 4
-    t.integer  "card_expenses_total_id",       limit: 4
+    t.integer  "cash_in_hand_deduction_id",          limit: 4
+    t.integer  "submitted_amount_id",                limit: 4
+    t.integer  "reimbursable_expenses_total_id",     limit: 4
+    t.integer  "card_expenses_total_id",             limit: 4
+    t.integer  "non_reimbursable_expenses_total_id", limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -1375,11 +1466,12 @@ ActiveRecord::Schema.define(version: 20170425072600) do
   create_table "time_expense_configs", force: :cascade do |t|
     t.integer  "parent_id",           limit: 4
     t.string   "parent_type",         limit: 255
-    t.decimal  "rate_per_hour",                   precision: 10, scale: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
+    t.integer  "rate_id",             limit: 4
+    t.integer  "period_id",           limit: 4
   end
 
   create_table "time_expenses", force: :cascade do |t|
