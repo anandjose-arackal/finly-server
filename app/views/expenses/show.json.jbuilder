@@ -6,11 +6,16 @@ json.date @result.expense.date.strftime("%d %b %Y")
 json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
 json.currency_id @result.expense.currency_id rescue nil
 json.original_currency_id @result.expense.currency_id rescue nil
-
+json.currency_symbol @result.expense.currency_symbol
+json.currency_country_code @result.expense.currency_country_code
 
 if @result.expense.report_id.present?
   json.original_amount_value @result.expense.original_amount_value
   json.base_currency_id @result.expense.report.base_currency_id
+  json.original_currency_symbol @result.expense.amount.currency.symbol
+  json.original_currency_country_code @result.expense.amount.currency.country_code
+  json.base_currency_symbol @result.expense.report.base_currency_symbol
+  json.base_currency_country_code @result.expense.report.base_currency_code
 end
 
 # flag to show whether a particular expense has been converted or not

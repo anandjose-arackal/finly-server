@@ -22,48 +22,57 @@ class Currency < ActiveRecord::Base
   CURRENCIES = [
       {
           country: "India",
-          country_code: "INR"
+          country_code: "INR",
+          symbol: "₹"
       },
       {
           country: "United States of America",
-          country_code: "USD"
+          country_code: "USD",
+          symbol: "$"
       },
       {
           country: "United Kingdom",
-          country_code: "GBP"
+          country_code: "GBP",
+          symbol: "£"
       },
       {
           country: "Australia",
-          country_code: "AUD"
+          country_code: "AUD",
+          symbol: "$"
       },
       {
           country: "Europe",
-          country_code: "EUR"
+          country_code: "EUR",
+          symbol: "€"
       },
       {
           country: "China",
-          country_code: "CNY"
+          country_code: "CNY",
+          symbol: "¥"
       },
       {
           country: "Japan",
-          country_code: "JPY"
+          country_code: "JPY",
+          symbol: "¥"
       },
       {
           country: "New Zealand",
-          country_code: "NZD"
+          country_code: "NZD",
+          symbol: "$"
       },
       {
           country: "Russia",
-          country_code: "RUB"
+          country_code: "RUB",
+          symbol: "₽"
       }
   ]
 
   def self.seed_data
-    CURRENCIES.each do |currency|
+    CURRENCIES.each do |currency, index|
       if Currency.find_by(country_code: currency[:country_code]).present?
         next
       else
-        Currency.create(country: currency[:country], country_code: currency[:country_code])
+        Currency.create(country: currency[:country], country_code: currency[:country_code], symbol: currency[:symbol])
       end
     end
   end

@@ -21,4 +21,6 @@ json.per_diem_config do
   end
 end
 
+json.base_currency_symbol @result.base_currency.symbol
+
 json.extract! @result.categories

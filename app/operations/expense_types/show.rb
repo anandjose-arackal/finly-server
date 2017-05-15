@@ -115,18 +115,20 @@ class ExpenseTypes::Show < ExpenseTypes::Base
     params[:time_config] = self.time_config
     params[:per_diem_config] = self.per_diem_config
     params[:categories] = company.categories.active
+    params[:base_currency] = parent.base_currency
     ExpenseTypes::Show::ExpenseConfigurationPresenter.new(user, params, messages)
   end
 
 
   class ExpenseTypes::Show::ExpenseConfigurationPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :distance_config, :time_config, :per_diem_config, :categories
+    attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :base_currency
 
     def init
       self.distance_config = params[:distance_config]
       self.time_config = params[:time_config]
       self.per_diem_config = params[:per_diem_config]
       self.categories = params[:categories]
+      self.base_currency = params[:base_currency]
     end
   end
 

@@ -15,6 +15,8 @@ json.deleted @result.report.is_deleted
 json.non_reimbursable_expenses_total @result.non_reimbursable_expenses_total
 json.reimbursable_expenses_total @result.reimbursable_expenses_total
 json.card_expenses_total @result.card_expenses_total
+json.currency_symbol @result.report.base_currency_symbol
+json.currency_country_code @result.report.base_currency_code
 
 policy_id = nil
 policy_name = nil

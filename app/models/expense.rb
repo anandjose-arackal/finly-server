@@ -578,6 +578,22 @@ class Expense < ActiveRecord::Base
     self.amount.destroy_currencies
   end
 
+  def currency_symbol
+    if self.amount.present?
+      self.amount.currency.symbol
+    else
+      return nil
+    end
+  end
+
+  def currency_country_code
+    if self.amount.present?
+      self.amount.currency.country_code
+    else
+      return nil
+    end
+  end
+
   private
 
   # cannot add an expense with future date
