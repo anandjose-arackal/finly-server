@@ -37,6 +37,8 @@
 
 
 
+
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -250,7 +252,7 @@ class Report < ActiveRecord::Base
         end
       end
     end
-    precision_value(temp_expenses.with_amount.sum(:value))
+    precision_value(temp_expenses.with_amount.sum(self.base_currency_code.to_sym))
   end
 
   def controlling_user?(user)
@@ -311,6 +313,30 @@ class Report < ActiveRecord::Base
     date = latest_exp.date if latest_exp.present?
     cash = self.user.cash_in_hand date
     cash.value - report_total < 0
+  end
+
+  def base_currency_id
+    if self.policy.present?
+      self.policy.base_currency_id
+    else
+      self.user.company.base_currency_id
+    end
+  end
+
+  def base_currency_code
+    if self.policy.present?
+      self.policy.base_currency.country_code
+    else
+      self.user.company.base_currency.country_code
+    end
+  end
+
+  def base_currency_symbol
+    if self.policy.present?
+      self.policy.base_currency.symbol
+    else
+      self.user.company.base_currency.symbol
+    end
   end
 
 

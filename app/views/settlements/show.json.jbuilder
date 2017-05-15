@@ -11,6 +11,8 @@ json.array! @result.items do |item|
     json.cash_expenses_total item.reimbursable_expenses_total.value rescue 0
     json.reimbursable_expenses_total item.reimbursable_expenses_total.value rescue 0
     json.non_reimbursable_expenses_total item.non_reimbursable_expenses_total.value rescue 0
+    json.currency_symbol item.base_currency_symbol
+    json.currency_code item.base_currency_code
     json.status item.status_name
     json.total_amount item.total_amount
   elsif item.is_a?(Payment)

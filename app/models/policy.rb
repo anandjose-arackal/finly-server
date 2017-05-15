@@ -2,16 +2,18 @@
 #
 # Table name: policies
 #
-#  id          :integer          not null, primary key
-#  name        :string(255)
-#  company_id  :integer
-#  owner_id    :integer
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  default     :boolean          default(FALSE), not null
-#  is_deleted  :boolean          default(FALSE), not null
-#  description :text(65535)
+#  id               :integer          not null, primary key
+#  name             :string(255)
+#  company_id       :integer
+#  owner_id         :integer
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  default          :boolean          default(FALSE), not null
+#  is_deleted       :boolean          default(FALSE), not null
+#  description      :text(65535)
+#  base_currency_id :integer          default(1)
 #
+
 
 
 
@@ -20,6 +22,7 @@ class Policy < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :company
+  belongs_to :base_currency, class_name: "Currency"
   has_one :configuration, class_name: 'PolicyConfiguration', dependent: :destroy
   has_many :user_mapping, class_name: 'PolicyUserMapping', dependent: :destroy
   has_many :users, through: :user_mapping

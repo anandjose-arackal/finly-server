@@ -17,9 +17,16 @@
 #  category_id          :integer
 #  is_deleted           :boolean          default(FALSE), not null
 #  transcribed          :boolean          default(FALSE)
-#  reimbursable         :boolean          default(TRUE)
 #  personal             :boolean          default(FALSE)
+#  reimbursable         :boolean          default(TRUE)
 #
+
+
+
+
+
+
+
 
 
 
@@ -259,18 +266,38 @@ class Expense < ActiveRecord::Base
   scope :unverified, -> {where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]}
 
   delegate :category_name, to: :category
+  delegate :amount_with_currency, to: :amount
+
+
+  def currency_id
+    if self.amount.present?
+      return self.amount.currency_id
+    else
+      return nil
+    end
+  end
 
 
   # this method is to purely show the amount values for the carious expenses
   def amount_value
     case self.expense_type_id
       when ExpenseType.id_for(:manual), ExpenseType.id_for(:card)
-        return precision_value self.amount.value
+        if self.report_id.blank?
+          return precision_value self.amount.value
+        else
+          base_currency_code = self.report.base_currency_code
+          return precision_value self.amount.send(base_currency_code.to_sym)
+        end
       when ExpenseType.id_for(:distance), ExpenseType.id_for(:time), ExpenseType.id_for(:per_diem)
         if self.amount.blank?
           return nil
         else
-          return precision_value self.amount.value
+          if self.report_id.blank?
+            return precision_value self.amount.value
+          else
+            base_currency_code = self.report.base_currency_code
+            return precision_value self.amount.send(base_currency_code.to_sym)
+          end
         end
       else
         return nil
@@ -287,21 +314,21 @@ class Expense < ActiveRecord::Base
         return self.amount.value
       when ExpenseType.id_for(:distance)
         if policy.blank?
-          rate = self.user.company.distance_expense_config.rate rescue nil
+          rate = self.user.company.distance_expense_config.rate_value rescue nil
           amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
           return amount
         else
-          rate = policy.distance_expense_config.rate rescue nil
+          rate = policy.distance_expense_config.rate_value rescue nil
           amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
           return amount
         end
       when ExpenseType.id_for(:time)
         if policy.blank?
-          rate = self.user.company.time_expense_config.rate rescue nil
+          rate = self.user.company.time_expense_config.rate_value rescue nil
           amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
           return amount
         else
-          rate = policy.time_expense_config.rate rescue nil
+          rate = policy.time_expense_config.rate_value rescue nil
           amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
           return amount
         end
@@ -352,9 +379,9 @@ class Expense < ActiveRecord::Base
           parent = report.policy
           parent = self.user.company if parent.nil?
           if self.distance_expense?
-            return "#{self.distance_expense.distance_value} KM @ ₹#{parent.distance_expense_config.rate_per_km} per KM"
+            return "#{self.distance_expense.distance_value} KM @ ₹#{parent.distance_expense_config.rate_value} per KM"
           elsif self.time_expense?
-            return "#{self.time_expense.time_object_value} Hours @ ₹#{parent.time_expense_config.rate_per_hour} per Hour"
+            return "#{self.time_expense.time_object_value} Hours @ ₹#{parent.time_expense_config.rate_value} per Hour"
           end
         end
     end
@@ -366,6 +393,14 @@ class Expense < ActiveRecord::Base
         return 0
       when ExpenseType.id_for(:card)
         return self.card_expense.surcharge_amount
+    end
+  end
+
+  def original_amount_value
+    if self.amount.present?
+      self.amount.value
+    else
+      nil
     end
   end
 
@@ -395,9 +430,9 @@ class Expense < ActiveRecord::Base
       if self.report_id.present?
         report = self.report
         if report.policy
-          return report.policy.distance_expense_config.rate_per_km
+          return report.policy.distance_expense_config.rate_value
         else
-          return report.user.company.distance_expense_config.rate_per_km
+          return report.user.company.distance_expense_config.rate_value
         end
       else
         return nil
@@ -421,9 +456,9 @@ class Expense < ActiveRecord::Base
       if self.report_id.present?
         report = self.report
         if report.policy
-          return report.policy.time_expense_config.rate_per_hour
+          return report.policy.time_expense_config.rate_value
         else
-          return report.user.company.time_expense_config.rate_per_hour
+          return report.user.company.time_expense_config.rate_value
         end
       else
         return nil
@@ -525,6 +560,39 @@ class Expense < ActiveRecord::Base
       return true
     end
     false
+  end
+
+  # method that updates all the currency values for a particular expense - todo - possibly should be moved to an operation
+  def update_other_currencies
+    unless self.amount.present?
+      return
+    end
+    # calls the respective method in the amounts model to update the currencies
+    self.amount.update_currencies(self.date)
+  end
+
+  def destroy_other_currencies
+    unless self.amount.present?
+      return
+    end
+    # calls the respective method in the amounts model to update the currencies
+    self.amount.destroy_currencies
+  end
+
+  def currency_symbol
+    if self.amount.present?
+      self.amount.currency.symbol
+    else
+      return nil
+    end
+  end
+
+  def currency_country_code
+    if self.amount.present?
+      self.amount.currency.country_code
+    else
+      return nil
+    end
   end
 
   private
