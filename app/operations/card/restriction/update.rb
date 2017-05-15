@@ -27,10 +27,19 @@ class Card::Restriction::Update < User::Base
 
   def init
     # self.selected_user = user.company.users.find_by(id: params[:id])
-    self.selected_user = User::Index.(user, params).team.with_id((params[:id] or params[:user_id])).first rescue nil
+    self.selected_user = params[:user]
+    self.selected_card = params[:card]
+
+    if selected_user.blank?
+      self.selected_user = User::Index.(user, params).team.with_id((params[:id] or params[:user_id])).first rescue nil
+    end
     return if selected_user.blank?
-    self.selected_card = selected_user.cards.with_id(params[:card_id]).first
+
+    if selected_card.blank?
+      self.selected_card = selected_user.cards.with_id(params[:card_id]).first
+    end
     return if selected_card.blank?
+
     self.card_restriction = selected_card.card_restriction
     self.card_limits = self.card_restriction.card_limits
     self.update_params = card_restriction_params
