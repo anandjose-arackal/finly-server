@@ -60,7 +60,7 @@ class ReceiptEmail < ActiveRecord::Base
                                                                     email_attachment.original_attachment_content_type,
                                                                     image_tmp_path
           document_converter.convert do |images|
-            images.each { |image| receipts.create(user_id: user_id, image: image, note: self.subject) }
+            images.each { |image| receipts.create(user_id: user_id, image: image, note: self.subject, to_be_transcribed: true) }
           end
         end
       else
@@ -70,7 +70,7 @@ class ReceiptEmail < ActiveRecord::Base
                                                                   ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
                                                                   image_tmp_path
         document_converter.convert do |images|
-          images.each { |image| receipts.create(user_id: user_id, image: image, note: self.subject) }
+          images.each { |image| receipts.create(user_id: user_id, image: image, note: self.subject, to_be_transcribed: true) }
         end
       end
   end
