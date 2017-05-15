@@ -243,7 +243,9 @@ class Amount < ActiveRecord::Base
 
   after_create {
     # i.e. updating the respective currency' column with value
-    self.update((self.currency.country_code) => self.value)
+    if Amount.column_names.include?(self.currency.country_code)
+      self.update((self.currency.country_code) => self.value)
+    end
   }
 
   def greater_than_amount_value
