@@ -35,7 +35,7 @@ class Currency::FetchData < BaseHandler
   end
 
   def env_key
-    'fixer_currency_conversion'
+    'currency_layer_currency_conversion'
   end
 
   def init
@@ -46,34 +46,41 @@ class Currency::FetchData < BaseHandler
       self.base_currency = "GBP"
     end
     # appending the date to the path of the url
-    self.request_path = self.path + "/#{date}"
+    self.request_path = self.path
   end
 
   def process
     self.response = self.connection.get do |req|
       req.url request_path
       req.params = {
-          base: base_currency
+         access_key: Constants::CURRENCY_LAYER_ACCESS_KEY,
+         date: date
       }
     end
   end
 
   def parse
     # parsing the response body into a json string
-    parsed_response = JSON.parse(response.body)
-    self.result_hash = {
-        date: date
-    }
-    parsed_response['rates'].each do |key, value|
-      result_hash[key] = value
-    end
-    # also adding the base currency so that the database has the value of GBP too
-    result_hash['GBP'] = 1
+    self.result_hash = extract_conversion_rates(JSON.parse(response.body))
   end
 
   def success
     params[:currency_data] = result_hash
     Currency::FetchData::CurrencyDatPresenter.new(user, params, messages)
+  end
+
+  private
+
+  def extract_conversion_rates(parsed_json)
+    result = {}
+    parsed_json.each do |key, value|
+      if key == 'quotes'
+        value.each do |k, v|
+          result[k[3..(k.size-1)]] = v
+        end
+      end
+    end
+    result
   end
 
 end
