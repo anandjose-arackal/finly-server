@@ -64,7 +64,153 @@ class Currency < ActiveRecord::Base
           country: "Russia",
           country_code: "RUB",
           symbol: "₽"
-      }
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+      {
+          country: "Russia",
+          country_code: "RUB",
+          symbol: "₽"
+      },
+
   ]
 
   def self.seed_data
