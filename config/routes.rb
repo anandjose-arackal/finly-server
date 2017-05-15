@@ -520,9 +520,9 @@
 
 Rails.application.routes.draw do
 
-  get 'user_groups/create'
+  # get 'user_groups/create'
 
-  get 'user_group/create'
+  # get 'user_group/create'
 
   namespace :transcriber do
     post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create

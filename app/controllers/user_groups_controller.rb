@@ -22,9 +22,9 @@ class UserGroupsController < ApplicationController
   #
   # end
 
-  # def destroy
-  #   @result = UserGroup::Destroy.(current_user, params)
-  #   respond response: (@result&.success? ? :success : :failure)
-  # end
+  def destroy
+    @result = UserGroup::Destroy.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
 
 end
