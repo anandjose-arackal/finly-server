@@ -52,6 +52,15 @@ json.cancellable @result.expense.cancellable?
 
 json.cancelled @result.expense.cancelled?
 
+# sending all the currencies and the respective symbols and codes
+json.currencies do
+  json.array!(Currency.all) do |currency|
+    json.symbol currency.symbol
+    json.country_code currency.country_code
+    json.id currency.id
+  end
+end
+
 json.custom_fields do
   expense = @result.expense
   case expense.expense_type_id

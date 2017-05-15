@@ -12,7 +12,7 @@
 # Parameters being passed are:
 # params:
 #   date: "14-03-1998"
-#   base: "GBP" - the base currency against which the rates are retrieved
+#   access_key: "sgsdf"
 
 class Currency::FetchData < BaseHandler
 
