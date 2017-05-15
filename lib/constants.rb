@@ -32,6 +32,8 @@ module Constants
 
   WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
 
+  CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+
   #########################
 
   if Rails.env.production?

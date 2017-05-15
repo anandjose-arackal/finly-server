@@ -378,9 +378,9 @@ class Expense < ActiveRecord::Base
           parent = report.policy
           parent = self.user.company if parent.nil?
           if self.distance_expense?
-            return "#{self.distance_expense.distance_value} KM @ ₹#{parent.distance_expense_config.rate_per_km} per KM"
+            return "#{self.distance_expense.distance_value} KM @ ₹#{parent.distance_expense_config.rate_value} per KM"
           elsif self.time_expense?
-            return "#{self.time_expense.time_object_value} Hours @ ₹#{parent.time_expense_config.rate_per_hour} per Hour"
+            return "#{self.time_expense.time_object_value} Hours @ ₹#{parent.time_expense_config.rate_value} per Hour"
           end
         end
     end
@@ -429,9 +429,9 @@ class Expense < ActiveRecord::Base
       if self.report_id.present?
         report = self.report
         if report.policy
-          return report.policy.distance_expense_config.rate_per_km
+          return report.policy.distance_expense_config.rate_value
         else
-          return report.user.company.distance_expense_config.rate_per_km
+          return report.user.company.distance_expense_config.rate_value
         end
       else
         return nil
@@ -455,9 +455,9 @@ class Expense < ActiveRecord::Base
       if self.report_id.present?
         report = self.report
         if report.policy
-          return report.policy.time_expense_config.rate_per_hour
+          return report.policy.time_expense_config.rate_value
         else
-          return report.user.company.time_expense_config.rate_per_hour
+          return report.user.company.time_expense_config.rate_value
         end
       else
         return nil

@@ -45,7 +45,7 @@ class DistanceExpenseConfig < ActiveRecord::Base
 
   def rate_exists_for_enabled
     if self.enabled
-      if self.rate_id.blank?
+      if self.rate.blank?
         errors.add(:rate, "cannot be empty")
       end
     end

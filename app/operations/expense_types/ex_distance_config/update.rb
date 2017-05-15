@@ -48,9 +48,12 @@ class ExpenseTypes::ExDistanceConfig::Update < ExpenseTypes::Base
 
   def pre_process
     base_currency_id = distance_config.parent.base_currency_id
-    update_params[:rate_attributes][:currency_id] = base_currency_id
-    if distance_config.rate.present?
-      update_params[:rate_attributes][:id] = distance_config.rate.id
+    if update_params[:rate_attributes]
+      update_params[:rate_attributes][:currency_id] = base_currency_id
+      update_params[:distance_unit_id] = PhysicalUnit.kilometre_id
+      if distance_config.rate.present?
+        update_params[:rate_attributes][:id] = distance_config.rate.id
+      end
     end
   end
 
