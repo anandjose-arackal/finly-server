@@ -19,8 +19,8 @@ class UserTeamsController < ApplicationController
   end
 
   def show
-    # @result = UserGroup::Destroy.(current_user, params)
-    # respond response: (@result&.success? ? :success : :failure)
+    @result = UserTeam::Show.(current_user, params)
+    respond
   end
 
   def destroy

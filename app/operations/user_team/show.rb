@@ -1,38 +1,38 @@
-class UserTeam::Create < UserTeam::Base
-  attr_accessor :user_team_configuration, :item_ids
+class UserTeam::Show < UserTeam::Base
 
-  def authorized_user_types
-    [:company_admin]
+  def success
+    params[:user_team] = self.user_team
+    UserTeam::Show::SuccessPresenter.new(user, params, messages)
   end
 
-  def pre_validate
-    if user.blank?
-      add_message :error, 'User not found'
-      return
-    end
-    unless params&.dig(:name).present?
-      add_message :error, 'Name cannot be blank'
-    end
-  end
+  class UserTeam::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :user_team, :user_groups, :users
 
-  def init
-    self.user_team_configuration = {name: params[:name], user_team_group_item_mappings:[]}
-    self.item_ids = []
-    params[:user_team_configuration]&.each do |key, value|
-      user_team_configuration[:user_team_group_item_mappings] << {user_group_id: key, user_group_item_id: value}
-      self.item_ids << value
+    def init
+      self.user_team = params[:user_team]
+      self.user_groups = self.user.company.user_groups
+      self.users = UserGroup::Users.(user, filter_group_items: self.user_team.user_group_items.pluck(:id).uniq)&.selected_users
     end
-  end
 
-  def validate
-    # Check if all group item and groups exists and that they belong to the given company
-  end
-
-  def process
-    config = user.company.user_teams.build user_team_configuration
-    unless config.save
-      add_message :error, config.errors.full_messages
+    def selected_group_items
+      map = {
+          id: user_team.id,
+          name: user_team.name,
+      }
+      groups = {}
+      user_team.user_team_group_item_mappings.each do |team_mapping|
+        user_group = team_mapping.user_group
+        user_group_item = team_mapping.user_group_item
+        group_id_s = team_mapping.user_group_id.to_s
+        if groups[group_id_s].blank?
+          groups[group_id_s] = {id: group_id_s, name: user_group.name, items: []}
+        end
+        groups[group_id_s][:items] << {id: user_group_item.id, name: user_group_item.name}
+      end
+      map[:groups] = groups.values
+      map[:groups]
     end
+
   end
 
 end

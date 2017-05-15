@@ -9,9 +9,9 @@ class UserGroup::Users < UserGroup::Base
   end
 
   def init
-    self.filter_group_items = []
-    params[:filter_group_items]&.each do |key, value|
-      self.filter_group_items << value
+    self.filter_group_items = params[:filter_group_items]
+    unless self.filter_group_items.is_a?(Array)
+      self.filter_group_items = [self.filter_group_items]
     end
   end
 
