@@ -41,10 +41,6 @@ class Currency::FetchData < BaseHandler
   def init
     super()
     self.date = params[:date]
-    self.base_currency = params[:base]
-    if base_currency.nil?
-      self.base_currency = "GBP"
-    end
     # appending the date to the path of the url
     self.request_path = self.path
   end
@@ -62,6 +58,7 @@ class Currency::FetchData < BaseHandler
   def parse
     # parsing the response body into a json string
     self.result_hash = extract_conversion_rates(JSON.parse(response.body))
+    result_hash['date'] = date
   end
 
   def success
