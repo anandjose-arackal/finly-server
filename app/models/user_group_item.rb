@@ -20,4 +20,10 @@ class UserGroupItem < ActiveRecord::Base
   validates :name, uniqueness: {scope: :user_group_id}
 
   scope :with_user_group, ->(user_group_id) { where user_group_id: user_group_id }
+  scope :with_id, ->(id) { where id: id }
+
+  before_destroy do
+    UserGroupItemMapping.with_group_item(self.id).destroy_all
+  end
+
 end
