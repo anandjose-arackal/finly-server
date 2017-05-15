@@ -21,73 +21,74 @@ class Currency < ActiveRecord::Base
 
   CURRENCIES = [
       {
-          country: "India",
+          country: "India Rupee",
           country_code: "INR",
           symbol: "₹"
       },
       {
-          country: "United States of America",
+          country: "United States of America Dollar",
           country_code: "USD",
           symbol: "$"
       },
       {
-          country: "United Kingdom",
+          country: "United Kingdom Pound",
           country_code: "GBP",
           symbol: "£"
       },
       {
-          country: "Australia",
+          country: "Australia Dollar",
           country_code: "AUD",
           symbol: "$"
       },
       {
-          country: "Europe",
+          country: "Europe Euro",
           country_code: "EUR",
           symbol: "€"
       },
       {
-          country: "China",
+          country: "China Yuan",
           country_code: "CNY",
           symbol: "¥"
       },
       {
-          country: "Japan",
+          country: "Japan Yen",
           country_code: "JPY",
           symbol: "¥"
       },
       {
-          country: "New Zealand",
+          country: "New Zealand Dollar",
           country_code: "NZD",
           symbol: "$"
       },
       {
-          country: "Russia",
+          country: "Russia Ruble",
           country_code: "RUB",
           symbol: "₽"
       },
       {
           :country=>"United Arab Emirates Dirham",
-          :country_code=>"AED"
-      },
-      {
-          :country => "United Arab Emirates Dirham",
-          :country_code => "AED"
+          :country_code=>"AED",
+          symbol: ""
       },
       {
           :country => "Afghan Afghani",
-          :country_code => "AFN"
+          :country_code => "AFN",
+          symbol: "؋"
       },
       {
           :country => "Albanian Lek",
-          :country_code => "ALL"
+          :country_code => "ALL",
+          symbol: "Lek"
       },
       {
           :country => "Armenian Dram",
-          :country_code => "AMD"
+          :country_code => "AMD",
+          symbol: "դր."
       },
       {
           :country => "Netherlands Antillean Guilder",
-          :country_code => "ANG"
+          :country_code => "ANG",
+          symbol: "ƒ"
       },
       {
           :country => "Angolan Kwanza",
@@ -95,23 +96,28 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Argentine Peso",
-          :country_code => "ARS"
+          :country_code => "ARS",
+          symbol: "$"
       },
       {
           :country => "Aruban Florin",
-          :country_code => "AWG"
+          :country_code => "AWG",
+          symbol: ""
       },
       {
           :country => "Azerbaijani Manat",
-          :country_code => "AZN"
+          :country_code => "AZN",
+          symbol: "₼"
       },
       {
           :country => "Bosnia-Herzegovina Convertible Mark",
-          :country_code => "BAM"
+          :country_code => "BAM",
+          symbol: "KM"
       },
       {
           :country => "Barbadian Dollar",
-          :country_code => "BBD"
+          :country_code => "BBD",
+          symbol: "$"
       },
       {
           :country => "Bangladeshi Taka",
@@ -131,11 +137,13 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Bermudan Dollar",
-          :country_code => "BMD"
+          :country_code => "BMD",
+          symbol: "$"
       },
       {
           :country => "Brunei Dollar",
-          :country_code => "BND"
+          :country_code => "BND",
+          symbol: "$"
       },
       {
           :country => "Bolivian Boliviano",
@@ -147,7 +155,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Bahamian Dollar",
-          :country_code => "BSD"
+          :country_code => "BSD",
+          symbol: "$"
       },
       {
           :country => "Bitcoin",
@@ -167,11 +176,13 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Belize Dollar",
-          :country_code => "BZD"
+          :country_code => "BZD",
+          symbol: "$"
       },
       {
           :country => "Canadian Dollar",
-          :country_code => "CAD"
+          :country_code => "CAD",
+          symbol: "$"
       },
       {
           :country => "Congolese Franc",
@@ -223,7 +234,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Danish Krone",
-          :country_code => "DKK"
+          :country_code => "DKK",
+          symbol: "kr"
       },
       {
           :country => "Dominican Peso",
@@ -235,7 +247,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Egyptian Pound",
-          :country_code => "EGP"
+          :country_code => "EGP",
+          symbol: "£"
       },
       {
           :country => "Eritrean Nakfa",
@@ -247,11 +260,13 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Fijian Dollar",
-          :country_code => "FJD"
+          :country_code => "FJD",
+          symbol: "$"
       },
       {
           :country => "Falkland Islands Pound",
-          :country_code => "FKP"
+          :country_code => "FKP",
+          symbol: "£"
       },
       {
           :country => "Georgian Lari",
@@ -259,7 +274,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Guernsey Pound",
-          :country_code => "GGP"
+          :country_code => "GGP",
+          symbol: "£"
       },
       {
           :country => "Ghanaian Cedi",
@@ -267,7 +283,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Gibraltar Pound",
-          :country_code => "GIP"
+          :country_code => "GIP",
+          symbol: "£"
       },
       {
           :country => "Gambian Dalasi",
@@ -283,11 +300,13 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Guyanaese Dollar",
-          :country_code => "GYD"
+          :country_code => "GYD",
+          symbol: "$"
       },
       {
           :country => "Hong Kong Dollar",
-          :country_code => "HKD"
+          :country_code => "HKD",
+          symbol: "$"
       },
       {
           :country => "Honduran Lempira",
@@ -303,19 +322,23 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Hungarian Forint",
-          :country_code => "HUF"
+          :country_code => "HUF",
+          symbol: "Ft"
       },
       {
           :country => "Indonesian Rupiah",
-          :country_code => "IDR"
+          :country_code => "IDR",
+          symbol: "Rp"
       },
       {
           :country => "Israeli New Sheqel",
-          :country_code => "ILS"
+          :country_code => "ILS",
+          symbol: "₪"
       },
       {
           :country => "Manx pound",
-          :country_code => "IMP"
+          :country_code => "IMP",
+          symbol: "£"
       },
       {
           :country => "Iraqi Dinar",
@@ -327,15 +350,18 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Icelandic Króna",
-          :country_code => "ISK"
+          :country_code => "ISK",
+          symbol: "kr"
       },
       {
           :country => "Jersey Pound",
-          :country_code => "JEP"
+          :country_code => "JEP",
+          symbol: "£"
       },
       {
           :country => "Jamaican Dollar",
-          :country_code => "JMD"
+          :country_code => "JMD",
+          symbol: "J$"
       },
       {
           :country => "Jordanian Dinar",
@@ -347,7 +373,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Kyrgystani Som",
-          :country_code => "KGS"
+          :country_code => "KGS",
+          symbol: "лв"
       },
       {
           :country => "Cambodian Riel",
@@ -359,11 +386,13 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "North Korean Won",
-          :country_code => "KPW"
+          :country_code => "KPW",
+          symbol: "₩"
       },
       {
           :country => "South Korean Won",
-          :country_code => "KRW"
+          :country_code => "KRW",
+          symbol: "₩"
       },
       {
           :country => "Kuwaiti Dinar",
@@ -371,11 +400,13 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Cayman Islands Dollar",
-          :country_code => "KYD"
+          :country_code => "KYD",
+          symbol: "$"
       },
       {
           :country => "Kazakhstani Tenge",
-          :country_code => "KZT"
+          :country_code => "KZT",
+          symbol: "лв"
       },
       {
           :country => "Laotian Kip",
@@ -383,15 +414,18 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Lebanese Pound",
-          :country_code => "LBP"
+          :country_code => "LBP",
+          symbol: "£"
       },
       {
           :country => "Sri Lankan Rupee",
-          :country_code => "LKR"
+          :country_code => "LKR",
+          symbol: "Rs"
       },
       {
           :country => "Liberian Dollar",
-          :country_code => "LRD"
+          :country_code => "LRD",
+          symbol: "$"
       },
       {
           :country => "Lesotho Loti",
@@ -435,7 +469,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Mauritian Rupee",
-          :country_code => "MUR"
+          :country_code => "MUR",
+          symbol: "Rs"
       },
       {
           :country => "Maldivian Rufiyaa",
@@ -459,7 +494,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Namibian Dollar",
-          :country_code => "NAD"
+          :country_code => "NAD",
+          symbol: "$"
       },
       {
           :country => "Nigerian Naira",
@@ -471,11 +507,13 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Norwegian Krone",
-          :country_code => "NOK"
+          :country_code => "NOK",
+          symbol: "kr"
       },
       {
           :country => "Nepalese Rupee",
-          :country_code => "NPR"
+          :country_code => "NPR",
+          symbol: "Rs"
       },
       {
           :country => "Omani Rial",
@@ -499,7 +537,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Pakistani Rupee",
-          :country_code => "PKR"
+          :country_code => "PKR",
+          symbol: "Rs"
       },
       {
           :country => "Polish Zloty",
@@ -519,7 +558,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Serbian Dinar",
-          :country_code => "RSD"
+          :country_code => "RSD",
+          symbol: "Дин."
       },
       {
           :country => "Rwandan Franc",
@@ -531,27 +571,33 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Solomon Islands Dollar",
-          :country_code => "SBD"
+          :country_code => "SBD",
+          symbol: "$"
       },
       {
           :country => "Seychellois Rupee",
-          :country_code => "SCR"
+          :country_code => "SCR",
+          symbol: "Rs"
       },
       {
           :country => "Sudanese Pound",
-          :country_code => "SDG"
+          :country_code => "SDG",
+          symbol: "£"
       },
       {
           :country => "Swedish Krona",
-          :country_code => "SEK"
+          :country_code => "SEK",
+          symbol: "kr"
       },
       {
           :country => "Singapore Dollar",
-          :country_code => "SGD"
+          :country_code => "SGD",
+          symbol: "$"
       },
       {
           :country => "Saint Helena Pound",
-          :country_code => "SHP"
+          :country_code => "SHP",
+          symbol: "£"
       },
       {
           :country => "Sierra Leonean Leone",
@@ -563,11 +609,13 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Surinamese Dollar",
-          :country_code => "SRD"
+          :country_code => "SRD",
+          symbol: "$"
       },
       {
           :country => "South Sudanese Pound",
-          :country_code => "SSP"
+          :country_code => "SSP",
+          symbol: "£"
       },
       {
           :country => "São Tomé and Príncipe Dobra",
@@ -579,7 +627,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Syrian Pound",
-          :country_code => "SYP"
+          :country_code => "SYP",
+          symbol: "£"
       },
       {
           :country => "Swazi Lilangeni",
@@ -611,11 +660,13 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Trinidad and Tobago Dollar",
-          :country_code => "TTD"
+          :country_code => "TTD",
+          symbol: "TT$"
       },
       {
           :country => "New Taiwan Dollar",
-          :country_code => "TWD"
+          :country_code => "TWD",
+          symbol: "NT$"
       },
       {
           :country => "Tanzanian Shilling",
@@ -639,11 +690,13 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Venezuelan Bolívar Fuerte",
-          :country_code => "VEF"
+          :country_code => "VEF",
+          symbol: "Bs"
       },
       {
           :country => "Vietnamese Dong",
-          :country_code => "VND"
+          :country_code => "VND",
+          symbol: "₫"
       },
       {
           :country => "Vanuatu Vatu",
@@ -667,7 +720,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "East Caribbean Dollar",
-          :country_code => "XCD"
+          :country_code => "XCD",
+          symbol: "$"
       },
       {
           :country => "Special Drawing Rights",
@@ -691,11 +745,13 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Yemeni Rial",
-          :country_code => "YER"
+          :country_code => "YER",
+          symbol: "﷼"
       },
       {
           :country => "South African Rand",
-          :country_code => "ZAR"
+          :country_code => "ZAR",
+          symbol: "R"
       },
       {
           :country => "Zambian Kwacha",
@@ -703,7 +759,8 @@ class Currency < ActiveRecord::Base
       },
       {
           :country => "Zimbabwean Dollar",
-          :country_code => "ZWL"
+          :country_code => "ZWL",
+          symbol: "Z$"
       }
   ]
 
