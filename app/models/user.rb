@@ -97,6 +97,7 @@ class User < ActiveRecord::Base
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable, dependent: :destroy
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
+  has_one :auto_reload_config, as: :reloadable, dependent: :destroy
 
   has_many :cards, dependent: :destroy
   has_many :card_transactions, dependent: :destroy

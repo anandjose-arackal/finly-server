@@ -12,7 +12,7 @@
 
 class AutoReloadConfig < ActiveRecord::Base
 
-  belongs_to :parent, polymorphic: true
+  belongs_to :reloadable, polymorphic: true
   belongs_to :minimum_balance, class_name: 'Amount'
 
   accepts_nested_attributes_for :minimum_balance

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170512165116) do
+ActiveRecord::Schema.define(version: 20170515070430) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -67,6 +67,37 @@ ActiveRecord::Schema.define(version: 20170512165116) do
     t.integer  "currency_id", limit: 4,                           null: false
     t.datetime "created_at",                                      null: false
     t.datetime "updated_at",                                      null: false
+    t.decimal  "INR",                   precision: 20, scale: 5
+    t.decimal  "USD",                   precision: 20, scale: 5
+    t.decimal  "GBP",                   precision: 20, scale: 5
+    t.decimal  "CAD",                   precision: 20, scale: 5
+    t.decimal  "EUR",                   precision: 20, scale: 5
+    t.decimal  "HRK",                   precision: 20, scale: 5
+    t.decimal  "RUB",                   precision: 20, scale: 5
+    t.decimal  "BGN",                   precision: 20, scale: 5
+    t.decimal  "BRL",                   precision: 20, scale: 5
+    t.decimal  "CHF",                   precision: 20, scale: 5
+    t.decimal  "CNY",                   precision: 20, scale: 5
+    t.decimal  "CZK",                   precision: 20, scale: 5
+    t.decimal  "DKK",                   precision: 20, scale: 5
+    t.decimal  "HKD",                   precision: 20, scale: 5
+    t.decimal  "HUF",                   precision: 20, scale: 5
+    t.decimal  "IDR",                   precision: 20, scale: 5
+    t.decimal  "ILS",                   precision: 20, scale: 5
+    t.decimal  "JPY",                   precision: 20, scale: 5
+    t.decimal  "KRW",                   precision: 20, scale: 5
+    t.decimal  "MXN",                   precision: 20, scale: 5
+    t.decimal  "NOK",                   precision: 20, scale: 5
+    t.decimal  "NZD",                   precision: 20, scale: 5
+    t.decimal  "PHP",                   precision: 20, scale: 5
+    t.decimal  "PLN",                   precision: 20, scale: 5
+    t.decimal  "RON",                   precision: 20, scale: 5
+    t.decimal  "SEK",                   precision: 20, scale: 5
+    t.decimal  "SGD",                   precision: 20, scale: 5
+    t.decimal  "THB",                   precision: 20, scale: 5
+    t.decimal  "TRY",                   precision: 20, scale: 5
+    t.decimal  "ZAR",                   precision: 20, scale: 5
+    t.decimal  "AUD",                   precision: 20, scale: 5
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
@@ -75,8 +106,9 @@ ActiveRecord::Schema.define(version: 20170512165116) do
     t.integer  "minimum_balance_id", limit: 4
     t.integer  "parent_id",          limit: 4
     t.string   "parent_type",        limit: 255
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "enabled",                        default: false
   end
 
   create_table "auto_submit_configs", force: :cascade do |t|
@@ -320,10 +352,11 @@ ActiveRecord::Schema.define(version: 20170512165116) do
   end
 
   create_table "companies", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.boolean  "active",                 default: true, null: false
+    t.string   "name",             limit: 255
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.boolean  "active",                       default: true, null: false
+    t.integer  "base_currency_id", limit: 4,   default: 1
   end
 
   create_table "company_accounts", force: :cascade do |t|
@@ -458,12 +491,12 @@ ActiveRecord::Schema.define(version: 20170512165116) do
   end
 
   create_table "crono_jobs", force: :cascade do |t|
-    t.string   "job_id",            limit: 255,   null: false
-    t.text     "log",               limit: 65535
+    t.string   "job_id",            limit: 255,      null: false
+    t.text     "log",               limit: 16777215
     t.datetime "last_performed_at"
     t.boolean  "healthy"
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
   end
 
   add_index "crono_jobs", ["job_id"], name: "index_crono_jobs_on_job_id", unique: true, using: :btree
@@ -475,6 +508,46 @@ ActiveRecord::Schema.define(version: 20170512165116) do
     t.datetime "updated_at",               null: false
     t.string   "symbol",       limit: 255
   end
+
+  create_table "currency_conversion_rates", force: :cascade do |t|
+    t.date     "date",                                null: false
+    t.decimal  "INR",        precision: 10, scale: 5
+    t.decimal  "USD",        precision: 10, scale: 5
+    t.decimal  "GBP",        precision: 10, scale: 5
+    t.decimal  "EUR",        precision: 10, scale: 5
+    t.decimal  "CAD",        precision: 10, scale: 5
+    t.decimal  "HRK",        precision: 10, scale: 5
+    t.decimal  "RUB",        precision: 10, scale: 5
+    t.decimal  "BGN",        precision: 10, scale: 5
+    t.decimal  "BRL",        precision: 10, scale: 5
+    t.decimal  "CHF",        precision: 10, scale: 5
+    t.decimal  "CNY",        precision: 10, scale: 5
+    t.decimal  "CZK",        precision: 10, scale: 5
+    t.decimal  "DKK",        precision: 10, scale: 5
+    t.decimal  "HKD",        precision: 10, scale: 5
+    t.decimal  "HUF",        precision: 10, scale: 5
+    t.decimal  "IDR",        precision: 10, scale: 5
+    t.decimal  "ILS",        precision: 10, scale: 5
+    t.decimal  "JPY",        precision: 10, scale: 5
+    t.decimal  "KRW",        precision: 10, scale: 5
+    t.decimal  "MXN",        precision: 10, scale: 5
+    t.decimal  "MYR",        precision: 10, scale: 5
+    t.decimal  "NOK",        precision: 10, scale: 5
+    t.decimal  "NZD",        precision: 10, scale: 5
+    t.decimal  "PHP",        precision: 10, scale: 5
+    t.decimal  "PLN",        precision: 10, scale: 5
+    t.decimal  "RON",        precision: 10, scale: 5
+    t.decimal  "SEK",        precision: 10, scale: 5
+    t.decimal  "SGD",        precision: 10, scale: 5
+    t.decimal  "THB",        precision: 10, scale: 5
+    t.decimal  "TRY",        precision: 10, scale: 5
+    t.decimal  "ZAR",        precision: 10, scale: 5
+    t.decimal  "AUD",        precision: 10, scale: 5
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+  end
+
+  add_index "currency_conversion_rates", ["date"], name: "index_currency_conversion_rates_on_date", using: :btree
 
   create_table "custom_fields", force: :cascade do |t|
     t.integer  "field_configuration_id", limit: 4,   null: false
@@ -493,11 +566,12 @@ ActiveRecord::Schema.define(version: 20170512165116) do
   create_table "distance_expense_configs", force: :cascade do |t|
     t.integer  "parent_id",           limit: 4
     t.string   "parent_type",         limit: 255
-    t.decimal  "rate_per_km",                     precision: 10, scale: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
+    t.integer  "rate_id",             limit: 4
+    t.integer  "distance_unit_id",    limit: 4
   end
 
   create_table "distance_expenses", force: :cascade do |t|
@@ -1131,14 +1205,15 @@ ActiveRecord::Schema.define(version: 20170512165116) do
   end
 
   create_table "policies", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.integer  "company_id",  limit: 4
-    t.integer  "owner_id",    limit: 4
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
-    t.boolean  "default",                   default: false, null: false
-    t.boolean  "is_deleted",                default: false, null: false
-    t.text     "description", limit: 65535
+    t.string   "name",             limit: 255
+    t.integer  "company_id",       limit: 4
+    t.integer  "owner_id",         limit: 4
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "default",                        default: false, null: false
+    t.boolean  "is_deleted",                     default: false, null: false
+    t.text     "description",      limit: 65535
+    t.integer  "base_currency_id", limit: 4,     default: 1
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
@@ -1392,11 +1467,12 @@ ActiveRecord::Schema.define(version: 20170512165116) do
   create_table "time_expense_configs", force: :cascade do |t|
     t.integer  "parent_id",           limit: 4
     t.string   "parent_type",         limit: 255
-    t.decimal  "rate_per_hour",                   precision: 10, scale: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
+    t.integer  "rate_id",             limit: 4
+    t.integer  "period_id",           limit: 4
   end
 
   create_table "time_expenses", force: :cascade do |t|
