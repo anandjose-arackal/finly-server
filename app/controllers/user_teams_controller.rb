@@ -14,8 +14,8 @@ class UserTeamsController < ApplicationController
   end
 
   def update
-    # @result = UserGroup::Update.(current_user, params)
-    # respond response: (@result&.success? ? :success : :failure)
+    @result = UserTeam::Update.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def show
