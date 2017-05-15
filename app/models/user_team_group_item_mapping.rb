@@ -16,9 +16,9 @@ class UserTeamGroupItemMapping < ActiveRecord::Base
   belongs_to :user_group
   belongs_to :user_group_item
 
-  validates :user_team, presence: true
+  # validates :user_team, presence: true
   validates :user_group_id, presence: true
-  validates :user_group_item_id, presence: true, uniqueness: {scope: [:user_group_id, :configuration_id]}
+  validates :user_group_item_id, presence: true, uniqueness: {scope: [:user_group_id, :user_team_id]}
 
   scope :with_type, ->(type_id) { where type_id: type_id }
   scope :with_user_group_item, ->(item_id) { where user_group_item_id: item_id }

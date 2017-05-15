@@ -15,6 +15,7 @@ class UserGroupItemMapping < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :user
+
   belongs_to :user_group_item
 
   scope :with_user, ->(user_id) { where user_id: user_id }

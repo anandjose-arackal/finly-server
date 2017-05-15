@@ -1,5 +1,5 @@
 class UserTeam::Create < UserTeam::Base
-  attr_accessor :user_team_configuration, :item_ids
+  attr_accessor :user_team_configuration
 
   def authorized_user_types
     [:company_admin]
@@ -16,16 +16,20 @@ class UserTeam::Create < UserTeam::Base
   end
 
   def init
-    self.user_team_configuration = {name: params[:name], user_team_group_item_mappings:[]}
-    self.item_ids = []
-    params[:user_team_configuration]&.each do |key, value|
-      user_team_configuration[:user_team_group_item_mappings] << {user_group_id: key, user_group_item_id: value}
-      self.item_ids << value
+    self.user_team_configuration = {name: params[:name], user_team_group_item_mappings_attributes: []}
+    item_ids = []
+    params[:user_team_items]&.each do |id|
+      next if item_ids.include?(id)
+      group = UserGroupItem.find_by(id: id)&.user_group
+      next unless group.present? and group.company_id == user.company_id
+      user_team_configuration[:user_team_group_item_mappings_attributes] << {user_group_id: group.id, user_group_item_id: id}
+      item_ids << id
     end
   end
 
   def validate
     # Check if all group item and groups exists and that they belong to the given company
+
   end
 
   def process
