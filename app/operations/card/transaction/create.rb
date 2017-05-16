@@ -140,6 +140,10 @@ class Card::Transaction::Create < BaseOperation
     params = self.params
     params[:transaction] = self.transaction
     Event::ECard::ETransaction::Create.(self.user, params)
+    # trigger auto reload of the card to match the amount in the config
+    if type == 'DEBIT' && %w(POS ATM ECOM).include?(mode)
+      User::Wallet::AutoReload::Reload.call_async(user.id, {})
+    end
   end
 
   def success

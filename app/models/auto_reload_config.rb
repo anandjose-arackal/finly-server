@@ -8,6 +8,7 @@
 #  parent_type        :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  enabled            :boolean          default(FALSE)
 #
 
 class AutoReloadConfig < ActiveRecord::Base
@@ -19,5 +20,15 @@ class AutoReloadConfig < ActiveRecord::Base
 
   delegate :minimum_balance_value, to: :minimum_balance
 
-  validates :minimum_balance_id, presence: true
+  validate :minimum_balance_presence
+
+  private
+
+  def minimum_balance_presence
+    if self.enabled
+      unless minimum_balance.present?
+        errors.add(:minimum_balance, "cannot be blank")
+      end
+    end
+  end
 end
