@@ -889,6 +889,12 @@ Rails.application.routes.draw do
   get 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#show'
   delete 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#destroy'
 
+
+  # Disburse
+  post 'disburse/users' => 'disburse/users#create'
+
+  get 'features_subscribed' => 'expense_types_configuration#features_subscribed'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
