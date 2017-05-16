@@ -28,12 +28,7 @@ class UserTeam::BatchUpdate::Restriction < UserTeam::BatchUpdate::Base
   end
 
   def process
-    users.each do |user|
-      if user.cards.with_card_program(self.card_program_id).present?
-        c = user.cards.with_card_program(self.card_program_id).first
 
-      end
-    end
   end
 
 end
