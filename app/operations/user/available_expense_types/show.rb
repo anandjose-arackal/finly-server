@@ -5,7 +5,7 @@ class User::AvailableExpenseTypes::Show < User::Base
 
   class User::AvailableExpenseTypes::Show::ExpenseTypesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :custom_fields_config
+    attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :custom_fields_config, :currencies
 
     def init
       self.distance_config = params[:distance_config]
@@ -13,6 +13,7 @@ class User::AvailableExpenseTypes::Show < User::Base
       self.per_diem_config = params[:per_diem_config]
       self.categories = params[:categories]
       self.custom_fields_config = params[:custom_fields_config]
+      self.currencies = Currency.all
     end
 
   end
