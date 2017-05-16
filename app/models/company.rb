@@ -98,7 +98,7 @@ class Company < ActiveRecord::Base
   }
 
   def default_policy
-    self.policies.default
+    self.policies.default&.first
   end
 
   def get_active_users
