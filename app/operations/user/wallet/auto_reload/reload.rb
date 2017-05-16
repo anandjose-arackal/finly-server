@@ -3,13 +3,13 @@ class User::Wallet::AutoReload::Reload < BackgroundOperation
   attr_accessor :selected_user, :wallet, :auto_reload_config, :expense_card, :card_balance_value, :load_amount_value
 
   def pre_validate
-    if user_id.blank? || params.blank?
+    if user.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
     end
   end
 
   def init
-    self.selected_user = User.find_by(id: user_id)
+    self.selected_user = user
     self.wallet = selected_user.wallet
     self.auto_reload_config = selected_user.auto_reload_config
     self.expense_card = Card.find_by(id: params[:card_id])

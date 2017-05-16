@@ -17,6 +17,7 @@ class BackgroundOperation < BaseOperation
     if user_id.present? and user_id.is_a?(User)
       user_id = user.id
     end
+    # this calls the super method of Sidekiq::Worker which calls the perfoem method
     super(user_id, params)
   end
 
