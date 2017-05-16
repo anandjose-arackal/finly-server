@@ -24,12 +24,5 @@ end
 json.base_currency_symbol @result.base_currency.symbol
 json.base_currency_country_code @result.base_currency.country_code
 
-json.currencies do
-  json.array!(@result.currencies) do |currency|
-    json.id currency.id
-    json.symbol currency.symbol
-    json.country_code currency.country_code
-  end
-end
 
 json.extract! @result.categories
