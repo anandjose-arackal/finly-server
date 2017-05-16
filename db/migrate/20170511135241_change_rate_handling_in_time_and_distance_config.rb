@@ -17,7 +17,7 @@ class ChangeRateHandlingInTimeAndDistanceConfig < ActiveRecord::Migration
     add_column :distance_expense_configs, :distance_unit_id, :integer, references: "PhysicalUnit"
 
     # creating periods that correspond to hour
-    Period.create(name: "Hour")
+    Period.seed_data
 
     # resetting the time rates for all the TimeExpenseConfigs
     time_rates.each do |k, v|

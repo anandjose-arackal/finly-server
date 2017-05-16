@@ -133,7 +133,7 @@ if NotifierType.count == 0
 end
 
 if Currency.count == 0
-  Currency.create id: 1, country: 'India', country_code: 'INR', symbol: '₹'
+  Currency.seed_data
 end
 
 if ExpenseType.count ==0
@@ -163,13 +163,7 @@ if RuleType.count == 0
   RuleType.create!(name: "Blocking")
 end
 
-if Period.count == 0
-  Period.create!(name: "Day")
-  Period.create!(name: "Week")
-  Period.create!(name: "Month")
-  Period.create!(name: "Quarter")
-  Period.create!(name: "Year")
-end
+Period.seed_data
 
 if PaymentType.count == 0
   PaymentType::TYPES.each do |key, value|
@@ -311,7 +305,7 @@ if User.count == 0
                    password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
                    role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
-                   team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
+                   team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0], policy_id: Company.first.policies.default.first.id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
@@ -320,7 +314,7 @@ if User.count == 0
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      mothers_maiden_name: Faker::Name.first_name,
                      role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
-                     team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
+                     team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0], policy_id: Company.first.policies.default.first.id}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
@@ -331,7 +325,7 @@ if User.count == 0
               mothers_maiden_name: Faker::Name.first_name,
               role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
                                         {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
-              team_mapping_attributes: [{default: true, manager: v[0], finance_manager: v[1]}],
+              team_mapping_attributes: [{default: true, manager: v[0], finance_manager: v[1], policy_id: Company.first.policies.default.first.id}],
               profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                    address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   ############################################################################################################################################
@@ -347,12 +341,12 @@ if User.count == 0
 
 
   m[0].team_mapping.default.first.update_attributes(approves_to: m[1])
-  m[0].team_mapping.build(approves_to: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}).save
-  u[0].team_mapping.build(manager: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
+  m[0].team_mapping.build(approves_to: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}, policy_id: Company.first.policies.default.first.id).save
+  u[0].team_mapping.build(manager: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}, policy_id: Company.first.policies.default.first.id).save
 
   fm[0].team_mapping.default.first.update_attributes(approves_finance_to: fm[1])
-  fm[0].team_mapping.build(approves_finance_to: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
-  u[0].team_mapping.build(finance_manager: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
+  fm[0].team_mapping.build(approves_finance_to: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}, policy_id: Company.first.policies.default.first.id).save
+  u[0].team_mapping.build(finance_manager: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 2000}, policy_id: Company.first.policies.default.first.id).save
 
 
   User.all.each do |user|
