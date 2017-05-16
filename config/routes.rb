@@ -892,6 +892,11 @@ Rails.application.routes.draw do
   get 'cards/medical/orders/:id' => 'benefits/medical#show'
   delete 'cards/medical/orders/:id' => 'benefits/medical#destroy'
 
+  namespace :bank_transfer do
+    get 'reimbursements' => 'reimbursement#show'
+    patch 'reimbursements' => 'reimbursement#update'
+    post 'reimbursements' => 'reimbursement#create'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
