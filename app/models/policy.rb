@@ -15,9 +15,6 @@
 #
 
 
-
-
-
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -45,6 +42,7 @@ class Policy < ActiveRecord::Base
   scope :company, ->(company_id) { where company_id: company_id }
   scope :by_name, ->(name) { where name: name }
   scope :with_id, -> (id) { where id: id }
+  scope :without_id, ->(id) { where.not id: id }
   scope :not_deleted, -> { where is_deleted: false }
   scope :find_from_id, -> (id) { find_by(id: id) }
 
@@ -105,7 +103,7 @@ class Policy < ActiveRecord::Base
 
   def one_default_per_company
     if default
-      default_policy = Policy.company(company_id).default
+      default_policy = Policy.company(company_id).without_id(self.id).default
       errors.add(:company, 'cannot have more than one default policy') if default_policy.present? and default_policy != self
     end
   end

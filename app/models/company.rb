@@ -167,7 +167,7 @@ class Company < ActiveRecord::Base
 
   def init_config_present
 
-    self.policies.build(default: true).save unless self.policies.default.present?
+    self.policies.build(default: true, name: 'Company (Default)').save unless self.policies.default.present?
     ExportPreference.build_default_preferences(self)
     Constants::DEFAULT_CATEGORIES.each do |category|
       self.categories.create(name: category)
