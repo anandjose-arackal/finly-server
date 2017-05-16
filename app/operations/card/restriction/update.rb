@@ -17,11 +17,13 @@ class Card::Restriction::Update < User::Base
       add_message :error, 'Invalid input. Please try again'
       return
     end
-    if params[:card_id].blank?
+    if params[:card].blank? and params[:card_id].blank?
       add_message :error, 'Card not found'
+      return
     end
-    if params[:user_id].blank? && params[:id].blank?
+    if params[:user].blank? and params[:user_id].blank? and params[:id].blank?
       add_message :error, 'User not found'
+      return
     end
   end
 
