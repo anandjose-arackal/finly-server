@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170515111610) do
+ActiveRecord::Schema.define(version: 20170516133327) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -241,12 +241,14 @@ ActiveRecord::Schema.define(version: 20170515111610) do
 
   create_table "auto_reload_configs", force: :cascade do |t|
     t.integer  "minimum_balance_id", limit: 4
-    t.integer  "parent_id",          limit: 4
-    t.string   "parent_type",        limit: 255
     t.datetime "created_at",                                     null: false
     t.datetime "updated_at",                                     null: false
     t.boolean  "enabled",                        default: false
+    t.integer  "reloadable_id",      limit: 4
+    t.string   "reloadable_type",    limit: 255
   end
+
+  add_index "auto_reload_configs", ["reloadable_type", "reloadable_id"], name: "index_auto_reload_configs_on_reloadable_type_and_reloadable_id", using: :btree
 
   create_table "auto_submit_configs", force: :cascade do |t|
     t.boolean  "enabled",                              default: false, null: false
