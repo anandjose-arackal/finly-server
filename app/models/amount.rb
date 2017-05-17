@@ -236,17 +236,22 @@ class Amount < ActiveRecord::Base
   alias_method :wallet_withdrawal_to_wallet_value, :amount_value
   alias_method :wallet_withdrawal_to_virtual_account_value, :amount_value
   alias_method :wallet_balance_value, :amount_value
-
   alias_method :rate_value, :amount_value
 
   scope :with_id, -> (id) { where id: id }
 
-  after_create {
-    # i.e. updating the respective currency' column with value
+  before_save do
+    set_base_currency_value
+  end
+
+  # i.e. updating the respective currency' column with value
+  def set_base_currency_value
     if Amount.column_names.include?(self.currency.country_code)
-      self.update((self.currency.country_code) => self.value)
+      # self.update((self.currency.country_code) => self.value)
+      # Setting the value without updating
+      self.send("#{self.currency.country_code}=",self.value)
     end
-  }
+  end
 
   def greater_than_amount_value
     self.value
