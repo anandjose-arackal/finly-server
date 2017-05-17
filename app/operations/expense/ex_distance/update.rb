@@ -136,6 +136,21 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       amount.update(value: expense.calculate_amount_value(expense.report.policy))
     end
 
+    # if the new category is personal, mark the expense as personal
+    if expense.category_name == 'Personal'
+      Expense::Personal::Mark.(user, {expense_id: expense.id})
+    end
+    ###############################################################
+
+    # updating the respective amounts table with the conversion rates
+    if expense.date == DateUtils.local_date
+      if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id
+        expense.destroy_other_currencies
+      end
+    else
+      expense.update_other_currencies
+    end
+
     add_message :success, 'Expense updated'
   end
 

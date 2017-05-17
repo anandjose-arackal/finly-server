@@ -24,7 +24,7 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
   def pre_validate
     super()
     if user.blank? || params.blank?
-      add_message :error, "Invalid parameters passed"
+      add_message :error, 'Invalid parameters passed'
     end
     if params[:expense].blank?
       messages[:error] << 'You have not provided any details to create an expense'
@@ -62,7 +62,7 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     # checking if the report is editable for personal view
     if personal_view? and expense_params[:report_id].present?
       report = user.reports.find_by(id: expense_params[:report_id])
-      unless report.editable?
+      unless report&.editable?
         messages[:error] << "Expense cannot be added to the report in this state"
       end
     end
@@ -106,6 +106,13 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
         amount.update(value: expense.calculate_amount_value(report.policy))
       end
       expense.update_attributes(amount_id: amount.id)
+
+      # calculate the equivalent amount in all currencies in the amounts table
+      if expense.date == DateUtils.local_date
+        expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+      else
+        expense.update_other_currencies
+      end
     end
 
     messages[:success] << 'Expense created'

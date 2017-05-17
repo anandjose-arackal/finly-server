@@ -85,6 +85,13 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
       expense.update(amount: amount)
     else
       amount.update(value: expense.calculate_amount_value(per_diem.configurable))
+
+      # calculate the equivalent amount in all currencies in the amounts table
+      if expense.date == DateUtils.local_date
+        expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+      else
+        expense.update_other_currencies
+      end
     end
 
     # add comment in report if expense is added within report

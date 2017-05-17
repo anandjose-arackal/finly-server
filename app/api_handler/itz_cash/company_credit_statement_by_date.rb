@@ -72,7 +72,15 @@ class ItzCash::CompanyCreditStatementByDate < ItzCash::Base
   def success
     params[:response_code] = parsed_response[0]
     params[:transactions] = []
-    description = parsed_response[1]
+
+    # description = parsed_response[1]
+    # todo jugaad as the response merchant name we are receiving contains comma
+    if parsed_response.size > 2
+      description = parsed_response[1..(parsed_response.size - 1)].join(',')
+    else
+      description = parsed_response[1]
+    end
+
     if description.size > 1
       # All transactions are delimited by '|'
       transactions = description.split('|')

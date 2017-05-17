@@ -2,16 +2,18 @@
 #
 # Table name: companies
 #
-#  id         :integer          not null, primary key
-#  name       :string(255)
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  active     :boolean          default(TRUE), not null
+#  id               :integer          not null, primary key
+#  name             :string(255)
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  active           :boolean          default(TRUE), not null
+#  base_currency_id :integer          default(1)
 #
 
 class Company < ActiveRecord::Base
   include Constants
 
+  belongs_to :base_currency, class_name: "Currency"
   has_many :users
   has_many :cards
   has_many :contacts, as: :contactable

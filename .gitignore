@@ -22,6 +22,7 @@ dump.rdb
 
 # all local executables
 /bin
+/sample_atm_transactions.txt
 
 .idea/*
 .vagrant/

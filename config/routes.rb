@@ -1,6 +1,7 @@
 # == Route Map
 #
 #                                  Prefix Verb   URI Pattern                                                 Controller#Action
+#                               crono_web        /crono                                                      Crono::Web
 # transcriber_transcribed_expenses_create POST   /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
 # transcriber_transcribed_expenses_update PATCH  /transcriber/expenses/:id/update(.:format)                  transcriber/receipts#update_expense
 #    transcriber_transcribed_receipt_show GET    /transcriber/expenses/:id/show(.:format)                    transcriber/receipts#show
@@ -308,6 +309,8 @@
 #                  expense_attach_receipt POST   /expenses/:expense_id/attach_receipt(.:format)              expenses#attach_receipt
 #                  expense_detach_receipt POST   /expenses/:expense_id/detach_receipt(.:format)              expenses#detach_receipt
 #                     expense_add_receipt POST   /expenses/:expense_id/add_receipt(.:format)                 expenses#add_receipt
+#                            expense_mark PATCH  /expenses/:expense_id/mark(.:format)                        expenses#mark
+#                          expense_unmark PATCH  /expenses/:expense_id/unmark(.:format)                      expenses#unmark
 #                                expenses GET    /expenses(.:format)                                         expenses#index
 #                                         POST   /expenses(.:format)                                         expenses#create
 #                             new_expense GET    /expenses/new(.:format)                                     expenses#new
@@ -318,6 +321,8 @@
 #                                         DELETE /expenses/:id(.:format)                                     expenses#destroy
 #                     expenses_unreported POST   /expenses/unreported(.:format)                              expenses#unreported
 #                        receipt_add_note POST   /receipts/:receipt_id/add_note(.:format)                    receipts#add_note
+#            receipt_enable_transcription PATCH  /receipts/:receipt_id/enable(.:format)                      receipts#enable_transcription
+#           receipt_disable_transcription PATCH  /receipts/:receipt_id/disable(.:format)                     receipts#disable_transcription
 #                                receipts GET    /receipts(.:format)                                         receipts#index
 #                                         POST   /receipts(.:format)                                         receipts#create
 #                             new_receipt GET    /receipts/new(.:format)                                     receipts#new
@@ -474,6 +479,15 @@
 #                                         PATCH  /transcriber/receipts/:id(.:format)                         transcriber/receipts#update
 #                                         PUT    /transcriber/receipts/:id(.:format)                         transcriber/receipts#update
 #                                         DELETE /transcriber/receipts/:id(.:format)                         transcriber/receipts#destroy
+#                       card_transactions GET    /card_transactions(.:format)                                card_transactions#index
+#                                         POST   /card_transactions(.:format)                                card_transactions#create
+#                    new_card_transaction GET    /card_transactions/new(.:format)                            card_transactions#new
+#                   edit_card_transaction GET    /card_transactions/:id/edit(.:format)                       card_transactions#edit
+#                        card_transaction GET    /card_transactions/:id(.:format)                            card_transactions#show
+#                                         PATCH  /card_transactions/:id(.:format)                            card_transactions#update
+#                                         PUT    /card_transactions/:id(.:format)                            card_transactions#update
+#                                         DELETE /card_transactions/:id(.:format)                            card_transactions#destroy
+#                  cancelled_transactions GET    /cancelled_against_transactions/:expense_id(.:format)       card_transactions#cancelled_transactions
 #      statements_company_balance_summary GET    /statements/company_balance_summary(.:format)               statements#company_balance_summary
 # statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)          statements#company_transactions_summary
 #     statements_company_policies_summary GET    /statements/company_policies_summary(.:format)              statements#company_policies_summary
@@ -520,6 +534,8 @@
 #
 
 Rails.application.routes.draw do
+
+  mount Crono::Web, at: '/crono'
 
   namespace :transcriber do
     post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create
@@ -709,11 +725,15 @@ Rails.application.routes.draw do
     post 'attach_receipt', to: 'expenses#attach_receipt'
     post 'detach_receipt', to: 'expenses#detach_receipt'
     post 'add_receipt', to: 'expenses#add_receipt'
+    patch 'mark', to: 'expenses#mark', as: :mark
+    patch 'unmark', to: 'expenses#unmark', as: :unmark
   end
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
 
   resources :receipts do
     post 'add_note', to: 'receipts#add_note', as: :add_note
+    patch 'enable', to: 'receipts#enable_transcription', as: :enable_transcription
+    patch 'disable', to: 'receipts#disable_transcription', as: :disable_transcription
   end
 
   post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
@@ -804,6 +824,11 @@ Rails.application.routes.draw do
     resources :receipts
   end
 
+  resources :card_transactions do
+
+  end
+  get 'cancelled_against_transactions/:expense_id', to: 'card_transactions#cancelled_transactions', as: :cancelled_transactions
+  
   get 'statements/company_balance_summary' => 'statements#company_balance_summary'
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
@@ -867,6 +892,11 @@ Rails.application.routes.draw do
   get 'cards/medical/orders/:id' => 'benefits/medical#show'
   delete 'cards/medical/orders/:id' => 'benefits/medical#destroy'
 
+  namespace :bank_transfer do
+    get 'reimbursements' => 'reimbursement#show'
+    patch 'reimbursements' => 'reimbursement#update'
+    post 'reimbursements' => 'reimbursement#create'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

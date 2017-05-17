@@ -5,20 +5,25 @@
 #  id                  :integer          not null, primary key
 #  parent_id           :integer
 #  parent_type         :string(255)
-#  rate_per_km         :decimal(10, 4)
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  enabled             :boolean
 #  default_category_id :integer
+#  rate_id             :integer
+#  distance_unit_id    :integer
 #
 
 class DistanceExpenseConfig < ActiveRecord::Base
   belongs_to :parent, polymorphic: true
 
   belongs_to :default_category, class_name: "Category"
+  belongs_to :rate, class_name: "Amount"
+  belongs_to :period
 
   validate :rate_exists_for_enabled
   validates :parent, presence: true
+
+  accepts_nested_attributes_for :rate
 
   def default_category_name
     if self.default_category_id
@@ -28,9 +33,9 @@ class DistanceExpenseConfig < ActiveRecord::Base
     end
   end
 
-  def rate
+  def rate_value
     if self.enabled
-      return self.rate_per_km
+      return self.rate.send(self.parent.base_currency.country_code)
     else
       return nil
     end
@@ -40,7 +45,7 @@ class DistanceExpenseConfig < ActiveRecord::Base
 
   def rate_exists_for_enabled
     if self.enabled
-      if self.rate_per_km.blank?
+      if self.rate.blank?
         errors.add(:rate, "cannot be empty")
       end
     end
