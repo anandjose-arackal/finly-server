@@ -28,8 +28,8 @@
     base: "https://api.fixer.io/"
     path: ""
   currency_layer_currency_conversion:
-    base: "http://apilayer.net/api/historical"
-    path: ""
+    base: "http://apilayer.net"
+    path: "api/historical"
 
 staging:
   <<: *default
@@ -69,6 +69,9 @@ itzcash_uat:
   msg91_custom_message:
     base: "https://control.msg91.com"
     path: "api/sendhttp.php"
+  currency_layer_currency_conversion:
+    base: "http://apilayer.net"
+    path: "api/historical"
 
 production:
   base_url: "http://naradaapp.itzcash.com:8280"
@@ -94,3 +97,6 @@ production:
   msg91_custom_message:
     base: "https://control.msg91.com"
     path: "api/sendhttp.php"
+  currency_layer_currency_conversion:
+    base: "http://apilayer.net"
+    path: "api/historical"

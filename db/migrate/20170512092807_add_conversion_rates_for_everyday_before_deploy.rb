@@ -10,7 +10,12 @@ class AddConversionRatesForEverydayBeforeDeploy < ActiveRecord::Migration
 
     # now storing all data for conversion from 1st April to date of deploy
     date = DateUtils.yesterday_local_date
-    while date >= Date.parse('01-04-2017')
+    if Rails.env.production?
+      end_date = Date.parse('01-01-2017')
+    else
+      end_date = 10.days.ago
+    end
+    while date >= end_date
       params = {
           date: date.strftime("%Y-%m-%d")
       }
