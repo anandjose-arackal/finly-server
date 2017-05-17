@@ -113,6 +113,8 @@ class MoneyRequest < ActiveRecord::Base
 
   default_scope { order(status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
+  validates :policy_id, presence: true
+
   before_save :handle_name
   before_save :handle_nil_amount
   before_create :create_items

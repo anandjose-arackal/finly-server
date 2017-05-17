@@ -77,6 +77,7 @@ class Report < ActiveRecord::Base
   validate :is_employee
   validate :has_expenses
   validate :controller_has_role
+  validates :policy_id, presence: true
 
   default_scope { order(report_status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
