@@ -16,7 +16,7 @@ class AddConversionRatesForEverydayBeforeDeploy < ActiveRecord::Migration
       end_date = 10.days.ago
     end
     while date >= end_date
-      params = {  
+      params = {
           date: date.strftime("%Y-%m-%d")
       }
       @result = Currency::FetchData.(nil, params)
