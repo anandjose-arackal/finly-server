@@ -29,7 +29,7 @@ end
 json.policy policy_name
 json.policy_id policy_id
 
-json.policies @result.report.user.policies do |policy|
+json.policies @result.policies do |policy|
   json.extract! policy, :id, :name
 end
 

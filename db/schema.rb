@@ -829,14 +829,13 @@ ActiveRecord::Schema.define(version: 20170517113243) do
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
   create_table "distance_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
     t.integer  "rate_id",             limit: 4
     t.integer  "distance_unit_id",    limit: 4
+    t.integer  "policy_id",           limit: 4, null: false
   end
 
   create_table "distance_expenses", force: :cascade do |t|
@@ -1260,7 +1259,7 @@ ActiveRecord::Schema.define(version: 20170517113243) do
   create_table "money_requests", force: :cascade do |t|
     t.string   "name",                         limit: 255
     t.integer  "user_id",                      limit: 4,                                 null: false
-    t.integer  "policy_id",                    limit: 4
+    t.integer  "policy_id",                    limit: 4,                                 null: false
     t.integer  "payment_mode_id",              limit: 4,                                 null: false
     t.integer  "payment_id",                   limit: 4
     t.date     "required_by_date"
@@ -1478,11 +1477,10 @@ ActiveRecord::Schema.define(version: 20170517113243) do
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
   create_table "per_diem_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",   limit: 4
-    t.string   "parent_type", limit: 255
     t.boolean  "enabled"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.integer  "policy_id",  limit: 4, null: false
   end
 
   create_table "per_diem_expenses", force: :cascade do |t|
@@ -1712,7 +1710,7 @@ ActiveRecord::Schema.define(version: 20170517113243) do
     t.string   "name",                               limit: 255,                               null: false
     t.integer  "user_id",                            limit: 4,                                 null: false
     t.integer  "report_status_id",                   limit: 4,                                 null: false
-    t.integer  "policy_id",                          limit: 4
+    t.integer  "policy_id",                          limit: 4,                                 null: false
     t.datetime "submitted_at",                                   precision: 6
     t.integer  "controlling_user_id",                limit: 4
     t.integer  "controlling_user_role_id",           limit: 4
@@ -1783,14 +1781,13 @@ ActiveRecord::Schema.define(version: 20170517113243) do
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
 
   create_table "time_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
     t.integer  "rate_id",             limit: 4
     t.integer  "period_id",           limit: 4
+    t.integer  "policy_id",           limit: 4, null: false
   end
 
   create_table "time_expenses", force: :cascade do |t|
@@ -1871,7 +1868,7 @@ ActiveRecord::Schema.define(version: 20170517113243) do
     t.boolean  "default",                          default: false, null: false
     t.datetime "created_at",                                       null: false
     t.datetime "updated_at",                                       null: false
-    t.integer  "policy_id",              limit: 4
+    t.integer  "policy_id",              limit: 4,                 null: false
   end
 
   add_index "user_manager_mappings", ["approves_finance_to_id"], name: "index_user_manager_mappings_on_approves_finance_to_id", using: :btree

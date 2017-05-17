@@ -3,14 +3,13 @@
 # Table name: distance_expense_configs
 #
 #  id                  :integer          not null, primary key
-#  parent_id           :integer
-#  parent_type         :string(255)
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  enabled             :boolean
 #  default_category_id :integer
 #  rate_id             :integer
 #  distance_unit_id    :integer
+#  policy_id           :integer          not null
 #
 
 require 'test_helper'

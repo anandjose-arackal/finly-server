@@ -24,15 +24,8 @@ class ExpenseTypes::ExDistanceConfig::Update < ExpenseTypes::Base
   end
 
   def init
-    case params[:parent_type]
-      when 'company'
-        self.distance_config = user.company.distance_expense_config
-      when 'policy'
-        policies = Policy::Index.(user, {view: 'admin'}).policies rescue []
-        self.distance_config = policies.find_from_id(params[:parent_id]).distance_expense_config rescue nil
-      else
-        self.distance_config = nil
-    end
+    policies = Policy::Index.(user, {view: 'admin'}).policies rescue []
+    self.distance_config = policies.find_by(id: params[:policy_id])&.distance_expense_config
     self.update_params = distance_expense_config_params
   end
 
@@ -47,7 +40,7 @@ class ExpenseTypes::ExDistanceConfig::Update < ExpenseTypes::Base
   end
 
   def pre_process
-    base_currency_id = distance_config.parent.base_currency_id
+    base_currency_id = distance_config.policy.base_currency_id
     if update_params[:rate_attributes]
       update_params[:rate_attributes][:currency_id] = base_currency_id
       update_params[:distance_unit_id] = PhysicalUnit.kilometre_id

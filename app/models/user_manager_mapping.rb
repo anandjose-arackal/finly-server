@@ -12,7 +12,7 @@
 #  default                :boolean          default(FALSE), not null
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
-#  policy_id              :integer
+#  policy_id              :integer          not null
 #
 
 

@@ -320,12 +320,13 @@ class User < ActiveRecord::Base
 
   after_create do
     # self.build_profile.save if self.profile.blank?
-    self.team_mapping.build(default: true).save if self.team_mapping.count == 0
+    default_policy_id = self.company.default_policy.id
+    self.team_mapping.build(default: true, policy_id: default_policy_id).save if self.team_mapping.count == 0
+    self.policy_user_mappings.build(policy_id: default_policy_id).save
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
     self.build_enforce_policy(enabled: false).save
-
   end
 
   def payments

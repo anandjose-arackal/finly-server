@@ -71,30 +71,6 @@ class User::AvailableExpenseTypes::Show < User::Base
             end
           end
         end
-      else
-        self.distance_config = {enabled: company.distance_expense_enabled?,
-                                rate: company.distance_expense_config.rate,
-                                default_category_id: company.distance_expense_config.default_category_id
-        }
-        self.time_config = {enabled: company.time_expense_enabled?,
-                            rate: company.time_expense_config.rate,
-                            default_category_id: company.time_expense_config.default_category_id
-        }
-        self.per_diem_config = {enabled: company.per_diem_expense_enabled?}
-        if per_diem_config
-          if company.per_diems.active.empty?
-            self.per_diem_config = {enabled: false}
-            self.per_diem_config[:per_diems] = []
-          else
-            per_diem_config[:per_diems] = []
-            company.per_diems.active.each do |per_diem|
-              per_diem_config[:per_diems] << {name: "#{per_diem.configurable.name} - #{per_diem.name}",
-                                              id: per_diem.id,
-                                              rate: per_diem.rate_value
-              }
-            end
-          end
-        end
       end
       # checks whether distance, time and per diem expenses are enabled for this particular report
     else

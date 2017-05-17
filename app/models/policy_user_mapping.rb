@@ -11,6 +11,7 @@
 #
 
 
+
 class PolicyUserMapping < ActiveRecord::Base
   include PolicyVersion
 

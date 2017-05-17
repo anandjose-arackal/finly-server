@@ -61,7 +61,7 @@ class Policy::Show < Policy::Base
       conditional_approves_to = nil
       conditional_approves_finance_to = nil
 
-      mappings = user.team_mapping.with_details.policy(@policy.id)
+      mappings = user.team_mapping.with_details.policy(policy.id)
       dm = mappings.default
       default_mapping = dm.first if dm.present?
       conditional_mapping = mappings.non_default
