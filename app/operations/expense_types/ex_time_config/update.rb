@@ -40,7 +40,7 @@ class ExpenseTypes::ExTimeConfig::Update < ExpenseTypes::Base
   end
 
   def pre_process
-    base_currency_id = time_config.parent.base_currency_id
+    base_currency_id = time_config.policy.base_currency_id
     if update_params[:rate_attributes]
       update_params[:rate_attributes][:currency_id] = base_currency_id
       if time_config.rate.present?

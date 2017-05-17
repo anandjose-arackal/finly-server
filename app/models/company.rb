@@ -125,6 +125,18 @@ class Company < ActiveRecord::Base
     itz_cash_property.easy_account_no
   end
 
+  def distance_expense_enabled?
+    self.default_policy.distance_expense_config.enabled
+  end
+
+  def time_expense_enabled?
+    self.default_policy.time_expense_config.enabled
+  end
+
+  def per_diem_expense_enabled?
+    self.default_policy.per_diem_expense_config.enabled
+  end
+
   def ocr_enabled?
     self.feature_subscription.ocr_enabled
   end
@@ -138,7 +150,6 @@ class Company < ActiveRecord::Base
   def d_code_assigned?
     !!self.itz_cash_property&.d_code.present?
   end
-
 
   private
 
