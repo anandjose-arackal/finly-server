@@ -5,7 +5,7 @@
 #  id                           :integer          not null, primary key
 #  name                         :string(255)
 #  user_id                      :integer          not null
-#  policy_id                    :integer
+#  policy_id                    :integer          not null
 #  payment_mode_id              :integer          not null
 #  payment_id                   :integer
 #  required_by_date             :date
@@ -24,6 +24,7 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #  submitted_amount_id          :integer
 #
+
 
 
 
@@ -112,6 +113,8 @@ class MoneyRequest < ActiveRecord::Base
   delegate :payment_mode_name, to: :payment_mode
 
   default_scope { order(status_id: :asc, submitted_at: :desc, created_at: :desc) }
+
+  validates :policy_id, presence: true
 
   before_save :handle_name
   before_save :handle_nil_amount

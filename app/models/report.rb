@@ -6,7 +6,7 @@
 #  name                               :string(255)      not null
 #  user_id                            :integer          not null
 #  report_status_id                   :integer          not null
-#  policy_id                          :integer
+#  policy_id                          :integer          not null
 #  submitted_at                       :datetime
 #  controlling_user_id                :integer
 #  controlling_user_role_id           :integer
@@ -29,6 +29,7 @@
 #  card_expenses_total_id             :integer
 #  non_reimbursable_expenses_total_id :integer
 #
+
 
 
 
@@ -77,6 +78,7 @@ class Report < ActiveRecord::Base
   validate :is_employee
   validate :has_expenses
   validate :controller_has_role
+  validates :policy_id, presence: true
 
   default_scope { order(report_status_id: :asc, submitted_at: :desc, created_at: :desc) }
 

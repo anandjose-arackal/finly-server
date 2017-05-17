@@ -253,54 +253,26 @@ class Report::Violation < Report::Base
     message = "Expenses are not enabled for the selected policy. Please change the policy of the report or remove the expense"
     case expense.expense_type_id
       when ExpenseType.id_for(:distance)
-        if report.policy.nil?
-          unless user.company.distance_expense_config.enabled
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Distance #{message}"}
-            return
-          end
-        else
-          unless report.policy.distance_expense_config.enabled
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Distance #{message}"}
-            return
-          end
+        unless report.policy.distance_expense_config.enabled
+          self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Distance #{message}"}
+          return
         end
       when ExpenseType.id_for(:time)
-        if report.policy.nil?
-          unless user.company.time_expense_config.enabled
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Time #{message}"}
-            return
-          end
-        else
-          unless report.policy.time_expense_config.enabled
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Time #{message}"}
-            return
-          end
+        unless report.policy.time_expense_config.enabled
+          self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Time #{message}"}
+          return
         end
       when ExpenseType.id_for(:per_diem)
-        if report.policy.nil?
-          if user.company.per_diem_expense_config.enabled
-            if user.company.per_diems.include?(expense.per_diem_expense.per_diem)
-              return
-            else
-              message = "of some expenses do not belong to the selected policy"
-              self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
-            end
-          else
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
+        if report.policy.per_diem_expense_config.enabled
+          if report.policy.per_diems.include?(expense.per_diem_expense.per_diem)
             return
+          else
+            message = "of some expenses do not belong to the selected policy"
+            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Some Per Diem #{message}"}
           end
         else
-          if report.policy.per_diem_expense_config.enabled
-            if report.policy.per_diems.include?(expense.per_diem_expense.per_diem)
-              return
-            else
-              message = "of some expenses do not belong to the selected policy"
-              self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Some Per Diem #{message}"}
-            end
-          else
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
-            return
-          end
+          self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
+          return
         end
       else
         # do nothing

@@ -23,23 +23,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -107,7 +90,7 @@ class Expense < ActiveRecord::Base
 
   default_scope { order('expenses.created_at DESC') }
 
-  scope :with_id, -> (ids) {where id: ids}
+  scope :with_id, -> (ids) { where id: ids }
 
   scope :non_personal, -> {
     where(personal: false)
@@ -131,8 +114,8 @@ class Expense < ActiveRecord::Base
     with_id(cancelled_expense_ids)
   }
 
-  scope :reimbursable, -> {where reimbursable: true}
-  scope :non_reimbursable, -> {where reimbursable: false}
+  scope :reimbursable, -> { where reimbursable: true }
+  scope :non_reimbursable, -> { where reimbursable: false }
 
   scope :filter_expense_cancelled, -> (flag) {
     if flag == '1'
@@ -233,25 +216,25 @@ class Expense < ActiveRecord::Base
   scope :card, -> { joins(:card_expense) }
 
   scope :only_card_expenses, -> { where(expense_type_id: ExpenseType.id_for(:card)) }
-  scope :except_card_expenses, -> {where.not(expense_type_id: ExpenseType.id_for(:card))}
+  scope :except_card_expenses, -> { where.not(expense_type_id: ExpenseType.id_for(:card)) }
   scope :only_manual_expenses, -> { where(expense_type_id: ExpenseType.id_for(:manual)) }
   scope :only_distance_expenses, -> { where(expense_type_id: ExpenseType.id_for(:distance)) }
   scope :only_time_expenses, -> { where(expense_type_id: ExpenseType.id_for(:time)) }
   scope :only_per_diem_expenses, -> { where(expense_type_id: ExpenseType.id_for(:per_diem)) }
-  scope :only_reimbursable_expenses, -> {where(expense_type_id: [ExpenseType.id_for(:manual),
-                                                                 ExpenseType.id_for(:distance),
-                                                                 ExpenseType.id_for(:time),
-                                                                 ExpenseType.id_for(:per_diem)])}
+  scope :only_reimbursable_expenses, -> { where(expense_type_id: [ExpenseType.id_for(:manual),
+                                                                  ExpenseType.id_for(:distance),
+                                                                  ExpenseType.id_for(:time),
+                                                                  ExpenseType.id_for(:per_diem)]) }
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }
-  scope :with_date_range, -> (start_date, end_date) {where('date >= ? AND date <= ?', start_date, end_date)}
+  scope :with_date_range, -> (start_date, end_date) { where('date >= ? AND date <= ?', start_date, end_date) }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
   scope :unreported_and_rejected, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
   scope :submitted, -> { where expense_status_id: ExpenseStatus.submitted_id }
-  scope :unreported, -> {where expense_status_id: ExpenseStatus.unreported_id}
-  scope :rejected, -> {where expense_status_id: ExpenseStatus.rejected_id}
-  scope :unsubmitted, -> {where expense_status_id: ExpenseStatus.unsubmitted_id}
+  scope :unreported, -> { where expense_status_id: ExpenseStatus.unreported_id }
+  scope :rejected, -> { where expense_status_id: ExpenseStatus.rejected_id }
+  scope :unsubmitted, -> { where expense_status_id: ExpenseStatus.unsubmitted_id }
   scope :admin_viewable, -> { where expense_status_id: [ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:rejected), ExpenseStatus.id_for(:unreported)] }
   scope :sort_date_desc, -> { order 'date DESC' }
   scope :sort_date_asc, -> { order 'date ASC' }
@@ -259,11 +242,11 @@ class Expense < ActiveRecord::Base
   scope :include_manual_expense, -> { joins :manual_expense }
   scope :filter_user_id, ->(id) { where user_id: id }
 
-  scope :transcribed, -> {where transcribed: true}
-  scope :untranscribed, -> {where transcribed: false}
+  scope :transcribed, -> { where transcribed: true }
+  scope :untranscribed, -> { where transcribed: false }
 
-  scope :verified, -> {where expense_status_id: ExpenseStatus.submitted_id}
-  scope :unverified, -> {where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]}
+  scope :verified, -> { where expense_status_id: ExpenseStatus.submitted_id }
+  scope :unverified, -> { where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
 
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount
@@ -313,43 +296,22 @@ class Expense < ActiveRecord::Base
       when ExpenseType.id_for(:card)
         return self.amount.value
       when ExpenseType.id_for(:distance)
-        if policy.blank?
-          rate = self.user.company.distance_expense_config.rate_value rescue nil
-          amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
-          return amount
-        else
-          rate = policy.distance_expense_config.rate_value rescue nil
-          amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
-          return amount
-        end
+
+        rate = policy.distance_expense_config.rate_value rescue nil
+        amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
+        return amount
       when ExpenseType.id_for(:time)
-        if policy.blank?
-          rate = self.user.company.time_expense_config.rate_value rescue nil
-          amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
-          return amount
-        else
-          rate = policy.time_expense_config.rate_value rescue nil
-          amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
-          return amount
-        end
+        rate = policy.time_expense_config.rate_value rescue nil
+        amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
+        return amount
       when ExpenseType.id_for(:per_diem)
         per_diem = self.per_diem_expense.per_diem
-        if policy.blank? || policy.is_a?(Company)
-          if user.company.per_diems.include?(per_diem)
-            rate = self.per_diem_expense.per_diem.rate_value rescue nil
-            amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
-            return amount
-          else
-            return 0
-          end
+        if policy.per_diems.include?(per_diem)
+          rate = self.per_diem_expense.per_diem.rate_value rescue nil
+          amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
+          return amount
         else
-          if policy.per_diems.include?(per_diem)
-            rate = self.per_diem_expense.per_diem.rate_value rescue nil
-            amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
-            return amount
-          else
-            return 0
-          end
+          return 0
         end
       else
         return 0
@@ -376,12 +338,10 @@ class Expense < ActiveRecord::Base
         if self.report.nil?
           return "- -"
         else
-          parent = report.policy
-          parent = self.user.company if parent.nil?
           if self.distance_expense?
-            return "#{self.distance_expense.distance_value} KM @ ₹#{parent.distance_expense_config.rate_value} per KM"
+            return "#{self.distance_expense.distance_value} KM @ ₹#{report.policy.distance_expense_config.rate_value} per KM"
           elsif self.time_expense?
-            return "#{self.time_expense.time_object_value} Hours @ ₹#{parent.time_expense_config.rate_value} per Hour"
+            return "#{self.time_expense.time_object_value} Hours @ ₹#{report.policy.time_expense_config.rate_value} per Hour"
           end
         end
     end
@@ -428,12 +388,7 @@ class Expense < ActiveRecord::Base
   def distance_rate_value
     if self.distance_expense?
       if self.report_id.present?
-        report = self.report
-        if report.policy
-          return report.policy.distance_expense_config.rate_value
-        else
-          return report.user.company.distance_expense_config.rate_value
-        end
+        return report.policy.distance_expense_config.rate_value
       else
         return nil
       end
@@ -454,12 +409,7 @@ class Expense < ActiveRecord::Base
   def time_rate_value
     if self.time_expense?
       if self.report_id.present?
-        report = self.report
-        if report.policy
-          return report.policy.time_expense_config.rate_value
-        else
-          return report.user.company.time_expense_config.rate_value
-        end
+        return self.report.policy.time_expense_config.rate_value
       else
         return nil
       end
@@ -668,5 +618,4 @@ class Expense < ActiveRecord::Base
       end
     end
   end
-
 end
