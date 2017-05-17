@@ -13,7 +13,7 @@
 class Company < ActiveRecord::Base
   include Constants
 
-  belongs_to :base_currency, class_name: "Currency"
+  belongs_to :base_currency, class_name: 'Currency'
   has_many :users
   has_many :cards
   has_many :contacts, as: :contactable
@@ -26,23 +26,12 @@ class Company < ActiveRecord::Base
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
   has_one :itz_cash_property
   has_many :company_transactions
-
-
-  has_one :distance_expense_config, as: :parent
-  has_one :time_expense_config, as: :parent
-  has_one :per_diem_expense_config, as: :parent
-
   has_many :per_diems, as: :configurable
-
   has_many :company_balance_histories
-
   has_many :field_configurations, as: :configurable
-
   has_one :feature_subscription, as: :subscribable
-
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
-
   has_many :payment_orders
 
   accepts_nested_attributes_for :configuration
@@ -53,7 +42,7 @@ class Company < ActiveRecord::Base
 
   validates :name, presence: true
 
-  scope :with_id, -> (id) {where id: id}
+  scope :with_id, -> (id) { where id: id }
   scope :filter_ocr, -> (flag) {
     if flag == '1'
       joins(:feature_subscription).select('companies.*').where('ocr_enabled IS true')
@@ -136,18 +125,6 @@ class Company < ActiveRecord::Base
     itz_cash_property.easy_account_no
   end
 
-  def distance_expense_enabled?
-    self.distance_expense_config.enabled
-  end
-
-  def time_expense_enabled?
-    self.time_expense_config.enabled
-  end
-
-  def per_diem_expense_enabled?
-    self.per_diem_expense_config.enabled
-  end
-
   def ocr_enabled?
     self.feature_subscription.ocr_enabled
   end
@@ -175,11 +152,6 @@ class Company < ActiveRecord::Base
 
     self.build_configuration.save if self.configuration.blank?
     self.build_account.save if self.account.blank?
-
-    # building the difference expense configurations
-    self.build_distance_expense_config(enabled: false).save
-    self.build_time_expense_config(enabled: false).save
-    self.build_per_diem_expense_config(enabled: false).save
 
     if self.feature_subscription.blank?
       self.build_feature_subscription.save

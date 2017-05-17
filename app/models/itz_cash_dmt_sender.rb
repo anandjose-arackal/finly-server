@@ -3,13 +3,11 @@
 # Table name: itz_cash_dmt_senders
 #
 #  id              :integer          not null, primary key
-#  username        :string(255)      not null
 #  mobile_number   :string(255)      not null
 #  registration_id :string(255)      not null
 #  user_id         :integer          not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
-#  password        :string(255)
 #  status_id       :integer          not null
 #  otp_verified    :boolean          default(FALSE), not null
 #

@@ -563,7 +563,7 @@ if FieldConfiguration.count == 0
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:report)})
   # Report mandatory custom field
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Name',
                                                                         field_type_id: FieldType.id_for(:text),
@@ -571,14 +571,14 @@ if FieldConfiguration.count == 0
                                                                         field_parent_type_id: FieldParentType.id_for(:report)})
 
   # Money Request custom fields
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Location',
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:money_request)})
   # Money Request mandatory custom field
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Project Name',
                                                                         field_type_id: FieldType.id_for(:text),

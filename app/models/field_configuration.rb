@@ -26,7 +26,6 @@ class FieldConfiguration < ActiveRecord::Base
   belongs_to :field_parent_type
   # Applicable for User, Policy, Company
   belongs_to :configurable, polymorphic: true
-
   has_many :drop_down_items, class_name: 'FieldDropDownItem'
   has_many :custom_fields
   belongs_to :default_value, polymorphic: true
@@ -60,8 +59,15 @@ class FieldConfiguration < ActiveRecord::Base
     if default_value.present? and not default_value.valid?
       self.errors.add :invalid, 'input format for "default value"'
     end
+
+    # IMP CONDITION - Expense Custom Field Configurations are always defined inside a policy while Expense Field Configuration are always defined inside Company
     if FieldParentType.expense_ids.include?(self.field_parent_type_id) and configurable_type != 'Company'
       self.errors.add :invalid, 'config. Custom Expense Field can only be configured at an organisation level'
+    end
+
+    # IMP CONDITION - Report and Money Request Field Configurations are always defined inside a policy while Expense Field Configuration are always defined inside Company
+    if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(self.field_parent_type_id) and configurable_type != 'Policy'
+        self.errors.add :invalid, 'config. Custom Fields for Reports and Money Requests can only be configured at policy level'
     end
     # # Policy custom fields can only be added for expenses as policy is not captured at the time of expense
     # if field_parent_type_id == FieldParentType.id_for(:expense) and configurable_type == 'Policy'

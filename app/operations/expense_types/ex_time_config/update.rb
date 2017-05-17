@@ -24,15 +24,8 @@ class ExpenseTypes::ExTimeConfig::Update < ExpenseTypes::Base
   end
 
   def init
-    case params[:parent_type]
-      when 'company'
-        self.time_config = user.company.time_expense_config
-      when 'policy'
-        policies = Policy::Index.(user, {view: 'admin'}).policies rescue []
-        self.time_config = policies.find_from_id(params[:parent_id]).time_expense_config rescue nil
-      else
-        self.time_config = nil
-    end
+    policies = Policy::Index.(user, {view: 'admin'}).policies rescue []
+    self.time_config = policies.find_by(id: params[:policy_id])&.time_expense_config
     self.update_params = time_expense_config_params
   end
 

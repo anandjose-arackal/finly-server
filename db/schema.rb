@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170517064220) do
+ActiveRecord::Schema.define(version: 20170517092134) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -829,14 +829,13 @@ ActiveRecord::Schema.define(version: 20170517064220) do
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
   create_table "distance_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
     t.integer  "rate_id",             limit: 4
     t.integer  "distance_unit_id",    limit: 4
+    t.integer  "policy_id",           limit: 4, null: false
   end
 
   create_table "distance_expenses", force: :cascade do |t|
@@ -1476,11 +1475,10 @@ ActiveRecord::Schema.define(version: 20170517064220) do
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
   create_table "per_diem_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",   limit: 4
-    t.string   "parent_type", limit: 255
     t.boolean  "enabled"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.integer  "policy_id",  limit: 4, null: false
   end
 
   create_table "per_diem_expenses", force: :cascade do |t|
@@ -1781,14 +1779,13 @@ ActiveRecord::Schema.define(version: 20170517064220) do
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
 
   create_table "time_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
     t.integer  "rate_id",             limit: 4
     t.integer  "period_id",           limit: 4
+    t.integer  "policy_id",           limit: 4, null: false
   end
 
   create_table "time_expenses", force: :cascade do |t|
@@ -1858,6 +1855,41 @@ ActiveRecord::Schema.define(version: 20170517064220) do
   add_index "user_balance_histories", ["finly_money_load_id"], name: "index_user_balance_histories_on_finly_money_load_id", using: :btree
   add_index "user_balance_histories", ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id", using: :btree
   add_index "user_balance_histories", ["user_id"], name: "index_user_balance_histories_on_user_id", using: :btree
+
+  create_table "user_group_item_mappings", force: :cascade do |t|
+    t.integer  "user_id",            limit: 4
+    t.integer  "user_group_item_id", limit: 4
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.boolean  "is_deleted",                   default: false
+    t.integer  "user_group_id",      limit: 4
+  end
+
+  add_index "user_group_item_mappings", ["user_group_id"], name: "index_user_group_item_mappings_on_user_group_id", using: :btree
+  add_index "user_group_item_mappings", ["user_group_item_id"], name: "index_user_group_item_mappings_on_user_group_item_id", using: :btree
+  add_index "user_group_item_mappings", ["user_id"], name: "index_user_group_item_mappings_on_user_id", using: :btree
+
+  create_table "user_group_items", force: :cascade do |t|
+    t.string   "name",          limit: 255,                 null: false
+    t.integer  "user_group_id", limit: 4,                   null: false
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+    t.boolean  "is_deleted",                default: false
+  end
+
+  add_index "user_group_items", ["name"], name: "index_user_group_items_on_name", using: :btree
+  add_index "user_group_items", ["user_group_id"], name: "index_user_group_items_on_user_group_id", using: :btree
+
+  create_table "user_groups", force: :cascade do |t|
+    t.string   "name",       limit: 255,                 null: false
+    t.integer  "company_id", limit: 4,                   null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.boolean  "is_deleted",             default: false
+  end
+
+  add_index "user_groups", ["company_id"], name: "index_user_groups_on_company_id", using: :btree
+  add_index "user_groups", ["name"], name: "index_user_groups_on_name", using: :btree
 
   create_table "user_manager_mappings", force: :cascade do |t|
     t.integer  "user_id",                limit: 4
@@ -1930,6 +1962,27 @@ ActiveRecord::Schema.define(version: 20170517064220) do
   end
 
   add_index "user_tags", ["user_id"], name: "index_user_tags_on_user_id", using: :btree
+
+  create_table "user_team_group_item_mappings", force: :cascade do |t|
+    t.integer  "user_group_id",      limit: 4, null: false
+    t.integer  "user_group_item_id", limit: 4, null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.integer  "user_team_id",       limit: 4
+  end
+
+  add_index "user_team_group_item_mappings", ["user_group_id"], name: "index_user_team_group_item_mappings_on_user_group_id", using: :btree
+  add_index "user_team_group_item_mappings", ["user_group_item_id"], name: "index_user_team_group_item_mappings_on_user_group_item_id", using: :btree
+  add_index "user_team_group_item_mappings", ["user_team_id"], name: "index_user_team_group_item_mappings_on_user_team_id", using: :btree
+
+  create_table "user_teams", force: :cascade do |t|
+    t.integer  "company_id", limit: 4,   null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "name",       limit: 255, null: false
+  end
+
+  add_index "user_teams", ["company_id"], name: "index_user_teams_on_company_id", using: :btree
 
   create_table "user_wallet_track_actions", force: :cascade do |t|
     t.string   "CreateUserWallets", limit: 255, null: false
@@ -2145,12 +2198,20 @@ ActiveRecord::Schema.define(version: 20170517064220) do
   add_foreign_key "transcribed_expenses", "users"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
+  add_foreign_key "user_group_item_mappings", "user_group_items"
+  add_foreign_key "user_group_item_mappings", "user_groups"
+  add_foreign_key "user_group_item_mappings", "users"
+  add_foreign_key "user_group_items", "user_groups"
+  add_foreign_key "user_groups", "companies"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"
   add_foreign_key "user_role_mappings", "user_roles"
   add_foreign_key "user_role_mappings", "users"
   add_foreign_key "user_tags", "users"
+  add_foreign_key "user_team_group_item_mappings", "user_group_items"
+  add_foreign_key "user_team_group_item_mappings", "user_groups"
+  add_foreign_key "user_team_group_item_mappings", "user_teams"
   add_foreign_key "user_wallet_tracks", "amounts"
   add_foreign_key "user_wallet_tracks", "user_wallet_track_actions"
   add_foreign_key "user_wallet_tracks", "user_wallets"

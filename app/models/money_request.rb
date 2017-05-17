@@ -5,7 +5,7 @@
 #  id                           :integer          not null, primary key
 #  name                         :string(255)
 #  user_id                      :integer          not null
-#  policy_id                    :integer
+#  policy_id                    :integer          not null
 #  payment_mode_id              :integer          not null
 #  payment_id                   :integer
 #  required_by_date             :date
@@ -24,6 +24,7 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #  submitted_amount_id          :integer
 #
+
 
 
 
