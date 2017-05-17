@@ -12,7 +12,7 @@ class UserTeam::BatchUpdate::Restriction < UserTeam::BatchUpdate::Base
 
   def init
     super
-    self.card_program = CardProgram.find_by(id: [:card_program_id])
+    self.card_program = CardProgram.find_by(id: params[:card_program_id])
   end
 
   def validate
@@ -30,7 +30,7 @@ class UserTeam::BatchUpdate::Restriction < UserTeam::BatchUpdate::Base
   def process
     params[:user_ids] = users.pluck(:id)
     params[:card_program] = self.card_program
-    UserTeam::BatchUpdate::Restriction::BackgroundUpdate.call_async(user, params)
+    UserTeam::BatchUpdate::Restriction::BackgroundUpdate.(user, params)
   end
 
   class UserTeam::BatchUpdate::Restriction::BackgroundUpdate < BackgroundOperation

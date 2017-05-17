@@ -873,6 +873,10 @@ Rails.application.routes.draw do
   resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]
   resources :teams, controller: 'user_teams', only: [:create, :index, :show, :update, :destroy]
 
+  resources :teams, controller: 'user_teams' do
+    patch 'set_restrictions', to: 'user_teams#set_restrictions'
+  end
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

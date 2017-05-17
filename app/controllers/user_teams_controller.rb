@@ -28,4 +28,9 @@ class UserTeamsController < ApplicationController
     respond response: (@result&.success? ? :success : :failure)
   end
 
+  def set_restrictions
+    @result = UserTeam::BatchUpdate::Restriction.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
 end
