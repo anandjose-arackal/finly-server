@@ -242,6 +242,11 @@ else
   c = Company.first
 end
 
+Company.all.each do |company|
+  company.feature_subscription.expense_management_enabled = true
+  company.save
+end
+
 if c.categories.count == 0
   10.times do |i|
     c.categories.create!(name: "Test category #{i+1}")
