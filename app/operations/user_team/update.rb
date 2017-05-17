@@ -24,6 +24,8 @@ class UserTeam::Update < UserTeam::Base
         self.user_team.user_team_group_item_mappings.build user_group_id: group.id, user_group_item_id: item_id
       end
     end
+
+    self.user_team.name = params[:name] if params[:name].present?
     self.user_team.save
   end
 
