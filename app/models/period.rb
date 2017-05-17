@@ -16,6 +16,8 @@ class Period < ActiveRecord::Base
 
   validates :name, presence: true
 
+  scope :with_name, -> (name) {where name: name}
+
   def period
     self.name
   end
@@ -30,6 +32,15 @@ class Period < ActiveRecord::Base
 
   def self.name_for(item)
     VALUES.key(item)
+  end
+
+  def self.seed_data
+    count = Period.count
+    VALUES.each do |key, value|
+      if count == 0 or Period.with_name(key).blank?
+        Period.create id: value, name: key
+      end
+    end
   end
 
 end
