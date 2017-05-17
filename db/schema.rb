@@ -958,6 +958,8 @@ ActiveRecord::Schema.define(version: 20170517092134) do
     t.boolean  "medical_card_enabled",                   default: false, null: false
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
+    t.boolean  "expense_card_enabled",                   default: false
+    t.boolean  "reimbursement_card_enabled",             default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree

@@ -192,7 +192,7 @@ class Expense < ActiveRecord::Base
   scope :filter_search, -> (value) do
     expense_ids = ManualExpense.where('merchant like ?', "%#{value}%").pluck(:expense_id)
     expense_ids += CardExpense.where('editable_merchant like ?', "%#{value}%").pluck(:expense_id)
-    expense_ids += PerDiemExpense.joins(:per_diem).where('per_diems.name LIKE ?', "%#{query}%").pluck(:expense_id)
+    expense_ids += PerDiemExpense.joins(:per_diem).where('per_diems.name LIKE ?', "%#{value}%").pluck(:expense_id)
 
     where('id IN (?) OR note like ?', expense_ids, "%#{value}%")
     # joins(:card_expense).joins(:manual_expense).joins(:amount).select('expenses.*').where('editable_merchant like ? or merchant like ? OR note like ?', "%#{value}%", "%#{value}%", "%#{value}%")
