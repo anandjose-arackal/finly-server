@@ -41,7 +41,6 @@ class Currency::FetchData < BaseHandler
   def init
     super()
     self.date = params[:date]
-    # appending the date to the path of the url
     self.request_path = self.path
   end
 

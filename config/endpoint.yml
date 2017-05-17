@@ -28,8 +28,8 @@
     base: "https://api.fixer.io/"
     path: ""
   currency_layer_currency_conversion:
-    base: "http://apilayer.net/api/historical"
-    path: ""
+    base: "http://apilayer.net"
+    path: "api/historical"
 
 staging:
   <<: *default
