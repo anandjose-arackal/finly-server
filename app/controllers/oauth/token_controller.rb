@@ -1,6 +1,4 @@
 class Oauth::TokenController < Opro::Oauth::TokenController
-
-
   def create
     super()
     if @auth_grant
