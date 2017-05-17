@@ -16,7 +16,7 @@ class Period < ActiveRecord::Base
 
   validates :name, presence: true
 
-  scope :with_name, ->(name) { where name: name }
+  scope :with_name, -> (name) {where name: name}
 
   def period
     self.name
