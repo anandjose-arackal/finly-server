@@ -27,5 +27,8 @@ class UpdateExpenseAmountsWithAllCurrencies < ActiveRecord::Migration
       end
       expense.amount.update(update_hash)
     end
+
+    # seeding currencies table with all currencies
+    Currency.seed_data
   end
 end
