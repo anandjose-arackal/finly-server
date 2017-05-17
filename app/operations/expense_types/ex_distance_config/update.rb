@@ -56,6 +56,10 @@ class ExpenseTypes::ExDistanceConfig::Update < ExpenseTypes::Base
     end
   end
 
+  def post_process
+    distance_config.rate.update_currencies(Date.today)
+  end
+
   private
 
   def distance_expense_config_params
