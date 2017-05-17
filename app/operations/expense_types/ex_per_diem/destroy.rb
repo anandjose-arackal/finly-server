@@ -22,15 +22,9 @@ class ExpenseTypes::ExPerDiem::Destroy < ExpenseTypes::ExPerDiem::Base
 
   def init
     id = params[:id] || params[:per_diem_id]
-    case params[:parent_type]
-      when 'company'
-        self.per_diem = user.company.per_diems.with_id(id).first rescue nil
-      when 'policy'
-        policy = user.company.policies.find_by(id: params[:parent_id])
-        self.per_diem = policy.per_diems.with_id(id).first rescue nil
-      else
-        self.per_diem = nil
-    end
+    policies = Policy::Index.(user, {view: 'admin'}).policies rescue []
+    self.policy = policies.find_by(id: params[:policy_id])
+    self.per_diem = policy.per_diems.with_id(id).first rescue nil
   end
 
   def authorize
@@ -44,7 +38,7 @@ class ExpenseTypes::ExPerDiem::Destroy < ExpenseTypes::ExPerDiem::Base
   end
 
   def process
-    unless per_diem.update(is_deleted: true)
+    unless per_diem.destroy
       messages[:error] = per_diem.errors.full_messages
     end
   end
