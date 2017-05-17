@@ -25,7 +25,10 @@ class PaymentType < ActiveRecord::Base
            debit: 19,
            reimbursement_outside_finly: 20,
            credit_meal_card: 21,
-           credit_medical_card: 22}
+           credit_medical_card: 22,
+           credit_expense_card: 23,
+           credit_reimbursement_card: 24
+         }
 
   scope :with_id, -> (id) { where id: id }
   scope :with_name, -> (name) { where name: name }

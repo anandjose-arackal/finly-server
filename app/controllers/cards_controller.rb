@@ -43,4 +43,11 @@ class CardsController < ApplicationController
     respond response: :success
   end
 
+  # For Mass Crediting accounts
+  def process_file
+    @result = Benefits::TaxBenefits::ParseFile.(config, current_user, params)
+    respond
+  end
+
+
 end

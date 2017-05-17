@@ -14,4 +14,18 @@ json.data do
     json.name @auth_grant.user.company.name
     json.d_code_assigned @auth_grant.user.company.d_code_assigned?
   end
+  # debugger
+  json.feature_subscription do
+    json.company do
+      json.name @views["company"]["name"]
+      json.id @views["company"]["id"]
+      json.features do
+        json.expense_management @views["company"]["features"]["expense_management"]
+        json.expense_card @views["company"]["features"]["expense_card"]
+        json.reimbursement_card @views["company"]["features"]["reimbursement_card"]
+        json.medical_card @views["company"]["features"]["medical_card"]
+        json.meal_card @views["company"]["features"]["meal_card"]
+      end
+    end
+  end
 end
