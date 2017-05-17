@@ -5,9 +5,7 @@ class AddConversionRatesForEverydayBeforeDeploy < ActiveRecord::Migration
       ETB FJD FKP GEL GGP GHS GIP GMD GNF GTQ GYD HNL HTG IMP IQD IRR ISK JEP JMD JOD KES KGS KHR KMF KPW KWD KYD KZT LAK LBP LKR LRD LSL LTL LVL LYD MAD MDL MGA MKD
       MMK MNT MOP MRO MUR MVR MWK MZN NAD NGN NIO NPR OMR PAB PEN PGK PKR PYG QAR RSD RWF SAR SBD SCR SDG SHP SLL SOS SRD STD SVC SYP SZL TJS TMT TND TOP TTD TWD TZS
       UAH UGX UYU UZS VEF VND VUV WST XAF XAG XAU XCD XDR XOF XPF YER ZMK ZMW ZWL).each do |symbol|
-      unless CurrencyConversionRate.column_names.include?(symbol.to_s)
-        add_column :currency_conversion_rates,  symbol.to_sym, :decimal, precision: 10, scale: 5
-      end
+      add_column :currency_conversion_rates,  symbol.to_sym, :decimal, precision: 10, scale: 5
     end
 
     # now storing all data for conversion from 1st April to date of deploy
