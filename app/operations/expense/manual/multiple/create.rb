@@ -28,7 +28,7 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
     # If valid is true then will start creating expenses
     self.valid = true
 
-    for key, params_each_expense  in multiple_expenses_params #value is params for Validate Class
+    for key, params_each_expense in multiple_expenses_params #value is params for Validate Class
 
       # creating strong params out of params received
       current_expense_params = manual_multiple_expense_params(params_each_expense)
