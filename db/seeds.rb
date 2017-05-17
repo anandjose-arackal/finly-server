@@ -231,6 +231,10 @@ SystemMessageType.seed_data
 
 ItzCashCardProgram.seed_data
 
+# ItzCashDmtBeneficiaryType.seed_data
+
+ItzCashDmtBeneficiaryStatus.seed_data
+
 ##########################
 
 if Amount.count == 0
@@ -362,6 +366,7 @@ if Card.count == 0
     if user.id < 9
       number = "S0001774009#{(user.id - 1)}"
       user.cards.create(proxy: number, description: "Test physical card for user #{user.id}",
+                        itz_cash_card_program_id: 1,
                         card_type_id: 1, company_id: user.company.id,
                         ending_number: random(1000, 9999).to_i, active: true,
                         card_program_id: CardProgram.first.id,

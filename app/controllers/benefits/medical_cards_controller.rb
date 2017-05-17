@@ -1,4 +1,4 @@
-class Benefits::MedicalController < Benefits::BaseController
+class Benefits::MedicalCardsController < Benefits::BaseController
 
   protected
   def config

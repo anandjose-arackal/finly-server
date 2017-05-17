@@ -1,6 +1,6 @@
 class AddNonPersonalFundTransferToCardProgram < ActiveRecord::Migration
   def change
-    add_column :card_programs, :non_personal_fund_transfer, :boolean
+    # add_column :card_programs, :non_personal_fund_transfer, :boolean
     if CardProgram.count > 0
       CardProgram.all.each do |program|
         case program.name

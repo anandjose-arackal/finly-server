@@ -15,6 +15,9 @@
     path: "user/servlet/NaradaSetAdditionalRestrictionsServlet"
   itzcash_company_statement_by_date:
     path: "user/servlet/CorporateTransactionStatementByDateRangeServlet"
+  itzcash_dmt:
+    base: "http://demo.itzcash.com"
+    path: "samsso/servlet/RmtMobileAppServlet"
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"
