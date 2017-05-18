@@ -29,7 +29,7 @@ class User::Wallet::AutoReload::Reload < BackgroundOperation
 
     # check if the respective card needs to be reloaded in the first place
     unless card_balance_value < auto_reload_config.minimum_balance_value
-      add_message :error, "Minimum balance is less than card balance"
+      add_message :error, "Card balance is greater than minimum balance"
       return
     end
 

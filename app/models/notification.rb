@@ -111,7 +111,7 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.id_for(:notify_cash_withdrawal_against_report_reimbursement)
         action += " reimbursement deducted from cash on hand"
       when NotificationActionType.id_for(:notify_auto_reload_card_failure)
-        acrion += " auto reload failed"
+        action += " auto reload failed"
       when NotificationActionType.id_for(:notify_auto_reload_card_success)
         action += " auto reload successful"
       else
@@ -190,11 +190,11 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.id_for(:notify_cash_withdrawal_against_report_reimbursement)
         action = " withdrawn funds from your cash on hand against reimbursement"
       when NotificationActionType.id_for(:notify_auto_reload_card_failure)
-        content = "Auto reload of your expense card with amount INR #{self.amount.value} failed because: #{self.message}"
+        content = "Auto reload of your expense card with amount failed because: #{self.message}"
         # returning content directly because further constructions are not required
         return content
       when NotificationActionType.id_for(:notify_auto_reload_card_success)
-        content += "Auto reload of your expense card with amount INT #{self.amount.value} was successfull"
+        content = "Auto reload of your expense card with amount INR #{self.amount.value} was successfull"
         # returning content directly because further constructions are not required
         return content
       else

@@ -31,7 +31,7 @@ class BackgroundOperation < BaseOperation
     end
     self.user = User.find_by_id(user_id)
     self.params = params
-    self.run.messages
+    self.run
   end
 
 end
