@@ -44,7 +44,7 @@ class ExpenseTypes::ExPerDiem::Destroy < ExpenseTypes::ExPerDiem::Base
   end
 
   def post_process
-    add_message :success, "Per Diem deleted"
+    add_message :success, 'Per Diem deleted'
   end
 
 
