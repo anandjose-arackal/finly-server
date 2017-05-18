@@ -29,10 +29,10 @@ class Expense::ExTime::Create < Expense::ExTime::Base
       add_message :error, 'You have not provided any details to create an expense'
       return
     end
-    time_value = params[:expense][:time_expense_attributes][:time_object_attributes][:value].to_d rescue nil
-    if time_value.present? and time_value <= 0
-      add_message :error, 'Time cannot be less than or equal to 0'
-    end
+    # time_value = params[:expense][:time_expense_attributes][:time_object_attributes][:value].to_d rescue nil
+    # if time_value.present? and time_value <= 0
+    #   add_message :error, 'Time cannot be less than or equal to 0'
+    # end
   end
 
   def init
