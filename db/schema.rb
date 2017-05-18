@@ -1858,6 +1858,41 @@ ActiveRecord::Schema.define(version: 20170517113243) do
   add_index "user_balance_histories", ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id", using: :btree
   add_index "user_balance_histories", ["user_id"], name: "index_user_balance_histories_on_user_id", using: :btree
 
+  create_table "user_group_item_mappings", force: :cascade do |t|
+    t.integer  "user_id",            limit: 4
+    t.integer  "user_group_item_id", limit: 4
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.boolean  "is_deleted",                   default: false
+    t.integer  "user_group_id",      limit: 4
+  end
+
+  add_index "user_group_item_mappings", ["user_group_id"], name: "index_user_group_item_mappings_on_user_group_id", using: :btree
+  add_index "user_group_item_mappings", ["user_group_item_id"], name: "index_user_group_item_mappings_on_user_group_item_id", using: :btree
+  add_index "user_group_item_mappings", ["user_id"], name: "index_user_group_item_mappings_on_user_id", using: :btree
+
+  create_table "user_group_items", force: :cascade do |t|
+    t.string   "name",          limit: 255,                 null: false
+    t.integer  "user_group_id", limit: 4,                   null: false
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+    t.boolean  "is_deleted",                default: false
+  end
+
+  add_index "user_group_items", ["name"], name: "index_user_group_items_on_name", using: :btree
+  add_index "user_group_items", ["user_group_id"], name: "index_user_group_items_on_user_group_id", using: :btree
+
+  create_table "user_groups", force: :cascade do |t|
+    t.string   "name",       limit: 255,                 null: false
+    t.integer  "company_id", limit: 4,                   null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.boolean  "is_deleted",             default: false
+  end
+
+  add_index "user_groups", ["company_id"], name: "index_user_groups_on_company_id", using: :btree
+  add_index "user_groups", ["name"], name: "index_user_groups_on_name", using: :btree
+
   create_table "user_manager_mappings", force: :cascade do |t|
     t.integer  "user_id",                limit: 4
     t.integer  "manager_id",             limit: 4
@@ -1929,6 +1964,27 @@ ActiveRecord::Schema.define(version: 20170517113243) do
   end
 
   add_index "user_tags", ["user_id"], name: "index_user_tags_on_user_id", using: :btree
+
+  create_table "user_team_group_item_mappings", force: :cascade do |t|
+    t.integer  "user_group_id",      limit: 4, null: false
+    t.integer  "user_group_item_id", limit: 4, null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.integer  "user_team_id",       limit: 4
+  end
+
+  add_index "user_team_group_item_mappings", ["user_group_id"], name: "index_user_team_group_item_mappings_on_user_group_id", using: :btree
+  add_index "user_team_group_item_mappings", ["user_group_item_id"], name: "index_user_team_group_item_mappings_on_user_group_item_id", using: :btree
+  add_index "user_team_group_item_mappings", ["user_team_id"], name: "index_user_team_group_item_mappings_on_user_team_id", using: :btree
+
+  create_table "user_teams", force: :cascade do |t|
+    t.integer  "company_id", limit: 4,   null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "name",       limit: 255, null: false
+  end
+
+  add_index "user_teams", ["company_id"], name: "index_user_teams_on_company_id", using: :btree
 
   create_table "user_wallet_track_actions", force: :cascade do |t|
     t.string   "CreateUserWallets", limit: 255, null: false
@@ -2144,12 +2200,20 @@ ActiveRecord::Schema.define(version: 20170517113243) do
   add_foreign_key "transcribed_expenses", "users"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
+  add_foreign_key "user_group_item_mappings", "user_group_items"
+  add_foreign_key "user_group_item_mappings", "user_groups"
+  add_foreign_key "user_group_item_mappings", "users"
+  add_foreign_key "user_group_items", "user_groups"
+  add_foreign_key "user_groups", "companies"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"
   add_foreign_key "user_role_mappings", "user_roles"
   add_foreign_key "user_role_mappings", "users"
   add_foreign_key "user_tags", "users"
+  add_foreign_key "user_team_group_item_mappings", "user_group_items"
+  add_foreign_key "user_team_group_item_mappings", "user_groups"
+  add_foreign_key "user_team_group_item_mappings", "user_teams"
   add_foreign_key "user_wallet_tracks", "amounts"
   add_foreign_key "user_wallet_tracks", "user_wallet_track_actions"
   add_foreign_key "user_wallet_tracks", "user_wallets"

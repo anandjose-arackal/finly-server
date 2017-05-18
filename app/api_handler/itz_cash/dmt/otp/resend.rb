@@ -10,10 +10,10 @@ class ItzCash::Dmt::Otp::Resend < ItzCash::Dmt::Base
       add_message :error, 'User not found'
       return
     end
-    if user.itz_cash_dmt_sender.blank?
-      add_message :error, 'You have not enabled Bank Transfers'
-      return
-    end
+    # if user.itz_cash_dmt_sender.blank?
+    #   add_message :error, 'You have not enabled Bank Transfers'
+    #   return
+    # end
     if params.blank? or params[:type].blank? or TYPE.key(params[:type]).blank?
       add_message :error, 'Error while resending OTP. Invalid Type'
       return
