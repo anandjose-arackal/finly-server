@@ -20,6 +20,7 @@
 #  updated_at           :datetime         not null
 #  link                 :text(65535)
 #  view_role_id         :integer
+#  message              :text(65535)
 #
 
 class Notification < ActiveRecord::Base
@@ -62,7 +63,7 @@ class Notification < ActiveRecord::Base
       when "Card"
         object = "Card"
       when "Wallet"
-        object = "Finly Account"
+        object = "Finly Money"
       when "Payment"
         object = "Cash"
       else
@@ -109,6 +110,10 @@ class Notification < ActiveRecord::Base
         action += " debited"
       when NotificationActionType.id_for(:notify_cash_withdrawal_against_report_reimbursement)
         action += " reimbursement deducted from cash on hand"
+      when NotificationActionType.id_for(:notify_auto_reload_card_failure)
+        acrion += " auto reload failed"
+      when NotificationActionType.id_for(:notify_auto_reload_card_success)
+        action += " auto reload successful"
       else
         # do nothing
     end
@@ -131,6 +136,7 @@ class Notification < ActiveRecord::Base
     end
 
     content += user_name
+
     # preposition selector
     if action_user_id.nil?
       prep = ""
@@ -183,6 +189,14 @@ class Notification < ActiveRecord::Base
         action = " debited an amount of"
       when NotificationActionType.id_for(:notify_cash_withdrawal_against_report_reimbursement)
         action = " withdrawn funds from your cash on hand against reimbursement"
+      when NotificationActionType.id_for(:notify_auto_reload_card_failure)
+        content = "Auto reload of your expense card with amount INR #{self.amount.value} failed because: #{self.message}"
+        # returning content directly because further constructions are not required
+        return content
+      when NotificationActionType.id_for(:notify_auto_reload_card_success)
+        content += "Auto reload of your expense card with amount INT #{self.amount.value} was successfull"
+        # returning content directly because further constructions are not required
+        return content
       else
         action = ""
     end
@@ -237,8 +251,8 @@ class Notification < ActiveRecord::Base
         object_name = " at #{e.merchant_name}"
       when "Card"
         object = " to your card"
-        # c = self.user.cards.first
-        # object_name = " with serial no. #{c.proxy}"
+        # adding conditions for auto reload success and failure
+
       when "Wallet"
         if action_type_id == NotificationActionType.id_for(:notify_credit)
           object = " to your Finly account"

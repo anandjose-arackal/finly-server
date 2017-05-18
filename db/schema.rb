@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170516133327) do
+ActiveRecord::Schema.define(version: 20170518073330) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -630,12 +630,12 @@ ActiveRecord::Schema.define(version: 20170516133327) do
   end
 
   create_table "crono_jobs", force: :cascade do |t|
-    t.string   "job_id",            limit: 255,      null: false
-    t.text     "log",               limit: 16777215
+    t.string   "job_id",            limit: 255,   null: false
+    t.text     "log",               limit: 65535
     t.datetime "last_performed_at"
     t.boolean  "healthy"
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
   end
 
   add_index "crono_jobs", ["job_id"], name: "index_crono_jobs_on_job_id", unique: true, using: :btree
@@ -1345,6 +1345,7 @@ ActiveRecord::Schema.define(version: 20170516133327) do
     t.datetime "updated_at",                                         null: false
     t.text     "link",                 limit: 65535
     t.integer  "view_role_id",         limit: 4
+    t.text     "message",              limit: 65535
   end
 
   add_index "notifications", ["action_type_id"], name: "index_notifications_on_action_type_id", using: :btree

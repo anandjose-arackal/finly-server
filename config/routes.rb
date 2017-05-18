@@ -554,7 +554,6 @@
 #                     features_subscribed GET    /features_subscribed(.:format)                              expense_types_configuration#features_subscribed
 #
 
-
 Rails.application.routes.draw do
 
   mount Crono::Web, at: '/crono'
