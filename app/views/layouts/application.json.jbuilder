@@ -27,12 +27,11 @@ if @result.present?
       json.messages @result.messages
       json.data data
     else
-      if data.present? and data.is_a?(Array)
-        json.merge! data
-      else
-        json.success false
+      unless data.present? and data.is_a?(Array)
+        json.success true
         json.messages @result.messages
       end
+      json.merge! data
     end
   else
     if data.present? and data.is_a?(Array)
