@@ -14,7 +14,7 @@ class UserGroup::Update < UserGroup::Base
     return unless self.user_group.present?
     user_group.name = params[:name]
     self.items = user_group.user_group_items
-    # Store all the group item ids present. Remove the id
+    # Store all the group item ids present. Remove the id which have been sent in params
     self.groups_items_to_destroy = self.items.pluck(:id)
     params&.dig(:items).each do |key, item_map|
       id = item_map[:id]
