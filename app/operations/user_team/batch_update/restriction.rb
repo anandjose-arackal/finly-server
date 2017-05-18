@@ -62,7 +62,6 @@ class UserTeam::BatchUpdate::Restriction < UserTeam::BatchUpdate::Base
     end
 
     def process
-      debugger
       users.each do |selected_user|
         card = selected_user.cards.with_card_program(self.card_program)&.first
         if card
