@@ -27,18 +27,20 @@ if @result.present?
       json.messages @result.messages
       json.data data
     else
-      unless data.present? and data.is_a?(Array)
-        json.success true
+      if data.present? and data.is_a?(Array)
+        json.merge! data
+      else
+        json.success false
         json.messages @result.messages
       end
-      json.merge! data
     end
   else
-    unless data.present? and data.is_a?(Array)
+    if data.present? and data.is_a?(Array)
+      json.merge! data
+    else
       json.success false
       json.messages @result.messages
     end
-    json.merge! data
   end
 else
   json.merge! JSON.parse yield rescue nil
