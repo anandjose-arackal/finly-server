@@ -31,7 +31,7 @@ if @result.present?
         json.success true
         json.messages @result.messages
       end
-      if data.present?
+      unless data.nil?
         json.merge! data
       end
     end
@@ -40,7 +40,7 @@ if @result.present?
       json.success false
       json.messages @result.messages
     end
-    if data.present?
+    unless data.nil?
       json.merge! data
     end
   end
