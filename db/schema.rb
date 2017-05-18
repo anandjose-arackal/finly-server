@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170517064220) do
+ActiveRecord::Schema.define(version: 20170517113243) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -829,14 +829,13 @@ ActiveRecord::Schema.define(version: 20170517064220) do
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
   create_table "distance_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
     t.integer  "rate_id",             limit: 4
     t.integer  "distance_unit_id",    limit: 4
+    t.integer  "policy_id",           limit: 4, null: false
   end
 
   create_table "distance_expenses", force: :cascade do |t|
@@ -959,6 +958,8 @@ ActiveRecord::Schema.define(version: 20170517064220) do
     t.boolean  "medical_card_enabled",                   default: false, null: false
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
+    t.boolean  "expense_card_enabled",                   default: false
+    t.boolean  "reimbursement_card_enabled",             default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -1476,11 +1477,10 @@ ActiveRecord::Schema.define(version: 20170517064220) do
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
   create_table "per_diem_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",   limit: 4
-    t.string   "parent_type", limit: 255
     t.boolean  "enabled"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.integer  "policy_id",  limit: 4, null: false
   end
 
   create_table "per_diem_expenses", force: :cascade do |t|
@@ -1781,14 +1781,13 @@ ActiveRecord::Schema.define(version: 20170517064220) do
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
 
   create_table "time_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
     t.integer  "rate_id",             limit: 4
     t.integer  "period_id",           limit: 4
+    t.integer  "policy_id",           limit: 4, null: false
   end
 
   create_table "time_expenses", force: :cascade do |t|
