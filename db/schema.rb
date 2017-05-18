@@ -378,9 +378,9 @@ ActiveRecord::Schema.define(version: 20170516133327) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
+    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
-    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -840,14 +840,13 @@ ActiveRecord::Schema.define(version: 20170516133327) do
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
   create_table "distance_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
     t.integer  "rate_id",             limit: 4
     t.integer  "distance_unit_id",    limit: 4
+    t.integer  "policy_id",           limit: 4, null: false
   end
 
   create_table "distance_expenses", force: :cascade do |t|
@@ -970,6 +969,8 @@ ActiveRecord::Schema.define(version: 20170516133327) do
     t.boolean  "medical_card_enabled",                   default: false, null: false
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
+    t.boolean  "expense_card_enabled",                   default: false
+    t.boolean  "reimbursement_card_enabled",             default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -1097,6 +1098,57 @@ ActiveRecord::Schema.define(version: 20170516133327) do
     t.string   "bank",         limit: 255
   end
 
+  create_table "itz_cash_dmt_beneficiaries", force: :cascade do |t|
+    t.string   "first_name",             limit: 255,                 null: false
+    t.string   "middle_name",            limit: 255
+    t.string   "last_name",              limit: 255,                 null: false
+    t.string   "mobile_number",          limit: 255,                 null: false
+    t.string   "relation",               limit: 255,                 null: false
+    t.string   "ifsc_option",            limit: 255,                 null: false
+    t.string   "ifsc_code",              limit: 255,                 null: false
+    t.string   "bank_name",              limit: 255
+    t.string   "branch_name",            limit: 255
+    t.string   "bank_city",              limit: 255
+    t.string   "bank_state",             limit: 255
+    t.string   "account_number",         limit: 255,                 null: false
+    t.string   "beneficiary_name",       limit: 255,                 null: false
+    t.string   "beneficiary_id",         limit: 255,                 null: false
+    t.boolean  "is_updatable",                                       null: false
+    t.integer  "itz_cash_dmt_sender_id", limit: 4,                   null: false
+    t.integer  "status_id",              limit: 4,                   null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.boolean  "default"
+    t.boolean  "reimbursement",                      default: false
+  end
+
+  add_index "itz_cash_dmt_beneficiaries", ["itz_cash_dmt_sender_id"], name: "index_itz_cash_dmt_beneficiaries_on_itz_cash_dmt_sender_id", using: :btree
+  add_index "itz_cash_dmt_beneficiaries", ["status_id"], name: "index_itz_cash_dmt_beneficiaries_on_status_id", using: :btree
+
+  create_table "itz_cash_dmt_beneficiary_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "itz_cash_dmt_sender_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "itz_cash_dmt_senders", force: :cascade do |t|
+    t.string   "mobile_number",   limit: 255,                 null: false
+    t.string   "registration_id", limit: 255,                 null: false
+    t.integer  "user_id",         limit: 4,                   null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.integer  "status_id",       limit: 4,                   null: false
+    t.boolean  "otp_verified",                default: false, null: false
+  end
+
+  add_index "itz_cash_dmt_senders", ["user_id"], name: "index_itz_cash_dmt_senders_on_user_id", using: :btree
+
   create_table "itz_cash_properties", force: :cascade do |t|
     t.string   "d_code",          limit: 255
     t.string   "easy_account_no", limit: 255
@@ -1218,7 +1270,7 @@ ActiveRecord::Schema.define(version: 20170516133327) do
   create_table "money_requests", force: :cascade do |t|
     t.string   "name",                         limit: 255
     t.integer  "user_id",                      limit: 4,                                 null: false
-    t.integer  "policy_id",                    limit: 4
+    t.integer  "policy_id",                    limit: 4,                                 null: false
     t.integer  "payment_mode_id",              limit: 4,                                 null: false
     t.integer  "payment_id",                   limit: 4
     t.date     "required_by_date"
@@ -1436,11 +1488,10 @@ ActiveRecord::Schema.define(version: 20170516133327) do
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
   create_table "per_diem_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",   limit: 4
-    t.string   "parent_type", limit: 255
     t.boolean  "enabled"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.integer  "policy_id",  limit: 4, null: false
   end
 
   create_table "per_diem_expenses", force: :cascade do |t|
@@ -1670,7 +1721,7 @@ ActiveRecord::Schema.define(version: 20170516133327) do
     t.string   "name",                               limit: 255,                               null: false
     t.integer  "user_id",                            limit: 4,                                 null: false
     t.integer  "report_status_id",                   limit: 4,                                 null: false
-    t.integer  "policy_id",                          limit: 4
+    t.integer  "policy_id",                          limit: 4,                                 null: false
     t.datetime "submitted_at",                                   precision: 6
     t.integer  "controlling_user_id",                limit: 4
     t.integer  "controlling_user_role_id",           limit: 4
@@ -1741,14 +1792,13 @@ ActiveRecord::Schema.define(version: 20170516133327) do
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
 
   create_table "time_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
     t.integer  "rate_id",             limit: 4
     t.integer  "period_id",           limit: 4
+    t.integer  "policy_id",           limit: 4, null: false
   end
 
   create_table "time_expenses", force: :cascade do |t|
@@ -1829,7 +1879,7 @@ ActiveRecord::Schema.define(version: 20170516133327) do
     t.boolean  "default",                          default: false, null: false
     t.datetime "created_at",                                       null: false
     t.datetime "updated_at",                                       null: false
-    t.integer  "policy_id",              limit: 4
+    t.integer  "policy_id",              limit: 4,                 null: false
   end
 
   add_index "user_manager_mappings", ["approves_finance_to_id"], name: "index_user_manager_mappings_on_approves_finance_to_id", using: :btree
@@ -2048,6 +2098,8 @@ ActiveRecord::Schema.define(version: 20170516133327) do
   add_foreign_key "field_configurations", "field_parent_types"
   add_foreign_key "field_configurations", "field_types"
   add_foreign_key "field_drop_down_items", "field_configurations"
+  add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
+  add_foreign_key "itz_cash_dmt_senders", "users"
   add_foreign_key "itz_cash_properties", "companies"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "mcc_category_mappings", "categories"

@@ -142,6 +142,15 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     end
     ###############################################################
 
+    # updating the respective amounts table with the conversion rates
+    if expense.date == DateUtils.local_date
+      if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id
+        expense.destroy_other_currencies
+      end
+    else
+      expense.update_other_currencies
+    end
+
     add_message :success, 'Expense updated'
   end
 

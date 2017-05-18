@@ -1,4 +1,4 @@
-class Benefits::MealController < Benefits::BaseController
+class Benefits::MealCardsController < Benefits::BaseController
 
   protected
   def config

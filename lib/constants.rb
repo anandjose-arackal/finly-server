@@ -32,6 +32,8 @@ module Constants
 
   WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
 
+  CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+
   #########################
 
   if Rails.env.production?
@@ -63,6 +65,19 @@ module Constants
   BASE_URL = url
 
   class Constants::ItzCash
+
+    ICW_CODE = 'D000000360'
+    DMT_USERNAME = 'itzic20000'
+    DMT_PASSWORD = '03jqURp0OO0aVkssyuy01g=='
+    EASY_WALLET_ID = 'IFTSPL IMPS Wallet'
+    EASY_WALLET_TYPE = 'IMPS'
+
+    DMT_PAYMENT_MODE = 'easyPay'
+
+    BENEFICIARY_REGISTRATION_RELATION = 'Friend'
+    IFSC_OPTION = 'ByIfsc'
+    PROCESSING_BANK_ID = 'RMB000000000002'
+    PROCESSING_BANK_NAME = 'ItzCash Card Ltd'
 
     RESTRICTION_BUDGET_CONSTANT = 1000000
     RESTRICTION_TRANS_CONSTANT = 1000

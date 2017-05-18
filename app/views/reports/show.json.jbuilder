@@ -15,6 +15,8 @@ json.deleted @result.report.is_deleted
 json.non_reimbursable_expenses_total @result.non_reimbursable_expenses_total
 json.reimbursable_expenses_total @result.reimbursable_expenses_total
 json.card_expenses_total @result.card_expenses_total
+json.currency_symbol @result.report.base_currency_symbol
+json.currency_country_code @result.report.base_currency_code
 
 policy_id = nil
 policy_name = nil
@@ -27,11 +29,12 @@ end
 json.policy policy_name
 json.policy_id policy_id
 
-json.policies @result.report.user.policies do |policy|
+json.policies @result.policies do |policy|
   json.extract! policy, :id, :name
 end
 
 json.total @result.report.total_amount
+json.base_currency_id @result.report.base_currency_id
 json.date @result.report.created_at.strftime('%d %b %Y')
 
 json.comments @result.comments do |comment|

@@ -16,17 +16,17 @@ class Policy::Index < Policy::Base
   def process
     if admin_view?
       if user.company_admin?
-        self.policies = user.company.policies.non_default
+        self.policies = user&.company.policies
       else
-        self.policies = user.admin_policies.non_default
+        self.policies = user&.admin_policies
       end
     else
-      self.policies = user.policies.non_default rescue nil
+      self.policies = user&.policies
     end
   end
 
   def post_process
-    self.policies = self.policies.exclude_deleted rescue self.policies
+    self.policies = self.policies&.exclude_deleted
   end
 
   def success

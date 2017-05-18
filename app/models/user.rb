@@ -48,11 +48,6 @@
 #
 
 
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -123,12 +118,16 @@ class User < ActiveRecord::Base
 
   has_many :payment_orders, foreign_key: :initiating_user_id
 
+  has_one :itz_cash_dmt_sender
+
   # has_one :feature_access, as: :accessible
 
   accepts_nested_attributes_for :role_mapping
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
   accepts_nested_attributes_for :cards
+  accepts_nested_attributes_for :itz_cash_dmt_sender
+  # accepts_nested_attributes_for :feature_access
 
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
   delegate :company_name, to: :company
@@ -322,7 +321,9 @@ class User < ActiveRecord::Base
 
   after_create do
     # self.build_profile.save if self.profile.blank?
-    self.team_mapping.build(default: true).save if self.team_mapping.count == 0
+    default_policy_id = self.company.default_policy.id
+    self.team_mapping.build(default: true, policy_id: default_policy_id).save if self.team_mapping.count == 0
+    self.policy_user_mappings.build(policy_id: default_policy_id).save
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save

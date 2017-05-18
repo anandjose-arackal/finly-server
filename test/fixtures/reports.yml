@@ -6,7 +6,7 @@
 #  name                               :string(255)      not null
 #  user_id                            :integer          not null
 #  report_status_id                   :integer          not null
-#  policy_id                          :integer
+#  policy_id                          :integer          not null
 #  submitted_at                       :datetime
 #  controlling_user_id                :integer
 #  controlling_user_role_id           :integer
