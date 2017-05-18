@@ -113,7 +113,7 @@ json.cards do
 
         json.limits do
           json.atm_limits do
-            json.array! card_limits.ecom_pos_limits.each do |limit|
+            json.array! card_limits.atm_limits.each do |limit|
               json.id limit.id
               json.period_id limit.period_id
               json.period_name limit.period_name rescue nil
@@ -123,7 +123,7 @@ json.cards do
             end
           end
           json.ecom_pos_limits do
-            json.array! card_limits.atm_limits.each do |limit|
+            json.array! card_limits.ecom_pos_limits.each do |limit|
               json.id limit.id
               json.period_id limit.period_id
               json.period_name limit.period_name rescue nil

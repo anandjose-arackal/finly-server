@@ -109,8 +109,8 @@ class Card::Restriction::Update < User::Base
   private
 
   def card_restriction_params
-    params.require(:restrictions).permit(:mcc_group_id, :mcc_restriction_type, :channel_atm, :channel_ecom_pos, limits: [atm_limits: [:id, :transactions, :budget],
-                                                                                                     ecom_pos_limits: [:id, :transactions, :budget]])
+    params.require(:restrictions).permit(:mcc_group_id, :mcc_restriction_type, :channel_atm, :channel_ecom_pos, limits: [atm_limits: [:id, :transactions, :budget, :type],
+                                                                                                     ecom_pos_limits: [:id, :transactions, :budget, :type]])
   end
 
   def set_atm_limit_params
@@ -120,6 +120,10 @@ class Card::Restriction::Update < User::Base
         v.each do |key, value|
           # setting the budget and transaction limit as nil if atm has been disabled
           value[:budget] = value[:transactions] = nil unless atm_enabled
+          unless value[:id]
+            value[:id] = card_restriction.card_limits.atm_limits.with_period(value[:type]).first.id
+          end
+          value.delete(:type)
           r << value
         end
       end
@@ -134,6 +138,10 @@ class Card::Restriction::Update < User::Base
         v.each do |key, value|
           # setting budget and transaction limits as nil if ecom/pos has been disabled
           value[:budget] = value[:transactions] = nil unless ecom_pos_enabled
+          unless value[:id]
+            value[:id] = card_restriction.card_limits.ecom_pos_limits.with_period(value[:type]).first.id
+          end
+          value.delete(:type)
           r << value
         end
       end
