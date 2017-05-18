@@ -72,6 +72,9 @@ itzcash_uat:
   currency_layer_currency_conversion:
     base: "http://apilayer.net"
     path: "api/historical"
+  itzcash_dmt:
+    base: "http://demo.itzcash.com"
+    path: "samsso/servlet/RmtMobileAppServlet"
 
 production:
   base_url: "http://naradaapp.itzcash.com:8280"
