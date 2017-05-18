@@ -45,8 +45,8 @@ class Card::Restriction::Update < User::Base
     self.card_restriction = selected_card.card_restriction
     self.card_limits = self.card_restriction.card_limits
     self.update_params = card_restriction_params
-    self.atm_enabled = !!update_params[:channel_atm]
-    self.ecom_pos_enabled = !!update_params[:channel_ecom_pos]
+    self.atm_enabled = (update_params[:channel_atm] == '0' || update_params[:channel_atm].nil?) ? false : true
+    self.ecom_pos_enabled = (update_params[:channel_ecom_pos] == '0' || update_params[:channel_ecom_pos].nil?) ? false : true
     self.atm_limit_params = set_atm_limit_params
     self.ecom_pos_limit_params = set_ecom_pos_limit_params
   end
