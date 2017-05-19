@@ -1,9 +1,9 @@
 class AddDefaultPolicyReportsMoneyRequests < ActiveRecord::Migration
   def change
-    Report.where(policy_id: nil).each do |report|
+    Report.unscoped.where(policy_id: nil).each do |report|
       report.update(policy_id: report.user.company.default_policy.id)
     end
-    MoneyRequest.where(policy_id: nil).each do |money_request|
+    MoneyRequest.unscoped.where(policy_id: nil).each do |money_request|
       money_request.update(policy_id: money_request.user.company.default_policy.id)
     end
     change_column_null :reports, :policy_id, false

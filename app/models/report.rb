@@ -318,27 +318,15 @@ class Report < ActiveRecord::Base
   end
 
   def base_currency_id
-    if self.policy.present?
-      self.policy.base_currency_id
-    else
-      self.user.company.base_currency_id
-    end
+    self.policy.base_currency_id
   end
 
   def base_currency_code
-    if self.policy.present?
-      self.policy.base_currency.country_code
-    else
-      self.user.company.base_currency.country_code
-    end
+    self.policy.base_currency.country_code
   end
 
   def base_currency_symbol
-    if self.policy.present?
-      self.policy.base_currency.symbol
-    else
-      self.user.company.base_currency.symbol
-    end
+    self.policy.base_currency.symbol
   end
 
 

@@ -11,7 +11,7 @@ class Report::TakeControl < Report::Base
 
   def authorize
     super
-    if user.policy_admin?
+    if not user.company_admin? and user.policy_admin?
       if report.policy and not user.policy_admin?(report.policy) # that is the report has a policy and the user is not policy admin
         raise_unauthorized_exception
       end

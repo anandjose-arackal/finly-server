@@ -16,7 +16,7 @@ class MoneyRequest::Update < MoneyRequest::Base
     super
     self.update_param = {}
     self.update_param = update_params
-    if self.update_param[:policy_id].blank? or self.update_param[:policy_id] == 'nil'
+    if self.update_param[:policy_id].blank? or ([0, '0', 'nil'].include?(self.update_param[:policy_id]))
       self.update_param[:policy_id] = nil
     end
     # Assign IDs to existing mapping and its amount so duplicate entries are
