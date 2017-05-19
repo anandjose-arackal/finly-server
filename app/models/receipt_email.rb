@@ -60,7 +60,20 @@ class ReceiptEmail < ActiveRecord::Base
                                                                     email_attachment.original_attachment_content_type,
                                                                     image_tmp_path
           document_converter.convert do |images|
-            images.each { |image| receipts.create(user_id: user_id, image: image, note: self.subject, to_be_transcribed: true) }
+            images.each do |image|
+              user = User.find_by_id(user_id)
+              receipt = receipts.create(user_id: user_id, image: image, note: self.subject)
+              if user.company.ocr_enabled?
+                receipt.update(to_be_transcribed: true)
+                ########## Mailer being triggered ###########
+                if Rails.env.production?
+                  Constants::TRANSCRIBER_EMAILS.each do |email|
+                    ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+                  end
+                end
+                #############################################
+              end
+            end
           end
         end
       else
@@ -70,7 +83,20 @@ class ReceiptEmail < ActiveRecord::Base
                                                                   ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
                                                                   image_tmp_path
         document_converter.convert do |images|
-          images.each { |image| receipts.create(user_id: user_id, image: image, note: self.subject, to_be_transcribed: true) }
+          images.each do |image|
+            user = User.find_by_id(user_id)
+            receipt = receipts.create(user_id: user_id, image: image, note: self.subject)
+            if user.company.ocr_enabled?
+              receipt.update(to_be_transcribed: true)
+              ########## Mailer being triggered ###########
+              if Rails.env.production?
+                Constants::TRANSCRIBER_EMAILS.each do |email|
+                  ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+                end
+              end
+              #############################################
+            end
+          end
         end
       end
   end
