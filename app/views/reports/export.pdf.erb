@@ -101,6 +101,24 @@
 
   <!-- END OF COMMENTS -->
 
+  <!-- Rendering the receipts that are part of this report -->
+
+  <% @expenses.each do |expense| %>
+
+    <div class="row" style="width: 100%;" id="pagebreak">
+      <div class="col-sm-12">
+        <h1 style="text-align: left; font-size: 16px; margin-left: 12px"><label>Receipt</label></h1>
+        <div class="img-responsive" style="text-align: center;">
+          <img src="<%= expense.receipts.first&.image&.url %>" style="max-width: 100%; height: auto;">
+        </div>
+      </div>
+    </div>
+    <br>
+
+  <% end %>
+
+  <!-- END -->
+
 </div>
 
 </body>

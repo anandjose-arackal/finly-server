@@ -16,9 +16,9 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
       when '4', 4
         @result = Expense::ExTime::Create.(current_user, param)
       when '5', 5
-        @result = Expense::ExPerDiem::Create.(current_user, v)
+        @result = Expense::ExPerDiem::Create.(current_user, param)
       else
-        respond response: :failure, message: "Invalid input"
+        respond response: :failure, message: 'Invalid input'
     end
 
     # @result = Expense::Manual::Create.(current_user, param)
