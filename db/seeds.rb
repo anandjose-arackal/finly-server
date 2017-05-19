@@ -368,7 +368,7 @@ if Card.count == 0
                         card_type_id: 1, company_id: user.company.id,
                         ending_number: random(1000, 9999).to_i, active: true,
                         card_program_id: CardProgram.first.id,
-                        itz_cash_card_program_id: 1)
+                        itz_cash_card_program_id: ItzCashCardProgram.id_for(:hdfc))
     end
   end
 end
