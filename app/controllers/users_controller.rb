@@ -174,7 +174,10 @@ class UsersController < ApplicationController
         success_message = 'Configuration updated'
       when 'enforce_policy'
         operation = User::Configuration::EnforcePolicy::Update.new(current_user, params)
-        success_message = "Configuration Updated"
+        success_message = 'Configuration Updated'
+      when 'groups'
+        operation = User::Group::Set.new(current_user, params)
+        success_message = 'User Group Configuration Updated'
       else
         # do nothing, ha!
     end
@@ -183,6 +186,10 @@ class UsersController < ApplicationController
       return
     end
     @result = operation.run
-    respond(response: :success, message: success_message)
+    if @result&.success?
+      respond(response: :success, message: success_message)
+    else
+      response response: :failure, message: (@result&.messages[:error] || 'Error while updating data')
+    end
   end
 end

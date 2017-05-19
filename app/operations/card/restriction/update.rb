@@ -1,4 +1,4 @@
-class User::CardRestrictions::Update < User::Base
+class Card::Restriction::Update < User::Base
 
   attr_accessor :selected_user, :selected_card, :card_restriction, :update_params, :limit_types_enable, :limit_types_disable,
                 :atm_limit_params, :atm_limits_present, :ecom_pos_limit_params, :ecom_pos_limits_present, :card_limits,
@@ -17,25 +17,36 @@ class User::CardRestrictions::Update < User::Base
       add_message :error, 'Invalid input. Please try again'
       return
     end
-    if params[:card_id].blank?
+    if params[:card].blank? and params[:card_id].blank?
       add_message :error, 'Card not found'
+      return
     end
-    if params[:user_id].blank? && params[:id].blank?
+    if params[:user].blank? and params[:user_id].blank? and params[:id].blank?
       add_message :error, 'User not found'
+      return
     end
   end
 
   def init
     # self.selected_user = user.company.users.find_by(id: params[:id])
-    self.selected_user = User::Index.(user, params).team.with_id((params[:id] or params[:user_id])).first rescue nil
+    self.selected_user = params[:user]
+    self.selected_card = params[:card]
+
+    if selected_user.blank?
+      self.selected_user = User::Index.(user, params).team.with_id((params[:id] or params[:user_id])).first rescue nil
+    end
     return if selected_user.blank?
-    self.selected_card = selected_user.cards.with_id(params[:card_id]).first
+
+    if selected_card.blank?
+      self.selected_card = selected_user.cards.with_id(params[:card_id]).first
+    end
     return if selected_card.blank?
+
     self.card_restriction = selected_card.card_restriction
     self.card_limits = self.card_restriction.card_limits
     self.update_params = card_restriction_params
-    self.atm_enabled = !!update_params[:channel_atm]
-    self.ecom_pos_enabled = !!update_params[:channel_ecom_pos]
+    self.atm_enabled = (update_params[:channel_atm] == '0' || update_params[:channel_atm].nil?) ? false : true
+    self.ecom_pos_enabled = (update_params[:channel_ecom_pos] == '0' || update_params[:channel_ecom_pos].nil?) ? false : true
     self.atm_limit_params = set_atm_limit_params
     self.ecom_pos_limit_params = set_ecom_pos_limit_params
   end
@@ -98,8 +109,8 @@ class User::CardRestrictions::Update < User::Base
   private
 
   def card_restriction_params
-    params.require(:restrictions).permit(:mcc_group_id, :mcc_restriction_type, :channel_atm, :channel_ecom_pos, limits: [atm_limits: [:id, :transactions, :budget],
-                                                                                                     ecom_pos_limits: [:id, :transactions, :budget]])
+    params.require(:restrictions).permit(:mcc_group_id, :mcc_restriction_type, :channel_atm, :channel_ecom_pos, limits: [atm_limits: [:id, :transactions, :budget, :type],
+                                                                                                     ecom_pos_limits: [:id, :transactions, :budget, :type]])
   end
 
   def set_atm_limit_params
@@ -109,6 +120,10 @@ class User::CardRestrictions::Update < User::Base
         v.each do |key, value|
           # setting the budget and transaction limit as nil if atm has been disabled
           value[:budget] = value[:transactions] = nil unless atm_enabled
+          unless value[:id]
+            value[:id] = card_restriction.card_limits.atm_limits.with_period(value[:type]).first.id
+          end
+          value.delete(:type)
           r << value
         end
       end
@@ -123,6 +138,10 @@ class User::CardRestrictions::Update < User::Base
         v.each do |key, value|
           # setting budget and transaction limits as nil if ecom/pos has been disabled
           value[:budget] = value[:transactions] = nil unless ecom_pos_enabled
+          unless value[:id]
+            value[:id] = card_restriction.card_limits.ecom_pos_limits.with_period(value[:type]).first.id
+          end
+          value.delete(:type)
           r << value
         end
       end

@@ -113,7 +113,7 @@ json.cards do
 
         json.limits do
           json.atm_limits do
-            json.array! card_limits.ecom_pos_limits.each do |limit|
+            json.array! card_limits.atm_limits.each do |limit|
               json.id limit.id
               json.period_id limit.period_id
               json.period_name limit.period_name rescue nil
@@ -123,7 +123,7 @@ json.cards do
             end
           end
           json.ecom_pos_limits do
-            json.array! card_limits.atm_limits.each do |limit|
+            json.array! card_limits.ecom_pos_limits.each do |limit|
               json.id limit.id
               json.period_id limit.period_id
               json.period_name limit.period_name rescue nil
@@ -178,5 +178,24 @@ end
 json.periods do
   json.array! @result.periods do |period|
     json.extract! period, :id, :name
+  end
+end
+json.groups do
+  json.array! @result.user_groups.each do |group|
+    json.id group.id
+    json.name group.name
+    set_item = @result.user_group_item_mappings.with_group(group.id)&.first&.user_group_item
+    json.set_item do
+      json.id set_item&.id
+      json.name set_item&.name
+    end
+    json.items do
+      items = group.user_group_items.map{|m| m = {id: m.id, name: m.name}}
+      items.unshift({id: 0, name: 'None'})
+      json.array items.each do |item|
+        json.id item[:id]
+        json.name item[:name]
+      end
+    end
   end
 end

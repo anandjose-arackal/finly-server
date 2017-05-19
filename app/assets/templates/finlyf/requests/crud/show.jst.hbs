@@ -24,9 +24,6 @@
               {{/if}}
             </label>
             <select name="money_request[policy_id]" class="item-attr-edit item-policy item-policy-edit form-control" name="item-policy" data-default-value="{{item.policy_id}}">
-              {{#unless item.enforce_policy_enabled}}
-                <option value="">None</option>
-              {{/unless}}
               {{#each item.policies}}
                 <option value="{{this.id}}">{{this.name}}</option>
               {{/each}}
@@ -49,7 +46,7 @@
               {{#switch item.payment_mode_id}}
                 {{#case 1}}Cash{{/case}}
                 {{#case 2}}Card{{/case}}
-              {{/switch}} 
+              {{/switch}}
             {{else}}
               --
             {{/if}}
@@ -58,7 +55,7 @@
               <select class="form-control item-attr-edit" name="money_request[payment_mode_id]">
                 <option value="1" {{#if_eq item.payment_mode_id 1}}selected="selected"{{/if_eq}}>Cash</option>
                 <option value="2" {{#if_eq item.payment_mode_id 2}}selected="selected"{{/if_eq}}>Card</option>
-              </select> 
+              </select>
             {{else}}
               <label class="control-label item-attr-edit">Cash</label>
               <input type="hidden" name="money_request[payment_mode_id]" value="1">
@@ -83,7 +80,7 @@
 
         <div class="row no-margin">
           <div class="col-sm-6"><label class="control-label">From:</label></div>
-          <div class="col-sm-6">{{item.user_name}}</div>   
+          <div class="col-sm-6">{{item.user_name}}</div>
         </div>
 
         <div class="row no-margin">
@@ -101,14 +98,14 @@
           <div class="col-sm-6">
             <label class="control-label item-attr-preview">{{#if item.required_by_date}}{{item.required_by_date}}{{else}}Not Set{{/if}}</label>
             <input class="item-attr-edit datepicker form-control" type="text" name="money_request[required_by_date]" value="{{item.required_by_date}}" />
-          </div>   
+          </div>
         </div>
 
         <div class="row no-margin">
           <div class="col-sm-6"><label class="control-label">Total Amount:</label></div>
           <div class="col-sm-6"><label>&#8377;&nbsp;{{item.total}}</label></div>
         </div>
-        
+
       </div>
       <div class="col-sm-5">
         <div class="row no-margin text-right">
@@ -179,11 +176,11 @@
           </div>
         </div>
       </div>
-        
+
     </div>
 
-      
-    
+
+
     {{!-- <div class="row no-margin request-categories">
       {{#each item.request_items}}
         {{#if this.amount.value}}
@@ -259,7 +256,7 @@
         </div>
       </div>
       {{/each}}
-    {{/if}}  
+    {{/if}}
     </div>
   </div><!-- col-sm-4 -->
 </div><!-- .row -->

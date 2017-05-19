@@ -15,7 +15,7 @@ class BackgroundOperation < BaseOperation
 
   def self.perform_async(user_id, params)
     if user_id.present? and user_id.is_a?(User)
-      user_id = user.id
+      user_id = user_id.id
     end
     super(user_id, params)
   end
