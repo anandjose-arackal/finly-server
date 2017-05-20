@@ -30,7 +30,7 @@ class UserGroup::Users < UserGroup::Base
     exclude_users = UserGroupItemMapping.with_group_item(exclude_item_ids).pluck(:user_id)
 
     if filter_group_items.present?
-      include_users =  UserGroupItemMapping.with_group_item(self.filter_group_items).pluck(:user_id)
+      include_users =  UserGroupItemMapping.with_group_item(self.filter_group_items).having_association_count(filter_group_items.size).pluck(:user_id)
       users = users.with_id(include_users)
     end
 
