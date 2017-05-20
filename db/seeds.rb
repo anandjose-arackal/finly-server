@@ -368,7 +368,7 @@ if Card.count == 0
                         card_type_id: 1, company_id: user.company.id,
                         ending_number: random(1000, 9999).to_i, active: true,
                         card_program_id: CardProgram.first.id,
-                        itz_cash_card_program_id: 1)
+                        itz_cash_card_program_id: ItzCashCardProgram.id_for(:hdfc))
     end
   end
 end
@@ -495,18 +495,6 @@ if Report.count == 0
 end
 
 unless Rails.env.production?
-  # if Card.count == 0
-  #   User.all.each do |user|
-  #     if user.id < 9
-  #       number = "S0001774009#{(user.id - 1)}"
-  #       user.cards.create(proxy: number, description: "Test physical card for user #{user.id}",
-  #                         product_code: Constants::ItzCash::PRODUCT_CODE,
-  #                         card_type_id: 1, company_id: user.company.id,
-  #                         ending_number: random(1000, 9999).to_i, active: true,
-  #                         card_program_id: CardProgram.first.id)
-  #     end
-  #   end
-  # end
 
   # creating some junk transactions and card expenses for testing
   if CardTransaction.count == 0
@@ -670,7 +658,7 @@ if CardTransaction.filter_refunds(1).count == 0
       from_date = DateTime.parse("01-01-2017 12:00:00")
       to_date = DateTime.now
       random_amount = random_integer(50, 200) + 0.1234
-      sample_msg_queue_entry = "321744RUPP0003508886000#{random_string_of_numbers(7)},#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_types[random_integer(0, 2000)%3]},OLCDCB_POSOFFUS,Refund #{Faker::University.name},91,#{trans_modes[random_integer(0, 2000)%2]},#{card.proxy},RBLRUP"
+      sample_msg_queue_entry = "321744RUPP0003508886000#{random_string_of_numbers(7)},#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_modes[0]},OLCDCB_POSOFFUS,Refund #{Faker::University.name},91,#{trans_types[0]},#{card.proxy},RBLRUP"
 
       data = sample_msg_queue_entry.split(",")
 
@@ -694,7 +682,7 @@ if CardTransaction.filter_refunds(1).count == 0
                       product_code: data[11]
       }
 
-      Card::Transaction::Create.(trans_params)
+      result = Card::Transaction::Create.(trans_params)
     end
   end
 end

@@ -19,4 +19,4 @@ Crono.perform(UpdateUserBalances).every 1.day, at: {hour: 00, min: 10}
 Crono.perform(UpdateCompanyBalances).every 1.day, at: {hour: 00, min: 20}
 Crono.perform(TaxBenefitProcess).every 1.day, at: {hour: 00, min: 25}
 Crono.perform(FetchCurrencyConversionRates).every 1.day, at: {hour: 05, min: 35}
-Crono.perform(UpdateConvertedAmountValues).every 1.day, at: {hour: 00, min: 30}
+Crono.perform(UpdateConvertedAmountValues).every 1.day, at: {hour: 05, min: 40}

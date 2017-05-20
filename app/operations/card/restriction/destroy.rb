@@ -1,4 +1,4 @@
-class User::CardRestrictions::Destroy < User::Base
+class Card::Restriction::Destroy < User::Base
 
   attr_accessor :card_limit
 

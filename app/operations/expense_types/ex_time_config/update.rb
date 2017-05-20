@@ -43,6 +43,7 @@ class ExpenseTypes::ExTimeConfig::Update < ExpenseTypes::Base
     base_currency_id = time_config.policy.base_currency_id
     if update_params[:rate_attributes]
       update_params[:rate_attributes][:currency_id] = base_currency_id
+      update_params[:period_id] = Period.id_for(:hour)
       if time_config.rate.present?
         update_params[:rate_attributes][:id] = time_config.rate.id
       end
@@ -55,10 +56,16 @@ class ExpenseTypes::ExTimeConfig::Update < ExpenseTypes::Base
     end
   end
 
+  def post_process
+    if time_config.rate
+      time_config.rate&.update(time_config.policy.base_currency.country_code.to_sym => time_config.rate_value)
+    end
+  end
+
   private
 
   def time_expense_config_params
-    params.require(:time_expense_config).permit(:default_category_id, :enabled, rate_attributes: [:value, :currency_id])
+    params.require(:time_expense_config).permit(:default_category_id, :enabled, :period_id, rate_attributes: [:value, :currency_id])
   end
 
 end
