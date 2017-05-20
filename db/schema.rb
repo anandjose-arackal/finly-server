@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170513110709) do
+ActiveRecord::Schema.define(version: 20170520091811) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -98,17 +98,157 @@ ActiveRecord::Schema.define(version: 20170513110709) do
     t.decimal  "TRY",                   precision: 20, scale: 5
     t.decimal  "ZAR",                   precision: 20, scale: 5
     t.decimal  "AUD",                   precision: 20, scale: 5
+    t.decimal  "AED",                   precision: 20, scale: 5
+    t.decimal  "AFN",                   precision: 20, scale: 5
+    t.decimal  "ALL",                   precision: 20, scale: 5
+    t.decimal  "AMD",                   precision: 20, scale: 5
+    t.decimal  "ANG",                   precision: 20, scale: 5
+    t.decimal  "AOA",                   precision: 20, scale: 5
+    t.decimal  "ARS",                   precision: 20, scale: 5
+    t.decimal  "AWG",                   precision: 20, scale: 5
+    t.decimal  "AZN",                   precision: 20, scale: 5
+    t.decimal  "BAM",                   precision: 20, scale: 5
+    t.decimal  "BBD",                   precision: 20, scale: 5
+    t.decimal  "BDT",                   precision: 20, scale: 5
+    t.decimal  "BHD",                   precision: 20, scale: 5
+    t.decimal  "BIF",                   precision: 20, scale: 5
+    t.decimal  "BMD",                   precision: 20, scale: 5
+    t.decimal  "BND",                   precision: 20, scale: 5
+    t.decimal  "BOB",                   precision: 20, scale: 5
+    t.decimal  "BSD",                   precision: 20, scale: 5
+    t.decimal  "BTC",                   precision: 20, scale: 5
+    t.decimal  "BTN",                   precision: 20, scale: 5
+    t.decimal  "BWP",                   precision: 20, scale: 5
+    t.decimal  "BYN",                   precision: 20, scale: 5
+    t.decimal  "BYR",                   precision: 20, scale: 5
+    t.decimal  "BZD",                   precision: 20, scale: 5
+    t.decimal  "CDF",                   precision: 20, scale: 5
+    t.decimal  "CLF",                   precision: 20, scale: 5
+    t.decimal  "CLP",                   precision: 20, scale: 5
+    t.decimal  "COP",                   precision: 20, scale: 5
+    t.decimal  "CRC",                   precision: 20, scale: 5
+    t.decimal  "CUC",                   precision: 20, scale: 5
+    t.decimal  "CUP",                   precision: 20, scale: 5
+    t.decimal  "CVE",                   precision: 20, scale: 5
+    t.decimal  "DJF",                   precision: 20, scale: 5
+    t.decimal  "DOP",                   precision: 20, scale: 5
+    t.decimal  "DZD",                   precision: 20, scale: 5
+    t.decimal  "EEK",                   precision: 20, scale: 5
+    t.decimal  "EGP",                   precision: 20, scale: 5
+    t.decimal  "ERN",                   precision: 20, scale: 5
+    t.decimal  "ETB",                   precision: 20, scale: 5
+    t.decimal  "FJD",                   precision: 20, scale: 5
+    t.decimal  "FKP",                   precision: 20, scale: 5
+    t.decimal  "GEL",                   precision: 20, scale: 5
+    t.decimal  "GGP",                   precision: 20, scale: 5
+    t.decimal  "GHS",                   precision: 20, scale: 5
+    t.decimal  "GIP",                   precision: 20, scale: 5
+    t.decimal  "GMD",                   precision: 20, scale: 5
+    t.decimal  "GNF",                   precision: 20, scale: 5
+    t.decimal  "GTQ",                   precision: 20, scale: 5
+    t.decimal  "GYD",                   precision: 20, scale: 5
+    t.decimal  "HNL",                   precision: 20, scale: 5
+    t.decimal  "HTG",                   precision: 20, scale: 5
+    t.decimal  "IMP",                   precision: 20, scale: 5
+    t.decimal  "IQD",                   precision: 20, scale: 5
+    t.decimal  "IRR",                   precision: 20, scale: 5
+    t.decimal  "ISK",                   precision: 20, scale: 5
+    t.decimal  "JEP",                   precision: 20, scale: 5
+    t.decimal  "JMD",                   precision: 20, scale: 5
+    t.decimal  "JOD",                   precision: 20, scale: 5
+    t.decimal  "KES",                   precision: 20, scale: 5
+    t.decimal  "KGS",                   precision: 20, scale: 5
+    t.decimal  "KHR",                   precision: 20, scale: 5
+    t.decimal  "KMF",                   precision: 20, scale: 5
+    t.decimal  "KPW",                   precision: 20, scale: 5
+    t.decimal  "KWD",                   precision: 20, scale: 5
+    t.decimal  "KYD",                   precision: 20, scale: 5
+    t.decimal  "KZT",                   precision: 20, scale: 5
+    t.decimal  "LAK",                   precision: 20, scale: 5
+    t.decimal  "LBP",                   precision: 20, scale: 5
+    t.decimal  "LKR",                   precision: 20, scale: 5
+    t.decimal  "LRD",                   precision: 20, scale: 5
+    t.decimal  "LSL",                   precision: 20, scale: 5
+    t.decimal  "LTL",                   precision: 20, scale: 5
+    t.decimal  "LVL",                   precision: 20, scale: 5
+    t.decimal  "LYD",                   precision: 20, scale: 5
+    t.decimal  "MAD",                   precision: 20, scale: 5
+    t.decimal  "MDL",                   precision: 20, scale: 5
+    t.decimal  "MGA",                   precision: 20, scale: 5
+    t.decimal  "MKD",                   precision: 20, scale: 5
+    t.decimal  "MMK",                   precision: 20, scale: 5
+    t.decimal  "MNT",                   precision: 20, scale: 5
+    t.decimal  "MOP",                   precision: 20, scale: 5
+    t.decimal  "MRO",                   precision: 20, scale: 5
+    t.decimal  "MUR",                   precision: 20, scale: 5
+    t.decimal  "MVR",                   precision: 20, scale: 5
+    t.decimal  "MWK",                   precision: 20, scale: 5
+    t.decimal  "MZN",                   precision: 20, scale: 5
+    t.decimal  "NAD",                   precision: 20, scale: 5
+    t.decimal  "NGN",                   precision: 20, scale: 5
+    t.decimal  "NIO",                   precision: 20, scale: 5
+    t.decimal  "NPR",                   precision: 20, scale: 5
+    t.decimal  "OMR",                   precision: 20, scale: 5
+    t.decimal  "PAB",                   precision: 20, scale: 5
+    t.decimal  "PEN",                   precision: 20, scale: 5
+    t.decimal  "PGK",                   precision: 20, scale: 5
+    t.decimal  "PKR",                   precision: 20, scale: 5
+    t.decimal  "PYG",                   precision: 20, scale: 5
+    t.decimal  "QAR",                   precision: 20, scale: 5
+    t.decimal  "RSD",                   precision: 20, scale: 5
+    t.decimal  "RWF",                   precision: 20, scale: 5
+    t.decimal  "SAR",                   precision: 20, scale: 5
+    t.decimal  "SBD",                   precision: 20, scale: 5
+    t.decimal  "SCR",                   precision: 20, scale: 5
+    t.decimal  "SDG",                   precision: 20, scale: 5
+    t.decimal  "SHP",                   precision: 20, scale: 5
+    t.decimal  "SLL",                   precision: 20, scale: 5
+    t.decimal  "SOS",                   precision: 20, scale: 5
+    t.decimal  "SRD",                   precision: 20, scale: 5
+    t.decimal  "STD",                   precision: 20, scale: 5
+    t.decimal  "SVC",                   precision: 20, scale: 5
+    t.decimal  "SYP",                   precision: 20, scale: 5
+    t.decimal  "SZL",                   precision: 20, scale: 5
+    t.decimal  "TJS",                   precision: 20, scale: 5
+    t.decimal  "TMT",                   precision: 20, scale: 5
+    t.decimal  "TND",                   precision: 20, scale: 5
+    t.decimal  "TOP",                   precision: 20, scale: 5
+    t.decimal  "TTD",                   precision: 20, scale: 5
+    t.decimal  "TWD",                   precision: 20, scale: 5
+    t.decimal  "TZS",                   precision: 20, scale: 5
+    t.decimal  "UAH",                   precision: 20, scale: 5
+    t.decimal  "UGX",                   precision: 20, scale: 5
+    t.decimal  "UYU",                   precision: 20, scale: 5
+    t.decimal  "UZS",                   precision: 20, scale: 5
+    t.decimal  "VEF",                   precision: 20, scale: 5
+    t.decimal  "VND",                   precision: 20, scale: 5
+    t.decimal  "VUV",                   precision: 20, scale: 5
+    t.decimal  "WST",                   precision: 20, scale: 5
+    t.decimal  "XAF",                   precision: 20, scale: 5
+    t.decimal  "XAG",                   precision: 20, scale: 5
+    t.decimal  "XAU",                   precision: 20, scale: 5
+    t.decimal  "XCD",                   precision: 20, scale: 5
+    t.decimal  "XDR",                   precision: 20, scale: 5
+    t.decimal  "XOF",                   precision: 20, scale: 5
+    t.decimal  "XPF",                   precision: 20, scale: 5
+    t.decimal  "YER",                   precision: 20, scale: 5
+    t.decimal  "ZMK",                   precision: 20, scale: 5
+    t.decimal  "ZMW",                   precision: 20, scale: 5
+    t.decimal  "ZWL",                   precision: 20, scale: 5
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
 
   create_table "auto_reload_configs", force: :cascade do |t|
     t.integer  "minimum_balance_id", limit: 4
-    t.integer  "parent_id",          limit: 4
-    t.string   "parent_type",        limit: 255
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "enabled",                        default: false
+    t.integer  "reloadable_id",      limit: 4
+    t.string   "reloadable_type",    limit: 255
   end
+
+  add_index "auto_reload_configs", ["reloadable_type", "reloadable_id"], name: "index_auto_reload_configs_on_reloadable_type_and_reloadable_id", using: :btree
 
   create_table "auto_submit_configs", force: :cascade do |t|
     t.boolean  "enabled",                              default: false, null: false
@@ -238,9 +378,9 @@ ActiveRecord::Schema.define(version: 20170513110709) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
+    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
-    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -544,6 +684,143 @@ ActiveRecord::Schema.define(version: 20170513110709) do
     t.decimal  "AUD",        precision: 10, scale: 5
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
+    t.decimal  "AED",        precision: 10, scale: 5
+    t.decimal  "AFN",        precision: 10, scale: 5
+    t.decimal  "ALL",        precision: 10, scale: 5
+    t.decimal  "AMD",        precision: 10, scale: 5
+    t.decimal  "ANG",        precision: 10, scale: 5
+    t.decimal  "AOA",        precision: 10, scale: 5
+    t.decimal  "ARS",        precision: 10, scale: 5
+    t.decimal  "AWG",        precision: 10, scale: 5
+    t.decimal  "AZN",        precision: 10, scale: 5
+    t.decimal  "BAM",        precision: 10, scale: 5
+    t.decimal  "BBD",        precision: 10, scale: 5
+    t.decimal  "BDT",        precision: 10, scale: 5
+    t.decimal  "BHD",        precision: 10, scale: 5
+    t.decimal  "BIF",        precision: 10, scale: 5
+    t.decimal  "BMD",        precision: 10, scale: 5
+    t.decimal  "BND",        precision: 10, scale: 5
+    t.decimal  "BOB",        precision: 10, scale: 5
+    t.decimal  "BSD",        precision: 10, scale: 5
+    t.decimal  "BTC",        precision: 10, scale: 5
+    t.decimal  "BTN",        precision: 10, scale: 5
+    t.decimal  "BWP",        precision: 10, scale: 5
+    t.decimal  "BYN",        precision: 10, scale: 5
+    t.decimal  "BYR",        precision: 10, scale: 5
+    t.decimal  "BZD",        precision: 10, scale: 5
+    t.decimal  "CDF",        precision: 10, scale: 5
+    t.decimal  "CLF",        precision: 10, scale: 5
+    t.decimal  "CLP",        precision: 10, scale: 5
+    t.decimal  "COP",        precision: 10, scale: 5
+    t.decimal  "CRC",        precision: 10, scale: 5
+    t.decimal  "CUC",        precision: 10, scale: 5
+    t.decimal  "CUP",        precision: 10, scale: 5
+    t.decimal  "CVE",        precision: 10, scale: 5
+    t.decimal  "DJF",        precision: 10, scale: 5
+    t.decimal  "DOP",        precision: 10, scale: 5
+    t.decimal  "DZD",        precision: 10, scale: 5
+    t.decimal  "EEK",        precision: 10, scale: 5
+    t.decimal  "EGP",        precision: 10, scale: 5
+    t.decimal  "ERN",        precision: 10, scale: 5
+    t.decimal  "ETB",        precision: 10, scale: 5
+    t.decimal  "FJD",        precision: 10, scale: 5
+    t.decimal  "FKP",        precision: 10, scale: 5
+    t.decimal  "GEL",        precision: 10, scale: 5
+    t.decimal  "GGP",        precision: 10, scale: 5
+    t.decimal  "GHS",        precision: 10, scale: 5
+    t.decimal  "GIP",        precision: 10, scale: 5
+    t.decimal  "GMD",        precision: 10, scale: 5
+    t.decimal  "GNF",        precision: 10, scale: 5
+    t.decimal  "GTQ",        precision: 10, scale: 5
+    t.decimal  "GYD",        precision: 10, scale: 5
+    t.decimal  "HNL",        precision: 10, scale: 5
+    t.decimal  "HTG",        precision: 10, scale: 5
+    t.decimal  "IMP",        precision: 10, scale: 5
+    t.decimal  "IQD",        precision: 10, scale: 5
+    t.decimal  "IRR",        precision: 10, scale: 5
+    t.decimal  "ISK",        precision: 10, scale: 5
+    t.decimal  "JEP",        precision: 10, scale: 5
+    t.decimal  "JMD",        precision: 10, scale: 5
+    t.decimal  "JOD",        precision: 10, scale: 5
+    t.decimal  "KES",        precision: 10, scale: 5
+    t.decimal  "KGS",        precision: 10, scale: 5
+    t.decimal  "KHR",        precision: 10, scale: 5
+    t.decimal  "KMF",        precision: 10, scale: 5
+    t.decimal  "KPW",        precision: 10, scale: 5
+    t.decimal  "KWD",        precision: 10, scale: 5
+    t.decimal  "KYD",        precision: 10, scale: 5
+    t.decimal  "KZT",        precision: 10, scale: 5
+    t.decimal  "LAK",        precision: 10, scale: 5
+    t.decimal  "LBP",        precision: 10, scale: 5
+    t.decimal  "LKR",        precision: 10, scale: 5
+    t.decimal  "LRD",        precision: 10, scale: 5
+    t.decimal  "LSL",        precision: 10, scale: 5
+    t.decimal  "LTL",        precision: 10, scale: 5
+    t.decimal  "LVL",        precision: 10, scale: 5
+    t.decimal  "LYD",        precision: 10, scale: 5
+    t.decimal  "MAD",        precision: 10, scale: 5
+    t.decimal  "MDL",        precision: 10, scale: 5
+    t.decimal  "MGA",        precision: 10, scale: 5
+    t.decimal  "MKD",        precision: 10, scale: 5
+    t.decimal  "MMK",        precision: 10, scale: 5
+    t.decimal  "MNT",        precision: 10, scale: 5
+    t.decimal  "MOP",        precision: 10, scale: 5
+    t.decimal  "MRO",        precision: 10, scale: 5
+    t.decimal  "MUR",        precision: 10, scale: 5
+    t.decimal  "MVR",        precision: 10, scale: 5
+    t.decimal  "MWK",        precision: 10, scale: 5
+    t.decimal  "MZN",        precision: 10, scale: 5
+    t.decimal  "NAD",        precision: 10, scale: 5
+    t.decimal  "NGN",        precision: 10, scale: 5
+    t.decimal  "NIO",        precision: 10, scale: 5
+    t.decimal  "NPR",        precision: 10, scale: 5
+    t.decimal  "OMR",        precision: 10, scale: 5
+    t.decimal  "PAB",        precision: 10, scale: 5
+    t.decimal  "PEN",        precision: 10, scale: 5
+    t.decimal  "PGK",        precision: 10, scale: 5
+    t.decimal  "PKR",        precision: 10, scale: 5
+    t.decimal  "PYG",        precision: 10, scale: 5
+    t.decimal  "QAR",        precision: 10, scale: 5
+    t.decimal  "RSD",        precision: 10, scale: 5
+    t.decimal  "RWF",        precision: 10, scale: 5
+    t.decimal  "SAR",        precision: 10, scale: 5
+    t.decimal  "SBD",        precision: 10, scale: 5
+    t.decimal  "SCR",        precision: 10, scale: 5
+    t.decimal  "SDG",        precision: 10, scale: 5
+    t.decimal  "SHP",        precision: 10, scale: 5
+    t.decimal  "SLL",        precision: 10, scale: 5
+    t.decimal  "SOS",        precision: 10, scale: 5
+    t.decimal  "SRD",        precision: 10, scale: 5
+    t.decimal  "STD",        precision: 10, scale: 5
+    t.decimal  "SVC",        precision: 10, scale: 5
+    t.decimal  "SYP",        precision: 10, scale: 5
+    t.decimal  "SZL",        precision: 10, scale: 5
+    t.decimal  "TJS",        precision: 10, scale: 5
+    t.decimal  "TMT",        precision: 10, scale: 5
+    t.decimal  "TND",        precision: 10, scale: 5
+    t.decimal  "TOP",        precision: 10, scale: 5
+    t.decimal  "TTD",        precision: 10, scale: 5
+    t.decimal  "TWD",        precision: 10, scale: 5
+    t.decimal  "TZS",        precision: 10, scale: 5
+    t.decimal  "UAH",        precision: 10, scale: 5
+    t.decimal  "UGX",        precision: 10, scale: 5
+    t.decimal  "UYU",        precision: 10, scale: 5
+    t.decimal  "UZS",        precision: 10, scale: 5
+    t.decimal  "VEF",        precision: 10, scale: 5
+    t.decimal  "VND",        precision: 10, scale: 5
+    t.decimal  "VUV",        precision: 10, scale: 5
+    t.decimal  "WST",        precision: 10, scale: 5
+    t.decimal  "XAF",        precision: 10, scale: 5
+    t.decimal  "XAG",        precision: 10, scale: 5
+    t.decimal  "XAU",        precision: 10, scale: 5
+    t.decimal  "XCD",        precision: 10, scale: 5
+    t.decimal  "XDR",        precision: 10, scale: 5
+    t.decimal  "XOF",        precision: 10, scale: 5
+    t.decimal  "XPF",        precision: 10, scale: 5
+    t.decimal  "YER",        precision: 10, scale: 5
+    t.decimal  "ZMK",        precision: 10, scale: 5
+    t.decimal  "ZMW",        precision: 10, scale: 5
+    t.decimal  "ZWL",        precision: 10, scale: 5
   end
 
   add_index "currency_conversion_rates", ["date"], name: "index_currency_conversion_rates_on_date", using: :btree
@@ -563,14 +840,13 @@ ActiveRecord::Schema.define(version: 20170513110709) do
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
   create_table "distance_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
     t.integer  "rate_id",             limit: 4
     t.integer  "distance_unit_id",    limit: 4
+    t.integer  "policy_id",           limit: 4, null: false
   end
 
   create_table "distance_expenses", force: :cascade do |t|
@@ -693,6 +969,8 @@ ActiveRecord::Schema.define(version: 20170513110709) do
     t.boolean  "medical_card_enabled",                   default: false, null: false
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
+    t.boolean  "expense_card_enabled",                   default: false
+    t.boolean  "reimbursement_card_enabled",             default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -820,6 +1098,57 @@ ActiveRecord::Schema.define(version: 20170513110709) do
     t.string   "bank",         limit: 255
   end
 
+  create_table "itz_cash_dmt_beneficiaries", force: :cascade do |t|
+    t.string   "first_name",             limit: 255,                 null: false
+    t.string   "middle_name",            limit: 255
+    t.string   "last_name",              limit: 255,                 null: false
+    t.string   "mobile_number",          limit: 255,                 null: false
+    t.string   "relation",               limit: 255,                 null: false
+    t.string   "ifsc_option",            limit: 255,                 null: false
+    t.string   "ifsc_code",              limit: 255,                 null: false
+    t.string   "bank_name",              limit: 255
+    t.string   "branch_name",            limit: 255
+    t.string   "bank_city",              limit: 255
+    t.string   "bank_state",             limit: 255
+    t.string   "account_number",         limit: 255,                 null: false
+    t.string   "beneficiary_name",       limit: 255,                 null: false
+    t.string   "beneficiary_id",         limit: 255,                 null: false
+    t.boolean  "is_updatable",                                       null: false
+    t.integer  "itz_cash_dmt_sender_id", limit: 4,                   null: false
+    t.integer  "status_id",              limit: 4,                   null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.boolean  "default"
+    t.boolean  "reimbursement",                      default: false
+  end
+
+  add_index "itz_cash_dmt_beneficiaries", ["itz_cash_dmt_sender_id"], name: "index_itz_cash_dmt_beneficiaries_on_itz_cash_dmt_sender_id", using: :btree
+  add_index "itz_cash_dmt_beneficiaries", ["status_id"], name: "index_itz_cash_dmt_beneficiaries_on_status_id", using: :btree
+
+  create_table "itz_cash_dmt_beneficiary_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "itz_cash_dmt_sender_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "itz_cash_dmt_senders", force: :cascade do |t|
+    t.string   "mobile_number",   limit: 255,                 null: false
+    t.string   "registration_id", limit: 255,                 null: false
+    t.integer  "user_id",         limit: 4,                   null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+    t.integer  "status_id",       limit: 4,                   null: false
+    t.boolean  "otp_verified",                default: false, null: false
+  end
+
+  add_index "itz_cash_dmt_senders", ["user_id"], name: "index_itz_cash_dmt_senders_on_user_id", using: :btree
+
   create_table "itz_cash_properties", force: :cascade do |t|
     t.string   "d_code",          limit: 255
     t.string   "easy_account_no", limit: 255
@@ -941,7 +1270,7 @@ ActiveRecord::Schema.define(version: 20170513110709) do
   create_table "money_requests", force: :cascade do |t|
     t.string   "name",                         limit: 255
     t.integer  "user_id",                      limit: 4,                                 null: false
-    t.integer  "policy_id",                    limit: 4
+    t.integer  "policy_id",                    limit: 4,                                 null: false
     t.integer  "payment_mode_id",              limit: 4,                                 null: false
     t.integer  "payment_id",                   limit: 4
     t.date     "required_by_date"
@@ -1016,6 +1345,7 @@ ActiveRecord::Schema.define(version: 20170513110709) do
     t.datetime "updated_at",                                         null: false
     t.text     "link",                 limit: 65535
     t.integer  "view_role_id",         limit: 4
+    t.text     "message",              limit: 65535
   end
 
   add_index "notifications", ["action_type_id"], name: "index_notifications_on_action_type_id", using: :btree
@@ -1159,11 +1489,10 @@ ActiveRecord::Schema.define(version: 20170513110709) do
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
 
   create_table "per_diem_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",   limit: 4
-    t.string   "parent_type", limit: 255
     t.boolean  "enabled"
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+    t.integer  "policy_id",  limit: 4, null: false
   end
 
   create_table "per_diem_expenses", force: :cascade do |t|
@@ -1248,12 +1577,14 @@ ActiveRecord::Schema.define(version: 20170513110709) do
   add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
 
   create_table "preview_registrations", force: :cascade do |t|
-    t.string   "email",        limit: 255
-    t.text     "company",      limit: 65535
-    t.string   "phone_number", limit: 255
-    t.text     "name",         limit: 65535
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.string   "email",              limit: 255
+    t.text     "company",            limit: 65535
+    t.string   "phone_number",       limit: 255
+    t.text     "name",               limit: 65535
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.text     "source",             limit: 65535
+    t.text     "source_description", limit: 65535
   end
 
   create_table "product_combinations", force: :cascade do |t|
@@ -1393,7 +1724,7 @@ ActiveRecord::Schema.define(version: 20170513110709) do
     t.string   "name",                               limit: 255,                               null: false
     t.integer  "user_id",                            limit: 4,                                 null: false
     t.integer  "report_status_id",                   limit: 4,                                 null: false
-    t.integer  "policy_id",                          limit: 4
+    t.integer  "policy_id",                          limit: 4,                                 null: false
     t.datetime "submitted_at",                                   precision: 6
     t.integer  "controlling_user_id",                limit: 4
     t.integer  "controlling_user_role_id",           limit: 4
@@ -1430,6 +1761,8 @@ ActiveRecord::Schema.define(version: 20170513110709) do
     t.string "email",              limit: 255
     t.string "mobile_number",      limit: 255
     t.string "resource_file_name", limit: 255
+    t.text   "source",             limit: 65535
+    t.text   "source_description", limit: 65535
   end
 
   create_table "rule_types", force: :cascade do |t|
@@ -1464,14 +1797,13 @@ ActiveRecord::Schema.define(version: 20170513110709) do
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
 
   create_table "time_expense_configs", force: :cascade do |t|
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.boolean  "enabled"
     t.integer  "default_category_id", limit: 4
     t.integer  "rate_id",             limit: 4
     t.integer  "period_id",           limit: 4
+    t.integer  "policy_id",           limit: 4, null: false
   end
 
   create_table "time_expenses", force: :cascade do |t|
@@ -1542,6 +1874,41 @@ ActiveRecord::Schema.define(version: 20170513110709) do
   add_index "user_balance_histories", ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id", using: :btree
   add_index "user_balance_histories", ["user_id"], name: "index_user_balance_histories_on_user_id", using: :btree
 
+  create_table "user_group_item_mappings", force: :cascade do |t|
+    t.integer  "user_id",            limit: 4
+    t.integer  "user_group_item_id", limit: 4
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.boolean  "is_deleted",                   default: false
+    t.integer  "user_group_id",      limit: 4
+  end
+
+  add_index "user_group_item_mappings", ["user_group_id"], name: "index_user_group_item_mappings_on_user_group_id", using: :btree
+  add_index "user_group_item_mappings", ["user_group_item_id"], name: "index_user_group_item_mappings_on_user_group_item_id", using: :btree
+  add_index "user_group_item_mappings", ["user_id"], name: "index_user_group_item_mappings_on_user_id", using: :btree
+
+  create_table "user_group_items", force: :cascade do |t|
+    t.string   "name",          limit: 255,                 null: false
+    t.integer  "user_group_id", limit: 4,                   null: false
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+    t.boolean  "is_deleted",                default: false
+  end
+
+  add_index "user_group_items", ["name"], name: "index_user_group_items_on_name", using: :btree
+  add_index "user_group_items", ["user_group_id"], name: "index_user_group_items_on_user_group_id", using: :btree
+
+  create_table "user_groups", force: :cascade do |t|
+    t.string   "name",       limit: 255,                 null: false
+    t.integer  "company_id", limit: 4,                   null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.boolean  "is_deleted",             default: false
+  end
+
+  add_index "user_groups", ["company_id"], name: "index_user_groups_on_company_id", using: :btree
+  add_index "user_groups", ["name"], name: "index_user_groups_on_name", using: :btree
+
   create_table "user_manager_mappings", force: :cascade do |t|
     t.integer  "user_id",                limit: 4
     t.integer  "manager_id",             limit: 4
@@ -1552,7 +1919,7 @@ ActiveRecord::Schema.define(version: 20170513110709) do
     t.boolean  "default",                          default: false, null: false
     t.datetime "created_at",                                       null: false
     t.datetime "updated_at",                                       null: false
-    t.integer  "policy_id",              limit: 4
+    t.integer  "policy_id",              limit: 4,                 null: false
   end
 
   add_index "user_manager_mappings", ["approves_finance_to_id"], name: "index_user_manager_mappings_on_approves_finance_to_id", using: :btree
@@ -1613,6 +1980,27 @@ ActiveRecord::Schema.define(version: 20170513110709) do
   end
 
   add_index "user_tags", ["user_id"], name: "index_user_tags_on_user_id", using: :btree
+
+  create_table "user_team_group_item_mappings", force: :cascade do |t|
+    t.integer  "user_group_id",      limit: 4, null: false
+    t.integer  "user_group_item_id", limit: 4, null: false
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.integer  "user_team_id",       limit: 4
+  end
+
+  add_index "user_team_group_item_mappings", ["user_group_id"], name: "index_user_team_group_item_mappings_on_user_group_id", using: :btree
+  add_index "user_team_group_item_mappings", ["user_group_item_id"], name: "index_user_team_group_item_mappings_on_user_group_item_id", using: :btree
+  add_index "user_team_group_item_mappings", ["user_team_id"], name: "index_user_team_group_item_mappings_on_user_team_id", using: :btree
+
+  create_table "user_teams", force: :cascade do |t|
+    t.integer  "company_id", limit: 4,   null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "name",       limit: 255, null: false
+  end
+
+  add_index "user_teams", ["company_id"], name: "index_user_teams_on_company_id", using: :btree
 
   create_table "user_wallet_track_actions", force: :cascade do |t|
     t.string   "CreateUserWallets", limit: 255, null: false
@@ -1771,6 +2159,8 @@ ActiveRecord::Schema.define(version: 20170513110709) do
   add_foreign_key "field_configurations", "field_parent_types"
   add_foreign_key "field_configurations", "field_types"
   add_foreign_key "field_drop_down_items", "field_configurations"
+  add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
+  add_foreign_key "itz_cash_dmt_senders", "users"
   add_foreign_key "itz_cash_properties", "companies"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "mcc_category_mappings", "categories"
@@ -1826,12 +2216,20 @@ ActiveRecord::Schema.define(version: 20170513110709) do
   add_foreign_key "transcribed_expenses", "users"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
+  add_foreign_key "user_group_item_mappings", "user_group_items"
+  add_foreign_key "user_group_item_mappings", "user_groups"
+  add_foreign_key "user_group_item_mappings", "users"
+  add_foreign_key "user_group_items", "user_groups"
+  add_foreign_key "user_groups", "companies"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_profiles", "users"
   add_foreign_key "user_role_mappings", "user_roles"
   add_foreign_key "user_role_mappings", "users"
   add_foreign_key "user_tags", "users"
+  add_foreign_key "user_team_group_item_mappings", "user_group_items"
+  add_foreign_key "user_team_group_item_mappings", "user_groups"
+  add_foreign_key "user_team_group_item_mappings", "user_teams"
   add_foreign_key "user_wallet_tracks", "amounts"
   add_foreign_key "user_wallet_tracks", "user_wallet_track_actions"
   add_foreign_key "user_wallet_tracks", "user_wallets"
