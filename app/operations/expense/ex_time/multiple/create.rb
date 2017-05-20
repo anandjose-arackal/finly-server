@@ -89,7 +89,6 @@ class Expense::ExTime::Multiple::Create < Expense::ExTime::Multiple::Base
       self.errors_by_expenses[key] = { error: [] }
 
       # Adding model level validation errors
-      debugger
       self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages unless value[:expense].valid?
 
       if personal_view? && value[:params][:report_id].present?

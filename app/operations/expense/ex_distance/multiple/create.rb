@@ -88,7 +88,6 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
   end
 
   def validate
-    debugger
     unless user.distance_expense_enabled?
       add_message :error, "Distance expense creation is not enabled"
       return false
