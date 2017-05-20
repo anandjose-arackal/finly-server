@@ -57,6 +57,6 @@ class ResourceRequests::Create < BaseOperation
   private
 
   def resource_request_params
-    params.require(:request).permit(:name, :email, :mobile_number, :source)
+    params.require(:request).permit(:name, :email, :mobile_number, :source, :source_description)
   end
 end
