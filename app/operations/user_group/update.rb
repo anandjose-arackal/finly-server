@@ -22,14 +22,14 @@ class UserGroup::Update < UserGroup::Base
       # If id is present, update the item name or else create a new item
       if id.present?
         items.each do |item|
-          if item.id == id&.to_i
+          if item.id == id&.to_i and name.present?
             item.name = name
             groups_items_to_destroy.delete(item.id)
             break
           end
         end
       else
-        items.build(name: name)
+        items.build(name: name) if name.present?
       end
     end
   end
