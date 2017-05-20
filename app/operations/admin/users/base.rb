@@ -13,7 +13,7 @@ class Admin::Users::Base < Admin::Base
       self.cards = selected_user.cards if selected_user
       self.policies = selected_user.policies
 
-      self.mapping = [Policy::Mappings::Show.(user, user: selected_user, policy: nil).map]
+      self.mapping = []
       self.policies.each do |policy|
         self.mapping << Policy::Mappings::Show.(user, user: selected_user, policy: policy).map
       end

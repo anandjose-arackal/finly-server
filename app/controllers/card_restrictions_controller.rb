@@ -7,13 +7,12 @@ class CardRestrictionsController < ApplicationController
   end
 
   def update
-    p "xxxx", current_user
-    @result = User::CardRestrictions::Update.(current_user, params)
+    @result = Card::Restriction::Update.(current_user, params)
     respond
   end
 
   def destroy
-    @result = User::CardRestrictions::Destroy.(current_user, params)
+    @result = Card::Restriction::Destroy.(current_user, params)
     if @result.success?
       flash[:success] = @result.messages[:success].to_sentence
     else

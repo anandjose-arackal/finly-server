@@ -11,39 +11,43 @@
       <div class="row no-margin">
         <div class="col-sm-6">
           <div class="row no-margin">
-            <div class="col-sm-4">User Name:</div> 
-            <div class="col-sm-8"><label><%= @target_user.name %></label></div> 
+            <div class="col-sm-4">User Name:</div>
+            <div class="col-sm-8"><label><%= @target_user.name %></label></div>
           </div>
           <div class="row no-margin">
-            <div class="col-sm-4">User Email:</div> 
-            <div class="col-sm-8"><label><%= @target_user.email %></label></div> 
+            <div class="col-sm-4">User Email:</div>
+            <div class="col-sm-8"><label><%= @target_user.email %></label></div>
           </div>
 
           <div class="row no-margin">
-            <div class="col-sm-4">User Mobile:</div> 
-            <div class="col-sm-8"><label><%= @target_user.mobile_number %></label></div> 
+            <div class="col-sm-4">User Mobile:</div>
+            <div class="col-sm-8"><label><%= @target_user.mobile_number %></label></div>
           </div>
-          
+
         </div>
       </div>
-      
-      <label>Policy Admin
-        <span style="font-size: 10px; font-weight: 400 "> (Policy Admins can take control of any of the reports submitted by the employees belonging to this policy)</span>
-      </label>
-      <form id="form-policy-member-settings">
 
-      <input type="hidden" name="user_policy_config[][policy_id]" value="<%= @result.map[:policy].id %>">
-      <div>
+      <% unless @result.map[:policy].default %>
+          <label>Policy Admin
+            <span style="font-size: 10px; font-weight: 400 "> (Policy Admins can take control of any of the reports submitted by the employees belonging to this policy)</span>
+          </label>
+          <form id="form-policy-member-settings">
 
-      <% policy_admin = @target_user.policy_admin?(@result.map[:policy].id) ? true : false %>
+            <input type="hidden" name="user_policy_config[][policy_id]" value="<%= @result.map[:policy].id %>">
+            <div>
 
-        <label class="radio-inline" style="font-size: 12px">
-          <input  type="radio" name="user_policy_config[][admin]" style="font-size: 8px" <%= "checked='checked'" if policy_admin %>" value="1">&nbsp;&nbsp;Yes
-        </label>
-        <label class="radio-inline" style="font-size: 12px">
-          <input  type="radio" name="user_policy_config[][admin]" style="font-size: 8px" <%= "checked='checked'" unless policy_admin %>" value="0">&nbsp;&nbsp;No
-        </label>
-      </div>
+              <% policy_admin = @target_user.policy_admin?(@result.map[:policy].id) ? true : false %>
+
+              <label class="radio-inline" style="font-size: 12px">
+                <input type="radio" name="user_policy_config[][admin]" style="font-size: 8px" <%= "checked='checked'" if policy_admin %>
+                " value="1">&nbsp;&nbsp;Yes
+              </label>
+              <label class="radio-inline" style="font-size: 12px">
+                <input type="radio" name="user_policy_config[][admin]" style="font-size: 8px" <%= "checked='checked'" unless policy_admin %>
+                " value="0">&nbsp;&nbsp;No
+              </label>
+            </div>
+      <% end %>
 
       <div class="row no-margin">
         <div class="policy">
@@ -57,246 +61,258 @@
           </div>
 
           <div class="policy-rules row no-margin">
-              <div class="row no-margin" style="padding: 10px 10px 0;">
-                <div class="col-sm-12 manager-data manager-container">
-                  <div class="row manager non-conditional no-margin">
-                    Submits reports To:&nbsp;&nbsp;
+            <div class="row no-margin" style="padding: 10px 10px 0;">
+              <div class="col-sm-12 manager-data manager-container">
+                <div class="row manager non-conditional no-margin">
+                  Submits reports To:&nbsp;&nbsp;
 
-                    <input type="hidden" name="user_manager_mapping[0][mapping_id]" value="<%= @result.map[:default][0].id %>">
-                    
-                    <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" data-default-value="<%= @result.map[:default][0].manager ? @result.map[:default][0].manager.id : '' %>">
-                      <option value="">None</option>
-                      <% @managers.team_managers.each do |m| %>
+                  <input type="hidden" name="user_manager_mapping[0][mapping_id]" value="<%= @result.map[:default][0].id %>">
+
+                  <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][manager_id]" data-default-value="<%= @result.map[:default][0].manager ? @result.map[:default][0].manager.id : '' %>">
+                    <option value="">None</option>
+                    <% @managers.team_managers.each do |m| %>
                         <option value="<%= m.id %>"><%= m.name %></option>
-                      <% end %>
-                    </select>
-                  </div>
-                  
-                  <% conditional_manager_count = 0 %>
-                  <% @result.map[:conditional_manager].each_with_index do |conditional_manager, index| %>
+                    <% end %>
+                  </select>
+                </div>
 
-                  <% conditional_manager_count += 1  %>
-                  <div class="row x conditional no-margin" data-condition-serial="<%= index + 1 %>">
+                <% conditional_manager_count = 0 %>
+                <% @result.map[:conditional_manager].each_with_index do |conditional_manager, index| %>
 
-                    <div class="col-sm-12 hideme hidden">
+                    <% conditional_manager_count += 1 %>
+                    <div class="row x conditional no-margin" data-condition-serial="<%= index + 1 %>">
+
+                      <div class="col-sm-12 hideme hidden">
                         <input type="number" name="user_manager_mapping[<%= index + 1 %>][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
-                      <input type="number" class="mapping-id" name="user_manager_mapping[<%= index + 1 %>][mapping_id]" value="<%= conditional_manager.id %>">
-                    </div>
+                        <input type="number" class="mapping-id" name="user_manager_mapping[<%= index + 1 %>][mapping_id]" value="<%= conditional_manager.id %>">
+                      </div>
 
-                    <div class="col-sm-3">If report total is greater than:</div>
+                      <div class="col-sm-3">If report total is greater than:</div>
 
-                    <div class="col-sm-2">
-                      </label>
-                      <input type="hidden" class="item-attr-edit" name="user_manager_mapping[<%= index + 1 %>][mapping][greater_than_amount_attributes][currency_id]" value="1">
-                      <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[<%= index + 1 %>][mapping][greater_than_amount_attributes][value]" value="<%= conditional_manager.greater_than_amount ? conditional_manager.greater_than_amount.value : '' %>">
-                    </div>
+                      <div class="col-sm-2">
+                        </label>
+                        <input type="hidden" class="item-attr-edit" name="user_manager_mapping[<%= index + 1 %>][mapping][greater_than_amount_attributes][currency_id]" value="1">
+                        <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[<%= index + 1 %>][mapping][greater_than_amount_attributes][value]" value="<%= conditional_manager.greater_than_amount ? conditional_manager.greater_than_amount.value : '' %>">
+                      </div>
 
-                    <div class="col-sm-3">then submits report to:</div>
+                      <div class="col-sm-3">then submits report to:</div>
 
-                    <div class="col-sm-3">
-                      <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[<%= index + 1 %>][mapping][manager_id]" data-default-value="<%= conditional_manager.manager ? conditional_manager.manager.id : '' %>">
-                        <option value="">None</option>
-                        <% @managers.team_managers.each do |m| %>
-                          <option value="<%= m.id %>"><%= m.name %></option>
-                        <% end %>
-                      </select>
-                    </div>
-                    <div class="col-sm-1">
-                      <button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button>
-                    </div>
-                  </div><!-- .conditional -->
-                  <% end %>
-
-                  <div class="col-sm-12 add-condition">
-                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="manager">Add Condition</button>
-                  </div>
-                </div><!-- .col-sm-12 -->
-                <hr />
-                <div class="col-sm-12 finance-manager-data manager-container">
-                  <div class="row finance-manager non-conditional no-margin">
-                    Submits Report Finance to:&nbsp;&nbsp;
-
-                    <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" data-default-value="<%= @result.map[:default][0].finance_manager ? @result.map[:default][0].finance_manager.id : '' %>">
-                      <option value="">None</option>
-                      <% @managers.team_finance_managers.each do |m| %>
-                        <option value="<%= m.id %>"><%= m.name %></option>
-                      <% end %>
-                    </select>
-
-                  </div>
-
-                  <% conditional_finance_manager_count = 0 %>
-                  <% @result.map[:conditional_finance_manager].each_with_index do |conditional_finance_manager, index| %>
-
-                  <% conditional_finance_manager_count += 1 %>
-                  <div class="row finance-manager conditional no-margin" data-condition-serial="<%= conditional_manager_count + index + 1 %>">
-                    <div class="col-sm-12 hideme hidden">
-                      <input type="number" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
-
-                      <input type="number" class="mapping-id" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping_id]" value="<%= conditional_finance_manager.id %>">
-                    </div>
-
-                    <div class="col-sm-3">If report total is greater than:</div>
-
-                    <div class="col-sm-2">
-                      <input type="hidden" class="item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping][greater_than_amount_attributes][currency_id]" value="1">
-                      <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping][greater_than_amount_attributes][value]" value="<%= conditional_finance_manager.greater_than_amount ?  conditional_finance_manager.greater_than_amount.value : '' %>">
-                    </div>
-
-                    
-                    <div class="col-sm-3">then submits report finance to:</div>
-
-
-
-                    <div class="col-sm-3">
-                      <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping][finance_manager_id]" data-default-value="<%= conditional_finance_manager.finance_manager ? conditional_finance_manager.finance_manager.id : '' %>">
-                        <option value="">None</option>
-                        <% @managers.team_finance_managers.each do |m| %>
-                          <option value="<%= m.id %>"><%= m.name %></option>
-                        <% end %>
-                      </select>
-                    </div>
-
-                    <div class="col-sm-1"><button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button></div>
-
-                  </div><!-- .conditional -->
-                  <% end %>
-                  <div class="col-sm-12 add-condition">
-                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="finance_manager">Add Condition</button>
-                  </div>
-                </div><!-- .col-sm-12 -->
-              </div><!-- .row -->
-
-              <div class="row no-margin" style="padding:0 10px;">
-                <% if @target_user.manager? %>
-                <div class="col-sm-12 approves-to-data manager-container">
-                  <div class="row approves-to non-conditional no-margin">
-                    Approves To:&nbsp;&nbsp;
-                    
-
-                    <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" data-default-value="<%= @result.map[:default][0].approves_to ? @result.map[:default][0].approves_to.id : '' %>">
-                      <option value="">None</option>
-                      <% @managers.team_managers.each do |m| %>
-                        <option value="<%= m.id %>"><%= m.name %></option>
-                      <% end %>
-                    </select>
-
-                  </div>
-                  <% conditional_approves_to_count = 0 %>
-                  <% @result.map[:conditional_approves_to].each_with_index do |conditional_approves_to, index| %>
-
-                  <% conditional_approves_to_count += 1 %>
-                  <div class="row conditional approves_to no-margin" data-condition-serial="<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>">
-
-                    <div class="col-sm-12 hideme hidden">  
-                      <input type="number" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
-
-                      <input type="number" class="mapping-id" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping_id]" value="<%= conditional_approves_to.id %>">
-                    </div>
-
-                    <div class="col-sm-3">If report total is greater than:</div>
-
-                    <div class="col-sm-2">
-                      <input type="hidden" class="item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping][greater_than_amount_attributes][currency_id]" value="1">
-                      <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping][greater_than_amount_attributes][value]" value="<%= conditional_approves_to.greater_than_amount ? conditional_approves_to.greater_than_amount.value : '' %>">
-
-                    </div>
-
-                    <div class="col-sm-3">then approves report to:</div>
-
-                    <div class="col-sm-3">
-
-                      <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping][approves_to_id]" data-default-value="<%= conditional_approves_to.approves_to ? conditional_approves_to.approves_to.id : '' %>">
-                        <option value="">None</option>
-                        <% @managers.team_managers.each do |m| %>
-                          <option value="<%= m.id %>"><%= m.name %></option>
-                        <% end %>
-                      </select>
-                    </div>
-                    <div class="col-sm-1"><button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button></div>
-                  </div>
-                  <% end %>
-                  <div class="col-sm-12 add-condition">
-                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="approves_to">Add Condition</button>
-                  </div>
-                </div><!-- .col-sm-12 -->
+                      <div class="col-sm-3">
+                        <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[<%= index + 1 %>][mapping][manager_id]" data-default-value="<%= conditional_manager.manager ? conditional_manager.manager.id : '' %>">
+                          <option value="">None</option>
+                          <% @managers.team_managers.each do |m| %>
+                              <option value="<%= m.id %>"><%= m.name %></option>
+                          <% end %>
+                        </select>
+                      </div>
+                      <div class="col-sm-1">
+                        <button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button>
+                      </div>
+                    </div><!-- .conditional -->
                 <% end %>
 
+                <div class="col-sm-12 add-condition">
+                  <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="manager">Add
+                    Condition
+                  </button>
+                </div>
+              </div><!-- .col-sm-12 -->
+              <hr/>
+              <div class="col-sm-12 finance-manager-data manager-container">
+                <div class="row finance-manager non-conditional no-margin">
+                  Submits Report Finance to:&nbsp;&nbsp;
 
-                <% if @target_user.finance_manager? %>
-                <div class="col-sm-12 approves-finance-to-data manager-container">
-                  <div class="row approves-finance-to non-conditional no-margin">
-                    Approves Finance To:&nbsp;&nbsp;
-
-                    <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" data-default-value="<%= @result.map[:default][0].approves_finance_to ? @result.map[:default][0].approves_finance_to.id : '' %>">
-                      <option value="">None</option>
-                      <% @managers.team_finance_managers.each do |m| %>
+                  <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][finance_manager_id]" data-default-value="<%= @result.map[:default][0].finance_manager ? @result.map[:default][0].finance_manager.id : '' %>">
+                    <option value="">None</option>
+                    <% @managers.team_finance_managers.each do |m| %>
                         <option value="<%= m.id %>"><%= m.name %></option>
-                      <% end %>
-                    </select>
+                    <% end %>
+                  </select>
 
-                  </div>
+                </div>
 
-                  <% conditional_approves_finance_to_count = 0 %>
-                  <% @result.map[:conditional_approves_finance_to].each_with_index do |conditional_approves_finance_to, index| %>
+                <% conditional_finance_manager_count = 0 %>
+                <% @result.map[:conditional_finance_manager].each_with_index do |conditional_finance_manager, index| %>
 
-                  <% conditional_approves_finance_to_count += 1 %>
-                  <div class="row conditional approves-finance-to no-margin" data-condition-serial="<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>">
-                    <div class="col-sm-12 hideme hidden">
+                    <% conditional_finance_manager_count += 1 %>
+                    <div class="row finance-manager conditional no-margin" data-condition-serial="<%= conditional_manager_count + index + 1 %>">
+                      <div class="col-sm-12 hideme hidden">
+                        <input type="number" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
 
-                      <input type="number" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
+                        <input type="number" class="mapping-id" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping_id]" value="<%= conditional_finance_manager.id %>">
+                      </div>
+
+                      <div class="col-sm-3">If report total is greater than:</div>
+
+                      <div class="col-sm-2">
+                        <input type="hidden" class="item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping][greater_than_amount_attributes][currency_id]" value="1">
+                        <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping][greater_than_amount_attributes][value]" value="<%= conditional_finance_manager.greater_than_amount ? conditional_finance_manager.greater_than_amount.value : '' %>">
+                      </div>
 
 
+                      <div class="col-sm-3">then submits report finance to:</div>
 
-                      <input type="number" class="mapping-id" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>][mapping_id]" value="<%= conditional_approves_finance_to.id %>">
-                    </div>
 
-                    <div class="col-sm-3">If report total is greater than:</div>
+                      <div class="col-sm-3">
+                        <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + index + 1 %>][mapping][finance_manager_id]" data-default-value="<%= conditional_finance_manager.finance_manager ? conditional_finance_manager.finance_manager.id : '' %>">
+                          <option value="">None</option>
+                          <% @managers.team_finance_managers.each do |m| %>
+                              <option value="<%= m.id %>"><%= m.name %></option>
+                          <% end %>
+                        </select>
+                      </div>
 
-                    <div class="col-sm-2">
-                      <input type="hidden" class="item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>][mapping][greater_than_amount_attributes][currency_id]" value="1">
-                      <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>][mapping][greater_than_amount_attributes][value]" value="<%= conditional_approves_finance_to.greater_than_amount ? conditional_approves_finance_to.greater_than_amount.value : '' %>">
+                      <div class="col-sm-1">
+                        <button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button>
+                      </div>
 
-                    </div>
+                    </div><!-- .conditional -->
+                <% end %>
+                <div class="col-sm-12 add-condition">
+                  <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="finance_manager">Add
+                    Condition
+                  </button>
+                </div>
+              </div><!-- .col-sm-12 -->
+            </div><!-- .row -->
 
-                    <div class="col-sm-3">then approves report finance to:</div>
+            <div class="row no-margin" style="padding:0 10px;">
+              <% if @target_user.manager? %>
+                  <div class="col-sm-12 approves-to-data manager-container">
+                    <div class="row approves-to non-conditional no-margin">
+                      Approves To:&nbsp;&nbsp;
 
-                    <div class="col-sm-3">
-                      <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>][mapping][approves_finance_to_id]" data-default-value="<%= conditional_approves_finance_to.approves_finance_to ? conditional_approves_finance_to.approves_finance_to.id : '' %>">
+
+                      <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_to_id]" data-default-value="<%= @result.map[:default][0].approves_to ? @result.map[:default][0].approves_to.id : '' %>">
                         <option value="">None</option>
-                        <% @managers.team_finance_managers.each do |m| %>
-                          <option value="<%= m.id %>"><%= m.name %></option>
+                        <% @managers.team_managers.each do |m| %>
+                            <option value="<%= m.id %>"><%= m.name %></option>
                         <% end %>
                       </select>
+
                     </div>
-                    <div class="col-sm-1"><button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button></div>
-                  </div>
-                  <% end %>
-                  <div class="col-sm-12 add-condition">
-                    <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="approves_finance_to">Add Condition</button>
-                  </div>
-                </div><!-- .col-sm-12 -->
-                <% end %>
-              </div>
-              <input type="hidden" name="type" value="team">
-              <button data-user-id="<%= @target_user.id %>" type="submit" class="btn btn-primary btn-sm btn-update-policy-member-settings">Update</button>
-            </form>
-          </div>
-        </div><!-- .policy -->   
-      </div>
+                    <% conditional_approves_to_count = 0 %>
+                    <% @result.map[:conditional_approves_to].each_with_index do |conditional_approves_to, index| %>
+
+                        <% conditional_approves_to_count += 1 %>
+                        <div class="row conditional approves_to no-margin" data-condition-serial="<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>">
+
+                          <div class="col-sm-12 hideme hidden">
+                            <input type="number" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
+
+                            <input type="number" class="mapping-id" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping_id]" value="<%= conditional_approves_to.id %>">
+                          </div>
+
+                          <div class="col-sm-3">If report total is greater than:</div>
+
+                          <div class="col-sm-2">
+                            <input type="hidden" class="item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping][greater_than_amount_attributes][currency_id]" value="1">
+                            <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping][greater_than_amount_attributes][value]" value="<%= conditional_approves_to.greater_than_amount ? conditional_approves_to.greater_than_amount.value : '' %>">
+
+                          </div>
+
+                          <div class="col-sm-3">then approves report to:</div>
+
+                          <div class="col-sm-3">
+
+                            <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + index + 1 %>][mapping][approves_to_id]" data-default-value="<%= conditional_approves_to.approves_to ? conditional_approves_to.approves_to.id : '' %>">
+                              <option value="">None</option>
+                              <% @managers.team_managers.each do |m| %>
+                                  <option value="<%= m.id %>"><%= m.name %></option>
+                              <% end %>
+                            </select>
+                          </div>
+                          <div class="col-sm-1">
+                            <button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button>
+                          </div>
+                        </div>
+                    <% end %>
+                    <div class="col-sm-12 add-condition">
+                      <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="approves_to">Add
+                        Condition
+                      </button>
+                    </div>
+                  </div><!-- .col-sm-12 -->
+              <% end %>
+
+
+              <% if @target_user.finance_manager? %>
+                  <div class="col-sm-12 approves-finance-to-data manager-container">
+                    <div class="row approves-finance-to non-conditional no-margin">
+                      Approves Finance To:&nbsp;&nbsp;
+
+                      <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[0][mapping][approves_finance_to_id]" data-default-value="<%= @result.map[:default][0].approves_finance_to ? @result.map[:default][0].approves_finance_to.id : '' %>">
+                        <option value="">None</option>
+                        <% @managers.team_finance_managers.each do |m| %>
+                            <option value="<%= m.id %>"><%= m.name %></option>
+                        <% end %>
+                      </select>
+
+                    </div>
+
+                    <% conditional_approves_finance_to_count = 0 %>
+                    <% @result.map[:conditional_approves_finance_to].each_with_index do |conditional_approves_finance_to, index| %>
+
+                        <% conditional_approves_finance_to_count += 1 %>
+                        <div class="row conditional approves-finance-to no-margin" data-condition-serial="<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>">
+                          <div class="col-sm-12 hideme hidden">
+
+                            <input type="number" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>][mapping][policy_id]" value="<%= @result.map[:policy].id %>">
+
+
+                            <input type="number" class="mapping-id" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>][mapping_id]" value="<%= conditional_approves_finance_to.id %>">
+                          </div>
+
+                          <div class="col-sm-3">If report total is greater than:</div>
+
+                          <div class="col-sm-2">
+                            <input type="hidden" class="item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>][mapping][greater_than_amount_attributes][currency_id]" value="1">
+                            <input type="number" class="form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>][mapping][greater_than_amount_attributes][value]" value="<%= conditional_approves_finance_to.greater_than_amount ? conditional_approves_finance_to.greater_than_amount.value : '' %>">
+
+                          </div>
+
+                          <div class="col-sm-3">then approves report finance to:</div>
+
+                          <div class="col-sm-3">
+                            <select class="select-assign-manager form-control item-attr-edit" name="user_manager_mapping[<%= conditional_manager_count + conditional_finance_manager_count + conditional_approves_to_count + index + 1 %>][mapping][approves_finance_to_id]" data-default-value="<%= conditional_approves_finance_to.approves_finance_to ? conditional_approves_finance_to.approves_finance_to.id : '' %>">
+                              <option value="">None</option>
+                              <% @managers.team_finance_managers.each do |m| %>
+                                  <option value="<%= m.id %>"><%= m.name %></option>
+                              <% end %>
+                            </select>
+                          </div>
+                          <div class="col-sm-1">
+                            <button class="item-attr-edit btn btn-xs btn-danger btn-remove-condition">Remove</button>
+                          </div>
+                        </div>
+                    <% end %>
+                    <div class="col-sm-12 add-condition">
+                      <button class="btn btn-sm btn-default btn-add-condition item-attr-edit" data-policy-id="<%= @result.map[:policy].id %>" data-manager-type="approves_finance_to">Add
+                        Condition
+                      </button>
+                    </div>
+                  </div><!-- .col-sm-12 -->
+              <% end %>
+            </div>
+            <input type="hidden" name="type" value="team">
+            <button data-user-id="<%= @target_user.id %>" type="submit" class="btn btn-primary btn-sm btn-update-policy-member-settings">Update</button>
+      </form>
     </div>
+  </div><!-- .policy -->
+</div>
+</div>
 
-  </div>
+</div>
 </div>
 <div class="hidden">
   <select class="hidden data-team-managers">
     <% @managers.team_managers.each do |m| %>
-      <option value="<%= m.id %>"><%= m.name %></option>
+        <option value="<%= m.id %>"><%= m.name %></option>
     <% end %>
-  </select> 
+  </select>
   <select class="hidden data-team-finance-managers">
     <% @managers.team_finance_managers.each do |m| %>
-      <option value="<%= m.id %>"><%= m.name %></option>
+        <option value="<%= m.id %>"><%= m.name %></option>
     <% end %>
-  </select> 
+  </select>
 </div>

@@ -1,0 +1,14 @@
+company:
+  name: <%= current_company.name %>
+  id: <%= current_company.id %>
+  logo:
+  <% if current_company.configuration.logo.present? %>
+    url: <%= current_company.configuration.logo.url(:thumb)%>
+  <% end %>
+  features:
+    expense_card: <%= current_company.feature_subscription.expense_card_enabled %>
+    meal_card: <%= current_company.feature_subscription.meal_card_enabled %>
+    medical_card: <%= current_company.feature_subscription.medical_card_enabled %>
+    reimbursement_card: <%= current_company.feature_subscription.reimbursement_card_enabled %>
+    expense_management: <%= current_company.feature_subscription.expense_management_enabled %>
+    fuel_card: <%= current_company.feature_subscription.fuel_card_enabled %>

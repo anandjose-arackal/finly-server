@@ -77,7 +77,7 @@ class Card < ActiveRecord::Base
     if result.success?
       case result.status_code
         when 'A'
-          if result.suspended_status == "N"
+          if result.suspended_status == 'N'
             self.update(active: true)
           else
             self.update(active: false)

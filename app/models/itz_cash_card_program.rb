@@ -40,7 +40,7 @@ class ItzCashCardProgram < ActiveRecord::Base
         ItzCashCardProgram.create(detail)
       end
     else
-      ItzCashCardProgram.create(name: "Test Expense Card", product_code: "NGPRHD")
+      ItzCashCardProgram.create(name: "Test HDFC Card", bank: "HDFC", product_code: "NGPRHD")
     end
   end
 

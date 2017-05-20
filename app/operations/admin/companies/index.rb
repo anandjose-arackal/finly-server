@@ -38,7 +38,6 @@ class Admin::Companies::Index < Admin::Companies::Base
     has_scope :filter_date_from
     has_scope :filter_date_to
 
-
     def init
       self.companies = params[:companies]
       self.companies = apply_scopes(companies, params)

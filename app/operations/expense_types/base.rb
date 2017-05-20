@@ -1,21 +1,16 @@
 class ExpenseTypes::Base < BaseOperation
 
   attr_accessor :expense_types_configuration, :update_params
-  attr_accessor :parent_object, :parent_type
+  attr_accessor :policy
 
   def authorize
-    unless parent_object
+    unless policy
       raise_unauthorized_exception
     end
 
     # checking compatible user types for the various configurations
-    if parent_object.is_a?(Company)
-      unless user.company_admin?
-        raise_unauthorized_exception
-      end
-    end
-    if parent_object.is_a?(Policy)
-      unless user.policy_admin?(parent_object) || user.company_admin?
+    if policy.is_a?(Policy)
+      unless user.policy_admin?(policy) || user.company_admin?
         raise_unauthorized_exception
       end
     end

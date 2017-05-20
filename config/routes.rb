@@ -308,6 +308,8 @@
 #                  expense_attach_receipt POST   /expenses/:expense_id/attach_receipt(.:format)              expenses#attach_receipt
 #                  expense_detach_receipt POST   /expenses/:expense_id/detach_receipt(.:format)              expenses#detach_receipt
 #                     expense_add_receipt POST   /expenses/:expense_id/add_receipt(.:format)                 expenses#add_receipt
+#                            expense_mark PATCH  /expenses/:expense_id/mark(.:format)                        expenses#mark
+#                          expense_unmark PATCH  /expenses/:expense_id/unmark(.:format)                      expenses#unmark
 #                                expenses GET    /expenses(.:format)                                         expenses#index
 #                                         POST   /expenses(.:format)                                         expenses#create
 #                             new_expense GET    /expenses/new(.:format)                                     expenses#new
@@ -318,6 +320,8 @@
 #                                         DELETE /expenses/:id(.:format)                                     expenses#destroy
 #                     expenses_unreported POST   /expenses/unreported(.:format)                              expenses#unreported
 #                        receipt_add_note POST   /receipts/:receipt_id/add_note(.:format)                    receipts#add_note
+#            receipt_enable_transcription PATCH  /receipts/:receipt_id/enable(.:format)                      receipts#enable_transcription
+#           receipt_disable_transcription PATCH  /receipts/:receipt_id/disable(.:format)                     receipts#disable_transcription
 #                                receipts GET    /receipts(.:format)                                         receipts#index
 #                                         POST   /receipts(.:format)                                         receipts#create
 #                             new_receipt GET    /receipts/new(.:format)                                     receipts#new
@@ -474,6 +478,15 @@
 #                                         PATCH  /transcriber/receipts/:id(.:format)                         transcriber/receipts#update
 #                                         PUT    /transcriber/receipts/:id(.:format)                         transcriber/receipts#update
 #                                         DELETE /transcriber/receipts/:id(.:format)                         transcriber/receipts#destroy
+#                       card_transactions GET    /card_transactions(.:format)                                card_transactions#index
+#                                         POST   /card_transactions(.:format)                                card_transactions#create
+#                    new_card_transaction GET    /card_transactions/new(.:format)                            card_transactions#new
+#                   edit_card_transaction GET    /card_transactions/:id/edit(.:format)                       card_transactions#edit
+#                        card_transaction GET    /card_transactions/:id(.:format)                            card_transactions#show
+#                                         PATCH  /card_transactions/:id(.:format)                            card_transactions#update
+#                                         PUT    /card_transactions/:id(.:format)                            card_transactions#update
+#                                         DELETE /card_transactions/:id(.:format)                            card_transactions#destroy
+#                  cancelled_transactions GET    /cancelled_against_transactions/:expense_id(.:format)       card_transactions#cancelled_transactions
 #      statements_company_balance_summary GET    /statements/company_balance_summary(.:format)               statements#company_balance_summary
 # statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)          statements#company_transactions_summary
 #     statements_company_policies_summary GET    /statements/company_policies_summary(.:format)              statements#company_policies_summary
@@ -505,21 +518,45 @@
 #                                    faqs GET    /faqs(.:format)                                             faqs#index
 #                                feedback POST   /feedback(.:format)                                         feedback#create
 #                         menu_data_cards GET    /menu_data_cards(.:format)                                  expense_types_configuration#menu_data_cards
-#                 cards_meal_process_file POST   /cards/meal/process_file(.:format)                          benefits/meal#process_file
-#                       cards_meal_orders POST   /cards/meal/orders(.:format)                                benefits/meal#create
-#                                         PATCH  /cards/meal/orders(.:format)                                benefits/meal#update
-#                                         GET    /cards/meal/orders(.:format)                                benefits/meal#index
-#                                         GET    /cards/meal/orders/:id(.:format)                            benefits/meal#show
-#                                         DELETE /cards/meal/orders/:id(.:format)                            benefits/meal#destroy
-#              cards_medical_process_file POST   /cards/medical/process_file(.:format)                       benefits/medical#process_file
-#                    cards_medical_orders POST   /cards/medical/orders(.:format)                             benefits/medical#create
-#                                         PATCH  /cards/medical/orders(.:format)                             benefits/medical#update
-#                                         GET    /cards/medical/orders(.:format)                             benefits/medical#index
-#                                         GET    /cards/medical/orders/:id(.:format)                         benefits/medical#show
-#                                         DELETE /cards/medical/orders/:id(.:format)                         benefits/medical#destroy
+#                      menu_data_disburse GET    /menu_data_disburse(.:format)                               expense_types_configuration#menu_data_disburse
+#                            cards_orders GET    /cards/orders(.:format)                                     orders/order_cards#index
+#                                         GET    /cards/orders/:id(.:format)                                 orders/order_cards#show
+#                                         DELETE /cards/orders/:id(.:format)                                 orders/order_cards#destroy
+#                 cards_meal_process_file POST   /cards/meal/process_file(.:format)                          benefits/meal_cards#process_file
+#                       cards_meal_orders POST   /cards/meal/orders(.:format)                                benefits/meal_cards#create
+#                                         PATCH  /cards/meal/orders(.:format)                                benefits/meal_cards#update
+#                                         GET    /cards/meal/orders(.:format)                                benefits/meal_cards#index
+#                                         GET    /cards/meal/orders/:id(.:format)                            benefits/meal_cards#show
+#                                         DELETE /cards/meal/orders/:id(.:format)                            benefits/meal_cards#destroy
+#              cards_medical_process_file POST   /cards/medical/process_file(.:format)                       benefits/medical_cards#process_file
+#                    cards_medical_orders POST   /cards/medical/orders(.:format)                             benefits/medical_cards#create
+#                                         PATCH  /cards/medical/orders(.:format)                             benefits/medical_cards#update
+#                                         GET    /cards/medical/orders(.:format)                             benefits/medical_cards#index
+#                                         GET    /cards/medical/orders/:id(.:format)                         benefits/medical_cards#show
+#                                         DELETE /cards/medical/orders/:id(.:format)                         benefits/medical_cards#destroy
+#              cards_expense_process_file POST   /cards/expense/process_file(.:format)                       benefits/expense_cards#process_file
+#                    cards_expense_orders POST   /cards/expense/orders(.:format)                             benefits/expense_cards#create
+#                                         PATCH  /cards/expense/orders(.:format)                             benefits/expense_cards#update
+#                                         GET    /cards/expense/orders(.:format)                             benefits/expense_cards#index
+#                                         GET    /cards/expense/orders/:id(.:format)                         benefits/expense_cards#show
+#                                         DELETE /cards/expense/orders/:id(.:format)                         benefits/expense_cards#destroy
+#        cards_reimbursement_process_file POST   /cards/reimbursement/process_file(.:format)                 benefits/reimbursement_cards#process_file
+#              cards_reimbursement_orders POST   /cards/reimbursement/orders(.:format)                       benefits/reimbursement_cards#create
+#                                         PATCH  /cards/reimbursement/orders(.:format)                       benefits/reimbursement_cards#update
+#                                         GET    /cards/reimbursement/orders(.:format)                       benefits/reimbursement_cards#index
+#                                         GET    /cards/reimbursement/orders/:id(.:format)                   benefits/reimbursement_cards#show
+#                                         DELETE /cards/reimbursement/orders/:id(.:format)                   benefits/reimbursement_cards#destroy
+#            bank_transfer_reimbursements GET    /bank_transfer/reimbursements(.:format)                     bank_transfer/reimbursement#show
+#                                         PATCH  /bank_transfer/reimbursements(.:format)                     bank_transfer/reimbursement#update
+#                                         POST   /bank_transfer/reimbursements(.:format)                     bank_transfer/reimbursement#create
+#                          disburse_users POST   /disburse/users(.:format)                                   disburse/users#create
+#                     features_subscribed GET    /features_subscribed(.:format)                              expense_types_configuration#features_subscribed
 #
 
+
 Rails.application.routes.draw do
+
+  mount Crono::Web, at: '/crono'
 
   namespace :transcriber do
     post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create
@@ -709,11 +746,17 @@ Rails.application.routes.draw do
     post 'attach_receipt', to: 'expenses#attach_receipt'
     post 'detach_receipt', to: 'expenses#detach_receipt'
     post 'add_receipt', to: 'expenses#add_receipt'
+    patch 'mark', to: 'expenses#mark', as: :mark
+    patch 'unmark', to: 'expenses#unmark', as: :unmark
   end
+
+
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
 
   resources :receipts do
     post 'add_note', to: 'receipts#add_note', as: :add_note
+    patch 'enable', to: 'receipts#enable_transcription', as: :enable_transcription
+    patch 'disable', to: 'receipts#disable_transcription', as: :disable_transcription
   end
 
   post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
@@ -804,6 +847,11 @@ Rails.application.routes.draw do
     resources :receipts
   end
 
+  resources :card_transactions do
+
+  end
+  get 'cancelled_against_transactions/:expense_id', to: 'card_transactions#cancelled_transactions', as: :cancelled_transactions
+
   get 'statements/company_balance_summary' => 'statements#company_balance_summary'
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
@@ -850,23 +898,65 @@ Rails.application.routes.draw do
   # Cards Module APIS
   # Getting Menu Data for Cards module
   get 'menu_data_cards' => 'expense_types_configuration#menu_data_cards'
+  get 'menu_data_disburse' => 'expense_types_configuration#menu_data_disburse'
+
+  # Orders
+  get 'cards/orders' => 'orders/order_cards#index'
+  get 'cards/orders/:id' => 'orders/order_cards#show'
+  delete 'cards/orders/:id' => 'orders/order_cards#destroy'
 
   # Meal Cards
-  post 'cards/meal/process_file' => 'benefits/meal#process_file'
-  post 'cards/meal/orders' => 'benefits/meal#create'
-  patch 'cards/meal/orders' => 'benefits/meal#update'
-  get 'cards/meal/orders' => 'benefits/meal#index'
-  get 'cards/meal/orders/:id' => 'benefits/meal#show'
-  delete 'cards/meal/orders/:id' => 'benefits/meal#destroy'
+  post 'cards/meal/process_file' => 'benefits/meal_cards#process_file'
+  post 'cards/meal/orders' => 'benefits/meal_cards#create'
+  patch 'cards/meal/orders' => 'benefits/meal_cards#update'
+  get 'cards/meal/orders' => 'benefits/meal_cards#index'
+  get 'cards/meal/orders/:id' => 'benefits/meal_cards#show'
+  delete 'cards/meal/orders/:id' => 'benefits/meal_cards#destroy'
 
   # Medical Cards
-  post 'cards/medical/process_file' => 'benefits/medical#process_file'
-  post 'cards/medical/orders' => 'benefits/medical#create'
-  patch 'cards/medical/orders' => 'benefits/medical#update'
-  get 'cards/medical/orders' => 'benefits/medical#index'
-  get 'cards/medical/orders/:id' => 'benefits/medical#show'
-  delete 'cards/medical/orders/:id' => 'benefits/medical#destroy'
 
+
+
+  post 'cards/medical/process_file' => 'benefits/medical_cards#process_file'
+  post 'cards/medical/orders' => 'benefits/medical_cards#create'
+  patch 'cards/medical/orders' => 'benefits/medical_cards#update'
+  get 'cards/medical/orders' => 'benefits/medical_cards#index'
+  get 'cards/medical/orders/:id' => 'benefits/medical_cards#show'
+  delete 'cards/medical/orders/:id' => 'benefits/medical_cards#destroy'
+
+  # Mass Credit for Expense Cards
+  post 'cards/expense/process_file' => 'benefits/expense_cards#process_file'
+  post 'cards/expense/orders' => 'benefits/expense_cards#create'
+  patch 'cards/expense/orders' => 'benefits/expense_cards#update'
+  get 'cards/expense/orders' => 'benefits/expense_cards#index'
+  get 'cards/expense/orders/:id' => 'benefits/expense_cards#show'
+  delete 'cards/expense/orders/:id' => 'benefits/expense_cards#destroy'
+
+  # Mass Credit for Expense Cards
+  post 'cards/reimbursement/process_file' => 'benefits/reimbursement_cards#process_file'
+  post 'cards/reimbursement/orders' => 'benefits/reimbursement_cards#create'
+  patch 'cards/reimbursement/orders' => 'benefits/reimbursement_cards#update'
+  get 'cards/reimbursement/orders' => 'benefits/reimbursement_cards#index'
+  get 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#show'
+  delete 'cards/reimbursement/orders/:id' => 'benefits/reimbursement_cards#destroy'
+
+  namespace :bank_transfer do
+    get 'reimbursements' => 'reimbursement#show'
+    patch 'reimbursements' => 'reimbursement#update'
+    post 'reimbursements' => 'reimbursement#create'
+  end
+
+
+  # Disburse
+  post 'disburse/users' => 'disburse/users#create'
+
+  get 'features_subscribed' => 'expense_types_configuration#features_subscribed'
+  resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]
+  resources :teams, controller: 'user_teams', only: [:create, :index, :show, :update, :destroy]
+
+  resources :teams, controller: 'user_teams' do
+    patch 'set_restrictions', to: 'user_teams#set_restrictions'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

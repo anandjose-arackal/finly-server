@@ -14,13 +14,15 @@
 #  medical_card_enabled       :boolean          default(FALSE), not null
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
+#  expense_card_enabled       :boolean          default(FALSE)
+#  reimbursement_card_enabled :boolean          default(FALSE)
 #
 
 class FeatureSubscription < ActiveRecord::Base
   belongs_to :subscribable, polymorphic: true
 
-  def benefits_enabled
-    (gift_card_enabled or gift_voucher_enabled or meal_card_enabled or fuel_card_enabled or medical_card_enabled)
+  def cards_enabled
+    (gift_card_enabled or gift_voucher_enabled or meal_card_enabled or fuel_card_enabled or medical_card_enabled or expense_card_enabled or reimbursement_card_enabled)
   end
 
 end

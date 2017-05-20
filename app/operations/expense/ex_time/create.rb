@@ -29,10 +29,10 @@ class Expense::ExTime::Create < Expense::ExTime::Base
       add_message :error, 'You have not provided any details to create an expense'
       return
     end
-    time_value = params[:expense][:time_expense_attributes][:time_object_attributes][:value].to_d rescue nil
-    if time_value.present? and time_value <= 0
-      add_message :error, 'Time cannot be less than or equal to 0'
-    end
+    # time_value = params[:expense][:time_expense_attributes][:time_object_attributes][:value].to_d rescue nil
+    # if time_value.present? and time_value <= 0
+    #   add_message :error, 'Time cannot be less than or equal to 0'
+    # end
   end
 
   def init
@@ -74,9 +74,6 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     return if has_errors?
 
     if self.expense.save
-      # Attach an existing receipt to the expense
-      set_custom_fields true
-
       if self.receipt.present?
         self.receipt.parent = expense
         self.receipt.save
@@ -106,6 +103,13 @@ class Expense::ExTime::Create < Expense::ExTime::Base
         amount.update(value: expense.calculate_amount_value(report.policy))
       end
       expense.update_attributes(amount_id: amount.id)
+
+      # calculate the equivalent amount in all currencies in the amounts table
+      if expense.date == DateUtils.local_date
+        expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+      else
+        expense.update_other_currencies
+      end
     end
 
     add_message :success, 'Expense created'
@@ -124,7 +128,6 @@ class Expense::ExTime::Create < Expense::ExTime::Base
         add_message :error, valid.messages[:error]
         return
       end
-      self.expense.time_expense.custom_fields.destroy_all
     end
   end
 

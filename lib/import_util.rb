@@ -1,6 +1,6 @@
 class ImportUtil
 
-  JUNK_CHARACTER_LIST = %w(<html> </html> <b> </b> <u> </u> <i> </i>)
+  JUNK_CHARACTER_LIST = %w(<html> </html> <b> </b> <u> </u> <i> </i> mailto :)
 
   def self.open_spreadsheet(file)
     case File.extname(file.original_filename)

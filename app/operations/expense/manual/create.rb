@@ -60,9 +60,6 @@ class Expense::Manual::Create < Expense::Manual::Base
     return if has_errors?
 
     if self.expense.save
-      # Set custom fields
-      set_custom_fields true
-
       # Attach an existing receipt to the expense
       if self.receipt.present?
         self.receipt.parent = expense
@@ -82,6 +79,14 @@ class Expense::Manual::Create < Expense::Manual::Base
         add_message :error, comment.errors.full_messages
       end
     end
+
+    # calculate the equivalent amount in all currencies in the amounts table
+    if expense.date == DateUtils.local_date
+      expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+    else
+      expense.update_other_currencies
+    end
+
     add_message :success, 'Expense created'
   end
 
@@ -98,7 +103,7 @@ class Expense::Manual::Create < Expense::Manual::Base
         add_message :error, valid.messages[:error]
         return
       end
-      self.expense.manual_expense.custom_fields.destroy_all
+      # self.expense.manual_expense.custom_fields.destroy_all
     end
   end
 
