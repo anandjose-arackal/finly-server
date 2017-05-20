@@ -57,7 +57,9 @@ class ExpenseTypes::ExDistanceConfig::Update < ExpenseTypes::Base
   end
 
   def post_process
-    distance_config.rate.update_currencies(Date.today)
+    if distance_config.rate
+      distance_config.rate&.update(distance_config.policy.base_currency.country_code.to_sym => distance_config.rate_value)
+    end
   end
 
   private
