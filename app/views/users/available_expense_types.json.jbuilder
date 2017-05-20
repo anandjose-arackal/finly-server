@@ -27,3 +27,9 @@ json.currencies do
     json.country_code currency.country_code
   end
 end
+
+json.categories do
+  json.array!(@categories) do |category|
+    json.extract! category, :id, :name
+  end
+end

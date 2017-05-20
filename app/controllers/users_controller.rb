@@ -140,6 +140,7 @@ class UsersController < ApplicationController
 
   def available_expense_types
     @result = User::AvailableExpenseTypes::Show.(current_user, params)
+    @categories = current_company.categories.active rescue []
     respond
   end
 
