@@ -21,6 +21,7 @@ class UserGroupItem < ActiveRecord::Base
 
   scope :with_user_group, ->(user_group_id) { where user_group_id: user_group_id }
   scope :with_id, ->(id) { where id: id }
+  scope :user_group_count, -> { pluck(:user_group_id).uniq.count }
 
   before_destroy do
     UserGroupItemMapping.with_group_item(self.id).destroy_all
