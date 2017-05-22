@@ -13,6 +13,11 @@ class UserGroupItemsController < ApplicationController
     respond
   end
 
+  def update
+    @result = UserGroup::Item::Update.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
   def pending_users
     @result = UserGroup::Item::Users::AddableUsers.(current_user, params)
     respond

@@ -872,7 +872,7 @@ Rails.application.routes.draw do
 
   resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]
   resources :groups do
-    resources :items, controller: 'user_group_items', only: [:show, :create, :destroy]
+    resources :items, controller: 'user_group_items', only: [:show, :create, :destroy, :update]
     resources :items do
       post '', to: 'user_group_items#create'
       get :pending_users, to: 'user_group_items#pending_users'
