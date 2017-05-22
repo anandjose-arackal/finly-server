@@ -21,7 +21,7 @@ class Expense::Base < BaseOperation
   end
 
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted
+    attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted, :conversion_rate
 
     def init
       self.expense = params[:expense]
@@ -30,6 +30,7 @@ class Expense::Base < BaseOperation
       self.editable = retrieve_editable
       self.per_diems = retrieve_per_diems(expense)
       self.converted = converted?
+      # self.conversion_rate = calculate_conversion_rate
     end
 
     def converted?
@@ -68,6 +69,17 @@ class Expense::Base < BaseOperation
         violations[:items] = items
       end
       violations
+    end
+
+    def calculate_conversion_rate
+      if expense.report.nil?
+        return nil
+      else
+        converted_amount = expense.amount.send(expense.amount.currency.country_code.to_s)
+        original_amount = expense.amount.value
+        return converted_amount/original_amount
+      end
+
     end
 
     def retrieve_editable
