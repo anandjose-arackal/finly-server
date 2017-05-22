@@ -4,7 +4,6 @@ class Expense::Personal::Unmark < Expense::Personal::Mark
 
   def init
     super()
-    self.other_category_id = user.company.categories.find_by(name: 'Other').id
   end
 
   def validate
@@ -31,7 +30,7 @@ class Expense::Personal::Unmark < Expense::Personal::Mark
   end
 
   def process
-    unless selected_expense.update(personal: false, category_id: other_category_id)
+    unless selected_expense.update(personal: false)
       add_message :error, selected_expense.errors.full_messages
     end
   end

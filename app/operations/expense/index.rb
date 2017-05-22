@@ -117,7 +117,7 @@ class Expense::Index < Expense::Base
     end
 
     def exclude_personal
-      if params[:filter_expense_personal] == '1'
+      if params[:filter_expense_type_id] == '7'
         self.expenses
       else
         self.expenses = expenses&.non_personal
