@@ -54,6 +54,9 @@ class MoneyRequest::Base < BaseOperation
     end
 
     def retrieve_policies
+      if money_request.user.enforce_policy_enabled?
+        return money_request.user.policies.non_default
+      end
       money_request.user.policies
     end
 
