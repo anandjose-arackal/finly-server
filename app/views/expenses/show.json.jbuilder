@@ -16,7 +16,7 @@ if @result.expense.report_id.present?
   json.original_currency_country_code @result.expense.amount.currency.country_code
   json.base_currency_symbol @result.expense.report.base_currency_symbol
   json.base_currency_country_code @result.expense.report.base_currency_code
-  json.currency_conversion_rate @result.expense.amount_value / @result.expense.original_amount_value
+  json.currency_conversion_rate precision_value (@result.expense.amount_value / @result.expense.original_amount_value)
 end
 
 # flag to show whether a particular expense has been converted or not
