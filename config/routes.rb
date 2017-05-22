@@ -871,8 +871,11 @@ Rails.application.routes.draw do
   delete 'cards/medical/orders/:id' => 'benefits/medical#destroy'
 
   resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]
-  resources :teams, controller: 'user_teams', only: [:create, :index, :show, :update, :destroy]
+  resources :groups do
+    resources :items, controller: 'user_group_items', only: [:show]
+  end
 
+  resources :teams, controller: 'user_teams', only: [:create, :index, :show, :update, :destroy]
   resources :teams, controller: 'user_teams' do
     patch 'set_restrictions', to: 'user_teams#set_restrictions'
   end
