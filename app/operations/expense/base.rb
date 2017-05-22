@@ -30,7 +30,7 @@ class Expense::Base < BaseOperation
       self.editable = retrieve_editable
       self.per_diems = retrieve_per_diems(expense)
       self.converted = converted?
-      # self.conversion_rate = calculate_conversion_rate
+      self.conversion_rate = calculate_conversion_rate
     end
 
     def converted?
@@ -75,9 +75,9 @@ class Expense::Base < BaseOperation
       if expense.report.nil?
         return nil
       else
-        converted_amount = expense.amount.send(expense.amount.currency.country_code.to_s)
-        original_amount = expense.amount.value
-        return converted_amount/original_amount
+        converted_amount = expense.amount_value
+        original_amount = expense.original_amount_value
+        return precision_value converted_amount/original_amount
       end
 
     end
