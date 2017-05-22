@@ -3,7 +3,7 @@ class RemovePersonalCategory < ActiveRecord::Migration
     # changing the category of all expenses that were originally 'Personal'
     Expense.unscoped.all.each do |expense|
       if expense.category.name == "Personal"
-        other_category_id = expense.user.company.categories.find_by(name: "Other")
+        other_category_id = expense.user.company.categories.with_name("Other")&.first&.id
         expense.update(category_id: other_category_id)
       end
     end
