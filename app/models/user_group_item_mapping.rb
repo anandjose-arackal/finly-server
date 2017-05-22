@@ -27,6 +27,7 @@ class UserGroupItemMapping < ActiveRecord::Base
   # Ex: If User belongs to Bangalore + Sales, and team is made of of Bangalore + None,
   # to ensure users belonging to Bangalore + None is identified, this associaation count needs to be of size 1 to remove users belonging to sales or any other team
   scope :having_association_count, -> (count) { group_by_user_id.having('count(user_id) = ?', count) }
+  scope :having_greater_than_association_count, -> (count) { group_by_user_id.having('count(user_id) >= ?', count) }
   # scope :users_having_group_items, ->(group_item_id)
 
   validates :user_id, presence: true

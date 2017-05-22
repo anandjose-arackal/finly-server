@@ -239,17 +239,6 @@ ActiveRecord::Schema.define(version: 20170520091811) do
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
 
-  create_table "auto_reload_configs", force: :cascade do |t|
-    t.integer  "minimum_balance_id", limit: 4
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.boolean  "enabled",                        default: false
-    t.integer  "reloadable_id",      limit: 4
-    t.string   "reloadable_type",    limit: 255
-  end
-
-  add_index "auto_reload_configs", ["reloadable_type", "reloadable_id"], name: "index_auto_reload_configs_on_reloadable_type_and_reloadable_id", using: :btree
-
   create_table "auto_submit_configs", force: :cascade do |t|
     t.boolean  "enabled",                              default: false, null: false
     t.boolean  "limit_to_card_expenses",               default: false, null: false
@@ -1345,7 +1334,6 @@ ActiveRecord::Schema.define(version: 20170520091811) do
     t.datetime "updated_at",                                         null: false
     t.text     "link",                 limit: 65535
     t.integer  "view_role_id",         limit: 4
-    t.text     "message",              limit: 65535
   end
 
   add_index "notifications", ["action_type_id"], name: "index_notifications_on_action_type_id", using: :btree
