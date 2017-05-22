@@ -19,5 +19,5 @@ class RemovePersonalCategory < ActiveRecord::Migration
 
     # # adding back the foreign key from expenses to category
     # add_foreign_key :expenses, :categories
-  end
+  end 
 end
