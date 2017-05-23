@@ -60,6 +60,8 @@ class Policy < ActiveRecord::Base
 
   after_create :initialize_expense_configs
 
+  default_scope { order('policies.created_at ASC') }
+
   def admins
     admin_mapping_ids = self.user_mapping.admin.pluck(:user_id)
     User.where(id: admin_mapping_ids)

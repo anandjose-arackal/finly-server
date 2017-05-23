@@ -18,7 +18,7 @@ module Constants
 
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finly.io', 'admin@finlytest.io']
 
-  DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other', 'Personal']
+  DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other']
 
   FLASH_COLORS = {alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
 
