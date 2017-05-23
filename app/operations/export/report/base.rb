@@ -70,4 +70,11 @@ class Export::Report::Base < Export::Base
     data_arr
   end
 
+  def extract_preferences(reports)
+    # first start with the default company preferences
+    self.preferences = user.company.export_preferences
+
+    # now extract the custom fields from each expense that is a part of all the report
+  end
+
 end

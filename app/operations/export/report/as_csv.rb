@@ -14,6 +14,7 @@ class Export::Report::AsCsv < Export::Report::Base
     report_presenter = Report::Index.(user, params)
     id = (params[:report_id] or params[:report_ids]).split(',') rescue nil
     self.reports = report_presenter.reports.with_id(id) rescue nil
+    extract_preferences(reports)
     self.preferences = user.company.export_preferences
   end
 
