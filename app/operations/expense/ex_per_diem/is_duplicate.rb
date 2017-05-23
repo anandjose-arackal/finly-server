@@ -1,0 +1,2 @@
+class IsDuplicate
+end
