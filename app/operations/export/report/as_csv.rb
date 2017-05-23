@@ -4,7 +4,7 @@
 
 class Export::Report::AsCsv < Export::Report::Base
 
-  attr_accessor :reports, :preferences, :result, :report_names
+  attr_accessor :reports, :preferences, :result, :report_names, :default_column_names, :custom_field_column_names
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
@@ -14,8 +14,9 @@ class Export::Report::AsCsv < Export::Report::Base
     report_presenter = Report::Index.(user, params)
     id = (params[:report_id] or params[:report_ids]).split(',') rescue nil
     self.reports = report_presenter.reports.with_id(id) rescue nil
-    extract_preferences(reports)
-    self.preferences = user.company.export_preferences
+    self.default_column_names = user.company.export_preferences.pluck(:name)
+    self.custom_field_column_names = extract_custom_field_names(reports)
+    # self.preferences = user.company.export_preferences
   end
 
   def authorize
@@ -29,12 +30,12 @@ class Export::Report::AsCsv < Export::Report::Base
   end
 
   def process
-    column_names = preferences.pluck(:name)
     self.result = CSV.generate do |csv|
-      csv << column_names
+      csv << (column_names + custom_field_column_names)
       reports.each do |r|
         r.expenses.each do |e|
           csv << retrieve_data(preferences, r, e)
+          csv << retrieve_custom_field_data(custom_field_column_names, e)
         end
       end
     end

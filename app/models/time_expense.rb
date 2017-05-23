@@ -25,4 +25,17 @@ class TimeExpense < ActiveRecord::Base
   accepts_nested_attributes_for :time_object
 
   delegate :time_object_value, to: :time_object
+
+  # returns an array of all the associated custom field's names
+  def custom_field_names
+    field_names = []
+    if self.custom_fields.empty?
+      field_names = []
+    else
+      self.custom_fields.each do |field|
+        field_names << field.field_configuration.field_name
+      end
+    end
+    field_names
+  end
 end

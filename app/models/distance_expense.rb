@@ -24,4 +24,17 @@ class DistanceExpense < ActiveRecord::Base
   accepts_nested_attributes_for :distance
 
   delegate :distance_value, to: :distance
+
+  # returns an array of all the associated custom field's names
+  def custom_field_names
+    field_names = []
+    if self.custom_fields.empty?
+      field_names = []
+    else
+      self.custom_fields.each do |field|
+        field_names << field.field_configuration.field_name
+      end
+    end
+    field_names
+  end
 end

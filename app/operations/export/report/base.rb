@@ -70,11 +70,23 @@ class Export::Report::Base < Export::Base
     data_arr
   end
 
-  def extract_preferences(reports)
-    # first start with the default company preferences
-    self.preferences = user.company.export_preferences
+  def retrieve_custom_field_data(custom_field_column_names, e)
+    field_names = e.custom_field_names
+    custom_field_column_names.each do |column|
+      if field_names.include?(column)
+        
+      end
+    end
+  end
 
+  def extract_custom_field_names(reports)
     # now extract the custom fields from each expense that is a part of all the report
+    reports.each do |report|
+      report.expenses.each do |expense|
+        # this gets all the custom field names from all different types of expenses
+        column_names << expense.custom_field_names
+      end
+    end
   end
 
 end
