@@ -477,6 +477,40 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def custom_field_values
+    case self.expense_type_id
+      when ExpenseType.id_for(:manual)
+        return self.manual_expense.custom_field_values
+      when ExpenseType.id_for(:distance)
+        return self.distance_expense.custom_field_values
+      when ExpenseType.id_for(:time)
+        return self.time_expense.custom_field_values
+      when ExpenseType.id_for(:per_diem)
+        return self.per_diem_expense.custom_field_values
+      when ExpenseType.id_for(:card)
+        return []
+      else
+        return []
+    end
+  end
+
+  def custom_field_value_by_name(name)
+    case self.expense_type_id
+      when ExpenseType.id_for(:manual)
+        return self.manual_expense.custom_field_value_by_name(name)
+      when ExpenseType.id_for(:distance)
+        return self.distance_expense.custom_field_value_by_name(name)
+      when ExpenseType.id_for(:time)
+        return self.time_expense.custom_field_value_by_name(name)
+      when ExpenseType.id_for(:per_diem)
+        return self.per_diem_expense.custom_field_value_by_name(name)
+      when ExpenseType.id_for(:card)
+        return []
+      else
+        return []
+    end
+  end
+
   # returns the number of receipts attached to this expense
   def receipts_count
     self.receipts.count
