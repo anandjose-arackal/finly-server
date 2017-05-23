@@ -28,7 +28,7 @@
 
 class ExpenseTypes::Show < ExpenseTypes::Base
 
-  attr_accessor :parent, :distance_config, :time_config, :per_diem_config, :company
+  attr_accessor :policy, :distance_config, :time_config, :per_diem_config, :company
 
   def authorized_user_types
     [:company_admin, :policy_admin]
@@ -42,57 +42,50 @@ class ExpenseTypes::Show < ExpenseTypes::Base
 
   def init
     self.company = user.company
-    case params[:parent_type]
-      when 'company'
-        self.parent = company
-      when 'policy'
         policies = Policy::Index.(user, view: 'admin').policies rescue []
-        self.parent = policies.find_from_id(params[:parent_id]) rescue nil
-      else
-        self.parent = nil
-    end
+        self.policy = policies.find_by(id: params[:policy_id]) rescue nil
     self.distance_config = self.time_config = self.per_diem_config = {}
   end
 
   def authorize
-    unless parent
+    unless policy
       raise_unauthorized_exception
     end
   end
 
   def process
-    if parent.distance_expense_config.enabled
+    if policy.distance_expense_config.enabled
       self.distance_config = {enabled: true,
-                              rate_per_km: parent.distance_expense_config.rate_per_km,
-                              default_category_id: parent.distance_expense_config.default_category_id,
-                              default_category_name: parent.distance_expense_config.default_category_name
+                              rate_per_km: policy.distance_expense_config.rate_value,
+                              default_category_id: policy.distance_expense_config.default_category_id,
+                              default_category_name: policy.distance_expense_config.default_category_name
 
                              }
     else
       self.distance_config = {enabled: false,
-                              rate_per_km: parent.distance_expense_config.rate_per_km,
-                              default_category_id: parent.distance_expense_config.default_category_id,
-                              default_category_name: parent.distance_expense_config.default_category_name
+                              rate_per_km: policy.distance_expense_config.rate_value,
+                              default_category_id: policy.distance_expense_config.default_category_id,
+                              default_category_name: policy.distance_expense_config.default_category_name
                               }
     end
-    if parent.time_expense_config.enabled
+    if policy.time_expense_config.enabled
       self.time_config = {enabled: true,
-                          rate_per_hour: parent.time_expense_config.rate_per_hour,
-                          default_category_id: parent.time_expense_config.default_category_id,
-                          default_category_name: parent.time_expense_config.default_category_name
+                          rate_per_hour: policy.time_expense_config.rate_value,
+                          default_category_id: policy.time_expense_config.default_category_id,
+                          default_category_name: policy.time_expense_config.default_category_name
                           }
     else
       self.time_config = {enabled: false,
-                          rate_per_hour: parent.time_expense_config.rate_per_hour,
-                          default_category_id: parent.time_expense_config.default_category_id,
-                          default_category_name: parent.time_expense_config.default_category_name
+                          rate_per_hour: policy.time_expense_config.rate_value,
+                          default_category_id: policy.time_expense_config.default_category_id,
+                          default_category_name: policy.time_expense_config.default_category_name
 
                           }
     end
-    if parent.per_diem_expense_config.enabled
+    if policy.per_diem_expense_config.enabled
       self.per_diem_config = {enabled: true}
       self.per_diem_config[:per_diems] = []
-      parent.per_diems.active.each do |per_diem|
+      policy.per_diems.active.each do |per_diem|
         self.per_diem_config[:per_diems] << {name: per_diem.name,
                                              rate: per_diem.rate_value,
                                              id: per_diem.id
@@ -101,7 +94,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
     else
       self.per_diem_config = {enabled: false}
       self.per_diem_config[:per_diems] = []
-      parent.per_diems.active.each do |per_diem|
+      policy.per_diems.active.each do |per_diem|
         self.per_diem_config[:per_diems] << {name: per_diem.name,
                                              rate: per_diem.rate_value,
                                              id: per_diem.id
@@ -115,18 +108,20 @@ class ExpenseTypes::Show < ExpenseTypes::Base
     params[:time_config] = self.time_config
     params[:per_diem_config] = self.per_diem_config
     params[:categories] = company.categories.active
+    params[:base_currency] = policy.base_currency
     ExpenseTypes::Show::ExpenseConfigurationPresenter.new(user, params, messages)
   end
 
 
   class ExpenseTypes::Show::ExpenseConfigurationPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :distance_config, :time_config, :per_diem_config, :categories
+    attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :base_currency
 
     def init
       self.distance_config = params[:distance_config]
       self.time_config = params[:time_config]
       self.per_diem_config = params[:per_diem_config]
       self.categories = params[:categories]
+      self.base_currency = params[:base_currency]
     end
   end
 

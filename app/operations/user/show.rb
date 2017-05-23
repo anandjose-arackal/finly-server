@@ -48,9 +48,10 @@ class User::Show < User::Base
       self.roles = {admin: self.selected_user.company_admin?, manager: self.selected_user.manager?,
                     finance_manager: self.selected_user.finance_manager?}
       self.team_mapping = self.selected_user.team_mapping
-      self.mapping = [Policy::Mappings::Show.(user, user: selected_user, policy: nil).map]
+      # self.mapping = [Policy::Mappings::Show.(user, user: selected_user, policy: nil).map]
       self.policies = selected_user.policies
       self.balances = params[:balances]
+      self.mapping = []
       self.policies.each do |policy|
         self.mapping << Policy::Mappings::Show.(user, user: selected_user, policy: policy).map
       end

@@ -51,7 +51,13 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     if expense.report_id and personal_view?
       unless expense.report.editable?
         messages[:error] << "Expense cannot be edited at this stage"
+        return
       end
+    end
+
+    if params[:expense][:reimbursable] == '1'
+      add_message :error, "Card expenses are non-reimbursable by default"
+      return
     end
   end
 
@@ -86,6 +92,12 @@ class Expense::ExCard::Update < Expense::ExCard::Base
     # add report comment
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
+    # if the new category is personal, mark the expense as personal
+    if expense.category_name == 'Personal'
+      Expense::Personal::Mark.(user, {expense_id: expense.id})
+    end
+    ###############################################################
+    
     messages[:success] << 'Expense updated'
   end
 

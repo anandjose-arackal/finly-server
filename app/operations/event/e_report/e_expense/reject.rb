@@ -27,7 +27,7 @@ class Event::EReport::EExpense::Reject < Event::EReport::Base
 
   def send_push_notification(user)
     return unless user.id == report.user_id
-    message = "Expense rejected : #{self.rejected_expense}"
+    message = "Expense rejected : #{self.rejected_expense.merchant_name}"
     GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
   end
 

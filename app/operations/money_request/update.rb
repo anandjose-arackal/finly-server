@@ -16,7 +16,7 @@ class MoneyRequest::Update < MoneyRequest::Base
     super
     self.update_param = {}
     self.update_param = update_params
-    if self.update_param[:policy_id].blank? or self.update_param[:policy_id] == 'nil'
+    if self.update_param[:policy_id].blank? or ([0, '0', 'nil'].include?(self.update_param[:policy_id]))
       self.update_param[:policy_id] = nil
     end
     # Assign IDs to existing mapping and its amount so duplicate entries are
@@ -110,8 +110,7 @@ class MoneyRequest::Update < MoneyRequest::Base
   end
 
   def update_params
-    params.require(:money_request)
-    .permit(:name, :required_by_date, :memo, :policy_id, :payment_mode_id,
+    params.require(:money_request).permit(:name, :required_by_date, :memo, :policy_id, :payment_mode_id,
             items_attributes: [:category_id, amount_attributes: [:value, :currency_id]])
   end
 

@@ -27,6 +27,7 @@
 
 
 
+
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 
@@ -112,6 +113,8 @@ class MoneyRequest < ActiveRecord::Base
   delegate :payment_mode_name, to: :payment_mode
 
   default_scope { order(status_id: :asc, submitted_at: :desc, created_at: :desc) }
+
+  validates :policy_id, presence: true
 
   before_save :handle_name
   before_save :handle_nil_amount

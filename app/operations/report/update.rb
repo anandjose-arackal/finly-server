@@ -17,7 +17,7 @@ class Report::Update < Report::Base
     super
     self.update_param = {}
     self.update_param = self.params.permit(:name, :policy_id, :memo)
-    if self.update_param[:policy_id].present? and self.update_param[:policy_id] == 'nil'
+    if self.update_param[:policy_id].present? and ([0, '0', 'nil'].include?(self.update_param[:policy_id]))
       self.update_param[:policy_id] = nil
     end
     if update_param.has_key?(:policy_id) and (update_param[:policy_id].blank? or update_param[:policy_id] == 0) and report.user.enforce_policy_enabled?

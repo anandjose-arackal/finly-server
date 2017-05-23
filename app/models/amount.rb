@@ -236,10 +236,22 @@ class Amount < ActiveRecord::Base
   alias_method :wallet_withdrawal_to_wallet_value, :amount_value
   alias_method :wallet_withdrawal_to_virtual_account_value, :amount_value
   alias_method :wallet_balance_value, :amount_value
-
   alias_method :rate_value, :amount_value
 
   scope :with_id, -> (id) { where id: id }
+
+  before_save do
+    set_base_currency_value
+  end
+
+  # i.e. updating the respective currency' column with value
+  def set_base_currency_value
+    if Amount.column_names.include?(self.currency.country_code)
+      # self.update((self.currency.country_code) => self.value)
+      # Setting the value without updating
+      self.send("#{self.currency.country_code}=",self.value)
+    end
+  end
 
   def greater_than_amount_value
     self.value
@@ -258,6 +270,14 @@ class Amount < ActiveRecord::Base
     super(self.value)
   end
 
+  def amount_with_currency(currency_code)
+    currency_code = currency_code.to_sym unless currency_code.is_a?(Symbol)
+    unless Amount.column_names.include?(currency_code)
+      return
+    end
+    self.send(currency_code)
+  end
+
   def as_json(options={})
     {value: self.value,
      currency: {
@@ -265,6 +285,41 @@ class Amount < ActiveRecord::Base
          country: self.currency.country,
          country_code: self.currency.country_code,
          symbol: self.currency.symbol}}
+  end
+
+  def update_currencies(date)
+    # i.e. if the expense is today's and the currency conversion data is not present
+    if date == DateUtils.local_date
+      return
+    end
+    date = date.strftime("%Y-%m-%d")
+    update_hash = {}
+    rate = CurrencyConversionRate.find_by(date: date)
+    if rate.nil?
+      # calculate the respective currency rate for the date in question
+      params = {date: Date.parse(date).strftime("%Y-%m-%d")} rescue nil
+      res = Currency::FetchData.(nil, params)
+      rate = CurrencyConversionRate.create(res.currency_data)
+    end
+    currencies = CurrencyConversionRate.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id'].include?(el)}
+    orig_curr = self.currency.country_code
+    currencies.each do |curr|
+      if Amount.column_names.include?(curr)
+        currency_rate = rate.send(curr.to_sym).to_f
+        normalized_amt = self.amount_value * currency_rate
+        update_hash[curr.to_sym] = (normalized_amt/rate.send(orig_curr.to_sym))
+      end
+    end
+    self.update(update_hash)
+  end
+
+  def destroy_currencies
+    update_hash = {}
+    currencies = Amount.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id', "#{self.currency.country_code}", 'value', 'currency_id'].include?(el)}
+    currencies.each do |curr|
+      update_hash[curr.to_sym] = nil
+    end
+    self.update(update_hash)
   end
 
   private

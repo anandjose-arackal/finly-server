@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170517113243) do
+ActiveRecord::Schema.define(version: 20170522100606) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -619,12 +619,12 @@ ActiveRecord::Schema.define(version: 20170517113243) do
   end
 
   create_table "crono_jobs", force: :cascade do |t|
-    t.string   "job_id",            limit: 255,   null: false
-    t.text     "log",               limit: 65535
+    t.string   "job_id",            limit: 255,      null: false
+    t.text     "log",               limit: 16777215
     t.datetime "last_performed_at"
     t.boolean  "healthy"
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
   end
 
   add_index "crono_jobs", ["job_id"], name: "index_crono_jobs_on_job_id", unique: true, using: :btree
@@ -1565,12 +1565,14 @@ ActiveRecord::Schema.define(version: 20170517113243) do
   add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
 
   create_table "preview_registrations", force: :cascade do |t|
-    t.string   "email",        limit: 255
-    t.text     "company",      limit: 65535
-    t.string   "phone_number", limit: 255
-    t.text     "name",         limit: 65535
-    t.datetime "created_at",                 null: false
-    t.datetime "updated_at",                 null: false
+    t.string   "email",              limit: 255
+    t.text     "company",            limit: 65535
+    t.string   "phone_number",       limit: 255
+    t.text     "name",               limit: 65535
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.text     "source",             limit: 65535
+    t.text     "source_description", limit: 65535
   end
 
   create_table "product_combinations", force: :cascade do |t|
@@ -1747,6 +1749,8 @@ ActiveRecord::Schema.define(version: 20170517113243) do
     t.string "email",              limit: 255
     t.string "mobile_number",      limit: 255
     t.string "resource_file_name", limit: 255
+    t.text   "source",             limit: 65535
+    t.text   "source_description", limit: 65535
   end
 
   create_table "rule_types", force: :cascade do |t|

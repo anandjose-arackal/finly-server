@@ -122,10 +122,25 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     # if the expense has an associated amount, update the amount
     if expense.amount.present?
       amount = expense.amount
-      amount.update(value: expense.calculate_amount_value(expense.report.policy))
+      amount.update(value: expense.calculate_amount_value(per_diem.configurable))
     else
       amount = Amount.create(value: expense.calculate_amount_value(per_diem.configurable), currency: Currency.first)
       expense.update(amount: amount)
+    end
+
+    # if the new category is personal, mark the expense as personal
+    if expense.category_name == 'Personal'
+      Expense::Personal::Mark.(user, {expense_id: expense.id})
+    end
+    ###############################################################
+
+    # updating the respective amounts table with the conversion rates
+    if expense.date == DateUtils.local_date
+      if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id
+        expense.destroy_other_currencies
+      end
+    else
+      expense.update_other_currencies
     end
 
     add_message :success, 'Expense updated'

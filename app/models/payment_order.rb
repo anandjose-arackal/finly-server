@@ -22,15 +22,29 @@
 
 class PaymentOrder < ActiveRecord::Base
 
-  CONFIG = {meal_card: {subscription: :meal_card_enabled,
-                        card_program_id: CardProgram.id_for(:meal),
-                        payment_type_id: PaymentType.id_for(:credit_meal_card),
-                        payment_order_type_id: PaymentOrderType.id_for(:meal_card)},
-            medical_card: {subscription: :medical_card_enabled,
-                           card_program_id: CardProgram.id_for(:medical),
-                           payment_type_id: PaymentType.id_for(:credit_medical_card),
-                           payment_order_type_id: PaymentOrderType.id_for(:medical_card)
-            }}
+  CONFIG = {
+    meal_card: {
+      subscription: :meal_card_enabled,
+      card_program_id: CardProgram.id_for(:meal),
+      payment_type_id: PaymentType.id_for(:credit_meal_card),
+      payment_order_type_id: PaymentOrderType.id_for(:meal_card)
+    },
+    medical_card: {subscription: :medical_card_enabled,
+      card_program_id: CardProgram.id_for(:medical),
+      payment_type_id: PaymentType.id_for(:credit_medical_card),
+      payment_order_type_id: PaymentOrderType.id_for(:medical_card)
+    },
+    expense_card: {subscription: :expense_card_enabled,
+      card_program_id: CardProgram.id_for(:expense),
+      payment_type_id: PaymentType.id_for(:credit_expense_card),
+      payment_order_type_id: PaymentOrderType.id_for(:expense_card)
+    },
+    reimbursement_card: {subscription: :reimbursement_card_enabled,
+      card_program_id: CardProgram.id_for(:reimbursement),
+      payment_type_id: PaymentType.id_for(:credit_reimbursement_card),
+      payment_order_type_id: PaymentOrderType.id_for(:reimbursement_card)
+    }
+  }
 
   belongs_to :payment_order_type
   belongs_to :payment_order_status

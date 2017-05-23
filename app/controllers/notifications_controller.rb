@@ -8,8 +8,12 @@ class NotificationsController < ApplicationController
   def unread
     # calls notifications index itself because it's the same sql query
     @result = Notification::Index.(current_user, params)
-    respond_to do |format|
-      format.json {render json: @result.unread_count}
+    if @result.success?
+      respond_to do |format|
+        format.json {render json: @result.unread_count}
+      end
+    else
+      respond response: :failure
     end
   end
 

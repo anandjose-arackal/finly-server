@@ -51,7 +51,8 @@ class Report < ActiveRecord::Base
   # Payment made as reimbursement
   belongs_to :report_status
   belongs_to :reimbursement, class_name: 'Payment'
-  belongs_to :cash_expenses_total, class_name: 'Amount'
+  belongs_to :reimbursable_expenses_total, class_name: 'Amount'
+  belongs_to :non_reimbursable_expenses_total, class_name: "Amount"
   belongs_to :card_expenses_total, class_name: 'Amount'
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
@@ -61,7 +62,8 @@ class Report < ActiveRecord::Base
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, class_name: 'Amount'
   accepts_nested_attributes_for :submitted_amount
-  accepts_nested_attributes_for :cash_expenses_total
+  accepts_nested_attributes_for :reimbursable_expenses_total
+  accepts_nested_attributes_for :non_reimbursable_expenses_total
   accepts_nested_attributes_for :card_expenses_total
   accepts_nested_attributes_for :custom_fields
 
@@ -69,6 +71,7 @@ class Report < ActiveRecord::Base
   validate :is_employee
   validate :has_expenses
   validate :controller_has_role
+  validates :policy_id, presence: true
 
   default_scope { order(report_status_id: :asc, submitted_at: :desc, created_at: :desc) }
 
@@ -80,8 +83,9 @@ class Report < ActiveRecord::Base
   scope :with_user_id, ->(user_id) { where user_id: user_id }
   scope :non_archived, -> { where.not archived: false }
   scope :archived, -> { where archived: true }
-  scope :with_amount, -> { joins :cash_expenses_total }
-  scope :with_cash_expenses_total, -> { joins :cash_expenses_total }
+  scope :with_amount, -> { joins :reimbursable_expenses_total }
+  scope :with_reimbursable_expenses_total, -> { joins :reimbursable_expenses_total }
+  scope :with_non_reimbursable_expenses_total, -> { joins :non_reimbursable_expenses_total }
   scope :with_card_expenses_total, -> { joins :card_expenses_total }
   scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
@@ -191,7 +195,7 @@ class Report < ActiveRecord::Base
   end
 
   def settlement_pending?
-    approved? and cash_expenses_total.present? and cash_expenses_total.value > 0
+    approved? and reimbursable_expenses_total.present? and reimbursable_expenses_total.value > 0
   end
 
   def can_submit?
@@ -239,11 +243,11 @@ class Report < ActiveRecord::Base
       options = [options] unless options.kind_of?(Array)
       if options.present?
         options.each do |item|
-          temp_expenses = self.expenses.send(item.to_sym) if item.present? and self.expenses.respond_to?(item.to_sym)
+          temp_expenses = temp_expenses.send(item.to_sym) if item.present? and temp_expenses.respond_to?(item.to_sym)
         end
       end
     end
-    precision_value(temp_expenses.with_amount.sum(:value))
+    precision_value(temp_expenses.with_amount.sum(self.base_currency_code.to_sym))
   end
 
   def controlling_user?(user)
@@ -304,6 +308,18 @@ class Report < ActiveRecord::Base
     date = latest_exp.date if latest_exp.present?
     cash = self.user.cash_in_hand date
     cash.value - report_total < 0
+  end
+
+  def base_currency_id
+    self.policy.base_currency_id
+  end
+
+  def base_currency_code
+    self.policy.base_currency.country_code
+  end
+
+  def base_currency_symbol
+    self.policy.base_currency.symbol
   end
 
 

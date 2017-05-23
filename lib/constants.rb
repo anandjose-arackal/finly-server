@@ -18,7 +18,7 @@ module Constants
 
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finly.io', 'admin@finlytest.io']
 
-  DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other', 'Personal']
+  DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other']
 
   FLASH_COLORS = {alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
 
@@ -32,10 +32,12 @@ module Constants
 
   WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
 
+  CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+
   #########################
 
   if Rails.env.production?
-    TRANSCRIBER_EMAILS = ['veekshith.rai@finly.io', 'vivek.a@finly.io']
+    TRANSCRIBER_EMAILS = %w(veekshith.rai@finly.io vivek.a@finly.io)
   else
     TRANSCRIBER_EMAILS = ['sreeram.nr@finly.io']
   end
@@ -63,6 +65,19 @@ module Constants
   BASE_URL = url
 
   class Constants::ItzCash
+
+    ICW_CODE = 'D000000360'
+    DMT_USERNAME = 'itzic20000'
+    DMT_PASSWORD = '03jqURp0OO0aVkssyuy01g=='
+    EASY_WALLET_ID = 'IFTSPL IMPS Wallet'
+    EASY_WALLET_TYPE = 'IMPS'
+
+    DMT_PAYMENT_MODE = 'easyPay'
+
+    BENEFICIARY_REGISTRATION_RELATION = 'Friend'
+    IFSC_OPTION = 'ByIfsc'
+    PROCESSING_BANK_ID = 'RMB000000000002'
+    PROCESSING_BANK_NAME = 'ItzCash Card Ltd'
 
     RESTRICTION_BUDGET_CONSTANT = 1000000
     RESTRICTION_TRANS_CONSTANT = 1000

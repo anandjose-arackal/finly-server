@@ -27,6 +27,9 @@ gem 'figaro', '1.1.1'
 gem 'puma', '3.6.2'
 
 gem 'crono', '1.0.3'
+gem 'haml'
+gem 'sinatra', require: nil
+
 
 # gem to import from excel
 gem 'roo', '2.5.1'
@@ -124,6 +127,7 @@ gem 'devise', '4.2.0'
 gem 'devise_invitable', '1.7.0'
 
 gem 'faraday', '0.10.0'
+# gem 'faraday_middleware', '0.11.0.1'
 
 gem 'hooks', '0.4.1'
 

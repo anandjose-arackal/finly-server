@@ -25,10 +25,13 @@
 
 
 
+
 class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
   belongs_to :receipt_email
+
+  has_many :system_messages, as: :messagable, dependent: :destroy
 
   validates :user_id, presence: true
 

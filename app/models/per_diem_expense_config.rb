@@ -10,7 +10,7 @@
 #
 
 class PerDiemExpenseConfig < ActiveRecord::Base
-  belongs_to :parent, polymorphic: true
+  belongs_to :policy
 
-  validates :parent, presence: true
+  validates :policy, presence: true
 end

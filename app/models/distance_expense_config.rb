@@ -13,24 +13,27 @@
 #
 
 class DistanceExpenseConfig < ActiveRecord::Base
-  belongs_to :parent, polymorphic: true
-
-  belongs_to :default_category, class_name: "Category"
+  belongs_to :default_category, class_name: 'Category'
+  belongs_to :rate, class_name: 'Amount'
+  belongs_to :period
+  belongs_to :policy
 
   validate :rate_exists_for_enabled
-  validates :parent, presence: true
+  validates :policy_id, presence: true
+
+  accepts_nested_attributes_for :rate
 
   def default_category_name
     if self.default_category_id
       return Category.find(default_category_id).name
     else
-      ""
+      ''
     end
   end
 
-  def rate
+  def rate_value
     if self.enabled
-      return self.rate_per_km
+      return self.rate.send(self.policy.base_currency.country_code)
     else
       return nil
     end
@@ -40,8 +43,8 @@ class DistanceExpenseConfig < ActiveRecord::Base
 
   def rate_exists_for_enabled
     if self.enabled
-      if self.rate_per_km.blank?
-        errors.add(:rate, "cannot be empty")
+      if self.rate.blank?
+        errors.add(:rate, 'cannot be empty')
       end
     end
   end

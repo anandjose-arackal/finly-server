@@ -10,7 +10,7 @@
 
 class Transcriber::Expenses::Create < Transcriber::Expenses::Base
 
-  attr_accessor :expense_params, :receipt, :selected_user, :expense
+  attr_accessor :expense_params, :receipt, :selected_user, :expense, :illegible
 
   def pre_validate
     super()
@@ -23,6 +23,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
     self.expense_params = manual_expense_params
     self.receipt = Receipt.find_by(id: params[:receipt_id])
     self.selected_user = receipt.user if receipt
+    self.illegible = params[:illegible]
   end
 
   def validate
@@ -56,17 +57,29 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
   end
 
   def process
-    self.expense = selected_user.expenses.build(expense_params)
-    if expense.save
-      receipt.update(parent: expense)
+    if illegible
+      receipt.update(to_be_transcribed: false)
+      system_message = receipt.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error), content: "Expense wasn't automatically generated because receipt was illegible")
+      unless system_message.save
+        add_message :error, system_message.errors.full_messages
+      end
     else
-      messages[:error] = expense.errors.full_messages
+      self.expense = selected_user.expenses.build(expense_params)
+      if expense.save
+        receipt.update(parent: expense)
+      else
+        messages[:error] = expense.errors.full_messages
+      end
     end
   end
 
   def post_process
-    expense.update(transcribed: true)
-    add_message :success, "Receipt transcribed"
+    if illegible
+      add_message :success, "Receipt marked as illegible"
+    else
+      expense.update(transcribed: true)
+      add_message :success, "Receipt transcribed"
+    end
   end
 
   private

@@ -26,8 +26,12 @@ class TimeObject < ActiveRecord::Base
   private
 
   def non_zero_value
-    if self.value < 0 || self.value == 0
-      errors.add(:time, "cannot be negative")
+    if self.value.present?
+      if self.value < 0 || self.value == 0
+        errors.add(:time, "cannot be negative")
+      end
+    else
+      errors.add(:time, "cannot be empty")
     end
   end
 

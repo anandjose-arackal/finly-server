@@ -52,7 +52,7 @@ if ReportStatus.count == 0
   ReportStatus.create(id: 3, name: 'Retracted', order: 2)
   ReportStatus.create(id: 4, name: 'Rejected', order: 4)
   ReportStatus.create(id: 5, name: 'Approved', order: 5)
-  ReportStatus.create(id: 6, name: 'Settlement', order: 6)
+  ReportStatus.create(id: 6, name: 'Settled', order: 6)
   ReportStatus.create(id: 7, name: 'Settlement Confirmed', order: 7)
   ReportStatus.create(id: 8, name: 'Closed', order: 8)
 end
@@ -133,7 +133,7 @@ if NotifierType.count == 0
 end
 
 if Currency.count == 0
-  Currency.create id: 1, country: 'India', country_code: 'INR', symbol: '₹'
+  Currency.seed_data
 end
 
 if ExpenseType.count ==0
@@ -163,13 +163,7 @@ if RuleType.count == 0
   RuleType.create!(name: "Blocking")
 end
 
-if Period.count == 0
-  Period.create!(name: "Day")
-  Period.create!(name: "Week")
-  Period.create!(name: "Month")
-  Period.create!(name: "Quarter")
-  Period.create!(name: "Year")
-end
+Period.seed_data
 
 if PaymentType.count == 0
   PaymentType::TYPES.each do |key, value|
@@ -231,6 +225,10 @@ SystemMessageType.seed_data
 
 ItzCashCardProgram.seed_data
 
+# ItzCashDmtBeneficiaryType.seed_data
+
+ItzCashDmtBeneficiaryStatus.seed_data
+
 ##########################
 
 if Amount.count == 0
@@ -242,6 +240,11 @@ if Company.count == 0
   c.reload
 else
   c = Company.first
+end
+
+Company.all.each do |company|
+  company.feature_subscription.expense_management_enabled = true
+  company.save
 end
 
 if c.categories.count == 0
@@ -307,7 +310,7 @@ if User.count == 0
                    password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
                    role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
-                   team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
+                   team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0], policy_id: Company.first.policies.default.first.id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
@@ -316,7 +319,7 @@ if User.count == 0
                      password: "hapitoe007", password_confirmation: "hapitoe007", company_id: c.id, mobile_number: random_mobile_number,
                      mothers_maiden_name: Faker::Name.first_name,
                      role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
-                     team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0]}],
+                     team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0], policy_id: Company.first.policies.default.first.id}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   end
@@ -327,7 +330,7 @@ if User.count == 0
               mothers_maiden_name: Faker::Name.first_name,
               role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
                                         {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
-              team_mapping_attributes: [{default: true, manager: v[0], finance_manager: v[1]}],
+              team_mapping_attributes: [{default: true, manager: v[0], finance_manager: v[1], policy_id: Company.first.policies.default.first.id}],
               profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                    address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
   ############################################################################################################################################
@@ -343,12 +346,12 @@ if User.count == 0
 
 
   m[0].team_mapping.default.first.update_attributes(approves_to: m[1])
-  m[0].team_mapping.build(approves_to: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}).save
-  u[0].team_mapping.build(manager: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
+  m[0].team_mapping.build(approves_to: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 500}, policy_id: Company.first.policies.default.first.id).save
+  u[0].team_mapping.build(manager: m[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}, policy_id: Company.first.policies.default.first.id).save
 
   fm[0].team_mapping.default.first.update_attributes(approves_finance_to: fm[1])
-  fm[0].team_mapping.build(approves_finance_to: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}).save
-  u[0].team_mapping.build(finance_manager: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 2000}).save
+  fm[0].team_mapping.build(approves_finance_to: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 1000}, policy_id: Company.first.policies.default.first.id).save
+  u[0].team_mapping.build(finance_manager: fm[2], greater_than_amount_attributes: {currency: Currency.first, value: 2000}, policy_id: Company.first.policies.default.first.id).save
 
 
   User.all.each do |user|
@@ -492,18 +495,6 @@ if Report.count == 0
 end
 
 unless Rails.env.production?
-  # if Card.count == 0
-  #   User.all.each do |user|
-  #     if user.id < 9
-  #       number = "S0001774009#{(user.id - 1)}"
-  #       user.cards.create(proxy: number, description: "Test physical card for user #{user.id}",
-  #                         product_code: Constants::ItzCash::PRODUCT_CODE,
-  #                         card_type_id: 1, company_id: user.company.id,
-  #                         ending_number: random(1000, 9999).to_i, active: true,
-  #                         card_program_id: CardProgram.first.id)
-  #     end
-  #   end
-  # end
 
   # creating some junk transactions and card expenses for testing
   if CardTransaction.count == 0
@@ -565,7 +556,7 @@ if FieldConfiguration.count == 0
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:report)})
   # Report mandatory custom field
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Name',
                                                                         field_type_id: FieldType.id_for(:text),
@@ -573,14 +564,14 @@ if FieldConfiguration.count == 0
                                                                         field_parent_type_id: FieldParentType.id_for(:report)})
 
   # Money Request custom fields
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Location',
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:money_request)})
   # Money Request mandatory custom field
-  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
+  CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Project Name',
                                                                         field_type_id: FieldType.id_for(:text),
@@ -654,4 +645,44 @@ if AdminUser.count == 0
   AdminUser.create!(email: 'vivek@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
   AdminUser.create!(email: 'veekshith@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
   AdminUser.create!(email: 'bala@finly.io', password: 'hapitoe007', password_confirmation: 'hapitoe007')
+end
+
+if CardTransaction.filter_refunds(1).count == 0
+  User.all.each do |user|
+    next unless user.cards.present?
+    card = user.cards.first
+    10.times do
+
+      trans_types = ["Credit"]
+      trans_modes = ["null"]
+      from_date = DateTime.parse("01-01-2017 12:00:00")
+      to_date = DateTime.now
+      random_amount = random_integer(50, 200) + 0.1234
+      sample_msg_queue_entry = "321744RUPP0003508886000#{random_string_of_numbers(7)},#{from_date + (to_date - from_date)*rand},#{random_amount},#{random_amount + random(5, 10)},173244,#{trans_modes[0]},OLCDCB_POSOFFUS,Refund #{Faker::University.name},91,#{trans_types[0]},#{card.proxy},RBLRUP"
+
+      data = sample_msg_queue_entry.split(",")
+
+      # for the split between merchant city and merchant name
+      name_city = data[7].split("\t") # splits the sixth field after the comma into name and city
+      merchant_name = name_city[0]
+      merchant_city = name_city[1]
+
+      trans_params = {reference_id: data[0],
+                      transaction_timestamp: data[1],
+                      transaction_amount_attributes: {value: data[2], currency_id: 1},
+                      billing_amount_attributes: {value: data[3], currency_id: 1},
+                      auth_transaction_id: data[4],
+                      transaction_mode: data[5],
+                      itzcash_merchant_key: data[6],
+                      merchant_name: merchant_name,
+                      merchant_city: merchant_city,
+                      response_code: data[8],
+                      transaction_type: data[9],
+                      serial_id: data[10],
+                      product_code: data[11]
+      }
+
+      result = Card::Transaction::Create.(trans_params)
+    end
+  end
 end

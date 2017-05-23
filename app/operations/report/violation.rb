@@ -23,7 +23,7 @@
 
 class Report::Violation < Report::Base
   include ActionView::Helpers::NumberHelper
-  attr_accessor :no_policy, :warning_messages, :policy
+  attr_accessor :no_policy, :warning_messages, :policy, :base_currency_code, :base_currency_id
 
   def authorized_user_types
     nil
@@ -39,6 +39,8 @@ class Report::Violation < Report::Base
     self.warning_messages = {}
     self.report = params[:report]
     self.policy = report.versioned_policy
+    self.base_currency_code = policy.nil? ? (user.company.base_currency.country_code) : (policy.base_currency.country_code)
+    self.base_currency_id = policy.nil? ? (user.company.base_currency.id) : (policy.base_currency.id)
     report.expenses.each do |expense|
       self.warning_messages[expense.id] = {}
       self.warning_messages[expense.id]['expense_warning'] = []
@@ -60,6 +62,16 @@ class Report::Violation < Report::Base
   def process
 
     report.expenses.each do |expense|
+      # because the incompatible expense violation needs to be calculated irrespective of the
+      # existence of a policy
+      check_compatible_expenses(expense)
+      check_non_base_currency(expense)
+
+      # i.e. if the expense does not have a possible currency computation skip rule checking because the amount isn't clear
+      if expense.amount&.currency_id != base_currency_id && expense.date == DateUtils.local_date
+        next
+      end
+
       unless no_policy
         policy.expense_rules.each do |rule|
           check_expense_rule rule, expense
@@ -68,9 +80,7 @@ class Report::Violation < Report::Base
           check_budget rule, expense
         end
       end
-      # because the incompatible expense violation needs to be calculated irrespective of the
-      # existence of a policy
-      check_compatible_expenses(expense)
+
     end
     self.response = warning_messages
   end
@@ -82,9 +92,9 @@ class Report::Violation < Report::Base
   private
   def check_expense_rule_violation(expense, rule, manager = nil)
     message = ''
-    if rule.amount_value
-      if expense.amount_value >= rule.amount_value
-        message += ' above ' + rule.amount_value.to_s
+    if rule.greater_than_amount_value && rule.greater_than_amount_value != 0
+      if expense.amount.send(base_currency_code.to_sym) >= rule.greater_than_amount_value
+        message += ' above ' + rule.greater_than_amount_value.to_s
       else
         return false
       end
@@ -166,18 +176,18 @@ class Report::Violation < Report::Base
     total_expenses = 0
     # all user reports with the associated budget
     user.reports.processed.with_policy_id(rule.policy_id).where.not(id: report.id).each do |budget_report|
-      if category
-        total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(:value), :precision => 2).to_f
+      if rule.include_reimbursable_expenses?
+        total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
       else
-        total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
+        total_expenses += number_with_precision(budget_report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
       end
     end
-    if category
-      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).filter_category_id(category.id).joins(:amount).sum(:value), :precision => 2).to_f
+    if rule.include_reimbursable_expenses?
+      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
     else
-      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).joins(:amount).sum(:value), :precision => 2).to_f
+      total_expenses += number_with_precision(report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
     end
-    if total_expenses > rule.amount_value
+    if total_expenses > rule.amount.send(base_currency_code.to_sym)
       return true
     end
     false
@@ -215,19 +225,19 @@ class Report::Violation < Report::Base
         if budget_violation?(expense, rule, start_date, end_date, category)
           if rule.type == 'Warning'
             if category
-              message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount_value.to_s}"
+              message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_warning'] << {type: 'category', message: message}
             else
-              message = "Total expenses #{budget_message} have exceeded #{rule.amount_value.to_s}"
+              message = "Total expenses #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_warning'] << {type: 'total', message: message}
             end
             return
           elsif rule.type == 'Blocking'
             if category
-              message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount_value.to_s}"
+              message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_blocking'] << {type: 'category', message: message}
             else
-              message = "Total expenses #{budget_message} have exceeded #{rule.amount_value.to_s}"
+              message = "Total expenses #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_blocking'] << {type: 'total', message: message}
             end
             return
@@ -243,57 +253,40 @@ class Report::Violation < Report::Base
     message = "Expenses are not enabled for the selected policy. Please change the policy of the report or remove the expense"
     case expense.expense_type_id
       when ExpenseType.id_for(:distance)
-        if report.policy.nil?
-          unless user.company.distance_expense_config.enabled
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Distance #{message}"}
-            return
-          end
-        else
-          unless report.policy.distance_expense_config.enabled
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Distance #{message}"}
-            return
-          end
+        unless report.policy.distance_expense_config.enabled
+          self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Distance #{message}"}
+          return
         end
       when ExpenseType.id_for(:time)
-        if report.policy.nil?
-          unless user.company.time_expense_config.enabled
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Time #{message}"}
-            return
-          end
-        else
-          unless report.policy.time_expense_config.enabled
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Time #{message}"}
-            return
-          end
+        unless report.policy.time_expense_config.enabled
+          self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Time #{message}"}
+          return
         end
       when ExpenseType.id_for(:per_diem)
-        if report.policy.nil?
-          if user.company.per_diem_expense_config.enabled
-            if user.company.per_diems.include?(expense.per_diem_expense.per_diem)
-              return
-            else
-              message = "of some expenses do not belong to the selected policy"
-              self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
-            end
-          else
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
+        if report.policy.per_diem_expense_config.enabled
+          if report.policy.per_diems.include?(expense.per_diem_expense.per_diem)
             return
+          else
+            message = "of some expenses do not belong to the selected policy"
+            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Some Per Diem #{message}"}
           end
         else
-          if report.policy.per_diem_expense_config.enabled
-            if report.policy.per_diems.include?(expense.per_diem_expense.per_diem)
-              return
-            else
-              message = "of some expenses do not belong to the selected policy"
-              self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Some Per Diem #{message}"}
-            end
-          else
-            self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
-            return
-          end
+          self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Per Diem #{message}"}
+          return
         end
       else
         # do nothing
+    end
+  end
+
+  def check_non_base_currency(expense)
+
+    if expense.date == DateUtils.local_date
+      if expense&.amount.currency_id == base_currency_id
+        return
+      else
+        self.warning_messages[expense.id]['expense_blocking'] << {type: 'non_base_currency', message: "Expenses that are reported in a different currency from #{base_currency_code} can only be submitted the next day"}
+      end
     end
   end
 end
