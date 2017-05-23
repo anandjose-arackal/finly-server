@@ -66,8 +66,8 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
 
       per_diem_id = current_expense_params[:per_diem_expense_attributes][:per_diem_id].to_d rescue nil
 
-      per_diem = PerDiem.find_from_id(per_diem_id)
-      if per_diem.blank?
+      self.multiple_expenses[key][:per_diem] = PerDiem.find_from_id(per_diem_id)
+      if self.multiple_expenses[key][:per_diem].blank?
         # add_message :error, "You have to select an associated per diem"
         self.errors_by_expenses[key][:error].push('You have to select an associated per diem')
       end
@@ -202,7 +202,37 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
 
   def post_process
 
-    # calculate amount of the expense
+    if self.valid
+      for key, value in self.multiple_expenses
+        # add comment in report if expense is added within report
+        if value[:expense].report_id.present? and value[:expense].report.retracted?
+          comment = value[:expense].report.comments.build report: value[:expense].report, user: user,
+                                                       report_comment_action_id: ReportCommentAction.id_for(:expense_add), expense: value[:expense]
+          unless comment.save
+            messages[:error] = comment.errors.full_messages
+          end
+        end
+
+
+        # Calculate Amount of the expense
+        amount = value[:expense].amount
+        if amount.blank?
+          amount = Amount.create(value: value[:expense].calculate_amount_value(value[:per_diem].configurable), currency: Currency.first)
+          value[:expense].update(amount: amount)
+        else
+          amount.update(value: value[:expense].calculate_amount_value(value[:per_diem].configurable))
+
+          # calculate the equivalent amount in all currencies in the amounts table
+          if value[:expense].date == DateUtils.local_date
+            value[:expense].amount.update(value[:expense].amount.currency.country_code.to_sym => value[:expense].amount_value)
+          else
+            value[:expense].update_other_currencies
+          end
+        end
+      end
+    end
+
+    # # calculate amount of the expense
     # amount = expense.amount
     # if amount.blank?
     #   amount = Amount.create(value: expense.calculate_amount_value(per_diem.configurable), currency: Currency.first)

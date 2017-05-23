@@ -225,19 +225,19 @@ class Report::Violation < Report::Base
         if budget_violation?(expense, rule, start_date, end_date, category)
           if rule.type == 'Warning'
             if category
-              message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount_value.to_s}"
+              message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_warning'] << {type: 'category', message: message}
             else
-              message = "Total expenses #{budget_message} have exceeded #{rule.amount_value.to_s}"
+              message = "Total expenses #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_warning'] << {type: 'total', message: message}
             end
             return
           elsif rule.type == 'Blocking'
             if category
-              message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount_value.to_s}"
+              message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_blocking'] << {type: 'category', message: message}
             else
-              message = "Total expenses #{budget_message} have exceeded #{rule.amount_value.to_s}"
+              message = "Total expenses #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_blocking'] << {type: 'total', message: message}
             end
             return
