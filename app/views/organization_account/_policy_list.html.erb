@@ -22,13 +22,13 @@
           <div id="policyListTable">
             <ul style="list-style-type: none; padding-left: 0;">
               <% @result.policies.each do |policy| %>
-                <li class="policy">
+                <li class="policy" data-navigate-to="<%= "#policies/" + policy.id.to_s + '/params={"view": "admin"}' %>">
                   <div class="row no-margin">
                     <div class="col-sm-8" style="font-size: 21px;line-height: 42px;">
-                      <%= link_to policy.name, "#policies/" + policy.id.to_s + '/params={"view": "admin"}' %>
+                      <h4><%= policy.name %></h4>
                     </div>
                     <div class="col-sm-3">
-                      <a id="showReportsButton" class="btn btn-primary btn-md" href="<%= root_path + '#reports/params={"filter_policy":"' + policy.id.to_s + '", "view": "admin"}'%>">View Reports</a>
+                      <button class="btn-show-policy-reports btn btn-primary btn-md" data-navigate-to="<%= '#reports/params={"filter_policy":"' + policy.id.to_s + '", "view": "admin"}'%>">View Reports</button>
                     </div>
                     <!-- 
                     <div class="col-sm-1">
@@ -80,6 +80,7 @@
 
 <style type="text/css">
   .policy{
+    cursor: pointer;
     margin-bottom: 10px;
     border: 1px solid #efefef;
     padding: 10px;
