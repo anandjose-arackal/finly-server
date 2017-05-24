@@ -68,6 +68,7 @@ class Expense < ActiveRecord::Base
   delegate :expense_type_name, to: :expense_type
   delegate :expense_status_name, to: :expense_status
   delegate :user_name, to: :user
+  delegate :manual?, :card?, :distance?, :time?, :per_diem?, to: :expense_type
 
   validates :date, presence: true
   validates :category_id, presence: true
@@ -142,6 +143,7 @@ class Expense < ActiveRecord::Base
   }
 
   scope :with_amount, -> { joins :amount }
+  scope :having_amount_currency, -> (amount, currency_id) { with_amount.where('amount.value = ? AND amount.currency_id = ?', amount, currency_id) }
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_report_id, ->(report_id) { where report_id: report_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
