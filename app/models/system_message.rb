@@ -23,4 +23,7 @@ class SystemMessage < ActiveRecord::Base
             name: system_message_type.name},
      content: content}
   end
+
+  scope :errors, -> {where system_message_type_id: SystemMessageType.id_for(:error)}
+  scope :info, -> {where system_message_type_id: SystemMessageType.id_for(:info)}
 end
