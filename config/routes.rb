@@ -556,6 +556,8 @@
 
 Rails.application.routes.draw do
 
+  get 'junk/show'
+
   mount Crono::Web, at: '/crono'
 
   namespace :transcriber do
