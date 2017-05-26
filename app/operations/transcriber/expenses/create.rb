@@ -40,7 +40,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
       return
     end
     if receipt.parent.present?
-      add_message :error, "This recept is already associated with an expense"
+      add_message :error, "This receipt is already associated with an expense"
     end
   end
 

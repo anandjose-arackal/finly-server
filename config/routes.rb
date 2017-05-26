@@ -954,8 +954,15 @@ Rails.application.routes.draw do
 
   get 'features_subscribed' => 'expense_types_configuration#features_subscribed'
   resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]
-  resources :teams, controller: 'user_teams', only: [:create, :index, :show, :update, :destroy]
+  resources :groups do
+    resources :items, controller: 'user_group_items', only: [:show, :create, :destroy, :update]
+    resources :items do
+      post '', to: 'user_group_items#create'
+      get :pending_users, to: 'user_group_items#pending_users'
+    end
+  end
 
+  resources :teams, controller: 'user_teams', only: [:create, :index, :show, :update, :destroy]
   resources :teams, controller: 'user_teams' do
     patch 'set_restrictions', to: 'user_teams#set_restrictions'
   end
