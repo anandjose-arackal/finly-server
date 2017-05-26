@@ -64,7 +64,6 @@ class User < ActiveRecord::Base
   belongs_to :company
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
-
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
   has_many :user_roles, through: :role_mapping, dependent: :destroy
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
@@ -76,7 +75,6 @@ class User < ActiveRecord::Base
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
-
   has_many :reports, dependent: :destroy
   has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
   has_many :report_tracks, class_name: 'ReportTrack', foreign_key: :action_user_id
@@ -85,7 +83,6 @@ class User < ActiveRecord::Base
   has_many :manager_reports, -> { distinct }, source: :report, through: :manager_report_tracks
   has_many :finance_report_tracks, -> { finance_manager_role }, class_name: 'ReportTrack', foreign_key: :modified_user_id
   has_many :finance_reports, -> { distinct }, source: :report, through: :finance_report_tracks
-
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
@@ -93,10 +90,8 @@ class User < ActiveRecord::Base
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable, dependent: :destroy
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
-
   has_many :cards, dependent: :destroy
   has_many :card_transactions, dependent: :destroy
-
   has_many :money_requests
   has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
   has_many :money_request_tracks, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
@@ -106,17 +101,11 @@ class User < ActiveRecord::Base
   has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
   has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
   has_many :notifications, dependent: :destroy
-
   has_many :notifier_type_configurations
-
   has_many :user_balance_histories
-
   belongs_to :otp_request_type
-
   has_many :feedbacks
-
   has_many :payment_orders, foreign_key: :initiating_user_id
-
   has_many :user_group_item_mappings
   has_many :user_group_items, through: :user_group_item_mappings
 

@@ -460,6 +460,13 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def partially_transcribed
+    if self.system_messages.errors.present?
+      return true
+    end
+    false
+  end
+
   # returns the number of receipts attached to this expense
   def receipts_count
     self.receipts.count
