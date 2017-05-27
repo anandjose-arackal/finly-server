@@ -1,6 +1,10 @@
-class User::Configuration::AutoSubmit::Update < BaseOperation
+class User::Configuration::AutoReload::Update < BaseOperation
 
   attr_accessor :reload_config, :update_params, :selected_user
+
+  def authorized_user_types
+    [:admin, :finance_manager, :manager, :employee]
+  end
 
   def pre_validate
     if user.blank? || params.blank?
@@ -9,7 +13,10 @@ class User::Configuration::AutoSubmit::Update < BaseOperation
   end
 
   def init
+    id = params[:id] || params[:user_id]
     self.selected_user = User::Team::Index.(user, params).with_id(id).first rescue nil
+    # if it's not someone in the user's team, it's the user themselves
+    self.selected_user = user if selected_user.blank?
     self.reload_config = selected_user.auto_reload_config
     self.update_params = auto_reload_config_params
   end
@@ -19,6 +26,11 @@ class User::Configuration::AutoSubmit::Update < BaseOperation
       add_message :error, "Minimum balance cannot be less than or equal to 0"
       return
     end
+  end
+
+  def pre_process
+    # ensuring that the auto reload configuration is always in Rupees
+    update_params[:minimum_balance_attributes][:currency_id] = "1"
   end
 
   def process
