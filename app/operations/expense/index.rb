@@ -94,7 +94,7 @@ class Expense::Index < Expense::Base
         self.expenses = apply_scopes(expenses, params)
 
         ## excluding personal and cancelled expenses if it's an expense/index action
-        if params[:action].include?('index')
+        if params[:action]&.include?('index')
           exclude_personal
         end
         ############################################################################
@@ -117,7 +117,7 @@ class Expense::Index < Expense::Base
     end
 
     def exclude_personal
-      if params[:filter_expense_personal] == '1'
+      if params[:filter_expense_type_id] == '7'
         self.expenses
       else
         self.expenses = expenses&.non_personal

@@ -19,6 +19,24 @@ class ExpensesController < ApplicationController
           respond render: "multiple_errors"
           return
         end
+      when '7'
+        @result = Expense::ExDistance::Multiple::Create.(current_user, params)
+        unless @result.success?
+          respond render: "multiple_errors"
+          return
+        end
+      when '8'
+        @result = Expense::ExTime::Multiple::Create.(current_user, params)
+        unless @result.success?
+          respond render: "multiple_errors"
+          return
+        end
+      when '9'
+        @result = Expense::ExPerDiem::Multiple::Create.(current_user, params)
+        unless @result.success?
+          respond render: "multiple_errors"
+          return
+        end
       else
         respond response: :failure, message: "Invalid input"
     end

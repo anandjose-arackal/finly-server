@@ -242,12 +242,18 @@ class Amount < ActiveRecord::Base
 
   scope :with_id, -> (id) { where id: id }
 
-  after_create {
-    # i.e. updating the respective currency' column with value
+  before_save do
+    set_base_currency_value
+  end
+
+  # i.e. updating the respective currency' column with value
+  def set_base_currency_value
     if Amount.column_names.include?(self.currency.country_code)
-      self.update((self.currency.country_code) => self.value)
+      # self.update((self.currency.country_code) => self.value)
+      # Setting the value without updating
+      self.send("#{self.currency.country_code}=",self.value)
     end
-  }
+  end
 
   def greater_than_amount_value
     self.value
@@ -292,7 +298,10 @@ class Amount < ActiveRecord::Base
     update_hash = {}
     rate = CurrencyConversionRate.find_by(date: date)
     if rate.nil?
-      return
+      # calculate the respective currency rate for the date in question
+      params = {date: Date.parse(date).strftime("%Y-%m-%d")} rescue nil
+      res = Currency::FetchData.(nil, params)
+      rate = CurrencyConversionRate.create(res.currency_data)
     end
     currencies = CurrencyConversionRate.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id'].include?(el)}
     orig_curr = self.currency.country_code

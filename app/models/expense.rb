@@ -24,6 +24,13 @@
 
 
 
+
+
+
+
+
+
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -141,7 +148,18 @@ class Expense < ActiveRecord::Base
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :with_user_id, ->(user_id) { where user_id: user_id }
   # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
-  scope :filter_expense_type_id, ->(type_id) { where expense_type_id: type_id }
+  scope :filter_expense_type_id, ->(type_id) {
+    if [1, 2, 3, 4, 5, '1', '2', '3', '4', '5'].include?(type_id)
+      where expense_type_id: type_id
+    elsif [6, '6'].include?(type_id)
+      ids = pluck(:id)
+      card_expenses = CardExpense.with_expense_id(ids)
+      cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
+      with_id(cancelled_expense_ids)
+    elsif [7, '7'].include?(type_id)
+      personal
+    end
+  }
 
   # scopes for the filters
   scope :filter_amount, -> (type, value) do
@@ -441,6 +459,13 @@ class Expense < ActiveRecord::Base
     else
       return nil
     end
+  end
+
+  def partially_transcribed
+    if self.system_messages.errors.present?
+      return true
+    end
+    false
   end
 
   # returns the number of receipts attached to this expense

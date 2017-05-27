@@ -31,14 +31,18 @@ if @result.present?
         json.success true
         json.messages @result.messages
       end
-      json.merge! data
+      unless data.nil?
+        json.merge! data
+      end
     end
   else
     unless data.present? and data.is_a?(Array)
       json.success false
       json.messages @result.messages
     end
-    json.merge! data
+    unless data.nil?
+      json.merge! data
+    end
   end
 else
   json.merge! JSON.parse yield rescue nil

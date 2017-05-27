@@ -62,6 +62,9 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
   end
 
   def validate
+    # MISSING
+    # Adding expense to reports, check validation for report editable
+
     for key, value in self.multiple_expenses
       # Setting errors for the current expense
       self.errors_by_expenses[key] = { error: [] }

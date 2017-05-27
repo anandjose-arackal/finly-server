@@ -100,7 +100,7 @@ class Report::Base < BaseOperation
         item_expenses = self.expenses.with_category(category.id)
         if item_expenses.present?
           item_name = category.name
-          item_sum = precision_value item_expenses.with_amount.sum(:value)
+          item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
           categorized_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
         end
       end
@@ -114,7 +114,7 @@ class Report::Base < BaseOperation
         item_expenses = self.expenses.with_date(date)
         if item_expenses.present?
           item_name = date
-          item_sum = precision_value item_expenses.with_amount.sum(:value)
+          item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
           date_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
         end
       end

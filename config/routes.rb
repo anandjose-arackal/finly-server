@@ -1,7 +1,6 @@
 # == Route Map
 #
 #                                  Prefix Verb   URI Pattern                                                 Controller#Action
-#                               crono_web        /crono                                                      Crono::Web
 # transcriber_transcribed_expenses_create POST   /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
 # transcriber_transcribed_expenses_update PATCH  /transcriber/expenses/:id/update(.:format)                  transcriber/receipts#update_expense
 #    transcriber_transcribed_receipt_show GET    /transcriber/expenses/:id/show(.:format)                    transcriber/receipts#show
@@ -851,7 +850,7 @@ Rails.application.routes.draw do
 
   end
   get 'cancelled_against_transactions/:expense_id', to: 'card_transactions#cancelled_transactions', as: :cancelled_transactions
-  
+
   get 'statements/company_balance_summary' => 'statements#company_balance_summary'
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
@@ -916,7 +915,7 @@ Rails.application.routes.draw do
   # Medical Cards
 
 
-  
+
   post 'cards/medical/process_file' => 'benefits/medical_cards#process_file'
   post 'cards/medical/orders' => 'benefits/medical_cards#create'
   patch 'cards/medical/orders' => 'benefits/medical_cards#update'
@@ -951,6 +950,19 @@ Rails.application.routes.draw do
   post 'disburse/users' => 'disburse/users#create'
 
   get 'features_subscribed' => 'expense_types_configuration#features_subscribed'
+  resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]
+  resources :groups do
+    resources :items, controller: 'user_group_items', only: [:show, :create, :destroy, :update]
+    resources :items do
+      post '', to: 'user_group_items#create'
+      get :pending_users, to: 'user_group_items#pending_users'
+    end
+  end
+
+  resources :teams, controller: 'user_teams', only: [:create, :index, :show, :update, :destroy]
+  resources :teams, controller: 'user_teams' do
+    patch 'set_restrictions', to: 'user_teams#set_restrictions'
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

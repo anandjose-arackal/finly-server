@@ -13,8 +13,8 @@ admin:
       - Organization Account: '#organization_account/params={"view":"admin"}'
       - Company Statements: '#company_statements/params={"view": "admin"}'
       - Notify NEFT Transfer: '/transfers/register'
-      <% if current_company.feature_subscription.benefits_enabled and current_user.company_admin? %>
-      - Employee Benefits: '/cards'
+      <% if current_company.feature_subscription.cards_enabled and current_user.company_admin? %>
+      - Employee Cards: '/disburse'
       <% end %>
       # - Policies: '/policies'
       - My Account: '#settings'

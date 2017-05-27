@@ -12,7 +12,7 @@
 
 class ExpenseTypes::ExPerDiem::Update < ExpenseTypes::ExPerDiem::Base
 
-  attr_accessor :parent_object, :per_diem
+  attr_accessor :policy, :per_diem
 
   def authorized_user_types
     [:company_admin, :policy_admin]
@@ -25,16 +25,9 @@ class ExpenseTypes::ExPerDiem::Update < ExpenseTypes::ExPerDiem::Base
   end
 
   def init
-    case params[:parent_type]
-      when 'company'
-        self.per_diem = user.company.per_diems.find_from_id(params[:id])
-      when 'policy'
-        company = user.company
-        policy = company.policies.find_from_id(params[:parent_id])
-        self.per_diem = policy.per_diems.find_from_id(params[:id])
-      else
-        # do nothing
-    end
+    policies = Policy::Index.(user, {view: 'admin'}).policies rescue []
+    self.policy = policies.find_by(id: params[:policy_id])
+    self.per_diem = policy.per_diems.find_from_id(params[:id])
   end
 
   def validate
