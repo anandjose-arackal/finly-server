@@ -20,6 +20,7 @@
 #  updated_at           :datetime         not null
 #  link                 :text(65535)
 #  view_role_id         :integer
+#  message              :text(65535)
 #
 
 class Notification < ActiveRecord::Base
