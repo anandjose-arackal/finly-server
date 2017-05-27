@@ -19,6 +19,10 @@ if @result.expense.report_id.present?
   json.currency_conversion_rate @result.conversion_rate
 end
 
+if @result.expense.card_expense?
+  json.original_merchant_name @result.expense.card_expense.card_transaction.merchant_name
+end
+
 # flag to show whether a particular expense has been converted or not
 json.converted @result.converted
 
