@@ -199,3 +199,8 @@ json.groups do
     end
   end
 end
+
+json.auto_reload_config do
+  json.enabled @result.user.auto_reload_config.enabled
+  json.minimum_balance_value @result.user.auto_reload_config.minimum_balance_value
+end
