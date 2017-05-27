@@ -49,6 +49,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -91,6 +92,8 @@ class User < ActiveRecord::Base
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable, dependent: :destroy
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
+  has_one :auto_reload_config, as: :reloadable, dependent: :destroy
+
   has_many :cards, dependent: :destroy
   has_many :card_transactions, dependent: :destroy
   has_many :money_requests
@@ -320,6 +323,7 @@ class User < ActiveRecord::Base
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
     self.build_enforce_policy(enabled: false).save
+    self.build_auto_reload_config(enabled: false)
   end
 
   def payments

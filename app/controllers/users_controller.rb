@@ -177,6 +177,9 @@ class UsersController < ApplicationController
       when 'enforce_policy'
         operation = User::Configuration::EnforcePolicy::Update.new(current_user, params)
         success_message = 'Configuration Updated'
+      when 'auto_reload'
+        operation = User::Configuration::AutoReload::Update.new(current_user, params)
+        success_message = 'Auto reload configuration uploaded'
       when 'groups'
         operation = User::Group::Set.new(current_user, params)
         success_message = 'User Group Configuration Updated'
