@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170522100606) do
+ActiveRecord::Schema.define(version: 20170528171430) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1147,6 +1147,21 @@ ActiveRecord::Schema.define(version: 20170522100606) do
   end
 
   add_index "itz_cash_properties", ["company_id"], name: "index_itz_cash_properties_on_company_id", using: :btree
+
+  create_table "locations", force: :cascade do |t|
+    t.integer  "locatable_id",   limit: 4
+    t.string   "locatable_type", limit: 255
+    t.decimal  "latitude",                     precision: 20, scale: 10
+    t.decimal  "longitude",                    precision: 20, scale: 10
+    t.string   "name",           limit: 255
+    t.text     "address",        limit: 65535
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.integer  "order",          limit: 4
+  end
+
+  add_index "locations", ["locatable_id"], name: "index_locations_on_locatable_id", using: :btree
+  add_index "locations", ["locatable_type"], name: "index_locations_on_locatable_type", using: :btree
 
   create_table "manual_expenses", force: :cascade do |t|
     t.integer  "expense_id", limit: 4

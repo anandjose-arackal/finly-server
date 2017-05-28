@@ -14,14 +14,15 @@ class DistanceExpense < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :expense
-  has_many :custom_fields, as: :parent, dependent: :destroy
-  accepts_nested_attributes_for :custom_fields
-
   belongs_to :distance
+  has_many :custom_fields, as: :parent, dependent: :destroy
+  has_many :locations, as: :locatable, dependent: :destroy
+
+  accepts_nested_attributes_for :custom_fields
+  accepts_nested_attributes_for :locations
+  accepts_nested_attributes_for :distance
 
   validates :distance, presence: true
-
-  accepts_nested_attributes_for :distance
 
   delegate :distance_value, to: :distance
 end

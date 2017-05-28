@@ -27,6 +27,9 @@ json.receipts expense.receipts.each do |receipt|
   json.normal receipt.image(:normal)
   json.thumb receipt.image(:thumb)
 end
+if expense.distance_expense?
+  json.locations expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order
+end
 json.custom_fields do
   case expense.expense_type_id
     when ExpenseType.id_for(:manual)

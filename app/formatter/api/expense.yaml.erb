@@ -16,6 +16,16 @@ expense:
     distance_attributes:
       value: <%= params[:distance] %>
       physical_unit_id: <%= PhysicalUnit.kilometre_id %>
+    <% if params[:locations].present? %>
+    locations_attributes:
+      <% params[:locations].each do |location| %>
+      - latitude: <%= location[:latitude] %>
+        longitude: <%= location[:longitude] %>
+        name: <%= location[:name] %>
+        address: <%= location[:address] %>
+        order: <%= location[:order] %>
+      <% end %>
+    <% end %>
   <% elsif type == '4' or type == 4 %>
   time_expense_attributes:
     time_object_attributes:

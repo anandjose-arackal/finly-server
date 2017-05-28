@@ -40,6 +40,16 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     define_editable_attributes if expense
     # setting up the expense params for updation
     self.updated_expense_params = distance_expense_params
+
+    # todo set ids for locations using order
+    # if expense&.locations.count > 0
+    #   self.updated_expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes).each do |location|
+    #     order = location[:order]
+    #     id = expense.locations.with_order(order)&.first&.id
+    #     location[:id] = id if id.present?
+    #   end
+    # end
+
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
       # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
       # todo - check if the api fails because of this
@@ -162,7 +172,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
                            distance_value: expense.distance_value,
                            category_name: expense.category_name,
                            receipt: expense.receipts.count
-                          }
+    }
   end
 
 end
