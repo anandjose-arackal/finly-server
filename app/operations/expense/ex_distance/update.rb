@@ -16,7 +16,7 @@
 
 class Expense::ExDistance::Update < Expense::ExDistance::Base
 
-  attr_accessor :updated_expense_params
+  attr_accessor :updated_expense_params, :locations_marked_for_destruction
   attr_accessor :editable_attrs, :receipt, :old_receipt
 
   def pre_validate
@@ -42,13 +42,15 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     self.updated_expense_params = distance_expense_params
 
     # todo set ids for locations using order
-    # if expense&.locations.count > 0
-    #   self.updated_expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes).each do |location|
-    #     order = location[:order]
-    #     id = expense.locations.with_order(order)&.first&.id
-    #     location[:id] = id if id.present?
-    #   end
-    # end
+    # self.locations_marked_for_destruction = expense&.locations.pluck(:id)
+    if expense&.locations.count > 0
+      self.updated_expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes).each do |location|
+        order = location[:order]
+        id = expense.locations.with_order(order)&.first&.id
+        # self.locations_marked_for_destruction.delete(id)
+        location[:id] = id if id.present?
+      end
+    end
 
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
       # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
