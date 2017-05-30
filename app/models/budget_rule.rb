@@ -17,6 +17,7 @@
 
 
 
+
 class BudgetRule < ActiveRecord::Base
   belongs_to :category
   belongs_to :amount, dependent: :destroy
@@ -44,6 +45,30 @@ class BudgetRule < ActiveRecord::Base
 
   def include_reimbursable_expenses?
     self.include_reimbursable
+  end
+
+  def rule_in_words
+    rule_in_words = "Total Expenses"
+    if self.period_id
+      case self.period_id
+        when 1
+          period = "day"
+        when 2
+          period = "week"
+        when 3
+          period = "month"
+        when 4
+          period = "year"
+      end
+      rule_in_words += " per " + period
+    end
+    if self.category_id
+      rule_in_words += " belonging to category " + self.category_name
+    end
+    if self.amount_id
+      rule_in_words += " should not exceed #{self.amount.currency.symbol}#{self.amount_value.to_s} #{self.amount.currency.country_code}"
+    end
+    rule_in_words
   end
 
   private

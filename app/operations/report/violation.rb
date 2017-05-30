@@ -138,6 +138,17 @@ class Report::Violation < Report::Base
         if expense.note && !expense.note.blank?
           message = false # i.e. the rule is not broken because there is a note
         end
+      when 4 #Receipt hard copy required
+        hard_copy = true
+        expense.receipts.each do |r|
+          unless r.hard_copy_received
+            hard_copy = false
+          end
+        end
+
+        if hard_copy
+          message = false
+        end
       else
         # do nothing
     end
@@ -147,6 +158,7 @@ class Report::Violation < Report::Base
     end
     warning += ' require a receipt' if rule.expense_rule_type_id == 1
     warning += ' require a note' if rule.expense_rule_type_id == 2
+    warning += ' require receipt hard copy submission' if rule.expense_rule_type_id = 4
     warning += ' are not allowed' if rule.expense_rule_type_id == 3
     rule_name = nil
     # initializing the rule name
@@ -157,6 +169,8 @@ class Report::Violation < Report::Base
         rule_name = 'note'
       when 3
         rule_name = 'disallow'
+      when 4
+        rule_name = 'receipt_hard_copy'
       else
         # do nothing
     end

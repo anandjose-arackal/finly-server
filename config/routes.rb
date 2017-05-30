@@ -1,6 +1,7 @@
 # == Route Map
 #
 #                                  Prefix Verb   URI Pattern                                                 Controller#Action
+#                               crono_web        /crono                                                      Crono::Web
 # transcriber_transcribed_expenses_create POST   /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
 # transcriber_transcribed_expenses_update PATCH  /transcriber/expenses/:id/update(.:format)                  transcriber/receipts#update_expense
 #    transcriber_transcribed_receipt_show GET    /transcriber/expenses/:id/show(.:format)                    transcriber/receipts#show
@@ -282,6 +283,7 @@
 #                     report_take_control PATCH  /reports/:report_id/take_control(.:format)                  reports#take_control
 #                     report_add_expenses POST   /reports/:report_id/add_expenses(.:format)                  reports#add_expenses
 #                  report_remove_expenses DELETE /reports/:report_id/remove_expenses(.:format)               reports#remove_expenses
+#          report_toggle_receipt_hardcopy POST   /reports/:report_id/toggle_receipt_hardcopy(.:format)       reports#toggle_receipt_hardcopy
 #                                         GET    /reports(.:format)                                          reports#index
 #                                         POST   /reports(.:format)                                          reports#create
 #                              new_report GET    /reports/new(.:format)                                      reports#new
@@ -551,8 +553,27 @@
 #                                         POST   /bank_transfer/reimbursements(.:format)                     bank_transfer/reimbursement#create
 #                          disburse_users POST   /disburse/users(.:format)                                   disburse/users#create
 #                     features_subscribed GET    /features_subscribed(.:format)                              expense_types_configuration#features_subscribed
+#                                  groups GET    /groups(.:format)                                           user_groups#index
+#                                         POST   /groups(.:format)                                           user_groups#create
+#                                   group PATCH  /groups/:id(.:format)                                       user_groups#update
+#                                         PUT    /groups/:id(.:format)                                       user_groups#update
+#                                         DELETE /groups/:id(.:format)                                       user_groups#destroy
+#                                   teams GET    /teams(.:format)                                            user_teams#index
+#                                         POST   /teams(.:format)                                            user_teams#create
+#                                    team GET    /teams/:id(.:format)                                        user_teams#show
+#                                         PATCH  /teams/:id(.:format)                                        user_teams#update
+#                                         PUT    /teams/:id(.:format)                                        user_teams#update
+#                                         DELETE /teams/:id(.:format)                                        user_teams#destroy
+#                   team_set_restrictions PATCH  /teams/:team_id/set_restrictions(.:format)                  user_teams#set_restrictions
+#                                         GET    /teams(.:format)                                            user_teams#index
+#                                         POST   /teams(.:format)                                            user_teams#create
+#                                new_team GET    /teams/new(.:format)                                        user_teams#new
+#                               edit_team GET    /teams/:id/edit(.:format)                                   user_teams#edit
+#                                         GET    /teams/:id(.:format)                                        user_teams#show
+#                                         PATCH  /teams/:id(.:format)                                        user_teams#update
+#                                         PUT    /teams/:id(.:format)                                        user_teams#update
+#                                         DELETE /teams/:id(.:format)                                        user_teams#destroy
 #
-
 
 Rails.application.routes.draw do
 
@@ -735,6 +756,7 @@ Rails.application.routes.draw do
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
+    post 'toggle_receipt_hardcopy' => 'reports#toggle_receipt_hardcopy', as: :toggle_receipt_hardcopy
   end
 
   resources :money_request, only: [:create, :index, :show, :destroy, :update]

@@ -20,5 +20,10 @@ class Admin::Companies::Base < Admin::Base
     def init
       self.company = params[:company]
     end
+
+    def company_balance
+      op = Company::VirtualAccount::Balance.(user, {company: company})
+      op.balance
+    end
   end
 end

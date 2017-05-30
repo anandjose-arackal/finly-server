@@ -174,6 +174,10 @@ class ReportComment < ActiveRecord::Base
         # deducing cash in hand for reimbursement
         payment_id = payment.id rescue nil
         comment = "#{name} has deducted your cash on hand against reimbursement for this report with Payment ID: #{payment_id}"
+      when ReportCommentAction.id_for(:hard_copy_receipt_submitted)
+        comment = "#{name} submitted hard copy for a receipt."
+      when ReportCommentAction.id_for(:hard_copy_receipt_not_submitted)
+        comment = "#{name} marked hard copy not submitted for a receipt."
       else
         # do nothing
     end

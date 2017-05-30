@@ -80,6 +80,8 @@ end
 
 json.receipts @result.expenses do |expense|
   unless expense.receipts.blank? or expense.receipts.first.image.url == '/assets/original/missing.png'
+    json.id expense.receipts.first.id
+    json.hard_copy_received expense.receipts.first.hard_copy_received
     json.image do
       json.file_type expense.receipts.first.file_format
       json.original expense.receipts.first.image.url

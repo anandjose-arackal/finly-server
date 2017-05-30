@@ -14,6 +14,7 @@
 #
 
 
+
 class ExpenseRule < ActiveRecord::Base
   belongs_to :greater_than_amount, class_name: "Amount", dependent: :destroy
   belongs_to :category
@@ -41,6 +42,30 @@ class ExpenseRule < ActiveRecord::Base
 
   has_paper_trail
 
+  def rule_in_words
+    rule_in_words = "Expenses"
+    if self.category_id
+      rule_in_words += " belonging to category " + self.category_name
+    end
+    if self.days_after
+      rule_in_words += " submitted after " + self.days_after.to_s + " days"
+    end
+    if self.greater_than_amount_id and self.greater_than_amount_value > 0
+      rule_in_words += " with amount greater than #{self.greater_than_amount.currency.symbol}#{self.amount_value.to_s} #{self.greater_than_amount.currency.country_code}"
+    end
+    case self.expense_rule_type_id
+      when 1
+        rule_in_words += " require a receipt."
+      when 2
+        rule_in_words += " require a note."
+      when 3
+        rule_in_words += " are not allowed"
+      when 4
+        rule_in_words += " require receipt hard copy submission."
+    end
+    rule_in_words
+  end
+
   private
   def update_parent_version
     self.policy.update_attribute(:updated_at, DateTime.now)
@@ -56,5 +81,6 @@ class ExpenseRule < ActiveRecord::Base
     end
 
   end
+
 
 end

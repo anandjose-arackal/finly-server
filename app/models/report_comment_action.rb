@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-
+  
 
 
 
@@ -18,7 +18,12 @@ class ReportCommentAction < ActiveRecord::Base
              report_reject: 7, report_unapprove: 8, report_take_control: 9, report_update: 10, report_settled: 11,
              report_settlement_confirmed: 12, report_closed: 13, report_attach_receipt: 14,
              report_detach_receipt: 15, expense_add: 16, expense_remove: 17, expense_reject: 18, expense_update: 19,
-             expense_attach_receipt: 20, expense_detach_receipt: 21, expense_update_receipt: 22, cash_in_hand_deduction_against_reimbursement: 23}
+             expense_attach_receipt: 20, expense_detach_receipt: 21, expense_update_receipt: 22, cash_in_hand_deduction_against_reimbursement: 23,
+             hard_copy_receipt_submitted: 24,
+             hard_copy_receipt_not_submitted: 25
+           }
+
+  scope :with_name, -> (name) {where name: name}
 
   self.class.instance_eval do
     ACTIONS.each do |key, value|
@@ -32,4 +37,12 @@ class ReportCommentAction < ActiveRecord::Base
     ACTIONS[action]
   end
 
+  def self.seed_data
+    count = ReportCommentAction.count
+    ACTIONS.each do |key, value|
+      if count == 0 or ReportCommentAction.with_name(key).blank?
+        ReportCommentAction.create id: value, name: key
+      end
+    end
+  end
 end
