@@ -44,11 +44,15 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     # todo set ids for locations using order
     self.locations_marked_for_destruction = expense&.distance_expense&.locations.pluck(:id)
     if expense&.distance_expense&.locations.count > 0
-      self.updated_expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes).each do |location|
-        order = location[:order]
-        id = expense&.distance_expense&.locations.having_order(order)&.id
-        self.locations_marked_for_destruction.delete(id)
-        location[:id] = id if id.present?
+      pos = 1
+      self.updated_expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes)&.each do |location|
+        id = expense&.distance_expense&.locations.with_order(pos)&.first&.id
+        if id.present?
+          self.locations_marked_for_destruction.delete(id)
+          location[:id] = id
+        end
+        location[:order] = pos
+        pos += 1
       end
     end
 

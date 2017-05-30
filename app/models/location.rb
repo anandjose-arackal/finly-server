@@ -22,6 +22,6 @@ class Location < ActiveRecord::Base
   validates :order, presence: true
 
   scope :with_id, -> (id) { where id: id }
-  scope :having_order, -> (order){ find_by order: order }
+  scope :with_order, -> (order){ where order: order }
 
 end
