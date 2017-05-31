@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170530081504) do
+ActiveRecord::Schema.define(version: 20170531124225) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -291,6 +291,29 @@ ActiveRecord::Schema.define(version: 20170530081504) do
   add_index "auto_submit_configs", ["default_policy_id"], name: "index_auto_submit_configs_on_default_policy_id", using: :btree
   add_index "auto_submit_configs", ["period_id"], name: "index_auto_submit_configs_on_period_id", using: :btree
   add_index "auto_submit_configs", ["submitable_type", "submitable_id"], name: "index_auto_submit_configs_on_submitable_type_and_submitable_id", using: :btree
+
+  create_table "auto_sync_config_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "auto_sync_configs", force: :cascade do |t|
+    t.integer  "company_id",               limit: 4
+    t.integer  "auto_sync_config_type_id", limit: 4
+    t.boolean  "categories_sync",                    default: false
+    t.boolean  "company_tags_sync",                  default: false
+    t.boolean  "external_users_sync",                default: false
+    t.boolean  "reports_sync",                       default: false
+    t.integer  "period_id",                limit: 4
+    t.boolean  "enabled",                            default: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+  end
+
+  add_index "auto_sync_configs", ["auto_sync_config_type_id"], name: "index_auto_sync_configs_on_auto_sync_config_type_id", using: :btree
+  add_index "auto_sync_configs", ["company_id"], name: "index_auto_sync_configs_on_company_id", using: :btree
+  add_index "auto_sync_configs", ["period_id"], name: "index_auto_sync_configs_on_period_id", using: :btree
 
   create_table "balance_sheets", force: :cascade do |t|
     t.integer  "user_id",                   limit: 4
@@ -602,6 +625,7 @@ ActiveRecord::Schema.define(version: 20170530081504) do
     t.datetime "updated_at",                                                null: false
     t.boolean  "other_expense_types",                       default: false
     t.text     "encrypted_easy_login_params", limit: 65535
+    t.string   "registered_mobile_number",    limit: 255
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -2205,6 +2229,9 @@ ActiveRecord::Schema.define(version: 20170530081504) do
   add_foreign_key "amounts", "currencies"
   add_foreign_key "authentications", "users"
   add_foreign_key "auto_submit_configs", "periods"
+  add_foreign_key "auto_sync_configs", "auto_sync_config_types"
+  add_foreign_key "auto_sync_configs", "companies"
+  add_foreign_key "auto_sync_configs", "periods"
   add_foreign_key "balance_sheets", "users"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "categories"
