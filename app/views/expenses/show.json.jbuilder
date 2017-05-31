@@ -94,5 +94,5 @@ if @result.expense.card_expense? && @result.expense.cancelled?
 end
 
 if @result.expense.distance_expense?
-  json.locations expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
+  json.locations @result.expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
 end
