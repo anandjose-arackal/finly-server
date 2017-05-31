@@ -34,6 +34,13 @@ module Constants
 
   CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
 
+  # PayU Payment Gateway URL
+  if Rails.env.production?
+    PAYU_RELOAD_URL = "https://www.itzcash.com/finly/servlet/AccountReloadServlet"
+  else
+    PAYU_RELOAD_URL = "https://staging.itzcash.com/loconav/servlet/AccountReloadServlet"
+  end
+
   #########################
 
   if Rails.env.production?
