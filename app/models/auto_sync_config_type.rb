@@ -10,5 +10,10 @@
 
 class AutoSyncConfigType < ActiveRecord::Base
 
+  VALUES = { quickbooks: 1, tally: 2 }
+
+  def self.id_for(name)
+    VALUES[name]
+  end
 
 end

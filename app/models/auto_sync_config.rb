@@ -22,5 +22,6 @@ class AutoSyncConfig < ActiveRecord::Base
   belongs_to :period
 
 
-
+  validates :company, presence: true
+  validates :periods, presence: true
 end
