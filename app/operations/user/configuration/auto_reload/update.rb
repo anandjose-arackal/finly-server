@@ -22,7 +22,7 @@ class User::Configuration::AutoReload::Update < BaseOperation
   end
 
   def validate
-    if update_params[:minimum_balance_attributes][:value].to_f <= 0
+    if update_params[:minimum_balance_attributes][:value].to_f <= 0 && update_params[:enabled] == '1'
       add_message :error, "Minimum balance cannot be less than or equal to 0"
       return
     end

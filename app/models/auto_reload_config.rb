@@ -18,7 +18,7 @@ class AutoReloadConfig < ActiveRecord::Base
 
   accepts_nested_attributes_for :minimum_balance
 
-  validate :minimum_balance_presence
+  # validate :minimum_balance_presence
 
   def minimum_balance_value
     if self.minimum_balance
