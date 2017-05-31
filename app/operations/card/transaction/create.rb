@@ -140,6 +140,14 @@ class Card::Transaction::Create < BaseOperation
     params = self.params
     params[:transaction] = self.transaction
     Event::ECard::ETransaction::Create.(self.user, params)
+    # trigger auto reload of the card to match the amount in the config
+    if type == 'DEBIT' && %w(POS ATM ECOM).include?(mode)
+      # check if auto reload needs to be performed for this particular card
+      card_balance_value = ItzCash::AccountDetails.(user, {card_id: card.id}).balance rescue 0
+      if user.auto_reload_config.minimum_balance_value > card_balance_value
+        User::Wallet::AutoReload::Reload.call_async(user.id, {card_id: card.id})
+      end
+    end
   end
 
   def success

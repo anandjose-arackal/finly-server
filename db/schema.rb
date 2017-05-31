@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170522100606) do
+ActiveRecord::Schema.define(version: 20170526134736) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -238,6 +238,17 @@ ActiveRecord::Schema.define(version: 20170522100606) do
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
+
+  create_table "auto_reload_configs", force: :cascade do |t|
+    t.integer  "minimum_balance_id", limit: 4
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "enabled",                        default: false
+    t.integer  "reloadable_id",      limit: 4
+    t.string   "reloadable_type",    limit: 255
+  end
+
+  add_index "auto_reload_configs", ["reloadable_type", "reloadable_id"], name: "index_auto_reload_configs_on_reloadable_type_and_reloadable_id", using: :btree
 
   create_table "auto_submit_configs", force: :cascade do |t|
     t.boolean  "enabled",                              default: false, null: false
@@ -547,16 +558,17 @@ ActiveRecord::Schema.define(version: 20170522100606) do
   add_index "company_balance_histories", ["wallet_withdrawal_to_wallet_id"], name: "index_wal_2_wal_on_company_history", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
-    t.integer  "company_id",          limit: 4,                   null: false
-    t.integer  "contact_id",          limit: 4
-    t.boolean  "verified",                        default: false
-    t.string   "logo_file_name",      limit: 255
-    t.string   "logo_content_type",   limit: 255
-    t.integer  "logo_file_size",      limit: 4
+    t.integer  "company_id",                  limit: 4,                     null: false
+    t.integer  "contact_id",                  limit: 4
+    t.boolean  "verified",                                  default: false
+    t.string   "logo_file_name",              limit: 255
+    t.string   "logo_content_type",           limit: 255
+    t.integer  "logo_file_size",              limit: 4
     t.datetime "logo_updated_at"
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
-    t.boolean  "other_expense_types",             default: false
+    t.datetime "created_at",                                                null: false
+    t.datetime "updated_at",                                                null: false
+    t.boolean  "other_expense_types",                       default: false
+    t.text     "encrypted_easy_login_params", limit: 65535
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -1334,6 +1346,7 @@ ActiveRecord::Schema.define(version: 20170522100606) do
     t.datetime "updated_at",                                         null: false
     t.text     "link",                 limit: 65535
     t.integer  "view_role_id",         limit: 4
+    t.text     "message",              limit: 65535
   end
 
   add_index "notifications", ["action_type_id"], name: "index_notifications_on_action_type_id", using: :btree
