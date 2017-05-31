@@ -158,7 +158,7 @@ class Report::Violation < Report::Base
     end
     warning += ' require a receipt' if rule.expense_rule_type_id == 1
     warning += ' require a note' if rule.expense_rule_type_id == 2
-    warning += ' require receipt hard copy submission' if rule.expense_rule_type_id = 4
+    warning += ' require receipt hard copy submission' if rule.expense_rule_type_id == 4
     warning += ' are not allowed' if rule.expense_rule_type_id == 3
     rule_name = nil
     # initializing the rule name
