@@ -249,7 +249,7 @@ end
 
 if User.count == 0
   a = User.create(company: Company.first, first_name: "Demo", last_name: "Admin", email: "admin@demo.com",
-                  password: "demo123", password_confirmation: "demo123", company_id: c.id, mobile_number: random_mobile_number,
+                  password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                   mothers_maiden_name: Faker::Name.first_name,
                   role_mapping_attributes: [{user_role_id: UserRole.admin_id},
                                             {user_role_id: UserRole.employee_id}],
@@ -259,7 +259,7 @@ if User.count == 0
   fm = []
   3.times do |pos|
     fm << User.create(company: Company.first, first_name: "Demo", last_name: "FinanceManager#{pos}", email: "finance#{pos}@demo.com",
-                      password: "demo123", password_confirmation: "demo123", company_id: c.id, mobile_number: random_mobile_number,
+                      password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                       mothers_maiden_name: Faker::Name.first_name,
                       role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
                                                 {user_role_id: UserRole.employee_id}],
@@ -270,7 +270,7 @@ if User.count == 0
   m = []
   3.times do |pos|
     m << User.create(company: Company.first, first_name: "Demo", last_name: "Manager#{pos}", email: "manager#{pos}@demo.com",
-                     password: "demo123", password_confirmation: "demo123", company_id: c.id, mobile_number: random_mobile_number,
+                     password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                      mothers_maiden_name: Faker::Name.first_name,
                      role_mapping_attributes: [{user_role_id: 3},
                                                {user_role_id: UserRole.employee_id}],
@@ -282,14 +282,14 @@ if User.count == 0
   ## User's for iOS testing
   v = []
   v << User.create(company: Company.first, first_name: "Demo", last_name: "Manager", email: "manager4@demo.com",
-                   password: "demo123", password_confirmation: "demo123", company_id: c.id, mobile_number: random_mobile_number,
+                   password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
                    role_mapping_attributes: [{user_role_id: UserRole.manager_id}, {user_role_id: UserRole.employee_id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
 
   v << User.create(company: Company.first, first_name: "Demo", last_name: "Finance", email: "finance4@demo.com",
-                   password: "demo123", password_confirmation: "demo123", company_id: c.id, mobile_number: random_mobile_number,
+                   password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
                    role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
@@ -301,7 +301,7 @@ if User.count == 0
 
   # creating user0
   u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "employee0@demo.com",
-                   password: "demo123", password_confirmation: "demo123", company_id: c.id, mobile_number: random_mobile_number,
+                   password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
                    role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
                    team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0], policy_id: Company.first.policies.default.first.id}],
@@ -310,7 +310,7 @@ if User.count == 0
 
   2.times do |pos|
     u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@demo.com",
-                     password: "demo123", password_confirmation: "demo123", company_id: c.id, mobile_number: random_mobile_number,
+                     password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                      mothers_maiden_name: Faker::Name.first_name,
                      role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0], policy_id: Company.first.policies.default.first.id}],
@@ -321,7 +321,7 @@ if User.count == 0
   ############################################################################################################################################
   
   User.create(company: Company.first, first_name: "Demo", last_name: "King", email: "king@demo.com",
-              password: "demo123", password_confirmation: "demo123", company_id: c.id, mobile_number: random_mobile_number,
+              password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
               mothers_maiden_name: Faker::Name.first_name,
               role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
                                         {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
@@ -624,10 +624,10 @@ end
 
 if AdminUser.count == 0
   # creating admin panel users who can access admin panel
-  AdminUser.create!(email: 'admin@Demo.io', password: 'demo123', password_confirmation: 'demo123')
-  AdminUser.create!(email: 'sreeram@Demo.io', password: 'demo123', password_confirmation: 'demo123')
-  AdminUser.create!(email: 'vivek@Demo.io', password: 'demo123', password_confirmation: 'demo123')
-  AdminUser.create!(email: 'veekshith@Demo.io', password: 'demo123', password_confirmation: 'demo123')
+  AdminUser.create!(email: 'admin@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
+  AdminUser.create!(email: 'sreeram@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
+  AdminUser.create!(email: 'vivek@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
+  AdminUser.create!(email: 'veekshith@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
 end
 
 if CardTransaction.filter_refunds(1).count == 0
