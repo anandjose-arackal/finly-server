@@ -194,7 +194,7 @@ class UsersController < ApplicationController
     if @result&.success?
       respond(response: :success, message: success_message)
     else
-      response response: :failure, message: (@result&.messages[:error] || 'Error while updating data')
+      respond(response: :failure, message: (@result&.messages[:error] || 'Error while updating data'))
     end
   end
 end
