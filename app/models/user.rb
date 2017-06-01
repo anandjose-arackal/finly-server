@@ -139,8 +139,13 @@ class User < ActiveRecord::Base
   validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
+  validates :external_id, uniqueness: { scope: :external_integration_type, message: "should be unique for an external integration type" }, if: lambda { |user| user.external_integration_type.present? }
 
-  # validate :valid_role
+  scope :quickbooks, -> { where(external_integration_type: FinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
+
+  def from_quickbooks?
+    external_integration_type == FinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]
+  end
 
   scope :with_id, ->(user_id) { where id: user_id }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
