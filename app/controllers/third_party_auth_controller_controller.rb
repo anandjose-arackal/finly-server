@@ -1,0 +1,2 @@
+class ThirdPartyAuthControllerController < ApplicationController
+end
