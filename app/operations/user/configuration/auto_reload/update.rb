@@ -31,6 +31,9 @@ class User::Configuration::AutoReload::Update < BaseOperation
   def pre_process
     # ensuring that the auto reload configuration is always in Rupees
     update_params[:minimum_balance_attributes][:currency_id] = "1"
+    if update_params[:enabled] == '0'
+      update_params.delete(:minimum_balance_attributes)
+    end
   end
 
   def process
