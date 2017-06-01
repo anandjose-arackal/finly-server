@@ -735,7 +735,10 @@ Rails.application.routes.draw do
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
+    # post 'bulk_approve' => 'reports#bulk_approve', as: :bulk_approve
   end
+  post 'reports/bulk_approve' => 'reports#bulk_approve', as: :reports_bulk_approve
+
 
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do
