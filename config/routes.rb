@@ -641,18 +641,19 @@ Rails.application.routes.draw do
 
   ######### API START ###########
   namespace :api do
-    namespace :v1 do
-      resources :users, only: [:create, :show, :index, :update]
-
-      resources :cards, only: [:show]
-      resources :cards do
-        get 'transactions', to: 'cards#transactions'
-        patch 'assign', to: 'cards#assign'
-        patch 'fund', to: 'cards#update_funds'
-        patch 'status', to: 'cards#update_status'
-        patch 'restrictions', to: 'cards#restrictions'
+    namespace :cards do
+      namespace :v1 do
+        resources :users, only: [:create, :show, :index, :update]
+        resources :cards, only: [:show]
+        resources :cards do
+          get 'transactions', to: 'cards#transactions'
+          patch 'assign', to: 'cards#assign'
+          patch 'fund', to: 'cards#update_funds'
+          patch 'status', to: 'cards#update_status'
+          patch 'restrictions', to: 'cards#restrictions'
+        end
+        post 'cards/request', to: 'cards#request'
       end
-      post 'cards/request', to: 'cards#request'
     end
   end
   ######### API END ###########

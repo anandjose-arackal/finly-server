@@ -1,4 +1,4 @@
-class Api::V1::UsersController < ApplicationController
+class Api::Cards::V1::UsersController < ApplicationController
 
   allow_oauth!
   before_action :authenticate_user!

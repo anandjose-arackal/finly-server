@@ -1,4 +1,4 @@
-class Api::V1::CardsController < ApplicationController
+class Api::Cards::V1::CardsController < ApplicationController
 
   def show
 
