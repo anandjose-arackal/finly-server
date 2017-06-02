@@ -1,4 +1,10 @@
 class RequestFormatter::Base < BaseOperation
+  attr_accessor :formatted_request
+
+  def success
+    params[:formatted_request] = self.formatted_request
+    RequestFormatter::Base::SuccessPresenter.new(user, params, messages)
+  end
 
   def format_file(dir_path, file_path, user, params)
     return nil if params.blank? or file_path.blank?
@@ -9,6 +15,16 @@ class RequestFormatter::Base < BaseOperation
     Formatter.remove_blanks map
     Formatter.symbolize_hash_keys map
     map
+  end
+
+  class RequestFormatter::Base::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :formatted_request
+
+    def init
+      return if self.params.blank?
+      self.formatted_request = self.params[:formatted_request]
+    end
+
   end
 
 end

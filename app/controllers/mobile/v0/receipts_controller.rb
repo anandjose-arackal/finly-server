@@ -6,8 +6,8 @@ class Api::V0::ReceiptsController < Api::V0::BaseApiController
   before_action :authenticate_user!
 
   def create
-    RequestFormatter::Receipts::Parse(current_user, params)
-    @result = Receipt::Create.(current_user, params)
+    formatted_params = RequestFormatter::Receipts::Parse(current_user, params)&.formatted_request
+    @result = Receipt::Create.(current_user, formatted_params)
     @result.config[:mobile_api] = true
     if @result.success?
       render 'mobile/v0/shared/success'

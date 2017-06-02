@@ -1,11 +1,5 @@
 class RequestFormatter::Receipts::Parse < RequestFormatter::Base
 
-  def validate
-    if params.blank?
-      add_message :error, 'Receipt not found'
-    end
-  end
-
   def process
     if params[:receipt].present? and not params[:receipt] == 'nil'
       image = extract_receipt_image(params)
@@ -13,6 +7,7 @@ class RequestFormatter::Receipts::Parse < RequestFormatter::Base
       params[:receipt][:image] = image
       params[:receipt][:user_id] = user.id
     end
+    self.formatted_request = params
   end
 
   def extract_receipt_image(params)
