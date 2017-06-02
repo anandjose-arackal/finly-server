@@ -4,7 +4,8 @@ class Api::Cards::V1::UsersController < ApplicationController
   before_action :authenticate_user!
 
   def create
-
+    @result = Users::Create.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def index
