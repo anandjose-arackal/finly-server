@@ -4,8 +4,8 @@ class Api::Cards::V1::UsersController < ApplicationController
   before_action :authenticate_user!
 
   def create
-    formatted_params = RequestFormatter::Api::Cards::V1::Users::Create.(user, params).formatted_request
-    @result = Users::Create.(current_user, formatted_params)
+    formatted_params = RequestFormatter::Api::Cards::V1::Users::Create.(current_user, params).formatted_request
+    @result = User::Create.(current_user, formatted_params)
     respond response: (@result&.success? ? :success : :failure)
   end
 
@@ -20,7 +20,33 @@ class Api::Cards::V1::UsersController < ApplicationController
   end
 
   def update
-
+    unless params[:type]
+      respond(response: :failure, message: 'Error while updating status. Type not found')
+      return
+    end
+    operation = nil
+    success_message = nil
+    case params[:type]
+      when 'role'
+        formatted_params = RequestFormatter::Api::Cards::V1::Users::UpdateRole.(current_user, params).formatted_request
+        operation = User::Role::Set.new(current_user, formatted_params)
+        success_message = 'Role updated'
+      when 'state', 'status'
+        operation = User::Configuration::UpdateState.new(current_user, params)
+        success_message = 'Status updated'
+      else
+        # do nothing, ha!
+    end
+    unless operation.present?
+      respond(response: :failure, message: 'Error while updating status. Invalid type')
+      return
+    end
+    @result = operation.run
+    if @result&.success?
+      respond(response: :success, message: success_message)
+    else
+      response response: :failure, message: (@result&.messages[:error] || 'Error while updating data')
+    end
   end
 
 end

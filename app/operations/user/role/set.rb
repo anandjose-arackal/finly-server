@@ -28,11 +28,11 @@ class User::Role::Set < BaseOperation
     if new_role_ids.blank? and params[:user_roles].present?
       new_role_ids = []
       new_role_ids << UserRole.admin_id if params[:user_roles][:admin].present? and
-          params[:user_roles][:admin].to_s == '1'
+          ['1', 'true'].include?(params[:user_roles][:admin].to_s)
       new_role_ids << UserRole.manager_id if params[:user_roles][:manager].present? and
-          params[:user_roles][:manager].to_s == '1'
+          ['1', 'true'].include?(params[:user_roles][:manager].to_s)
       new_role_ids << UserRole.finance_manager_id if params[:user_roles][:finance_manager].present? and
-          params[:user_roles][:finance_manager].to_s == '1'
+          ['1', 'true'].include?(params[:user_roles][:finance_manager].to_s)
     end
     new_role_ids = [new_role_ids] unless new_role_ids.is_a?(Array)
     # To ensure all users have a personal view

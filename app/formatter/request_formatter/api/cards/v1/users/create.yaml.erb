@@ -1,7 +1,8 @@
+company_id: <%= user.company_id %>
 user:
   email: <%= params[:email] %>
   password: <%= Constants::DEFAULT_PASSWORD %>
-  password_confirmation:<%= Constants::DEFAULT_PASSWORD %>
+  password_confirmation: <%= Constants::DEFAULT_PASSWORD %>
   mobile_number: <%= params[:mobile_number] %>
   first_name: <%= params[:first_name] %>
   last_name: <%= params[:last_name] %>

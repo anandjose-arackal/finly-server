@@ -1,0 +1,11 @@
+user_roles:
+<% if params[:admin] %>
+  - <%= UserRole.id_for(:admin) %>
+<% end %>
+<% if params[:finance_manager] %>
+  - <%= UserRole.id_for(:finance_manager) %>
+<% end %>
+<% if params[:manager] %>
+  - <%= UserRole.id_for(:manager) %>
+<% end %>
+  - <%= UserRole.id_for(:employee) %>
