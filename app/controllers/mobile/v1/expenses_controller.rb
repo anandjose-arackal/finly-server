@@ -6,7 +6,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   before_action :authenticate_user!
 
   def create
-    param = RequestFormatter.api_expense(current_user, params)
+    param = RequestFormatter::Api::Mobile::V1::Expenses::Parse.(current_user, params)
 
     case params[:type]
       when '1', 1
@@ -48,7 +48,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   end
 
   def update
-    param = RequestFormatter.api_expense(current_user, params)
+    param = RequestFormatter::Api::Mobile::V1::Expenses::Parse.(current_user, params)
     case params[:type]
       when '1', 1
         @result = Expense::Manual::Update.(current_user, param)
