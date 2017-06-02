@@ -2,7 +2,7 @@ class Api::V1::BaseApiController < ApplicationController
   rescue_from NotAuthorizedException, with: :un_authorized
 
   def un_authorized
-    render 'api/v1/shared/failure'
+    render 'mobile/v1/shared/failure'
   end
 
   protected
@@ -10,13 +10,13 @@ class Api::V1::BaseApiController < ApplicationController
     if opts.present?
       if opts[:response] == :failure
         respond_to do |format|
-          format.json { render 'api/v1/shared/failure' }
+          format.json { render 'mobile/v1/shared/failure' }
         end
         return
       end
       if opts[:response] == :success
         respond_to do |format|
-          format.json { render 'api/v1/shared/success' }
+          format.json { render 'mobile/v1/shared/success' }
         end
         return
       end

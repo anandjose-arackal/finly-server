@@ -10,9 +10,9 @@ class Api::V0::ReceiptsController < Api::V0::BaseApiController
     @result = Receipt::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      render 'api/v0/shared/success'
+      render 'mobile/v0/shared/success'
     else
-      render 'api/v0/shared/failure'
+      render 'mobile/v0/shared/failure'
     end
   end
 
@@ -26,9 +26,9 @@ class Api::V0::ReceiptsController < Api::V0::BaseApiController
     @result = Receipt::Destroy.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      render 'api/v0/shared/success'
+      render 'mobile/v0/shared/success'
     else
-      render 'api/v0/shared/failure'
+      render 'mobile/v0/shared/failure'
     end
   end
 
@@ -36,9 +36,9 @@ class Api::V0::ReceiptsController < Api::V0::BaseApiController
     @result = Receipt::Update.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      render 'api/v0/shared/success'
+      render 'mobile/v0/shared/success'
     else
-      render 'api/v0/shared/failure'
+      render 'mobile/v0/shared/failure'
     end
   end
 

@@ -7,18 +7,18 @@ class Api::V0::Configuration::GcmController <  Api::V0::BaseApiController
   def create
     operation = Gcm::Register.new(current_user, params)
     if operation.run
-      render 'api/v0/shared/success'
+      render 'mobile/v0/shared/success'
     else
-      render 'api/v0/shared/failure'
+      render 'mobile/v0/shared/failure'
     end
   end
 
   def delete
     operation = Gcm::Unregister.new(current_user, params)
     if operation.run
-      render 'api/v0/shared/success'
+      render 'mobile/v0/shared/success'
     else
-      render 'api/v0/shared/failure'
+      render 'mobile/v0/shared/failure'
     end
   end
 

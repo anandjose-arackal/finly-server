@@ -14,7 +14,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     end
     respond
   end
@@ -30,7 +30,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Update.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     end
     respond
   end
@@ -46,12 +46,12 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result.config[:mobile_api] = true
     # if @result.success?
     #   flash.now[:success] = 'Report Deleted'
-    #   render 'api/v0/shared/success'
+    #   render 'mobile/v0/shared/success'
     # end
     if @result.success?
-      render 'api/v0/shared/success'
+      render 'mobile/v0/shared/success'
     else
-      render 'api/v0/shared/failure'
+      render 'mobile/v0/shared/failure'
     end
   end
 
@@ -59,7 +59,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Expenses::Add.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     else
       respond
     end
@@ -69,7 +69,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Expenses::Remove.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     else
       respond
     end
@@ -79,7 +79,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Expenses::Reject.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     else
       respond
     end
@@ -89,7 +89,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Submit.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     else
       respond
     end
@@ -99,7 +99,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Retract.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     else
       respond
     end
@@ -109,7 +109,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Approve.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     else
       respond
     end
@@ -119,7 +119,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Reject.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     else
       respond
     end
@@ -129,7 +129,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Unapprove.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     else
       respond
     end
@@ -139,7 +139,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Submit.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     else
       respond
     end
@@ -149,7 +149,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::SettlementConfirm.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     else
       respond
     end
@@ -162,7 +162,7 @@ class Api::V0::ReportsController < Api::V0::BaseApiController
     @result = Report::Comment::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/reports/show'
+      respond render: 'mobile/v0/reports/show'
     else
       respond
     end

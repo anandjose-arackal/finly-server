@@ -8,9 +8,9 @@ class Api::V1::Configuration::GcmController <  Api::V1::BaseApiController
     @result = Gcm::Register.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      render 'api/v1/shared/success'
+      render 'mobile/v1/shared/success'
     else
-      render 'api/v1/shared/failure'
+      render 'mobile/v1/shared/failure'
     end
   end
 
@@ -18,9 +18,9 @@ class Api::V1::Configuration::GcmController <  Api::V1::BaseApiController
     @result = Gcm::Unregister.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      render 'api/v1/shared/success'
+      render 'mobile/v1/shared/success'
     else
-      render 'api/v1/shared/failure'
+      render 'mobile/v1/shared/failure'
     end
   end
 

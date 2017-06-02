@@ -11,7 +11,7 @@ class Api::V1::MoneyRequestsController < Api::V1::BaseApiController
     @result = MoneyRequest::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v1/money_requests/show'
+      respond render: 'mobile/v1/money_requests/show'
     else
       respond response: :failure
     end
@@ -59,7 +59,7 @@ class Api::V1::MoneyRequestsController < Api::V1::BaseApiController
     end
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v1/money_requests/show'
+      respond render: 'mobile/v1/money_requests/show'
     else
       respond response: :failure
     end
@@ -78,7 +78,7 @@ class Api::V1::MoneyRequestsController < Api::V1::BaseApiController
     @result = MoneyRequest::Comment::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v1/money_requests/show'
+      respond render: 'mobile/v1/money_requests/show'
     else
       respond response: :failure
     end

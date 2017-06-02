@@ -12,9 +12,9 @@ class Api::V0::ExpensesController < Api::V0::BaseApiController
     if @result.success?
       if @result.expense.report_id.present?
         @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
-        respond render: 'api/v0/reports/show'
+        respond render: 'mobile/v0/reports/show'
       else
-        respond render: 'api/v0/expenses/show'
+        respond render: 'mobile/v0/expenses/show'
       end
     else
       respond
@@ -48,9 +48,9 @@ class Api::V0::ExpensesController < Api::V0::BaseApiController
     if @result.success?
       if @result.expense.reload.report_id.present?
         @result = Report::Show.(@result.user, report_id: @result.expense.report_id, view: params[:view])
-        respond render: 'api/v0/reports/show'
+        respond render: 'mobile/v0/reports/show'
       else
-        respond render: 'api/v0/expenses/show'
+        respond render: 'mobile/v0/expenses/show'
       end
     else
       respond
@@ -61,9 +61,9 @@ class Api::V0::ExpensesController < Api::V0::BaseApiController
     @result = Expense::Destroy.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v0/shared/success'
+      respond render: 'mobile/v0/shared/success'
     else
-      respond render: 'api/v0/shared/failure'
+      respond render: 'mobile/v0/shared/failure'
     end
   end
 

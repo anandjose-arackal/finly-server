@@ -13,7 +13,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     @result = Report::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v1/reports/show'
+      respond render: 'mobile/v1/reports/show'
     else
       respond response: :failure
     end
@@ -53,7 +53,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     if @result.present?
       @result.config[:mobile_api] = true
       if @result.success?
-        respond render: 'api/v1/reports/show'
+        respond render: 'mobile/v1/reports/show'
         return
       end
     end
@@ -83,7 +83,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
     @result = Report::Comment::Create.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
-      respond render: 'api/v1/reports/show'
+      respond render: 'mobile/v1/reports/show'
     else
       respond response: :failure
     end
