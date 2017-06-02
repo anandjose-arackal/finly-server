@@ -1,19 +1,27 @@
 user:
   email: <%= params[:email] %>
-  password:
-  password_confirmation:
-  mobile_number:
-  first_name:
-  last_name:
-  mothers_maiden_name:
+  password: <%= Constants::DEFAULT_PASSWORD %>
+  password_confirmation:<%= Constants::DEFAULT_PASSWORD %>
+  mobile_number: <%= params[:mobile_number] %>
+  first_name: <%= params[:first_name] %>
+  last_name: <%= params[:last_name] %>
+  mothers_maiden_name: <%= params[:mothers_maiden_name] %>
   profile_attributes:
-    date_of_birth:
-    gender:
-    address_1:
-    address_2:
-    city:
-    state_id:
-    pin_code:
+    date_of_birth: <%= params[:date_of_birth] %>
+    gender: <%= params[:gender] %>
+    address_1: <%= params[:address_1] %>
+    address_2: <%= params[:address_2] %>
+    city: <%= params[:city] %>
+    state_id: <%= params[:state_id] %>
+    pin_code: <%= params[:pin_code] %>
   role_mapping_attributes:
-    -
-    -
+  <% if params[:admin] %>
+    - <%= UserRole.id_for(:admin) %>
+  <% end %>
+  <% if params[:finance_manager] %>
+    - <%= UserRole.id_for(:finance_manager) %>
+  <% end %>
+  <% if params[:manager] %>
+    - <%= UserRole.id_for(:manager) %>
+  <% end %>
+    - <%= UserRole.id_for(:employee) %>

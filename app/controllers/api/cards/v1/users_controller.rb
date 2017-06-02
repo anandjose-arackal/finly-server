@@ -4,7 +4,8 @@ class Api::Cards::V1::UsersController < ApplicationController
   before_action :authenticate_user!
 
   def create
-    @result = Users::Create.(current_user, params)
+    formatted_params = RequestFormatter::Api::Cards::V1::Users::Create.(user, params).formatted_request
+    @result = Users::Create.(current_user, formatted_params)
     respond response: (@result&.success? ? :success : :failure)
   end
 
