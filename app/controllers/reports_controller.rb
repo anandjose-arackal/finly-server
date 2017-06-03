@@ -57,11 +57,13 @@ class ReportsController < ApplicationController
     @result = Report::BulkApprove.(current_user, params)
     # respond render: :show
     unless @result.success?
-      debugger
-      respond render: :bulk_approve_errors
+      respond_to do |format|
+        format.json {render :bulk_approve_errors }
+      end
+      # respond render: :bulk_approve_errors
       return
     end
-    respond response: :success
+    # respond response: :success
   end
 
   def reject

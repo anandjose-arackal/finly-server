@@ -4,7 +4,7 @@
 # auto_approve : optional - set to true if the report is to be auto-approved. i.e. if there is no reporting manager
 
 class Report::BulkApprove < BaseOperation
-  attr_accessor :auto_approve, :auto_submit, :multiple_reports, :valid, :confirm_approve
+  attr_accessor :auto_approve, :auto_submit, :multiple_reports, :valid, :confirm_approve, :approved_all
 
   def authorized_user_types
     return nil if params.present? and (params[:auto_approve] or params[:auto_submit] )
@@ -20,13 +20,19 @@ class Report::BulkApprove < BaseOperation
   def init
     self.multiple_reports = {}
     self.valid = true
+    self.approved_all = true
     # self.reports_errors = {}
-    report_ids = params[:report_ids].split(",")
+    report_ids_cs = params[:report_ids] || ""
+    report_ids = report_ids_cs.split(",")
     self.confirm_approve = params[:confirm_approve]
     report_ids.each_with_index do |report_id, index|
       self.multiple_reports[index] = {}
       self.multiple_reports[index][:report] = Report.find(report_id)
       self.multiple_reports[index][:errors] = []
+      self.multiple_reports[index][:notices] = []
+      self.multiple_reports[index][:violations] = {}
+      self.multiple_reports[index][:violations][:warning] = []
+      self.multiple_reports[index][:violations][:blocking] = []
 
     end
 
@@ -69,14 +75,40 @@ class Report::BulkApprove < BaseOperation
 
       violations = Report::Violation.(user, report: value[:report])
       violations_present = false
-      violations.each do |key, value|
-        if value['expense_blocking'].present? or value['budget_blocking'].present?
-          violations_present = true
-        end
+      warning_messages = []
+      blocking_messages = []
+      violations.each do |key, violation|
+        
+
+        warning_messages.concat violation[:expense_warning] if violation[:expense_warning].present?
+        warning_messages.concat violation[:budget_warning] if violation[:budget_warning].present?
+        warning_messages.concat violation['expense_warning'] if violation['expense_warning'].present?
+        warning_messages.concat violation['budget_warning'] if violation['budget_warning'].present?
+
+        blocking_messages.concat violation[:expense_blocking] if violation[:expense_blocking].present?
+        blocking_messages.concat violation[:budget_blocking] if violation[:budget_blocking].present?
+        blocking_messages.concat violation['expense_blocking'] if violation['expense_blocking'].present?
+        blocking_messages.concat violation['budget_blocking'] if violation['budget_blocking'].present?
       end
-      if violations_present
-        value[:errors] << 'Reports with blocking violations cannot be submitted'
+
+      if blocking_messages.size > 0
+        blocking_messages.uniq!
+        Formatter.remove_blanks blocking_messages
       end
+
+
+      if warning_messages.size > 0
+        warning_messages.uniq!
+        Formatter.remove_blanks warning_messages
+      end
+
+      value[:violations][:warning] += warning_messages
+      value[:violations][:blocking] += blocking_messages
+      
+      if blocking_messages.present?
+        value[:errors] << 'Reports with blocking violations cannot be approved.'
+      end
+      
       unless value[:errors].blank?
         self.valid = false
       end
@@ -103,6 +135,61 @@ class Report::BulkApprove < BaseOperation
     if valid
       if confirm_approve
         # Process reports
+        for key, value in multiple_reports
+          report = value[:report]
+          presenter = User::Team::Review::NextReviewer.(report)
+          manager = presenter.user
+          to_user_role_id = presenter.role_id
+          status = ReportStatus.processing_id
+          if manager.blank?
+            status = ReportStatus.approved_id
+            # if the report has no reimbursable expenses, mark it as closed because there are no reimbursements
+            if report.expenses.only_reimbursable_expenses.count == 0
+              status = ReportStatus.closed_id
+            end
+          end
+
+          if status == ReportStatus.approved_id || status == ReportStatus.closed_id
+            approved_at = DateUtils.local_date_time
+          else
+            approved_at = nil
+          end
+
+          curr_user_role = User::Team::Review::UserRole.(user, report)
+          update_attributes = {report_status_id: status,
+                               controlling_user: manager,
+                               controlling_for_user_id: nil,
+                               controlling_user_role_id: to_user_role_id,
+                               controlling_for_user_role_id: nil,
+                               # auto_approve: auto_approve,
+                               approved_at: approved_at}
+          # update_attributes[:submitted_at] = DateTime.now if auto_approve
+          if report.update_attributes update_attributes
+            
+            track = report.tracks.build action_user: user,
+                                        modified_user_id: report.controlling_user_id,
+                                        modified_user_role_id: to_user_role_id,
+                                        report_tracking_action_id: ReportTrackingAction.id_for(:approve),
+                                        report_status_id: status,
+                                        action_user_role_id: curr_user_role
+            track.save
+
+            if report.closed?
+              track = report.tracks.build action_user: nil,
+                                          modified_user: nil,
+                                          report_tracking_action_id: ReportTrackingAction.id_for(:closed),
+                                          report_status_id: ReportStatus.closed_id
+              track.save
+            end
+          else
+            self.approved_all = false
+            value[:errors] += report.errors.full_messages
+          end
+
+          # value[:errors] += report.errors.full_messages
+          # add_message :error, report.errors.full_messages
+        end
+        # add_message :success, "Reports will be approved."
       end
     else
       add_message :error, "Please fix the errors"
@@ -163,40 +250,60 @@ class Report::BulkApprove < BaseOperation
   def post_process
     if valid
       if confirm_approve
-        # Do post process stuff
+        if approved_all
+          for key, value in self.multiple_reports
+            report = value[:report]
+            comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_approve)
+            comment.save
+
+            # set the reimbursement amount of the report
+            unless report.processing?
+              Settlement::Report::Approved.(user, report: report)
+              report.reload
+            end
+            # if report is closed, add the relevant comment
+            if report.closed?
+              # Add comments stating report has been closed as no reimbursements required
+              comment = report.comments.build(user: nil,
+                                              report_comment_action_id: ReportCommentAction.id_for(:report_closed),
+                                              content: " as there are no reimbursable expenses")
+              comment.save
+            end
+            # Send notifications
+            Event::EReport::Approve.(self.user, report: report, auto_approve: auto_approve)
+
+            value[:notices].push('Report Approved!')
+          end
+        end
       end
     end
-    # if success?
-    #   if auto_approve
-    #     comment = report.comments.build report_comment_action_id: ReportCommentAction.id_for(:report_auto_approve)
-    #   else
-    #     comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:report_approve)
-    #   end
-    #   comment.save
-
-    #   # set the reimbursement amount of the report
-    #   unless report.processing?
-    #     Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
-    #     report.reload
-    #   end
-    #   # if report is closed, add the relevant comment
-    #   if report.closed?
-    #     # Add comments stating report has been closed as no reimbursements required
-    #     comment = report.comments.build(user: nil,
-    #                                     report_comment_action_id: ReportCommentAction.id_for(:report_closed),
-    #                                     content: " as there are no reimbursable expenses")
-    #     comment.save
-    #   end
-    #   # Send notifications
-    #   Event::EReport::Approve.(self.user, report: self.report, auto_approve: auto_approve)
-
-    #   add_message :success, 'Report approved!'
-    # end
   end
+
+  def success
+    params[:multiple_reports] = self.multiple_reports
+    Report::BulkApprove::SuccessPresenter.new(user, params, messages)
+  end
+
+
 
   def failure
     params[:reports_errors] = self.multiple_reports
     Report::BulkApprove::FailurePresenter.new(user, params, messages)
+  end
+
+  class Report::BulkApprove::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :multiple_reports
+    def init
+      self.multiple_reports = params[:multiple_reports]
+    end
+
+    def reports_with_data
+      ar = []
+      for key, value in self.multiple_reports
+        ar.push(value)
+      end
+      ar
+    end
   end
 
   class Report::BulkApprove::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
@@ -205,8 +312,12 @@ class Report::BulkApprove < BaseOperation
       self.multiple_errors = params[:reports_errors]
     end
 
-    def formatted_messages
-      self.multiple_errors
+    def reports_with_errors
+      ar = []
+      for key, value in self.multiple_errors
+        ar.push(value)
+      end
+      ar
     end
   end
 end
