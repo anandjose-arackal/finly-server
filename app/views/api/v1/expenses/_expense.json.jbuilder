@@ -18,6 +18,8 @@ json.original_amount do
   json.partial! 'api/v1/shared/amount', amount: expense.original_amount
 end
 
+json.converted expense.converted?
+
 json.type expense.expense_type_id
 # if expense.manual_expense?
 #   json.merchant_name expense.manual_expense.merchant_name
