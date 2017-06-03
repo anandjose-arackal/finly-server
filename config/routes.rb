@@ -758,6 +758,8 @@ Rails.application.routes.draw do
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
     post 'toggle_receipt_hardcopy' => 'reports#toggle_receipt_hardcopy', as: :toggle_receipt_hardcopy
   end
+  post 'reports/bulk_approve' => 'reports#bulk_approve', as: :reports_bulk_approve
+
 
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do
