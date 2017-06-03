@@ -1,4 +1,6 @@
 class CardsController < ApplicationController
+
+  before_action :authenticate_user!
   allow_oauth!
 
   # params = {user_id: 1}

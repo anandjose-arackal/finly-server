@@ -1,7 +1,11 @@
 class Api::Cards::V1::CardsController < ApplicationController
 
-  def show
+  before_action :authenticate_user!
+  allow_oauth!
 
+  def show
+    @result = User::PrepaidCard::Show.(current_user, params)
+    respond
   end
 
   def transactions
