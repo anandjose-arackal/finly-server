@@ -10,6 +10,8 @@
 #  updated_at          :datetime         not null
 #  surcharge_id        :integer
 #  is_deleted          :boolean          default(FALSE)
+#  cancelled           :boolean          default(FALSE)
+#  atm_surcharge       :boolean          default(FALSE)
 #
 
 

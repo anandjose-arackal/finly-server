@@ -53,7 +53,7 @@ module Constants
   elsif Rails.env.staging?
     url = "http://staging.finly.io/#"
   elsif Rails.env.itzcash_uat?
-    url = "http://uat.finly.io/#"
+    url = "http://demo.finly.io/#"
   elsif Rails.env.local_vm?
     url = "http://192.168.56.101/#"
   elsif Rails.env.production?

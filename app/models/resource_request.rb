@@ -7,6 +7,8 @@
 #  email              :string(255)
 #  mobile_number      :string(255)
 #  resource_file_name :string(255)
+#  source             :text(65535)
+#  source_description :text(65535)
 #
 
 class ResourceRequest < ActiveRecord::Base
