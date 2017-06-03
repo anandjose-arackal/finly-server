@@ -310,6 +310,10 @@ class Report < ActiveRecord::Base
     cash.value - report_total < 0
   end
 
+  def base_currency
+    self.policy.base_currency
+  end
+
   def base_currency_id
     self.policy.base_currency_id
   end

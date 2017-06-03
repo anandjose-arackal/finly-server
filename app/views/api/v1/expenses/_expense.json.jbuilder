@@ -9,9 +9,15 @@ json.status do
   json.id expense.expense_status_id
   json.name expense.expense_status.name
 end
+
 json.amount do
-  json.partial! 'api/v1/shared/amount', amount: expense.amount
+  json.partial! 'api/v1/shared/amount', amount: expense.base_amount
 end
+
+json.original_amount do
+  json.partial! 'api/v1/shared/amount', amount: expense.original_amount
+end
+
 json.type expense.expense_type_id
 # if expense.manual_expense?
 #   json.merchant_name expense.manual_expense.merchant_name
@@ -41,3 +47,4 @@ json.custom_fields do
       json.array! expense.per_diem_expense.custom_fields
   end
 end
+json.cancelled expense.cancelled?

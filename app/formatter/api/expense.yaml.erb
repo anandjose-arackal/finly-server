@@ -26,7 +26,7 @@ expense:
   <% if params[:amount].present? %>
   amount_attributes:
     value: <%= params[:amount] %>
-    currency_id: <%= Currency.first.id %>
+    currency_id: <%= (params[:currency_id] or Currency.first.id) %>
   <% end %>
   <% if params[:receipt].present? %>
   receipts_attributes:

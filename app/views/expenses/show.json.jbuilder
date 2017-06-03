@@ -4,6 +4,7 @@ json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name,
 
 json.date @result.expense.date.strftime("%d %b %Y")
 json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
+
 json.currency_id @result.expense.currency_id rescue nil
 json.original_currency_id @result.expense.currency_id rescue nil
 json.currency_symbol @result.expense.currency_symbol

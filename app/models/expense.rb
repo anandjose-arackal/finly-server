@@ -22,14 +22,6 @@
 #
 
 
-
-
-
-
-
-
-
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -303,6 +295,19 @@ class Expense < ActiveRecord::Base
       else
         return nil
     end
+  end
+
+  def base_amount
+    unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present?
+      return self.amount
+    end
+    value = amount_value
+    currency = report_id.present? ? report.base_currency : amount.currency
+    Amount.new(value: amount_value, currency: currency)
+  end
+
+  def original_amount
+    self.amount
   end
 
 

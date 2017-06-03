@@ -181,6 +181,8 @@ class Amount < ActiveRecord::Base
   include MathUtil
   belongs_to :currency
 
+  accepts_nested_attributes_for :currency
+
   validate :no_negative_amount
 
   validates :currency_id, presence: true
