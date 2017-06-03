@@ -1,6 +1,6 @@
 json.extract! expense, :id, :date, :note, :report_id, :expense_type_id,
               :distance_value, :time_value, :per_diem_name, :per_diem_rate_value, :per_diem_quantity_value,
-              :distance_rate_value, :time_rate_value, :transcribed, :merchant_name
+              :distance_rate_value, :time_rate_value, :transcribed, :merchant_name, :reimbursable
 json.user do
   json.id expense.user.id
   json.name expense.user.name

@@ -3,6 +3,7 @@ receipt_id: <%= params[:receipt_id] %>
 expense:
   report_id: <%= params[:report_id] %>
   date: <%= params[:date] %>
+  reimbursable: <%= params[:reimbursable] %>
   category_id: <%= params[:category_id] %>
   <% type = params[:type].present? ? params[:type] : nil %>
   <% if type == '1' or type == 1 %>
