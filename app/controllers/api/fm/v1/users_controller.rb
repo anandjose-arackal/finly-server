@@ -1,10 +1,10 @@
-class Api::Cards::V1::UsersController < ApplicationController
+class Api::Fm::V1::UsersController < ApplicationController
 
   allow_oauth!
   before_action :authenticate_user!
 
   def create
-    formatted_params = RequestFormatter::Api::Cards::V1::Users::Create.(current_user, params).formatted_request
+    formatted_params = RequestFormatter::Api::Fm::V1::Users::Create.(current_user, params).formatted_request
     @result = User::Create.(current_user, formatted_params)
     respond response: (@result&.success? ? :success : :failure)
   end
@@ -28,7 +28,7 @@ class Api::Cards::V1::UsersController < ApplicationController
     success_message = nil
     case params[:type]
       when 'role'
-        formatted_params = RequestFormatter::Api::Cards::V1::Users::UpdateRole.(current_user, params).formatted_request
+        formatted_params = RequestFormatter::Api::Fm::V1::Users::UpdateRole.(current_user, params).formatted_request
         operation = User::Role::Set.new(current_user, formatted_params)
         success_message = 'Role updated'
       when 'state', 'status'
