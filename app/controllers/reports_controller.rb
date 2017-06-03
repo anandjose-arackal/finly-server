@@ -73,6 +73,14 @@ class ReportsController < ApplicationController
     respond render: :show
   end
 
+  def toggle_receipt_hardcopy
+    @result = Report::Receipts::ToggleHardCopy.(current_user, params)
+    if @result.success?
+      render 'toggle_receipt_hardcopy'
+    end
+    # respond render: :show
+  end
+
   def reimburse
     # rs = ReportService.new(user: current_user, report: @report)
     # if rs.reimburse

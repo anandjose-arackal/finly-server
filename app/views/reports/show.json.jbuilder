@@ -52,12 +52,22 @@ json.comments @result.comments do |comment|
   json.comment_user_name comment_u_name
   json.comment_user_initial comment_initials
 end
-categorized_expense = @result.expenses_category_sorted
-json.expense_sections categorized_expense do |category|
+
+expenses_sorted_by = params[:expenses_sorted_by] || 'category'
+json.expenses_sorted_by expenses_sorted_by
+if expenses_sorted_by == 'category'
+  sorted_expenses = @result.expenses_category_sorted
+elsif expenses_sorted_by == 'date'
+  sorted_expenses = @result.expenses_date_sorted
+else
+  sorted_expenses = @result.expenses_category_sorted
+end
+
+json.expense_sections sorted_expenses do |category|
   json.extract! category, :section_name, :section_total
 
   json.expenses category[:expenses] do |expense|
-    json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id,
+    json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id, :category_name,
                            :distance_value, :distance_rate_value, :time_value, :time_rate_value
     if expense.note
       if expense.note.length < 29
@@ -80,6 +90,8 @@ end
 
 json.receipts @result.expenses do |expense|
   unless expense.receipts.blank? or expense.receipts.first.image.url == '/assets/original/missing.png'
+    json.id expense.receipts.first.id
+    json.hard_copy_received expense.receipts.first.hard_copy_received
     json.image do
       json.file_type expense.receipts.first.file_format
       json.original expense.receipts.first.image.url

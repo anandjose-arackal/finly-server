@@ -16,7 +16,9 @@
 #  note               :text(65535)
 #  receipt_email_id   :integer
 #  to_be_transcribed  :boolean          default(FALSE)
+#  hard_copy_received :boolean          default(FALSE)
 #
+
 
 
 

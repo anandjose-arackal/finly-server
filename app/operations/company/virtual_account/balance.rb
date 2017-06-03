@@ -1,5 +1,5 @@
 class Company::VirtualAccount::Balance < BaseOperation
-  attr_accessor :total_wallet_balance, :balance, :account_number, :scheduled_payment_orders_balance
+  attr_accessor :total_wallet_balance, :balance, :account_number, :scheduled_payment_orders_balance, :company
 
   def authorized_user_types
     [:company_admin]
@@ -12,12 +12,16 @@ class Company::VirtualAccount::Balance < BaseOperation
   end
 
   def init
-    self.total_wallet_balance = user.company.account.wallet_balance.value
-    self.scheduled_payment_orders_balance = user.company.payment_orders.scheduled.total_amount_requested
+    # debugger
+    # self.company = user.company || 
+    self.company = params[:company] || user.company
+
+    self.total_wallet_balance = company.account.wallet_balance.value
+    self.scheduled_payment_orders_balance = company.payment_orders.scheduled.total_amount_requested
   end
 
   def process
-    response = ItzCash::VirtualAccountBalance.(user.company)
+    response = ItzCash::VirtualAccountBalance.(company)
     unless response.success?
       add_message :error, response.messages[:error]
       return

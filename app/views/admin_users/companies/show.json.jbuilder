@@ -1,7 +1,6 @@
 json.id @result.company.id
 json.name @result.company.name
 json.d_code @result.company.d_code
-json.balance @result.company.balance_amount(DateUtils.local_date)
 json.logo @result.company.configuration.logo.url(:thumb)
 json.ocr_enabled @result.company.ocr_enabled?
 json.expense_management_enabled @result.company.expense_management_enabled?
@@ -12,3 +11,4 @@ json.fuel_card_enabled @result.company.fuel_card_enabled?
 json.medical_card_enabled @result.company.medical_card_enabled?
 json.expense_card_enabled @result.company.expense_card_enabled?
 json.reimbursement_card_enabled @result.company.reimbursement_card_enabled?
+json.balance @result.company_balance
