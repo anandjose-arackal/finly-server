@@ -1,10 +1,6 @@
 class Card::Index < Card::Base
   attr_accessor :cards
 
-  def authorized_user_types
-    :company_admin
-  end
-
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'
@@ -13,7 +9,17 @@ class Card::Index < Card::Base
   end
 
   def init
-    self.cards = user.company.cards
+    self.params = {} if params.nil?
+
+    if admin_view? and user.company_admin?
+      self.cards = user.company.cards
+    elsif personal_view?
+      self.cards = user.cards
+    else
+      # For policy admin, manager and finance managers
+      user_ids = User::Index.(user, params).team.pluck(:id)
+      self.cards = user.company.cards.with_user(user_ids)
+    end
   end
 
   def success

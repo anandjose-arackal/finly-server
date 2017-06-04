@@ -644,15 +644,15 @@ Rails.application.routes.draw do
     namespace :fm do
       namespace :v1 do
         resources :users, only: [:create, :show, :index, :update]
-        resources :prepaid, only: [:index, :show]
-        resources :prepaid do
-          get 'transactions', to: 'prepaid#transactions'
-          patch 'assign', to: 'prepaid#assign'
-          patch 'fund', to: 'prepaid#update_funds'
-          patch 'status', to: 'prepaid#update_status'
-          patch 'restrictions', to: 'prepaid#restrictions'
+        resources :cards, only: [:index, :show]
+        resources :cards do
+          get 'transactions', to: 'cards#transactions'
+          patch 'assign', to: 'cards#assign'
+          patch 'fund', to: 'cards#update_funds'
+          patch 'status', to: 'cards#update_status'
+          patch 'restrictions', to: 'cards#restrictions'
         end
-        post 'prepaid/request', to: 'prepaid#request'
+        post 'prepaid/request', to: 'cards#request'
       end
     end
   end
