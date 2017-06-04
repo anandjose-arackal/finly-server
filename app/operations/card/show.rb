@@ -30,10 +30,12 @@ class Card::Show < Card::Base
   end
 
   class Card::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :card
+    attr_accessor :card, :configurable_restrictions, :restrictions
 
     def init
       self.card = params&.dig(:card)
+      self.configurable_restrictions = self.card&.card_program.spend_restrictions
+      self.restrictions = self.card&.card_restriction
     end
   end
 
