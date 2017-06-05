@@ -1,7 +1,4 @@
-class Api::Fm::V1::UsersController < ApplicationController
-
-  allow_oauth!
-  before_action :authenticate_user!
+class Api::Fm::V1::UsersController < ApiApplicationController
 
   def create
     formatted_params = RequestFormatter::Api::Fm::V1::Users::Create.(current_user, params).formatted_request

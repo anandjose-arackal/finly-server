@@ -1,7 +1,4 @@
-class Api::Fm::V1::FundsController < ApplicationController
-
-  allow_oauth!
-  before_action :authenticate_user!
+class Api::Fm::V1::FundsController < ApiApplicationController
 
   def credit
     params[:validate_password] = false

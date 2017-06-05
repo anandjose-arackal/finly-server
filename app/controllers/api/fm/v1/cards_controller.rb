@@ -1,7 +1,4 @@
-class Api::Fm::V1::CardsController < ApplicationController
-
-  before_action :authenticate_user!
-  allow_oauth!
+class Api::Fm::V1::CardsController < ApiApplicationController
 
   def index
     @result = Card::Index.(current_user, params)

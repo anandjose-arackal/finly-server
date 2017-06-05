@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170522100606) do
+ActiveRecord::Schema.define(version: 20170605170829) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1148,6 +1148,22 @@ ActiveRecord::Schema.define(version: 20170522100606) do
 
   add_index "itz_cash_properties", ["company_id"], name: "index_itz_cash_properties_on_company_id", using: :btree
 
+  create_table "locations", force: :cascade do |t|
+    t.integer  "locatable_id",   limit: 4
+    t.string   "locatable_type", limit: 255
+    t.decimal  "latitude",                     precision: 30, scale: 15
+    t.decimal  "longitude",                    precision: 30, scale: 15
+    t.string   "name",           limit: 255
+    t.text     "address",        limit: 65535
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.string   "maps_id",        limit: 255
+    t.integer  "order",          limit: 4
+  end
+
+  add_index "locations", ["locatable_id"], name: "index_locations_on_locatable_id", using: :btree
+  add_index "locations", ["locatable_type"], name: "index_locations_on_locatable_type", using: :btree
+
   create_table "manual_expenses", force: :cascade do |t|
     t.integer  "expense_id", limit: 4
     t.string   "merchant",   limit: 255
@@ -2096,6 +2112,25 @@ ActiveRecord::Schema.define(version: 20170522100606) do
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
   add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
 
+  create_table "whitelisted_ip_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "whitelisted_ips", force: :cascade do |t|
+    t.string   "ip_address",              limit: 255, null: false
+    t.integer  "company_id",              limit: 4,   null: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.integer  "whitelisted_ip_types_id", limit: 4,   null: false
+    t.integer  "whitelisted_ip_type_id",  limit: 4,   null: false
+  end
+
+  add_index "whitelisted_ips", ["company_id"], name: "index_whitelisted_ips_on_company_id", using: :btree
+  add_index "whitelisted_ips", ["ip_address"], name: "index_whitelisted_ips_on_ip_address", using: :btree
+  add_index "whitelisted_ips", ["whitelisted_ip_types_id"], name: "index_whitelisted_ips_on_whitelisted_ip_types_id", using: :btree
+
   add_foreign_key "admin_user_role_mappings", "admin_user_roles"
   add_foreign_key "admin_user_role_mappings", "admin_users"
   add_foreign_key "amounts", "currencies"
@@ -2223,4 +2258,5 @@ ActiveRecord::Schema.define(version: 20170522100606) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
+  add_foreign_key "whitelisted_ips", "companies"
 end

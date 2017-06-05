@@ -643,6 +643,8 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :fm do
       namespace :v1 do
+        post 'auth', to: 'token#create'
+        delete 'auth', to: 'token#destroy'
         resources :users, only: [:create, :show, :index, :update]
         resources :cards, only: [:index, :show]
         resources :cards do
