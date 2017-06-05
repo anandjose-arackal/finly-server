@@ -41,12 +41,18 @@ class User::Wallet::Base < BaseOperation
       add_message :error, 'Amount cannot be blank'
       return
     end
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate this transfer'
-      return
+    require_password_validation = true
+    unless params[:validate_password].nil?
+      require_password_validation = !!params[:validate_password]
     end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password!'
+    if require_password_validation
+      if params[:password].blank?
+        add_message :error, 'You need to provide your password to initiate this transfer'
+        return
+      end
+      unless user.valid_password?(params[:password])
+        add_message :error, 'Invalid Password!'
+      end
     end
 
     self.amount = params[:amount].to_d rescue nil
