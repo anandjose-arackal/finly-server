@@ -1,0 +1,5 @@
+amount: <%= params[:amount] %>
+initiating_account_type: 'virtual_account'
+receiving_user_id: <%= params[:user_id] %>
+receiving_account_type: <%= params[:account_type] == 'finly_money' ? 'wallet' : (params[:account_type] || 'card') %>
+receiving_account_id: <%= params[:account_id] %>
