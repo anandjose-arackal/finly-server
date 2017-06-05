@@ -28,6 +28,7 @@ class User::Wallet::Base < BaseOperation
     end
     if params[:receiving_account_type] == :card and params[:receiving_account_id].blank?
       add_message :error, 'Card not found'
+      return
     end
   end
 
@@ -52,6 +53,7 @@ class User::Wallet::Base < BaseOperation
       end
       unless user.valid_password?(params[:password])
         add_message :error, 'Invalid Password!'
+        return
       end
     end
 
@@ -105,15 +107,19 @@ class User::Wallet::Base < BaseOperation
     super
     if self.amount.blank?
       add_message :error, 'Amount cannot be blank'
+      return
     end
     if initiating_user.blank? or receiving_user.blank?
       add_message :error, 'User not found'
+      return
     end
     if initiating_account_type.blank? or receiving_account_type.blank?
       add_message :error, 'Account not found'
+      return
     end
     if initiating_account.blank? or receiving_account.blank?
       add_message :error, 'Error in request. Cannot initiate this transfer'
+      return
     end
 
     # checking of the card being transferred from can be used for debiting / crediting funds
