@@ -647,13 +647,13 @@ Rails.application.routes.draw do
         resources :cards, only: [:index, :show]
         resources :cards do
           get 'transactions', to: 'cards#transactions'
-          patch 'assign', to: 'cards#assign'
+          # patch 'assign', to: 'cards#assign'
           patch 'status', to: 'cards#update_status'
-          patch 'restrictions', to: 'cards#update_restrictions'
+          # patch 'restrictions', to: 'cards#update_restrictions'
         end
         post 'funds/credit', to: 'funds#credit'
         post 'funds/debit', to: 'funds#debit'
-        post 'cards/request', to: 'cards#request'
+        # post 'cards/request', to: 'cards#request'
       end
     end
   end
