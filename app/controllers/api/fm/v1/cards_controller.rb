@@ -18,4 +18,46 @@ class Api::Fm::V1::CardsController < ApplicationController
     respond
   end
 
+  def update_status
+    params[:validate_password] = false
+    status_type = params&.dig(:status)&.to_i rescue -1
+    case status_type
+      when User::PrepaidCard::Base::STATUS[:block]
+        # Block = 0
+        @result = User::PrepaidCard::Block.(current_user, params)
+      when User::PrepaidCard::Base::STATUS[:unblock]
+        # Unblock = 1
+        @result = User::PrepaidCard::Unblock.(current_user, params)
+    end
+    if @result.nil?
+      respond response: :failure, message: 'Invalid Status'
+    else
+      respond response: (@result&.success? ? :success : :failure)
+    end
+
+  end
+
+  def update_balance
+    action_type = params[:type] || params[:action_type] rescue nil
+    case action_type
+      when 'credit', :credit
+        # Value = 1
+        @result = User::Wallet::Credit.(current_user, params)
+      when 'debit', :debit
+        # Value = 2
+        @result = User::Wallet::Debit.(current_user, params)
+    end
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def update_restrictions
+    @result = Card::Restriction::Update.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def assign
+    # @result
+    # respond response: (@result&.success? ? :success : :failure)
+  end
+
 end

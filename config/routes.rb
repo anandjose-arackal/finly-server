@@ -650,7 +650,7 @@ Rails.application.routes.draw do
           patch 'assign', to: 'cards#assign'
           patch 'fund', to: 'cards#update_funds'
           patch 'status', to: 'cards#update_status'
-          patch 'restrictions', to: 'cards#restrictions'
+          patch 'restrictions', to: 'cards#update_restrictions'
         end
         post 'prepaid/request', to: 'cards#request'
       end
