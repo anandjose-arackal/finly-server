@@ -1,5 +1,5 @@
 require "#{Rails.root}/app/operations/expense/manual/create"
-class Api::V1::ReceiptsController < Api::V1::BaseApiController
+class Mobile::V1::ReceiptsController < Mobile::V1::BaseApiController
   protect_from_forgery with: :null_session
 
   allow_oauth!

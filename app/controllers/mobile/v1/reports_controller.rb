@@ -1,6 +1,6 @@
 # Dir[File.expand_path "app/app/operations/**/*.rb"].each{|f| require_relative(f)}
 require "#{Rails.root}/app/operations/report/comment/create"
-class Api::V1::ReportsController < Api::V1::BaseApiController
+class Mobile::V1::ReportsController < Mobile::V1::BaseApiController
   include MathUtil
   protect_from_forgery with: :null_session
 

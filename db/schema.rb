@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170605170829) do
+ActiveRecord::Schema.define(version: 20170605175730) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2119,17 +2119,15 @@ ActiveRecord::Schema.define(version: 20170605170829) do
   end
 
   create_table "whitelisted_ips", force: :cascade do |t|
-    t.string   "ip_address",              limit: 255, null: false
-    t.integer  "company_id",              limit: 4,   null: false
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-    t.integer  "whitelisted_ip_types_id", limit: 4,   null: false
-    t.integer  "whitelisted_ip_type_id",  limit: 4,   null: false
+    t.string   "ip_address",             limit: 255, null: false
+    t.integer  "company_id",             limit: 4,   null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.integer  "whitelisted_ip_type_id", limit: 4,   null: false
   end
 
   add_index "whitelisted_ips", ["company_id"], name: "index_whitelisted_ips_on_company_id", using: :btree
   add_index "whitelisted_ips", ["ip_address"], name: "index_whitelisted_ips_on_ip_address", using: :btree
-  add_index "whitelisted_ips", ["whitelisted_ip_types_id"], name: "index_whitelisted_ips_on_whitelisted_ip_types_id", using: :btree
 
   add_foreign_key "admin_user_role_mappings", "admin_user_roles"
   add_foreign_key "admin_user_role_mappings", "admin_users"

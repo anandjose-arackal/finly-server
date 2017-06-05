@@ -1,4 +1,4 @@
-class Api::V0::Configuration::GcmController <  Api::V0::BaseApiController
+class Mobile::V0::Configuration::GcmController <  Mobile::V0::BaseApiController
   protect_from_forgery with: :null_session
 
   allow_oauth!

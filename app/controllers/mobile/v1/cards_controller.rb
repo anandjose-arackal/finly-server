@@ -1,4 +1,4 @@
-class Api::V1::CardsController < ApplicationController
+class Mobile::V1::CardsController < ApplicationController
   protect_from_forgery with: :null_session
 
   allow_oauth!

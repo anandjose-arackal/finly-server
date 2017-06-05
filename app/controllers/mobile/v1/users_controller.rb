@@ -1,4 +1,4 @@
-class  Api::V1::UsersController < Api::V1::BaseApiController
+class  Mobile::V1::UsersController < Mobile::V1::BaseApiController
   protect_from_forgery with: :null_session
 
   allow_oauth!
