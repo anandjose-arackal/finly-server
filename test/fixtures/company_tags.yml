@@ -9,7 +9,7 @@
 #  active                          :boolean          default(TRUE), not null
 #  created_at                      :datetime         not null
 #  updated_at                      :datetime         not null
-#  external_tag_id                 :string(255)
+#  external_tag_type               :string(255)
 #  external_integration_type       :string(255)
 #  external_id                     :string(255)
 #  external_additional_information :string(255)

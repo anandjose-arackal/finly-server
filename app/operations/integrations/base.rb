@@ -1,10 +1,14 @@
-class Integrations::Base
+class Integrations::Base < BaseOperation
 
   attr_accessor :company, :selected_user, :adapter
 
   def initialize(company, params)
     self.company = company
     self.params = params
+  end
+
+  def self.call(company, params)
+    self.new(company, params).run
   end
 
   def init
