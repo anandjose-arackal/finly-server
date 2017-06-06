@@ -69,6 +69,7 @@ class CardTransaction < ActiveRecord::Base
   scope :with_transaction_timestamp_range, -> (start_time, end_time) {where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_time, end_time)}
 
   scope :atm_withdrawals, -> {where transaction_mode: "ATM"}
+  scope :with_user, -> (user_id) { where user_id: user_id }
   scope :pos_expenses, -> {where transaction_mode: "POS"}
   scope :online_expenses, -> {where('UPPER(transaction_mode) = ?', "ECOM")}
   scope :expensed_transactions, -> {where('UPPER(transaction_mode) IN (?)', ["POS", "ECOM"])}
