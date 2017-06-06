@@ -1,4 +1,4 @@
-\default: &default
+default: &default
   base_url: "https://staging.itzcash.com"
   itzcash_account_details:
     base: "http://demo.itzcash.com"

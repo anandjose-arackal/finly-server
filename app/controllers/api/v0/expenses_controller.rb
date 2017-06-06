@@ -7,7 +7,21 @@ class Api::V0::ExpensesController < Api::V0::BaseApiController
 
   def create
     param = RequestFormatter.api_expense(current_user, params)
-    @result = Expense::Manual::Create.(current_user, param)
+
+    case params[:type]
+      when '1', 1
+        @result = Expense::Manual::Create.(current_user, param)
+      when '3', 3
+        @result = Expense::ExDistance::Create.(current_user, param)
+      when '4', 4
+        @result = Expense::ExTime::Create.(current_user, param)
+      when '5', 5
+        @result = Expense::ExPerDiem::Create.(current_user, param)
+      else
+        respond response: :failure, message: 'Invalid input'
+    end
+
+    # @result = Expense::Manual::Create.(current_user, param)
     @result.config[:mobile_api] = true
     if @result.success?
       if @result.expense.report_id.present?
@@ -36,10 +50,16 @@ class Api::V0::ExpensesController < Api::V0::BaseApiController
   def update
     param = RequestFormatter.api_expense(current_user, params)
     case params[:type]
-      when '1'
+      when '1', 1
         @result = Expense::Manual::Update.(current_user, param)
-      when '2'
+      when '2', 2
         @result = Expense::ExCard::Update.(current_user, param)
+      when '3', 3
+        @result = Expense::ExDistance::Update.(current_user, param)
+      when '4', 4
+        @result = Expense::ExTime::Update.(current_user, param)
+      when '5', 5
+        @result = Expense::ExPerDiem::Update.(current_user, param)
       else
         respond render: :failure
         return

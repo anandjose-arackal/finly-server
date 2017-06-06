@@ -13,9 +13,22 @@ expense:
     editable_merchant: <%= params[:merchant] %>
   <% elsif type == '3' or type == 3 %>
   distance_expense_attributes:
+    <% if params[:distance].present? %>
     distance_attributes:
       value: <%= params[:distance] %>
       physical_unit_id: <%= PhysicalUnit.kilometre_id %>
+    <% end %>
+    <% if params[:locations].present? %>
+    locations_attributes:
+      <% params[:locations].each do |location| %>
+      - latitude: <%= location[:latitude] %>
+        longitude: <%= location[:longitude] %>
+        name: <%= location[:name] %>
+        address: >
+          <%= location[:address] %>
+        maps_id: <%= location[:maps_id] %>
+      <% end %>
+    <% end %>
   <% elsif type == '4' or type == 4 %>
   time_expense_attributes:
     time_object_attributes:
