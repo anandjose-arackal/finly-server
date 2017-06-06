@@ -1,4 +1,4 @@
-json.partial! '/api/v1/users/user', user: @result.selected_user
+json.partial! '/mobile/v1/users/user', user: @result.selected_user
 json.actions do 
 	@result.actions.each do |key, value|
 		json.set! key, value

@@ -10,7 +10,7 @@ json.status do
   json.name expense.expense_status.name
 end
 json.amount do
-  json.partial! 'api/v1/shared/amount', amount: expense.amount
+  json.partial! 'mobile/v1/shared/amount', amount: expense.amount
 end
 json.type expense.expense_type_id
 # if expense.manual_expense?
