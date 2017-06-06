@@ -5,7 +5,7 @@ class Api::V1::ExpensesController < Api::V1::BaseApiController
   before_action :authenticate_user!
 
   def create
-    param = RequestFormatter::Api::Mobile::V1::Expenses::Parse.(current_user, params)
+    param = RequestFormatter.api_expense(current_user, params)
 
     case params[:type]
       when '1', 1
