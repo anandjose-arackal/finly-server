@@ -7,7 +7,7 @@ class ItzCash::Block < ItzCash::Base
       add_message :error, 'User not found'
       return
     end
-    if params&.dig(:card)
+    if params&.dig(:card).blank?
       add_message :error, 'Card not found'  
       return
     end
