@@ -50,13 +50,14 @@ class Card < ActiveRecord::Base
   scope :unassigned, -> { where user_id: nil }
   scope :active, -> { where active: true }
   scope :expense_cards, -> { where card_program_id: CardProgram.id_for(:expense) }
+  scope :manager_viewable_transactions, -> { where card_program_id: CardProgram.all.with_manager_view_transactions.pluck(:id) }
   scope :with_card_program, ->(id) { where card_program_id: id }
   scope :creditable_cards, -> { with_card_program(CardProgram.all.with_manager_credit) }
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
 
-  scope :expense_cards_only, -> {where card_program_id: CardProgram.id_for(:expense)}
-  scope :reimbursement_cards_only, -> {where card_program_id: CardProgram.id_for(:reimbursement)}
+  scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
+  scope :reimbursement_cards_only, -> { where card_program_id: CardProgram.id_for(:reimbursement) }
 
   delegate :card_balance_value, to: :card_balance
   delegate :card_program_name, to: :card_program
