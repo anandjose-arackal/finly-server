@@ -6,18 +6,11 @@ class Integrations::Quickbooks::SyncCategories < Integrations::Base
     end
   end
 
-  def init
-    # sets up the connection for the sync with quickbooks
-    self.selected_user = User.find_by(id: params[:id])
-    auth = selected_user.authentications.quickbooks.first
-    FinlyIntegrations.adapter = :quickbooks
-    adapter = FinlyIntegrations.adapter
-    adapter.setup_connection(auth)
-  end
 
   def validate
-
+    # what validation can we have here?
   end
+
 
   def process
     # call the Quickbooks adapter method that retrieves the categories from Quickbooks online repo and saves it locally
