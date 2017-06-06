@@ -81,7 +81,6 @@ module FinlyIntegrations
         employees = []
         service = Quickbooks::Service::Employee.new
         retrieve_all_in_batches employees, service, method(:quickbooks_employee_mapper), updated_at
-        debugger
         employees
       end
 

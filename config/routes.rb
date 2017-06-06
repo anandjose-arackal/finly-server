@@ -19,6 +19,8 @@
 #                                         PUT    /admin_users/password(.:format)                             devise/passwords#update
 #     api_v1_configuration_category_index GET    /api/v1/configuration/category/index(.:format)              api/v1/configuration/category#index
 #           api_v1_configuration_category GET    /api/v1/configuration/category(.:format)                    api/v1/configuration#category
+#                                         GET    /auth/:provider/callback(.:format)                          third_party_auth#quickbooks
+#                      testing_quickbooks GET    /testing_quickbooks(.:format)                               third_party_auth#testing
 #                         email_processor POST   /email/incoming(.:format)                                   griddler/emails#create
 #                               oauth_new GET    /oauth/new(.:format)                                        oauth/auth#new
 #                         oauth_authorize POST   /oauth/authorize(.:format)                                  opro/oauth/auth#create
@@ -632,6 +634,9 @@ Rails.application.routes.draw do
 
   # get 'home/index'
 
+  # adding routes for Quickbooks auth
+  get '/auth/:provider/callback', controller: 'third_party_auth', action: 'quickbooks'
+  get 'testing_quickbooks', to: 'third_party_auth#testing'
 
   mount_griddler('/email/incoming')
   mount_opro_oauth controllers: {

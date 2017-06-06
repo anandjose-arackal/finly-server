@@ -2,8 +2,8 @@ class AddQuickbooksIntegrationFieldsToDb < ActiveRecord::Migration
   def change
     # all migrations required for the quickbooks integration will be done here
 
-    Creating new tables first
-    Creating Quickbooks configurations
+    #Creating new tables first
+    #Creating Quickbooks configurations
     create_table :quickbooks_configurations do |t|
       t.string :quickbooks_payment_type
       t.references :payment_type, index: true, foreign_key: true
@@ -41,7 +41,7 @@ class AddQuickbooksIntegrationFieldsToDb < ActiveRecord::Migration
     end
     add_foreign_key :authentications, :users
 
-    Create Quickbooks payment type
+    #Create Quickbooks payment type
     create_table :quickbooks_payment_types do |t|
       t.string :name
       t.references :company, foreign_key: true, index: true
@@ -95,7 +95,7 @@ class AddQuickbooksIntegrationFieldsToDb < ActiveRecord::Migration
     add_column :quickbooks_payment_types, :external_updated_at, :datetime
     add_column :quickbooks_payment_types, :active, :boolean
     add_column :quickbooks_payment_types, :external_additional_information, :text
-    add_index(:quickbooks_payment_types, [:external_id, :external_integration_type], unique: true)
+    # add_index(:quickbooks_payment_types, [:external_id, :external_integration_type], unique: true)
 
 
     # Required indexes

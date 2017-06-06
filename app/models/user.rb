@@ -54,6 +54,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -98,6 +99,7 @@ class User < ActiveRecord::Base
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
   has_one :auto_reload_config, as: :reloadable, dependent: :destroy
 
+  has_many :authentications
   has_many :cards, dependent: :destroy
   has_many :card_transactions, dependent: :destroy
   has_many :money_requests

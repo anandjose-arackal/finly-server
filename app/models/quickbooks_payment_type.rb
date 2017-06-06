@@ -4,7 +4,7 @@
 #
 #  id                              :integer          not null, primary key
 #  name                            :string(255)
-#  companies_id                    :integer
+#  company_id                      :integer
 #  created_at                      :datetime         not null
 #  updated_at                      :datetime         not null
 #  external_id                     :string(255)

@@ -625,7 +625,6 @@ ActiveRecord::Schema.define(version: 20170531124225) do
     t.datetime "updated_at",                                                null: false
     t.boolean  "other_expense_types",                       default: false
     t.text     "encrypted_easy_login_params", limit: 65535
-    t.string   "registered_mobile_number",    limit: 255
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -1691,7 +1690,7 @@ ActiveRecord::Schema.define(version: 20170531124225) do
 
   create_table "quickbooks_payment_types", force: :cascade do |t|
     t.string   "name",                            limit: 255
-    t.integer  "companies_id",                    limit: 4
+    t.integer  "company_id",                      limit: 4
     t.datetime "created_at",                                    null: false
     t.datetime "updated_at",                                    null: false
     t.string   "external_id",                     limit: 255
@@ -1701,7 +1700,7 @@ ActiveRecord::Schema.define(version: 20170531124225) do
     t.text     "external_additional_information", limit: 65535
   end
 
-  add_index "quickbooks_payment_types", ["companies_id"], name: "index_quickbooks_payment_types_on_companies_id", using: :btree
+  add_index "quickbooks_payment_types", ["company_id"], name: "index_quickbooks_payment_types_on_company_id", using: :btree
 
   create_table "receipt_email_attachments", force: :cascade do |t|
     t.integer  "receipt_email_id",                 limit: 4
@@ -2319,6 +2318,7 @@ ActiveRecord::Schema.define(version: 20170531124225) do
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "quickbooks_configurations", "payment_types"
   add_foreign_key "quickbooks_configurations", "users"
+  add_foreign_key "quickbooks_payment_types", "companies"
   add_foreign_key "receipts", "expenses"
   add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"

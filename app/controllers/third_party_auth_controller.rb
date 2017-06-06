@@ -1,6 +1,6 @@
-class ThirdPartyAuthControllerController < ApplicationController
+class ThirdPartyAuthController < ApplicationController
 
-  def create
+  def quickbooks
     # this action will decide which authentication to use and appropriately
     # will probably have to be moved to an operation depending on the type of integration - i.e. quickbooks or tally
     auth = env['omniauth.auth']
@@ -11,4 +11,12 @@ class ThirdPartyAuthControllerController < ApplicationController
     user_auth.save
 
   end
+
+  def tally
+
+  end
+
+  # def testing
+  #
+  # end
 end
