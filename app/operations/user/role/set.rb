@@ -27,8 +27,7 @@ class User::Role::Set < BaseOperation
     new_role_ids = params[:user_role_id]
     if new_role_ids.blank? and params[:user_roles].present?
       new_role_ids = []
-      new_role_ids << UserRole.admin_id if params[:user_roles][:admin].present? and
-          ['1', 'true'].include?(params[:user_roles][:admin].to_s)
+      new_role_ids << UserRole.id_for(:admin) if params[:user_roles][:admin].present? and ['1', 'true'].include?(params[:user_roles][:admin].to_s)
       new_role_ids << UserRole.manager_id if params[:user_roles][:manager].present? and
           ['1', 'true'].include?(params[:user_roles][:manager].to_s)
       new_role_ids << UserRole.finance_manager_id if params[:user_roles][:finance_manager].present? and

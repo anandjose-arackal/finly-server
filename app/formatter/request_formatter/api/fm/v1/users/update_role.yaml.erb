@@ -1,4 +1,5 @@
-user_roles:
+id: <%= (params[:user_id] or params[:id]) %>
+user_role_id:
 <% if params[:admin] %>
   - <%= UserRole.id_for(:admin) %>
 <% end %>

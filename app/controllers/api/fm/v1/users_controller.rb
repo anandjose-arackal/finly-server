@@ -17,6 +17,7 @@ class Api::Fm::V1::UsersController < ApiApplicationController
   end
 
   def update
+    params[:validate_password] = false
     unless params[:type]
       respond(response: :failure, message: 'Error while updating status. Type not found')
       return
@@ -42,7 +43,7 @@ class Api::Fm::V1::UsersController < ApiApplicationController
     if @result&.success?
       respond(response: :success, message: success_message)
     else
-      response response: :failure, message: (@result&.messages[:error] || 'Error while updating data')
+      respond response: :failure, message: (@result&.messages[:error] || 'Error while updating data')
     end
   end
 
