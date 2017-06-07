@@ -6,7 +6,7 @@ class Mobile::V1::ReceiptsController < Mobile::V1::BaseApiController
   before_action :authenticate_user!
 
   def create
-    formatted_params = RequestFormatter::Receipts::Parse.(current_user, params)&.formatted_request
+    formatted_params = RequestFormatter::ReceiptsParser::Parse.(current_user, params)&.formatted_request
     @result = Receipt::Create.(current_user, formatted_params)
     @result.config[:mobile_api] = true
     unless @result.success?

@@ -1,4 +1,4 @@
-class RequestFormatter::Receipts::Parse < RequestFormatter::Base
+class RequestFormatter::ReceiptsParser::Parse < RequestFormatter::Base
 
   def process
     if params[:receipt].present? and not params[:receipt] == 'nil'

@@ -15,7 +15,7 @@ class RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse < RequestFo
 
     # Load receipt seperately has yaml cannot handle images
     if params[:receipt].present?
-      formatted_params = RequestFormatter::Receipts::Parse.(user, params).formatted_request
+      formatted_params = RequestFormatter::ReceiptsParser::Parse.(user, params).formatted_request
       map[:expense] = {} if map[:expense].blank?
       receipt = formatted_params[:receipt]
       receipt = nil if receipt == 'nil'
