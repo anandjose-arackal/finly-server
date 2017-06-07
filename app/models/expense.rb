@@ -312,8 +312,8 @@ class Expense < ActiveRecord::Base
 
   def conversion_rate
     return nil unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present? and report_id.present?
-    converted_amount = expense.amount_value
-    original_amount = expense.original_amount_value
+    converted_amount = amount_value
+    original_amount = original_amount_value
     precision_value converted_amount/original_amount
   end
 
