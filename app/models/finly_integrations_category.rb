@@ -13,7 +13,7 @@ class FinlyIntegrationsCategory
       begin
         additional_information_json = JSON.parse self.external_additional_information
         if is_payment? additional_information_json
-          finly_category = PaymentType.find_or_initialize_by(external_integration_type: self.external_integration_type,
+          finly_category = QuickbooksPaymentType.find_or_initialize_by(external_integration_type: self.external_integration_type,
           external_id: self.external_id)
         elsif is_expense?(additional_information_json) || self.category_sub_type == QUICKBOOKS_CATEGORY_SUB_TYPES.last
           finly_category = Category.find_or_initialize_by(external_integration_type: self.external_integration_type,
@@ -26,12 +26,12 @@ class FinlyIntegrationsCategory
             category.external_updated_at = self.external_updated_at
             category.active = self.active
             category.external_additional_information = self.external_additional_information
-            category.external_category_type = self.category_sub_type unless  is_payment? additional_information_json
+            category.external_category_type = self.category_sub_type unless is_payment? additional_information_json
           end
           finly_category.save
         end
       rescue ActiveRecord::RecordNotUnique
-        retry
+        #retry
       end
     else
       return false

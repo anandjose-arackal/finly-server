@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170606112712) do
+ActiveRecord::Schema.define(version: 20170606120758) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -646,16 +646,16 @@ ActiveRecord::Schema.define(version: 20170606112712) do
   add_index "company_funds_load_requests", ["requested_by_user_id"], name: "index_company_funds_load_requests_on_requested_by_user_id", using: :btree
 
   create_table "company_tags", force: :cascade do |t|
-    t.integer  "company_id",                      limit: 4,                  null: false
-    t.string   "name",                            limit: 255,                null: false
+    t.integer  "company_id",                      limit: 4,                       null: false
+    t.string   "name",                            limit: 255,                     null: false
     t.string   "gl_code",                         limit: 255
-    t.boolean  "active",                                      default: true, null: false
-    t.datetime "created_at",                                                 null: false
-    t.datetime "updated_at",                                                 null: false
+    t.boolean  "active",                                           default: true, null: false
+    t.datetime "created_at",                                                      null: false
+    t.datetime "updated_at",                                                      null: false
     t.string   "external_tag_type",               limit: 255
     t.string   "external_integration_type",       limit: 255
     t.string   "external_id",                     limit: 255
-    t.string   "external_additional_information", limit: 255
+    t.text     "external_additional_information", limit: 16777215
     t.string   "external_updated_at",             limit: 255
   end
 
