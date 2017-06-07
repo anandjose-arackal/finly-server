@@ -2,15 +2,10 @@ manager_name = @result.manager.name rescue nil
 finance_manager_name = @result.finance_manager.name rescue nil
 json.manager_name manager_name
 json.finance_manager_name finance_manager_name
-json.total do
-  json.value @result.total
-  json.currency do
-    json.extract! Currency.first, :id, :country, :country_code, :symbol
-  end
-end
+json.total @result.total
 json.date @result.dates
 json.report do
-  json.partial! '/mobile/v0/reports/report', report: @result.report, result: @result
+  json.partial! '/api/v0/reports/report', report: @result.report, result: @result
 end
 json.actions do
   json.take_control @result.actions[:take_control].present?
@@ -27,7 +22,7 @@ end
 json.expenses_group @result.expenses_category_sorted do |item|
   json.extract! item, :section_name, :section_total
   json.expenses item[:expenses] do |expense_item|
-    json.partial! '/api/v1/expenses/expense', expense: expense_item
+    json.partial! '/api/v0/expenses/expense', expense: expense_item
   end
 end
 json.comments @result.comments do |comment|

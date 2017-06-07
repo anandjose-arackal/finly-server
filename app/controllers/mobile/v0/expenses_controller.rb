@@ -1,4 +1,3 @@
-require "#{Rails.root}/app/operations/expense/manual/create"
 class Mobile::V0::ExpensesController < Mobile::V0::BaseApiController
   protect_from_forgery with: :null_session
 
@@ -6,7 +5,7 @@ class Mobile::V0::ExpensesController < Mobile::V0::BaseApiController
   before_action :authenticate_user!
 
   def create
-    param = RequestFormatter::Api::Mobile::V1::Expenses::Parse.(current_user, params).formatted_request
+    param = RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse.(current_user, params).formatted_request
     @result = Expense::Manual::Create.(current_user, param)
     @result.config[:mobile_api] = true
     if @result.success?
@@ -34,7 +33,7 @@ class Mobile::V0::ExpensesController < Mobile::V0::BaseApiController
   end
 
   def update
-    param = RequestFormatter::Api::Mobile::V1::Expenses::Parse.(current_user, params).formatted_request
+    param = RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse.(current_user, params).formatted_request
     case params[:type]
       when '1'
         @result = Expense::Manual::Update.(current_user, param)

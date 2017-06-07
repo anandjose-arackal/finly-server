@@ -668,6 +668,7 @@ Rails.application.routes.draw do
     end
 
     namespace :v1 do
+      post 'auth', to: 'token#create'
       get 'configuration/category'
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
       resources :reports, only: [:create, :index, :show, :update, :destroy]

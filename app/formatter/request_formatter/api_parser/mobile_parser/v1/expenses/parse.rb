@@ -1,4 +1,4 @@
-class RequestFormatter::Api::Mobile::V1::Expenses::Parse < RequestFormatter::Base
+class RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse < RequestFormatter::Base
 
   def validate
     if user.blank?

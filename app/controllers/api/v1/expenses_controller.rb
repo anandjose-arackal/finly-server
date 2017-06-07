@@ -1,3 +1,4 @@
+require "#{Rails.root}/app/operations/expense/manual/create"
 class Api::V1::ExpensesController < Api::V1::BaseApiController
   protect_from_forgery with: :null_session
 
