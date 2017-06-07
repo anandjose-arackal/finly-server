@@ -28,9 +28,11 @@
 
 
 
+
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 
+  has_many :email_authorizations, as: :authorizable
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :user
   belongs_to :card

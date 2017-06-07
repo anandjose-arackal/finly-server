@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170522100606) do
+ActiveRecord::Schema.define(version: 20170606150212) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -367,9 +367,9 @@ ActiveRecord::Schema.define(version: 20170522100606) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
-    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -857,6 +857,18 @@ ActiveRecord::Schema.define(version: 20170522100606) do
 
   add_index "distances", ["physical_unit_id"], name: "index_distances_on_physical_unit_id", using: :btree
 
+  create_table "email_authorizations", force: :cascade do |t|
+    t.integer "user_id",           limit: 4
+    t.integer "authorizable_id",   limit: 4,                  null: false
+    t.string  "authorizable_type", limit: 255,                null: false
+    t.string  "token",             limit: 255
+    t.boolean "is_valid",                      default: true
+  end
+
+  add_index "email_authorizations", ["authorizable_id"], name: "index_email_authorizations_on_authorizable_id", using: :btree
+  add_index "email_authorizations", ["authorizable_type"], name: "index_email_authorizations_on_authorizable_type", using: :btree
+  add_index "email_authorizations", ["user_id"], name: "index_email_authorizations_on_user_id", using: :btree
+
   create_table "enforce_policies", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
     t.string   "enforceable_type", limit: 255, null: false
@@ -960,6 +972,7 @@ ActiveRecord::Schema.define(version: 20170522100606) do
     t.datetime "updated_at",                                             null: false
     t.boolean  "expense_card_enabled",                   default: false
     t.boolean  "reimbursement_card_enabled",             default: false
+    t.boolean  "hard_copy_receipt",                      default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -1633,6 +1646,7 @@ ActiveRecord::Schema.define(version: 20170522100606) do
     t.text     "note",               limit: 65535
     t.integer  "receipt_email_id",   limit: 4
     t.boolean  "to_be_transcribed",                default: false
+    t.boolean  "hard_copy_received",               default: false
   end
 
   add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
@@ -2129,6 +2143,7 @@ ActiveRecord::Schema.define(version: 20170522100606) do
   add_foreign_key "custom_fields", "field_configurations"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
+  add_foreign_key "email_authorizations", "users"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"
