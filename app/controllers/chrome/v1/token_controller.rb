@@ -1,4 +1,4 @@
-class Api::Chrome::V1::TokenController < Oauth::TokenController
+class Chrome::V1::TokenController < Oauth::TokenController
 
   def create
     super()

@@ -703,6 +703,18 @@ Rails.application.routes.draw do
 
   ######### MOBILE END ###########
 
+  ######### CHROME START ###########
+  namespace :chrome do
+    namespace :v1 do
+      post 'auth', to: 'token#create'
+      delete 'auth', to: 'token#destroy'
+
+      get 'expenses/configuration', to: 'expenses#configuration'
+      resources :expenses, only: [:create, :show, :update, :destroy]
+    end
+  end
+  ######### CHROME END ###########
+
   ######### API START ###########
   namespace :api do
     namespace :fm do
@@ -720,12 +732,6 @@ Rails.application.routes.draw do
         post 'funds/credit', to: 'funds#credit'
         post 'funds/debit', to: 'funds#debit'
         # post 'cards/request', to: 'cards#request'
-      end
-    end
-    namespace :chrome do
-      namespace :v1 do
-        post 'auth', to: 'token#create'
-        delete 'auth', to: 'token#destroy'
       end
     end
   end

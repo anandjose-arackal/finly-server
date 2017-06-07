@@ -1,4 +1,4 @@
-class Chrome::V1::ExpenseController < ApplicationController
+class Chrome::V1::ExpensesController < ApplicationController
 
   allow_oauth!
   before_action :authenticate_user!
