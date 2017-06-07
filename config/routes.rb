@@ -1,7 +1,7 @@
 # == Route Map
 #
 #                                  Prefix Verb   URI Pattern                                                 Controller#Action
-#                               junk_show GET    /junk/show(.:format)                                        junk#show
+
 #                               crono_web        /crono                                                      Crono::Web
 # transcriber_transcribed_expenses_create POST   /transcriber/expenses/create(.:format)                      transcriber/receipts#create_expense
 # transcriber_transcribed_expenses_update PATCH  /transcriber/expenses/:id/update(.:format)                  transcriber/receipts#update_expense
@@ -284,6 +284,7 @@
 #                     report_take_control PATCH  /reports/:report_id/take_control(.:format)                  reports#take_control
 #                     report_add_expenses POST   /reports/:report_id/add_expenses(.:format)                  reports#add_expenses
 #                  report_remove_expenses DELETE /reports/:report_id/remove_expenses(.:format)               reports#remove_expenses
+#          report_toggle_receipt_hardcopy POST   /reports/:report_id/toggle_receipt_hardcopy(.:format)       reports#toggle_receipt_hardcopy
 #                                         GET    /reports(.:format)                                          reports#index
 #                                         POST   /reports(.:format)                                          reports#create
 #                              new_report GET    /reports/new(.:format)                                      reports#new
@@ -558,29 +559,7 @@
 #                                   group PATCH  /groups/:id(.:format)                                       user_groups#update
 #                                         PUT    /groups/:id(.:format)                                       user_groups#update
 #                                         DELETE /groups/:id(.:format)                                       user_groups#destroy
-#                             group_items POST   /groups/:group_id/items(.:format)                           user_group_items#create
-#                              group_item GET    /groups/:group_id/items/:id(.:format)                       user_group_items#show
-#                                         PATCH  /groups/:group_id/items/:id(.:format)                       user_group_items#update
-#                                         PUT    /groups/:group_id/items/:id(.:format)                       user_group_items#update
-#                                         DELETE /groups/:group_id/items/:id(.:format)                       user_group_items#destroy
-#                                         POST   /groups/:group_id/items/:item_id(.:format)                  user_group_items#create
-#                group_item_pending_users GET    /groups/:group_id/items/:item_id/pending_users(.:format)    user_group_items#pending_users
-#                                         GET    /groups/:group_id/items(.:format)                           items#index
-#                                         POST   /groups/:group_id/items(.:format)                           items#create
-#                          new_group_item GET    /groups/:group_id/items/new(.:format)                       items#new
-#                         edit_group_item GET    /groups/:group_id/items/:id/edit(.:format)                  items#edit
-#                                         GET    /groups/:group_id/items/:id(.:format)                       items#show
-#                                         PATCH  /groups/:group_id/items/:id(.:format)                       items#update
-#                                         PUT    /groups/:group_id/items/:id(.:format)                       items#update
-#                                         DELETE /groups/:group_id/items/:id(.:format)                       items#destroy
-#                                         GET    /groups(.:format)                                           groups#index
-#                                         POST   /groups(.:format)                                           groups#create
-#                               new_group GET    /groups/new(.:format)                                       groups#new
-#                              edit_group GET    /groups/:id/edit(.:format)                                  groups#edit
-#                                         GET    /groups/:id(.:format)                                       groups#show
-#                                         PATCH  /groups/:id(.:format)                                       groups#update
-#                                         PUT    /groups/:id(.:format)                                       groups#update
-#                                         DELETE /groups/:id(.:format)                                       groups#destroy
+
 #                                   teams GET    /teams(.:format)                                            user_teams#index
 #                                         POST   /teams(.:format)                                            user_teams#create
 #                                    team GET    /teams/:id(.:format)                                        user_teams#show
@@ -781,7 +760,10 @@ Rails.application.routes.draw do
     patch 'take_control' => 'reports#take_control', as: :take_control
     post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
     delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
+    post 'toggle_receipt_hardcopy' => 'reports#toggle_receipt_hardcopy', as: :toggle_receipt_hardcopy
   end
+  post 'reports/bulk_approve' => 'reports#bulk_approve', as: :reports_bulk_approve
+
 
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do

@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20170606120758) do
+=======
+ActiveRecord::Schema.define(version: 20170529112336) do
+>>>>>>> development-pre
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -427,9 +431,9 @@ ActiveRecord::Schema.define(version: 20170606120758) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
-    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -1034,6 +1038,7 @@ ActiveRecord::Schema.define(version: 20170606120758) do
     t.datetime "updated_at",                                             null: false
     t.boolean  "expense_card_enabled",                   default: false
     t.boolean  "reimbursement_card_enabled",             default: false
+    t.boolean  "hard_copy_receipt",                      default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -1755,6 +1760,7 @@ ActiveRecord::Schema.define(version: 20170606120758) do
     t.text     "note",               limit: 65535
     t.integer  "receipt_email_id",   limit: 4
     t.boolean  "to_be_transcribed",                default: false
+    t.boolean  "hard_copy_received",               default: false
   end
 
   add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
