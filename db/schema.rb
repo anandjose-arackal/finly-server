@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170531075507) do
+ActiveRecord::Schema.define(version: 20170606120758) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -291,6 +291,29 @@ ActiveRecord::Schema.define(version: 20170531075507) do
   add_index "auto_submit_configs", ["default_policy_id"], name: "index_auto_submit_configs_on_default_policy_id", using: :btree
   add_index "auto_submit_configs", ["period_id"], name: "index_auto_submit_configs_on_period_id", using: :btree
   add_index "auto_submit_configs", ["submitable_type", "submitable_id"], name: "index_auto_submit_configs_on_submitable_type_and_submitable_id", using: :btree
+
+  create_table "auto_sync_config_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "auto_sync_configs", force: :cascade do |t|
+    t.integer  "company_id",               limit: 4
+    t.integer  "auto_sync_config_type_id", limit: 4
+    t.boolean  "categories_sync",                    default: false
+    t.boolean  "company_tags_sync",                  default: false
+    t.boolean  "external_users_sync",                default: false
+    t.boolean  "reports_sync",                       default: false
+    t.integer  "period_id",                limit: 4
+    t.boolean  "enabled",                            default: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+  end
+
+  add_index "auto_sync_configs", ["auto_sync_config_type_id"], name: "index_auto_sync_configs_on_auto_sync_config_type_id", using: :btree
+  add_index "auto_sync_configs", ["company_id"], name: "index_auto_sync_configs_on_company_id", using: :btree
+  add_index "auto_sync_configs", ["period_id"], name: "index_auto_sync_configs_on_period_id", using: :btree
 
   create_table "balance_sheets", force: :cascade do |t|
     t.integer  "user_id",                   limit: 4
@@ -624,16 +647,16 @@ ActiveRecord::Schema.define(version: 20170531075507) do
   add_index "company_funds_load_requests", ["requested_by_user_id"], name: "index_company_funds_load_requests_on_requested_by_user_id", using: :btree
 
   create_table "company_tags", force: :cascade do |t|
-    t.integer  "company_id",                      limit: 4,                  null: false
-    t.string   "name",                            limit: 255,                null: false
+    t.integer  "company_id",                      limit: 4,                       null: false
+    t.string   "name",                            limit: 255,                     null: false
     t.string   "gl_code",                         limit: 255
-    t.boolean  "active",                                      default: true, null: false
-    t.datetime "created_at",                                                 null: false
-    t.datetime "updated_at",                                                 null: false
-    t.string   "external_tag_id",                 limit: 255
+    t.boolean  "active",                                           default: true, null: false
+    t.datetime "created_at",                                                      null: false
+    t.datetime "updated_at",                                                      null: false
+    t.string   "external_tag_type",               limit: 255
     t.string   "external_integration_type",       limit: 255
     t.string   "external_id",                     limit: 255
-    t.string   "external_additional_information", limit: 255
+    t.text     "external_additional_information", limit: 16777215
     t.string   "external_updated_at",             limit: 255
   end
 
@@ -1668,7 +1691,7 @@ ActiveRecord::Schema.define(version: 20170531075507) do
 
   create_table "quickbooks_payment_types", force: :cascade do |t|
     t.string   "name",                            limit: 255
-    t.integer  "companies_id",                    limit: 4
+    t.integer  "company_id",                      limit: 4
     t.datetime "created_at",                                    null: false
     t.datetime "updated_at",                                    null: false
     t.string   "external_id",                     limit: 255
@@ -1678,7 +1701,7 @@ ActiveRecord::Schema.define(version: 20170531075507) do
     t.text     "external_additional_information", limit: 65535
   end
 
-  add_index "quickbooks_payment_types", ["companies_id"], name: "index_quickbooks_payment_types_on_companies_id", using: :btree
+  add_index "quickbooks_payment_types", ["company_id"], name: "index_quickbooks_payment_types_on_company_id", using: :btree
 
   create_table "receipt_email_attachments", force: :cascade do |t|
     t.integer  "receipt_email_id",                 limit: 4
@@ -2206,6 +2229,9 @@ ActiveRecord::Schema.define(version: 20170531075507) do
   add_foreign_key "amounts", "currencies"
   add_foreign_key "authentications", "users"
   add_foreign_key "auto_submit_configs", "periods"
+  add_foreign_key "auto_sync_configs", "auto_sync_config_types"
+  add_foreign_key "auto_sync_configs", "companies"
+  add_foreign_key "auto_sync_configs", "periods"
   add_foreign_key "balance_sheets", "users"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "categories"
@@ -2293,6 +2319,7 @@ ActiveRecord::Schema.define(version: 20170531075507) do
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "quickbooks_configurations", "payment_types"
   add_foreign_key "quickbooks_configurations", "users"
+  add_foreign_key "quickbooks_payment_types", "companies"
   add_foreign_key "receipts", "expenses"
   add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"
