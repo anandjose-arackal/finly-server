@@ -579,58 +579,25 @@
 
 Rails.application.routes.draw do
 
-  get 'junk/show'
+  ######### GEMS SPECIFIC START ###########
 
   mount Crono::Web, at: '/crono'
-
-  namespace :transcriber do
-    post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create
-    patch 'expenses/:id/update', to: 'receipts#update_expense', as: :transcribed_expenses_update
-    get 'expenses/:id/show', to: 'receipts#show', as: :transcribed_receipt_show
-    get 'companies/:id', to: 'companies#show', as: :untranscribed_receipts
-    get 'companies', to: 'companies#index', as: :companies
-  end
-
-  get 'menu_data', to: 'users#menu_data'
-
   devise_for :admin_users, controllers: {sessions: 'admin_users/sessions'}
-
-  namespace :api do
-    namespace :v1 do
-      namespace :configuration do
-        get 'category/index'
-      end
-    end
-  end
-
-  namespace :api do
-    namespace :v1 do
-      get 'configuration/category'
-    end
-  end
-
-  # get 'home/index'
-
 
   mount_griddler('/email/incoming')
   mount_opro_oauth controllers: {
       oauth_new: 'oauth/auth',
       oauth_token: 'oauth/token'
   }
-  # adding admin oauth token creation for admin login
-  post 'admin/oauth/token', to: 'admin_users/oauth/token#create', as: :admin_oauth_token_generate, defaults: {format: 'json'}
-
-  get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
-
-  post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
-  post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
-  get 'download_resource', to: 'registrations#resources_download', as: :resources_download
 
   devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"} do
     # get 'login', to: 'sessions#new', as: :login
     # post 'login', to: 'session#create', as: :login
-
   end
+
+  ######### GEMS SPECIFIC END ###########
+
+  ######### MOBILE LEGACY START ###########
 
   namespace :api do
     namespace :v0 do
@@ -690,6 +657,156 @@ Rails.application.routes.draw do
       get 'available_expense_types', to: 'expenses#available_expense_types'
     end
   end
+
+  ######### MOBILE LEGACY END ###########
+
+  ######### MOBILE START ###########
+
+  namespace :mobile do
+    namespace :v0 do
+      resources :expenses, only: [:index, :show, :create, :update, :destroy]
+      resources :reports, only: [:create, :index, :show, :update, :destroy]
+      resources :reports do
+        post 'comment' => 'reports#comment', as: :comment
+        patch 'retract' => 'reports#retract', as: :retract
+        patch 'submit' => 'reports#submit', as: :submit
+        patch 'approve' => 'reports#approve', as: :approve
+        patch 'unapprove' => 'reports#unapprove', as: :unapprove
+        patch 'reject' => 'reports#reject', as: :reject
+        patch 'settlement_confirm' => 'reports#settlement_confirm', as: :settlement_confirm
+        patch 'take_control' => 'reports#take_control', as: :take_control
+        post 'add_expenses' => 'reports#add_expenses', as: :add_expenses
+        delete 'remove_expenses' => 'reports#remove_expenses', as: :remove_expenses
+        patch 'reject_expense' => 'reports#reject_expense', as: :reject_expense
+        post 'assign_policy', to: 'reports#assign_policy', as: :assign_policy
+      end
+      resources :receipts, only: [:create, :index, :destroy, :update]
+      resources :receipts do
+        post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
+      end
+      namespace :configuration do
+        get 'categories' => 'category#index', as: :categories
+        post 'gcm/register', to: 'gcm#create'
+        post 'gcm/unregister', to: 'gcm#delete'
+      end
+    end
+
+    namespace :v1 do
+      post 'auth', to: 'token#create'
+      get 'configuration/category'
+      resources :expenses, only: [:index, :show, :create, :update, :destroy]
+      resources :reports, only: [:create, :index, :show, :update, :destroy]
+      resources :reports do
+        post 'comment' => 'reports#comment', as: :comment
+      end
+      resources :money_requests, only: [:create, :index, :show, :destroy, :update]
+      resources :money_requests do
+        post 'comment' => 'money_requests#comment', as: :comment
+      end
+      resources :receipts, only: [:create, :index, :destroy, :update]
+      resources :receipts do
+        post 'add_note', to: 'receipts#add_note', as: :add_note
+        post 'expense_from_receipt', to: 'receipts#expense_from_receipt', as: :expense_from_receipt
+      end
+      resources :users, only: [:index, :show]
+      resources :users do
+        get 'summary', to: 'users#summary', as: :user_summary
+      end
+      post 'cards/balance/update', to: 'cards#update_balance'
+      post 'cards/status/update', to: 'cards#update_status'
+      namespace :configuration do
+        get 'category/index'
+        get 'categories' => 'category#index', as: :categories
+        post 'gcm/register', to: 'gcm#create'
+        post 'gcm/unregister', to: 'gcm#delete'
+      end
+      get 'balances', to: 'users#balance'
+      get 'available_expense_types', to: 'expenses#available_expense_types'
+    end
+  end
+
+  ######### MOBILE END ###########
+
+  ######### CHROME START ###########
+  namespace :chrome do
+    namespace :v1 do
+      post 'auth', to: 'token#create'
+      delete 'auth', to: 'token#destroy'
+
+      get 'expenses/configuration', to: 'expenses#configuration'
+      resources :expenses, only: [:create, :show, :update, :destroy]
+    end
+  end
+  ######### CHROME END ###########
+
+  ######### API START ###########
+  namespace :api do
+    namespace :fm do
+      namespace :v1 do
+        post 'auth', to: 'token#create'
+        delete 'auth', to: 'token#destroy'
+        resources :users, only: [:create, :show, :index, :update]
+        resources :cards, only: [:index, :show]
+        resources :cards do
+          get 'transactions', to: 'cards#transactions'
+          # patch 'assign', to: 'cards#assign'
+          patch 'status', to: 'cards#update_status'
+          # patch 'restrictions', to: 'cards#update_restrictions'
+        end
+        post 'funds/credit', to: 'funds#credit'
+        post 'funds/debit', to: 'funds#debit'
+        # post 'cards/request', to: 'cards#request'
+      end
+    end
+  end
+  ######### API END ###########
+
+  ######### ADMIN PANEL START ###########
+
+  namespace :transcriber do
+    post 'expenses/create', to: 'receipts#create_expense', as: :transcribed_expenses_create
+    patch 'expenses/:id/update', to: 'receipts#update_expense', as: :transcribed_expenses_update
+    get 'expenses/:id/show', to: 'receipts#show', as: :transcribed_receipt_show
+    get 'companies/:id', to: 'companies#show', as: :untranscribed_receipts
+    get 'companies', to: 'companies#index', as: :companies
+    resources :expenses
+    resources :companies
+    resources :receipts
+  end
+
+  namespace :admin_users do
+    resources :companies
+    resources :users do
+      patch 'update_status', to: 'users#update_status', as: :update_status
+      patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping
+      delete 'destroy_mapping', to: 'users#destroy_mapping', as: :destroy_mapping
+    end
+    post 'welcome', to: 'users#admin_welcome', as: :welcome
+    post 'users/set_role', to: 'users#set_role', as: :set_role
+    get 'lookup', to: 'users#lookup', as: :lookup
+    post 'import', to: 'users#import', as: :import
+    get 'temp_import', to: 'users#temp_import'
+    resources :expenses
+    resources :cards do
+      patch 'block', to: 'cards#block', as: :block
+    end
+  end
+
+  get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
+
+  ######### ADMIN PANEL END ###########
+
+  get 'menu_data', to: 'users#menu_data'
+
+  # adding admin oauth token creation for admin login
+  post 'admin/oauth/token', to: 'admin_users/oauth/token#create', as: :admin_oauth_token_generate, defaults: {format: 'json'}
+
+  get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
+
+  post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
+  post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
+  get 'download_resource', to: 'registrations#resources_download', as: :resources_download
+
 
   get 'policies/expense_rules' => 'policies#expense_rules'
   get 'policies/budget_rules' => 'policies#budget_rules'
@@ -846,34 +963,8 @@ Rails.application.routes.draw do
 
   get 'expense_type_configurations', to: 'expense_types_configuration#show', as: :expense_type_configuration_show
   patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update
-  
+
   resources :per_diems
-
-  namespace :admin_users do
-    resources :companies
-    resources :users do
-      patch 'update_status', to: 'users#update_status', as: :update_status
-      patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping
-      delete 'destroy_mapping', to: 'users#destroy_mapping', as: :destroy_mapping
-    end
-    post 'welcome', to: 'users#admin_welcome', as: :welcome
-    post 'users/set_role', to: 'users#set_role', as: :set_role
-    get 'lookup', to: 'users#lookup',as: :lookup
-    post 'import', to: 'users#import', as: :import
-    get 'temp_import', to: 'users#temp_import'
-    resources :expenses
-    resources :cards do
-      patch 'block', to: 'cards#block', as: :block
-    end
-  end
-
-  get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
-
-  namespace :transcriber do
-    resources :expenses
-    resources :companies
-    resources :receipts
-  end
 
   resources :card_transactions do
 
@@ -942,7 +1033,6 @@ Rails.application.routes.draw do
   delete 'cards/meal/orders/:id' => 'benefits/meal_cards#destroy'
 
   # Medical Cards
-
 
 
   post 'cards/medical/process_file' => 'benefits/medical_cards#process_file'

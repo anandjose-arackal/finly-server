@@ -1,4 +1,5 @@
-class Disburse::Users::Create < Admin::Users::Create
+# Used to create users without invitation
+class User::Create < Admin::Users::Create
   def pre_validate
     # Overriding admin user create operation's behaviour
   end

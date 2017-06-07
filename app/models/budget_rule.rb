@@ -17,8 +17,6 @@
 
 
 
-
-
 class BudgetRule < ActiveRecord::Base
   belongs_to :category
   belongs_to :amount, dependent: :destroy

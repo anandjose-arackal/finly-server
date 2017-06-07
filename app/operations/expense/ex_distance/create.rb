@@ -45,6 +45,13 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     if expense_params[:receipts_attributes] == [nil]
       expense_params.delete(:receipts_attributes)
     end
+
+    # Setting order for each of the locations
+    pos = 1
+    self.expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes)&.each do |location|
+      location[:order] = pos
+      pos += 1
+    end
   end
 
   def validate

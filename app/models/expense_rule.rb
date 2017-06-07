@@ -14,8 +14,6 @@
 #
 
 
-
-
 class ExpenseRule < ActiveRecord::Base
   belongs_to :greater_than_amount, class_name: "Amount", dependent: :destroy
   belongs_to :category
@@ -82,6 +80,5 @@ class ExpenseRule < ActiveRecord::Base
     end
 
   end
-
 
 end

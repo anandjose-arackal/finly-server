@@ -168,7 +168,7 @@ class UsersController < ApplicationController
       when 'details'
         operation = User::Configuration::UpdateDetails.new(current_user, params)
         success_message = 'Details updated'
-      when 'state'
+      when 'state', 'status'
         operation = User::Configuration::UpdateState.new(current_user, params)
         success_message = 'State updated'
       when 'auto_submit'

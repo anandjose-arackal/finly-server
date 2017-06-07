@@ -85,6 +85,9 @@ json.expense_sections sorted_expenses do |category|
       json.warning_present (items[:expense_warning].present? or items[:budget_warning].present? or items['expense_warning'].present? or items['budget_warning'].present?)
       json.items items
     end
+    if expense.distance_expense?
+      json.locations expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
+    end
   end
 end
 

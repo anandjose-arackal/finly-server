@@ -13,16 +13,8 @@ class User::PrepaidCard::Show < User::PrepaidCard::Base
     end
   end
 
-  def validate
-    super
-    return if has_errors?
-    if selected_user.cards.with_id(params[:card_id]).blank?
-      add_message :error, 'Card not found'
-    end
-  end
-
   def process
-    self.account_details = ItzCash::AccountDetails.(selected_user, params)
+    self.account_details = ItzCash::AccountDetails.(user, card: self.card)
     if account_details.failure?
       messages[:error] = account_details.messages[:error]
     end

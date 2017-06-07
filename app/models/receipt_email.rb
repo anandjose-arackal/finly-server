@@ -28,6 +28,7 @@
 
 
 
+
 require 'fileutils'
 class ReceiptEmail < ActiveRecord::Base
   has_many :receipts
