@@ -20,6 +20,7 @@ dump.rdb
 /public/system/company_configurations/*
 /public/common/files/temp_files/*
 /sample_atm_transactions.txt
+/junk_expenses.rb
 
 # all local executables
 /bin
