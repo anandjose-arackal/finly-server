@@ -19,6 +19,7 @@ json.original_amount do
 end
 
 json.converted expense.converted?
+json.conversion_rate @result.conversion_rate
 
 json.type expense.expense_type_id
 # if expense.manual_expense?
