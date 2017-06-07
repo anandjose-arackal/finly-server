@@ -161,6 +161,40 @@ class Company < ActiveRecord::Base
     self.feature_subscription.ocr_enabled
   end
 
+  # Feature subscription methods
+  def expense_management_enabled?
+    self.feature_subscription.expense_management_enabled
+  end
+
+  def gift_card_enabled?
+    self.feature_subscription.gift_card_enabled
+  end
+
+  def gift_voucher_enabled?
+    self.feature_subscription.gift_voucher_enabled
+  end
+
+  def meal_card_enabled?
+    self.feature_subscription.meal_card_enabled
+  end
+
+  def fuel_card_enabled?
+    self.feature_subscription.fuel_card_enabled
+  end
+
+  def medical_card_enabled?
+    self.feature_subscription.medical_card_enabled
+  end
+
+  def expense_card_enabled?
+    self.feature_subscription.expense_card_enabled
+  end
+
+  def reimbursement_card_enabled?
+    self.feature_subscription.reimbursement_card_enabled
+  end
+
+
   def balance_amount(date)
     balance_history = self.company_balance_histories.with_date(date).first rescue nil
     return 0 if balance_history.nil?

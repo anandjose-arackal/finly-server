@@ -625,6 +625,7 @@ ActiveRecord::Schema.define(version: 20170606120758) do
     t.datetime "updated_at",                                                null: false
     t.boolean  "other_expense_types",                       default: false
     t.text     "encrypted_easy_login_params", limit: 65535
+    t.string   "registered_mobile_number",    limit: 255
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
