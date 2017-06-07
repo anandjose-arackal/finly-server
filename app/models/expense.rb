@@ -23,14 +23,6 @@
 
 
 
-
-
-
-
-
-
-
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -306,6 +298,32 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def base_amount
+    unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present?
+      return self.amount
+    end
+    currency = report_id.present? ? report.base_currency : amount.currency
+    Amount.new(value: amount_value, currency: currency)
+  end
+
+  def original_amount
+    self.amount
+  end
+
+  def conversion_rate
+    return nil unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present? and report_id.present?
+    converted_amount = expense.amount_value
+    original_amount = expense.original_amount_value
+    precision_value converted_amount/original_amount
+  end
+
+  def converted?
+    return false unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present? and report_id.present?
+    if report.base_currency_id != amount.currency_id
+      return true
+    end
+    false
+  end
 
   # this method is to calculate the amount values for the various time/distance/per diem expenses
   def calculate_amount_value(policy)
