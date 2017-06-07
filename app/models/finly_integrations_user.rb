@@ -29,26 +29,25 @@ class FinlyIntegrationsUser < ActiveRecord::Base
   belongs_to :user
   belongs_to :company
 
-  # def save
-  #   if self.valid?
-  #     begin
-  #       finly_user = User.find_or_initialize_by(external_integration_type: self.external_integration_type,
-  #         external_id: self.external_id)
-  #       finly_user.tap do |user|
-  #         user.email = self.email
-  #         user.company_id = self.company_id
-  #         user.name = self.name
-  #         user.mobile_number = self.mobile_number
-  #         user.external_updated_at = self.external_updated_at
-  #         user.active = self.active
-  #         user.external_additional_information = self.external_additional_information
-  #       end
-  #       finly_user.save
-  #     rescue ActiveRecord::RecordNotUnique
-  #       retry
-  #     end
-  #   else
-  #     return false
-  #   end
-  # end
+  # adds the relevant details to the User model and saves it in the db
+  def save
+    if self.valid?
+      begin
+        finly_user = User.find_by(email: self.email) || User.find_by(mobile_number: self.mobile_number)
+        if finly_user
+          finly_user.tap do |user|
+            user.external_id = self.external_id
+            user.external_integration_type = self.external_integration_type
+            user.external_updated_at = self.external_updated_at
+            user.external_additional_information = self.external_additional_information
+          end
+          finly_user.save
+        end
+      rescue ActiveRecord::RecordNotUnique
+        # retry
+      end
+    else
+      return false
+    end
+  end
 end

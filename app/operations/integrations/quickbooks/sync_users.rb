@@ -14,6 +14,6 @@ class SyncUsers < Integrations::Base
   end
 
   def post_process
-
+    add_message :success, "Users synced"
   end
 end

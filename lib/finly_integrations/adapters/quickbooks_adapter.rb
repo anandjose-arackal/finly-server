@@ -35,7 +35,7 @@ module FinlyIntegrations
 
       def save_report(report)
         finly_purchase = Quickbooks::Model::Purchase.new
-        finly_purchase.account_id = @quickbooks_config.payment_type.external_id
+        finly_purchase.account_id = @quickbooks_config.quickbooks_payment_type.external_id
         finly_purchase.payment_type = @quickbooks_config.quickbooks_payment_type
         report.expenses.each do |expense|
           category = expense.category
