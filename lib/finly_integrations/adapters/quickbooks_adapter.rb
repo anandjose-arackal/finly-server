@@ -37,10 +37,16 @@ module FinlyIntegrations
         finly_purchase = Quickbooks::Model::Purchase.new
         finly_purchase.account_id = @quickbooks_config.quickbooks_payment_type.external_id
         finly_purchase.payment_type = @quickbooks_config.quickbooks_payment_type
+        # finly_purchase.payment_type = "Cash"
         report.expenses.each do |expense|
           category = expense.category
           raise 'Expense doesn\'t belong to a category. Aborting export of the report.' if category.nil?
-          raise 'All expenses of this report don\'t belong to Quickbooks. Aborting export of the report.' if category.external_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
+          begin
+            raise 'All expenses of this report don\'t belong to Quickbooks. Aborting export of the report.' if category.external_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
+          rescue NoMethodError
+            puts "Expense category does not exist in Quickbooks"
+            return
+          end
           line_item = Quickbooks::Model::PurchaseLineItem.new
           line_item.description = expense.note
           line_item.amount = expense.amount.value.to_f
