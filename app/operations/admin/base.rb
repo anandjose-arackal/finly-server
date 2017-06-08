@@ -1,7 +1,7 @@
 class Admin::Base < BaseOperation
 
   def pre_validate
-    unless user.finly_admin? || user.company_id == 1
+    unless user.finly_admin?
       raise_unauthorized_exception
     end
   end
