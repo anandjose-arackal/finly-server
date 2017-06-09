@@ -28,6 +28,7 @@ class ReceiptEmail::Process < BackgroundOperation
   def process
     self.receipt_email.receipt_email_attachments.each do |attachment|
       if attachment.download_pending?
+        url = attachment.attachment_url
 
       end
     end
