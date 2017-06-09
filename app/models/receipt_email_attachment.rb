@@ -12,7 +12,6 @@
 #  updated_at                       :datetime         not null
 #
 
-
 class ReceiptEmailAttachment < ActiveRecord::Base
   PDF_CONTENT_TYPES = ['application/pdf'].freeze
   IMAGE_CONTENT_TYPES = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].freeze
@@ -41,5 +40,13 @@ class ReceiptEmailAttachment < ActiveRecord::Base
 
   def msdoc?
     MSWORD_CONTENT_TYPES.include? original_attachment_content_type
+  end
+
+  def download_pending?
+    (attachment_url.present? and original_attachment.blank?)
+  end
+
+  def load_attachment_from_url
+
   end
 end

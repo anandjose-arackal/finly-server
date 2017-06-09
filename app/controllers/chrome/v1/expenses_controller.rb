@@ -4,7 +4,9 @@ class Chrome::V1::ExpensesController < ApplicationController
   before_action :authenticate_user!
 
   def create
-
+    formatted_param = RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse.(current_user, params)&.formatted_request
+    @result = Expense::Manual::Create.(current_user, formatted_param)
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def show

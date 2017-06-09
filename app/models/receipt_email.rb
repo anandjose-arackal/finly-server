@@ -26,14 +26,13 @@
 #  raw_header_updated_at   :datetime
 #
 
-
-
-
 require 'fileutils'
 class ReceiptEmail < ActiveRecord::Base
   has_many :receipts
   has_many :receipt_email_attachments, dependent: :destroy
   belongs_to :user
+
+  accepts_nested_attributes_for :receipt_email_attachments
 
   validates :user_id, presence: true
 

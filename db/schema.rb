@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170605175730) do
+ActiveRecord::Schema.define(version: 20170608143310) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1618,8 +1618,9 @@ ActiveRecord::Schema.define(version: 20170605175730) do
     t.string   "original_attachment_content_type", limit: 255
     t.integer  "original_attachment_file_size",    limit: 4
     t.datetime "original_attachment_updated_at"
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.text     "attachment_url",                   limit: 65535
   end
 
   add_index "receipt_email_attachments", ["receipt_email_id"], name: "index_receipt_email_attachments_on_receipt_email_id", using: :btree
@@ -1646,8 +1647,14 @@ ActiveRecord::Schema.define(version: 20170605175730) do
     t.string   "raw_header_content_type", limit: 255
     t.integer  "raw_header_file_size",    limit: 4
     t.datetime "raw_header_updated_at"
+    t.integer  "expense_id",              limit: 4
+    t.string   "email_id",                limit: 255
+    t.string   "sender",                  limit: 255
+    t.string   "source",                  limit: 255
+    t.datetime "timestamp"
   end
 
+  add_index "receipt_emails", ["expense_id"], name: "index_receipt_emails_on_expense_id", using: :btree
   add_index "receipt_emails", ["user_id"], name: "index_receipt_emails_on_user_id", using: :btree
 
   create_table "receipts", force: :cascade do |t|
@@ -2232,6 +2239,7 @@ ActiveRecord::Schema.define(version: 20170605175730) do
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
+  add_foreign_key "receipt_emails", "expenses"
   add_foreign_key "receipts", "expenses"
   add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"

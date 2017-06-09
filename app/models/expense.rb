@@ -55,6 +55,8 @@ class Expense < ActiveRecord::Base
   accepts_nested_attributes_for :time_expense
   accepts_nested_attributes_for :per_diem_expense
 
+  has_one :receipt_email
+
   # delegating to associated classes the dependent attribute calls
   # delegate :amount_value, :currency, to: :amount
   delegate :surcharge_value, to: :card_expense

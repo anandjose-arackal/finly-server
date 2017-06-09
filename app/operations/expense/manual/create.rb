@@ -71,6 +71,10 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   def post_process
+    if expense.receipt_email.present?
+
+    end
+
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?
       comment = self.expense.report.comments.build report: self.expense.report, user: user,
