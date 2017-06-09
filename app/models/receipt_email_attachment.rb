@@ -16,7 +16,7 @@
 
 
 class ReceiptEmailAttachment < ActiveRecord::Base
-  PDF_CONTENT_TYPES = ['application/pdf', 'text/html'].freeze
+  PDF_CONTENT_TYPES = ['application/pdf'].freeze
   IMAGE_CONTENT_TYPES = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].freeze
   MSWORD_CONTENT_TYPES = ['application/rtf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].freeze
 

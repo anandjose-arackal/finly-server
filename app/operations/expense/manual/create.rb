@@ -70,9 +70,9 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   def post_process
-    if expense&.receipt_email.present?
-      ReceiptEmail::ProcessEmail.call(user, expense_id: self.expense.id)
-    end
+    # if expense&.receipt_email.present?
+    #   ReceiptEmail::ProcessEmail.call(user, expense_id: self.expense.id)
+    # end
 
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?

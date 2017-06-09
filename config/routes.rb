@@ -730,6 +730,7 @@ Rails.application.routes.draw do
   ######### CHROME START ###########
   namespace :chrome do
     namespace :v1 do
+
       post 'auth', to: 'token#create'
       delete 'auth', to: 'token#destroy'
 
