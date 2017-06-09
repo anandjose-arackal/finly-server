@@ -1,3 +1,4 @@
+# Used to download email url attachments and create receipts out of them. Currently not being used.
 class ReceiptEmail::ProcessEmail < BackgroundOperation
   attr_accessor :expense, :receipt_email
 
