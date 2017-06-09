@@ -12,7 +12,6 @@ class Export::Expense::AsCsv < Export::Expense::Base
 
   def init
     expense_presenter = ::Expense::Index.(user, params)
-    debugger
     # id = (params[:report_id] or params[:report_ids]).split(',') rescue nil
     # self.reports = report_presenter.reports.with_id(id) rescue nil
     self.preferences = user.company.export_preferences

@@ -124,7 +124,7 @@ class Report::Base < BaseOperation
     def load_actions
       actions = {}
       # Editable Receipts
-      # debugger
+
       # if self.report.controlling_user?(user) && (self.report.open? || self.report.processing? || self.report.retracted? || self.report.rejected?)
       #   actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])} 
       # end

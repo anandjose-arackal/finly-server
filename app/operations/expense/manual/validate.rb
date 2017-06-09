@@ -54,7 +54,7 @@ class Expense::Manual::Validate < Expense::Manual::Base
   end
 
   def process
-    # debugger
+
     self.expense = user.expenses.new(expense_params)
     add_message :error_local, self.expense.errors.full_messages unless self.expense.valid?
 

@@ -23,6 +23,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -45,6 +46,7 @@ class Expense < ActiveRecord::Base
   has_one :distance_expense, dependent: :destroy
   has_one :time_expense, dependent: :destroy
   has_one :per_diem_expense, dependent: :destroy
+  has_one :receipt_email
 
   accepts_nested_attributes_for :system_messages
   accepts_nested_attributes_for :amount
@@ -54,8 +56,8 @@ class Expense < ActiveRecord::Base
   accepts_nested_attributes_for :distance_expense
   accepts_nested_attributes_for :time_expense
   accepts_nested_attributes_for :per_diem_expense
+  accepts_nested_attributes_for :receipt_email
 
-  has_one :receipt_email
 
   # delegating to associated classes the dependent attribute calls
   # delegate :amount_value, :currency, to: :amount

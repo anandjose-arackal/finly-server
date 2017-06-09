@@ -12,7 +12,7 @@ class Company::VirtualAccount::Balance < BaseOperation
   end
 
   def init
-    # debugger
+
     # self.company = user.company || 
     self.company = params[:company] || user.company
 

@@ -1,8 +1,8 @@
-class Attachment::Download < BaseHandler
+class File::Download < BaseHandler
 
   attr_accessor :file
 
-  class Attachment::Download::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class File::Download::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :file, :file_name
 
@@ -32,7 +32,7 @@ class Attachment::Download < BaseHandler
 
   def success
     params[:file] = self.file
-    Attachment::Download::SuccessPresenter.new(user, params, messages)
+    File::Download::SuccessPresenter.new(user, params, messages)
   end
 
 end
