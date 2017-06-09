@@ -7,6 +7,7 @@ class DuplicateExpenseMapping < ActiveRecord::Base
   scope :with_duplicate_expense, ->(exp_id) { where duplicate_expense_id: exp_id }
   scope :with_id, ->(id) { where id: id }
   scope :without_id, ->(id) { where.note id: id }
+  scope :limit_to, ->(count) { limit count }
 
   validates :expense_id, presence: true
   validates :duplicate_expense_id, presence: true

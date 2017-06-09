@@ -10,4 +10,5 @@ json.array!(@result.paginated_expenses) do |expense|
     end
   end
   json.date expense.date.strftime("%d %b %Y")
+  json.potential_duplicate expense.has_duplicate_expenses?
 end

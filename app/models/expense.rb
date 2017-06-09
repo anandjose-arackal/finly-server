@@ -649,6 +649,17 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def has_duplicate_expenses?
+    filtered_duplicate_expenses.limit_to(1).present?
+  end
+
+  def filtered_duplicate_expenses
+    if expense.submitted?
+      return duplicate_expenses.submitted
+    end
+    duplicate_expenses
+  end
+
   private
 
   # cannot add an expense with future date
