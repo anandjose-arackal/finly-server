@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170520091811) do
+ActiveRecord::Schema.define(version: 20170609102443) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -238,6 +238,17 @@ ActiveRecord::Schema.define(version: 20170520091811) do
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
+
+  create_table "auto_reload_configs", force: :cascade do |t|
+    t.integer  "minimum_balance_id", limit: 4
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.boolean  "enabled",                        default: false
+    t.integer  "reloadable_id",      limit: 4
+    t.string   "reloadable_type",    limit: 255
+  end
+
+  add_index "auto_reload_configs", ["reloadable_type", "reloadable_id"], name: "index_auto_reload_configs_on_reloadable_type_and_reloadable_id", using: :btree
 
   create_table "auto_submit_configs", force: :cascade do |t|
     t.boolean  "enabled",                              default: false, null: false
@@ -547,16 +558,18 @@ ActiveRecord::Schema.define(version: 20170520091811) do
   add_index "company_balance_histories", ["wallet_withdrawal_to_wallet_id"], name: "index_wal_2_wal_on_company_history", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
-    t.integer  "company_id",          limit: 4,                   null: false
-    t.integer  "contact_id",          limit: 4
-    t.boolean  "verified",                        default: false
-    t.string   "logo_file_name",      limit: 255
-    t.string   "logo_content_type",   limit: 255
-    t.integer  "logo_file_size",      limit: 4
+    t.integer  "company_id",                  limit: 4,                     null: false
+    t.integer  "contact_id",                  limit: 4
+    t.boolean  "verified",                                  default: false
+    t.string   "logo_file_name",              limit: 255
+    t.string   "logo_content_type",           limit: 255
+    t.integer  "logo_file_size",              limit: 4
     t.datetime "logo_updated_at"
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
-    t.boolean  "other_expense_types",             default: false
+    t.datetime "created_at",                                                null: false
+    t.datetime "updated_at",                                                null: false
+    t.boolean  "other_expense_types",                       default: false
+    t.text     "encrypted_easy_login_params", limit: 65535
+    t.string   "registered_mobile_number",    limit: 255
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -960,6 +973,7 @@ ActiveRecord::Schema.define(version: 20170520091811) do
     t.datetime "updated_at",                                             null: false
     t.boolean  "expense_card_enabled",                   default: false
     t.boolean  "reimbursement_card_enabled",             default: false
+    t.boolean  "hard_copy_receipt",                      default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -1148,6 +1162,22 @@ ActiveRecord::Schema.define(version: 20170520091811) do
 
   add_index "itz_cash_properties", ["company_id"], name: "index_itz_cash_properties_on_company_id", using: :btree
 
+  create_table "locations", force: :cascade do |t|
+    t.integer  "locatable_id",   limit: 4
+    t.string   "locatable_type", limit: 255
+    t.decimal  "latitude",                     precision: 30, scale: 15
+    t.decimal  "longitude",                    precision: 30, scale: 15
+    t.string   "name",           limit: 255
+    t.text     "address",        limit: 65535
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.string   "maps_id",        limit: 255
+    t.integer  "order",          limit: 4
+  end
+
+  add_index "locations", ["locatable_id"], name: "index_locations_on_locatable_id", using: :btree
+  add_index "locations", ["locatable_type"], name: "index_locations_on_locatable_type", using: :btree
+
   create_table "manual_expenses", force: :cascade do |t|
     t.integer  "expense_id", limit: 4
     t.string   "merchant",   limit: 255
@@ -1334,6 +1364,7 @@ ActiveRecord::Schema.define(version: 20170520091811) do
     t.datetime "updated_at",                                         null: false
     t.text     "link",                 limit: 65535
     t.integer  "view_role_id",         limit: 4
+    t.text     "message",              limit: 65535
   end
 
   add_index "notifications", ["action_type_id"], name: "index_notifications_on_action_type_id", using: :btree
@@ -1587,8 +1618,10 @@ ActiveRecord::Schema.define(version: 20170520091811) do
     t.string   "original_attachment_content_type", limit: 255
     t.integer  "original_attachment_file_size",    limit: 4
     t.datetime "original_attachment_updated_at"
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.text     "attachment_url",                   limit: 65535
+    t.string   "attachment_url_file_name",         limit: 255
   end
 
   add_index "receipt_email_attachments", ["receipt_email_id"], name: "index_receipt_email_attachments_on_receipt_email_id", using: :btree
@@ -1615,8 +1648,13 @@ ActiveRecord::Schema.define(version: 20170520091811) do
     t.string   "raw_header_content_type", limit: 255
     t.integer  "raw_header_file_size",    limit: 4
     t.datetime "raw_header_updated_at"
+    t.integer  "expense_id",              limit: 4
+    t.string   "email_id",                limit: 255
+    t.string   "sender",                  limit: 255
+    t.string   "source",                  limit: 255
   end
 
+  add_index "receipt_emails", ["expense_id"], name: "index_receipt_emails_on_expense_id", using: :btree
   add_index "receipt_emails", ["user_id"], name: "index_receipt_emails_on_user_id", using: :btree
 
   create_table "receipts", force: :cascade do |t|
@@ -1633,6 +1671,7 @@ ActiveRecord::Schema.define(version: 20170520091811) do
     t.text     "note",               limit: 65535
     t.integer  "receipt_email_id",   limit: 4
     t.boolean  "to_be_transcribed",                default: false
+    t.boolean  "hard_copy_received",               default: false
   end
 
   add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
@@ -2096,6 +2135,23 @@ ActiveRecord::Schema.define(version: 20170520091811) do
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
   add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
 
+  create_table "whitelisted_ip_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "whitelisted_ips", force: :cascade do |t|
+    t.string   "ip_address",             limit: 255, null: false
+    t.integer  "company_id",             limit: 4,   null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.integer  "whitelisted_ip_type_id", limit: 4,   null: false
+  end
+
+  add_index "whitelisted_ips", ["company_id"], name: "index_whitelisted_ips_on_company_id", using: :btree
+  add_index "whitelisted_ips", ["ip_address"], name: "index_whitelisted_ips_on_ip_address", using: :btree
+
   add_foreign_key "admin_user_role_mappings", "admin_user_roles"
   add_foreign_key "admin_user_role_mappings", "admin_users"
   add_foreign_key "amounts", "currencies"
@@ -2183,6 +2239,7 @@ ActiveRecord::Schema.define(version: 20170520091811) do
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
+  add_foreign_key "receipt_emails", "expenses"
   add_foreign_key "receipts", "expenses"
   add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"
@@ -2223,4 +2280,5 @@ ActiveRecord::Schema.define(version: 20170520091811) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
+  add_foreign_key "whitelisted_ips", "companies"
 end

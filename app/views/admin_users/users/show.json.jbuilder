@@ -10,6 +10,10 @@ else
   json.mobile_number @result.selected_user.mobile_number
 end
 
+json.wallet do
+  json.balance @result.wallet.balance_value
+end
+
 json.cards do
   json.array!(@result.cards) do |card|
     json.type card.card_program_name
@@ -20,6 +24,47 @@ json.cards do
     json.id card.id
     json.itz_cash_card_program_name card.itz_cash_card_program_name rescue nil
     json.itz_cash_card_program_id card.itz_cash_card_program_id rescue nil
+    json.balance card.balance.to_f
+    json.available_eligibility card.card_eligibility.value.to_f
+
+
+    json.configurable_restrictions card.card_program.spend_restrictions
+    if card.card_program.spend_restrictions
+      json.restrictions do
+
+        card_restriction = card.card_restriction
+        card_limits = card_restriction.card_limits
+
+        json.channel_atm card_restriction.channel_atm
+        json.channel_ecom_pos card_restriction.channel_ecom_pos
+        json.mcc_group_id card_restriction.mcc_group_id
+        json.mcc_restriction_type card_restriction.mcc_restriction_type
+        json.mcc_group_name card_restriction.mcc_group_name rescue nil
+
+        json.limits do
+          json.atm_limits do
+            json.array! card_limits.atm_limits.each do |limit|
+              json.id limit.id
+              json.period_id limit.period_id
+              json.period_name limit.period_name rescue nil
+              json.budget limit.budget
+              json.transactions limit.transactions
+              json.enabled limit.allowed
+            end
+          end
+          json.ecom_pos_limits do
+            json.array! card_limits.ecom_pos_limits.each do |limit|
+              json.id limit.id
+              json.period_id limit.period_id
+              json.period_name limit.period_name rescue nil
+              json.budget limit.budget
+              json.transactions limit.transactions
+              json.enabled limit.allowed
+            end
+          end
+        end
+      end
+    end
   end
 end
 

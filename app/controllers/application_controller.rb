@@ -171,7 +171,6 @@ class ApplicationController < ActionController::Base
     # devise_parameter_sanitizer.permit(:account_update, keys: [:name])
   end
 
-
   def after_sign_out_path_for(resource)
     root_url
   end
@@ -199,5 +198,15 @@ class ApplicationController < ActionController::Base
   #     redirect_to edit_default_password_path
   #   end
   # end
+
+  def whitelisted?(ip, type_id)
+    return true if WhitelistedIp.with_type(type_id).with_ip(ip).present?
+    false
+  end
+
+  def block_foreign_hosts(type_id)
+    return false if whitelisted?(request.remote_ip, type_id)
+    head(403)
+  end
 
 end

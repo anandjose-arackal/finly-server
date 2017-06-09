@@ -1,6 +1,6 @@
 class Company::Preview < BaseOperation
 
-  attr_accessor :preview_company
+  attr_accessor :preview_company, :preview_parameters
 
   def pre_validate
     if params.blank?
@@ -8,8 +8,17 @@ class Company::Preview < BaseOperation
     end
   end
 
+  def init
+    self.preview_parameters = preview_params
+  end
+
+  def pre_process
+    # clean up the mobile number in case it has extra characters
+    preview_parameters[:phone_number] = CleanUpUtils.mobile_number_cleanup(preview_parameters[:phone_number]) if preview_parameters[:phone_number]
+  end
+
   def process
-    self.preview_company = PreviewRegistration.new(preview_params)
+    self.preview_company = PreviewRegistration.new(preview_parameters)
     unless preview_company.save
       messages[:error] = preview_company.errors.full_messages
     end

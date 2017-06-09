@@ -54,7 +54,6 @@ class Expense::Manual::Create < Expense::Manual::Base
 
   def process
     self.expense = user.expenses.build(expense_params)
-
     # Create custom fields only for validations. Fields will be saved later
     validate_custom_fields
     return if has_errors?
@@ -71,6 +70,10 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   def post_process
+    # if expense&.receipt_email.present?
+    #   ReceiptEmail::ProcessEmail.call(user, expense_id: self.expense.id)
+    # end
+
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?
       comment = self.expense.report.comments.build report: self.expense.report, user: user,

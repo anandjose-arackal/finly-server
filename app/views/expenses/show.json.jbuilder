@@ -4,6 +4,7 @@ json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name,
 
 json.date @result.expense.date.strftime("%d %b %Y")
 json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
+
 json.currency_id @result.expense.currency_id rescue nil
 json.original_currency_id @result.expense.currency_id rescue nil
 json.currency_symbol @result.expense.currency_symbol
@@ -16,6 +17,11 @@ if @result.expense.report_id.present?
   json.original_currency_country_code @result.expense.amount.currency.country_code
   json.base_currency_symbol @result.expense.report.base_currency_symbol
   json.base_currency_country_code @result.expense.report.base_currency_code
+  json.currency_conversion_rate @result.conversion_rate
+end
+
+if @result.expense.card_expense?
+  json.original_merchant_name @result.expense.card_expense.card_transaction.merchant_name
 end
 
 # flag to show whether a particular expense has been converted or not
@@ -90,4 +96,8 @@ if @result.expense.card_expense? && @result.expense.cancelled?
       json.card_number "XXXXXXXXXXXX#{transaction.card.ending_number}"
     end
   end
+end
+
+if @result.expense.distance_expense?
+  json.locations @result.expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
 end

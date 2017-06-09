@@ -18,7 +18,7 @@ module Constants
 
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finly.io', 'admin@finlytest.io']
 
-  DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other', 'Personal']
+  DEFAULT_CATEGORIES = ['Education and Training', 'Travel', 'Entertainment', 'Marketing and Advertising', 'Meals', 'Office Expenses', 'Other']
 
   FLASH_COLORS = {alert: 'red', error: 'red', failure: 'red', success: 'green', message: 'blue', notice: 'blue'}
 
@@ -33,6 +33,13 @@ module Constants
   WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
 
   CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+
+  # PayU Payment Gateway URL
+  if Rails.env.production?
+    PAYU_RELOAD_URL = "https://www.itzcash.com/finly/servlet/AccountReloadServlet"
+  else
+    PAYU_RELOAD_URL = "https://staging.itzcash.com/loconav/servlet/AccountReloadServlet"
+  end
 
   #########################
 
@@ -53,7 +60,7 @@ module Constants
   elsif Rails.env.staging?
     url = "http://staging.finly.io/#"
   elsif Rails.env.itzcash_uat?
-    url = "http://uat.finly.io/#"
+    url = "http://demo.finly.io/#"
   elsif Rails.env.local_vm?
     url = "http://192.168.56.101/#"
   elsif Rails.env.production?
@@ -63,6 +70,8 @@ module Constants
   end
 
   BASE_URL = url
+
+  DEFAULT_PASSWORD = "lqskmclkmsal1k"
 
   class Constants::ItzCash
 

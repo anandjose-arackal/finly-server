@@ -18,9 +18,10 @@ class UsersController < ApplicationController
   # for list of team members - currently sending instance variables based on what was shown in the previous user listing
   def index
     @result = User::Index.(current_user, params)
-    respond_to do |format|
-      format.json { render json: @result.paginated_team.as_json }
-    end
+    # respond_to do |format|
+    #   format.json { render json: @result.paginated_team.as_json }
+    # end
+    respond
   end
 
   # For destroying user manager mapping
@@ -167,7 +168,7 @@ class UsersController < ApplicationController
       when 'details'
         operation = User::Configuration::UpdateDetails.new(current_user, params)
         success_message = 'Details updated'
-      when 'state'
+      when 'state', 'status'
         operation = User::Configuration::UpdateState.new(current_user, params)
         success_message = 'State updated'
       when 'auto_submit'
@@ -176,6 +177,9 @@ class UsersController < ApplicationController
       when 'enforce_policy'
         operation = User::Configuration::EnforcePolicy::Update.new(current_user, params)
         success_message = 'Configuration Updated'
+      when 'auto_reload'
+        operation = User::Configuration::AutoReload::Update.new(current_user, params)
+        success_message = 'Auto reload configuration uploaded'
       when 'groups'
         operation = User::Group::Set.new(current_user, params)
         success_message = 'User Group Configuration Updated'
@@ -190,7 +194,7 @@ class UsersController < ApplicationController
     if @result&.success?
       respond(response: :success, message: success_message)
     else
-      response response: :failure, message: (@result&.messages[:error] || 'Error while updating data')
+      respond(response: :failure, message: (@result&.messages[:error] || 'Error while updating data'))
     end
   end
 end

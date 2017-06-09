@@ -16,7 +16,7 @@
 
 class Expense::ExDistance::Update < Expense::ExDistance::Base
 
-  attr_accessor :updated_expense_params
+  attr_accessor :updated_expense_params, :locations_marked_for_destruction
   attr_accessor :editable_attrs, :receipt, :old_receipt
 
   def pre_validate
@@ -40,6 +40,22 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     define_editable_attributes if expense
     # setting up the expense params for updation
     self.updated_expense_params = distance_expense_params
+
+    # todo set ids for locations using order
+    self.locations_marked_for_destruction = expense&.distance_expense&.locations.pluck(:id)
+    if expense&.distance_expense&.locations.count > 0
+      pos = 1
+      self.updated_expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes)&.each do |location|
+        id = expense&.distance_expense&.locations.with_order(pos)&.first&.id
+        if id.present?
+          self.locations_marked_for_destruction.delete(id)
+          location[:id] = id
+        end
+        location[:order] = pos
+        pos += 1
+      end
+    end
+
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
       # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
       # todo - check if the api fails because of this
@@ -53,8 +69,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       updated_expense_params.delete(:receipts_attributes)
     end
     if expense
-      if self.updated_expense_params[:distance_expense_attributes].present? and self.updated_expense_params[:distance_expense_attributes][:distance_attributes].present? and
-          expense.distance_expense.present?
+      if self.updated_expense_params[:distance_expense_attributes].present? and expense.distance_expense.present?
         self.updated_expense_params[:distance_expense_attributes][:id] = expense.distance_expense.id
       end
       if self.updated_expense_params[:distance_expense_attributes][:distance_attributes].present? and self.updated_expense_params[:distance_expense_attributes][:distance_attributes][:value].present? and
@@ -112,6 +127,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     end
 
     if expense.update(updated_expense_params)
+      expense.distance_expense.locations.with_id(locations_marked_for_destruction).destroy_all if self.locations_marked_for_destruction.present?
       if receipt
         receipt.parent = expense
         if receipt.save
@@ -162,7 +178,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
                            distance_value: expense.distance_value,
                            category_name: expense.category_name,
                            receipt: expense.receipts.count
-                          }
+    }
   end
 
 end

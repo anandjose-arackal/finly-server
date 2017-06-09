@@ -1,0 +1,1 @@
+json.partial! 'expense', expense: @result.expense

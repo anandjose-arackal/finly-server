@@ -40,6 +40,4 @@ class Admin::Companies::Update < Admin::Companies::Base
   def post_process
     add_message :success, "Company updated"
   end
-
-
 end

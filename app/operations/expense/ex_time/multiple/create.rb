@@ -70,7 +70,7 @@ class Expense::ExTime::Multiple::Create < Expense::ExTime::Multiple::Base
   end
 
   def validate
-    # debugger
+
     unless user.time_expense_enabled?
       add_message :error, "Time expense creation is not enabled"
       return false
@@ -180,36 +180,39 @@ class Expense::ExTime::Multiple::Create < Expense::ExTime::Multiple::Base
   end
 
   def post_process
-    # debugger
-    # # add comment in report if expense is added within report
-    # if self.expense.report_id.present? and self.expense.report.retracted?
-    #   comment = self.expense.report.comments.build report: self.expense.report, user: user,
-    #                                                report_comment_action_id: ReportCommentAction.id_for(:expense_add), expense: expense
-    #   unless comment.save
-    #     messages[:error] = comment.errors.full_messages
-    #   end
-    # end
-    # # if the expense is part of a report, calculate the associated amount
-    # if expense_params[:report_id].present?
-    #   report = user.reports.find_by(id: expense_params[:report_id])
-    #   amount = expense.amount
-    #   if amount.nil?
-    #     amount_params = {value: expense.calculate_amount_value(report.policy), currency_id: Currency.first.id}
-    #     amount = Amount.create(amount_params)
-    #   else
-    #     amount.update(value: expense.calculate_amount_value(report.policy))
-    #   end
-    #   expense.update_attributes(amount_id: amount.id)
+    if self.valid
+      for key, value in self.multiple_expenses
+        # Add Report Comment
+        if value[:expense].report_id.present? and value[:expense].report.retracted?
+          comment = value[:expense].report.comments.build report: value[:expense].report, user: user,
+                                                       report_comment_action_id: ReportCommentAction.id_for(:expense_add), expense: value[:expense]
+          unless comment.save
+            messages[:error] = comment.errors.full_messages
+          end
+        end
 
-    #   # calculate the equivalent amount in all currencies in the amounts table
-    #   if expense.date == DateUtils.local_date
-    #     expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
-    #   else
-    #     expense.update_other_currencies
-    #   end
-    # end
 
-    # add_message :success, 'Expense created'
+        # if the expense is part of a report, calculate the associated amount
+        if value[:expense].report.present?
+          report = user.reports.find_by(id: value[:expense].report.id)
+          amount = value[:expense].amount
+          if amount.nil?
+            amount_params = {value: value[:expense].calculate_amount_value(report.policy), currency_id: Currency.first.id}
+            amount = Amount.create(amount_params)
+          else
+            amount.update(value: value[:expense].calculate_amount_value(report.policy))
+          end
+          value[:expense].update_attributes(amount_id: amount.id)
+
+          # calculate the equivalent amount in all currencies in the amounts table
+          if value[:expense].date == DateUtils.local_date
+            value[:expense].amount.update(value[:expense].amount.currency.country_code.to_sym => value[:expense].amount_value)
+          else
+            value[:expense].update_other_currencies
+          end
+        end
+      end
+    end
   end
 
   # protected
@@ -241,7 +244,7 @@ class Expense::ExTime::Multiple::Create < Expense::ExTime::Multiple::Base
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = false
-    # debugger
+
     CustomField::SetFields.(expense.time_expense, FieldParentType.id_for(:time_expense), custom_fields)
   end
 

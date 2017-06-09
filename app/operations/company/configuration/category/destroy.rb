@@ -18,8 +18,8 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
       messages[:error] << 'Category not found'
       return false
     end
-    if category.name == "Other" or category.name == "Personal"
-      messages[:error] << "Cannot remove 'Other' or 'Personal' categories"
+    if category.name == "Other"
+      messages[:error] << "Cannot remove 'Other' categories"
       return false
     end
   end

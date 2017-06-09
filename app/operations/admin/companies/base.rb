@@ -5,7 +5,18 @@ class Admin::Companies::Base < Admin::Base
   end
 
   def company_params
-    params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code], configuration_attributes: [:logo], feature_subscription_attributes: [:ocr_enabled])
+    params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code], configuration_attributes: [:logo],
+                                    feature_subscription_attributes: [
+                                      :ocr_enabled,
+                                      :expense_management_enabled,
+                                      :gift_card_enabled,
+                                      :gift_voucher_enabled,
+                                      :meal_card_enabled,
+                                      :fuel_card_enabled,
+                                      :medical_card_enabled,
+                                      :expense_card_enabled,
+                                      :reimbursement_card_enabled
+                                    ])
   end
 
   def success
@@ -19,6 +30,11 @@ class Admin::Companies::Base < Admin::Base
 
     def init
       self.company = params[:company]
+    end
+
+    def company_balance
+      op = Company::VirtualAccount::Balance.(user, {company: company})
+      op.balance
     end
   end
 end

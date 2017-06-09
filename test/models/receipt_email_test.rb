@@ -24,6 +24,10 @@
 #  raw_header_content_type :string(255)
 #  raw_header_file_size    :integer
 #  raw_header_updated_at   :datetime
+#  expense_id              :integer
+#  email_id                :string(255)
+#  sender                  :string(255)
+#  source                  :string(255)
 #
 
 
