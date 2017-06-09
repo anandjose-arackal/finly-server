@@ -1,2 +1,0 @@
-class IsDuplicate
-end

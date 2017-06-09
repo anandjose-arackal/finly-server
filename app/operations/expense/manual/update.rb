@@ -111,6 +111,8 @@ class Expense::Manual::Update < Expense::Manual::Base
     # add comment in report if expense is added within report
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
+    Expense::Manual::ProcessDuplicate.(self.user, expense: self.expense)
+
     # marking the expense as non-transcribed after the first edit
     if expense.transcribed
       expense.update(transcribed: false)

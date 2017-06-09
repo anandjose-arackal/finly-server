@@ -38,8 +38,11 @@ class Expense < ActiveRecord::Base
   belongs_to :surcharge, class_name: 'Amount'
 
   has_many :receipts, as: :parent
-
   has_many :system_messages, as: :messagable, dependent: :destroy
+
+  has_many :duplicate_expense_mappings, foreign_key: :expense_id, dependent: :destroy
+  has_many :duplicate_expenses, through: :duplicate_expense_mappings
+  has_many :is_duplicate_expense_mappings, class_name: 'DuplicateExpenseMapping', foreign_key: :duplicate_expense_id, dependent: :destroy
 
   has_one :manual_expense, dependent: :destroy
   has_one :card_expense, dependent: :destroy
@@ -140,7 +143,7 @@ class Expense < ActiveRecord::Base
   }
 
   scope :with_amount, -> { joins :amount }
-  scope :having_amount_currency, -> (amount, currency_id) { with_amount.where('amount.value = ? AND amount.currency_id = ?', amount, currency_id) }
+  scope :having_amount_currency, -> (amount, currency_id) { with_amount.where('amounts.value IN (?) AND amounts.currency_id IN (?)', amount, currency_id) }
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_report_id, ->(report_id) { where report_id: report_id }
   scope :with_user, ->(user_id) { where user_id: user_id }

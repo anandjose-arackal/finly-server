@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170609102443) do
+ActiveRecord::Schema.define(version: 20170609165120) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -869,6 +869,15 @@ ActiveRecord::Schema.define(version: 20170609102443) do
   end
 
   add_index "distances", ["physical_unit_id"], name: "index_distances_on_physical_unit_id", using: :btree
+
+  create_table "duplicate_expense_mappings", force: :cascade do |t|
+    t.integer  "expense_id",           limit: 4, null: false
+    t.integer  "duplicate_expense_id", limit: 4, null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "duplicate_expense_mappings", ["expense_id"], name: "index_duplicate_expense_mappings_on_expense_id", using: :btree
 
   create_table "enforce_policies", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
