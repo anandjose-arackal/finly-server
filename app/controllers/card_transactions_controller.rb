@@ -18,4 +18,10 @@ class CardTransactionsController < ApplicationController
     respond
   end
 
+  def refunds
+
+  end
+
+  
+
 end
