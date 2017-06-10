@@ -16,6 +16,7 @@ class CreateReceiptExtracts < ActiveRecord::Migration
       t.references :category, index: true, foreign_key: true
       t.integer :sourcable_id, index: true
       t.string :sourcable_type, index: true
+      t.boolean :illegible
 
       t.timestamps null: false
     end
