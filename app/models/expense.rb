@@ -661,6 +661,10 @@ class Expense < ActiveRecord::Base
     duplicate_expenses
   end
 
+  def can_delete?
+    !self.submitted?
+  end
+
   private
 
   # cannot add an expense with future date
