@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  merchant: MyString
+  reference_id: MyString
+  receipt_id: 
+  timestamp: 2017-06-10 18:00:27
+  amount_id: 
+
+two:
+  merchant: MyString
+  reference_id: MyString
+  receipt_id: 
+  timestamp: 2017-06-10 18:00:27
+  amount_id: 
