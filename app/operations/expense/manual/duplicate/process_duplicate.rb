@@ -1,4 +1,4 @@
-class Expense::Manual::ProcessDuplicate < Expense::Base
+class Expense::Manual::Duplicate::ProcessDuplicate < Expense::Base
   attr_accessor :expense
 
   def pre_validate

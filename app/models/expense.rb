@@ -264,6 +264,7 @@ class Expense < ActiveRecord::Base
 
   scope :transcribed, -> { where transcribed: true }
   scope :untranscribed, -> { where transcribed: false }
+  scope :limit_to, ->(count) { limit count }
 
   scope :verified, -> { where expense_status_id: ExpenseStatus.submitted_id }
   scope :unverified, -> { where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
@@ -654,7 +655,7 @@ class Expense < ActiveRecord::Base
   end
 
   def filtered_duplicate_expenses
-    if expense.submitted?
+    if submitted?
       return duplicate_expenses.submitted
     end
     duplicate_expenses

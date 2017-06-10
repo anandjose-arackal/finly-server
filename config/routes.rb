@@ -1641,8 +1641,8 @@ Rails.application.routes.draw do
     post 'add_receipt', to: 'expenses#add_receipt'
     patch 'mark', to: 'expenses#mark', as: :mark
     patch 'unmark', to: 'expenses#unmark', as: :unmark
+    get 'duplicates', to: 'expenses#duplicates'
   end
-
 
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
 
