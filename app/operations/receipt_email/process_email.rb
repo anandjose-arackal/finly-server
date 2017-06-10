@@ -34,7 +34,6 @@ class ReceiptEmail::ProcessEmail < BackgroundOperation
         file_presenter = File::Download.(self.user, url: url, file_name: file_name)
         if file_presenter&.success?
           attachment.update(original_attachment: file_presenter.file)
-          debugger
         else
           attachment.system_messages.create system_message_type_id: SystemMessageType.id_for(:error), content: 'Error downloading attachment'
         end

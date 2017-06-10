@@ -55,7 +55,7 @@ class ReceiptEmailAttachment < ActiveRecord::Base
   protected
 
   def original_or_url_presence
-    unless original_attachment.present? or (attachment_url.present? and attachment_url_file_name.present?)
+    unless !!original_attachment or (attachment_url.present? and attachment_url_file_name.present?)
       if attachment_url.present? and attachment_url_file_name.blank?
         errors.add :attachment, 'name cannot be empty'
       elsif attachment_url.blank? and attachment_url_file_name.present?
