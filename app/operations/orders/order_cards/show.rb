@@ -26,7 +26,7 @@ class Orders::OrderCards::Show < Orders::OrderCards::Base
   end
 
   def process
-    # debugger
+
     actions[:cancel] = true if self.payment_order.scheduled?
     # self.payment_orders = user.company.payment_orders.with_type_id(params_order_cards[:order_type_ids])
   end

@@ -27,7 +27,7 @@ json.cards do
     json.balance card.balance.to_f
     json.available_eligibility card.card_eligibility.value.to_f
 
-    # debugger
+
     json.configurable_restrictions card.card_program.spend_restrictions
     if card.card_program.spend_restrictions
       json.restrictions do

@@ -112,7 +112,7 @@ class Report::BulkApprove < BaseOperation
       unless value[:errors].blank?
         self.valid = false
       end
-      # debugger
+
     end
     # unless report.processing? or auto_approve
     #   add_message :error, 'Cannot approve this report as it is not in processing state'

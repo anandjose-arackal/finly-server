@@ -14,7 +14,7 @@ json.data do
     json.name @auth_grant.user.company.name
     json.d_code_assigned @auth_grant.user.company.d_code_assigned?
   end
-  # debugger
+
   views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/feature_subscription.yml.erb", {current_company: @auth_grant.user.company, current_user: @auth_grant.user})
   json.feature_subscription do
     json.company do

@@ -11,8 +11,8 @@
 #  address        :text(65535)
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
-#  order          :integer
 #  maps_id        :string(255)
+#  order          :integer
 #
 
 class Location < ActiveRecord::Base
