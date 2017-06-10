@@ -12,3 +12,4 @@ json.medical_card_enabled @result.company.medical_card_enabled?
 json.expense_card_enabled @result.company.expense_card_enabled?
 json.reimbursement_card_enabled @result.company.reimbursement_card_enabled?
 json.balance @result.company_balance
+json.hard_copy_receipt @result.company.hard_copy_receipt_enabled?

@@ -1544,6 +1544,8 @@ Rails.application.routes.draw do
 
   ######### ADMIN PANEL END ###########
 
+  get 'junk/show', to: 'junk#show'
+
   get 'menu_data', to: 'users#menu_data'
 
   # adding admin oauth token creation for admin login

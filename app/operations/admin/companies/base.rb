@@ -15,7 +15,8 @@ class Admin::Companies::Base < Admin::Base
                                       :fuel_card_enabled,
                                       :medical_card_enabled,
                                       :expense_card_enabled,
-                                      :reimbursement_card_enabled
+                                      :reimbursement_card_enabled,
+                                      :hard_copy_receipt
                                     ])
   end
 
