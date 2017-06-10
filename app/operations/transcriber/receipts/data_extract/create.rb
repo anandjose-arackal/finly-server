@@ -44,9 +44,21 @@ class Transcriber::Receipts::DataExtract::Create < Transcriber::Receipts::DataEx
     self.receipt_extract.save
   end
 
+  def post_process
+    # Check if has potential card expense, create cash expense if no card expense present
+  end
+
+  def success
+    Transcriber::Receipts::DataExtract::Create::SuccessPresenter.new(user, params, messages)
+  end
+
+  class Transcriber::Receipts::DataExtract::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+  end
+
   protected
   def receipt_extract_strong_params
-    self.params.require(:receipt_extract).permit(:merchant, :reference_id, :timestamp,
+    self.params.require(:receipt_extract).permit(:merchant, :reference_id, :timestamp, :category_id,
                                                  amount: [:value, :currency_id])
   end
 

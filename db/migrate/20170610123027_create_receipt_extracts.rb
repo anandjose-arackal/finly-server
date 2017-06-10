@@ -13,6 +13,7 @@ class CreateReceiptExtracts < ActiveRecord::Migration
       t.references :amount, index: true, foreign_key: true
       t.references :receipt, index: true, foreign_key: true, null: false
       t.references :receipt_extract_sources, index: true, foreign_key: true, null: false
+      t.references :category, index: true, foreign_key: true
       t.integer :sourcable_id, index: true
       t.string :sourcable_type, index: true
 
