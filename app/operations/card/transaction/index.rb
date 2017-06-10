@@ -11,7 +11,7 @@ class Card::Transaction::Index < BaseOperation
   end
 
   def init
-    self.selected_user = params[:user]
+    self.selected_user = params[:user] || user
     self.selected_card = params[:card]
 
     if selected_user.blank? and selected_card.blank?
@@ -70,6 +70,7 @@ class Card::Transaction::Index < BaseOperation
     include HasScope
 
     has_scope :filter_refunds
+    has_scope :filter_atm_withdrawals
 
     attr_accessor :transactions
 
