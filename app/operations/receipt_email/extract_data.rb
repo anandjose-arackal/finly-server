@@ -15,8 +15,10 @@ class ReceiptEmail::ExtractData < ReceiptEmail::Base
 
     matched_template = nil
     receipt_email_sender = ReceiptEmailSender.having_email_id(sender)
-    # If a match is found based on sender, use the template
-    # If a match is not found, check if the search_term provided ReceiptEmailSender is found, if found use that to identify the template
+    # If a match is found based on sender, use the template. This works fine when the email is directly picked up
+    #
+    # If a match is not found, check if the search_term provided ReceiptEmailSender is found,
+    # if found use that to identify the template. Used when the email is forwarded to receipts@finly.io
     if receipt_email_sender.present?
       matched_template = receipt_email_sender.receipt_email_template
     else
