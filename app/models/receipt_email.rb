@@ -80,17 +80,21 @@ class ReceiptEmail < ActiveRecord::Base
         document_converter.convert do |images|
           images.each do |image|
             receipt = receipts.create(user_id: user_id, image: image, note: self.subject)
-            # Todo attach receipt to expense
-            if user.company.ocr_enabled? and not self.expense_id.present?
-              receipt.update(to_be_transcribed: true)
-              ########## Mailer being triggered ###########
-              if Rails.env.production?
-                Constants::TRANSCRIBER_EMAILS.each do |email|
-                  ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+            if self.expense_id.present?
+              receipt.update(parent: self.expense)
+            else
+              if user.company.ocr_enabled?
+                receipt.update(to_be_transcribed: true)
+                ########## Mailer being triggered ###########
+                if Rails.env.production?
+                  Constants::TRANSCRIBER_EMAILS.each do |email|
+                    ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+                  end
                 end
+                #############################################
               end
-              #############################################
             end
+
           end
         end
       end
@@ -103,16 +107,19 @@ class ReceiptEmail < ActiveRecord::Base
       document_converter.convert do |images|
         images.each do |image|
           receipt = receipts.create(user_id: user_id, image: image, note: self.subject)
-          # Todo attach receipt to expense
-          if user.company.ocr_enabled? and not self.expense_id.present?
-            receipt.update(to_be_transcribed: true)
-            ########## Mailer being triggered ###########
-            if Rails.env.production?
-              Constants::TRANSCRIBER_EMAILS.each do |email|
-                ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+          if self.expense_id.present?
+            receipt.update(parent: self.expense)
+          else
+            if user.company.ocr_enabled?
+              receipt.update(to_be_transcribed: true)
+              ########## Mailer being triggered ###########
+              if Rails.env.production?
+                Constants::TRANSCRIBER_EMAILS.each do |email|
+                  ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+                end
               end
+              #############################################
             end
-            #############################################
           end
         end
       end
