@@ -20,15 +20,15 @@ class ReceiptEmailDataPointMode < ActiveRecord::Base
   end
 
   def css_selector_only?
-    self.id == self.class.id_for(:xpath_only)
+    self.id == self.class.id_for(:css_selector_only)
   end
 
   def xpath_first?
-    self.id == self.class.id_for(:xpath_only)
+    self.id == self.class.id_for(:xpath_first)
   end
 
   def css_selector_first?
-    self.id == self.class.id_for(:xpath_only)
+    self.id == self.class.id_for(:css_selector_first)
   end
 
 end

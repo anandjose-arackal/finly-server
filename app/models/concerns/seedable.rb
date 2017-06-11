@@ -2,7 +2,7 @@ module Seedable
   extend ActiveSupport::Concern
 
   included do
-    scope :with_name, -> { where name: self.name }
+    scope :with_name, -> (name) { where name: name }
   end
 
   class_methods do
@@ -10,8 +10,8 @@ module Seedable
       []
     end
 
-    def id_for(name)
-      items = self.with_name(name)
+    def id_for(key)
+      items = self.with_name(key)
       if items.present?
         return items.first.id
       end
