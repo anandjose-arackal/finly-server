@@ -79,7 +79,6 @@ class ReceiptEmail < ActiveRecord::Base
                                                                   image_tmp_path
         document_converter.convert do |images|
           images.each do |image|
-            user = User.find_by_id(user_id)
             receipt = receipts.create(user_id: user_id, image: image, note: self.subject)
             # Todo attach receipt to expense
             if user.company.ocr_enabled? and not self.expense_id.present?
@@ -103,7 +102,6 @@ class ReceiptEmail < ActiveRecord::Base
                                                                 image_tmp_path
       document_converter.convert do |images|
         images.each do |image|
-          user = User.find_by_id(user_id)
           receipt = receipts.create(user_id: user_id, image: image, note: self.subject)
           # Todo attach receipt to expense
           if user.company.ocr_enabled? and not self.expense_id.present?
