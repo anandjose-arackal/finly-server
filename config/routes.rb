@@ -1635,6 +1635,7 @@ Rails.application.routes.draw do
     post 'comment' => 'money_request#comment', as: :comment
   end
 
+  delete 'expenses', to: 'expenses#destroy'
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'
     post 'detach_receipt', to: 'expenses#detach_receipt'
