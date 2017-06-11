@@ -106,6 +106,18 @@ class Transcriber::Receipts::DataExtract::MatchExpense < Transcriber::Receipts::
 
   def compute_suggested_match(date, time, amount_value)
     return if closest_matches.blank?
+
+    if closest_matches.size == 1
+      self.suggested_match = self.closest_matches.first
+      self.closest_matches = nil
+      return
+    else
+      match = nil
+      difference = nil
+      closest_matches.each do |expense|
+
+      end
+    end
   end
 
   def success
