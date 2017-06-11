@@ -32,6 +32,8 @@ class ReceiptEmail::ExtractData < ReceiptEmail::Base
       end
     end
     extract_data_using_template(matched_template, html_body)
+    return if has_errors?
+    self.receipt_email.receipt_extract
   end
 
   def post_process
@@ -69,9 +71,6 @@ class ReceiptEmail::ExtractData < ReceiptEmail::Base
     self.merchant = template.name
     self.amount = extract_amount(parser, template)
     self.currency_id = extract_currency(parser, template)
-    if amount.blank?
-      add_message :error, 'Extraction failed'
-    end
     # if amount.present?
     #   self.receipt_email.user.expenses.create(amount_attributes: {value: amount, currency_id: currency_id},
     #                        manual_expense_attributes: {merchant: merchant_name},

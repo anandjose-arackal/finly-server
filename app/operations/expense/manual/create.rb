@@ -74,6 +74,8 @@ class Expense::Manual::Create < Expense::Manual::Base
       ReceiptEmail::ProcessEmail.call_async(user, receipt_email_id: self.expense.receipt_email.id)
     end
 
+    Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: self.expense)
+
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?
       comment = self.expense.report.comments.build report: self.expense.report, user: user,

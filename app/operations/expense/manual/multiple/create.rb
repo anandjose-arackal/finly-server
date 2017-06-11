@@ -50,7 +50,7 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
 
       # Initializing expense out of strong params
       self.multiple_expenses[key][:expense] = user.expenses.new(current_expense_params)
-     
+
       # Storing strong params for reference
       self.multiple_expenses[key][:params] = current_expense_params
 
@@ -67,7 +67,7 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
 
     for key, value in self.multiple_expenses
       # Setting errors for the current expense
-      self.errors_by_expenses[key] = { error: [] }
+      self.errors_by_expenses[key] = {error: []}
 
       # Adding model level validation errors
       self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages unless value[:expense].valid?
@@ -104,7 +104,7 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
     else
       # Hack
       make_expenses_invalid(self.multiple_expenses)
-      add_message :failure, 'Cannot create expenses. Please fix the errors and try again.' 
+      add_message :failure, 'Cannot create expenses. Please fix the errors and try again.'
     end
   end
 
@@ -121,7 +121,7 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
   end
 
   def post_process
-
+    self.multiple_expenses.each { |expense| Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: expense) }
   end
 
   def set_custom_fields_multiple(expense, current_params)
@@ -140,6 +140,7 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
 
   class Expense::Manual::Multiple::Base::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
     attr_accessor :expense_errors
+
     def init
       self.expense_errors = params[:expense_errors]
     end

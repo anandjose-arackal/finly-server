@@ -1,0 +1,29 @@
+# == Schema Information
+#
+# Table name: receipt_extracts
+#
+#  id                        :integer          not null, primary key
+#  merchant                  :string(255)
+#  reference_id              :string(255)
+#  amount_id                 :integer
+#  receipt_id                :integer          not null
+#  receipt_extract_source_id :integer          not null
+#  category_id               :integer
+#  sourcable_id              :integer
+#  sourcable_type            :string(255)
+#  illegible                 :boolean
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  date                      :date
+#  time                      :time
+#
+
+class ExpenseDataExtract < ActiveRecord::Base
+  belongs_to :extractable, polymorphic: true
+  belongs_to :amount
+  belongs_to :expense_data_extract_source
+  belongs_to :category
+  belongs_to :sourcable, polymorphic: true
+
+  validates :expense_data_extract_sources_id, presence: true
+end

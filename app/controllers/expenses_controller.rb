@@ -131,4 +131,9 @@ class ExpensesController < ApplicationController
     end
   end
 
+  def duplicates
+    @result = Expense::Manual::Duplicate::Show.(current_user, params)
+    respond
+  end
+
 end

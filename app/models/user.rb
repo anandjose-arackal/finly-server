@@ -115,6 +115,7 @@ class User < ActiveRecord::Base
   has_many :payment_orders, foreign_key: :initiating_user_id
   has_many :user_group_item_mappings
   has_many :user_group_items, through: :user_group_item_mappings
+  has_many :expense_data_extracts, as: :sourcable
 
   has_one :itz_cash_dmt_sender
 
