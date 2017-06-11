@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170611165156) do
+ActiveRecord::Schema.define(version: 20170611165937) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1739,7 +1739,6 @@ ActiveRecord::Schema.define(version: 20170611165156) do
   add_index "receipt_emails", ["user_id"], name: "index_receipt_emails_on_user_id", using: :btree
 
   create_table "receipts", force: :cascade do |t|
-    t.integer  "expense_id",         limit: 4
     t.integer  "user_id",            limit: 4
     t.datetime "created_at",                                       null: false
     t.datetime "updated_at",                                       null: false
@@ -1755,7 +1754,6 @@ ActiveRecord::Schema.define(version: 20170611165156) do
     t.boolean  "hard_copy_received",               default: false
   end
 
-  add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
   add_index "receipts", ["receipt_email_id"], name: "index_receipts_on_receipt_email_id", using: :btree
   add_index "receipts", ["user_id"], name: "index_receipts_on_user_id", using: :btree
@@ -2326,7 +2324,6 @@ ActiveRecord::Schema.define(version: 20170611165156) do
   add_foreign_key "receipt_email_data_points", "receipt_email_templates"
   add_foreign_key "receipt_email_senders", "receipt_email_templates"
   add_foreign_key "receipt_emails", "expenses"
-  add_foreign_key "receipts", "expenses"
   add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"
   add_foreign_key "report_comments", "expenses"

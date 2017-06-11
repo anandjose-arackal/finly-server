@@ -38,6 +38,7 @@
 
 
 
+
 require 'fileutils'
 class ReceiptEmail < ActiveRecord::Base
   has_many :receipts
@@ -79,7 +80,8 @@ class ReceiptEmail < ActiveRecord::Base
         document_converter.convert do |images|
           images.each do |image|
             user = User.find_by_id(user_id)
-            receipt = receipts.create(user_id: user_id, image: image, note: self.subject, expense_id: self.expense_id)
+            receipt = receipts.create(user_id: user_id, image: image, note: self.subject)
+            # Todo attach receipt to expense
             if user.company.ocr_enabled? and not self.expense_id.present?
               receipt.update(to_be_transcribed: true)
               ########## Mailer being triggered ###########
@@ -102,7 +104,8 @@ class ReceiptEmail < ActiveRecord::Base
       document_converter.convert do |images|
         images.each do |image|
           user = User.find_by_id(user_id)
-          receipt = receipts.create(user_id: user_id, image: image, note: self.subject, expense_id: self.expense_id)
+          receipt = receipts.create(user_id: user_id, image: image, note: self.subject)
+          # Todo attach receipt to expense
           if user.company.ocr_enabled? and not self.expense_id.present?
             receipt.update(to_be_transcribed: true)
             ########## Mailer being triggered ###########
