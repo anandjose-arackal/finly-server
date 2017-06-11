@@ -58,8 +58,8 @@ class Transcriber::Receipts::DataExtract::Create < Transcriber::Receipts::DataEx
 
   protected
   def receipt_extract_strong_params
-    self.params.require(:receipt_extract).permit(:merchant, :reference_id, :timestamp, :category_id, :illegible,
-                                                 amount: [:value, :currency_id])
+    self.params.require(:receipt_extract).permit(:merchant, :reference_id, :date, :time,
+                                                 :category_id, :illegible, amount: [:value, :currency_id])
   end
 
 end

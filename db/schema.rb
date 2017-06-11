@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170609165120) do
+ActiveRecord::Schema.define(version: 20170610194858) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1666,6 +1666,35 @@ ActiveRecord::Schema.define(version: 20170609165120) do
   add_index "receipt_emails", ["expense_id"], name: "index_receipt_emails_on_expense_id", using: :btree
   add_index "receipt_emails", ["user_id"], name: "index_receipt_emails_on_user_id", using: :btree
 
+  create_table "receipt_extract_sources", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "receipt_extracts", force: :cascade do |t|
+    t.string   "merchant",                  limit: 255
+    t.string   "reference_id",              limit: 255
+    t.integer  "amount_id",                 limit: 4
+    t.integer  "receipt_id",                limit: 4,   null: false
+    t.integer  "receipt_extract_source_id", limit: 4,   null: false
+    t.integer  "category_id",               limit: 4
+    t.integer  "sourcable_id",              limit: 4
+    t.string   "sourcable_type",            limit: 255
+    t.boolean  "illegible"
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.date     "date"
+    t.time     "time"
+  end
+
+  add_index "receipt_extracts", ["amount_id"], name: "index_receipt_extracts_on_amount_id", using: :btree
+  add_index "receipt_extracts", ["category_id"], name: "index_receipt_extracts_on_category_id", using: :btree
+  add_index "receipt_extracts", ["receipt_extract_source_id"], name: "index_receipt_extracts_on_receipt_extract_source_id", using: :btree
+  add_index "receipt_extracts", ["receipt_id"], name: "index_receipt_extracts_on_receipt_id", using: :btree
+  add_index "receipt_extracts", ["sourcable_id"], name: "index_receipt_extracts_on_sourcable_id", using: :btree
+  add_index "receipt_extracts", ["sourcable_type"], name: "index_receipt_extracts_on_sourcable_type", using: :btree
+
   create_table "receipts", force: :cascade do |t|
     t.integer  "expense_id",         limit: 4
     t.integer  "user_id",            limit: 4
@@ -2249,6 +2278,10 @@ ActiveRecord::Schema.define(version: 20170609165120) do
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "receipt_emails", "expenses"
+  add_foreign_key "receipt_extracts", "amounts"
+  add_foreign_key "receipt_extracts", "categories"
+  add_foreign_key "receipt_extracts", "receipt_extract_sources"
+  add_foreign_key "receipt_extracts", "receipts"
   add_foreign_key "receipts", "expenses"
   add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"

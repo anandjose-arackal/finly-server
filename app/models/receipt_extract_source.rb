@@ -1,3 +1,13 @@
+# == Schema Information
+#
+# Table name: receipt_extract_sources
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class ReceiptExtractSource < ActiveRecord::Base
 
   scope :with_name, -> (name) {where name: name}
