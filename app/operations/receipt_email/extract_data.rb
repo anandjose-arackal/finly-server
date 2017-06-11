@@ -1,7 +1,7 @@
 class ReceiptEmail::ExtractData < ReceiptEmail::Base
 
   def process
-    html_body = nil
+    html_body =
     sender = self.receipt_email.sender
     datetime = self.receipt_email.sent_at
     note = self.receipt_email.subject
@@ -15,6 +15,8 @@ class ReceiptEmail::ExtractData < ReceiptEmail::Base
 
     matched_template = nil
     receipt_email_sender = ReceiptEmailSender.having_email_id(sender)
+    # If a match is found based on sender, use the template
+    # If a match is not found, check if the search_term provided ReceiptEmailSender is found, if found use that to identify the template
     if receipt_email_sender.present?
       matched_template = receipt_email_sender.receipt_email_template
     else
@@ -44,10 +46,9 @@ class ReceiptEmail::ExtractData < ReceiptEmail::Base
   end
 
   def extract_amount(parser, template)
-    debugger
     template.receipt_email_data_points.each do |data_point|
       if data_point.xpath_only_mode?(:amount)
-        result = parser.at_css(data_point.amount_xpath)&.text[Regexp.new(data_point.amount_xpath_regex)]
+        result = parser.xpath(data_point.amount_xpath)&.text[Regexp.new(data_point.amount_xpath_regex)]
         return result if result.present?
       elsif data_point.css_selector_only_mode?(:amount)
         result = parser.at_css(data_point.amount_css_selector)&.text[Regexp.new(data_point.amount_css_selector_regex)]
