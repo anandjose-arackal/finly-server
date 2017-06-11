@@ -1,5 +1,5 @@
 class ReceiptEmail::ExtractData < ReceiptEmail::Base
-  attr_accessor :amount, :currency_id, :merchant, :datetime, :note
+  attr_accessor :amount, :currency_id, :merchant, :datetime, :note, :expense_data_extract
 
   def process
     html_body =
@@ -32,35 +32,36 @@ class ReceiptEmail::ExtractData < ReceiptEmail::Base
       end
     end
     extract_data_using_template(matched_template, html_body)
-    return if has_errors?
-    self.receipt_email.receipt_extract
   end
 
   def post_process
-
+    attributes = {
+        amount_attributes:
+            {
+                value: amount,
+                currency_id: currency_id
+            },
+        merchant: merchant,
+        category_id: user.company.categories.last.id,
+        datetime: datetime,
+        note: self.note,
+        expense_data_extract_source_id: ExpenseDataExtractSource.id_for(:auto_extract_email)
+    }
+    self.expense_data_extract = self.receipt_email.expense_data_extracts.create attributes
   end
 
   def success
-    params[:expense] = {amount_attributes: {value: amount, currency_id: currency_id},
-                        manual_expense_attributes: {merchant: merchant_name},
-                        category_id: user.company.categories.last.id, expense_type_id: ExpenseType.id_for(:manual), date: datetime,
-                        receipt_email: self.receipt_email, receipts: self.receipt_email.receipts}
+    params[:expense_data_extract] = self.expense_data_extract
+    params[:receipt_email] = self.receipt_email
     ReceiptEmail::ExtractData::ExtractedData.new(user, params, messages)
   end
 
   class ReceiptEmail::ExtractData::ExtractedData < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :amount_value, :currency_id, :merchant, :date, :note, :expense_type_id, :receipts, :receipt_email, :expense_attributes
+    attr_accessor :receipt_email, :expense_data_extract
 
     def init
-      self.expense_attributes = params[:expense]
-      self.amount_value = params[:expense][:amount_attributes][:value]
-      self.currency_id = params[:expense][:amount_attributes][:currency_id]
-      self.merchant = params[:expense][:manual_expense_attributes][:merchant]
-      self.category_id = params[:expense][:category_id]
-      self.expense_type_id = params[:expense][:expense_type_id]
-      self.date = params[:expense][:date]
-      self.receipt_email = params[:expense][:receipt_email]
-      self.receipts = params[:expense][:receipts]
+      self.receipt_email = params[:receipt_email]
+      self.expense_data_extract = params[:expense_data_extract]
     end
   end
 
@@ -71,12 +72,6 @@ class ReceiptEmail::ExtractData < ReceiptEmail::Base
     self.merchant = template.name
     self.amount = extract_amount(parser, template)
     self.currency_id = extract_currency(parser, template)
-    # if amount.present?
-    #   self.receipt_email.user.expenses.create(amount_attributes: {value: amount, currency_id: currency_id},
-    #                        manual_expense_attributes: {merchant: merchant_name},
-    #                        category_id: user.company.categories.last.id, expense_type_id: ExpenseType.id_for(:manual), date: datetime,
-    #                        receipt_email: self.receipt_email, receipts: self.receipt_email.receipts)
-    # end
   end
 
   def extract_amount(parser, template)

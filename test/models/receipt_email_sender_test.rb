@@ -7,6 +7,8 @@
 #  receipt_email_template_id :integer          not null
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  domain                    :string(255)      not null
+#  search_term               :string(255)      not null
 #
 
 require 'test_helper'

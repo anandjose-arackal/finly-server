@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170611163246) do
+ActiveRecord::Schema.define(version: 20170611165156) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -896,25 +896,26 @@ ActiveRecord::Schema.define(version: 20170611163246) do
   end
 
   create_table "expense_data_extracts", force: :cascade do |t|
-    t.string   "merchant",                  limit: 255
-    t.string   "reference_id",              limit: 255
-    t.integer  "amount_id",                 limit: 4
-    t.integer  "receipt_extract_source_id", limit: 4,     null: false
-    t.integer  "category_id",               limit: 4
-    t.integer  "sourcable_id",              limit: 4
-    t.string   "sourcable_type",            limit: 255
+    t.string   "merchant",                       limit: 255
+    t.string   "reference_id",                   limit: 255
+    t.integer  "amount_id",                      limit: 4
+    t.integer  "expense_data_extract_source_id", limit: 4,     null: false
+    t.integer  "category_id",                    limit: 4
+    t.integer  "sourcable_id",                   limit: 4
+    t.string   "sourcable_type",                 limit: 255
     t.boolean  "illegible"
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-    t.integer  "extractable_id",            limit: 4,     null: false
-    t.string   "extractable_type",          limit: 255,   null: false
-    t.text     "note",                      limit: 65535
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.integer  "extractable_id",                 limit: 4,     null: false
+    t.string   "extractable_type",               limit: 255,   null: false
+    t.text     "note",                           limit: 65535
     t.datetime "datetime"
+    t.date     "date"
   end
 
   add_index "expense_data_extracts", ["amount_id"], name: "index_expense_data_extracts_on_amount_id", using: :btree
   add_index "expense_data_extracts", ["category_id"], name: "index_expense_data_extracts_on_category_id", using: :btree
-  add_index "expense_data_extracts", ["receipt_extract_source_id"], name: "index_expense_data_extracts_on_receipt_extract_source_id", using: :btree
+  add_index "expense_data_extracts", ["expense_data_extract_source_id"], name: "index_expense_data_extracts_on_expense_data_extract_source_id", using: :btree
   add_index "expense_data_extracts", ["sourcable_id"], name: "index_expense_data_extracts_on_sourcable_id", using: :btree
   add_index "expense_data_extracts", ["sourcable_type"], name: "index_expense_data_extracts_on_sourcable_type", using: :btree
 
@@ -2267,7 +2268,7 @@ ActiveRecord::Schema.define(version: 20170611163246) do
   add_foreign_key "distances", "physical_units"
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"
-  add_foreign_key "expense_data_extracts", "expense_data_extract_sources", column: "receipt_extract_source_id"
+  add_foreign_key "expense_data_extracts", "expense_data_extract_sources"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"

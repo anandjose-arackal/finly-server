@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: receipt_extract_sources
+# Table name: expense_data_extract_sources
 #
 #  id         :integer          not null, primary key
 #  name       :string(255)
