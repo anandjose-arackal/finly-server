@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170611121327) do
+ActiveRecord::Schema.define(version: 20170611133026) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1646,14 +1646,13 @@ ActiveRecord::Schema.define(version: 20170611121327) do
     t.string   "amount_xpath_regex",        limit: 255,                              null: false
     t.text     "amount_css_selector",       limit: 65535,                            null: false
     t.string   "amount_css_selector_regex", limit: 255,                              null: false
-    t.integer  "mode_id",                   limit: 4,                                null: false
     t.integer  "receipt_email_template_id", limit: 4,                                null: false
     t.decimal  "priority",                                precision: 10, default: 0, null: false
     t.datetime "created_at",                                                         null: false
     t.datetime "updated_at",                                                         null: false
+    t.integer  "amount_mode_id",            limit: 4,                                null: false
   end
 
-  add_index "receipt_email_data_points", ["mode_id"], name: "index_receipt_email_data_points_on_mode_id", using: :btree
   add_index "receipt_email_data_points", ["receipt_email_template_id"], name: "index_receipt_email_data_points_on_receipt_email_template_id", using: :btree
 
   create_table "receipt_email_senders", force: :cascade do |t|
@@ -1661,6 +1660,8 @@ ActiveRecord::Schema.define(version: 20170611121327) do
     t.integer  "receipt_email_template_id", limit: 4,   null: false
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
+    t.string   "domain",                    limit: 255, null: false
+    t.string   "search_term",               limit: 255, null: false
   end
 
   add_index "receipt_email_senders", ["receipt_email_template_id"], name: "index_receipt_email_senders_on_receipt_email_template_id", using: :btree

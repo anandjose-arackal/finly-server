@@ -13,11 +13,46 @@ class ReceiptEmail::ExtractData < ReceiptEmail::Base
       html_body = email.html_part.body.decoded
     end
 
+    matched_template = nil
     receipt_email_sender = ReceiptEmailSender.having_email_id(sender)
     if receipt_email_sender.present?
-      template = receipt_email_sender.receipt_email_template
+      matched_template = receipt_email_sender.receipt_email_template
     else
       # String search to find sender
+      ReceiptEmailSender.all.each do |s|
+        if html_body.contains(s.search_term)
+          matched_template = s.receipt_email_template
+          break
+        end
+      end
+    end
+    extract_data_using_template(matched_template, html_body, sender, time, note)
+  end
+
+  def extract_data_using_template(template, html_body, sender, time, note)
+    return if template.blank?
+    parser = Nokogiri::HTML(html_body)
+    amount = extract_amount(parser, template)
+  end
+
+  def extract_amount(parser, template)
+    template.receipt_email_data_points.each do |data_point|
+      if data_point.xpath_only_mode?
+        result = parser.xpath(data_point.amount_xpath)
+        if result.present?
+          return result.match(data_point.amount_xpath_regex)
+        end
+      elsif data_point.css_selector_only_mode?
+        result = parser.at_css(data_point.amount_css_selector)
+        if result.present?
+          return result.match(data_point.amount_css_selector_regex)
+        end
+      elsif data_point.xpath_first_mode?
+        # Todo
+      elsif data_point.css_selector_first_mode?
+        # Todo
+      end
+
     end
   end
 

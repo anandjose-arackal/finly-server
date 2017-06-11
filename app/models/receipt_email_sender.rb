@@ -13,4 +13,5 @@ class ReceiptEmailSender < ActiveRecord::Base
   belongs_to :receipt_email_template
 
   scope :having_email_id, -> (email_id) { find_by email_id: email_id }
+  scope :pluck_email_id, -> { pluck(:email_id) }
 end

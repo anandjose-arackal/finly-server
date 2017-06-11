@@ -10,6 +10,6 @@
 #
 
 class ReceiptEmailTemplate < ActiveRecord::Base
-  has_many :receipt_email_senders
-  has_many :receipt_email_data_points
+  has_many :receipt_email_senders, dependent: :destroy
+  has_many :receipt_email_data_points, dependent: :destroy
 end
