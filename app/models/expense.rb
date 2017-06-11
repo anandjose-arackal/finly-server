@@ -144,7 +144,7 @@ class Expense < ActiveRecord::Base
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :with_user_id, ->(user_id) { where user_id: user_id }
   # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
-  scope :filter_expense_type_id, ->(type_id) {
+  scope :filter_expense_type_id, ->(type_id) do
     if [1, 2, 3, 4, 5, '1', '2', '3', '4', '5'].include?(type_id)
       where expense_type_id: type_id
     elsif [6, '6'].include?(type_id)
@@ -155,7 +155,7 @@ class Expense < ActiveRecord::Base
     elsif [7, '7'].include?(type_id)
       personal
     end
-  }
+  end
 
   # scopes for the filters
   scope :filter_amount, -> (type, value) do

@@ -1,0 +1,33 @@
+# == Schema Information
+#
+# Table name: receipt_email_data_points
+#
+#  id                        :integer          not null, primary key
+#  amount_xpath              :text(65535)      not null
+#  amount_xpath_regex        :string(255)      not null
+#  amount_css_selector       :text(65535)      not null
+#  amount_css_selector_regex :string(255)      not null
+#  mode_id                   :integer          not null
+#  receipt_email_template_id :integer          not null
+#  priority                  :decimal(10, )    default(0), not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  xpath: MyText
+  xpath_amount_regex: MyString
+  css_selector: MyText
+  css_selector_amount_regex: MyString
+  receipt_email_data_point_mode_id: 
+  priority: 9.99
+
+two:
+  xpath: MyText
+  xpath_amount_regex: MyString
+  css_selector: MyText
+  css_selector_amount_regex: MyString
+  receipt_email_data_point_mode_id: 
+  priority: 9.99
