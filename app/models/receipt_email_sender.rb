@@ -14,4 +14,7 @@ class ReceiptEmailSender < ActiveRecord::Base
 
   scope :having_email_id, -> (email_id) { find_by email_id: email_id }
   scope :pluck_email_id, -> { pluck(:email_id) }
+
+  validates :email_id, presence: true, uniqueness: true
+  validates :receipt_email_template_id, presence: true
 end

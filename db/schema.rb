@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170611133026) do
+ActiveRecord::Schema.define(version: 20170611140310) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1667,10 +1667,11 @@ ActiveRecord::Schema.define(version: 20170611133026) do
   add_index "receipt_email_senders", ["receipt_email_template_id"], name: "index_receipt_email_senders_on_receipt_email_template_id", using: :btree
 
   create_table "receipt_email_templates", force: :cascade do |t|
-    t.string   "name",       limit: 255, null: false
-    t.datetime "datetime",               null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "name",                limit: 255, null: false
+    t.datetime "datetime",                        null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "default_currency_id", limit: 4,   null: false
   end
 
   create_table "receipt_emails", force: :cascade do |t|

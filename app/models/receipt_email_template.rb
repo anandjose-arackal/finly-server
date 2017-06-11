@@ -12,4 +12,8 @@
 class ReceiptEmailTemplate < ActiveRecord::Base
   has_many :receipt_email_senders, dependent: :destroy
   has_many :receipt_email_data_points, dependent: :destroy
+
+  belongs_to :default_currency, class_name: 'Currency'
+
+  validates :default_currency_id, presence: true
 end

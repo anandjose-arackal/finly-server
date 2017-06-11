@@ -26,13 +26,14 @@ class ReceiptEmail::ExtractData < ReceiptEmail::Base
         end
       end
     end
-    extract_data_using_template(matched_template, html_body, sender, time, note)
+    extract_data_using_template(matched_template, html_body, time, note)
   end
 
-  def extract_data_using_template(template, html_body, sender, time, note)
+  def extract_data_using_template(template, html_body, time, note)
     return if template.blank?
     parser = Nokogiri::HTML(html_body)
     amount = extract_amount(parser, template)
+    currency_id = extract_currency(parser, template)
   end
 
   def extract_amount(parser, template)
@@ -40,20 +41,25 @@ class ReceiptEmail::ExtractData < ReceiptEmail::Base
       if data_point.xpath_only_mode?
         result = parser.xpath(data_point.amount_xpath)
         if result.present?
-          return result.match(data_point.amount_xpath_regex)
+          amount = result.match(data_point.amount_xpath_regex)
+          return amount
         end
       elsif data_point.css_selector_only_mode?
         result = parser.at_css(data_point.amount_css_selector)
         if result.present?
-          return result.match(data_point.amount_css_selector_regex)
+          amount = result.match(data_point.amount_css_selector_regex)
+          return amount
         end
       elsif data_point.xpath_first_mode?
         # Todo
       elsif data_point.css_selector_first_mode?
         # Todo
       end
-
     end
+  end
+
+  def extract_currency(parser, template)
+    template.default_currency_id
   end
 
 end
