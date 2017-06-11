@@ -40,7 +40,7 @@ class ReceiptEmail::ExtractData < ReceiptEmail::Base
     amount = extract_amount(parser, template)
     currency_id = extract_currency(parser, template)
     if amount.present?
-      user.expenses.create(amount_attributes: {value: amount, currency_id: currency_id},
+      self.receipt_email.user.expenses.create(amount_attributes: {value: amount, currency_id: currency_id},
                            manual_expense_attributes: {merchant: merchant_name},
                            category_id: user.company.categories.last.id, expense_type_id: ExpenseType.id_for(:manual), date: datetime,
                            receipt_email: self.receipt_email, receipts: self.receipt_email.receipts)
