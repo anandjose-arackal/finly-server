@@ -1481,8 +1481,9 @@ Rails.application.routes.draw do
       post 'auth', to: 'token#create'
       delete 'auth', to: 'token#destroy'
 
-      get 'expenses/configuration', to: 'expenses#configuration'
-      resources :expenses, only: [:create, :show, :update, :destroy]
+      post 'expenses/configuration', to: 'expenses#configuration'
+      resources :expenses, only: [:create, :update, :destroy]
+      post 'expenses/:email_id', to: 'expenses#show'
     end
   end
   ######### CHROME END ###########

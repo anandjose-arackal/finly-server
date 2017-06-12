@@ -28,20 +28,12 @@ class RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse < RequestFo
       map[:expense][:receipt_email_attributes][:raw_html] = FakeFileIO.new(name, email_body)
     end
 
-    # <% if params[:receipt_email][:attachments].present? %>
-    # receipt_email_attachments_attributes:
-    #   <% params[:receipt_email][:attachments].each do |attachment| %>
-    #      - attachment_url: <%= attachment[:url] %>
-    #     attachment_url_file_name: <%= attachment[:file_name] %>
-    #      <% end %>
-    # <% end %>
-
-    if params[:receipt_email][:attachments].present?
-      map[:expense][:receipt_email_attributes][:receipt_email_attachments_attributes] = []
-      params[:receipt_email][:attachments].each do |attachment_hash|
-        map[:expense][:receipt_email_attributes][:receipt_email_attachments_attributes] << {original_attachment: attachment_hash[:original_attachment]}
-      end
-    end
+    # if params[:receipt_email][:attachments].present?
+    #   map[:expense][:receipt_email_attributes][:receipt_email_attachments_attributes] = []
+    #   params[:receipt_email][:attachments].each do |attachment_hash|
+    #     map[:expense][:receipt_email_attributes][:receipt_email_attachments_attributes] << {original_attachment: attachment_hash[:original_attachment]}
+    #   end
+    # end
 
     Formatter.handle_api_nil map
 
