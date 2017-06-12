@@ -71,6 +71,8 @@ module Constants
 
   BASE_URL = url
 
+  DEFAULT_PASSWORD = "lqskmclkmsal1k"
+
   class Constants::ItzCash
 
     ICW_CODE = 'D000000360'

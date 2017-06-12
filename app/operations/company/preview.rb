@@ -14,7 +14,7 @@ class Company::Preview < BaseOperation
 
   def pre_process
     # clean up the mobile number in case it has extra characters
-    preview_parameters[:phone_number] = CleanUpUtils.mobile_number_cleanup(preview_parameters[:phone_number])
+    preview_parameters[:phone_number] = CleanUpUtils.mobile_number_cleanup(preview_parameters[:phone_number]) if preview_parameters[:phone_number]
   end
 
   def process

@@ -15,7 +15,7 @@ class User::Wallet::AutoReload::Reload < BackgroundOperation
     self.auto_reload_config = selected_user.auto_reload_config
     self.expense_card = Card.find_by(id: params[:card_id])
     if expense_card && selected_user
-      self.card_balance_value = ItzCash::AccountDetails.(selected_user, {card_id: expense_card.id}).balance rescue nil
+      self.card_balance_value = ItzCash::AccountDetails.(selected_user, {card: expense_card}).balance rescue nil
       self.load_amount_value = auto_reload_config.minimum_balance_value - card_balance_value
     end
   end

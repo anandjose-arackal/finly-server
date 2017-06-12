@@ -111,6 +111,7 @@ class User::AvailableExpenseTypes::Show < User::Base
     params[:time_config] = time_config
     params[:per_diem_config] = per_diem_config
     params[:custom_fields_config] = self.custom_fields_config
+    params[:categories] = self.user.company.categories
     User::AvailableExpenseTypes::Show::ExpenseTypesPresenter.new(user, params, messages)
   end
 end

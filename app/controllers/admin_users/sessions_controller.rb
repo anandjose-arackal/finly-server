@@ -22,7 +22,7 @@ class AdminUsers::SessionsController < Devise::SessionsController
   end
 
   def destroy
-    # SIGNOUT FOR TOKEN AUTHENTICATION
+    # SIGN OUT FOR TOKEN AUTHENTICATION
     # Deleting the cookies set while authenticating tokens in TokensController#create
     cookies.delete "access_token"
     cookies.delete "refresh_token"
@@ -36,7 +36,7 @@ class AdminUsers::SessionsController < Devise::SessionsController
       format.json { render :json => {:success => true} }
     end
 
-    # SHALL NOT WORK WITH REGULAR SIGNOUT METHOD! :(
+    # SHALL NOT WORK WITH REGULAR SIGN OUT METHOD! :(
     # super()
   end
 

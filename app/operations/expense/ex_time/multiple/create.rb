@@ -70,7 +70,7 @@ class Expense::ExTime::Multiple::Create < Expense::ExTime::Multiple::Base
   end
 
   def validate
-    # debugger
+
     unless user.time_expense_enabled?
       add_message :error, "Time expense creation is not enabled"
       return false
@@ -244,7 +244,7 @@ class Expense::ExTime::Multiple::Create < Expense::ExTime::Multiple::Base
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = false
-    # debugger
+
     CustomField::SetFields.(expense.time_expense, FieldParentType.id_for(:time_expense), custom_fields)
   end
 

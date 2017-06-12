@@ -1,23 +1,52 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :amount_value, :category_name, :category_id, :expense_type_id,
-                               :distance_value, :time_value, :per_diem_name, :per_diem_rate_value, :per_diem_quantity_value,
-                               :distance_rate_value, :time_rate_value, :transcribed, :reimbursable
+                                    :transcribed, :reimbursable
+
+json.distance do
+  json.value @result.expense.distance_value
+  json.rate_value @result.expense.distance_rate_value
+end
+
+json.time do
+  json.value @result.expense.time_value
+  json.rate_value @result.expense.time_rate_value
+end
+
+json.per_diem do
+  json.name @result.expense.per_diem_name
+  json.rate_value @result.expense.per_diem_rate_value
+  json.quantity_value @result.expense.per_diem_quantity_value
+end
 
 json.date @result.expense.date.strftime("%d %b %Y")
 json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
-json.currency_id @result.expense.currency_id rescue nil
-json.original_currency_id @result.expense.currency_id rescue nil
-json.currency_symbol @result.expense.currency_symbol
-json.currency_country_code @result.expense.currency_country_code
 
+json.currency do
+  json.id @result.expense.currency_id rescue nil
+  json.symbol @result.expense.currency_symbol rescue nil
+  json.country_code @result.expense.currency_country_code
+end
+
+# currencies and amounts in case the expense is being viewed from within a report
 if @result.expense.report_id.present?
-  json.original_amount_value @result.expense.original_amount_value
-  json.base_currency_id @result.expense.report.base_currency_id
-  json.original_currency_symbol @result.expense.amount.currency.symbol
-  json.original_currency_country_code @result.expense.amount.currency.country_code
-  json.base_currency_symbol @result.expense.report.base_currency_symbol
-  json.base_currency_country_code @result.expense.report.base_currency_code
+  json.original_currency do
+    json.id @result.expense.currency_id rescue nil
+    json.symbol @result.expense.amount.currency.symbol rescue nil
+    json.country_code @result.expense.amount.currency.country_code rescue nil
+  end
+
+  json.base_currency do
+    json.id @result.expense.report.base_currency_id
+    json.country_code @result.expense.report.base_currency_code
+    json.currency_symbol @result.expense.report.base_currency_symbol
+  end
+
+  json.original_amount do
+    json.value @result.expense.original_amount_value
+  end
+
   json.currency_conversion_rate @result.conversion_rate
 end
+
 
 if @result.expense.card_expense?
   json.original_merchant_name @result.expense.card_expense.card_transaction.merchant_name
@@ -95,4 +124,8 @@ if @result.expense.card_expense? && @result.expense.cancelled?
       json.card_number "XXXXXXXXXXXX#{transaction.card.ending_number}"
     end
   end
+end
+
+if @result.expense.distance_expense?
+  json.locations @result.expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
 end
