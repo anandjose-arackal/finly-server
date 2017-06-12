@@ -1,11 +1,10 @@
 class CreateReceiptExtracts < ActiveRecord::Migration
   def change
-    create_table :receipt_extract_sources do |t|
-      t.string :name
-
-      t.timestamps null: false
-    end
-    ExpenseDataExtractSource.seed_data
+    # create_table :receipt_extract_sources do |t|
+    #   t.string :name
+    #
+    #   t.timestamps null: false
+    # end
     create_table :receipt_extracts do |t|
       t.string :merchant
       t.string :reference_id
