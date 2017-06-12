@@ -1,10 +1,10 @@
 # Used to download email url attachments and create receipts out of them. Currently not being used.
 class ReceiptEmail::ProcessEmail < ReceiptEmail::Base
-
+# NOTE: THIS IS A BACKGROUND_OPERATION
   def process
     download_attachment_urls
     save_receipts
-    ReceiptEmail::ExtractData.(user, receipt_email_id: self.receipt_email.id)
+    ReceiptEmail::Extractor::Extract.(user, receipt_email_id: self.receipt_email.id)
     create_expense
   end
 
