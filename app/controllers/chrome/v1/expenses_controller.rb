@@ -9,10 +9,6 @@ class Chrome::V1::ExpensesController < ApplicationController
     respond response: (@result&.success? ? :success : :failure)
   end
 
-  def show
-
-  end
-
   def update
 
   end
