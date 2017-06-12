@@ -21,7 +21,7 @@ class Card::Transaction::Index < BaseOperation
         self.selected_card = Card::Index.(user, params).cards.find_by(id: (params[:card_id] or params[:id])) rescue nil
       end
     end
-
+    
     if selected_card.blank? and selected_user.blank?
       if personal_view?
         self.selected_user = user
