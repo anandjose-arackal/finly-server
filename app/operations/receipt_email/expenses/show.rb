@@ -19,7 +19,7 @@ class ReceiptEmail::Expenses::Show < BaseOperation
 
   def process
     if self.receipt_email.present?
-
+      self.expense_data_extract = self.receipt_email.expense_data_extract
     else
 
     end

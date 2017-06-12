@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170612053817) do
+ActiveRecord::Schema.define(version: 20170612155039) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1720,6 +1720,8 @@ ActiveRecord::Schema.define(version: 20170612053817) do
     t.integer  "receipt_email_id",   limit: 4
     t.boolean  "to_be_transcribed",                default: false
     t.boolean  "hard_copy_received",               default: false
+    t.integer  "sourcable_id",       limit: 4
+    t.integer  "sourcable_type",     limit: 4
   end
 
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree

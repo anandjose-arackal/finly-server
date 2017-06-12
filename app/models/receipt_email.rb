@@ -35,7 +35,7 @@
 #
 require 'fileutils'
 class ReceiptEmail < ActiveRecord::Base
-  has_many :receipts
+  has_many :receipts, as: :sourcable
   has_many :receipt_email_attachments, dependent: :destroy
   has_many :expense_data_extracts, as: :extractable
   belongs_to :user
@@ -93,15 +93,10 @@ class ReceiptEmail < ActiveRecord::Base
 
         to_be_transcribed = false
         receipt_files.each do |receipt_file|
-          receipt = receipts.create(user_id: user_id, image: receipt_file, note: self.subject)
-          if self.expense_id.present?
-            # Set the expense as the parent of the receipt
-            receipt.update(parent: self.expense)
-          else
-            if user.company.ocr_enabled?
-              receipt.update(to_be_transcribed: true)
-              to_be_transcribed = true
-            end
+          receipt = receipts.create(user_id: user_id, image: receipt_file, note: self.subject, parent: self.expense)
+          if self.expense_id.blank? and user.company.ocr_enabled?
+            receipt.update(to_be_transcribed: true)
+            to_be_transcribed = true
           end
         end
         if to_be_transcribed and Rails.env.production?
@@ -118,24 +113,22 @@ class ReceiptEmail < ActiveRecord::Base
       document_converter = ReceiptProcessor::BaseConverter.new raw_html_text,
                                                                ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
                                                                image_tmp_path
+      to_be_transcribed = false
       document_converter.convert do |images|
         images.each do |image|
-          receipt = receipts.create(user_id: user_id, image: image, note: self.subject)
-          if self.expense_id.present?
-            receipt.update(parent: self.expense)
-          else
-            if user.company.ocr_enabled?
-              receipt.update(to_be_transcribed: true)
-              ########## Mailer being triggered ###########
-              if Rails.env.production?
-                Constants::TRANSCRIBER_EMAILS.each do |email|
-                  ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
-                end
-              end
-              #############################################
-            end
+          receipt = receipts.create(user_id: user_id, image: image, note: self.subject, parent: self.expense)
+          if self.expense_id.blank? and user.company.ocr_enabled?
+            receipt.update(to_be_transcribed: true)
+            to_be_transcribed = true
           end
         end
+      end
+      if to_be_transcribed and Rails.env.production?
+        ########## Mailer being triggered ###########
+        Constants::TRANSCRIBER_EMAILS.each do |email|
+          ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+        end
+        #############################################
       end
     end
   end

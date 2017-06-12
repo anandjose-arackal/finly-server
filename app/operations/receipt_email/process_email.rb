@@ -4,7 +4,7 @@ class ReceiptEmail::ProcessEmail < ReceiptEmail::Base
   def process
     download_attachment_urls
     save_receipts
-    ReceiptEmail::Extractor::Extract.(user, receipt_email_id: self.receipt_email.id)
+    extract_data
     create_expense
   end
 
@@ -26,6 +26,25 @@ class ReceiptEmail::ProcessEmail < ReceiptEmail::Base
 
   def save_receipts
     self.receipt_email.save_receipts
+  end
+
+  def extract_data
+    html_body = nil
+    sender = self.receipt_email.sender
+    sent_at = self.receipt_email.sent_at
+    subject = self.receipt_email.subject
+
+    if self.receipt_email.raw_html.present?
+      html_body = self.receipt_email.raw_html
+    elsif self.receipt_email.original_source.present?
+      email = Mail.read_from_string(File.read(self.receipt_email.original_source.path))
+      html_body = email.html_part.body.decoded
+    end
+
+    extracted_data = ReceiptEmail::Extractor::Extract.(user, html_body: html_body, sender: sender, sent_at: sent_at, subject: subject)
+    if extracted_data&.success?
+      data.save_data_extract(self.receipt_email)
+    end
   end
 
   def create_expense
