@@ -38,8 +38,8 @@ class RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse < RequestFo
 
     if params[:receipt_email][:attachments].present?
       map[:expense][:receipt_email_attributes][:receipt_email_attachments_attributes] = []
-      params[:receipt_email][:attachments].each do |attachment|
-        map[:expense][:receipt_email_attributes][:receipt_email_attachments_attributes] << {original_attachment: attachment}
+      params[:receipt_email][:attachments].each do |attachment_hash|
+        map[:expense][:receipt_email_attributes][:receipt_email_attachments_attributes] << {original_attachment: attachment_hash[:original_attachment]}
       end
     end
 
