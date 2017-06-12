@@ -26,6 +26,7 @@ class ExpenseDataExtract < ActiveRecord::Base
   belongs_to :expense_data_extract_source
   belongs_to :category
   belongs_to :sourcable, polymorphic: true
+  belongs_to :status, class_name: 'ExpenseDataExtractStatus'
 
   accepts_nested_attributes_for :amount
 

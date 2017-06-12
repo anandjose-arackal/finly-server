@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170611165937) do
+ActiveRecord::Schema.define(version: 20170612034421) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -895,6 +895,12 @@ ActiveRecord::Schema.define(version: 20170611165937) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "expense_data_extract_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "expense_data_extracts", force: :cascade do |t|
     t.string   "merchant",                       limit: 255
     t.string   "reference_id",                   limit: 255
@@ -903,7 +909,6 @@ ActiveRecord::Schema.define(version: 20170611165937) do
     t.integer  "category_id",                    limit: 4
     t.integer  "sourcable_id",                   limit: 4
     t.string   "sourcable_type",                 limit: 255
-    t.boolean  "illegible"
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.integer  "extractable_id",                 limit: 4,     null: false
@@ -911,6 +916,7 @@ ActiveRecord::Schema.define(version: 20170611165937) do
     t.text     "note",                           limit: 65535
     t.datetime "datetime"
     t.date     "date"
+    t.integer  "status_id",                      limit: 4,     null: false
   end
 
   add_index "expense_data_extracts", ["amount_id"], name: "index_expense_data_extracts_on_amount_id", using: :btree
