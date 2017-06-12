@@ -24,8 +24,8 @@ class RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse < RequestFo
     email_body = params&.dig(:receipt_email)&.dig(:body)
     if email_body.present? and map&.dig(:expense)&.dig(:receipt_email_attributes).present?
       email_id = (params&.dig(:receipt_email)&.dig(:email_id) || SecureRandom.hex(6))
-      name = "#{email_id}_body.txt}"
-      map[:expense][:receipt_email_attributes][:body] = FakeFileIO.new(name, email_body)
+      name = "#{email_id}_raw_html.html}"
+      map[:expense][:receipt_email_attributes][:raw_html] = FakeFileIO.new(name, email_body)
     end
 
     # <% if params[:receipt_email][:attachments].present? %>
