@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170612034421) do
+ActiveRecord::Schema.define(version: 20170612053817) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1671,44 +1671,6 @@ ActiveRecord::Schema.define(version: 20170612034421) do
 
   add_index "receipt_email_attachments", ["receipt_email_id"], name: "index_receipt_email_attachments_on_receipt_email_id", using: :btree
 
-  create_table "receipt_email_data_point_modes", force: :cascade do |t|
-    t.string   "name",       limit: 255, null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "receipt_email_data_points", force: :cascade do |t|
-    t.text     "amount_xpath",              limit: 65535
-    t.string   "amount_xpath_regex",        limit: 255
-    t.text     "amount_css_selector",       limit: 65535
-    t.string   "amount_css_selector_regex", limit: 255
-    t.integer  "receipt_email_template_id", limit: 4,                                null: false
-    t.decimal  "priority",                                precision: 10, default: 0, null: false
-    t.datetime "created_at",                                                         null: false
-    t.datetime "updated_at",                                                         null: false
-    t.integer  "amount_mode_id",            limit: 4,                                null: false
-  end
-
-  add_index "receipt_email_data_points", ["receipt_email_template_id"], name: "index_receipt_email_data_points_on_receipt_email_template_id", using: :btree
-
-  create_table "receipt_email_senders", force: :cascade do |t|
-    t.string   "email_id",                  limit: 255, null: false
-    t.integer  "receipt_email_template_id", limit: 4,   null: false
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.string   "domain",                    limit: 255, null: false
-    t.string   "search_term",               limit: 255, null: false
-  end
-
-  add_index "receipt_email_senders", ["receipt_email_template_id"], name: "index_receipt_email_senders_on_receipt_email_template_id", using: :btree
-
-  create_table "receipt_email_templates", force: :cascade do |t|
-    t.string   "name",                limit: 255, null: false
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
-    t.integer  "default_currency_id", limit: 4,   null: false
-  end
-
   create_table "receipt_emails", force: :cascade do |t|
     t.text     "subject",                      limit: 65535
     t.datetime "sent_at"
@@ -2327,8 +2289,6 @@ ActiveRecord::Schema.define(version: 20170612034421) do
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
-  add_foreign_key "receipt_email_data_points", "receipt_email_templates"
-  add_foreign_key "receipt_email_senders", "receipt_email_templates"
   add_foreign_key "receipt_emails", "expenses"
   add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"

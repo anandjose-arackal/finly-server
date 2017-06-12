@@ -24,6 +24,7 @@ class ReceiptEmail::Extrator::Extract < ReceiptEmail::Base
       self.expense_data_extract = data.save_data_extract(self.receipt_email)
     end
   end
+
   def success
     params[:expense_data_extract] = self.expense_data_extract
     params[:receipt_email] = self.receipt_email
