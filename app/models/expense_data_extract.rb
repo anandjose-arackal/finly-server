@@ -10,7 +10,6 @@
 #  category_id                    :integer
 #  sourcable_id                   :integer
 #  sourcable_type                 :string(255)
-#  illegible                      :boolean
 #  created_at                     :datetime         not null
 #  updated_at                     :datetime         not null
 #  extractable_id                 :integer          not null
@@ -18,6 +17,7 @@
 #  note                           :text(65535)
 #  datetime                       :datetime
 #  date                           :date
+#  status_id                      :integer          not null
 #
 
 class ExpenseDataExtract < ActiveRecord::Base

@@ -1,4 +1,4 @@
-class ReceiptEmail::Expense::Show < BaseOperation
+class ReceiptEmail::Expenses::Show < BaseOperation
   attr_accessor :receipt_email, :expense_data_extract
 
   def pre_validate
@@ -29,7 +29,7 @@ class ReceiptEmail::Expense::Show < BaseOperation
 
   end
 
-  class ReceiptEmail::Expense::Show < BaseOperation::BasePresenter::SuccessPresenter
+  class ReceiptEmail::Expenses::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
   end
 
