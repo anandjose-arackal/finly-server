@@ -25,7 +25,7 @@ class ReceiptEmail::ProcessEmail < ReceiptEmail::Base
   end
 
   def save_receipts
-    self.receipt_email.save_receipt_image
+    self.receipt_email.save_receipts
   end
 
   def create_expense

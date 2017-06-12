@@ -28,7 +28,7 @@ class EmailProcessor
         receipt_email.receipt_email_attachments.create(original_attachment: attachment)
       end
     end
-    # receipt_email.save_receipt_image
+    # receipt_email.save_receipts
     ReceiptEmail::ProcessEmail.(user, receipt_email_id: receipt_email.id)
   end
 end
