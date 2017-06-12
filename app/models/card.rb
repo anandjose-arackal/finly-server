@@ -72,7 +72,7 @@ class Card < ActiveRecord::Base
   after_create do
     user = self.user
 
-    result = ItzCash::AccountDetails.(user, card_id: self.id)
+    result = ItzCash::AccountDetails.(user, card: self)
 
     # marking the card by default as either active or inactive
     if result.success?
@@ -125,14 +125,14 @@ class Card < ActiveRecord::Base
   # attr_accessor :balance, :available_card_eligibility
   def balance
     if card_balance.blank?
-      ItzCash::AccountDetails.(user, card_id: self.id)
+      ItzCash::AccountDetails.(user, card: self)
     end
     self.card_balance.value
   end
 
   def available_card_eligibility
     if card_eligibility.blank?
-      ItzCash::AccountDetails.(user, card_id: self.id)
+      ItzCash::AccountDetails.(user, card: self)
     end
     self.card_eligibility.value
   end

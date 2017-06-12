@@ -1,5 +1,5 @@
 class ItzCash::Credit < ItzCash::Base
-  attr_accessor :amount
+  attr_accessor :amount, :card
 
   def pre_validate
     if user.blank?
@@ -29,9 +29,9 @@ class ItzCash::Credit < ItzCash::Base
 
   def post_params
     if params[:card].present? and params[:card].user_id == user.id
-      card = params[:card]
+      self.card = params[:card]
     else
-      card = user.cards.with_id(params[:card_id]).first
+      self.card = user.cards.with_id(params[:card_id]).first
     end
     serial_id = card.serial_id
     {serialid: serial_id, itzmodule: Constants::ItzCash::MODULE, dcode: user.company.d_code,
@@ -76,6 +76,7 @@ class ItzCash::Credit < ItzCash::Base
     params[:amount] = parsed_response[2]
     params[:transaction_id]= parsed_response[3]
     params[:message]= parsed_response[4]
+    # params[:card] = card if params[:card].blank?
     ItzCash::Credit::SuccessPresenter.new(self.user, params, messages)
   end
 
