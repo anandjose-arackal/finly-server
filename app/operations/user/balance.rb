@@ -104,7 +104,7 @@ class User::Balance < User::Base
         if card_id.present?
           card = target_user.cards.find_by_id(card_id)
           if card.present? and (personal or card.card_program.manager_view_balance or card.card_program.manager_view_eligibility)
-            presenter = User::PrepaidCard::Show.(user, user: target_user, card_id: card.id, view: params[:view])
+            presenter = User::PrepaidCard::Show.(user, {user: target_user, card_id: card.id, view: params[:view]})
             show_balance = (personal or card.card_program.manager_view_balance)
             show_eligibility = (personal or card.card_program.manager_view_eligibility)
             balance = nil
@@ -123,7 +123,7 @@ class User::Balance < User::Base
         else
           self.target_user.cards.each do |card|
             next unless personal or card.card_program.manager_view_balance or card.card_program.manager_view_eligibility
-            presenter = User::PrepaidCard::Show.(user, user: target_user, card_id: card.id, view: params[:view])
+            presenter = User::PrepaidCard::Show.(user, {user: target_user, card_id: card.id, view: params[:view]})
             show_balance = (personal or card.card_program.manager_view_balance)
             show_eligibility = (personal or card.card_program.manager_view_eligibility)
             balance = nil

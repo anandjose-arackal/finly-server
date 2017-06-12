@@ -70,6 +70,7 @@ class Card::Transaction::Index < BaseOperation
     include HasScope
 
     has_scope :filter_refunds
+    has_scope :filter_atm_withdrawals
 
     attr_accessor :transactions
 

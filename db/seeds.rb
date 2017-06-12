@@ -468,7 +468,7 @@ end
 unless Rails.env.production?
 
   # creating some junk transactions and card expenses for testing
-  if CardTransaction.count == 0
+  # if CardTransaction.count == 0
     User.all.each do |user|
       next unless user.cards.present?
       card = user.cards.first
@@ -507,7 +507,7 @@ unless Rails.env.production?
       end
 
     end
-  end
+  # end
 end
 # end
 

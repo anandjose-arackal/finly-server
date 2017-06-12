@@ -201,8 +201,8 @@ json.groups do
 end
 
 json.auto_reload_config do
-  json.enabled @result.user.auto_reload_config.enabled
-  if @result.user.auto_reload_config.enabled
-    json.minimum_balance_value @result.user.auto_reload_config.minimum_balance_value
+  json.enabled @result.selected_user.auto_reload_config.enabled rescue nil
+  if @result.selected_user&.auto_reload_config&.enabled
+    json.minimum_balance_value @result.selected_user.auto_reload_config.minimum_balance_value rescue nil
   end
 end

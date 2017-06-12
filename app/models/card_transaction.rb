@@ -68,6 +68,7 @@ class CardTransaction < ActiveRecord::Base
   # scope for timestamp range
   scope :with_transaction_timestamp_range, -> (start_time, end_time) { where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_time, end_time) }
 
+
   scope :atm_withdrawals, -> { where transaction_mode: "ATM" }
   scope :with_user, -> (user_id) { where user_id: user_id }
   scope :pos_expenses, -> { where transaction_mode: "POS" }
@@ -81,6 +82,14 @@ class CardTransaction < ActiveRecord::Base
   scope :filter_refunds, -> (flag) {
     if ['1', 1].include?(flag)
       credits.where.not(cancelled: true).where('UPPER(merchant_name) like ? OR UPPER(merchant_name) like ?', "%Refund%", "%refund%")
+    else
+      # do nothing
+    end
+  }
+
+  scope :filter_atm_withdrawals, -> (flag) {
+    if ['1', 1].include?(flag)
+      where transaction_mode: "ATM"
     else
       # do nothing
     end

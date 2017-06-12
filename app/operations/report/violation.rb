@@ -90,6 +90,7 @@ class Report::Violation < Report::Base
   end
 
   private
+
   def check_expense_rule_violation(expense, rule, manager = nil)
     message = ''
     if rule.greater_than_amount_value && rule.greater_than_amount_value != 0
