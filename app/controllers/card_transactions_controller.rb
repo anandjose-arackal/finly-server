@@ -25,7 +25,7 @@ class CardTransactionsController < ApplicationController
   end
 
   def atm_withdrawals
-    params[:refunds] = '1'
+    params[:filter_atm_withdrawals] = '1'
     @result = Card::Transaction::Index.(current_user, params)
     respond
   end
