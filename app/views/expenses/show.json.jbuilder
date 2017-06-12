@@ -12,7 +12,7 @@ json.time do
 end
 
 json.per_diem do
-  json.value @result.expense.per_diem_name
+  json.name @result.expense.per_diem_name
   json.rate_value @result.expense.per_diem_rate_value
   json.quantity_value @result.expense.per_diem_quantity_value
 end
