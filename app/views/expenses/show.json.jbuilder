@@ -101,3 +101,5 @@ end
 if @result.expense.distance_expense?
   json.locations @result.expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
 end
+
+json.potential_duplicate @result.expense.has_duplicate_expenses?
