@@ -24,7 +24,7 @@ class ReceiptEmail::Extractor::Adapter::DataPoint
       when :xpath
         return parser&.xpath(xpath)&.text[xpath_regex]
       when :css_selector
-        return parser&.xpath(css_selector)&.text[css_selector_regex]
+        return parser&.at_css(css_selector)&.text[css_selector_regex]
     end
   end
 

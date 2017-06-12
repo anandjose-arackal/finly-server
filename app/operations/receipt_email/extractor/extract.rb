@@ -1,4 +1,4 @@
-class ReceiptEmail::Extrator::Extract < ReceiptEmail::Base
+class ReceiptEmail::Extractor::Extract < ReceiptEmail::Base
   # NOTE: THIS IS A BACKGROUND_OPERATION
   attr_accessor :amount, :currency_id, :merchant, :datetime, :note, :expense_data_extract
 
@@ -28,10 +28,10 @@ class ReceiptEmail::Extrator::Extract < ReceiptEmail::Base
   def success
     params[:expense_data_extract] = self.expense_data_extract
     params[:receipt_email] = self.receipt_email
-    ReceiptEmail::ExtractData::ExtractedData.new(user, params, messages)
+    ReceiptEmail::Extractor::Extract::ExtractedData.new(user, params, messages)
   end
 
-  class ReceiptEmail::ExtractData::ExtractedData < BaseOperation::BasePresenter::SuccessPresenter
+  class ReceiptEmail::Extractor::Extract::ExtractedData < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :receipt_email, :expense_data_extract
 
     def init
