@@ -1,4 +1,4 @@
-class ReceiptEmail::Extractor::Adapter::UberAdapter < ReceiptEmail::Extractor::Adapter::Base
+class ReceiptEmail::Extractor::Adapter::UberIndia < ReceiptEmail::Extractor::Adapter::Base
 
   def self.senders
     'uber.india@uber.com'
