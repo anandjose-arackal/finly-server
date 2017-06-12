@@ -76,7 +76,7 @@ class ItzCash::Credit < ItzCash::Base
     params[:amount] = parsed_response[2]
     params[:transaction_id]= parsed_response[3]
     params[:message]= parsed_response[4]
-    # params[:card] = card if params[:card].blank?
+    params[:card] = card if params[:card].blank?
     ItzCash::Credit::SuccessPresenter.new(self.user, params, messages)
   end
 
