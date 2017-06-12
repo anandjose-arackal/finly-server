@@ -1,4 +1,4 @@
-class ReceiptEmail::Extractor::Extract < ReceiptEmail::Base
+class ReceiptEmail::Extractor::Extract < BackgroundOperation
   # NOTE: THIS IS A BACKGROUND_OPERATION
   attr_accessor :html_body, :sender, :sent_at, :subject
   attr_accessor :amount, :currency_id, :merchant, :datetime, :note, :extracted_data
@@ -28,7 +28,7 @@ class ReceiptEmail::Extractor::Extract < ReceiptEmail::Base
       add_message :error, 'Cannot parse email'
       return
     end
-    data_presenter = adapter.(self.receipt_email, html_body)
+    data_presenter = adapter.(self.user, self.sender, self.sent_at, self.subject, html_body)
 
     if data_presenter&.success?
       self.extracted_data = data_presenter

@@ -21,7 +21,7 @@ class ReceiptEmail::Expenses::Show < BaseOperation
     if self.receipt_email.present?
       self.expense_data_extract = self.receipt_email.expense_data_extract
     else
-
+      self.extracted_data = ReceiptEmail::Extractor::Extract.(user, html_body: params[:html_body], sender: params[:sender], sent_at: params[:sent_at], subject: params[:subject])
     end
   end
 

@@ -1,5 +1,5 @@
 class ReceiptEmail::Extractor::Adapter::Base < BaseOperation
-  attr_accessor :receipt_email, :parser, :html_body, :extracted_data
+  attr_accessor :sender, :sent_at, :subject, :parser, :html_body, :user, :extracted_data
 
   def self.senders
     []
@@ -9,19 +9,21 @@ class ReceiptEmail::Extractor::Adapter::Base < BaseOperation
     []
   end
 
-  def self.call(receipt_email, html_body)
-    self.new(receipt_email, html_body).run
+  def self.call(user, sender, sent_at, subject, html_body)
+    self.new(user, sender, sent_at, subject, html_body).run
   end
 
-  def initialize(receipt_email, html_body)
-    self.receipt_email = receipt_email
+  def initialize(user, sender, sent_at, subject, html_body)
+    self.user = user
+    self.sender = sender
+    self.sent_at = sent_at
+    self.subject = subject
     self.html_body = html_body
   end
 
   def pre_validate
-    if self.receipt_email.blank?
-      add_message :error, 'Receipt Email not found'
-      return
+    if user.blank?
+      add_message :error, 'User not found'
     end
     if self.html_body.blank?
       add_message :error, 'Email not found'
@@ -64,15 +66,15 @@ class ReceiptEmail::Extractor::Adapter::Base < BaseOperation
   end
 
   def datetime
-    self.receipt_email.sent_at
+    self.sent_at
   end
 
   def note
-    self.receipt_email.subject
+    self.subject
   end
 
   def category_id
-    categories = self.receipt_email.user.company.categories
+    categories = self.user.company.categories
     categories.others&.first or categories.last.id
   end
 
