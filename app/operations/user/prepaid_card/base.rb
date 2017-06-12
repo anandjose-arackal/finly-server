@@ -40,13 +40,6 @@ class User::PrepaidCard::Base < BaseOperation
   end
 
   def validate
-    # if selected_user.blank?
-    #   messages[:error] << 'User not found'
-    #   return
-    # end
-    # if selected_user.cards.blank?
-    #   messages[:error] << 'Card has not been assigned to the user'
-    # end
     if self.card.blank?
       add_message :error, 'Card not found'
     end
