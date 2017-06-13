@@ -24,7 +24,7 @@ class ReceiptEmail::Extractor::Adapter::Loader
         end
       end
     end
-    nil
+    ReceiptEmail::Extractor::Adapter::Generic
   end
 
 end
