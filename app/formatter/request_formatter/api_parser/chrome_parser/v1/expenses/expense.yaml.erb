@@ -4,6 +4,7 @@ expense:
   date: <%= params[:expense][:date] %>
   reimbursable: <%= params[:expense][:reimbursable] %>
   category_id: <%= params[:expense][:category_id] %>
+  note: <%= params[:expense][:note] %>
   manual_expense_attributes:
     merchant: <%= params[:expense][:merchant] %>
   <% if params[:expense][:amount].present? %>

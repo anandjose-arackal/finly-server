@@ -9,11 +9,11 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      messages[:error] << "Parameters or user not found"
+      messages[:error] << 'Parameters or user not found'
       return false
     end
     if params[:expense_id].nil? and params[:id].blank?
-      messages[:error] << "Expense ID missing!"
+      messages[:error] << 'Expense ID missing'
       return false
     end
     amount_value = params[:expense][:amount_attributes][:value].to_d rescue nil

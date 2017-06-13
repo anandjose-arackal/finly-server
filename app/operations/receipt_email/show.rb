@@ -14,18 +14,18 @@ class ReceiptEmail::Show < BaseOperation
 
   def init
     id = params[:receipt_email][:email_id]
-    self.receipt_email = self.user.receipt_emails.find_by(id: id)
+    self.receipt_email = self.user.receipt_emails.with_email_id(id)&.first
   end
 
   def process
-    if self.receipt_email.present?
-      self.expense_data_extract = self.receipt_email.expense_data_extract
-      merchant = self.expense_data_extract
-      amount_value = self.expense_data_extract.amount&.value
-      currency_id = self.expense_data_extract.amount&.currency_id
-      category_id = self.expense_data_extract.category_id
-      note = self.expense_data_extract.note
-      datetime = (self.datetime or self.date)
+    if self.receipt_email.present? and self.receipt_email.expense_data_extracts.present?
+      expense_data_extract = self.receipt_email.expense_data_extracts&.first
+      merchant = expense_data_extract
+      amount_value = expense_data_extract.amount&.value
+      currency_id = expense_data_extract.amount&.currency_id
+      category_id = expense_data_extract.category_id
+      note = expense_data_extract.note
+      datetime = (expense_data_extract.datetime or expense_data_extract.date)
       self.extracted_data = ReceiptEmail::Extractor::Data.new(merchant, amount_value, currency_id, datetime, note, category_id, nil)
     else
       self.extracted_data = ReceiptEmail::Extractor::Extract.(user, html_body: params[:html_body], sender: params[:sender], sent_at: params[:sent_at], subject: params[:subject])

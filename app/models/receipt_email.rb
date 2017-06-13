@@ -43,6 +43,8 @@ class ReceiptEmail < ActiveRecord::Base
 
   accepts_nested_attributes_for :receipt_email_attachments
 
+  scope :with_email_id, ->(email_id) { where email_id: email_id }
+
   validates :user_id, presence: true
 
   # BODY_CONTENT_TYPES = ['text/plain', 'text/html', 'message/rfc822', 'multipart/alternative', 'message/partial']

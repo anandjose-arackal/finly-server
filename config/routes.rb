@@ -1483,8 +1483,7 @@ Rails.application.routes.draw do
 
       post 'expenses/configuration', to: 'expenses#configuration'
       resources :expenses, only: [:create, :update, :destroy]
-      post 'expenses/:email_id', to: 'expenses#show'
-      post 'emails/:email_id', to: 'receipt_email#show'
+      post 'emails/:id', to: 'receipt_email#show'
     end
   end
   ######### CHROME END ###########

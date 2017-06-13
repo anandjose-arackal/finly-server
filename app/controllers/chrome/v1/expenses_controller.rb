@@ -10,7 +10,13 @@ class Chrome::V1::ExpensesController < ApplicationController
   end
 
   def update
-
+    formatted_param = RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse.(current_user, params)&.formatted_request
+    @result = Expense::Manual::Update.(current_user, formatted_param)
+    if @result.success?
+      respond response: :success
+    else
+      respond(response: :failure, message: @result.messages[:error])
+    end
   end
 
   def destroy
