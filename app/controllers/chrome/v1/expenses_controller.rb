@@ -14,7 +14,12 @@ class Chrome::V1::ExpensesController < ApplicationController
   end
 
   def destroy
-
+    @result = Expense::Destroy.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond(response: :failure, message: @result.messages[:error])
+    end
   end
 
   def configuration
