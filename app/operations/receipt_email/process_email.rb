@@ -1,32 +1,15 @@
 # Used to download email url attachments and create receipts out of them. Currently not being used.
-class ReceiptEmail::ProcessEmail < BackgroundOperation
-  attr_accessor :expense, :receipt_email
-
-  def pre_validate
-    if user.blank?
-      add_message :error, 'User not found'
-      return
-    end
-    if params.blank? or (params[:expense_id].blank? and params[:id].blank?)
-      add_message :error, 'Error loading attachments'
-      return
-    end
-  end
-
-  def init
-    id = (params[:id] or params[:expense_id])
-    self.expense = user.expenses.find_by(id: id)
-    self.receipt_email = self.expense&.receipt_email
-  end
-
-  def validate
-    if self.expense.blank? or self.receipt_email.blank?
-      add_message :error, 'Attachments not found'
-      return
-    end
-  end
-
+class ReceiptEmail::ProcessEmail < ReceiptEmail::Base
+# NOTE: THIS IS A BACKGROUND_OPERATION
   def process
+    download_attachment_urls
+    save_receipts
+    extract_data
+    create_expense
+  end
+
+  protected
+  def download_attachment_urls
     self.receipt_email.receipt_email_attachments.each do |attachment|
       if attachment.download_pending?
         url = attachment.attachment_url
@@ -39,7 +22,51 @@ class ReceiptEmail::ProcessEmail < BackgroundOperation
         end
       end
     end
-    self.receipt_email.save_receipt_image
+  end
+
+  def save_receipts
+    self.receipt_email.save_receipts
+  end
+
+  def extract_data
+    html_body = nil
+    sender = self.receipt_email.sender
+    sent_at = self.receipt_email.sent_at
+    subject = self.receipt_email.subject
+
+    if self.receipt_email.raw_html.present?
+      html_body = self.receipt_email.raw_html
+    elsif self.receipt_email.original_source.present?
+      email = Mail.read_from_string(File.read(self.receipt_email.original_source.path))
+      html_body = email.html_part.body.decoded
+    end
+
+    extracted_data = ReceiptEmail::Extractor::Extract.(user, html_body: html_body, sender: sender, sent_at: sent_at, subject: subject)
+    if extracted_data&.success?
+      data.save_data_extract(self.receipt_email)
+    end
+  end
+
+  def create_expense
+    return unless self.receipt_email.expense_id.blank? and self.receipt_email.expense_data_extract.present?
+    extract = self.receipt_email.expense_data_extract
+    # Create expenses for completely and partially extracted emails
+    return unless [ExpenseDataExtractStatus.id_for(:success), ExpenseDataExtractStatus.id_for(:partial_extract)].include?(extract.status_id)
+    expense_param = {}
+    if extract.amount_id.present?
+      expense_param[:amount_attributes] = {
+          value: extract.amount.value,
+          currency_id: extract.amount.currency_id
+      }
+    end
+    if extract.merchant.present?
+      expense_param[:manual_expense_attributes] ={merchant_name: extract.merchant}
+    end
+    expense_param[:date] = extract.datetime
+    expense_param[:note] = extract.note
+    expense_param[:category_id] = self.receipt_email.user.company.categories.with_name('others')&.first&.id
+    expense_param[:user_id] = self.receipt_email.user_id
+    self.receipt_email.expense.create expense_param
   end
 
 end

@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: duplicate_expense_mappings
+#
+#  id                   :integer          not null, primary key
+#  expense_id           :integer          not null
+#  duplicate_expense_id :integer          not null
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#
+
 class DuplicateExpenseMapping < ActiveRecord::Base
   belongs_to :expense, class_name: 'Expense'
   belongs_to :duplicate_expense, class_name: 'Expense'
