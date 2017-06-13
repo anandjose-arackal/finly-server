@@ -97,22 +97,7 @@ class ReceiptEmail::Extractor::Adapter::Base < BaseOperation
   end
 
   def success
-    ReceiptEmail::Extractor::Adapter::Base::SuccessPresenter.new(extracted_data: self.extracted_data)
-  end
-
-  class ReceiptEmail::Extractor::Adapter::Base::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :extracted_data, :receipt_email, :html_body
-
-    def initialize(params)
-      super(nil, params)
-    end
-
-    def init
-      self.extracted_data = params[:extracted_data]
-      self.receipt_email = params[:receipt_email]
-      self.html_body = params[:html_body]
-    end
-
+    self.extracted_data
   end
 
   private
