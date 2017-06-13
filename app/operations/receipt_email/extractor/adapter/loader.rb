@@ -18,12 +18,13 @@ class ReceiptEmail::Extractor::Adapter::Loader
         mail_keywords = adapter.mail_keywords
         mail_keywords = [mail_keywords] unless mail_keywords.is_a?(Array)
         mail_keywords.each do |keyword|
-          if html_body.contains(keyword)
+          if html.include? keyword
             return adapter
           end
         end
       end
     end
+    nil
   end
 
 end

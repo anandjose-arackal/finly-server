@@ -22,9 +22,9 @@ class ReceiptEmail::Extractor::Adapter::DataPoint
   def extract_data_from(parser)
     case mode
       when :xpath
-        return parser&.xpath(xpath)&.text[xpath_regex]
+        return (parser&.xpath(xpath)&.text[xpath_regex] rescue nil)
       when :css_selector
-        return parser&.at_css(css_selector)&.text[css_selector_regex]
+        return (parser&.at_css(css_selector)&.text[css_selector_regex] rescue nil)
     end
   end
 
