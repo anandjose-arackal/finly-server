@@ -57,7 +57,7 @@ class ReceiptEmail::Extractor::Adapter::Base < BaseOperation
     data_points.each do |data_point|
       next unless data_point.is_a?(ReceiptEmail::Extractor::Adapter::DataPoint)
       amount_val = data_point.extract_data_from(self.parser)
-      return amount.val if amount_val.present?
+      return amount_val if amount_val.present?
     end
     nil
   end
