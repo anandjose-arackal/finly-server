@@ -1,6 +1,9 @@
 class ReceiptEmail::Extractor::Adapter::Loader
 
-  ADAPTERS = [ReceiptEmail::Extractor::Adapter::UberIndia]
+  ADAPTERS = [
+    ReceiptEmail::Extractor::Adapter::UberIndia,
+    ReceiptEmail::Extractor::Adapter::Flipkart
+  ]
 
   def self.adapter_for(sender, html)
     if sender.present?
