@@ -66,7 +66,10 @@ class ReceiptEmail::ProcessEmail < ReceiptEmail::Base
     expense_param[:note] = extract.note
     expense_param[:category_id] = self.receipt_email.user.company.categories.with_name('others')&.first&.id
     expense_param[:user_id] = self.receipt_email.user_id
-    self.receipt_email.expense.create expense_param
+    # Set email attachments as receipts of the expense
+    if self.receipt_email.expense.create expense_param
+      self.receipt_email.receipts.update_all parent_id: self.receipt_email.expense.id, parent_type: 'Expense'
+    end
   end
 
 end
