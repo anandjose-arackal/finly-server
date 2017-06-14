@@ -1,6 +1,6 @@
 json.extract! expense, :id, :date, :note, :report_id, :expense_type_id,
               :distance_value, :time_value, :per_diem_name, :per_diem_rate_value, :per_diem_quantity_value,
-              :distance_rate_value, :time_rate_value, :transcribed, :merchant_name
+              :distance_rate_value, :time_rate_value, :transcribed, :merchant_name, :reimbursable
 json.user do
   json.id expense.user.id
   json.name expense.user.name
@@ -9,9 +9,18 @@ json.status do
   json.id expense.expense_status_id
   json.name expense.expense_status.name
 end
+
 json.amount do
-  json.partial! 'api/v1/shared/amount', amount: expense.amount
+  json.partial! 'api/v1/shared/amount', amount: expense.base_amount
 end
+
+json.original_amount do
+  json.partial! 'api/v1/shared/amount', amount: expense.original_amount
+end
+
+json.converted expense.converted?
+json.conversion_rate expense.conversion_rate
+
 json.type expense.expense_type_id
 # if expense.manual_expense?
 #   json.merchant_name expense.manual_expense.merchant_name
@@ -27,6 +36,9 @@ json.receipts expense.receipts.each do |receipt|
   json.normal receipt.image(:normal)
   json.thumb receipt.image(:thumb)
 end
+if expense.distance_expense?
+  json.locations expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
+end
 json.custom_fields do
   case expense.expense_type_id
     when ExpenseType.id_for(:manual)
@@ -41,3 +53,4 @@ json.custom_fields do
       json.array! expense.per_diem_expense.custom_fields
   end
 end
+json.cancelled expense.cancelled?

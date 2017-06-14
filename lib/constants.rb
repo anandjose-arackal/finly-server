@@ -34,6 +34,13 @@ module Constants
 
   CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
 
+  # PayU Payment Gateway URL
+  if Rails.env.production?
+    PAYU_RELOAD_URL = "https://www.itzcash.com/finly/servlet/AccountReloadServlet"
+  else
+    PAYU_RELOAD_URL = "https://staging.itzcash.com/loconav/servlet/AccountReloadServlet"
+  end
+
   #########################
 
   if Rails.env.production?
@@ -55,8 +62,8 @@ module Constants
     url = "http://staging.finly.io/#"
     authorizer_url = "http://staging.finly.io/authorizer#"
   elsif Rails.env.itzcash_uat?
-    url = "http://uat.finly.io/#"
-    authorizer_url = "http://uat.finly.io/authorizer#"
+    url = "http://demo.finly.io/#"
+    authorizer_url = "http://demo.finly.io/authorizer#"
   elsif Rails.env.local_vm?
     url = "http://192.168.56.101/#"
     authorizer_url = "http://192.168.56.101/authorizer#"
@@ -70,6 +77,8 @@ module Constants
 
   BASE_URL = url
   BASE_URL_AUTHORIZER = authorizer_url
+
+  DEFAULT_PASSWORD = "lqskmclkmsal1k"
 
   class Constants::ItzCash
 

@@ -33,14 +33,6 @@
 
 
 
-
-
-
-
-
-
-
-
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -317,6 +309,10 @@ class Report < ActiveRecord::Base
     date = latest_exp.date if latest_exp.present?
     cash = self.user.cash_in_hand date
     cash.value - report_total < 0
+  end
+
+  def base_currency
+    self.policy.base_currency
   end
 
   def base_currency_id

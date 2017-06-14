@@ -6,11 +6,7 @@ class ItzCash::AccountDetails < ItzCash::Base
       add_message :error, 'User not found'
       return
     end
-    unless user.cards.present?
-      add_message :error, 'A card has not been assigned to the user'
-      return
-    end
-    if params.blank? or params[:card_id].blank? or user.cards.with_id(params[:card_id]).blank?
+    if params[:card].blank?
       add_message :error, 'Card not found'
     end
   end
@@ -25,7 +21,7 @@ class ItzCash::AccountDetails < ItzCash::Base
 
   def init
     super
-    self.card = user.cards.with_id(params[:card_id]).first
+    self.card = params[:card]
   end
 
   def success

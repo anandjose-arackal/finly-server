@@ -43,6 +43,17 @@ class Report::Approve < Report::Base
     unless report.processing? or auto_approve
       add_message :error, 'Cannot approve this report as it is not in processing state'
     end
+
+    violations = Report::Violation.(user, report: report)
+    violations_present = false
+    violations.each do |key, value|
+      if value['expense_blocking'].present? or value['budget_blocking'].present?
+        violations_present = true
+      end
+    end
+    if violations_present
+      add_message :error, 'Reports with blocking violations cannot be approved'
+    end
   end
 
   def process

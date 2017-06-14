@@ -1,0 +1,1 @@
+json.array! @result.addable_users, :id, :name, :mobile_number, :email

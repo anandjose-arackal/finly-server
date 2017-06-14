@@ -20,6 +20,8 @@ module PoliciesHelper
             rule_in_words += " require a note."
           when 3
             rule_in_words += " are not allowed"
+          when 4
+            rule_in_words += " require receipt hard copy."
         end
     elsif rule.is_a?(BudgetRule)
         rule_in_words = "Total Expenses"

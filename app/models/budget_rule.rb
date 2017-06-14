@@ -47,6 +47,30 @@ class BudgetRule < ActiveRecord::Base
     self.include_reimbursable
   end
 
+  def rule_in_words
+    rule_in_words = "Total Expenses"
+    if self.period_id
+      case self.period_id
+        when 1
+          period = "day"
+        when 2
+          period = "week"
+        when 3
+          period = "month"
+        when 4
+          period = "year"
+      end
+      rule_in_words += " per " + period
+    end
+    if self.category_id
+      rule_in_words += " belonging to category " + self.category_name
+    end
+    if self.amount_id
+      rule_in_words += " should not exceed #{self.amount.currency.symbol}#{self.amount_value.to_s} #{self.amount.currency.country_code}"
+    end
+    rule_in_words
+  end
+
   private
   def update_parent_version
     self.policy.update_attribute(:updated_at, DateTime.now)

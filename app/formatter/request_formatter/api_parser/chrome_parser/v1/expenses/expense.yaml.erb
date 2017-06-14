@@ -1,0 +1,32 @@
+<% params[:expense] = {} if params&.dig(:expense).nil? %>
+id: <%= params[:expense][:id] %>
+expense:
+  date: <%= params[:expense][:date] %>
+  reimbursable: <%= params[:expense][:reimbursable] %>
+  category_id: <%= params[:expense][:category_id] %>
+  manual_expense_attributes:
+    merchant: <%= params[:expense][:merchant] %>
+  <% if params[:expense][:amount].present? %>
+  amount_attributes:
+    value: <%= params[:expense][:amount] %>
+    currency_id: <%= (params[:expense][:currency_id] or Currency.first.id) %>
+  <% end %>
+  <% if params[:receipt_email].present? %>
+  receipt_email_attributes:
+    source: <%= params[:receipt_email][:source] %>
+    user_id: <%= user.id %>
+    email_id: <%= params[:receipt_email][:email_id] %>
+    sender: <%= params[:receipt_email][:sender] %>
+    subject: <%= params[:receipt_email][:subject] %>
+    <% if params[:receipt_email][:timestamp].present? %>
+    sent_at: <%= DateTime.parse(params[:receipt_email][:timestamp]) %>
+    <% end %>
+    body: <%= FakeFileIO.new("#{params[:receipt_email][:email_id]}_body.txt", params[:receipt_email][:body]) %>
+    <% if params[:receipt_email][:attachments].present? %>
+    receipt_email_attachments_attributes:
+      <% params[:receipt_email][:attachments].each do |attachment| %>
+      - attachment_url: <%= attachment[:url] %>
+        attachment_url_file_name: <%= attachment[:file_name] %>
+      <% end %>
+   <% end %>
+<% end %>

@@ -8,10 +8,11 @@ class CompaniesController < ApplicationController
     @result = Company::VirtualAccount::Balance.(current_user, params)
     if @result.success?
       @company_balance = @result.balance
+      @company = @result.company
     else
       @company_balance = 0
     end
-    render partial: 'notify'
+    respond
   end
 
   def add_balance

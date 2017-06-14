@@ -38,7 +38,7 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
     for key, params_each_expense in multiple_expense_params
 
       current_expense_params = perdiem_multiple_expense_params(params_each_expense)
-      # debugger
+
 
       current_expense_params[:expense_type_id] = ExpenseType.per_diem_expense_id
 
@@ -105,7 +105,7 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
   end
 
   def validate
-    # debugger
+
     unless user.per_diem_expense_enabled?
       add_message :error, "PerDiem expense creation is not enabled"
       return false
@@ -288,7 +288,7 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = false
-    # debugger
+
     CustomField::SetFields.(expense.per_diem_expense, FieldParentType.id_for(:per_diem_expense), custom_fields)
   end
 

@@ -7,7 +7,8 @@
 #  authorizable_id   :integer          not null
 #  authorizable_type :string(255)      not null
 #  token             :string(255)
-#  valid             :boolean          default(TRUE)
+#  is_valid          :boolean          default(TRUE)
+#  view_role_id      :integer
 #
 
 class EmailAuthorization < ActiveRecord::Base

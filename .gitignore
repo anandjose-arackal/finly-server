@@ -20,10 +20,11 @@ dump.rdb
 /public/system/company_configurations/*
 /public/common/files/temp_files/*
 /sample_atm_transactions.txt
+/junk_expenses.rb
+/Sample transactions
 
 # all local executables
 /bin
-/sample_atm_transactions.txt
 
 .idea/*
 .vagrant/

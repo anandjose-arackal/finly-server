@@ -34,7 +34,7 @@ class Export::Report::Base < Export::Base
   end
 
 
-  def retrieve_data(preferences, report, expense)
+  def retrieve_data(preferences, report, expense, custom_field_names)
     data_arr = []
     user = report.user
     preferences.each do |pref|
@@ -67,7 +67,36 @@ class Export::Report::Base < Export::Base
           data_arr << ''
       end
     end
+    # now adding the custom field values for the respective expense
+    data_arr += retrieve_custom_field_data(custom_field_names, expense)
     data_arr
+  end
+
+  def retrieve_custom_field_data(custom_field_names, expense)
+    values = []
+    field_names = expense.custom_field_names
+    custom_field_names.each do |column|
+      if field_names.include?(column)
+        values << expense.custom_field_value_by_name(column)
+      else
+        values << ''
+      end
+    end
+    values
+  end
+
+  def extract_custom_field_names(reports)
+    # now extract the custom fields from each expense that is a part of all the report
+    field_names = []
+    reports.each do |report|
+      report.expenses.each do |expense|
+        # this gets all the custom field names from all different types of expenses
+        if expense.custom_field_names.present?
+          field_names += expense.custom_field_names
+        end
+      end
+    end
+    field_names
   end
 
 end

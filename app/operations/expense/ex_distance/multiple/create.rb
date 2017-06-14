@@ -292,7 +292,7 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = false
-    # debugger
+
     CustomField::SetFields.(expense.distance_expense, FieldParentType.id_for(:distance_expense), custom_fields)
   end
 

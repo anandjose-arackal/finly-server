@@ -26,11 +26,6 @@
 
 
 
-
-
-
-
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -53,6 +48,7 @@ class Expense < ActiveRecord::Base
   has_one :distance_expense, dependent: :destroy
   has_one :time_expense, dependent: :destroy
   has_one :per_diem_expense, dependent: :destroy
+  has_one :receipt_email
 
   accepts_nested_attributes_for :system_messages
   accepts_nested_attributes_for :amount
@@ -62,6 +58,8 @@ class Expense < ActiveRecord::Base
   accepts_nested_attributes_for :distance_expense
   accepts_nested_attributes_for :time_expense
   accepts_nested_attributes_for :per_diem_expense
+  accepts_nested_attributes_for :receipt_email
+
 
   # delegating to associated classes the dependent attribute calls
   # delegate :amount_value, :currency, to: :amount
@@ -306,6 +304,32 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def base_amount
+    unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present?
+      return self.amount
+    end
+    currency = report_id.present? ? report.base_currency : amount.currency
+    Amount.new(value: amount_value, currency: currency)
+  end
+
+  def original_amount
+    self.amount
+  end
+
+  def conversion_rate
+    return nil unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present? and report_id.present?
+    converted_amount = amount_value
+    original_amount = original_amount_value
+    precision_value converted_amount/original_amount
+  end
+
+  def converted?
+    return false unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present? and report_id.present?
+    if report.base_currency_id != amount.currency_id
+      return true
+    end
+    false
+  end
 
   # this method is to calculate the amount values for the various time/distance/per diem expenses
   def calculate_amount_value(policy)
@@ -459,6 +483,64 @@ class Expense < ActiveRecord::Base
     else
       return nil
     end
+  end
+
+  def custom_field_names
+    case self.expense_type_id
+      when ExpenseType.id_for(:manual)
+        return self.manual_expense.custom_field_names
+      when ExpenseType.id_for(:distance)
+        return self.distance_expense.custom_field_names
+      when ExpenseType.id_for(:time)
+        return self.time_expense.custom_field_names
+      when ExpenseType.id_for(:per_diem)
+        return self.per_diem_expense.custom_field_names
+      when ExpenseType.id_for(:card)
+        return []
+      else
+        return []
+    end
+  end
+
+  def custom_field_values
+    case self.expense_type_id
+      when ExpenseType.id_for(:manual)
+        return self.manual_expense.custom_field_values
+      when ExpenseType.id_for(:distance)
+        return self.distance_expense.custom_field_values
+      when ExpenseType.id_for(:time)
+        return self.time_expense.custom_field_values
+      when ExpenseType.id_for(:per_diem)
+        return self.per_diem_expense.custom_field_values
+      when ExpenseType.id_for(:card)
+        return []
+      else
+        return []
+    end
+  end
+
+  def custom_field_value_by_name(name)
+    case self.expense_type_id
+      when ExpenseType.id_for(:manual)
+        return self.manual_expense.custom_field_value_by_name(name)
+      when ExpenseType.id_for(:distance)
+        return self.distance_expense.custom_field_value_by_name(name)
+      when ExpenseType.id_for(:time)
+        return self.time_expense.custom_field_value_by_name(name)
+      when ExpenseType.id_for(:per_diem)
+        return self.per_diem_expense.custom_field_value_by_name(name)
+      when ExpenseType.id_for(:card)
+        return []
+      else
+        return []
+    end
+  end
+
+  def partially_transcribed
+    if self.system_messages.errors.present?
+      return true
+    end
+    false
   end
 
   # returns the number of receipts attached to this expense
