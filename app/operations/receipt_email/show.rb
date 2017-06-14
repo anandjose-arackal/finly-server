@@ -53,6 +53,7 @@ class ReceiptEmail::Show < BaseOperation
       data = {}
       if self.receipt_email&.expense.present? and self.receipt_email&.expense&.manual_expense.present?
         expense = self.receipt_email.expense
+        custom_fields = expense.manual_expense&.custom_fields
         data = {
             id: expense.id,
             merchant: expense.manual_expense.merchant_name,
@@ -71,8 +72,12 @@ class ReceiptEmail::Show < BaseOperation
                     country_code: expense.amount.currency.country_code,
                     symbol: expense.amount.currency.symbol
                 }
-            }
+            },
+            custom_fields: {}
         }
+        custom_fields&.each do |field|
+          data[:custom_fields][field.id] = field.value&.value
+        end
       elsif extracted_data.present?
         category = Category.find_by(id: extracted_data.category_id)
         currency = Currency.find_by(id: extracted_data.currency_id)
