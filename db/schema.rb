@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170608143310) do
+ActiveRecord::Schema.define(version: 20170614081142) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1881,6 +1881,7 @@ ActiveRecord::Schema.define(version: 20170608143310) do
     t.integer  "reimbursable_expenses_total_id",     limit: 4
     t.integer  "card_expenses_total_id",             limit: 4
     t.integer  "non_reimbursable_expenses_total_id", limit: 4
+    t.boolean  "synced_with_quickbooks"
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
