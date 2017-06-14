@@ -16,9 +16,20 @@ class SyncReport < Integrations::Base
     end
   end
 
+  def validate
+    if report.synced_with_quickbooks
+      add_message :error, "This report is already synced with quickbooks"
+    end
+  end
+
   def process
     unless adapter.save_report(report)
-      add_message :error, "Report could not be saved, try again later"
+      add_message :error, adapter.save_report(report)
     end
+  end
+
+  def post_process
+    # mark the report as synced with quickbooks so that you don't have to sync it again
+    report.update(synced_with_quickbooks: true)
   end
 end
