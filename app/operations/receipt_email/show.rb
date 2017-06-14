@@ -58,7 +58,8 @@ class ReceiptEmail::Show < BaseOperation
             id: expense.id,
             merchant: expense.manual_expense.merchant_name,
             date: expense.date,
-            note: expense.note,
+            # note: expense.note,
+            note: nil,
             category: {
                 id: expense.category.id,
                 name: expense.category.name
@@ -76,7 +77,9 @@ class ReceiptEmail::Show < BaseOperation
             custom_fields: {}
         }
         custom_fields&.each do |field|
-          data[:custom_fields][field.id] = field.value&.value
+          if field and field.field_configuration.present?
+            data[:custom_fields][field.field_configuration.id] = field.value&.value
+          end
         end
       elsif extracted_data.present?
         category = Category.find_by(id: extracted_data.category_id)
@@ -85,7 +88,8 @@ class ReceiptEmail::Show < BaseOperation
             id: nil,
             merchant: extracted_data.merchant,
             date: extracted_data.datetime,
-            note: extracted_data.note,
+            # note: extracted_data.note,
+            note: nil,
             category: {
                 id: category&.id,
                 name: category&.name
@@ -100,8 +104,7 @@ class ReceiptEmail::Show < BaseOperation
                     symbol: currency&.symbol
                 }
             },
-            custom_fields: {
-            }
+            custom_fields: {}
         }
       end
       data
