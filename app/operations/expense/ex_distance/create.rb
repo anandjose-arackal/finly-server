@@ -122,6 +122,11 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       end
     end
 
+    # checking if the expense has any receipts, and marking them all as no need to be transcribed
+    if expense.receipts.present?
+      expense.receipts.update_all(to_be_transcribed: false)
+    end
+
     messages[:success] << 'Expense created'
   end
 

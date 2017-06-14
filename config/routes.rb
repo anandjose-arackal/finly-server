@@ -394,6 +394,7 @@
 #                                         PUT    /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         DELETE /admin_users/cards/:id(.:format)                               admin_users/cards#destroy
 #                              admin_menu GET    /admin_menus(.:format)                                         admin_users/users#admin_menus
+#                               junk_show GET    /junk/show(.:format)                                           junk#show
 #                               menu_data GET    /menu_data(.:format)                                           users#menu_data
 #              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                   admin_users/oauth/token#create {:format=>"json"}
 #                           accept_invite GET    /users/invitation/accept(.:format)                             pending_invites#edit
@@ -637,6 +638,8 @@
 #                                         PATCH  /card_transactions/:id(.:format)                               card_transactions#update
 #                                         PUT    /card_transactions/:id(.:format)                               card_transactions#update
 #                                         DELETE /card_transactions/:id(.:format)                               card_transactions#destroy
+#                         atm_withdrawals GET    /atm_withdrawals(.:format)                                     card_transactions#atm_withdrawals
+#                                 refunds GET    /refunds(.:format)                                             card_transactions#refunds
 #                  cancelled_transactions GET    /cancelled_against_transactions/:expense_id(.:format)          card_transactions#cancelled_transactions
 #      statements_company_balance_summary GET    /statements/company_balance_summary(.:format)                  statements#company_balance_summary
 # statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)             statements#company_transactions_summary
@@ -1545,6 +1548,8 @@ Rails.application.routes.draw do
 
   ######### ADMIN PANEL END ###########
 
+  get 'junk/show', to: 'junk#show'
+
   get 'menu_data', to: 'users#menu_data'
 
   # adding admin oauth token creation for admin login
@@ -1718,6 +1723,10 @@ Rails.application.routes.draw do
   resources :card_transactions do
 
   end
+
+  get 'atm_withdrawals', to: 'card_transactions#atm_withdrawals', as: :atm_withdrawals
+  get 'refunds', to: 'card_transactions#refunds', as: :refunds
+
   get 'cancelled_against_transactions/:expense_id', to: 'card_transactions#cancelled_transactions', as: :cancelled_transactions
 
   get 'statements/company_balance_summary' => 'statements#company_balance_summary'
