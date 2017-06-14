@@ -46,7 +46,12 @@ class UserManagerMapping < ActiveRecord::Base
   scope :policy, -> (policy_id) { where policy_id: policy_id }
   scope :without_policy, ->{ where policy_id: nil }
   scope :sort, ->(sort_by, order) do
-    order.upcase! if order
+
+    direction = order&.downcase == 'asc' ? 'asc' : 'desc'
+    column = sanitize_sql(sort_by)
+
+    order("#{column} #{direction}")
+
     order("#{sort_by} #{order}") #sort_by: created_at, date etc. order: asc/desc
   end
   scope :manager, -> { where 'manager_id IS NOT NULL' }

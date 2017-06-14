@@ -175,8 +175,12 @@ class Expense < ActiveRecord::Base
   end
 
   scope :filter_sort, ->(sort_by, order) do
-    order.upcase! if order
-    order("#{sort_by} #{order}") # sort_by: created_at, date etc. order: asc/desc
+    # order("#{sort_by} #{order}") # sort_by: created_at, date etc. order: asc/desc
+    direction = order&.downcase == 'asc' ? 'asc' : 'desc'
+    column = sanitize_sql(sort_by)
+
+    order("#{column} #{direction}")
+
   end
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     unless date_from.blank? && date_to.blank?

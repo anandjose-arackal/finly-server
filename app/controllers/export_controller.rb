@@ -48,19 +48,16 @@ class ExportController < ApplicationController
   def set_headers
 
     access_token = request.cookies["access_token"]
-    query = "SELECT `id`, `user_id`, `access_token_expires_at` FROM `opro_auth_grants` WHERE `access_token`='" + access_token + "' LIMIT 1"
-    results = ActiveRecord::Base.connection.execute(query)
+    # query = "SELECT `id`, `user_id`, `access_token_expires_at` FROM `opro_auth_grants` WHERE `access_token`='" + access_token + "' LIMIT 1"
+    # results = ActiveRecord::Base.connection.execute(query)
 
-    user_id = nil
-    expires_at = nil
+    auth_grant = Opro::Oauth::AuthGrant.find_by(access_token: access_token)
 
-    if results.count == 1
-      results.each do |row|
-        user_id = row[1]
-        expires_at = row[2]
-      end
+    if auth_grant.present?
+      user_id = auth_grant.user_id
+      expires_at = auth_grant.access_token_expires_at
 
-      if Time.now < expires_at
+      if expires_at and Time.now < expires_at
         # Token is valid
         @user = User.find(user_id)
       else
@@ -69,9 +66,29 @@ class ExportController < ApplicationController
       end
 
     else
-      # NOT AUTHORIZED
       @user = false
     end
+    # user_id = nil
+    # expires_at = nil
+
+    # if results.count == 1
+    #   results.each do |row|
+    #     user_id = row[1]
+    #     expires_at = row[2]
+    #   end
+
+    #   if Time.now < expires_at
+    #     # Token is valid
+    #     @user = User.find(user_id)
+    #   else
+    #     # Token has expired
+    #     @user = false
+    #   end
+
+    # else
+    #   # NOT AUTHORIZED
+    #   @user = false
+    # end
 
     unless @user
       render json: {success: false, message: "Please login."}
