@@ -1,3 +1,5 @@
+# as of now, not required, will be explored properly further if necessary
+
 class SyncUsers < Integrations::Base
 
   def pre_validate
