@@ -12,4 +12,12 @@
 
 class EmailAuthorization < ActiveRecord::Base
   belongs_to :authorizable, polymorphic: true
+  belongs_to :user
+
+
+  scope :with_authorizable, -> (authorizable) { where authorizable: authorizable }
+  scope :with_token, -> (token) { where token: token }
+  scope :with_view_role_id, -> (id) { where view_role_id: id }
+  scope :with_valid, -> { where is_valid: true }
+  scope :with_user_id, -> (user_id) { where user_id: user_id }
 end

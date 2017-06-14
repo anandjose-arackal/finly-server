@@ -13,7 +13,6 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def get_token(user)
-    debugger
     email_authorization = params[:email_authorization]
     token = email_authorization.token
     token
@@ -64,7 +63,7 @@ class Event::EReport::Submit < Event::EReport::Base
   def report_view_role(user)
     if user.id == report.user_id
       return nil
-    elsif user.id == report.controlling_user_role_id
+    elsif user.id == report.controlling_user_id
       return report.controlling_user_role_id
     end
   end

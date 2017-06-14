@@ -50,19 +50,26 @@ module Constants
   if Rails.env.development?
     # url = "http://192.168.81.157:3000/#"
     url = "http://localhost/#"
+    authorizer_url = "http://localhost/authorizer#"
   elsif Rails.env.staging?
     url = "http://staging.finly.io/#"
+    authorizer_url = "http://staging.finly.io/authorizer#"
   elsif Rails.env.itzcash_uat?
     url = "http://uat.finly.io/#"
+    authorizer_url = "http://uat.finly.io/authorizer#"
   elsif Rails.env.local_vm?
     url = "http://192.168.56.101/#"
+    authorizer_url = "http://192.168.56.101/authorizer#"
   elsif Rails.env.production?
     url = "https://www.finly.io/#"
+    authorizer_url = "https://www.finly.io/authorizer#"
   else
     url = ""
+    authorizer_url = ""
   end
 
   BASE_URL = url
+  BASE_URL_AUTHORIZER = authorizer_url
 
   class Constants::ItzCash
 

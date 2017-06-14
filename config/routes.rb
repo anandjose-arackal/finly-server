@@ -958,6 +958,13 @@ Rails.application.routes.draw do
     patch 'set_restrictions', to: 'user_teams#set_restrictions'
   end
 
+  namespace :authorizer do 
+    resources :reports do
+      patch 'approve' => 'reports#approve', as: :approve
+      patch 'reject' => 'reports#reject', as: :reject
+    end
+  end
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

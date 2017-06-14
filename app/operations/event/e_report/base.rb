@@ -20,6 +20,7 @@ class Event::EReport::Base < Event::SetNotifier
   end
 
   def init
+    # debugger
     self.report = params[:report]
   end
 
@@ -29,7 +30,7 @@ class Event::EReport::Base < Event::SetNotifier
     end
   end
 
-  def get_token
+  def get_token(user)
 
   end
 
@@ -66,12 +67,14 @@ class Event::EReport::Base < Event::SetNotifier
     params[:event_id] = event_id
     params[:action_name] = action_name
     params[:role_id] = report_view_role(user)
-    params[:action_url_token] = get_token(user)
+    if params[:email_authorization]
+      params[:action_url_token] = get_token(user)
+    end
   end
 
   class Event::EReport::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :report, :user, :body_val, :subject_val, :button_val, :categories, :expenses, :rejected_expenses, :event_id,
-                  :action_name, :comment_body, :expenses_sorted, :role_id, :view_url, :company, :action_url_token
+                  :action_name, :comment_body, :expenses_sorted, :role_id, :view_url, :company, :action_url_token, :action_url
 
     def initialize(user, params)
       self.report = params[:report]
@@ -89,8 +92,10 @@ class Event::EReport::Base < Event::SetNotifier
       self.role_id = params[:role_id]
       self.view_url = generate_url(role_id).html_safe
       self.company = user.company
-      self.action_url_token = params[:action_url_token]
-      self.action_url = generate_action_url(user, role_id).html_safe
+      if params[:action_url_token]
+        self.action_url_token = params[:action_url_token]
+        self.action_url = generate_action_url(user, role_id).html_safe
+      end
     end
 
     def expenses_category_sorted
@@ -136,15 +141,15 @@ class Event::EReport::Base < Event::SetNotifier
           view = "\"personal\""
       end
 
-
+      url = ''
       if report.controlling_user_id == user.id
       # token = params[:email_authorization]
 
-        suffix = "/params={\"view\":" + view + ",\"token\":\"#{token}\"}"
-        path = "/authorizer/report/#{report.id}"
-        url = Constants::BASE_URL + path + suffix
+        suffix = "/params={\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}"
+        path = "report/#{report.id}"
+        url = Constants::BASE_URL_AUTHORIZER + path + suffix
       end
-      debugger
+      url
     end
 
     def validate

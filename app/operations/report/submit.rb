@@ -120,22 +120,17 @@ class Report::Submit < Report::Base
   def post_process
 
     # Creating Email Authorization
+
     # If report is processing
+    email_authorization = nil
+    # email_authorization_presenter = EmailAuthorization::Create.(user, {authorizable: report})
     if report.processing?
-      email_authorization_params = {
-        token: Digest::SHA1.hexdigest([Time.now, rand].join),
-        authorizable_id: report.id,
-        authorizable_type: 'Report',
-        user_id: report.controlling_user_id
-      }
-
-      email_authorization = EmailAuthorization.new(email_authorization_params)
-      if email_authorization.save
-
+      report.reload
+      email_authorization_presenter = EmailAuthorization::Create.(user, {authorizable: report})
+      if email_authorization_presenter.success?
+        email_authorization = email_authorization_presenter.email_authorization
       end
     end
-
-    debugger
 
     # If report is auto approved
 
@@ -145,7 +140,7 @@ class Report::Submit < Report::Base
     # adding comment regarding the change in status of this report
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
 
-    Event::EReport::Submit.(user, email_authorization: email_authorization, report: report)
+    Event::EReport::Submit.(user, {email_authorization: email_authorization, report: report})
 
     add_message :success, 'Report Submitted'
 
