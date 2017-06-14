@@ -51,8 +51,6 @@ class UserManagerMapping < ActiveRecord::Base
     column = sanitize_sql(sort_by)
 
     order("#{column} #{direction}")
-
-    order("#{sort_by} #{order}") #sort_by: created_at, date etc. order: asc/desc
   end
   scope :manager, -> { where 'manager_id IS NOT NULL' }
   scope :finance_manager, -> { where 'finance_manager_id IS NOT NULL' }
