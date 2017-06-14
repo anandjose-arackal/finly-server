@@ -43,6 +43,7 @@ class ReceiptEmail < ActiveRecord::Base
 
   accepts_nested_attributes_for :receipt_email_attachments
 
+  default_scope {order created_at: :desc}
   scope :with_email_id, ->(email_id) { where email_id: email_id }
 
   validates :user_id, presence: true
