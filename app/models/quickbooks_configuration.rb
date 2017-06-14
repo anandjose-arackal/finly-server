@@ -13,6 +13,8 @@
 #  quickbooks_payment_type_id :integer
 #
 
+# an instance of this class will have to be created for every user trying to sync reports - i.e. ideally the admins
+
 class QuickbooksConfiguration < ActiveRecord::Base
   belongs_to :quickbooks_payment_type
   belongs_to :user

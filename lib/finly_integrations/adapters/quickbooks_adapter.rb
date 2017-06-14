@@ -4,8 +4,8 @@ module FinlyIntegrations
     class QuickbooksAdapter < AbstractAdapter
       ADAPTER_NAME = :quickbooks
       CATEGORY_LINE_ITEMS_MAPPER = {
-        FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0] => ['AccountBasedExpenseLineDetail', :account_based_expense!],
-        FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[1] => ['ItemBasedExpenseLineDetail', :item_based_expense!],
+          FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0] => ['AccountBasedExpenseLineDetail', :account_based_expense!],
+          FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[1] => ['ItemBasedExpenseLineDetail', :item_based_expense!],
       }
 
       def setup_connection(auth_obj)
@@ -35,35 +35,31 @@ module FinlyIntegrations
 
       def save_report(report)
         finly_purchase = Quickbooks::Model::Purchase.new
-        # finly_purchase.account_id = @quickbooks_config.quickbooks_payment_type.external_id
-        # finly_purchase.payment_type = @quickbooks_config.quickbooks_payment_type
+        finly_purchase.account_id = @quickbooks_config.payment_type.external_id
+        finly_purchase.payment_type = @quickbooks_config.quickbooks_payment_type
         # finly_purchase.payment_type = "Cash"
         report.expenses.each do |expense|
           category = expense.category
-          if category.nil?
-            message = 'Expense doesn\'t belong to a category. Aborting export of the report.'
-            return message
-          end
-          begin
-            raise 'All expenses of this report don\'t belong to Quickbooks. Aborting export of the report.' if category.external_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
-          rescue NoMethodError
-            message = "Expense category does not exist in Quickbooks"
-            return message
-          end
+          raise 'Expense doesn\'t belong to a category. Aborting export of the report.' if category.nil?
+          raise 'All expenses of this report don\'t belong to Quickbooks. Aborting export of the report.' if category.external_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
           line_item = Quickbooks::Model::PurchaseLineItem.new
           line_item.description = expense.note
           line_item.amount = expense.amount.value.to_f
           line_item.detail_type = CATEGORY_LINE_ITEMS_MAPPER[category.external_category_type][0]
           line_item.send(CATEGORY_LINE_ITEMS_MAPPER[category.external_category_type][1]) do |detail|
-            # detail.account_id = category.external_id
+            if category.external_category_type == FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0]
+              detail.account_id = category.external_id
+            else
+              detail.item_id = category.external_id
+            end
           end
           finly_purchase.line_items << line_item
         end
         purchase_service = Quickbooks::Service::Purchase.new
         initialize_service(purchase_service)
         created_purchase = purchase_service.create(finly_purchase)
+        puts "Created Report in Quickbooks!"
         puts created_purchase
-        return true
       end
 
       def accounts(updated_at = nil)
@@ -130,7 +126,7 @@ module FinlyIntegrations
       end
 
       private
-      
+
       def quickbooks_employee_mapper(user)
         fi_user = FinlyIntegrationsUser.find_or_initialize_by(external_integration_type: FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, external_id: user.id, external_user_type: FinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.first)
         fi_user.email = user.primary_email_address.address if user.primary_email_address.present?
