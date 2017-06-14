@@ -83,6 +83,11 @@ class Expense::Manual::Create < Expense::Manual::Base
       end
     end
 
+    # checking if the expense has any receipts, and marking them all as no need to be transcribed
+    if expense.receipts.present?
+      expense.receipts.update_all(to_be_transcribed: false)
+    end
+
     # calculate the equivalent amount in all currencies in the amounts table
     if expense.date == DateUtils.local_date
       expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
