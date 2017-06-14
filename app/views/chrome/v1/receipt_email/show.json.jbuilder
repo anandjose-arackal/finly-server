@@ -22,5 +22,10 @@ if @result.success?
         json.symbol data[:amount][:currency][:symbol]
       end
     end
+    json.custom_fields do
+      data[:custom_fields]&.each do |key, value|
+        json.set! key, value
+      end
+    end
   end
 end

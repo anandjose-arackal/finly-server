@@ -99,6 +99,8 @@ class ReceiptEmail::Show < BaseOperation
                     country_code: currency&.country_code,
                     symbol: currency&.symbol
                 }
+            },
+            custom_fields: {
             }
         }
       end
