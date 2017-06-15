@@ -1,4 +1,4 @@
-class ReceiptEmail::Extractor::Data < BaseOperation::BasePresenter::SuccessPresenter
+class Receipt::Extractor::Data < BaseOperation::BasePresenter::SuccessPresenter
   attr_accessor :merchant, :amount_value, :currency_id, :datetime, :note, :category_id, :status_id
 
   def initialize(merchant, amount_value, currency_id, datetime, note, category_id, status_id)

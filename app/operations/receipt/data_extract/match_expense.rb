@@ -14,7 +14,7 @@
 #   - Pick one based on closest amount
 #   - If both have the same amounts, pick one based on closest timestamp if available
 
-class Transcriber::Receipts::DataExtract::MatchExpense < Transcriber::Receipts::DataExtract::Base
+class Receipt::DataExtract::MatchExpense < Receipt::DataExtract::Base
   attr_accessor :receipt_extract, :card_expenses, :suggested_match, :closest_matches, :possible_matches, :card_transactions
 
   CONFIG = {
@@ -41,9 +41,9 @@ class Transcriber::Receipts::DataExtract::MatchExpense < Transcriber::Receipts::
 
   def init
     self.receipt_extract = params[:receipt_extract]
-    self.card_expenses = self.receipt_extract&.receipt.user.expenses.only_card_expenses
-    card_transcation_ids = self.card_expenses.pluck_card_transaction_id
-    self.card_transactions = CardTransaction.with_id(card_transcation_ids)
+    self.card_expenses = self.receipt_extract&.extractable&.user.expenses.only_card_expenses
+    card_transaction_ids = self.card_expenses&.pluck_card_transaction_id
+    self.card_transactions = CardTransaction.with_id(card_transaction_ids) if card_transaction_ids.present?
   end
 
   def validate
@@ -111,20 +111,24 @@ class Transcriber::Receipts::DataExtract::MatchExpense < Transcriber::Receipts::
       self.suggested_match = self.closest_matches.first
       self.closest_matches = nil
       return
-    else
-      match = nil
-      difference = nil
-      closest_matches.each do |expense|
-
+    end
+    match = nil
+    difference = 999999
+    closest_matches.each do |expense|
+      diff = expense.amount.value - amount_value
+      if diff < difference
+        difference = diff
+        match = expense
       end
     end
+    self.suggested_match = match
   end
 
   def success
 
   end
 
-  class Transcriber::Receipts::DataExtract::MatchExpense::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Receipt::DataExtract::MatchExpense::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :suggested_match, :closest_matches, :possible_matches
   end
 

@@ -1,7 +1,7 @@
 class ReceiptEmail::Extractor::Adapter::Base < BaseOperation
   attr_accessor :sender, :sent_at, :subject, :parser, :html_body, :user, :extracted_data
 
-  REGEX_AMOUNT = /[1-9]\d*(\.\d+)?/
+  REGEX_AMOUNT = /\A[1-9]\d*(\.\d+)?\z/
 
   def self.senders
     []
@@ -96,7 +96,7 @@ class ReceiptEmail::Extractor::Adapter::Base < BaseOperation
     note = self.note
     category_id = self.category_id
     status_id = self.status(merchant, amount_value, currency_id, datetime, note, category_id)
-    self.extracted_data = ReceiptEmail::Extractor::Data.new(merchant, amount_value, currency_id, datetime, note, category_id, status_id)
+    self.extracted_data = Receipt::Extractor::Data.new(merchant, amount_value, currency_id, datetime, note, category_id, status_id)
   end
 
   def success

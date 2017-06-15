@@ -26,7 +26,7 @@ class ReceiptEmail::Show < BaseOperation
       category_id = expense_data_extract.category_id
       note = expense_data_extract.note
       datetime = (expense_data_extract.datetime or expense_data_extract.date)
-      self.extracted_data = ReceiptEmail::Extractor::Data.new(merchant, amount_value, currency_id, datetime, note, category_id, nil)
+      self.extracted_data = Receipt::Extractor::Data.new(merchant, amount_value, currency_id, datetime, note, category_id, nil)
     else
       self.extracted_data = ReceiptEmail::Extractor::Extract.(user, html_body: params[:html_body], sender: params[:sender], sent_at: params[:sent_at], subject: params[:subject])
       unless self.extracted_data.success?

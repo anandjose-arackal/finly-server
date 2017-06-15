@@ -1,4 +1,4 @@
-class ReceiptEmail::Base < BackgroundOperation
+class Receipt::Base < BackgroundOperation
   attr_accessor :receipt_email
 
   def pre_validate

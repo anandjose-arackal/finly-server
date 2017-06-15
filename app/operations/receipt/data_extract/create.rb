@@ -1,6 +1,6 @@
 # Required Params
 # {receipt_id: 1, expense_data_extract: {merchant: 'merchant name', reference_id: 'reference id', timestamp: 'timestamp', expense_data_extract_source}}
-class Transcriber::Receipts::DataExtract::Create < Transcriber::Receipts::DataExtract::Base
+class Receipt::DataExtract::Create < Receipt::DataExtract::Base
   attr_accessor :expense_data_extract_params, :expense_data_extract, :receipt
 
   def pre_validate
@@ -49,10 +49,10 @@ class Transcriber::Receipts::DataExtract::Create < Transcriber::Receipts::DataEx
   end
 
   def success
-    Transcriber::Receipts::DataExtract::Create::SuccessPresenter.new(user, params, messages)
+    Receipt::DataExtract::Create::SuccessPresenter.new(user, params, messages)
   end
 
-  class Transcriber::Receipts::DataExtract::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Receipt::DataExtract::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
   end
 
