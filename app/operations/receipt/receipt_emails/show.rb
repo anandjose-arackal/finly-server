@@ -1,4 +1,4 @@
-class ReceiptEmail::Show < BaseOperation
+class Receipt::ReceiptEmails::Show < BaseOperation
   attr_accessor :receipt_email, :extracted_data
 
   def pre_validate
@@ -26,9 +26,9 @@ class ReceiptEmail::Show < BaseOperation
       category_id = expense_data_extract.category_id
       note = expense_data_extract.note
       datetime = (expense_data_extract.datetime or expense_data_extract.date)
-      self.extracted_data = Receipt::Extractor::Data.new(merchant, amount_value, currency_id, datetime, note, category_id, nil)
+      self.extracted_data = Receipt::ReceiptEmails::Extractor::Data.new(merchant, amount_value, currency_id, datetime, note, category_id, nil)
     else
-      self.extracted_data = ReceiptEmail::Extractor::Extract.(user, html_body: params[:html_body], sender: params[:sender], sent_at: params[:sent_at], subject: params[:subject])
+      self.extracted_data = Receipt::ReceiptEmails::Extractor::Extract.(user, html_body: params[:html_body], sender: params[:sender], sent_at: params[:sent_at], subject: params[:subject])
       unless self.extracted_data.success?
         add_message :error, self.extracted_data.messages[:error]
       end
@@ -38,10 +38,10 @@ class ReceiptEmail::Show < BaseOperation
   def success
     params[:receipt_email] = self.receipt_email
     params[:extracted_data] = self.extracted_data
-    ReceiptEmail::Show::SuccessPresenter.new(user, params, messages)
+    Receipt::ReceiptEmails::Show::SuccessPresenter.new(user, params, messages)
   end
 
-  class ReceiptEmail::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Receipt::ReceiptEmails::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :receipt_email, :extracted_data
 
     def init

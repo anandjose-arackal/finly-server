@@ -4,7 +4,7 @@ class Chrome::V1::ReceiptEmailController < ApplicationController
   allow_oauth!
 
   def show
-    @result = ReceiptEmail::Show.(current_user, params)
+    @result = Receipt::ReceiptEmails::Show.(current_user, params)
   end
 
 end

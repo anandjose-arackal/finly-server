@@ -1,5 +1,5 @@
 # Used to download email url attachments and create receipts out of them. Currently not being used.
-class ReceiptEmail::ProcessEmail < Receipt::Base
+class Receipt::ReceiptEmails::ProcessEmail < Receipt::Base
 # NOTE: THIS IS A BACKGROUND_OPERATION
   def process
     download_attachment_urls
@@ -41,7 +41,7 @@ class ReceiptEmail::ProcessEmail < Receipt::Base
       html_body = email.html_part.body.decoded
     end
 
-    extracted_data = ReceiptEmail::Extractor::Extract.(user, html_body: html_body, sender: sender, sent_at: sent_at, subject: subject)
+    extracted_data = Receipt::ReceiptEmails::Extractor::Extract.(user, html_body: html_body, sender: sender, sent_at: sent_at, subject: subject)
     if extracted_data&.success?
       data.save_data_extract(self.receipt_email)
     end

@@ -1,4 +1,4 @@
-class ReceiptEmail::Extractor::Adapter::Generic < ReceiptEmail::Extractor::Adapter::Base
+class Receipt::ReceiptEmails::Extractor::Adapter::Generic < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def merchant
     if sender.present?

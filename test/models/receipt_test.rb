@@ -16,6 +16,8 @@
 #  receipt_email_id   :integer
 #  to_be_transcribed  :boolean          default(FALSE)
 #  hard_copy_received :boolean          default(FALSE)
+#  sourcable_id       :integer
+#  sourcable_type     :integer
 #
 
 

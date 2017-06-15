@@ -1,4 +1,4 @@
-class ReceiptEmail::Extractor::Extract < BackgroundOperation
+class Receipt::ReceiptEmails::Extractor::Extract < BackgroundOperation
   # NOTE: THIS IS A BACKGROUND_OPERATION
   attr_accessor :html_body, :sender, :sent_at, :subject
   attr_accessor :amount, :currency_id, :merchant, :datetime, :note, :extracted_data
@@ -22,7 +22,7 @@ class ReceiptEmail::Extractor::Extract < BackgroundOperation
   end
 
   def process
-    adapter = ReceiptEmail::Extractor::Adapter::Loader.adapter_for(sender, html_body)
+    adapter = Receipt::ReceiptEmails::Extractor::Adapter::Loader.adapter_for(sender, html_body)
 
     if adapter.blank?
       add_message :error, 'Cannot parse email'

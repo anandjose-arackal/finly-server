@@ -1,10 +1,10 @@
-class ReceiptEmail::Extractor::Adapter::Loader
+class Receipt::ReceiptEmails::Extractor::Adapter::Loader
 
   ADAPTERS = [
-    ReceiptEmail::Extractor::Adapter::UberIndia,
-    ReceiptEmail::Extractor::Adapter::Flipkart,
-    ReceiptEmail::Extractor::Adapter::OlaCabs,
-    ReceiptEmail::Extractor::Adapter::AmazonIndia
+    Receipt::ReceiptEmails::Extractor::Adapter::UberIndia,
+    Receipt::ReceiptEmails::Extractor::Adapter::Flipkart,
+    Receipt::ReceiptEmails::Extractor::Adapter::OlaCabs,
+    Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia
   ]
 
   def self.adapter_for(sender, html)
@@ -29,7 +29,7 @@ class ReceiptEmail::Extractor::Adapter::Loader
         end
       end
     end
-    ReceiptEmail::Extractor::Adapter::Generic
+    Receipt::ReceiptEmails::Extractor::Adapter::Generic
   end
 
 end

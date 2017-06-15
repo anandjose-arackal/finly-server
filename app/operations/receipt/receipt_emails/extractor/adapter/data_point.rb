@@ -1,4 +1,4 @@
-class ReceiptEmail::Extractor::Adapter::DataPoint
+class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
   attr_accessor :mode, :xpath, :xpath_regex, :css_selector, :css_selector_regex
 
   def self.xpath_mode(xpath, regex)

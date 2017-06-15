@@ -1,4 +1,4 @@
-class ReceiptEmail::Extractor::Adapter::Base < BaseOperation
+class Receipt::ReceiptEmails::Extractor::Adapter::Base < BaseOperation
   attr_accessor :sender, :sent_at, :subject, :parser, :html_body, :user, :extracted_data
 
   REGEX_AMOUNT = /\A[1-9]\d*(\.\d+)?\z/
@@ -57,7 +57,7 @@ class ReceiptEmail::Extractor::Adapter::Base < BaseOperation
     return nil if data_points.blank?
     data_points = [data_points] unless data_points.is_a?(Array)
     data_points.each do |data_point|
-      next unless data_point.is_a?(ReceiptEmail::Extractor::Adapter::DataPoint)
+      next unless data_point.is_a?(Receipt::ReceiptEmails::Extractor::Adapter::DataPoint)
       amount_val = data_point.extract_data_from(self.parser)
       return amount_val if amount_val.present?
     end
@@ -96,7 +96,7 @@ class ReceiptEmail::Extractor::Adapter::Base < BaseOperation
     note = self.note
     category_id = self.category_id
     status_id = self.status(merchant, amount_value, currency_id, datetime, note, category_id)
-    self.extracted_data = Receipt::Extractor::Data.new(merchant, amount_value, currency_id, datetime, note, category_id, status_id)
+    self.extracted_data = Receipt::ReceiptEmails::Extractor::Data.new(merchant, amount_value, currency_id, datetime, note, category_id, status_id)
   end
 
   def success
