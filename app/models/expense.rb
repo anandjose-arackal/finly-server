@@ -374,7 +374,16 @@ class Expense < ActiveRecord::Base
         return "" if self.card_expense.nil?
         return self.card_expense.editable_merchant
       when ExpenseType.id_for(:per_diem)
-        return "#{self.per_diem_expense.per_diem.configurable.name} - #{self.per_diem_expense.per_diem_name}"
+        # un-scoping here for cases when the per diem gets destroyed
+        policy_name = self.per_diem_expense.per_diem&.configurable&.name
+        if policy_name.nil?
+          policy_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.configurable&.name
+        end
+        per_diem_name = self.per_diem_expense&.per_diem_name rescue nil
+        if per_diem_name.nil?
+          per_diem_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.name
+        end
+        return "#{policy_name} - #{per_diem_name}"
       else
         if self.report.nil?
           return "- -"
@@ -469,7 +478,12 @@ class Expense < ActiveRecord::Base
 
   def per_diem_rate_value
     if self.per_diem_expense?
-      return self.per_diem_expense.per_diem.rate_value
+      # unscoping for cases when the per diem gets destroyed
+      rate = self.per_diem_expense.per_diem&.rate_value rescue nil
+      if rate.nil?
+        rate = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id).rate_value
+      end
+      return rate
     else
       return nil
     end
@@ -477,7 +491,16 @@ class Expense < ActiveRecord::Base
 
   def per_diem_name
     if self.per_diem_expense?
-      return "#{self.per_diem_expense.per_diem.configurable.name} - #{self.per_diem_expense.per_diem_name}"
+      # unscoping for cases when the per diem gets destroyed
+      policy_name = self.per_diem_expense.per_diem&.configurable&.name
+      if policy_name.nil?
+        policy_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.configurable&.name
+      end
+      per_diem_name = self.per_diem_expense&.per_diem_name rescue nil
+      if per_diem_name.nil?
+        per_diem_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.name
+      end
+      return "#{policy_name} - #{per_diem_name}"
     else
       return nil
     end
