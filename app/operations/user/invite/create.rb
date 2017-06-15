@@ -188,6 +188,8 @@ class User::Invite::Create < User::Invite::Base
       self.policy_id = invite_params[:policy_id]
       invite_params.delete(:policy_id)
     end
+    # adding the company's default policy to all invitation parameters
+    invite_params[:team_mapping_attributes][0][:policy_id] = user.company.policies.default.first.id rescue nil
   end
 
   def process
