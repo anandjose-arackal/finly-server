@@ -58,8 +58,8 @@ class Receipt::ReceiptEmails::Show < BaseOperation
             id: expense.id,
             merchant: expense.manual_expense.merchant_name,
             date: expense.date,
-            # note: expense.note,
-            note: nil,
+            note: expense.note,
+            # note: nil,
             category: {
                 id: expense.category.id,
                 name: expense.category.name
