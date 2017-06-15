@@ -57,7 +57,7 @@ class Receipt::ReceiptEmails::Show < BaseOperation
         data = {
             id: expense.id,
             merchant: expense.manual_expense.merchant_name,
-            date: expense.date,
+            date: DateUtils.date_formatted(expense.date),
             note: expense.note,
             # note: nil,
             category: {
@@ -87,7 +87,7 @@ class Receipt::ReceiptEmails::Show < BaseOperation
         data = {
             id: nil,
             merchant: extracted_data.merchant,
-            date: extracted_data.datetime,
+            date: DateUtils.date_formatted(extracted_data.datetime),
             # note: extracted_data.note,
             note: nil,
             category: {
