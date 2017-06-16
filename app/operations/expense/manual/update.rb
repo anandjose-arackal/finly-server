@@ -122,11 +122,11 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
     end
 
-    # if the new category is personal, mark the expense as personal
-    if expense.category_name == 'Personal'
-      Expense::Personal::Mark.(user, {expense_id: expense.id})
+    # checking if the expense has any receipts, and marking them all as no need to be transcribed
+    if expense.receipts.present?
+      expense.receipts.update_all(to_be_transcribed: false)
     end
-    ###############################################################
+
 
     if expense.date == DateUtils.local_date
       if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id

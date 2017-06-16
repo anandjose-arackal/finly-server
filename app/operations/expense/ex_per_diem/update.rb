@@ -128,11 +128,10 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
       expense.update(amount: amount)
     end
 
-    # if the new category is personal, mark the expense as personal
-    if expense.category_name == 'Personal'
-      Expense::Personal::Mark.(user, {expense_id: expense.id})
+    # checking if the expense has any receipts, and marking them all as no need to be transcribed
+    if expense.receipts.present?
+      expense.receipts.update_all(to_be_transcribed: false)
     end
-    ###############################################################
 
     # updating the respective amounts table with the conversion rates
     if expense.date == DateUtils.local_date

@@ -94,6 +94,11 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
       end
     end
 
+    # checking if the expense has any receipts, and marking them all as no need to be transcribed
+    if expense.receipts.present?
+      expense.receipts.update_all(to_be_transcribed: false)
+    end
+
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?
       comment = self.expense.report.comments.build report: self.expense.report, user: user,
