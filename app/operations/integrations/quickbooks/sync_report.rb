@@ -19,6 +19,10 @@ class SyncReport < Integrations::Base
   def validate
     if report.synced_with_quickbooks
       add_message :error, "This report is already synced with quickbooks"
+      return
+    end
+    unless report.processed?
+      add_message :error, "Only processed reports can be synced to the accounting tool"
     end
   end
 

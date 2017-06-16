@@ -35,6 +35,7 @@
 
 
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -194,6 +195,12 @@ class Report < ActiveRecord::Base
 
   def editable?
     open? or retracted? or rejected?
+  end
+
+  def processed?
+    if [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id].include?(self.report_status_id)
+      return true
+    end
   end
 
   def settlement_pending?

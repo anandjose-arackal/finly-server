@@ -35,9 +35,9 @@ module FinlyIntegrations
 
       def save_report(report)
         finly_purchase = Quickbooks::Model::Purchase.new
-        finly_purchase.account_id = @quickbooks_config.payment_type.external_id
-        finly_purchase.payment_type = @quickbooks_config.quickbooks_payment_type
-        # finly_purchase.payment_type = "Cash"
+        finly_purchase.account_id = @quickbooks_config.quickbooks_payment_type.external_id
+        finly_purchase.payment_type = @quickbooks_config.default_quickbooks_payment_type
+
         report.expenses.each do |expense|
           category = expense.category
           raise 'Expense doesn\'t belong to a category. Aborting export of the report.' if category.nil?
@@ -55,6 +55,7 @@ module FinlyIntegrations
           end
           finly_purchase.line_items << line_item
         end
+        debugger
         purchase_service = Quickbooks::Service::Purchase.new
         initialize_service(purchase_service)
         created_purchase = purchase_service.create(finly_purchase)
