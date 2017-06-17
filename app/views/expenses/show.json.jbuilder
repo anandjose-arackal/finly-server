@@ -1,4 +1,4 @@
-json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :amount_value, :category_name, :category_id, :expense_type_id,
+json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :category_name, :category_id, :expense_type_id,
                                     :transcribed, :reimbursable
 
 json.distance do
@@ -20,33 +20,16 @@ end
 json.date @result.expense.date.strftime("%d %b %Y")
 json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
 
-json.currency do
-  json.id @result.expense.currency_id rescue nil
-  json.symbol @result.expense.currency_symbol rescue nil
-  json.country_code @result.expense.currency_country_code
+json.amount do
+  json.partial! 'shared/amount', amount: @result.expense.original_amount
 end
 
-# currencies and amounts in case the expense is being viewed from within a report
-if @result.expense.report_id.present?
-  json.original_currency do
-    json.id @result.expense.currency_id rescue nil
-    json.symbol @result.expense.amount.currency.symbol rescue nil
-    json.country_code @result.expense.amount.currency.country_code rescue nil
-  end
-
-  json.base_currency do
-    json.id @result.expense.report.base_currency_id
-    json.country_code @result.expense.report.base_currency_code
-    json.currency_symbol @result.expense.report.base_currency_symbol
-  end
-
-  json.original_amount do
-    json.value @result.expense.original_amount_value
-  end
-
-  json.currency_conversion_rate @result.conversion_rate
+json.converted_amount do
+  json.partial! 'shared/amount', amount: @result.expense.base_amount
 end
 
+json.converted @result.expense.converted?
+json.conversion_rate @result.expense.conversion_rate
 
 if @result.expense.card_expense?
   json.original_merchant_name @result.expense.card_expense.card_transaction.merchant_name
