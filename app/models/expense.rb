@@ -145,7 +145,9 @@ class Expense < ActiveRecord::Base
   scope :with_user_id, ->(user_id) { where user_id: user_id }
   # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
   scope :filter_expense_type_id, ->(type_id) {
-    if [1, 2, 3, 4, 5, '1', '2', '3', '4', '5'].include?(type_id)
+    type_id = [type_id] unless type_id.is_a?(Array)
+    diff_arr = (type_id - [1, 2, 3, 4, 5, '1', '2', '3', '4', '5'])
+    if diff_arr and diff_arr.size == 0
       where expense_type_id: type_id
     elsif [6, '6'].include?(type_id)
       ids = pluck(:id)
