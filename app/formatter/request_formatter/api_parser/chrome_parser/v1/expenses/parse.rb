@@ -13,11 +13,11 @@ class RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse < RequestFo
       map[:expense][:receipts_attributes][0] = receipt
     end
 
-    if params[:custom_fields].present?
-      if params[:custom_fields].kind_of?(String)
-        map[:custom_fields] = JSON.parse params[:custom_fields]
+    if params&.dig(:expense)&.dig(:custom_fields).present?
+      if params[:expense][:custom_fields].kind_of?(String)
+        map[:expense][:custom_fields] = JSON.parse params[:expense][:custom_fields]
       else
-        map[:custom_fields] = params[:custom_fields]
+        map[:expense][:custom_fields] = params[:expense][:custom_fields]
       end
     end
 
