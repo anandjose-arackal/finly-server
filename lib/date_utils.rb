@@ -40,7 +40,7 @@ class DateUtils
   end
 
   def self.date_formatted(date)
-    return date if datetime.blank?
+    return date if date.blank?
     if date.is_a?(String)
       date = parse_date date
     end
