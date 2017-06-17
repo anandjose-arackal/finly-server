@@ -174,6 +174,7 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
       add_message :success, "Created #{self.multiple_expenses.values.length} expenses successfully."
 
     else
+      make_expenses_invalid(self.multiple_expenses)
       add_message :failure, "Cannot create expenses. Please fix the errors and try again."
     end
 
@@ -196,6 +197,17 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
     # else
     #   messages[:error] = self.expense.errors.full_messages
     # end
+  end
+
+  # Hack
+  def make_expenses_invalid(h)
+    # WEIRD BUG: JIRA TICKET ID: FIN-411
+    # After rendering the error json file, its saving the valid expenses
+    # Making expenses invalid is the only way to stop this from happening
+    # Needs further investigation to remove the bug
+    for key, expense in h
+      expense[:expense].date = nil
+    end
   end
 
   def post_process
