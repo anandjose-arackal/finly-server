@@ -15,9 +15,9 @@ class RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse < RequestFo
 
     if params&.dig(:expense)&.dig(:custom_fields).present?
       if params[:expense][:custom_fields].kind_of?(String)
-        map[:expense][:custom_fields] = JSON.parse params[:expense][:custom_fields]
+        map[:custom_fields] = JSON.parse params[:expense][:custom_fields]
       else
-        map[:expense][:custom_fields] = params[:expense][:custom_fields]
+        map[:custom_fields] = params[:expense][:custom_fields]
       end
     end
 
