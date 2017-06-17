@@ -20,8 +20,6 @@
 #
 
 
-
-
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -141,8 +139,9 @@ class Payment < ActiveRecord::Base
     unless self.initiating_account_type == 'Company'
       name += "#{self.initiating_user.name}'s"
     end
-
-    if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand), PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement)].include?(self.payment_type_id)
+    if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
+        PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement),
+        PaymentType.id_for(:reimbursement_outside_finly)].include?(self.payment_type_id)
       return nil
     end
 
@@ -164,8 +163,14 @@ class Payment < ActiveRecord::Base
       name += "#{self.receiving_user.name}'s"
     end
 
-    if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand), PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement)].include?(self.payment_type_id)
+    if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
+        PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement)].include?(self.payment_type_id)
       name += " Cash on Hand"
+      return name
+    end
+
+    if [PaymentType.id_for(:reimbursement_outside_finly)].include?(self.payment_type_id)
+      name = 'Settled Outside Finly'
       return name
     end
 
