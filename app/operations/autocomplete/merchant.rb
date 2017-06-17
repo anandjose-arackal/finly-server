@@ -4,7 +4,7 @@ class Autocomplete::Merchant < BaseOperation
 
   def pre_validate
     if user.blank? or params.blank?
-      messages[:error] << "Invalid parameters"
+      messages[:error] << 'Invalid parameters'
     end
   end
 
@@ -13,7 +13,7 @@ class Autocomplete::Merchant < BaseOperation
   end
 
   def process
-    expense_ids = Expense::Index.(user, params).expenses.unreported.pluck(:id)
+    expense_ids = Expense::Index.(user, params).expenses.pluck(:id)
 
     # todo - see if there's a better way to do this.
     self.response = ManualExpense.merchant_like(query, expense_ids)

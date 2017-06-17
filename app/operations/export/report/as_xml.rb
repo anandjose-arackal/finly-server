@@ -11,7 +11,7 @@ class Export::Report::AsXml < Export::Report::Base
   end
 
   def init
-    report_presenter = Report::Index.(user, params)
+    report_presenter = ::Report::Index.(user, params)
     id = (params[:report_id] or params[:report_ids]).split(',') rescue nil
     self.reports = report_presenter.reports.with_id(id) rescue nil
     self.default_column_names = user.company.export_preferences.pluck(:name)
