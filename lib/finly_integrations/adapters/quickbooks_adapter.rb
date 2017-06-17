@@ -7,6 +7,10 @@ module FinlyIntegrations
           FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0] => ['AccountBasedExpenseLineDetail', :account_based_expense!],
           FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[1] => ['ItemBasedExpenseLineDetail', :item_based_expense!],
       }
+      PAYMENT_TYPES_MAPPER = {
+          reimbursable: "Cash",
+          non_reimbursable: "CreditCard"
+      }
 
       def setup_connection(auth_obj)
         @access_token = OAuth::AccessToken.new(QB_OAUTH_CONSUMER, auth_obj.token, auth_obj.secret)
@@ -33,17 +37,17 @@ module FinlyIntegrations
         categories
       end
 
-      def save_report(report)
+      def save_report(qb_report)
         finly_purchase = Quickbooks::Model::Purchase.new
-        finly_purchase.account_id = @quickbooks_config.quickbooks_payment_type.external_id
-        finly_purchase.payment_type = @quickbooks_config.default_quickbooks_payment_type
+        finly_purchase.account_id = qb_report.report.quickbooks_payment_type_external_id
+        finly_purchase.payment_type = ( qb_report.reimbursable ? "Cash" : "CreditCard" )
 
-        report.expenses.each do |expense|
+        qb_report.expenses.each do |expense|
           category = expense.category
           raise 'Expense doesn\'t belong to a category. Aborting export of the report.' if category.nil?
           raise 'All expenses of this report don\'t belong to Quickbooks. Aborting export of the report.' if category.external_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
           line_item = Quickbooks::Model::PurchaseLineItem.new
-          line_item.description = expense.note
+          line_item.description = "#{expense.merchant_name} - #{expense.note}"
           line_item.amount = expense.amount.value.to_f
           line_item.detail_type = CATEGORY_LINE_ITEMS_MAPPER[category.external_category_type][0]
           line_item.send(CATEGORY_LINE_ITEMS_MAPPER[category.external_category_type][1]) do |detail|
@@ -55,7 +59,6 @@ module FinlyIntegrations
           end
           finly_purchase.line_items << line_item
         end
-        debugger
         purchase_service = Quickbooks::Service::Purchase.new
         initialize_service(purchase_service)
         created_purchase = purchase_service.create(finly_purchase)

@@ -236,6 +236,12 @@ class Report < ActiveRecord::Base
     self.accounted
   end
 
+  def quickbooks_payment_type_external_id
+    company_id = self.user.company_id
+    ext_id = QuickbooksPaymentType.checking_account_with_company(company_id).id rescue nil
+    return ext_id
+  end
+
   def relative_status_name(user)
     if processing? and controlling_user? user
       return 'Pending Review'

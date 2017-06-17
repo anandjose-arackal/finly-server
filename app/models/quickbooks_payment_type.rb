@@ -20,6 +20,10 @@ class QuickbooksPaymentType < ActiveRecord::Base
   belongs_to :company
 
   scope :quickbooks, -> { where(external_integration_type: FinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
+  scope :checking_account_with_company, -> (id) {
+    where(company_id: id).where(name: "Checking")
+  }
+
 
   validates :external_id, uniqueness: { scope: :external_integration_type, message: "should be unique for an external integration type" }, if: -> { self.external_integration_type.present? }
 

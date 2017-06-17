@@ -35,7 +35,8 @@ class Admin::Companies::Base < Admin::Base
 
     def company_balance
       op = Company::VirtualAccount::Balance.(user, {company: company})
-      op.balance
+      debugger
+      op.balance rescue 0
     end
   end
 end

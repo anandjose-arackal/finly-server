@@ -2,9 +2,14 @@ class Integrations::Base < BaseOperation
 
   attr_accessor :company, :selected_user, :adapter
 
-  def initialize(company, params)
+  def authorized_user_types
+    [:company_admin]
+  end
+
+  def initialize(company, params, user)
     self.company = company
     self.params = params
+    self.user = user
   end
 
   def self.call(company, params)

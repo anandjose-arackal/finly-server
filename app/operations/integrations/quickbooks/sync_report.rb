@@ -1,6 +1,6 @@
 class SyncReport < Integrations::Base
 
-  attr_accessor :report
+  attr_accessor :report, :qb_reports
 
   def pre_validate
     if company.blank? || params.blank?
@@ -13,6 +13,24 @@ class SyncReport < Integrations::Base
     if report.blank?
       user_ids = company.users
       self.report = Report.with_user(user_ids).find_by(id: params[:report_id])
+    end
+    # now splitting the report into two - one with reimbursable and one with non-reimbursable expenses
+    self.qb_reports = []
+    reimbursable_expenses = report.expenses.reimbursable
+    if reimbursable_expenses.present?
+      qb_report = QuickbooksReportConfig.new
+      qb_report.report = report
+      qb_report.expenses = reimbursable_expenses
+      qb_report.reimbursable = true
+      qb_reports << qb_report
+    end
+    non_reimbursable_expenses = report.expenses.non_reimbursable
+    if non_reimbursable_expenses.present?
+      qb_report = QuickbooksReportConfig.new
+      qb_report.report = report
+      qb_report.expenses = non_reimbursable_expenses
+      qb_report.reimbursable = false
+      qb_reports << qb_report
     end
   end
 
@@ -27,8 +45,11 @@ class SyncReport < Integrations::Base
   end
 
   def process
-    unless adapter.save_report(report)
-      add_message :error, adapter.save_report(report)
+    qb_reports.each do |report|
+      unless adapter.save_report(report)
+        add_message :error, adapter.save_report(report)
+        return
+      end
     end
   end
 
