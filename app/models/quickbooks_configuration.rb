@@ -11,6 +11,8 @@
 #  created_at                      :datetime         not null
 #  updated_at                      :datetime         not null
 #  quickbooks_payment_type_id      :integer
+#  reimbursable_account_id         :integer
+#  non_reimbursable_account_id     :integer
 #
 
 # an instance of this class will have to be created for every user trying to sync reports - i.e. ideally the admins
@@ -18,4 +20,6 @@
 class QuickbooksConfiguration < ActiveRecord::Base
   belongs_to :quickbooks_payment_type
   belongs_to :user
+  belongs_to :reimbursable_account, class_name: 'QuickbooksPaymentType'
+  belongs_to :non_reimbursable_account, class_name: 'QuickbooksPaymentType'
 end

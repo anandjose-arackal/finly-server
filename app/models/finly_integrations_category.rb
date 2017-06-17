@@ -1,19 +1,19 @@
 class FinlyIntegrationsCategory
-  include FinlyIntegratable
+  include QuickbooksFinlyIntegratable
   QUICKBOOKS_CATEGORY_SUB_TYPES = ['Account', 'Item']
 
   attr_accessor :name, :category_sub_type
 
   validates :name, presence: true
 
-  validates :category_sub_type, inclusion: { in: QUICKBOOKS_CATEGORY_SUB_TYPES }, if: proc {|finly_category| finly_category.external_integration_type == FinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0] }
+  validates :category_sub_type, inclusion: { in: QUICKBOOKS_CATEGORY_SUB_TYPES }, if: proc {|finly_category| finly_category.quickbooks_integration_type == FinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0] }
 
   def save
     if self.valid?
       begin
-        additional_information_json = JSON.parse self.external_additional_information
+        additional_information_json = JSON.parse self.quickbooks_additional_information
         if is_payment? additional_information_json
-          finly_category = QuickbooksPaymentType.find_or_initialize_by(external_integration_type: self.external_integration_type,
+          finly_category = QuickbooksPaymentType.find_or_initialize_by(quickbooks_integration_type: self.external_integration_type,
           external_id: self.external_id)
         elsif is_expense?(additional_information_json) || self.category_sub_type == QUICKBOOKS_CATEGORY_SUB_TYPES.last
           finly_category = Category.find_or_initialize_by(external_integration_type: self.external_integration_type,

@@ -19,12 +19,12 @@
 #
 
 class FinlyIntegrationsUser < ActiveRecord::Base
-  include FinlyIntegratable
+  include QuickbooksFinlyIntegratable
   QUICKBOOKS_USER_TYPES = ['Employee', 'Vendor']
 
   validates :email, presence: true
 
-  validates :external_user_type, inclusion: { in: QUICKBOOKS_USER_TYPES }, if: proc {|finly_external_user| finly_external_user.external_integration_type == FinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0] }
+  validates :quickbooks_user_type, inclusion: { in: QUICKBOOKS_USER_TYPES }, if: proc {|finly_external_user| finly_external_user.external_integration_type == FinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0] }
 
   belongs_to :user
   belongs_to :company

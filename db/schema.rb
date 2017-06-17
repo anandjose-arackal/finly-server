@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170616092958) do
+ActiveRecord::Schema.define(version: 20170617112406) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -523,23 +523,16 @@ ActiveRecord::Schema.define(version: 20170616092958) do
   add_index "cards", ["user_id"], name: "index_cards_on_user_id", using: :btree
 
   create_table "categories", force: :cascade do |t|
-    t.integer  "company_id",                      limit: 4,                    null: false
-    t.string   "name",                            limit: 255,                  null: false
-    t.string   "gl_code",                         limit: 255
-    t.string   "payroll_code",                    limit: 255
-    t.boolean  "active",                                        default: true, null: false
-    t.datetime "created_at",                                                   null: false
-    t.datetime "updated_at",                                                   null: false
-    t.string   "external_category_type",          limit: 255
-    t.string   "external_id",                     limit: 255
-    t.string   "external_integration_type",       limit: 255
-    t.datetime "external_updated_at"
-    t.text     "external_additional_information", limit: 65535
+    t.integer  "company_id",   limit: 4,                  null: false
+    t.string   "name",         limit: 255,                null: false
+    t.string   "gl_code",      limit: 255
+    t.string   "payroll_code", limit: 255
+    t.boolean  "active",                   default: true, null: false
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
   end
 
   add_index "categories", ["company_id"], name: "index_categories_on_company_id", using: :btree
-  add_index "categories", ["external_id", "external_integration_type"], name: "index_categories_on_external_id_and_external_integration_type", unique: true, using: :btree
-  add_index "categories", ["external_updated_at"], name: "index_categories_on_external_updated_at", using: :btree
 
   create_table "channel_types", force: :cascade do |t|
     t.string "name",         limit: 255
@@ -647,17 +640,12 @@ ActiveRecord::Schema.define(version: 20170616092958) do
   add_index "company_funds_load_requests", ["requested_by_user_id"], name: "index_company_funds_load_requests_on_requested_by_user_id", using: :btree
 
   create_table "company_tags", force: :cascade do |t|
-    t.integer  "company_id",                      limit: 4,                       null: false
-    t.string   "name",                            limit: 255,                     null: false
-    t.string   "gl_code",                         limit: 255
-    t.boolean  "active",                                           default: true, null: false
-    t.datetime "created_at",                                                      null: false
-    t.datetime "updated_at",                                                      null: false
-    t.string   "external_tag_type",               limit: 255
-    t.string   "external_integration_type",       limit: 255
-    t.string   "external_id",                     limit: 255
-    t.text     "external_additional_information", limit: 16777215
-    t.string   "external_updated_at",             limit: 255
+    t.integer  "company_id", limit: 4,                  null: false
+    t.string   "name",       limit: 255,                null: false
+    t.string   "gl_code",    limit: 255
+    t.boolean  "active",                 default: true, null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
   end
 
   add_index "company_tags", ["company_id"], name: "index_company_tags_on_company_id", using: :btree
@@ -1157,14 +1145,14 @@ ActiveRecord::Schema.define(version: 20170616092958) do
     t.string   "email",                           limit: 255
     t.string   "name",                            limit: 255
     t.string   "mobile_number",                   limit: 255
-    t.string   "external_id",                     limit: 255
-    t.string   "external_integration_type",       limit: 255
-    t.datetime "external_updated_at"
+    t.string   "quickbooks_id",                   limit: 255
+    t.string   "quickbooks_integration_type",     limit: 255
+    t.datetime "quickbooks_updated_at"
     t.boolean  "active"
     t.text     "external_additional_information", limit: 65535
     t.integer  "user_id",                         limit: 4
     t.integer  "company_id",                      limit: 4
-    t.string   "external_user_type",              limit: 255
+    t.string   "quickbooks_user_type",            limit: 255
     t.datetime "created_at",                                    null: false
     t.datetime "updated_at",                                    null: false
   end
@@ -1692,6 +1680,28 @@ ActiveRecord::Schema.define(version: 20170616092958) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "quickbooks_categories", force: :cascade do |t|
+    t.integer  "categories_id",                     limit: 4
+    t.string   "quickbooks_category_type",          limit: 255
+    t.string   "quickbooks_id",                     limit: 255
+    t.string   "quickbooks_integration_type",       limit: 255
+    t.datetime "quickbooks_updated_at"
+    t.text     "quickbooks_additional_information", limit: 16777215
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+  end
+
+  create_table "quickbooks_company_tag", force: :cascade do |t|
+    t.integer  "company_tags_id",                 limit: 4
+    t.string   "quickbooks_tag_type",             limit: 255
+    t.string   "quickbooks_integration_type",     limit: 255
+    t.string   "quickbooks_id",                   limit: 255
+    t.text     "quickbooks_external_information", limit: 16777215
+    t.datetime "quickbooks_updated_at"
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
   create_table "quickbooks_configurations", force: :cascade do |t|
     t.string   "default_quickbooks_payment_type", limit: 255
     t.integer  "user_id",                         limit: 4
@@ -1701,21 +1711,23 @@ ActiveRecord::Schema.define(version: 20170616092958) do
     t.datetime "created_at",                                  null: false
     t.datetime "updated_at",                                  null: false
     t.integer  "quickbooks_payment_type_id",      limit: 4
+    t.integer  "reimbursable_account_id",         limit: 4
+    t.integer  "non_reimbursable_account_id",     limit: 4
   end
 
   add_index "quickbooks_configurations", ["quickbooks_payment_type_id"], name: "index_quickbooks_configurations_on_quickbooks_payment_type_id", using: :btree
   add_index "quickbooks_configurations", ["user_id"], name: "index_quickbooks_configurations_on_user_id", using: :btree
 
   create_table "quickbooks_payment_types", force: :cascade do |t|
-    t.string   "name",                            limit: 255
-    t.integer  "company_id",                      limit: 4
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
-    t.string   "external_id",                     limit: 255
-    t.string   "external_integration_type",       limit: 255
-    t.datetime "external_updated_at"
+    t.string   "name",                              limit: 255
+    t.integer  "company_id",                        limit: 4
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.string   "quickbooks_id",                     limit: 255
+    t.string   "quickbooks_integration_type",       limit: 255
+    t.datetime "quickbooks_updated_at"
     t.boolean  "active"
-    t.text     "external_additional_information", limit: 65535
+    t.text     "quickbooks_additional_information", limit: 65535
   end
 
   add_index "quickbooks_payment_types", ["company_id"], name: "index_quickbooks_payment_types_on_company_id", using: :btree

@@ -1,12 +1,12 @@
-class FinlyIntegrationsTag
-  include FinlyIntegratable
+class QuickbooksFinlyIntegrationsTag
+  include QuickbooksFinlyIntegratable
   QUICKBOOKS_TAG_SUB_TYPES = ['Class', 'Customer', 'Location']
 
   attr_accessor :name, :tag_sub_type
 
   validates :name, presence: true
 
-  validates :tag_sub_type, inclusion: { in: QUICKBOOKS_TAG_SUB_TYPES }, if: proc {|finly_category| finly_category.external_integration_type == FinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0] }
+  validates :tag_sub_type, inclusion: { in: QUICKBOOKS_TAG_SUB_TYPES }, if: proc {|finly_category| finly_category.quickbooks_integration_type == FinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0] }
 
   def save
     if self.valid?
@@ -16,10 +16,10 @@ class FinlyIntegrationsTag
         finly_tag.tap do |tag|
           tag.name = self.name
           tag.company_id = self.company_id
-          tag.external_updated_at = self.external_updated_at
+          tag.quickbooks_updated_at = self.quickbooks_updated_at
           tag.active = self.active
-          tag.external_additional_information = self.external_additional_information
-          tag.external_tag_type = self.tag_sub_type
+          tag.quickbooks_additional_information = self.quickbooks_additional_information
+          tag.quickbooks_tag_type = self.tag_sub_type
         end
         finly_tag.save
       rescue ActiveRecord::RecordNotUnique
