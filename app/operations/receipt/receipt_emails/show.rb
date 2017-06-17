@@ -74,11 +74,15 @@ class Receipt::ReceiptEmails::Show < BaseOperation
                     symbol: expense.amount.currency.symbol
                 }
             },
-            custom_fields: {}
+            custom_fields: []
         }
         custom_fields&.each do |field|
           if field and field.field_configuration.present?
-            data[:custom_fields][field.field_configuration.id] = field.value&.value
+            data[:custom_fields] << {
+                id: field.field_configuration.id,
+                label: field.field_configuration.field_name,
+                value: field.value&.value
+            }
           end
         end
       elsif extracted_data.present?
@@ -104,7 +108,7 @@ class Receipt::ReceiptEmails::Show < BaseOperation
                     symbol: currency&.symbol
                 }
             },
-            custom_fields: {}
+            custom_fields: []
         }
       end
       data
