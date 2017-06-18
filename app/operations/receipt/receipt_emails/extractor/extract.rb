@@ -39,7 +39,7 @@ class Receipt::ReceiptEmails::Extractor::Extract < BackgroundOperation
             sender: self.sender,
             sent_at: self.sent_at,
             subject: self.subject,
-            raw_html: FakeFileIO.new(self.html_body, "#{sender}_failed.html"),
+            raw_html: FakeFileIO.new("#{self.sender}_failed.html", self.html_body),
             fixed: false,
             parsed_merchant: self.extracted_data.merchant,
             parsed_amount_value: self.extracted_data.amount_value,
