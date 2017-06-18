@@ -4,10 +4,6 @@ class Receipt::ReceiptEmails::Extractor::Adapter::UberIndia < Receipt::ReceiptEm
     'uber.india@uber.com'
   end
 
-  def self.mail_keywords
-    'uber.com'
-  end
-
   def merchant
     'Uber India'
   end

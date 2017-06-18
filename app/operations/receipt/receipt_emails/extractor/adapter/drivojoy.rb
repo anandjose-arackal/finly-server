@@ -4,10 +4,6 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy < Receipt::ReceiptEma
     'invoice@drivojoy.com'
   end
 
-  def self.mail_keywords
-    'invoice@drivojoy.com'
-  end
-
   def merchant
     'Drivojoy'
   end

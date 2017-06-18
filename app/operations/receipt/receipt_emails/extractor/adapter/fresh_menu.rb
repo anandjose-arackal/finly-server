@@ -4,10 +4,6 @@ class Receipt::ReceiptEmails::Extractor::Adapter::FreshMenu < Receipt::ReceiptEm
     'order@freshmenu.com'
   end
 
-  def self.mail_keywords
-    'order@freshmenu.com'
-  end
-
   def merchant
     'FreshMenu'
   end

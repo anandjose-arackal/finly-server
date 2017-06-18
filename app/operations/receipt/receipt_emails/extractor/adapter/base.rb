@@ -9,8 +9,62 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Base < BaseOperation
   end
 
   def self.mail_keywords
-    []
+    [
+        {
+            subject: [],
+            body: []
+        }
+    ]
   end
+
+  def self.can_parse?(user, sender, sent_at, subject, html_body)
+    senders = self.senders
+    if senders.present?
+      senders = [senders] unless senders.is_a?(Array)
+      # Check if the sender matches with any of the known senders for the adapter
+      if senders.include? sender
+        return true
+      end
+
+      # Check if the known senders are present in the email body
+      if is_keyword_present? html_body, self.senders
+        return true
+      end
+    end
+
+    mail_keywords = self.mail_keywords
+    mail_keywords = [mail_keywords] unless mail_keywords.is_a?(Array)
+    mail_keywords.each do |keyword_hash|
+      next unless keyword_hash.is_a?(Hash)
+      subject_keywords = keyword_hash[:subject]
+      body_keywords = keyword_hash[:body]
+
+      if subject_keywords.present? and body_keywords.present?
+        if is_keyword_present?(subject, subject_keywords) and is_keyword_present?(html_body, body_keywords)
+          return true
+        end
+      elsif subject_keywords.present?
+        if is_keyword_present? subject, subject_keywords
+          return true
+        end
+      elsif body_keywords.present?
+        if is_keyword_present? html_body, body_keywords
+          return true
+        end
+      end
+    end
+    false
+  end
+
+  def self.is_keyword_present?(string, keywords_arr)
+    return false if keywords_arr.blank?
+    keywords_arr = [keywords_arr] unless keywords_arr.is_a?(Array)
+    if keywords_arr.all? { |k| string.include? k }
+      return true
+    end
+    false
+  end
+
 
   def self.call(user, sender, sent_at, subject, html_body)
     self.new(user, sender, sent_at, subject, html_body).run

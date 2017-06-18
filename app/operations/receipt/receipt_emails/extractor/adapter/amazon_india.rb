@@ -4,10 +4,6 @@ class Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia < Receipt::Receipt
     ['auto-confirm@amazon.in', 'ship-confirm@amazon.in']
   end
 
-  def self.mail_keywords
-    ['auto-confirm@amazon.in', 'ship-confirm@amazon.in']
-  end
-
   def merchant
     'Amazon India'
   end

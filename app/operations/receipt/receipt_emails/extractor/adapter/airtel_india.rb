@@ -4,10 +4,6 @@ class Receipt::ReceiptEmails::Extractor::Adapter::AirtelIndia < Receipt::Receipt
     'ebill@airtel.com'
   end
 
-  def self.mail_keywords
-    'ebill@airtel.com'
-  end
-
   def merchant
     'Airtel India'
   end

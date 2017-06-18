@@ -22,13 +22,14 @@ class Receipt::ReceiptEmails::Extractor::Extract < BackgroundOperation
   end
 
   def process
-    adapter = Receipt::ReceiptEmails::Extractor::Adapter::Loader.adapter_for(sender, html_body)
+    adapter = Receipt::ReceiptEmails::Extractor::Adapter::Loader.adapter_for(self.user, self.sender, self.sent_at, self.subject, html_body)
 
     if adapter.blank?
       add_message :error, 'Cannot parse email'
       return
     end
-    data_presenter = adapter.(self.user, self.sender, self.sent_at, self.subject, html_body)
+
+    data_presenter = adapter.run
 
     if data_presenter&.success?
       self.extracted_data = data_presenter

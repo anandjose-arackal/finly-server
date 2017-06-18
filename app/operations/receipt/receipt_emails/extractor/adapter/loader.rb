@@ -1,40 +1,24 @@
 class Receipt::ReceiptEmails::Extractor::Adapter::Loader
 
   ADAPTERS = [
-    Receipt::ReceiptEmails::Extractor::Adapter::UberIndia,
-    Receipt::ReceiptEmails::Extractor::Adapter::Flipkart,
-    Receipt::ReceiptEmails::Extractor::Adapter::OlaCabs,
-    Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia,
-    Receipt::ReceiptEmails::Extractor::Adapter::Swiggy,
-    Receipt::ReceiptEmails::Extractor::Adapter::ZomatoIndia,
-    Receipt::ReceiptEmails::Extractor::Adapter::FreshMenu,
-    Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy,
-    Receipt::ReceiptEmails::Extractor::Adapter::AirtelIndia
+      Receipt::ReceiptEmails::Extractor::Adapter::UberIndia,
+      Receipt::ReceiptEmails::Extractor::Adapter::Flipkart,
+      Receipt::ReceiptEmails::Extractor::Adapter::OlaCabs,
+      Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia,
+      Receipt::ReceiptEmails::Extractor::Adapter::Swiggy,
+      Receipt::ReceiptEmails::Extractor::Adapter::ZomatoIndia,
+      Receipt::ReceiptEmails::Extractor::Adapter::FreshMenu,
+      Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy,
+      Receipt::ReceiptEmails::Extractor::Adapter::AirtelIndia
   ]
 
-  def self.adapter_for(sender, html)
-    if sender.present?
-      ADAPTERS.each do |adapter|
-        senders = adapter.senders
-        senders = [senders] unless senders.is_a?(Array)
-        if senders.include? sender
-          return adapter
-        end
+  def self.adapter_for(user, sender, sent_at, subject, html_body)
+    ADAPTERS.each do |adapter|
+      if adapter.can_parse?(user, sender, sent_at, subject, html_body)
+        return adapter.new(user, sender, sent_at, subject, html_body)
       end
     end
-
-    if html.present?
-      ADAPTERS.each do |adapter|
-        mail_keywords = adapter.mail_keywords
-        mail_keywords = [mail_keywords] unless mail_keywords.is_a?(Array)
-        mail_keywords.each do |keyword|
-          if html.include? keyword
-            return adapter
-          end
-        end
-      end
-    end
-    Receipt::ReceiptEmails::Extractor::Adapter::Generic
+    Receipt::ReceiptEmails::Extractor::Adapter::Generic.new(user, sender, sent_at, subject, html_body)
   end
 
   def self.known_sender?(sender)

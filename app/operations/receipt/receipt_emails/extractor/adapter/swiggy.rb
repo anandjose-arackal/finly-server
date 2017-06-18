@@ -5,7 +5,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Swiggy < Receipt::ReceiptEmail
   end
 
   def self.mail_keywords
-    'Thanks for using Swiggy! Your order'
+    [{body: ['Thanks for using Swiggy! Your order']}]
   end
 
   def merchant
@@ -14,7 +14,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Swiggy < Receipt::ReceiptEmail
 
   def amount_data_points
     [
-      Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=grand-total] td'),
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=grand-total] td'),
     ]
   end
 

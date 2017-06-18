@@ -4,10 +4,6 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Flipkart < Receipt::ReceiptEma
     'no-reply@flipkart.com'
   end
 
-  def self.mail_keywords
-    'flipkart.com'
-  end
-
   def merchant
     'Flipkart Pvt Ltd'
   end

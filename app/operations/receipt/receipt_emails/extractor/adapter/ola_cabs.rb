@@ -4,10 +4,6 @@ class Receipt::ReceiptEmails::Extractor::Adapter::OlaCabs < Receipt::ReceiptEmai
     'noreply@olacabs.com'
   end
 
-  def self.mail_keywords
-    'olacabs.com'
-  end
-
   def merchant
     'Ola Cabs'
   end
