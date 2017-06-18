@@ -25,6 +25,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
   end
 
   def extract_data_from(parser)
+    debugger
     extract = nil
     regex = nil
     case mode
@@ -47,7 +48,6 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
   def process_options(extract)
     return extract unless extract.present?
     return unless [Nokogiri::XML::NodeSet].include?(extract.class)
-
     # Default css selector is considered at first position unless position is defined
     case self.options[:position]
       when :first, nil
