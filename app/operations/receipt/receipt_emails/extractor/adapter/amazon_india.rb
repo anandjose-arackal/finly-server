@@ -1,11 +1,11 @@
 class Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
-    'auto-confirm@amazon.in'
+    ['auto-confirm@amazon.in', 'ship-confirm@amazon.in']
   end
 
   def self.mail_keywords
-    'auto-confirm@amazon.in'
+    ['auto-confirm@amazon.in', 'ship-confirm@amazon.in']
   end
 
   def merchant
@@ -14,8 +14,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia < Receipt::Receipt
 
   def amount_data_points
     [
-      Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=total]+ [class*=total] strong', REGEX_AMOUNT),
-      Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('td tr+ tr strong', REGEX_AMOUNT)
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=total]+ [class*=total] strong', REGEX_AMOUNT),
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('td tr+ tr strong', REGEX_AMOUNT)
     ]
   end
 
