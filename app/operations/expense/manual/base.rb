@@ -17,7 +17,7 @@ class Expense::Manual::Base < Expense::Base
                                         amount_attributes: [:value, :currency_id],
                                         manual_expense_attributes: [:merchant],
                                         receipts_attributes: [:image, :user_id, :id],
-                                        receipt_email_attributes: [:source, :email_id, :sender,
+                                        receipt_email_attributes: [:source, :email_id, :sender, :raw_html,
                                                                    :subject, :sent_at, :body, :user_id,
                                                                    receipt_email_attachments_attributes: [:attachment_url, :attachment_url_file_name, :original_attachment]])
     # Hack as image upload from API is failing in strong params
