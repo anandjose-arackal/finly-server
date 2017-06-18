@@ -14,7 +14,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::UberIndia < Receipt::ReceiptEm
 
   def amount_data_points
     # Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('.topPrice', /[0-9\\.]+/)
-    Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=topPrice]', REGEX_AMOUNT)
+    Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=topPrice]')
   end
 
 end

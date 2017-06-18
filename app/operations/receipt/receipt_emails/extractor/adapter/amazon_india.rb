@@ -14,8 +14,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia < Receipt::Receipt
 
   def amount_data_points
     [
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=total]+ [class*=total] strong', REGEX_AMOUNT),
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('td tr+ tr strong', REGEX_AMOUNT)
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=total]+ [class*=total] strong'),
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('td tr+ tr strong')
     ]
   end
 

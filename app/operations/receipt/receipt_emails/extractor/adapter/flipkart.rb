@@ -13,7 +13,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Flipkart < Receipt::ReceiptEma
   end
 
   def amount_data_points
-    Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=container] td span', REGEX_AMOUNT)
+    Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=container] td span')
   end
 
 end

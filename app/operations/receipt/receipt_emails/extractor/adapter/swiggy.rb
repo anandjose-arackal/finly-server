@@ -14,7 +14,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Swiggy < Receipt::ReceiptEmail
 
   def amount_data_points
     [
-      Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=grand-total] td', REGEX_AMOUNT),
+      Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=grand-total] td'),
     ]
   end
 

@@ -14,8 +14,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::OlaCabs < Receipt::ReceiptEmai
 
   def amount_data_points
     [
-      Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=stamp-padding] td', REGEX_AMOUNT),
-      Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=body] div+ div div td div > span', REGEX_AMOUNT)
+      Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=stamp-padding] td'),
+      Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=body] div+ div div td div > span')
     ]
   end
 
