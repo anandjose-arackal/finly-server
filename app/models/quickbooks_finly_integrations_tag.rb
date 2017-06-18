@@ -6,7 +6,7 @@ class QuickbooksFinlyIntegrationsTag
 
   validates :name, presence: true
 
-  validates :tag_sub_type, inclusion: { in: QUICKBOOKS_TAG_SUB_TYPES }, if: proc {|finly_category| finly_category.quickbooks_integration_type == FinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0] }
+  validates :tag_sub_type, inclusion: { in: QUICKBOOKS_TAG_SUB_TYPES }, if: proc {|finly_category| finly_category.quickbooks_integration_type == QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0] }
 
   def save
     if self.valid?

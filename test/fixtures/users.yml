@@ -2,53 +2,53 @@
 #
 # Table name: users
 #
-#  id                              :integer          not null, primary key
-#  email                           :string(255)      default("")
-#  encrypted_password              :string(255)      default(""), not null
-#  reset_password_token            :string(255)
-#  reset_password_sent_at          :datetime
-#  remember_created_at             :datetime
-#  sign_in_count                   :integer          default(0), not null
-#  current_sign_in_at              :datetime
-#  last_sign_in_at                 :datetime
-#  current_sign_in_ip              :string(255)
-#  last_sign_in_ip                 :string(255)
-#  confirmation_token              :string(255)
-#  confirmed_at                    :datetime
-#  confirmation_sent_at            :datetime
-#  unconfirmed_email               :string(255)
-#  failed_attempts                 :integer          default(0), not null
-#  unlock_token                    :string(255)
-#  locked_at                       :datetime
-#  created_at                      :datetime         not null
-#  updated_at                      :datetime         not null
-#  company_id                      :integer          not null
-#  mobile_number                   :string(255)
-#  active                          :boolean          default(TRUE), not null
-#  invitation_token                :string(255)
-#  invitation_created_at           :datetime
-#  invitation_sent_at              :datetime
-#  invitation_accepted_at          :datetime
-#  invitation_limit                :integer
-#  invited_by_id                   :integer
-#  invited_by_type                 :string(255)
-#  invitations_count               :integer          default(0)
-#  otp                             :string(255)
-#  otp_sent_at                     :datetime
-#  otp_verified_at                 :datetime
-#  otp_verified                    :boolean          default(FALSE), not null
-#  otp_count                       :integer          default(0), not null
-#  first_name                      :string(255)
-#  last_name                       :string(255)
-#  mobile_only_invite              :boolean          default(FALSE)
-#  mothers_maiden_name             :string(255)
-#  verified                        :boolean          default(FALSE)
-#  otp_request_type_id             :integer
-#  default_password                :boolean          default(FALSE)
-#  external_id                     :string(255)
-#  external_integration_type       :string(255)
-#  external_updated_at             :datetime
-#  external_additional_information :text(65535)
+#  id                                :integer          not null, primary key
+#  email                             :string(255)      default("")
+#  encrypted_password                :string(255)      default(""), not null
+#  reset_password_token              :string(255)
+#  reset_password_sent_at            :datetime
+#  remember_created_at               :datetime
+#  sign_in_count                     :integer          default(0), not null
+#  current_sign_in_at                :datetime
+#  last_sign_in_at                   :datetime
+#  current_sign_in_ip                :string(255)
+#  last_sign_in_ip                   :string(255)
+#  confirmation_token                :string(255)
+#  confirmed_at                      :datetime
+#  confirmation_sent_at              :datetime
+#  unconfirmed_email                 :string(255)
+#  failed_attempts                   :integer          default(0), not null
+#  unlock_token                      :string(255)
+#  locked_at                         :datetime
+#  created_at                        :datetime         not null
+#  updated_at                        :datetime         not null
+#  company_id                        :integer          not null
+#  mobile_number                     :string(255)
+#  active                            :boolean          default(TRUE), not null
+#  invitation_token                  :string(255)
+#  invitation_created_at             :datetime
+#  invitation_sent_at                :datetime
+#  invitation_accepted_at            :datetime
+#  invitation_limit                  :integer
+#  invited_by_id                     :integer
+#  invited_by_type                   :string(255)
+#  invitations_count                 :integer          default(0)
+#  otp                               :string(255)
+#  otp_sent_at                       :datetime
+#  otp_verified_at                   :datetime
+#  otp_verified                      :boolean          default(FALSE), not null
+#  otp_count                         :integer          default(0), not null
+#  first_name                        :string(255)
+#  last_name                         :string(255)
+#  mobile_only_invite                :boolean          default(FALSE)
+#  mothers_maiden_name               :string(255)
+#  verified                          :boolean          default(FALSE)
+#  otp_request_type_id               :integer
+#  default_password                  :boolean          default(FALSE)
+#  quickbooks_id                     :string(255)
+#  quickbooks_integration_type       :string(255)
+#  quickbooks_updated_at             :datetime
+#  quickbooks_additional_information :text(65535)
 #
 
 # one kind of user for each user type

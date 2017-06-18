@@ -4,8 +4,8 @@ module FinlyIntegrations
     class QuickbooksAdapter < AbstractAdapter
       ADAPTER_NAME = :quickbooks
       CATEGORY_LINE_ITEMS_MAPPER = {
-          FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0] => ['AccountBasedExpenseLineDetail', :account_based_expense!],
-          FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[1] => ['ItemBasedExpenseLineDetail', :item_based_expense!],
+          QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0] => ['AccountBasedExpenseLineDetail', :account_based_expense!],
+          QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[1] => ['ItemBasedExpenseLineDetail', :item_based_expense!],
       }
       PAYMENT_TYPES_MAPPER = {
           reimbursable: "Cash",
@@ -44,14 +44,18 @@ module FinlyIntegrations
 
         qb_report.expenses.each do |expense|
           category = expense.category
-          raise 'Expense doesn\'t belong to a category. Aborting export of the report.' if category.nil?
-          raise 'All expenses of this report don\'t belong to Quickbooks. Aborting export of the report.' if category.external_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
+          if category.nil?
+            return "Expense doesn't belong to a category. Aborting export of the report."
+          end
+          if category.quickbooks_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
+            return "All expenses of this report don't belong to Quickbooks. Aborting export of the report."
+          end
           line_item = Quickbooks::Model::PurchaseLineItem.new
           line_item.description = "#{expense.merchant_name} - #{expense.note}"
           line_item.amount = expense.amount.value.to_f
-          line_item.detail_type = CATEGORY_LINE_ITEMS_MAPPER[category.external_category_type][0]
-          line_item.send(CATEGORY_LINE_ITEMS_MAPPER[category.external_category_type][1]) do |detail|
-            if category.external_category_type == FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0]
+          line_item.detail_type = CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category_type][0]
+          line_item.send(CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category_type][1]) do |detail|
+            if category.quickbooks_category_type == QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0]
               detail.account_id = category.external_id
             else
               detail.item_id = category.external_id
@@ -132,24 +136,24 @@ module FinlyIntegrations
       private
 
       def quickbooks_employee_mapper(user)
-        fi_user = FinlyIntegrationsUser.find_or_initialize_by(external_integration_type: FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, external_id: user.id, external_user_type: FinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.first)
+        fi_user = QuickbooksFinlyIntegrationsUser.find_or_initialize_by(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, quickbooks_id: user.id, quickbooks_user_type: QuickbooksFinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.first)
         fi_user.email = user.primary_email_address.address if user.primary_email_address.present?
         fi_user.name = user.display_name
         fi_user.company_id = @finly_company_id
         fi_user.mobile_number = user.primary_phone.free_form_number if user.primary_phone.present?
-        fi_user.external_updated_at = user.meta_data.last_updated_time
+        fi_user.quickbooks_updated_at = user.meta_data.last_updated_time
         fi_user.active = user.active?
         save_additional_information(fi_user, user)
         fi_user
       end
 
       def quickbooks_vendor_mapper(user)
-        fi_user = FinlyIntegrationsUser.find_or_initialize_by(external_integration_type: FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, external_id: user.id, external_user_type: FinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.last)
+        fi_user = FinlyIntegrationsUser.find_or_initialize_by(quickbooks_integration_type: FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, quickbooks_id: user.id, quickbooks_user_type: FinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.last)
         fi_user.email = user.primary_email_address.address if user.primary_email_address.present?
         fi_user.name = user.display_name
         fi_user.company_id = @finly_company_id
         fi_user.mobile_number = user.primary_phone.free_form_number if user.primary_phone.present?
-        fi_user.external_updated_at = user.meta_data.last_updated_time
+        fi_user.quickbooks_updated_at = user.meta_data.last_updated_time
         fi_user.active = user.active?
         save_additional_information(fi_user, user)
         fi_user
@@ -159,10 +163,10 @@ module FinlyIntegrations
         fi_account = FinlyIntegrationsCategory.new
         fi_account.name = account.name
         fi_account.active = account.active?
-        fi_account.external_id = account.id
+        fi_account.quickbooks_id = account.id
         fi_account.company_id = @finly_company_id
-        fi_account.external_integration_type = FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
-        fi_account.external_updated_at = account.meta_data.last_updated_time
+        fi_account.quickbooks_integration_type = FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
+        fi_account.quickbooks_updated_at = account.meta_data.last_updated_time
         fi_account.category_sub_type = FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES.first
         save_additional_information(fi_account, account)
         fi_account
@@ -172,10 +176,10 @@ module FinlyIntegrations
         fi_item = FinlyIntegrationsCategory.new
         fi_item.name = item.name
         fi_item.active = item.active?
-        fi_item.external_id = item.id
+        fi_item.quickbooks_id = item.id
         fi_item.company_id = @finly_company_id
-        fi_item.external_integration_type = FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
-        fi_item.external_updated_at = item.meta_data.last_updated_time
+        fi_item.quickbooks_integration_type = FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
+        fi_item.quickbooks_updated_at = item.meta_data.last_updated_time
         fi_item.category_sub_type = FinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES.last
         save_additional_information(fi_item, item)
         fi_item
@@ -185,10 +189,10 @@ module FinlyIntegrations
         fi_class = FinlyIntegrationsTag.new
         fi_class.name = klass.name
         fi_class.active = klass.active?
-        fi_class.external_id = klass.id
+        fi_class.quickbooks_id = klass.id
         fi_class.company_id = @finly_company_id
-        fi_class.external_integration_type = FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
-        fi_class.external_updated_at = klass.meta_data.last_updated_time
+        fi_class.quickbooks_integration_type = FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
+        fi_class.quickbooks_updated_at = klass.meta_data.last_updated_time
         fi_class.tag_sub_type = FinlyIntegrationsTag::QUICKBOOKS_TAG_SUB_TYPES.first
         save_additional_information(fi_class, klass)
         fi_class
@@ -198,10 +202,10 @@ module FinlyIntegrations
         fi_customer = FinlyIntegrationsTag.new
         fi_customer.name = customer.display_name
         fi_customer.active = customer.active?
-        fi_customer.external_id = customer.id
+        fi_customer.quickbooks_id = customer.id
         fi_customer.company_id = @finly_company_id
-        fi_customer.external_integration_type = FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
-        fi_customer.external_updated_at = customer.meta_data.last_updated_time
+        fi_customer.quickbooks_integration_type = FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
+        fi_customer.quickbooks_updated_at = customer.meta_data.last_updated_time
         fi_customer.tag_sub_type = FinlyIntegrationsTag::QUICKBOOKS_TAG_SUB_TYPES[1]
         save_additional_information(fi_customer, customer)
         fi_customer
@@ -211,17 +215,17 @@ module FinlyIntegrations
         fi_department = FinlyIntegrationsTag.new
         fi_department.name = department.name
         fi_department.active = department.active?
-        fi_department.external_id = department.id
+        fi_department.quickbooks_id = department.id
         fi_department.company_id = @finly_company_id
-        fi_department.external_integration_type = FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
-        fi_department.external_updated_at = department.meta_data.last_updated_time
+        fi_department.quickbooks_integration_type = FinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
+        fi_department.quickbooks_updated_at = department.meta_data.last_updated_time
         fi_department.tag_sub_type = FinlyIntegrationsTag::QUICKBOOKS_TAG_SUB_TYPES.last
         save_additional_information(fi_department, department)
         fi_department
       end
 
       def save_additional_information(finly_obj, quickbooks_obj)
-        finly_obj.external_additional_information = quickbooks_obj.to_json
+        finly_obj.quickbooks_additional_information = quickbooks_obj.to_json
       end
 
       def retrieve_all_in_batches(container, service, obj_mapper, updated_at = nil)

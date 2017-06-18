@@ -7,7 +7,7 @@ module QuickbooksFinlyIntegratable
   included do
     include ActiveModel::Validations
 
-    validates :quickbooks_integration_type, inclusion: { in: FinlyIntegratable::ALLOWED_INTEGRATION_TYPES }
+    validates :quickbooks_integration_type, inclusion: { in: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES }
 
     validates :quickbooks_id, presence: true
     
