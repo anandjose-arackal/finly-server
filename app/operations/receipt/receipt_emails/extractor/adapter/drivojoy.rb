@@ -14,7 +14,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy < Receipt::ReceiptEma
 
   def amount_data_points
     [
-      Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('td+ td b')
+      Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('td~ td+ td b')
     ]
   end
 
