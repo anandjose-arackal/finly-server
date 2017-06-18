@@ -21,7 +21,7 @@ class RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse < RequestFo
       end
     end
 
-    email_body = params&.dig(:receipt_email)&.dig(:body)
+    email_body = (params&.dig(:receipt_email)&.dig(:html_body) or params&.dig(:receipt_email)&.dig(:body))
     if email_body.present? and map&.dig(:expense)&.dig(:receipt_email_attributes).present?
       email_id = (params&.dig(:receipt_email)&.dig(:email_id) || SecureRandom.hex(6))
       name = "#{email_id}_raw_html.html}"
