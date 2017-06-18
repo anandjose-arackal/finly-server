@@ -1,7 +1,8 @@
 class Receipt::ReceiptEmails::Extractor::Adapter::Base < BaseOperation
   attr_accessor :sender, :sent_at, :subject, :parser, :html_body, :user, :extracted_data
 
-  REGEX_AMOUNT = /[1-9]\d*(\.\d+)?/
+  # REGEX_AMOUNT = /[1-9]\d*(\.\d+)?/
+  REGEX_AMOUNT = /[1-9]\d*((,|\.)\d+)*/
 
   def self.senders
     []

@@ -22,9 +22,11 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
   def extract_data_from(parser)
     case mode
       when :xpath
-        return (parser&.xpath(xpath)&.text[xpath_regex] rescue nil)
+        # Gsubbing removes the comma from the amounts if any is found
+        return (parser&.xpath(xpath)&.text[xpath_regex].gsub(',','') rescue nil)
       when :css_selector
-        return (parser&.at_css(css_selector)&.text[css_selector_regex] rescue nil)
+        # Gsubbing removes the comma from the amounts if any is found
+        return (parser&.at_css(css_selector)&.text[css_selector_regex].gsub(',','') rescue nil)
     end
   end
 

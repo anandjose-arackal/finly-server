@@ -28,7 +28,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia < Receipt::Receipt
       next unless data_point.is_a?(Receipt::ReceiptEmails::Extractor::Adapter::DataPoint)
       amount_val = 0
       parser&.css(data_point.css_selector)&.each do |selector|
-        amount_val += (selector.text[data_point.css_selector_regex].to_f rescue 0)
+        # Gsubbing removes the comma from the amounts if any is found
+        amount_val += (selector.text[data_point.css_selector_regex].gsub(',','').to_f rescue 0)
       end
       return amount_val if amount_val.present? and amount_val > 0
     end
