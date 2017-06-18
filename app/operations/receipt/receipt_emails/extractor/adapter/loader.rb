@@ -7,6 +7,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
     Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia,
     Receipt::ReceiptEmails::Extractor::Adapter::Swiggy,
     Receipt::ReceiptEmails::Extractor::Adapter::ZomatoIndia,
+    Receipt::ReceiptEmails::Extractor::Adapter::FreshMenu,
     Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy
   ]
 
