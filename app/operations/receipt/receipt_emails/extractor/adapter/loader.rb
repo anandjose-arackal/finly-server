@@ -4,7 +4,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
     Receipt::ReceiptEmails::Extractor::Adapter::UberIndia,
     Receipt::ReceiptEmails::Extractor::Adapter::Flipkart,
     Receipt::ReceiptEmails::Extractor::Adapter::OlaCabs,
-    Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia
+    Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia,
+    Receipt::ReceiptEmails::Extractor::Adapter::Swiggy
   ]
 
   def self.adapter_for(sender, html)
