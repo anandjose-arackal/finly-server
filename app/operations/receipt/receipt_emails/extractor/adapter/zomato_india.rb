@@ -5,7 +5,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::ZomatoIndia < Receipt::Receipt
   end
 
   def self.mail_keywords
-    'Thanks for ordering with Zomato!'
+    'order@zomato.com'
   end
 
   def merchant

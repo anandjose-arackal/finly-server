@@ -6,7 +6,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
     Receipt::ReceiptEmails::Extractor::Adapter::OlaCabs,
     Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia,
     Receipt::ReceiptEmails::Extractor::Adapter::Swiggy,
-    Receipt::ReceiptEmails::Extractor::Adapter::ZomatoIndia
+    Receipt::ReceiptEmails::Extractor::Adapter::ZomatoIndia,
+    Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy
   ]
 
   def self.adapter_for(sender, html)
