@@ -25,7 +25,6 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
   end
 
   def extract_data_from(parser)
-    debugger
     extract = nil
     regex = nil
     case mode
