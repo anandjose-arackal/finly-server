@@ -5,6 +5,7 @@
 #  id                             :integer          not null, primary key
 #  merchant                       :string(255)
 #  reference_id                   :string(255)
+#  time                           :time
 #  amount_id                      :integer
 #  expense_data_extract_source_id :integer          not null
 #  category_id                    :integer
@@ -16,7 +17,6 @@
 #  extractable_type               :string(255)      not null
 #  note                           :text(65535)
 #  datetime                       :datetime
-#  date                           :date
 #  status_id                      :integer          not null
 #
 

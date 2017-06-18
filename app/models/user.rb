@@ -56,6 +56,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -70,6 +71,8 @@ class User < ActiveRecord::Base
   attr_reader :raw_invitation_token
 
   belongs_to :company
+  belongs_to :otp_request_type
+
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
@@ -99,6 +102,7 @@ class User < ActiveRecord::Base
   has_one :auto_submit_config, as: :submitable, dependent: :destroy
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
   has_one :auto_reload_config, as: :reloadable, dependent: :destroy
+  has_one :itz_cash_dmt_sender
 
   has_many :cards, dependent: :destroy
   has_many :card_transactions, dependent: :destroy
@@ -113,14 +117,12 @@ class User < ActiveRecord::Base
   has_many :notifications, dependent: :destroy
   has_many :notifier_type_configurations
   has_many :user_balance_histories
-  belongs_to :otp_request_type
   has_many :feedbacks
   has_many :payment_orders, foreign_key: :initiating_user_id
   has_many :user_group_item_mappings
   has_many :user_group_items, through: :user_group_item_mappings
   has_many :expense_data_extracts, as: :sourcable
-
-  has_one :itz_cash_dmt_sender
+  has_many :receipt_email_parse_failures
 
   # has_one :feature_access, as: :accessible
 

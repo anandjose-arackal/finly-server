@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170612155039) do
+ActiveRecord::Schema.define(version: 20170618084925) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -904,6 +904,7 @@ ActiveRecord::Schema.define(version: 20170612155039) do
   create_table "expense_data_extracts", force: :cascade do |t|
     t.string   "merchant",                       limit: 255
     t.string   "reference_id",                   limit: 255
+    t.time     "time"
     t.integer  "amount_id",                      limit: 4
     t.integer  "expense_data_extract_source_id", limit: 4,     null: false
     t.integer  "category_id",                    limit: 4
@@ -915,7 +916,6 @@ ActiveRecord::Schema.define(version: 20170612155039) do
     t.string   "extractable_type",               limit: 255,   null: false
     t.text     "note",                           limit: 65535
     t.datetime "datetime"
-    t.date     "date"
     t.integer  "status_id",                      limit: 4,     null: false
   end
 
@@ -1216,8 +1216,8 @@ ActiveRecord::Schema.define(version: 20170612155039) do
     t.text     "address",        limit: 65535
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.string   "maps_id",        limit: 255
     t.integer  "order",          limit: 4
+    t.string   "maps_id",        limit: 255
   end
 
   add_index "locations", ["locatable_id"], name: "index_locations_on_locatable_id", using: :btree
@@ -1670,6 +1670,51 @@ ActiveRecord::Schema.define(version: 20170612155039) do
   end
 
   add_index "receipt_email_attachments", ["receipt_email_id"], name: "index_receipt_email_attachments_on_receipt_email_id", using: :btree
+
+  create_table "receipt_email_parse_failures", force: :cascade do |t|
+    t.integer  "user_id",                      limit: 4
+    t.string   "subject",                      limit: 255
+    t.datetime "sent_at"
+    t.string   "body_file_name",               limit: 255
+    t.string   "body_content_type",            limit: 255
+    t.integer  "body_file_size",               limit: 4
+    t.datetime "body_updated_at"
+    t.string   "raw_text_file_name",           limit: 255
+    t.string   "raw_text_content_type",        limit: 255
+    t.integer  "raw_text_file_size",           limit: 4
+    t.datetime "raw_text_updated_at"
+    t.string   "raw_html_file_name",           limit: 255
+    t.string   "raw_html_content_type",        limit: 255
+    t.integer  "raw_html_file_size",           limit: 4
+    t.datetime "raw_html_updated_at"
+    t.string   "raw_header_file_name",         limit: 255
+    t.string   "raw_header_content_type",      limit: 255
+    t.integer  "raw_header_file_size",         limit: 4
+    t.datetime "raw_header_updated_at"
+    t.string   "original_source_file_name",    limit: 255
+    t.string   "original_source_content_type", limit: 255
+    t.integer  "original_source_file_size",    limit: 4
+    t.datetime "original_source_updated_at"
+    t.string   "email_id",                     limit: 255
+    t.string   "sender",                       limit: 255
+    t.boolean  "fixed",                                      default: false
+    t.string   "parsed_merchant",              limit: 255
+    t.string   "parsed_amount_value",          limit: 255
+    t.integer  "parsed_currency_id",           limit: 4
+    t.datetime "parsed_datetime"
+    t.text     "parsed_note",                  limit: 65535
+    t.integer  "parsed_category_id",           limit: 4
+    t.datetime "created_at",                                                 null: false
+    t.datetime "updated_at",                                                 null: false
+    t.string   "source_file_name",             limit: 255
+    t.string   "source_content_type",          limit: 255
+    t.integer  "source_file_size",             limit: 4
+    t.datetime "source_updated_at"
+  end
+
+  add_index "receipt_email_parse_failures", ["parsed_category_id"], name: "index_receipt_email_parse_failures_on_parsed_category_id", using: :btree
+  add_index "receipt_email_parse_failures", ["parsed_currency_id"], name: "index_receipt_email_parse_failures_on_parsed_currency_id", using: :btree
+  add_index "receipt_email_parse_failures", ["user_id"], name: "index_receipt_email_parse_failures_on_user_id", using: :btree
 
   create_table "receipt_emails", force: :cascade do |t|
     t.text     "subject",                      limit: 65535
@@ -2291,6 +2336,7 @@ ActiveRecord::Schema.define(version: 20170612155039) do
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
+  add_foreign_key "receipt_email_parse_failures", "users"
   add_foreign_key "receipt_emails", "expenses"
   add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"

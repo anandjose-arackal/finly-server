@@ -32,6 +32,24 @@ class Receipt::ReceiptEmails::Extractor::Extract < BackgroundOperation
 
     if data_presenter&.success?
       self.extracted_data = data_presenter
+
+      # If the extraction is a partial match, store the email as parsing failed in a separate db so it can be parsed in the future
+      if self.extracted_data.partial_match? and Receipt::ReceiptEmails::Extractor::Adapter::Loader.known_sender?(sender)
+        failure_param = {
+            sender: self.sender,
+            sent_at: self.sent_at,
+            subject: self.subject,
+            raw_html: FakeFileIO.new(self.html_body, "#{sender}_failed.html"),
+            fixed: false,
+            parsed_merchant: self.extracted_data.merchant,
+            parsed_amount_value: self.extracted_data.amount_value,
+            parsed_currency_id: self.extracted_data.currency_id,
+            parsed_datetime: self.extracted_data.datetime,
+            parsed_note: self.extracted_data.note,
+            parsed_category_id: self.extracted_data.category_id
+        }
+        user.receipt_email_parse_failures.create failure_param
+      end
     else
       add_message :error, 'Failed to auto extract from email'
     end

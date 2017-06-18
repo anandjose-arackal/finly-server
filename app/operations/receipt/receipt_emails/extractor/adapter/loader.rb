@@ -32,4 +32,17 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
     Receipt::ReceiptEmails::Extractor::Adapter::Generic
   end
 
+  def self.known_sender?(sender)
+    if sender.present?
+      ADAPTERS.each do |adapter|
+        senders = adapter.senders
+        senders = [senders] unless senders.is_a?(Array)
+        if senders.include? sender
+          return true
+        end
+      end
+    end
+    false
+  end
+
 end

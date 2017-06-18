@@ -34,4 +34,21 @@ class Receipt::ReceiptEmails::Extractor::Data < BaseOperation::BasePresenter::Su
     data_extract
   end
 
+  def partial_match?
+    # if complete_match?
+    #   return false
+    # elsif self.merchant.present? or self.amount_value.present? or self.currency_id.present? or self.datetime.present? or self.category_id.present?
+    #   return true
+    # end
+    # false
+    !complete_match?
+  end
+
+  def complete_match?
+    if self.merchant.present? and self.amount_value.present? and self.currency_id.present? and self.datetime.present? and self.category_id.present?
+      return true
+    end
+    false
+  end
+
 end
