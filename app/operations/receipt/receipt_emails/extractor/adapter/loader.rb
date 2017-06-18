@@ -9,7 +9,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::ZomatoIndia,
       Receipt::ReceiptEmails::Extractor::Adapter::FreshMenu,
       Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy,
-      Receipt::ReceiptEmails::Extractor::Adapter::AirtelIndia,
+      Receipt::ReceiptEmails::Extractor::Adapter::AirtelMobileIndia,
       Receipt::ReceiptEmails::Extractor::Adapter::MakeMyTrip
   ]
 
