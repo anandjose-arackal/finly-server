@@ -8,7 +8,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
     Receipt::ReceiptEmails::Extractor::Adapter::Swiggy,
     Receipt::ReceiptEmails::Extractor::Adapter::ZomatoIndia,
     Receipt::ReceiptEmails::Extractor::Adapter::FreshMenu,
-    Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy
+    Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy,
+    Receipt::ReceiptEmails::Extractor::Adapter::AirtelIndia
   ]
 
   def self.adapter_for(sender, html)
