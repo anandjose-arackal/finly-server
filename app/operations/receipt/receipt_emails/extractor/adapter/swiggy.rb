@@ -5,7 +5,14 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Swiggy < Receipt::ReceiptEmail
   end
 
   def self.mail_keywords
-    [{body: ['Thanks for using Swiggy! Your order']}]
+    [
+        {
+            subject: ['Your receipt for Swiggy order']
+        },
+        {
+            body: ['Thanks for using Swiggy! Your order']
+        }
+    ]
   end
 
   def merchant
