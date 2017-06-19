@@ -19,7 +19,7 @@
 
 class QuickbooksConfiguration < ActiveRecord::Base
   belongs_to :quickbooks_payment_type
-  belongs_to :user
+  belongs_to :company
   belongs_to :reimbursable_account, class_name: 'QuickbooksPaymentType'
   belongs_to :non_reimbursable_account, class_name: 'QuickbooksPaymentType'
 end

@@ -237,10 +237,14 @@ class Report < ActiveRecord::Base
     self.accounted
   end
 
-  def quickbooks_payment_type_external_id
+  def payment_type_quickbooks_id(reimbursable)
     company_id = self.user.company_id
-    ext_id = QuickbooksPaymentType.checking_account_with_company(company_id).id rescue nil
-    return ext_id
+    qb = QuickbooksConfiguration.find_by(company_id: company_id)
+    if reimbursable
+      return qb.reimbursable_account_id
+    else
+      return qb.non_reimbursable_account_id
+    end
   end
 
   def relative_status_name(user)

@@ -20,14 +20,20 @@ class QuickbooksFinlyIntegrationsCategory
           quickbooks_id: self.quickbooks_id, quickbooks_category_type: self.category_sub_type)
         end
         if finly_integrations_category.present?
-          category_params = {category_attributes: {}}
-          category_params[:category_attributes][:company_id] = self.company_id
-          category_params[:category_attributes][:name] = self.name
-          category_params[:quickbooks_updated_at] = self.quickbooks_updated_at
-          category_params[:category_attributes][:active] = self.active
-          category_params[:quickbooks_additional_information] = self.quickbooks_additional_information
-          category_params[:quickbooks_category_type] = self.category_sub_type unless is_payment? additional_information_json
-          finly_integrations_category.update(category_params)
+          if finly_integrations_category.is_a?(QuickbooksCategory)
+            category_params = {category_attributes: {}}
+            category_params[:category_attributes][:company_id] = self.company_id
+            category_params[:category_attributes][:name] = self.name
+            category_params[:quickbooks_updated_at] = self.quickbooks_updated_at
+            category_params[:category_attributes][:active] = self.active
+            category_params[:quickbooks_additional_information] = self.quickbooks_additional_information
+            category_params[:quickbooks_category_type] = self.category_sub_type unless is_payment? additional_information_json
+            finly_integrations_category.update(category_params)
+          elsif finly_integrations_category.is_a?(QuickbooksPaymentType)
+            finly_integrations_category.name = self.name
+            finly_integrations_category.company_id = self.company_id
+            finly_integrations_category.quickbooks_additional_information = self.quickbooks_additional_information
+          end
         end
       rescue ActiveRecord::RecordNotUnique
         #retry
