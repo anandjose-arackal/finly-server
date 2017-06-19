@@ -22,10 +22,6 @@
 #
 
 
-
-
-
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -272,7 +268,7 @@ class Expense < ActiveRecord::Base
   scope :unverified, -> { where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
 
   scope :joins_card_expenses, -> { only_card_expenses.joins(:card_expense) }
-  scope :pluck_card_transaction_id, -> { joins_card_expenses.pluck('card_expense.card_transaction_id')}
+  scope :pluck_card_transaction_id, -> { joins_card_expenses.pluck('card_expense.card_transaction_id') }
 
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount
@@ -620,6 +616,10 @@ class Expense < ActiveRecord::Base
       return true
     end
     false
+  end
+
+  def editable?
+    [ExpenseStatus.id_for(:unreported), ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:rejected)].include?(self.expense_status_id)
   end
 
   # method that updates all the currency values for a particular expense - todo - possibly should be moved to an operation
