@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170619150204) do
+ActiveRecord::Schema.define(version: 20170619171805) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1067,6 +1067,7 @@ ActiveRecord::Schema.define(version: 20170619150204) do
     t.boolean  "expense_card_enabled",                   default: false
     t.boolean  "reimbursement_card_enabled",             default: false
     t.boolean  "hard_copy_receipt",                      default: false
+    t.boolean  "itz_cash_d_code_enabled",                default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
