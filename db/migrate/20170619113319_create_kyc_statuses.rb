@@ -5,5 +5,6 @@ class CreateKycStatuses < ActiveRecord::Migration
 
       t.timestamps null: false
     end
+    KycStatus.seed_data
   end
 end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170619102226) do
+ActiveRecord::Schema.define(version: 20170619113431) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -631,6 +631,29 @@ ActiveRecord::Schema.define(version: 20170619102226) do
     t.string   "designation",      limit: 255
   end
 
+  create_table "corporate_kycs", force: :cascade do |t|
+    t.integer  "company_id",                    limit: 4
+    t.string   "pan_card_file_name",            limit: 255
+    t.string   "pan_card_content_type",         limit: 255
+    t.integer  "pan_card_file_size",            limit: 4
+    t.datetime "pan_card_updated_at"
+    t.string   "coi_file_name",                 limit: 255
+    t.string   "coi_content_type",              limit: 255
+    t.integer  "coi_file_size",                 limit: 4
+    t.datetime "coi_updated_at"
+    t.string   "agreement_file_name",           limit: 255
+    t.string   "agreement_content_type",        limit: 255
+    t.integer  "agreement_file_size",           limit: 4
+    t.datetime "agreement_updated_at"
+    t.string   "board_resolution_file_name",    limit: 255
+    t.string   "board_resolution_content_type", limit: 255
+    t.integer  "board_resolution_file_size",    limit: 4
+    t.datetime "board_resolution_updated_at"
+    t.integer  "kyc_status_id",                 limit: 4
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+  end
+
   create_table "crono_jobs", force: :cascade do |t|
     t.string   "job_id",            limit: 255,      null: false
     t.text     "log",               limit: 16777215
@@ -1206,6 +1229,12 @@ ActiveRecord::Schema.define(version: 20170619102226) do
   end
 
   add_index "itz_cash_properties", ["company_id"], name: "index_itz_cash_properties_on_company_id", using: :btree
+
+  create_table "kyc_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "locations", force: :cascade do |t|
     t.integer  "locatable_id",   limit: 4
