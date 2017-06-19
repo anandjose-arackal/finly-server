@@ -39,7 +39,6 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
       else
         return nil
     end
-    debugger
     extract = process_options extract
     extract&.text[regex].gsub(',', '') rescue nil
   end
