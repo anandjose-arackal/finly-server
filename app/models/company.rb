@@ -23,6 +23,7 @@ class Company < ActiveRecord::Base
   has_many :policies, dependent: :destroy
   has_many :export_preferences, dependent: :destroy
   has_one :account, class_name: 'CompanyAccount'
+  has_one :quickbooks_configuration
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
   has_one :itz_cash_property
   has_many :company_transactions

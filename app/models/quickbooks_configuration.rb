@@ -22,4 +22,8 @@ class QuickbooksConfiguration < ActiveRecord::Base
   belongs_to :company
   belongs_to :reimbursable_account, class_name: 'QuickbooksPaymentType'
   belongs_to :non_reimbursable_account, class_name: 'QuickbooksPaymentType'
+
+  def quickbooks_expense_date
+
+  end
 end

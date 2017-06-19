@@ -1335,6 +1335,12 @@
 
 Rails.application.routes.draw do
 
+  get 'qukickbooks_configurations/create'
+
+  get 'qukickbooks_configurations/update'
+
+  get 'qukickbooks_configurations/show'
+
   ######### GEMS SPECIFIC START ###########
 
   mount Crono::Web, at: '/crono'
