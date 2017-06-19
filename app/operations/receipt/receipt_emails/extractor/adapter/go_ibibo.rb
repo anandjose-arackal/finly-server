@@ -10,7 +10,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::GoIbibo < Receipt::ReceiptEmai
 
   def amount_data_points
     [
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=contentTxt]+ [class*=contentTxt]')
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('p:contains("You have paid")')
     ]
   end
 
