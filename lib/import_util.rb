@@ -1,3 +1,5 @@
+require 'roo'
+
 class ImportUtil
 
   JUNK_CHARACTER_LIST = %w(<html> </html> <b> </b> <u> </u> <i> </i> mailto :)
