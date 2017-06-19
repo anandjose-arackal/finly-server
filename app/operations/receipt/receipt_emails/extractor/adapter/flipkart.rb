@@ -9,7 +9,10 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Flipkart < Receipt::ReceiptEma
   end
 
   def amount_data_points
-    Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=container] td span')
+    [
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('[class*=container] td span'),
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr:contains("Total") td', position: :last)
+    ]
   end
 
 end
