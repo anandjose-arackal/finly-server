@@ -2,7 +2,7 @@ json.messages []
 expensed = (@result.success? and @result.receipt_email&.expense.present?)
 json.expensed expensed
 json.parsed @result.success?
-json.editable (expensed and @result.receipt_email.expense.editable?)
+json.editable (!expensed or @result.receipt_email.expense.editable?)
 if @result.success?
   json.expense do
     data = @result.data
