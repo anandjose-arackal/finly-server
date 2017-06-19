@@ -10,7 +10,9 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::FreshMenu,
       Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy,
       Receipt::ReceiptEmails::Extractor::Adapter::AirtelMobileIndia,
-      Receipt::ReceiptEmails::Extractor::Adapter::MakeMyTrip
+      Receipt::ReceiptEmails::Extractor::Adapter::MakeMyTrip,
+      Receipt::ReceiptEmails::Extractor::Adapter::Housejoy,
+      Receipt::ReceiptEmails::Extractor::Adapter::Irctc
   ]
 
   def self.adapter_for(user, sender, sent_at, subject, html_body)

@@ -27,6 +27,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
   def extract_data_from(parser)
     extract = nil
     regex = nil
+    debugger
     case mode
       when :xpath
         # Gsubbing removes the comma from the amounts if any is found

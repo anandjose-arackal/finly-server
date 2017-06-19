@@ -10,7 +10,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::MakeMyTrip < Receipt::ReceiptE
 
   def amount_data_points
     [
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr tr:contains("Total Amount Charged")')
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr tr:has(td:contains("Total Amount Charged"))')
     ]
   end
 
