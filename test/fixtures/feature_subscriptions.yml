@@ -16,6 +16,7 @@
 #  updated_at                 :datetime         not null
 #  expense_card_enabled       :boolean          default(FALSE)
 #  reimbursement_card_enabled :boolean          default(FALSE)
+#  hard_copy_receipt          :boolean          default(FALSE)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

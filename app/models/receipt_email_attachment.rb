@@ -10,6 +10,8 @@
 #  original_attachment_updated_at   :datetime
 #  created_at                       :datetime         not null
 #  updated_at                       :datetime         not null
+#  attachment_url                   :text(65535)
+#  attachment_url_file_name         :string(255)
 #
 
 

@@ -2,29 +2,38 @@
 #
 # Table name: receipt_emails
 #
-#  id                      :integer          not null, primary key
-#  subject                 :text(65535)
-#  sent_at                 :datetime
-#  user_id                 :integer
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  body_file_name          :string(255)
-#  body_content_type       :string(255)
-#  body_file_size          :integer
-#  body_updated_at         :datetime
-#  raw_text_file_name      :string(255)
-#  raw_text_content_type   :string(255)
-#  raw_text_file_size      :integer
-#  raw_text_updated_at     :datetime
-#  raw_html_file_name      :string(255)
-#  raw_html_content_type   :string(255)
-#  raw_html_file_size      :integer
-#  raw_html_updated_at     :datetime
-#  raw_header_file_name    :string(255)
-#  raw_header_content_type :string(255)
-#  raw_header_file_size    :integer
-#  raw_header_updated_at   :datetime
+#  id                           :integer          not null, primary key
+#  subject                      :text(65535)
+#  sent_at                      :datetime
+#  user_id                      :integer
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  body_file_name               :string(255)
+#  body_content_type            :string(255)
+#  body_file_size               :integer
+#  body_updated_at              :datetime
+#  raw_text_file_name           :string(255)
+#  raw_text_content_type        :string(255)
+#  raw_text_file_size           :integer
+#  raw_text_updated_at          :datetime
+#  raw_html_file_name           :string(255)
+#  raw_html_content_type        :string(255)
+#  raw_html_file_size           :integer
+#  raw_html_updated_at          :datetime
+#  raw_header_file_name         :string(255)
+#  raw_header_content_type      :string(255)
+#  raw_header_file_size         :integer
+#  raw_header_updated_at        :datetime
+#  expense_id                   :integer
+#  email_id                     :string(255)
+#  sender                       :string(255)
+#  source                       :string(255)
+#  original_source_file_name    :string(255)
+#  original_source_content_type :string(255)
+#  original_source_file_size    :integer
+#  original_source_updated_at   :datetime
 #
+
 
 
 require 'fileutils'

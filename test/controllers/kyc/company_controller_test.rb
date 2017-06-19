@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CorporateKycTest < ActiveSupport::TestCase
+class Kyc::CompanyControllerTest < ActionController::TestCase
   # test "the truth" do
   #   assert true
   # end

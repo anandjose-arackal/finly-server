@@ -35,7 +35,7 @@ class Company < ActiveRecord::Base
   has_many :payment_orders
   has_many :user_groups
   has_many :user_teams
-  has_one :corporate_kyc
+  has_one :company_kyc
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -205,7 +205,7 @@ class Company < ActiveRecord::Base
       self.build_feature_subscription.save
     end
 
-    self.build_corporate_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.corporate_kyc.blank?
+    self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
   end
 
 end

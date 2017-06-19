@@ -818,7 +818,7 @@ Rails.application.routes.draw do
 
   get 'expense_type_configurations', to: 'expense_types_configuration#show', as: :expense_type_configuration_show
   patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update
-  
+
   resources :per_diems
 
   namespace :admin_users do
@@ -830,7 +830,7 @@ Rails.application.routes.draw do
     end
     post 'welcome', to: 'users#admin_welcome', as: :welcome
     post 'users/set_role', to: 'users#set_role', as: :set_role
-    get 'lookup', to: 'users#lookup',as: :lookup
+    get 'lookup', to: 'users#lookup', as: :lookup
     post 'import', to: 'users#import', as: :import
     get 'temp_import', to: 'users#temp_import'
     resources :expenses
@@ -916,7 +916,6 @@ Rails.application.routes.draw do
   # Medical Cards
 
 
-
   post 'cards/medical/process_file' => 'benefits/medical_cards#process_file'
   post 'cards/medical/orders' => 'benefits/medical_cards#create'
   patch 'cards/medical/orders' => 'benefits/medical_cards#update'
@@ -946,6 +945,10 @@ Rails.application.routes.draw do
     post 'reimbursements' => 'reimbursement#create'
   end
 
+  namespace :kyc do
+    get 'company', to: 'company#show'
+    patch 'company', to: 'company#update'
+  end
 
   # Disburse
   post 'disburse/users' => 'disburse/users#create'

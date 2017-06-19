@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170619113431) do
+ActiveRecord::Schema.define(version: 20170619150204) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -589,6 +589,31 @@ ActiveRecord::Schema.define(version: 20170619113431) do
   add_index "company_funds_load_requests", ["amount_id"], name: "index_company_funds_load_requests_on_amount_id", using: :btree
   add_index "company_funds_load_requests", ["company_id"], name: "index_company_funds_load_requests_on_company_id", using: :btree
   add_index "company_funds_load_requests", ["requested_by_user_id"], name: "index_company_funds_load_requests_on_requested_by_user_id", using: :btree
+
+  create_table "company_kycs", force: :cascade do |t|
+    t.string   "pan_card_file_name",            limit: 255
+    t.string   "pan_card_content_type",         limit: 255
+    t.integer  "pan_card_file_size",            limit: 4
+    t.datetime "pan_card_updated_at"
+    t.string   "coi_file_name",                 limit: 255
+    t.string   "coi_content_type",              limit: 255
+    t.integer  "coi_file_size",                 limit: 4
+    t.datetime "coi_updated_at"
+    t.string   "agreement_file_name",           limit: 255
+    t.string   "agreement_content_type",        limit: 255
+    t.integer  "agreement_file_size",           limit: 4
+    t.datetime "agreement_updated_at"
+    t.string   "board_resolution_file_name",    limit: 255
+    t.string   "board_resolution_content_type", limit: 255
+    t.integer  "board_resolution_file_size",    limit: 4
+    t.datetime "board_resolution_updated_at"
+    t.integer  "kyc_status_id",                 limit: 4
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
+    t.integer  "company_id",                    limit: 4,   null: false
+  end
+
+  add_index "company_kycs", ["company_id"], name: "index_company_kycs_on_company_id", using: :btree
 
   create_table "company_tags", force: :cascade do |t|
     t.integer  "company_id", limit: 4,                  null: false
@@ -2315,6 +2340,7 @@ ActiveRecord::Schema.define(version: 20170619113431) do
   add_foreign_key "company_configurations", "contacts"
   add_foreign_key "company_funds_load_requests", "amounts"
   add_foreign_key "company_funds_load_requests", "companies"
+  add_foreign_key "company_kycs", "companies"
   add_foreign_key "company_tags", "companies"
   add_foreign_key "custom_fields", "field_configurations"
   add_foreign_key "distance_expenses", "expenses"

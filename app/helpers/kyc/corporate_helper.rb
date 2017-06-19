@@ -1,2 +1,0 @@
-module Kyc::CorporateHelper
-end
