@@ -1,4 +1,4 @@
-class Integrations::Quickbooks::Configuration::Update < Integrations::Base
+class Integrations::Quickbooks::Configuration::Update < Integrations::Quickbooks::Configuration::Base
 
   attr_accessor :company, :config_params, :qb_config
 
@@ -18,6 +18,10 @@ class Integrations::Quickbooks::Configuration::Update < Integrations::Base
     unless qb_config.update(config_params)
       add_message :error, config.errors.full_messages
     end
+  end
+
+  def post_process
+    add_message :success, "Quickbooks configuration updated"
   end
 
   private

@@ -1,6 +1,9 @@
 # == Route Map
 #
 #                                  Prefix Verb   URI Pattern                                                    Controller#Action
+#       qukickbooks_configurations_create GET    /qukickbooks_configurations/create(.:format)                   qukickbooks_configurations#create
+#       qukickbooks_configurations_update GET    /qukickbooks_configurations/update(.:format)                   qukickbooks_configurations#update
+#         qukickbooks_configurations_show GET    /qukickbooks_configurations/show(.:format)                     qukickbooks_configurations#show
 #                               crono_web        /crono                                                         Crono::Web
 #                  new_admin_user_session GET    /admin_users/sign_in(.:format)                                 admin_users/sessions#new
 #                      admin_user_session POST   /admin_users/sign_in(.:format)                                 admin_users/sessions#create

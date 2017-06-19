@@ -13,6 +13,7 @@
 #  quickbooks_payment_type_id      :integer
 #  reimbursable_account_id         :integer
 #  non_reimbursable_account_id     :integer
+#  company_id                      :integer
 #
 
 # an instance of this class will have to be created for every user trying to sync reports - i.e. ideally the admins

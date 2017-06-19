@@ -1,4 +1,4 @@
-class Integrations::Quickbooks::Configuration::Create < Integrations::Base
+class Integrations::Quickbooks::Configuration::Create < Integrations::Quickbooks::Configuration::Base
 
   attr_accessor :company, :config_params
 

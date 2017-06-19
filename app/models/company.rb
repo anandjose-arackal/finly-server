@@ -37,6 +37,7 @@ class Company < ActiveRecord::Base
   has_many :user_groups
   has_many :user_teams
   has_many :auto_sync_configs
+  has_many :quickbooks_payment_types
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property

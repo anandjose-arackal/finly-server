@@ -3,7 +3,7 @@
 # Table name: quickbooks_categories
 #
 #  id                                :integer          not null, primary key
-#  categories_id                     :integer
+#  category_id                       :integer
 #  quickbooks_category_type          :string(255)
 #  quickbooks_id                     :string(255)
 #  quickbooks_integration_type       :string(255)

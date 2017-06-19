@@ -16,7 +16,6 @@
 
 class QuickbooksPaymentType < ActiveRecord::Base
 
-  has_many :expenses
   belongs_to :company
 
   scope :quickbooks, -> { where(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
