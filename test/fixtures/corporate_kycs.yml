@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  pan_card: 
+  coi: 
+  agreement: 
+  board_resolution: 
+  kyc_status: 
+
+two:
+  pan_card: 
+  coi: 
+  agreement: 
+  board_resolution: 
+  kyc_status: 
