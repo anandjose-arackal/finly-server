@@ -10,7 +10,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::BookMyShow < Receipt::ReceiptE
 
   def amount_data_points
     [
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('table:contains("AMOUNT PAID") tr:contains("AMOUNT PAID")')
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('table table:contains("AMOUNT PAID") tr:contains("AMOUNT PAID")')
     ]
   end
 
