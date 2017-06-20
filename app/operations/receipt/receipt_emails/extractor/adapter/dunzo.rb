@@ -1,4 +1,4 @@
-class Receipt::ReceiptEmails::Extractor::Adapter::GoIbibo < Receipt::ReceiptEmails::Extractor::Adapter::Base
+class Receipt::ReceiptEmails::Extractor::Adapter::Dunzo < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
     ['support@dunzo.in']
@@ -10,7 +10,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::GoIbibo < Receipt::ReceiptEmai
 
   def amount_data_points
     [
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr+ td:contains("You have paid")')
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('td td td:contains("TOTAL")')
     ]
   end
 
