@@ -14,7 +14,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::PaypalOrder < Receipt::Receipt
 
   def amount_data_points
     [
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr tr tr:contains("Total")')
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr tr tr:contains("Total")'),
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr:contains("Amount")')
     ]
   end
 
