@@ -761,6 +761,7 @@
 #              quickbooks_sync_categories POST   /quickbooks/sync_categories(.:format)                          quickbooks#categories
 #           quickbooks_sync_payment_types POST   /quickbooks/sync_payment_types(.:format)                       quickbooks#sync_payment_types
 #                quickbooks_update_config PATCH  /quickbooks/update_config(.:format)                            quickbooks#update
+#                       quickbooks_config GET    /quickbooks/config(.:format)                                   quickbooks#show
 #
 
 #                               crono_web        /crono                                                      Crono::Web
@@ -1889,7 +1890,8 @@ Rails.application.routes.draw do
   post 'quickbooks/sync_categories', to: 'quickbooks#categories', as: :quickbooks_sync_categories
   post 'quickbooks/sync_payment_types', to: 'quickbooks#sync_payment_types', as: :quickbooks_sync_payment_types
   patch 'quickbooks/update_config', to: 'quickbooks#update', as: :quickbooks_update_config
-
+  get 'quickbooks/config', to: 'quickbooks#show', as: :quickbooks_config
+  
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

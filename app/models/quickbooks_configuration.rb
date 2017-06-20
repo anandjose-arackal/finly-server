@@ -7,7 +7,7 @@
 #  user_id                         :integer
 #  auto_import                     :boolean
 #  auto_export                     :boolean
-#  transaction_date_field          :string(255)
+#  transaction_date_field          :integer
 #  created_at                      :datetime         not null
 #  updated_at                      :datetime         not null
 #  quickbooks_payment_type_id      :integer
@@ -25,8 +25,13 @@ class QuickbooksConfiguration < ActiveRecord::Base
   belongs_to :reimbursable_account, class_name: 'QuickbooksPaymentType'
   belongs_to :non_reimbursable_account, class_name: 'QuickbooksPaymentType'
 
+  TRANSACTION_DATE_FIELD_TYPES = {
+      1 => "Start Date",
+      2 => "End Date"
+  }
 
   def quickbooks_expense_date
 
   end
+
 end

@@ -28,5 +28,8 @@ class Integrations::Quickbooks::Authentication::Create < BaseOperation
 
   def post_process
     add_message :success, "You have successfully linked your Quickbooks account with Finly"
+
+    # fetching the payment types for this company and storing it in the database
+    Integrations::Quickbooks::SyncPaymentTypes.(user.company, params, user)
   end
 end
