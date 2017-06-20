@@ -1,25 +1,40 @@
 class Receipt::ReceiptEmails::Extractor::Adapter::Loader
 
   ADAPTERS = [
+      # Travel
       Receipt::ReceiptEmails::Extractor::Adapter::UberIndia,
-      Receipt::ReceiptEmails::Extractor::Adapter::Flipkart,
       Receipt::ReceiptEmails::Extractor::Adapter::OlaCabs,
+
+      # Shopping
+      Receipt::ReceiptEmails::Extractor::Adapter::Flipkart,
       Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia,
+      Receipt::ReceiptEmails::Extractor::Adapter::Chumbak,
+
+      # Food Delivery
       Receipt::ReceiptEmails::Extractor::Adapter::Swiggy,
       Receipt::ReceiptEmails::Extractor::Adapter::ZomatoIndia,
       Receipt::ReceiptEmails::Extractor::Adapter::FreshMenu,
-      Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy,
-      Receipt::ReceiptEmails::Extractor::Adapter::AirtelMobileIndia,
+      Receipt::ReceiptEmails::Extractor::Adapter::FoodPandaIndia,
+
+      # Travel
       Receipt::ReceiptEmails::Extractor::Adapter::MakeMyTrip,
-      Receipt::ReceiptEmails::Extractor::Adapter::Housejoy,
       Receipt::ReceiptEmails::Extractor::Adapter::Irctc,
       Receipt::ReceiptEmails::Extractor::Adapter::GoIbibo,
-      Receipt::ReceiptEmails::Extractor::Adapter::Dunzo,
-      Receipt::ReceiptEmails::Extractor::Adapter::FoodPandaIndia,
       Receipt::ReceiptEmails::Extractor::Adapter::GoAir,
-      Receipt::ReceiptEmails::Extractor::Adapter::Chumbak,
       Receipt::ReceiptEmails::Extractor::Adapter::Redbus,
-      Receipt::ReceiptEmails::Extractor::Adapter::BookMyShow
+
+      # Bills
+      Receipt::ReceiptEmails::Extractor::Adapter::AirtelMobileIndia,
+
+      # Bookings
+      Receipt::ReceiptEmails::Extractor::Adapter::BookMyShow,
+
+      # Services
+      Receipt::ReceiptEmails::Extractor::Adapter::Dunzo,
+      Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy,
+      Receipt::ReceiptEmails::Extractor::Adapter::Housejoy
+
+      # Others
   ]
 
   def self.adapter_for(user, sender, sent_at, subject, html_body)
