@@ -1,4 +1,4 @@
-class Receipt::ReceiptEmails::Extractor::Adapter::OyoRooms < Receipt::ReceiptEmails::Extractor::Adapter::Base
+class Receipt::ReceiptEmails::Extractor::Adapter::PaypalOrder < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
     'service@intl.paypal.com'

@@ -33,7 +33,10 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       # Services
       Receipt::ReceiptEmails::Extractor::Adapter::Dunzo,
       Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy,
-      Receipt::ReceiptEmails::Extractor::Adapter::Housejoy
+      Receipt::ReceiptEmails::Extractor::Adapter::Housejoy,
+
+      # Payment
+      Receipt::ReceiptEmails::Extractor::Adapter::PaypalOrder
 
       # Others
   ]
