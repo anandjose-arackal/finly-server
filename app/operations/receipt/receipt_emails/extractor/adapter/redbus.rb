@@ -10,6 +10,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Redbus < Receipt::ReceiptEmail
 
   def amount_data_points
     [
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('p:contains("Discounted Fare")'),
         Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('p:contains("Total Fare")'),
     ]
   end
