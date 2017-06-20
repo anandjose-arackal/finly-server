@@ -236,6 +236,7 @@ class Admin::Users::Import < Admin::Base
 
     # generating a password for the user
     generated_password = generate_default_password
+    company = Company.find_by(id: row[import_fields[:company_id]])
 
     user_params = { first_name: row[import_fields[:first_name]],
                     last_name: row[import_fields[:last_name]],
@@ -247,7 +248,8 @@ class Admin::Users::Import < Admin::Base
                     team_mapping_attributes: [{default: true, manager: manager,
                                                finance_manager: finance_manager,
                                                approves_to: approves_to,
-                                               approves_finance_to: approves_finance_to
+                                               approves_finance_to: approves_finance_to,
+                                               policy_id: (company.policies.default.first.id rescue nil)
                                               }],
                     profile_attributes: {address_1: row[import_fields[:address_1]],
                                          address_2: row[import_fields[:address_2]],
