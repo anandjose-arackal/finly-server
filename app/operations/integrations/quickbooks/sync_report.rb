@@ -1,4 +1,6 @@
-class SyncReport < Integrations::Base
+# this operation can take a single report id and sync that with quickbooks
+
+class Integrations::Quickbooks::SyncReport < Integrations::Quickbooks::Base
 
   attr_accessor :report, :qb_reports
 
@@ -9,6 +11,7 @@ class SyncReport < Integrations::Base
   end
 
   def init
+    super()
     self.report = params[:report]
     if report.blank?
       user_ids = company.users

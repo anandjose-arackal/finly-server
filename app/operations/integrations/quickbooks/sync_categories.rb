@@ -1,4 +1,4 @@
-class Integrations::Quickbooks::SyncCategories < Integrations::Base
+class Integrations::Quickbooks::SyncCategories < Integrations::Quickbooks::Base
 
   def pre_validate
     if user.blank? && params.blank?

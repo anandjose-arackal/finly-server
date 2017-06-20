@@ -1,4 +1,4 @@
-class Integrations::Quickbooks::SyncPaymentTypes < Integrations::Base
+class Integrations::Quickbooks::SyncPaymentTypes < Integrations::Quickbooks::Base
 
   def pre_validate
     if user.blank? && params.blank?
