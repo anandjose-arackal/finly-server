@@ -1,11 +1,11 @@
 class Receipt::ReceiptEmails::Extractor::Adapter::OyoRooms < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
-    'no-reply@flipkart.com'
+    'noreply@oyorooms.com'
   end
 
   def merchant
-    'Flipkart Pvt Ltd'
+    'OYO Rooms'
   end
 
   def amount_data_points
