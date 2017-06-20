@@ -18,7 +18,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::FoodPandaIndia,
       Receipt::ReceiptEmails::Extractor::Adapter::GoAir,
       Receipt::ReceiptEmails::Extractor::Adapter::Chumbak,
-      Receipt::ReceiptEmails::Extractor::Adapter::Redbus
+      Receipt::ReceiptEmails::Extractor::Adapter::Redbus,
+      Receipt::ReceiptEmails::Extractor::Adapter::BookMyShow
   ]
 
   def self.adapter_for(user, sender, sent_at, subject, html_body)
