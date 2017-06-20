@@ -40,7 +40,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
         return nil
     end
     extract = process_options extract
-    extract&.text[regex].gsub(',', '') rescue nil
+    extract&.text[regex]&.squish&.gsub(',', '') rescue nil
   end
 
   # Allows defining options such as position of array after xpath / css_selector is applied
@@ -50,9 +50,9 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
     # Default css selector is considered at first position unless position is defined
     case self.options[:position]
       when :first, nil
-        return extract.first
+        extract = extract.first
       when :last
-        return extract.last
+        extract = extract.last
     end
 
     extract
