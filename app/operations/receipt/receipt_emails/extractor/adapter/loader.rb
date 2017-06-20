@@ -4,12 +4,13 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       # Travel
       Receipt::ReceiptEmails::Extractor::Adapter::UberIndia,
       Receipt::ReceiptEmails::Extractor::Adapter::OlaCabs,
-      Receipt::ReceiptEmails::Extractor::Adapter::MakeMyTrip,
+      Receipt::ReceiptEmails::Extractor::Adapter::MeruCabs,
       Receipt::ReceiptEmails::Extractor::Adapter::Irctc,
+      Receipt::ReceiptEmails::Extractor::Adapter::Redbus,
+      Receipt::ReceiptEmails::Extractor::Adapter::MakeMyTrip,
       Receipt::ReceiptEmails::Extractor::Adapter::GoIbibo,
       Receipt::ReceiptEmails::Extractor::Adapter::GoAir,
-      Receipt::ReceiptEmails::Extractor::Adapter::Redbus,
-      Receipt::ReceiptEmails::Extractor::Adapter::MeruCabs,
+      Receipt::ReceiptEmails::Extractor::Adapter::IndiGo,
 
       # Shopping
       Receipt::ReceiptEmails::Extractor::Adapter::Flipkart,
