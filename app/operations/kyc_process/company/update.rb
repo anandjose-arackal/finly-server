@@ -2,6 +2,7 @@ class KycProcess::Company::Update < KycProcess::Company::Base
   attr_accessor :kyc_params
 
   def init
+    super
     self.kyc_params = kyc_strong_params
   end
 
