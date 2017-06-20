@@ -15,7 +15,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::Irctc,
       Receipt::ReceiptEmails::Extractor::Adapter::GoIbibo,
       Receipt::ReceiptEmails::Extractor::Adapter::Dunzo,
-      Receipt::ReceiptEmails::Extractor::Adapter::FoodPandaIndia
+      Receipt::ReceiptEmails::Extractor::Adapter::FoodPandaIndia,
+      Receipt::ReceiptEmails::Extractor::Adapter::GoAir
   ]
 
   def self.adapter_for(user, sender, sent_at, subject, html_body)
