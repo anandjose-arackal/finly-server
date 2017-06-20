@@ -4,6 +4,12 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       # Travel
       Receipt::ReceiptEmails::Extractor::Adapter::UberIndia,
       Receipt::ReceiptEmails::Extractor::Adapter::OlaCabs,
+      Receipt::ReceiptEmails::Extractor::Adapter::MakeMyTrip,
+      Receipt::ReceiptEmails::Extractor::Adapter::Irctc,
+      Receipt::ReceiptEmails::Extractor::Adapter::GoIbibo,
+      Receipt::ReceiptEmails::Extractor::Adapter::GoAir,
+      Receipt::ReceiptEmails::Extractor::Adapter::Redbus,
+      Receipt::ReceiptEmails::Extractor::Adapter::MeruCabs,
 
       # Shopping
       Receipt::ReceiptEmails::Extractor::Adapter::Flipkart,
@@ -15,13 +21,6 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::ZomatoIndia,
       Receipt::ReceiptEmails::Extractor::Adapter::FreshMenu,
       Receipt::ReceiptEmails::Extractor::Adapter::FoodPandaIndia,
-
-      # Travel
-      Receipt::ReceiptEmails::Extractor::Adapter::MakeMyTrip,
-      Receipt::ReceiptEmails::Extractor::Adapter::Irctc,
-      Receipt::ReceiptEmails::Extractor::Adapter::GoIbibo,
-      Receipt::ReceiptEmails::Extractor::Adapter::GoAir,
-      Receipt::ReceiptEmails::Extractor::Adapter::Redbus,
 
       # Bills
       Receipt::ReceiptEmails::Extractor::Adapter::AirtelMobileIndia,
