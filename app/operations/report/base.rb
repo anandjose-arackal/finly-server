@@ -113,7 +113,7 @@ class Report::Base < BaseOperation
       dates.each do |date|
         item_expenses = self.expenses.with_date(date)
         if item_expenses.present?
-          item_name = date
+          item_name = DateUtils.date_formatted date
           item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
           date_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
         end
