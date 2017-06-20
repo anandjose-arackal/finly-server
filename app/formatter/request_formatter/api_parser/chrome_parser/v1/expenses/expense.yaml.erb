@@ -18,7 +18,7 @@ expense:
     user_id: <%= user.id %>
     email_id: "<%= params[:receipt_email][:email_id] %>"
     sender: "<%= params[:receipt_email][:sender] %>"
-    subject: "<%= params[:receipt_email][:subject] %>"
+    subject: "<%= YamlUtils.escape_string params[:receipt_email][:subject] %>"
     <% if params[:receipt_email][:timestamp].present? %>
     sent_at: <%= DateTime.parse(params[:receipt_email][:timestamp]) %>
     <% end %>
