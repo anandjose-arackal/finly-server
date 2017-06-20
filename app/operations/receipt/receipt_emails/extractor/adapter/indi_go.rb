@@ -10,7 +10,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::IndiGo < Receipt::ReceiptEmail
 
   def amount_data_points
     [
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('table table:contains("Price Summary") td:contains("Total Fare")', position: :last,
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('table table:contains("Price Summary") tr:contains("Total Fare")', position: :last,
                                                                                 css_selector_regex: Receipt::ReceiptEmails::Extractor::Adapter::Base::REGEX_AMOUNT_WITH_SPACE)
     ]
   end
