@@ -33,6 +33,7 @@ class QuickbooksFinlyIntegrationsCategory
             finly_integrations_category.name = self.name
             finly_integrations_category.company_id = self.company_id
             finly_integrations_category.quickbooks_additional_information = self.quickbooks_additional_information
+            finly_integrations_category.save
           end
         end
       rescue ActiveRecord::RecordNotUnique

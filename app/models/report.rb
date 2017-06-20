@@ -242,9 +242,9 @@ class Report < ActiveRecord::Base
     company_id = self.user.company_id
     qb = QuickbooksConfiguration.find_by(company_id: company_id)
     if reimbursable
-      return qb.reimbursable_account_id
+      return qb.reimbursable_account&.quickbooks_id
     else
-      return qb.non_reimbursable_account_id
+      return qb.non_reimbursable_account&.quickbooks_id
     end
   end
 

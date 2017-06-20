@@ -17,6 +17,8 @@
 class Category < ActiveRecord::Base
   belongs_to :company
 
+  has_one :quickbooks_category
+
   validates :company_id, presence: true
   validates :name, presence: true
 

@@ -47,7 +47,7 @@ module FinlyIntegrations
           if category.nil? || category.quickbooks_category.nil?
             return "Expense doesn't belong to a category. Aborting export of the report."
           end
-          if category.quickbooks_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
+          if category.quickbooks_category.quickbooks_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
             return "All expenses of this report don't belong to Quickbooks. Aborting export of the report."
           end
           line_item = Quickbooks::Model::PurchaseLineItem.new
@@ -67,7 +67,8 @@ module FinlyIntegrations
         initialize_service(purchase_service)
         created_purchase = purchase_service.create(finly_purchase)
         puts "Created Report in Quickbooks!"
-        puts created_purchase
+        # puts created_purchase
+        return true
       end
 
       def accounts(updated_at = nil)

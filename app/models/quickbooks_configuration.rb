@@ -16,13 +16,15 @@
 #  company_id                      :integer
 #
 
-# an instance of this class will have to be created for every user trying to sync reports - i.e. ideally the admins
+# one instance of this will exist for every company
 
 class QuickbooksConfiguration < ActiveRecord::Base
+
   belongs_to :quickbooks_payment_type
   belongs_to :company
   belongs_to :reimbursable_account, class_name: 'QuickbooksPaymentType'
   belongs_to :non_reimbursable_account, class_name: 'QuickbooksPaymentType'
+
 
   def quickbooks_expense_date
 

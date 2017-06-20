@@ -21,12 +21,13 @@ class Integrations::Quickbooks::SyncPaymentTypes < Integrations::Quickbooks::Bas
         cat = QuickbooksPaymentType.create(quickbooks_integration_type: category.quickbooks_integration_type,
                                            quickbooks_id: category.quickbooks_id,
                                            name: category.name,
+                                           company_id: category.company_id,
                                            quickbooks_additional_information: category.quickbooks_additional_information)
       end
     end
   end
 
   def post_process
-    add_message :success, "Categories successfully synced"
+    add_message :success, "Payment types successfully synced"
   end
 end

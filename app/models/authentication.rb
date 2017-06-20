@@ -29,5 +29,5 @@
 class Authentication < ActiveRecord::Base
   belongs_to :user
 
-  scope :quickbooks, -> { where(provider: FinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
+  scope :quickbooks, -> { where(provider: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
 end

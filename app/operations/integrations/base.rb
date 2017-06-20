@@ -6,23 +6,5 @@ class Integrations::Base < BaseOperation
     [:company_admin]
   end
 
-  def initialize(company, params, user)
-    self.company = company
-    self.params = params
-    self.user = user
-  end
-
-  def self.call(company, params)
-    self.new(company, params).run
-  end
-
-  def init
-    # sets up the connection for the sync with quickbooks
-    self.selected_user = User.find_by(id: params[:id])
-    auth = selected_user.authentications.quickbooks.first
-    FinlyIntegrations.adapter = :quickbooks
-    self.adapter = FinlyIntegrations.adapter
-    adapter.setup_connection(auth)
-  end
 
 end

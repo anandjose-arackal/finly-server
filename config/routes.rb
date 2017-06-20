@@ -757,10 +757,10 @@
 #                  export_atm_transaction GET    /export/atm_transaction(.:format)                              export#atm_transactions
 #                                         GET    /auth/:provider/callback(.:format)                             third_party_auth#quickbooks
 #                      testing_quickbooks GET    /testing_quickbooks(.:format)                                  third_party_auth#testing
-#                  quickbooks_sync_report POST   /quickbooks/sync_report(.:format)                              quickbooks/quickbooks#sync_report
-#              quickbooks_sync_categories POST   /quickbooks/sync_categories(.:format)                          quickbooks/quickbooks#categories
-#           quickbooks_sync_payment_types POST   /quickbooks/sync_payment_types(.:format)                       quickbooks/quickbooks#sync_payment_types
-#                quickbooks_update_config PATCH  /quickbooks/update_config(.:format)                            quickbooks/quickbooks#update
+#                  quickbooks_sync_report POST   /quickbooks/sync_report(.:format)                              quickbooks#sync_report
+#              quickbooks_sync_categories POST   /quickbooks/sync_categories(.:format)                          quickbooks#categories
+#           quickbooks_sync_payment_types POST   /quickbooks/sync_payment_types(.:format)                       quickbooks#sync_payment_types
+#                quickbooks_update_config PATCH  /quickbooks/update_config(.:format)                            quickbooks#update
 #
 
 #                               crono_web        /crono                                                      Crono::Web
