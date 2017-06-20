@@ -188,6 +188,14 @@ class Company < ActiveRecord::Base
     !!self.itz_cash_property&.d_code.present?
   end
 
+  def kyc_required?
+    return false unless feature_subscription.itz_cash_d_code_enabled
+    if [KycStatus.id_for(:incomplete), KycStatus.id_for(:error)].include?(company_kyc.kyc_status_id)
+      return true
+    end
+    false
+  end
+
   private
 
   def init_config_present
