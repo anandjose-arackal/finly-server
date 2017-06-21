@@ -85,10 +85,10 @@ class MoneyRequest < ActiveRecord::Base
   scope :filter_user_id, ->(id) { where(user_id: id) }
   scope :filter_request_id, ->(id) { where(id: id) }
   scope :filter_search, ->(value) do
-    user_ids = self.pluck(:id)
-    user_ids = User.with_id(user_ids).where("name like :value OR email like :value", value: "%#{value}%").pluck(:id)
+    # user_ids = self.pluck(:id)
+    # user_ids = User.with_id(user_ids).where("name like :value OR email like :value", value: "%#{value}%").pluck(:id)
     money_requests = arel_table
-    where(money_requests[:name].matches("%#{value}%").or(money_requests[:user_id].in(user_ids)).or(money_requests[:id].eq(value)))
+    where(money_requests[:name].matches("%#{value}%").or(money_requests[:id].eq(value)))
   end
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
