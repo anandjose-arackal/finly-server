@@ -67,6 +67,10 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
 
     self.payment_order_data.each do |item|
       user_email_mob = item[:user]
+      # converting mobile number to a string
+      if user_email_mob.is_a?(Float)
+        user_email_mob = user_email_mob&.to_i&.to_s
+      end
       user = self.user.company.users.find_for_database_authentication(email: user_email_mob)
       amount = item[:amount].to_d rescue nil
 
