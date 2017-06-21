@@ -4,6 +4,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Base < BaseOperation
   # REGEX_AMOUNT = /[1-9]\d*(\.\d+)?/
   REGEX_AMOUNT = /[1-9]\d*((,|\.)\d+)*/
   REGEX_AMOUNT_WITH_SPACE = /[1-9]\d*\s?((,|\.)\s?\d+)*/
+  REGEX_AMOUNT_WITH_RS = /Rs(\.)?(\s)?[1-9]\d*((,|\.)\d+)/
 
   def self.senders
     []

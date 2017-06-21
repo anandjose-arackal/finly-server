@@ -39,12 +39,13 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
       else
         return nil
     end
-    extract = process_options extract
-    extract&.text[regex]&.gsub(' ', '')&.gsub(',', '') rescue nil
+    extract = pre_process_options extract
+    extract = extract&.text[regex]&.gsub(' ', '')&.gsub(',', '') rescue nil
+    extract = post_process_options extract
   end
 
   # Allows defining options such as position of array after xpath / css_selector is applied
-  def process_options(extract)
+  def pre_process_options(extract)
     return extract unless extract.present?
     return unless [Nokogiri::XML::NodeSet].include?(extract.class)
     # Default css selector is considered at first position unless position is defined
@@ -55,6 +56,17 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
         extract = extract.last
     end
 
+    extract
+  end
+
+  def post_process_options(extract)
+    return extract unless extract.present?
+    return extract unless extract.is_a?(String)
+
+    self.options[:strip] = [self.options[:strip]] if not self.options[:strip].nil? and self.options[:strip].is_a?(String)
+    self.options[:strip]&.each do |text|
+      extract = extract.gsub(text, '')
+    end
     extract
   end
 
