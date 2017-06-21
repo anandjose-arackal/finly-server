@@ -24,8 +24,9 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::FreshMenu,
       Receipt::ReceiptEmails::Extractor::Adapter::FoodPandaIndia,
 
-      # Bills
+      # Invoice
       Receipt::ReceiptEmails::Extractor::Adapter::AirtelMobileIndia,
+      Receipt::ReceiptEmails::Extractor::Adapter::BigRock,
 
       # Bookings
       Receipt::ReceiptEmails::Extractor::Adapter::BookMyShow,
