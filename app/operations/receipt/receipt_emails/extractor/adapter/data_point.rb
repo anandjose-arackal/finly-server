@@ -42,6 +42,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
     extract = pre_process_options extract
     extract = extract&.text[regex]&.gsub(' ', '')&.gsub(',', '') rescue nil
     extract = post_process_options extract
+    extract
   end
 
   # Allows defining options such as position of array after xpath / css_selector is applied

@@ -29,7 +29,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Base < BaseOperation
       end
 
       # Check if the known senders are present in the email body
-      if is_keyword_present? html_body, self.senders
+      if is_keyword_present? html_body, senders, mode: :any
         return true
       end
     end
@@ -58,11 +58,19 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Base < BaseOperation
     false
   end
 
-  def self.is_keyword_present?(string, keywords_arr)
+  def self.is_keyword_present?(string, keywords_arr, options = {})
     return false if keywords_arr.blank?
     keywords_arr = [keywords_arr] unless keywords_arr.is_a?(Array)
-    if keywords_arr.all? { |k| string.include? k }
-      return true
+    mode = (options&.dig(:mode) or :all)
+    case mode
+      when :all
+        if keywords_arr.all? { |k| string.include? k }
+          return true
+        end
+      when :any
+        if keywords_arr.any? { |k| string.include? k }
+          return true
+        end
     end
     false
   end
