@@ -1,11 +1,11 @@
-class Receipt::ReceiptEmails::Extractor::Adapter::PayTm < Receipt::ReceiptEmails::Extractor::Adapter::Base
+class Receipt::ReceiptEmails::Extractor::Adapter::PayTM < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
     'alerts@paytm.com'
   end
 
   def merchant
-    'PayTm'
+    'PayTM'
   end
 
   def amount_data_points
