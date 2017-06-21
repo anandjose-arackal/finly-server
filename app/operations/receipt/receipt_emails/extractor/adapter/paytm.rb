@@ -1,7 +1,7 @@
 class Receipt::ReceiptEmails::Extractor::Adapter::Paytm < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
-    'alerts@paytm.com'
+    ['alerts@paytm.com', 'no-reply@paytm.com']
   end
 
   def merchant
