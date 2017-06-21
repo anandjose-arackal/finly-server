@@ -41,8 +41,7 @@ module FinlyIntegrations
         finly_purchase = Quickbooks::Model::Purchase.new
         finly_purchase.account_id = qb_report.payment_type_quickbooks_id(qb_report.reimbursable)
         finly_purchase.payment_type = ( qb_report.reimbursable ? "Cash" : "CreditCard" )
-
-        debugger
+        
         qb_report.expenses.each do |expense|
           category = expense.category
           if category.nil? || category.quickbooks_category.nil?
