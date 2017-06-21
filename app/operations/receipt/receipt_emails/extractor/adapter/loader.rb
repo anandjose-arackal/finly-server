@@ -36,6 +36,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::Dunzo,
       Receipt::ReceiptEmails::Extractor::Adapter::Drivojoy,
       Receipt::ReceiptEmails::Extractor::Adapter::Housejoy,
+      Receipt::ReceiptEmails::Extractor::Adapter::Furlenco,
 
       # Payment
       Receipt::ReceiptEmails::Extractor::Adapter::PaypalOrder,
