@@ -39,9 +39,7 @@ class ImportUtil
         unless j >= row_length
           val = row[j]
         end
-        if val.present? and val.is_a?(String)
-          # val.to_s.sub!('mailto:','')
-        end
+        val = cleanup_email(val)
         map[key] = val
       end
       if options.present? and options[:skip_empty_lines]
@@ -72,12 +70,18 @@ class ImportUtil
 
   end
 
-  def self.cleanup_email(raw_email, character_array = JUNK_CHARACTER_LIST)
-    clean_email = raw_email
-    character_array.each do |character|
-      clean_email = clean_email.sub(character, '')
+  def self.cleanup_email(raw_text, character_array = JUNK_CHARACTER_LIST)
+    if raw_text.blank?
+      return raw_text
     end
-    return clean_email
+    clean_text = raw_text
+    if clean_text.is_a?(Float) || clean_text.is_a?(Integer)
+      clean_text = clean_text&.to_i&.to_s
+    end
+    character_array.each do |character|
+      clean_text = clean_text.sub(character, '')
+    end
+    return clean_text
   end
 
 end
