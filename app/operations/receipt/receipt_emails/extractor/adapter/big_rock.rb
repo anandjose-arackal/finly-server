@@ -10,8 +10,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::BigRock < Receipt::ReceiptEmai
 
   def amount_data_points
     [
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('table table:contains("Invoice Details") tr td'),
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr:contains("INR")')
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('table table:contains("Invoice Details") tr td', position: :last),
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr:contains("INR")',position: :last)
     ]
   end
 
