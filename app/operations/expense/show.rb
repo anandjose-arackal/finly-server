@@ -2,7 +2,7 @@ class Expense::Show < Expense::Base
 
   def pre_validate
     super
-    if params[:expense_id].blank? or params[:id].blank?
+    if params[:expense_id].blank? && params[:id].blank?
       add_message :error, 'Expense not found'
       return
     end
