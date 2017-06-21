@@ -60,7 +60,7 @@ class PerDiemExpense < ActiveRecord::Base
   def custom_field_value_by_name(name)
     self.custom_fields.each do |cf|
       if cf.field_configuration.field_name.casecmp(name) == 0
-        return cf.value.value
+        return cf&.value&.value
       end
     end
   end

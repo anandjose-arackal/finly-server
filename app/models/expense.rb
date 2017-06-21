@@ -149,14 +149,18 @@ class Expense < ActiveRecord::Base
   scope :with_user_id, ->(user_id) { where user_id: user_id }
   # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
   scope :filter_expense_type_id, ->(type_id) do
-    if [1, 2, 3, 4, 5, '1', '2', '3', '4', '5'].include?(type_id)
+    type_id = [type_id] unless type_id.is_a?(Array)
+    diff_arr = (type_id - [1, 2, 3, 4, 5, '1', '2', '3', '4', '5'])
+    diff_arr_cancelled = (type_id - [6, '6'])
+    diff_arr_personal = (type_id - [7, '7'])
+    if diff_arr and diff_arr.size == 0
       where expense_type_id: type_id
-    elsif [6, '6'].include?(type_id)
+    elsif diff_arr_cancelled.size == 0
       ids = pluck(:id)
       card_expenses = CardExpense.with_expense_id(ids)
       cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
       with_id(cancelled_expense_ids)
-    elsif [7, '7'].include?(type_id)
+    elsif diff_arr_personal.size == 0
       personal
     end
   end
