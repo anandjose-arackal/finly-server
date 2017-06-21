@@ -45,7 +45,7 @@ module FinlyIntegrations
         qb_report.expenses.each do |expense|
           category = expense.category
           if category.nil? || category.quickbooks_category.nil?
-            return "Expense doesn't belong to a category. Aborting export of the report."
+            return "Expense doesn't belong to a Quickbooks category. Please update the expenses and try again"
           end
           if category.quickbooks_category.quickbooks_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
             return "All expenses of this report don't belong to Quickbooks. Aborting export of the report."
@@ -53,12 +53,12 @@ module FinlyIntegrations
           line_item = Quickbooks::Model::PurchaseLineItem.new
           line_item.description = "#{expense.merchant_name} - #{expense.note}"
           line_item.amount = expense.amount.value.to_f
-          line_item.detail_type = CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category_type][0]
-          line_item.send(CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category_type][1]) do |detail|
-            if category.quickbooks_category_type == QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0]
-              detail.account_id = category.quickbooks_id
+          line_item.detail_type = CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category.quickbooks_category_type][0]
+          line_item.send(CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category.quickbooks_category_type][1]) do |detail|
+            if category.quickbooks_category.quickbooks_category_type == QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0]
+              detail.account_id = category.quickbooks_category.quickbooks_id
             else
-              detail.item_id = category.quickbooks_id
+              detail.item_id = category.quickbooks_category.quickbooks_id
             end
           end
           finly_purchase.line_items << line_item

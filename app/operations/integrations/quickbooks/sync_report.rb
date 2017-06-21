@@ -49,8 +49,9 @@ class Integrations::Quickbooks::SyncReport < Integrations::Quickbooks::Base
 
   def process
     qb_reports.each do |report|
-      unless adapter.save_report(report)
-        add_message :error, adapter.save_report(report)
+      result = adapter.save_report(report)
+      if result.is_a?(String)
+        add_message :error, result
         return
       end
     end
