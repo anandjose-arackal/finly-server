@@ -1,11 +1,11 @@
 class Receipt::ReceiptEmails::Extractor::Adapter::GoDaddy < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
-    'billing@bigrock.com'
+    'donotreply@godaddy.com'
   end
 
   def merchant
-    'BigRock'
+    'GoDaddy'
   end
 
   def amount_data_points
