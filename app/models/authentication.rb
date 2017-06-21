@@ -30,4 +30,5 @@ class Authentication < ActiveRecord::Base
   belongs_to :user
 
   scope :quickbooks, -> { where(provider: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
+  scope :valid, -> { where('DATE(expires_at) > ?', Date.today) }
 end

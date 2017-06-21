@@ -23,7 +23,7 @@ class QuickbooksPaymentType < ActiveRecord::Base
     where(company_id: id).where(name: "Checking")
   }
 
-  validates :quickbooks_id, uniqueness: { scope: :quickbooks_integration_type, message: "should be unique for a quickbooks integration type" }, if: -> { self.quickbooks_integration_type.present? }
+  # validates :quickbooks_id, uniqueness: { scope: :quickbooks_integration_type, message: "should be unique for a quickbooks integration type" }, if: -> { self.quickbooks_integration_type.present? }
 
   def from_quickbooks?
     quickbooks_integration_type == QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]

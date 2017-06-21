@@ -1,12 +1,5 @@
 class Integrations::Quickbooks::SyncCompanyTags < Integrations::Base
 
-
-  def pre_validate
-    if company.blank? || params.blank?
-      add_message :error, "Invalid parameters, try again"
-    end
-  end
-
   def process
     company_tags = adapter.tags
     # for now these are being stored in the local db as Finly Company tags, so we have to figure out the use cases later

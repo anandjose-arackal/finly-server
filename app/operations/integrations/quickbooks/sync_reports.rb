@@ -3,7 +3,7 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::Base
   attr_accessor :reports, :temp_errors, :qb_reports
 
   def pre_validate
-    if user.blank? || params.blank?
+    if company.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
     end
   end

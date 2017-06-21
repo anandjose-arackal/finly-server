@@ -31,5 +31,8 @@ class Integrations::Quickbooks::Authentication::Create < BaseOperation
 
     # fetching the payment types for this company and storing it in the database
     Integrations::Quickbooks::SyncPaymentTypes.(user.company, params, user)
+
+    # creating a quickbooks configuration account for this particulat company
+    user.company.build_quickbooks_configuration(default_quickbooks_payment_type: "Cash").save
   end
 end

@@ -8,6 +8,16 @@ class Integrations::Quickbooks::Base < Integrations::Base
     [:company_admin]
   end
 
+  def pre_validate
+    if company.blank? || params.blank?
+      add_message :error, "Invalid parameters, please try again"
+    end
+
+    if user.authentications.valid.empty?
+      add_message :error, "You haven't connected to quickbooks yet, please connect your account and try again"
+    end
+  end
+
   def initialize(company, params, user)
     self.company = company
     self.params = params

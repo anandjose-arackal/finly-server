@@ -10,12 +10,6 @@ class CategoriesController < ApplicationController
     else
       respond response: :failure, message: @result.messages[:error]
     end
-    # messages = @result.messages
-    # if @result.success?
-    #   @result = Company::Configuration::Show.(current_user, params)
-    #   @result.messages = messages
-    # end
-    respond
   end
 
   def destroy
@@ -25,22 +19,12 @@ class CategoriesController < ApplicationController
     else
       respond response: :failure, message: @result.messages[:error]
     end
-    # messages = @result.messages
-    # if @result.success?
-    #   @result = Company::Configuration::Show.(current_user, params)
-    #   @result.messages = messages
-    # end
-    # # respond
-    # respond do |format|
-    #   format.js {}
-    # end
   end
 
   def index
     @categories = current_company.categories.active rescue []
-    respond
-    # respond_to do |format|
-    #   format.json {render json: @categories.as_json(:only => [:id, :name])}
-    # end
+    respond_to do |format|
+      format.json {render json: @categories.as_json(:only => [:id, :name])}
+    end
   end
 end

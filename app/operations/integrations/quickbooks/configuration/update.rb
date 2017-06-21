@@ -14,6 +14,12 @@ class Integrations::Quickbooks::Configuration::Update < Integrations::Quickbooks
     self.config_params = quickbooks_configuration_params
   end
 
+  def validate
+    if qb_config.nil?
+      add_message :error, "You have not connected to Quickbooks yet, try again after connecting"
+    end
+  end
+
   def process
     unless qb_config.update(config_params)
       add_message :error, config.errors.full_messages
