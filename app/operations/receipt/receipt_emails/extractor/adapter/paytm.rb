@@ -10,7 +10,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Paytm < Receipt::ReceiptEmails
 
   def amount_data_points
     [
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('div div div div:contains("You have made a payment of', css_selector_regex: Receipt::ReceiptEmails::Extractor::Adapter::Base::REGEX_AMOUNT_WITH_RS, strip: ['Rs', 'Rs.', 'Rs. ']),
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('div div div div:contains("You have made a payment of', css_selector_regex: Receipt::ReceiptEmails::Extractor::Adapter::Base::REGEX_AMOUNT_WITH_RS, strip: ['Rs.', 'Rs']),
         Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('table tr:contains("Amount paid")')
     ]
   end
