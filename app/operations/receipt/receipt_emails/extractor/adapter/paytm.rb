@@ -17,7 +17,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Paytm < Receipt::ReceiptEmails
 
   def amount_value
     # Try extracting amount from subject itself. If not available then look at body
-    val = subject[/Rs(\.)?(\s)?[1-9]\d*((,|\.)\d+)/]
+    val = subject[Receipt::ReceiptEmails::Extractor::Adapter::Base::REGEX_AMOUNT_WITH_RS]
     ['Rs.','Rs',  ',', ' '].each do |text|
       val = val&.gsub(text, '')
     end
