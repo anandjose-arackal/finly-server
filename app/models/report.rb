@@ -239,16 +239,6 @@ class Report < ActiveRecord::Base
     self.accounted
   end
 
-  def payment_type_quickbooks_id(reimbursable)
-    company_id = self.user.company_id
-    qb = QuickbooksConfiguration.find_by(company_id: company_id)
-    if reimbursable
-      return qb.reimbursable_account&.quickbooks_id
-    else
-      return qb.non_reimbursable_account&.quickbooks_id
-    end
-  end
-
   def relative_status_name(user)
     if processing? and controlling_user? user
       return 'Pending Review'

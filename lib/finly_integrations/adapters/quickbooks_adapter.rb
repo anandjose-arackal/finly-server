@@ -39,13 +39,14 @@ module FinlyIntegrations
 
       def save_report(qb_report)
         finly_purchase = Quickbooks::Model::Purchase.new
-        finly_purchase.account_id = qb_report.report.payment_type_quickbooks_id(qb_report.reimbursable)
+        finly_purchase.account_id = qb_report.payment_type_quickbooks_id(qb_report.reimbursable)
         finly_purchase.payment_type = ( qb_report.reimbursable ? "Cash" : "CreditCard" )
 
+        debugger
         qb_report.expenses.each do |expense|
           category = expense.category
           if category.nil? || category.quickbooks_category.nil?
-            return "Expense doesn't belong to a Quickbooks category. Please update the expenses and try again"
+            return "Expense at #{expense.merchant_name} doesn't belong to a Quickbooks category. Please update the expenses and try again"
           end
           if category.quickbooks_category.quickbooks_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
             return "All expenses of this report don't belong to Quickbooks. Aborting export of the report."

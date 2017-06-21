@@ -1,6 +1,6 @@
 class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::Base
 
-  attr_accessor :reports, :temp_errors, :qb_reports
+  attr_accessor :reports, :temp_errors, :reimbursable_qb_report, :non_reimbursable_qb_report
 
   def pre_validate
     if company.blank? || params.blank?
@@ -12,21 +12,27 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::Base
     super()
     user_ids = user.company.users.pluck(:id)
     self.reports = Report.with_user(user_ids).where(id: params[:report_ids])
-    self.temp_errors = []
+    self.reimbursable_qb_report = QuickbooksReportConfig.new(user, true)
+    self.non_reimbursable_qb_report = QuickbooksReportConfig.new(user, false)
   end
 
   def validate
-    # todo - check whether these reports are already synced with quickbooks in the first place
-    # reports.each do |report|
-    #   if report.synced_with_quickbooks
-    #     reports.reject! {|r| r.id == report.id}
-    #   end
-    # end
+    # if any of the reports are already synced with quickbooks, stop the sync and mention their names
+    synced_report_names = []
+    reports.each do |report|
+      if report.synced_with_quickbooks
+        synced_report_names << report.name
+      end
+    end
+    unless synced_report_names.empty?
+      add_message :error, "Some of these reports are already synced with Quickbooks, please uncheck them and try again"
+    end
   end
+
+
 
   def pre_process
     # splitting the reports into two sections for syncing with quickbooks online
-    self.qb_reports = []
     reports.each do |report|
       # if the report is already synced, skip to the next one
       if report.synced_with_quickbooks
@@ -34,33 +40,30 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::Base
       end
       reimbursable_expenses = report.expenses.reimbursable
       if reimbursable_expenses.present?
-        qb_report = QuickbooksReportConfig.new
-        qb_report.report = report
-        qb_report.expenses = reimbursable_expenses
-        qb_report.reimbursable = true
-        qb_reports << qb_report
+        reimbursable_qb_report.expenses += reimbursable_expenses
       end
       non_reimbursable_expenses = report.expenses.non_reimbursable
       if non_reimbursable_expenses.present?
-        qb_report = QuickbooksReportConfig.new
-        qb_report.report = report
-        qb_report.expenses = non_reimbursable_expenses
-        qb_report.reimbursable = false
-        qb_reports << qb_report
+        non_reimbursable_qb_report.expenses += non_reimbursable_expenses
       end
     end
   end
 
   def process
-    qb_reports.each do |qb_report|
-      result = adapter.save_report(qb_report)
-      if result.is_a?(String)
-        temp_errors << {report_id: qb_report.report.id, message: result}
-      end
+    result = adapter.save_report(reimbursable_qb_report)
+    if result.is_a?(String)
+      add_message :error, result
+      return
+    end
+    result = adapter.save_report(non_reimbursable_qb_report)
+    if result.is_a?(String)
+      add_message :error, result
+      return
     end
   end
 
   def post_process
     # find a way to show the individual errors with the respective report names
+    add_message :success, "Reports synced"
   end
 end
