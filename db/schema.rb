@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170608143310) do
+ActiveRecord::Schema.define(version: 20170618084925) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -870,6 +870,15 @@ ActiveRecord::Schema.define(version: 20170608143310) do
 
   add_index "distances", ["physical_unit_id"], name: "index_distances_on_physical_unit_id", using: :btree
 
+  create_table "duplicate_expense_mappings", force: :cascade do |t|
+    t.integer  "expense_id",           limit: 4, null: false
+    t.integer  "duplicate_expense_id", limit: 4, null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "duplicate_expense_mappings", ["expense_id"], name: "index_duplicate_expense_mappings_on_expense_id", using: :btree
+
   create_table "enforce_policies", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
     t.string   "enforceable_type", limit: 255, null: false
@@ -879,6 +888,42 @@ ActiveRecord::Schema.define(version: 20170608143310) do
   end
 
   add_index "enforce_policies", ["enforceable_type", "enforceable_id"], name: "index_enforce_policies_on_enforceable_type_and_enforceable_id", using: :btree
+
+  create_table "expense_data_extract_sources", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "expense_data_extract_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "expense_data_extracts", force: :cascade do |t|
+    t.string   "merchant",                       limit: 255
+    t.string   "reference_id",                   limit: 255
+    t.time     "time"
+    t.integer  "amount_id",                      limit: 4
+    t.integer  "expense_data_extract_source_id", limit: 4,     null: false
+    t.integer  "category_id",                    limit: 4
+    t.integer  "sourcable_id",                   limit: 4
+    t.string   "sourcable_type",                 limit: 255
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.integer  "extractable_id",                 limit: 4,     null: false
+    t.string   "extractable_type",               limit: 255,   null: false
+    t.text     "note",                           limit: 65535
+    t.datetime "datetime"
+    t.integer  "status_id",                      limit: 4,     null: false
+  end
+
+  add_index "expense_data_extracts", ["amount_id"], name: "index_expense_data_extracts_on_amount_id", using: :btree
+  add_index "expense_data_extracts", ["category_id"], name: "index_expense_data_extracts_on_category_id", using: :btree
+  add_index "expense_data_extracts", ["expense_data_extract_source_id"], name: "index_expense_data_extracts_on_expense_data_extract_source_id", using: :btree
+  add_index "expense_data_extracts", ["sourcable_id"], name: "index_expense_data_extracts_on_sourcable_id", using: :btree
+  add_index "expense_data_extracts", ["sourcable_type"], name: "index_expense_data_extracts_on_sourcable_type", using: :btree
 
   create_table "expense_rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -1626,39 +1671,87 @@ ActiveRecord::Schema.define(version: 20170608143310) do
 
   add_index "receipt_email_attachments", ["receipt_email_id"], name: "index_receipt_email_attachments_on_receipt_email_id", using: :btree
 
-  create_table "receipt_emails", force: :cascade do |t|
-    t.text     "subject",                 limit: 65535
+  create_table "receipt_email_parse_failures", force: :cascade do |t|
+    t.integer  "user_id",                      limit: 4
+    t.string   "subject",                      limit: 255
     t.datetime "sent_at"
-    t.integer  "user_id",                 limit: 4
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.string   "body_file_name",          limit: 255
-    t.string   "body_content_type",       limit: 255
-    t.integer  "body_file_size",          limit: 4
+    t.string   "body_file_name",               limit: 255
+    t.string   "body_content_type",            limit: 255
+    t.integer  "body_file_size",               limit: 4
     t.datetime "body_updated_at"
-    t.string   "raw_text_file_name",      limit: 255
-    t.string   "raw_text_content_type",   limit: 255
-    t.integer  "raw_text_file_size",      limit: 4
+    t.string   "raw_text_file_name",           limit: 255
+    t.string   "raw_text_content_type",        limit: 255
+    t.integer  "raw_text_file_size",           limit: 4
     t.datetime "raw_text_updated_at"
-    t.string   "raw_html_file_name",      limit: 255
-    t.string   "raw_html_content_type",   limit: 255
-    t.integer  "raw_html_file_size",      limit: 4
+    t.string   "raw_html_file_name",           limit: 255
+    t.string   "raw_html_content_type",        limit: 255
+    t.integer  "raw_html_file_size",           limit: 4
     t.datetime "raw_html_updated_at"
-    t.string   "raw_header_file_name",    limit: 255
-    t.string   "raw_header_content_type", limit: 255
-    t.integer  "raw_header_file_size",    limit: 4
+    t.string   "raw_header_file_name",         limit: 255
+    t.string   "raw_header_content_type",      limit: 255
+    t.integer  "raw_header_file_size",         limit: 4
     t.datetime "raw_header_updated_at"
-    t.integer  "expense_id",              limit: 4
-    t.string   "email_id",                limit: 255
-    t.string   "sender",                  limit: 255
-    t.string   "source",                  limit: 255
+    t.string   "original_source_file_name",    limit: 255
+    t.string   "original_source_content_type", limit: 255
+    t.integer  "original_source_file_size",    limit: 4
+    t.datetime "original_source_updated_at"
+    t.string   "email_id",                     limit: 255
+    t.string   "sender",                       limit: 255
+    t.boolean  "fixed",                                      default: false
+    t.string   "parsed_merchant",              limit: 255
+    t.string   "parsed_amount_value",          limit: 255
+    t.integer  "parsed_currency_id",           limit: 4
+    t.datetime "parsed_datetime"
+    t.text     "parsed_note",                  limit: 65535
+    t.integer  "parsed_category_id",           limit: 4
+    t.datetime "created_at",                                                 null: false
+    t.datetime "updated_at",                                                 null: false
+    t.string   "source_file_name",             limit: 255
+    t.string   "source_content_type",          limit: 255
+    t.integer  "source_file_size",             limit: 4
+    t.datetime "source_updated_at"
+  end
+
+  add_index "receipt_email_parse_failures", ["parsed_category_id"], name: "index_receipt_email_parse_failures_on_parsed_category_id", using: :btree
+  add_index "receipt_email_parse_failures", ["parsed_currency_id"], name: "index_receipt_email_parse_failures_on_parsed_currency_id", using: :btree
+  add_index "receipt_email_parse_failures", ["user_id"], name: "index_receipt_email_parse_failures_on_user_id", using: :btree
+
+  create_table "receipt_emails", force: :cascade do |t|
+    t.text     "subject",                      limit: 65535
+    t.datetime "sent_at"
+    t.integer  "user_id",                      limit: 4
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+    t.string   "body_file_name",               limit: 255
+    t.string   "body_content_type",            limit: 255
+    t.integer  "body_file_size",               limit: 4
+    t.datetime "body_updated_at"
+    t.string   "raw_text_file_name",           limit: 255
+    t.string   "raw_text_content_type",        limit: 255
+    t.integer  "raw_text_file_size",           limit: 4
+    t.datetime "raw_text_updated_at"
+    t.string   "raw_html_file_name",           limit: 255
+    t.string   "raw_html_content_type",        limit: 255
+    t.integer  "raw_html_file_size",           limit: 4
+    t.datetime "raw_html_updated_at"
+    t.string   "raw_header_file_name",         limit: 255
+    t.string   "raw_header_content_type",      limit: 255
+    t.integer  "raw_header_file_size",         limit: 4
+    t.datetime "raw_header_updated_at"
+    t.integer  "expense_id",                   limit: 4
+    t.string   "email_id",                     limit: 255
+    t.string   "sender",                       limit: 255
+    t.string   "source",                       limit: 255
+    t.string   "original_source_file_name",    limit: 255
+    t.string   "original_source_content_type", limit: 255
+    t.integer  "original_source_file_size",    limit: 4
+    t.datetime "original_source_updated_at"
   end
 
   add_index "receipt_emails", ["expense_id"], name: "index_receipt_emails_on_expense_id", using: :btree
   add_index "receipt_emails", ["user_id"], name: "index_receipt_emails_on_user_id", using: :btree
 
   create_table "receipts", force: :cascade do |t|
-    t.integer  "expense_id",         limit: 4
     t.integer  "user_id",            limit: 4
     t.datetime "created_at",                                       null: false
     t.datetime "updated_at",                                       null: false
@@ -1672,9 +1765,10 @@ ActiveRecord::Schema.define(version: 20170608143310) do
     t.integer  "receipt_email_id",   limit: 4
     t.boolean  "to_be_transcribed",                default: false
     t.boolean  "hard_copy_received",               default: false
+    t.integer  "sourcable_id",       limit: 4
+    t.integer  "sourcable_type",     limit: 4
   end
 
-  add_index "receipts", ["expense_id"], name: "index_receipts_on_expense_id", using: :btree
   add_index "receipts", ["parent_type", "parent_id"], name: "index_receipts_on_parent_type_and_parent_id", using: :btree
   add_index "receipts", ["receipt_email_id"], name: "index_receipts_on_receipt_email_id", using: :btree
   add_index "receipts", ["user_id"], name: "index_receipts_on_user_id", using: :btree
@@ -2185,6 +2279,9 @@ ActiveRecord::Schema.define(version: 20170608143310) do
   add_foreign_key "custom_fields", "field_configurations"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
+  add_foreign_key "expense_data_extracts", "amounts"
+  add_foreign_key "expense_data_extracts", "categories"
+  add_foreign_key "expense_data_extracts", "expense_data_extract_sources"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"
@@ -2239,8 +2336,8 @@ ActiveRecord::Schema.define(version: 20170608143310) do
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
+  add_foreign_key "receipt_email_parse_failures", "users"
   add_foreign_key "receipt_emails", "expenses"
-  add_foreign_key "receipts", "expenses"
   add_foreign_key "receipts", "receipt_emails"
   add_foreign_key "receipts", "users"
   add_foreign_key "report_comments", "expenses"

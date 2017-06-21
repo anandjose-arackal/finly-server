@@ -3,7 +3,6 @@
 # Table name: receipts
 #
 #  id                 :integer          not null, primary key
-#  expense_id         :integer
 #  user_id            :integer
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
@@ -17,14 +16,9 @@
 #  receipt_email_id   :integer
 #  to_be_transcribed  :boolean          default(FALSE)
 #  hard_copy_received :boolean          default(FALSE)
+#  sourcable_id       :integer
+#  sourcable_type     :integer
 #
-
-
-
-
-
-
-
 
 
 
@@ -33,7 +27,9 @@ class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
   belongs_to :receipt_email
+  belongs_to :sourcable, polymorphic: true
 
+  has_many :expense_data_extracts, as: :extractable
   has_many :system_messages, as: :messagable, dependent: :destroy
 
   validates :user_id, presence: true

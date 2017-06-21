@@ -9,11 +9,11 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      messages[:error] << "Parameters or user not found"
+      messages[:error] << 'Parameters or user not found'
       return false
     end
     if params[:expense_id].nil? and params[:id].blank?
-      messages[:error] << "Expense ID missing!"
+      messages[:error] << 'Expense ID missing'
       return false
     end
     amount_value = params[:expense][:amount_attributes][:value].to_d rescue nil
@@ -110,6 +110,8 @@ class Expense::Manual::Update < Expense::Manual::Base
   def post_process
     # add comment in report if expense is added within report
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
+
+    Expense::Manual::Duplicate::ProcessDuplicate.(self.user, expense: self.expense)
 
     # marking the expense as non-transcribed after the first edit
     if expense.transcribed

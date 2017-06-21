@@ -1,9 +1,18 @@
 class Expense::Show < Expense::Base
 
-  def authorize
+  def pre_validate
+    super
+    if params[:expense_id].blank? or params[:id].blank?
+      add_message :error, 'Expense not found'
+      return
+    end
+  end
+
+  def validate
+    super
     if self.expense.blank?
-      messages[:error] << 'Expense not found'
-      raise_unauthorized_exception
+      add_message :error, 'Expense not found'
+      return
     end
   end
 

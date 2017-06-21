@@ -13,13 +13,27 @@ class RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse < RequestFo
       map[:expense][:receipts_attributes][0] = receipt
     end
 
-    if params[:custom_fields].present?
-      if params[:custom_fields].kind_of?(String)
-        map[:custom_fields] = JSON.parse params[:custom_fields]
+    if params&.dig(:expense)&.dig(:custom_fields).present?
+      if params[:expense][:custom_fields].kind_of?(String)
+        map[:custom_fields] = JSON.parse params[:expense][:custom_fields]
       else
-        map[:custom_fields] = params[:custom_fields]
+        map[:custom_fields] = params[:expense][:custom_fields]
       end
     end
+
+    email_body = (params&.dig(:receipt_email)&.dig(:html_body) or params&.dig(:receipt_email)&.dig(:body))
+    if email_body.present? and map&.dig(:expense)&.dig(:receipt_email_attributes).present?
+      email_id = (params&.dig(:receipt_email)&.dig(:email_id) || SecureRandom.hex(6))
+      name = "#{email_id}_raw_html.html}"
+      map[:expense][:receipt_email_attributes][:raw_html] = FakeFileIO.new(name, email_body)
+    end
+
+    # if params[:receipt_email][:attachments].present?
+    #   map[:expense][:receipt_email_attributes][:receipt_email_attachments_attributes] = []
+    #   params[:receipt_email][:attachments].each do |attachment_hash|
+    #     map[:expense][:receipt_email_attributes][:receipt_email_attachments_attributes] << {original_attachment: attachment_hash[:original_attachment]}
+    #   end
+    # end
 
     Formatter.handle_api_nil map
 
