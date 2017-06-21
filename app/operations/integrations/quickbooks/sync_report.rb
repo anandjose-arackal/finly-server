@@ -60,5 +60,7 @@ class Integrations::Quickbooks::SyncReport < Integrations::Quickbooks::Base
   def post_process
     # mark the report as synced with quickbooks so that you don't have to sync it again
     report.update(synced_with_quickbooks: true)
+
+    add_message :success, "Report synced with quickbooks"
   end
 end

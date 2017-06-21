@@ -1887,6 +1887,7 @@ Rails.application.routes.draw do
 
 
   post 'quickbooks/sync_report', to: 'quickbooks#sync_report', as: :quickbooks_sync_report
+  post 'quickbooks/sync_reports', to: 'quickbooks#sync_reports', as: :quickbooks_sync_reports
   post 'quickbooks/sync_categories', to: 'quickbooks#sync_categories', as: :quickbooks_sync_categories
   post 'quickbooks/sync_payment_types', to: 'quickbooks#sync_payment_types', as: :quickbooks_sync_payment_types
   patch 'quickbooks/update_config', to: 'quickbooks#update', as: :quickbooks_update_config

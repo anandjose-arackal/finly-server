@@ -33,6 +33,8 @@ class Integrations::Quickbooks::Authentication::Create < BaseOperation
     Integrations::Quickbooks::SyncPaymentTypes.(user.company, params, user)
 
     # creating a quickbooks configuration account for this particulat company
-    user.company.build_quickbooks_configuration(default_quickbooks_payment_type: "Cash").save
+    if user.company.quickbooks_configuration.nil?
+      user.company.build_quickbooks_configuration(default_quickbooks_payment_type: "Cash").save
+    end
   end
 end

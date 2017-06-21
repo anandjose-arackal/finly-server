@@ -52,7 +52,7 @@ module FinlyIntegrations
           end
           line_item = Quickbooks::Model::PurchaseLineItem.new
           line_item.description = "#{expense.merchant_name} - #{expense.note}"
-          line_item.amount = expense.amount.value.to_f
+          line_item.amount = expense.amount.send(:INR).to_f
           line_item.detail_type = CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category.quickbooks_category_type][0]
           line_item.send(CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category.quickbooks_category_type][1]) do |detail|
             if category.quickbooks_category.quickbooks_category_type == QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0]
