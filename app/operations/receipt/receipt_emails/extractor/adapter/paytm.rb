@@ -1,4 +1,4 @@
-class Receipt::ReceiptEmails::Extractor::Adapter::PayTM < Receipt::ReceiptEmails::Extractor::Adapter::Base
+class Receipt::ReceiptEmails::Extractor::Adapter::Paytm < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
     'alerts@paytm.com'
