@@ -1,0 +1,471 @@
+Delivered-To: vivekagb@gmail.com
+Received: by 10.103.47.15 with SMTP id v15csp547928vsv;
+        Sat, 5 Nov 2016 23:32:51 -0700 (PDT)
+X-Received: by 10.98.147.218 with SMTP id r87mr2417772pfk.108.1478413971248;
+        Sat, 05 Nov 2016 23:32:51 -0700 (PDT)
+Return-Path: <bounces+1348610-e249-vivekagb=gmail.com@mails.flipkart.com>
+Received: from o4.email.flipkart.com (o4.email.flipkart.com. [167.89.21.206])
+        by mx.google.com with ESMTPS id cn3si21305542pad.137.2016.11.05.23.32.50
+        for <vivekagb@gmail.com>
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 05 Nov 2016 23:32:51 -0700 (PDT)
+Received-SPF: pass (google.com: domain of bounces+1348610-e249-vivekagb=gmail.com@mails.flipkart.com designates 167.89.21.206 as permitted sender) client-ip=167.89.21.206;
+Authentication-Results: mx.google.com;
+       dkim=pass header.i=@flipkart.com;
+       dkim=pass header.i=@sendgrid.info;
+       spf=pass (google.com: domain of bounces+1348610-e249-vivekagb=gmail.com@mails.flipkart.com designates 167.89.21.206 as permitted sender) smtp.mailfrom=bounces+1348610-e249-vivekagb=gmail.com@mails.flipkart.com;
+       dmarc=pass (p=NONE dis=NONE) header.from=flipkart.com
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=flipkart.com; 
+	h=content-transfer-encoding:content-type:from:mime-version:subject:to; 
+	s=s1; bh=BGxsSMhOQJ6pC41bWgB6iTRec0I=; b=C6qUc5RoYkaKvekAtDT/BcW
+	mLUpnY5THFzuL4hn1cqBUaN/OR4La5ms7Y1RbjQCmQZMD4yRyH2Hg7L17/baAJx1
+	yiMhOf4yUles2ATW/QZkPDDWeub5q954ssGviAxmqZSsY9FJCfy44SMvAbBP57Q9
+	d92nONxRyiJ6UHaKbOxI=
+DKIM-Signature: v=1; a=rsa-sha1; c=relaxed; d=sendgrid.info; 
+	h=content-transfer-encoding:content-type:from:mime-version:subject:to:x-feedback-id; 
+	s=smtpapi; bh=BGxsSMhOQJ6pC41bWgB6iTRec0I=; b=EMN2aRZyMkQAdUANrg
+	8G/ss+Y9dxI9YzGM8BYPgOB1lnyOsBCVSIINBvG0Okl5y/C9JUUjHFax5MbinYPd
+	gw5BfzA6yknktym24MMyV4GeZNEAY+Za1OV0WTVUCRMI722JI96KTZJd63lKPcVR
+	IyOxDm+6G1ecHmaE/y9e9mBrk=
+Received: by filter0067p1las1.sendgrid.net with SMTP id filter0067p1las1-18672-581ECE91-2F
+        2016-11-06 06:32:49.819251401 +0000 UTC
+Received: from MTM0ODYxMA (m200.flipkart.com [180.179.174.219])
+	by ismtpd0017p1sin1.sendgrid.net (SG) with HTTP id i1_yFtwdQxKghrrI8Ecn6A
+	Sun, 06 Nov 2016 06:32:49.464 +0000 (UTC)
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/html; charset=UTF-8
+Date: Sun, 06 Nov 2016 06:32:49 +0000
+From: "Flipkart.com" <no-reply@flipkart.com>
+Mime-Version: 1.0
+Subject: Order Confirmation - Your Order with Flipkart.com [OD307526919758964000] has been successfully placed!
+To: "Customer" <vivekagb@gmail.com>
+Message-ID: <i1_yFtwdQxKghrrI8Ecn6A@ismtpd0017p1sin1.sendgrid.net>
+X-SG-EID: PEwShHc78JR2oECdspURmt3i6RYqD8rIFJy+s05pxv+Ewn+WPiP3vWzvJOBYAN9BoE3shCRFR7rEQY
+ IXbPXtA8xWIqF7QJjjf5eZvAI8D3zgJ4s1v4rhS3m/HHNmQ+sC196w7YTyEAexJz4vVSPXauZd90pf
+ BhA8PpV+aBLszjA4D46Vlq4W5qh7U8iTvie79rAwlaAEi3w+07V9GtNZA0rUFSSi6vRvTArbG/oEil
+ Y=
+X-SG-ID: mcTyqcYTtmn56LU3ATD1f2pm6WfAql34AThboF2zeJmR5sIKo1eNls2WW+0n0DjFLvssQ9MtQE78IT
+ qruGJjsdViYbF5/4uCYG3abHWJ2rQ2m1nWxEWbQ0h66P36eQ/WjnTu9cQZ+5NePZBqQ7fv/hzwnnTe
+ cTRe24yfTkZAMqI=
+X-Feedback-ID: 1348610:n0tpSwqXOGFo1ntmmTMWeurDdsVZ9aEYEK9vEBIS4Js=:n0tpSwqXOGFo1ntmmTMWeurDdsVZ9aEYEK9vEBIS4Js=:SG
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.=
+w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> <html xmlns=3D"http://www.w3=
+.org/1999/xhtml"> <head> <meta name=3D"viewport" content=3D"width=3Ddevice-=
+width;initial-scale=3D1.0; user-scalable=3D1;" /> <meta http-equiv=3D"Conte=
+nt-Type" content=3D"text/html; charset=3DUTF-8" /> <meta http-equiv=3D"X-UA=
+-Compatible" content=3D"IE=3Dedge" /> <title>Order confirmation from Flipka=
+rt.com</title> <META NAME=3D"ROBOTS" CONTENT=3D"NOINDEX,NOFOLLOW" CONTENT=
+=3D"text/html; charset=3DUTF-8" /> <style type=3D"text/css">=20=20
+ /* Tablets & mobiles */=20=20
+ @media only screen and (max-width: 600px) {=20=20
+ table[class=3D"body-wrapper"], a[class=3D"btn"] {=20=20
+ width: 100% !important;=20=20
+ }=20=20
+ td[class=3D"col"] {=20=20
+ width: 100% !important;=20=20
+ display: block !important;=20=20
+ }=20=20
+ td[class=3D"bottom-border"] {=20=20
+ border-right: none !important;=20=20
+ border-bottom: dashed 1px #b3b3b3 !important;=20=20
+ }=20=20
+ td[class=3D"no-right-border"] {=20=20
+ border-right: none !important;=20=20
+ }=20=20
+ }=20=20
+ /* Desktop */=20=20
+ @media only screen and (min-width: 601px) {=20=20
+ table[class=3D"body-wrapper"] {=20=20
+ width: 600px !important;=20=20
+ }=20=20
+ }=20=20
+</style> </head> <style type=3D"text/css">=20=20
+ /*********************************/=20=20
+ /* Reset CSS styles starts */=20=20
+ /*********************************/=20=20
+ body{ -webkit-font-smoothing:antialiased; -webkit-text-size-adjust:100%; -=
+ms-text-size-adjust:100%; width: 100%; height: 100%; margin:0; padding:0; b=
+ackground-color:#eeeeee;font-family: Arial,Tahoma,Verdana,sans-serif;font-w=
+eight:299px;font-size:13px; }=20=20
+ /* outlook.com / hotmail */=20=20
+ .ExternalClass {=20=20
+ width:100%;=20=20
+ }=20=20
+ .ExternalClass,=20=20
+ .ExternalClass p,=20=20
+ .ExternalClass span,=20=20
+ .ExternalClass font,=20=20
+ .ExternalClass td,=20=20
+ .ExternalClass div {=20=20
+ line-height: 100%;=20=20
+ }=20=20
+ /* outlook 2007 / 2010 / 2013 */=20=20
+ table {=20=20
+ mso-table-lspace:0pt;=20=20
+ mso-table-rspace:0pt;=20=20
+ }=20=20
+ img {=20=20
+ -ms-interpolation-mode:bicubic;=20=20
+ }=20=20
+ /* OSX / iOS / windows mobile */=20=20
+ body {=20=20
+ -webkit-text-size-adjust:100%;=20=20
+ -ms-text-size-adjust:100%;=20=20
+ }=20=20
+ img { border:0px; }=20=20
+ table {border-spacing: 0px;}=20=20
+ body,div,dl,dt,dd,ul,li,h1,h2,h3,h4,h5,h6,pre,form,p,blockquote,th,td { ma=
+rgin:0px;padding:0px; }=20=20
+ a:link { color: #666666;text-decoration:none; }=20=20
+ a:visited { color: #666666;text-decoration:none; }=20=20
+ a:hover { color: #2271B2;text-decoration:underline; }=20=20
+ /*********************************/=20=20
+ /* Email related styles */=20=20
+ /*********************************/=20=20
+ .body-wrapper { margin: 0px auto; }=20=20
+ .btn { background:linear-gradient(to bottom,#007fb8 1%,#6ebad5 3%,#007fb8 =
+7%,#007fb8 100%); }=20=20
+ .header { background-color: #027cd5; }=20=20
+</style> <body style=3D"-webkit-font-smoothing:antialiased; -webkit-text-si=
+ze-adjust:100%; -ms-text-size-adjust:100%; width: 100%; height: 100%; margi=
+n:10px auto; padding:0; background-color:#ffffff;font-family: Arial,Tahoma,=
+Verdana,sans-serif;font-weight:299px;font-size:13px;text-align:center;" bgc=
+olor=3D"#ffffff"> <!-- Wrapper table for outlook 2000 / 2002 / 2003/ 2007 /=
+ 2010 / 2013 and Lotus notes 8 & 8.5 --> <!--[if (gte mso 9)|(IE)]> <table =
+width=3D"600" style=3D"width:600px;" class=3D"body-wrapper" cellspacing=3D"=
+0" align=3D"center" cellpadding=3D"0"> <tr> <td valign=3D"top" align=3D"cen=
+ter"> <![endif]--> <table class=3D"body-wrapper" width=3D"100%" cellspacing=
+=3D"0" cellpadding=3D"0" style=3D"max-width:600px;"> <tr> <td class=3D"head=
+er" width=3D"10" bgcolor=3D"#027cd5" style=3D"width:10px;background-color: =
+#027cd5;">=C2=A0</td> <td class=3D"header" valign=3D"middle" align=3D"left"=
+ height=3D"50" bgcolor=3D"#027cd5" style=3D"background-color: #027cd5;paddi=
+ng:0;margin:0;"> <a style=3D"text-decoration:none;outline:none;color:#fffff=
+f;font-size: 13px;" href=3D"http://www.flipkart.com/ch.php?utm_medium=3Dema=
+il&utm_source=3Dorder&utm_campaign=3Dorder_confirmation&utm_content=3Dclick=
+&u=3De9899825726e469dbcf4f2f0c3160151&cmpid=3Demail_order_order_confirmatio=
+n&l=3D-&url=3Dhttp%3A%2F%2Fdl.flipkart.com%2Fdl%2F" target=3D"_blank"> <img=
+ border=3D"0" height=3D"30" src=3D"http://img6a.flixcart.com/www/promos/new=
+/20150709-142534-flipkart.png" alt=3D"Flipkart.com" style=3D"border:none;">=
+ </a> </td> <td class=3D"header" valign=3D"middle" align=3D"right" height=
+=3D"50" bgcolor=3D"#027cd5" style=3D"background-color: #027cd5;padding:0;ma=
+rgin:0;"> <a style=3D"text-decoration:none;outline:none;color:#ffffff;font-=
+size: 11px;" href=3D"http://www.flipkart.com/ch.php?utm_medium=3Demail&utm_=
+source=3Dorder&utm_campaign=3Dorder_confirmation&utm_content=3Dclick&u=3De9=
+899825726e469dbcf4f2f0c3160151&cmpid=3Demail_order_order_confirmation&l=3D-=
+&url=3Dhttp%3A%2F%2Fdl.flipkart.com%2Fdl%2F%2Fmobile-apps%3Fotracker%3Dcodc=
+onfirm_email_app"> <img border=3D"0" style=3D"vertical-align:middle;" alt=
+=3D"Download APP" height=3D"33" src=3D"http://img5a.flixcart.com/www/promos=
+/new/20150722-131253-download-app.png" />=20=20
+ DOWNLOAD APP=20=20
+</a> </td> <td class=3D"header" width=3D"10" bgcolor=3D"#027cd5" style=3D"w=
+idth:10px;background-color: #027cd5;">=C2=A0</td> </tr> </table> <table cla=
+ss=3D"body-wrapper" width=3D"100%" cellspacing=3D"0" cellpadding=3D"0" styl=
+e=3D"max-width:600px;"> <tr> <td valign=3D"top" align=3D"center" class=3D"c=
+ol" width=3D"300"> <table border=3D"0" cellspacing=3D"0" cellpadding=3D"0" =
+width=3D"100%" bgcolor=3D"#006cb4"> <tr> <td valign=3D"middle" align=3D"rig=
+ht" width=3D"20%" height=3D"35" style=3D"border-bottom:solid 1px #CCC;paddi=
+ng:0;color:#ffffff;"> <a style=3D"text-decoration:none;outline:none;display=
+:block;" href=3D"http://www.flipkart.com/ch.php?utm_medium=3Demail&utm_sour=
+ce=3Dorder&utm_campaign=3Dorder_confirmation&utm_content=3Dclick&u=3De98998=
+25726e469dbcf4f2f0c3160151&cmpid=3Demail_order_order_confirmation&l=3D-&url=
+=3Dhttps%3A%2F%2Fdl.flipkart.com%2Fdl%2Forder_details%3Forder_id%3DOD307526=
+919758964000%26token%3D8a4fa7cdb7f82842a2a649103ac21bd6%26link%3Dcodconfirm=
+_email_track" target=3D"_blank"> <img border=3D"0" src=3D"http://img6a.flix=
+cart.com/www/promos/new/20150716-155048-track.png" alt=3D""> </a> </td> <td=
+ valign=3D"middle" width=3D"30%" align=3D"left" height=3D"35" style=3D"bord=
+er-bottom:solid 1px #CCC;border-right:solid 1px #CCC;padding:0 0 0 5px;"> <=
+a style=3D"text-decoration:none;outline:none;display:block;" href=3D"http:/=
+/www.flipkart.com/ch.php?utm_medium=3Demail&utm_source=3Dorder&utm_campaign=
+=3Dorder_confirmation&utm_content=3Dclick&u=3De9899825726e469dbcf4f2f0c3160=
+151&cmpid=3Demail_order_order_confirmation&l=3D-&url=3Dhttps%3A%2F%2Fdl.fli=
+pkart.com%2Fdl%2Forder_details%3Forder_id%3DOD307526919758964000%26token%3D=
+8a4fa7cdb7f82842a2a649103ac21bd6%26link%3Dcodconfirm_email_track" target=3D=
+"_blank"> <span style=3D"font-size:11px;color:#e1e1e1;line-height:14px;">TR=
+ACK</span><br> <span style=3D"font-size:11px;color:#e1e1e1;line-height:14px=
+;">ORDER</span> </a> </td> <td valign=3D"middle" align=3D"right" width=3D"2=
+0%" height=3D"35" style=3D"border-bottom:solid 1px #CCC;padding:0;color:#ff=
+ffff;"> <a style=3D"text-decoration:none;outline:none;display:block;" href=
+=3D"http://www.flipkart.com/ch.php?utm_medium=3Demail&utm_source=3Dorder&ut=
+m_campaign=3Dorder_confirmation&utm_content=3Dclick&u=3De9899825726e469dbcf=
+4f2f0c3160151&cmpid=3Demail_order_order_confirmation&l=3D-&url=3Dhttps%3A%2=
+F%2Fdl.flipkart.com%2Fdl%2Forder_details%3Forder_id%3DOD307526919758964000%=
+26token%3D8a4fa7cdb7f82842a2a649103ac21bd6%26link%3Dcodconfirm_email_cancel=
+" target=3D"_blank"> <img border=3D"0" src=3D"http://img6a.flixcart.com/www=
+/promos/new/20150716-155048-cancel.png" alt=3D""> </a> </td> <td valign=3D"=
+middle" align=3D"left" width=3D"30%" class=3D"no-right-border" height=3D"35=
+" style=3D"border-bottom:solid 1px #CCC;border-right:solid 1px #CCC;padding=
+:0 0 0 5px;"> <a style=3D"text-decoration:none;outline:none;display:block;"=
+ href=3D"http://www.flipkart.com/ch.php?utm_medium=3Demail&utm_source=3Dord=
+er&utm_campaign=3Dorder_confirmation&utm_content=3Dclick&u=3De9899825726e46=
+9dbcf4f2f0c3160151&cmpid=3Demail_order_order_confirmation&l=3D-&url=3Dhttps=
+%3A%2F%2Fdl.flipkart.com%2Fdl%2Forder_details%3Forder_id%3DOD30752691975896=
+4000%26token%3D8a4fa7cdb7f82842a2a649103ac21bd6%26link%3Dcodconfirm_email_c=
+ancel" target=3D"_blank"> <span style=3D"font-size:11px;color:#e1e1e1;line-=
+height:14px;">CANCEL</span><br> <span style=3D"font-size:11px;color:#e1e1e1=
+;line-height:14px;">ORDER</span> </a> </td> </tr> </table> </td> <td valign=
+=3D"top" align=3D"center" class=3D"col" width=3D"300"> <table border=3D"0" =
+cellspacing=3D"0" cellpadding=3D"0" width=3D"100%" bgcolor=3D"#006cb4"> <tr=
+> <td valign=3D"middle" align=3D"right" width=3D"20%" height=3D"35" style=
+=3D"border-bottom:solid 1px #CCC;padding:0;color:#ffffff;"> <a style=3D"tex=
+t-decoration:none;outline:none;display:block;" href=3D"http://www.flipkart.=
+com/ch.php?utm_medium=3Demail&utm_source=3Dorder&utm_campaign=3Dorder_confi=
+rmation&utm_content=3Dclick&u=3De9899825726e469dbcf4f2f0c3160151&cmpid=3Dem=
+ail_order_order_confirmation&l=3D-&url=3Dhttps%3A%2F%2Fdl.flipkart.com%2Fdl=
+%2Forder_details%3Forder_id%3DOD307526919758964000%26token%3D8a4fa7cdb7f828=
+42a2a649103ac21bd6%26link%3Dcodconfirm_email_return" target=3D"_blank"> <im=
+g border=3D"0" src=3D"http://img5a.flixcart.com/www/promos/new/20150716-155=
+048-return.png" alt=3D""> </a> </td> <td valign=3D"middle" align=3D"left" w=
+idth=3D"30%" height=3D"35" style=3D"border-bottom:solid 1px #CCC;border-rig=
+ht:solid 1px #CCC;padding:0 0 0 5px;"> <a style=3D"text-decoration:none;out=
+line:none;display:block;" href=3D"http://www.flipkart.com/ch.php?utm_medium=
+=3Demail&utm_source=3Dorder&utm_campaign=3Dorder_confirmation&utm_content=
+=3Dclick&u=3De9899825726e469dbcf4f2f0c3160151&cmpid=3Demail_order_order_con=
+firmation&l=3D-&url=3Dhttps%3A%2F%2Fdl.flipkart.com%2Fdl%2Forder_details%3F=
+order_id%3DOD307526919758964000%26token%3D8a4fa7cdb7f82842a2a649103ac21bd6%=
+26link%3Dcodconfirm_email_return" target=3D"_blank"> <span style=3D"font-si=
+ze:11px;color:#e1e1e1;white-space: nowrap;line-height:14px;">FREE & EASY</s=
+pan><br><span style=3D"font-size:11px;color:#e1e1e1;line-height:14px;">RETU=
+RNS</span> </a> </td> <td valign=3D"middle" align=3D"right" width=3D"20%" h=
+eight=3D"35" style=3D"border-bottom:solid 1px #CCC;padding:0;color:#ffffff;=
+"> <a style=3D"text-decoration:none;outline:none;display:block;" href=3D"ht=
+tp://www.flipkart.com/ch.php?utm_medium=3Demail&utm_source=3Dorder&utm_camp=
+aign=3Dorder_confirmation&utm_content=3Dclick&u=3De9899825726e469dbcf4f2f0c=
+3160151&cmpid=3Demail_order_order_confirmation&l=3D-&url=3Dhttp%3A%2F%2Fdl.=
+flipkart.com%2Fdl%2F%2Fs%2Fcontact%3Flink%3Dcodconfirm_email_contact" targe=
+t=3D"_blank"> <img border=3D"0" src=3D"http://img5a.flixcart.com/www/promos=
+/new/20150716-155048-cs.png" alt=3D""> </a> </td> <td valign=3D"middle" ali=
+gn=3D"left" width=3D"30%" height=3D"35" style=3D"border-bottom:solid 1px #C=
+CC;padding:0 0 0 5px;"> <a style=3D"text-decoration:none;outline:none;displ=
+ay:block;" href=3D"http://www.flipkart.com/ch.php?utm_medium=3Demail&utm_so=
+urce=3Dorder&utm_campaign=3Dorder_confirmation&utm_content=3Dclick&u=3De989=
+9825726e469dbcf4f2f0c3160151&cmpid=3Demail_order_order_confirmation&l=3D-&u=
+rl=3Dhttp%3A%2F%2Fdl.flipkart.com%2Fdl%2F%2Fs%2Fcontact%3Faction%3Dorder%26=
+orderid%3DOD307526919758964000%26link%3Dcodconfirm_email_contact" target=3D=
+"_blank"> <span style=3D"font-size:11px;color:#e1e1e1;line-height:14px;">CU=
+STOMER</span><br> <span style=3D"font-size:11px;color:#e1e1e1;line-height:1=
+4px;">SUPPORT</span> </a> </td> </tr> </table> </td> </tr> </table> <!-- =
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D --> <!-- Intro text--> <!-- =3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D --> <table class=3D"body-wrapper" width=3D"100%=
+" cellspacing=3D"0" cellpadding=3D"0" style=3D"max-width:600px;border-left:=
+solid 1px #e6e6e6;border-right:solid 1px #e6e6e6;"> <tr> <td align=3D"left"=
+ valign=3D"top" class=3D"container" style=3D"color:#2c2c2c; display:block; =
+line-height:20px; font-weight:300; margin:0 auto; clear:both;border-bottom:=
+1px solid #E6E6E6;background-color: #F9F9F9;padding:20px" bgcolor=3D"#F9F9F=
+9"> <p style=3D"padding:0;margin:0;font-size:16px;font-weight: bold;font-si=
+ze:13px;"> Hi Customer, </p><br/> <p style=3D"padding:0;margin:0;color: #56=
+5656;font-size:13px;"> Your order has been successfully placed!</p><br/> <p=
+ style=3D"padding:0;margin:0;color: #565656;line-height:22px;font-size:13px=
+;">=20=20
+ Delivery is on track and we will keep you updated as your order is being p=
+acked,shipped and delivered. Meanwhile, you can check the status of your or=
+der on=20=20
+ <a alt=3D"Flipkart.com" style=3D"text-decoration: none;" href=3D"http://ww=
+w.flipkart.com/ch.php?utm_medium=3Demail&utm_source=3Dorder&utm_campaign=3D=
+order_confirmation&utm_content=3Dclick&u=3De9899825726e469dbcf4f2f0c3160151=
+&cmpid=3Demail_order_order_confirmation&l=3D-&url=3Dhttps%3A%2F%2Fdl.flipka=
+rt.com%2Fdl%2Forder_details%3Forder_id%3DOD307526919758964000%26token%3D8a4=
+fa7cdb7f82842a2a649103ac21bd6" target=3D"_blank"><span style=3D"color:#666;=
+font-size:13px;">Flipkart.com</span></a> </p><br/> <p style=3D"text-align:c=
+enter;padding:0;margin:0;" align=3D"center"> <a style=3D"width:200px;margin=
+: 0px auto;background:linear-gradient(to bottom,#007fb8 1%,#6ebad5 3%,#007f=
+b8 7%,#007fb8 100%);background-color:#007fb8;text-align: center;border:#004=
+b91 solid 1px;padding:8px 0;text-decoration:none;border-radius:2px;display:=
+block;color:#fff;font-size:13px;" href=3D"http://www.flipkart.com/ch.php?ut=
+m_medium=3Demail&utm_source=3Dorder&utm_campaign=3Dorder_confirmation&utm_c=
+ontent=3Dclick&u=3De9899825726e469dbcf4f2f0c3160151&cmpid=3Demail_order_ord=
+er_confirmation&l=3D-&url=3Dhttps%3A%2F%2Fdl.flipkart.com%2Fdl%2Forder_deta=
+ils%3Forder_id%3DOD307526919758964000%26token%3D8a4fa7cdb7f82842a2a649103ac=
+21bd6%26link%3Dcodconfirm_email_vieworder" align=3D"center" class=3D"btn" t=
+arget=3D"_blank"> <span style=3D"color:#ffffff;font-size:13px;background-co=
+lor:#007fb8;">TRACK ORDER</span> </a> </p> </td> </tr> </table> <table clas=
+s=3D"body-wrapper" width=3D"100%" cellspacing=3D"0" cellpadding=3D"0" style=
+=3D"max-width:600px;border-left:solid 1px #e6e6e6;border-right:solid 1px #e=
+6e6e6;"> <tbody> <tr> <td align=3D"left" valign=3D"top" style=3D"background=
+-color: #FFFFFF; display:block; margin:0 auto; clear:both;padding:20px 20px=
+ 0 20px;" bgcolor=3D""> <table border=3D"0" cellspacing=3D"0" cellpadding=
+=3D"0" width=3D"100%" style=3D"margin:0"> <tr> <td colspan=3D"4" width=3D"1=
+00%" align=3D"left" valign=3D"top"> <p style=3D"padding:0;margin: 0;color: =
+#565656;line-height:22px;font-size:13px;">=20=20
+ Please find below, the summary of your order <a style=3D"text-decoration: =
+underline;" href=3D"http://www.flipkart.com/ch.php?utm_medium=3Demail&utm_s=
+ource=3Dorder&utm_campaign=3Dorder_confirmation&utm_content=3Dclick&u=3De98=
+99825726e469dbcf4f2f0c3160151&cmpid=3Demail_order_order_confirmation&l=3D-&=
+url=3Dhttps%3A%2F%2Fdl.flipkart.com%2Fdl%2Forder_details%3Forder_id%3DOD307=
+526919758964000%26token%3D8a4fa7cdb7f82842a2a649103ac21bd6%26link%3Dcodconf=
+irm_email_orderid" target=3D"_blank"><span style=3D"color:#565656;font-size=
+:13px;">OD307526919758964000</span></a> </p><br/> </td> </tr> <tr> <td cols=
+pan=3D"4" align=3D"left" valign=3D"top"> <table border=3D"0" cellspacing=3D=
+"0" cellpadding=3D"0" width=3D"100%"> <tbody><tr> <td valign=3D"middle" ali=
+gn=3D"left" rowspan=3D"2" style=3D"white-space: nowrap;padding-right: 5px;f=
+ont-size:13px;">=20=20
+ Seller:=20=20
+  <a style=3D"color:#666;font-size:12px;text-decoration:none;" href=3D"http=
+://www.flipkart.com/ch.php?utm_medium=3Demail&utm_source=3Dorder&utm_campai=
+gn=3Dorder_confirmation&utm_content=3Dclick&u=3De9899825726e469dbcf4f2f0c31=
+60151&cmpid=3Demail_order_order_confirmation&l=3D-&url=3Dhttp%3A%2F%2Fdl.fl=
+ipkart.com%2Fdl%2F%2Fseller%2Fease2shop%2Fc8228b0667ee40d8" target=3D"_blan=
+k"><span style=3D"color:#666;">Ease2shop</span></a>=20=20
+ </td> <td valign=3D"middle" align=3D"left" style=3D"border-bottom: solid 2=
+px #565656;width:90%;">=C2=A0</td> </tr> <tr> <td valign=3D"middle" align=
+=3D"left">=C2=A0</td> </tr> </tbody> </table> </td> </tr> </table> </td> </=
+tr> </tbody> </table>=20=20
+<table class=3D"body-wrapper" width=3D"100%" cellspacing=3D"0" cellpadding=
+=3D"0" style=3D"max-width:600px;border-left:solid 1px #e6e6e6;border-right:=
+solid 1px #e6e6e6;"> <tr> <td valign=3D"top" align=3D"center" class=3D"col"=
+ width=3D"350" style=3D"background-color: #ffffff;"> <table border=3D"0" ce=
+llspacing=3D"0" cellpadding=3D"0" width=3D"100%"> <tr> <td width=3D"40%" st=
+yle=3D"padding-left:20px;;text-align:center" valign=3D"middle" align=3D"cen=
+ter"> <a style=3D"text-decoration:none" href=3D"http://www.flipkart.com/ch.=
+php?utm_medium=3Demail&utm_source=3Dorder&utm_campaign=3Dorder_confirmation=
+&utm_content=3Dclick&u=3De9899825726e469dbcf4f2f0c3160151&cmpid=3Demail_ord=
+er_order_confirmation&l=3D-&url=3Dhttp%3A%2F%2Fdl.flipkart.com%2Fdl%2Fitem%=
+2FWBTE9VGZW9ZYPUKT" target=3D"_blank"> <img border=3D"0" src=3D"http://img.=
+fkcdn.com/image/water-bottle/u/k/t/tupperware-fliptop1litre-100x100-imae9vd=
+6kje3ybkx.jpeg" /> </a> </td> <td width=3D"60%" align=3D"center" valign=3D"=
+top" style=3D"padding:12px 15px 0 10px;margin:0;vertical-align:top;min-widt=
+h:100px;"> <p style=3D"padding:0;margin:0"> <a style=3D"text-decoration:non=
+e;color: #565656;" href=3D"http://www.flipkart.com/ch.php?utm_medium=3Demai=
+l&utm_source=3Dorder&utm_campaign=3Dorder_confirmation&utm_content=3Dclick&=
+u=3De9899825726e469dbcf4f2f0c3160151&cmpid=3Demail_order_order_confirmation=
+&l=3D-&url=3Dhttp%3A%2F%2Fdl.flipkart.com%2Fdl%2Fitem%2FWBTE9VGZW9ZYPUKT" t=
+arget=3D"_blank"> <span style=3D"color: #565656;font-size:13px;">Tupperware=
+ FlipTop Aquasafe Set of 4 1000 ml Water Bottles=C2=A0<sup></sup></span> </=
+a> </p>=20=20
+ </td> </tr> </table> </td> <td valign=3D"top" align=3D"center" class=3D"co=
+l" width=3D"250" style=3D"background-color: #ffffff;"> <table border=3D"0" =
+cellspacing=3D"0" cellpadding=3D"0" width=3D"100%"> <tr> <td width=3D"33%" =
+valign=3D"top" align=3D"center" style=3D"padding:12px 10px 0 10px;margin:0;=
+text-align:center"> <p style=3D"white-space:nowrap;padding:0;margin:0;color=
+:#848484;font-size:12px;">Item Price</p> <p style=3D"white-space:nowrap;mar=
+gin:0;padding:7px 0 0 0;color:#565656;font-size:13px;">=20=20
+ Rs. 950=20=20
+</p> </td> <td width=3D"33%" valign=3D"top" align=3D"center" style=3D"paddi=
+ng:12px 10px 0 10px;margin:0;text-align:center"> <p style=3D"padding:0;marg=
+in:0;color:#848484;font-size:12px;">Qty</p> <p style=3D"padding:7px 0 0 0;m=
+argin:0;color:#565656;font-size:13px;">=20=20
+ 1=20=20
+</p> </td> <td width=3D"33%" valign=3D"top" align=3D"center" style=3D"paddi=
+ng:12px 20px 0 10px;margin:0;text-align:center"> <p style=3D"white-space:no=
+wrap;padding:0;margin:0;color:#848484;font-size:12px;">Subtotal </p> <p sty=
+le=3D"white-space:nowrap;padding:7px 0 0 0;margin:0;color:#565656;font-size=
+:13px;">=20=20
+ Rs. 950=20=20
+</p> </td> </tr> </table> </td> </tr> </table> <table class=3D"body-wrapper=
+" width=3D"100%" cellspacing=3D"0" cellpadding=3D"0" style=3D"max-width:600=
+px;border-left:solid 1px #e6e6e6;border-right:solid 1px #e6e6e6;"> <tr> <td=
+ valign=3D"top" align=3D"center" style=3D"background-color: #ffffff; displa=
+y:block; margin:0 auto; clear:both;padding:5px 20px 0 20px;" bgcolor=3D"#ff=
+f"> <table border=3D"0" cellspacing=3D"0" cellpadding=3D"0" width=3D"100%" =
+style=3D"margin:0"> <tr> <td colspan=3D"4" align=3D"center" valign=3D"top" =
+style=3D"border-bottom:#ccc dashed 1px;padding:0 0 17px 0;">=20=20
+   <p style=3D"margin:10px 0 0 0;padding: 5px;background-color: #f9f9f9;bor=
+der: 1px solid #eee;color:#666;font-size:13px;text-align: center;">=20=20
+ (+) Delivery: Rs. 65=20=20
+ </p>=20=20
+      <p style=3D"padding: 4px 5px;background-color: #FFFED5;border: 1px so=
+lid #f9e2b2;color:#565656;margin: 10px 0 0 0;text-align: center;font-size:1=
+2px;">=20=20
+  will be delivered by Mon 14, Nov 2016=20=20
+  </p>=20=20
+ </td> </tr> </table> </td> </tr> </table>=20=20
+<table class=3D"body-wrapper" width=3D"100%" cellspacing=3D"0" cellpadding=
+=3D"0" style=3D"max-width:600px;border-left:solid 1px #e6e6e6;border-right:=
+solid 1px #e6e6e6;"> <tr> <td class=3D"container" valign=3D"top" align=3D"r=
+ight" bgcolor=3D"" style=3D"clear:both; display:block; margin:0 auto;paddin=
+g: 10px 20px 0 20px;background-color:#ffffff;"> <table cellspacing=3D"0" ce=
+llpadding=3D"0" width=3D"100%"> <tr> <td valign=3D"top" align=3D"right" sty=
+le=3D"border-top: 2px solid #565656;border-bottom:1px solid #E6E6E6;padding=
+: 15px 0;margin:0;background-color: #f9f9f9;">=20=20
+  <p style=3D"padding:0;margin:0;text-align:right;color:#565656;line-height=
+:22px;white-space:nowrap;font-size:21px;">=20=20
+ Total <span style=3D"font-size: 21px;">Rs. 1015</span> </p> </td> </tr> </=
+table> </td> </tr> </table> <table class=3D"body-wrapper" width=3D"100%" ce=
+llspacing=3D"0" cellpadding=3D"0" style=3D"max-width:600px;border-left:soli=
+d 1px #e6e6e6;border-right:solid 1px #e6e6e6;"> <tr> <td class=3D"container=
+" valign=3D"top" align=3D"left" style=3D"background-color: #ffffff; color:#=
+565656; display:block; line-height:20px; font-weight:300; margin:0 auto; cl=
+ear:both; padding:20px 20px 0 20px;" bgcolor=3D"#ffffff"> <p style=3D"line-=
+height:22px;padding: 0 0 20px 0;margin:0;color: #565656;border-bottom:#E6E6=
+E6 solid 1px;font-size:13px;">=20=20
+ Outstanding Amount Payable on Delivery: <strong> Rs. 1015. </strong> </p>=
+=20=20
+  </td> </tr> </table> <table class=3D"body-wrapper" width=3D"100%" cellspa=
+cing=3D"0" cellpadding=3D"0" style=3D"max-width:600px;border-left:solid 1px=
+ #e6e6e6;border-right:solid 1px #e6e6e6;"> <tbody> <tr> <td class=3D"contai=
+ner" valign=3D"top" align=3D"left" style=3D"background-color: #ffffff; colo=
+r: #565656; display:block; font-weight:300; margin:0;padding:0; clear:both;=
+" bgcolor=3D"#ffffff"> <table width=3D"100%" cellspacing=3D"0" cellpadding=
+=3D"0"> <tr> <td valign=3D"top" align=3D"left" style=3D"padding:20px 20px 0=
+ 20px;margin:0;"> <p style=3D"margin:0;padding:0;color: #565656;font-size:1=
+3px;">=20=20
+  DELIVERY ADDRESS=20=20
+ </p> <p style=3D"padding:0;margin: 15px 0 10px 0;font-size:18px;color: #33=
+3333;">=20=20
+ Vivek AG 9986676713=20=20
+</p> <p style=3D"line-height:18px;padding:0;margin: 0;color: #565656;font-s=
+ize:13px;">=20=20
+ Flat no. S-204, Wilson Court Apts,
+No.48 6th Cross, 2nd main, Wilson Garden<br>=20=20
+  Wilson Garden Police Station<br>=20=20
+  Bangalore - 560027<br>=20=20
+ Karnataka=20=20
+ </p> </td> </tr> </table> </td> </tr> </tbody> </table> <table class=3D"bo=
+dy-wrapper" width=3D"100%" cellspacing=3D"0" cellpadding=3D"0" style=3D"max=
+-width:600px;border-left:solid 1px #e6e6e6;border-right:solid 1px #e6e6e6;"=
+> <tbody> <tr> <td valign=3D"top" align=3D"center" style=3D"border-top:#E6E=
+6E6 solid 1px;border-bottom:#E6E6E6 solid 1px;background-color: #F9F9F9; di=
+splay:block; margin:0 auto; clear:both;padding:10px 20px;" bgcolor=3D"">=20=
+=20
+  <img border=3D"0" src=3D"http://img3a.flixcart.com/www/email/images/20140=
+620-115928-email_infographic.jpg" alt=3D"Order Placed - Processing - In-tra=
+nsit - Delivery" width=3D"100%" style=3D"height:auto;background-color:#F6F2=
+E9;border:none;color:#565656;font-size:9px;width:100%;">=20=20
+ </td> </tr> </tbody> </table>=20=20
+<table class=3D"body-wrapper" width=3D"100%" cellspacing=3D"0" cellpadding=
+=3D"0" style=3D"max-width:600px;border-left:solid 1px #e6e6e6;border-right:=
+solid 1px #e6e6e6;"> <tr> <td valign=3D"top" align=3D"center" class=3D"col"=
+ width=3D"300" style=3D"background-color: #f9f9f9;"> <br/> <table width=3D"=
+100%" cellspacing=3D"0" cellpadding=3D"0"> <tr> <td valign=3D"top" align=3D=
+"left" class=3D"bottom-border" style=3D"padding:0 10px 15px 20px;margin:0;b=
+order-right:dashed 1px #b3b3b3;"> <p style=3D"padding: 0;margin: 0 0 7px 0;=
+font-size: 16px;color:#565656;">What Next?</p> <p style=3D"padding: 0;margi=
+n: 0;font-size: 11px;color:#565656;line-height: 20px;">=20=20
+ You will receive an email with your courier Tracking ID & a link to track =
+your order.=20=20
+</p> </td> </tr> </table> </td> <td valign=3D"top" align=3D"center" class=
+=3D"col" width=3D"300" style=3D"background-color: #f9f9f9;"> <br/> <table w=
+idth=3D"100%" cellspacing=3D"0" cellpadding=3D"0"> <tr> <td valign=3D"top" =
+align=3D"left" style=3D"padding:0 10px 15px 20px;margin:0;"> <p style=3D"pa=
+dding: 0;margin: 0 0 7px 0;font-size: 16px;color:#565656;">Any Questions?</=
+p> <p style=3D"padding: 0;margin: 0;font-size: 11px;color:#565656;line-heig=
+ht: 20px;">=20=20
+ Get in touch with our 24x7=20=20
+ Customer Care</span></a>=20=20
+ team.=20=20
+</p> </td> </tr> </table> </td> </tr> </table> <table class=3D"body-wrapper=
+" width=3D"100%" cellspacing=3D"0" cellpadding=3D"0" style=3D"max-width:600=
+px;border:solid 1px #e6e6e6;border-top:none"> <tbody> <tr> <td valign=3D"to=
+p" align=3D"center" style=3D"text-align:center;background-color: #F9F9F9; d=
+isplay:block; margin:0 auto; clear:both;padding:15px 40px;" bgcolor=3D"#F9F=
+9F9"> <p style=3D"padding: 0;margin: 0 0 7px 0;"> <a style=3D"text-decorati=
+on: none;color:#565656;" href=3D"http://www.flipkart.com/ch.php?utm_medium=
+=3Demail&utm_source=3Dorder&utm_campaign=3Dorder_confirmation&utm_content=
+=3Dclick&u=3De9899825726e469dbcf4f2f0c3160151&cmpid=3Demail_order_order_con=
+firmation&l=3D-&url=3Dhttp%3A%2F%2Fdl.flipkart.com%2Fdl%2F" title=3D"Flipka=
+rt.com" target=3D"_blank"><span style=3D"color:#565656;font-size:13px;">Fli=
+pkart.com</span></a> </p> <p style=3D"padding:10px 0 0 0;margin:0;border-to=
+p:solid 1px #CCCCCC;font-size: 11px;color:#565656;">=20=20
+ 24x7 Customer Support=C2=A0 | =C2=A0Buyer Protection=C2=A0 | =C2=A0Flexibl=
+e Payment Options=C2=A0 | =C2=A0Largest Collection=20=20
+</p> </td> </tr> </tbody> </table> <!--[if (gte mso 9)|(IE)]> </td> </tr> <=
+/table> <![endif]--> <img style=3D'width:1px;height:1px;' src=3D"http://www=
+.flipkart.com/ch.php?utm_medium=3Demail&utm_source=3Dorder&utm_campaign=3Do=
+rder_confirmation&utm_content=3Dopen&u=3De9899825726e469dbcf4f2f0c3160151&c=
+mpid=3Demail_order_order_confirmation&l=3DopenImg&url=3Dhttp%3A%2F%2Fimg7a.=
+flixcart.com%2Fwww%2Femail%2Fimages%2F20150520-144253-track.png"/></body> <=
+/html>=20=

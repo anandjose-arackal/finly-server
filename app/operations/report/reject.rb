@@ -82,6 +82,9 @@ class Report::Reject < Report::Base
     # destroying the submitted amount field
     report.submitted_amount.destroy
 
+    # Invalidate all existing Email Authorizations
+    email_auth_invalidate_presenter = EmailAuthorization::Invalidate.(user, authorizable: report)
+
     Event::EReport::Reject.(user, report: report)
     messages[:success] << "Report rejected"
   end

@@ -72,7 +72,8 @@ class User::Show < User::Base
           disabled_by = card.disabled_by_role.name rescue nil
           active = card.active
           name = "#{card.card_program.name} Card"
-          ending_number = card.ending_number
+          # ending_number = card.ending_number
+          proxy = card.proxy
           id = card.id
 
           if not personal_view? and card.card_program.manager_blockable
@@ -101,7 +102,8 @@ class User::Show < User::Base
           end
           self.cards << {card: {show_balance: show_balance,
                                 show_eligibility: show_eligibility,
-                                ending_number: ending_number,
+                                # ending_number: ending_number,
+                                proxy: proxy,
                                 configurable_restrictions: configurable_restrictions,
                                 balance: balance,
                                 eligibility: eligibility,

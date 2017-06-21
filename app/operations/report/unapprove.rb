@@ -78,7 +78,10 @@ class Report::Unapprove < Report::Base
     if prev_status.approved?
       Settlement::Report::Unapproved.(user, report: report)
     end
+    EmailAuthorization::Invalidate.(user, authorizable: report)
+    EmailAuthorization::Create.(user, {authorizable: report})
 
+    # If its sending mail to previous guy, send token again to him, need to pass token todo
     Event::EReport::Unapprove.(self.user, report: report)
     add_message :success, 'Report unapproved'
   end

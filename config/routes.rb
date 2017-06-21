@@ -1520,8 +1520,9 @@ Rails.application.routes.draw do
       post 'auth', to: 'token#create'
       delete 'auth', to: 'token#destroy'
 
-      get 'expenses/configuration', to: 'expenses#configuration'
-      resources :expenses, only: [:create, :show, :update, :destroy]
+      post 'expenses/configuration', to: 'expenses#configuration'
+      resources :expenses, only: [:create, :update, :destroy]
+      post 'emails/:id', to: 'receipt_email#show'
     end
   end
   ######### CHROME END ###########
@@ -1676,14 +1677,15 @@ Rails.application.routes.draw do
     post 'comment' => 'money_request#comment', as: :comment
   end
 
+  delete 'expenses', to: 'expenses#destroy'
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'
     post 'detach_receipt', to: 'expenses#detach_receipt'
     post 'add_receipt', to: 'expenses#add_receipt'
     patch 'mark', to: 'expenses#mark', as: :mark
     patch 'unmark', to: 'expenses#unmark', as: :unmark
+    get 'duplicates', to: 'expenses#duplicates'
   end
-
 
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
 
@@ -1876,6 +1878,13 @@ Rails.application.routes.draw do
     patch 'set_restrictions', to: 'user_teams#set_restrictions'
   end
 
+  namespace :authorizer do 
+    resources :reports do
+      patch 'approve' => 'reports#approve', as: :approve
+      patch 'reject' => 'reports#reject', as: :reject
+    end
+  end
+  
   get 'export/expense', to: 'export#expense'
   get 'export/atm_transaction', to: 'export#atm_transactions'
 
