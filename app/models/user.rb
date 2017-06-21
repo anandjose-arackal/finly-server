@@ -553,7 +553,7 @@ class User < ActiveRecord::Base
 
   def finly_admin?
     jouska_id = Company.find_by(name: "Jouska").id rescue nil
-    if self.company_id == jouska_id || self.company_id == 1
+    if self.company_id == jouska_id
       return true
     else
       return false
