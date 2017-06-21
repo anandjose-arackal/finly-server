@@ -36,7 +36,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::Housejoy,
 
       # Payment
-      Receipt::ReceiptEmails::Extractor::Adapter::PaypalOrder
+      Receipt::ReceiptEmails::Extractor::Adapter::PaypalOrder,
+      Receipt::ReceiptEmails::Extractor::Adapter::PayTm
 
       # Others
   ]
