@@ -11,7 +11,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
+<<<<<<< HEAD
 ActiveRecord::Schema.define(version: 20170618084925) do
+=======
+ActiveRecord::Schema.define(version: 20170613081520) do
+>>>>>>> development
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -378,9 +382,9 @@ ActiveRecord::Schema.define(version: 20170618084925) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
-    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -870,6 +874,7 @@ ActiveRecord::Schema.define(version: 20170618084925) do
 
   add_index "distances", ["physical_unit_id"], name: "index_distances_on_physical_unit_id", using: :btree
 
+<<<<<<< HEAD
   create_table "duplicate_expense_mappings", force: :cascade do |t|
     t.integer  "expense_id",           limit: 4, null: false
     t.integer  "duplicate_expense_id", limit: 4, null: false
@@ -878,6 +883,21 @@ ActiveRecord::Schema.define(version: 20170618084925) do
   end
 
   add_index "duplicate_expense_mappings", ["expense_id"], name: "index_duplicate_expense_mappings_on_expense_id", using: :btree
+=======
+  create_table "email_authorizations", force: :cascade do |t|
+    t.integer "user_id",           limit: 4
+    t.integer "authorizable_id",   limit: 4,                  null: false
+    t.string  "authorizable_type", limit: 255,                null: false
+    t.string  "token",             limit: 255
+    t.boolean "is_valid",                      default: true
+    t.integer "view_role_id",      limit: 4
+  end
+
+  add_index "email_authorizations", ["authorizable_id"], name: "index_email_authorizations_on_authorizable_id", using: :btree
+  add_index "email_authorizations", ["authorizable_type"], name: "index_email_authorizations_on_authorizable_type", using: :btree
+  add_index "email_authorizations", ["token"], name: "index_email_authorizations_on_token", using: :btree
+  add_index "email_authorizations", ["user_id"], name: "index_email_authorizations_on_user_id", using: :btree
+>>>>>>> development
 
   create_table "enforce_policies", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
@@ -2279,9 +2299,13 @@ ActiveRecord::Schema.define(version: 20170618084925) do
   add_foreign_key "custom_fields", "field_configurations"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
+<<<<<<< HEAD
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"
   add_foreign_key "expense_data_extracts", "expense_data_extract_sources"
+=======
+  add_foreign_key "email_authorizations", "users"
+>>>>>>> development
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"

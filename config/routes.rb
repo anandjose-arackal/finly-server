@@ -1842,6 +1842,13 @@ Rails.application.routes.draw do
     patch 'set_restrictions', to: 'user_teams#set_restrictions'
   end
 
+  namespace :authorizer do 
+    resources :reports do
+      patch 'approve' => 'reports#approve', as: :approve
+      patch 'reject' => 'reports#reject', as: :reject
+    end
+  end
+  
   get 'export/expense', to: 'export#expense'
   get 'export/atm_transaction', to: 'export#atm_transactions'
 
