@@ -12,6 +12,12 @@ class Event::EReport::Submit < Event::EReport::Base
     [self.report.user, self.report.reload.controlling_user]
   end
 
+  def get_token(user)
+    email_authorization = params[:email_authorization]
+    token = email_authorization.token
+    token
+  end
+
   def notification_affected_users
     [report.controlling_user]
   end
@@ -57,7 +63,7 @@ class Event::EReport::Submit < Event::EReport::Base
   def report_view_role(user)
     if user.id == report.user_id
       return nil
-    elsif user.id == report.controlling_user_role_id
+    elsif user.id == report.controlling_user_id
       return report.controlling_user_role_id
     end
   end
