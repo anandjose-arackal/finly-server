@@ -5,5 +5,7 @@ else
   json.url "https://staging.itzcash.com/loconav/servlet/AccountReloadServlet"
 end
 # json.encrypted_params @company.configuration.encrypted_easy_login_params
-json.encrypted_params @company.configuration.encrypted_easy_login_params
-json.id @company.id
+json.encrypted_params @company&.configuration.encrypted_easy_login_params
+json.id @company&.id
+
+json.payu_enabled @company&.configuration.encrypted_easy_login_params.present?

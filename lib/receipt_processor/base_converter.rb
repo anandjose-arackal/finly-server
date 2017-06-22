@@ -18,15 +18,15 @@ module ReceiptProcessor
       @image_tmp_path = image_tmp_path
       if pdf?
         @converter = PDFConverter.new
-        # Removing support for MSDoc as receipt
-        # elsif msdoc?
-        #   @converter = MSDocConverter.new
       elsif html?
         @converter = HTMLConverter.new
-      elsif image?
-        @converter = ImageConverter.new
+        # Removing support for MSDoc and Image as receipt
+        # elsif msdoc?
+        #   @converter = MSDocConverter.new
+        # elsif image?
+        #   @converter = ImageConverter.new
       else
-        raise "#{doc_content_type} content type not supported"
+        # raise "#{doc_content_type} content type not supported"
       end
     end
 
@@ -57,5 +57,11 @@ module ReceiptProcessor
     def html?
       HTML_CONTENT_TYPES.include? @content_type
     end
+
+    def self.is_receipt?(content_type)
+      PDF_CONTENT_TYPES.include? content_type
+    end
+
   end
+
 end
