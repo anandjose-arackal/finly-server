@@ -1,1 +1,1 @@
-json.agreements @result.agreements_by_type
+json.array! @result.agreements_by_type
