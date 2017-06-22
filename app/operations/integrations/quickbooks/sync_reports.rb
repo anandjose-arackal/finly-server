@@ -17,6 +17,12 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::Base
   end
 
   def validate
+    # if Quickbooks hasn't been configured yet, throw an error asking them to configure it
+    unless user.company.quickbooks_configuration.present? && user.company.quickbooks_configuration.reimbursable_account_id.present? && user.company.quickbooks_configuration.non_reimbursable_account_id.present?
+      add_message :error, "You have not configured quickbooks yet. Please do so from company account and try again"
+      return
+    end
+
     # if any of the reports are already synced with quickbooks, stop the sync and mention their names
     synced_report_names = []
     reports.each do |report|
@@ -50,12 +56,12 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::Base
   end
 
   def process
-    result = adapter.save_report(reimbursable_qb_report)
+    result = adapter.save_report(reimbursable_qb_report) unless reimbursable_qb_report.expenses.empty?
     if result.is_a?(String)
       add_message :error, result
       return
     end
-    result = adapter.save_report(non_reimbursable_qb_report)
+    result = adapter.save_report(non_reimbursable_qb_report) unless non_reimbursable_qb_report.expenses.empty?
     if result.is_a?(String)
       add_message :error, result
       return

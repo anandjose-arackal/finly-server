@@ -50,6 +50,10 @@ module FinlyIntegrations
           if category.quickbooks_category.quickbooks_integration_type.to_sym != FinlyIntegrationsConstants::ADAPTERS_LIST[0]
             return "All expenses of this report don't belong to Quickbooks. Aborting export of the report."
           end
+          # because inventory items have an associated quantity
+          if category.quickbooks_category.inventory_item?
+            next
+          end
           line_item = Quickbooks::Model::PurchaseLineItem.new
           line_item.description = "#{expense.merchant_name} - #{expense.note}"
           line_item.amount = expense.amount.send(:INR).to_f
@@ -63,6 +67,7 @@ module FinlyIntegrations
           end
           finly_purchase.line_items << line_item
         end
+        debugger
         purchase_service = Quickbooks::Service::Purchase.new
         initialize_service(purchase_service)
         created_purchase = purchase_service.create(finly_purchase)

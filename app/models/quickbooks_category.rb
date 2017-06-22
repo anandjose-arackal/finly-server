@@ -18,4 +18,12 @@ class QuickbooksCategory < ActiveRecord::Base
   belongs_to :category
 
   accepts_nested_attributes_for :category
+
+  # to check if its an inventory item, as inventory items need a quantity associated
+  def inventory_item?
+    data = JSON.parse(self.quickbooks_additional_information)
+    if data['type'] == "Inventory"
+      return true
+    end
+  end
 end

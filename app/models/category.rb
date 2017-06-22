@@ -17,7 +17,7 @@
 class Category < ActiveRecord::Base
   belongs_to :company
 
-  has_one :quickbooks_category
+  has_one :quickbooks_category, dependent: :destroy
 
   validates :company_id, presence: true
   validates :name, presence: true, uniqueness: {scope: :company_id}
