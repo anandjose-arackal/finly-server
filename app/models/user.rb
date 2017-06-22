@@ -115,6 +115,8 @@ class User < ActiveRecord::Base
   has_many :expense_data_extracts, as: :sourcable
   has_many :receipt_email_parse_failures
   has_many :user_login_tracks
+  has_many :login_agreement_mappings
+  has_many :agreements, through: :login_agreement_mappings
 
   has_one :itz_cash_dmt_sender
 
