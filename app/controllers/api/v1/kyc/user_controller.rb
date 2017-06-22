@@ -9,7 +9,8 @@ class Api::V1::Kyc::UserController < ApplicationController
   end
 
   def update
-    @result = KycProcess::User::Update.(current_user, params)
+    formatted_request = RequestFormatter::KycParser::Parse.(current_user, params).formatted_request
+    @result = KycProcess::User::Update.(current_user, formatted_request)
     respond response: @result&.success? ? :success : :failure
   end
 
