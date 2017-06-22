@@ -24,4 +24,8 @@ class Agreement < ActiveRecord::Base
   validates :version, presence: true
   validates :active, presence: true
 
+  scope :without_id, -> (id) { where.not id: id }
+  scope :with_type_id, ->(type_id) { where agreement_type_id: type_id }
+  scope :active, -> { where active: true }
+
 end
