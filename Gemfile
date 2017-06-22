@@ -20,7 +20,7 @@ gem 'rollbar'
 gem 'oj', '~> 2.18.1'
 
 # gem for admin panel
-gem 'activeadmin', '1.0.0.pre5', git: 'https://github.com/activeadmin/activeadmin.git'
+gem 'activeadmin', '1.0.0', git: 'https://github.com/activeadmin/activeadmin.git'
 
 # puma web server
 gem 'figaro', '1.1.1'
@@ -39,7 +39,7 @@ gem 'roo-xls', '1.0.0'
   gem 'annotate', '2.7.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
-gem 'rails', '4.2.6'
+gem 'rails', '4.2.7.1'
 # Use mysql as the database for Active Record
 gem 'mysql2', '0.4.5'
 
@@ -127,7 +127,7 @@ gem 'devise', '4.2.0'
 gem 'devise_invitable', '1.7.0'
 
 gem 'faraday', '0.10.0'
-# gem 'faraday_middleware', '0.11.0.1'
+gem 'faraday_middleware', '0.11.0.1'
 
 gem 'hooks', '0.4.1'
 

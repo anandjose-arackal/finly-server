@@ -59,7 +59,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
   def process
     if illegible
       receipt.update(to_be_transcribed: false)
-      system_message = receipt.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error), content: "Expense wasn't automatically generated because receipt was illegible")
+      system_message = receipt.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error), content: "Expense was not automatically generated because receipt was illegible")
       unless system_message.save
         add_message :error, system_message.errors.full_messages
       end

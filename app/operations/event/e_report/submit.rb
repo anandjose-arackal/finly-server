@@ -12,6 +12,12 @@ class Event::EReport::Submit < Event::EReport::Base
     [self.report.user, self.report.reload.controlling_user]
   end
 
+  def get_token(user)
+    email_authorization = params[:email_authorization]
+    token = email_authorization.token
+    token
+  end
+
   def notification_affected_users
     [report.controlling_user]
   end

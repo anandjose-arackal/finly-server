@@ -48,7 +48,6 @@
 #
 
 
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -63,6 +62,8 @@ class User < ActiveRecord::Base
   attr_reader :raw_invitation_token
 
   belongs_to :company
+  belongs_to :otp_request_type
+
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
@@ -91,6 +92,9 @@ class User < ActiveRecord::Base
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable, dependent: :destroy
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
+  has_one :auto_reload_config, as: :reloadable, dependent: :destroy
+  has_one :itz_cash_dmt_sender
+
   has_many :cards, dependent: :destroy
   has_many :card_transactions, dependent: :destroy
   has_many :money_requests
@@ -104,11 +108,12 @@ class User < ActiveRecord::Base
   has_many :notifications, dependent: :destroy
   has_many :notifier_type_configurations
   has_many :user_balance_histories
-  belongs_to :otp_request_type
   has_many :feedbacks
   has_many :payment_orders, foreign_key: :initiating_user_id
   has_many :user_group_item_mappings
   has_many :user_group_items, through: :user_group_item_mappings
+  has_many :expense_data_extracts, as: :sourcable
+  has_many :receipt_email_parse_failures
   has_many :user_login_tracks
 
   has_one :itz_cash_dmt_sender
@@ -321,6 +326,7 @@ class User < ActiveRecord::Base
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
     self.build_enforce_policy(enabled: false).save
+    self.build_auto_reload_config(enabled: false).save
   end
 
   def payments

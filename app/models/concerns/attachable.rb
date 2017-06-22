@@ -1,0 +1,24 @@
+module Attachable
+  extend ActiveSupport::Concern
+
+  def is_image?(content_type)
+    content_type =~ %r(image)
+  end
+
+  def is_pdf?(content_type)
+    content_type =~ %r{\.(pdf)$}i
+  end
+
+  def check_file_type(file)
+    if file.present? and is_image? file.content_type
+      {
+          :thumb => "500x500>",
+          large: "2160x2160>",
+          normal: "1080x1080>"
+      }
+    else
+      {}
+    end
+  end
+
+end

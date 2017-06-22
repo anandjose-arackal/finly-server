@@ -7,7 +7,7 @@ class Admin::Cards::Unblock < Admin::Cards::Block
   end
 
   def process
-    unblock_presenter = ItzCash::Unblock.(selected_card.user, {card_id: selected_card.id})
+    unblock_presenter = ItzCash::Unblock.(selected_card.user, {card_id: selected_card})
     if unblock_presenter.success?
       selected_card.update(active: true,
                            disabled_by_role_id: nil,

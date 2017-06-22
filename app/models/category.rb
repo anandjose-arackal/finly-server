@@ -14,6 +14,7 @@
 
 
 
+
 class Category < ActiveRecord::Base
   belongs_to :company
 
@@ -28,5 +29,6 @@ class Category < ActiveRecord::Base
   scope :active, -> { where active: true }
   scope :with_id, ->(id) { where id: id }
   scope :with_name, ->(name) { where name: name }
+  scope :others, -> { where name: 'others' }
 
 end

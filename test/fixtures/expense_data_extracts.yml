@@ -1,0 +1,37 @@
+# == Schema Information
+#
+# Table name: expense_data_extracts
+#
+#  id                             :integer          not null, primary key
+#  merchant                       :string(255)
+#  reference_id                   :string(255)
+#  time                           :time
+#  amount_id                      :integer
+#  expense_data_extract_source_id :integer          not null
+#  category_id                    :integer
+#  sourcable_id                   :integer
+#  sourcable_type                 :string(255)
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#  extractable_id                 :integer          not null
+#  extractable_type               :string(255)      not null
+#  note                           :text(65535)
+#  datetime                       :datetime
+#  status_id                      :integer          not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  merchant: MyString
+  reference_id: MyString
+  receipt_id: 
+  timestamp: 2017-06-10 18:00:27
+  amount_id: 
+
+two:
+  merchant: MyString
+  reference_id: MyString
+  receipt_id: 
+  timestamp: 2017-06-10 18:00:27
+  amount_id: 

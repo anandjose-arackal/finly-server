@@ -9,7 +9,7 @@ class ExportController < ApplicationController
     respond_to do |format|
       format.csv {
         @report = Export::Report::AsCsv.(@user, params)
-        send_data @report.data, filename: "#{@report.report_names}"
+        send_data @report.data, filename: "#{@report.report_names}.csv"
       }
       format.xls {
         @report = Export::Report::AsXml.(@user, params)
@@ -23,6 +23,44 @@ class ExportController < ApplicationController
         @include_comments = true
         render pdf: "report-#{@report.name}", layout: "pdf.html.erb", print_media_type: true
       }
+    end
+  end
+
+  def expense
+    respond_to do |format|
+      format.csv {
+        @result = Expense::Export::AsCsv.(@user, params)
+        send_data @result.data, filename: "#{@result.file_name}"
+      }
+      format.xls {
+        @result = Expense::Export::AsXml.(@user, params)
+      }
+      # format.pdf {
+      #   @result = Report::Show.(@user, params)
+      #   @report = @result.report
+      #   @current_user = current_user
+      #   @include_comments = true
+      #   render pdf: "report-#{@report.name}", layout: "pdf.html.erb", print_media_type: true
+      # }
+    end
+  end
+
+  def atm_transactions
+    respond_to do |format|
+      format.csv {
+        @result = Card::Export::Transaction::AsCsv.(@user, params)
+        send_data @result.data, filename: "#{@result.file_name}"
+      }
+      format.xls {
+        @result = Card::Export::Transaction::AsXml.(@user, params)
+      }
+      # format.pdf {
+      #   @result = Report::Show.(@user, params)
+      #   @report = @result.report
+      #   @current_user = current_user
+      #   @include_comments = true
+      #   render pdf: "report-#{@report.name}", layout: "pdf.html.erb", print_media_type: true
+      # }
     end
   end
 
@@ -48,19 +86,16 @@ class ExportController < ApplicationController
   def set_headers
 
     access_token = request.cookies["access_token"]
-    query = "SELECT `id`, `user_id`, `access_token_expires_at` FROM `opro_auth_grants` WHERE `access_token`='" + access_token + "' LIMIT 1"
-    results = ActiveRecord::Base.connection.execute(query)
+    # query = "SELECT `id`, `user_id`, `access_token_expires_at` FROM `opro_auth_grants` WHERE `access_token`='" + access_token + "' LIMIT 1"
+    # results = ActiveRecord::Base.connection.execute(query)
 
-    user_id = nil
-    expires_at = nil
+    auth_grant = Opro::Oauth::AuthGrant.find_by(access_token: access_token)
 
-    if results.count == 1
-      results.each do |row|
-        user_id = row[1]
-        expires_at = row[2]
-      end
+    if auth_grant.present?
+      user_id = auth_grant.user_id
+      expires_at = auth_grant.access_token_expires_at
 
-      if Time.now < expires_at
+      if expires_at and Time.now < expires_at
         # Token is valid
         @user = User.find(user_id)
       else
@@ -69,9 +104,29 @@ class ExportController < ApplicationController
       end
 
     else
-      # NOT AUTHORIZED
       @user = false
     end
+    # user_id = nil
+    # expires_at = nil
+
+    # if results.count == 1
+    #   results.each do |row|
+    #     user_id = row[1]
+    #     expires_at = row[2]
+    #   end
+
+    #   if Time.now < expires_at
+    #     # Token is valid
+    #     @user = User.find(user_id)
+    #   else
+    #     # Token has expired
+    #     @user = false
+    #   end
+
+    # else
+    #   # NOT AUTHORIZED
+    #   @user = false
+    # end
 
     unless @user
       render json: {success: false, message: "Please login."}

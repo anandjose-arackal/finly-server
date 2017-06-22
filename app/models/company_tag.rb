@@ -11,7 +11,6 @@
 #  updated_at :datetime         not null
 #
 
-
 class CompanyTag < ActiveRecord::Base
   belongs_to :company
 end

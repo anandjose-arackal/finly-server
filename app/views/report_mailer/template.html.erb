@@ -22,6 +22,14 @@
               border-radius: 2px;
               text-decoration: none;">View Report</a>
         </div>
+        <% if @data.action_url %>
+          <div style="text-align: center;" style="margin-top: 30px;">
+            <a href="<%=@data.action_url%>" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
+                border-radius: 2px;
+                text-decoration: none;">Approve/Reject Report</a>
+          </div>
+        <% end %>
+
         <br>
         <!-- <h3>Report Total:<span>&#8377;</span></h3> -->
         <% unless @data.event_id == NotifierType.id_for(:report_comment) %>

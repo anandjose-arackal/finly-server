@@ -177,6 +177,10 @@ class Company < ActiveRecord::Base
     self.feature_subscription.reimbursement_card_enabled
   end
 
+  def hard_copy_receipt_enabled?
+    self.feature_subscription.hard_copy_receipt
+  end
+
 
   def balance_amount(date)
     balance_history = self.company_balance_histories.with_date(date).first rescue nil

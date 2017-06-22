@@ -26,21 +26,23 @@
 #
 
 class CompanyKyc < ActiveRecord::Base
+  include Attachable
+
   belongs_to :company
   belongs_to :kyc_status
 
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
 
-  has_attached_file :coi, styles: lambda { |a| a.instance.check_file_type }, default_url: '/assets/:style/missing.png'
+  has_attached_file :coi, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :coi, content_type: CONTENT_TYPES
 
-  has_attached_file :pan_card, styles: lambda { |a| a.instance.check_file_type }, default_url: '/assets/:style/missing.png'
+  has_attached_file :pan_card, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :pan_card, content_type: CONTENT_TYPES
 
-  has_attached_file :agreement, styles: lambda { |a| a.instance.check_file_type }, default_url: '/assets/:style/missing.png'
+  has_attached_file :agreement, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :agreement, content_type: CONTENT_TYPES
 
-  has_attached_file :board_resolution, styles: lambda { |a| a.instance.check_file_type }, default_url: '/assets/:style/missing.png'
+  has_attached_file :board_resolution, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :board_resolution, content_type: CONTENT_TYPES
 
 end

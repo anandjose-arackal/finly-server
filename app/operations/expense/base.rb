@@ -29,17 +29,8 @@ class Expense::Base < BaseOperation
       self.violation = retrieve_violation
       self.editable = retrieve_editable
       self.per_diems = retrieve_per_diems(expense)
-      self.converted = converted?
-      self.conversion_rate = calculate_conversion_rate
-    end
-
-    def converted?
-      if expense.report.present? && expense.amount.present?
-        if expense.report.base_currency_id != expense.amount.currency_id
-          return true
-        end
-      end
-      false
+      self.converted = expense.converted?
+      self.conversion_rate = expense.conversion_rate
     end
 
     def retrieve_per_diems(expense)
@@ -79,7 +70,6 @@ class Expense::Base < BaseOperation
         original_amount = expense.original_amount_value
         return precision_value converted_amount/original_amount
       end
-
     end
 
     def retrieve_editable

@@ -54,7 +54,6 @@ class Expense::Manual::Create < Expense::Manual::Base
 
   def process
     self.expense = user.expenses.build(expense_params)
-
     # Create custom fields only for validations. Fields will be saved later
     validate_custom_fields
     return if has_errors?
@@ -71,6 +70,12 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   def post_process
+    if expense&.receipt_email.present?
+      Receipt::ReceiptEmails::ProcessEmail.call_async(user, receipt_email_id: self.expense.receipt_email.id)
+    end
+
+    Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: self.expense)
+
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?
       comment = self.expense.report.comments.build report: self.expense.report, user: user,
@@ -78,6 +83,11 @@ class Expense::Manual::Create < Expense::Manual::Base
       unless comment.save
         add_message :error, comment.errors.full_messages
       end
+    end
+
+    # checking if the expense has any receipts, and marking them all as no need to be transcribed
+    if expense.receipts.present?
+      expense.receipts.update_all(to_be_transcribed: false)
     end
 
     # calculate the equivalent amount in all currencies in the amounts table

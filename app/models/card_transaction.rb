@@ -56,34 +56,48 @@ class CardTransaction < ActiveRecord::Base
   accepts_nested_attributes_for :card_amount
   accepts_nested_attributes_for :billing_amount
 
-  default_scope {order(transaction_timestamp: :desc)}
+  default_scope { order(transaction_timestamp: :desc) }
 
-  scope :debits, -> {where transaction_type: 'Debit'}
-  scope :credits, -> {where transaction_type: 'Credit'}
+  scope :with_id, -> { where id: id }
+  scope :debits, -> { where transaction_type: 'Debit' }
+  scope :credits, -> { where transaction_type: 'Credit' }
 
-  scope :on_date, -> (date) {where('DATE(transaction_timestamp) = ?', date)}
+  scope :on_date, -> (date) { where('DATE(transaction_timestamp) = ?', date) }
 
-  scope :joins_billing_amount, -> {joins(:billing_amount)}
+  scope :joins_billing_amount, -> { joins(:billing_amount) }
 
   # scope for timestamp range
-  scope :with_transaction_timestamp_range, -> (start_time, end_time) {where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_time, end_time)}
+  scope :with_transaction_timestamp_range, -> (start_time, end_time) { where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_time, end_time) }
 
-  scope :atm_withdrawals, -> {where transaction_mode: "ATM"}
-  scope :pos_expenses, -> {where transaction_mode: "POS"}
-  scope :online_expenses, -> {where('UPPER(transaction_mode) = ?', "ECOM")}
-  scope :expensed_transactions, -> {where('UPPER(transaction_mode) IN (?)', ["POS", "ECOM"])}
+
+  scope :atm_withdrawals, -> { where transaction_mode: "ATM" }
+  scope :with_user, -> (user_id) { where user_id: user_id }
+  scope :pos_expenses, -> { where transaction_mode: "POS" }
+  scope :online_expenses, -> { where('UPPER(transaction_mode) = ?', "ECOM") }
+  scope :expensed_transactions, -> { where('UPPER(transaction_mode) IN (?)', ["POS", "ECOM"]) }
   scope :refunds, -> {
     credits.where.not(cancelled: true).where('UPPER(merchant_name) like ? OR UPPER(merchant_name) like ?', "%Refund%", "%refund%")
   }
 
   # this will include manual refunds from ItzCash as well as transaction cancellations from any merchant or vendor
-  scope :filter_refunds, -> (flag){
+  scope :filter_refunds, -> (flag) {
     if ['1', 1].include?(flag)
       credits.where.not(cancelled: true).where('UPPER(merchant_name) like ? OR UPPER(merchant_name) like ?', "%Refund%", "%refund%")
     else
       # do nothing
     end
   }
+
+  scope :filter_atm_withdrawals, -> (flag) {
+    if ['1', 1].include?(flag)
+      where transaction_mode: "ATM"
+    else
+      # do nothing
+    end
+  }
+
+  scope :with_user, ->(user_ids) { where user_id: user_ids }
+  scope :with_card, ->(card_ids) { where card_id: card_ids }
 
   def credit?
     self.transaction_type == 'Credit'

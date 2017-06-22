@@ -10,7 +10,7 @@ class Kyc::CompanyController < ApplicationController
 
   def update
     @result = KycProcess::Company::Update.(current_user, params)
-    respond
+    respond response: @result&.success? ? :success : :failure
   end
 
 end

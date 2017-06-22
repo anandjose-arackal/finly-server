@@ -15,19 +15,23 @@
 #
 
 
+
 class ReceiptEmailAttachment < ActiveRecord::Base
   PDF_CONTENT_TYPES = ['application/pdf'].freeze
   IMAGE_CONTENT_TYPES = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].freeze
   MSWORD_CONTENT_TYPES = ['application/rtf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].freeze
 
+  has_many :system_messages, as: :messagable
+
   belongs_to :receipt_email
   has_attached_file :original_attachment
 
-  validates_attachment  :original_attachment,
-                        presence: true,
-                        content_type: {
-                            content_type: (IMAGE_CONTENT_TYPES + PDF_CONTENT_TYPES + MSWORD_CONTENT_TYPES)
-                        }
+  validate :original_or_url_presence
+
+  validates_attachment :original_attachment,
+                       content_type: {
+                           content_type: (IMAGE_CONTENT_TYPES + PDF_CONTENT_TYPES + MSWORD_CONTENT_TYPES)
+                       }
 
   scope :pdfs, -> { where(original_attachment_content_type: PDF_CONTENT_TYPES) }
   scope :images, -> { where(original_attachment_content_type: IMAGE_CONTENT_TYPES) }
@@ -44,4 +48,23 @@ class ReceiptEmailAttachment < ActiveRecord::Base
   def msdoc?
     MSWORD_CONTENT_TYPES.include? original_attachment_content_type
   end
+
+  def download_pending?
+    (attachment_url.present? and original_attachment.blank?)
+  end
+
+  protected
+
+  def original_or_url_presence
+    unless !!original_attachment or (attachment_url.present? and attachment_url_file_name.present?)
+      if attachment_url.present? and attachment_url_file_name.blank?
+        errors.add :attachment, 'name cannot be empty'
+      elsif attachment_url.blank? and attachment_url_file_name.present?
+        errors.add :attachment, 'url cannot be empty'
+      else
+        errors.add :attachment, 'cannot be empty'
+      end
+    end
+  end
+
 end

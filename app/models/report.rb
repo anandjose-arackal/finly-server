@@ -38,6 +38,7 @@ class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
 
+  has_many :email_authorizations, as: :authorizable
   belongs_to :user
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
   belongs_to :policy
@@ -120,10 +121,10 @@ class Report < ActiveRecord::Base
   scope :filter_user_id, ->(id) { where(user_id: id) }
   scope :filter_report_id, ->(id) { where(id: id) }
   scope :filter_search, ->(value) do
-    user_ids = self.pluck(:id)
-    user_ids = User.with_id(user_ids).where("name like :value OR email like :value", value: "%#{value}%").pluck(:id)
+    # user_ids = self.pluck(:id)
+    # user_ids = User.with_id(user_ids).where("name like :value OR email like :value", value: "%#{value}%").pluck(:id)
     reports = arel_table
-    where(reports[:name].matches("%#{value}%").or(reports[:user_id].in(user_ids)).or(reports[:id].eq(value)))
+    where(reports[:name].matches("%#{value}%").or(reports[:id].eq(value)))
   end
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
@@ -309,6 +310,10 @@ class Report < ActiveRecord::Base
     date = latest_exp.date if latest_exp.present?
     cash = self.user.cash_in_hand date
     cash.value - report_total < 0
+  end
+
+  def base_currency
+    self.policy.base_currency
   end
 
   def base_currency_id

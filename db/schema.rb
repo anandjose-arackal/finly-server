@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170619171805) do
+ActiveRecord::Schema.define(version: 20170621065009) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -927,6 +927,20 @@ ActiveRecord::Schema.define(version: 20170619171805) do
 
   add_index "duplicate_expense_mappings", ["expense_id"], name: "index_duplicate_expense_mappings_on_expense_id", using: :btree
 
+  create_table "email_authorizations", force: :cascade do |t|
+    t.integer "user_id",           limit: 4
+    t.integer "authorizable_id",   limit: 4,                  null: false
+    t.string  "authorizable_type", limit: 255,                null: false
+    t.string  "token",             limit: 255
+    t.boolean "is_valid",                      default: true
+    t.integer "view_role_id",      limit: 4
+  end
+
+  add_index "email_authorizations", ["authorizable_id"], name: "index_email_authorizations_on_authorizable_id", using: :btree
+  add_index "email_authorizations", ["authorizable_type"], name: "index_email_authorizations_on_authorizable_type", using: :btree
+  add_index "email_authorizations", ["token"], name: "index_email_authorizations_on_token", using: :btree
+  add_index "email_authorizations", ["user_id"], name: "index_email_authorizations_on_user_id", using: :btree
+
   create_table "enforce_policies", force: :cascade do |t|
     t.integer  "enforceable_id",   limit: 4,   null: false
     t.string   "enforceable_type", limit: 255, null: false
@@ -1414,6 +1428,7 @@ ActiveRecord::Schema.define(version: 20170619171805) do
   add_index "money_requests", ["controlling_user_id"], name: "index_money_requests_on_controlling_user_id", using: :btree
   add_index "money_requests", ["controlling_user_role_id"], name: "index_money_requests_on_controlling_user_role_id", using: :btree
   add_index "money_requests", ["loaded_by"], name: "index_money_requests_on_loaded_by", using: :btree
+  add_index "money_requests", ["name"], name: "index_money_requests_on_name", using: :btree
   add_index "money_requests", ["payment_id"], name: "index_money_requests_on_payment_id", using: :btree
   add_index "money_requests", ["payment_mode_id"], name: "index_money_requests_on_payment_mode_id", using: :btree
   add_index "money_requests", ["policy_id"], name: "index_money_requests_on_policy_id", using: :btree
@@ -1928,6 +1943,7 @@ ActiveRecord::Schema.define(version: 20170619171805) do
   add_index "reports", ["controlling_for_user_role_id"], name: "index_reports_on_controlling_for_user_role_id", using: :btree
   add_index "reports", ["controlling_user_id"], name: "index_reports_on_controlling_user_id", using: :btree
   add_index "reports", ["controlling_user_role_id"], name: "index_reports_on_controlling_user_role_id", using: :btree
+  add_index "reports", ["name"], name: "index_reports_on_name", using: :btree
   add_index "reports", ["policy_id"], name: "index_reports_on_policy_id", using: :btree
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree
@@ -2346,6 +2362,7 @@ ActiveRecord::Schema.define(version: 20170619171805) do
   add_foreign_key "custom_fields", "field_configurations"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
+  add_foreign_key "email_authorizations", "users"
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"
   add_foreign_key "expense_data_extracts", "expense_data_extract_sources"

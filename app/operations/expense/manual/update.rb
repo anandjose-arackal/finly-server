@@ -9,11 +9,11 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def pre_validate
     if params.blank? or user.blank?
-      messages[:error] << "Parameters or user not found"
+      messages[:error] << 'Parameters or user not found'
       return false
     end
     if params[:expense_id].nil? and params[:id].blank?
-      messages[:error] << "Expense ID missing!"
+      messages[:error] << 'Expense ID missing'
       return false
     end
     amount_value = params[:expense][:amount_attributes][:value].to_d rescue nil
@@ -111,6 +111,8 @@ class Expense::Manual::Update < Expense::Manual::Base
     # add comment in report if expense is added within report
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
+    Expense::Manual::Duplicate::ProcessDuplicate.(self.user, expense: self.expense)
+
     # marking the expense as non-transcribed after the first edit
     if expense.transcribed
       expense.update(transcribed: false)
@@ -122,11 +124,11 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
     end
 
-    # if the new category is personal, mark the expense as personal
-    if expense.category_name == 'Personal'
-      Expense::Personal::Mark.(user, {expense_id: expense.id})
+    # checking if the expense has any receipts, and marking them all as no need to be transcribed
+    if expense.receipts.present?
+      expense.receipts.update_all(to_be_transcribed: false)
     end
-    ###############################################################
+
 
     if expense.date == DateUtils.local_date
       if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id

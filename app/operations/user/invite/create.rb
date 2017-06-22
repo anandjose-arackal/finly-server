@@ -195,7 +195,7 @@ class User::Invite::Create < User::Invite::Base
   def process
     self.invited_users = []
 
-    # if it's an email invite, use the same olf technique of invitation
+    # if it's an email invite, use the same old technique of invitation
     if email_invite?
       emails.each do |email|
         invite_params[:email] = email
