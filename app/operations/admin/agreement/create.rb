@@ -23,7 +23,7 @@ class Admin::Agreement::Create < Admin::Agreement::Base
   end
 
   def process
-
+    self.agreement.save
   end
 
   protected

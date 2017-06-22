@@ -51,6 +51,10 @@ class Admin::AdminRolePermissions::Show < Admin::AdminRolePermissions::Base
                           {
                               name: "Transcribed Receipts",
                               url: "trascribed_receipts"
+                          },
+                          {
+                              name: 'Agreements',
+                              url: 'company_agreements'
                           }
                       ]
                   }

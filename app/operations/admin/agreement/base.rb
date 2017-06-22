@@ -1,2 +1,2 @@
-class Admin::Agreement::Base < BaseOperation
+class Admin::Agreement::Base < Admin::Base
 end
