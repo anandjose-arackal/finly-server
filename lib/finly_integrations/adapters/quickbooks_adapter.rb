@@ -67,7 +67,6 @@ module FinlyIntegrations
           end
           finly_purchase.line_items << line_item
         end
-        debugger
         purchase_service = Quickbooks::Service::Purchase.new
         initialize_service(purchase_service)
         created_purchase = purchase_service.create(finly_purchase)
