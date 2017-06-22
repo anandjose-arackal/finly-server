@@ -2,6 +2,7 @@ class Admin::Agreement::Create < Admin::Agreement::Base
   attr_accessor :agreement
 
   def pre_validate
+    super
     if params&.dig(:agreement).blank? or params&.dig(:agreement)&.dig(:content).blank?
       add_message :error, 'Agreement cannot be blank'
     end

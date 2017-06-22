@@ -9,7 +9,8 @@ class AdminUsers::AgreementController < ApplicationController
   end
 
   def index
-
+    @result = Admin::Agreement::Index.(current_user, params)
+    respond
   end
 
 end
