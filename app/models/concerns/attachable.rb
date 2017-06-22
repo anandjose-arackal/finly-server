@@ -12,12 +12,25 @@ module Attachable
   def check_file_type(file)
     if file.present? and is_image? file.content_type
       {
-          :thumb => "500x500>",
-          large: "2160x2160>",
-          normal: "1080x1080>"
+          :thumb => '500x500>',
+          large: '2160x2160>',
+          normal: '1080x1080>'
       }
     else
-      {}
+      {
+
+      }
+    end
+  end
+
+  def file_format(file)
+    return nil if file.blank?
+    if file.image_content_type == 'application/pdf'
+      'pdf'
+    elsif ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].include?(self.image_content_type)
+      'image'
+    else
+      'image'
     end
   end
 
