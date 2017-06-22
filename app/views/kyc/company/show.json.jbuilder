@@ -1,4 +1,5 @@
 kyc = @result.company_kyc
+json.editable kyc.editable?
 json.status do
   json.id kyc.kyc_status.id
   json.name kyc.kyc_status.name.humanize
