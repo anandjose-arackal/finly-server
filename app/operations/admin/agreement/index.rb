@@ -18,7 +18,7 @@ class Admin::Agreement::Index < Admin::Agreement::Base
     end
 
     def agreements_by_type
-      agreement_by_type = {}
+      agreement_by_type = []
       AgreementType.all.each do |type|
         agreement = self.agreements.with_type_id(type.id)&.first
         content = nil
@@ -26,7 +26,7 @@ class Admin::Agreement::Index < Admin::Agreement::Base
         if content_path.present?
           content = File.read(content_path)
         end
-        agreement_by_type[type.id] = {
+        agreement_by_type << {
             type: {
                 id: type.id,
                 name: type.name.humanize
