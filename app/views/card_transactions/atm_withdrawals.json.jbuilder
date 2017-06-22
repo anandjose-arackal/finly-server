@@ -9,5 +9,5 @@ json.array!(@result.transactions) do |transaction|
   json.currency_country_code transaction.transaction_amount.currency_country_code
 
   json.amount_value transaction.transaction_amount_value
-  json.card_number "XXXXXXXXXXXX#{transaction.card.ending_number}"
+  json.proxy transaction.card.proxy
 end
