@@ -25,9 +25,9 @@ module Attachable
 
   def file_format(file)
     return nil if file.blank?
-    if file.image_content_type == 'application/pdf'
+    if file.content_type == 'application/pdf'
       'pdf'
-    elsif ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].include?(self.image_content_type)
+    elsif ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].include?(file.content_type)
       'image'
     else
       'image'
