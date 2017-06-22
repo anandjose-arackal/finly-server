@@ -1,15 +1,16 @@
 class QuickbooksController < ApplicationController
 
+  before_action :add_company_to_params
   allow_oauth!
 
   def sync_report
-    @result = Integrations::Quickbooks::SyncReport.(current_company, params, current_user)
-    respond
+    @result = Integrations::Quickbooks::SyncReport.call_async(current_user.id, params)
+    respond response: :success, message: "Report Sync initiated"
   end
 
   def sync_reports
-    @result = Integrations::Quickbooks::SyncReports.(current_company, params, current_user)
-    respond
+    @result = Integrations::Quickbooks::SyncReports.call_async(current_user.id, params)
+    respond response: :success, message: "Reports Sync initiated"
   end
 
   def sync_categories
@@ -37,6 +38,10 @@ class QuickbooksController < ApplicationController
 
   def current_company
     current_user.company
+  end
+
+  def add_company_to_params
+    params[:company_id] = current_user.company_id
   end
 
 end

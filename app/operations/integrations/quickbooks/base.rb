@@ -1,7 +1,7 @@
 require 'finly_integrations/adapters/quickbooks_adapter'
 
 # this will be an async operation because the syncing will happen in the abckground
-class Integrations::Quickbooks::Base < BackgroundOperation
+class Integrations::Quickbooks::Base < BaseOperation
 
   attr_accessor :adapter
 

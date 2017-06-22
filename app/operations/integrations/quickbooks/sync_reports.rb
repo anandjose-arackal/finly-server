@@ -1,9 +1,10 @@
-class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::Base
+class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBase
 
-  attr_accessor :reports, :temp_errors, :qb_reports, :date_type, :quickbooks_configuration
+  attr_accessor :reports, :temp_errors, :qb_reports, :date_type, :quickbooks_configuration, :company
 
   def init
     super()
+    self.company = Company.find_by(id: params[:company_id])
     self.quickbooks_configuration = user.company.quickbooks_configuration
     user_ids = user.company.users.pluck(:id)
     self.reports = Report.with_user(user_ids).where(id: params[:report_ids])
@@ -86,16 +87,31 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::Base
 
   # this should create a successful notification entry saying the reports have been synced
   def success
-
+    view_role = params[:view] == 'admin' ? 1 : 2
+    user.notifications.create(notification_type_id: NotificationType.id_for(:report),
+                                       action_type_id: NotificationActionType.id_for(:notify_quickbooks_sync_success),
+                                       action_user_id: user.id,
+                                       path_object_type: "Reports",
+                                       object_type: "Report",
+                                       read: false,
+                                       timestamp: DateUtils.local_date_time,
+                                       view_role_id: view_role)
+    reports.each do |report|
+      report.update(synced_with_quickbooks: true)
+    end
   end
 
   # this should create a failure notification entry saying the reports have not been synced
   def failure
-
-  end
-
-  def post_process
-    # find a way to show the individual errors with the respective report names
-    add_message :success, "Reports synced"
+    view_role = params[:view] == 'admin' ? 1 : 2
+    user.notifications.create(notification_type_id: NotificationType.id_for(:report),
+                                       action_type_id: NotificationActionType.id_for(:notify_quickbooks_sync_failure),
+                                       action_user_id: user.id,
+                                       path_object_type: "Reports",
+                                       object_type: "Report",
+                                       read: false,
+                                       timestamp: DateUtils.local_date_time,
+                                       view_role_id: view_role,
+                                       message: messages[:error].to_sentence)
   end
 end
