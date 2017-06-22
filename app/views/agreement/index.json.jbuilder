@@ -1,0 +1,1 @@
+json.agreements @result.agreements_by_type

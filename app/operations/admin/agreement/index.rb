@@ -2,7 +2,7 @@ class Admin::Agreement::Index < Admin::Agreement::Base
   attr_accessor :agreements
 
   def init
-    self.agreements = Agreement.all.active
+    self.agreements = ::Agreement.all.active
   end
 
   def success
