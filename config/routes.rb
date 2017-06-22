@@ -1836,6 +1836,9 @@ Rails.application.routes.draw do
   namespace :kyc do
     get 'company', to: 'company#show'
     patch 'company', to: 'company#update'
+
+    get 'users/:id', to: 'user#show'
+    patch 'users/:id', to: 'user#update'
   end
 
   # Disburse

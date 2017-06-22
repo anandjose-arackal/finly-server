@@ -1,8 +1,16 @@
 class KycProcess::User::Update < KycProcess::User::Base
-  attr_accessor :kyc_params
+  attr_accessor :kyc_params, :update_user
+
+  def pre_validate
+    if user.blank? or params&.dig(:id).blank?
+      add_message :error, 'User not found'
+    end
+  end
 
   def init
-    super
+    self.update_user = User::Show.(user, params)&.selected_user
+    return if self.update_user.blank?
+    self.individual_kyc = self.update_user.individual_kyc
     self.kyc_params = kyc_strong_params
   end
 
