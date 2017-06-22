@@ -31,7 +31,9 @@ class Admin::Agreement::Index < Admin::Agreement::Base
                 id: type.id,
                 name: type.name.humanize
             },
-            content: content
+            content: content,
+            version: agreement&.version,
+            updated_on: DateUtils.date_formatted(agreement&.updated_at)
         }
       end
       agreement_by_type
