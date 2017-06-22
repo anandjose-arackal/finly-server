@@ -1542,6 +1542,12 @@ Rails.application.routes.draw do
     resources :cards do
       patch 'block', to: 'cards#block', as: :block
     end
+    resources :companies do
+      get 'kyc', to: 'companies#show'
+      patch 'kyc', to: 'companies#update'
+      patch 'review', to: 'companies#review'
+      patch 'status', to: 'companies#update_status'
+    end
   end
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
