@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  id_proof: 
+  pan_card: 
+  kyc_status: 
+
+two:
+  id_proof: 
+  pan_card: 
+  kyc_status: 

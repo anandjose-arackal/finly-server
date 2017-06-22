@@ -118,6 +118,7 @@ class User < ActiveRecord::Base
   has_many :login_agreement_mappings
   has_many :agreements, through: :login_agreement_mappings
 
+  has_one :individual_kyc
   has_one :itz_cash_dmt_sender
 
   # has_one :feature_access, as: :accessible
@@ -329,6 +330,7 @@ class User < ActiveRecord::Base
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
     self.build_enforce_policy(enabled: false).save
     self.build_auto_reload_config(enabled: false).save
+    self.build_individual_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.individual_kyc.blank?
   end
 
   def payments
