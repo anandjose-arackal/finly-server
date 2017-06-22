@@ -46,4 +46,8 @@ class CompanyKyc < ActiveRecord::Base
   has_attached_file :board_resolution, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :board_resolution, content_type: CONTENT_TYPES
 
+  def editable?
+    [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:error)].include?(kyc_status_id)
+  end
+
 end
