@@ -2,12 +2,13 @@
 
 class QuickbooksReportConfig
 
-  attr_accessor :reimbursable, :expenses, :report, :account_id, :user
+  attr_accessor :reimbursable, :expenses, :report, :account_id, :user, :date
 
   def initialize(user, reimbursable)
     self.user = user
     self.reimbursable = reimbursable
     self.expenses = []
+    self.date = Date.today
   end
 
   def payment_type_quickbooks_id(reimbursable)

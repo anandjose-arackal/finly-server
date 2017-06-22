@@ -12,7 +12,7 @@ class QuickbooksFinlyIntegrationsCategory
     if self.valid?
       begin
         additional_information_json = JSON.parse self.quickbooks_additional_information
-        if is_inventory_item? additional_information_json
+        if is_inventory_item?(additional_information_json) || is_category?(additional_information_json)
           return
         elsif is_payment? additional_information_json
           finly_integrations_category = QuickbooksPaymentType.find_or_initialize_by(quickbooks_integration_type: self.quickbooks_integration_type,
@@ -56,6 +56,12 @@ class QuickbooksFinlyIntegrationsCategory
 
   def is_inventory_item?(additional_information_json)
     if additional_information_json['type'] == "Inventory"
+      return true
+    end
+  end
+
+  def is_category?(additional_information_json)
+    if additional_information_json['type'] == "Category"
       return true
     end
   end
