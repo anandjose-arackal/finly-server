@@ -1551,7 +1551,7 @@ Rails.application.routes.draw do
       patch 'review', to: 'companies#review'
       patch 'status', to: 'companies#update_status'
     end
-    resources :agreements, only: [:create, :index]
+    resources :agreement, only: [:create, :index]
   end
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu

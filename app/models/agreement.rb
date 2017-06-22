@@ -15,6 +15,8 @@
 #
 
 class Agreement < ActiveRecord::Base
+  include Attachable
+
   belongs_to :agreement_type
   has_many :login_agreement_mappings
   has_many :users, through: :login_agreement_mappings
@@ -27,5 +29,10 @@ class Agreement < ActiveRecord::Base
   scope :without_id, -> (id) { where.not id: id }
   scope :with_type_id, ->(type_id) { where agreement_type_id: type_id }
   scope :active, -> { where active: true }
+
+  CONTENT_TYPES = {content_type: %w(text/plain text/html)}
+
+  has_attached_file :file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
+  validates_attachment :file, content_type: CONTENT_TYPES
 
 end

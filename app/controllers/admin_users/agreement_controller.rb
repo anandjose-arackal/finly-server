@@ -1,7 +1,11 @@
 class AdminUsers::AgreementController < ApplicationController
 
-  def create
+  before_action :authenticate_user!
+  allow_oauth!
 
+  def create
+    @result = Admin::Agreement::Create.(current_user, params)
+    respond response: (@result.success? ? :success : :failure)
   end
 
   def index
