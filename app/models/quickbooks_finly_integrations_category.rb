@@ -12,7 +12,9 @@ class QuickbooksFinlyIntegrationsCategory
     if self.valid?
       begin
         additional_information_json = JSON.parse self.quickbooks_additional_information
-        if is_payment? additional_information_json
+        if is_inventory_item? additional_information_json
+          return
+        elsif is_payment? additional_information_json
           finly_integrations_category = QuickbooksPaymentType.find_or_initialize_by(quickbooks_integration_type: self.quickbooks_integration_type,
           quickbooks_id: self.quickbooks_id)
         elsif is_expense?(additional_information_json) || self.category_sub_type == QUICKBOOKS_CATEGORY_SUB_TYPES.last
@@ -50,5 +52,11 @@ class QuickbooksFinlyIntegrationsCategory
 
   def is_expense?(additional_information_json)
     FinlyIntegrationsConstants::QUICKBOOKS_ACCOUNT_EXPENSE_TYPE == additional_information_json['account_type']
+  end
+
+  def is_inventory_item?(additional_information_json)
+    if additional_information_json['type'] == "Inventory"
+      return true
+    end
   end
 end
