@@ -7,7 +7,6 @@ class RequestFormatter::KycParser::Parse < RequestFormatter::Base
       params[:individual_kyc] = {}
       params[:individual_kyc][:pan_card] = pan_card
       params[:individual_kyc][:id_proof] = id_proof
-      params[:individual_kyc][:user_id] = user.id
     end
     self.formatted_request = params
   end
