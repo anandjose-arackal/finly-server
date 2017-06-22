@@ -1407,7 +1407,7 @@ Rails.application.routes.draw do
       get 'available_expense_types', to: 'expenses#available_expense_types'
 
       get 'kyc', to: 'kyc/user#show'
-      patch 'kyc', to: 'kyc/user#update'
+      post 'kyc', to: 'kyc/user#update'
     end
   end
 
