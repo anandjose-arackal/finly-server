@@ -1,11 +1,12 @@
 require 'finly_integrations/adapters/quickbooks_adapter'
 
-class Integrations::Quickbooks::Base < Integrations::Base
+# this will be an async operation because the syncing will happen in the abckground
+class Integrations::Quickbooks::Base < BackgroundOperation
 
   attr_accessor :adapter
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :finance_manager]
   end
 
   def pre_validate

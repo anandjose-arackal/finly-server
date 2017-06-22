@@ -12,6 +12,7 @@ class QuickbooksFinlyIntegrationsCategory
     if self.valid?
       begin
         additional_information_json = JSON.parse self.quickbooks_additional_information
+        finly_integrations_category = nil
         if is_inventory_item?(additional_information_json) || is_category?(additional_information_json)
           return
         elsif is_payment? additional_information_json
@@ -21,7 +22,7 @@ class QuickbooksFinlyIntegrationsCategory
           finly_integrations_category = QuickbooksCategory.find_or_initialize_by(quickbooks_integration_type: self.quickbooks_integration_type,
           quickbooks_id: self.quickbooks_id, quickbooks_category_type: self.category_sub_type)
         end
-        if finly_integrations_category.present?
+        if finly_integrations_category&.present?
           if finly_integrations_category.is_a?(QuickbooksCategory)
             category_params = {category_attributes: {}}
             category_params[:category_attributes][:company_id] = self.company_id
