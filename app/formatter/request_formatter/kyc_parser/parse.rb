@@ -1,13 +1,11 @@
 class RequestFormatter::KycParser::Parse < RequestFormatter::Base
 
   def process
-    if params[:individual_kyc].present?
-      pan_card = extract_image(params, :pan_card)
-      id_proof = extract_image(params, :id_proof)
-      params[:individual_kyc] = {}
-      params[:individual_kyc][:pan_card] = pan_card
-      params[:individual_kyc][:id_proof] = id_proof
-    end
+    pan_card = extract_image(params, :pan_card)
+    id_proof = extract_image(params, :id_proof)
+    params[:individual_kyc] = {}
+    params[:individual_kyc][:pan_card] = pan_card
+    params[:individual_kyc][:id_proof] = id_proof
     self.formatted_request = params
   end
 
