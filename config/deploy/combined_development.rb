@@ -7,7 +7,7 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '13.126.130.25', user: 'centos', roles: %w{web app db}, port: 22
+server '35.154.155.160', user: 'centos', roles: %w{web app db}, port: 22
 set :stage, 'staging'
 set :use_sudo, false
 set :rbenv_type, :user

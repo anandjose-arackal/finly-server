@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170621065009) do
+ActiveRecord::Schema.define(version: 20170623051536) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1900,7 +1900,7 @@ ActiveRecord::Schema.define(version: 20170621065009) do
     t.text     "note",               limit: 65535
     t.integer  "receipt_email_id",   limit: 4
     t.boolean  "to_be_transcribed",                default: false
-    t.boolean  "hard_copy_received",               default: false
+    t.boolean  "hard_copy_received",               default: true
     t.integer  "sourcable_id",       limit: 4
     t.integer  "sourcable_type",     limit: 4
   end
