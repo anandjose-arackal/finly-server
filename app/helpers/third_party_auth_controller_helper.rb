@@ -1,0 +1,2 @@
+module ThirdPartyAuthControllerHelper
+end
