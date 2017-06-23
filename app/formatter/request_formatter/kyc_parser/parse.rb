@@ -4,8 +4,8 @@ class RequestFormatter::KycParser::Parse < RequestFormatter::Base
     # pan_card = extract_image(params, :pan_card)
     # id_proof = extract_image(params, :id_proof)
     params[:individual_kyc] = {}
-    params[:individual_kyc][:pan_card] = params[:pan_card]
-    params[:individual_kyc][:id_proof] = params[:id_proof]
+    params[:individual_kyc][:pan_card] = params[:pan_card] if params[:pan_card].present?
+    params[:individual_kyc][:id_proof] = params[:id_proof] if params[:id_proof].present?
     self.formatted_request = params
   end
 
