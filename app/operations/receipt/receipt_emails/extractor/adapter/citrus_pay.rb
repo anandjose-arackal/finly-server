@@ -14,4 +14,12 @@ class Receipt::ReceiptEmails::Extractor::Adapter::CitrusPay < Receipt::ReceiptEm
     ]
   end
 
+  def amount_value
+    val = super
+    ['INR',' '].each do |text|
+      val = val&.gsub(text, '')
+    end
+    return val
+  end
+
 end
