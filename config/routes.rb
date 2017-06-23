@@ -1406,8 +1406,8 @@ Rails.application.routes.draw do
       get 'balances', to: 'users#balance'
       get 'available_expense_types', to: 'expenses#available_expense_types'
 
-      get 'kyc', to: 'kyc/user#show'
-      post 'kyc', to: 'kyc/user#update'
+      get 'kyc/:id', to: 'kyc/user#show'
+      post 'kyc/:id', to: 'kyc/user#update'
     end
   end
 
