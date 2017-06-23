@@ -1,6 +1,11 @@
 class KycProcess::User::Update < KycProcess::User::Base
   attr_accessor :kyc_params
 
+  def init
+    super
+    self.kyc_params = kyc_strong_params
+  end
+
   def process
     unless self.individual_kyc.update(self.kyc_params)
       add_message :error, self.individual_kyc.errors.full_messages

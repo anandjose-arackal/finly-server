@@ -11,7 +11,6 @@ class KycProcess::User::Base < BaseOperation
     self.update_user = User::Show.(user, params)&.selected_user
     return if self.update_user.blank?
     self.individual_kyc = self.update_user.individual_kyc
-    self.kyc_params = kyc_strong_params
   end
 
   # def pre_validate
