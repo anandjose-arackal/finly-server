@@ -1,5 +1,5 @@
 class KycProcess::User::Update < KycProcess::User::Base
-  attr_accessor :kyc_params, :update_user
+  attr_accessor :kyc_params
 
   def process
     unless self.individual_kyc.update(self.kyc_params)
