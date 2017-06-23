@@ -50,13 +50,17 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
     return extract unless extract.present?
     return unless [Nokogiri::XML::NodeSet].include?(extract.class)
     # Default css selector is considered at first position unless position is defined
-    case self.options[:position]
-      when :first, nil
-        extract = extract.first
-      when :last
-        extract = extract.last
+    position = self.options[:position]
+    if position.is_a? (Symbol)
+      case position
+        when :first, nil
+          extract = extract.first
+        when :last
+          extract = extract.last
+      end
+    elsif position.is_a?(Integer) and extract.is_a?(Nokogiri::XML::NodeSet)
+      extract = extract[position]
     end
-
     extract
   end
 
