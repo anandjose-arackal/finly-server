@@ -31,6 +31,11 @@ gem 'haml'
 gem 'sinatra', require: nil
 
 
+# gems for quickbooks integration
+gem 'omniauth'
+gem 'omniauth-quickbooks'
+gem 'quickbooks-ruby', git: 'git://github.com/ruckus/quickbooks-ruby.git', ref: '22c8df58bbed441207f3d0d8ac5a786cdb4821a5'
+
 # gem to import from excel
 gem 'roo', '2.5.1'
 gem 'roo-xls', '1.0.0'

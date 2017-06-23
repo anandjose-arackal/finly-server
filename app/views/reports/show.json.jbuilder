@@ -17,6 +17,8 @@ json.reimbursable_expenses_total @result.reimbursable_expenses_total
 json.card_expenses_total @result.card_expenses_total
 json.currency_symbol @result.report.base_currency_symbol
 json.currency_country_code @result.report.base_currency_code
+json.synced_with_quickbooks !!@result.report.synced_with_quickbooks
+json.show_sync_button (@result.report.processed? && is_admin_view)
 
 policy_id = nil
 policy_name = nil
