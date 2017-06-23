@@ -1,11 +1,11 @@
 class Receipt::ReceiptEmails::Extractor::Adapter::CitrusPay < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
-    'billing@bigrock.com'
+    'noreply@citruspay.com'
   end
 
   def merchant
-    'BigRock'
+    'Citrus Pay'
   end
 
   def amount_data_points

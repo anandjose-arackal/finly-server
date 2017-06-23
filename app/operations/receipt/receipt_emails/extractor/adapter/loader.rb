@@ -40,7 +40,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
 
       # Payment
       Receipt::ReceiptEmails::Extractor::Adapter::PaypalOrder,
-      Receipt::ReceiptEmails::Extractor::Adapter::Paytm
+      Receipt::ReceiptEmails::Extractor::Adapter::Paytm,
+      Receipt::ReceiptEmails::Extractor::Adapter::CitrusPay
 
       # Others
   ]
