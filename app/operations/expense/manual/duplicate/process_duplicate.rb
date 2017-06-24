@@ -26,7 +26,7 @@ class Expense::Manual::Duplicate::ProcessDuplicate < Expense::Base
   def process
     old_duplicates = expense.duplicate_expenses
     old_duplicate_ids = old_duplicates.pluck(:id) - [expense.id]
-    new_duplicates = Expense.with_date(expense.date).having_amount_currency(expense.amount.value, expense.amount.currency_id)
+    new_duplicates = user.expenses.with_date(expense.date).having_amount_currency(expense.amount.value, expense.amount.currency_id)
     new_duplicate_ids = new_duplicates.pluck(:id) - [expense.id]
 
     duplicates_to_create = new_duplicate_ids - old_duplicate_ids
