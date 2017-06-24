@@ -23,7 +23,6 @@
 
 
 
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -38,8 +37,11 @@ class Expense < ActiveRecord::Base
   belongs_to :surcharge, class_name: 'Amount'
 
   has_many :receipts, as: :parent
-
   has_many :system_messages, as: :messagable, dependent: :destroy
+
+  has_many :duplicate_expense_mappings, foreign_key: :expense_id, dependent: :destroy
+  has_many :duplicate_expenses, through: :duplicate_expense_mappings
+  has_many :is_duplicate_expense_mappings, class_name: 'DuplicateExpenseMapping', foreign_key: :duplicate_expense_id, dependent: :destroy
 
   has_one :manual_expense, dependent: :destroy
   has_one :card_expense, dependent: :destroy
@@ -65,6 +67,7 @@ class Expense < ActiveRecord::Base
   delegate :expense_type_name, to: :expense_type
   delegate :expense_status_name, to: :expense_status
   delegate :user_name, to: :user
+  delegate :manual?, :card?, :distance?, :time?, :per_diem?, to: :expense_type
 
   validates :date, presence: true
   validates :category_id, presence: true
@@ -139,12 +142,13 @@ class Expense < ActiveRecord::Base
   }
 
   scope :with_amount, -> { joins :amount }
+  scope :having_amount_currency, -> (amount, currency_id) { with_amount.where('amounts.value IN (?) AND amounts.currency_id IN (?)', amount, currency_id) }
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_report_id, ->(report_id) { where report_id: report_id }
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :with_user_id, ->(user_id) { where user_id: user_id }
   # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
-  scope :filter_expense_type_id, ->(type_id) {
+  scope :filter_expense_type_id, ->(type_id) do
     type_id = [type_id] unless type_id.is_a?(Array)
     diff_arr = (type_id - [1, 2, 3, 4, 5, '1', '2', '3', '4', '5'])
     diff_arr_cancelled = (type_id - [6, '6'])
@@ -159,7 +163,7 @@ class Expense < ActiveRecord::Base
     elsif diff_arr_personal.size == 0
       personal
     end
-  }
+  end
 
   # scopes for the filters
   scope :filter_amount, -> (type, value) do
@@ -263,9 +267,13 @@ class Expense < ActiveRecord::Base
 
   scope :transcribed, -> { where transcribed: true }
   scope :untranscribed, -> { where transcribed: false }
+  scope :limit_to, ->(count) { limit count }
 
   scope :verified, -> { where expense_status_id: ExpenseStatus.submitted_id }
   scope :unverified, -> { where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
+
+  scope :joins_card_expenses, -> { only_card_expenses.joins(:card_expense) }
+  scope :pluck_card_transaction_id, -> { joins_card_expenses.pluck('card_expense.card_transaction_id') }
 
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount
@@ -638,6 +646,10 @@ class Expense < ActiveRecord::Base
     false
   end
 
+  def editable?
+    [ExpenseStatus.id_for(:unreported), ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:rejected)].include?(self.expense_status_id)
+  end
+
   # method that updates all the currency values for a particular expense - todo - possibly should be moved to an operation
   def update_other_currencies
     unless self.amount.present?
@@ -669,6 +681,21 @@ class Expense < ActiveRecord::Base
     else
       return nil
     end
+  end
+
+  def has_duplicate_expenses?
+    filtered_duplicate_expenses.limit_to(1).present?
+  end
+
+  def filtered_duplicate_expenses
+    if submitted?
+      return duplicate_expenses.submitted
+    end
+    duplicate_expenses
+  end
+
+  def can_delete?
+    !self.submitted?
   end
 
   private

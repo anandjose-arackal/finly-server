@@ -88,6 +88,7 @@ json.expense_sections sorted_expenses do |category|
     if expense.distance_expense?
       json.locations expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
     end
+    json.potential_duplicate expense.has_duplicate_expenses?
   end
 end
 
