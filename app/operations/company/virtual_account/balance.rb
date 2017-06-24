@@ -17,7 +17,7 @@ class Company::VirtualAccount::Balance < BaseOperation
 
   def init
 
-    # self.company = user.company || 
+    # self.company = user.company ||
     self.company = params[:company] || user.company
 
     self.total_wallet_balance = company.account.wallet_balance.value

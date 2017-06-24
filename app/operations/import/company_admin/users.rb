@@ -32,11 +32,18 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
     end
   end
 
+  def pre_process
+
+  end
+
   def process
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
       type = retrieve_invite_type(row)
       self.params = process_row(row)
+      ##### adding default policy id to team mapping ##
+      params[:team_mapping_attributes][0][:policy_id] = user.company.policies.default.first.id rescue nil
+      #################################################
       error_messages = params[:error_messages]
       params.delete(:error_messages)
 

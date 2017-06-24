@@ -11,6 +11,7 @@ class CompaniesController < ApplicationController
       @company = @result.company
     else
       @company_balance = 0
+      @company = nil
     end
     respond
   end

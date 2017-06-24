@@ -1,6 +1,10 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :category_name, :category_id, :expense_type_id,
                                     :transcribed, :reimbursable
 
+if @result.expense.report.present?
+  json.report_id @result.expense.report_id
+end
+
 json.distance do
   json.value @result.expense.distance_value
   json.rate_value @result.expense.distance_rate_value

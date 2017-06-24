@@ -28,7 +28,11 @@
 #  reimbursable_expenses_total_id     :integer
 #  card_expenses_total_id             :integer
 #  non_reimbursable_expenses_total_id :integer
+#  synced_with_quickbooks             :boolean
 #
+
+
+
 
 
 
@@ -38,6 +42,7 @@ class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
 
+  has_many :email_authorizations, as: :authorizable
   belongs_to :user
   belongs_to :status, class_name: 'ReportStatus', foreign_key: :report_status_id
   belongs_to :policy
@@ -120,10 +125,10 @@ class Report < ActiveRecord::Base
   scope :filter_user_id, ->(id) { where(user_id: id) }
   scope :filter_report_id, ->(id) { where(id: id) }
   scope :filter_search, ->(value) do
-    user_ids = self.pluck(:id)
-    user_ids = User.with_id(user_ids).where("name like :value OR email like :value", value: "%#{value}%").pluck(:id)
+    # user_ids = self.pluck(:id)
+    # user_ids = User.with_id(user_ids).where("name like :value OR email like :value", value: "%#{value}%").pluck(:id)
     reports = arel_table
-    where(reports[:name].matches("%#{value}%").or(reports[:user_id].in(user_ids)).or(reports[:id].eq(value)))
+    where(reports[:name].matches("%#{value}%").or(reports[:id].eq(value)))
   end
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
@@ -193,6 +198,12 @@ class Report < ActiveRecord::Base
 
   def editable?
     open? or retracted? or rejected?
+  end
+
+  def processed?
+    if [ReportStatus.approved_id, ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id].include?(self.report_status_id)
+      return true
+    end
   end
 
   def settlement_pending?

@@ -72,13 +72,18 @@ class ReceiptEmail < ActiveRecord::Base
     if receipt_email_attachments.any?
       receipt_email_attachments.each do |email_attachment|
         attachment_content_type = email_attachment.original_attachment_content_type
+        next unless ReceiptProcessor::BaseConverter.is_receipt? attachment_content_type
+
         receipt_files = []
         if ReceiptProcessor::BaseConverter::PDF_CONTENT_TYPES.include? attachment_content_type
           # PDF Attachments
           receipt_files << email_attachment.original_attachment
-        elsif ReceiptProcessor::BaseConverter::IMAGE_CONTENT_TYPES.include? attachment_content_type
-          # Image Attachments
-          receipt_files << email_attachment.original_attachment
+
+        # Ignoring Image Attachments
+        # elsif ReceiptProcessor::BaseConverter::IMAGE_CONTENT_TYPES.include? attachment_content_type
+        #   # Image Attachments
+        #   receipt_files << email_attachment.original_attachment
+
         elsif ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.include? attachment_content_type
           # HTML Attachments
           image_tmp_path = "#{Rails.root}/tmp/images/#{email_attachment.original_attachment_file_name}".gsub(/\..*$/, '.jpg')
@@ -111,7 +116,8 @@ class ReceiptEmail < ActiveRecord::Base
           #############################################
         end
       end
-    else
+    end
+    if receipts.blank?
       image_tmp_path = "#{Rails.root}/tmp/images/#{id}.jpg"
       raw_html_text = Paperclip.io_adapters.for(raw_html).read.force_encoding(Encoding::UTF_8)
       document_converter = ReceiptProcessor::BaseConverter.new raw_html_text,

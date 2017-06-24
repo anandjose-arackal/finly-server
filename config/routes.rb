@@ -1,6 +1,9 @@
 # == Route Map
 #
 #                                  Prefix Verb   URI Pattern                                                    Controller#Action
+#       qukickbooks_configurations_create GET    /qukickbooks_configurations/create(.:format)                   qukickbooks_configurations#create
+#       qukickbooks_configurations_update GET    /qukickbooks_configurations/update(.:format)                   qukickbooks_configurations#update
+#         qukickbooks_configurations_show GET    /qukickbooks_configurations/show(.:format)                     qukickbooks_configurations#show
 #                               crono_web        /crono                                                         Crono::Web
 #                  new_admin_user_session GET    /admin_users/sign_in(.:format)                                 admin_users/sessions#new
 #                      admin_user_session POST   /admin_users/sign_in(.:format)                                 admin_users/sessions#create
@@ -10,6 +13,8 @@
 #                edit_admin_user_password GET    /admin_users/password/edit(.:format)                           devise/passwords#edit
 #                                         PATCH  /admin_users/password(.:format)                                devise/passwords#update
 #                                         PUT    /admin_users/password(.:format)                                devise/passwords#update
+#     api_v1_configuration_category_index GET    /api/v1/configuration/category/index(.:format)                 api/v1/configuration/category#index
+#           api_v1_configuration_category GET    /api/v1/configuration/category(.:format)                       api/v1/configuration#category
 #                         email_processor POST   /email/incoming(.:format)                                      griddler/emails#create
 #                               oauth_new GET    /oauth/new(.:format)                                           oauth/auth#new
 #                         oauth_authorize POST   /oauth/authorize(.:format)                                     opro/oauth/auth#create
@@ -750,6 +755,13 @@
 #                                         DELETE /teams/:id(.:format)                                           user_teams#destroy
 #                          export_expense GET    /export/expense(.:format)                                      export#expense
 #                  export_atm_transaction GET    /export/atm_transaction(.:format)                              export#atm_transactions
+#                                         GET    /auth/:provider/callback(.:format)                             third_party_auth#quickbooks
+#                      testing_quickbooks GET    /testing_quickbooks(.:format)                                  third_party_auth#testing
+#                  quickbooks_sync_report POST   /quickbooks/sync_report(.:format)                              quickbooks#sync_report
+#              quickbooks_sync_categories POST   /quickbooks/sync_categories(.:format)                          quickbooks#categories
+#           quickbooks_sync_payment_types POST   /quickbooks/sync_payment_types(.:format)                       quickbooks#sync_payment_types
+#                quickbooks_update_config PATCH  /quickbooks/update_config(.:format)                            quickbooks#update
+#                       quickbooks_config GET    /quickbooks/config(.:format)                                   quickbooks#show
 #
 
 #                               crono_web        /crono                                                      Crono::Web
@@ -769,6 +781,8 @@
 #                                         PUT    /admin_users/password(.:format)                             devise/passwords#update
 #     api_v1_configuration_category_index GET    /api/v1/configuration/category/index(.:format)              api/v1/configuration/category#index
 #           api_v1_configuration_category GET    /api/v1/configuration/category(.:format)                    api/v1/configuration#category
+#                                         GET    /auth/:provider/callback(.:format)                          third_party_auth#quickbooks
+#                      testing_quickbooks GET    /testing_quickbooks(.:format)                               third_party_auth#testing
 #                         email_processor POST   /email/incoming(.:format)                                   griddler/emails#create
 #                               oauth_new GET    /oauth/new(.:format)                                        oauth/auth#new
 #                         oauth_authorize POST   /oauth/authorize(.:format)                                  opro/oauth/auth#create
@@ -1329,10 +1343,32 @@
 
 Rails.application.routes.draw do
 
+  get 'qukickbooks_configurations/create'
+
+  get 'qukickbooks_configurations/update'
+
+  get 'qukickbooks_configurations/show'
+
   ######### GEMS SPECIFIC START ###########
 
   mount Crono::Web, at: '/crono'
   devise_for :admin_users, controllers: {sessions: 'admin_users/sessions'}
+
+  namespace :api do
+    namespace :v1 do
+      namespace :configuration do
+        get 'category/index'
+      end
+    end
+  end
+
+  namespace :api do
+    namespace :v1 do
+      get 'configuration/category'
+    end
+  end
+
+  # get 'home/index'
 
   mount_griddler('/email/incoming')
   mount_opro_oauth controllers: {
@@ -1842,9 +1878,30 @@ Rails.application.routes.draw do
     patch 'set_restrictions', to: 'user_teams#set_restrictions'
   end
 
+  namespace :authorizer do 
+    resources :reports do
+      patch 'approve' => 'reports#approve', as: :approve
+      patch 'reject' => 'reports#reject', as: :reject
+    end
+  end
+  
   get 'export/expense', to: 'export#expense'
   get 'export/atm_transaction', to: 'export#atm_transactions'
 
+
+  # All APIs for Quickbooks integration and syncing
+
+  get '/auth/:provider/callback', controller: 'third_party_auth', action: 'quickbooks'
+  get 'testing_quickbooks', to: 'third_party_auth#testing'
+
+
+  post 'quickbooks/sync_report', to: 'quickbooks#sync_report', as: :quickbooks_sync_report
+  post 'quickbooks/sync_reports', to: 'quickbooks#sync_reports', as: :quickbooks_sync_reports
+  post 'quickbooks/sync_categories', to: 'quickbooks#sync_categories', as: :quickbooks_sync_categories
+  post 'quickbooks/sync_payment_types', to: 'quickbooks#sync_payment_types', as: :quickbooks_sync_payment_types
+  patch 'quickbooks/update_config', to: 'quickbooks#update', as: :quickbooks_update_config
+  get 'quickbooks/config', to: 'quickbooks#show', as: :quickbooks_config
+  
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

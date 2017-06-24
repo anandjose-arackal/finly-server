@@ -72,7 +72,8 @@ class User::Show < User::Base
           disabled_by = card.disabled_by_role.name rescue nil
           active = card.active
           name = "#{card.card_program.name} Card"
-          ending_number = card.ending_number
+          # ending_number = card.ending_number
+          proxy = card.proxy
           id = card.id
 
           if not personal_view? and card.card_program.manager_blockable
@@ -101,7 +102,8 @@ class User::Show < User::Base
           end
           self.cards << {card: {show_balance: show_balance,
                                 show_eligibility: show_eligibility,
-                                ending_number: ending_number,
+                                # ending_number: ending_number,
+                                proxy: proxy,
                                 configurable_restrictions: configurable_restrictions,
                                 balance: balance,
                                 eligibility: eligibility,
@@ -213,7 +215,7 @@ class User::Show < User::Base
           show_balance = (personal_transfer or card.card_program.manager_view_balance)
           show_eligibility = (personal_transfer or card.card_program.manager_view_eligibility)
           balance = balances[:target_user][:card][card.id][:balance] rescue nil
-          eligibility = balances[:target_user][:card][card.id][:balance] rescue nil
+          eligibility = balances[:target_user][:card][card.id][:eligibility] rescue nil
 
           action = {type: :card, id: card.id, name: "#{to_user_name} #{card.card_program.name} Card",
                     balance: balance, eligibility: eligibility, show_balance: show_balance,
