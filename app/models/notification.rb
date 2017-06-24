@@ -114,6 +114,10 @@ class Notification < ActiveRecord::Base
         action += " auto reload failed"
       when NotificationActionType.id_for(:notify_auto_reload_card_success)
         action += " auto reload successful"
+      when NotificationActionType.id_for(:notify_quickbooks_sync_success)
+        action += " sync with Quickbooks was successful"
+      when NotificationActionType.id_for(:notify_quickbooks_sync_failure)
+        action += " sync with Quickbooks failed"
       else
         # do nothing
     end
@@ -195,6 +199,14 @@ class Notification < ActiveRecord::Base
         return content
       when NotificationActionType.id_for(:notify_auto_reload_card_success)
         content = "Auto reload of your expense card with amount INR #{self.amount.value} was successfull"
+        # returning content directly because further constructions are not required
+        return content
+      when NotificationActionType.id_for(:notify_quickbooks_sync_success)
+        content = "Syncing of reports with Quickbooks was successful"
+        # returning content directly because further constructions are not required
+        return content
+      when NotificationActionType.id_for(:notify_quickbooks_sync_failure)
+        content = "Syncing of reports with Quickbooks was partially successful or failed because : #{self.message}"
         # returning content directly because further constructions are not required
         return content
       else
@@ -353,7 +365,7 @@ class Notification < ActiveRecord::Base
       else
         return ""
     end
-    owner = object.user
+    owner = object.user rescue self.user
     if self.action_type_id == NotificationActionType.id_for(:notify_auto_approve)
       return ""
     elsif self.action_type_id == NotificationActionType.id_for(:notify_submit)

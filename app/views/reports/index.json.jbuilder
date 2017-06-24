@@ -18,4 +18,5 @@ json.array!(@result.paginated_reports) do |report|
   json.currency_id report.base_currency_id
   json.date report.created_at.strftime("%d %b")
   json.currency_symbol report.base_currency_symbol
+  json.synced_with_quickbooks report.synced_with_quickbooks
 end

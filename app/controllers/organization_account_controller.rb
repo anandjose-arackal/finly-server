@@ -12,9 +12,10 @@ class OrganizationAccountController < ApplicationController
 
   def categories
     @result = Company::Configuration::Show.(current_user, params)
-    respond_to do |format|
-      format.html {render partial: 'category_list'}
-    end
+    respond
+    # respond_to do |format|
+    #   format.html {render partial: 'category_list'}
+    # end
   end
 
   def export_preferences

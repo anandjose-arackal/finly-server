@@ -23,6 +23,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::ZomatoIndia,
       Receipt::ReceiptEmails::Extractor::Adapter::FreshMenu,
       Receipt::ReceiptEmails::Extractor::Adapter::FoodPandaIndia,
+      Receipt::ReceiptEmails::Extractor::Adapter::Box8,
 
       # Invoice
       Receipt::ReceiptEmails::Extractor::Adapter::AirtelMobileIndia,
@@ -40,7 +41,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
 
       # Payment
       Receipt::ReceiptEmails::Extractor::Adapter::PaypalOrder,
-      Receipt::ReceiptEmails::Extractor::Adapter::Paytm
+      Receipt::ReceiptEmails::Extractor::Adapter::Paytm,
+      Receipt::ReceiptEmails::Extractor::Adapter::CitrusPay
 
       # Others
   ]
