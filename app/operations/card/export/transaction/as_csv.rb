@@ -22,7 +22,8 @@ class Card::Export::Transaction::AsCsv < Card::Export::Transaction::Base
       user_ids = user.company.users.pluck(:id)
     end
 
-    self.atm_withdrawals = CardTransaction.atm_withdrawals.with_user user_ids
+    op = Card::Transaction::Index.(user, {user_ids: user_ids})
+    self.atm_withdrawals = op.transactions rescue []
   end
 
   def validate

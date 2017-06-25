@@ -49,18 +49,11 @@ class ExportController < ApplicationController
     respond_to do |format|
       format.csv {
         @result = Card::Export::Transaction::AsCsv.(@user, params)
-        send_data @result.data, filename: "#{@result.file_name}"
+        send_data @result.data, filename: "#{@result.file_name}.csv"
       }
       format.xls {
         @result = Card::Export::Transaction::AsXml.(@user, params)
       }
-      # format.pdf {
-      #   @result = Report::Show.(@user, params)
-      #   @report = @result.report
-      #   @current_user = current_user
-      #   @include_comments = true
-      #   render pdf: "report-#{@report.name}", layout: "pdf.html.erb", print_media_type: true
-      # }
     end
   end
 
