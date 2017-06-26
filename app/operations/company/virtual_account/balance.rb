@@ -33,15 +33,16 @@ class Company::VirtualAccount::Balance < BaseOperation
   end
 
   def success
-    Company::VirtualAccount::Balance::SuccessPresenter.new(user, {balance: self.balance, account_number: self.account_number}, messages)
+    Company::VirtualAccount::Balance::SuccessPresenter.new(user, {balance: self.balance, account_number: self.account_number, company: user.company}, messages)
   end
 
   class Company::VirtualAccount::Balance::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :balance, :account_number
+    attr_accessor :balance, :account_number, :company
 
     def init
       self.balance = params[:balance]
       self.account_number = params[:account_number]
+      self.company = params[:company]
     end
 
   end

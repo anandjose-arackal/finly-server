@@ -12,7 +12,11 @@ class Receipt::Create < Receipt::Base
   end
 
   def validate
-    unless user.company.ocr_enabled?
+    if user.company.ocr_enabled?
+      if receipt_params[:to_be_transcribed].nil?
+        receipt_params[:to_be_transcribed] = '1'
+      end
+    else
       receipt_params.delete(:to_be_transcribed)
     end
   end

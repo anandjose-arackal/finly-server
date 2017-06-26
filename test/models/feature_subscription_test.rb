@@ -14,6 +14,8 @@
 #  medical_card_enabled       :boolean          default(FALSE), not null
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
+#  expense_card_enabled       :boolean          default(FALSE)
+#  reimbursement_card_enabled :boolean          default(FALSE)
 #
 
 require 'test_helper'

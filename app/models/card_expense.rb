@@ -11,6 +11,7 @@
 #  surcharge_id        :integer
 #  is_deleted          :boolean          default(FALSE)
 #  cancelled           :boolean          default(FALSE)
+#  atm_surcharge       :boolean          default(FALSE)
 #
 
 class CardExpense < ActiveRecord::Base
@@ -20,6 +21,7 @@ class CardExpense < ActiveRecord::Base
   belongs_to :expense # foreign key would be expense_id
   belongs_to :surcharge, class_name: 'Amount'
 
+  has_many :cancelled_against_transactions, class_name: 'CardTransaction', foreign_key: :cancelled_against_expense_id
   has_many :custom_fields, as: :parent, dependent: :destroy
   accepts_nested_attributes_for :custom_fields
 
@@ -37,6 +39,10 @@ class CardExpense < ActiveRecord::Base
   def card_merchant_name
     self.editable_merchant
   end
+
+  scope :with_expense_id, -> (expense_id) {
+    where expense_id: expense_id
+  }
 
   scope :merchant_like, -> (merchant, expense_ids) do
     where(expense_id: expense_ids).where('lower(editable_merchant) LIKE ?', "%#{merchant.downcase}%").pluck(:editable_merchant)

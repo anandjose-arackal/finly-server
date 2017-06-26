@@ -46,6 +46,7 @@ class TransactionsMsgQueuePoller
       api_reference_id = data[12] rescue nil
       mcc_code = data[13] rescue nil
       transaction_status = data[14] rescue nil
+      type_of_details = data[15] rescue nil
 
       trans_params = {reference_id: reference_id,
                        transaction_timestamp: transaction_timestamp,
@@ -62,7 +63,8 @@ class TransactionsMsgQueuePoller
                        product_code: product_code,
                        api_reference_id: api_reference_id,
                        mcc_code: mcc_code,
-                       transaction_status: transaction_status
+                       transaction_status: transaction_status,
+                       type_of_details: type_of_details
                       }
 
       rescued = false
@@ -80,7 +82,7 @@ class TransactionsMsgQueuePoller
       trans_params.delete(:transaction)
 
       # if the creation of an entry on the transaction table fails, log it in a file
-      if !rescued && @result.success? && @result.transaction.nil?
+      if !rescued && @result&.success? && @result&.transaction.nil?
         begin
           trans = CardTransaction.new(trans_params)
           unless trans.save
@@ -89,7 +91,7 @@ class TransactionsMsgQueuePoller
         rescue => error
           error_logger.error("Following transaction could not be created : #{message.body} because of following errors: #{error.message}")
         end
-      elsif @result.failure?
+      elsif @result&.failure?
         error_logger.error("Following transaction : #{message.body} couldn't be created because of the following errors: #{@result.messages[:error].to_sentence}")
       end
     end

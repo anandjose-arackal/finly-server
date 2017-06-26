@@ -40,16 +40,18 @@ class User::Show < User::Base
                   :company_finance_managers, :company_admins, :company_policies,
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
-                  :periods, :auto_submit_config, :mcc_groups, :card_periods, :cards, :balances
+                  :periods, :auto_submit_config, :mcc_groups, :card_periods, :cards, :balances,
+                  :user_group_item_mappings, :user_groups
 
     def init
       self.selected_user = params[:selected_user]
       self.roles = {admin: self.selected_user.company_admin?, manager: self.selected_user.manager?,
                     finance_manager: self.selected_user.finance_manager?}
       self.team_mapping = self.selected_user.team_mapping
-      self.mapping = [Policy::Mappings::Show.(user, user: selected_user, policy: nil).map]
+      # self.mapping = [Policy::Mappings::Show.(user, user: selected_user, policy: nil).map]
       self.policies = selected_user.policies
       self.balances = params[:balances]
+      self.mapping = []
       self.policies.each do |policy|
         self.mapping << Policy::Mappings::Show.(user, user: selected_user, policy: policy).map
       end
@@ -70,7 +72,8 @@ class User::Show < User::Base
           disabled_by = card.disabled_by_role.name rescue nil
           active = card.active
           name = "#{card.card_program.name} Card"
-          ending_number = card.ending_number
+          # ending_number = card.ending_number
+          proxy = card.proxy
           id = card.id
 
           if not personal_view? and card.card_program.manager_blockable
@@ -99,19 +102,23 @@ class User::Show < User::Base
           end
           self.cards << {card: {show_balance: show_balance,
                                 show_eligibility: show_eligibility,
-                                ending_number: ending_number,
+                                # ending_number: ending_number,
+                                proxy: proxy,
                                 configurable_restrictions: configurable_restrictions,
                                 balance: balance,
                                 eligibility: eligibility,
                                 disabled_by: disabled_by,
                                 active: active, name: name, id: id},
-                         actions: actions, card_restriction: card.card_restriction}
+                         actions: actions,
+                         card_restriction: card.card_restriction}
         end
       end
       self.auto_submit_config = self.selected_user.auto_submit_config
       self.periods = Period.all
       self.card_periods = Period.limit(3)
       self.mcc_groups = MccGroup.all
+      self.user_groups = selected_user.company.user_groups
+      self.user_group_item_mappings = selected_user.user_group_item_mappings
     end
 
     private

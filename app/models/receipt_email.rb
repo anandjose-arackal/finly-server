@@ -53,26 +53,56 @@ class ReceiptEmail < ActiveRecord::Base
   def save_receipt_image
     FileUtils.mkdir_p "#{Rails.root}/tmp/images"
 
-      if receipt_email_attachments.any?
-        receipt_email_attachments.each do |email_attachment|
-          image_tmp_path = "#{Rails.root}/tmp/images/#{email_attachment.original_attachment_file_name}".gsub(/\..*$/, '.jpg')
-          document_converter = ReceiptProcessor::BaseConverter.new  email_attachment.original_attachment.path,
-                                                                    email_attachment.original_attachment_content_type,
-                                                                    image_tmp_path
-          document_converter.convert do |images|
-            images.each { |image| receipts.create(user_id: user_id, image: image, note: self.subject, to_be_transcribed: true) }
+    if receipt_email_attachments.any?
+      receipt_email_attachments.each do |email_attachment|
+
+        next unless ReceiptProcessor::BaseConverter.is_receipt? email_attachment.original_attachment_content_type
+
+        image_tmp_path = "#{Rails.root}/tmp/images/#{email_attachment.original_attachment_file_name}".gsub(/\..*$/, '.jpg')
+        document_converter = ReceiptProcessor::BaseConverter.new email_attachment.original_attachment.path,
+                                                                 email_attachment.original_attachment_content_type,
+                                                                 image_tmp_path
+        document_converter.convert do |images|
+          images.each do |image|
+            user = User.find_by_id(user_id)
+            receipt = receipts.create(user_id: user_id, image: image, note: self.subject)
+            if user.company.ocr_enabled?
+              receipt.update(to_be_transcribed: true)
+              ########## Mailer being triggered ###########
+              if Rails.env.production?
+                Constants::TRANSCRIBER_EMAILS.each do |email|
+                  ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+                end
+              end
+              #############################################
+            end
           end
         end
-      else
-        image_tmp_path = "#{Rails.root}/tmp/images/#{id}.jpg"
-        raw_html_text = Paperclip.io_adapters.for(raw_html).read.force_encoding(Encoding::UTF_8)
-        document_converter = ReceiptProcessor::BaseConverter.new  raw_html_text,
-                                                                  ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
-                                                                  image_tmp_path
-        document_converter.convert do |images|
-          images.each { |image| receipts.create(user_id: user_id, image: image, note: self.subject, to_be_transcribed: true) }
+      end
+    end
+    if receipts.blank?
+      image_tmp_path = "#{Rails.root}/tmp/images/#{id}.jpg"
+      raw_html_text = Paperclip.io_adapters.for(raw_html).read.force_encoding(Encoding::UTF_8)
+      document_converter = ReceiptProcessor::BaseConverter.new raw_html_text,
+                                                               ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
+                                                               image_tmp_path
+      document_converter.convert do |images|
+        images.each do |image|
+          user = User.find_by_id(user_id)
+          receipt = receipts.create(user_id: user_id, image: image, note: self.subject)
+          if user.company.ocr_enabled?
+            receipt.update(to_be_transcribed: true)
+            ########## Mailer being triggered ###########
+            if Rails.env.production?
+              Constants::TRANSCRIBER_EMAILS.each do |email|
+                ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
+              end
+            end
+            #############################################
+          end
         end
       end
+    end
   end
 
 end

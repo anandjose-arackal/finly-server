@@ -13,6 +13,7 @@
 #
 
 class PerDiem < ActiveRecord::Base
+  include SoftDeletable
 
   belongs_to :configurable, polymorphic: true
 

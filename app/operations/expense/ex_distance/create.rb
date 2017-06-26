@@ -76,9 +76,6 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     return if has_errors?
 
     if self.expense.save
-      # Set custom fields
-      set_custom_fields true
-
       # Attach an existing receipt to the expense
       if self.receipt.present?
         self.receipt.parent = expense
@@ -109,6 +106,13 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
         amount.update(value: expense.calculate_amount_value(report.policy))
       end
       expense.update_attributes(amount_id: amount.id)
+
+      # calculate the equivalent amount in all currencies in the amounts table
+      if expense.date == DateUtils.local_date
+        expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+      else
+        expense.update_other_currencies
+      end
     end
 
     messages[:success] << 'Expense created'
@@ -127,7 +131,6 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
         add_message :error, valid.messages[:error]
         return
       end
-      self.expense.distance_expense.custom_fields.destroy_all
     end
   end
 

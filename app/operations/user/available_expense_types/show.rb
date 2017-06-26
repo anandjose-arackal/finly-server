@@ -5,7 +5,7 @@ class User::AvailableExpenseTypes::Show < User::Base
 
   class User::AvailableExpenseTypes::Show::ExpenseTypesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :custom_fields_config
+    attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :custom_fields_config, :currencies
 
     def init
       self.distance_config = params[:distance_config]
@@ -13,6 +13,7 @@ class User::AvailableExpenseTypes::Show < User::Base
       self.per_diem_config = params[:per_diem_config]
       self.categories = params[:categories]
       self.custom_fields_config = params[:custom_fields_config]
+      self.currencies = Currency.all
     end
 
   end
@@ -63,30 +64,6 @@ class User::AvailableExpenseTypes::Show < User::Base
           else
             per_diem_config[:per_diems] = []
             policy.per_diems.active.each do |per_diem|
-              per_diem_config[:per_diems] << {name: "#{per_diem.configurable.name} - #{per_diem.name}",
-                                              id: per_diem.id,
-                                              rate: per_diem.rate_value
-              }
-            end
-          end
-        end
-      else
-        self.distance_config = {enabled: company.distance_expense_enabled?,
-                                rate: company.distance_expense_config.rate,
-                                default_category_id: company.distance_expense_config.default_category_id
-        }
-        self.time_config = {enabled: company.time_expense_enabled?,
-                            rate: company.time_expense_config.rate,
-                            default_category_id: company.time_expense_config.default_category_id
-        }
-        self.per_diem_config = {enabled: company.per_diem_expense_enabled?}
-        if per_diem_config
-          if company.per_diems.active.empty?
-            self.per_diem_config = {enabled: false}
-            self.per_diem_config[:per_diems] = []
-          else
-            per_diem_config[:per_diems] = []
-            company.per_diems.active.each do |per_diem|
               per_diem_config[:per_diems] << {name: "#{per_diem.configurable.name} - #{per_diem.name}",
                                               id: per_diem.id,
                                               rate: per_diem.rate_value

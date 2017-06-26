@@ -48,7 +48,6 @@
 #
 
 
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -65,7 +64,6 @@ class User < ActiveRecord::Base
   belongs_to :company
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
-
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
   has_many :user_roles, through: :role_mapping, dependent: :destroy
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
@@ -77,7 +75,6 @@ class User < ActiveRecord::Base
   has_many :policies, through: :policy_user_mappings, dependent: :destroy
   has_many :admin_policy_user_mappings, -> { admin }, class_name: 'PolicyUserMapping', foreign_key: :user_id, dependent: :destroy
   has_many :admin_policies, source: :policy, class_name: 'Policy', through: :admin_policy_user_mappings
-
   has_many :reports, dependent: :destroy
   has_many :controlling_reports, class_name: 'Report', foreign_key: :controlling_user_id
   has_many :report_tracks, class_name: 'ReportTrack', foreign_key: :action_user_id
@@ -86,7 +83,6 @@ class User < ActiveRecord::Base
   has_many :manager_reports, -> { distinct }, source: :report, through: :manager_report_tracks
   has_many :finance_report_tracks, -> { finance_manager_role }, class_name: 'ReportTrack', foreign_key: :modified_user_id
   has_many :finance_reports, -> { distinct }, source: :report, through: :finance_report_tracks
-
   # has_many :reviewed_reports, class_name: 'Report'
   has_one :balance_sheet, dependent: :destroy
   has_many :initiating_payments, foreign_key: 'initiating_user_id', class_name: 'Payment', dependent: :destroy
@@ -94,10 +90,8 @@ class User < ActiveRecord::Base
   has_many :invitations, :class_name => 'User', :as => :invited_by
   has_one :auto_submit_config, as: :submitable, dependent: :destroy
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
-
   has_many :cards, dependent: :destroy
   has_many :card_transactions, dependent: :destroy
-
   has_many :money_requests
   has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
   has_many :money_request_tracks, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
@@ -107,16 +101,15 @@ class User < ActiveRecord::Base
   has_many :finance_money_request_tracks, -> { finance_manager_role }, class_name: 'MoneyRequestTrack', foreign_key: :modified_user_id
   has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
   has_many :notifications, dependent: :destroy
-
   has_many :notifier_type_configurations
-
   has_many :user_balance_histories
-
   belongs_to :otp_request_type
-
   has_many :feedbacks
-
   has_many :payment_orders, foreign_key: :initiating_user_id
+  has_many :user_group_item_mappings
+  has_many :user_group_items, through: :user_group_item_mappings
+
+  has_one :itz_cash_dmt_sender
 
   # has_one :feature_access, as: :accessible
 
@@ -124,6 +117,8 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :team_mapping
   accepts_nested_attributes_for :profile
   accepts_nested_attributes_for :cards
+  accepts_nested_attributes_for :itz_cash_dmt_sender
+  # accepts_nested_attributes_for :feature_access
 
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
   delegate :company_name, to: :company
@@ -132,8 +127,8 @@ class User < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :email, uniqueness: {allow_blank: true, case_sensitive: false}
-  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
-  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9]+\Z/}, length: {maximum: 30}
+  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
+  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
 
@@ -208,8 +203,8 @@ class User < ActiveRecord::Base
   # scopes for filters
   # scope :filter_search, -> (term) { where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_search, ->(term) do
-    where "first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ?",
-          "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%"
+    where "first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ? or mobile_number like ?",
+          "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%"
   end
 
   scope :filter_state, -> (state) do
@@ -317,12 +312,13 @@ class User < ActiveRecord::Base
 
   after_create do
     # self.build_profile.save if self.profile.blank?
-    self.team_mapping.build(default: true).save if self.team_mapping.count == 0
+    default_policy_id = self.company.default_policy.id
+    self.team_mapping.build(default: true, policy_id: default_policy_id).save if self.team_mapping.count == 0
+    self.policy_user_mappings.build(policy_id: default_policy_id).save
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
     self.build_enforce_policy(enabled: false).save
-
   end
 
   def payments
@@ -425,6 +421,7 @@ class User < ActiveRecord::Base
 
   # Checks the cash in hand on the date given and current date and responds with whichever is lower
   def cash_in_hand(date = nil)
+    date_obj = date
     unless date.kind_of?(Date)
       date_obj = date.to_date rescue nil
     end
@@ -432,7 +429,7 @@ class User < ActiveRecord::Base
     return cash if date_obj.blank? or date_obj == DateUtils.local_date
     history = self.user_balance_histories.find_by(date: date_obj)
     if history.blank?
-      return 0
+      return Amount.new(value: 0, currency_id: 1)
     else
       cash_on_hand = history.cash_on_hand_balance
       return cash_on_hand
@@ -542,7 +539,13 @@ class User < ActiveRecord::Base
 
   def finly_admin?
     jouska_id = Company.find_by(name: "Jouska").id rescue nil
-    if self.company_id == jouska_id || self.company_id == 1
+    unless Rails.env.production?
+      if self.email == 'king@demo.com'
+        return true
+      end
+    end
+
+    if self.company_id == jouska_id
       return true
     else
       return false

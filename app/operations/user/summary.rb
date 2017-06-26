@@ -58,7 +58,8 @@ class User::Summary < User::Base
           item[:credit] = card.card_program.manager_credit
           item[:debit] = card.card_program.manager_debit
         end
-        item[:ending_number] = card.ending_number
+        # item[:ending_number] = card.ending_number
+        item[:proxy] = card.proxy
         item[:actions] = {}
         item[:actions][:unblockable] = card.unblockable? # determining of the user can unblock the card at this stage
         item[:actions][:meta] = {}

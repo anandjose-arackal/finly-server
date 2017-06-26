@@ -73,6 +73,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     if expense.report_id and personal_view?
       unless expense.report.editable?
         messages[:error] << 'Expense cannot be edited at this stage'
+        return
       end
     end
   end
@@ -110,17 +111,32 @@ class Expense::Manual::Update < Expense::Manual::Base
     # add comment in report if expense is added within report
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
-    add_message :success, 'Expense updated'
-
     # marking the expense as non-transcribed after the first edit
     if expense.transcribed
       expense.update(transcribed: false)
+      expense.system_messages.destroy_all
       if expense.receipts.present?
         expense.receipts.each do |receipt|
           receipt.update(to_be_transcribed: false)
         end
       end
     end
+
+    # if the new category is personal, mark the expense as personal
+    if expense.category_name == 'Personal'
+      Expense::Personal::Mark.(user, {expense_id: expense.id})
+    end
+    ###############################################################
+
+    if expense.date == DateUtils.local_date
+      if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id
+        expense.destroy_other_currencies
+      end
+    else
+      expense.update_other_currencies
+    end
+
+    add_message :success, 'Expense updated'
   end
 
   private

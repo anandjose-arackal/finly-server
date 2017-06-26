@@ -30,14 +30,16 @@
 
 
           <!-- deleting a particular policy -->
-          <form data-remote data-turboboost method="post" action="<%= %>" id="deletePolicy<%=policy.id%>"></form>
+          <form data-remote data-turboboost method="post" action="<%= %>" id="deletePolicy<%= policy.id %>"></form>
           <input name="_method" type="hidden" value="delete"/>
           <input name="authenticity_token" value="<%= form_authenticity_token %>" hidden="hidden">
 
           <tr>
-            <td style="width: 30%;"> <% link_to policy.name, policy %></td>
+            <td style="width: 30%;">
+              <% link_to policy.name, policy %></td>
             <td style="width: 40%;">
-              <a id="showReportsButton" class="btn btn-primary green-button" href="<%= reports_path(view: params[:view])%>">View Reports</a>
+              <a id="showReportsButton" class="btn btn-primary green-button" href="<%= reports_path(view: params[:view]) %>">View
+                Reports</a>
               <i class="fa fa-trash-o"></i></td>
           </tr>
 
@@ -55,22 +57,23 @@
 
 <script>
 
-  function  validate(){
-    var x;
-    x = document.getElementById("policyName").value.trim();
-    if (x == "") {
-      alert("Enter a Policy Name");
-      return false;
-    };
-  }
+    function validate() {
+        var x;
+        x = document.getElementById("policyName").value.trim();
+        if (x == "") {
+            alert("Enter a Policy Name");
+            return false;
+        }
+        ;
+    }
 
-  function getPolicyReportsPath(policyId) {
+    function getPolicyReportsPath(policyId) {
 
-    path = '/admin/company/reports?filter_policy_id=' + policyId;
+        path = '/admin/company/reports?filter_policy_id=' + policyId;
 
-    return path;
+        return path;
 
-  }
+    }
 
 </script>
 

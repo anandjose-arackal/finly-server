@@ -5,7 +5,7 @@
 # expenses: array of expense objects to be added to the report
 
 class Report::Create < Report::Base
-  attr_accessor :for_user, :policy_id
+  attr_accessor :for_user, :policy_id, :expenses
 
   def authorized_user_types
     [:employee]
@@ -19,16 +19,32 @@ class Report::Create < Report::Base
 
   def init
     self.for_user = (params[:for_user] or user)
+    return if for_user.blank?
     self.policy_id = params[:policy_id]
     if policy_id.blank? and for_user.enforce_policy_enabled?
-      self.policy_id = for_user.policies.non_default.first.id rescue nil
+      self.policy_id = for_user.policies.non_default&.first&.id
     end
+    if policy_id.blank?
+      self.policy_id = user.company.default_policy.id
+    end
+    self.expenses = params[:expenses] || (for_user.expenses.where(id: params[:expense_ids].split(',')) rescue [])
   end
 
   def authorize
     if policy_id.present? and for_user.policies.with_id(policy_id).blank?
       add_message :error, 'User does not belong to the selected policy'
       raise_unauthorized_exception
+    end
+  end
+
+  def validate
+    if expenses.present?
+      expenses.each do |expense|
+        if expense.personal
+          add_message :error, "Personal expenses cannot be added to reports"
+          return
+        end
+      end
     end
   end
 

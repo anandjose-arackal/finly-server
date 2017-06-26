@@ -66,8 +66,6 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     return if has_errors?
 
     if self.expense.save
-      # Set custom fields
-      set_custom_fields true
       # Attach an existing receipt to the expense
       if self.receipt.present?
         self.receipt.parent = expense
@@ -87,6 +85,13 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
       expense.update(amount: amount)
     else
       amount.update(value: expense.calculate_amount_value(per_diem.configurable))
+
+      # calculate the equivalent amount in all currencies in the amounts table
+      if expense.date == DateUtils.local_date
+        expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+      else
+        expense.update_other_currencies
+      end
     end
 
     # add comment in report if expense is added within report
@@ -114,7 +119,6 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
         add_message :error, valid.messages[:error]
         return
       end
-      self.expense.per_diem_expense.custom_fields.destroy_all
     end
   end
 

@@ -18,9 +18,10 @@ class UsersController < ApplicationController
   # for list of team members - currently sending instance variables based on what was shown in the previous user listing
   def index
     @result = User::Index.(current_user, params)
-    respond_to do |format|
-      format.json { render json: @result.paginated_team.as_json }
-    end
+    # respond_to do |format|
+    #   format.json { render json: @result.paginated_team.as_json }
+    # end
+    respond
   end
 
   # For destroying user manager mapping
@@ -140,6 +141,7 @@ class UsersController < ApplicationController
 
   def available_expense_types
     @result = User::AvailableExpenseTypes::Show.(current_user, params)
+    @categories = current_company.categories.active rescue []
     respond
   end
 
@@ -174,7 +176,10 @@ class UsersController < ApplicationController
         success_message = 'Configuration updated'
       when 'enforce_policy'
         operation = User::Configuration::EnforcePolicy::Update.new(current_user, params)
-        success_message = "Configuration Updated"
+        success_message = 'Configuration Updated'
+      when 'groups'
+        operation = User::Group::Set.new(current_user, params)
+        success_message = 'User Group Configuration Updated'
       else
         # do nothing, ha!
     end
@@ -183,6 +188,10 @@ class UsersController < ApplicationController
       return
     end
     @result = operation.run
-    respond(response: :success, message: success_message)
+    if @result&.success?
+      respond(response: :success, message: success_message)
+    else
+      response response: :failure, message: (@result&.messages[:error] || 'Error while updating data')
+    end
   end
 end

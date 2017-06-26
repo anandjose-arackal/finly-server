@@ -44,7 +44,8 @@ class Report::Base < BaseOperation
 
   class Report::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
-                  :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present
+                  :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present,
+                  :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total
 
     def init
       self.report = params[:report]
@@ -62,14 +63,18 @@ class Report::Base < BaseOperation
       self.finance_manager = User::Team::Approver.(report.user, report: report, type: :finance_manager)
       self.violations = Report::Violation.(user, report: self.report)
       self.violations_present = has_warning? || has_blocking?
+      self.reimbursable_expenses_total = reimbursable_expenses
+      self.non_reimbursable_expenses_total = non_reimbursable_expenses
+      self.card_expenses_total = report.total_amount(:only_card_expenses)
     end
 
     def retrieve_policies
-      policies = []
-      unless report.user.enforce_policy_enabled?
-        policies << {id: 0, name: 'None'}
+      # policies = []
+      if report.user.enforce_policy_enabled?
+        # policies << {id: 0, name: 'None'}
+        return report.user.policies.non_default
       end
-      policies + report.user.policies.non_default
+      report.user.policies
     end
 
     def status_name(report)
@@ -81,13 +86,21 @@ class Report::Base < BaseOperation
       end
     end
 
+    def reimbursable_expenses
+      report.total_amount([:reimbursable])
+    end
+
+    def non_reimbursable_expenses
+      report.total_amount(:non_reimbursable)
+    end
+
     def expenses_category_sorted
       categorized_expenses = []
       self.categories.each do |category|
         item_expenses = self.expenses.with_category(category.id)
         if item_expenses.present?
           item_name = category.name
-          item_sum = precision_value item_expenses.with_amount.sum(:value)
+          item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
           categorized_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
         end
       end
@@ -101,7 +114,7 @@ class Report::Base < BaseOperation
         item_expenses = self.expenses.with_date(date)
         if item_expenses.present?
           item_name = date
-          item_sum = precision_value item_expenses.with_amount.sum(:value)
+          item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
           date_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
         end
       end

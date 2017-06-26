@@ -2,16 +2,18 @@
 #
 # Table name: companies
 #
-#  id         :integer          not null, primary key
-#  name       :string(255)
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  active     :boolean          default(TRUE), not null
+#  id               :integer          not null, primary key
+#  name             :string(255)
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  active           :boolean          default(TRUE), not null
+#  base_currency_id :integer          default(1)
 #
 
 class Company < ActiveRecord::Base
   include Constants
 
+  belongs_to :base_currency, class_name: 'Currency'
   has_many :users
   has_many :cards
   has_many :contacts, as: :contactable
@@ -24,24 +26,15 @@ class Company < ActiveRecord::Base
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
   has_one :itz_cash_property
   has_many :company_transactions
-
-
-  has_one :distance_expense_config, as: :parent
-  has_one :time_expense_config, as: :parent
-  has_one :per_diem_expense_config, as: :parent
-
   has_many :per_diems, as: :configurable
-
   has_many :company_balance_histories
-
   has_many :field_configurations, as: :configurable
-
   has_one :feature_subscription, as: :subscribable
-
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
-
   has_many :payment_orders
+  has_many :user_groups
+  has_many :user_teams
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -51,7 +44,7 @@ class Company < ActiveRecord::Base
 
   validates :name, presence: true
 
-  scope :with_id, -> (id) {where id: id}
+  scope :with_id, -> (id) { where id: id }
   scope :filter_ocr, -> (flag) {
     if flag == '1'
       joins(:feature_subscription).select('companies.*').where('ocr_enabled IS true')
@@ -96,7 +89,7 @@ class Company < ActiveRecord::Base
   }
 
   def default_policy
-    self.policies.default
+    self.policies.default&.first
   end
 
   def get_active_users
@@ -135,20 +128,54 @@ class Company < ActiveRecord::Base
   end
 
   def distance_expense_enabled?
-    self.distance_expense_config.enabled
+    self.default_policy.distance_expense_config.enabled
   end
 
   def time_expense_enabled?
-    self.time_expense_config.enabled
+    self.default_policy.time_expense_config.enabled
   end
 
   def per_diem_expense_enabled?
-    self.per_diem_expense_config.enabled
+    self.default_policy.per_diem_expense_config.enabled
   end
 
   def ocr_enabled?
     self.feature_subscription.ocr_enabled
   end
+
+  # Feature subscription methods
+  def expense_management_enabled?
+    self.feature_subscription.expense_management_enabled
+  end
+
+  def gift_card_enabled?
+    self.feature_subscription.gift_card_enabled
+  end
+
+  def gift_voucher_enabled?
+    self.feature_subscription.gift_voucher_enabled
+  end
+
+  def meal_card_enabled?
+    self.feature_subscription.meal_card_enabled
+  end
+
+  def fuel_card_enabled?
+    self.feature_subscription.fuel_card_enabled
+  end
+
+  def medical_card_enabled?
+    self.feature_subscription.medical_card_enabled
+  end
+
+  def expense_card_enabled?
+    self.feature_subscription.expense_card_enabled
+  end
+
+  def reimbursement_card_enabled?
+    self.feature_subscription.reimbursement_card_enabled
+  end
+
 
   def balance_amount(date)
     balance_history = self.company_balance_histories.with_date(date).first rescue nil
@@ -160,12 +187,11 @@ class Company < ActiveRecord::Base
     !!self.itz_cash_property&.d_code.present?
   end
 
-
   private
 
   def init_config_present
 
-    self.policies.build(default: true).save unless self.policies.default.present?
+    self.policies.build(default: true, name: 'Company (Default)').save unless self.policies.default.present?
     ExportPreference.build_default_preferences(self)
     Constants::DEFAULT_CATEGORIES.each do |category|
       self.categories.create(name: category)
@@ -173,11 +199,6 @@ class Company < ActiveRecord::Base
 
     self.build_configuration.save if self.configuration.blank?
     self.build_account.save if self.account.blank?
-
-    # building the difference expense configurations
-    self.build_distance_expense_config(enabled: false).save
-    self.build_time_expense_config(enabled: false).save
-    self.build_per_diem_expense_config(enabled: false).save
 
     if self.feature_subscription.blank?
       self.build_feature_subscription.save

@@ -1,9 +1,26 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :amount_value, :category_name, :category_id, :expense_type_id,
                                :distance_value, :time_value, :per_diem_name, :per_diem_rate_value, :per_diem_quantity_value,
-                               :distance_rate_value, :time_rate_value, :transcribed
+                               :distance_rate_value, :time_rate_value, :transcribed, :reimbursable
 
 json.date @result.expense.date.strftime("%d %b %Y")
 json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
+json.currency_id @result.expense.currency_id rescue nil
+json.original_currency_id @result.expense.currency_id rescue nil
+json.currency_symbol @result.expense.currency_symbol
+json.currency_country_code @result.expense.currency_country_code
+
+if @result.expense.report_id.present?
+  json.original_amount_value @result.expense.original_amount_value
+  json.base_currency_id @result.expense.report.base_currency_id
+  json.original_currency_symbol @result.expense.amount.currency.symbol
+  json.original_currency_country_code @result.expense.amount.currency.country_code
+  json.base_currency_symbol @result.expense.report.base_currency_symbol
+  json.base_currency_country_code @result.expense.report.base_currency_code
+  json.currency_conversion_rate @result.conversion_rate
+end
+
+# flag to show whether a particular expense has been converted or not
+json.converted @result.converted
 
 json.receipts @result.expense.receipts do |receipt|
   json.id receipt.id
@@ -24,7 +41,26 @@ json.violations @result.violation
 
 json.editable @result.editable
 
+json.show_options @result.expense.report.blank? && (params[:view] == 'personal' || params[:view].nil?)
+
 json.deletable ((params[:view].nil? || params[:view] == 'personal') && @result.expense.deletable_expense? && @result.expense.report_id.nil?)
+
+json.reimbursable @result.expense.reimbursable
+
+json.personal @result.expense.personal
+
+json.cancellable @result.expense.cancellable?
+
+json.cancelled @result.expense.cancelled?
+
+# sending all the currencies and the respective symbols and codes
+json.currencies do
+  json.array!(Currency.all) do |currency|
+    json.symbol currency.symbol
+    json.country_code currency.country_code
+    json.id currency.id
+  end
+end
 
 json.custom_fields do
   expense = @result.expense
@@ -44,4 +80,15 @@ end
 
 json.system_messages do
   json.array!(@result.expense.system_messages.pluck(:content))
+end
+
+if @result.expense.card_expense? && @result.expense.cancelled?
+  json.cancelled_against_transactions do
+    json.array!(@result.expense.card_expense&.cancelled_against_transactions) do |transaction|
+      json.timestamp transaction.transaction_timestamp
+      json.amount_value transaction.billing_amount_value
+      json.type "Refund"
+      json.card_number "XXXXXXXXXXXX#{transaction.card.ending_number}"
+    end
+  end
 end
