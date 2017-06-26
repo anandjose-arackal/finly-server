@@ -657,6 +657,6 @@ if CardTransaction.filter_refunds(1).count == 0
   end
 end
 
-Expense.all.each do |expense|
-  expense.update_other_currencies
-end
+# Expense.all.each do |expense|
+#   expense.update_other_currencies
+# end
