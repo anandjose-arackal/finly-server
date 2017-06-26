@@ -22,6 +22,7 @@
 #  city                :string(255)
 #  state_id            :integer
 #  pin_code            :string(255)
+#  apple_push_token    :string(255)
 #
 
 require 'test_helper'
