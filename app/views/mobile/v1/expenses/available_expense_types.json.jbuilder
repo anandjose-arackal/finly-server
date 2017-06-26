@@ -24,6 +24,7 @@ json.currencies do
     json.id currency.id
     json.symbol currency.symbol
     json.country_code currency.country_code
+    json.country currency.country
   end
 end
 
