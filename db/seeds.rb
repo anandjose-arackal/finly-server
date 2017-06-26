@@ -401,7 +401,7 @@ if p.rules_count == 0
                              rule_type_id: 2)
 end
 
-# if Report.count == 0
+if Report.count == 0
 
   c.users.all.each do |user|
 
@@ -463,12 +463,12 @@ end
       end
     end
   end
-# end
+end
 
 unless Rails.env.production?
 
   # creating some junk transactions and card expenses for testing
-  # if CardTransaction.count == 0
+  if CardTransaction.count == 0
     User.all.each do |user|
       next unless user.cards.present?
       card = user.cards.first
@@ -507,7 +507,7 @@ unless Rails.env.production?
       end
 
     end
-  # end
+  end
 end
 # end
 
