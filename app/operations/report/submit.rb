@@ -118,10 +118,29 @@ class Report::Submit < Report::Base
   end
 
   def post_process
+
+    # Creating Email Authorization
+
+    # If report is processing
+    email_authorization = nil
+    # email_authorization_presenter = EmailAuthorization::Create.(user, {authorizable: report})
+    if report.processing?
+      report.reload
+      email_authorization_presenter = EmailAuthorization::Create.(user, {authorizable: report})
+      if email_authorization_presenter.success?
+        email_authorization = email_authorization_presenter.email_authorization
+      end
+    end
+
+    # If report is auto approved
+
+
+    # Email Authorization Ends
+
     # adding comment regarding the change in status of this report
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_submit)
 
-    Event::EReport::Submit.(user, report: report)
+    Event::EReport::Submit.(user, {email_authorization: email_authorization, report: report})
 
     add_message :success, 'Report Submitted'
 

@@ -23,20 +23,7 @@ def random_mobile_number
   StringRandom.random_regex(pattern)
 end
 
-if ExportField.count == 0
-  ExportField.create(id: 1, name: 'Employee Name')
-  ExportField.create(id: 2, name: 'Employee ID')
-  ExportField.create(id: 3, name: 'Payroll ID')
-  ExportField.create(id: 4, name: 'Report ID')
-  ExportField.create(id: 5, name: 'Report name')
-  ExportField.create(id: 6, name: 'Report Status')
-  ExportField.create(id: 7, name: 'Expense ID')
-  ExportField.create(id: 8, name: 'Expense Merchant')
-  ExportField.create(id: 9, name: 'Expense Currency')
-  ExportField.create(id: 10, name: 'Expense Amount')
-  ExportField.create(id: 11, name: 'Expense Date')
-  ExportField.create(id: 12, name: 'Expense Category Name')
-end
+ExportField.seed_data
 
 if UserRole.count == 0
   UserRole.create id: 1, name: 'Admin'
@@ -414,7 +401,7 @@ if p.rules_count == 0
                              rule_type_id: 2)
 end
 
-if Report.count == 0
+# if Report.count == 0
 
   c.users.all.each do |user|
 
@@ -476,12 +463,12 @@ if Report.count == 0
       end
     end
   end
-end
+# end
 
 unless Rails.env.production?
 
   # creating some junk transactions and card expenses for testing
-  if CardTransaction.count == 0
+  # if CardTransaction.count == 0
     User.all.each do |user|
       next unless user.cards.present?
       card = user.cards.first
@@ -520,7 +507,7 @@ unless Rails.env.production?
       end
 
     end
-  end
+  # end
 end
 # end
 
@@ -668,4 +655,8 @@ if CardTransaction.filter_refunds(1).count == 0
       result = Card::Transaction::Create.(trans_params)
     end
   end
+end
+
+Expense.all.each do |expense|
+  expense.update_other_currencies
 end

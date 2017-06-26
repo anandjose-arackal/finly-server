@@ -23,6 +23,7 @@ class Company < ActiveRecord::Base
   has_many :policies, dependent: :destroy
   has_many :export_preferences, dependent: :destroy
   has_one :account, class_name: 'CompanyAccount'
+  has_one :quickbooks_configuration
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
   has_one :itz_cash_property
   has_many :company_transactions
@@ -35,10 +36,13 @@ class Company < ActiveRecord::Base
   has_many :payment_orders
   has_many :user_groups
   has_many :user_teams
+  has_many :auto_sync_configs
+  has_many :quickbooks_payment_types
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
   accepts_nested_attributes_for :feature_subscription
+  accepts_nested_attributes_for :auto_sync_configs
 
   after_create :init_config_present
 
@@ -86,6 +90,22 @@ class Company < ActiveRecord::Base
   scope :filter_date_to, -> (end_date) {
     end_date = end_date.to_date + 1
     where('created_at <= ?', end_date)
+  }
+
+  scope :auto_sync_categories_enabled, -> {
+    joins(:auto_sync_configs).select('companies.*').where(categories_sync: true)
+  }
+
+  scope :auto_sync_company_tags_enabled, -> {
+    joins(:auto_sync_configs).select('companies.*').where(company_tags_sync: true)
+  }
+
+  scope :auto_sync_external_users_enabled, -> {
+    joins(:auto_sync_configs).select('companies.*').where(external_users_sync: true)
+  }
+
+  scope :auto_sync_reports_enabled, -> {
+    joins(:auto_sync_configs).select('companies.*').where(reports_sync: true)
   }
 
   def default_policy
@@ -176,6 +196,10 @@ class Company < ActiveRecord::Base
     self.feature_subscription.reimbursement_card_enabled
   end
 
+  def hard_copy_receipt_enabled?
+    self.feature_subscription.hard_copy_receipt
+  end
+
 
   def balance_amount(date)
     balance_history = self.company_balance_histories.with_date(date).first rescue nil
@@ -202,6 +226,11 @@ class Company < ActiveRecord::Base
 
     if self.feature_subscription.blank?
       self.build_feature_subscription.save
+    end
+
+    # create the auto sync configurations for each new company
+    AutoSyncConfigType::VALUES.each do |type|
+      self.auto_sync_configs.build(enabled: false)
     end
   end
 

@@ -112,6 +112,11 @@ class Expense::ExTime::Create < Expense::ExTime::Base
       end
     end
 
+    # checking if the expense has any receipts, and marking them all as no need to be transcribed
+    if expense.receipts.present?
+      expense.receipts.update_all(to_be_transcribed: false)
+    end
+
     add_message :success, 'Expense created'
   end
 

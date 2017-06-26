@@ -11,11 +11,13 @@
 #
 
 class UserGroupItem < ActiveRecord::Base
-  include SoftDeletable
 
   belongs_to :user_group
-  has_many :user_group_item_mappings
+  has_many :user_group_item_mappings, dependent: :destroy
   has_many :users, through: :user_group_item_mappings
+
+  has_many :user_team_group_item_mappings, dependent: :destroy
+  has_many :user_teams, through: :user_team_group_item_mappings
 
   validates :name, uniqueness: {scope: :user_group_id}
 
@@ -23,8 +25,8 @@ class UserGroupItem < ActiveRecord::Base
   scope :with_id, ->(id) { where id: id }
   scope :user_group_count, -> { pluck(:user_group_id).uniq.count }
 
-  before_destroy do
-    UserGroupItemMapping.with_group_item(self.id).destroy_all
-  end
+  # before_destroy do
+  #   UserGroupItemMapping.with_group_item(self.id).destroy_all
+  # end
 
 end

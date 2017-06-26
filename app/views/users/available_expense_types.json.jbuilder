@@ -19,7 +19,6 @@ json.per_diem_config do
   end
 end
 json.custom_fields_config @result.custom_fields_config
-
 json.currencies do
   json.array!(@result.currencies) do |currency|
     json.id currency.id

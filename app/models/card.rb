@@ -50,19 +50,20 @@ class Card < ActiveRecord::Base
   scope :unassigned, -> { where user_id: nil }
   scope :active, -> { where active: true }
   scope :expense_cards, -> { where card_program_id: CardProgram.id_for(:expense) }
+  scope :manager_viewable_transactions, -> { where card_program_id: CardProgram.all.with_manager_view_transactions.pluck(:id) }
   scope :with_card_program, ->(id) { where card_program_id: id }
   scope :creditable_cards, -> { with_card_program(CardProgram.all.with_manager_credit) }
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
 
-  scope :expense_cards_only, -> {where card_program_id: CardProgram.id_for(:expense)}
-  scope :reimbursement_cards_only, -> {where card_program_id: CardProgram.id_for(:reimbursement)}
+  scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
+  scope :reimbursement_cards_only, -> { where card_program_id: CardProgram.id_for(:reimbursement) }
 
   delegate :card_balance_value, to: :card_balance
   delegate :card_program_name, to: :card_program
   delegate :itz_cash_card_program_name, to: :itz_cash_card_program
 
-  validates :proxy, uniqueness: true, format: {with: /[S]\d{11}/}, length: {is: 12}
+  validates :proxy, uniqueness: true, format: {with: /\A[S]\d{11}\z/}, length: {is: 12}
   validates :ending_number, presence: true
   validates :card_program_id, presence: true
   validate :user_or_company_presence
@@ -71,7 +72,7 @@ class Card < ActiveRecord::Base
   after_create do
     user = self.user
 
-    result = ItzCash::AccountDetails.(user, card_id: self.id)
+    result = ItzCash::AccountDetails.(user, card: self)
 
     # marking the card by default as either active or inactive
     if result.success?
@@ -124,14 +125,14 @@ class Card < ActiveRecord::Base
   # attr_accessor :balance, :available_card_eligibility
   def balance
     if card_balance.blank?
-      ItzCash::AccountDetails.(user, card_id: self.id)
+      ItzCash::AccountDetails.(user, card: self)
     end
     self.card_balance.value
   end
 
   def available_card_eligibility
     if card_eligibility.blank?
-      ItzCash::AccountDetails.(user, card_id: self.id)
+      ItzCash::AccountDetails.(user, card: self)
     end
     self.card_eligibility.value
   end

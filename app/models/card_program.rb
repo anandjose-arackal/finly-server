@@ -28,6 +28,7 @@ class CardProgram < ActiveRecord::Base
   scope :with_manager_credit, -> { where manager_credit: true }
   scope :with_reimbursement, -> { where receive_reimbursement: true }
   scope :with_non_personal_fund_transfer, -> { where non_personal_fund_transfer: true }
+  scope :with_manager_view_transactions, -> { where manager_view_transactions: true }
 
   PROGRAMS = {expense: 1, reimbursement: 2, meal: 3, medical: 4}
 
@@ -52,7 +53,7 @@ class CardProgram < ActiveRecord::Base
                                      personal_wallet_fund_transfer: false,
                                      spend_restrictions: false,
                                      end_date_restrictions: true,
-                                     manager_credit: false,
+                                     manager_credit: true,
                                      manager_debit: false,
                                      manager_blockable: false,
                                      manager_view_balance: false,

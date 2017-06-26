@@ -2,7 +2,7 @@ module Constants
   VALID_EMAIL_FORMAT = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
   VALID_MOBILE_NUMBER = /\A(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[789]\d{9}\z/i
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
-  VALID_GENDER = /[MmFf]/i
+  VALID_GENDER = /\A[MmFf]\z/i
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
 
   OTP_RESEND_INTERVAL = 60
@@ -34,6 +34,13 @@ module Constants
 
   CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
 
+  # PayU Payment Gateway URL
+  if Rails.env.production?
+    PAYU_RELOAD_URL = "https://www.itzcash.com/finly/servlet/AccountReloadServlet"
+  else
+    PAYU_RELOAD_URL = "https://staging.itzcash.com/loconav/servlet/AccountReloadServlet"
+  end
+
   #########################
 
   if Rails.env.production?
@@ -50,19 +57,28 @@ module Constants
   if Rails.env.development?
     # url = "http://192.168.81.157:3000/#"
     url = "http://localhost/#"
+    authorizer_url = "http://localhost/authorizer#"
   elsif Rails.env.staging?
     url = "http://staging.finly.io/#"
+    authorizer_url = "http://staging.finly.io/authorizer#"
   elsif Rails.env.itzcash_uat?
     url = "http://demo.finly.io/#"
+    authorizer_url = "http://demo.finly.io/authorizer#"
   elsif Rails.env.local_vm?
     url = "http://192.168.56.101/#"
+    authorizer_url = "http://192.168.56.101/authorizer#"
   elsif Rails.env.production?
     url = "https://www.finly.io/#"
+    authorizer_url = "https://www.finly.io/authorizer#"
   else
     url = ""
+    authorizer_url = ""
   end
 
   BASE_URL = url
+  BASE_URL_AUTHORIZER = authorizer_url
+
+  DEFAULT_PASSWORD = "lqskmclkmsal1k"
 
   class Constants::ItzCash
 

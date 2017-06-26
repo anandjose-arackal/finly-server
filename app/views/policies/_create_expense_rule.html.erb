@@ -22,19 +22,26 @@
 
           <div class="col-sm-12">
             <div class="row no-margin">
-              <div class="col-sm-4">
+              <div class="col-sm-3">
                 <label>
                   <input type="radio" name="expense_rule[expense_rule_type_id]" target="newRuleAfterDays" value="1" checked>&nbsp;&nbsp;Require Receipt  
                 </label>    
               </div>
 
-              <div class="col-sm-4">
+              <% if current_company.feature_subscription.hard_copy_receipt %>
+                <div class="col-sm-3">
+                  <label>
+                    <input type="radio" name="expense_rule[expense_rule_type_id]" target="newRuleAfterDays" value="4">&nbsp;&nbsp;Require Receipt Hard Copy Submission
+                  </label>    
+                </div>
+              <% end %>
+
+              <div class="col-sm-3">
                 <label>
                   <input type="radio" name="expense_rule[expense_rule_type_id]" target="newRuleAfterDays" value="2">&nbsp;&nbsp;Require Note
                 </label>
               </div>
-
-              <div class="col-sm-4">
+              <div class="col-sm-3">
                 <label>
                   <input type="radio" name="expense_rule[expense_rule_type_id]" target="newRuleAfterDays" value="3">&nbsp;&nbsp;Disallow Expense  
                 </label>    

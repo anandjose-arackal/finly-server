@@ -43,6 +43,17 @@ class Report::Approve < Report::Base
     unless report.processing? or auto_approve
       add_message :error, 'Cannot approve this report as it is not in processing state'
     end
+
+    violations = Report::Violation.(user, report: report)
+    violations_present = false
+    violations.each do |key, value|
+      if value['expense_blocking'].present? or value['budget_blocking'].present?
+        violations_present = true
+      end
+    end
+    if violations_present
+      add_message :error, 'Reports with blocking violations cannot be approved'
+    end
   end
 
   def process
@@ -108,10 +119,24 @@ class Report::Approve < Report::Base
       end
       comment.save
 
+      email_authorization = nil
+
       # set the reimbursement amount of the report
       unless report.processing?
         Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
         report.reload
+
+        # Mark all previous tokens as invalid
+        email_auth_invalidate_presenter = EmailAuthorization::Invalidate.(user, authorizable: report)
+        # unless email_auth_invalidate_presenter.success?
+
+        # end
+      else
+        email_auth_invalidate_presenter = EmailAuthorization::Invalidate.(user, authorizable: report)
+        email_authorization_presenter = EmailAuthorization::Create.(user, {authorizable: report})
+        if email_authorization_presenter.success?
+          email_authorization = email_authorization_presenter.email_authorization
+        end
       end
       # if report is closed, add the relevant comment
       if report.closed?
@@ -122,7 +147,7 @@ class Report::Approve < Report::Base
         comment.save
       end
       # Send notifications
-      Event::EReport::Approve.(self.user, report: self.report, auto_approve: auto_approve)
+      Event::EReport::Approve.(self.user, {report: self.report, auto_approve: auto_approve, email_authorization: email_authorization})
 
       add_message :success, 'Report approved!'
     end

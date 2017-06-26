@@ -1,6 +1,6 @@
 class Disburse::UsersController < ApplicationController
   def create
-    @result = Disburse::Users::Create.(current_user, params)
+    @result = User::CreateWoPassword.(current_user, params)
     if @result.success?
       respond response: :success
     else

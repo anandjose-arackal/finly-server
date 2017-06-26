@@ -53,6 +53,19 @@ class ReportsController < ApplicationController
     respond render: :show
   end
 
+  def bulk_approve
+    @result = Report::BulkApprove.(current_user, params)
+    # respond render: :show
+    unless @result.success?
+      respond_to do |format|
+        format.json {render :bulk_approve_errors }
+      end
+      # respond render: :bulk_approve_errors
+      return
+    end
+    # respond response: :success
+  end
+
   def reject
     @result = Report::Reject.(current_user, params)
     respond render: :show
@@ -71,6 +84,14 @@ class ReportsController < ApplicationController
   def take_control
     @result = Report::TakeControl.(current_user, params)
     respond render: :show
+  end
+
+  def toggle_receipt_hardcopy
+    @result = Report::Receipts::ToggleHardCopy.(current_user, params)
+    if @result.success?
+      render 'toggle_receipt_hardcopy'
+    end
+    # respond render: :show
   end
 
   def reimburse

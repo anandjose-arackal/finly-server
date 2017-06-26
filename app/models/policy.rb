@@ -16,6 +16,7 @@
 
 
 
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -53,7 +54,6 @@ class Policy < ActiveRecord::Base
   has_many :field_configurations, as: :configurable
 
   validates :company_id, presence: true
-  # validate :valid_name
   validate :one_default_per_company
 
   has_paper_trail
@@ -96,13 +96,6 @@ class Policy < ActiveRecord::Base
   end
 
   private
-
-  # def valid_name
-  #   errors.add(:name, 'cannot be blank') if name.blank? and not default
-  #   if company_id.present? and name.present?
-  #     errors.add(:name, 'has to be unique') if Policy.company(company_id).non_default.exclude_deleted.by_name(name).present?
-  #   end
-  # end
 
   def one_default_per_company
     if default

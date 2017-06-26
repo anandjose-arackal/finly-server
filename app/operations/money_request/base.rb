@@ -5,6 +5,9 @@ class MoneyRequest::Base < BaseOperation
     if user.blank?
       messages[:error] << 'User not found'
     end
+    if params[:filter_search].present?
+      params[:filter_search].strip! if params[:filter_search].is_a?(String)
+    end
   end
 
   def init

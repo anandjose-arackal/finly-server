@@ -10,9 +10,6 @@
 
 
 
-
-
-
 class ExpenseType < ActiveRecord::Base
 
   validates :name, presence: true
@@ -47,6 +44,26 @@ class ExpenseType < ActiveRecord::Base
 
   def self.per_diem_expense_id
     5
+  end
+
+  def manual?
+    self.id == ExpenseType.id_for(:manual)
+  end
+
+  def card?
+    self.id == ExpenseType.id_for(:card)
+  end
+
+  def distance?
+    self.id == ExpenseType.id_for(:distance)
+  end
+
+  def time?
+    self.id == ExpenseType.id_for(:time)
+  end
+
+  def per_diem?
+    self.id == ExpenseType.id_for(:per_diem)
   end
 
 end

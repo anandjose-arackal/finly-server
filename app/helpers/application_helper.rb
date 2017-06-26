@@ -16,7 +16,7 @@ module ApplicationHelper
 
   def is_admin_view
     view = params[:view]
-    if view == 'admin'
+    if view == 'admin' || view == :admin
       return true
     end
     false
