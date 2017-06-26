@@ -55,6 +55,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::DataPoint
         extract = extract.first
       when :last
         extract = extract.last
+      when :all, :none
+        # Do nothing
     end
 
     extract
