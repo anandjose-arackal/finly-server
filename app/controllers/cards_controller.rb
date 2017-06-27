@@ -42,7 +42,7 @@ class CardsController < ApplicationController
         # Unblock = 1
         @result = User::PrepaidCard::Unblock.(current_user, params)
     end
-    respond response: :success
+    respond
   end
 
   # For Mass Crediting accounts
