@@ -66,7 +66,7 @@ class Card < ActiveRecord::Base
   validates :proxy, uniqueness: true, format: {with: /\A[S]\d{11}\z/}, length: {is: 12}
   validates :ending_number, presence: true
   validates :card_program_id, presence: true
-  validate :user_or_company_presence
+  validates :company_id, presence: true
   # validates :itz_cash_card_program_id, presence: true
 
   after_create do
@@ -149,12 +149,5 @@ class Card < ActiveRecord::Base
     self.active
   end
 
-  private
-
-  def user_or_company_presence
-    unless self.user.present? || self.company.present?
-      errors.add(:card, "should belong to either company or user")
-    end
-  end
 
 end
