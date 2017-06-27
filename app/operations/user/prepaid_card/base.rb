@@ -21,22 +21,6 @@ class User::PrepaidCard::Base < BaseOperation
       cards = Card::Index.(user, params)
       self.card = cards.cards.find_by(id: card_id)
     end
-
-    # self.selected_user = params[:user]
-    # return unless self.selected_user.blank?
-    # selected_user_id = (params[:id] or params[:user_id])
-    # if personal_view? or selected_user_id == user.id
-    #   self.selected_user = user
-    # else
-    #   operation = User::Team::Index.new(user, params)
-    #   result = operation.run
-    #   if operation.success?
-    #     self.selected_user = result.with_id(selected_user_id).first rescue nil
-    #     messages[:error] << 'User not found' if self.selected_user.blank?
-    #   else
-    #     messages[:error] = operation.messages[:error]
-    #   end
-    # end
   end
 
   def validate
