@@ -20,7 +20,6 @@ class Event::EReport::Base < Event::SetNotifier
   end
 
   def init
-    # debugger
     self.report = params[:report]
   end
 

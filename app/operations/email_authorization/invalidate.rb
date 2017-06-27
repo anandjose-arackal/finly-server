@@ -11,7 +11,6 @@ class EmailAuthorization::Invalidate < EmailAuthorization::Base
   end
 
   def process
-    # debugger
     transaction = email_authorizations.update_all({is_valid: false})
     unless transaction
       add_message :error, "Updating Email Authorizatio Failed"

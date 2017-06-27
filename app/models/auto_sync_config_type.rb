@@ -1,0 +1,19 @@
+# == Schema Information
+#
+# Table name: auto_sync_config_types
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
+class AutoSyncConfigType < ActiveRecord::Base
+
+  VALUES = { quickbooks: 1, tally: 2 }
+
+  def self.id_for(name)
+    VALUES[name]
+  end
+
+end

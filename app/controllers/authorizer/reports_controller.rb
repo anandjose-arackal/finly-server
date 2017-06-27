@@ -1,7 +1,6 @@
 class Authorizer::ReportsController < ApplicationController
   def show
     @result = Report::ReportAuthorizer::Show.(params)
-    # debugger
     if @result.failure?
       respond response: :failure
       return

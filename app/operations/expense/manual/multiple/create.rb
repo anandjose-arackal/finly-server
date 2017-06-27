@@ -121,7 +121,7 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
   end
 
   def post_process
-    self.multiple_expenses.each { |expense| Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: expense) }
+    self.multiple_expenses.each { |key, expense_hash| Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: expense_hash[:expense]) }
   end
 
   def set_custom_fields_multiple(expense, current_params)

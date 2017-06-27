@@ -10,6 +10,7 @@ class Api::Fm::V1::CardsController < ApiApplicationController
     respond
   end
 
+  # retrieves card transactions by card_id
   def transactions
     @result = Card::Transaction::Index.(current_user, params)
     respond

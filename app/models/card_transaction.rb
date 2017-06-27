@@ -99,6 +99,28 @@ class CardTransaction < ActiveRecord::Base
   scope :with_user, ->(user_ids) { where user_id: user_ids }
   scope :with_card, ->(card_ids) { where card_id: card_ids }
 
+  scope :filter_user_id, -> (user_id) {
+    where user_id: user_id
+  }
+
+  scope :filter_user_search, -> (term){
+    user_ids = self.pluck(:user_id)
+    matching_user_ids = User.where(id: user_ids).where('first_name LIKE ? OR last_name LIKE ? OR email like ?', "%#{term}%", "%#{term}%", "%#{term}%")
+    self.where(user_id: matching_user_ids)
+  }
+
+  scope :filter_date, -> (date_from, date_to) {
+    unless date_from.blank? && date_to.blank?
+      type_val = :transaction_timestamp
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = DateUtils.local_date if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date if date_to.present?
+      transactions = arel_table
+      where(transactions[type_val].gteq(date_from).and(transactions[type_val].lteq(date_to)))
+    end
+  }
+
   def credit?
     self.transaction_type == 'Credit'
   end
