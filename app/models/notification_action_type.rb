@@ -30,7 +30,11 @@ class NotificationActionType < ActiveRecord::Base
              notify_credit_cash_advance: 18,
              notify_take_control: 19,
              notify_awaiting_approval: 20,
-             notify_cash_withdrawal_against_report_reimbursement: 21
+             notify_cash_withdrawal_against_report_reimbursement: 21,
+             notify_auto_reload_card_failure: 22,
+             notify_auto_reload_card_success: 23,
+             notify_quickbooks_sync_success: 24,
+             notify_quickbooks_sync_failure: 25
             }
 
   self.class.instance_eval do
@@ -43,6 +47,15 @@ class NotificationActionType < ActiveRecord::Base
 
   def self.id_for(action)
     VALUES[action]
+  end
+
+  def self.seed_data
+    count = NotificationActionType.count
+    VALUES.each do |key, value|
+      if count == 0 or NotificationActionType.with_name(key).blank?
+        NotificationActionType.create id: value, name: key
+      end
+    end
   end
 
 end

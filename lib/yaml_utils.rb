@@ -16,4 +16,9 @@ class YamlUtils
     YAML.load(loaded_erb)
   end
 
+  def self.escape_string(string)
+    return string if string.blank?
+    string.gsub('"','\\"')
+  end
+
 end

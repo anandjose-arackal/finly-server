@@ -240,6 +240,7 @@ class BaseHandler
       faraday.request :url_encoded # form-encode POST params
       faraday.response :logger # log requests to STDOUT
       faraday.options[:timeout] = 60 # time out is 60 seconds
+      faraday.use FaradayMiddleware::FollowRedirects, limit: 5
       faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
     end
   end

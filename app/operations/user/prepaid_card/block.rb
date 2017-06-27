@@ -1,5 +1,5 @@
 class User::PrepaidCard::Block < User::PrepaidCard::Base
-  attr_accessor :block_presenter, :card
+  attr_accessor :block_presenter
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
@@ -8,35 +8,24 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
   def pre_validate
     super
     return if has_errors?
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password for disabling the card'
-    elsif not user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password!'
+    require_password_validation = true
+    unless params[:validate_password].nil?
+      require_password_validation = !!params[:validate_password]
+      end
+    if require_password_validation
+      if params[:password].blank?
+        add_message :error, 'You need to provide your password for disabling the card'
+      elsif not user.valid_password?(params[:password])
+        add_message :error, 'Invalid Password!'
+      end
     end
-    if params[:card_id].blank?
+    if params[:card_id].blank? and self.params[:card].blank?
       add_message :error, 'Card not found'
     end
   end
 
-  def init
-    super()
-    self.card = selected_user.cards.with_id(card_id).first rescue nil
-  end
-
-  def validate
-    super   
-    return if has_errors?
-    if self.card_id.blank?  
-      add_message :error, 'Card not found'
-      return
-    end
-    if self.card.blank?
-      add_message :error, "Card not found"
-    end
-  end
-  
   def process
-    self.block_presenter = ItzCash::Block.(selected_user, card_id: self.card_id)
+    self.block_presenter = ItzCash::Block.(self.user, card: self.card)
     if block_presenter.failure?
       add_message :error, block_presenter.messages[:error]
     end
@@ -49,7 +38,7 @@ class User::PrepaidCard::Block < User::PrepaidCard::Base
     update_params = {active: false,
                      disabled_by_role_id: role,
                      disabled_by_user_id: user.id,
-                     disable_note: params[:disable_note]}
+                     disable_note: (params[:disable_note] or params[:reason])}
     if self.block_presenter.present? and self.block_presenter.success?
       card.update_attributes(update_params)
       add_message :success, 'Successfully blocked the card!'

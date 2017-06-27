@@ -1,0 +1,6 @@
+class AddIndexToReports < ActiveRecord::Migration
+  def change
+    add_index :reports, :name
+    add_index :money_requests, :name
+  end
+end

@@ -20,9 +20,13 @@ class UserGroup::Create < UserGroup::Base
   def init
     self.name = params[:name]
     self.items = params[:items]
+    if self.items.blank?
+      self.items = []
+    end
     if self.items.is_a?(String)
       self.items = [self.items]
     end
+    self.items = items.reject { |c| c.blank? }
   end
 
   def validate

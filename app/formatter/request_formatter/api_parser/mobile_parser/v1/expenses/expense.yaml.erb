@@ -1,0 +1,62 @@
+id: <%= params[:id] %>
+receipt_id: <%= params[:receipt_id] %>
+expense:
+  report_id: <%= params[:report_id] %>
+  date: <%= params[:date] %>
+  reimbursable: <%= params[:reimbursable] %>
+  category_id: <%= params[:category_id] %>
+  <% type = params[:type].present? ? params[:type] : nil %>
+  <% if type == '1' or type == 1 %>
+  manual_expense_attributes:
+    merchant: <%= params[:merchant] %>
+  <% elsif type == '2' or type == 2 %>
+  card_expense_attributes:
+    editable_merchant: <%= params[:merchant] %>
+  <% elsif type == '3' or type == 3 %>
+  distance_expense_attributes:
+    <% if params[:distance].present? %>
+    distance_attributes:
+      value: <%= params[:distance] %>
+      physical_unit_id: <%= PhysicalUnit.kilometre_id %>
+    <% end %>
+    <% if params[:locations].present? and params[:locations].is_a?(Array) %>
+    locations_attributes:
+      <% params[:locations].each do |location| %>
+      - latitude: <%= location[:latitude] %>
+        longitude: <%= location[:longitude] %>
+        name: <%= location[:name] %>
+        address: >
+          <%= location[:address] %>
+        maps_id: <%= location[:maps_id] %>
+      <% end %>
+    <% end %>
+  <% elsif type == '4' or type == 4 %>
+  time_expense_attributes:
+    time_object_attributes:
+      value: <%= params[:time] %>
+      physical_unit_id: <%= PhysicalUnit.hour_id %>
+  <% end %>
+  <% if params[:amount].present? %>
+  amount_attributes:
+    value: <%= params[:amount] %>
+    currency_id: <%= (params[:currency_id] or Currency.first.id) %>
+  <% end %>
+  <% if params[:receipt].present? %>
+  receipts_attributes:
+    - '#load_receipt'
+  <% end%>
+  <% if params[:receipt_email].present? %>
+  receipt_email_attributes:
+    source: <%= params[:receipt_email][:source] %>
+    email_id: <%= params[:receipt_email][:email_id] %>
+    sender: <%= params[:receipt_email][:sender] %>
+    subject: <%= params[:receipt_email][:subject] %>
+    timestamp: <%= params[:receipt_email][:timestamp] %>
+    body: <%= FakeFileIO.new("#{params[:receipt_email][:email_id]}_body.txt", params[:receipt_email][:body]) %>
+    <% if params[:receipt_email][:attachments].present? %>
+    receipt_email_attachments_attributes:
+      <% params[:receipt_email][:attachments].each do |attachment| %>
+      - attachment_url: <%= attachment[:url] %>
+      <% end %>
+   <% end %>
+<% end %>

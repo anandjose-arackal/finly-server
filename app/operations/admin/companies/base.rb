@@ -15,7 +15,8 @@ class Admin::Companies::Base < Admin::Base
                                       :fuel_card_enabled,
                                       :medical_card_enabled,
                                       :expense_card_enabled,
-                                      :reimbursement_card_enabled
+                                      :reimbursement_card_enabled,
+                                      :hard_copy_receipt
                                     ])
   end
 
@@ -23,13 +24,17 @@ class Admin::Companies::Base < Admin::Base
     Admin::Companies::Base::CompanyPresenter.new(user, {company: company}, messages)
   end
 
-
   class Admin::Companies::Base::CompanyPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
     attr_accessor :company
 
     def init
       self.company = params[:company]
     end
+
+    def company_balance
+      op = Company::VirtualAccount::Balance.(user, {company: company})
+      op&.success? ? op.balance : nil
+    end
   end
+
 end

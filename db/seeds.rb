@@ -23,20 +23,7 @@ def random_mobile_number
   StringRandom.random_regex(pattern)
 end
 
-if ExportField.count == 0
-  ExportField.create(id: 1, name: 'Employee Name')
-  ExportField.create(id: 2, name: 'Employee ID')
-  ExportField.create(id: 3, name: 'Payroll ID')
-  ExportField.create(id: 4, name: 'Report ID')
-  ExportField.create(id: 5, name: 'Report name')
-  ExportField.create(id: 6, name: 'Report Status')
-  ExportField.create(id: 7, name: 'Expense ID')
-  ExportField.create(id: 8, name: 'Expense Merchant')
-  ExportField.create(id: 9, name: 'Expense Currency')
-  ExportField.create(id: 10, name: 'Expense Amount')
-  ExportField.create(id: 11, name: 'Expense Date')
-  ExportField.create(id: 12, name: 'Expense Category Name')
-end
+ExportField.seed_data
 
 if UserRole.count == 0
   UserRole.create id: 1, name: 'Admin'
@@ -669,3 +656,7 @@ if CardTransaction.filter_refunds(1).count == 0
     end
   end
 end
+
+# Expense.all.each do |expense|
+#   expense.update_other_currencies
+# end

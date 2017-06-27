@@ -20,6 +20,7 @@
 #  updated_at           :datetime         not null
 #  link                 :text(65535)
 #  view_role_id         :integer
+#  message              :text(65535)
 #
 
 class Notification < ActiveRecord::Base
@@ -62,7 +63,7 @@ class Notification < ActiveRecord::Base
       when "Card"
         object = "Card"
       when "Wallet"
-        object = "Finly Account"
+        object = "Finly Money"
       when "Payment"
         object = "Cash"
       else
@@ -109,6 +110,14 @@ class Notification < ActiveRecord::Base
         action += " debited"
       when NotificationActionType.id_for(:notify_cash_withdrawal_against_report_reimbursement)
         action += " reimbursement deducted from cash on hand"
+      when NotificationActionType.id_for(:notify_auto_reload_card_failure)
+        action += " auto reload failed"
+      when NotificationActionType.id_for(:notify_auto_reload_card_success)
+        action += " auto reload successful"
+      when NotificationActionType.id_for(:notify_quickbooks_sync_success)
+        action += " sync with Quickbooks was successful"
+      when NotificationActionType.id_for(:notify_quickbooks_sync_failure)
+        action += " sync with Quickbooks failed"
       else
         # do nothing
     end
@@ -131,6 +140,7 @@ class Notification < ActiveRecord::Base
     end
 
     content += user_name
+
     # preposition selector
     if action_user_id.nil?
       prep = ""
@@ -183,6 +193,22 @@ class Notification < ActiveRecord::Base
         action = " debited an amount of"
       when NotificationActionType.id_for(:notify_cash_withdrawal_against_report_reimbursement)
         action = " withdrawn funds from your cash on hand against reimbursement"
+      when NotificationActionType.id_for(:notify_auto_reload_card_failure)
+        content = "Auto reload of your expense card with amount failed because: #{self.message}"
+        # returning content directly because further constructions are not required
+        return content
+      when NotificationActionType.id_for(:notify_auto_reload_card_success)
+        content = "Auto reload of your expense card with amount INR #{self.amount.value} was successfull"
+        # returning content directly because further constructions are not required
+        return content
+      when NotificationActionType.id_for(:notify_quickbooks_sync_success)
+        content = "Syncing of reports with Quickbooks was successful"
+        # returning content directly because further constructions are not required
+        return content
+      when NotificationActionType.id_for(:notify_quickbooks_sync_failure)
+        content = "Syncing of reports with Quickbooks was partially successful or failed because : #{self.message}"
+        # returning content directly because further constructions are not required
+        return content
       else
         action = ""
     end
@@ -237,8 +263,8 @@ class Notification < ActiveRecord::Base
         object_name = " at #{e.merchant_name}"
       when "Card"
         object = " to your card"
-        # c = self.user.cards.first
-        # object_name = " with serial no. #{c.proxy}"
+        # adding conditions for auto reload success and failure
+
       when "Wallet"
         if action_type_id == NotificationActionType.id_for(:notify_credit)
           object = " to your Finly account"
@@ -288,6 +314,9 @@ class Notification < ActiveRecord::Base
         else
           path = "reports/#{self.path_object_id}"
         end
+      when "Reports"
+        suffix = "/params={\"view\":" + view
+        path = "reports"
       when "Money Request"
         path_object = MoneyRequest.unscoped.find_by(id: self.path_object_id)
         if path_object.is_deleted?
@@ -339,7 +368,7 @@ class Notification < ActiveRecord::Base
       else
         return ""
     end
-    owner = object.user
+    owner = object.user rescue self.user
     if self.action_type_id == NotificationActionType.id_for(:notify_auto_approve)
       return ""
     elsif self.action_type_id == NotificationActionType.id_for(:notify_submit)

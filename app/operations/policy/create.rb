@@ -32,6 +32,7 @@ class Policy::Create < Policy::Base
   def process
     self.cloned_policy = company.default_policy.deep_clone except: [:users, :user_mapping]
     cloned_policy.name = params[:name]
+    cloned_policy.description = ''
     cloned_policy.default = false
     if cloned_policy.save
       self.policy = cloned_policy
