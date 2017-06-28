@@ -48,10 +48,12 @@ class Receipt::ReceiptEmails::ProcessEmail < Receipt::ReceiptEmails::Base
   end
 
   def create_expense
-    return unless self.receipt_email.expense_id.blank? and self.receipt_email.expense_data_extract.present?
-    extract = self.receipt_email.expense_data_extract
+    return unless self.receipt_email.expense_id.blank? and self.receipt_email.expense_data_extracts.present?
+    # Create expenses from successful extracts only
+    extract = self.receipt_email&.expense_data_extracts&.success&.first
+    return unless extract.present?
     # Create expenses for completely and partially extracted emails
-    return unless [ExpenseDataExtractStatus.id_for(:success), ExpenseDataExtractStatus.id_for(:partial_extract)].include?(extract.status_id)
+    # return unless [ExpenseDataExtractStatus.id_for(:success), ExpenseDataExtractStatus.id_for(:partial_extract)].include?(extract.status_id)
     expense_param = {}
     if extract.amount_id.present?
       expense_param[:amount_attributes] = {
