@@ -1,6 +1,8 @@
 class AgreementController < ApplicationController
+
   allow_oauth!
   before_action :authenticate_user!, only: [:validate, :agree]
+
   def index
     @result = Agreements::Index.(nil, params)
     respond

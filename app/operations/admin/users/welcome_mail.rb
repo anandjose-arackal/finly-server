@@ -20,6 +20,7 @@ class Admin::Users::WelcomeMail < Admin::Base
   def process
     raw, enc = Devise.token_generator.generate(User, :reset_password_token)
     self.raw_token = raw
+    puts raw
     selected_user.update_attribute(:reset_password_token, enc)
     selected_user.update_attribute(:reset_password_sent_at, DateUtils.local_date_time)
   end

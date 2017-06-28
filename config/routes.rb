@@ -178,6 +178,8 @@
 #     api_v1_configuration_gcm_unregister POST   /api/v1/configuration/gcm/unregister(.:format)                 api/v1/configuration/gcm#delete
 #                         api_v1_balances GET    /api/v1/balances(.:format)                                     api/v1/users#balance
 #          api_v1_available_expense_types GET    /api/v1/available_expense_types(.:format)                      api/v1/expenses#available_expense_types
+#                                  api_v1 GET    /api/v1/kyc/:id(.:format)                                      api/v1/kyc/user#show
+#                                         POST   /api/v1/kyc/:id(.:format)                                      api/v1/kyc/user#update
 #                      mobile_v0_expenses GET    /mobile/v0/expenses(.:format)                                  mobile/v0/expenses#index
 #                                         POST   /mobile/v0/expenses(.:format)                                  mobile/v0/expenses#create
 #                       mobile_v0_expense GET    /mobile/v0/expenses/:id(.:format)                              mobile/v0/expenses#show
@@ -301,12 +303,12 @@
 #       mobile_v1_available_expense_types GET    /mobile/v1/available_expense_types(.:format)                   mobile/v1/expenses#available_expense_types
 #                          chrome_v1_auth POST   /chrome/v1/auth(.:format)                                      chrome/v1/token#create
 #                                         DELETE /chrome/v1/auth(.:format)                                      chrome/v1/token#destroy
-#        chrome_v1_expenses_configuration GET    /chrome/v1/expenses/configuration(.:format)                    chrome/v1/expenses#configuration
+#        chrome_v1_expenses_configuration POST   /chrome/v1/expenses/configuration(.:format)                    chrome/v1/expenses#configuration
 #                      chrome_v1_expenses POST   /chrome/v1/expenses(.:format)                                  chrome/v1/expenses#create
-#                       chrome_v1_expense GET    /chrome/v1/expenses/:id(.:format)                              chrome/v1/expenses#show
-#                                         PATCH  /chrome/v1/expenses/:id(.:format)                              chrome/v1/expenses#update
+#                       chrome_v1_expense PATCH  /chrome/v1/expenses/:id(.:format)                              chrome/v1/expenses#update
 #                                         PUT    /chrome/v1/expenses/:id(.:format)                              chrome/v1/expenses#update
 #                                         DELETE /chrome/v1/expenses/:id(.:format)                              chrome/v1/expenses#destroy
+#                               chrome_v1 POST   /chrome/v1/emails/:id(.:format)                                chrome/v1/receipt_email#show
 #                          api_fm_v1_auth POST   /api/fm/v1/auth(.:format)                                      api/fm/v1/token#create
 #                                         DELETE /api/fm/v1/auth(.:format)                                      api/fm/v1/token#destroy
 #                         api_fm_v1_users GET    /api/fm/v1/users(.:format)                                     api/fm/v1/users#index
@@ -398,6 +400,20 @@
 #                                         PATCH  /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         PUT    /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         DELETE /admin_users/cards/:id(.:format)                               admin_users/cards#destroy
+#                 admin_users_company_kyc GET    /admin_users/companies/:company_id/kyc(.:format)               admin_users/companies#show
+#                                         PATCH  /admin_users/companies/:company_id/kyc(.:format)               admin_users/companies#update
+#              admin_users_company_review PATCH  /admin_users/companies/:company_id/review(.:format)            admin_users/companies#review
+#              admin_users_company_status PATCH  /admin_users/companies/:company_id/status(.:format)            admin_users/companies#update_status
+#                                         GET    /admin_users/companies(.:format)                               admin_users/companies#index
+#                                         POST   /admin_users/companies(.:format)                               admin_users/companies#create
+#                                         GET    /admin_users/companies/new(.:format)                           admin_users/companies#new
+#                                         GET    /admin_users/companies/:id/edit(.:format)                      admin_users/companies#edit
+#                                         GET    /admin_users/companies/:id(.:format)                           admin_users/companies#show
+#                                         PATCH  /admin_users/companies/:id(.:format)                           admin_users/companies#update
+#                                         PUT    /admin_users/companies/:id(.:format)                           admin_users/companies#update
+#                                         DELETE /admin_users/companies/:id(.:format)                           admin_users/companies#destroy
+#             admin_users_agreement_index GET    /admin_users/agreement(.:format)                               admin_users/agreement#index
+#                                         POST   /admin_users/agreement(.:format)                               admin_users/agreement#create
 #                              admin_menu GET    /admin_menus(.:format)                                         admin_users/users#admin_menus
 #                               junk_show GET    /junk/show(.:format)                                           junk#show
 #                               menu_data GET    /menu_data(.:format)                                           users#menu_data
@@ -528,12 +544,14 @@
 #                                         PATCH  /money_request/:id(.:format)                                   money_request#update
 #                                         PUT    /money_request/:id(.:format)                                   money_request#update
 #                                         DELETE /money_request/:id(.:format)                                   money_request#destroy
+#                                expenses DELETE /expenses(.:format)                                            expenses#destroy
 #                  expense_attach_receipt POST   /expenses/:expense_id/attach_receipt(.:format)                 expenses#attach_receipt
 #                  expense_detach_receipt POST   /expenses/:expense_id/detach_receipt(.:format)                 expenses#detach_receipt
 #                     expense_add_receipt POST   /expenses/:expense_id/add_receipt(.:format)                    expenses#add_receipt
 #                            expense_mark PATCH  /expenses/:expense_id/mark(.:format)                           expenses#mark
 #                          expense_unmark PATCH  /expenses/:expense_id/unmark(.:format)                         expenses#unmark
-#                                expenses GET    /expenses(.:format)                                            expenses#index
+#                      expense_duplicates GET    /expenses/:expense_id/duplicates(.:format)                     expenses#duplicates
+#                                         GET    /expenses(.:format)                                            expenses#index
 #                                         POST   /expenses(.:format)                                            expenses#create
 #                             new_expense GET    /expenses/new(.:format)                                        expenses#new
 #                            edit_expense GET    /expenses/:id/edit(.:format)                                   expenses#edit
@@ -708,6 +726,10 @@
 #            bank_transfer_reimbursements GET    /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#show
 #                                         PATCH  /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#update
 #                                         POST   /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#create
+#                             kyc_company GET    /kyc/company(.:format)                                         kyc/company#show
+#                                         PATCH  /kyc/company(.:format)                                         kyc/company#update
+#                                     kyc GET    /kyc/users/:id(.:format)                                       kyc/user#show
+#                                         PATCH  /kyc/users/:id(.:format)                                       kyc/user#update
 #                          disburse_users POST   /disburse/users(.:format)                                      disburse/users#create
 #                     features_subscribed GET    /features_subscribed(.:format)                                 expense_types_configuration#features_subscribed
 #                                  groups GET    /groups(.:format)                                              user_groups#index
@@ -753,12 +775,26 @@
 #                                         PATCH  /teams/:id(.:format)                                           user_teams#update
 #                                         PUT    /teams/:id(.:format)                                           user_teams#update
 #                                         DELETE /teams/:id(.:format)                                           user_teams#destroy
+#               authorizer_report_approve PATCH  /authorizer/reports/:report_id/approve(.:format)               authorizer/reports#approve
+#                authorizer_report_reject PATCH  /authorizer/reports/:report_id/reject(.:format)                authorizer/reports#reject
+#                      authorizer_reports GET    /authorizer/reports(.:format)                                  authorizer/reports#index
+#                                         POST   /authorizer/reports(.:format)                                  authorizer/reports#create
+#                   new_authorizer_report GET    /authorizer/reports/new(.:format)                              authorizer/reports#new
+#                  edit_authorizer_report GET    /authorizer/reports/:id/edit(.:format)                         authorizer/reports#edit
+#                       authorizer_report GET    /authorizer/reports/:id(.:format)                              authorizer/reports#show
+#                                         PATCH  /authorizer/reports/:id(.:format)                              authorizer/reports#update
+#                                         PUT    /authorizer/reports/:id(.:format)                              authorizer/reports#update
+#                                         DELETE /authorizer/reports/:id(.:format)                              authorizer/reports#destroy
 #                          export_expense GET    /export/expense(.:format)                                      export#expense
 #                  export_atm_transaction GET    /export/atm_transaction(.:format)                              export#atm_transactions
+#                               agreement GET    /agreement(.:format)                                           agreement#index
+#                      agreement_validate GET    /agreement/validate(.:format)                                  agreement#validate
+#                         agreement_agree POST   /agreement/agree(.:format)                                     agreement#agree
 #                                         GET    /auth/:provider/callback(.:format)                             third_party_auth#quickbooks
 #                      testing_quickbooks GET    /testing_quickbooks(.:format)                                  third_party_auth#testing
 #                  quickbooks_sync_report POST   /quickbooks/sync_report(.:format)                              quickbooks#sync_report
-#              quickbooks_sync_categories POST   /quickbooks/sync_categories(.:format)                          quickbooks#categories
+#                 quickbooks_sync_reports POST   /quickbooks/sync_reports(.:format)                             quickbooks#sync_reports
+#              quickbooks_sync_categories POST   /quickbooks/sync_categories(.:format)                          quickbooks#sync_categories
 #           quickbooks_sync_payment_types POST   /quickbooks/sync_payment_types(.:format)                       quickbooks#sync_payment_types
 #                quickbooks_update_config PATCH  /quickbooks/update_config(.:format)                            quickbooks#update
 #                       quickbooks_config GET    /quickbooks/config(.:format)                                   quickbooks#show

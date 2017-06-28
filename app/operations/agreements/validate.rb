@@ -1,15 +1,16 @@
 class Agreements::Validate < BaseOperation
   attr_accessor :agreed, :kyc_required
   def pre_validate
+    if user.blank? or params.blank?
+      add_message :error, "No user or params present."
+    end
   end
 
   def init
   end
 
   def validate
-    if user.blank? or params.blank?
-      messages[:error] << "No user or params present."
-    end
+
   end
 
   def process

@@ -12,6 +12,7 @@
 #  active            :boolean          default(FALSE), not null
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
+#  url               :string(255)
 #
 
 require 'test_helper'
