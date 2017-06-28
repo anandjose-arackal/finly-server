@@ -1,4 +1,4 @@
-class Agreements::Validate < BaseOperation
+class Agreements::Validate < Agreements::Base
   attr_accessor :agreed, :kyc_required
   def pre_validate
     if user.blank? or params.blank?

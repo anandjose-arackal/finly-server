@@ -1,19 +1,20 @@
-class Agreements::Agree < BaseOperation
+class Agreements::Agree < Agreements::Base
   attr_accessor :agreements, :agree
 
   def pre_validate
     if user.blank? or params.blank?
       messages[:error] << "No user or params present."
+      return
+    end
+    unless params[:agree].present?
+      add_message :error, "You cannot proceed without agreeing to the agreements"
+      return
     end
   end
 
   def init
-    unless params[:agree].present?
-      add_message :error, "You cannot proceed without agreeing to the agreements"
-    else
-      if params[:agree].to_i == 1
-        self.agree = true
-      end
+    if params[:agree].to_i == 1
+      self.agree = true
     end
   end
 
@@ -45,5 +46,11 @@ class Agreements::Agree < BaseOperation
 
   def post_process
     add_message :success, "You agreed to all the agreements."
+  end
+
+  private
+
+  def agreement_params
+    params.require(:company_kyc).permit(:pin_code, :date_of_establishment, :registered_mobile_number, :pan_card_no, :customer_type_id)
   end
 end

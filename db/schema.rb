@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170628112913) do
+ActiveRecord::Schema.define(version: 20170628175759) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -661,30 +661,50 @@ ActiveRecord::Schema.define(version: 20170628112913) do
   add_index "company_funds_load_requests", ["requested_by_user_id"], name: "index_company_funds_load_requests_on_requested_by_user_id", using: :btree
 
   create_table "company_kycs", force: :cascade do |t|
-    t.string   "pan_card_file_name",            limit: 255
-    t.string   "pan_card_content_type",         limit: 255
-    t.integer  "pan_card_file_size",            limit: 4
+    t.string   "pan_card_file_name",                        limit: 255
+    t.string   "pan_card_content_type",                     limit: 255
+    t.integer  "pan_card_file_size",                        limit: 4
     t.datetime "pan_card_updated_at"
-    t.string   "coi_file_name",                 limit: 255
-    t.string   "coi_content_type",              limit: 255
-    t.integer  "coi_file_size",                 limit: 4
+    t.string   "coi_file_name",                             limit: 255
+    t.string   "coi_content_type",                          limit: 255
+    t.integer  "coi_file_size",                             limit: 4
     t.datetime "coi_updated_at"
-    t.string   "board_resolution_file_name",    limit: 255
-    t.string   "board_resolution_content_type", limit: 255
-    t.integer  "board_resolution_file_size",    limit: 4
+    t.string   "board_resolution_file_name",                limit: 255
+    t.string   "board_resolution_content_type",             limit: 255
+    t.integer  "board_resolution_file_size",                limit: 4
     t.datetime "board_resolution_updated_at"
-    t.integer  "kyc_status_id",                 limit: 4
-    t.integer  "company_id",                    limit: 4,     null: false
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
-    t.string   "customer_type_name",            limit: 255
+    t.integer  "kyc_status_id",                             limit: 4
+    t.integer  "company_id",                                limit: 4,     null: false
+    t.datetime "created_at",                                              null: false
+    t.datetime "updated_at",                                              null: false
     t.date     "date_of_establishment"
-    t.text     "street_2",                      limit: 65535
-    t.text     "street_3",                      limit: 65535
-    t.string   "registered_mobile_number",      limit: 255
-    t.string   "pan_card_no",                   limit: 255
-    t.string   "pin_code",                      limit: 255
-    t.string   "city_code",                     limit: 255
+    t.text     "street_2",                                  limit: 65535
+    t.text     "street_3",                                  limit: 65535
+    t.string   "registered_mobile_number",                  limit: 255
+    t.string   "pan_card_no",                               limit: 255
+    t.string   "pin_code",                                  limit: 255
+    t.string   "city_code",                                 limit: 255
+    t.string   "aadhar_card_file_name",                     limit: 255
+    t.string   "aadhar_card_content_type",                  limit: 255
+    t.integer  "aadhar_card_file_size",                     limit: 4
+    t.datetime "aadhar_card_updated_at"
+    t.string   "vat_registration_certificate_file_name",    limit: 255
+    t.string   "vat_registration_certificate_content_type", limit: 255
+    t.integer  "vat_registration_certificate_file_size",    limit: 4
+    t.datetime "vat_registration_certificate_updated_at"
+    t.string   "registration_of_trust_file_name",           limit: 255
+    t.string   "registration_of_trust_content_type",        limit: 255
+    t.integer  "registration_of_trust_file_size",           limit: 4
+    t.datetime "registration_of_trust_updated_at"
+    t.string   "driving_licence_file_name",                 limit: 255
+    t.string   "driving_licence_content_type",              limit: 255
+    t.integer  "driving_licence_file_size",                 limit: 4
+    t.datetime "driving_licence_updated_at"
+    t.string   "passport_file_name",                        limit: 255
+    t.string   "passport_content_type",                     limit: 255
+    t.integer  "passport_file_size",                        limit: 4
+    t.datetime "passport_updated_at"
+    t.integer  "company_type_id",                           limit: 4
   end
 
   add_index "company_kycs", ["company_id"], name: "index_company_kycs_on_company_id", using: :btree
@@ -718,6 +738,11 @@ ActiveRecord::Schema.define(version: 20170628112913) do
   add_index "company_transactions", ["balance_amount_id"], name: "index_company_transactions_on_balance_amount_id", using: :btree
   add_index "company_transactions", ["company_id"], name: "index_company_transactions_on_company_id", using: :btree
   add_index "company_transactions", ["transaction_amount_id"], name: "index_company_transactions_on_transaction_amount_id", using: :btree
+
+  create_table "company_types", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
 
   create_table "contacts", force: :cascade do |t|
     t.string   "email",            limit: 255
