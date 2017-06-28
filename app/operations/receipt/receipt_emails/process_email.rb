@@ -66,8 +66,9 @@ class Receipt::ReceiptEmails::ProcessEmail < Receipt::ReceiptEmails::Base
     end
     expense_param[:date] = extract.datetime
     expense_param[:note] = extract.note
-    expense_param[:category_id] = self.receipt_email.user.company.categories.with_name('others')&.first&.id
-    expense_param[:user_id] = self.receipt_email.user_id
+    expense_param[:category_id] = receipt_email.user.company.categories.with_name('Other')&.first&.id
+    expense_param[:user_id] = receipt_email.user_id
+    expense_param[:expense_type_id] = ExpenseType.id_for(:manual)
     # Set email attachments as receipts of the expense
     expense =self.receipt_email.build_expense expense_param
     if expense.save
