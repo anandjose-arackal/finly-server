@@ -15,7 +15,7 @@
 #  note               :text(65535)
 #  receipt_email_id   :integer
 #  to_be_transcribed  :boolean          default(FALSE)
-#  hard_copy_received :boolean          default(FALSE)
+#  hard_copy_received :boolean          default(TRUE)
 #  sourcable_id       :integer
 #  sourcable_type     :integer
 #
@@ -43,6 +43,8 @@ class Receipt < ActiveRecord::Base
       # content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf application/msword application/vnd.openxmlformats-officedocument.wordprocessingml.document)
       content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)
   }
+
+  default_scope {order(created_at: :desc)}
 
   scope :with_user_id, -> (user_ids) {where user_id: user_ids}
   scope :with_id, ->(id) { where id: id }

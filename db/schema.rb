@@ -1517,6 +1517,7 @@ ActiveRecord::Schema.define(version: 20170624151459) do
     t.datetime "updated_at",                                                             null: false
     t.boolean  "is_deleted",                                             default: false, null: false
     t.integer  "submitted_amount_id",          limit: 4
+    t.integer  "display_id",                   limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -2105,6 +2106,7 @@ ActiveRecord::Schema.define(version: 20170624151459) do
     t.integer  "reimbursable_expenses_total_id",     limit: 4
     t.integer  "card_expenses_total_id",             limit: 4
     t.integer  "non_reimbursable_expenses_total_id", limit: 4
+    t.integer  "display_id",                         limit: 4
     t.boolean  "synced_with_quickbooks"
   end
 

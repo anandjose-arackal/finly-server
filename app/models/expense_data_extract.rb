@@ -31,4 +31,9 @@ class ExpenseDataExtract < ActiveRecord::Base
   accepts_nested_attributes_for :amount
 
   validates :expense_data_extract_source_id, presence: true
+
+  default_scope { order(created_at: :desc) }
+
+  scope :success, -> {where status_id: ExpenseDataExtractStatus.id_for(:success)}
+
 end
