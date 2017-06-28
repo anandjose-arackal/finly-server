@@ -1870,6 +1870,8 @@ Rails.application.routes.draw do
   get 'export/atm_transaction', to: 'export#atm_transactions'
 
   get 'agreement', to: 'agreement#index'
+  get 'agreement/validate', to: 'agreement#validate'
+  post 'agreement/agree', to: 'agreement#agree'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

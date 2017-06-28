@@ -553,7 +553,7 @@ class User < ActiveRecord::Base
   def finly_admin?
     jouska_id = Company.find_by(name: "Jouska").id rescue nil
     unless Rails.env.production?
-      if self.email == 'king@demo.com'
+      if ['king@demo.com', 'king@finlytest.io'].include?(self.email)
         return true
       end
     end

@@ -33,7 +33,8 @@ class Admin::Agreement::Index < Admin::Agreement::Base
             },
             content: content,
             version: agreement&.version,
-            updated_on: DateUtils.date_formatted(agreement&.updated_at)
+            updated_on: DateUtils.date_formatted(agreement&.updated_at),
+            url: agreement&.url
         }
       end
       agreement_by_type
