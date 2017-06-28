@@ -314,6 +314,9 @@ class Notification < ActiveRecord::Base
         else
           path = "reports/#{self.path_object_id}"
         end
+      when "Reports"
+        suffix = "/params={\"view\":" + view
+        path = "reports"
       when "Money Request"
         path_object = MoneyRequest.unscoped.find_by(id: self.path_object_id)
         if path_object.is_deleted?

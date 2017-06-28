@@ -87,7 +87,7 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
 
   # this should create a successful notification entry saying the reports have been synced
   def success
-    view_role = params[:view] == 'admin' ? 1 : 2
+    view_role = 1
     user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                        action_type_id: NotificationActionType.id_for(:notify_quickbooks_sync_success),
                                        action_user_id: user.id,
@@ -103,7 +103,7 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
 
   # this should create a failure notification entry saying the reports have not been synced
   def failure
-    view_role = params[:view] == 'admin' ? 1 : 2
+    view_role = 1
     user.notifications.create(notification_type_id: NotificationType.id_for(:report),
                                        action_type_id: NotificationActionType.id_for(:notify_quickbooks_sync_failure),
                                        action_user_id: user.id,
