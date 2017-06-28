@@ -43,7 +43,7 @@ class Receipt::ReceiptEmails::ProcessEmail < Receipt::ReceiptEmails::Base
 
     extracted_data = Receipt::ReceiptEmails::Extractor::Extract.(user, html_body: html_body, sender: sender, sent_at: sent_at, subject: subject)
     if extracted_data&.success?
-      data.save_data_extract(self.receipt_email)
+      extracted_data.save_data_extract(self.receipt_email)
     end
   end
 

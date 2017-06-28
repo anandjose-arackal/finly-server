@@ -150,6 +150,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Base < BaseOperation
     unless merchant and amount_value and currency_id and datetime and note and category_id
       return ExpenseDataExtractStatus.id_for(:failed)
     end
+    # todo handle partial extraction
     ExpenseDataExtractStatus.id_for(:success)
   end
 
