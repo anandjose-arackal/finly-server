@@ -32,9 +32,11 @@ expense:
     <% end %>
   <% elsif type == '4' or type == 4 %>
   time_expense_attributes:
+    <% if params[:time].present? %>
     time_object_attributes:
       value: <%= params[:time] %>
       physical_unit_id: <%= PhysicalUnit.hour_id %>
+    <% end %>
   <% end %>
   <% if params[:amount].present? %>
   amount_attributes:

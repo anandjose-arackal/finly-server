@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170624151459) do
+ActiveRecord::Schema.define(version: 20170627105243) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -526,7 +526,7 @@ ActiveRecord::Schema.define(version: 20170624151459) do
     t.text     "description",              limit: 65535
     t.datetime "created_at",                                            null: false
     t.datetime "updated_at",                                            null: false
-    t.integer  "company_id",               limit: 4
+    t.integer  "company_id",               limit: 4,                    null: false
     t.integer  "disabled_by_role_id",      limit: 4
     t.integer  "disabled_by_user_id",      limit: 4
     t.boolean  "active"
@@ -1517,7 +1517,6 @@ ActiveRecord::Schema.define(version: 20170624151459) do
     t.datetime "updated_at",                                                             null: false
     t.boolean  "is_deleted",                                             default: false, null: false
     t.integer  "submitted_amount_id",          limit: 4
-    t.integer  "display_id",                   limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -2106,7 +2105,6 @@ ActiveRecord::Schema.define(version: 20170624151459) do
     t.integer  "reimbursable_expenses_total_id",     limit: 4
     t.integer  "card_expenses_total_id",             limit: 4
     t.integer  "non_reimbursable_expenses_total_id", limit: 4
-    t.integer  "display_id",                         limit: 4
     t.boolean  "synced_with_quickbooks"
   end
 
@@ -2323,6 +2321,7 @@ ActiveRecord::Schema.define(version: 20170624151459) do
     t.string   "city",                limit: 255
     t.integer  "state_id",            limit: 4
     t.string   "pin_code",            limit: 255
+    t.string   "apple_push_token",    limit: 255
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree

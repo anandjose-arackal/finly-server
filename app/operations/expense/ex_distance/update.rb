@@ -72,8 +72,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       if self.updated_expense_params[:distance_expense_attributes].present? and expense.distance_expense.present?
         self.updated_expense_params[:distance_expense_attributes][:id] = expense.distance_expense.id
       end
-      if self.updated_expense_params[:distance_expense_attributes][:distance_attributes].present? and self.updated_expense_params[:distance_expense_attributes][:distance_attributes][:value].present? and
-          expense.distance_expense.distance_id.present?
+      if self.updated_expense_params&.dig(:distance_expense_attributes,:distance_attributes, :value).present? and expense.distance_expense.distance_id.present?
         self.updated_expense_params[:distance_expense_attributes][:distance_attributes][:id] = expense.distance_expense.distance.id
       end
       if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
