@@ -62,7 +62,7 @@ class Receipt::ReceiptEmails::ProcessEmail < Receipt::ReceiptEmails::Base
       }
     end
     if extract.merchant.present?
-      expense_param[:manual_expense_attributes] ={merchant_name: extract.merchant}
+      expense_param[:manual_expense_attributes] ={merchant: extract.merchant}
     end
     expense_param[:date] = extract.datetime
     expense_param[:note] = extract.note
