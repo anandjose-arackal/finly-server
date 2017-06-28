@@ -29,6 +29,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::AirtelMobileIndia,
       Receipt::ReceiptEmails::Extractor::Adapter::BigRock,
       Receipt::ReceiptEmails::Extractor::Adapter::GoDaddy,
+      Receipt::ReceiptEmails::Extractor::Adapter::Google,
 
       # Bookings
       Receipt::ReceiptEmails::Extractor::Adapter::BookMyShow,
@@ -42,7 +43,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       # Payment
       Receipt::ReceiptEmails::Extractor::Adapter::PaypalOrder,
       Receipt::ReceiptEmails::Extractor::Adapter::Paytm,
-      Receipt::ReceiptEmails::Extractor::Adapter::CitrusPay
+      Receipt::ReceiptEmails::Extractor::Adapter::CitrusPay,
+      Receipt::ReceiptEmails::Extractor::Adapter::PayU
 
       # Others
   ]
