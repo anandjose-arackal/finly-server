@@ -14,4 +14,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Google < Receipt::ReceiptEmail
     ]
   end
 
+  def currency_id
+    Currency.id_for('USD')
+  end
+
 end
