@@ -111,6 +111,7 @@ class ReceiptEmail < ActiveRecord::Base
         if to_be_transcribed and Rails.env.production?
           ########## Mailer being triggered ###########
           receipts.each do |receipt|
+            next unless receipt.to_be_transcribed
             Constants::TRANSCRIBER_EMAILS.each do |email|
               ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
             end
@@ -138,6 +139,7 @@ class ReceiptEmail < ActiveRecord::Base
       if to_be_transcribed and Rails.env.production?
         ########## Mailer being triggered ###########
         receipts.each do |receipt|
+          next unless receipt.to_be_transcribed
           Constants::TRANSCRIBER_EMAILS.each do |email|
             ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
           end
