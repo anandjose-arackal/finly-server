@@ -2,8 +2,8 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
   attr_accessor :category
 
   def pre_validate
-    unless params[:category][:name].present?
-      messages[:error] << 'Name of the category cannot be blank'
+    if user.blank? || params.blank?
+      add_message :error, "Invalid parameters, try again"
     end
   end
 

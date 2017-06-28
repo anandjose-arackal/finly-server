@@ -11,7 +11,6 @@ class EmailAuthorization::Create < EmailAuthorization::Base
     view_role_id = authorizable.controlling_user_role_id
     e_auth = EmailAuthorization.with_user_id(user_id).with_authorizable(authorizable).with_view_role_id(view_role_id).limit(1)
     self.email_authorization = e_auth&.first
-    # debugger
   end
 
   def validate

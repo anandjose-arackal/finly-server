@@ -2,49 +2,6 @@
 #
 # Table name: users
 #
-#  id                     :integer          not null, primary key
-#  email                  :string(255)      default("")
-#  encrypted_password     :string(255)      default(""), not null
-#  reset_password_token   :string(255)
-#  reset_password_sent_at :datetime
-#  remember_created_at    :datetime
-#  sign_in_count          :integer          default(0), not null
-#  current_sign_in_at     :datetime
-#  last_sign_in_at        :datetime
-#  current_sign_in_ip     :string(255)
-#  last_sign_in_ip        :string(255)
-#  confirmation_token     :string(255)
-#  confirmed_at           :datetime
-#  confirmation_sent_at   :datetime
-#  unconfirmed_email      :string(255)
-#  failed_attempts        :integer          default(0), not null
-#  unlock_token           :string(255)
-#  locked_at              :datetime
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  company_id             :integer          not null
-#  mobile_number          :string(255)
-#  active                 :boolean          default(TRUE), not null
-#  invitation_token       :string(255)
-#  invitation_created_at  :datetime
-#  invitation_sent_at     :datetime
-#  invitation_accepted_at :datetime
-#  invitation_limit       :integer
-#  invited_by_id          :integer
-#  invited_by_type        :string(255)
-#  invitations_count      :integer          default(0)
-#  otp                    :string(255)
-#  otp_sent_at            :datetime
-#  otp_verified_at        :datetime
-#  otp_verified           :boolean          default(FALSE), not null
-#  otp_count              :integer          default(0), not null
-#  first_name             :string(255)
-#  last_name              :string(255)
-#  mobile_only_invite     :boolean          default(FALSE)
-#  mothers_maiden_name    :string(255)
-#  verified               :boolean          default(FALSE)
-#  otp_request_type_id    :integer
-#  default_password       :boolean          default(FALSE)
 #
 
 
@@ -96,6 +53,7 @@ class User < ActiveRecord::Base
   has_one :auto_reload_config, as: :reloadable, dependent: :destroy
   has_one :itz_cash_dmt_sender
 
+  has_many :authentications
   has_many :cards, dependent: :destroy
   has_many :card_transactions, dependent: :destroy
   has_many :money_requests
@@ -142,8 +100,14 @@ class User < ActiveRecord::Base
   validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
+  validates :quickbooks_id, uniqueness: { scope: :quickbooks_integration_type, message: "should be unique for an external integration type" }, if: lambda { |user| user.quickbooks_integration_type.present? }
 
-  # validate :valid_role
+  scope :quickbooks, -> { where(external_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
+
+
+  def from_quickbooks?
+    external_integration_type == QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]
+  end
 
   scope :with_id, ->(user_id) { where id: user_id }
   scope :with_company_id, ->(company_id) { where company_id: company_id }

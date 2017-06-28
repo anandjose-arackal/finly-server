@@ -22,7 +22,7 @@ class Admin::Cards::Block < Admin::Cards::Base
   end
 
   def process
-    block_presenter = ItzCash::Block.(selected_card.user, {card_id: selected_card})
+    block_presenter = ItzCash::Block.(selected_card.user, {card: selected_card})
     if block_presenter.success?
       selected_card.update(active: false,
                            disabled_by_role_id: UserRole.id_for(:admin),

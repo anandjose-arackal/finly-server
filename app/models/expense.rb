@@ -26,6 +26,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -299,7 +300,7 @@ class Expense < ActiveRecord::Base
   def amount_value
     case self.expense_type_id
       when ExpenseType.id_for(:manual), ExpenseType.id_for(:card)
-        if self.report_id.blank?
+        if self.report_id.blank? || self.report.blank?
           return precision_value self.amount.value
         else
           base_currency_code = self.report.base_currency_code

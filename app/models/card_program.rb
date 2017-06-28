@@ -53,7 +53,7 @@ class CardProgram < ActiveRecord::Base
                                      personal_wallet_fund_transfer: false,
                                      spend_restrictions: false,
                                      end_date_restrictions: true,
-                                     manager_credit: false,
+                                     manager_credit: true,
                                      manager_debit: false,
                                      manager_blockable: false,
                                      manager_view_balance: false,

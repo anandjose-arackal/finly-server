@@ -10,6 +10,7 @@ class Autocomplete::Merchant < BaseOperation
 
   def init
     self.query = params[:filter_search] || params[:query]
+    self.query.strip! if self.query.is_a?(String)
   end
 
   def process

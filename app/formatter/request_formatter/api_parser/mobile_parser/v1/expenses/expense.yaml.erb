@@ -19,7 +19,7 @@ expense:
       value: <%= params[:distance] %>
       physical_unit_id: <%= PhysicalUnit.kilometre_id %>
     <% end %>
-    <% if params[:locations].present? %>
+    <% if params[:locations].present? and params[:locations].is_a?(Array) %>
     locations_attributes:
       <% params[:locations].each do |location| %>
       - latitude: <%= location[:latitude] %>
