@@ -69,8 +69,11 @@ class Receipt::ReceiptEmails::ProcessEmail < Receipt::ReceiptEmails::Base
     expense_param[:category_id] = self.receipt_email.user.company.categories.with_name('others')&.first&.id
     expense_param[:user_id] = self.receipt_email.user_id
     # Set email attachments as receipts of the expense
-    if self.receipt_email.expense.create expense_param
+    expense =self.receipt_email.build_expense expense_param
+    if expense.save
       self.receipt_email.receipts.update_all parent_id: self.receipt_email.expense.id, parent_type: 'Expense'
+    else
+      add_message :error, expense.errors.full_messages
     end
   end
 
