@@ -34,6 +34,7 @@
 #  original_source_updated_at   :datetime
 #
 
+
 require 'fileutils'
 class ReceiptEmail < ActiveRecord::Base
   has_many :receipts, as: :sourcable
