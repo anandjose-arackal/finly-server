@@ -212,6 +212,8 @@ SystemMessageType.seed_data
 
 ItzCashCardProgram.seed_data
 
+CompanyType.seed_data
+
 # ItzCashDmtBeneficiaryType.seed_data
 
 ItzCashDmtBeneficiaryStatus.seed_data

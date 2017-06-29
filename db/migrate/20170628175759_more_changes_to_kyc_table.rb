@@ -3,7 +3,7 @@ class MoreChangesToKycTable < ActiveRecord::Migration
     remove_column :company_kycs, :customer_type_name, :string
 
     create_table :company_types do |t|
-      t.name
+      t.string :name
 
       t.timestamps null: false
     end

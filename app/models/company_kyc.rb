@@ -54,6 +54,7 @@ class CompanyKyc < ActiveRecord::Base
 
   belongs_to :company
   belongs_to :kyc_status
+  belongs_to :company_type
   has_many :system_messages, as: :messagable, dependent: :destroy
 
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}

@@ -412,8 +412,8 @@
 #                                         PATCH  /admin_users/companies/:id(.:format)                           admin_users/companies#update
 #                                         PUT    /admin_users/companies/:id(.:format)                           admin_users/companies#update
 #                                         DELETE /admin_users/companies/:id(.:format)                           admin_users/companies#destroy
-#             admin_users_agreement_index GET    /admin_users/agreement(.:format)                               admin_users/agreement#index
-#                                         POST   /admin_users/agreement(.:format)                               admin_users/agreement#create
+#                  admin_users_agreements GET    /admin_users/agreements(.:format)                              admin_users/agreements#index
+#                                         POST   /admin_users/agreements(.:format)                              admin_users/agreements#create
 #                              admin_menu GET    /admin_menus(.:format)                                         admin_users/users#admin_menus
 #                               junk_show GET    /junk/show(.:format)                                           junk#show
 #                               menu_data GET    /menu_data(.:format)                                           users#menu_data
@@ -787,9 +787,9 @@
 #                                         DELETE /authorizer/reports/:id(.:format)                              authorizer/reports#destroy
 #                          export_expense GET    /export/expense(.:format)                                      export#expense
 #                  export_atm_transaction GET    /export/atm_transaction(.:format)                              export#atm_transactions
-#                               agreement GET    /agreement(.:format)                                           agreement#index
-#                      agreement_validate GET    /agreement/validate(.:format)                                  agreement#validate
-#                         agreement_agree POST   /agreement/agree(.:format)                                     agreement#agree
+#                              agreements GET    /agreements(.:format)                                          agreements#index
+#                     agreements_validate GET    /agreements/validate(.:format)                                 agreements#validate
+#                        agreements_agree POST   /agreements/agree(.:format)                                    agreements#agree
 #                                         GET    /auth/:provider/callback(.:format)                             third_party_auth#quickbooks
 #                      testing_quickbooks GET    /testing_quickbooks(.:format)                                  third_party_auth#testing
 #                  quickbooks_sync_report POST   /quickbooks/sync_report(.:format)                              quickbooks#sync_report
@@ -1623,7 +1623,7 @@ Rails.application.routes.draw do
       patch 'review', to: 'companies#review'
       patch 'status', to: 'companies#update_status'
     end
-    resources :agreement, only: [:create, :index]
+    resources :agreements, only: [:create, :index]
   end
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
@@ -1941,9 +1941,9 @@ Rails.application.routes.draw do
   get 'export/expense', to: 'export#expense'
   get 'export/atm_transaction', to: 'export#atm_transactions'
 
-  get 'agreement', to: 'agreement#index'
-  get 'agreement/validate', to: 'agreement#validate'
-  post 'agreement/agree', to: 'agreement#agree'
+  get 'agreements', to: 'agreements#index'
+  get 'agreements/validate', to: 'agreements#validate'
+  post 'agreements/agree', to: 'agreements#agree'
 
 
   # All APIs for Quickbooks integration and syncing

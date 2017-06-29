@@ -1,0 +1,2 @@
+class RequiredDocuments
+end

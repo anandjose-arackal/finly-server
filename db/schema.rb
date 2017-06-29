@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170628175759) do
+ActiveRecord::Schema.define(version: 20170629103644) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -580,6 +580,19 @@ ActiveRecord::Schema.define(version: 20170628175759) do
   add_index "company_accounts", ["company_id"], name: "index_company_accounts_on_company_id", using: :btree
   add_index "company_accounts", ["wallet_balance_id"], name: "index_company_accounts_on_wallet_balance_id", using: :btree
 
+  create_table "company_agreement_tracks", force: :cascade do |t|
+    t.integer  "user_id",      limit: 4,   null: false
+    t.integer  "agreement_id", limit: 4,   null: false
+    t.string   "ip_address",   limit: 255
+    t.string   "referrer",     limit: 255
+    t.string   "application",  limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "company_agreement_tracks", ["agreement_id"], name: "index_company_agreement_tracks_on_agreement_id", using: :btree
+  add_index "company_agreement_tracks", ["user_id"], name: "index_company_agreement_tracks_on_user_id", using: :btree
+
   create_table "company_balance_histories", force: :cascade do |t|
     t.integer  "company_id",                              limit: 4
     t.integer  "neft_transfer_id",                        limit: 4
@@ -740,8 +753,9 @@ ActiveRecord::Schema.define(version: 20170628175759) do
   add_index "company_transactions", ["transaction_amount_id"], name: "index_company_transactions_on_transaction_amount_id", using: :btree
 
   create_table "company_types", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   create_table "contacts", force: :cascade do |t|
@@ -2210,19 +2224,6 @@ ActiveRecord::Schema.define(version: 20170628175759) do
   add_index "transcribed_expenses", ["receipt_id"], name: "index_transcribed_expenses_on_receipt_id", using: :btree
   add_index "transcribed_expenses", ["user_id"], name: "index_transcribed_expenses_on_user_id", using: :btree
 
-  create_table "user_agreement_tracks", force: :cascade do |t|
-    t.integer  "user_id",      limit: 4,   null: false
-    t.integer  "agreement_id", limit: 4,   null: false
-    t.string   "ip_address",   limit: 255
-    t.string   "referrer",     limit: 255
-    t.string   "application",  limit: 255
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-  end
-
-  add_index "user_agreement_tracks", ["agreement_id"], name: "index_user_agreement_tracks_on_agreement_id", using: :btree
-  add_index "user_agreement_tracks", ["user_id"], name: "index_user_agreement_tracks_on_user_id", using: :btree
-
   create_table "user_balance_histories", force: :cascade do |t|
     t.date     "date"
     t.integer  "user_id",                    limit: 4
@@ -2426,52 +2427,49 @@ ActiveRecord::Schema.define(version: 20170628175759) do
   add_index "user_wallets", ["user_id"], name: "index_user_wallets_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                             limit: 255,   default: ""
-    t.string   "encrypted_password",                limit: 255,   default: "",    null: false
-    t.string   "reset_password_token",              limit: 255
+    t.string   "email",                  limit: 255, default: ""
+    t.string   "encrypted_password",     limit: 255, default: "",    null: false
+    t.string   "reset_password_token",   limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",                     limit: 4,     default: 0,     null: false
+    t.integer  "sign_in_count",          limit: 4,   default: 0,     null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip",                limit: 255
-    t.string   "last_sign_in_ip",                   limit: 255
-    t.string   "confirmation_token",                limit: 255
+    t.string   "current_sign_in_ip",     limit: 255
+    t.string   "last_sign_in_ip",        limit: 255
+    t.string   "confirmation_token",     limit: 255
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
-    t.string   "unconfirmed_email",                 limit: 255
-    t.integer  "failed_attempts",                   limit: 4,     default: 0,     null: false
-    t.string   "unlock_token",                      limit: 255
+    t.string   "unconfirmed_email",      limit: 255
+    t.integer  "failed_attempts",        limit: 4,   default: 0,     null: false
+    t.string   "unlock_token",           limit: 255
     t.datetime "locked_at"
-    t.datetime "created_at",                                                      null: false
-    t.datetime "updated_at",                                                      null: false
-    t.integer  "company_id",                        limit: 4,                     null: false
-    t.string   "mobile_number",                     limit: 255
-    t.boolean  "active",                                          default: true,  null: false
-    t.string   "invitation_token",                  limit: 255
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.integer  "company_id",             limit: 4,                   null: false
+    t.string   "mobile_number",          limit: 255
+    t.boolean  "active",                             default: true,  null: false
+    t.string   "invitation_token",       limit: 255
     t.datetime "invitation_created_at"
     t.datetime "invitation_sent_at"
     t.datetime "invitation_accepted_at"
-    t.integer  "invitation_limit",                  limit: 4
-    t.integer  "invited_by_id",                     limit: 4
-    t.string   "invited_by_type",                   limit: 255
-    t.integer  "invitations_count",                 limit: 4,     default: 0
-    t.string   "otp",                               limit: 255
+    t.integer  "invitation_limit",       limit: 4
+    t.integer  "invited_by_id",          limit: 4
+    t.string   "invited_by_type",        limit: 255
+    t.integer  "invitations_count",      limit: 4,   default: 0
+    t.string   "otp",                    limit: 255
     t.datetime "otp_sent_at"
     t.datetime "otp_verified_at"
-    t.boolean  "otp_verified",                                    default: false, null: false
-    t.integer  "otp_count",                         limit: 4,     default: 0,     null: false
-    t.string   "first_name",                        limit: 255
-    t.string   "last_name",                         limit: 255
-    t.boolean  "mobile_only_invite",                              default: false
-    t.string   "mothers_maiden_name",               limit: 255
-    t.boolean  "verified",                                        default: false
-    t.integer  "otp_request_type_id",               limit: 4
-    t.boolean  "default_password",                                default: false
-    t.string   "quickbooks_id",                     limit: 255
-    t.string   "quickbooks_integration_type",       limit: 255
-    t.datetime "quickbooks_updated_at"
-    t.text     "quickbooks_additional_information", limit: 65535
+    t.boolean  "otp_verified",                       default: false, null: false
+    t.integer  "otp_count",              limit: 4,   default: 0,     null: false
+    t.string   "first_name",             limit: 255
+    t.string   "last_name",              limit: 255
+    t.boolean  "mobile_only_invite",                 default: false
+    t.string   "mothers_maiden_name",    limit: 255
+    t.boolean  "verified",                           default: false
+    t.integer  "otp_request_type_id",    limit: 4
+    t.boolean  "default_password",                   default: false
+    t.boolean  "point_of_contact",                   default: false
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
@@ -2479,8 +2477,6 @@ ActiveRecord::Schema.define(version: 20170628175759) do
   add_index "users", ["invitation_token"], name: "index_users_on_invitation_token", unique: true, using: :btree
   add_index "users", ["invitations_count"], name: "index_users_on_invitations_count", using: :btree
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
-  add_index "users", ["quickbooks_id", "quickbooks_integration_type"], name: "index_users_on_quickbooks_id_and_quickbooks_integration_type", unique: true, using: :btree
-  add_index "users", ["quickbooks_updated_at"], name: "index_users_on_quickbooks_updated_at", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
   create_table "version_associations", force: :cascade do |t|
@@ -2551,6 +2547,8 @@ ActiveRecord::Schema.define(version: 20170628175759) do
   add_foreign_key "cards", "users"
   add_foreign_key "categories", "companies"
   add_foreign_key "company_accounts", "companies"
+  add_foreign_key "company_agreement_tracks", "agreements"
+  add_foreign_key "company_agreement_tracks", "users"
   add_foreign_key "company_balance_histories", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
@@ -2647,8 +2645,6 @@ ActiveRecord::Schema.define(version: 20170628175759) do
   add_foreign_key "transcribed_expenses", "expenses"
   add_foreign_key "transcribed_expenses", "receipts"
   add_foreign_key "transcribed_expenses", "users"
-  add_foreign_key "user_agreement_tracks", "agreements"
-  add_foreign_key "user_agreement_tracks", "users"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
   add_foreign_key "user_group_item_mappings", "user_group_items"

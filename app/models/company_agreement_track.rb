@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: user_agreement_tracks
+# Table name: company_agreement_tracks
 #
 #  id           :integer          not null, primary key
 #  user_id      :integer          not null
@@ -12,7 +12,7 @@
 #  updated_at   :datetime         not null
 #
 
-class UserAgreementTrack < ActiveRecord::Base
+class CompanyAgreementTrack < ActiveRecord::Base
   belongs_to :agreement
   belongs_to :user
 
