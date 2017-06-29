@@ -70,11 +70,17 @@ class Receipt::ReceiptEmails::ProcessEmail < Receipt::ReceiptEmails::Base
     expense_param[:user_id] = receipt_email.user_id
     expense_param[:expense_type_id] = ExpenseType.id_for(:manual)
     # Set email attachments as receipts of the expense
-    expense =self.receipt_email.build_expense expense_param
-    if expense.save
-      self.receipt_email.receipts.update_all parent_id: self.receipt_email.expense.id, parent_type: 'Expense'
+
+    expense_presenter = Expense::Manual::Create.(user, expense: expense_param, prevent_process_email: true)
+    if expense_presenter&.success?
+      expense = expense_presenter.expense
+      receipt_email.update(expense_id: expense.id)
+      # end
+      # expense = self.receipt_email.build_expense expense_param
+      # if expense.save
+      self.receipt_email.receipts.update_all parent_id: expense.id, parent_type: 'Expense'
     else
-      add_message :error, expense.errors.full_messages
+      add_message :error, expense_presenter.messages[:error]
     end
   end
 
