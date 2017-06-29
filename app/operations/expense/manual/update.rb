@@ -5,7 +5,7 @@
 
 class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :updated_expense_params
-  attr_accessor :editable_attrs, :receipt, :old_receipt
+  attr_accessor :editable_attrs, :receipt, :old_receipt, :destroy_receipts
 
   def pre_validate
     if params.blank? or user.blank?
@@ -31,13 +31,9 @@ class Expense::Manual::Update < Expense::Manual::Base
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
       # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
       # todo - check if the api fails because of this
-      if updated_expense_params[:receipts_attributes] == ['']
-        receipt = expense.receipts.first
-        if receipt
-          receipt.parent = nil
-          receipt.save
-        end
-      end
+      # if updated_expense_params[:receipts_attributes] == ['']
+        self.destroy_receipts = true
+      # end
       updated_expense_params.delete(:receipts_attributes)
     end
     if expense
@@ -93,6 +89,14 @@ class Expense::Manual::Update < Expense::Manual::Base
       return
     end
     if expense.update(updated_expense_params)
+      if self.destroy_receipts
+        expense.receipts.each do |receipt|
+          if receipt
+            receipt.parent = nil
+            receipt.save
+          end
+        end
+      end
       if receipt
         receipt.parent = expense
         if receipt.save
