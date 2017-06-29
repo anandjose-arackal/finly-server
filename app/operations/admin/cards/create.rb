@@ -31,7 +31,12 @@ class Admin::Cards::Create < Admin::Cards::Base
   end
 
   def pre_process
-
+    company_id = (self.company&.id or self.selected_user&.company_id)
+    if company_id.blank?
+      add_message :error, 'Company and User not found'
+      return
+    end
+    self.card_create_params[:company_id] = company_id
   end
 
   def process

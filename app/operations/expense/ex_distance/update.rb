@@ -42,17 +42,19 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     self.updated_expense_params = distance_expense_params
 
     # todo set ids for locations using order
-    self.locations_marked_for_destruction = expense&.distance_expense&.locations.pluck(:id)
-    if expense&.distance_expense&.locations.count > 0
-      pos = 1
-      self.updated_expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes)&.each do |location|
-        id = expense&.distance_expense&.locations.with_order(pos)&.first&.id
-        if id.present?
-          self.locations_marked_for_destruction.delete(id)
-          location[:id] = id
+    if self.updated_expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes).present?
+      self.locations_marked_for_destruction = expense&.distance_expense&.locations.pluck(:id)
+      if expense&.distance_expense&.locations.count > 0
+        pos = 1
+        self.updated_expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes)&.each do |location|
+          id = expense&.distance_expense&.locations.with_order(pos)&.first&.id
+          if id.present?
+            self.locations_marked_for_destruction.delete(id)
+            location[:id] = id
+          end
+          location[:order] = pos
+          pos += 1
         end
-        location[:order] = pos
-        pos += 1
       end
     end
 
@@ -72,8 +74,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       if self.updated_expense_params[:distance_expense_attributes].present? and expense.distance_expense.present?
         self.updated_expense_params[:distance_expense_attributes][:id] = expense.distance_expense.id
       end
-      if self.updated_expense_params[:distance_expense_attributes][:distance_attributes].present? and self.updated_expense_params[:distance_expense_attributes][:distance_attributes][:value].present? and
-          expense.distance_expense.distance_id.present?
+      if self.updated_expense_params&.dig(:distance_expense_attributes, :distance_attributes, :value).present? and expense.distance_expense.distance_id.present?
         self.updated_expense_params[:distance_expense_attributes][:distance_attributes][:id] = expense.distance_expense.distance.id
       end
       if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?

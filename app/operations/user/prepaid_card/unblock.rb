@@ -8,8 +8,8 @@ class User::PrepaidCard::Unblock < User::PrepaidCard::Block
       return
     end
     curr_role = user_role_id
-    if curr_role == UserRole.id_for(:employee) and disabled_by_role != nil and disabled_by_role != UserRole.id_for(:employee) and not self.user.company_admin?
-      add_message :error, "The card has been disabled by the #{UserRole.name_for(disabled_by_role)}. You do not have the appropriate permission to enable the card"
+    if curr_role == UserRole.id_for(:employee) and card.disabled_by_role_id != nil and card.disabled_by_role_id != UserRole.id_for(:employee) and not self.user.company_admin?
+      add_message :error, "The card has been disabled by the #{UserRole.name_for(card.disabled_by_role_id)}. You do not have the appropriate permission to enable the card"
     end
 
     if params[:user_deactivation] and not card.disabled_by_role_id.nil?

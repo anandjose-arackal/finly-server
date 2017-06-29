@@ -15,19 +15,20 @@ json.wallet do
 end
 
 json.cards do
-  json.array!(@result.cards) do |card|
-    json.type card.card_program_name
-    json.card_program_id card.card_program_id
-    json.proxy card.proxy
-    json.ending_number card.ending_number
-    json.active card.active
-    json.id card.id
-    json.itz_cash_card_program_name card.itz_cash_card_program_name rescue nil
-    json.itz_cash_card_program_id card.itz_cash_card_program_id rescue nil
-    json.balance card.balance.to_f
-    json.available_eligibility card.card_eligibility.value.to_f
+  json.array!(@result.cards) do |card_hash|
+    json.type card_hash[:card]&.card_program_name
+    json.card_program_id card_hash[:card]&.card_program_id
+    json.proxy card_hash[:card]&.proxy
+    json.ending_number card_hash[:card]&.ending_number
+    json.active card_hash[:active]
+    json.id card_hash[:card]&.id
+    json.itz_cash_card_program_name card_hash[:card]&.itz_cash_card_program_name rescue nil
+    json.itz_cash_card_program_id card_hash[:card]&.itz_cash_card_program_id rescue nil
+    json.balance card_hash[:balance]&.to_f
+    json.available_eligibility card_hash[:eligibility]&.to_f
 
 
+    card = card_hash[:card]
     json.configurable_restrictions card.card_program.spend_restrictions
     if card.card_program.spend_restrictions
       json.restrictions do

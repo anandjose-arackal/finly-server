@@ -36,12 +36,10 @@ class Expense::ExTime::Update < Expense::ExTime::Base
       updated_expense_params.delete(:receipts_attributes)
     end
     if expense
-      if self.updated_expense_params[:time_expense_attributes].present? and self.updated_expense_params[:time_expense_attributes][:time_object_attributes].present? and
-          expense.time_expense.present?
+      if self.updated_expense_params&.dig(:time_expense_attributes,:time_object_attributes).present? and expense.time_expense.present?
         self.updated_expense_params[:time_expense_attributes][:id] = expense.time_expense.id
       end
-      if self.updated_expense_params[:time_expense_attributes][:time_object_attributes].present? and self.updated_expense_params[:time_expense_attributes][:time_object_attributes][:value].present? and
-          expense.time_expense.time_object_id.present?
+      if self.updated_expense_params&.dig(:time_expense_attributes,:time_object_attributes, :value).present? and expense.time_expense.time_object_id.present?
         self.updated_expense_params[:time_expense_attributes][:time_object_attributes][:id] = expense.time_expense.time_object.id
       end
       if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
