@@ -66,19 +66,19 @@ class CompanyKyc < ActiveRecord::Base
   validates_attachment :pan_card, content_type: CONTENT_TYPES
 
   has_attached_file :passport, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :board_resolution, content_type: CONTENT_TYPES
+  validates_attachment :passport, content_type: CONTENT_TYPES
 
-  has_attached_file :diving_licence, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :board_resolution, content_type: CONTENT_TYPES
+  has_attached_file :driving_licence, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
+  validates_attachment :driving_licence, content_type: CONTENT_TYPES
 
   has_attached_file :aadhar_card, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :board_resolution, content_type: CONTENT_TYPES
+  validates_attachment :aadhar_card, content_type: CONTENT_TYPES
 
   has_attached_file :vat_registration_certificate, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :board_resolution, content_type: CONTENT_TYPES
+  validates_attachment :vat_registration_certificate, content_type: CONTENT_TYPES
 
   has_attached_file :registration_of_trust, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :board_resolution, content_type: CONTENT_TYPES
+  validates_attachment :registration_of_trust, content_type: CONTENT_TYPES
 
   def editable?
     [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:error)].include?(kyc_status_id)
