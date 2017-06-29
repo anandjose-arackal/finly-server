@@ -10,7 +10,7 @@
 #  description              :text(65535)
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
-#  company_id               :integer
+#  company_id               :integer          not null
 #  disabled_by_role_id      :integer
 #  disabled_by_user_id      :integer
 #  active                   :boolean
