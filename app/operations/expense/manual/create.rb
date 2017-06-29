@@ -70,7 +70,7 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   def post_process
-    if expense&.receipt_email.present?
+    if expense&.receipt_email.present? and not params[:prevent_email_process]
       Receipt::ReceiptEmails::ProcessEmail.call_async(user, receipt_email_id: self.expense.receipt_email.id)
     end
 
@@ -98,6 +98,11 @@ class Expense::Manual::Create < Expense::Manual::Base
     end
 
     add_message :success, 'Expense created'
+  end
+
+  def success
+    params[:expense] = self.expense
+    Expense::Manual::Create::SuccessPresenter.new(user, params, messages)
   end
 
   protected
@@ -128,5 +133,13 @@ class Expense::Manual::Create < Expense::Manual::Base
   # def success
   #   Expense::Manual::Create::CreatePresenter.new(expense)
   # end
+
+  class Expense::Manual::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :expense
+
+    def init
+      self.expense = params[:expense]
+    end
+  end
 
 end
