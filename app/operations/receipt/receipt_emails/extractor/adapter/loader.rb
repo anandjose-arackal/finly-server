@@ -29,6 +29,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::AirtelMobileIndia,
       Receipt::ReceiptEmails::Extractor::Adapter::BigRock,
       Receipt::ReceiptEmails::Extractor::Adapter::GoDaddy,
+      Receipt::ReceiptEmails::Extractor::Adapter::Google,
 
       # Bookings
       Receipt::ReceiptEmails::Extractor::Adapter::BookMyShow,
