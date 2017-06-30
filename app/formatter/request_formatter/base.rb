@@ -10,8 +10,10 @@ class RequestFormatter::Base < BaseOperation
     return nil if params.blank? or file_path.blank?
     path = dir_path.present? ? "#{dir_path}/#{file_path}" : file_path
     yaml_formatter = RequestFormatter::Base::YamlFormatter.new params
+    # Set all values with placeholders as YAML does not support many data formats.
     yaml_formatter.generate_yaml_params
     output = YamlUtils.load_yaml_erb(path, {user: user, params: yaml_formatter.yaml_params, yaml_formatter: yaml_formatter})
+    # Used for replacing the placeholders with actual values again.
     map = yaml_formatter.process_yaml_output output
     Formatter.remove_blanks map
     Formatter.symbolize_hash_keys map
@@ -28,6 +30,9 @@ class RequestFormatter::Base < BaseOperation
 
   end
 
+  # As YAML cannot handle many formats such as files, boolean, multilined strings, we use yamlformatter which replaces all the values in the has with a placeholder.
+  # Once the params is restructured using YAML, we replace the original values using YamlFormatter.process_yaml_output.
+  # This way YAML can be used to restructure any hash with any format of data
   class RequestFormatter::Base::YamlFormatter
     attr_accessor :params, :placeholder_mapping, :yaml_params, :pos
 
@@ -39,6 +44,7 @@ class RequestFormatter::Base < BaseOperation
       self.pos = 0
     end
 
+    # Used for replacing the values with placeholders
     def generate_yaml_params
       return nil if self.params.blank?
       self.yaml_params = self.params.deep_dup
@@ -46,6 +52,7 @@ class RequestFormatter::Base < BaseOperation
       yaml_params
     end
 
+    # Used for retrieving values from YAML Output using placeholders
     def process_yaml_output(yaml_output)
       if yaml_output.is_a?(Array)
         yaml_output.each_with_index do |value, position|

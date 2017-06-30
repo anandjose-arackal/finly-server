@@ -27,13 +27,13 @@ class RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse < RequestFo
       map[:expense][:receipts_attributes][0] = receipt
     end
 
-    # if params[:custom_fields].present?
-    #   if params[:custom_fields].kind_of?(String)
-    #     map[:custom_fields] = JSON.parse params[:custom_fields]
-    #   else
-    #     map[:custom_fields] = params[:custom_fields]
-    #   end
-    # end
+    if params[:custom_fields].present?
+      if params[:custom_fields].kind_of?(String)
+        map[:custom_fields] = JSON.parse params[:custom_fields]
+      else
+        map[:custom_fields] = params[:custom_fields]
+      end
+    end
 
     Formatter.handle_api_nil map
 
