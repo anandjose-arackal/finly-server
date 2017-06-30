@@ -59,6 +59,14 @@ class Card < ActiveRecord::Base
   scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
   scope :reimbursement_cards_only, -> { where card_program_id: CardProgram.id_for(:reimbursement) }
 
+  scope :filter_search, -> (term) {
+    if term.present?
+      where('proxy like ?', "%#{term}%")
+    else
+      # do nothing
+    end
+  }
+
   delegate :card_balance_value, to: :card_balance
   delegate :card_program_name, to: :card_program
   delegate :itz_cash_card_program_name, to: :itz_cash_card_program

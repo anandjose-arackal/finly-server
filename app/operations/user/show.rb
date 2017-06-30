@@ -41,7 +41,7 @@ class User::Show < User::Base
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
                   :periods, :auto_submit_config, :mcc_groups, :card_periods, :cards, :balances,
-                  :user_group_item_mappings, :user_groups
+                  :user_group_item_mappings, :user_groups, :unassigned_cards
 
     def init
       self.selected_user = params[:selected_user]
@@ -119,6 +119,7 @@ class User::Show < User::Base
       self.mcc_groups = MccGroup.all
       self.user_groups = selected_user.company.user_groups
       self.user_group_item_mappings = selected_user.user_group_item_mappings
+      self.unassigned_cards = user.company.cards&.unassigned
     end
 
     private
