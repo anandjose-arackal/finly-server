@@ -29,7 +29,7 @@ json.currencies do
 end
 
 json.categories do
-  json.array!(@categories) do |category|
+  json.array!(@result.categories) do |category|
     json.extract! category, :id, :name
   end
 end
