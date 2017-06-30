@@ -14,7 +14,7 @@ json.user do
     json.non_approver !approver
   end
   if is_admin_view
-    json.expense_card_assignable @result.user.expense_card_assignable?
+    json.expense_card_assignable @result.selected_user.expense_card_assignable?
     json.unassigned_cards @result.unassigned_cards
   end
 end
