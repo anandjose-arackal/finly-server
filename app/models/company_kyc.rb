@@ -98,7 +98,7 @@ class CompanyKyc < ActiveRecord::Base
   def pin_code_format
     if self.pin_code.present?
       unless self.pin_code =~ Constants::VALID_PIN_CODE
-        errors.add(:pin_code, " is an invalid pin code")
+        errors.add(:pin_code, "is invalid")
       end
     end
   end
