@@ -25,4 +25,37 @@ class RequestFormatter::Base < BaseOperation
 
   end
 
+  # private
+  def generate_yaml_params(params)
+    yaml_params = params.deep_dup
+    temp_holder = {}
+    i = 0
+    replace_hash_with_keys yaml_params, i, temp_holder
+    {params: params, yaml_params: yaml_params, yaml_map: temp_holder}
+  end
+
+  def replace_hash_with_keys(params, pos, temp_hash)
+    if params.is_a?(Array)
+      params.each_with_index do |value, position|
+        if [Hash, Array].include? value.class
+          replace_hash_with_keys value, pos, temp_hash
+        else
+          temp_hash[pos] = value
+          params[position] = pos
+          pos += 1
+        end
+      end
+    elsif params.is_a?(Hash)
+      params.each do |key, value|
+        if [Hash, Array].include? value.class
+          replace_hash_with_keys value, pos, temp_hash
+        else
+          temp_hash[pos] = value
+          params[key] = pos
+          pos += 1
+        end
+      end
+    end
+  end
+
 end
