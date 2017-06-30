@@ -6,6 +6,10 @@ class KycProcess::Company::Update < KycProcess::Company::Base
     self.kyc_params = kyc_strong_params
   end
 
+  def validate
+    # depending on the type of company, we will be checking the documents that are uploded
+  end
+
   def process
     unless self.company_kyc.update(self.kyc_params)
       add_message :error, self.company_kyc.errors.full_messages
@@ -13,6 +17,22 @@ class KycProcess::Company::Update < KycProcess::Company::Base
   end
 
   def post_process
+    # update the status based on the company type and documents uploaded
+    case company_kyc.company_type_id
+      when 1
+        if company_kyc.pan_card.present? && (company_kyc.aadhar_card.present? || company_kyc.driving_licence.present? || company_kyc.passport.present?)
+          company_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
+        else
+          company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
+        end
+      when 2, 3, 5
+        if company_kyc.pan_card.present? && company_kyc.coi.present?
+          company_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
+        else
+          company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
+        end
+    end
+
     if self.company_kyc.coi.present? and self.company_kyc.pan_card.present?
       self.company_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
     else
@@ -20,9 +40,24 @@ class KycProcess::Company::Update < KycProcess::Company::Base
     end
   end
 
+  def success
+    param[:processing] = company.company_kyc.processing?
+    KycProcess::Company::Update::SuccessPresenter.new(user, params, messages)
+  end
+
+  class KycProcess::Company::Update::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :completed
+
+    def init
+      # because completed from the user's perspective the process (uploading) is completed
+      self.completed = params[:processing]
+    end
+  end
+
   protected
   def kyc_strong_params
-    params.require(:company_kyc).permit(:coi, :pan_card)
+    params.require(:company_kyc).permit(:coi, :pan_card, :passport, :driving_licence, :aadhar_card, :vat_registration_certificate, :registration_of_trust)
   end
 
 end

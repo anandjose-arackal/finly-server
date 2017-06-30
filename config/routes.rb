@@ -1906,8 +1906,8 @@ Rails.application.routes.draw do
   end
 
   namespace :kyc do
-    get 'company', to: 'company#show'
-    patch 'company', to: 'company#update'
+    get 'company', to: 'companies#show'
+    patch 'company', to: 'companies#update'
 
     get 'users/:id', to: 'user#show'
     patch 'users/:id', to: 'user#update'
@@ -1944,7 +1944,8 @@ Rails.application.routes.draw do
   get 'agreements', to: 'agreements#index'
   get 'agreements/validate', to: 'agreements#validate'
   post 'agreements/agree', to: 'agreements#agree'
-
+  get 'agreements/company', to: 'agreements#company_data'
+  patch 'agreements/update', to: 'agreements#update'
 
   # All APIs for Quickbooks integration and syncing
 

@@ -1,4 +1,4 @@
-class Kyc::CompanyController < ApplicationController
+class Kyc::CompaniesController < ApplicationController
 
   before_action :authenticate_user!
   allow_oauth!

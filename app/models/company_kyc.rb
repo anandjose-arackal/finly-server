@@ -84,4 +84,11 @@ class CompanyKyc < ActiveRecord::Base
     [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:error)].include?(kyc_status_id)
   end
 
+  def completed?
+    if self.kyc_status_id == KycStatus.id_for(:completed)
+      return true
+    end
+    false
+  end
+
 end

@@ -8,11 +8,6 @@ class AgreementsController < ApplicationController
     respond
   end
 
-  def required_documents
-    @result = Agreements::RequiredDocuments.(current_user, params)
-    respond
-  end
-
   def index
     @result = Agreements::Index.(nil, params)
     respond
@@ -26,6 +21,11 @@ class AgreementsController < ApplicationController
   def agree
     params[:ip_address] = request.remote_ip
     @result = Agreements::Agree.(current_user, params)
+    respond
+  end
+
+  def update
+    @result = Agreements::Kyc::Update.(current_user, params)
     respond
   end
 
