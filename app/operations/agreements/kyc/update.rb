@@ -19,7 +19,21 @@ class Agreements::Kyc::Update < Agreements::Base
     # check whether the user is the POC for that company
     unless user.point_of_contact
       add_message :error, "You are not authorized to upload this information"
+      return
     end
+
+    # checking if all the individual fields are present in the request
+    reg_mob_no = kyc_params[:registered_mobile_number]
+    doe = kyc_params[:date_of_establishment]
+    street_2 = kyc_params[:street_2]
+    street_3 = kyc_params[:street_3]
+    pin_code = kyc_params[:pin_code]
+
+    validate_field reg_mob_no, "Registered mobile number"
+    validate_field doe, "Date of Establishment"
+    validate_field street_2, "Address line 2"
+    validate_field street_3, "Address line 3"
+    validate_field pin_code, "Pin code"
   end
 
   def process
@@ -36,5 +50,11 @@ class Agreements::Kyc::Update < Agreements::Base
 
   def company_kyc_params
     params.require(:company_kyc).permit(:company_type_id, :registered_mobile_number, :date_of_establishment, :street_2, :street_3, :pin_code)
+  end
+
+  def validate_field(field, attribute_name)
+    if field.blank?
+      add_message :error, "#{attribute_name} cannot be blank"
+    end
   end
 end

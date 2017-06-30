@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170630111720) do
+ActiveRecord::Schema.define(version: 20170630121751) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -85,9 +85,9 @@ ActiveRecord::Schema.define(version: 20170630111720) do
 
   create_table "amounts", force: :cascade do |t|
     t.decimal  "value",                 precision: 64, scale: 12
-    t.integer  "currency_id", limit: 4,                           null: false
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
+    t.integer  "currency_id", limit: 4,                                           null: false
+    t.datetime "created_at",                                                      null: false
+    t.datetime "updated_at",                                                      null: false
     t.decimal  "INR",                   precision: 20, scale: 5
     t.decimal  "USD",                   precision: 20, scale: 5
     t.decimal  "GBP",                   precision: 20, scale: 5
@@ -256,6 +256,7 @@ ActiveRecord::Schema.define(version: 20170630111720) do
     t.decimal  "ZMK",                   precision: 20, scale: 5
     t.decimal  "ZMW",                   precision: 20, scale: 5
     t.decimal  "ZWL",                   precision: 20, scale: 5
+    t.boolean  "is_deleted",                                      default: false
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
