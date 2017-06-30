@@ -13,14 +13,8 @@ class RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse < RequestFo
   def process
     map = format_file(__dir__, 'expense.yaml.erb', user, params)
 
-    if params.dig(:note).present?
-      map[:expense] = {} if map[:expense].nil?
-      map[:expense][:note] = params[:note]
-    end
-
-    if params&.dig(:reimbursable).present?
-      map[:expense] = {} if map[:expense].nil?
-      map[:expense][:reimbursable] = StringUtils.to_bool params[:reimbursable]
+    if map&.dig(:expense, :reimbursable).present?
+      map[:expense][:reimbursable] = StringUtils.to_bool map[:expense][:reimbursable]
     end
 
     # Load receipt seperately has yaml cannot handle images
@@ -33,13 +27,13 @@ class RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse < RequestFo
       map[:expense][:receipts_attributes][0] = receipt
     end
 
-    if params[:custom_fields].present?
-      if params[:custom_fields].kind_of?(String)
-        map[:custom_fields] = JSON.parse params[:custom_fields]
-      else
-        map[:custom_fields] = params[:custom_fields]
-      end
-    end
+    # if params[:custom_fields].present?
+    #   if params[:custom_fields].kind_of?(String)
+    #     map[:custom_fields] = JSON.parse params[:custom_fields]
+    #   else
+    #     map[:custom_fields] = params[:custom_fields]
+    #   end
+    # end
 
     Formatter.handle_api_nil map
 

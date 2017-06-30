@@ -3,9 +3,10 @@ receipt_id: <%= params[:receipt_id] %>
 expense:
   report_id: <%= params[:report_id] %>
   date: <%= params[:date] %>
+  note: <%= params[:note] %>
   reimbursable: <%= params[:reimbursable] %>
   category_id: <%= params[:category_id] %>
-  <% type = params[:type].present? ? params[:type] : nil %>
+  <% type = yaml_formatter.value_for_placeholder params[:type] %>
   <% if type == '1' or type == 1 %>
   manual_expense_attributes:
     merchant: <%= params[:merchant] %>
@@ -19,14 +20,13 @@ expense:
       value: <%= params[:distance] %>
       physical_unit_id: <%= PhysicalUnit.kilometre_id %>
     <% end %>
-    <% if params[:locations].present? %>
+    <% if yaml_formatter.value_for_placeholder(params[:locations]).present? %>
     locations_attributes:
       <% params[:locations].each do |location| %>
       - latitude: <%= location[:latitude] %>
         longitude: <%= location[:longitude] %>
         name: <%= location[:name] %>
-        address: >
-          <%= location[:address] %>
+        address: <%= location[:address] %>
         maps_id: <%= location[:maps_id] %>
       <% end %>
     <% end %>
@@ -54,7 +54,8 @@ expense:
     sender: <%= params[:receipt_email][:sender] %>
     subject: <%= params[:receipt_email][:subject] %>
     timestamp: <%= params[:receipt_email][:timestamp] %>
-    body: <%= FakeFileIO.new("#{params[:receipt_email][:email_id]}_body.txt", params[:receipt_email][:body]) %>
+    <% email_id = yaml_formatter.value_for_placeholder params[:receipt_email][:email_id] %>
+    body: <%= FakeFileIO.new("#{email_id}_body.txt", yaml_formatter.value_for_placeholder(params[:receipt_email][:body])) %>
     <% if params[:receipt_email][:attachments].present? %>
     receipt_email_attachments_attributes:
       <% params[:receipt_email][:attachments].each do |attachment| %>

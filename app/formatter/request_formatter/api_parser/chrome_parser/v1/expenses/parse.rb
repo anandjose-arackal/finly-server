@@ -3,17 +3,6 @@ class RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse < RequestFo
   def process
     map = format_file(__dir__, 'expense.yaml.erb', user, params)
 
-    if params.dig(:note).present?
-      map[:expense] = {} if map[:expense].nil?
-      map[:expense][:note] = params[:note]
-    end
-
-    if params&.dig(:reimbursable).present?
-      map[:expense] = {} if map[:expense].nil?
-      map[:expense][:reimbursable] = StringUtils.to_bool params[:reimbursable]
-    end
-
-
     # Load receipt seperately has yaml cannot handle images
     if params[:receipt].present?
       formatted_params = RequestFormatter::ReceiptsParser::Parse.(user, params).formatted_request

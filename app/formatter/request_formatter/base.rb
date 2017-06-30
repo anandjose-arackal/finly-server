@@ -9,7 +9,10 @@ class RequestFormatter::Base < BaseOperation
   def format_file(dir_path, file_path, user, params)
     return nil if params.blank? or file_path.blank?
     path = dir_path.present? ? "#{dir_path}/#{file_path}" : file_path
-    map = YamlUtils.load_yaml_erb(path, {user: user, params: params})
+    yaml_formatter = RequestFormatter::Base::YamlFormatter.new params
+    yaml_formatter.generate_yaml_params
+    output = YamlUtils.load_yaml_erb(path, {user: user, params: yaml_formatter.yaml_params, yaml_formatter: yaml_formatter})
+    map = yaml_formatter.process_yaml_output output
     Formatter.remove_blanks map
     Formatter.symbolize_hash_keys map
     map
@@ -25,36 +28,82 @@ class RequestFormatter::Base < BaseOperation
 
   end
 
-  # private
-  def generate_yaml_params(params)
-    yaml_params = params.deep_dup
-    temp_holder = {}
-    i = 0
-    replace_hash_with_keys yaml_params, i, temp_holder
-    {params: params, yaml_params: yaml_params, yaml_map: temp_holder}
-  end
+  class RequestFormatter::Base::YamlFormatter
+    attr_accessor :params, :placeholder_mapping, :yaml_params, :pos
 
-  def replace_hash_with_keys(params, pos, temp_hash)
-    if params.is_a?(Array)
-      params.each_with_index do |value, position|
-        if [Hash, Array].include? value.class
-          replace_hash_with_keys value, pos, temp_hash
-        else
-          temp_hash[pos] = value
-          params[position] = pos
-          pos += 1
+    PLACEHOLDER_KEY = 'yaml_placeholder_'
+
+    def initialize(params)
+      self.params = params
+      self.placeholder_mapping = {}
+      self.pos = 0
+    end
+
+    def generate_yaml_params
+      return nil if self.params.blank?
+      self.yaml_params = self.params.deep_dup
+      set_placeholders yaml_params, placeholder_mapping
+      yaml_params
+    end
+
+    def process_yaml_output(yaml_output)
+      if yaml_output.is_a?(Array)
+        yaml_output.each_with_index do |value, position|
+          puts "Value: #{value}, position: #{position}, Class: #{value.class}"
+          if [Hash, Array].include? value.class
+            process_yaml_output value
+          else
+            yaml_output[position] = placeholder_mapping[value]
+          end
+        end
+      elsif yaml_output.is_a?(Hash)
+        yaml_output.each do |key, value|
+          if [Hash, Array].include? value.class
+            process_yaml_output value
+          elsif value.is_a?(String) and value.starts_with?(PLACEHOLDER_KEY)
+            yaml_output[key] = placeholder_mapping[value]
+          end
         end
       end
-    elsif params.is_a?(Hash)
-      params.each do |key, value|
-        if [Hash, Array].include? value.class
-          replace_hash_with_keys value, pos, temp_hash
-        else
-          temp_hash[pos] = value
-          params[key] = pos
-          pos += 1
+    end
+
+    def value_for_placeholder(placeholder)
+      return nil if placeholder.blank? or self.params.blank? or placeholder_mapping.blank? or yaml_params.blank?
+      placeholder_mapping[placeholder]
+    end
+
+    protected
+    def set_placeholders(items, placeholder_mapping)
+      case items.class
+        when Array
+          when Hash, ActionController::Parameters
+      end
+      if items.is_a?(Array)
+        items.each_with_index do |value, position|
+          if [ActionController::Parameters, Hash, Array].include? value.class
+            set_placeholders value, placeholder_mapping
+          else
+            pos = next_pos
+            placeholder_mapping["#{PLACEHOLDER_KEY}#{pos}"] = value
+            items[position] = "#{PLACEHOLDER_KEY}#{pos}"
+          end
+        end
+      elsif items.is_a?(Hash)
+        items.each do |key, value|
+          if [ActionController::Parameters, Hash, Array].include? value.class
+            set_placeholders value, placeholder_mapping
+          else
+            pos = next_pos
+            placeholder_mapping["#{PLACEHOLDER_KEY}#{pos}"] = value
+            items[key] = "#{PLACEHOLDER_KEY}#{pos}"
+          end
         end
       end
+    end
+
+    def next_pos
+      self.pos += 1
+      self.pos
     end
   end
 
