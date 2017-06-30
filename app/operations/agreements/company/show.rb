@@ -39,7 +39,8 @@ class Agreements::Company::Show < Agreements::Base
   class Agreements::Company::Show::CompanyKycPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :email, :registered_mobile_number, :poc_first_name, :poc_last_name, :company,
-                  :company_type, :street_2, :street_3, :date_of_establishment, :pin_code, :company_kyc
+                  :company_type, :street_2, :street_3, :date_of_establishment, :pin_code, :company_kyc,
+                  :company_types
 
     def init
       self.company = params[:company]
@@ -53,6 +54,7 @@ class Agreements::Company::Show < Agreements::Base
       self.street_3 = company_kyc&.street_3
       self.pin_code = company_kyc&.pin_code
       self.date_of_establishment = company_kyc&.date_of_establishment
+      self.company_types = CompanyType.all
     end
   end
 end

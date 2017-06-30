@@ -12,6 +12,6 @@ class CompanyType < ActiveRecord::Base
   include Seedable
 
   def self.values
-    ['Sole Proprietor', 'Partnership Firm', 'Private Ltd Company', 'Ltd Company', 'Ltd Liability Partnership']
+    ['Sole Proprietor', 'Partnership Firm', 'Private Ltd Company', 'Ltd Company', 'Ltd Liability Partnership', 'Trust and Societies']
   end
 end
