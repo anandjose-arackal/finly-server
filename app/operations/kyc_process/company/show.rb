@@ -37,7 +37,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
         when 1
           # aadhar card or VAT registration certificate
           # todo - will think about this later
-          
+
         when 2, 3, 5
           coi = {}
           coi[:name] = "Certificate of Incorporation"
