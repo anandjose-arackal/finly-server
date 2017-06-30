@@ -45,7 +45,7 @@
 #  verified               :boolean          default(FALSE)
 #  otp_request_type_id    :integer
 #  default_password       :boolean          default(FALSE)
-#  point_of_contact       :boolean
+#  point_of_contact       :boolean          default(FALSE)
 #
 
 require 'test_helper'
