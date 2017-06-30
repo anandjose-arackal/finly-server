@@ -26,6 +26,17 @@ class Card::Assign < Card::Base
 
     if selected_user.blank?
       add_message :error, "User not found"
+      return
     end
+  end
+
+  def process
+    unless card.update(user_id: selected_user.id)
+      add_message :error, card.errors.full_messages
+    end
+  end
+
+  def post_process
+    add_message :success, "Card assigned"
   end
 end
