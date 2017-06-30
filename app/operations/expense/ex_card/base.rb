@@ -25,7 +25,7 @@ class Expense::ExCard::Base < Expense::Base
                                         receipts_attributes: [:image, :user_id, :id])
     # Hack as image upload from API is failing in strong params
     receipts = [receipts] unless receipts.is_a?(Array)
-    p[:receipts_attributes] = receipts if receipts.present? and p.present?
+    p[:receipts_attributes] = receipts if receipts.present? and not p.nil?
     p.permit!
   end
 

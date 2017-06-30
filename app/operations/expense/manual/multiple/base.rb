@@ -14,7 +14,7 @@ class Expense::Manual::Multiple::Base < BaseOperation
                                         amount_attributes: [:value, :currency_id], manual_expense_attributes: [:merchant], receipts_attributes: [:image, :user_id, :id])
     # Hack as image upload from API is failing in strong params_passed
     receipts = [receipts] unless receipts.is_a?(Array)
-    p[:receipts_attributes] = receipts if receipts.present? and p.present?
+    p[:receipts_attributes] = receipts if receipts.present? and not p.nil?
     p.permit!
   end
 end
