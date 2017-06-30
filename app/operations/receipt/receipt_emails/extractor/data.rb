@@ -12,12 +12,12 @@ class Receipt::ReceiptEmails::Extractor::Data < BaseOperation::BasePresenter::Su
   end
 
   def expense_data_extract_params
+    amount_attributes = nil
+    if amount_value.present? or currency_id.present?
+      amount_attributes = {value: (amount_value or 0), currency_id: (currency_id or 1)}
+    end
     {
-        amount_attributes:
-            {
-                value: amount_value,
-                currency_id: currency_id
-            },
+        amount_attributes: amount_attributes,
         merchant: merchant,
         category_id: category_id,
         datetime: datetime,

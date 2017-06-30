@@ -32,6 +32,7 @@
 
 
 
+
 class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
@@ -52,6 +53,8 @@ class Receipt < ActiveRecord::Base
       # content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf application/msword application/vnd.openxmlformats-officedocument.wordprocessingml.document)
       content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)
   }
+
+  default_scope {order(created_at: :desc)}
 
   scope :with_user_id, -> (user_ids) {where user_id: user_ids}
   scope :with_id, ->(id) { where id: id }

@@ -726,8 +726,8 @@
 #            bank_transfer_reimbursements GET    /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#show
 #                                         PATCH  /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#update
 #                                         POST   /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#create
-#                             kyc_company GET    /kyc/company(.:format)                                         kyc/company#show
-#                                         PATCH  /kyc/company(.:format)                                         kyc/company#update
+#                             kyc_company GET    /kyc/company(.:format)                                         kyc/companies#show
+#                                         PATCH  /kyc/company(.:format)                                         kyc/companies#update
 #                                     kyc GET    /kyc/users/:id(.:format)                                       kyc/user#show
 #                                         PATCH  /kyc/users/:id(.:format)                                       kyc/user#update
 #                          disburse_users POST   /disburse/users(.:format)                                      disburse/users#create
@@ -790,6 +790,8 @@
 #                              agreements GET    /agreements(.:format)                                          agreements#index
 #                     agreements_validate GET    /agreements/validate(.:format)                                 agreements#validate
 #                        agreements_agree POST   /agreements/agree(.:format)                                    agreements#agree
+#                      agreements_company GET    /agreements/company(.:format)                                  agreements#company_data
+#                       agreements_update PATCH  /agreements/update(.:format)                                   agreements#update
 #                                         GET    /auth/:provider/callback(.:format)                             third_party_auth#quickbooks
 #                      testing_quickbooks GET    /testing_quickbooks(.:format)                                  third_party_auth#testing
 #                  quickbooks_sync_report POST   /quickbooks/sync_report(.:format)                              quickbooks#sync_report
