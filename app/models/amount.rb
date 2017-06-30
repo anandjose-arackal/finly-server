@@ -179,6 +179,8 @@
 
 class Amount < ActiveRecord::Base
   include MathUtil
+  include SoftDeletable
+
   belongs_to :currency
 
   accepts_nested_attributes_for :currency

@@ -93,7 +93,9 @@ class Event::EReport::Base < Event::SetNotifier
       self.company = user.company
       if params[:action_url_token]
         self.action_url_token = params[:action_url_token]
-        self.action_url = generate_action_url(user, role_id).html_safe
+        action_url = generate_action_url(user, role_id)
+        self.action_url = action_url.html_safe if action_url.present?
+        # self.action_url = generate_action_url(user, role_id).html_safe
       end
     end
 
@@ -140,7 +142,7 @@ class Event::EReport::Base < Event::SetNotifier
           view = "\"personal\""
       end
 
-      url = ''
+      url = nil
       if report.controlling_user_id == user.id
       # token = params[:email_authorization]
 

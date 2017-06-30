@@ -98,10 +98,12 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
       illegible_attributes << "Date"
       expense_params[:date] = DateUtils.local_date # setting the date as today by default
     end
-    expense_params[:system_messages_attributes] << {
-        content: "#{illegible_attributes.to_sentence} #{illegible_attributes.size == 1 ? 'is' : 'are'} illegible",
-        system_message_type_id: SystemMessageType.id_for(:error)
-    }
+    unless illegible_attributes.empty?
+      expense_params[:system_messages_attributes] << {
+          content: "#{illegible_attributes.to_sentence} #{illegible_attributes.size == 1 ? 'is' : 'are'} illegible",
+          system_message_type_id: SystemMessageType.id_for(:error)
+      }
+    end
     expense_params.permit!
   end
 end
