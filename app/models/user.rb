@@ -562,7 +562,7 @@ class User < ActiveRecord::Base
   end
 
   def expense_card_assignable?
-    if user.cards.expense_cards.present?
+    if self.cards.expense_cards.present?
       return false
     end
     true
