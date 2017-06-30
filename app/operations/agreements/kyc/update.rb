@@ -23,17 +23,19 @@ class Agreements::Kyc::Update < Agreements::Base
     end
 
     # checking if all the individual fields are present in the request
-    reg_mob_no = kyc_params[:registered_mobile_number]
     doe = kyc_params[:date_of_establishment]
     street_2 = kyc_params[:street_2]
     street_3 = kyc_params[:street_3]
     pin_code = kyc_params[:pin_code]
 
-    validate_field reg_mob_no, "Registered mobile number"
     validate_field doe, "Date of Establishment"
     validate_field street_2, "Address line 2"
     validate_field street_3, "Address line 3"
     validate_field pin_code, "Pin code"
+  end
+
+  def pre_process
+    # here add the other fields extracted from the user and company information to the company_kyc model
   end
 
   def process
