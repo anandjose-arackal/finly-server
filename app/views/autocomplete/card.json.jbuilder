@@ -1,4 +1,4 @@
 json.array!(@result.cards) do |card|
-  json.proxy card.proxy
-  json.id card.id
+  json.label card.proxy
+  json.value card.id
 end
