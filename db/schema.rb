@@ -689,9 +689,9 @@ ActiveRecord::Schema.define(version: 20170630121751) do
     t.integer  "board_resolution_file_size",                limit: 4
     t.datetime "board_resolution_updated_at"
     t.integer  "kyc_status_id",                             limit: 4
-    t.integer  "company_id",                                limit: 4,     null: false
     t.datetime "created_at",                                              null: false
     t.datetime "updated_at",                                              null: false
+    t.integer  "company_id",                                limit: 4,     null: false
     t.date     "date_of_establishment"
     t.text     "street_2",                                  limit: 65535
     t.text     "street_3",                                  limit: 65535
@@ -769,6 +769,29 @@ ActiveRecord::Schema.define(version: 20170630121751) do
     t.integer  "contactable_id",   limit: 4
     t.string   "contactable_type", limit: 255
     t.string   "designation",      limit: 255
+  end
+
+  create_table "corporate_kycs", force: :cascade do |t|
+    t.integer  "company_id",                    limit: 4
+    t.string   "pan_card_file_name",            limit: 255
+    t.string   "pan_card_content_type",         limit: 255
+    t.integer  "pan_card_file_size",            limit: 4
+    t.datetime "pan_card_updated_at"
+    t.string   "coi_file_name",                 limit: 255
+    t.string   "coi_content_type",              limit: 255
+    t.integer  "coi_file_size",                 limit: 4
+    t.datetime "coi_updated_at"
+    t.string   "agreement_file_name",           limit: 255
+    t.string   "agreement_content_type",        limit: 255
+    t.integer  "agreement_file_size",           limit: 4
+    t.datetime "agreement_updated_at"
+    t.string   "board_resolution_file_name",    limit: 255
+    t.string   "board_resolution_content_type", limit: 255
+    t.integer  "board_resolution_file_size",    limit: 4
+    t.datetime "board_resolution_updated_at"
+    t.integer  "kyc_status_id",                 limit: 4
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
   end
 
   create_table "crono_jobs", force: :cascade do |t|
@@ -1958,10 +1981,6 @@ ActiveRecord::Schema.define(version: 20170630121751) do
     t.datetime "original_source_updated_at"
     t.string   "email_id",                     limit: 255
     t.string   "sender",                       limit: 255
-    t.string   "source_file_name",             limit: 255
-    t.string   "source_content_type",          limit: 255
-    t.integer  "source_file_size",             limit: 4
-    t.datetime "source_updated_at"
     t.boolean  "fixed",                                      default: false
     t.string   "parsed_merchant",              limit: 255
     t.string   "parsed_amount_value",          limit: 255
@@ -1971,6 +1990,10 @@ ActiveRecord::Schema.define(version: 20170630121751) do
     t.integer  "parsed_category_id",           limit: 4
     t.datetime "created_at",                                                 null: false
     t.datetime "updated_at",                                                 null: false
+    t.string   "source_file_name",             limit: 255
+    t.string   "source_content_type",          limit: 255
+    t.integer  "source_file_size",             limit: 4
+    t.datetime "source_updated_at"
   end
 
   add_index "receipt_email_parse_failures", ["parsed_category_id"], name: "index_receipt_email_parse_failures_on_parsed_category_id", using: :btree
@@ -2344,6 +2367,7 @@ ActiveRecord::Schema.define(version: 20170630121751) do
     t.string   "city",                limit: 255
     t.integer  "state_id",            limit: 4
     t.string   "pin_code",            limit: 255
+    t.string   "apple_push_token",    limit: 255
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree
