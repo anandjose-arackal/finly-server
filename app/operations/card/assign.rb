@@ -16,6 +16,7 @@ class Card::Assign < Card::Base
   def init
     self.selected_user = user.company.users.find_by(id: params[:user_id])
     self.card = user.company.cards&.unassigned&.find_by(id: params[:card_id])
+    self.card_program = CardProgram.find_by(id: params[:card_program_id])
   end
 
   def validate
@@ -28,6 +29,8 @@ class Card::Assign < Card::Base
       add_message :error, "User not found"
       return
     end
+
+
   end
 
   def process

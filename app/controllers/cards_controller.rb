@@ -56,6 +56,11 @@ class CardsController < ApplicationController
     respond
   end
 
+  def unassigned
+    @result = Card::Unassigned.(current_user, params)
+    respond
+  end
+
 
 
 end

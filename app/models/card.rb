@@ -55,6 +55,7 @@ class Card < ActiveRecord::Base
   scope :creditable_cards, -> { with_card_program(CardProgram.all.with_manager_credit) }
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
+  scope :meal_cards, -> {where card_program_id: CardProgram.id_for(:meal)}
 
   scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
   scope :reimbursement_cards_only, -> { where card_program_id: CardProgram.id_for(:reimbursement) }
