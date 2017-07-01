@@ -1666,6 +1666,8 @@ Rails.application.routes.draw do
   post 'cards/details' => 'cards#details', as: :card_details
   post 'cards/update_balance' => 'cards#update_balance', as: :update_balance
   post 'cards/update_status' => 'cards#update_status', as: :update_card_status
+  patch 'cards/assign', to: 'cards#assign', as: :assign_card
+  get 'cards/unassigned', to: 'cards#unassigned', as: :unassigned_cards
 
   resources :reports, except: [:new, :edit]
   get 'export/report(.:format)' => 'export#report', as: :export_report

@@ -55,6 +55,7 @@ class Card < ActiveRecord::Base
   scope :creditable_cards, -> { with_card_program(CardProgram.all.with_manager_credit) }
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
+  scope :meal_cards, -> {where card_program_id: CardProgram.id_for(:meal)}
 
   scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
   scope :reimbursement_cards_only, -> { where card_program_id: CardProgram.id_for(:reimbursement) }
@@ -73,9 +74,10 @@ class Card < ActiveRecord::Base
 
   validates :proxy, uniqueness: true, format: {with: /\A[S]\d{11}\z/}, length: {is: 12}
   validates :ending_number, presence: true
-  validates :card_program_id, presence: true
+  # validates :card_program_id, presence: true
   validates :company_id, presence: true
   # validates :itz_cash_card_program_id, presence: true
+  validate :card_program_with_user
 
   after_create do
     user = self.user
@@ -155,6 +157,16 @@ class Card < ActiveRecord::Base
 
   def active?
     self.active
+  end
+
+  private
+
+  def card_program_with_user
+    if self.user_id.present?
+      if self.card_program_id.blank?
+        errors.add(:card, "must have an associated card program")
+      end
+    end
   end
 
 
