@@ -1,7 +1,7 @@
 # operation to assign a particular card to a particular person by the company admin
 class Card::Assign < Card::Base
 
-  attr_accessor :selected_user
+  attr_accessor :selected_user, :card, :card_program
 
   def authorized_user_types
     [:company_admin]
@@ -30,7 +30,14 @@ class Card::Assign < Card::Base
       return
     end
 
+    if card_program.blank?
+      add_message :error, "Card Program not found"
+      return
+    end
 
+    if selected_user.cards.with_card_program(card_program.id).present?
+      add_message :error, "This user already has a #{card_program.name} card"
+    end
   end
 
   def process
