@@ -21,6 +21,7 @@ class UsersController < ApplicationController
     # respond_to do |format|
     #   format.json { render json: @result.paginated_team.as_json }
     # end
+    debugger
     respond
   end
 

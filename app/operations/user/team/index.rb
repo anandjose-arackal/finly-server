@@ -18,6 +18,8 @@ class User::Team::Index < User::Team::Base
   has_scope :having_cash_on_hand_balance
   has_scope :having_wallet_balance
   has_scope :with_cards_having_card_program, type: :array
+  has_scope :filter_disburse
+  has_scope :filter_expense_management
 
   def pre_validate
     unless user.present?
@@ -61,6 +63,20 @@ class User::Team::Index < User::Team::Base
   def validate
     unless role_id.present?
       messages[:error] << 'User role not defined'
+    end
+  end
+
+  def configure_expense_management
+    request = params[:request]
+
+  end
+
+  def configure_disburse
+    # adding filters so that only users subscribed to disburse will be shown in the disburse panel
+    request = params[:request]
+    debugger
+    if request.referrer.include?('disburse')
+      params[:filter_disburse] = '1'
     end
   end
 

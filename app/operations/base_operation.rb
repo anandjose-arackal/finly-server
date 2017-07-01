@@ -35,6 +35,10 @@ class BaseOperation
     return failure if has_errors?
     subscribe
     return failure if has_errors?
+    configure_expense_management
+    return failure if has_errors?
+    configure_disburse
+    return failure if has_errors?
     pre_process
     return failure if has_errors?
     process
@@ -111,6 +115,14 @@ class BaseOperation
 
   # Any post process based events such as notifications, mailers is created here
   def post_process
+
+  end
+
+  def configure_expense_management
+
+  end
+
+  def configure_disburse
 
   end
 
