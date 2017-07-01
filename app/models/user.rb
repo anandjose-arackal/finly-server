@@ -148,14 +148,6 @@ class User < ActiveRecord::Base
   validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
-  validates :quickbooks_id, uniqueness: { scope: :quickbooks_integration_type, message: "should be unique for an external integration type" }, if: lambda { |user| user.quickbooks_integration_type.present? }
-
-  scope :quickbooks, -> { where(external_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
-
-
-  def from_quickbooks?
-    external_integration_type == QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]
-  end
 
   scope :with_id, ->(user_id) { where id: user_id }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
