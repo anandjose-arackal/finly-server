@@ -41,7 +41,7 @@ class Card::Assign < Card::Base
   end
 
   def process
-    unless card.update(user_id: selected_user.id)
+    unless card.update(user_id: selected_user.id, card_program_id: card_program.id)
       add_message :error, card.errors.full_messages
     end
   end

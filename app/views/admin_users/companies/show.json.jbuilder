@@ -14,6 +14,13 @@ json.reimbursement_card_enabled @result.company.reimbursement_card_enabled?
 json.balance @result.company_balance
 json.hard_copy_receipt @result.company.hard_copy_receipt_enabled?
 json.encrypted_params @result.company.configuration.encrypted_easy_login_params
+
+if Rails.env.production?
+  json.url "https://www.itzcash.com/finly/servlet/AccountReloadServlet"
+else
+  json.url "https://staging.itzcash.com/loconav/servlet/AccountReloadServlet"
+end
+
 json.kyc do
   kyc = @result.company.company_kyc
   editable = (kyc.editable? or [KycStatus.id_for(:processing)].include?(kyc.kyc_status_id))
