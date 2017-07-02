@@ -10,9 +10,11 @@
 
 class SystemMessageType < ActiveRecord::Base
 
-  VALUES = {info: 1,
-            error: 2,
-            success: 3}
+  VALUES = {
+      info: 1,
+      error: 2,
+      success: 3
+  }
 
   scope :with_id, -> (id) { where id: id }
   scope :with_name, -> (name) { where name: name }
@@ -33,6 +35,5 @@ class SystemMessageType < ActiveRecord::Base
       end
     end
   end
-
 
 end

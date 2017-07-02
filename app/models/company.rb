@@ -38,6 +38,7 @@ class Company < ActiveRecord::Base
   has_many :user_teams
   has_many :auto_sync_configs
   has_many :quickbooks_payment_types
+  has_one :company_kyc
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -211,6 +212,14 @@ class Company < ActiveRecord::Base
     !!self.itz_cash_property&.d_code.present?
   end
 
+  def kyc_required?
+    return false unless feature_subscription.itz_cash_d_code_enabled
+    if [KycStatus.id_for(:incomplete), KycStatus.id_for(:error)].include?(company_kyc.kyc_status_id)
+      return true
+    end
+    false
+  end
+
   private
 
   def init_config_present
@@ -232,6 +241,8 @@ class Company < ActiveRecord::Base
     AutoSyncConfigType::VALUES.each do |type|
       self.auto_sync_configs.build(enabled: false)
     end
+
+    self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
   end
 
 end

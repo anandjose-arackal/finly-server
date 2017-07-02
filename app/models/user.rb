@@ -59,7 +59,6 @@
 
 
 
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -127,6 +126,12 @@ class User < ActiveRecord::Base
   has_many :user_group_items, through: :user_group_item_mappings
   has_many :expense_data_extracts, as: :sourcable
   has_many :receipt_email_parse_failures
+  has_many :user_login_tracks
+  has_many :login_agreement_mappings
+  has_many :agreements, through: :login_agreement_mappings
+
+  has_one :individual_kyc
+  has_one :itz_cash_dmt_sender
 
   # has_one :feature_access, as: :accessible
 
@@ -148,6 +153,7 @@ class User < ActiveRecord::Base
   validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
+
 
   scope :with_id, ->(user_id) { where id: user_id }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
@@ -335,6 +341,7 @@ class User < ActiveRecord::Base
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
     self.build_enforce_policy(enabled: false).save
     self.build_auto_reload_config(enabled: false).save
+    self.build_individual_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.individual_kyc.blank?
   end
 
   def payments
@@ -563,7 +570,7 @@ class User < ActiveRecord::Base
   def finly_admin?
     jouska_id = Company.find_by(name: "Jouska").id rescue nil
     unless Rails.env.production?
-      if self.email == 'king@demo.com'
+      if ['king@demo.com', 'king@finlytest.io'].include?(self.email)
         return true
       end
     end

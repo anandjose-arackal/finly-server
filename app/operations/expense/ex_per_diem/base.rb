@@ -15,7 +15,7 @@ class Expense::ExPerDiem::Base < Expense::Base
                                         :receipt_id, :receipt, per_diem_expense_attributes: [:id, :quantity, :per_diem_id])
     # Hack as image upload from API is failing in strong params
     receipts = [receipts] unless receipts.is_a?(Array)
-    p[:receipts_attributes] = receipts if receipts.present? and p.present?
+    p[:receipts_attributes] = receipts if receipts.present? and not p.nil?
     p.permit!
 
   end

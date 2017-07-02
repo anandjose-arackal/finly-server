@@ -178,6 +178,8 @@
 #     api_v1_configuration_gcm_unregister POST   /api/v1/configuration/gcm/unregister(.:format)                 api/v1/configuration/gcm#delete
 #                         api_v1_balances GET    /api/v1/balances(.:format)                                     api/v1/users#balance
 #          api_v1_available_expense_types GET    /api/v1/available_expense_types(.:format)                      api/v1/expenses#available_expense_types
+#                                  api_v1 GET    /api/v1/kyc/:id(.:format)                                      api/v1/kyc/user#show
+#                                         POST   /api/v1/kyc/:id(.:format)                                      api/v1/kyc/user#update
 #                      mobile_v0_expenses GET    /mobile/v0/expenses(.:format)                                  mobile/v0/expenses#index
 #                                         POST   /mobile/v0/expenses(.:format)                                  mobile/v0/expenses#create
 #                       mobile_v0_expense GET    /mobile/v0/expenses/:id(.:format)                              mobile/v0/expenses#show
@@ -357,6 +359,8 @@
 #                                         PATCH  /transcriber/receipts/:id(.:format)                            transcriber/receipts#update
 #                                         PUT    /transcriber/receipts/:id(.:format)                            transcriber/receipts#update
 #                                         DELETE /transcriber/receipts/:id(.:format)                            transcriber/receipts#destroy
+#         admin_users_company_dcode_check POST   /admin_users/companies/:company_id/dcode_check(.:format)       admin_users/companies#check_dcode
+#      admin_users_company_configure_payu POST   /admin_users/companies/:company_id/configure_payu(.:format)    admin_users/companies#configure_payu
 #                   admin_users_companies GET    /admin_users/companies(.:format)                               admin_users/companies#index
 #                                         POST   /admin_users/companies(.:format)                               admin_users/companies#create
 #                 new_admin_users_company GET    /admin_users/companies/new(.:format)                           admin_users/companies#new
@@ -398,6 +402,20 @@
 #                                         PATCH  /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         PUT    /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         DELETE /admin_users/cards/:id(.:format)                               admin_users/cards#destroy
+#                 admin_users_company_kyc GET    /admin_users/companies/:company_id/kyc(.:format)               admin_users/companies#show
+#                                         PATCH  /admin_users/companies/:company_id/kyc(.:format)               admin_users/companies#update
+#              admin_users_company_review PATCH  /admin_users/companies/:company_id/review(.:format)            admin_users/companies#review
+#              admin_users_company_status PATCH  /admin_users/companies/:company_id/status(.:format)            admin_users/companies#update_status
+#                                         GET    /admin_users/companies(.:format)                               admin_users/companies#index
+#                                         POST   /admin_users/companies(.:format)                               admin_users/companies#create
+#                                         GET    /admin_users/companies/new(.:format)                           admin_users/companies#new
+#                                         GET    /admin_users/companies/:id/edit(.:format)                      admin_users/companies#edit
+#                                         GET    /admin_users/companies/:id(.:format)                           admin_users/companies#show
+#                                         PATCH  /admin_users/companies/:id(.:format)                           admin_users/companies#update
+#                                         PUT    /admin_users/companies/:id(.:format)                           admin_users/companies#update
+#                                         DELETE /admin_users/companies/:id(.:format)                           admin_users/companies#destroy
+#                  admin_users_agreements GET    /admin_users/agreements(.:format)                              admin_users/agreements#index
+#                                         POST   /admin_users/agreements(.:format)                              admin_users/agreements#create
 #                              admin_menu GET    /admin_menus(.:format)                                         admin_users/users#admin_menus
 #                               junk_show GET    /junk/show(.:format)                                           junk#show
 #                               menu_data GET    /menu_data(.:format)                                           users#menu_data
@@ -711,6 +729,10 @@
 #            bank_transfer_reimbursements GET    /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#show
 #                                         PATCH  /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#update
 #                                         POST   /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#create
+#                             kyc_company GET    /kyc/company(.:format)                                         kyc/companies#show
+#                                         PATCH  /kyc/company(.:format)                                         kyc/companies#update
+#                                     kyc GET    /kyc/users/:id(.:format)                                       kyc/user#show
+#                                         PATCH  /kyc/users/:id(.:format)                                       kyc/user#update
 #                          disburse_users POST   /disburse/users(.:format)                                      disburse/users#create
 #                     features_subscribed GET    /features_subscribed(.:format)                                 expense_types_configuration#features_subscribed
 #                                  groups GET    /groups(.:format)                                              user_groups#index
@@ -768,6 +790,11 @@
 #                                         DELETE /authorizer/reports/:id(.:format)                              authorizer/reports#destroy
 #                          export_expense GET    /export/expense(.:format)                                      export#expense
 #                  export_atm_transaction GET    /export/atm_transaction(.:format)                              export#atm_transactions
+#                              agreements GET    /agreements(.:format)                                          agreements#index
+#                     agreements_validate GET    /agreements/validate(.:format)                                 agreements#validate
+#                        agreements_agree POST   /agreements/agree(.:format)                                    agreements#agree
+#                      agreements_company GET    /agreements/company(.:format)                                  agreements#company_data
+#                       agreements_update PATCH  /agreements/update(.:format)                                   agreements#update
 #                                         GET    /auth/:provider/callback(.:format)                             third_party_auth#quickbooks
 #                      testing_quickbooks GET    /testing_quickbooks(.:format)                                  third_party_auth#testing
 #                  quickbooks_sync_report POST   /quickbooks/sync_report(.:format)                              quickbooks#sync_report
@@ -1455,6 +1482,9 @@ Rails.application.routes.draw do
       end
       get 'balances', to: 'users#balance'
       get 'available_expense_types', to: 'expenses#available_expense_types'
+
+      get 'kyc/:id', to: 'kyc/user#show'
+      post 'kyc/:id', to: 'kyc/user#update'
     end
   end
 
@@ -1577,7 +1607,10 @@ Rails.application.routes.draw do
   end
 
   namespace :admin_users do
-    resources :companies
+    resources :companies do
+      post 'dcode_check', to: 'companies#check_dcode'
+      post 'configure_payu', to: 'companies#configure_payu'
+    end
     resources :users do
       patch 'update_status', to: 'users#update_status', as: :update_status
       patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping
@@ -1592,6 +1625,13 @@ Rails.application.routes.draw do
     resources :cards do
       patch 'block', to: 'cards#block', as: :block
     end
+    resources :companies do
+      get 'kyc', to: 'companies#show'
+      patch 'kyc', to: 'companies#update'
+      patch 'review', to: 'companies#review'
+      patch 'status', to: 'companies#update_status'
+    end
+    resources :agreements, only: [:create, :index]
   end
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
@@ -1876,6 +1916,13 @@ Rails.application.routes.draw do
     post 'reimbursements' => 'reimbursement#create'
   end
 
+  namespace :kyc do
+    get 'company', to: 'companies#show'
+    patch 'company', to: 'companies#update'
+
+    get 'users/:id', to: 'user#show'
+    patch 'users/:id', to: 'user#update'
+  end
 
   # Disburse
   post 'disburse/users' => 'disburse/users#create'
@@ -1895,16 +1942,21 @@ Rails.application.routes.draw do
     patch 'set_restrictions', to: 'user_teams#set_restrictions'
   end
 
-  namespace :authorizer do 
+  namespace :authorizer do
     resources :reports do
       patch 'approve' => 'reports#approve', as: :approve
       patch 'reject' => 'reports#reject', as: :reject
     end
   end
-  
+
   get 'export/expense', to: 'export#expense'
   get 'export/atm_transaction', to: 'export#atm_transactions'
 
+  get 'agreements', to: 'agreements#index'
+  get 'agreements/validate', to: 'agreements#validate'
+  post 'agreements/agree', to: 'agreements#agree'
+  get 'agreements/company', to: 'agreements#company_data'
+  patch 'agreements/update', to: 'agreements#update'
 
   # All APIs for Quickbooks integration and syncing
 
@@ -1918,7 +1970,7 @@ Rails.application.routes.draw do
   post 'quickbooks/sync_payment_types', to: 'quickbooks#sync_payment_types', as: :quickbooks_sync_payment_types
   patch 'quickbooks/update_config', to: 'quickbooks#update', as: :quickbooks_update_config
   get 'quickbooks/config', to: 'quickbooks#show', as: :quickbooks_config
-  
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

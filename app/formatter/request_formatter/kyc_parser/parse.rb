@@ -1,0 +1,22 @@
+class RequestFormatter::KycParser::Parse < RequestFormatter::Base
+
+  def process
+    # pan_card = extract_image(params, :pan_card)
+    # id_proof = extract_image(params, :id_proof)
+    params[:individual_kyc] = {}
+    params[:individual_kyc][:pan_card] = params[:pan_card] if params[:pan_card].present?
+    params[:individual_kyc][:id_proof] = params[:id_proof] if params[:id_proof].present?
+    self.formatted_request = params
+  end
+
+  # def extract_image(params, key)
+  #   data = params[key]
+  #   return data if data.blank?
+  #   file = data.tempfile
+  #   file.class.class_eval { attr_accessor :original_filename, :content_type }
+  #   file.original_filename = params[:filename]
+  #   file.content_type = params[:content_type]
+  #   file
+  # end
+
+end

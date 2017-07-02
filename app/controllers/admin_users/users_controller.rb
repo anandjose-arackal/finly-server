@@ -38,6 +38,7 @@ class AdminUsers::UsersController < ApplicationController
   # returns the respective menus that a particular user has access to
   def admin_menus
     @result = Admin::AdminRolePermissions::Show.(current_user, params)
+      emails = []
     respond_to do |format|
       format.json {
         render json: @result.as_json
