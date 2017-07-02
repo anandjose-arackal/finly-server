@@ -10,7 +10,6 @@ class Mobile::V1::Kyc::UserController < ApplicationController
 
   def update
     formatted_request = RequestFormatter::KycParser::Parse.(current_user, params).formatted_request
-    debugger
     @result = KycProcess::User::Update.(current_user, formatted_request)
     respond response: @result&.success? ? :success : :failure
   end
