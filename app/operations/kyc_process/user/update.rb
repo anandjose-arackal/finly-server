@@ -7,7 +7,6 @@ class KycProcess::User::Update < KycProcess::User::Base
   end
 
   def process
-    debugger
     unless self.individual_kyc.update(self.kyc_params)
       add_message :error, self.individual_kyc.errors.full_messages
     end
