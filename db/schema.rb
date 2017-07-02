@@ -449,9 +449,9 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
+    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
-    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -1060,6 +1060,7 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.string   "reference_id",                   limit: 255
     t.time     "time"
     t.integer  "amount_id",                      limit: 4
+    t.integer  "expense_data_extract_source_id", limit: 4,     null: false
     t.integer  "category_id",                    limit: 4
     t.integer  "sourcable_id",                   limit: 4
     t.string   "sourcable_type",                 limit: 255
@@ -1069,12 +1070,12 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.string   "extractable_type",               limit: 255,   null: false
     t.text     "note",                           limit: 65535
     t.datetime "datetime"
-    t.integer  "expense_data_extract_source_id", limit: 4
     t.integer  "status_id",                      limit: 4,     null: false
   end
 
   add_index "expense_data_extracts", ["amount_id"], name: "index_expense_data_extracts_on_amount_id", using: :btree
   add_index "expense_data_extracts", ["category_id"], name: "index_expense_data_extracts_on_category_id", using: :btree
+  add_index "expense_data_extracts", ["expense_data_extract_source_id"], name: "index_expense_data_extracts_on_expense_data_extract_source_id", using: :btree
   add_index "expense_data_extracts", ["sourcable_id"], name: "index_expense_data_extracts_on_sourcable_id", using: :btree
   add_index "expense_data_extracts", ["sourcable_type"], name: "index_expense_data_extracts_on_sourcable_type", using: :btree
 
@@ -2573,6 +2574,7 @@ ActiveRecord::Schema.define(version: 20170702194152) do
   add_foreign_key "email_authorizations", "users"
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"
+  add_foreign_key "expense_data_extracts", "expense_data_extract_sources"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"
