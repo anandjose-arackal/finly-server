@@ -8,6 +8,5 @@ json.data do
       json.normal receipt.image(:normal)
       json.thumb receipt.image(:thumb)
     end
-
   end
 end
