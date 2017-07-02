@@ -12,7 +12,7 @@ class Admin::Companies::ConfigurePayu < Admin::Companies::Base
     id = params[:id] || params[:company_id]
     self.company = Company.find_by(id: id)
     # todo - change this after merge with company kyc
-    self.registered_mobile_number = company.configuration.registered_mobile_number
+    self.registered_mobile_number = company.configuration.registered_mobile_number || company.company_kyc.registered_mobile_number
     self.easy_account_number = company.itz_cash_property.easy_account_no
   end
 
