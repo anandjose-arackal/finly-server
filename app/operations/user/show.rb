@@ -151,6 +151,13 @@ class User::Show < User::Base
 
       actions[:transfer_options] = load_transfer_options(balances)
 
+      # if viewing user is an admin and the user doesn't have cards, then a card can be assigned by the admin
+      if user.company_admin? && user.company.cards&.unassigned&.present? && selected_user.cards&.expense_cards.empty?
+        actions[:assign_card] = true
+      else
+        actions[:assign_card] = false
+      end
+
       actions
     end
 
