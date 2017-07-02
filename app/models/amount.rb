@@ -322,7 +322,7 @@ class Amount < ActiveRecord::Base
 
   def destroy_currencies
     update_hash = {}
-    currencies = Amount.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id', "#{self.currency.country_code}", 'value', 'currency_id'].include?(el)}
+    currencies = Amount.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id', "#{self.currency.country_code}", 'value', 'currency_id', 'is_deleted'].include?(el)}
     currencies.each do |curr|
       update_hash[curr.to_sym] = nil
     end
