@@ -18,10 +18,15 @@ class Admin::Users::WelcomeMail < Admin::Base
   end
 
   def process
-    raw, enc = Devise.token_generator.generate(User, :reset_password_token)
-    self.raw_token = raw
-    selected_user.update_attribute(:reset_password_token, enc)
-    selected_user.update_attribute(:reset_password_sent_at, DateUtils.local_date_time)
+    if selected_user.email.present?
+      raw, enc = Devise.token_generator.generate(User, :reset_password_token)
+      self.raw_token = raw
+      selected_user.update_attribute(:reset_password_token, enc)
+      selected_user.update_attribute(:reset_password_sent_at, DateUtils.local_date_time)
+    else
+      # todo - if the user has no email, send him/her an SMS asking them to login from www.finly.io
+      
+    end
   end
 
   def post_process
