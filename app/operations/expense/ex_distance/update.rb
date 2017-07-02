@@ -66,9 +66,9 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
       # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
       # todo - check if the api fails because of this
-      # if updated_expense_params[:receipts_attributes] == [""]
+      if updated_expense_params[:receipts_attributes] == [""]
         self.destroy_receipts = true
-      # end
+      end
       updated_expense_params.delete(:receipts_attributes)
     end
     if expense

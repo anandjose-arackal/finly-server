@@ -26,9 +26,9 @@ class Expense::ExTime::Update < Expense::ExTime::Base
     self.updated_expense_params = time_expense_params
     if updated_expense_params[:receipts_attributes] == [nil] or updated_expense_params[:receipts_attributes] == [""]
       # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
-      # if updated_expense_params[:receipts_attributes] == [""]
+      if updated_expense_params[:receipts_attributes] == [""]
         self.destroy_receipts = true
-      # end
+      end
       updated_expense_params.delete(:receipts_attributes)
     end
     if expense
