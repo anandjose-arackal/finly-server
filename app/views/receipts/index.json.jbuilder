@@ -18,7 +18,6 @@ json.array!(@result.receipts) do |receipt|
   json.system_messages do
     json.array!(receipt.system_messages.pluck(:content))
   end
-
   json.ocr_enabled receipt.user.company.ocr_enabled?
   json.to_be_transcribed receipt.to_be_transcribed
 end

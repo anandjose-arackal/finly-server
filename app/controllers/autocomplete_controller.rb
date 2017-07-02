@@ -14,4 +14,9 @@ class AutocompleteController < ApplicationController
       format.json {}
     end
   end
+
+  def card
+    @result = Autocomplete::Cards.(current_user, params)
+    respond
+  end
 end

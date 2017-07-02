@@ -41,7 +41,8 @@ class User::Show < User::Base
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
                   :periods, :auto_submit_config, :mcc_groups, :card_periods, :cards, :balances,
-                  :user_group_item_mappings, :user_groups
+                  :user_group_item_mappings, :user_groups, :unassigned_cards,
+                  :user_panel_subscription
 
     def init
       self.selected_user = params[:selected_user]
@@ -58,6 +59,7 @@ class User::Show < User::Base
       self.actions = load_actions(self.balances)
       self.mapping_editable = user.company_admin?
       self.wallet = self.selected_user.wallet
+      self.user_panel_subscription = selected_user.user_panel_subscription
       self.cards = []
       personal = (selected_user == user)
       if balances.present?
@@ -119,6 +121,7 @@ class User::Show < User::Base
       self.mcc_groups = MccGroup.all
       self.user_groups = selected_user.company.user_groups
       self.user_group_item_mappings = selected_user.user_group_item_mappings
+      self.unassigned_cards = user.company.cards&.unassigned
     end
 
     private
@@ -149,6 +152,18 @@ class User::Show < User::Base
       end
 
       actions[:transfer_options] = load_transfer_options(balances)
+
+      # if viewing user is an admin and the user doesn't have cards, then a card can be assigned by the admin
+      if user.company_admin? && user.company.cards&.unassigned&.present? && selected_user.cards&.expense_cards.empty?
+        actions[:assign_card] = true
+      else
+        actions[:assign_card] = false
+      end
+
+      # adding actions for updating the panel subscriptions for the selected user
+      if user.company_admin?
+        actions[:update_subscriptions] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
+      end
 
       actions
     end

@@ -11,6 +11,7 @@ class ApplicationController < ActionController::Base
   before_filter :set_paper_trail_whodunnit
 
   before_action :whitelisted_emails
+  before_action :add_request_to_params
   # before_action :verify_otp
   # before_action :check_first_time_login
 
@@ -150,6 +151,11 @@ class ApplicationController < ActionController::Base
         format.html {}
       end
     end
+  end
+
+  def add_request_to_params
+    # adding the request object to the params hash
+    params[:request] = request
   end
 
   def respond_failure(message=nil)

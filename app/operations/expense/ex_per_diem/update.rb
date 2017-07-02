@@ -1,7 +1,7 @@
 class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
 
   attr_accessor :updated_expense_params
-  attr_accessor :editable_attrs, :receipt, :old_receipt, :per_diem
+  attr_accessor :editable_attrs, :receipt, :old_receipt, :per_diem, :destroy_receipts
 
   def pre_validate
     if params.blank? or user.blank?
@@ -28,11 +28,7 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
       # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
       # todo - check if the api fails because of this
       if updated_expense_params[:receipts_attributes] == [""]
-        receipt = expense.receipts.first
-        if receipt
-          receipt.parent = nil
-          receipt.save
-        end
+        self.destroy_receipts = true
       end
       updated_expense_params.delete(:receipts_attributes)
     end
@@ -101,6 +97,14 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
     end
 
     if expense.update(updated_expense_params)
+      if self.destroy_receipts
+        expense.receipts.each do |receipt|
+          if receipt
+            receipt.parent = nil
+            receipt.save
+          end
+        end
+      end
       if receipt
         receipt.parent = expense
         if receipt.save

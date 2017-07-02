@@ -18,9 +18,6 @@ class UsersController < ApplicationController
   # for list of team members - currently sending instance variables based on what was shown in the previous user listing
   def index
     @result = User::Index.(current_user, params)
-    # respond_to do |format|
-    #   format.json { render json: @result.paginated_team.as_json }
-    # end
     respond
   end
 
@@ -183,6 +180,9 @@ class UsersController < ApplicationController
       when 'groups'
         operation = User::Group::Set.new(current_user, params)
         success_message = 'User Group Configuration Updated'
+      when 'panel_subscriptions'
+        operation = User::Configuration::PanelSubscription::Update.new(current_user, params)
+        success_message = "Subscriptions Updated"
       else
         # do nothing, ha!
     end

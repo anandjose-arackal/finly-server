@@ -1,6 +1,6 @@
 class Admin::Users::Create < Admin::Users::Base
 
-  attr_accessor :company, :created_user
+  attr_accessor :company, :created_user, :new_user_params
 
   def pre_validate
     super()
@@ -12,10 +12,11 @@ class Admin::Users::Create < Admin::Users::Base
   def init
     id = params[:id] || params[:company_id]
     self.company = Company.find_by(id: id)
+    self.new_user_params = user_params
   end
 
   def process
-    self.created_user = company.users.build(user_params)
+    self.created_user = company.users.build(new_user_params)
     created_user.skip_confirmation_notification!
     if created_user.save
       created_user.activate
@@ -29,6 +30,14 @@ class Admin::Users::Create < Admin::Users::Base
 
   def post_process
     add_message :success, "User created"
+  end
+
+  def configure_disburse
+    request = params[:request]
+    if request.referrer.include?('disburse')
+      new_user_params[:user_panel_subscription_attributes] = {disburse: true}
+      new_user_params.permit!
+    end
   end
 
   def success
@@ -51,7 +60,8 @@ class Admin::Users::Create < Admin::Users::Base
                                  :last_name, :mothers_maiden_name,
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
                                                       :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id],
-                                 role_mapping_attributes: [:user_role_id])
+                                 role_mapping_attributes: [:user_role_id],
+                                 user_panel_subscription_attributes: [:expense_management, :disburse])
 
   end
 end

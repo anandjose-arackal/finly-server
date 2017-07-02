@@ -2,54 +2,52 @@
 #
 # Table name: users
 #
-#  id                                :integer          not null, primary key
-#  email                             :string(255)      default("")
-#  encrypted_password                :string(255)      default(""), not null
-#  reset_password_token              :string(255)
-#  reset_password_sent_at            :datetime
-#  remember_created_at               :datetime
-#  sign_in_count                     :integer          default(0), not null
-#  current_sign_in_at                :datetime
-#  last_sign_in_at                   :datetime
-#  current_sign_in_ip                :string(255)
-#  last_sign_in_ip                   :string(255)
-#  confirmation_token                :string(255)
-#  confirmed_at                      :datetime
-#  confirmation_sent_at              :datetime
-#  unconfirmed_email                 :string(255)
-#  failed_attempts                   :integer          default(0), not null
-#  unlock_token                      :string(255)
-#  locked_at                         :datetime
-#  created_at                        :datetime         not null
-#  updated_at                        :datetime         not null
-#  company_id                        :integer          not null
-#  mobile_number                     :string(255)
-#  active                            :boolean          default(TRUE), not null
-#  invitation_token                  :string(255)
-#  invitation_created_at             :datetime
-#  invitation_sent_at                :datetime
-#  invitation_accepted_at            :datetime
-#  invitation_limit                  :integer
-#  invited_by_id                     :integer
-#  invited_by_type                   :string(255)
-#  invitations_count                 :integer          default(0)
-#  otp                               :string(255)
-#  otp_sent_at                       :datetime
-#  otp_verified_at                   :datetime
-#  otp_verified                      :boolean          default(FALSE), not null
-#  otp_count                         :integer          default(0), not null
-#  first_name                        :string(255)
-#  last_name                         :string(255)
-#  mobile_only_invite                :boolean          default(FALSE)
-#  mothers_maiden_name               :string(255)
-#  verified                          :boolean          default(FALSE)
-#  otp_request_type_id               :integer
-#  default_password                  :boolean          default(FALSE)
-#  quickbooks_id                     :string(255)
-#  quickbooks_integration_type       :string(255)
-#  quickbooks_updated_at             :datetime
-#  quickbooks_additional_information :text(65535)
+#  id                     :integer          not null, primary key
+#  email                  :string(255)      default("")
+#  encrypted_password     :string(255)      default(""), not null
+#  reset_password_token   :string(255)
+#  reset_password_sent_at :datetime
+#  remember_created_at    :datetime
+#  sign_in_count          :integer          default(0), not null
+#  current_sign_in_at     :datetime
+#  last_sign_in_at        :datetime
+#  current_sign_in_ip     :string(255)
+#  last_sign_in_ip        :string(255)
+#  confirmation_token     :string(255)
+#  confirmed_at           :datetime
+#  confirmation_sent_at   :datetime
+#  unconfirmed_email      :string(255)
+#  failed_attempts        :integer          default(0), not null
+#  unlock_token           :string(255)
+#  locked_at              :datetime
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  company_id             :integer          not null
+#  mobile_number          :string(255)
+#  active                 :boolean          default(TRUE), not null
+#  invitation_token       :string(255)
+#  invitation_created_at  :datetime
+#  invitation_sent_at     :datetime
+#  invitation_accepted_at :datetime
+#  invitation_limit       :integer
+#  invited_by_id          :integer
+#  invited_by_type        :string(255)
+#  invitations_count      :integer          default(0)
+#  otp                    :string(255)
+#  otp_sent_at            :datetime
+#  otp_verified_at        :datetime
+#  otp_verified           :boolean          default(FALSE), not null
+#  otp_count              :integer          default(0), not null
+#  first_name             :string(255)
+#  last_name              :string(255)
+#  mobile_only_invite     :boolean          default(FALSE)
+#  mothers_maiden_name    :string(255)
+#  verified               :boolean          default(FALSE)
+#  otp_request_type_id    :integer
+#  default_password       :boolean          default(FALSE)
+#  point_of_contact       :boolean          default(FALSE)
 #
+
 
 
 
@@ -108,6 +106,7 @@ class User < ActiveRecord::Base
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
   has_one :auto_reload_config, as: :reloadable, dependent: :destroy
   has_one :itz_cash_dmt_sender
+  has_one :user_panel_subscription
 
   has_many :authentications
   has_many :cards, dependent: :destroy
@@ -129,6 +128,12 @@ class User < ActiveRecord::Base
   has_many :user_group_items, through: :user_group_item_mappings
   has_many :expense_data_extracts, as: :sourcable
   has_many :receipt_email_parse_failures
+  has_many :user_login_tracks
+  has_many :login_agreement_mappings
+  has_many :agreements, through: :login_agreement_mappings
+
+  has_one :individual_kyc
+  has_one :itz_cash_dmt_sender
 
   # has_one :feature_access, as: :accessible
 
@@ -137,6 +142,7 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :profile
   accepts_nested_attributes_for :cards
   accepts_nested_attributes_for :itz_cash_dmt_sender
+  accepts_nested_attributes_for :user_panel_subscription
   # accepts_nested_attributes_for :feature_access
 
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
@@ -150,14 +156,7 @@ class User < ActiveRecord::Base
   validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
-  validates :quickbooks_id, uniqueness: { scope: :quickbooks_integration_type, message: "should be unique for an external integration type" }, if: lambda { |user| user.quickbooks_integration_type.present? }
 
-  scope :quickbooks, -> { where(external_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]) }
-
-
-  def from_quickbooks?
-    external_integration_type == QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES[0]
-  end
 
   scope :with_id, ->(user_id) { where id: user_id }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
@@ -335,6 +334,22 @@ class User < ActiveRecord::Base
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :approved_reports_total]) }
 
+  scope :filter_disburse, -> (enabled) {
+    if enabled == '1' || enabled == 1
+      joins(:user_panel_subscription).select('users.*').where('disburse = ?', true)
+    else
+      joins(:user_panel_subscription).select('users.*').where('disburse = ? or disburse = ?', false, nil)
+    end
+  }
+
+  scope :filter_expense_management, -> (enabled) {
+    if enabled == '1' || enabled == 1
+      joins(:user_panel_subscription).select('users.*').where('expense_management = ?', true)
+    else
+      joins(:user_panel_subscription).select('users.*').where('expense_management = ? or expense_management = ?', false, nil)
+    end
+  }
+
   after_create do
     # self.build_profile.save if self.profile.blank?
     default_policy_id = self.company.default_policy.id
@@ -345,6 +360,7 @@ class User < ActiveRecord::Base
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
     self.build_enforce_policy(enabled: false).save
     self.build_auto_reload_config(enabled: false).save
+    self.build_individual_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.individual_kyc.blank?
   end
 
   def payments
@@ -563,10 +579,17 @@ class User < ActiveRecord::Base
     end
   end
 
+  def expense_card_assignable?
+    if self.cards.expense_cards.present?
+      return false
+    end
+    true
+  end
+
   def finly_admin?
     jouska_id = Company.find_by(name: "Jouska").id rescue nil
     unless Rails.env.production?
-      if self.email == 'king@demo.com'
+      if ['king@demo.com', 'king@finlytest.io'].include?(self.email)
         return true
       end
     end

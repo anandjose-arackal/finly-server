@@ -13,12 +13,16 @@ class RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse < RequestFo
   def process
     map = format_file(__dir__, 'expense.yaml.erb', user, params)
 
+    if map&.dig(:expense, :reimbursable).present?
+      map[:expense][:reimbursable] = StringUtils.to_bool map[:expense][:reimbursable]
+    end
+
     # Load receipt seperately has yaml cannot handle images
     if params[:receipt].present?
       formatted_params = RequestFormatter::ReceiptsParser::Parse.(user, params).formatted_request
       map[:expense] = {} if map[:expense].blank?
       receipt = formatted_params[:receipt]
-      receipt = nil if receipt == 'nil'
+      receipt = '' if receipt == 'nil'
       map[:expense][:receipts_attributes]= []
       map[:expense][:receipts_attributes][0] = receipt
     end

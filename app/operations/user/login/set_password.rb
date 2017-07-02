@@ -45,7 +45,7 @@ class User::Login::SetPassword < BaseOperation
       return
     end
     # setting verified as true for this user
-    selected_user.update_attributes(verified: true)
+    selected_user.update_attributes(verified: true, default_password: false)
   end
 
   def post_process

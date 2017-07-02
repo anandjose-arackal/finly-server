@@ -4,7 +4,7 @@
 
 class User::Lookup < User::Base
 
-  attr_accessor :selected_user, :registered, :verified, :otp_verified
+  attr_accessor :selected_user, :registered, :verified, :otp_verified, :default_password
 
   def self.call(params)
     self.new(nil, params).run
@@ -24,10 +24,16 @@ class User::Lookup < User::Base
       self.registered = false
       return
     elsif selected_user.first_name.blank?
+      if selected_user.default_password
+        self.default_password = true
+      end
       self.registered = false
       add_message :error, 'You have not signed up with Finly yet! Please contact your manager for further details'
       return
     else
+      if selected_user.default_password
+        self.default_password = true
+      end
       if selected_user.active?
         self.registered = true
       else
@@ -44,17 +50,19 @@ class User::Lookup < User::Base
     params[:registered] = registered
     params[:verified] = verified
     params[:otp_verified] = otp_verified
+    params[:df] = default_password
     User::Lookup::LookupPresenter.new(user, params, messages)
   end
 
   class User::Lookup::LookupPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :verified, :registered, :otp_verified
+    attr_accessor :verified, :registered, :otp_verified, :df
 
     def init
       self.verified = params[:verified]
       self.registered = params[:registered]
       self.otp_verified = params[:otp_verified]
+      self.df = params[:df]
     end
   end
 

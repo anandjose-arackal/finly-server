@@ -13,6 +13,14 @@ json.user do
     json.approver approver
     json.non_approver !approver
   end
+  if is_admin_view
+    json.expense_card_assignable @result.selected_user.expense_card_assignable?
+    json.unassigned_cards @result.unassigned_cards
+  end
+end
+json.subscriptions do
+  json.expense_management @result.user_panel_subscription.expense_management
+  json.disburse @result.user_panel_subscription.disburse
 end
 json.role do
   json.admin @result.roles[:admin]

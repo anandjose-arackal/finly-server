@@ -1,5 +1,6 @@
 json.success true
 json.otp_verified @auth_grant.user.otp_verified
+json.kyc_required @auth_grant.user.company.kyc_required?
 json.data do
   json.access_token @auth_grant.access_token
   json.token_type Opro.token_type || 'bearer'
