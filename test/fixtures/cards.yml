@@ -16,7 +16,7 @@
 #  active                   :boolean
 #  disable_note             :text(65535)
 #  card_balance_id          :integer
-#  card_program_id          :integer          not null
+#  card_program_id          :integer
 #  card_eligibility_id      :integer
 #  admin_unblockable        :boolean          default(TRUE)
 #  itz_cash_card_program_id :integer

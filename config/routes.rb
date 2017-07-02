@@ -359,6 +359,8 @@
 #                                         PATCH  /transcriber/receipts/:id(.:format)                            transcriber/receipts#update
 #                                         PUT    /transcriber/receipts/:id(.:format)                            transcriber/receipts#update
 #                                         DELETE /transcriber/receipts/:id(.:format)                            transcriber/receipts#destroy
+#         admin_users_company_dcode_check POST   /admin_users/companies/:company_id/dcode_check(.:format)       admin_users/companies#check_dcode
+#      admin_users_company_configure_payu POST   /admin_users/companies/:company_id/configure_payu(.:format)    admin_users/companies#configure_payu
 #                   admin_users_companies GET    /admin_users/companies(.:format)                               admin_users/companies#index
 #                                         POST   /admin_users/companies(.:format)                               admin_users/companies#create
 #                 new_admin_users_company GET    /admin_users/companies/new(.:format)                           admin_users/companies#new
@@ -1604,7 +1606,10 @@ Rails.application.routes.draw do
   end
 
   namespace :admin_users do
-    resources :companies
+    resources :companies do
+      post 'dcode_check', to: 'companies#check_dcode'
+      post 'configure_payu', to: 'companies#configure_payu'
+    end
     resources :users do
       patch 'update_status', to: 'users#update_status', as: :update_status
       patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping
