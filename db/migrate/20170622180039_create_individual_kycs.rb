@@ -8,8 +8,6 @@ class CreateIndividualKycs < ActiveRecord::Migration
 
       t.timestamps null: false
     end
-    User.all.each do |user|
-      user.build_individual_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save
-    end
+
   end
 end

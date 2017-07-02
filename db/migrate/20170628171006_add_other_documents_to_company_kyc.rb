@@ -7,5 +7,9 @@ class AddOtherDocumentsToCompanyKyc < ActiveRecord::Migration
       t.attachment :driving_licence
       t.attachment :passport
     end
+
+    Company.all.each do |company|
+      company.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save
+    end
   end
 end

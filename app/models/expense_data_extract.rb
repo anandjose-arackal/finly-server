@@ -7,7 +7,6 @@
 #  reference_id                   :string(255)
 #  time                           :time
 #  amount_id                      :integer
-#  expense_data_extract_source_id :integer          not null
 #  category_id                    :integer
 #  sourcable_id                   :integer
 #  sourcable_type                 :string(255)
@@ -17,6 +16,7 @@
 #  extractable_type               :string(255)      not null
 #  note                           :text(65535)
 #  datetime                       :datetime
+#  expense_data_extract_source_id :integer
 #  status_id                      :integer          not null
 #
 

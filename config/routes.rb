@@ -301,6 +301,8 @@
 #  mobile_v1_configuration_gcm_unregister POST   /mobile/v1/configuration/gcm/unregister(.:format)              mobile/v1/configuration/gcm#delete
 #                      mobile_v1_balances GET    /mobile/v1/balances(.:format)                                  mobile/v1/users#balance
 #       mobile_v1_available_expense_types GET    /mobile/v1/available_expense_types(.:format)                   mobile/v1/expenses#available_expense_types
+#                               mobile_v1 GET    /mobile/v1/kyc/:id(.:format)                                   mobile/v1/kyc/user#show
+#                                         POST   /mobile/v1/kyc/:id(.:format)                                   mobile/v1/kyc/user#update
 #                          chrome_v1_auth POST   /chrome/v1/auth(.:format)                                      chrome/v1/token#create
 #                                         DELETE /chrome/v1/auth(.:format)                                      chrome/v1/token#destroy
 #        chrome_v1_expenses_configuration POST   /chrome/v1/expenses/configuration(.:format)                    chrome/v1/expenses#configuration
@@ -503,6 +505,8 @@
 #                            card_details POST   /cards/details(.:format)                                       cards#details
 #                          update_balance POST   /cards/update_balance(.:format)                                cards#update_balance
 #                      update_card_status POST   /cards/update_status(.:format)                                 cards#update_status
+#                             assign_card PATCH  /cards/assign(.:format)                                        cards#assign
+#                        unassigned_cards GET    /cards/unassigned(.:format)                                    cards#unassigned
 #                                 reports GET    /reports(.:format)                                             reports#index
 #                                         POST   /reports(.:format)                                             reports#create
 #                                  report GET    /reports/:id(.:format)                                         reports#show
