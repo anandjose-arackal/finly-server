@@ -141,6 +141,7 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :profile
   accepts_nested_attributes_for :cards
   accepts_nested_attributes_for :itz_cash_dmt_sender
+  accepts_nested_attributes_for :user_panel_subscription
   # accepts_nested_attributes_for :feature_access
 
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile

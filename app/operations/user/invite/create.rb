@@ -182,6 +182,22 @@ class User::Invite::Create < User::Invite::Base
     end
   end
 
+  def configure_expense_management
+    request = params[:request]
+    unless request.referrer.include?('disburse')
+      invite_params[:user_panel_subscription_attributes] = {expense_management: true}
+      invite_params.permit!
+    end
+  end
+
+  def configure_disburse
+    request = params[:request]
+    if request.referrer.include?('disburse')
+      invite_params[:user_panel_subscription_attributes] = {disburse: true}
+      invite_params.permit!
+    end
+  end
+
   def pre_process
     # if the user has a policy during invite, temporarily storing that user's policy to add it separately later
     if invite_params[:policy_id]
