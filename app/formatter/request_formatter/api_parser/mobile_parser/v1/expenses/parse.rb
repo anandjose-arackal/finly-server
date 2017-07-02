@@ -22,7 +22,7 @@ class RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse < RequestFo
       formatted_params = RequestFormatter::ReceiptsParser::Parse.(user, params).formatted_request
       map[:expense] = {} if map[:expense].blank?
       receipt = formatted_params[:receipt]
-      receipt = nil if receipt == 'nil'
+      receipt = '' if receipt == 'nil'
       map[:expense][:receipts_attributes]= []
       map[:expense][:receipts_attributes][0] = receipt
     end

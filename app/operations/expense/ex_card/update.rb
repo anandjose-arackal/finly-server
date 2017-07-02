@@ -2,7 +2,7 @@
 # The only editable fields are: editable_merchant, note, category_id, and receipts
 
 class Expense::ExCard::Update < Expense::ExCard::Base
-  attr_accessor :updated_expense_params, :editable_attrs, :receipt, :old_receipt
+  attr_accessor :updated_expense_params, :editable_attrs, :receipt, :old_receipt, :destroy_receipts
 
   def pre_validate
     if user.blank? or params.blank?
@@ -24,12 +24,9 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       # if the receipts attributes is passed as [""], the receipt attached to this expense gets disassociated
       # todo - check if the api fails because of this
       if updated_expense_params[:receipts_attributes] == [""]
-        receipt = expense.receipts.first
-        if receipt
-          receipt.parent = nil
-          receipt.save
-        end
+        self.destroy_receipts = true
       end
+      # end
       updated_expense_params.delete(:receipts_attributes)
     end
     if expense
@@ -55,7 +52,7 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       end
     end
 
-    if params[:expense][:reimbursable] == '1'
+    if StringUtils.to_bool params.dig(:expense, :reimbursable)
       add_message :error, "Card expenses are non-reimbursable by default"
       return
     end
@@ -74,6 +71,14 @@ class Expense::ExCard::Update < Expense::ExCard::Base
 
   def process
     if expense.update(updated_expense_params)
+      if self.destroy_receipts
+        expense.receipts.each do |receipt|
+          if receipt
+            receipt.parent = nil
+            receipt.save
+          end
+        end
+      end
       if receipt
         receipt.parent = expense
         if receipt.save
@@ -97,7 +102,7 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       Expense::Personal::Mark.(user, {expense_id: expense.id})
     end
     ###############################################################
-    
+
     messages[:success] << 'Expense updated'
   end
 
@@ -108,7 +113,7 @@ class Expense::ExCard::Update < Expense::ExCard::Base
                            merchant_name: expense.merchant_name,
                            category_name: expense.category_name,
                            receipt: expense.receipts.count
-                          }
+    }
   end
 
 end
