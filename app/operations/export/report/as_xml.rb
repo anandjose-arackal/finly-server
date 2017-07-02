@@ -4,16 +4,18 @@
 
 class Export::Report::AsXml < Export::Report::Base
 
-  attr_accessor :reports, :preferences, :result, :report_names
+  attr_accessor :reports, :preferences, :result, :report_names, :default_column_names, :custom_field_column_names
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
   end
 
   def init
-    report_presenter = Report::Index.(user, params)
+    report_presenter = ::Report::Index.(user, params)
     id = (params[:report_id] or params[:report_ids]).split(',') rescue nil
     self.reports = report_presenter.reports.with_id(id) rescue nil
+    self.default_column_names = user.company.export_preferences.pluck(:name)
+    self.custom_field_column_names = extract_custom_field_names(reports)
     self.preferences = user.company.export_preferences
   end
 
@@ -24,11 +26,11 @@ class Export::Report::AsXml < Export::Report::Base
   end
 
   def process
-    @column_names = preferences.pluck(:name)
+    @column_names = (default_column_names + custom_field_column_names)
     @data = []
     reports.each do |r|
       r.expenses.each do |e|
-        @data << retrieve_data(preferences, r, e)
+        @data << retrieve_data(preferences, r, e, custom_field_column_names)
       end
     end
   end

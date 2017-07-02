@@ -13,8 +13,4 @@ class Transcriber::ReceiptsController < ApplicationController
     respond
   end
 
-
-  private
-
-
 end

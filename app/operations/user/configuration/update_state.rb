@@ -15,12 +15,18 @@ class User::Configuration::UpdateState < BaseOperation
       add_message :error, 'User or params not passed'
       return
     end
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to complete this action'
-      return
+    require_password_validation = true
+    unless params[:validate_password].nil?
+      require_password_validation = !!params[:validate_password]
     end
-    unless self.user.valid_password?(params[:password])
-      add_message :error, 'Invalid password'
+    if require_password_validation
+      if params[:password].blank?
+        add_message :error, 'You need to provide your password to complete this action'
+        return
+      end
+      unless self.user.valid_password?(params[:password])
+        add_message :error, 'Invalid password'
+      end
     end
   end
 
@@ -37,7 +43,7 @@ class User::Configuration::UpdateState < BaseOperation
 
   def validate
     if to_user.id == user.id
-      add_message :error, 'You cannot deactivate yourself'
+      add_message :error, 'You cannot activate / deactivate yourself'
     end
   end
 

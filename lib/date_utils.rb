@@ -22,7 +22,7 @@ class DateUtils
   end
 
   def self.datetime_in_ist(datetime)
-    return nil if datetime.blank?
+    return datetime if datetime.blank?
     datetime += " +5:30" unless datetime.include?("+5:30")
     datetime
   end
@@ -40,6 +40,7 @@ class DateUtils
   end
 
   def self.date_formatted(date)
+    return date if date.blank?
     if date.is_a?(String)
       date = parse_date date
     end

@@ -4,16 +4,18 @@
 
 class Export::Report::AsCsv < Export::Report::Base
 
-  attr_accessor :reports, :preferences, :result, :report_names
+  attr_accessor :reports, :preferences, :result, :report_names, :default_column_names, :custom_field_column_names
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :admin]
   end
 
   def init
-    report_presenter = Report::Index.(user, params)
+    report_presenter = ::Report::Index.(user, params)
     id = (params[:report_id] or params[:report_ids]).split(',') rescue nil
     self.reports = report_presenter.reports.with_id(id) rescue nil
+    self.default_column_names = user.company.export_preferences.pluck(:name)
+    self.custom_field_column_names = extract_custom_field_names(reports)
     self.preferences = user.company.export_preferences
   end
 
@@ -28,12 +30,12 @@ class Export::Report::AsCsv < Export::Report::Base
   end
 
   def process
-    column_names = preferences.pluck(:name)
     self.result = CSV.generate do |csv|
-      csv << column_names
+      csv << (default_column_names + custom_field_column_names)
       reports.each do |r|
         r.expenses.each do |e|
-          csv << retrieve_data(preferences, r, e)
+          csv << retrieve_data(preferences, r, e, custom_field_column_names)
+          
         end
       end
     end
@@ -45,7 +47,11 @@ class Export::Report::AsCsv < Export::Report::Base
     reports.each do |report|
       names << report.name
     end
-    self.report_names = names.to_sentence
+    if names.size == 1
+      self.report_names = names.to_sentence
+    else
+      self.report_names = "report_#{Date.today.day}_#{Date.today.month}_#{Date.today.year}"
+    end
   end
 
   def success

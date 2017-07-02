@@ -1,0 +1,1 @@
+json.partial! 'user', user: @result.selected_user

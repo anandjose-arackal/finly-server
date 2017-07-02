@@ -179,7 +179,11 @@
 
 class Amount < ActiveRecord::Base
   include MathUtil
+  include SoftDeletable
+
   belongs_to :currency
+
+  accepts_nested_attributes_for :currency
 
   validate :no_negative_amount
 
@@ -236,6 +240,8 @@ class Amount < ActiveRecord::Base
   alias_method :wallet_withdrawal_to_wallet_value, :amount_value
   alias_method :wallet_withdrawal_to_virtual_account_value, :amount_value
   alias_method :wallet_balance_value, :amount_value
+  alias_method :minimum_balance_value, :amount_value
+
   alias_method :rate_value, :amount_value
 
   scope :with_id, -> (id) { where id: id }

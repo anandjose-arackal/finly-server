@@ -1,4 +1,6 @@
 class CardsController < ApplicationController
+
+  before_action :authenticate_user!
   allow_oauth!
 
   # params = {user_id: 1}
@@ -40,7 +42,7 @@ class CardsController < ApplicationController
         # Unblock = 1
         @result = User::PrepaidCard::Unblock.(current_user, params)
     end
-    respond response: :success
+    respond
   end
 
   # For Mass Crediting accounts

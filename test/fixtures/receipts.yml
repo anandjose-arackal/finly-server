@@ -3,7 +3,6 @@
 # Table name: receipts
 #
 #  id                 :integer          not null, primary key
-#  expense_id         :integer
 #  user_id            :integer
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
@@ -16,6 +15,9 @@
 #  note               :text(65535)
 #  receipt_email_id   :integer
 #  to_be_transcribed  :boolean          default(FALSE)
+#  hard_copy_received :boolean          default(TRUE)
+#  sourcable_id       :integer
+#  sourcable_type     :integer
 #
 
 

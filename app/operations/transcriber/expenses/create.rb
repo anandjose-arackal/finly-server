@@ -59,7 +59,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
   def process
     if illegible
       receipt.update(to_be_transcribed: false)
-      system_message = receipt.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error), content: "Expense wasn't automatically generated because receipt was illegible")
+      system_message = receipt.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error), content: "Expense was not automatically generated because receipt was illegible")
       unless system_message.save
         add_message :error, system_message.errors.full_messages
       end
@@ -86,27 +86,24 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
 
   def set_system_messages
     expense_params[:system_messages_attributes] = []
+    illegible_attributes = []
     if expense_params[:amount_attributes][:value] == "--"
-      expense_params[:system_messages_attributes] << {
-        content: "Amount is illegible",
-        system_message_type_id: SystemMessageType.id_for(:error)
-      }
+      illegible_attributes << "Amount"
       expense_params[:amount_attributes][:value] = 0
     end
     if expense_params[:manual_expense_attributes][:merchant] == "--"
-      expense_params[:system_messages_attributes] << {
-        content: "Merchant is illegible",
-        system_message_type_id: SystemMessageType.id_for(:error)
-      }
+      illegible_attributes << "Merchant"
     end
     if expense_params[:date] == "--"
-      expense_params[:system_messages_attributes] << {
-        content: "Date is illegible",
-        system_message_type_id: SystemMessageType.id_for(:error)
-      }
+      illegible_attributes << "Date"
       expense_params[:date] = DateUtils.local_date # setting the date as today by default
+    end
+    unless illegible_attributes.empty?
+      expense_params[:system_messages_attributes] << {
+          content: "#{illegible_attributes.to_sentence} #{illegible_attributes.size == 1 ? 'is' : 'are'} illegible",
+          system_message_type_id: SystemMessageType.id_for(:error)
+      }
     end
     expense_params.permit!
   end
-
 end

@@ -23,6 +23,9 @@ case fetch(:stage)
   when :development
     set :deploy_to, '/home/vivek/app'
     set :rails_env, 'staging'
+  when :combined_development
+    set :deploy_to, '/home/centos/app'
+    set :rails_env, 'staging'
 end
 
 set :pty, true

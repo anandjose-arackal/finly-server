@@ -28,7 +28,6 @@ class BalanceMsgQueuePoller
 
       data = message.body.split(delimiter)
 
-
       balance_update_params = {card_proxy: data[1],
                                amount_attributes: {value: data[2], currency_id: 1},
                                timestamp: data[3]

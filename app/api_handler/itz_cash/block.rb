@@ -7,11 +7,7 @@ class ItzCash::Block < ItzCash::Base
       add_message :error, 'User not found'
       return
     end
-    if user.cards.blank?
-      add_message :error, 'A card has not been assigned to the user'
-      return
-    end
-    if params.blank? or params[:card_id].blank? or user.cards.with_id(params[:card_id]).blank?
+    if params&.dig(:card).blank?
       add_message :error, 'Card not found'  
       return
     end
@@ -22,7 +18,7 @@ class ItzCash::Block < ItzCash::Base
   end
 
   def post_params
-    self.card = user.cards.with_id(params[:card_id]).first
+    self.card = params[:card]
     serial_id = card.proxy
     request_type = self.request_type
     itz_module = Constants::ItzCash::MODULE

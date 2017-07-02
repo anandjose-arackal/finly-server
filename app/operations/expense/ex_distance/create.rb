@@ -45,6 +45,13 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     if expense_params[:receipts_attributes] == [nil]
       expense_params.delete(:receipts_attributes)
     end
+
+    # Setting order for each of the locations
+    pos = 1
+    self.expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes)&.each do |location|
+      location[:order] = pos
+      pos += 1
+    end
   end
 
   def validate
@@ -113,6 +120,11 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       else
         expense.update_other_currencies
       end
+    end
+
+    # checking if the expense has any receipts, and marking them all as no need to be transcribed
+    if expense.receipts.present?
+      expense.receipts.update_all(to_be_transcribed: false)
     end
 
     messages[:success] << 'Expense created'

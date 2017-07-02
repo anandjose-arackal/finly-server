@@ -38,7 +38,7 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
     for key, params_each_expense in multiple_expense_params
 
       current_expense_params = perdiem_multiple_expense_params(params_each_expense)
-      # debugger
+
 
       current_expense_params[:expense_type_id] = ExpenseType.per_diem_expense_id
 
@@ -75,14 +75,17 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
 
       if self.errors_by_expenses[key][:error].present?
         self.valid = false
-        add_message :failure, "Cannot create expenses. Please fix the errors and try again."
-        next
+        # add_message :failure, "Cannot create expenses. Please fix the errors and try again."
+        # next
       end
 
+      # if self.valid
+    
       self.multiple_expenses[key][:expense] = user.expenses.new(current_expense_params)
-
+    
+      # end
       self.multiple_expenses[key][:params] = current_expense_params
-
+      
       set_custom_fields_multiple(self.multiple_expenses[key][:expense], params_each_expense)
     end
 
@@ -105,7 +108,7 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
   end
 
   def validate
-    # debugger
+
     unless user.per_diem_expense_enabled?
       add_message :error, "PerDiem expense creation is not enabled"
       return false
@@ -127,6 +130,7 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
       end
 
       valid = CustomField::Validate.(value[:expense].per_diem_expense)
+
       unless valid.success?
         # Adding custom field validation errors
         self.errors_by_expenses[key][:error] += valid.messages[:error]
@@ -179,7 +183,8 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
       add_message :success, "Created #{self.multiple_expenses.values.length} expenses successfully."
 
     else
-      add_message :failure, "Cannot create expenses. Please fix the errors and try again."
+      make_expenses_invalid(self.multiple_expenses)
+      add_message :failure, "Cannot create expensesxx. Please fix the errors and try again."
     end
 
 
@@ -198,6 +203,17 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
     # else
     #   messages[:error] = self.expense.errors.full_messages
     # end
+  end
+
+  # Hack
+  def make_expenses_invalid(h)
+    # WEIRD BUG: JIRA TICKET ID: FIN-411
+    # After rendering the error json file, its saving the valid expenses
+    # Making expenses invalid is the only way to stop this from happening
+    # Needs further investigation to remove the bug
+    for key, expense in h
+      expense[:expense].date = nil
+    end
   end
 
   def post_process
@@ -288,7 +304,7 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = false
-    # debugger
+
     CustomField::SetFields.(expense.per_diem_expense, FieldParentType.id_for(:per_diem_expense), custom_fields)
   end
 

@@ -7,11 +7,12 @@ class ReportMailerPreview < ActionMailer::Preview
 
   # http://localhost:3001/rails/mailers/report_mailer/submit
   def submit
-    event = Event::EReport::Submit.new(User.second, {report: Report.first})
+    email_auth = EmailAuthorization.find(13)
+    event = Event::EReport::Submit.new(User.find(4), {email_authorization: email_auth, report: Report.find(210)})
     event.init
     subject = event.mailer_subject(event.user)
     body = event.mailer_body(event.user)
-    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, {report: event.report, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:report_submit), action_name: "Report Submitted"}))
+    ReportMailer.send_mail(Event::EReport::Base::MailerPresenter.new(event.user, {report: event.report, subject: subject, body: body, button_name: 'View Report', event_id: NotifierType.id_for(:report_submit), action_name: "Report Submitted", action_url_token: email_auth.token}))
   end
 
   # http://localhost:3001/rails/mailers/report_mailer/approve

@@ -43,7 +43,7 @@ class Orders::OrderCards::Base < BaseOperation
   # end
 
   def order_cards_params
-    # debugger
+
     return {} unless params.present?
 
     order_type_ids = []

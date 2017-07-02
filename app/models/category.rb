@@ -14,11 +14,14 @@
 
 
 
+
 class Category < ActiveRecord::Base
   belongs_to :company
 
+  has_one :quickbooks_category, dependent: :destroy
+
   validates :company_id, presence: true
-  validates :name, presence: true
+  validates :name, presence: true, uniqueness: {scope: :company_id}
 
   # returns the name of the category
   def category_name
@@ -28,5 +31,6 @@ class Category < ActiveRecord::Base
   scope :active, -> { where active: true }
   scope :with_id, ->(id) { where id: id }
   scope :with_name, ->(name) { where name: name }
+  scope :others, -> { where name: 'others' }
 
 end

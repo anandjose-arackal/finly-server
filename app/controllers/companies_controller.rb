@@ -13,7 +13,7 @@ class CompaniesController < ApplicationController
       @company_balance = 0
       @company = nil
     end
-    # render partial: 'notify'
+    respond
   end
 
   def add_balance

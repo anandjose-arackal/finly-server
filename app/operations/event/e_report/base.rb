@@ -29,6 +29,10 @@ class Event::EReport::Base < Event::SetNotifier
     end
   end
 
+  def get_token(user)
+
+  end
+
   def send_mailer(user)
   	return if user.blank?
     set_presenter_params(user)
@@ -62,11 +66,14 @@ class Event::EReport::Base < Event::SetNotifier
     params[:event_id] = event_id
     params[:action_name] = action_name
     params[:role_id] = report_view_role(user)
+    if params[:email_authorization]
+      params[:action_url_token] = get_token(user)
+    end
   end
 
   class Event::EReport::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :report, :user, :body_val, :subject_val, :button_val, :categories, :expenses, :rejected_expenses, :event_id,
-                  :action_name, :comment_body, :expenses_sorted, :role_id, :view_url, :company
+                  :action_name, :comment_body, :expenses_sorted, :role_id, :view_url, :company, :action_url_token, :action_url
 
     def initialize(user, params)
       self.report = params[:report]
@@ -84,6 +91,12 @@ class Event::EReport::Base < Event::SetNotifier
       self.role_id = params[:role_id]
       self.view_url = generate_url(role_id).html_safe
       self.company = user.company
+      if params[:action_url_token]
+        self.action_url_token = params[:action_url_token]
+        action_url = generate_action_url(user, role_id)
+        self.action_url = action_url.html_safe if action_url.present?
+        # self.action_url = generate_action_url(user, role_id).html_safe
+      end
     end
 
     def expenses_category_sorted
@@ -114,6 +127,30 @@ class Event::EReport::Base < Event::SetNotifier
       suffix = "/params={\"view\":" + view + ",\"preview\":true}"
       path = "reports/#{report.id}"
       url = Constants::BASE_URL + path + suffix
+    end
+
+    def generate_action_url(user, role_id)
+      view = ""
+      case role_id
+        when 3
+          view = "\"manager\""
+        when 2
+          view = "\"finance_manager\""
+        when 1
+          view = "\"admin\""
+        else
+          view = "\"personal\""
+      end
+
+      url = nil
+      if report.controlling_user_id == user.id
+      # token = params[:email_authorization]
+
+        suffix = "/params={\"view\":" + view + ",\"token\":\"#{self.action_url_token}\"}"
+        path = "report/#{report.id}"
+        url = Constants::BASE_URL_AUTHORIZER + path + suffix
+      end
+      url
     end
 
     def validate

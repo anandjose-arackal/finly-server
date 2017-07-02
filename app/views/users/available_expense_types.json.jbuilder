@@ -19,7 +19,6 @@ json.per_diem_config do
   end
 end
 json.custom_fields_config @result.custom_fields_config
-
 json.currencies do
   json.array!(@result.currencies) do |currency|
     json.id currency.id
@@ -29,7 +28,7 @@ json.currencies do
 end
 
 json.categories do
-  json.array!(@categories) do |category|
+  json.array!(@result.categories) do |category|
     json.extract! category, :id, :name
   end
 end

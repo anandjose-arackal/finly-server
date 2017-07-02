@@ -16,6 +16,8 @@
 #  updated_at                 :datetime         not null
 #  expense_card_enabled       :boolean          default(FALSE)
 #  reimbursement_card_enabled :boolean          default(FALSE)
+#  hard_copy_receipt          :boolean          default(FALSE)
+#  itz_cash_d_code_enabled    :boolean          default(FALSE)
 #
 
 require 'test_helper'

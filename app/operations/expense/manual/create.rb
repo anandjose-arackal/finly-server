@@ -54,7 +54,6 @@ class Expense::Manual::Create < Expense::Manual::Base
 
   def process
     self.expense = user.expenses.build(expense_params)
-
     # Create custom fields only for validations. Fields will be saved later
     validate_custom_fields
     return if has_errors?
@@ -71,6 +70,12 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   def post_process
+    if expense&.receipt_email.present? and not params[:prevent_email_process]
+      Receipt::ReceiptEmails::ProcessEmail.call_async(user, receipt_email_id: self.expense.receipt_email.id)
+    end
+
+    Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: self.expense)
+
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?
       comment = self.expense.report.comments.build report: self.expense.report, user: user,
@@ -78,6 +83,11 @@ class Expense::Manual::Create < Expense::Manual::Base
       unless comment.save
         add_message :error, comment.errors.full_messages
       end
+    end
+
+    # checking if the expense has any receipts, and marking them all as no need to be transcribed
+    if expense.receipts.present?
+      expense.receipts.update_all(to_be_transcribed: false)
     end
 
     # calculate the equivalent amount in all currencies in the amounts table
@@ -88,6 +98,11 @@ class Expense::Manual::Create < Expense::Manual::Base
     end
 
     add_message :success, 'Expense created'
+  end
+
+  def success
+    params[:expense] = self.expense
+    Expense::Manual::Create::SuccessPresenter.new(user, params, messages)
   end
 
   protected
@@ -118,5 +133,13 @@ class Expense::Manual::Create < Expense::Manual::Base
   # def success
   #   Expense::Manual::Create::CreatePresenter.new(expense)
   # end
+
+  class Expense::Manual::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :expense
+
+    def init
+      self.expense = params[:expense]
+    end
+  end
 
 end
