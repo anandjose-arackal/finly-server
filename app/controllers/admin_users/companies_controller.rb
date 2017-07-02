@@ -36,6 +36,24 @@ class AdminUsers::CompaniesController < ApplicationController
     end
   end
 
+  def check_dcode
+    @result = Admin::Companies::VerifyDcodeActivation.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def configure_payu
+    @result = Admin::Companies::ConfigurePayu.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
   private
 
 
