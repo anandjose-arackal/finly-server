@@ -18,7 +18,7 @@ class UserPanelSubscription < ActiveRecord::Base
   private
 
   def at_least_one_panel
-    if self.disburse.false? && self.expense_management.false?
+    if self.disburse == false && self.expense_management == false
       errors.add(:user, "must belong to at least one of the features")
     end
   end

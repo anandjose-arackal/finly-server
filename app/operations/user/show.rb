@@ -150,6 +150,13 @@ class User::Show < User::Base
 
       actions[:transfer_options] = load_transfer_options(balances)
 
+      # adding the actions for whether a user can be assigned a card
+      if selected_user.cards.expense_cards.present?
+        actions[:assign_card] = false
+      else
+        actions[:assign_card] = true
+      end
+
       actions
     end
 

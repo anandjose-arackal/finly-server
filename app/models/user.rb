@@ -337,6 +337,16 @@ class User < ActiveRecord::Base
   scope :filter_disburse, -> (enabled) {
     if enabled == '1' || enabled == 1
       joins(:user_panel_subscription).select('users.*').where('disburse = ?', true)
+    else
+      joins(:user_panel_subscription).select('users.*').where('disburse = ? or disburse = ?', false, nil)
+    end
+  }
+
+  scope :filter_expense_management, -> (enabled) {
+    if enabled == '1' || enabled == 1
+      joins(:user_panel_subscription).select('users.*').where('expense_management = ?', true)
+    else
+      joins(:user_panel_subscription).select('users.*').where('expense_management = ? or expense_management = ?', false, nil)
     end
   }
 
