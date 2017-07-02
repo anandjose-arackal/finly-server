@@ -3,7 +3,6 @@ json.amount expense.amount.value
 json.user_name expense.user.name
 json.category_name expense.category.name
 json.type expense.expense_type_id
-# Old Implementation
 json.receipt_url do
   large = nil
   normal = nil
@@ -16,16 +15,6 @@ json.receipt_url do
   json.large large
   json.normal normal
   json.thumb thumb
-end
-# New Implementation
-json.receipts do |receipt|
-  json.extract! receipt, :id, :note, :created_at
-  json.file_format receipt.file_format
-  json.image do
-    json.large receipt.image(:large)
-    json.normal receipt.image(:normal)
-    json.thumb receipt.image(:thumb)
-  end
 end
 json.custom_fields do
   case expense.expense_type_id
