@@ -105,6 +105,7 @@ class User < ActiveRecord::Base
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
   has_one :auto_reload_config, as: :reloadable, dependent: :destroy
   has_one :itz_cash_dmt_sender
+  has_one :user_panel_subscription
 
   has_many :authentications
   has_many :cards, dependent: :destroy
@@ -330,6 +331,22 @@ class User < ActiveRecord::Base
   scope :only_employees, -> { where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :approved_reports_total]) }
+
+  scope :filter_disburse, -> (enabled) {
+    if enabled == '1' || enabled == 1
+      joins(:user_panel_subscription).select('users.*').where('disburse = ?', true)
+    else
+      joins(:user_panel_subscription).select('users.*').where('disburse = ? or disburse = ?', false, nil)
+    end
+  }
+
+  scope :filter_expense_management, -> (enabled) {
+    if enabled == '1' || enabled == 1
+      joins(:user_panel_subscription).select('users.*').where('expense_management = ?', true)
+    else
+      joins(:user_panel_subscription).select('users.*').where('expense_management = ? or expense_management = ?', false, nil)
+    end
+  }
 
   after_create do
     # self.build_profile.save if self.profile.blank?
