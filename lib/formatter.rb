@@ -65,4 +65,19 @@ class Formatter
     hash
   end
 
+  def self.remove_line_breaks(item)
+    if item.kind_of?(Array)
+      item.each do |v|
+        remove_line_breaks v
+      end
+    elsif item.kind_of?(Hash)
+      item.each do |key, value|
+        remove_line_breaks value
+      end
+      return
+    elsif item.kind_of?(String)
+      item.gsub!(/\n/, ' ')
+    end
+  end
+
 end

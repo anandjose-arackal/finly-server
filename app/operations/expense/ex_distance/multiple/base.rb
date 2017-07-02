@@ -15,7 +15,7 @@ class Expense::ExDistance::Multiple::Base < BaseOperation
                                         :receipt_id, :receipt, distance_expense_attributes: [:id, distance_attributes: [:value, :id]])
     # Hack as image upload from API is failing in strong params
     receipts = [receipts] unless receipts.is_a?(Array)
-    p[:receipts_attributes] = receipts if receipts.present? and p.present?
+    p[:receipts_attributes] = receipts if receipts.present? and not p.nil?
     p.permit!
 
   end

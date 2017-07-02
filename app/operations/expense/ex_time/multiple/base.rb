@@ -14,7 +14,7 @@ class Expense::ExTime::Multiple::Base < BaseOperation
                                         :receipt_id, :receipt, time_expense_attributes: [:id, time_object_attributes: [:value, :id]])
     # Hack as image upload from API is failing in strong params_passed
     receipts = [receipts] unless receipts.is_a?(Array)
-    p[:receipts_attributes] = receipts if receipts.present? and p.present?
+    p[:receipts_attributes] = receipts if receipts.present? and not p.nil?
     p.permit!
   end
 
