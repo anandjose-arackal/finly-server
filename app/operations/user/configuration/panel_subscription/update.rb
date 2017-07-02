@@ -32,4 +32,11 @@ class User::Configuration::PanelSubscription::Update < BaseOperation
     add_message :success, "Updated subscription preferences successfully"
   end
 
+  private
+
+
+  def subscription_params
+    params.require(:user_panel_config).permit(:disburse, :expense_management)
+  end
+
 end

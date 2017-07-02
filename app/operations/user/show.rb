@@ -41,7 +41,8 @@ class User::Show < User::Base
                   :actions, :team, :team_managers, :team_finance_managers, :team_policies,
                   :team_members_presenter, :selected_user, :mapping_editable, :wallet, :card,
                   :periods, :auto_submit_config, :mcc_groups, :card_periods, :cards, :balances,
-                  :user_group_item_mappings, :user_groups, :unassigned_cards
+                  :user_group_item_mappings, :user_groups, :unassigned_cards,
+                  :user_panel_subscription
 
     def init
       self.selected_user = params[:selected_user]
@@ -58,6 +59,7 @@ class User::Show < User::Base
       self.actions = load_actions(self.balances)
       self.mapping_editable = user.company_admin?
       self.wallet = self.selected_user.wallet
+      self.user_panel_subscription = selected_user.user_panel_subscription
       self.cards = []
       personal = (selected_user == user)
       if balances.present?

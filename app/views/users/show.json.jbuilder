@@ -18,6 +18,10 @@ json.user do
     json.unassigned_cards @result.unassigned_cards
   end
 end
+json.subscriptions do
+  json.expense_management @result.user_panel_subscription.expense_management
+  json.disburse @result.user_panel_subscription.disburse
+end
 json.role do
   json.admin @result.roles[:admin]
   json.manager @result.roles[:manager]
