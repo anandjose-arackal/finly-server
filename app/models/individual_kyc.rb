@@ -29,8 +29,8 @@ class IndividualKyc < ActiveRecord::Base
   has_attached_file :id_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :id_proof, content_type: CONTENT_TYPES
 
-  has_attached_file :pan_card, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :pan_card, content_type: CONTENT_TYPES
+  has_attached_file :address_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
+  validates_attachment :address_proof, content_type: CONTENT_TYPES
 
   def editable?
     [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:error)].include?(kyc_status_id)

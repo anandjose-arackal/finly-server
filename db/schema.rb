@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170630121751) do
+ActiveRecord::Schema.define(version: 20170702114138) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1316,18 +1316,18 @@ ActiveRecord::Schema.define(version: 20170630121751) do
   end
 
   create_table "individual_kycs", force: :cascade do |t|
-    t.string   "id_proof_file_name",    limit: 255
-    t.string   "id_proof_content_type", limit: 255
-    t.integer  "id_proof_file_size",    limit: 4
+    t.string   "id_proof_file_name",         limit: 255
+    t.string   "id_proof_content_type",      limit: 255
+    t.integer  "id_proof_file_size",         limit: 4
     t.datetime "id_proof_updated_at"
-    t.string   "pan_card_file_name",    limit: 255
-    t.string   "pan_card_content_type", limit: 255
-    t.integer  "pan_card_file_size",    limit: 4
-    t.datetime "pan_card_updated_at"
-    t.integer  "kyc_status_id",         limit: 4
-    t.integer  "user_id",               limit: 4,   null: false
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.integer  "kyc_status_id",              limit: 4
+    t.integer  "user_id",                    limit: 4,   null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.string   "address_proof_file_name",    limit: 255
+    t.string   "address_proof_content_type", limit: 255
+    t.integer  "address_proof_file_size",    limit: 4
+    t.datetime "address_proof_updated_at"
   end
 
   add_index "individual_kycs", ["user_id"], name: "index_individual_kycs_on_user_id", using: :btree

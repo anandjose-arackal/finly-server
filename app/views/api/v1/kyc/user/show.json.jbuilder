@@ -9,10 +9,10 @@ json.id_proof do
   json.original kyc&.id_proof&.url
   json.thumb kyc&.id_proof&.url(:thumb)
 end
-json.pan_card do
-  json.file_type kyc.file_format(kyc.pan_card)
-  json.original kyc&.pan_card&.url
-  json.thumb kyc&.pan_card&.url(:thumb)
+json.address_proof do
+  json.file_type kyc.file_format(kyc.address_proof)
+  json.original kyc&.address_proof&.url
+  json.thumb kyc&.address_proof&.url(:thumb)
 end
 json.system_messages do
   json.array!(kyc&.system_messages.pluck(:content))

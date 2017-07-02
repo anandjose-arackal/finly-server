@@ -1,7 +1,7 @@
 json.array! @result.receipts do |receipt|
   json.extract! receipt, :id, :user_id, :note, :created_at
-  json.file_format receipt.file_format
   json.image do
+    json.file_format receipt.file_format
     json.original receipt.image.url
     json.large receipt.image(:large)
     json.normal receipt.image(:normal)
