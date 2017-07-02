@@ -15,7 +15,7 @@ class User::Configuration::PanelSubscription::Update < BaseOperation
   def init
     id = params[:id] || params[:user_id]
     self.selected_user = user.company.users.find_by(id: id)
-    self.panel_subscription = selected_user.panel_subscription
+    self.panel_subscription = selected_user.user_panel_subscription
   end
 
   def validate

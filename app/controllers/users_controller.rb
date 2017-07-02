@@ -180,6 +180,9 @@ class UsersController < ApplicationController
       when 'groups'
         operation = User::Group::Set.new(current_user, params)
         success_message = 'User Group Configuration Updated'
+      when 'panel_subscriptions'
+        operation = User::Configuration::PanelSubscription::Update.new(current_user, params)
+        success_message = "Subscriptions Updated"
       else
         # do nothing, ha!
     end

@@ -160,6 +160,11 @@ class User::Show < User::Base
         actions[:assign_card] = false
       end
 
+      # adding actions for updating the panel subscriptions for the selected user
+      if user.company_admin?
+        actions[:update_subscriptions] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
+      end
+
       actions
     end
 
