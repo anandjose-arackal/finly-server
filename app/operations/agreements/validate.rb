@@ -23,14 +23,22 @@ class Agreements::Validate < Agreements::Base
 
     active_agreements_id = Agreement.active.pluck(:id)
 
-    if active_agreements_id.present?
-      active_agreements_id.each do |agreement_id|
-        user_agreement = CompanyAgreementTrack.with_user(user.id).with_agreement(agreement_id)
-        unless user_agreement.present?
-          self.agreed = false
-        end
-      end
+    # since this is not required for all active agreements, just check for the presence of
+    # a user acceptance occurrence
+    user_agreement = CompanyAgreementTrack.with_user(user.id)
+    if user_agreement.empty? && active_agreements_id.present?
+      # i.e. there are active agreements and these companies haven't agreed to the respective
+      # agreements
+      self.agreed = false
     end
+    # if active_agreements_id.present?
+    #   active_agreements_id.each do |agreement_id|
+    #     user_agreement = CompanyAgreementTrack.with_user(user.id).with_agreement(agreement_id)
+    #     unless user_agreement.present?
+    #       self.agreed = false
+    #     end
+    #   end
+    # end
 
     self.kyc_required = user.company.kyc_required?
   end
