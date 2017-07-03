@@ -42,6 +42,9 @@ views:
       - name: Expenses
         url: expenses
         id: expenses
+      - name: ATM Withdrawals
+        url: atm_withdrawals
+        id: atm_withdrawals
       - name: Users
         url: users
         id: users
@@ -51,22 +54,56 @@ views:
       - name: Analytics
         url: analytics
         id: analytics
-      - name: ATM Withdrawals
-        url: atm_withdrawals
-        id: atm_withdrawals
+      - name: Personal
+        url: personal
+        id: personal
+        sub_menus:
+          - name: Expenses
+            id: personal_expenses
+            url: personal/expenses
+          - name: ATM Withdrawals
+            id: personal_atm_withdrawals
+            url: personal/atm_withdrawals
   finance:
     menus:
       navbar:
       - name: Expenses
         url: expenses
         id: expenses
+      - name: ATM Withdrawals
+        url: atm_withdrawals
+        id: atm_withdrawals 
       - name: Users
         url: users
         id: users
       - name: Analytics
         url: analytics
         id: analytics
-      - name: ATM Withdrawals
-        url: atm_withdrawals
-        id: atm_withdrawals
+      - name: Personal
+        url: personal
+        id: personal
+        sub_menus:
+          - name: Personal Expenses
+            id: personal_expenses
+            url: personal/expenses
+          - name: Personal ATM Withdrawals
+            id: personal_atm_withdrawals
+            url: personal/atm_withdrawals
+  personal:
+    menus:
+      navbar:
+      - name: Personal
+        url: personal
+        id: personal
+        sub_menus:
+          - name: Personal Expenses
+            id: personal_expenses
+            url: personal/expenses
+          - name: Personal ATM Withdrawals
+            id: personal_atm_withdrawals
+            url: personal/atm_withdrawals
+          - name: Finly Money & Cards
+            id: finly_money
+            url: personal/accounts
+
 
