@@ -64,6 +64,8 @@ class Card::Transaction::Index < BaseOperation
       self.transactions = selected_card.transactions
     elsif selected_cards
       self.transactions = CardTransaction.with_card(selected_cards)
+    elsif selected_user.present?
+      self.transactions = selected_user.card_transactions
     end
   end
 
