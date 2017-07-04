@@ -31,9 +31,9 @@ class Admin::Users::Base < Admin::Base
         data << {
             card: card,
             proxy: card.proxy,
-            balance: result.balance,
-            eligibility: result.available_card_eligibility,
-            active: (result.suspended_status == 'N' ? true : false)
+            balance: (result.balance rescue 0),
+            eligibility: (result.available_card_eligibility rescue 0),
+            active: ((result.suspended_status rescue nil) == 'N' ? true : false)
         }
       end
       data

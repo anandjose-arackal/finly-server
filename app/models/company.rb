@@ -201,6 +201,20 @@ class Company < ActiveRecord::Base
     self.feature_subscription.hard_copy_receipt
   end
 
+  def more_than_one_subscription?
+    count = 0
+    [:expense_management_enabled, :gift_card_enabled, :medical_card_enabled, :fuel_card_enabled, :meal_card_enabled, :expense_card_enabled, :reimbursement_card_enabled].each do |feature|
+      if self.feature_subscription.send(feature)
+        count += 1
+      end
+    end
+    if count >= 2
+      return true
+    else
+      return false
+    end
+  end
+
 
   def balance_amount(date)
     balance_history = self.company_balance_histories.with_date(date).first rescue nil
