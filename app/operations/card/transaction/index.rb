@@ -13,7 +13,7 @@ class Card::Transaction::Index < BaseOperation
   def init
     self.selected_user = params[:user]
     self.selected_card = params[:card]
-    self.transactions = []
+    self.transactions = nil
 
     if selected_card.blank?
       if params[:card_id].present? or params[:id].present?
@@ -26,7 +26,7 @@ class Card::Transaction::Index < BaseOperation
       if personal_view?
         self.selected_user = user
       elsif params[:user_ids].present?
-        if params[:user_id].is_a?(String)
+        if params[:user_ids].is_a?(String)
           user_ids = params[:user_ids].split(",")
         else
           user_ids = params[:user_ids]
@@ -60,9 +60,9 @@ class Card::Transaction::Index < BaseOperation
   end
 
   def process
-    if selected_card
+    if selected_card.present?
       self.transactions = selected_card.transactions
-    elsif selected_cards
+    elsif selected_cards.present?
       self.transactions = CardTransaction.with_card(selected_cards)
     end
   end

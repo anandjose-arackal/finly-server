@@ -51,4 +51,9 @@ class Mobile::V1::CardsController < ApplicationController
     end
   end
 
+  def transactions
+    @result = Card::Transaction::Index.(current_user, params)
+    respond
+  end
+
 end

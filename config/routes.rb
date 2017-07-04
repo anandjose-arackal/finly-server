@@ -1559,6 +1559,8 @@ Rails.application.routes.draw do
 
       get 'kyc/:id', to: 'kyc/user#show'
       post 'kyc/:id', to: 'kyc/user#update'
+
+      get 'transactions', to: 'cards#transactions'
     end
   end
 
