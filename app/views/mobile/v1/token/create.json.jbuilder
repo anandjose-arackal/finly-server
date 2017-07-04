@@ -14,7 +14,6 @@ json.data do
     json.name @auth_grant.user.company.name
     json.d_code_assigned @auth_grant.user.company.d_code_assigned?
   end
-
   views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/feature_subscription.yml.erb", {current_company: @auth_grant.user.company, current_user: @auth_grant.user})
   json.feature_subscription do
     json.company do
@@ -27,6 +26,10 @@ json.data do
         json.medical_card views["company"]["features"]["medical_card"]
         json.meal_card views["company"]["features"]["meal_card"]
       end
+    end
+    json.user do
+      json.expense_management @auth_grant.user.user_panel_subscription.expense_management
+      json.disburse @auth_grant.user.user_panel_subscription.disburse
     end
   end
 end
