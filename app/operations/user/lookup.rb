@@ -50,19 +50,19 @@ class User::Lookup < User::Base
     params[:registered] = registered
     params[:verified] = verified
     params[:otp_verified] = otp_verified
-    params[:df] = default_password
+    params[:set_password] = default_password
     User::Lookup::LookupPresenter.new(user, params, messages)
   end
 
   class User::Lookup::LookupPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :verified, :registered, :otp_verified, :df
+    attr_accessor :verified, :registered, :otp_verified, :set_password
 
     def init
       self.verified = params[:verified]
       self.registered = params[:registered]
       self.otp_verified = params[:otp_verified]
-      self.df = params[:df]
+      self.set_password = params[:set_password]
     end
   end
 
