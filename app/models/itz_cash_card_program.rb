@@ -31,6 +31,11 @@ class ItzCashCardProgram < ActiveRecord::Base
           name: "Kotak Reimbursement",
           bank: "Kotak",
           product_code: "KOTAKC",
+      },
+      {
+          name: "RBL Expense (Visa)",
+          bank: "RBL",
+          product_code: "RBLFIN"
       }
   ]
 
