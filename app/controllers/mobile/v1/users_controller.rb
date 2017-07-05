@@ -41,11 +41,13 @@ class  Mobile::V1::UsersController < Mobile::V1::BaseApiController
   def send_verification_otp
     params[:type] = OtpRequestType.id_for(:set_or_forgot_password)
     @result = User::Login::SendVerificationOtp.(params)
+    @result.config[:mobile_api] = true
     respond
   end
 
   def verify_user_otp
     @result = User::Login::VerifyLoginOtp.(params)
+    @result.config[:mobile_api] = true
     respond
   end
 
@@ -53,6 +55,7 @@ class  Mobile::V1::UsersController < Mobile::V1::BaseApiController
   # also the action that mobile users use to set their password if they've forgotten it
   def set_new_password
     @result = User::Login::SetPassword.(params)
+    @result.config[:mobile_api] = true
     respond
   end
 
