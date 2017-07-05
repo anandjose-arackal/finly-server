@@ -29,6 +29,11 @@ class Admin::Users::Create < Admin::Users::Base
   end
 
   def post_process
+    # if this is the first user in the company, set him/her as POC
+    if created_user.company.users.count == 1
+      created_user.update(point_of_contact: true)
+    end
+
     add_message :success, "User created"
   end
 
