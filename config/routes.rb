@@ -1561,6 +1561,10 @@ Rails.application.routes.draw do
       post 'kyc/:id', to: 'kyc/user#update'
 
       get 'transactions', to: 'cards#transactions'
+      post 'lookup', to: 'users#lookup'
+      post 'send_verification_otp', to: 'users#send_verification_otp'
+      post 'verify_user_otp', to: 'users#verify_user_otp'
+      post 'set_new_password', to: 'users#set_new_password'
     end
   end
 
