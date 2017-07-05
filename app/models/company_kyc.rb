@@ -80,8 +80,18 @@ class CompanyKyc < ActiveRecord::Base
   has_attached_file :registration_of_trust, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :registration_of_trust, content_type: CONTENT_TYPES
 
+  has_attached_file :certificate_of_registration, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
+  validates_attachment :certificate_of_registration, content_type: CONTENT_TYPES
+
   def editable?
     [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:error)].include?(kyc_status_id)
+  end
+
+  def processing?
+    if self.kyc_status_id == KycStatus.id_for(:processing)
+      return true
+    end
+    false
   end
 
   def completed?

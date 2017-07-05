@@ -42,10 +42,10 @@ class KycProcess::Company::Update < KycProcess::Company::Base
 
   def success
     param[:processing] = company.company_kyc.processing?
-    KycProcess::Company::Update::SuccessPresenter.new(user, params, messages)
+    KycProcess::Company::Update::KycPresenter.new(user, params, messages)
   end
 
-  class KycProcess::Company::Update::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class KycProcess::Company::Update::KycPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :completed
 
