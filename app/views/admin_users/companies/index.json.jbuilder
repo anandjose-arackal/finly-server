@@ -7,7 +7,7 @@ json.array!(@result.companies) do |company|
   json.company_types do
     json.array!(CompanyType.all) do |ct|
       json.id ct.id
-      json.name ct.id
+      json.name ct.name
     end
   end
 end
