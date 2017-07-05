@@ -25,8 +25,9 @@ class Admin::Companies::Create < Admin::Companies::Base
   end
 
   def post_process
-    # send mailer perhaps?
-
+    if company.company_kyc.present?
+      company.company_kyc.update(company_type_id: 3)
+    end
     add_message :success, "Company created!"
   end
 
