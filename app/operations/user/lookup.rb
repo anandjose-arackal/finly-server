@@ -47,10 +47,10 @@ class User::Lookup < User::Base
   end
 
   def success
-    params[:registered] = registered
-    params[:verified] = verified
-    params[:otp_verified] = otp_verified
-    params[:set_password] = default_password
+    params[:registered] = self.registered
+    params[:verified] = self.verified
+    params[:otp_verified] = self.otp_verified
+    params[:set_password] = self.default_password
     User::Lookup::LookupPresenter.new(user, params, messages)
   end
 
