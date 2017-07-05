@@ -32,12 +32,21 @@ class Admin::Users::Create < Admin::Users::Base
     add_message :success, "User created"
   end
 
+  def pre_process
+    # from admin panel subscribing users to both by default
+    new_user_params[:user_panel_subscription_attributes] = {
+        expense_management: true,
+        disburse: true
+    }
+    new_user_params.permit!
+  end
+
   def configure_disburse
-    request = params[:request]
-    if request.referrer.include?('disburse')
-      new_user_params[:user_panel_subscription_attributes] = {disburse: true}
-      new_user_params.permit!
-    end
+    # request = params[:request]
+    # if request.referrer.include?('disburse')
+    #   new_user_params[:user_panel_subscription_attributes] = {disburse: true}
+    #   new_user_params.permit!
+    # end
   end
 
   def success
