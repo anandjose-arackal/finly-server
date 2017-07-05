@@ -49,7 +49,7 @@ class User::Login::SetPassword < BaseOperation
   end
 
   def post_process
-    add_message :success, "Password set!"
+    add_message :success, 'Password set'
   end
 
   def success
