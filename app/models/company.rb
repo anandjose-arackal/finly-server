@@ -44,6 +44,7 @@ class Company < ActiveRecord::Base
   accepts_nested_attributes_for :itz_cash_property
   accepts_nested_attributes_for :feature_subscription
   accepts_nested_attributes_for :auto_sync_configs
+  accepts_nested_attributes_for :company_kyc
 
   after_create :init_config_present
 
@@ -256,7 +257,7 @@ class Company < ActiveRecord::Base
       self.auto_sync_configs.build(enabled: false)
     end
 
-    self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
+    # self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
   end
 
 end

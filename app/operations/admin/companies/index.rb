@@ -29,7 +29,7 @@ class Admin::Companies::Index < Admin::Companies::Base
 
     include HasScope
 
-    attr_accessor :companies
+    attr_accessor :companies, :company_types
 
     has_scope :filter_search
     has_scope :created_between, using: [:start_date, :end_date], type: :hash
@@ -41,6 +41,7 @@ class Admin::Companies::Index < Admin::Companies::Base
     def init
       self.companies = params[:companies]
       self.companies = apply_scopes(companies, params)
+      self.company_types = CompanyType.all
     end
   end
 

@@ -31,7 +31,10 @@ class Company::Create < Company::Base
   end
 
   def post_process
-    company&.company_kyc&.update(company_type_id: 3)
+    if company.present?
+      # setting the company kyc status as incomplete while creation
+      company.company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
+    end
     add_message :success, "Company created successfully!"
   end
 
@@ -42,7 +45,7 @@ class Company::Create < Company::Base
   private
 
   def company_params
-    params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code])
+    params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code], company_kyc_attributes: [:company_type_id])
   end
 
 end

@@ -39,10 +39,10 @@ class Admin::Users::Update < Admin::Users::Base
   private
 
   def user_params
-    params.require(:user).permit(:first_name, :last_name, :mothers_maiden_name,
+    params.require(:user).permit(:first_name, :last_name, :mothers_maiden_name, :point_of_contact,
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
-                                                      :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id])
-
+                                                      :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id],
+                                 user_panel_dubscription_attributes: [:expense_management, :disburse])
   end
 
 end
