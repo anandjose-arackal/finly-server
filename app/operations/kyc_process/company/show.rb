@@ -101,7 +101,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
             file = {
                 type: (company_kyc.vat_registration_certificate),
                 original: (company_kyc.vat_registration_certificate&.url),
-                thumb: (company_kyc.certificatvat_registration_certificatee_of_registration&.url(:thumb))
+                thumb: (company_kyc.vat_registration_certificate&.url(:thumb))
             }
             address_proof[:options][1][:file] = file
           end
