@@ -48,6 +48,11 @@ class User::Lookup < User::Base
 
   def success
     params[:registered] = self.registered
+    if selected_user.present?
+      number = selected_user.mobile_number
+      params[:id] = selected_user.id
+      params[:mobile_number] = "XXXXXXX#{number[(number.length-3)..number.length]}"
+    end
     params[:verified] = self.verified
     params[:otp_verified] = self.otp_verified
     params[:set_password] = self.default_password
@@ -56,13 +61,17 @@ class User::Lookup < User::Base
 
   class User::Lookup::LookupPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :verified, :registered, :otp_verified, :set_password
+    attr_accessor :verified, :registered, :otp_verified, :set_password, :mobile_number, :id
 
     def init
       self.verified = params[:verified]
       self.registered = params[:registered]
       self.otp_verified = params[:otp_verified]
       self.set_password = params[:set_password]
+      if self.set_password
+        self.id = params[:id]
+        self.mobile_number = params[:mobile_number]
+      end
     end
   end
 
