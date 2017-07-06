@@ -10,11 +10,24 @@ class KycProcess::Company::Show < KycProcess::Company::Base
   end
 
   class KycProcess::Company::Show::DocumentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :company_kyc, :user_completed
+    attr_accessor :company_kyc, :user_completed, :actions
 
     def init
       self.company_kyc = params[:company_kyc]
       self.user_completed = company_kyc.processing?
+      self.actions = retrieve_actions
+    end
+
+    def retrieve_actions
+      actions = {}
+      if company_kyc.kyc_status_id == KycStatus.id_for(:incomplete)
+        actions[:upload]
+      elsif company_kyc.kyc_status_id == KycStatus.id_for(:submitted)
+        actions[:upload]
+        actions[:confirm]
+      elsif company_kyc.kyc_status_id == KycStatus.id_for(:submitted)
+        actions[:unconfirm]
+      end
     end
 
     def documents
@@ -47,11 +60,6 @@ class KycProcess::Company::Show < KycProcess::Company::Base
                 name: "Aadhar Card",
                 identifier: "aadhar_card",
                 uploaded: company_kyc.aadhar_card.present?,
-                file: {
-                  type: company_kyc.aadhar_card.content_type,
-                  original: company_kyc.aadhar_card&.url,
-                  thumb: company_kyc.aadhar_card&.url(:thumb)
-                }
             }
           end
           if company_kyc.vat_registration_certificate.present?
@@ -59,11 +67,13 @@ class KycProcess::Company::Show < KycProcess::Company::Base
                 name: "VAT registration certificate",
                 identifier: "vat_registration_certificate",
                 uploaded: company_kyc.vat_registration_certificate.present?,
-                file: {
-                  type: company_kyc.vat_registration_certificate&.content_type,
-                  original:  company_kyc.vat_registration_certificate&.url,
-                  thumb: company_kyc.vat_registration_certificate&.url(:thumb)
-                }
+            }
+          end
+          if aadhar[:uploaded]
+            aadhar[:file] = {
+                type: (company_kyc.aadhar_card&.content_type || company_kyc.vat_registration_certificate&.content_type),
+                original: (company_kyc.aadhar_card&.url || company_kyc.vat_registration_certificate&.url),
+                thumb: (company_kyc.aadhar_card&.url(:thumb) || company_kyc.vat_registration_certificate&.url(:thumb))
             }
           end
           docs << aadhar

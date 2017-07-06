@@ -13,4 +13,10 @@ class Kyc::CompaniesController < ApplicationController
     respond response: @result&.success? ? :success : :failure
   end
 
+  def confirm
+    # this action updates the status of the KYC from submitted to processing
+    @result = KycProcess::Company::Confirm.(current_user, params)
+    respond response: @result&.success? ? :success : :failure
+  end
+
 end

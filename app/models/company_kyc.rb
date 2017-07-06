@@ -98,6 +98,13 @@ class CompanyKyc < ActiveRecord::Base
     false
   end
 
+  def submitted?
+    if self.kyc_status_id == KycStatus.id_for(:submitted)
+      return true
+    end
+    false
+  end
+
   def completed?
     if self.kyc_status_id == KycStatus.id_for(:completed)
       return true

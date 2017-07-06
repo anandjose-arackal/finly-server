@@ -735,8 +735,8 @@
 #            bank_transfer_reimbursements GET    /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#show
 #                                         PATCH  /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#update
 #                                         POST   /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#create
-#                             kyc_company GET    /kyc/company(.:format)                                         kyc/companies#show
-#                                         PATCH  /kyc/company(.:format)                                         kyc/companies#update
+#                          kyc_docs__show GET    /kyc/company(.:format)                                         kyc/companies#show
+#                         kyc_docs_update PATCH  /kyc/company(.:format)                                         kyc/companies#update
 #                                     kyc GET    /kyc/users/:id(.:format)                                       kyc/user#show
 #                                         PATCH  /kyc/users/:id(.:format)                                       kyc/user#update
 #                          disburse_users POST   /disburse/users(.:format)                                      disburse/users#create
@@ -1643,7 +1643,7 @@ Rails.application.routes.draw do
     end
     namespace :kyc do
       resources :companies do
-        
+        patch 'confirm', to: 'companies#confirm', as: :confirm
       end
     end
     resources :agreements, only: [:create, :index]
@@ -1932,8 +1932,8 @@ Rails.application.routes.draw do
   end
 
   namespace :kyc do
-    get 'company', to: 'companies#show'
-    patch 'company', to: 'companies#update'
+    get 'company', to: 'companies#show', as: :docs__show
+    patch 'company', to: 'companies#update', as: :docs_update
 
     get 'users/:id', to: 'user#show'
     patch 'users/:id', to: 'user#update'
