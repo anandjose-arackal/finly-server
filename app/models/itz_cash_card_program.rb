@@ -13,6 +13,7 @@
 
 class ItzCashCardProgram < ActiveRecord::Base
 
+  scope :with_product_code, -> (product_code) { where product_code: product_code }
 
   BANKS = {hdfc: 1, rbl: 2, kotak: 3}
 
@@ -40,12 +41,16 @@ class ItzCashCardProgram < ActiveRecord::Base
   ]
 
   def self.seed_data
-    if Rails.env.production?
+    if not Rails.env.production?
       PROGRAM_DETAILS.each do |detail|
-        ItzCashCardProgram.create(detail)
+        if ItzCashCardProgram.with_product_code(detail[:product_code]).blank?
+          ItzCashCardProgram.create(detail)
+        end
       end
     else
-      ItzCashCardProgram.create(name: "Test HDFC Card", bank: "HDFC", product_code: "NGPRHD")
+      if ItzCashCardProgram.count == 0
+        ItzCashCardProgram.create(name: 'Test HDFC Card', bank: 'HDFC', product_code: 'NGPRHD')
+      end
     end
   end
 
