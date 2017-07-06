@@ -21,7 +21,7 @@ case fetch(:stage)
     set :deploy_to, '/home/vivek/app'
     set :rails_env, 'local_vm'
   when :development
-    set :deploy_to, '/home/vivek/app'
+    set :deploy_to, '/home/centos/app'
     set :rails_env, 'staging'
   when :combined_development
     set :deploy_to, '/home/centos/app'
