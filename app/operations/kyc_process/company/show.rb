@@ -78,13 +78,13 @@ class KycProcess::Company::Show < KycProcess::Company::Base
           }
           if aadhar[:uploaded]
             aadhar[:file] = {
-                type: (company_kyc.aadhar_card&.content_type || company_kyc.vat_registration_certificate&.content_type),
+                type: (company_kyc.aadhar_card_content_type || company_kyc.vat_registration_certificate_content_type),
                 original: (company_kyc.aadhar_card&.url || company_kyc.vat_registration_certificate&.url),
                 thumb: (company_kyc.aadhar_card&.url(:thumb) || company_kyc.vat_registration_certificate&.url(:thumb))
             }
           end
           docs << aadhar
-        when 3, 5, 6
+        when 3, 5
           coi = {}
           coi[:name] = "Certificate of Incorporation"
           coi[:identifier] = "coi"
@@ -109,8 +109,19 @@ class KycProcess::Company::Show < KycProcess::Company::Base
                 thumb: company_kyc.certificate_of_registration&.url(:thumb)
             }
           end
-          docs << coi
-        # when 4
+          docs << certificate_of_registration
+        when 6
+          registration_of_trust = {}
+          registration_of_trust[:name] = "Certificate of Regiration"
+          registration_of_trust[:identifier] = "certificate_of_registration"
+          registration_of_trust[:uploaded] = company_kyc.certificate_of_registration.present?
+          if company_kyc.registration_of_trust.present?
+            registration_of_trust[:file] = {
+                type: company_kyc.registration_of_trust_content_type,
+                original: company_kyc.registration_of_trust&.url,
+                thumb: company_kyc.registration_of_trust&.url(:thumb)
+            }
+          end
           # need to be clarified
       end
       return docs
