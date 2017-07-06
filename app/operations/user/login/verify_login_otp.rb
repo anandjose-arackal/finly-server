@@ -24,7 +24,7 @@ class User::Login::VerifyLoginOtp < BaseOperation
       return
     end
     unless selected_user
-      add_message :error, 'Mobile number does not exist'
+      add_message :error, 'User not found'
       return
     end
     unless selected_user.otp == params[:otp]

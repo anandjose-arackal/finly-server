@@ -27,11 +27,6 @@ class User::Login::SendVerificationOtp < BaseOperation
       return
     end
 
-    unless params[:mobile_number] =~ Constants::VALID_MOBILE_NUMBER
-      add_message :error, "Invalid mobile number"
-      return
-    end
-
     # ensuring the user cannot send an OTP before 60 seconds
     if selected_user.otp.present? and selected_user.otp_sent_at > OTP_RESEND_TIMER.seconds.ago
       # i.e. if the otp was sent < 60 seconds ago, don't resend it again
