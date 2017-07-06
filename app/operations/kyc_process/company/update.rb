@@ -33,15 +33,17 @@ class KycProcess::Company::Update < KycProcess::Company::Base
         end
     end
 
-    if self.company_kyc.coi.present? and self.company_kyc.pan_card.present?
-      self.company_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
-    else
-      self.company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
-    end
+    add_message :error, "Documents uploaded successfully"
+
+    # if self.company_kyc.coi.present? and self.company_kyc.pan_card.present?
+    #   self.company_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
+    # else
+    #   self.company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
+    # end
   end
 
   def success
-    param[:processing] = company.company_kyc.processing?
+    params[:processing] = company.company_kyc.processing?
     KycProcess::Company::Update::KycPresenter.new(user, params, messages)
   end
 
