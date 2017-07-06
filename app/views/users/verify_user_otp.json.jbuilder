@@ -1,2 +1,1 @@
-json.mobile_number @result.mobile_number
-json.success @result.success?
+json.set_password_token @result.set_password_token

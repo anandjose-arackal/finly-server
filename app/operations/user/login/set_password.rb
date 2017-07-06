@@ -8,19 +8,31 @@ class User::Login::SetPassword < BaseOperation
   end
 
   def pre_validate
-    if params.blank?
-      add_message :error, "Invalid parameters"
+    if params&.dig(:user, :password).blank?
+      add_message :error, 'Password cannot be blank'
+      return
+    end
+    if params&.dig(:user, :password_confirmation).blank?
+      add_message :error, 'Password cannot be blank'
+      return
+    end
+    if params[:token].blank?
+      add_message :error, 'Invalid Token'
     end
   end
 
   def init
     self.password_params = password_parameters
-    self.selected_user = User.find_for_database_authentication(email: params&.dig(:user)&.dig(:email_mobile))
+    self.selected_user = User.with_reset_password_token(params[:token])
   end
 
   def validate
     unless selected_user
       add_message :error, 'This user is not recognized'
+      return
+    end
+    if self.selected_user.reset_password_sent_at.blank? or (DateTime.now - self.selected_user.reset_password_sent_at) > 5.minutes
+      add_message :error, 'Session expired'
       return
     end
     if password_params[:password].blank?

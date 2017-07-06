@@ -2,7 +2,7 @@
 
 class User::Login::VerifyLoginOtp < BaseOperation
 
-  attr_accessor :selected_user
+  attr_accessor :selected_user, :set_password_token
 
   def self.call(params)
     super(nil, params)
@@ -42,17 +42,25 @@ class User::Login::VerifyLoginOtp < BaseOperation
     selected_user.save(validate: false)
   end
 
+  def post_process
+    raw, enc = Devise.token_generator.generate(User, :reset_password_token)
+    self.set_password_token = raw
+    selected_user.update_attribute(:reset_password_token, enc)
+    selected_user.update_attribute(:reset_password_sent_at, DateUtils.local_date_time)
+  end
+
   def success
+    params[:set_password_token] = self.set_password_token
     User::Login::VerifyLoginOtp::OtpPresenter.new(user, params, messages)
   end
 
   class User::Login::VerifyLoginOtp::OtpPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
-    attr_accessor :mobile_number
+    attr_accessor :set_password_token
 
     def init
-      self.mobile_number = params[:mobile_number]
+      self.set_password_token = params[:set_password_token]
     end
 
   end
+
 end
