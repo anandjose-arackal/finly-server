@@ -18,7 +18,7 @@ class Admin::Companies::Create < Admin::Companies::Base
   end
 
   def pre_process
-    self.company_create_params[:company_kyc_attributes] = params[:company_kyc_attributes]
+    # self.company_create_params[:company_kyc_attributes] = params[:company_kyc_attributes]
     self.company_create_params[:company_kyc_attributes][:kyc_status_id] = KycStatus.id_for(:incomplete)
     company_create_params.permit!
   end
