@@ -49,7 +49,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
                 uploaded: company_kyc.aadhar_card.present?,
                 file: {
                   type: company_kyc.aadhar_card.content_type,
-                  file: company_kyc.aadhar_card&.url,
+                  original: company_kyc.aadhar_card&.url,
                   thumb: company_kyc.aadhar_card&.url(:thumb)
                 }
             }
@@ -61,7 +61,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
                 uploaded: company_kyc.vat_registration_certificate.present?,
                 file: {
                   type: company_kyc.vat_registration_certificate&.content_type,
-                  file: company_kyc.vat_registration_certificate&.url,
+                  original:  company_kyc.vat_registration_certificate&.url,
                   thumb: company_kyc.vat_registration_certificate&.url(:thumb)
                 }
             }
