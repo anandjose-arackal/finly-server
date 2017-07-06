@@ -24,13 +24,16 @@ class Admin::Users::WelcomeMail < Admin::Base
       selected_user.update_attribute(:reset_password_token, enc)
       selected_user.update_attribute(:reset_password_sent_at, DateUtils.local_date_time)
     else
-      # todo - if the user has no email, send him/her an SMS asking them to login from www.finly.io
 
     end
   end
 
   def post_process
-    add_message :success, "Email notifier sent"
-    UserMailer.delay.admin_welcome(selected_user, raw_token)
+    if selected_user.email.present?
+      add_message :success, "Email invite sent"
+      UserMailer.delay.admin_welcome(selected_user, raw_token)
+    else
+      # todo - if the user has no email, send him/her an SMS asking them to login from www.finly.io
+    end
   end
 end

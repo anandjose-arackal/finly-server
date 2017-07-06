@@ -1778,7 +1778,6 @@ Rails.application.routes.draw do
   get 'lookup', to: 'users#lookup', as: :lookup
   post 'send_verification_otp', to: 'users#send_verification_otp', as: :send_verification_otp
   post 'verify_user_otp', to: 'users#verify_user_otp', as: :verify_user_otp
-  post 'set_password', to: 'users#set_new_password', as: :set_password
 
   resources :users, only: [:create, :update, :index, :destroy, :show]
   resources :users do
