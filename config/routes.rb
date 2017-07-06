@@ -410,6 +410,7 @@
 #                                         PATCH  /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         PUT    /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         DELETE /admin_users/cards/:id(.:format)                               admin_users/cards#destroy
+#          admin_users_kyc_company_reject PATCH  /admin_users/kyc/companies/:company_id/reject(.:format)        admin_users/kyc/companies#reject
 #               admin_users_kyc_companies GET    /admin_users/kyc/companies(.:format)                           admin_users/kyc/companies#index
 #                                         POST   /admin_users/kyc/companies(.:format)                           admin_users/kyc/companies#create
 #             new_admin_users_kyc_company GET    /admin_users/kyc/companies/new(.:format)                       admin_users/kyc/companies#new
@@ -735,8 +736,9 @@
 #            bank_transfer_reimbursements GET    /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#show
 #                                         PATCH  /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#update
 #                                         POST   /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#create
-#                          kyc_docs__show GET    /kyc/company(.:format)                                         kyc/companies#show
+#                           kyc_docs_show GET    /kyc/company(.:format)                                         kyc/companies#show
 #                         kyc_docs_update PATCH  /kyc/company(.:format)                                         kyc/companies#update
+#                             kyc_confirm PATCH  /kyc/confirm(.:format)                                         kyc/companies#confirm
 #                                     kyc GET    /kyc/users/:id(.:format)                                       kyc/user#show
 #                                         PATCH  /kyc/users/:id(.:format)                                       kyc/user#update
 #                          disburse_users POST   /disburse/users(.:format)                                      disburse/users#create
@@ -1932,7 +1934,7 @@ Rails.application.routes.draw do
   end
 
   namespace :kyc do
-    get 'company', to: 'companies#show', as: :docs__show
+    get 'company', to: 'companies#show', as: :docs_show
     patch 'company', to: 'companies#update', as: :docs_update
     patch 'confirm', to: 'companies#confirm', as: :confirm
 

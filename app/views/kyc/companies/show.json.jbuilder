@@ -16,6 +16,7 @@ json.editable kyc.editable?
 # end
 json.company_type kyc.company_type.name
 json.completed @result.user_completed
+json.actions @result.actions
 json.documents do
   json.array!(@result.documents) do |doc|
     json.name doc[:name]
