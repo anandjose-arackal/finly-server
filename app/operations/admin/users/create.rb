@@ -39,19 +39,11 @@ class Admin::Users::Create < Admin::Users::Base
 
   def pre_process
     # from admin panel subscribing users to both by default
-    new_user_params[:user_panel_subscription_attributes] = {
-        expense_management: true,
-        disburse: true
-    }
-    new_user_params.permit!
-  end
-
-  def configure_disburse
-    # request = params[:request]
-    # if request.referrer.include?('disburse')
-    #   new_user_params[:user_panel_subscription_attributes] = {disburse: true}
-    #   new_user_params.permit!
-    # end
+    # new_user_params[:user_panel_subscription_attributes] = {
+    #     expense_management: true,
+    #     disburse: true
+    # }
+    # new_user_params.permit!
   end
 
   def success
@@ -71,7 +63,7 @@ class Admin::Users::Create < Admin::Users::Base
 
   def user_params
     params.require(:user).permit(:email, :password, :password_confirmation, :invitation_token, :mobile_number, :first_name,
-                                 :last_name, :mothers_maiden_name,
+                                 :last_name, :mothers_maiden_name, :point_of_contact,
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
                                                       :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id],
                                  role_mapping_attributes: [:user_role_id],

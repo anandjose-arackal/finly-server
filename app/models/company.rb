@@ -44,6 +44,7 @@ class Company < ActiveRecord::Base
   accepts_nested_attributes_for :itz_cash_property
   accepts_nested_attributes_for :feature_subscription
   accepts_nested_attributes_for :auto_sync_configs
+  accepts_nested_attributes_for :company_kyc
 
   after_create :init_config_present
 
