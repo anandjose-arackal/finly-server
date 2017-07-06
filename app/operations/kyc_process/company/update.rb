@@ -10,7 +10,14 @@ class KycProcess::Company::Update < KycProcess::Company::Base
     # depending on the type of company, we will be checking the documents that are uploded
   end
 
+  def pre_process
+    # self.kyc_params[:aadhar_card] = kyc_params[:aadhar]
+    # self.kyc_params[:pan_card] = kyc_params[:pan_card]
+    # kyc_params.permit!
+  end
+
   def process
+    debugger
     unless self.company_kyc.update(self.kyc_params)
       add_message :error, self.company_kyc.errors.full_messages
     end
@@ -58,6 +65,7 @@ class KycProcess::Company::Update < KycProcess::Company::Base
   end
 
   protected
+
   def kyc_strong_params
     params.require(:company_kyc).permit(:coi, :pan_card, :passport, :driving_licence, :aadhar_card, :vat_registration_certificate, :registration_of_trust)
   end

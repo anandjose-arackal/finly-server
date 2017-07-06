@@ -6,10 +6,10 @@ class KycProcess::Company::Show < KycProcess::Company::Base
 
   def success
     params[:company_kyc] =  self.company_kyc
-    KycProcess::Company::Show::SuccessPresenter.new(user, params, messages)
+    KycProcess::Company::Show::DocumentsPresenter.new(user, params, messages)
   end
 
-  class KycProcess::Company::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class KycProcess::Company::Show::DocumentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :company_kyc, :user_completed
 
     def init
@@ -22,7 +22,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
       # pan card is common for all
       pan_card = {}
       pan_card[:name] = "PAN Card"
-      pan_card[:identifier] = "pan"
+      pan_card[:identifier] = "pan_card"
       pan_card[:uploaded] = company_kyc.pan_card.present?
       if company_kyc.pan_card.present?
         pan_card[:file] = {
@@ -39,7 +39,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
           # sole proprietor
           aadhar = {}
           aadhar[:name] = "Aadhar Card"
-          aadhar[:identifier] = "aadhar"
+          aadhar[:identifier] = "aadhar_card"
           aadhar[:uploaded] = company_kyc.aadhar_card.present? || company_kyc.certificate_of_registration.present?
           aadhar[:options] = ["Aadhar Card", "Certificate of Registration"]
           if company_kyc.aadhar_card.present?
