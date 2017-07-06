@@ -56,7 +56,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
             }
           end
           docs << aadhar
-        when 2, 3, 5
+        when 3, 5
           coi = {}
           coi[:name] = "Certificate of Incorporation"
           coi[:identifier] = "coi"
@@ -66,6 +66,19 @@ class KycProcess::Company::Show < KycProcess::Company::Base
                 type: company_kyc.coi_content_type,
                 file: company_kyc.coi&.url,
                 thumb: company_kyc.coi&.url(:thumb)
+            }
+          end
+          docs << coi
+        when 2
+          certificate_of_registration = {}
+          certificate_of_registration[:name] = "Certificate of Regiration"
+          certificate_of_registration[:identifier] = "certificate_of_registration"
+          certificate_of_registration[:uploaded] = company_kyc.certificate_of_registration.present?
+          if company_kyc.certificate_of_registration.present?
+            certificate_of_registration[:file] = {
+                type: company_kyc.certificate_of_registration_content_type,
+                file: company_kyc.certificate_of_registration&.url,
+                thumb: company_kyc.certificate_of_registration&.url(:thumb)
             }
           end
           docs << coi
