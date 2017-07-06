@@ -56,7 +56,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
             }
           end
           docs << aadhar
-        when 3, 5
+        when 3, 5, 6
           coi = {}
           coi[:name] = "Certificate of Incorporation"
           coi[:identifier] = "coi"
