@@ -303,6 +303,11 @@
 #       mobile_v1_available_expense_types GET    /mobile/v1/available_expense_types(.:format)                   mobile/v1/expenses#available_expense_types
 #                               mobile_v1 GET    /mobile/v1/kyc/:id(.:format)                                   mobile/v1/kyc/user#show
 #                                         POST   /mobile/v1/kyc/:id(.:format)                                   mobile/v1/kyc/user#update
+#                  mobile_v1_transactions GET    /mobile/v1/transactions(.:format)                              mobile/v1/cards#transactions
+#                        mobile_v1_lookup POST   /mobile/v1/lookup(.:format)                                    mobile/v1/users#lookup
+#         mobile_v1_send_verification_otp POST   /mobile/v1/send_verification_otp(.:format)                     mobile/v1/users#send_verification_otp
+#               mobile_v1_verify_user_otp POST   /mobile/v1/verify_user_otp(.:format)                           mobile/v1/users#verify_user_otp
+#              mobile_v1_set_new_password POST   /mobile/v1/set_new_password(.:format)                          mobile/v1/users#set_new_password
 #                          chrome_v1_auth POST   /chrome/v1/auth(.:format)                                      chrome/v1/token#create
 #                                         DELETE /chrome/v1/auth(.:format)                                      chrome/v1/token#destroy
 #        chrome_v1_expenses_configuration POST   /chrome/v1/expenses/configuration(.:format)                    chrome/v1/expenses#configuration
@@ -371,6 +376,7 @@
 #                                         PATCH  /admin_users/companies/:id(.:format)                           admin_users/companies#update
 #                                         PUT    /admin_users/companies/:id(.:format)                           admin_users/companies#update
 #                                         DELETE /admin_users/companies/:id(.:format)                           admin_users/companies#destroy
+#               admin_users_company_types GET    /admin_users/company_types(.:format)                           admin_users/companies#company_types
 #          admin_users_user_update_status PATCH  /admin_users/users/:user_id/update_status(.:format)            admin_users/users#update_status
 #         admin_users_user_update_mapping PATCH  /admin_users/users/:user_id/update_mapping(.:format)           admin_users/users#update_mapping
 #        admin_users_user_destroy_mapping DELETE /admin_users/users/:user_id/destroy_mapping(.:format)          admin_users/users#destroy_mapping
@@ -1624,6 +1630,7 @@ Rails.application.routes.draw do
       post 'dcode_check', to: 'companies#check_dcode'
       post 'configure_payu', to: 'companies#configure_payu'
     end
+    get 'company_types', to: 'companies#company_types'
     resources :users do
       patch 'update_status', to: 'users#update_status', as: :update_status
       patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping
