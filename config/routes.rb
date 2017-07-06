@@ -376,6 +376,7 @@
 #                                         PATCH  /admin_users/companies/:id(.:format)                           admin_users/companies#update
 #                                         PUT    /admin_users/companies/:id(.:format)                           admin_users/companies#update
 #                                         DELETE /admin_users/companies/:id(.:format)                           admin_users/companies#destroy
+#               admin_users_company_types GET    /admin_users/company_types(.:format)                           admin_users/companies#company_types
 #          admin_users_user_update_status PATCH  /admin_users/users/:user_id/update_status(.:format)            admin_users/users#update_status
 #         admin_users_user_update_mapping PATCH  /admin_users/users/:user_id/update_mapping(.:format)           admin_users/users#update_mapping
 #        admin_users_user_destroy_mapping DELETE /admin_users/users/:user_id/destroy_mapping(.:format)          admin_users/users#destroy_mapping
@@ -1625,6 +1626,7 @@ Rails.application.routes.draw do
       post 'dcode_check', to: 'companies#check_dcode'
       post 'configure_payu', to: 'companies#configure_payu'
     end
+    get 'company_types', to: 'companies#company_types'
     resources :users do
       patch 'update_status', to: 'users#update_status', as: :update_status
       patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping
