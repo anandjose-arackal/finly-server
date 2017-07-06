@@ -75,7 +75,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
           if company_kyc.coi.present?
             coi[:file] = {
                 type: company_kyc.coi_content_type,
-                file: company_kyc.coi&.url,
+                original: company_kyc.coi&.url,
                 thumb: company_kyc.coi&.url(:thumb)
             }
           end
@@ -88,7 +88,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
           if company_kyc.certificate_of_registration.present?
             certificate_of_registration[:file] = {
                 type: company_kyc.certificate_of_registration_content_type,
-                file: company_kyc.certificate_of_registration&.url,
+                original: company_kyc.certificate_of_registration&.url,
                 thumb: company_kyc.certificate_of_registration&.url(:thumb)
             }
           end
