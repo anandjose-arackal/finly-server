@@ -36,23 +36,34 @@ class KycProcess::Company::Show < KycProcess::Company::Base
       # now based on company type, the other document is decided
       case company_kyc.company_type_id
         when 1
-          # sole proprietor
+          # sole proprietor -
           aadhar = {}
           aadhar[:name] = "Aadhar Card"
           aadhar[:identifier] = "aadhar_card"
           aadhar[:uploaded] = company_kyc.aadhar_card.present? || company_kyc.certificate_of_registration.present?
-          aadhar[:options] = ["Aadhar Card", "Certificate of Registration"]
+          aadhar[:options] = []
           if company_kyc.aadhar_card.present?
-            aadhar[:file] = {
-                type: company_kyc.aadhar_card.content_type,
-                file: company_kyc.aadhar_card&.url,
-                thumb: company_kyc.aadhar_card&.url(:thumb)
+            aadhar[:options] << {
+                name: "Aadhar Card",
+                identifier: "aadhar_card",
+                uploaded: company_kyc.aadhar_card.present?,
+                file: {
+                  type: company_kyc.aadhar_card.content_type,
+                  file: company_kyc.aadhar_card&.url,
+                  thumb: company_kyc.aadhar_card&.url(:thumb)
+                }
             }
-          elsif company_kyc.certificate_of_registration.present?
-            aadhar[:file] = {
-                type: company_kyc.certificate_of_registration&.content_type,
-                file: company_kyc.certificate_of_registration&.url,
-                thumb: company_kyc.certificate_of_registration&.url(:thumb)
+          end
+          if company_kyc.vat_registration_certificate.present?
+            aadhar[:options] << {
+                name: "VAT registration certificate",
+                identifier: "vat_registration_certificate",
+                uploaded: company_kyc.vat_registration_certificate.present?,
+                file: {
+                  type: company_kyc.vat_registration_certificate&.content_type,
+                  file: company_kyc.vat_registration_certificate&.url,
+                  thumb: company_kyc.vat_registration_certificate&.url(:thumb)
+                }
             }
           end
           docs << aadhar

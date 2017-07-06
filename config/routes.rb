@@ -303,6 +303,11 @@
 #       mobile_v1_available_expense_types GET    /mobile/v1/available_expense_types(.:format)                   mobile/v1/expenses#available_expense_types
 #                               mobile_v1 GET    /mobile/v1/kyc/:id(.:format)                                   mobile/v1/kyc/user#show
 #                                         POST   /mobile/v1/kyc/:id(.:format)                                   mobile/v1/kyc/user#update
+#                  mobile_v1_transactions GET    /mobile/v1/transactions(.:format)                              mobile/v1/cards#transactions
+#                        mobile_v1_lookup POST   /mobile/v1/lookup(.:format)                                    mobile/v1/users#lookup
+#         mobile_v1_send_verification_otp POST   /mobile/v1/send_verification_otp(.:format)                     mobile/v1/users#send_verification_otp
+#               mobile_v1_verify_user_otp POST   /mobile/v1/verify_user_otp(.:format)                           mobile/v1/users#verify_user_otp
+#              mobile_v1_set_new_password POST   /mobile/v1/set_new_password(.:format)                          mobile/v1/users#set_new_password
 #                          chrome_v1_auth POST   /chrome/v1/auth(.:format)                                      chrome/v1/token#create
 #                                         DELETE /chrome/v1/auth(.:format)                                      chrome/v1/token#destroy
 #        chrome_v1_expenses_configuration POST   /chrome/v1/expenses/configuration(.:format)                    chrome/v1/expenses#configuration
@@ -404,18 +409,14 @@
 #                                         PATCH  /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         PUT    /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         DELETE /admin_users/cards/:id(.:format)                               admin_users/cards#destroy
-#                 admin_users_company_kyc GET    /admin_users/companies/:company_id/kyc(.:format)               admin_users/companies#show
-#                                         PATCH  /admin_users/companies/:company_id/kyc(.:format)               admin_users/companies#update
-#              admin_users_company_review PATCH  /admin_users/companies/:company_id/review(.:format)            admin_users/companies#review
-#              admin_users_company_status PATCH  /admin_users/companies/:company_id/status(.:format)            admin_users/companies#update_status
-#                                         GET    /admin_users/companies(.:format)                               admin_users/companies#index
-#                                         POST   /admin_users/companies(.:format)                               admin_users/companies#create
-#                                         GET    /admin_users/companies/new(.:format)                           admin_users/companies#new
-#                                         GET    /admin_users/companies/:id/edit(.:format)                      admin_users/companies#edit
-#                                         GET    /admin_users/companies/:id(.:format)                           admin_users/companies#show
-#                                         PATCH  /admin_users/companies/:id(.:format)                           admin_users/companies#update
-#                                         PUT    /admin_users/companies/:id(.:format)                           admin_users/companies#update
-#                                         DELETE /admin_users/companies/:id(.:format)                           admin_users/companies#destroy
+#               admin_users_kyc_companies GET    /admin_users/kyc/companies(.:format)                           admin_users/kyc/companies#index
+#                                         POST   /admin_users/kyc/companies(.:format)                           admin_users/kyc/companies#create
+#             new_admin_users_kyc_company GET    /admin_users/kyc/companies/new(.:format)                       admin_users/kyc/companies#new
+#            edit_admin_users_kyc_company GET    /admin_users/kyc/companies/:id/edit(.:format)                  admin_users/kyc/companies#edit
+#                 admin_users_kyc_company GET    /admin_users/kyc/companies/:id(.:format)                       admin_users/kyc/companies#show
+#                                         PATCH  /admin_users/kyc/companies/:id(.:format)                       admin_users/kyc/companies#update
+#                                         PUT    /admin_users/kyc/companies/:id(.:format)                       admin_users/kyc/companies#update
+#                                         DELETE /admin_users/kyc/companies/:id(.:format)                       admin_users/kyc/companies#destroy
 #                  admin_users_agreements GET    /admin_users/agreements(.:format)                              admin_users/agreements#index
 #                                         POST   /admin_users/agreements(.:format)                              admin_users/agreements#create
 #                              admin_menu GET    /admin_menus(.:format)                                         admin_users/users#admin_menus
@@ -1638,11 +1639,10 @@ Rails.application.routes.draw do
     resources :cards do
       patch 'block', to: 'cards#block', as: :block
     end
-    resources :companies do
-      get 'kyc', to: 'companies#show'
-      patch 'kyc', to: 'companies#update'
-      patch 'review', to: 'companies#review'
-      patch 'status', to: 'companies#update_status'
+    namespace :kyc do
+      resources :companies do
+        
+      end
     end
     resources :agreements, only: [:create, :index]
   end
