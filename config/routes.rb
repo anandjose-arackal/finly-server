@@ -1643,7 +1643,7 @@ Rails.application.routes.draw do
     end
     namespace :kyc do
       resources :companies do
-        patch 'confirm', to: 'companies#confirm', as: :confirm
+        patch 'reject', to: 'companies#reject', as: :reject
       end
     end
     resources :agreements, only: [:create, :index]
@@ -1934,6 +1934,7 @@ Rails.application.routes.draw do
   namespace :kyc do
     get 'company', to: 'companies#show', as: :docs__show
     patch 'company', to: 'companies#update', as: :docs_update
+    patch 'confirm', to: 'companies#confirm', as: :confirm
 
     get 'users/:id', to: 'user#show'
     patch 'users/:id', to: 'user#update'

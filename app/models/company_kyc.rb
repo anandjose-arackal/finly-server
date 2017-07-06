@@ -61,6 +61,8 @@ class CompanyKyc < ActiveRecord::Base
   belongs_to :company_type
   has_many :system_messages, as: :messagable, dependent: :destroy
 
+  accepts_nested_attributes_for :system_messages
+
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
 
   has_attached_file :coi, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
