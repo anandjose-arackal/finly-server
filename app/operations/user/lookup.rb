@@ -68,7 +68,7 @@ class User::Lookup < User::Base
       self.registered = params[:registered]
       self.otp_verified = params[:otp_verified]
       self.set_password = params[:set_password]
-      if self.set_password
+      if params[:set_password]
         self.id = params[:id]
         self.mobile_number = params[:mobile_number]
       end
