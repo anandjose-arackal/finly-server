@@ -69,7 +69,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
             }
           end
           docs << coi
-        when 2
+        when 2, 4
           certificate_of_registration = {}
           certificate_of_registration[:name] = "Certificate of Regiration"
           certificate_of_registration[:identifier] = "certificate_of_registration"
@@ -82,7 +82,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
             }
           end
           docs << coi
-        when 4
+        # when 4
           # need to be clarified
       end
       return docs

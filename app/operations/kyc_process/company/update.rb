@@ -31,8 +31,14 @@ class KycProcess::Company::Update < KycProcess::Company::Base
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
-      when 2, 3, 5
+      when 3, 5
         if company_kyc.pan_card.present? && company_kyc.coi.present?
+          company_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
+        else
+          company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
+        end
+      when 2
+        if company_kyc.pan_card.present? && company_kyc.certificate_of_registration.present?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
