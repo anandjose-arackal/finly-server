@@ -18,8 +18,8 @@ class Admin::Companies::Create < Admin::Companies::Base
   end
 
   def pre_process
-    self.company_create_params[:company_kyc_attributes] = params[:company_kyc_attributes]
-    company_create_params.permit!
+    # self.company_create_params[:company_kyc_attributes] = params[:company_kyc_attributes]
+    # company_create_params.permit!
   end
 
   def process
