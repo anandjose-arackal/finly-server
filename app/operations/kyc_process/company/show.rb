@@ -54,12 +54,17 @@ class KycProcess::Company::Show < KycProcess::Company::Base
           thumb: company_kyc.pan_card&.url(:thumb)
         }
       end
+      system_messages = nil
+      if company_kyc.system_messages.pan_card_messages.present?
+        system_messages = company_kyc.system_messages.pan_card_messages
+      end
       id_proof[:options] = []
       id_proof[:options] << {
          identifier: "pan_card",
          name: "PAN",
          uploaded: company_kyc.pan_card.present?,
-         file: file
+         file: file,
+         system_messages: system_messages&.pluck(:content)
       }
       docs << id_proof
 
@@ -76,8 +81,8 @@ class KycProcess::Company::Show < KycProcess::Company::Base
               uploaded: company_kyc.aadhar_card.present?
           }
           address_proof[:options] << {
-              identifier: "certificate_of_registration",
-              name: "Certificate of Registration",
+              identifier: "vat_registration_certificate",
+              name: "VAT registration certificate",
               uploaded: company_kyc.certificate_of_registration.present?
           }
           if company_kyc.aadhar_card.present?
@@ -88,15 +93,22 @@ class KycProcess::Company::Show < KycProcess::Company::Base
             }
             address_proof[:options][0][:file] = file
           end
-          if company_kyc.certificate_of_registration.present?
+          if company_kyc.system_messages.aadhar_card_messages.present?
+            system_messages = company_kyc.system_messages.aadhar_card_messages
+            address_proof[:options][0][:system_messages] = system_messages&.pluck(:content)
+          end
+          if company_kyc.vat_registration_certificate.present?
             file = {
-                type: (company_kyc.certificate_of_registration),
-                original: (company_kyc.certificate_of_registration&.url),
-                thumb: (company_kyc.certificate_of_registration&.url(:thumb))
+                type: (company_kyc.vat_registration_certificate),
+                original: (company_kyc.vat_registration_certificate&.url),
+                thumb: (company_kyc.certificatvat_registration_certificatee_of_registration&.url(:thumb))
             }
             address_proof[:options][1][:file] = file
           end
-
+          if company_kyc.system_messages.vat_registration_certificate_messages.present?
+            system_messages = company_kyc.system_messages.vat_registration_certificate_messages
+            address_proof[:options][1][:system_messages] = system_messages&.pluck(:content)
+          end
           docs << address_proof
         when 3, 5
           address_proof = {}
@@ -114,6 +126,10 @@ class KycProcess::Company::Show < KycProcess::Company::Base
                 thumb: (company_kyc.coi&.url(:thumb))
             }
             address_proof[:options][0][:file] = file
+          end
+          if company_kyc.system_messages.coi_messages.present?
+            system_messages = company_kyc.system_messages.coi_messages
+            address_proof[:options][0][:system_messages] = system_messages&.pluck(:content)
           end
           docs << address_proof
         when 2, 4
@@ -133,6 +149,10 @@ class KycProcess::Company::Show < KycProcess::Company::Base
             }
             address_proof[:options][0][:file] = file
           end
+          if company_kyc.system_messages.certificate_of_registration_messages.present?
+            system_messages = company_kyc.system_messages.certificate_of_registration_messages
+            address_proof[:options][0][:system_messages] = system_messages&.pluck(:content)
+          end
           docs << address_proof
         when 6
           address_proof = {}
@@ -150,6 +170,10 @@ class KycProcess::Company::Show < KycProcess::Company::Base
                 thumb: (company_kyc.registration_of_trust&.url(:thumb))
             }
             address_proof[:options][0][:file] = file
+          end
+          if company_kyc.system_messages.registration_of_trust_messages.present?
+            system_messages = company_kyc.system_messages.registration_of_trust_messages
+            address_proof[:options][0][:system_messages] = system_messages&.pluck(:content)
           end
           docs << address_proof
       end

@@ -1,3 +1,14 @@
+# == Schema Information
+#
+# Table name: city_id_city_code_mappings
+#
+#  id         :integer          not null, primary key
+#  city_id    :string(255)
+#  city_code  :string(255)
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class CityIdCityCodeMapping < ActiveRecord::Base
 
   scope :with_city_id, -> (city_id) {where city_id: city_id}

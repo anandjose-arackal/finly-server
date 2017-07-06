@@ -24,11 +24,14 @@ class Admin::KycProcesses::Companies::Reject < Admin::KycProcesses::Companies::B
   def pre_process
     # set the kyc status as error for this particular company
     message = rejection_params[:message]
+    doc_type = rejection_params[:document_type]
     rej_params.delete(:message)
+    rej_params.delete(:document_type)
     rej_params[:kyc_status_id] = KycStatus.id_for(:error)
     rej_params[:system_message_attributes] = [{
         content: "Your KYC was rejected because: #{message}",
-        system_message_type_id: SystemMessageType.id_for(:error)
+        system_message_type_id: SystemMessageType.id_for(:error),
+        type: doc_type
     }]
     rej_params.permit!
   end
@@ -50,6 +53,6 @@ class Admin::KycProcesses::Companies::Reject < Admin::KycProcesses::Companies::B
   private
 
   def rejection_params
-    params.require(:company_kyc).permit(:message)
+    params.require(:company_kyc).permit(:message, :document_type)
   end
 end
