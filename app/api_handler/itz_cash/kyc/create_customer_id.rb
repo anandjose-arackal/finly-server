@@ -29,7 +29,7 @@ class ItzCash::Kyc::CreateCustomerId < ItzCash::Base
             remark: "Customer Request",
             pincode: company_kyc.pin_code,
             street3: company_kyc.street_3,
-            citycode: "1977"
+            citycode: company_kyc.city_code
         }
     }
   end

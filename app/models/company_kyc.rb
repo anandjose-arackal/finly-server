@@ -89,6 +89,8 @@ class CompanyKyc < ActiveRecord::Base
   has_attached_file :certificate_of_registration, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :certificate_of_registration, content_type: CONTENT_TYPES
 
+  validate :pin_code_format
+
   def editable?
     [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:error)].include?(kyc_status_id)
   end
@@ -114,7 +116,10 @@ class CompanyKyc < ActiveRecord::Base
     false
   end
 
-  validate :pin_code_format
+  def city_code
+    pin = self.pin_code
+
+  end
 
   private
 
