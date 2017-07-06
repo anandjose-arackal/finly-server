@@ -20,16 +20,7 @@ json.actions @result.actions
 json.documents do
   json.array!(@result.documents) do |doc|
     json.name doc[:name]
-    json.identifier doc[:identifier]
-    json.uploaded doc[:uploaded]
     json.options doc[:options]
-    if doc[:file].present?
-      json.file do
-        json.type doc[:file][:type]
-        json.original doc[:file][:original]
-        json.thumb doc[:file][:thumb]
-      end
-    end
   end
 end
 

@@ -118,7 +118,8 @@ class CompanyKyc < ActiveRecord::Base
 
   def city_code
     pin = self.pin_code
-
+    city_id = PinCodeCityIdMapping.find_by(pin_code: pin)
+    city_code = CityICityCodeMapping.find_by(city_id: city_id)
   end
 
   private

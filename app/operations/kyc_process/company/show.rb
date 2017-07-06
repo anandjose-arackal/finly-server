@@ -4,11 +4,11 @@ class KycProcess::Company::Show < KycProcess::Company::Base
 
   end
 
-  def validate
-    unless user.point_of_contact
-      raise_unauthorized_exception
-    end
-  end
+  # def validate
+  #   unless user.point_of_contact
+  #     raise_unauthorized_exception
+  #   end
+  # end
 
   def success
     params[:company_kyc] =  self.company_kyc
@@ -44,85 +44,114 @@ class KycProcess::Company::Show < KycProcess::Company::Base
     def documents
       docs = []
       # pan card is common for all
-      pan_card = {}
-      pan_card[:name] = "PAN Card"
-      pan_card[:identifier] = "pan_card"
-      pan_card[:uploaded] = company_kyc.pan_card.present?
+      id_proof = {}
+      id_proof[:name] = "ID Proof"
+      file = {}
       if company_kyc.pan_card.present?
-        pan_card[:file] = {
-            type: company_kyc.pan_card_content_type,
-            original: company_kyc.pan_card&.url,
-            thumb: company_kyc.pan_card&.url(:thumb)
+        file = {
+          type: company_kyc.pan_card_content_type,
+          original: company_kyc.pan_card&.url,
+          thumb: company_kyc.pan_card&.url(:thumb)
         }
       end
-      docs << pan_card
+      id_proof[:options] = []
+      id_proof[:options] << {
+         identifier: "pan_card",
+         name: "PAN",
+         uploaded: company_kyc.pan_card.present?,
+         file: file
+      }
+      docs << id_proof
 
       # now based on company type, the other document is decided
       case company_kyc.company_type_id
         when 1
           # sole proprietor
-          aadhar = {}
-          aadhar[:name] = "Aadhar Card"
-          aadhar[:identifier] = "aadhar_card"
-          aadhar[:uploaded] = company_kyc.aadhar_card.present? || company_kyc.certificate_of_registration.present?
-          aadhar[:options] = []
-          aadhar[:options] << {
-              name: "Aadhar Card",
+          address_proof = {}
+          address_proof[:name] = "Address Proof"
+          address_proof[:options] = []
+          address_proof[:options] << {
               identifier: "aadhar_card",
-              uploaded: company_kyc.aadhar_card.present?,
+              name: "Aadhar Card",
+              uploaded: company_kyc.aadhar_card.present?
           }
-          aadhar[:options] << {
-              name: "VAT registration certificate",
-              identifier: "vat_registration_certificate",
-              uploaded: company_kyc.vat_registration_certificate.present?,
+          address_proof[:options] << {
+              identifier: "certificate_of_registration",
+              name: "Certificate of Registration",
+              uploaded: company_kyc.certificate_of_registration.present?
           }
-          if aadhar[:uploaded]
-            aadhar[:file] = {
-                type: (company_kyc.aadhar_card_content_type || company_kyc.vat_registration_certificate_content_type),
-                original: (company_kyc.aadhar_card&.url || company_kyc.vat_registration_certificate&.url),
-                thumb: (company_kyc.aadhar_card&.url(:thumb) || company_kyc.vat_registration_certificate&.url(:thumb))
+          if company_kyc.aadhar_card.present?
+            file = {
+                type: (company_kyc.aadhar_card_content_type),
+                original: (company_kyc.aadhar_card&.url),
+                thumb: (company_kyc.aadhar_card&.url(:thumb))
             }
+            address_proof[:options][0][:file] = file
           end
-          docs << aadhar
-        when 3, 5
-          coi = {}
-          coi[:name] = "Certificate of Incorporation"
-          coi[:identifier] = "coi"
-          coi[:uploaded] = company_kyc.coi.present?
-          if company_kyc.coi.present?
-            coi[:file] = {
-                type: company_kyc.coi_content_type,
-                original: company_kyc.coi&.url,
-                thumb: company_kyc.coi&.url(:thumb)
-            }
-          end
-          docs << coi
-        when 2, 4
-          certificate_of_registration = {}
-          certificate_of_registration[:name] = "Certificate of Regiration"
-          certificate_of_registration[:identifier] = "certificate_of_registration"
-          certificate_of_registration[:uploaded] = company_kyc.certificate_of_registration.present?
           if company_kyc.certificate_of_registration.present?
-            certificate_of_registration[:file] = {
-                type: company_kyc.certificate_of_registration_content_type,
-                original: company_kyc.certificate_of_registration&.url,
-                thumb: company_kyc.certificate_of_registration&.url(:thumb)
+            file = {
+                type: (company_kyc.certificate_of_registration),
+                original: (company_kyc.certificate_of_registration&.url),
+                thumb: (company_kyc.certificate_of_registration&.url(:thumb))
             }
+            address_proof[:options][1][:file] = file
           end
-          docs << certificate_of_registration
+
+          docs << address_proof
+        when 3, 5
+          address_proof = {}
+          address_proof[:name] = "Address Proof"
+          address_proof[:options] = []
+          address_proof[:options] << {
+              identifier: "coi",
+              name: "Certificate of Incorporation",
+              uploaded: company_kyc.coi.present?
+          }
+          if company_kyc.coi.present?
+            file = {
+                type: (company_kyc.coi),
+                original: (company_kyc.coi&.url),
+                thumb: (company_kyc.coi&.url(:thumb))
+            }
+            address_proof[:options][0][:file] = file
+          end
+          docs << address_proof
+        when 2, 4
+          address_proof = {}
+          address_proof[:name] = "Address Proof"
+          address_proof[:options] = []
+          address_proof[:options] << {
+              identifier: "certificate_of_registration",
+              name: "Certificate of Registration",
+              uploaded: company_kyc.certificate_of_registration.present?
+          }
+          if company_kyc.certificate_of_registration.present?
+            file = {
+                type: (company_kyc.certificate_of_registration),
+                original: (company_kyc.certificate_of_registration&.url),
+                thumb: (company_kyc.certificate_of_registration&.url(:thumb))
+            }
+            address_proof[:options][0][:file] = file
+          end
+          docs << address_proof
         when 6
-          registration_of_trust = {}
-          registration_of_trust[:name] = "Certificate of Regiration"
-          registration_of_trust[:identifier] = "certificate_of_registration"
-          registration_of_trust[:uploaded] = company_kyc.certificate_of_registration.present?
+          address_proof = {}
+          address_proof[:name] = "Address Proof"
+          address_proof[:options] = []
+          address_proof[:options] << {
+              identifier: "registration_of_trust",
+              name: "Registration of Trust",
+              uploaded: company_kyc.registration_of_trust.present?
+          }
           if company_kyc.registration_of_trust.present?
-            registration_of_trust[:file] = {
-                type: company_kyc.registration_of_trust_content_type,
-                original: company_kyc.registration_of_trust&.url,
-                thumb: company_kyc.registration_of_trust&.url(:thumb)
+            file = {
+                type: (company_kyc.registration_of_trust),
+                original: (company_kyc.registration_of_trust&.url),
+                thumb: (company_kyc.registration_of_trust&.url(:thumb))
             }
+            address_proof[:options][0][:file] = file
           end
-          # need to be clarified
+          docs << address_proof
       end
       return docs
     end
