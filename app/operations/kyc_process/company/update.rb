@@ -17,7 +17,6 @@ class KycProcess::Company::Update < KycProcess::Company::Base
   end
 
   def process
-    debugger
     unless self.company_kyc.update(self.kyc_params)
       add_message :error, self.company_kyc.errors.full_messages
     end
@@ -40,7 +39,7 @@ class KycProcess::Company::Update < KycProcess::Company::Base
         end
     end
 
-    add_message :error, "Documents uploaded successfully"
+    add_message :success, "Documents uploaded successfully"
 
     # if self.company_kyc.coi.present? and self.company_kyc.pan_card.present?
     #   self.company_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
