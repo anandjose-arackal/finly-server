@@ -61,7 +61,7 @@ class User::Lookup < User::Base
 
   class User::Lookup::LookupPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :verified, :registered, :otp_verified, :set_password, :mobile_number, :id
+    attr_accessor :verified, :registered, :otp_verified, :set_password, :mobile_number
 
     def init
       self.verified = params[:verified]
@@ -69,7 +69,6 @@ class User::Lookup < User::Base
       self.otp_verified = params[:otp_verified]
       self.set_password = params[:set_password]
       if params[:set_password]
-        self.id = params[:id]
         self.mobile_number = params[:mobile_number]
       end
     end

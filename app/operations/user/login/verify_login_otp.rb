@@ -15,7 +15,7 @@ class User::Login::VerifyLoginOtp < BaseOperation
   end
 
   def init
-    self.selected_user = User.find_by(mobile_number: params[:mobile_number])
+    self.selected_user = User.find_for_database_authentication(email: params[:email_mobile])
   end
 
   def validate
