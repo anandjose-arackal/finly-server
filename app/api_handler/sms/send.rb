@@ -1,13 +1,17 @@
-class Sms::Base < BaseHandler
+class Sms::Send < BaseHandler
+
+  def init
+    super
+    self.params = {} if self.params.nil?
+  end
 
   def message
-
+    params[:message]
   end
 
   def mobile_numbers
-    return if params.blank?
     mob_num = (params[:mobile_number] or params[:mobile_numbers])
-    users = (params[:user] or params[:users])
+    users = (params[:user] or params[:users] or user)
 
     if mob_num.present?
       unless mob_num.is_a?(Array)
@@ -31,7 +35,7 @@ class Sms::Base < BaseHandler
     'msg91_custom_message'
   end
 
-  def post_params
+  def query_params
     mob_num = mobile_numbers
     if mob_num.blank?
       add_message :error, 'Error sending SMS. Mobile number cannot be blank'
@@ -42,9 +46,13 @@ class Sms::Base < BaseHandler
       add_message :error, 'Message cannot be blank'
       return
     end
+    list = ""
+    mob_num.each do |number|
+      list += number.to_s + ","
+    end
     {
         authkey: authentication_key,
-        mobiles: mob_num,
+        mobiles: list,
         message: msg,
         sender: 'FINLYX',
         route: 4,
@@ -54,10 +62,10 @@ class Sms::Base < BaseHandler
   end
 
   def success
-    Sms::Base::SuccessPresenter.new(user, {result: 'Success'})
+    Sms::Send::SuccessPresenter.new(user, {result: 'Success'})
   end
 
-  class Sms::Base::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
+  class Sms::Send::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
 
     attr_accessor :result
 
