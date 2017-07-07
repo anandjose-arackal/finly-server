@@ -159,6 +159,20 @@ class Card < ActiveRecord::Base
     self.active
   end
 
+  def expense_card?
+    if self.card_program_id == CardProgram.id_for(:expense)
+      return true
+    end
+    false
+  end
+
+  def reimbursement_card?
+    if self.card_program_id == CardProgram.id_for(:reimbursement)
+      return true
+    end
+    false
+  end
+
   private
 
   def card_program_with_user
