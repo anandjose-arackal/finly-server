@@ -82,7 +82,7 @@ class KycProcess::Company::Update < KycProcess::Company::Base
   protected
 
   def kyc_strong_params
-    params.require(:company_kyc).permit(:coi, :pan_card, :passport, :driving_licence, :aadhar_card, :vat_registration_certificate, :registration_of_trust)
+    params.require(:company_kyc).permit(:coi, :pan_card, :passport, :driving_licence, :aadhar_card, :vat_registration_certificate, :registration_of_trust, :certificate_of_registration)
   end
 
 end
