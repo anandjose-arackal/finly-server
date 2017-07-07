@@ -33,7 +33,7 @@ class KycProcess::Company::Update < KycProcess::Company::Base
     # update the status based on the company type and documents uploaded
     case company_kyc.company_type_id
       when 1
-        if company_kyc.pan_card.present? && (company_kyc.aadhar_card.present? || company_kyc.driving_licence.present? || company_kyc.passport.present?)
+        if company_kyc.pan_card.present? && (company_kyc.aadhar_card.present? || company_kyc.vat_registration_certificate.present?)
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
@@ -44,8 +44,14 @@ class KycProcess::Company::Update < KycProcess::Company::Base
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
-      when 2
+      when 2, 4
         if company_kyc.pan_card.present? && company_kyc.certificate_of_registration.present?
+          company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
+        else
+          company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
+        end
+      when 6
+        if company_kyc.pan_card.present? && company_kyc.registration_of_trust.present?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
