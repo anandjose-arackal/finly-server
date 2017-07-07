@@ -83,7 +83,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
           address_proof[:options] << {
               identifier: "vat_registration_certificate",
               name: "VAT registration certificate",
-              uploaded: company_kyc.certificate_of_registration.present?
+              uploaded: company_kyc.vat_registration_certificate.present?
           }
           if company_kyc.aadhar_card.present?
             file = {
@@ -101,7 +101,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
             file = {
                 type: (company_kyc.vat_registration_certificate),
                 original: (company_kyc.vat_registration_certificate&.url),
-                thumb: (company_kyc.certificatvat_registration_certificatee_of_registration&.url(:thumb))
+                thumb: (company_kyc.vat_registration_certificate&.url(:thumb))
             }
             address_proof[:options][1][:file] = file
           end

@@ -1,6 +1,6 @@
 class Admin::KycProcesses::Companies::Reject < Admin::KycProcesses::Companies::Base
 
-  attr_accessor :company, :rej_params, :company_kyc
+  attr_accessor :company, :rej_params, :company_kyc, :system_message_params
 
   def pre_validate
     if user.blank? || params.blank?
@@ -28,17 +28,20 @@ class Admin::KycProcesses::Companies::Reject < Admin::KycProcesses::Companies::B
     rej_params.delete(:message)
     rej_params.delete(:document_type)
     rej_params[:kyc_status_id] = KycStatus.id_for(:error)
-    rej_params[:system_message_attributes] = [{
+    rej_params.permit!
+    self.system_message_params = {
         content: "Your KYC was rejected because: #{message}",
         system_message_type_id: SystemMessageType.id_for(:error),
-        type: doc_type
-    }]
-    rej_params.permit!
+        message_type: doc_type
+    }
   end
 
   def process
-    unless company_kyc.update(rej_params)
-      add_message :error, company_kyc.errors.full_messages
+    system_message = company_kyc.system_messages.build(system_message_params)
+    if system_message.save
+      company_kyc.update(rej_params)
+    else
+      add_message :error, system_message.errors.full_messages
     end
   end
 
@@ -47,6 +50,8 @@ class Admin::KycProcesses::Companies::Reject < Admin::KycProcesses::Companies::B
     poc = company.users.where(point_of_contact: true).first
     # notification = poc.notification.build()
 
+    # set the kyc status as error for this particular company
+    company_kyc.update(kyc_status_id: KycStatus.id_for(:error))
     add_message :success, "User successfully notified"
   end
 

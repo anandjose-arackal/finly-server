@@ -1,6 +1,13 @@
 class KycProcess::Company::Update < KycProcess::Company::Base
   attr_accessor :kyc_params
 
+  def pre_validate
+    super()
+    if params[:company_kyc].blank?
+      add_message :error, "No params passed, try again"
+    end
+  end
+
   def init
     super
     self.kyc_params = kyc_strong_params
@@ -44,6 +51,9 @@ class KycProcess::Company::Update < KycProcess::Company::Base
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
     end
+
+    # clearing all system messages that were associated with this particular KYC document
+    company_kyc.system_messages.destroy_all
 
     add_message :success, "Documents uploaded successfully"
 
