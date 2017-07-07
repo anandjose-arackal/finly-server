@@ -7,7 +7,7 @@ class SeedCompanyTypesAndCreateCompanyKycForExistingCompanies < ActiveRecord::Mi
     Company.all.each do |company|
       unless company.company_kyc.present?
         # todo - change this to create it based on each actual company
-        company.build_company_kyc(company_type_id: 3)
+        company.build_company_kyc(company_type_id: 3, kyc_status_id: KycStatus.id_for()).save
       end
     end
 
