@@ -19,7 +19,7 @@ class CustomMessage::Create < BaseHandler
     self.message = params[:message]
     # the default message is the custom message that is sent while inviting a user via mobile number
     if message.nil?
-      self.message = "You have been invited to use Finly. Please contact your manager to activate your account"
+      self.message = 'You have been invited to use Finly. Please contact your manager to activate your account'
     end
   end
 
@@ -27,14 +27,15 @@ class CustomMessage::Create < BaseHandler
     # post payload as JSON instead of "www-form-urlencoded" encoding:
     self.response = self.connection.get do |req|
       req.url path
-      req.params = {authkey: authentication_key,
-                    mobiles: mobile_numbers,
-                    message: message,
-                    sender: "FINLYX",
-                    route: 4,
-                    country: 91,
-                    response: "json"
-                    }
+      req.params = {
+          authkey: authentication_key,
+          mobiles: mobile_numbers,
+          message: message,
+          sender: 'FINLYX',
+          route: 4,
+          country: 91,
+          response: 'json'
+      }
     end
   end
 
@@ -43,7 +44,7 @@ class CustomMessage::Create < BaseHandler
   end
 
   def success
-    CustomMessage::Create::SuccessPresenter.new(user, {result: "Success"})
+    CustomMessage::Create::SuccessPresenter.new(user, {result: 'Success'})
   end
 
   class CustomMessage::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
