@@ -31,6 +31,7 @@ class Company::Create < Company::Base
   end
 
   def post_process
+    company&.company_kyc&.update(company_type_id: 3)
     add_message :success, "Company created successfully!"
   end
 

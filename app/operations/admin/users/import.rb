@@ -265,7 +265,11 @@ class Admin::Users::Import < Admin::Base
                     },
                     company_id: row[import_fields[:company_id]],
                     mothers_maiden_name: row[import_fields[:mothers_maiden_name]],
-                    error_messages: errors
+                    error_messages: errors,
+                    user_panel_subscription_attributes: {
+                        expense_management: company.feature_subscription.expense_management_enabled,
+                        disburse: company.feature_subscription.cards_enabled
+                    }
     }
 
     # # i.e. add cards only when the user

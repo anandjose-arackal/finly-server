@@ -16,14 +16,18 @@ json.array!(@result.paginated_team) do |user|
       json.active card.active
       json.card_program_id card.card_program.id
       json.card_program_name card.card_program.name
-      json.eligibility  card.card_eligibility.value
+      eligibility = (card.card_eligibility.value rescue 0)
+      json.eligibility eligibility
       # Balance for only expense card
       if card.card_program.id == 1
-        json.balance card.card_balance.value
+        balance = (card.card_balance.value rescue 0)
+        json.balance balance
       end
       json.currency do
-        json.country_code card.card_balance.currency.country_code
-        json.symbol card.card_balance.currency.symbol
+        country_code = (card.card_balance.currency.country_code rescue nil)
+        json.country_code country_code
+        symbol = (card.card_balance.currency.symbol rescue nil)
+        json.symbol symbol
       end
     end
   end

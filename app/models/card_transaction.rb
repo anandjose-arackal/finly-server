@@ -58,7 +58,7 @@ class CardTransaction < ActiveRecord::Base
 
   default_scope { order(transaction_timestamp: :desc) }
 
-  scope :with_id, -> { where id: id }
+  scope :with_id, ->(id) { where id: id }
   scope :debits, -> { where transaction_type: 'Debit' }
   scope :credits, -> { where transaction_type: 'Credit' }
 

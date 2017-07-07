@@ -19,6 +19,7 @@ json.user do
   end
 end
 json.subscriptions do
+  json.show_config @result.selected_user.company.more_than_one_subscription?
   json.expense_management @result.user_panel_subscription.expense_management
   json.disburse @result.user_panel_subscription.disburse
 end
