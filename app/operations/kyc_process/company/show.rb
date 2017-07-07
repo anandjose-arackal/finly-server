@@ -99,7 +99,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
           end
           if company_kyc.vat_registration_certificate.present?
             file = {
-                type: (company_kyc.vat_registration_certificate),
+                type: (company_kyc.vat_registration_certificate_content_type),
                 original: (company_kyc.vat_registration_certificate&.url),
                 thumb: (company_kyc.vat_registration_certificate&.url(:thumb))
             }
@@ -121,7 +121,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
           }
           if company_kyc.coi.present?
             file = {
-                type: (company_kyc.coi),
+                type: (company_kyc.coi_content_type),
                 original: (company_kyc.coi&.url),
                 thumb: (company_kyc.coi&.url(:thumb))
             }
@@ -143,7 +143,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
           }
           if company_kyc.certificate_of_registration.present?
             file = {
-                type: (company_kyc.certificate_of_registration),
+                type: (company_kyc.certificate_of_registration_content_type),
                 original: (company_kyc.certificate_of_registration&.url),
                 thumb: (company_kyc.certificate_of_registration&.url(:thumb))
             }
@@ -165,7 +165,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
           }
           if company_kyc.registration_of_trust.present?
             file = {
-                type: (company_kyc.registration_of_trust),
+                type: (company_kyc.registration_of_trust_content_type),
                 original: (company_kyc.registration_of_trust&.url),
                 thumb: (company_kyc.registration_of_trust&.url(:thumb))
             }
