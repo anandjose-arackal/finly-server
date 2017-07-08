@@ -12,8 +12,8 @@ class Oauth::TokenController < Doorkeeper::TokensController
     params[:request] = request
     params[:application] = 'web'
     User::Track::Login.(@user, params)
-    # cookies['access_token'] = {:value => response.token.token, :httponly => true}
-    # cookies['refresh_token'] = {:value => response.token.refresh_token, :httponly => true}
+    cookies['access_token'] = {:value => response.token.token, :httponly => true}
+    cookies['refresh_token'] = {:value => response.token.refresh_token, :httponly => true}
       # end
   # rescue Errors::DoorkeeperError => e
   #   handle_token_exception e
