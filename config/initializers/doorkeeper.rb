@@ -1,5 +1,4 @@
 Doorkeeper.configure do
-  # Devise::Doorkeeper.configure_doorkeeper(self)
   # Change the ORM that doorkeeper will use (needs plugins)
   orm :active_record
 

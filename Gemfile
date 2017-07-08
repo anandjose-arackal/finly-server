@@ -131,7 +131,6 @@ gem 'devise', '4.2.0'
 
 gem 'devise_invitable', '1.7.0'
 gem 'doorkeeper', '4.2.6'
-gem 'devise-doorkeeper'
 
 gem 'faraday', '0.10.0'
 gem 'faraday_middleware', '0.11.0.1'

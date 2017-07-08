@@ -71,8 +71,6 @@ class User < ActiveRecord::Base
 
   devise :database_authenticatable, :validatable, password_length: 8..128
 
-  # devise :doorkeeper
-
   attr_accessor :view, :invitation_note
   attr_reader :raw_invitation_token
 

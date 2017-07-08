@@ -175,10 +175,6 @@ GEM
       railties (>= 4.1.0, < 5.1)
       responders
       warden (~> 1.2.3)
-    devise-doorkeeper (1.1.2)
-      devise
-      doorkeeper
-      rails
     devise_invitable (1.7.0)
       actionmailer (>= 4.0.0)
       devise (>= 4.0.0)
@@ -481,7 +477,6 @@ DEPENDENCIES
   daemons (= 1.2.4)
   deep_cloneable (= 2.2.1)
   devise (= 4.2.0)
-  devise-doorkeeper
   devise_invitable (= 1.7.0)
   doorkeeper (= 4.2.6)
   faker (= 1.6.6)
