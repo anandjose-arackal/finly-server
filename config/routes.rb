@@ -1422,15 +1422,16 @@ Rails.application.routes.draw do
   # get 'home/index'
 
   mount_griddler('/email/incoming')
-  mount_opro_oauth controllers: {
-      oauth_new: 'oauth/auth',
-      oauth_token: 'oauth/token'
-  }
-
-  devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"} do
-    # get 'login', to: 'sessions#new', as: :login
-    # post 'login', to: 'session#create', as: :login
-  end
+  # mount_opro_oauth controllers: {
+  #     oauth_new: 'oauth/auth',
+  #     oauth_token: 'oauth/token'
+  # }
+  #
+  # devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"} do
+  #   # get 'login', to: 'sessions#new', as: :login
+  #   # post 'login', to: 'session#create', as: :login
+  # end
+  use_doorkeeper
 
   ######### GEMS SPECIFIC END ###########
 
