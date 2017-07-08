@@ -1394,6 +1394,10 @@ Rails.application.routes.draw do
 
   get 'qukickbooks_configurations/show'
 
+  # adding this before the devise routes because devise overrides out custom path
+  get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
+
+
   ######### GEMS SPECIFIC START ###########
 
   mount Crono::Web, at: '/crono'
@@ -1657,8 +1661,6 @@ Rails.application.routes.draw do
 
   # adding admin oauth token creation for admin login
   post 'admin/oauth/token', to: 'admin_users/oauth/token#create', as: :admin_oauth_token_generate, defaults: {format: 'json'}
-
-  get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
   post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
