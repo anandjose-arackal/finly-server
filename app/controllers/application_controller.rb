@@ -4,6 +4,9 @@ require 'require_all'
 # Dir[File.expand_path "#{Rails.root}/app/operations/expense/card/**/*.rb"].each { |f| require(f) }
 class ApplicationController < ActionController::Base
   include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
+  # include AbstractController::Callbacks
+  # include ActionController::Head
+  include Doorkeeper::Rails::Helpers
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
 
@@ -216,7 +219,7 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    @current_user ||= User.find(doorkeeper_token[:resource_owner_id]) if doorkeeper_token&.dig(:resource_owner_id)
+    @current_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id]) if doorkeeper_token&.resource_owner_id&.present?
   end
 
   def current_company

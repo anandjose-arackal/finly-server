@@ -17,6 +17,8 @@ Doorkeeper.configure do
     user.valid_password?(params[:password]) ? user : false
   end
 
+
+
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
   # admin_authenticator do
   #   # Put your admin authentication logic here.

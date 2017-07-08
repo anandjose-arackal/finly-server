@@ -1431,7 +1431,10 @@ Rails.application.routes.draw do
   #   # get 'login', to: 'sessions#new', as: :login
   #   # post 'login', to: 'session#create', as: :login
   # end
-  use_doorkeeper
+  use_doorkeeper do
+    # it accepts :authorizations, :tokens, :applications and :authorized_applications
+    controllers :tokens => 'oauth/token'
+  end
 
   ######### GEMS SPECIFIC END ###########
 
