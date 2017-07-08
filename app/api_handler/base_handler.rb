@@ -41,6 +41,11 @@ class BaseHandler
 
   end
 
+  def http_request_type
+    # :get, :post, :patch, :delete, :put
+    :post
+  end
+
   def run
     clear_messages
     authorize_user authorized_user_types
@@ -101,15 +106,50 @@ class BaseHandler
     p = self.path
     query_param = self.query_params
     body_param = self.post_params
-    return unless p.present?
+    return unless p.present? and not has_errors?
     begin
       puts "Posting Path : #{p}"
       puts "Post Params: #{body_param}"
-      # self.response = self.connection.post p, body_param
-      self.response = self.connection.post do |req|
-        req.url p
-        req.params = query_param if query_param.present?
-        req.body = body_param if body_param.present?
+
+      request_type = http_request_type
+
+      case request_type
+        when :get
+          # self.response = self.connection.post p, body_param
+          self.response = self.connection.get do |req|
+            req.url p
+            req.params = query_param if query_param.present?
+          end
+        when :post
+          # self.response = self.connection.post p, body_param
+          self.response = self.connection.post do |req|
+            req.url p
+            req.params = query_param if query_param.present?
+            req.body = body_param if body_param.present?
+          end
+        when :patch
+          # self.response = self.connection.post p, body_param
+          self.response = self.connection.patch do |req|
+            req.url p
+            req.params = query_param if query_param.present?
+            req.body = body_param if body_param.present?
+          end
+        when :put
+          # self.response = self.connection.post p, body_param
+          self.response = self.connection.put do |req|
+            req.url p
+            req.params = query_param if query_param.present?
+            req.body = body_param if body_param.present?
+          end
+        when :delete
+          # self.response = self.connection.post p, body_param
+          self.response = self.connection.delete do |req|
+            req.url p
+            req.params = query_param if query_param.present?
+          end
+        else
+          add_message :error, 'Invalid Request Type'
+          return;
       end
       puts "response : #{self.response.body}"
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed

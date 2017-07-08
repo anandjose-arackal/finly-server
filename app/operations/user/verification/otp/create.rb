@@ -42,15 +42,13 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
 
     if selected_user.otp && selected_user.otp_request_type_id == otp_request_type_id && selected_user.otp_sent_at > 15.minutes.ago
       self.otp = selected_user.otp
-      self.message = "#{otp} is your verification code."
     else
       self.otp = MathUtil.generate_random_number(6)
-      self.message = "#{otp} is your verification code."
     end
   end
 
   def process
-    response = CustomMessage::Create.(selected_user, {mobile_number: [selected_user.mobile_number], message: message})
+    response = Sms::UserOtp.(user, otp: self.otp)
     if response.success?
       selected_user.update_attributes(otp_count: (selected_user.otp_count+1))
       # further update the otp and sent_at only if a new type of otp has been requested
