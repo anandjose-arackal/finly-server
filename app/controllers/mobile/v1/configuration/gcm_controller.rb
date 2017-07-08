@@ -1,8 +1,8 @@
 class Mobile::V1::Configuration::GcmController <  Mobile::V1::BaseApiController
   protect_from_forgery with: :null_session
 
-  allow_oauth!
-  before_action :authenticate_user!
+  before_action :doorkeeper_authorize!
+
 
   def create
     @result = Gcm::Register.(current_user, params)

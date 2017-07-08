@@ -1,7 +1,7 @@
 class AgreementsController < ApplicationController
 
-  allow_oauth!
-  before_action :authenticate_user!, only: [:validate, :agree, :company_data]
+  before_action :doorkeeper_authorize!
+  , only: [:validate, :agree, :company_data]
 
   def company_data
     @result = Agreements::Company::Show.(current_user, params)

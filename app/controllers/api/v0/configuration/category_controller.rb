@@ -2,8 +2,8 @@ require "#{Rails.root}/app/operations/company/configuration/category/index"
 class Api::V0::Configuration::CategoryController < Api::V0::BaseApiController
   protect_from_forgery with: :null_session
 
-  allow_oauth!
-  before_action :authenticate_user!
+  before_action :doorkeeper_authorize!
+
 
   respond_to :json
 

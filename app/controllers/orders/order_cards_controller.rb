@@ -1,7 +1,7 @@
 class Orders::OrderCardsController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action :doorkeeper_authorize!
   
   def index
     @result = Orders::OrderCards::Index.(current_user, params)

@@ -1,8 +1,6 @@
 class ExpensesController < ApplicationController
 
-  doorkeeper_for :all
-  before_action :authenticate_user!
-  # allow_oauth!
+  before_action :doorkeeper_authorize!
 
   def create
     case params[:type]

@@ -1,7 +1,7 @@
 class UserGroupItemsController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action :doorkeeper_authorize!
 
   def create
     @result = UserGroup::Item::Users::Add.(current_user, params)

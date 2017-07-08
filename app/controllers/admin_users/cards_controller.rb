@@ -1,8 +1,8 @@
 class AdminUsers::CardsController < ApplicationController
 
   # todo - temporary
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action :doorkeeper_authorize!
 
   def create
     @result = Admin::Cards::Create.(current_user, params)

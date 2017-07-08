@@ -1,7 +1,7 @@
 class CardsController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action :doorkeeper_authorize!
 
   # params = {user_id: 1}
   def details

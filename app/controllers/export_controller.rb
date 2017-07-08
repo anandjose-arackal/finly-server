@@ -2,8 +2,8 @@ class ExportController < ApplicationController
   include MathUtil
 
   before_action :set_headers
-  # before_action :authenticate_user!
-  allow_oauth!
+  #
+  before_action :doorkeeper_authorize!
 
   def report
     respond_to do |format|

@@ -2,8 +2,8 @@ require "#{Rails.root}/app/operations/company/configuration/category/index"
 class Mobile::V1::Configuration::CategoryController < Mobile::V1::BaseApiController
   protect_from_forgery with: :null_session
 
-  allow_oauth!
-  before_action :authenticate_user!
+  before_action :doorkeeper_authorize!
+
 
   respond_to :json
 

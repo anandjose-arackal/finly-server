@@ -2,8 +2,8 @@ require "#{Rails.root}/app/operations/expense/manual/create"
 class Api::V1::ExpensesController < Api::V1::BaseApiController
   protect_from_forgery with: :null_session
 
-  allow_oauth!
-  before_action :authenticate_user!
+  before_action :doorkeeper_authorize!
+
 
   def create
     param = RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse.(current_user, params).formatted_request

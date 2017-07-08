@@ -215,4 +215,12 @@ class ApplicationController < ActionController::Base
     head(403)
   end
 
+  def current_user
+    @current_user ||= User.find(doorkeeper_token[:resource_owner_id]) if doorkeeper_token&.dig(:resource_owner_id)
+  end
+
+  def current_company
+    current_user&.company
+  end
+
 end

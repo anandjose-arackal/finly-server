@@ -111,7 +111,7 @@ gem 'sidekiq', '4.2.7'
 # gem for font awesome
 gem 'font-awesome-rails', '4.7.0.0'
 
-gem 'opro', '0.5.0', git: 'https://github.com/opro/opro.git', branch: 'master'
+# gem 'opro', '0.5.0', git: 'https://github.com/opro/opro.git', branch: 'master'
 # gem 'opro', github: 'opro/opro', branch: 'master'
 
 gem 'has_scope', '0.6.0'

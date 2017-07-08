@@ -1,7 +1,7 @@
 class ExportPreferencesController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action :doorkeeper_authorize!
 
   def create
     create_op = Company::ExportPreferences::Create.new(current_user, params)

@@ -1,7 +1,7 @@
 class AdminUsers::ExpensesController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action :doorkeeper_authorize!
 
   def index
     @result = Admin::Expenses::Index.(current_user, params)

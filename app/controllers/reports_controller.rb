@@ -1,7 +1,7 @@
 class ReportsController < ApplicationController
   include MathUtil
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action :doorkeeper_authorize!
 
   def create
     @result = Report::Create.(current_user, params)

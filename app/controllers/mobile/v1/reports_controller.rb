@@ -4,8 +4,8 @@ class Mobile::V1::ReportsController < Mobile::V1::BaseApiController
   include MathUtil
   protect_from_forgery with: :null_session
 
-  allow_oauth!
-  before_action :authenticate_user!
+  before_action :doorkeeper_authorize!
+
 
   respond_to :json
 

@@ -1,7 +1,7 @@
 class CategoriesController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action :doorkeeper_authorize!
 
   def create
     @result = Company::Configuration::Category::Create.(current_user, params)

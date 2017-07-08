@@ -1,7 +1,7 @@
 class Kyc::UserController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action :doorkeeper_authorize!
 
   def show
     @result = KycProcess::User::Show.(current_user, params)

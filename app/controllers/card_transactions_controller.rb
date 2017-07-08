@@ -1,8 +1,8 @@
 class CardTransactionsController < ApplicationController
 
-  before_action :authenticate_user!
 
-  allow_oauth!
+
+  before_action :doorkeeper_authorize!
 
   def index
     @result = Card::Transaction::Index.(current_user, params)
