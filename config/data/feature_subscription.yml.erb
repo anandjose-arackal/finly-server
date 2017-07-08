@@ -14,5 +14,5 @@ company:
     fuel_card: <%= current_company.feature_subscription.fuel_card_enabled %>
     hard_copy_receipt: <%= current_company.feature_subscription.hard_copy_receipt %>
 user:
-  expense_management: <%= current_user.user_panel_subscription.expense_management %>
-  disburse: <%= current_user.user_panel_subscription.disburse %>
+  expense_management: <%= current_user.user_panel_subscription.expense_management && current_user.company.expense_management_enabled? %>
+  disburse: <%= current_user.user_panel_subscription.disburse && current_user.company.feature_subscription.cards_enabled %>
