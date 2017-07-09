@@ -15,7 +15,7 @@ class User::Lookup < User::Base
   end
 
   def init
-    self.selected_user = User.find_for_database_authentication(email: params[:email_mobile])
+    self.selected_user = User.find_for_database_authentication(username: params[:email_mobile])
   end
 
   def process

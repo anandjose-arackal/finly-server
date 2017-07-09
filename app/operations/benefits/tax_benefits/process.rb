@@ -71,7 +71,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       if user_email_mob.is_a?(Float)
         user_email_mob = user_email_mob&.to_i&.to_s
       end
-      user = self.user.company.users.find_for_database_authentication(email: user_email_mob)
+      user = self.user.company.users.find_for_database_authentication(username: user_email_mob)
       amount = item[:amount].to_d rescue nil
 
       valid = true

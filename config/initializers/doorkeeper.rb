@@ -7,16 +7,22 @@ Doorkeeper.configure do
     # fail "Please configure doorkeeper resource_owner_authenticator block located in #{__FILE__}"
     # Put your resource owner authentication logic here.
     # Example implementation:
-    User.find_by_id(session[:user_id]) || redirect_to(new_user_session_url)
+    # User.find_by_id(session[:user_id])# || redirect_to(new_user_session_url)
+    false
   end
 
   resource_owner_from_credentials do |routes|
-    return false if params[:email].blank? or params[:password].blank?
-    user = User.find_for_database_authentication(params) rescue nil
-    return false if user.blank?
-    user.valid_password?(params[:password]) ? user : false
+    if params[:username].blank? or params[:password].blank?
+      false
+    else
+      user = (User.find_for_database_authentication(params) rescue nil)
+      if user.blank?
+        false
+      else
+        user&.valid_password?(params[:password]) ? user : false
+      end
+    end
   end
-
 
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.

@@ -492,9 +492,9 @@ class User < ActiveRecord::Base
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate
   def self.find_for_database_authentication(conditions={})
-    return nil if conditions.blank? or conditions[:email].blank?
-    email = conditions[:email].delete(' ')
-    find_by(mobile_number: email) || find_by(email: email)
+    return nil if conditions.blank? or conditions[:username].blank?
+    username = conditions[:username].delete(' ')
+    find_by(mobile_number: username) || find_by(email: username)
   end
 
   def manager_activateable?
