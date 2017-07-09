@@ -1395,9 +1395,7 @@
 Rails.application.routes.draw do
 
   get 'qukickbooks_configurations/create'
-
   get 'qukickbooks_configurations/update'
-
   get 'qukickbooks_configurations/show'
 
   ######### GEMS SPECIFIC START ###########
@@ -1427,7 +1425,7 @@ Rails.application.routes.draw do
   #     oauth_token: 'oauth/token'
   # }
   #
-  devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"}
+  devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
   use_doorkeeper do
     # it accepts :authorizations, :tokens, :applications and :authorized_applications
     controllers :tokens => 'oauth/token'

@@ -15,12 +15,14 @@ Doorkeeper.configure do
     if params[:username].blank? or params[:password].blank?
       false
     else
-      user = (User.find_for_database_authentication(params) rescue nil)
-      if user.blank?
-        false
-      else
-        user&.valid_password?(params[:password]) ? user : false
+      case params[:scope]
+        # Nil is default scope
+        when 'user', nil
+          u = User.find_for_database_authentication(:username => params[:username])
+        when 'admin'
+          u = AdminUser.find_for_database_authentication(:username => params[:username])
       end
+      u if u && u.valid_password?(params[:password])
     end
   end
 

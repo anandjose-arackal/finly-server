@@ -23,7 +23,6 @@ class AdminUser < ActiveRecord::Base
   devise :database_authenticatable, 
          :recoverable, :rememberable, :trackable, :validatable
 
-
   has_many :admin_user_role_mappings, dependent: :destroy
   has_many :admin_user_roles, through: :admin_user_role_mappings, dependent: :destroy
 
@@ -39,7 +38,7 @@ class AdminUser < ActiveRecord::Base
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate
   def self.find_for_database_authentication(conditions={})
-    find_by(email: conditions[:email])
+    find_by(email: conditions[:username])
   end
 
 end
