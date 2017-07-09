@@ -1427,10 +1427,7 @@ Rails.application.routes.draw do
   #     oauth_token: 'oauth/token'
   # }
   #
-  # devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"} do
-  #   # get 'login', to: 'sessions#new', as: :login
-  #   # post 'login', to: 'session#create', as: :login
-  # end
+  devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"}
   use_doorkeeper do
     # it accepts :authorizations, :tokens, :applications and :authorized_applications
     controllers :tokens => 'oauth/token'
@@ -1574,7 +1571,6 @@ Rails.application.routes.draw do
       post 'lookup', to: 'users#lookup'
       post 'send_verification_otp', to: 'users#send_verification_otp'
       post 'verify_user_otp', to: 'users#verify_user_otp'
-      post 'set_new_password', to: 'users#set_new_password'
     end
   end
 

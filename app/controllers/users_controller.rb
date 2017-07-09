@@ -117,12 +117,12 @@ class UsersController < ApplicationController
     respond
   end
 
-  # action that lets mobile only users set their password for the first time
-  # also the action that mobile users use to set their password if they've forgotten it
-  def set_new_password
-    @result = User::Login::SetPassword.(params)
-    respond
-  end
+  # # action that lets mobile only users set their password for the first time
+  # # also the action that mobile users use to set their password if they've forgotten it
+  # def set_new_password
+  #   @result = User::Login::SetPassword.(params)
+  #   respond
+  # end
 
   def lookup
     cookies.delete :user_name
