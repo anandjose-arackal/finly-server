@@ -1,4 +1,6 @@
 class Oauth::TokenController < Doorkeeper::TokensController
+  include ActionController::Cookies, ActionController::Helpers,
+          SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
 
   def create
     unless pre_process
@@ -8,7 +10,6 @@ class Oauth::TokenController < Doorkeeper::TokensController
     response = authorize_response
     headers.merge! response.headers
     self.status = response.status
-
 
     if self.status == 200
       @auth_grant = response
@@ -32,8 +33,11 @@ class Oauth::TokenController < Doorkeeper::TokensController
   def on_create_success(response)
     params[:request] = request
     params[:application] = 'web'
-    self.response.set_cookie 'access_token', {:value => response.token.token, :httponly => true}
-    self.response.set_cookie 'refresh_token', {:value => response.token.refresh_token, :httponly => true}
+    # self.response.set_cookie 'access_token', {:value => response.token.token, :httponly => true}
+    # self.response.set_cookie 'refresh_token', {:value => response.token.refresh_token, :httponly => true}
+    cookies["access_token"] = {:value => @token.token, :httponly => true}
+    cookies["refresh_token"] = {:value => @token.refresh_token, :httponly => true}
+
     # render json: {}, status: 200
     render_json 'oauth/token/create.json.jbuilder', response.status
   end
@@ -45,8 +49,8 @@ class Oauth::TokenController < Doorkeeper::TokensController
   end
 
   def set_grant_type
-    ### Temp Workaround ####
-    if params.dig(:email).present? and params.dig(:username)
+    ### todo TEMP WORKAROUND - MAKE ALL CLIENTS SEND USERNAME AND REMOVE THIS JUGAAD
+    if params.dig(:email).present? and params.dig(:username).blank?
       params[:username] = params[:email]
     end
     ########################

@@ -1,6 +1,6 @@
 class PendingInvitesController < ApplicationController
-  , except: [:edit, :accept]
-  before_action :doorkeeper_authorize!
+
+  before_action :doorkeeper_authorize!, except: [:edit, :accept]
 
   def edit
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)

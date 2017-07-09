@@ -1,7 +1,6 @@
 class AgreementsController < ApplicationController
 
-  before_action :doorkeeper_authorize!
-  , only: [:validate, :agree, :company_data]
+  before_action :doorkeeper_authorize!, only: [:validate, :agree, :company_data]
 
   def company_data
     @result = Agreements::Company::Show.(current_user, params)
