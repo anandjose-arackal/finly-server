@@ -1,11 +1,8 @@
 class Chrome::V1::TokenController < Oauth::TokenController
 
-  def create
-    super()
-  end
-
-  def destroy
-    super()
+  protected
+  def on_create_success(response)
+    render_json 'chrome/v1/token/create.json.jbuilder', response.status
   end
 
 end

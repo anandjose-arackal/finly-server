@@ -2,10 +2,10 @@ json.success true
 json.otp_verified @user.otp_verified
 json.kyc_required @user.company.kyc_required?
 json.data do
-  json.access_token @auth_grant.token.token
+  json.access_token @token.token
   json.token_type 'bearer'
-  json.refresh_token @auth_grant.token.refresh_token
-  json.expires_in @auth_grant.token.expires_in
+  json.refresh_token @token.refresh_token
+  json.expires_in @token.expires_in
   json.user do
     json.extract! @user, :id, :name, :email, :mobile_number
     json.roles @user.user_roles, :id, :name
