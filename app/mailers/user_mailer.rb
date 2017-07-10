@@ -47,7 +47,7 @@ class UserMailer < ApplicationMailer
   def admin_welcome(user, token)
     @user = user
     @token = token
-    mail to: user.email, subject: "Welcome to Finly, powered by ItzCash!"
+    mail to: user.email, subject: "Welcome to Finly!"
   end
 
   def role_updated(user)
