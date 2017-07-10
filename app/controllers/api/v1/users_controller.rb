@@ -1,7 +1,7 @@
 class  Api::V1::UsersController < Api::V1::BaseApiController
   protect_from_forgery with: :null_session
 
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { doorkeeper_authorize! :mobile}
 
 
   respond_to :json
