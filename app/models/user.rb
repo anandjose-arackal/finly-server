@@ -61,6 +61,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -349,6 +350,10 @@ class User < ActiveRecord::Base
     else
       joins(:user_panel_subscription).select('users.*').where('expense_management = ? or expense_management = ?', false, nil)
     end
+  }
+
+  scope :point_of_contact, -> {
+    where point_of_contact: true
   }
 
   after_create do

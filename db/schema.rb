@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170702194152) do
+ActiveRecord::Schema.define(version: 20170707034159) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -561,6 +561,13 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.string "abbreviation", limit: 255
   end
 
+  create_table "city_id_city_code_mappings", force: :cascade do |t|
+    t.string   "city_id",    limit: 255
+    t.string   "city_code",  limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "companies", force: :cascade do |t|
     t.string   "name",             limit: 255
     t.datetime "created_at",                                  null: false
@@ -689,9 +696,9 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.integer  "board_resolution_file_size",                limit: 4
     t.datetime "board_resolution_updated_at"
     t.integer  "kyc_status_id",                             limit: 4
+    t.integer  "company_id",                                limit: 4,     null: false
     t.datetime "created_at",                                              null: false
     t.datetime "updated_at",                                              null: false
-    t.integer  "company_id",                                limit: 4,     null: false
     t.date     "date_of_establishment"
     t.text     "street_2",                                  limit: 65535
     t.text     "street_3",                                  limit: 65535
@@ -720,6 +727,10 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.integer  "passport_file_size",                        limit: 4
     t.datetime "passport_updated_at"
     t.integer  "company_type_id",                           limit: 4
+    t.string   "certificate_of_registration_file_name",     limit: 255
+    t.string   "certificate_of_registration_content_type",  limit: 255
+    t.integer  "certificate_of_registration_file_size",     limit: 4
+    t.datetime "certificate_of_registration_updated_at"
   end
 
   add_index "company_kycs", ["company_id"], name: "index_company_kycs_on_company_id", using: :btree
@@ -769,29 +780,6 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.integer  "contactable_id",   limit: 4
     t.string   "contactable_type", limit: 255
     t.string   "designation",      limit: 255
-  end
-
-  create_table "corporate_kycs", force: :cascade do |t|
-    t.integer  "company_id",                    limit: 4
-    t.string   "pan_card_file_name",            limit: 255
-    t.string   "pan_card_content_type",         limit: 255
-    t.integer  "pan_card_file_size",            limit: 4
-    t.datetime "pan_card_updated_at"
-    t.string   "coi_file_name",                 limit: 255
-    t.string   "coi_content_type",              limit: 255
-    t.integer  "coi_file_size",                 limit: 4
-    t.datetime "coi_updated_at"
-    t.string   "agreement_file_name",           limit: 255
-    t.string   "agreement_content_type",        limit: 255
-    t.integer  "agreement_file_size",           limit: 4
-    t.datetime "agreement_updated_at"
-    t.string   "board_resolution_file_name",    limit: 255
-    t.string   "board_resolution_content_type", limit: 255
-    t.integer  "board_resolution_file_size",    limit: 4
-    t.datetime "board_resolution_updated_at"
-    t.integer  "kyc_status_id",                 limit: 4
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
   end
 
   create_table "crono_jobs", force: :cascade do |t|
@@ -1083,7 +1071,6 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.string   "reference_id",                   limit: 255
     t.time     "time"
     t.integer  "amount_id",                      limit: 4
-    t.integer  "expense_data_extract_source_id", limit: 4,     null: false
     t.integer  "category_id",                    limit: 4
     t.integer  "sourcable_id",                   limit: 4
     t.string   "sourcable_type",                 limit: 255
@@ -1093,12 +1080,12 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.string   "extractable_type",               limit: 255,   null: false
     t.text     "note",                           limit: 65535
     t.datetime "datetime"
+    t.integer  "expense_data_extract_source_id", limit: 4
     t.integer  "status_id",                      limit: 4,     null: false
   end
 
   add_index "expense_data_extracts", ["amount_id"], name: "index_expense_data_extracts_on_amount_id", using: :btree
   add_index "expense_data_extracts", ["category_id"], name: "index_expense_data_extracts_on_category_id", using: :btree
-  add_index "expense_data_extracts", ["expense_data_extract_source_id"], name: "index_expense_data_extracts_on_expense_data_extract_source_id", using: :btree
   add_index "expense_data_extracts", ["sourcable_id"], name: "index_expense_data_extracts_on_sourcable_id", using: :btree
   add_index "expense_data_extracts", ["sourcable_type"], name: "index_expense_data_extracts_on_sourcable_type", using: :btree
 
@@ -1808,6 +1795,13 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "pin_code_city_id_mappings", force: :cascade do |t|
+    t.string   "pin_code",   limit: 255
+    t.string   "city_id",    limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "policies", force: :cascade do |t|
     t.string   "name",             limit: 255
     t.integer  "company_id",       limit: 4
@@ -1981,6 +1975,10 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.datetime "original_source_updated_at"
     t.string   "email_id",                     limit: 255
     t.string   "sender",                       limit: 255
+    t.string   "source_file_name",             limit: 255
+    t.string   "source_content_type",          limit: 255
+    t.integer  "source_file_size",             limit: 4
+    t.datetime "source_updated_at"
     t.boolean  "fixed",                                      default: false
     t.string   "parsed_merchant",              limit: 255
     t.string   "parsed_amount_value",          limit: 255
@@ -1990,10 +1988,6 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.integer  "parsed_category_id",           limit: 4
     t.datetime "created_at",                                                 null: false
     t.datetime "updated_at",                                                 null: false
-    t.string   "source_file_name",             limit: 255
-    t.string   "source_content_type",          limit: 255
-    t.integer  "source_file_size",             limit: 4
-    t.datetime "source_updated_at"
   end
 
   add_index "receipt_email_parse_failures", ["parsed_category_id"], name: "index_receipt_email_parse_failures_on_parsed_category_id", using: :btree
@@ -2199,6 +2193,7 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.datetime "created_at",                                           null: false
     t.datetime "updated_at",                                           null: false
     t.boolean  "is_deleted",                           default: false
+    t.string   "message_type",           limit: 255
   end
 
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
@@ -2377,7 +2372,6 @@ ActiveRecord::Schema.define(version: 20170702194152) do
     t.string   "city",                limit: 255
     t.integer  "state_id",            limit: 4
     t.string   "pin_code",            limit: 255
-    t.string   "apple_push_token",    limit: 255
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree
@@ -2598,7 +2592,6 @@ ActiveRecord::Schema.define(version: 20170702194152) do
   add_foreign_key "email_authorizations", "users"
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"
-  add_foreign_key "expense_data_extracts", "expense_data_extract_sources"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"
