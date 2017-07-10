@@ -21,6 +21,7 @@
 #   end
 # end
 kyc = @result.company_kyc
+json.editable true # because admin panel is always editable
 json.company_type kyc.company_type.name
 json.completed @result.completed
 json.actions @result.actions
