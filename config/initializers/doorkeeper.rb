@@ -8,24 +8,22 @@ Doorkeeper.configure do
     # Put your resource owner authentication logic here.
     # Example implementation:
     # User.find_by_id(session[:user_id])# || redirect_to(new_user_session_url)
-    false
+    nil
   end
 
   resource_owner_from_credentials do |routes|
     if params[:username].blank? or params[:password].blank?
       false
     else
-      case params[:scope]
-        # Nil is default scope
-        when 'user', nil
+      case params.dig(:scope)&.underscore&.to_sym
+        when :web, :mobile, :chrome, :api
           u = User.find_for_database_authentication(:username => params[:username])
-        when 'admin'
+        when :admin
           u = AdminUser.find_for_database_authentication(:username => params[:username])
       end
       u if u && u.valid_password?(params[:password])
     end
   end
-
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
   # admin_authenticator do
@@ -71,8 +69,8 @@ Doorkeeper.configure do
   # Define access token scopes for your provider
   # For more information go to
   # https://github.com/doorkeeper-gem/doorkeeper/wiki/Using-Scopes
-  # default_scopes  :user
-  optional_scopes :web, :android, :ios, :api, :admin
+  default_scopes :none
+  optional_scopes :web, :mobile, :chrome, :api, :admin
 
   # Change the way client credentials are retrieved from the request object.
   # By default it retrieves first from the `HTTP_AUTHORIZATION` header, then

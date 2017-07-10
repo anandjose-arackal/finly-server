@@ -3,7 +3,7 @@ class ExportController < ApplicationController
 
   before_action :set_headers
   #
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def report
     respond_to do |format|

@@ -1,7 +1,7 @@
 class ReportsController < ApplicationController
   include MathUtil
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def create
     @result = Report::Create.(current_user, params)

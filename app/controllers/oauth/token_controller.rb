@@ -6,7 +6,6 @@ class Oauth::TokenController < Doorkeeper::TokensController
     unless pre_process
       return
     end
-
     response = authorize_response
     headers.merge! response.headers
     self.status = response.status
@@ -27,7 +26,14 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   protected
   def pre_process
+    ### todo TEMP WORKAROUND - MAKE ALL CLIENTS SEND USERNAME AND REMOVE THIS JUGAAD
+    if params.dig(:email).present? and params.dig(:username).blank?
+      params[:username] = params[:email]
+    end
+    ########################
+
     set_grant_type
+    set_scope
   end
 
   def on_create_success(response)
@@ -49,12 +55,15 @@ class Oauth::TokenController < Doorkeeper::TokensController
   end
 
   def set_grant_type
-    ### todo TEMP WORKAROUND - MAKE ALL CLIENTS SEND USERNAME AND REMOVE THIS JUGAAD
-    if params.dig(:email).present? and params.dig(:username).blank?
-      params[:username] = params[:email]
-    end
-    ########################
     params[:grant_type] = 'password'
+  end
+
+  def set_scope
+    params[:scope] = self.auth_scope&.to_s
+  end
+
+  def auth_scope
+    :web
   end
 
 end

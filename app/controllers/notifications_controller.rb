@@ -1,7 +1,7 @@
 class NotificationsController < ApplicationController
 
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def index
     @result = Notification::Index.(current_user, params)

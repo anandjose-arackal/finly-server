@@ -1,7 +1,7 @@
 class CardsController < ApplicationController
 
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   # params = {user_id: 1}
   def details

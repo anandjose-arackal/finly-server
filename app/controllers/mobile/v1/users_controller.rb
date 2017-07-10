@@ -1,7 +1,7 @@
 class  Mobile::V1::UsersController < Mobile::V1::BaseApiController
   protect_from_forgery with: :null_session
 
-  before_action :doorkeeper_authorize!, except: [:lookup, :send_verification_otp, :verify_user_otp, :set_new_password]
+  before_action -> { doorkeeper_authorize! :mobile} , except: [:lookup, :send_verification_otp, :verify_user_otp, :set_new_password]
 
   respond_to :json
 

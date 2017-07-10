@@ -2,7 +2,7 @@ class MenusController < ApplicationController
 
   # todo - temporary, will be changed once new token auth is implemented
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def user_menus
 

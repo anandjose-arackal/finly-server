@@ -1,7 +1,7 @@
 class OrganizationAccountController < ApplicationController
 
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def policies_list
     @result = Company::Configuration::Show.(current_user, params)

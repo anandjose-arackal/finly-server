@@ -1,5 +1,7 @@
 class Api::Fm::V1::FundsController < ApiApplicationController
 
+  before_action -> { doorkeeper_authorize! :api}
+
   def credit
     formatted_param = RequestFormatter::ApiParser::FmParser::V1::Funds::CreditDebit.(current_user, params)&.formatted_request
     formatted_param[:validate_password]  = false

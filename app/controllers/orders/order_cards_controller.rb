@@ -1,7 +1,7 @@
 class Orders::OrderCardsController < ApplicationController
 
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
   
   def index
     @result = Orders::OrderCards::Index.(current_user, params)

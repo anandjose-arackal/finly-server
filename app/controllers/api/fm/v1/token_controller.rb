@@ -1,4 +1,6 @@
 class Api::Fm::V1::TokenController < Oauth::TokenController
+  include AbstractController::Callbacks
+  include ActionController::Head
 
   protected
   def pre_process
@@ -19,8 +21,11 @@ class Api::Fm::V1::TokenController < Oauth::TokenController
 
   def block_foreign_hosts(type_id)
     return false if whitelisted?(request.remote_ip, type_id)
-    self.status = 403
-    return true
+    head(403)
+  end
+
+  def auth_scope
+    :api
   end
 
 end

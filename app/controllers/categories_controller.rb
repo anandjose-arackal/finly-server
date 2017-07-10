@@ -1,7 +1,7 @@
 class CategoriesController < ApplicationController
 
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def create
     @result = Company::Configuration::Category::Create.(current_user, params)

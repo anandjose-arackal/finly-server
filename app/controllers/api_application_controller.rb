@@ -2,7 +2,7 @@ class ApiApplicationController < ApplicationController
 
   before_action { block_foreign_hosts(WhitelistedIpType.id_for(:api)) }
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
   before_action :validate_user_admin
   before_action :append_params
 

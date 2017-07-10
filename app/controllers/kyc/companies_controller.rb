@@ -1,7 +1,7 @@
 class Kyc::CompaniesController < ApplicationController
 
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def show
     @result = KycProcess::Company::Show.(current_user, params)

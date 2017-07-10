@@ -1,7 +1,7 @@
 class AdminUsers::ExpensesController < ApplicationController
 
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def index
     @result = Admin::Expenses::Index.(current_user, params)

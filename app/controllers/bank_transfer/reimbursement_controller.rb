@@ -1,7 +1,7 @@
 class BankTransfer::ReimbursementController < ApplicationController
 
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def create
     action_type = params&.dig(:action_type)

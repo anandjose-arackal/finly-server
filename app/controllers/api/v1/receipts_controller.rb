@@ -2,7 +2,7 @@ require "#{Rails.root}/app/operations/expense/manual/create"
 class Api::V1::ReceiptsController < Api::V1::BaseApiController
   protect_from_forgery with: :null_session
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
 
   def create

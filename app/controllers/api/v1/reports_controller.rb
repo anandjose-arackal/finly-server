@@ -4,7 +4,7 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
   include MathUtil
   protect_from_forgery with: :null_session
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
 
   respond_to :json

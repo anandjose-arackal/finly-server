@@ -1,7 +1,7 @@
 class RulesController < ApplicationController
 
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def create
     @result = Policy::Rules::Create.(current_user, params)

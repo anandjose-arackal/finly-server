@@ -1,7 +1,7 @@
 class Api::V0::Configuration::GcmController <  Api::V0::BaseApiController
   protect_from_forgery with: :null_session
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
 
   def create

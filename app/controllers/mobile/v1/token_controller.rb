@@ -5,4 +5,8 @@ class Mobile::V1::TokenController < Oauth::TokenController
     render_json 'mobile/v1/token/create.json.jbuilder', response.status
   end
 
+  def auth_scope
+    :mobile
+  end
+
 end

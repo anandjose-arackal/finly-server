@@ -1,7 +1,7 @@
 class ExportPreferencesController < ApplicationController
 
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def create
     create_op = Company::ExportPreferences::Create.new(current_user, params)

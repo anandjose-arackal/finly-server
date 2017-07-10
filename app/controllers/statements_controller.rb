@@ -1,7 +1,7 @@
 class StatementsController < ApplicationController
 
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def index
   end

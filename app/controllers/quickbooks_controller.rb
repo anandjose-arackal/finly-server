@@ -1,7 +1,7 @@
 class QuickbooksController < ApplicationController
 
   before_action :add_company_to_params
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def sync_report
     @result = Integrations::Quickbooks::SyncReport.call_async(current_user.id, params)

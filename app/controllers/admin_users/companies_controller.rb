@@ -2,7 +2,7 @@ class AdminUsers::CompaniesController < ApplicationController
 
   # todo - temporary
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def new
     @states = State.all

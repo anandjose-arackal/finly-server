@@ -2,7 +2,7 @@ require "#{Rails.root}/app/operations/company/configuration/category/index"
 class Mobile::V0::Configuration::CategoryController < Mobile::V0::BaseApiController
   protect_from_forgery with: :null_session
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :mobile}
 
 
   respond_to :json

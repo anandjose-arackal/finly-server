@@ -2,7 +2,7 @@ class AdminUsers::CardsController < ApplicationController
 
   # todo - temporary
 
-  before_action :doorkeeper_authorize!
+  before_action -> { doorkeeper_authorize! :web}
 
   def create
     @result = Admin::Cards::Create.(current_user, params)

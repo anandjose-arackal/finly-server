@@ -1,8 +1,7 @@
 class Mobile::V1::CardsController < ApplicationController
   protect_from_forgery with: :null_session
 
-  before_action :doorkeeper_authorize!
-
+  before_action -> { doorkeeper_authorize! :mobile}
 
   respond_to :json
 
