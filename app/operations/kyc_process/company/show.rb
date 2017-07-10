@@ -4,12 +4,6 @@ class KycProcess::Company::Show < KycProcess::Company::Base
 
   end
 
-  # def validate
-  #   unless user.point_of_contact
-  #     raise_unauthorized_exception
-  #   end
-  # end
-
   def success
     params[:company_kyc] =  self.company_kyc
     KycProcess::Company::Show::DocumentsPresenter.new(user, params, messages)
@@ -36,7 +30,11 @@ class KycProcess::Company::Show < KycProcess::Company::Base
           actions[:reject] = Rails.application.routes.url_helpers.admin_users_kyc_company_reject_path(company_kyc.company)
         end
       elsif company_kyc.kyc_status_id == KycStatus.id_for(:submitted)
-        actions[:unconfirm] = ""
+        if user.finly_admin?
+          # do nothing, HA!
+        else
+          actions[:retract] = Rails.application.routes.url_helpers
+        end
       end
       actions
     end

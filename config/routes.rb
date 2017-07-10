@@ -1936,6 +1936,7 @@ Rails.application.routes.draw do
     get 'company', to: 'companies#show', as: :docs_show
     patch 'company', to: 'companies#update', as: :docs_update
     patch 'confirm', to: 'companies#confirm', as: :confirm
+    patch 'retract', to: 'companies#retract', as: :retract
 
     get 'users/:id', to: 'user#show'
     patch 'users/:id', to: 'user#update'
