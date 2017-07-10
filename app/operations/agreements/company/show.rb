@@ -40,7 +40,7 @@ class Agreements::Company::Show < Agreements::Base
 
     attr_accessor :email, :registered_mobile_number, :poc_first_name, :poc_last_name, :company,
                   :company_type, :street_2, :street_3, :date_of_establishment, :pin_code, :company_kyc,
-                  :company_types
+                  :company_types, :agreed
 
     def init
       self.company = params[:company]
@@ -55,6 +55,7 @@ class Agreements::Company::Show < Agreements::Base
       self.pin_code = company_kyc&.pin_code
       self.date_of_establishment = company_kyc&.date_of_establishment
       self.company_types = CompanyType.all
+      self.agreed = company.accepted_agreements?
     end
   end
 end
