@@ -21,4 +21,11 @@ class AdminUsers::Kyc::CompaniesController < ApplicationController
 
   end
 
+  # action that rejects a particular user's KYC documents for failing the first screening after
+  # admin panel verification
+  def reject
+    @result = Admin::KycProcesses::Companies::Reject.(current_user, params)
+    respond response: @result&.success? ? :success : :failure
+  end
+
 end

@@ -5,3 +5,4 @@ json.array!(@result.companies) do |company|
   json.ocr_enabled company.ocr_enabled? rescue nil
   json.cards company.itz_cash_property.d_code.present? rescue nil
 end
+

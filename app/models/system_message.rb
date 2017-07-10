@@ -10,6 +10,7 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  is_deleted             :boolean          default(FALSE)
+#  message_type           :string(255)
 #
 
 class SystemMessage < ActiveRecord::Base
@@ -26,4 +27,12 @@ class SystemMessage < ActiveRecord::Base
 
   scope :errors, -> {where system_message_type_id: SystemMessageType.id_for(:error)}
   scope :info, -> {where system_message_type_id: SystemMessageType.id_for(:info)}
+
+  scope :aadhar_card_messages, -> {where message_type: "aadhar_card"}
+  scope :certificate_of_registration_messages, -> {where message_type: "certificate_of_registration"}
+  scope :registration_of_trust_messages, -> {where message_type: "registration_of_trust"}
+  scope :pan_card_messages, -> {where message_type: "pan_card"}
+  scope :vat_registration_certificate_messages, -> {where message_type: "vat_registration_certificate"}
+  scope :certificate_of_registration_messages, -> {where message_type: "certificate_of_registration"}
+  scope :coi_messages, -> {where message_type: "coi"}
 end

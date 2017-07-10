@@ -14,10 +14,14 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Generic < Receipt::ReceiptEmai
   end
 
   # def amount_data_points
-  #   keywords = ['Amount Paid', 'Total Amount', 'Shipment Total', 'Total', 'Paid']
+  #   keywords = ['Amount Paid', 'Total Amount', 'Grand Total', 'Shipment Total', 'Total', 'Paid']
   #   [
   #       Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr:has(td:contains("Amount Paid"):not(:has(*)))')
   #   ]
+  #   arr = []
+  #   keywords.each do |keyword|
+  #     arr << Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode("tr:has(td:contains(\"#{keyword}\"):not(:has(*)))")
+  #   end
   # end
 
 

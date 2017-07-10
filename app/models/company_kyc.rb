@@ -47,6 +47,11 @@
 #  passport_file_size                        :integer
 #  passport_updated_at                       :datetime
 #  company_type_id                           :integer
+#  certificate_of_registration_file_name     :string(255)
+#  certificate_of_registration_content_type  :string(255)
+#  certificate_of_registration_file_size     :integer
+#  certificate_of_registration_updated_at    :datetime
+#  customer_id                               :string(255)
 #
 
 class CompanyKyc < ActiveRecord::Base
@@ -56,6 +61,8 @@ class CompanyKyc < ActiveRecord::Base
   belongs_to :kyc_status
   belongs_to :company_type
   has_many :system_messages, as: :messagable, dependent: :destroy
+
+  accepts_nested_attributes_for :system_messages
 
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
 
@@ -80,8 +87,27 @@ class CompanyKyc < ActiveRecord::Base
   has_attached_file :registration_of_trust, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :registration_of_trust, content_type: CONTENT_TYPES
 
+  has_attached_file :certificate_of_registration, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
+  validates_attachment :certificate_of_registration, content_type: CONTENT_TYPES
+
+  validate :pin_code_format
+
   def editable?
     [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:error)].include?(kyc_status_id)
+  end
+
+  def processing?
+    if self.kyc_status_id == KycStatus.id_for(:processing)
+      return true
+    end
+    false
+  end
+
+  def submitted?
+    if self.kyc_status_id == KycStatus.id_for(:submitted)
+      return true
+    end
+    false
   end
 
   def completed?
@@ -91,7 +117,11 @@ class CompanyKyc < ActiveRecord::Base
     false
   end
 
-  validate :pin_code_format
+  def city_code
+    pin = self.pin_code
+    city_id = PinCodeCityIdMapping.find_by(pin_code: pin)
+    city_code = CityIdCityCodeMapping.find_by(city_id: city_id)
+  end
 
   private
 

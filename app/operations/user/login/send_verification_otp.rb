@@ -17,18 +17,13 @@ class User::Login::SendVerificationOtp < BaseOperation
   end
 
   def init
-    self.selected_user = User.find_by(mobile_number: params[:mobile_number])
+    self.selected_user = User.find_for_database_authentication(email: params[:email_mobile])
     self.otp_request_type_id = params[:type]
   end
 
   def validate
     unless selected_user
       add_message :error, "User not found"
-      return
-    end
-
-    unless params[:mobile_number] =~ Constants::VALID_MOBILE_NUMBER
-      add_message :error, "Invalid mobile number"
       return
     end
 
@@ -45,16 +40,14 @@ class User::Login::SendVerificationOtp < BaseOperation
     # if the last OTP was sent less than 15 minutes ago, send the same OTP back
     if selected_user.otp_request_type_id == otp_request_type_id && selected_user.otp_sent_at > 15.minutes.ago && selected_user.otp
       self.otp = selected_user.otp
-      self.message = "#{otp} is your verification code."
       # else send the a new OTP after generating it
     else
       self.otp = MathUtil.generate_random_number(6)
-      self.message = "#{otp} is your verification code."
     end
   end
 
   def process
-    response = CustomMessage::Create.(selected_user, {mobile_number: [selected_user.mobile_number], message: message})
+    response = Sms::UserOtp.(selected_user, otp: self.otp)
     if response.success?
       # have to save it without validation because update_attributes considers validations
       selected_user.assign_attributes(otp_count: (selected_user.otp_count+1))

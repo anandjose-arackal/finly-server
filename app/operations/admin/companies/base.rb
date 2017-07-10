@@ -6,6 +6,7 @@ class Admin::Companies::Base < Admin::Base
 
   def company_params
     params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code], configuration_attributes: [:logo],
+                                    company_kyc_attributes: [:company_type_id, :customer_type_id],
                                     feature_subscription_attributes: [
                                       :ocr_enabled,
                                       :expense_management_enabled,

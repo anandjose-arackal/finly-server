@@ -54,6 +54,10 @@ class AdminUsers::CompaniesController < ApplicationController
     end
   end
 
+  def company_types
+    @company_types = CompanyType.all
+  end
+
   private
 
 
