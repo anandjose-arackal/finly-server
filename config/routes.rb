@@ -588,7 +588,6 @@
 #                                  lookup GET    /lookup(.:format)                                              users#lookup
 #                   send_verification_otp POST   /send_verification_otp(.:format)                               users#send_verification_otp
 #                         verify_user_otp POST   /verify_user_otp(.:format)                                     users#verify_user_otp
-#                            set_password POST   /set_password(.:format)                                        users#set_new_password
 #                                   users GET    /users(.:format)                                               users#index
 #                                         POST   /users(.:format)                                               users#create
 #                                    user GET    /users/:id(.:format)                                           users#show
@@ -739,6 +738,7 @@
 #                           kyc_docs_show GET    /kyc/company(.:format)                                         kyc/companies#show
 #                         kyc_docs_update PATCH  /kyc/company(.:format)                                         kyc/companies#update
 #                             kyc_confirm PATCH  /kyc/confirm(.:format)                                         kyc/companies#confirm
+#                             kyc_retract PATCH  /kyc/retract(.:format)                                         kyc/companies#retract
 #                                     kyc GET    /kyc/users/:id(.:format)                                       kyc/user#show
 #                                         PATCH  /kyc/users/:id(.:format)                                       kyc/user#update
 #                          disburse_users POST   /disburse/users(.:format)                                      disburse/users#create

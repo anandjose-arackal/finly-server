@@ -33,7 +33,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
         if user.finly_admin?
           # do nothing, HA!
         else
-          actions[:retract] = Rails.application.routes.url_helpers
+          actions[:retract] = Rails.application.routes.url_helpers.kyc_reject_path
         end
       end
       actions
