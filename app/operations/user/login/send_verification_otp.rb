@@ -47,7 +47,7 @@ class User::Login::SendVerificationOtp < BaseOperation
   end
 
   def process
-    response = Sms::UserOtp.(user, otp: self.otp)
+    response = Sms::UserOtp.(selected_user, otp: self.otp)
     if response.success?
       # have to save it without validation because update_attributes considers validations
       selected_user.assign_attributes(otp_count: (selected_user.otp_count+1))
