@@ -9,22 +9,12 @@
 #
 
 class AdminUserRole < ActiveRecord::Base
+  include Seedable
 
-  VALUES = {
-    finly_admin: 1,
-    transcriber: 2
-  }
+  validates :name, presence: true
 
-  def self.seed_data
-    if AdminUserRole.count == 0
-      VALUES.each do |key, value|
-        AdminUserRole.create( id: value, name: key)
-      end
-    end
-  end
-
-  def self.id_for(role)
-    VALUES[role]
+  def self.values
+    [:admin, :transcriber, :verifier, :itzcash_verifier, :itzcash_ops]
   end
 
 end

@@ -219,7 +219,14 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    @current_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id]) if doorkeeper_token&.resource_owner_id&.present?
+    if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
+      scopes = doorkeeper_token[:scopes]
+      if scopes.include?('admin')
+        @current_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
+      elsif scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome')or scopes.include?('api')
+        @current_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
+      end
+    end
   end
 
   def current_company

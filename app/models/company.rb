@@ -229,7 +229,7 @@ class Company < ActiveRecord::Base
 
   def kyc_required?
     return false unless feature_subscription.itz_cash_d_code_enabled
-    if [KycStatus.id_for(:incomplete), KycStatus.id_for(:error)].include?(company_kyc.kyc_status_id)
+    if [KycStatus.id_for(:incomplete), KycStatus.id_for(:rejected)].include?(company_kyc.kyc_status_id)
       return true
     end
     false

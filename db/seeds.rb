@@ -214,9 +214,9 @@ ItzCashCardProgram.seed_data
 
 CompanyType.seed_data
 
-# ItzCashDmtBeneficiaryType.seed_data
-
 ItzCashDmtBeneficiaryStatus.seed_data
+
+AdminUserRole.seed_data
 
 ##########################
 
@@ -232,8 +232,7 @@ else
 end
 
 Company.all.each do |company|
-  company.feature_subscription.expense_management_enabled = true
-  company.save
+  company.feature_subscription.update(expense_management_enabled: true)
 end
 
 if User.count == 0
