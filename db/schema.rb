@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170707034159) do
+ActiveRecord::Schema.define(version: 20170710112542) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -696,9 +696,9 @@ ActiveRecord::Schema.define(version: 20170707034159) do
     t.integer  "board_resolution_file_size",                limit: 4
     t.datetime "board_resolution_updated_at"
     t.integer  "kyc_status_id",                             limit: 4
-    t.integer  "company_id",                                limit: 4,     null: false
     t.datetime "created_at",                                              null: false
     t.datetime "updated_at",                                              null: false
+    t.integer  "company_id",                                limit: 4,     null: false
     t.date     "date_of_establishment"
     t.text     "street_2",                                  limit: 65535
     t.text     "street_3",                                  limit: 65535
@@ -780,6 +780,29 @@ ActiveRecord::Schema.define(version: 20170707034159) do
     t.integer  "contactable_id",   limit: 4
     t.string   "contactable_type", limit: 255
     t.string   "designation",      limit: 255
+  end
+
+  create_table "corporate_kycs", force: :cascade do |t|
+    t.integer  "company_id",                    limit: 4
+    t.string   "pan_card_file_name",            limit: 255
+    t.string   "pan_card_content_type",         limit: 255
+    t.integer  "pan_card_file_size",            limit: 4
+    t.datetime "pan_card_updated_at"
+    t.string   "coi_file_name",                 limit: 255
+    t.string   "coi_content_type",              limit: 255
+    t.integer  "coi_file_size",                 limit: 4
+    t.datetime "coi_updated_at"
+    t.string   "agreement_file_name",           limit: 255
+    t.string   "agreement_content_type",        limit: 255
+    t.integer  "agreement_file_size",           limit: 4
+    t.datetime "agreement_updated_at"
+    t.string   "board_resolution_file_name",    limit: 255
+    t.string   "board_resolution_content_type", limit: 255
+    t.integer  "board_resolution_file_size",    limit: 4
+    t.datetime "board_resolution_updated_at"
+    t.integer  "kyc_status_id",                 limit: 4
+    t.datetime "created_at",                                null: false
+    t.datetime "updated_at",                                null: false
   end
 
   create_table "crono_jobs", force: :cascade do |t|
@@ -1071,6 +1094,7 @@ ActiveRecord::Schema.define(version: 20170707034159) do
     t.string   "reference_id",                   limit: 255
     t.time     "time"
     t.integer  "amount_id",                      limit: 4
+    t.integer  "expense_data_extract_source_id", limit: 4,     null: false
     t.integer  "category_id",                    limit: 4
     t.integer  "sourcable_id",                   limit: 4
     t.string   "sourcable_type",                 limit: 255
@@ -1080,12 +1104,12 @@ ActiveRecord::Schema.define(version: 20170707034159) do
     t.string   "extractable_type",               limit: 255,   null: false
     t.text     "note",                           limit: 65535
     t.datetime "datetime"
-    t.integer  "expense_data_extract_source_id", limit: 4
     t.integer  "status_id",                      limit: 4,     null: false
   end
 
   add_index "expense_data_extracts", ["amount_id"], name: "index_expense_data_extracts_on_amount_id", using: :btree
   add_index "expense_data_extracts", ["category_id"], name: "index_expense_data_extracts_on_category_id", using: :btree
+  add_index "expense_data_extracts", ["expense_data_extract_source_id"], name: "index_expense_data_extracts_on_expense_data_extract_source_id", using: :btree
   add_index "expense_data_extracts", ["sourcable_id"], name: "index_expense_data_extracts_on_sourcable_id", using: :btree
   add_index "expense_data_extracts", ["sourcable_type"], name: "index_expense_data_extracts_on_sourcable_type", using: :btree
 
@@ -1639,6 +1663,49 @@ ActiveRecord::Schema.define(version: 20170707034159) do
     t.datetime "updated_at",                                 null: false
   end
 
+  create_table "oauth_access_grants", force: :cascade do |t|
+    t.integer  "resource_owner_id", limit: 4,     null: false
+    t.integer  "application_id",    limit: 4,     null: false
+    t.string   "token",             limit: 255,   null: false
+    t.integer  "expires_in",        limit: 4,     null: false
+    t.text     "redirect_uri",      limit: 65535, null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "revoked_at"
+    t.string   "scopes",            limit: 255
+  end
+
+  add_index "oauth_access_grants", ["application_id"], name: "fk_rails_b4b53e07b8", using: :btree
+  add_index "oauth_access_grants", ["token"], name: "index_oauth_access_grants_on_token", unique: true, using: :btree
+
+  create_table "oauth_access_tokens", force: :cascade do |t|
+    t.integer  "resource_owner_id",      limit: 4
+    t.integer  "application_id",         limit: 4
+    t.string   "token",                  limit: 255,              null: false
+    t.string   "refresh_token",          limit: 255
+    t.integer  "expires_in",             limit: 4
+    t.datetime "revoked_at"
+    t.datetime "created_at",                                      null: false
+    t.string   "scopes",                 limit: 255
+    t.string   "previous_refresh_token", limit: 255, default: "", null: false
+  end
+
+  add_index "oauth_access_tokens", ["application_id"], name: "fk_rails_732cb83ab7", using: :btree
+  add_index "oauth_access_tokens", ["refresh_token"], name: "index_oauth_access_tokens_on_refresh_token", unique: true, using: :btree
+  add_index "oauth_access_tokens", ["resource_owner_id"], name: "index_oauth_access_tokens_on_resource_owner_id", using: :btree
+  add_index "oauth_access_tokens", ["token"], name: "index_oauth_access_tokens_on_token", unique: true, using: :btree
+
+  create_table "oauth_applications", force: :cascade do |t|
+    t.string   "name",         limit: 255,                null: false
+    t.string   "uid",          limit: 255,                null: false
+    t.string   "secret",       limit: 255,                null: false
+    t.text     "redirect_uri", limit: 65535,              null: false
+    t.string   "scopes",       limit: 255,   default: "", null: false
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+  end
+
+  add_index "oauth_applications", ["uid"], name: "index_oauth_applications_on_uid", unique: true, using: :btree
+
   create_table "opro_auth_grants", force: :cascade do |t|
     t.string   "code",                    limit: 255
     t.string   "access_token",            limit: 255
@@ -1975,10 +2042,6 @@ ActiveRecord::Schema.define(version: 20170707034159) do
     t.datetime "original_source_updated_at"
     t.string   "email_id",                     limit: 255
     t.string   "sender",                       limit: 255
-    t.string   "source_file_name",             limit: 255
-    t.string   "source_content_type",          limit: 255
-    t.integer  "source_file_size",             limit: 4
-    t.datetime "source_updated_at"
     t.boolean  "fixed",                                      default: false
     t.string   "parsed_merchant",              limit: 255
     t.string   "parsed_amount_value",          limit: 255
@@ -1988,6 +2051,10 @@ ActiveRecord::Schema.define(version: 20170707034159) do
     t.integer  "parsed_category_id",           limit: 4
     t.datetime "created_at",                                                 null: false
     t.datetime "updated_at",                                                 null: false
+    t.string   "source_file_name",             limit: 255
+    t.string   "source_content_type",          limit: 255
+    t.integer  "source_file_size",             limit: 4
+    t.datetime "source_updated_at"
   end
 
   add_index "receipt_email_parse_failures", ["parsed_category_id"], name: "index_receipt_email_parse_failures_on_parsed_category_id", using: :btree
@@ -2372,6 +2439,7 @@ ActiveRecord::Schema.define(version: 20170707034159) do
     t.string   "city",                limit: 255
     t.integer  "state_id",            limit: 4
     t.string   "pin_code",            limit: 255
+    t.string   "apple_push_token",    limit: 255
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree
@@ -2457,12 +2525,12 @@ ActiveRecord::Schema.define(version: 20170707034159) do
   add_index "user_wallets", ["user_id"], name: "index_user_wallets_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                  limit: 255, default: ""
-    t.string   "encrypted_password",     limit: 255, default: "",    null: false
+    t.string   "email",                  limit: 255,   default: ""
+    t.string   "encrypted_password",     limit: 255,   default: "",      null: false
     t.string   "reset_password_token",   limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          limit: 4,   default: 0,     null: false
+    t.integer  "sign_in_count",          limit: 4,     default: 0,       null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip",     limit: 255
@@ -2471,14 +2539,14 @@ ActiveRecord::Schema.define(version: 20170707034159) do
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
     t.string   "unconfirmed_email",      limit: 255
-    t.integer  "failed_attempts",        limit: 4,   default: 0,     null: false
+    t.integer  "failed_attempts",        limit: 4,     default: 0,       null: false
     t.string   "unlock_token",           limit: 255
     t.datetime "locked_at"
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
-    t.integer  "company_id",             limit: 4,                   null: false
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.integer  "company_id",             limit: 4,                       null: false
     t.string   "mobile_number",          limit: 255
-    t.boolean  "active",                             default: true,  null: false
+    t.boolean  "active",                               default: true,    null: false
     t.string   "invitation_token",       limit: 255
     t.datetime "invitation_created_at"
     t.datetime "invitation_sent_at"
@@ -2486,28 +2554,35 @@ ActiveRecord::Schema.define(version: 20170707034159) do
     t.integer  "invitation_limit",       limit: 4
     t.integer  "invited_by_id",          limit: 4
     t.string   "invited_by_type",        limit: 255
-    t.integer  "invitations_count",      limit: 4,   default: 0
+    t.integer  "invitations_count",      limit: 4,     default: 0
     t.string   "otp",                    limit: 255
     t.datetime "otp_sent_at"
     t.datetime "otp_verified_at"
-    t.boolean  "otp_verified",                       default: false, null: false
-    t.integer  "otp_count",              limit: 4,   default: 0,     null: false
+    t.boolean  "otp_verified",                         default: false,   null: false
+    t.integer  "otp_count",              limit: 4,     default: 0,       null: false
     t.string   "first_name",             limit: 255
     t.string   "last_name",              limit: 255
-    t.boolean  "mobile_only_invite",                 default: false
+    t.boolean  "mobile_only_invite",                   default: false
     t.string   "mothers_maiden_name",    limit: 255
-    t.boolean  "verified",                           default: false
+    t.boolean  "verified",                             default: false
     t.integer  "otp_request_type_id",    limit: 4
-    t.boolean  "default_password",                   default: false
-    t.boolean  "point_of_contact",                   default: false
+    t.boolean  "default_password",                     default: false
+    t.boolean  "point_of_contact",                     default: false
+    t.text     "tokens",                 limit: 65535
+    t.string   "provider",               limit: 255,   default: "email", null: false
+    t.string   "uid",                    limit: 255,   default: "",      null: false
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
-  add_index "users", ["email"], name: "index_users_on_email", using: :btree
+  add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
+  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
   add_index "users", ["invitation_token"], name: "index_users_on_invitation_token", unique: true, using: :btree
   add_index "users", ["invitations_count"], name: "index_users_on_invitations_count", using: :btree
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
+  add_index "users", ["mobile_number"], name: "index_users_on_mobile_number", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+  add_index "users", ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true, using: :btree
+  add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
   create_table "version_associations", force: :cascade do |t|
     t.integer "version_id",       limit: 4
@@ -2592,6 +2667,7 @@ ActiveRecord::Schema.define(version: 20170707034159) do
   add_foreign_key "email_authorizations", "users"
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"
+  add_foreign_key "expense_data_extracts", "expense_data_extract_sources"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"
@@ -2638,6 +2714,8 @@ ActiveRecord::Schema.define(version: 20170707034159) do
   add_foreign_key "notifications", "users"
   add_foreign_key "notifier_type_configurations", "notifier_types", column: "event_id"
   add_foreign_key "notifier_type_configurations", "users"
+  add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
+  add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
   add_foreign_key "payment_orders", "payment_order_types"
