@@ -56,8 +56,10 @@ views:
           url: analytics
           id: analytics
         cog:
+        <% unless current_company.kyc_completed? %>
         - name: Verify KYC
           url: '#documents'
+        <% end %>
         - name: Organization Account
           url: '#organization_account'
         - name: Load Company Balance
