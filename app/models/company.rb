@@ -235,6 +235,10 @@ class Company < ActiveRecord::Base
     false
   end
 
+  def kyc_completed?
+    self.company_kyc.completed?
+  end
+
   private
 
   def init_config_present

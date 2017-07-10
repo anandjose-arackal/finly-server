@@ -16,11 +16,11 @@ class KycProcess::Company::Show < KycProcess::Company::Base
   end
 
   class KycProcess::Company::Show::DocumentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :company_kyc, :user_completed, :actions
+    attr_accessor :company_kyc, :completed, :actions
 
     def init
       self.company_kyc = params[:company_kyc]
-      self.user_completed = company_kyc.processing?
+      self.completed = company_kyc.completed?
       self.actions = retrieve_actions
     end
 
@@ -39,6 +39,18 @@ class KycProcess::Company::Show < KycProcess::Company::Base
         actions[:unconfirm] = ""
       end
       actions
+    end
+
+    def editable?
+      if user.finly_admin?
+        true
+      else
+        if company_kyc.editable?
+          true
+        else
+          false
+        end
+      end
     end
 
     def documents

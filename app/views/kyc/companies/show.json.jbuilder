@@ -1,8 +1,8 @@
 kyc = @result.company_kyc
-json.editable kyc.editable?
+json.editable @result.editable?
 
 json.company_type kyc.company_type.name
-json.completed @result.user_completed
+json.completed @result.completed
 json.actions @result.actions
 json.documents do
   json.array!(@result.documents) do |doc|
