@@ -1,0 +1,23 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  card_id: 
+  card_owner_id: 1
+  initiating_user_id: 1
+  initiating_user_type: MyString
+  status_id: 1
+  request_action_user_id: 1
+  request_action_user_type: MyString
+  closed_at: 2017-07-11 00:35:48
+  card_program_id: 
+
+two:
+  card_id: 
+  card_owner_id: 1
+  initiating_user_id: 1
+  initiating_user_type: MyString
+  status_id: 1
+  request_action_user_id: 1
+  request_action_user_type: MyString
+  closed_at: 2017-07-11 00:35:48
+  card_program_id: 
