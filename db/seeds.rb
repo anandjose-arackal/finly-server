@@ -214,6 +214,12 @@ ItzCashCardProgram.seed_data
 
 CompanyType.seed_data
 
+PinCodeCityIdMapping.seed_data
+
+CityIdCityCodeMapping.seed_data
+
+# ItzCashDmtBeneficiaryType.seed_data
+
 ItzCashDmtBeneficiaryStatus.seed_data
 
 AdminUserRole.seed_data

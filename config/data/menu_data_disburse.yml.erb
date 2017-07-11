@@ -55,16 +55,17 @@ views:
         - name: Analytics
           url: analytics
           id: analytics
-        # - name: Personal
-        #   url: personal
-        #   id: personal
-        #   sub_menus:
-        #     - name: Expenses
-        #       id: personal_expenses
-        #       url: personal/expenses
-        #     - name: ATM Withdrawals
-        #       id: personal_atm_withdrawals
-        #       url: personal/atm_withdrawals
+        cog:
+        <% unless current_company.kyc_completed? %>
+        - name: Verify KYC
+          url: '#documents'
+        <% end %>
+        - name: Organization Account
+          url: '#organization_account'
+        - name: Load Company Balance
+          url: '/transfers/register'
+          target: '_blank'
+
   <% elsif current_user.finance_manager? %>
     finance:
       menus:

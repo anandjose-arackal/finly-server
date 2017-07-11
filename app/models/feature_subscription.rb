@@ -27,4 +27,13 @@ class FeatureSubscription < ActiveRecord::Base
     (gift_card_enabled or gift_voucher_enabled or meal_card_enabled or fuel_card_enabled or medical_card_enabled or expense_card_enabled or reimbursement_card_enabled)
   end
 
+  def d_code_enabled?
+    if self.itz_cash_d_code_enabled || self.cards_enabled
+      return true
+    elsif self.subscribable.itz_cash_property.d_code.present?
+      return true
+    end
+    false
+  end
+
 end

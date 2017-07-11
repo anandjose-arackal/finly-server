@@ -30,6 +30,9 @@ default: &default
   currency_layer_currency_conversion:
     base: "http://apilayer.net"
     path: "api/historical"
+  generate_customer_id:
+    base: 'http://staging.itzcash.com'
+    path: 'api/customer/register'
 
 staging:
   <<: *default
@@ -75,6 +78,9 @@ itzcash_uat:
   itzcash_dmt:
     base: "http://demo.itzcash.com"
     path: "samsso/servlet/RmtMobileAppServlet"
+  generate_customer_id:
+    base: 'http://staging.itzcash.com'
+    path: 'api/customer/register'
 
 production:
   base_url: "http://naradaapp.itzcash.com:8280"
@@ -103,3 +109,6 @@ production:
   currency_layer_currency_conversion:
     base: "http://apilayer.net"
     path: "api/historical"
+  generate_customer_id:
+    base: 'http://staging.itzcash.com'
+    path: 'api/customer/register'
