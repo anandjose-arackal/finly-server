@@ -1,7 +1,7 @@
 class MobileAppVersions
 
   # Android Latest Version
-  ANDROID_BASE_VERSION = 4
+  ANDROID_BASE_VERSION = 3
   ANDROID_LATEST_VERSION = 4
 
   # iOS Latest Versions
