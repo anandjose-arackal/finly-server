@@ -618,10 +618,10 @@ end
 
 if AdminUser.count == 0
   # creating admin panel users who can access admin panel
-  AdminUser.create!(email: 'admin@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
-  AdminUser.create!(email: 'sreeram@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
-  AdminUser.create!(email: 'vivek@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
-  AdminUser.create!(email: 'veekshith@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
+  AdminUser.create!(email: 'admin@Demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number)
+  AdminUser.create!(email: 'sreeram@Demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number)
+  AdminUser.create!(email: 'vivek@Demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number)
+  AdminUser.create!(email: 'veekshith@Demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number)
 end
 
 if CardTransaction.filter_refunds(1).count == 0

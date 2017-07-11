@@ -13,7 +13,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
     if self.status == 200
       @auth_grant = response
       @token = response.token
-      @user = User.find_by(id: response.token.resource_owner_id)
+      @user = current_user(response&.token)
       User::Track::Login.(@user, params)
 
       on_create_success(response)
@@ -64,6 +64,17 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   def auth_scope
     :web
+  end
+
+  def current_user(doorkeeper_token)
+    if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
+      scopes = doorkeeper_token[:scopes]
+      if scopes.include?('admin')
+        @current_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
+      elsif scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome')or scopes.include?('api')
+        @current_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
+      end
+    end
   end
 
 end

@@ -7,8 +7,17 @@ user:
   <% if current_user.admin? %>
   - admin
   <% end %>
-  <% if current_user.finance_manager? %>
-  - finance_manager
+  <% if current_user.transcriber? %>
+  - transcriber
+  <% end %>
+  <% if current_user.verifier? %>
+  - verifier
+  <% end %>
+  <% if current_user.itzcash_verifier? %>
+  - transcriber
+  <% end %>
+  <% if current_user.itzcash_operations? %>
+  - transcriber
   <% end %>
 views:
   admin:

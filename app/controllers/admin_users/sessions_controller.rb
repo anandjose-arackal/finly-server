@@ -3,7 +3,7 @@ class AdminUsers::SessionsController < Devise::SessionsController
   prepend_before_action :verify_signed_out_user, except: [:new, :create, :destroy]
   respond_to :json
 
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { doorkeeper_authorize! :admin}
 
   def new
     super()

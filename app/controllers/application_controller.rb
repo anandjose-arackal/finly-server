@@ -230,7 +230,9 @@ class ApplicationController < ActionController::Base
   end
 
   def current_company
-    current_user&.company
+    u = current_user
+    return nil unless u.class == User
+    u&.company
   end
 
 end
