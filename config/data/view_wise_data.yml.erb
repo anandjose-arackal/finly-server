@@ -16,6 +16,9 @@ admin:
       <% if current_company.feature_subscription.cards_enabled and current_user.company_admin? %>
       - Employee Cards: '/disburse'
       <% end %>
+      <% unless current_company.kyc_completed? %>
+      - Verify KYC: '/#documents'
+      <% end %>
       # - Policies: '/policies'
       - My Account: '#settings'
       # - Expense Policies: '/policies?view=admin'

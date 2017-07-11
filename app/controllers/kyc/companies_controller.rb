@@ -13,4 +13,16 @@ class Kyc::CompaniesController < ApplicationController
     respond response: @result&.success? ? :success : :failure
   end
 
+  def confirm
+    # this action updates the status of the KYC from submitted to processing
+    @result = KycProcess::Company::Confirm.(current_user, params)
+    respond response: @result&.success? ? :success : :failure
+  end
+
+  # action that essentially lets the user retract their confirmation of documents and upload them again if required
+  def retract
+    @result = KycProcess::Company::Retract.(current_user, params)
+    respond response: @result&.success? ? :success : :failure
+  end
+
 end

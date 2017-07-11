@@ -227,12 +227,25 @@ class Company < ActiveRecord::Base
     !!self.itz_cash_property&.d_code.present?
   end
 
+  def accepted_agreements?
+    poc = self.users.point_of_contact.first
+    user_agreement = CompanyAgreementTrack.with_user(poc.id)
+    if user_agreement.empty?
+      return false
+    end
+    true
+  end
+
   def kyc_required?
-    return false unless feature_subscription.itz_cash_d_code_enabled
-    if [KycStatus.id_for(:incomplete), KycStatus.id_for(:error)].include?(company_kyc.kyc_status_id)
+    return false unless feature_subscription.d_code_enabled?
+    if [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:error)].include?(company_kyc.kyc_status_id)
       return true
     end
     false
+  end
+
+  def kyc_completed?
+    self.company_kyc.completed?
   end
 
   private

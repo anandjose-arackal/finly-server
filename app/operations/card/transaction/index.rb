@@ -89,7 +89,7 @@ class Card::Transaction::Index < BaseOperation
 
     def init
       self.transactions = params[:transactions]
-      self.transactions = apply_scopes(transactions, params)
+      self.transactions = apply_scopes(transactions, params).paginate(page: params[:page], per_page: 30)
     end
 
   end

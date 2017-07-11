@@ -234,7 +234,8 @@ class User::Invite::Create < User::Invite::Base
         end
       end
       # send welcome message to all invited users
-      CustomMessage::Create.(user, {mobile_number: numbers})
+      # CustomMessage::Create.(user, {mobile_number: numbers})
+      Sms::UserInvite.(user)
       # manually confirming everyone since there is no email by default and devise marks that as unconfirmed
       invited_users.each do |user|
         user.confirm

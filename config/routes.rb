@@ -410,18 +410,15 @@
 #                                         PATCH  /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         PUT    /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         DELETE /admin_users/cards/:id(.:format)                               admin_users/cards#destroy
-#                 admin_users_company_kyc GET    /admin_users/companies/:company_id/kyc(.:format)               admin_users/companies#show
-#                                         PATCH  /admin_users/companies/:company_id/kyc(.:format)               admin_users/companies#update
-#              admin_users_company_review PATCH  /admin_users/companies/:company_id/review(.:format)            admin_users/companies#review
-#              admin_users_company_status PATCH  /admin_users/companies/:company_id/status(.:format)            admin_users/companies#update_status
-#                                         GET    /admin_users/companies(.:format)                               admin_users/companies#index
-#                                         POST   /admin_users/companies(.:format)                               admin_users/companies#create
-#                                         GET    /admin_users/companies/new(.:format)                           admin_users/companies#new
-#                                         GET    /admin_users/companies/:id/edit(.:format)                      admin_users/companies#edit
-#                                         GET    /admin_users/companies/:id(.:format)                           admin_users/companies#show
-#                                         PATCH  /admin_users/companies/:id(.:format)                           admin_users/companies#update
-#                                         PUT    /admin_users/companies/:id(.:format)                           admin_users/companies#update
-#                                         DELETE /admin_users/companies/:id(.:format)                           admin_users/companies#destroy
+#          admin_users_kyc_company_reject PATCH  /admin_users/kyc/companies/:company_id/reject(.:format)        admin_users/kyc/companies#reject
+#               admin_users_kyc_companies GET    /admin_users/kyc/companies(.:format)                           admin_users/kyc/companies#index
+#                                         POST   /admin_users/kyc/companies(.:format)                           admin_users/kyc/companies#create
+#             new_admin_users_kyc_company GET    /admin_users/kyc/companies/new(.:format)                       admin_users/kyc/companies#new
+#            edit_admin_users_kyc_company GET    /admin_users/kyc/companies/:id/edit(.:format)                  admin_users/kyc/companies#edit
+#                 admin_users_kyc_company GET    /admin_users/kyc/companies/:id(.:format)                       admin_users/kyc/companies#show
+#                                         PATCH  /admin_users/kyc/companies/:id(.:format)                       admin_users/kyc/companies#update
+#                                         PUT    /admin_users/kyc/companies/:id(.:format)                       admin_users/kyc/companies#update
+#                                         DELETE /admin_users/kyc/companies/:id(.:format)                       admin_users/kyc/companies#destroy
 #                  admin_users_agreements GET    /admin_users/agreements(.:format)                              admin_users/agreements#index
 #                                         POST   /admin_users/agreements(.:format)                              admin_users/agreements#create
 #                              admin_menu GET    /admin_menus(.:format)                                         admin_users/users#admin_menus
@@ -591,7 +588,6 @@
 #                                  lookup GET    /lookup(.:format)                                              users#lookup
 #                   send_verification_otp POST   /send_verification_otp(.:format)                               users#send_verification_otp
 #                         verify_user_otp POST   /verify_user_otp(.:format)                                     users#verify_user_otp
-#                            set_password POST   /set_password(.:format)                                        users#set_new_password
 #                                   users GET    /users(.:format)                                               users#index
 #                                         POST   /users(.:format)                                               users#create
 #                                    user GET    /users/:id(.:format)                                           users#show
@@ -739,8 +735,10 @@
 #            bank_transfer_reimbursements GET    /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#show
 #                                         PATCH  /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#update
 #                                         POST   /bank_transfer/reimbursements(.:format)                        bank_transfer/reimbursement#create
-#                             kyc_company GET    /kyc/company(.:format)                                         kyc/companies#show
-#                                         PATCH  /kyc/company(.:format)                                         kyc/companies#update
+#                           kyc_docs_show GET    /kyc/company(.:format)                                         kyc/companies#show
+#                         kyc_docs_update PATCH  /kyc/company(.:format)                                         kyc/companies#update
+#                             kyc_confirm PATCH  /kyc/confirm(.:format)                                         kyc/companies#confirm
+#                             kyc_retract PATCH  /kyc/retract(.:format)                                         kyc/companies#retract
 #                                     kyc GET    /kyc/users/:id(.:format)                                       kyc/user#show
 #                                         PATCH  /kyc/users/:id(.:format)                                       kyc/user#update
 #                          disburse_users POST   /disburse/users(.:format)                                      disburse/users#create
@@ -1649,11 +1647,10 @@ Rails.application.routes.draw do
     resources :cards do
       patch 'block', to: 'cards#block', as: :block
     end
-    resources :companies do
-      get 'kyc', to: 'companies#show'
-      patch 'kyc', to: 'companies#update'
-      patch 'review', to: 'companies#review'
-      patch 'status', to: 'companies#update_status'
+    namespace :kyc do
+      resources :companies do
+        patch 'reject', to: 'companies#reject', as: :reject
+      end
     end
     resources :agreements, only: [:create, :index]
   end
@@ -1938,8 +1935,10 @@ Rails.application.routes.draw do
   end
 
   namespace :kyc do
-    get 'company', to: 'companies#show'
-    patch 'company', to: 'companies#update'
+    get 'company', to: 'companies#show', as: :docs_show
+    patch 'company', to: 'companies#update', as: :docs_update
+    patch 'confirm', to: 'companies#confirm', as: :confirm
+    patch 'retract', to: 'companies#retract', as: :retract
 
     get 'users/:id', to: 'user#show'
     patch 'users/:id', to: 'user#update'
