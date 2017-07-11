@@ -8,7 +8,7 @@ one:
   status_id: 1
   request_action_user_id: 1
   request_action_user_type: MyString
-  closed_at: 2017-07-11 00:35:48
+  closed_at: 2017-07-11 14:29:26
   card_program_id: 
 
 two:
@@ -19,5 +19,5 @@ two:
   status_id: 1
   request_action_user_id: 1
   request_action_user_type: MyString
-  closed_at: 2017-07-11 00:35:48
+  closed_at: 2017-07-11 14:29:26
   card_program_id: 

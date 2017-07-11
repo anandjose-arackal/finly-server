@@ -14,7 +14,7 @@ class AdminUserRole < ActiveRecord::Base
   validates :name, presence: true
 
   def self.values
-    [:admin, :transcriber, :verifier, :itzcash_verifier, :itzcash_ops]
+    [:admin, :transcriber, :verifier, :itzcash_verifier, :itzcash_operations]
   end
 
 end

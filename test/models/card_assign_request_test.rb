@@ -1,6 +1,6 @@
 require 'test_helper'
 
-class CardUpdateRequestStatusTest < ActiveSupport::TestCase
+class CardAssignRequestTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

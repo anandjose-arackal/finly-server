@@ -20,7 +20,7 @@
 class AdminUser < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
-  devise :database_authenticatable, 
+  devise :database_authenticatable,
          :recoverable, :rememberable, :trackable, :validatable
 
   has_many :admin_user_role_mappings, dependent: :destroy
@@ -39,6 +39,12 @@ class AdminUser < ActiveRecord::Base
   # overriding devise's default method so that it compares against both email and phone number to authenticate
   def self.find_for_database_authentication(conditions={})
     find_by(email: conditions[:username])
+  end
+
+  def has_role?(role_id)
+    roles = admin_user_roles
+    return false unless role_id.present? and roles.present?
+    roles.pluck(:id).include?(role_id)
   end
 
 end

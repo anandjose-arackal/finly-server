@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170710112542) do
+ActiveRecord::Schema.define(version: 20170711085926) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -367,6 +367,33 @@ ActiveRecord::Schema.define(version: 20170710112542) do
   add_index "budget_rules", ["policy_id"], name: "index_budget_rules_on_policy_id", using: :btree
   add_index "budget_rules", ["rule_type_id"], name: "index_budget_rules_on_rule_type_id", using: :btree
 
+  create_table "card_assign_request_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "card_assign_requests", force: :cascade do |t|
+    t.integer  "card_id",                  limit: 4
+    t.integer  "card_owner_id",            limit: 4,   null: false
+    t.integer  "initiating_user_id",       limit: 4,   null: false
+    t.string   "initiating_user_type",     limit: 255, null: false
+    t.integer  "status_id",                limit: 4,   null: false
+    t.integer  "request_action_user_id",   limit: 4
+    t.string   "request_action_user_type", limit: 255
+    t.datetime "closed_at"
+    t.integer  "card_program_id",          limit: 4,   null: false
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+  end
+
+  add_index "card_assign_requests", ["card_id"], name: "index_card_assign_requests_on_card_id", using: :btree
+  add_index "card_assign_requests", ["card_owner_id"], name: "index_card_assign_requests_on_card_owner_id", using: :btree
+  add_index "card_assign_requests", ["card_program_id"], name: "index_card_assign_requests_on_card_program_id", using: :btree
+  add_index "card_assign_requests", ["initiating_user_id"], name: "index_card_assign_requests_on_initiating_user_id", using: :btree
+  add_index "card_assign_requests", ["initiating_user_type"], name: "index_card_assign_requests_on_initiating_user_type", using: :btree
+  add_index "card_assign_requests", ["status_id"], name: "index_card_assign_requests_on_status_id", using: :btree
+
   create_table "card_balance_histories", force: :cascade do |t|
     t.integer  "card_id",    limit: 4
     t.integer  "amount_id",  limit: 4
@@ -538,6 +565,7 @@ ActiveRecord::Schema.define(version: 20170710112542) do
     t.integer  "card_eligibility_id",      limit: 4
     t.boolean  "admin_unblockable",                      default: true
     t.integer  "itz_cash_card_program_id", limit: 4
+    t.integer  "card_status_id",           limit: 4,                    null: false
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -559,6 +587,13 @@ ActiveRecord::Schema.define(version: 20170710112542) do
   create_table "channel_types", force: :cascade do |t|
     t.string "name",         limit: 255
     t.string "abbreviation", limit: 255
+  end
+
+  create_table "city_id_city_code_mappings", force: :cascade do |t|
+    t.string   "city_id",    limit: 255
+    t.string   "city_code",  limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
   create_table "companies", force: :cascade do |t|
@@ -720,6 +755,11 @@ ActiveRecord::Schema.define(version: 20170710112542) do
     t.integer  "passport_file_size",                        limit: 4
     t.datetime "passport_updated_at"
     t.integer  "company_type_id",                           limit: 4
+    t.string   "certificate_of_registration_file_name",     limit: 255
+    t.string   "certificate_of_registration_content_type",  limit: 255
+    t.integer  "certificate_of_registration_file_size",     limit: 4
+    t.datetime "certificate_of_registration_updated_at"
+    t.integer  "customer_type_id",                          limit: 4
   end
 
   add_index "company_kycs", ["company_id"], name: "index_company_kycs_on_company_id", using: :btree
@@ -1851,6 +1891,13 @@ ActiveRecord::Schema.define(version: 20170710112542) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "pin_code_city_id_mappings", force: :cascade do |t|
+    t.string   "pin_code",   limit: 255
+    t.string   "city_id",    limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "policies", force: :cascade do |t|
     t.string   "name",             limit: 255
     t.integer  "company_id",       limit: 4
@@ -2242,6 +2289,7 @@ ActiveRecord::Schema.define(version: 20170710112542) do
     t.datetime "created_at",                                           null: false
     t.datetime "updated_at",                                           null: false
     t.boolean  "is_deleted",                           default: false
+    t.string   "message_type",           limit: 255
   end
 
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
@@ -2619,6 +2667,8 @@ ActiveRecord::Schema.define(version: 20170710112542) do
   add_foreign_key "budget_rules", "periods"
   add_foreign_key "budget_rules", "policies"
   add_foreign_key "budget_rules", "rule_types"
+  add_foreign_key "card_assign_requests", "card_programs"
+  add_foreign_key "card_assign_requests", "cards"
   add_foreign_key "card_balance_histories", "amounts"
   add_foreign_key "card_balance_histories", "cards"
   add_foreign_key "card_configurations", "card_statuses"
