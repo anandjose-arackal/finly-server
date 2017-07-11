@@ -1,0 +1,87 @@
+user:
+  name: <%= current_user.name %>
+  id: <%= current_user.id %>
+  email: <%= current_user.email %>
+  mobile_number: <%= current_user.mobile_number %>
+  roles:
+  <% if current_user.admin? %>
+  - admin
+  <% end %>
+  <% if current_user.finance_manager? %>
+  - finance_manager
+  <% end %>
+views:
+  admin:
+    menus:
+      navbar:
+      - name: Companies
+        url: companies
+        id: companies
+        type: anchor
+      - name: Users
+        url: users
+        id: users
+        type: anchor
+      - name: 'E M'
+        id: em
+        type: dropdown
+        items:
+        - name: Reports
+          id: reports
+          url: reports
+        - name: Expenses
+          id: expenses
+          url: expenses
+      - name: Cards
+        id: cards
+        type: anchor
+        url: cards
+      - name: OCR
+        id: ocr
+        type: dropdown
+        items:
+        - name: "Untranscribed Receipts"
+          id: untranscribed_receipts
+          url: untranscribed_receipts
+        - name: "Transcribed Receipts"
+          id: transcribed_receipts
+          url: transcribed_receipts
+      - name: Other
+        id: other
+        type: dropdown
+        items:
+        - name: Agreements
+          id: agreements
+          url: company_agreements
+
+  transcriber:
+    menus:
+      navbar:
+      - name: "Untranscribed Receipts"
+        id: untranscribed_receipts
+        url: untranscribed_receipts
+      - name: "Transcribed Receipts"
+        id: transcribed_receipts
+        url: transcribed_receipts
+
+  itzcash_verifier:
+    menus:
+      navbar:
+      - name: "Unassigned Cards"
+        id: unassigned_cards
+        url: unassigned_cards
+      - name: "Assigned Cards"
+        id: assigned_cards
+        url: assigned_cards
+
+  itzcash_operations:
+    menus:
+      navbar:
+      - name: "Unassigned Cards"
+        id: unassigned_cards
+        url: unassigned_cards
+      - name: "Assigned Cards"
+        id: assigned_cards
+        url: assigned_cards
+
+      
