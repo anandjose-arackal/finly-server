@@ -12,4 +12,9 @@ class AdminUsers::Oauth::TokenController < Oauth::TokenController
     render_json 'admin_users/oauth/token/create.json.jbuilder', response.status
   end
 
+  protected
+  def auth_scope
+    :admin
+  end
+
 end
