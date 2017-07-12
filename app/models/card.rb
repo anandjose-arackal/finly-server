@@ -20,6 +20,7 @@
 #  card_eligibility_id      :integer
 #  admin_unblockable        :boolean          default(TRUE)
 #  itz_cash_card_program_id :integer
+#  card_status_id           :integer          not null
 #
 
 class Card < ActiveRecord::Base
@@ -30,6 +31,7 @@ class Card < ActiveRecord::Base
   belongs_to :disabled_by_user, class_name: 'User'
   belongs_to :card_program
   belongs_to :itz_cash_card_program
+  belongs_to :card_status
   has_many :transactions, class_name: 'CardTransaction'
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
@@ -37,6 +39,7 @@ class Card < ActiveRecord::Base
   has_one :card_restriction, dependent: :destroy
 
   has_many :card_balance_history, dependent: :destroy
+  has_many :card_assign_requests
 
   belongs_to :card_balance, class_name: 'Amount'
   belongs_to :card_eligibility, class_name: 'Amount'
@@ -157,6 +160,10 @@ class Card < ActiveRecord::Base
 
   def active?
     self.active
+  end
+
+  def unassigned?
+    self.card_status_id == CardStatus.id_for(:unassigned) and self.user_id.blank?
   end
 
   def expense_card?

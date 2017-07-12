@@ -52,7 +52,8 @@ class CardsController < ApplicationController
   end
 
   def assign
-    @result = Card::Assign.(current_user, params)
+    # @result = Card::Assign.(current_user, params)
+    @result = Card::AssignRequest::Create.(current_user, params)
     respond
   end
 

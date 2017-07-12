@@ -5,5 +5,8 @@ class CreateCardAssignRequestStatuses < ActiveRecord::Migration
 
       t.timestamps null: false
     end
+    if Company.count > 0
+      CardAssignRequestStatus.seed_data
+    end
   end
 end

@@ -27,6 +27,7 @@ class AdminUser < ActiveRecord::Base
   has_many :admin_user_roles, through: :admin_user_role_mappings, dependent: :destroy
 
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
+  scope :with_email, ->(email) { where email: email }
 
   def finly_admin?
     # todo temporary, will change once roles has been estabilished
