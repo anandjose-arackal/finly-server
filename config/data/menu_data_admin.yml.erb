@@ -74,6 +74,7 @@ views:
           id: agreements
           url: company_agreements
   <% end %>
+  
   <% if current_user.transcriber? %>
   transcriber:
     menus:
@@ -85,10 +86,14 @@ views:
         id: transcribed_receipts
         url: transcribed_receipts
   <% end %>
-  <% if current_user.itzcash_verifier? %>
-  itzcash_verifier:
+
+  <% if current_user.verifier? %>
+  verifier:
     menus:
       navbar:
+      - name: "Companies"
+        id: 'itzcash_companies'
+        url: 'itzcash/companies'
       - name: "Unassigned Cards"
         id: unassigned_cards
         url: unassigned_cards
@@ -96,10 +101,29 @@ views:
         id: assigned_cards
         url: assigned_cards
   <% end %>
+
+  <% if current_user.itzcash_verifier? %>
+  itzcash_verifier:
+    menus:
+      navbar:
+      - name: "Companies"
+        id: 'itzcash_companies'
+        url: 'itzcash/companies'
+      - name: "Unassigned Cards"
+        id: unassigned_cards
+        url: unassigned_cards
+      - name: "Assigned Cards"
+        id: assigned_cards
+        url: assigned_cards
+  <% end %>
+
   <% if current_user.itzcash_operations? %>
   itzcash_operations:
     menus:
       navbar:
+      - name: "Companies"
+        id: 'itzcash_companies'
+        url: 'itzcash/companies'
       - name: "Unassigned Cards"
         id: unassigned_cards
         url: unassigned_cards
