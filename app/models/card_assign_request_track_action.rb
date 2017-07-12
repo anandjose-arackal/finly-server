@@ -12,7 +12,7 @@ class CardAssignRequestTrackAction < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:submit, :approve, :reject, :cancel]
+    [:submit, :approve, :final_approve, :assigned, :assigned_upgraded, :reject, :cancel]
   end
 
 end

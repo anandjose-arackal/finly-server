@@ -5,7 +5,7 @@ class Admin::Cards::AssignRequests::Base < Admin::Base
     if user.blank?
       add_message :error, 'User not found'
     end
-    if params&.dig(:card_assign_request_id).blank?
+    if params&.dig(:card_assign_request_id).blank? and params&.dig(:id).blank?
       add_message :error, 'Card Assign Request not found'
     end
   end
@@ -16,7 +16,8 @@ class Admin::Cards::AssignRequests::Base < Admin::Base
       add_message :error, assign_requests_presenter.messages[:error]
       return
     end
-    self.card_assign_request = assign_requests_presenter.card_assign_requests.find_by_id(params[:card_assign_request_id])
+    id = (params[:id] or params[:card_assign_request_id])
+    self.card_assign_request = assign_requests_presenter.card_assign_requests.find_by_id(id)
   end
 
   def validate

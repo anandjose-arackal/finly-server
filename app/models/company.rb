@@ -246,7 +246,7 @@ class Company < ActiveRecord::Base
   end
 
   def kyc_completed?
-    self.company_kyc.completed?
+    !!self.company_kyc&.completed?
   end
 
   private
@@ -271,7 +271,7 @@ class Company < ActiveRecord::Base
       self.auto_sync_configs.build(enabled: false)
     end
 
-    # self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
+    self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
   end
 
 end
