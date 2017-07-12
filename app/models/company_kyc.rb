@@ -93,7 +93,7 @@ class CompanyKyc < ActiveRecord::Base
   validate :pin_code_format
 
   def editable?
-    [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:error)].include?(kyc_status_id)
+    [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:rejected)].include?(kyc_status_id)
   end
 
   def processing?

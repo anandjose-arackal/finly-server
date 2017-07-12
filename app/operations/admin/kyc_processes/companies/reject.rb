@@ -27,7 +27,7 @@ class Admin::KycProcesses::Companies::Reject < Admin::KycProcesses::Companies::B
     doc_type = rejection_params[:document_type]
     rej_params.delete(:message)
     rej_params.delete(:document_type)
-    rej_params[:kyc_status_id] = KycStatus.id_for(:error)
+    rej_params[:kyc_status_id] = KycStatus.id_for(:rejected)
     rej_params.permit!
     self.system_message_params = {
         content: "Your KYC was rejected because: #{message}",
@@ -51,7 +51,7 @@ class Admin::KycProcesses::Companies::Reject < Admin::KycProcesses::Companies::B
     # notification = poc.notification.build()
 
     # set the kyc status as error for this particular company
-    company_kyc.update(kyc_status_id: KycStatus.id_for(:error))
+    company_kyc.update(kyc_status_id: KycStatus.id_for(:rejected))
     add_message :success, "User successfully notified"
   end
 
