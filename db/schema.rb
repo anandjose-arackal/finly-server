@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170711191421) do
+ActiveRecord::Schema.define(version: 20170712111317) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -432,6 +432,7 @@ ActiveRecord::Schema.define(version: 20170711191421) do
     t.integer  "admin_review_workflow_id",  limit: 4
     t.integer  "review_position",           limit: 4,     default: 0
     t.text     "admin_note",                limit: 65535
+    t.integer  "company_id",                limit: 4,                 null: false
   end
 
   add_index "card_assign_requests", ["admin_review_workflow_id"], name: "index_card_assign_requests_on_admin_review_workflow_id", using: :btree
@@ -440,6 +441,7 @@ ActiveRecord::Schema.define(version: 20170711191421) do
   add_index "card_assign_requests", ["card_id"], name: "index_card_assign_requests_on_card_id", using: :btree
   add_index "card_assign_requests", ["card_owner_id"], name: "index_card_assign_requests_on_card_owner_id", using: :btree
   add_index "card_assign_requests", ["card_program_id"], name: "index_card_assign_requests_on_card_program_id", using: :btree
+  add_index "card_assign_requests", ["company_id"], name: "index_card_assign_requests_on_company_id", using: :btree
   add_index "card_assign_requests", ["initiating_resource_id"], name: "index_card_assign_requests_on_initiating_resource_id", using: :btree
   add_index "card_assign_requests", ["initiating_resource_type"], name: "index_card_assign_requests_on_initiating_resource_type", using: :btree
   add_index "card_assign_requests", ["status_id"], name: "index_card_assign_requests_on_status_id", using: :btree
@@ -2690,6 +2692,7 @@ ActiveRecord::Schema.define(version: 20170711191421) do
   add_foreign_key "card_assign_requests", "admin_review_workflows"
   add_foreign_key "card_assign_requests", "card_programs"
   add_foreign_key "card_assign_requests", "cards"
+  add_foreign_key "card_assign_requests", "companies"
   add_foreign_key "card_balance_histories", "amounts"
   add_foreign_key "card_balance_histories", "cards"
   add_foreign_key "card_configurations", "card_statuses"
