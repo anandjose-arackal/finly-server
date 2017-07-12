@@ -5,21 +5,32 @@ user:
   mobile_number: <%= current_user.mobile_number %>
   roles:
   <% if current_user.admin? %>
-  - admin
+  - id: admin
+    name: Admin
+    default_url: 'companies'
   <% end %>
   <% if current_user.transcriber? %>
-  - transcriber
+  - id: transcriber
+    name: Transcriber
+    default_url: 'untranscribed_receipts'
   <% end %>
   <% if current_user.verifier? %>
-  - verifier
+  - id: verifier
+    name: Verifier
+    default_url: 'cards'
   <% end %>
   <% if current_user.itzcash_verifier? %>
-  - transcriber
+  - id: itzcash_verifier
+    name: 'ItzCash Verifier'
+    default_url: 'cards'
   <% end %>
   <% if current_user.itzcash_operations? %>
-  - transcriber
+  - id: itzcash_operations
+    name: ItzCash Operations
+    default_url: 'cards'
   <% end %>
 views:
+  <% if current_user.admin? %>
   admin:
     menus:
       navbar:
@@ -62,7 +73,8 @@ views:
         - name: Agreements
           id: agreements
           url: company_agreements
-
+  <% end %>
+  <% if current_user.transcriber? %>
   transcriber:
     menus:
       navbar:
@@ -72,7 +84,8 @@ views:
       - name: "Transcribed Receipts"
         id: transcribed_receipts
         url: transcribed_receipts
-
+  <% end %>
+  <% if current_user.itzcash_verifier? %>
   itzcash_verifier:
     menus:
       navbar:
@@ -82,7 +95,8 @@ views:
       - name: "Assigned Cards"
         id: assigned_cards
         url: assigned_cards
-
+  <% end %>
+  <% if current_user.itzcash_operations? %>
   itzcash_operations:
     menus:
       navbar:
@@ -92,5 +106,6 @@ views:
       - name: "Assigned Cards"
         id: assigned_cards
         url: assigned_cards
+  <% end %>
 
       
