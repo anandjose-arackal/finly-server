@@ -17,5 +17,6 @@ class AdminReviewWorkflowLevel < ActiveRecord::Base
   default_scope { order position: :asc }
 
   scope :with_admin_reviewer, -> (reviewer_id) { where admin_reviewer_id: reviewer_id }
+  scope :with_position, -> (position) { where position: position }
 
 end

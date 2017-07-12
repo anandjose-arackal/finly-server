@@ -63,7 +63,7 @@ class Card::AssignRequest::Create < Card::AssignRequest::Base
     request_param = {
         card_id: self.card.id,
         card_program_id: self.card_program.id,
-        status_id: CardAssignRequestStatus.id_for(:submitted),
+        status_id: CardAssignRequestStatus.id_for(:processing),
         card_owner_id: selected_user.id,
         initiating_resource: self.user,
         admin_review_workflow: review_workflow,
@@ -71,9 +71,15 @@ class Card::AssignRequest::Create < Card::AssignRequest::Base
     }
     self.card_assign_request = card.card_assign_requests.new request_param
     unless self.card_assign_request.save
-      card.update(user_id: selected_user.id, card_program_id: card_program.id, card_status_id: CardStatus.id_for(:assign_requested))
       add_message :error, self.card_assign_request.errors.full_messages
     end
+    card.update(user_id: selected_user.id, card_program_id: card_program.id, card_status_id: CardStatus.id_for(:assign_requested))
+
+    track_params = {
+        action_resource: user,
+        action_id: CardAssignRequestTrackAction.id_for(:submit)
+    }
+    self.card_assign_request.tracks.create track_params
   end
 
   def success

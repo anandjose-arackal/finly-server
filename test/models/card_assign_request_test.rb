@@ -16,6 +16,7 @@
 #  updated_at                :datetime         not null
 #  admin_review_workflow_id  :integer
 #  review_position           :integer          default(0)
+#  admin_note                :text(65535)
 #
 
 require 'test_helper'

@@ -16,6 +16,7 @@
 #  updated_at                :datetime         not null
 #  admin_review_workflow_id  :integer
 #  review_position           :integer          default(0)
+#  admin_note                :text(65535)
 #
 
 class CardAssignRequest < ActiveRecord::Base
@@ -26,6 +27,8 @@ class CardAssignRequest < ActiveRecord::Base
   belongs_to :initiating_resource, polymorphic: true
   belongs_to :assigned_by_resource, polymorphic: true
   belongs_to :admin_review_workflow
+
+  has_many :tracks, class_name: 'CardAssignRequestTrack'
 
   validates :card_id, presence: true
   validates :card_program_id, presence: true
