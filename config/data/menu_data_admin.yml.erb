@@ -22,12 +22,12 @@ user:
   <% if current_user.itzcash_verifier? %>
   - id: itzcash_verifier
     name: 'ItzCash Verifier'
-    default_url: 'cards'
+    default_url: 'itzcash/companies'
   <% end %>
   <% if current_user.itzcash_operations? %>
   - id: itzcash_operations
     name: ItzCash Operations
-    default_url: 'cards'
+    default_url: 'itzcash/companies'
   <% end %>
 views:
   <% if current_user.admin? %>
