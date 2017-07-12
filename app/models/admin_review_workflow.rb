@@ -16,7 +16,7 @@ class AdminReviewWorkflow < ActiveRecord::Base
   def self.values
     {
         assign_card: {
-            '0': ['admin@demo.io', 'king@demo.io'],
+            '0': ['admin@demo.io', 'sreeram@demo.io'],
             '1': 'vivek@demo.io',
             '2': 'veekshith@demo.io'
         }
@@ -38,7 +38,7 @@ class AdminReviewWorkflow < ActiveRecord::Base
         # create new workflow
         workflow = AdminReviewWorkflow.create name: name
       end
-      workflow.admin_review_workflow_levels.destroy_all
+      workflow.levels.destroy_all
       config.each do |pos, emails|
         emails = [emails] unless emails.is_a?(Array)
         emails.each do |email|
@@ -47,7 +47,7 @@ class AdminReviewWorkflow < ActiveRecord::Base
             raise "AdminUser with Email ID #{email} not found"
             return
           end
-          workflow.admin_review_workflow_levels.create position: pos.to_s.to_i, admin_reviewer: reviewer
+          workflow.levels.create position: pos.to_s.to_i, admin_reviewer: reviewer
         end
       end
     end

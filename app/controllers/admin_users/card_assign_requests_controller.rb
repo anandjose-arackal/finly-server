@@ -1,6 +1,6 @@
 class AdminUsers::CardAssignRequestsController < ApplicationController
 
-  before_action -> { doorkeeper_authorize! :web }
+  before_action -> { doorkeeper_authorize! :admin }
 
   def company_index
     @result = Admin::Cards::AssignRequests::CompanyIndex.(current_user, params)
