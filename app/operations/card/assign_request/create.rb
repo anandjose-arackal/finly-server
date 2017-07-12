@@ -67,7 +67,8 @@ class Card::AssignRequest::Create < Card::AssignRequest::Base
         card_owner_id: selected_user.id,
         initiating_resource: self.user,
         admin_review_workflow: review_workflow,
-        review_position: review_workflow.levels.first.position
+        review_position: review_workflow.levels.first.position,
+        company_id: user.company_id
     }
     self.card_assign_request = card.card_assign_requests.new request_param
     unless self.card_assign_request.save

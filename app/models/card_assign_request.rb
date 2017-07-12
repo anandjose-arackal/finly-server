@@ -27,6 +27,7 @@ class CardAssignRequest < ActiveRecord::Base
   belongs_to :initiating_resource, polymorphic: true
   belongs_to :assigned_by_resource, polymorphic: true
   belongs_to :admin_review_workflow
+  belongs_to :company
 
   has_many :tracks, class_name: 'CardAssignRequestTrack'
 
@@ -39,5 +40,10 @@ class CardAssignRequest < ActiveRecord::Base
 
   scope :with_admin_review_workflow, -> (workflow_id) { where admin_review_workflow_id: workflow_id }
   scope :with_review_position, ->(review_pos) { where review_position: review_pos }
+  scope :filter_company, ->(company_id) { where company_id: company_id }
+
+  def processing?
+    self.status_id == CardAssignRequestStatus.id_for(:processing)
+  end
 
 end

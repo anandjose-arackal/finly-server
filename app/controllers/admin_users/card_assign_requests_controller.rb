@@ -8,7 +8,8 @@ class AdminUsers::CardAssignRequestsController < ApplicationController
   end
 
   def index
-
+    @result = Admin::Cards::AssignRequests::Index.(current_user, params)
+    respond
   end
 
   def approve

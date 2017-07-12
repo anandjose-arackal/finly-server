@@ -39,6 +39,7 @@ class Company < ActiveRecord::Base
   has_many :auto_sync_configs
   has_many :quickbooks_payment_types
   has_one :company_kyc
+  has_many :card_assign_requests
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
