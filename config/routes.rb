@@ -1651,6 +1651,7 @@ Rails.application.routes.draw do
       end
     end
     resources :agreements, only: [:create, :index]
+    get 'card_assign_requests/companies', to: 'card_assign_requests#company_index'
   end
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
