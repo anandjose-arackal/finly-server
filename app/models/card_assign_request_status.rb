@@ -12,7 +12,7 @@ class CardAssignRequestStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:submitted, :processing, :approved, :assigned, :rejected, :cancelled]
+    [:processing, :approved, :assigned, :assigned_and_upgraded, :rejected, :cancelled]
   end
 
 end

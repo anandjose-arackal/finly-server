@@ -13,7 +13,6 @@ class AdminReviewWorkflow < ActiveRecord::Base
 
   has_many :levels, class_name: 'AdminReviewWorkflowLevel', dependent: :destroy
 
-
   def self.values
     {
         assign_card: {

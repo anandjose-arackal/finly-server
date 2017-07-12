@@ -16,6 +16,10 @@ class Admin::Cards::AssignRequests::Index < Admin::Cards::AssignRequests::Base
     end
   end
 
+  def validate
+
+  end
+
   def success
     params[:assign_card_requests] = self.assign_card_requests
     Admin::Cards::AssignRequests::Index::SuccessPresenter.new(user, params, messages)
@@ -26,6 +30,10 @@ class Admin::Cards::AssignRequests::Index < Admin::Cards::AssignRequests::Base
 
     def init
       self.assign_card_requests = params[:assign_card_requests]
+    end
+
+    def actions
+
     end
 
   end

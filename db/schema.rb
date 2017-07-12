@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170711112056) do
+ActiveRecord::Schema.define(version: 20170711191421) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -416,18 +416,19 @@ ActiveRecord::Schema.define(version: 20170711112056) do
 
   create_table "card_assign_requests", force: :cascade do |t|
     t.integer  "card_id",                   limit: 4
-    t.integer  "card_owner_id",             limit: 4,               null: false
-    t.integer  "initiating_resource_id",    limit: 4,               null: false
-    t.string   "initiating_resource_type",  limit: 255,             null: false
-    t.integer  "status_id",                 limit: 4,               null: false
+    t.integer  "card_owner_id",             limit: 4,                 null: false
+    t.integer  "initiating_resource_id",    limit: 4,                 null: false
+    t.string   "initiating_resource_type",  limit: 255,               null: false
+    t.integer  "status_id",                 limit: 4,                 null: false
     t.integer  "assigned_by_resource_id",   limit: 4
     t.string   "assigned_by_resource_type", limit: 255
     t.datetime "assigned_on"
-    t.integer  "card_program_id",           limit: 4,               null: false
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
+    t.integer  "card_program_id",           limit: 4,                 null: false
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
     t.integer  "admin_review_workflow_id",  limit: 4
-    t.integer  "review_position",           limit: 4,   default: 0
+    t.integer  "review_position",           limit: 4,     default: 0
+    t.text     "admin_note",                limit: 65535
   end
 
   add_index "card_assign_requests", ["admin_review_workflow_id"], name: "index_card_assign_requests_on_admin_review_workflow_id", using: :btree

@@ -1655,6 +1655,10 @@ Rails.application.routes.draw do
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
 
+  namespace :admin_users do
+    resources :card_assign_requests, only: [:index]
+  end
+
   ######### ADMIN PANEL END ###########
 
   get 'junk/show', to: 'junk#show'
