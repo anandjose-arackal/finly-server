@@ -102,6 +102,10 @@ class Card::Transaction::Create < BaseOperation
                 add_message :error, transaction.errors.full_messages
                 return false
               end
+
+              # add to cash on hand only if it's an expense card
+              return true unless card.card_program.create_expense
+
               # add to cash on hand
               if user.payments.create(amount_attributes: {value: params[:transaction_amount_attributes][:value], currency_id: Currency.first.id},
                                       date: DateUtils.local_date,
@@ -139,7 +143,9 @@ class Card::Transaction::Create < BaseOperation
     return unless success?
     params = self.params
     params[:transaction] = self.transaction
-    Event::ECard::ETransaction::Create.(self.user, params)
+    if card.expense_card?
+      Event::ECard::ETransaction::Create.(self.user, params)
+    end
     # trigger auto reload of the card to match the amount in the config
     if type == 'DEBIT' && %w(POS ATM ECOM).include?(mode)
       # check if auto reload needs to be performed for this particular card

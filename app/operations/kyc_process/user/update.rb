@@ -14,7 +14,7 @@ class KycProcess::User::Update < KycProcess::User::Base
 
   def post_process
     if self.individual_kyc.id_proof.present? and self.individual_kyc.address_proof.present?
-      self.individual_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
+      self.individual_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
     else
       self.individual_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
     end
