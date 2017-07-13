@@ -1651,14 +1651,12 @@ Rails.application.routes.draw do
       end
     end
     resources :agreements, only: [:create, :index]
-    resources :card_assign_requests, only: [:index]
-    resources :card_assign_requests do
-      post 'approve', to: 'card_assign_requests#approve'
-      post 'reject', to: 'card_assign_requests#reject'
-      post 'mark_assigned', to: 'card_assign_requests#mark_as_assigned'
-      post 'mark_assigned_upgraded', to: 'card_assign_requests#mark_as_assigned_upgraded'
-    end
     get 'card_assign_requests/companies', to: 'card_assign_requests#company_index'
+    get 'card_assign_requests', to: 'card_assign_requests#index'
+    post 'card_assign_requests/approve', to: 'card_assign_requests#approve'
+    post 'card_assign_requests/reject', to: 'card_assign_requests#reject'
+    post 'card_assign_requests/mark_assigned', to: 'card_assign_requests#mark_as_assigned'
+    post 'card_assign_requests/mark_assigned_upgraded', to: 'card_assign_requests#mark_as_assigned_upgraded'
   end
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu

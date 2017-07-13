@@ -1,5 +1,5 @@
 class Admin::Cards::AssignRequests::Base < Admin::Base
-  attr_accessor :card_assign_request
+  attr_accessor :card_assign_requests
 
   def pre_validate
     if user.blank?
@@ -17,11 +17,11 @@ class Admin::Cards::AssignRequests::Base < Admin::Base
       return
     end
     id = (params[:id] or params[:card_assign_request_id])
-    self.card_assign_request = assign_requests_presenter.card_assign_requests.find_by_id(id)
+    self.card_assign_requests = assign_requests_presenter.card_assign_requests.with_id(id)
   end
 
   def validate
-    if self.card_assign_request.blank?
+    if self.card_assign_requests.blank?
       add_message :error, 'Card Assign Request not found'
     end
   end

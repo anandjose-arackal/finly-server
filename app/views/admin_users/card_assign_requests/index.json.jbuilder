@@ -21,6 +21,9 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
     card = card_assign_request.card
     json.proxy card.proxy
   end
+  json.status do
+    json.name card_assign_request.status.name
+  end
   json.kyc do
     kyc = @result.kyc_for(card_assign_request)
     json.address_proof do
