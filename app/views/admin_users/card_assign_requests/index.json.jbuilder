@@ -3,7 +3,7 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
   json.company do
     company = @result.company_for(card_assign_request)
     json.id company&.id
-    json.name company&.name
+    json.name company&.name&.humanize
   end
   json.user do
     user = card_assign_request.card_owner
