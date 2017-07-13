@@ -28,6 +28,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
         # because the admin panel operation inherits this one, and this needs to be shown only if the particular user is a Finly Admin
         if user.finly_admin?
           actions[:reject] = Rails.application.routes.url_helpers.admin_users_kyc_company_reject_path(company_kyc.company)
+          actions[:confirm] = Rails.application.routes.url_helpers.admin_users_kyc_company_confirm_path(company_kyc.company)
         end
       elsif company_kyc.kyc_status_id == KycStatus.id_for(:submitted)
         if user.finly_admin?

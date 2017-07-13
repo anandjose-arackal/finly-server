@@ -411,6 +411,7 @@
 #                                         PUT    /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         DELETE /admin_users/cards/:id(.:format)                               admin_users/cards#destroy
 #          admin_users_kyc_company_reject PATCH  /admin_users/kyc/companies/:company_id/reject(.:format)        admin_users/kyc/companies#reject
+#         admin_users_kyc_company_confirm PATCH  /admin_users/kyc/companies/:company_id/confirm(.:format)       admin_users/kyc/companies#confirm
 #               admin_users_kyc_companies GET    /admin_users/kyc/companies(.:format)                           admin_users/kyc/companies#index
 #                                         POST   /admin_users/kyc/companies(.:format)                           admin_users/kyc/companies#create
 #             new_admin_users_kyc_company GET    /admin_users/kyc/companies/new(.:format)                       admin_users/kyc/companies#new
@@ -1650,6 +1651,7 @@ Rails.application.routes.draw do
     namespace :kyc do
       resources :companies do
         patch 'reject', to: 'companies#reject', as: :reject
+        patch 'confirm', to: 'companies#confirm', as: :confirm
       end
     end
     resources :agreements, only: [:create, :index]

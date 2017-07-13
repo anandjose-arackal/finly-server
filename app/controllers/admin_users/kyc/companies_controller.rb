@@ -28,4 +28,9 @@ class AdminUsers::Kyc::CompaniesController < ApplicationController
     respond response: @result&.success? ? :success : :failure
   end
 
+  def confirm
+    @result = Admin::KycProcesses::Companies::Confirm.(current_user, params)
+    respond response: @result&.success? ? :success : :failure
+  end
+
 end
