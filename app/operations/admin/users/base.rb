@@ -16,7 +16,8 @@ class Admin::Users::Base < Admin::Base
 
       self.mapping = []
       self.policies.each do |policy|
-        self.mapping << Policy::Mappings::Show.(user, user: selected_user, policy: policy).map
+        op = Admin::Policy::Mappings::Show.(user, user: selected_user, policy: policy)
+        self.mapping << op.map
       end
 
       self.managers = selected_user.company.users.signed_up.with_roles.only_managers
@@ -34,6 +35,23 @@ class Admin::Users::Base < Admin::Base
             balance: (result.balance rescue 0),
             eligibility: (result.available_card_eligibility rescue 0),
             active: ((result.suspended_status rescue nil) == 'N' ? true : false)
+        }
+      end
+      data
+    end
+
+    def individual_kyc_data
+      data = {}
+      if selected_user.individual_kyc.kyc_status_id > 1
+        data[:id_proof] = {
+          url: selected_user.individual_kyc.id_proof.url,
+          file_type: selected_user.individual_kyc.id_proof.content_type
+        }
+
+
+        data[:address_proof] = {
+          url: selected_user.individual_kyc.address_proof.url,
+          file_type: selected_user.individual_kyc.address_proof.content_type
         }
       end
       data

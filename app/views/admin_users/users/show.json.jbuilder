@@ -69,6 +69,8 @@ json.cards do
   end
 end
 
+json.individual_kyc @result.individual_kyc_data
+
 json.roles do
   json.admin @result.selected_user.admin?
   json.finance_manager @result.selected_user.finance_manager?
