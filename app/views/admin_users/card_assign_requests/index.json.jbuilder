@@ -1,8 +1,9 @@
 json.array! @result.card_assign_requests.each do |card_assign_request|
+  json.id card_assign_request.id
   json.company do
     company = @result.company_for(card_assign_request)
     json.id company&.id
-    json.name company&.name
+    json.name company&.name&.humanize
   end
   json.user do
     user = card_assign_request.card_owner
@@ -20,6 +21,9 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
   json.card do
     card = card_assign_request.card
     json.proxy card.proxy
+  end
+  json.status do
+    json.name card_assign_request.status.name
   end
   json.kyc do
     kyc = @result.kyc_for(card_assign_request)

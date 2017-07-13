@@ -10,7 +10,7 @@ class Admin::Cards::AssignRequests::NextAdminReviewPosition < Admin::Cards::Assi
 
   def init
     self.card_assign_request = params[:card_assign_request]
-    self.workflow = self.card_assign_request&.admin_review_workflow
+    self.workflow = card_assign_request&.admin_review_workflow
   end
 
   def validate
@@ -21,16 +21,16 @@ class Admin::Cards::AssignRequests::NextAdminReviewPosition < Admin::Cards::Assi
   end
 
   def process
-    current_review_position = self.card_assign_request.review_position
+    current_review_position = card_assign_request.review_position
     self.next_review_position = (current_review_position + 1) if workflow.levels.with_position((current_review_position + 1)).present?
   end
 
   def success
     params[:next_review_position] = self.next_review_position
-    Admin::Cards::AssignRequests::NextAdminReviewPosition::SuccessPresenter.new(user, params, messages)
+    Admin::Cards::AssignRequests::NextAdminReviewPosition::Presenter.new(user, params, messages)
   end
 
-  class Admin::Cards::AssignRequests::NextAdminReviewPosition::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Admin::Cards::AssignRequests::NextAdminReviewPosition::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :next_review_position
 
     def init

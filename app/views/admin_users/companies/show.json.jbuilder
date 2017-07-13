@@ -23,7 +23,7 @@ end
 
 json.kyc do
   kyc = @result.company.company_kyc
-  editable = (kyc.editable? or [KycStatus.id_for(:processing)].include?(kyc.kyc_status_id))
+  editable = (kyc&.editable? or [KycStatus.id_for(:processing)].include?(kyc&.kyc_status_id))
   json.editable editable
   json.status do
     json.id kyc.kyc_status.id

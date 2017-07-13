@@ -13,19 +13,23 @@ class AdminUsers::CardAssignRequestsController < ApplicationController
   end
 
   def approve
-
+    @result = Admin::Cards::AssignRequests::Approve.(current_user, params)
+    respond
   end
 
   def reject
-
+    @result = Admin::Cards::AssignRequests::Reject.(current_user, params)
+    respond
   end
 
   def mark_as_assigned
-
+    @result = Admin::Cards::AssignRequests::MarkAsAssigned.(current_user, params)
+    respond
   end
 
   def mark_as_assigned_upgraded
-
+    @result = Admin::Cards::AssignRequests::MarkAsAssigned.(current_user, params)
+    respond
   end
 
 end
