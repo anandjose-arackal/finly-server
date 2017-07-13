@@ -252,7 +252,7 @@ class Company < ActiveRecord::Base
     documents = []
     # irrespective of company type, all companies need pan card
     documents << "pan_card"
-    case self.company_type_id
+    case self.company_kyc.company_type_id
 
       when CompanyType.id_for(:sole_proprietorship)
         if company_kyc.aadhar_card.present?
