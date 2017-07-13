@@ -1,4 +1,5 @@
 json.array! @result.card_assign_requests.each do |card_assign_request|
+  json.id card_assign_request.id
   json.company do
     company = @result.company_for(card_assign_request)
     json.id company&.id
