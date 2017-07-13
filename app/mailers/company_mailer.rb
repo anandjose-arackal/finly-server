@@ -9,4 +9,16 @@ class CompanyMailer < ApplicationMailer
     mail to: Constants::ITZCASH_EMAIL_ID, subject: "Transaction Details for Company: #{transaction_details[:company]}"
   end
 
+  # mailer that is sent to ItzCash when all documents have been confirmed as sent from the user
+  def send_to_itzcash(company)
+    @company = company
+    @company_kyc = company.company_kyc
+    @documents = company.kyc_documents
+    @documents.each do |doc|
+      attachments[doc.humanize] = File.open(company_kyc.send("#{doc}").path)
+    end
+    # can add more details here as we need
+    mail to: Constants::ITZ_CASH_KYC_EMAIL, subject: "KYC Documents for #{company.name}"
+  end
+
 end

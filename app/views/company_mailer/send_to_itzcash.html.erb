@@ -1,0 +1,13 @@
+<% content_for :body do %>
+    <h3> Please find attached the KYC documents for company <%= @company.name%> </h3>
+    <br/>
+    <p> The documents attached herewith are: </p>
+
+    <% @documents.each_with_index do |doc, index| %>
+        <h5><%= index +1 %>. <%= doc.humanize %></h5>
+    <% end %>
+
+    <br/>
+<% end %>
+
+<%= render 'application_mailer/template' %>
