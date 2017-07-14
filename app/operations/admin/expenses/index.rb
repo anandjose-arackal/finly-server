@@ -4,7 +4,7 @@ class Admin::Expenses::Index < Admin::Expenses::Base
 
   class Admin::Expenses::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :expenses, :categories
+    attr_accessor :expenses, :categories, :paginated_expenses
 
     include HasScope
 
@@ -17,9 +17,9 @@ class Admin::Expenses::Index < Admin::Expenses::Base
     def init
       self.expenses = params[:expenses]
       self.expenses = apply_scopes(expenses, params)
+      self.paginated_expenses = expenses.paginate(page: params[:page], per_page: 30)
       self.categories = user.company.categories.active
     end
-
   end
 
   def pre_validate

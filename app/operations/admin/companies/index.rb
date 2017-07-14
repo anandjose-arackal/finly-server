@@ -29,7 +29,7 @@ class Admin::Companies::Index < Admin::Companies::Base
 
     include HasScope
 
-    attr_accessor :companies, :company_types
+    attr_accessor :companies, :company_types, :paginated_companies
 
     has_scope :filter_search
     has_scope :created_between, using: [:start_date, :end_date], type: :hash
@@ -41,6 +41,7 @@ class Admin::Companies::Index < Admin::Companies::Base
     def init
       self.companies = params[:companies]
       self.companies = apply_scopes(companies, params)
+      self.paginated_companies = companies.paginate(page: params[:page], per_page: 30)
       self.company_types = CompanyType.all
     end
   end

@@ -356,6 +356,10 @@ class User < ActiveRecord::Base
     where point_of_contact: true
   }
 
+  scope :filter_card_number, -> (term) {
+    joins(:cards).select('users.*').where('proxy like ?', "%#{term}%")
+  }
+
   after_create do
     # self.build_profile.save if self.profile.blank?
     default_policy_id = self.company.default_policy.id
