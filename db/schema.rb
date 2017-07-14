@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170712150529) do
+ActiveRecord::Schema.define(version: 20170714090725) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -598,6 +598,64 @@ ActiveRecord::Schema.define(version: 20170712150529) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "card_upgrade_request_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "card_upgrade_request_track_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "card_upgrade_request_track_actions", ["name"], name: "index_card_upgrade_request_track_actions_on_name", using: :btree
+
+  create_table "card_upgrade_request_tracks", force: :cascade do |t|
+    t.integer  "card_upgrade_request_id", limit: 4,     null: false
+    t.integer  "action_resource_id",      limit: 4
+    t.string   "action_resource_type",    limit: 255
+    t.integer  "action_id",               limit: 4,     null: false
+    t.text     "note",                    limit: 65535
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "card_upgrade_request_tracks", ["action_id"], name: "index_card_upgrade_request_tracks_on_action_id", using: :btree
+  add_index "card_upgrade_request_tracks", ["action_resource_id"], name: "index_card_upgrade_request_tracks_on_action_resource_id", using: :btree
+  add_index "card_upgrade_request_tracks", ["action_resource_type"], name: "index_card_upgrade_request_tracks_on_action_resource_type", using: :btree
+  add_index "card_upgrade_request_tracks", ["card_upgrade_request_id"], name: "index_card_upgrade_request_tracks_on_card_upgrade_request_id", using: :btree
+
+  create_table "card_upgrade_requests", force: :cascade do |t|
+    t.integer  "card_id",                   limit: 4,     null: false
+    t.integer  "card_owner_id",             limit: 4,     null: false
+    t.integer  "initiating_resource_id",    limit: 4,     null: false
+    t.string   "initiating_resource_type",  limit: 255,   null: false
+    t.integer  "status_id",                 limit: 4
+    t.integer  "upgraded_by_resource_id",   limit: 4
+    t.string   "upgraded_by_resource_type", limit: 255
+    t.datetime "assigned_on"
+    t.integer  "admin_review_workflow_id",  limit: 4,     null: false
+    t.integer  "review_position",           limit: 4
+    t.text     "admin_note",                limit: 65535
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.integer  "company_id_id",             limit: 4,     null: false
+    t.integer  "company_id",                limit: 4,     null: false
+  end
+
+  add_index "card_upgrade_requests", ["admin_review_workflow_id"], name: "index_card_upgrade_requests_on_admin_review_workflow_id", using: :btree
+  add_index "card_upgrade_requests", ["card_id"], name: "index_card_upgrade_requests_on_card_id", using: :btree
+  add_index "card_upgrade_requests", ["card_owner_id"], name: "index_card_upgrade_requests_on_card_owner_id", using: :btree
+  add_index "card_upgrade_requests", ["company_id"], name: "index_card_upgrade_requests_on_company_id", using: :btree
+  add_index "card_upgrade_requests", ["company_id_id"], name: "index_card_upgrade_requests_on_company_id_id", using: :btree
+  add_index "card_upgrade_requests", ["initiating_resource_id"], name: "index_card_upgrade_requests_on_initiating_resource_id", using: :btree
+  add_index "card_upgrade_requests", ["initiating_resource_type"], name: "index_card_upgrade_requests_on_initiating_resource_type", using: :btree
+  add_index "card_upgrade_requests", ["status_id"], name: "index_card_upgrade_requests_on_status_id", using: :btree
+  add_index "card_upgrade_requests", ["upgraded_by_resource_id"], name: "index_card_upgrade_requests_on_upgraded_by_resource_id", using: :btree
+  add_index "card_upgrade_requests", ["upgraded_by_resource_type"], name: "index_card_upgrade_requests_on_upgraded_by_resource_type", using: :btree
 
   create_table "cards", force: :cascade do |t|
     t.integer  "user_id",                  limit: 4
@@ -1383,6 +1441,35 @@ ActiveRecord::Schema.define(version: 20170712150529) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "individual_kyc_track_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "individual_kyc_track_actions", ["name"], name: "index_individual_kyc_track_actions_on_name", using: :btree
+
+  create_table "individual_kyc_tracks", force: :cascade do |t|
+    t.integer  "individual_kyc_id",    limit: 4,     null: false
+    t.integer  "action_resource_id",   limit: 4
+    t.string   "action_resource_type", limit: 255
+    t.integer  "action_id",            limit: 4,     null: false
+    t.text     "note",                 limit: 65535
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "individual_kyc_tracks", ["action_id"], name: "index_individual_kyc_tracks_on_action_id", using: :btree
+  add_index "individual_kyc_tracks", ["action_resource_id"], name: "index_individual_kyc_tracks_on_action_resource_id", using: :btree
+  add_index "individual_kyc_tracks", ["action_resource_type"], name: "index_individual_kyc_tracks_on_action_resource_type", using: :btree
+  add_index "individual_kyc_tracks", ["individual_kyc_id"], name: "index_individual_kyc_tracks_on_individual_kyc_id", using: :btree
+
+  create_table "individual_kyc_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "individual_kycs", force: :cascade do |t|
     t.string   "id_proof_file_name",         limit: 255
     t.string   "id_proof_content_type",      limit: 255
@@ -1396,8 +1483,24 @@ ActiveRecord::Schema.define(version: 20170712150529) do
     t.string   "address_proof_content_type", limit: 255
     t.integer  "address_proof_file_size",    limit: 4
     t.datetime "address_proof_updated_at"
+    t.integer  "review_position",            limit: 4
+    t.integer  "admin_review_workflow_id",   limit: 4,   null: false
+    t.integer  "upgraded_by_resource_id",    limit: 4
+    t.integer  "type_id",                    limit: 4
+    t.string   "kyc_file_1_file_name",       limit: 255
+    t.string   "kyc_file_1_content_type",    limit: 255
+    t.integer  "kyc_file_1_file_size",       limit: 4
+    t.datetime "kyc_file_1_updated_at"
+    t.string   "kyc_file_2_file_name",       limit: 255
+    t.string   "kyc_file_2_content_type",    limit: 255
+    t.integer  "kyc_file_2_file_size",       limit: 4
+    t.datetime "kyc_file_2_updated_at"
+    t.string   "kyc_number",                 limit: 255
+    t.integer  "company_id",                 limit: 4,   null: false
   end
 
+  add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
+  add_index "individual_kycs", ["company_id"], name: "index_individual_kycs_on_company_id", using: :btree
   add_index "individual_kycs", ["user_id"], name: "index_individual_kycs_on_user_id", using: :btree
 
   create_table "itz_cash_card_programs", force: :cascade do |t|
@@ -2702,6 +2805,10 @@ ActiveRecord::Schema.define(version: 20170712150529) do
   add_foreign_key "card_restrictions", "cards"
   add_foreign_key "card_transactions", "cards"
   add_foreign_key "card_transactions", "users"
+  add_foreign_key "card_upgrade_request_tracks", "card_upgrade_requests"
+  add_foreign_key "card_upgrade_requests", "admin_review_workflows"
+  add_foreign_key "card_upgrade_requests", "cards"
+  add_foreign_key "card_upgrade_requests", "companies"
   add_foreign_key "cards", "card_types"
   add_foreign_key "cards", "companies"
   add_foreign_key "cards", "users"
@@ -2740,6 +2847,9 @@ ActiveRecord::Schema.define(version: 20170712150529) do
   add_foreign_key "field_configurations", "field_parent_types"
   add_foreign_key "field_configurations", "field_types"
   add_foreign_key "field_drop_down_items", "field_configurations"
+  add_foreign_key "individual_kyc_tracks", "individual_kycs"
+  add_foreign_key "individual_kycs", "admin_review_workflows"
+  add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
   add_foreign_key "itz_cash_dmt_senders", "users"

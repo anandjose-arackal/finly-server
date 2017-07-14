@@ -11,6 +11,8 @@
 class CardAssignRequestTrackAction < ActiveRecord::Base
   include Seedable
 
+  validates :name, presence: true
+
   def self.values
     [:submit, :approve, :final_approve, :assigned, :assigned_upgraded, :reject, :cancel]
   end

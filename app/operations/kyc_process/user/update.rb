@@ -12,20 +12,18 @@ class KycProcess::User::Update < KycProcess::User::Base
     end
   end
 
-  def post_process
-    if self.individual_kyc.id_proof.present? and self.individual_kyc.address_proof.present?
-      self.individual_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
-    else
-      self.individual_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
-    end
-  end
-
   protected
   def kyc_strong_params
     # params.require(:individual_kyc).permit(:id_proof, :address_proof)
     params = {}
+    ## DEPRICATED START ##
     params[:id_proof]= self.params[:individual_kyc][:id_proof] if self.params[:individual_kyc][:id_proof].present?
     params[:address_proof] = self.params[:individual_kyc][:address_proof] if self.params[:individual_kyc][:address_proof].present?
+    ## DEPRICATED END ##
+    params[:kyc_file_1]= self.params[:individual_kyc][:kyc_file_1] if self.params[:individual_kyc][:kyc_file_1].present?
+    params[:kyc_file_2] = self.params[:individual_kyc][:kyc_file_2] if self.params[:individual_kyc][:kyc_file_2].present?
+    params[:kyc_number]= self.params[:individual_kyc][:kyc_number] if self.params[:individual_kyc][:kyc_number].present?
+    params[:type_id]= self.params[:individual_kyc][:type_id] if self.params[:individual_kyc][:type_id].present?
     params
   end
 
