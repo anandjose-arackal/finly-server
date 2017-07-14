@@ -1674,7 +1674,6 @@ Rails.application.routes.draw do
   post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
   get 'download_resource', to: 'registrations#resources_download', as: :resources_download
 
-
   get 'policies/expense_rules' => 'policies#expense_rules'
   get 'policies/budget_rules' => 'policies#budget_rules'
   get 'policies/policy_members' => 'policies#policy_members'
@@ -1730,6 +1729,7 @@ Rails.application.routes.draw do
   post 'cards/update_balance' => 'cards#update_balance', as: :update_balance
   post 'cards/update_status' => 'cards#update_status', as: :update_card_status
   patch 'cards/assign', to: 'cards#assign', as: :assign_card
+  patch 'cards/assign/:id/cancel', to: 'cards#assign', as: :cancel_assign_request
   get 'cards/unassigned', to: 'cards#unassigned', as: :unassigned_cards
 
   resources :reports, except: [:new, :edit]

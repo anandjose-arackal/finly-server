@@ -1,9 +1,7 @@
 class Admin::Users::Base < Admin::Base
-
   attr_accessor :selected_user
 
   class Admin::Users::Base::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
     attr_accessor :created_user, :selected_user, :cards, :policies, :mapping,
                   :managers, :finance_managers, :wallet
 
@@ -33,8 +31,21 @@ class Admin::Users::Base < Admin::Base
             proxy: card.proxy,
             balance: (result.balance rescue 0),
             eligibility: (result.available_card_eligibility rescue 0),
-            active: ((result.suspended_status rescue nil) == 'N' ? true : false)
+            active: ((result.suspended_status rescue nil) == 'N' ? true : false),
+            status: {id: card.card_status.id, name: card.card_status.name}
         }
+        unless card.assigned?
+          assign_request = card.card_assign_requests.with_user_id(selected_user.id)
+          if assign_request.present?
+            data[:assign_request] = {
+                id: assign_request.id,
+                status: {
+                    id: assign_request.status.id,
+                    name: assign_request.status.name
+                }
+            }
+          end
+        end
       end
       data
     end

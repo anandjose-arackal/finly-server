@@ -102,17 +102,46 @@ class User::Show < User::Base
               end
             end
           end
-          self.cards << {card: {show_balance: show_balance,
-                                show_eligibility: show_eligibility,
-                                # ending_number: ending_number,
-                                proxy: proxy,
-                                configurable_restrictions: configurable_restrictions,
-                                balance: balance,
-                                eligibility: eligibility,
-                                disabled_by: disabled_by,
-                                active: active, name: name, id: id},
-                         actions: actions,
-                         card_restriction: card.card_restriction}
+          assign_request_data = nil
+          unless card.assigned?
+            assign_request = card.card_assign_requests.with_card_owner_id(selected_user.id)&.first
+            if assign_request.present?
+              assign_request_data = {
+                  id: assign_request.id,
+                  status: {
+                      id: assign_request.status.id,
+                      name: assign_request.status.name
+                  }
+              }
+              if assign_request.cancellable? and admin_view?
+                cancel_params = {}
+                cancel_params[:view] = params[:view]
+                cancel_params[:id] = assign_request.id
+                actions[:cancel_assign_request] = Rails.application.routes.url_helpers.cancel_assign_request_path(cancel_params)
+              end
+            end
+          end
+          self.cards << {
+              card: {
+                  show_balance: show_balance,
+                  show_eligibility: show_eligibility,
+                  # ending_number: ending_number,
+                  proxy: proxy,
+                  configurable_restrictions: configurable_restrictions,
+                  balance: balance,
+                  eligibility: eligibility,
+                  disabled_by: disabled_by,
+                  active: active,
+                  name: name,
+                  id: id,
+                  status: {
+                      id: card.card_status.id,
+                      name: card.card_status.name
+                  },
+                  assign_request: assign_request_data
+              },
+              actions: actions,
+              card_restriction: card.card_restriction}
         end
       end
       self.auto_submit_config = self.selected_user.auto_submit_config
