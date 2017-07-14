@@ -11,6 +11,8 @@
 class CardAssignRequestStatus < ActiveRecord::Base
   include Seedable
 
+  validates :name, presence: true
+
   def self.values
     [:processing, :approved, :assigned, :assigned_and_upgraded, :rejected, :cancelled]
   end

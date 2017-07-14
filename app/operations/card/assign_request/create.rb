@@ -18,6 +18,10 @@ class Card::AssignRequest::Create < Card::AssignRequest::Base
       add_message :error, 'Card Program cannot be blank'
       return
     end
+    unless admin_view?
+      add_message :error, 'You can assign cards only as an admin'
+      return
+    end
   end
 
   def init
@@ -55,6 +59,7 @@ class Card::AssignRequest::Create < Card::AssignRequest::Base
     end
     unless self.card.unassigned?
       add_message :error, 'Card has already been assigned to another user'
+      return
     end
   end
 

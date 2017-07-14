@@ -166,6 +166,10 @@ class Card < ActiveRecord::Base
     self.card_status_id == CardStatus.id_for(:unassigned) and self.user_id.blank?
   end
 
+  def assigned?
+    return (not [CardStatus.id_for(:unassigned), CardStatus.id_for(:assign_requested)].include?(self.card_status_id))
+  end
+
   def expense_card?
     if self.card_program_id == CardProgram.id_for(:expense)
       return true
@@ -179,6 +183,7 @@ class Card < ActiveRecord::Base
     end
     false
   end
+
 
   private
 

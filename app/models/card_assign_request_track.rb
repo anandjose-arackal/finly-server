@@ -17,4 +17,7 @@ class CardAssignRequestTrack < ActiveRecord::Base
   belongs_to :action_resource, polymorphic: true
   belongs_to :action, class_name: 'CardAssignRequestTrackAction'
 
+  validates :card_assign_request_id, presence: true
+  validates :action_id, presence: true
+
 end

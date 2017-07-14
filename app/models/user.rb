@@ -51,18 +51,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -134,6 +122,8 @@ class User < ActiveRecord::Base
   has_many :user_login_tracks
   has_many :login_agreement_mappings
   has_many :agreements, through: :login_agreement_mappings
+  has_many :card_assign_requests, foreign_key: :card_owner_id
+  has_many :card_upgrade_requests, foreign_key: :card_owner_id
 
   has_one :individual_kyc
   has_one :itz_cash_dmt_sender
@@ -367,7 +357,7 @@ class User < ActiveRecord::Base
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
     self.build_enforce_policy(enabled: false).save
     self.build_auto_reload_config(enabled: false).save
-    self.build_individual_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.individual_kyc.blank?
+    self.build_individual_kyc(company_id: self.company_id, kyc_status_id: KycStatus.id_for(:incomplete), admin_review_workflow: AdminReviewWorkflow.workflow_for(:kyc_update)).save if self.individual_kyc.blank?
   end
 
   def payments

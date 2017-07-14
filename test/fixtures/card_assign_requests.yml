@@ -17,6 +17,7 @@
 #  admin_review_workflow_id  :integer
 #  review_position           :integer          default(0)
 #  admin_note                :text(65535)
+#  company_id                :integer          not null
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

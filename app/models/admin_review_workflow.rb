@@ -19,6 +19,10 @@ class AdminReviewWorkflow < ActiveRecord::Base
             '0': ['admin@demo.io', 'sreeram@demo.io'],
             '1': 'vivek@demo.io',
             '2': 'veekshith@demo.io'
+        },
+        kyc_update: {
+            '0': ['admin@demo.io', 'sreeram@demo.io'],
+            '2': 'veekshith@demo.io'
         }
     }
   end

@@ -12,6 +12,7 @@ class Admin::Cards::AssignRequests::CompanyIndex < Admin::Cards::AssignRequests:
     pending_requests_presenter = Admin::Cards::AssignRequests::Index.(user, params)
     unless pending_requests_presenter.success?
       add_message :error, pending_requests_presenter.messages[:error]
+      return
     end
     assign_requests = pending_requests_presenter.card_assign_requests
     assign_requests_user_ids = assign_requests.pluck(:card_owner_id)

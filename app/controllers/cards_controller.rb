@@ -57,6 +57,12 @@ class CardsController < ApplicationController
     respond
   end
 
+  def cancel_assign
+    # @result = Card::Assign.(current_user, params)
+    @result = Card::AssignRequest::Cancel.(current_user, params)
+    respond
+  end
+
   def unassigned
     @result = Card::Unassigned.(current_user, params)
     respond

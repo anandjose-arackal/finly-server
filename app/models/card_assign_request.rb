@@ -17,6 +17,7 @@
 #  admin_review_workflow_id  :integer
 #  review_position           :integer          default(0)
 #  admin_note                :text(65535)
+#  company_id                :integer          not null
 #
 
 class CardAssignRequest < ActiveRecord::Base
@@ -31,6 +32,8 @@ class CardAssignRequest < ActiveRecord::Base
 
   has_many :tracks, class_name: 'CardAssignRequestTrack'
 
+  default_scope { where.not status_id: CardAssignRequestStatus.id_for(:cancelled) }
+
   validates :card_id, presence: true
   validates :card_program_id, presence: true
   validates :status_id, presence: true
@@ -41,10 +44,15 @@ class CardAssignRequest < ActiveRecord::Base
   scope :with_admin_review_workflow, -> (workflow_id) { where admin_review_workflow_id: workflow_id }
   scope :with_review_position, ->(review_pos) { where review_position: review_pos }
   scope :filter_company, ->(company_id) { where company_id: company_id }
+  scope :with_card_owner_id, -> (id) { where card_owner_id: id }
   scope :with_id, -> (id) { where id: id }
 
   def processing?
     self.status_id == CardAssignRequestStatus.id_for(:processing)
+  end
+
+  def cancellable?
+    [CardAssignRequestStatus.id_for(:rejected)].include?(self.status_id)
   end
 
 end
