@@ -21,6 +21,12 @@ class AdminUsers::Kyc::CompaniesController < ApplicationController
 
   end
 
+  # action that sends the relevant documents to ItzCash when pressed from the admin panel
+  def send_to_itzcash
+    @result = Admin::KycProcesses::Companies::SendToItzcash.(current_user, params)
+    respond response: @result&.success? ? :success : :failure
+  end
+
   # action that rejects a particular user's KYC documents for failing the first screening after
   # admin panel verification
   def reject
