@@ -2,10 +2,10 @@ class AdminUsers::Kyc::UsersController < ApplicationController
 
   before_action -> { doorkeeper_authorize! :admin }
 
-  def company_index
-    @result = Admin::KycProcesses::Users::CompanyIndex.(current_user, params)
-    respond
-  end
+  # def company_index
+  #   @result = Admin::KycProcesses::Users::CompanyIndex.(current_user, params)
+  #   respond
+  # end
 
   def index
     @result = Admin::KycProcesses::Users::Index.(current_user, params)

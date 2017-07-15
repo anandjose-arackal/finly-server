@@ -1659,8 +1659,10 @@ Rails.application.routes.draw do
     end
     resources :agreements, only: [:create, :index]
 
+    namespace :verifier do
+      get 'companies', to: 'company#index'
+    end
     # Assign Card Workflow
-    get 'card_assign_requests/companies', to: 'card_assign_requests#company_index'
     get 'card_assign_requests', to: 'card_assign_requests#index'
     post 'card_assign_requests/approve', to: 'card_assign_requests#approve'
     post 'card_assign_requests/reject', to: 'card_assign_requests#reject'
