@@ -48,8 +48,8 @@ class IndividualKyc < ActiveRecord::Base
   scope :with_id, -> (id) { where id: id }
 
 
-  # CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
-  CONTENT_TYPES = {content_type: %w(image/jpg)}
+  CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
+  # CONTENT_TYPES = {content_type: %w(image/jpg)}
 
   ## DEPRICATED START ##
   has_attached_file :id_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
@@ -64,6 +64,8 @@ class IndividualKyc < ActiveRecord::Base
 
   has_attached_file :kyc_file_2, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :kyc_file_1, content_type: CONTENT_TYPES
+
+
 
   def editable?
     [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:rejected)].include?(kyc_status_id)
