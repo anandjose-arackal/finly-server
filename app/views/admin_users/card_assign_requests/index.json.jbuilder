@@ -25,24 +25,39 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
   json.status do
     json.name card_assign_request.status.name
   end
-  json.kyc do
-    kyc = @result.kyc_for(card_assign_request)
-    json.address_proof do
-      json.file_type kyc&.file_format(kyc.address_proof)
-      json.original kyc&.address_proof&.url
-      json.thumb kyc&.address_proof&.url(:thumb)
-    end
-    json.id_proof do
-      json.file_type kyc&.file_format(kyc.id_proof)
-      json.original kyc&.id_proof&.url
-      json.thumb kyc&.id_proof&.url(:thumb)
-    end
-  end
   json.actions do
     actions = @result.actions_for(card_assign_request)
     json.approve !!actions[:approve]
     json.reject !!actions[:reject]
     json.mark_as_assigned !!actions[:mark_as_assigned]
     json.mark_as_upgraded !!actions[:mark_as_upgraded]
+  end
+  json.kyc do
+    kyc = @result.kyc_for(card_assign_request)
+    json.id_number kyc&.kyc_number
+    if kyc&.type.blank?
+      json.type nil
+    else
+      json.type do
+        json.id kyc.type.id
+        json.name kyc.type.name
+      end
+    end
+    if kyc&.file_1.blank?
+      json.file_1 nil
+    else
+      json.file_1 do
+        json.original kyc&.kyc_file_1&.url
+        json.thumb kyc&.kyc_file_2&.url(:thumb)
+      end
+    end
+    if kyc&.file_2.blank?
+      json.file_2 nil
+    else
+      json.file_2 do
+        json.original kyc&.kyc_file_2&.url
+        json.thumb kyc&.kyc_file_2&.url(:thumb)
+      end
+    end
   end
 end
