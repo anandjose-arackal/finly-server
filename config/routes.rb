@@ -1668,6 +1668,7 @@ Rails.application.routes.draw do
     post 'card_assign_requests/reject', to: 'card_assign_requests#reject'
     post 'card_assign_requests/mark_assigned', to: 'card_assign_requests#mark_as_assigned'
     post 'card_assign_requests/mark_assigned_upgraded', to: 'card_assign_requests#mark_as_assigned_upgraded'
+    get 'card_assign_requests/export(.:format)' => 'card_assign_requests#export'
   end
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu

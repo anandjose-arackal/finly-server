@@ -1,11 +1,7 @@
 class AdminUsers::CardAssignRequestsController < ApplicationController
 
+  before_action :set_tokens_in_header, only: :export
   before_action -> { doorkeeper_authorize! :admin }
-
-  # def company_index
-  #   @result = Admin::Cards::AssignRequests::CompanyIndex.(current_user, params)
-  #   respond
-  # end
 
   def index
     @result = Admin::Cards::AssignRequests::Index.(current_user, params)
@@ -29,6 +25,11 @@ class AdminUsers::CardAssignRequestsController < ApplicationController
 
   def mark_as_assigned_upgraded
     @result = Admin::Cards::AssignRequests::MarkAsAssigned.(current_user, params)
+    respond
+  end
+
+  def export
+    @result = Admin::Cards::AssignRequests::Export::AsXls.(current_user, params)
     respond
   end
 

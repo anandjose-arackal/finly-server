@@ -135,10 +135,14 @@ class ApplicationController < ActionController::Base
     end
     if @result.present?
       if @result.success?
-        respond_to do |format|
-          format.js {}
-          format.json {}
-          format.html {}
+        if [Exporter, Exporter::Spreadsheet, Exporter::Pdf].include? @result.class
+          @result.render(self)
+        else
+          respond_to do |format|
+            format.js {}
+            format.json {}
+            format.html {}
+          end
         end
       else
         respond_to do |format|
@@ -233,6 +237,13 @@ class ApplicationController < ActionController::Base
     u = current_user
     return nil unless u.class == User
     u&.company
+  end
+
+  def set_tokens_in_header
+    access_token = request.cookies['access_token']
+    if access_token.present?
+      request.headers['Authorization'] = "Bearer #{access_token}"
+    end
   end
 
 end
