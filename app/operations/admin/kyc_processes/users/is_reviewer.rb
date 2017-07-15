@@ -33,10 +33,10 @@ class Admin::KycProcesses::Users::IsReviewer < Admin::KycProcesses::Users::Base
 
   def success
     params[:is_reviewer] = self.is_reviewer
-    Admin::KycProcesses::Users::IsReviewer::NextAdminReviewPosition::SuccessPresenter.new(user, params, messages)
+    Admin::KycProcesses::Users::IsReviewer::SuccessPresenter.new(user, params, messages)
   end
 
-  class Admin::KycProcesses::Users::IsReviewer::NextAdminReviewPosition::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Admin::KycProcesses::Users::IsReviewer::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :is_reviewer
 
     def init
