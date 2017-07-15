@@ -48,8 +48,8 @@ class IndividualKyc < ActiveRecord::Base
   scope :with_id, -> (id) { where id: id }
 
 
-  # CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
-  CONTENT_TYPES = {content_type: %w(image/jpg)}
+  CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
+  # CONTENT_TYPES = {content_type: %w(image/jpg)}
 
   ## DEPRICATED START ##
   has_attached_file :id_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
