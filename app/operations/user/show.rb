@@ -66,6 +66,7 @@ class User::Show < User::Base
         selected_user.cards.each do |card|
           actions = {}
           # Card Actions
+          assigned = card.assigned?
           show_balance = personal ? true : card.card_program.manager_view_balance
           show_eligibility = personal ? true : card.card_program.manager_view_eligibility
           configurable_restrictions = card.card_program.spend_restrictions
@@ -111,7 +112,8 @@ class User::Show < User::Base
                   status: {
                       id: assign_request.status.id,
                       name: assign_request.status.name
-                  }
+                  },
+                  message: assign_request.admin_note
               }
               if assign_request.cancellable? and admin_view?
                 cancel_params = {}
@@ -123,6 +125,7 @@ class User::Show < User::Base
           end
           self.cards << {
               card: {
+                  assigned: assigned,
                   show_balance: show_balance,
                   show_eligibility: show_eligibility,
                   # ending_number: ending_number,
