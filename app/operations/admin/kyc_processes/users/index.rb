@@ -36,7 +36,7 @@ class Admin::KycProcesses::Users::Index < Admin::KycProcesses::Users::Base
     end
 
     def company_for(individual_kyc)
-      individual_kyc&.card_owner&.company
+      individual_kyc&.user&.company
     end
 
     def actions_for(individual_kyc)

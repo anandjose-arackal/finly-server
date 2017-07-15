@@ -13,7 +13,7 @@ class Admin::KycProcesses::Users::Approve < Admin::KycProcesses::Users::Base
         add_message :error, 'You are not the assigned reviewer for this request'
         return
       end
-      unless [KycStatus.id_for(:processing)].include? individual_kyc.status_id
+      unless [KycStatus.id_for(:processing)].include? individual_kyc.kyc_status_id
         add_message :error, "Error. KYC for #{individual_kyc.user.name} cannot be approved in this stage"
         return
       end
@@ -29,7 +29,7 @@ class Admin::KycProcesses::Users::Approve < Admin::KycProcesses::Users::Base
       end
       if next_reviewer_presenter.is_final?
         # No more reviewers
-        individual_kyc.update(review_position: nil, status_id: KycStatus.id_for(:approved))
+        individual_kyc.update(review_position: nil, kyc_status_id: KycStatus.id_for(:approved))
 
         track_params = {
             action_resource: user,

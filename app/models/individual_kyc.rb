@@ -65,6 +65,10 @@ class IndividualKyc < ActiveRecord::Base
   has_attached_file :kyc_file_2, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :kyc_file_1, content_type: CONTENT_TYPES
 
+  def processing?
+    [KycStatus.id_for(:processing), KycStatus.id_for(:submitted)].include?(self.kyc_status_id)
+  end
+
   def editable?
     [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:rejected)].include?(kyc_status_id)
   end
