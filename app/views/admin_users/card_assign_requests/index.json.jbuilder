@@ -51,7 +51,7 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
         json.thumb kyc&.kyc_file_2&.url(:thumb)
       end
     end
-    if kyc&.file_2.blank?
+    if kyc&.kyc_file_2.blank?
       json.file_2 nil
     else
       json.file_2 do
