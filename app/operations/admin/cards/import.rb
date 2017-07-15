@@ -1,6 +1,6 @@
 class Admin::Cards::Import < Admin::Base
 
-  attr_accessor :file_url, :file, :result_hash
+  attr_accessor :file_url, :file, :result_hash, :params, :missing_params
 
   def pre_validate
     if user.blank? || params.blank?
@@ -24,10 +24,57 @@ class Admin::Cards::Import < Admin::Base
   end
 
   def process
-    (2..sheet.last_row)
+    (2..sheet.last_row).each do |i|
+      row = sheet.row(i)
+      self.params = process_row(row)
+
+      unless validate_params(row)
+        result_hash[i] = "#{missing_params.to_sentence} cannot be blank"
+        next
+      end
+
+      card = Card.new(params)
+      if card.save
+        card.update(active: true)
+        result_hash[i] = "Success!"
+      else
+        add_message :error, card.errors.full_messages
+      end
+    end
+  end
+
+  def post_process
+    self.file_url = create_response_csv
+  end
+
+  class Admin::Cards::Import < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :file_url
+
+    def init
+      self.file_url = params[:file_url]
+    end
   end
 
   private
+
+  def process_row(row)
+    card_proxy = row[import_fields[:proxy]]
+    card_program_id = row[import_fields[:card_program_id]]
+    itz_cash_card_program_id = row[import_fields[:itz_cash_card_program_id]]
+    company_id = row[import_fields[:company_id]]
+    ending_number = row[import_fields[:ending_number]]
+
+    params = {
+        card: {
+            proxy: card_proxy,
+            card_program_id: card_program_id,
+            itz_cash_card_program_id: itz_cash_card_program_id,
+            company_id: company_id,
+            ending_number: ending_number
+        }
+    }
+  end
 
   def import_fields
     {
@@ -37,5 +84,37 @@ class Admin::Cards::Import < Admin::Base
         :itz_cash_card_program => 3,
         :ending_number => 4
     }
+  end
+
+  def validate_params(row)
+    self.missing_params = []
+    if row[import_fields[:proxy]].blank?
+      missing_params << "Card Serial No."
+    end
+    if row[import_fields[:company_id]].blank?
+      missing_params << "Company ID"
+    end
+    if row[import_fields[:itz_cash_card_program_id]].blank?
+      missing_params << "ItzCash Card Program"
+    end
+    if row[import_fields[:card_program_id]].blank?
+      missing_params << "Card Program"
+    end
+    missing_params
+  end
+
+  def create_response_csv
+    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    CSV.open(file_name, 'wb') do |csv|
+      self.header << 'Result'
+      csv << header
+      (2..sheet.last_row).each do |i|
+        row = sheet.row(i)
+        row = row.map(&:to_s)
+        row << result_hash[i]
+        csv << row
+      end
+    end
+    return file_name.gsub('public', '')
   end
 end
