@@ -1656,6 +1656,8 @@ Rails.application.routes.draw do
       post 'users/approve', to: 'users#approve'
       post 'users/reject', to: 'users#reject'
       post 'users/mark_as_upgraded', to: 'users#mark_as_upgraded'
+      get 'users/export(.:format)' => 'users#export'
+      get 'users/kycs/download' => 'users#download_kycs'
     end
     resources :agreements, only: [:create, :index]
 
