@@ -1,6 +1,7 @@
 class AdminUsers::Kyc::UsersController < ApplicationController
 
-  before_action -> { doorkeeper_authorize! :admin }
+  # before_action :set_tokens_in_header, only: :export
+  # before_action -> { doorkeeper_authorize! :admin }
 
   # def company_index
   #   @result = Admin::KycProcesses::Users::CompanyIndex.(current_user, params)
@@ -24,6 +25,17 @@ class AdminUsers::Kyc::UsersController < ApplicationController
 
   def mark_as_upgraded
     @result = Admin::KycProcesses::Users::MarkAsAssigned.(current_user, params)
+    respond
+  end
+
+  def export
+    current_user = AdminUser.first
+    @result = Admin::KycProcesses::Users::Export::AsXls.(current_user, params)
+    respond
+  end
+
+  def download_kycs
+    @result = Admin::KycProcesses::Users::Export::Kycs.(current_user, params)
     respond
   end
 
