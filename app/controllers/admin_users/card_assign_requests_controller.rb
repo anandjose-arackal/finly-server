@@ -33,4 +33,9 @@ class AdminUsers::CardAssignRequestsController < ApplicationController
     respond
   end
 
+  def download_kycs
+    @result = Admin::Cards::AssignRequests::Export::Kycs.(current_user, params)
+    respond
+  end
+
 end
