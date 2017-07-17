@@ -56,6 +56,7 @@ class Admin::Cards::AssignRequests::Index < Admin::Cards::AssignRequests::Base
       end
       next_reviewer_presenter = Admin::Cards::AssignRequests::NextAdminReviewPosition.(user, admin_user: user, card_assign_request: card_assign_request)
       if next_reviewer_presenter.success? and next_reviewer_presenter.is_final? and user.has_role?(AdminUserRole.id_for(:itzcash_operations))
+        actions.delete(:approve)
         actions[:mark_as_assigned] = true
         actions[:mark_as_upgraded] = true
       end
