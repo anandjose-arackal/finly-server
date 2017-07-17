@@ -15,9 +15,6 @@
 #  last_sign_in_ip        :string(255)
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
-#  first_name             :string(255)
-#  last_name              :string(255)
-#  mobile_number          :string(255)      not null
 #
 
 class AdminUser < ActiveRecord::Base
@@ -58,6 +55,10 @@ class AdminUser < ActiveRecord::Base
 
   def transcriber?
     self.admin_user_role_mappings.transcriber.present?
+  end
+
+  def call_center?
+    self.admin_user_role_mappings.call_center.present?
   end
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate

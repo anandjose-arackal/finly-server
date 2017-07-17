@@ -20,7 +20,6 @@
 #  card_eligibility_id      :integer
 #  admin_unblockable        :boolean          default(TRUE)
 #  itz_cash_card_program_id :integer
-#  card_status_id           :integer          not null
 #
 
 
