@@ -10,6 +10,13 @@ else
   json.mobile_number @result.selected_user.mobile_number
 end
 
+json.itz_cash_card_programs do
+  json.array!(@result.itz_cash_card_programs) do |program|
+    json.id program.id
+    json.name program.name
+  end
+end
+
 json.wallet do
   json.balance @result.wallet.balance_value
 end
