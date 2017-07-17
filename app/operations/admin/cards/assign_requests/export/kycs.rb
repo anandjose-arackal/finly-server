@@ -5,8 +5,8 @@ class Admin::Cards::AssignRequests::Export::Kycs < Admin::Cards::AssignRequests:
     kycs = IndividualKyc.with_user_id(self.card_assign_requests.pluck(:card_owner_id))
     self.download_urls = []
     kycs&.each do |kyc|
-      self.download_urls << "www.finly.io#{kyc.kyc_file_1.url}" if kyc.kyc_file_1.present?
-      self.download_urls << "www.finly.io#{kyc.kyc_file_2.url}" if kyc.kyc_file_2.present?
+      self.download_urls << kyc.kyc_file_1.url if kyc.kyc_file_1.present?
+      self.download_urls << kyc.kyc_file_2.url if kyc.kyc_file_2.present?
     end
   end
 

@@ -4,8 +4,8 @@ class Admin::KycProcesses::Users::Export::Kycs < Admin::KycProcesses::Users::Bas
   def process
     self.download_urls = []
     self.individual_kycs&.each do |kyc|
-      self.download_urls << "www.finly.io#{kyc.kyc_file_1.url}" if kyc.kyc_file_1.present?
-      self.download_urls << "www.finly.io#{kyc.kyc_file_2.url}" if kyc.kyc_file_2.present?
+      self.download_urls << kyc.kyc_file_1.url if kyc.kyc_file_1.present?
+      self.download_urls << kyc.kyc_file_2.url if kyc.kyc_file_2.present?
     end
   end
 

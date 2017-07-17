@@ -1744,7 +1744,7 @@ Rails.application.routes.draw do
   post 'cards/update_balance' => 'cards#update_balance', as: :update_balance
   post 'cards/update_status' => 'cards#update_status', as: :update_card_status
   patch 'cards/assign', to: 'cards#assign', as: :assign_card
-  patch 'cards/assign/:id/cancel', to: 'cards#assign', as: :cancel_assign_request
+  patch 'cards/assign/:id/cancel', to: 'cards#cancel_assign', as: :cancel_assign_request
   get 'cards/unassigned', to: 'cards#unassigned', as: :unassigned_cards
 
   resources :reports, except: [:new, :edit]
