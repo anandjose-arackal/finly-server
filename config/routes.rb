@@ -1656,14 +1656,29 @@ Rails.application.routes.draw do
       resources :companies do
         patch 'reject', to: 'companies#reject', as: :reject
       end
+
+      # Upgrade Card Workflow
+      get 'users/companies', to: 'users#company_index'
+      get 'users', to: 'users#index'
+      post 'users/approve', to: 'users#approve'
+      post 'users/reject', to: 'users#reject'
+      post 'users/mark_as_upgraded', to: 'users#mark_as_upgraded'
+      get 'users/export(.:format)' => 'users#export'
+      get 'users/kycs/download' => 'users#download_kycs'
     end
     resources :agreements, only: [:create, :index]
-    get 'card_assign_requests/companies', to: 'card_assign_requests#company_index'
+
+    namespace :verifier do
+      get 'companies', to: 'company#index'
+    end
+    # Assign Card Workflow
     get 'card_assign_requests', to: 'card_assign_requests#index'
     post 'card_assign_requests/approve', to: 'card_assign_requests#approve'
     post 'card_assign_requests/reject', to: 'card_assign_requests#reject'
     post 'card_assign_requests/mark_assigned', to: 'card_assign_requests#mark_as_assigned'
     post 'card_assign_requests/mark_assigned_upgraded', to: 'card_assign_requests#mark_as_assigned_upgraded'
+    get 'card_assign_requests/export(.:format)' => 'card_assign_requests#export'
+    get 'card_assign_requests/kycs/download' => 'card_assign_requests#download_kycs'
 
     post 'call_center/search', to: 'call_center/users#search', as: :search
   end
@@ -1738,7 +1753,7 @@ Rails.application.routes.draw do
   post 'cards/update_balance' => 'cards#update_balance', as: :update_balance
   post 'cards/update_status' => 'cards#update_status', as: :update_card_status
   patch 'cards/assign', to: 'cards#assign', as: :assign_card
-  patch 'cards/assign/:id/cancel', to: 'cards#assign', as: :cancel_assign_request
+  patch 'cards/assign/:id/cancel', to: 'cards#cancel_assign', as: :cancel_assign_request
   get 'cards/unassigned', to: 'cards#unassigned', as: :unassigned_cards
 
   resources :reports, except: [:new, :edit]

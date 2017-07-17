@@ -69,6 +69,11 @@ json.cards do
   end
 end
 
+json.subscriptions do
+  json.expense_management @result.user_panel_subscription.expense_management
+  json.disburse @result.user_panel_subscription.disburse
+end
+
 json.individual_kyc @result.individual_kyc_data
 
 json.roles do

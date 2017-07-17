@@ -13,7 +13,7 @@ class Admin::KycProcesses::Users::MarkAsUpgraded < Admin::KycProcesses::Users::B
         add_message :error, 'You are not the assigned reviewer for this request'
         return
       end
-      unless [KycStatus.id_for(:processing), KycStatus.id_for(:approved)].include? individual_kyc.status_id
+      unless [KycStatus.id_for(:processing), KycStatus.id_for(:approved)].include? individual_kyc.kyc_status_id
         add_message :error, "Error. User #{individual_kyc.user.name} cannot be approved in this stage"
         return
       end
@@ -22,13 +22,15 @@ class Admin::KycProcesses::Users::MarkAsUpgraded < Admin::KycProcesses::Users::B
 
   def process
     self.individual_kycs.each do |individual_kyc|
-      individual_kyc.update(review_position: nil, status_id: KycStatus.id_for(:completed), upgraded_by_resource: user, upgraded_on: DateTime.now)
+      individual_kyc.update(review_position: nil, kyc_status_id: KycStatus.id_for(:completed), upgraded_by_resource: user, upgraded_on: DateTime.now)
       individual_kyc.card.update(card_status_id: CardStatus.id_for(:upgraded))
       track_params = {
           action_resource: user,
           action_id: IndividualKycTrackAction.id_for(:upgraded)
       }
       individual_kyc.tracks.create track_params
+      # individual_kyc.user.cards.update_all
+      # Todo mark all cards as upgraded
     end
   end
 

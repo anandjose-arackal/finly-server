@@ -3,7 +3,7 @@ class Admin::Users::Base < Admin::Base
 
   class Admin::Users::Base::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :created_user, :selected_user, :cards, :policies, :mapping,
-                  :managers, :finance_managers, :wallet
+                  :managers, :finance_managers, :wallet, :user_panel_subscription
 
     def init
       self.created_user = params[:created_user]
@@ -11,6 +11,7 @@ class Admin::Users::Base < Admin::Base
       self.wallet = selected_user.wallet
       self.cards = retrieve_card_data
       self.policies = selected_user.policies
+      self.user_panel_subscription = selected_user.user_panel_subscription
 
       self.mapping = []
       self.policies.each do |policy|
@@ -67,5 +68,7 @@ class Admin::Users::Base < Admin::Base
       end
       data
     end
+
+
   end
 end

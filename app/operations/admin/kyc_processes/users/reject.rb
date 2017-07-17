@@ -13,7 +13,7 @@ class Admin::KycProcesses::Users::Reject < Admin::KycProcesses::Users::Base
         add_message :error, 'You are not the assigned reviewer for this request'
         return
       end
-      unless [KycStatus.id_for(:processing), KycStatus.id_for(:approved)].include? card_assign_request.status_id
+      unless [KycStatus.id_for(:processing), KycStatus.id_for(:approved)].include? individual_kyc.kyc_status_id
         add_message :error, "Error. User #{individual_kyc.user.name} cannot be approved in this stage"
         return
       end
@@ -22,7 +22,7 @@ class Admin::KycProcesses::Users::Reject < Admin::KycProcesses::Users::Base
 
   def process
     self.individual_kycs.each do |individual_kyc|
-      individual_kyc.update(review_position: nil, status_id: KycStatus.id_for(:rejected), admin_note: params[:admin_note])
+      individual_kyc.update(review_position: nil, kyc_status_id: KycStatus.id_for(:rejected), admin_note: params[:admin_note])
       track_params = {
           action_resource: user,
           action_id: IndividualKycTrackAction.id_for(:reject),
