@@ -23,7 +23,6 @@ class Admin::Cards::AssignRequests::MarkAsAssignedUpgraded < Admin::Cards::Assig
   def process
     self.card_assign_requests.each do |card_assign_request|
       card_assign_request.update(review_position: nil, status_id: CardAssignRequestStatus.id_for(:assigned_and_upgraded), assigned_by_resource: user, assigned_on: DateTime.now)
-      card.update(card_status_id: CardStatus.id_for(:assigned))
       card_assign_request.card.update(card_status_id: CardStatus.id_for(:upgraded))
       track_params = {
           action_resource: user,
