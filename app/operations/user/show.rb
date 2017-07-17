@@ -111,7 +111,8 @@ class User::Show < User::Base
                   status: {
                       id: assign_request.status.id,
                       name: assign_request.status.name
-                  }
+                  },
+                  note: assign_request.admin_note
               }
               if assign_request.cancellable? and admin_view?
                 cancel_params = {}
