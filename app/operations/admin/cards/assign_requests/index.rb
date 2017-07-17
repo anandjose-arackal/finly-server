@@ -28,7 +28,7 @@ class Admin::Cards::AssignRequests::Index < Admin::Cards::AssignRequests::Base
   class Admin::Cards::AssignRequests::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :card_assign_requests
 
-    has_scope :filter_company
+    has_scope :filter_company_id
 
     def init
       self.card_assign_requests = apply_scopes(params[:card_assign_requests])
