@@ -18,5 +18,6 @@ class AdminUserRoleMapping < ActiveRecord::Base
   scope :verifier, -> {where(admin_user_role_id: AdminUserRole.id_for(:verifier))}
   scope :itzcash_verifier, -> {where(admin_user_role_id: AdminUserRole.id_for(:itzcash_verifier))}
   scope :itzcash_operations, -> {where(admin_user_role_id: AdminUserRole.id_for(:itzcash_operations))}
+  scope :call_center, -> {where admin_user_role_id: AdminUserRole.id_for(:call_center)}
 
 end

@@ -11,20 +11,25 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170716085351) do
+ActiveRecord::Schema.define(version: 20170714090725) do
 
   create_table "aadhar_card_data", force: :cascade do |t|
-    t.string   "loc",        limit: 255
-    t.string   "vtc",        limit: 255
-    t.string   "co",         limit: 255
-    t.string   "name",       limit: 255
+    t.string   "loc",                 limit: 255
+    t.string   "vtc",                 limit: 255
+    t.string   "co",                  limit: 255
+    t.string   "name",                limit: 255
     t.date     "dob"
-    t.string   "gender",     limit: 255
-    t.string   "subdist",    limit: 255
-    t.string   "pc",         limit: 255
-    t.string   "state",      limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "gender",              limit: 255
+    t.string   "subdist",             limit: 255
+    t.string   "pc",                  limit: 255
+    t.string   "state",               limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "company_kyc_data_id", limit: 4
+    t.string   "father_name",         limit: 255
+    t.string   "dist",                limit: 255
+    t.string   "po",                  limit: 255
+    t.string   "uid",                 limit: 255
   end
 
   create_table "active_admin_comments", force: :cascade do |t|
@@ -439,7 +444,7 @@ ActiveRecord::Schema.define(version: 20170716085351) do
     t.integer  "status_id",                 limit: 4,                 null: false
     t.integer  "assigned_by_resource_id",   limit: 4
     t.string   "assigned_by_resource_type", limit: 255
-    t.datetime "closed_at"
+    t.datetime "assigned_on"
     t.integer  "card_program_id",           limit: 4,                 null: false
     t.datetime "created_at",                                          null: false
     t.datetime "updated_at",                                          null: false
@@ -450,6 +455,8 @@ ActiveRecord::Schema.define(version: 20170716085351) do
   end
 
   add_index "card_assign_requests", ["admin_review_workflow_id"], name: "index_card_assign_requests_on_admin_review_workflow_id", using: :btree
+  add_index "card_assign_requests", ["assigned_by_resource_id"], name: "index_card_assign_requests_on_assigned_by_resource_id", using: :btree
+  add_index "card_assign_requests", ["assigned_by_resource_type"], name: "index_card_assign_requests_on_assigned_by_resource_type", using: :btree
   add_index "card_assign_requests", ["card_id"], name: "index_card_assign_requests_on_card_id", using: :btree
   add_index "card_assign_requests", ["card_owner_id"], name: "index_card_assign_requests_on_card_owner_id", using: :btree
   add_index "card_assign_requests", ["card_program_id"], name: "index_card_assign_requests_on_card_program_id", using: :btree
@@ -611,11 +618,6 @@ ActiveRecord::Schema.define(version: 20170716085351) do
     t.datetime "updated_at",             null: false
   end
 
-  create_table "card_upgrade_request_statuses", force: :cascade do |t|
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
   create_table "cards", force: :cascade do |t|
     t.integer  "user_id",                  limit: 4
     t.string   "ending_number",            limit: 255,                  null: false
@@ -657,6 +659,7 @@ ActiveRecord::Schema.define(version: 20170716085351) do
     t.string   "certification_of_registration_number", limit: 255
     t.datetime "created_at",                                       null: false
     t.datetime "updated_at",                                       null: false
+    t.integer  "company_kyc_data_id",                  limit: 4
   end
 
   create_table "channel_types", force: :cascade do |t|
@@ -672,9 +675,10 @@ ActiveRecord::Schema.define(version: 20170716085351) do
   end
 
   create_table "coi_data", force: :cascade do |t|
-    t.string   "coi_number", limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "coi_number",          limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "company_kyc_data_id", limit: 4
   end
 
   create_table "companies", force: :cascade do |t|
@@ -792,17 +796,9 @@ ActiveRecord::Schema.define(version: 20170716085351) do
   add_index "company_funds_load_requests", ["requested_by_user_id"], name: "index_company_funds_load_requests_on_requested_by_user_id", using: :btree
 
   create_table "company_kyc_data", force: :cascade do |t|
-    t.integer  "pan_card_data_id",                     limit: 4
-    t.integer  "aadhar_card_data_id",                  limit: 4
-    t.integer  "passport_data_id",                     limit: 4
-    t.integer  "driving_licence_data_id",              limit: 4
-    t.integer  "coi_data_id",                          limit: 4
-    t.integer  "certificate_of_registration_data_id",  limit: 4
-    t.integer  "company_id",                           limit: 4
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.integer  "vat_registration_certificate_data_id", limit: 4
-    t.integer  "registration_of_trust_data_id",        limit: 4
+    t.integer  "company_kyc_id", limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "company_kycs", force: :cascade do |t|
@@ -891,9 +887,10 @@ ActiveRecord::Schema.define(version: 20170716085351) do
   add_index "company_transactions", ["transaction_amount_id"], name: "index_company_transactions_on_transaction_amount_id", using: :btree
 
   create_table "company_types", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "name",         limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.string   "company_code", limit: 255
   end
 
   create_table "contacts", force: :cascade do |t|
@@ -1151,6 +1148,7 @@ ActiveRecord::Schema.define(version: 20170716085351) do
     t.date     "dob"
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
+    t.integer  "company_kyc_data_id",    limit: 4
   end
 
   create_table "duplicate_expense_mappings", force: :cascade do |t|
@@ -1469,15 +1467,15 @@ ActiveRecord::Schema.define(version: 20170716085351) do
     t.integer  "id_proof_file_size",         limit: 4
     t.datetime "id_proof_updated_at"
     t.integer  "kyc_status_id",              limit: 4
-    t.integer  "user_id",                    limit: 4,     null: false
-    t.datetime "created_at",                               null: false
-    t.datetime "updated_at",                               null: false
+    t.integer  "user_id",                    limit: 4,   null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
     t.string   "address_proof_file_name",    limit: 255
     t.string   "address_proof_content_type", limit: 255
     t.integer  "address_proof_file_size",    limit: 4
     t.datetime "address_proof_updated_at"
     t.integer  "review_position",            limit: 4
-    t.integer  "admin_review_workflow_id",   limit: 4,     null: false
+    t.integer  "admin_review_workflow_id",   limit: 4,   null: false
     t.integer  "upgraded_by_resource_id",    limit: 4
     t.string   "proof_file_1_file_name",     limit: 255
     t.string   "proof_file_1_content_type",  limit: 255
@@ -1499,9 +1497,7 @@ ActiveRecord::Schema.define(version: 20170716085351) do
     t.integer  "kyc_file_2_file_size",       limit: 4
     t.datetime "kyc_file_2_updated_at"
     t.string   "kyc_number",                 limit: 255
-    t.integer  "company_id",                 limit: 4,     null: false
-    t.text     "admin_note",                 limit: 65535
-    t.datetime "submitted_on"
+    t.integer  "company_id",                 limit: 4,   null: false
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
@@ -1907,25 +1903,27 @@ ActiveRecord::Schema.define(version: 20170716085351) do
   end
 
   create_table "pan_card_data", force: :cascade do |t|
-    t.string   "pan_number",   limit: 255
-    t.string   "fathers_name", limit: 255
-    t.string   "name",         limit: 255
+    t.string   "pan_number",          limit: 255
+    t.string   "fathers_name",        limit: 255
+    t.string   "name",                limit: 255
     t.date     "dob"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "company_kyc_data_id", limit: 4
   end
 
   create_table "passport_data", force: :cascade do |t|
-    t.string   "status",          limit: 255
-    t.string   "last_name",       limit: 255
-    t.string   "name",            limit: 255
+    t.string   "status",              limit: 255
+    t.string   "last_name",           limit: 255
+    t.string   "name",                limit: 255
     t.date     "dob"
     t.date     "doe"
-    t.string   "country_code",    limit: 255
-    t.string   "passport_number", limit: 255
-    t.string   "passport_type",   limit: 255
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.string   "country_code",        limit: 255
+    t.string   "passport_number",     limit: 255
+    t.string   "passport_type",       limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "company_kyc_data_id", limit: 4
   end
 
   create_table "payment_modes", force: :cascade do |t|
@@ -2311,10 +2309,11 @@ ActiveRecord::Schema.define(version: 20170716085351) do
     t.datetime "updated_at",             null: false
   end
 
-  create_table "registration_of_trust", force: :cascade do |t|
+  create_table "registration_of_trust_data", force: :cascade do |t|
     t.string   "registration_of_trust_number", limit: 255
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
+    t.integer  "company_kyc_data_id",          limit: 4
   end
 
   create_table "report_comment_actions", force: :cascade do |t|
@@ -2773,6 +2772,7 @@ ActiveRecord::Schema.define(version: 20170716085351) do
     t.string   "vat_registration_number", limit: 255
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
+    t.integer  "company_kyc_data_id",     limit: 4
   end
 
   create_table "version_associations", force: :cascade do |t|
