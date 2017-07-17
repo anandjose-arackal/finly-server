@@ -113,7 +113,7 @@ class User::Show < User::Base
                       id: assign_request.status.id,
                       name: assign_request.status.name
                   },
-                  message: assign_request.admin_note
+                  admin_note: assign_request.admin_note
               }
               if assign_request.cancellable? and admin_view?
                 cancel_params = {}

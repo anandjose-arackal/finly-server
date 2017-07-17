@@ -29,6 +29,8 @@ class Admin::KycProcesses::Users::MarkAsUpgraded < Admin::KycProcesses::Users::B
           action_id: IndividualKycTrackAction.id_for(:upgraded)
       }
       individual_kyc.tracks.create track_params
+      # individual_kyc.user.cards.update_all
+      # Todo mark all cards as upgraded
     end
   end
 

@@ -57,20 +57,6 @@ class Admin::KycProcesses::Users::Export::AsXls < Admin::KycProcesses::Users::Ba
           kyc.type.name,
           kyc.kyc_number
       ]
-      # self.contents << [
-      #     user.email,
-      #     user.mobile_number,
-      #     nil,
-      #     profile.address_1,
-      #     profile.address_2,
-      #     profile.date_of_birth,
-      #     profile.gender,
-      #     profile.state.name,
-      #     profile.pin_code,
-      #     user.first_name,
-      #     user.last_name,
-      #     user.mothers_maiden_name
-      # ]
     end
   end
 

@@ -40,7 +40,7 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
     else
       json.type do
         json.id kyc.type.id
-        json.name kyc.type.name
+        json.name kyc.type.name.humanize
       end
     end
     if kyc&.kyc_file_1.blank?
