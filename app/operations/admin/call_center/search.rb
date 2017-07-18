@@ -19,12 +19,16 @@ class Admin::CallCenter::Search < Admin::Base
 
   def process
     self.user = User.find_by(mobile_number: term) || User.find_by(email: term)
+    if user.blank?
+      add_message :error, "User not found"
+    end
   end
 
   def success
     params[:user] = user
     Admin::CallCenter::Search::UserPresenter.new(user, params, messages)
   end
+
 
   class Admin::CallCenter::Search::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -34,4 +38,5 @@ class Admin::CallCenter::Search < Admin::Base
       self.user = params[:user]
     end
   end
+
 end

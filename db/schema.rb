@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170714090725) do
+ActiveRecord::Schema.define(version: 20170716085351) do
 
   create_table "aadhar_card_data", force: :cascade do |t|
     t.string   "loc",                 limit: 255
@@ -1467,15 +1467,15 @@ ActiveRecord::Schema.define(version: 20170714090725) do
     t.integer  "id_proof_file_size",         limit: 4
     t.datetime "id_proof_updated_at"
     t.integer  "kyc_status_id",              limit: 4
-    t.integer  "user_id",                    limit: 4,   null: false
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
+    t.integer  "user_id",                    limit: 4,     null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
     t.string   "address_proof_file_name",    limit: 255
     t.string   "address_proof_content_type", limit: 255
     t.integer  "address_proof_file_size",    limit: 4
     t.datetime "address_proof_updated_at"
     t.integer  "review_position",            limit: 4
-    t.integer  "admin_review_workflow_id",   limit: 4,   null: false
+    t.integer  "admin_review_workflow_id",   limit: 4,     null: false
     t.integer  "upgraded_by_resource_id",    limit: 4
     t.string   "proof_file_1_file_name",     limit: 255
     t.string   "proof_file_1_content_type",  limit: 255
@@ -1497,7 +1497,9 @@ ActiveRecord::Schema.define(version: 20170714090725) do
     t.integer  "kyc_file_2_file_size",       limit: 4
     t.datetime "kyc_file_2_updated_at"
     t.string   "kyc_number",                 limit: 255
-    t.integer  "company_id",                 limit: 4,   null: false
+    t.integer  "company_id",                 limit: 4,     null: false
+    t.text     "admin_note",                 limit: 65535
+    t.datetime "submitted_on"
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
