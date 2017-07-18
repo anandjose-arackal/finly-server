@@ -30,7 +30,7 @@ class CardAssignRequest < ActiveRecord::Base
   belongs_to :admin_review_workflow
   belongs_to :company
 
-  has_many :tracks, class_name: 'CardAssignRequestTrack'
+  has_many :tracks, class_name: 'CardAssignRequestTrack', dependent: :destroy
 
   default_scope { where.not status_id: CardAssignRequestStatus.id_for(:cancelled) }
 

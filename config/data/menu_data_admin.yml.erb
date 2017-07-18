@@ -29,6 +29,11 @@ user:
     name: ItzCash Operations
     default_url: 'itzcash/companies'
   <% end %>
+  <% if current_user.call_center? %>
+  - id: call_center
+    name: Call Center
+    default_url: 'helpcenter'
+  <% end %>
 views:
   <% if current_user.admin? %>
   admin:
@@ -132,13 +137,13 @@ views:
       #   url: assigned_cards
   <% end %>
 
-  <%# if current_user.callcenter? %>
-  # callcenter:
-  #   menus:
-  #     navbar:
-  #     - name: "Search"
-  #       id: 'callcenter_search'
-  #       url: 'callcenter'
+  <%# if current_user.call_center? %>
+  callcenter:
+    menus:
+      navbar:
+      - name: "Search"
+        id: 'helpcenter'
+        url: 'helpcenter'
   <%# end %>
 
       
