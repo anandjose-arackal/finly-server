@@ -1,0 +1,149 @@
+user:
+  name: <%= current_user.name %>
+  id: <%= current_user.id %>
+  email: <%= current_user.email %>
+  mobile_number: <%= current_user.mobile_number %>
+  roles:
+  <% if current_user.admin? %>
+  - id: admin
+    name: Admin
+    default_url: 'companies'
+  <% end %>
+  <% if current_user.transcriber? %>
+  - id: transcriber
+    name: Transcriber
+    default_url: 'untranscribed_receipts'
+  <% end %>
+  <% if current_user.verifier? %>
+  - id: verifier
+    name: Verifier
+    default_url: 'itzcash/companies'
+  <% end %>
+  <% if current_user.itzcash_verifier? %>
+  - id: itzcash_verifier
+    name: 'ItzCash Verifier'
+    default_url: 'itzcash/companies'
+  <% end %>
+  <% if current_user.itzcash_operations? %>
+  - id: itzcash_operations
+    name: ItzCash Operations
+    default_url: 'itzcash/companies'
+  <% end %>
+  <% if current_user.call_center? %>
+  - id: call_center
+    name: Call Center
+    default_url: 'helpcenter'
+  <% end %>
+views:
+  <% if current_user.admin? %>
+  admin:
+    menus:
+      navbar:
+      - name: Companies
+        url: companies
+        id: companies
+        type: anchor
+      - name: Users
+        url: users
+        id: users
+        type: anchor
+      - name: 'E M'
+        id: em
+        type: dropdown
+        items:
+        - name: Reports
+          id: reports
+          url: reports
+        - name: Expenses
+          id: expenses
+          url: expenses
+      - name: Cards
+        id: cards
+        type: anchor
+        url: cards
+      - name: OCR
+        id: ocr
+        type: dropdown
+        items:
+        - name: "Untranscribed Receipts"
+          id: untranscribed_receipts
+          url: untranscribed_receipts
+        - name: "Transcribed Receipts"
+          id: transcribed_receipts
+          url: transcribed_receipts
+      - name: Other
+        id: other
+        type: dropdown
+        items:
+        - name: Agreements
+          id: agreements
+          url: company_agreements
+  <% end %>
+  
+  <% if current_user.transcriber? %>
+  transcriber:
+    menus:
+      navbar:
+      - name: "Untranscribed Receipts"
+        id: untranscribed_receipts
+        url: untranscribed_receipts
+      - name: "Transcribed Receipts"
+        id: transcribed_receipts
+        url: transcribed_receipts
+  <% end %>
+
+  <% if current_user.verifier? %>
+  verifier:
+    menus:
+      navbar:
+      - name: "Companies"
+        id: 'itzcash_companies'
+        url: 'itzcash/companies'
+      # - name: "Unassigned Cards"
+      #   id: unassigned_cards
+      #   url: unassigned_cards
+      # - name: "Assigned Cards"
+      #   id: assigned_cards
+      #   url: assigned_cards
+  <% end %>
+
+  <% if current_user.itzcash_verifier? %>
+  itzcash_verifier:
+    menus:
+      navbar:
+      - name: "Companies"
+        id: 'itzcash_companies'
+        url: 'itzcash/companies'
+      # - name: "Unassigned Cards"
+      #   id: unassigned_cards
+      #   url: unassigned_cards
+      # - name: "Assigned Cards"
+      #   id: assigned_cards
+      #   url: assigned_cards
+  <% end %>
+
+  <% if current_user.itzcash_operations? %>
+  itzcash_operations:
+    menus:
+      navbar:
+      - name: "Companies"
+        id: 'itzcash_companies'
+        url: 'itzcash/companies'
+      # - name: "Unassigned Cards"
+      #   id: unassigned_cards
+      #   url: unassigned_cards
+      # - name: "Assigned Cards"
+      #   id: assigned_cards
+      #   url: assigned_cards
+  <% end %>
+
+  <% if current_user.call_center? %>
+  callcenter:
+    menus:
+      navbar:
+      - name: "Search"
+        id: 'helpcenter'
+        url: 'helpcenter'
+  <% end %>
+
+      

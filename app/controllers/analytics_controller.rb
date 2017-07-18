@@ -1,5 +1,5 @@
 class AnalyticsController < ApplicationController
-  allow_oauth!
+  before_action -> { doorkeeper_authorize! :web}
 
   def show
     # params[:page] = 1

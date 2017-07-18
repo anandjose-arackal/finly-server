@@ -18,16 +18,6 @@ GIT
       sprockets (< 4.1)
 
 GIT
-  remote: https://github.com/opro/opro.git
-  revision: 3ad524363d419525fc35af43277d8d0f831423fa
-  branch: master
-  specs:
-    opro (0.5.0)
-      jbuilder (~> 2.3)
-      kramdown
-      rails (>= 3.1.0)
-
-GIT
   remote: https://github.com/ramanbedi1989/proselytism.git
   revision: bcb1713c0585eb7f733fc4f3752635c073e8a905
   specs:
@@ -178,6 +168,8 @@ GEM
     devise_invitable (1.7.0)
       actionmailer (>= 4.0.0)
       devise (>= 4.0.0)
+    doorkeeper (4.2.6)
+      railties (>= 4.2)
     eco (1.0.0)
       coffee-script
       eco-source
@@ -259,7 +251,6 @@ GEM
       activerecord
       kaminari-core (= 1.0.1)
     kaminari-core (1.0.1)
-    kramdown (1.13.2)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mail (2.6.6)
@@ -476,6 +467,7 @@ DEPENDENCIES
   deep_cloneable (= 2.2.1)
   devise (= 4.2.0)
   devise_invitable (= 1.7.0)
+  doorkeeper (= 4.2.6)
   faker (= 1.6.6)
   faraday (= 0.10.0)
   faraday_middleware (= 0.11.0.1)
@@ -501,7 +493,6 @@ DEPENDENCIES
   oj (~> 2.18.1)
   omniauth
   omniauth-quickbooks
-  opro (= 0.5.0)!
   paper_trail (= 5.1.1)
   paperclip (= 5.1.0)
   proselytism (= 0.0.3)!

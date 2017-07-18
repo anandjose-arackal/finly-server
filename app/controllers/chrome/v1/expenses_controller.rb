@@ -1,7 +1,6 @@
 class Chrome::V1::ExpensesController < ApplicationController
 
-  allow_oauth!
-  before_action :authenticate_user!
+  before_action -> { doorkeeper_authorize! :chrome}
 
   def create
     formatted_param = RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse.(current_user, params)&.formatted_request

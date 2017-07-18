@@ -1,9 +1,9 @@
 class PoliciesController < ApplicationController
   # protect_from_forgery with: :null_session
 
-  allow_oauth!
+  before_action -> { doorkeeper_authorize! :web}
 
-  before_action :authenticate_user!
+
 
   def create
     @result = Policy::Create.(current_user, params)

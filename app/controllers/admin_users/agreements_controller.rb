@@ -1,7 +1,6 @@
 class AdminUsers::AgreementsController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+  before_action -> { doorkeeper_authorize! :admin }
 
   def create
     @result = Admin::Agreement::Create.(current_user, params)
