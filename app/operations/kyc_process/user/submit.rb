@@ -10,7 +10,7 @@ class KycProcess::User::Submit < KycProcess::User::Base
   end
 
   def process
-    unless self.individual_kyc.update(kyc_status_id: KycStatus.id_for(:processing), review_position: 0, submitted_on: DateTime.now)
+    unless self.individual_kyc.update(kyc_status_id: KycStatus.id_for(:submitted), review_position: 0, submitted_on: DateTime.now)
       add_message :error, self.individual_kyc.errors.full_messages
       return
     end

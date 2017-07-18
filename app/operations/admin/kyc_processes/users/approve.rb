@@ -38,7 +38,7 @@ class Admin::KycProcesses::Users::Approve < Admin::KycProcesses::Users::Base
         individual_kyc.tracks.create track_params
       else
         next_reviewer_position = next_reviewer_presenter.next_review_position
-        individual_kyc.update(review_position: next_reviewer_position)
+        individual_kyc.update(kyc_status_id: KycStatus.id_for(:processing), review_position: next_reviewer_position)
 
         track_params = {
             action_resource: user,

@@ -1,5 +1,6 @@
 kyc = @result.individual_kyc
 json.editable kyc.editable?
+json.retractable kyc.retractable?
 json.kyc_number kyc&.kyc_number
 json.status do
   json.id kyc.kyc_status.id

@@ -1573,6 +1573,9 @@ Rails.application.routes.draw do
 
       get 'kyc/:id', to: 'kyc/user#show'
       post 'kyc/:id', to: 'kyc/user#update'
+      post 'kyc/:id/submit', to: 'kyc/user#submit'
+      post 'kyc/:id/update_and_submit', to: 'kyc/user#update_and_submit'
+      post 'kyc/:id/retract', to: 'kyc/user#retract'
 
       get 'transactions', to: 'cards#transactions'
       post 'lookup', to: 'users#lookup'

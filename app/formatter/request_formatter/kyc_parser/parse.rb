@@ -16,7 +16,6 @@ class RequestFormatter::KycParser::Parse < RequestFormatter::Base
     params[:individual_kyc][:id_proof] = params[:id_proof] if params[:id_proof].present?
     # DEPRICATED END #
 
-
     # Handling for Android START #
     if params.dig(:kyc_file_1_file).present?
       params[:kyc_file_1] = extract_image(params[:kyc_file_1_file], params[:kyc_file_1_content_type], params[:kyc_file_1_file_name])
@@ -26,15 +25,22 @@ class RequestFormatter::KycParser::Parse < RequestFormatter::Base
     end
     # Handling for Android END #
 
-    params[:individual_kyc][:kyc_file_1] = params[:kyc_file_1] if params[:kyc_file_1].present?
-    params[:individual_kyc][:kyc_file_2] = params[:kyc_file_2] if params[:kyc_file_2].present?
-    params[:individual_kyc][:kyc_number] = params[:kyc_number] if params[:kyc_number].present?
-    params[:individual_kyc][:type_id] = params[:type_id] if params[:type_id].present?
     if params[:type_name].present?
-      params[:individual_kyc][:type_id] = IndividualKycType.id_for(params[:type_name])
+      params[:type_id] = IndividualKycType.id_for(params[:type_name])
     end
 
-    self.formatted_request = params
+    if params[:state_name].present?
+      params[:state_id] = State.id_for(params[:state_name])
+    end
+
+    if params[:user].nil?
+      params[:user] = {}
+    end
+
+    param = format_file(__dir__, 'kyc.yaml.erb', user, params)
+    Formatter.handle_api_nil param
+
+    self.formatted_request = param
   end
 
   def extract_image(data, content_type, file_name)

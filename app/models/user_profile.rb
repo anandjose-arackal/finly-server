@@ -33,7 +33,7 @@ class UserProfile < ActiveRecord::Base
 
   # validates :user_id, presence: true
   validates :date_of_birth, presence: true
-  validates :gender, presence: {message: "not selected"}, format: Constants::VALID_GENDER, length: {is: 1}
+  validates :gender, presence: {message: 'not selected'}, format: Constants::VALID_GENDER, length: {is: 1}
   validates :address_1, presence: true, length: {maximum: 100}
   validates :address_2, presence: true, length: {maximum: 100}
   validates :city, presence: true, length: {maximum: 100}

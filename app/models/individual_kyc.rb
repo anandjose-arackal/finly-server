@@ -50,7 +50,6 @@ class IndividualKyc < ActiveRecord::Base
   scope :with_user_id, -> (id) { where user_id: id }
   scope :with_id, -> (id) { where id: id }
 
-
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
   # CONTENT_TYPES = {content_type: %w(image/jpg)}
 
@@ -73,7 +72,11 @@ class IndividualKyc < ActiveRecord::Base
   end
 
   def editable?
-    [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:rejected)].include?(kyc_status_id)
+    [KycStatus.id_for(:incomplete), KycStatus.id_for(:rejected)].include?(kyc_status_id)
+  end
+
+  def retractable?
+    [KycStatus.id_for(:submitted)].include?(kyc_status_id)
   end
 
 end
