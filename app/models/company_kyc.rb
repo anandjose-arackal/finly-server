@@ -52,11 +52,6 @@
 #  certificate_of_registration_file_size     :integer
 #  certificate_of_registration_updated_at    :datetime
 #  customer_type_id                          :integer
-#  customer_id                               :string(255)
-#  authorized_signatory_aadhar_file_name     :string(255)
-#  authorized_signatory_aadhar_content_type  :string(255)
-#  authorized_signatory_aadhar_file_size     :integer
-#  authorized_signatory_aadhar_updated_at    :datetime
 #
 
 class CompanyKyc < ActiveRecord::Base
@@ -98,7 +93,7 @@ class CompanyKyc < ActiveRecord::Base
   validate :pin_code_format
 
   def editable?
-    [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:error)].include?(kyc_status_id)
+    [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:rejected)].include?(kyc_status_id)
   end
 
   def processing?

@@ -1,8 +1,8 @@
 class AdminUsers::CompaniesController < ApplicationController
 
   # todo - temporary
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action -> { doorkeeper_authorize! :admin}
 
   def new
     @states = State.all

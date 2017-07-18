@@ -18,10 +18,6 @@
 #
 
 
-
-
-
-
 class ReportTrack < ActiveRecord::Base
   belongs_to :report
   belongs_to :report_status
@@ -31,7 +27,7 @@ class ReportTrack < ActiveRecord::Base
   belongs_to :modified_user, class_name: 'User'
   belongs_to :modified_user_role, class_name: 'UserRole'
   belongs_to :payment
-  belongs_to :cash_in_hand_deduction, class_name: "Payment"
+  belongs_to :cash_in_hand_deduction, class_name: 'Payment'
 
   default_scope { order('created_at ASC') }
 

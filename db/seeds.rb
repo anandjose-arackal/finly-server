@@ -222,6 +222,14 @@ CityIdCityCodeMapping.seed_data
 
 ItzCashDmtBeneficiaryStatus.seed_data
 
+AdminUserRole.seed_data
+
+CardStatus.seed_data
+
+CardAssignRequestStatus.seed_data
+
+CardAssignRequestTrackAction.seed_data
+
 ##########################
 
 if Amount.count == 0
@@ -236,8 +244,7 @@ else
 end
 
 Company.all.each do |company|
-  company.feature_subscription.expense_management_enabled = true
-  company.save
+  company.feature_subscription.update(expense_management_enabled: true)
 end
 
 if User.count == 0
@@ -247,7 +254,8 @@ if User.count == 0
                   role_mapping_attributes: [{user_role_id: UserRole.admin_id},
                                             {user_role_id: UserRole.employee_id}],
                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                       address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                                       address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
+                  user_panel_subscription_attributes: {disburse: true, expense_management: true})
 
   fm = []
   3.times do |pos|
@@ -257,7 +265,8 @@ if User.count == 0
                       role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
                                                 {user_role_id: UserRole.employee_id}],
                       profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
+                      user_panel_subscription_attributes: {disburse: true, expense_management: true})
 
   end
   m = []
@@ -268,7 +277,8 @@ if User.count == 0
                      role_mapping_attributes: [{user_role_id: 3},
                                                {user_role_id: UserRole.employee_id}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                          address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                                          address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
+                     user_panel_subscription_attributes: {disburse: true, expense_management: true})
   end
 
   ##############################################################################################################################################
@@ -279,14 +289,16 @@ if User.count == 0
                    mothers_maiden_name: Faker::Name.first_name,
                    role_mapping_attributes: [{user_role_id: UserRole.manager_id}, {user_role_id: UserRole.employee_id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
+                   user_panel_subscription_attributes: {disburse: true, expense_management: true})
 
   v << User.create(company: Company.first, first_name: "Demo", last_name: "Finance", email: "finance4@demo.com",
                    password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
                    role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
+                   user_panel_subscription_attributes: {disburse: true, expense_management: true})
 
   ##############################################################################################################################################
 
@@ -299,7 +311,8 @@ if User.count == 0
                    role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
                    team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0], policy_id: Company.first.policies.default.first.id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
+                   user_panel_subscription_attributes: {disburse: true, expense_management: true})
 
   2.times do |pos|
     u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@demo.com",
@@ -308,18 +321,20 @@ if User.count == 0
                      role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0], policy_id: Company.first.policies.default.first.id}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                          address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                                          address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
+                     user_panel_subscription_attributes: {disburse: true, expense_management: true})
   end
 
   ############################################################################################################################################
-  
+
   User.create(company: Company.first, first_name: "Demo", last_name: "King", email: "king@demo.com",
               password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
               mothers_maiden_name: Faker::Name.first_name,
               role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
                                         {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
               profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
-                                   address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"})
+                                   address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
+              user_panel_subscription_attributes: {disburse: true, expense_management: true})
 
 
   m[0].team_mapping.default.first.update_attributes(approves_to: m[1])
@@ -345,7 +360,7 @@ if Card.count == 0
                         card_type_id: 1, company_id: user.company.id,
                         ending_number: random(1000, 9999).to_i, active: true,
                         card_program_id: CardProgram.first.id,
-                        itz_cash_card_program_id: ItzCashCardProgram.id_for(:hdfc))
+                        itz_cash_card_program_id: ItzCashCardProgram.id_for(:hdfc), card_status_id: CardStatus.id_for(:assigned))
     end
   end
 end
@@ -617,11 +632,17 @@ end
 
 if AdminUser.count == 0
   # creating admin panel users who can access admin panel
-  AdminUser.create!(email: 'admin@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
-  AdminUser.create!(email: 'sreeram@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
-  AdminUser.create!(email: 'vivek@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
-  AdminUser.create!(email: 'veekshith@Demo.io', password: 'demo1234', password_confirmation: 'demo1234')
+  AdminUser.create!(email: 'admin@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
+                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:admin)}, {admin_user_role_id: AdminUserRole.id_for(:transcriber)}])
+  AdminUser.create!(email: 'sreeram@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
+                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:admin)}, {admin_user_role_id: AdminUserRole.id_for(:transcriber)}])
+  AdminUser.create!(email: 'vivek@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
+                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:itzcash_verifier)}])
+  AdminUser.create!(email: 'veekshith@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
+                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:itzcash_operations)}])
 end
+
+AdminReviewWorkflow.seed_data
 
 if CardTransaction.filter_refunds(1).count == 0
   User.all.each do |user|

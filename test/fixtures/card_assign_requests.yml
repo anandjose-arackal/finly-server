@@ -1,0 +1,45 @@
+# == Schema Information
+#
+# Table name: card_assign_requests
+#
+#  id                        :integer          not null, primary key
+#  card_id                   :integer
+#  card_owner_id             :integer          not null
+#  initiating_resource_id    :integer          not null
+#  initiating_resource_type  :string(255)      not null
+#  status_id                 :integer          not null
+#  assigned_by_resource_id   :integer
+#  assigned_by_resource_type :string(255)
+#  assigned_on               :datetime
+#  card_program_id           :integer          not null
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  admin_review_workflow_id  :integer
+#  review_position           :integer          default(0)
+#  admin_note                :text(65535)
+#  company_id                :integer          not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  card_id: 
+  card_owner_id: 1
+  initiating_user_id: 1
+  initiating_user_type: MyString
+  status_id: 1
+  request_action_user_id: 1
+  request_action_user_type: MyString
+  closed_at: 2017-07-11 14:29:26
+  card_program_id: 
+
+two:
+  card_id: 
+  card_owner_id: 1
+  initiating_user_id: 1
+  initiating_user_type: MyString
+  status_id: 1
+  request_action_user_id: 1
+  request_action_user_type: MyString
+  closed_at: 2017-07-11 14:29:26
+  card_program_id: 

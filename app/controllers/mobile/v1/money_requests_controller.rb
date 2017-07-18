@@ -1,8 +1,8 @@
 class Mobile::V1::MoneyRequestsController < Mobile::V1::BaseApiController
   protect_from_forgery with: :null_session
 
-  allow_oauth!
-  before_action :authenticate_user!
+  before_action -> { doorkeeper_authorize! :mobile}
+
 
   respond_to :json
 

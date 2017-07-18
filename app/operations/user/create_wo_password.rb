@@ -4,4 +4,16 @@ class User::CreateWoPassword < Admin::Users::Create
     # Overriding admin user create operation's behaviour
     params[:user][:password] = rand(36**8).to_s(36)
   end
+
+  def configure_disburse
+    # from disburse panel subscribing users to only disburse
+    request = params[:request]
+    if request.referrer.include?('disburse')
+      new_user_params[:user_panel_subscription_attributes] = {
+          expense_management: false,
+          disburse: true
+      }
+    end
+    new_user_params.permit!
+  end
 end

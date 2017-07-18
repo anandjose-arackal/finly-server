@@ -12,7 +12,7 @@ class KycStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:incomplete, :submitted, :processing, :error, :approved, :completed]
+    [:incomplete, :submitted, :retracted, :processing, :rejected, :approved, :completed]
   end
 
 end

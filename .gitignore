@@ -19,6 +19,7 @@ dump.rdb
 /public/system/receipts/*
 /public/system/company_configurations/*
 /public/system/company_kycs/*
+/public/system/individual_kycs/*
 /public/system/agreements/*
 /public/common/files/temp_files/*
 /sample_atm_transactions.txt

@@ -1,7 +1,7 @@
 class CardsController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action -> { doorkeeper_authorize! :web}
 
   # params = {user_id: 1}
   def details
@@ -52,7 +52,14 @@ class CardsController < ApplicationController
   end
 
   def assign
-    @result = Card::Assign.(current_user, params)
+    # @result = Card::Assign.(current_user, params)
+    @result = Card::AssignRequest::Create.(current_user, params)
+    respond
+  end
+
+  def cancel_assign
+    # @result = Card::Assign.(current_user, params)
+    @result = Card::AssignRequest::Cancel.(current_user, params)
     respond
   end
 
