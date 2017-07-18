@@ -4,6 +4,7 @@
 #       qukickbooks_configurations_create GET    /qukickbooks_configurations/create(.:format)                   qukickbooks_configurations#create
 #       qukickbooks_configurations_update GET    /qukickbooks_configurations/update(.:format)                   qukickbooks_configurations#update
 #         qukickbooks_configurations_show GET    /qukickbooks_configurations/show(.:format)                     qukickbooks_configurations#show
+#                           accept_invite GET    /users/invitation/accept(.:format)                             pending_invites#edit
 #                               crono_web        /crono                                                         Crono::Web
 #                  new_admin_user_session GET    /admin_users/sign_in(.:format)                                 admin_users/sessions#new
 #                      admin_user_session POST   /admin_users/sign_in(.:format)                                 admin_users/sessions#create
@@ -410,6 +411,7 @@
 #                                         PATCH  /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         PUT    /admin_users/cards/:id(.:format)                               admin_users/cards#update
 #                                         DELETE /admin_users/cards/:id(.:format)                               admin_users/cards#destroy
+#                admin_users_import_cards POST   /admin_users/import(.:format)                                  admin_users/cards#import
 #          admin_users_kyc_company_reject PATCH  /admin_users/kyc/companies/:company_id/reject(.:format)        admin_users/kyc/companies#reject
 #         admin_users_kyc_company_confirm PATCH  /admin_users/kyc/companies/:company_id/confirm(.:format)       admin_users/kyc/companies#confirm
 #               admin_users_kyc_companies GET    /admin_users/kyc/companies(.:format)                           admin_users/kyc/companies#index
@@ -426,7 +428,6 @@
 #                               junk_show GET    /junk/show(.:format)                                           junk#show
 #                               menu_data GET    /menu_data(.:format)                                           users#menu_data
 #              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                   admin_users/oauth/token#create {:format=>"json"}
-#                           accept_invite GET    /users/invitation/accept(.:format)                             pending_invites#edit
 #                    preview_registration POST   /welcome/preview(.:format)                                     registrations#preview
 #                       resources_details POST   /resources_details(.:format)                                   registrations#resource_requests
 #                      resources_download GET    /download_resource(.:format)                                   registrations#resources_download
@@ -1648,6 +1649,7 @@ Rails.application.routes.draw do
     resources :cards do
       patch 'block', to: 'cards#block', as: :block
     end
+    post 'import_cards', to: 'cards#import', as: :import_cards
     namespace :kyc do
       resources :companies do
         patch 'reject', to: 'companies#reject', as: :reject

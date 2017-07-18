@@ -19,6 +19,7 @@
 #  transcribed          :boolean          default(FALSE)
 #  personal             :boolean          default(FALSE)
 #  reimbursable         :boolean          default(TRUE)
+#  from_cash_on_hand    :boolean          default(FALSE)
 #
 
 require 'test_helper'
