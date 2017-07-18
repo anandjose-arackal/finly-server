@@ -28,8 +28,8 @@ json.data do
       end
     end
     json.user do
-      json.expense_management @user.user_panel_subscription.expense_management
-      json.disburse @user.user_panel_subscription.disburse
+      json.expense_management !!@user.user_panel_subscription.expense_management
+      json.disburse !!@user.user_panel_subscription.disburse
     end
   end
 end
