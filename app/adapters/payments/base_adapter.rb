@@ -3,6 +3,8 @@
 
 class Payments::BaseAdapter
 
+  attr_accessor :errors
+
   def initialize(source = nil, params = nil)
     # source is the source from where the credit / debit is supposed to happen
     # params is general, can be anything
