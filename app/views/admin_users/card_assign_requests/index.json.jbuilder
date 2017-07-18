@@ -54,7 +54,7 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
     else
       json.file_1 do
         json.original kyc&.kyc_file_1&.url
-        json.thumb kyc&.kyc_file_2&.url(:thumb)
+        json.thumb kyc&.kyc_file_1&.url(:thumb)
       end
     end
     if kyc&.kyc_file_2.blank?

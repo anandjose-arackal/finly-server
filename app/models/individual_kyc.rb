@@ -51,7 +51,7 @@ class IndividualKyc < ActiveRecord::Base
   scope :with_id, -> (id) { where id: id }
 
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
-  # CONTENT_TYPES = {content_type: %w(image/jpg)}
+  CONTENT_TYPES_JPG = {content_type: %w(image/jpg image/jpeg)}
 
   ## DEPRICATED START ##
   has_attached_file :id_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
@@ -62,10 +62,10 @@ class IndividualKyc < ActiveRecord::Base
   ## DEPRICATED END ##
 
   has_attached_file :kyc_file_1, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :kyc_file_1, content_type: CONTENT_TYPES
+  validates_attachment :kyc_file_1, content_type: CONTENT_TYPES_JPG
 
   has_attached_file :kyc_file_2, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :kyc_file_1, content_type: CONTENT_TYPES
+  validates_attachment :kyc_file_2, content_type: CONTENT_TYPES_JPG
 
   def processing?
     [KycStatus.id_for(:processing), KycStatus.id_for(:submitted)].include?(self.kyc_status_id)
