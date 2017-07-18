@@ -1,7 +1,7 @@
 class CompaniesController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action -> { doorkeeper_authorize! :web}
 
   def notify
     # todo

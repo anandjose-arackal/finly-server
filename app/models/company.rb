@@ -39,6 +39,9 @@ class Company < ActiveRecord::Base
   has_many :auto_sync_configs
   has_many :quickbooks_payment_types
   has_one :company_kyc
+  has_many :card_assign_requests
+  has_many :card_upgrade_requests
+  has_many :individual_kycs
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -238,14 +241,14 @@ class Company < ActiveRecord::Base
 
   def kyc_required?
     return false unless feature_subscription.d_code_enabled?
-    if [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:error)].include?(company_kyc.kyc_status_id)
+    if [KycStatus.id_for(:incomplete), KycStatus.id_for(:submitted), KycStatus.id_for(:rejected)].include?(company_kyc.kyc_status_id)
       return true
     end
     false
   end
 
   def kyc_completed?
-    self.company_kyc.completed?
+    !!self.company_kyc&.completed?
   end
 
   private
@@ -270,7 +273,7 @@ class Company < ActiveRecord::Base
       self.auto_sync_configs.build(enabled: false)
     end
 
-    # self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
+    self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
   end
 
 end

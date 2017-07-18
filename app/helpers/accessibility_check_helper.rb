@@ -10,6 +10,10 @@ module AccessibilityCheckHelper
     user == current_user
   end
 
+  def current_user
+    @current_user
+  end
+
   # def validate_logged_in_user
   #   unless logged_in?
   #     flash[:danger] = 'You need to log in first!'

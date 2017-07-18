@@ -14,6 +14,7 @@
 
 
 class State < ActiveRecord::Base
+  include Seedable
 
   VALUES = [{:code => 'S00', :name => 'Outside India'}, {:code => 'S01', :name => 'Maharashtra'}, {:code => 'S02', :name => 'Gujarat'}, {:code => 'S03', :name => 'Andhra Pradesh'},
             {:code => 'S04', :name => 'Arunachal Pradesh'}, {:code => 'S05', :name => 'Assam'}, {:code => 'S06', :name => 'Bihar'}, {:code => 'S07', :name => 'Chattisgarh'},

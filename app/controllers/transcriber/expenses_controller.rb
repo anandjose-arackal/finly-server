@@ -1,7 +1,7 @@
 class Transcriber::ExpensesController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action -> { doorkeeper_authorize! :web}
 
   def create
     @result = Transcriber::Expenses::Create.(current_user, params)

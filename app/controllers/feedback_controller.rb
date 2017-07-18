@@ -1,6 +1,6 @@
 class FeedbackController < ApplicationController
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action -> { doorkeeper_authorize! :web}
 
   def create
     @result = Feedback::Create.(current_user, params)
