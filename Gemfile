@@ -40,8 +40,8 @@ gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref
 gem 'roo', '2.5.1'
 gem 'roo-xls', '1.0.0'
 
-  # Gem to show db schema in model file
-  gem 'annotate', '2.7.1'
+# Gem to show db schema in model file
+gem 'annotate', '2.7.1'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.7.1'
@@ -111,7 +111,7 @@ gem 'sidekiq', '4.2.7'
 # gem for font awesome
 gem 'font-awesome-rails', '4.7.0.0'
 
-gem 'opro', '0.5.0', git: 'https://github.com/opro/opro.git', branch: 'master'
+# gem 'opro', '0.5.0', git: 'https://github.com/opro/opro.git', branch: 'master'
 # gem 'opro', github: 'opro/opro', branch: 'master'
 
 gem 'has_scope', '0.6.0'
@@ -120,7 +120,7 @@ gem 'sendgrid-ruby', '4.0.6'
 gem 'griddler', '1.3.1'
 gem 'griddler-sendgrid', '0.0.1'
 gem 'rmagick', '2.16.0'
-gem 'imgkit','1.6.1'
+gem 'imgkit', '1.6.1'
 # gem 'wkhtmltoimage-binary', '0.12.2'
 gem 'proselytism', '0.0.3', git: 'https://github.com/ramanbedi1989/proselytism.git'
 
@@ -130,6 +130,7 @@ gem 'require_all', '1.3.3'
 gem 'devise', '4.2.0'
 
 gem 'devise_invitable', '1.7.0'
+gem 'doorkeeper', '4.2.6'
 
 gem 'faraday', '0.10.0'
 gem 'faraday_middleware', '0.11.0.1'

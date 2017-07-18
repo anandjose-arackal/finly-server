@@ -1,0 +1,25 @@
+# == Schema Information
+#
+# Table name: admin_review_workflow_levels
+#
+#  id                       :integer          not null, primary key
+#  admin_review_workflow_id :integer          not null
+#  position                 :integer          not null
+#  admin_reviewer_id        :integer          not null
+#  created_at               :datetime         not null
+#  updated_at               :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  admin_review_workflow_id: 
+  position: 1
+  reviewer_id: 1
+  reviewer_type: MyString
+
+two:
+  admin_review_workflow_id: 
+  position: 1
+  reviewer_id: 1
+  reviewer_type: MyString

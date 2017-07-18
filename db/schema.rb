@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170710181130) do
+ActiveRecord::Schema.define(version: 20170716085351) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -27,6 +27,26 @@ ActiveRecord::Schema.define(version: 20170710181130) do
   add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
   add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
+
+  create_table "admin_review_workflow_levels", force: :cascade do |t|
+    t.integer  "admin_review_workflow_id", limit: 4, null: false
+    t.integer  "position",                 limit: 4, null: false
+    t.integer  "admin_reviewer_id",        limit: 4, null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "admin_review_workflow_levels", ["admin_review_workflow_id"], name: "index_admin_review_workflow_levels_on_admin_review_workflow_id", using: :btree
+  add_index "admin_review_workflow_levels", ["admin_reviewer_id"], name: "index_admin_review_workflow_levels_on_admin_reviewer_id", using: :btree
+  add_index "admin_review_workflow_levels", ["position"], name: "index_admin_review_workflow_levels_on_position", using: :btree
+
+  create_table "admin_review_workflows", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "admin_review_workflows", ["name"], name: "index_admin_review_workflows_on_name", using: :btree
 
   create_table "admin_user_role_mappings", force: :cascade do |t|
     t.integer  "admin_user_id",      limit: 4
@@ -57,6 +77,9 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.string   "last_sign_in_ip",        limit: 255
     t.datetime "created_at",                                      null: false
     t.datetime "updated_at",                                      null: false
+    t.string   "first_name",             limit: 255
+    t.string   "last_name",              limit: 255
+    t.string   "mobile_number",          limit: 255,              null: false
   end
 
   add_index "admin_users", ["email"], name: "index_admin_users_on_email", unique: true, using: :btree
@@ -367,6 +390,62 @@ ActiveRecord::Schema.define(version: 20170710181130) do
   add_index "budget_rules", ["policy_id"], name: "index_budget_rules_on_policy_id", using: :btree
   add_index "budget_rules", ["rule_type_id"], name: "index_budget_rules_on_rule_type_id", using: :btree
 
+  create_table "card_assign_request_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "card_assign_request_track_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "card_assign_request_tracks", force: :cascade do |t|
+    t.integer  "card_assign_request_id", limit: 4,     null: false
+    t.integer  "action_resource_id",     limit: 4
+    t.string   "action_resource_type",   limit: 255
+    t.integer  "action_id",              limit: 4,     null: false
+    t.text     "note",                   limit: 65535
+    t.datetime "created_at",                           null: false
+    t.datetime "updated_at",                           null: false
+  end
+
+  add_index "card_assign_request_tracks", ["action_id"], name: "index_card_assign_request_tracks_on_action_id", using: :btree
+  add_index "card_assign_request_tracks", ["action_resource_id"], name: "index_card_assign_request_tracks_on_action_resource_id", using: :btree
+  add_index "card_assign_request_tracks", ["action_resource_type"], name: "index_card_assign_request_tracks_on_action_resource_type", using: :btree
+  add_index "card_assign_request_tracks", ["card_assign_request_id"], name: "index_card_assign_request_tracks_on_card_assign_request_id", using: :btree
+
+  create_table "card_assign_requests", force: :cascade do |t|
+    t.integer  "card_id",                   limit: 4
+    t.integer  "card_owner_id",             limit: 4,                 null: false
+    t.integer  "initiating_resource_id",    limit: 4,                 null: false
+    t.string   "initiating_resource_type",  limit: 255,               null: false
+    t.integer  "status_id",                 limit: 4,                 null: false
+    t.integer  "assigned_by_resource_id",   limit: 4
+    t.string   "assigned_by_resource_type", limit: 255
+    t.datetime "assigned_on"
+    t.integer  "card_program_id",           limit: 4,                 null: false
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
+    t.integer  "admin_review_workflow_id",  limit: 4
+    t.integer  "review_position",           limit: 4,     default: 0
+    t.text     "admin_note",                limit: 65535
+    t.integer  "company_id",                limit: 4,                 null: false
+  end
+
+  add_index "card_assign_requests", ["admin_review_workflow_id"], name: "index_card_assign_requests_on_admin_review_workflow_id", using: :btree
+  add_index "card_assign_requests", ["assigned_by_resource_id"], name: "index_card_assign_requests_on_assigned_by_resource_id", using: :btree
+  add_index "card_assign_requests", ["assigned_by_resource_type"], name: "index_card_assign_requests_on_assigned_by_resource_type", using: :btree
+  add_index "card_assign_requests", ["card_id"], name: "index_card_assign_requests_on_card_id", using: :btree
+  add_index "card_assign_requests", ["card_owner_id"], name: "index_card_assign_requests_on_card_owner_id", using: :btree
+  add_index "card_assign_requests", ["card_program_id"], name: "index_card_assign_requests_on_card_program_id", using: :btree
+  add_index "card_assign_requests", ["company_id"], name: "index_card_assign_requests_on_company_id", using: :btree
+  add_index "card_assign_requests", ["initiating_resource_id"], name: "index_card_assign_requests_on_initiating_resource_id", using: :btree
+  add_index "card_assign_requests", ["initiating_resource_type"], name: "index_card_assign_requests_on_initiating_resource_type", using: :btree
+  add_index "card_assign_requests", ["status_id"], name: "index_card_assign_requests_on_status_id", using: :btree
+
   create_table "card_balance_histories", force: :cascade do |t|
     t.integer  "card_id",    limit: 4
     t.integer  "amount_id",  limit: 4
@@ -449,9 +528,9 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
-    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -538,6 +617,7 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.integer  "card_eligibility_id",      limit: 4
     t.boolean  "admin_unblockable",                      default: true
     t.integer  "itz_cash_card_program_id", limit: 4
+    t.integer  "card_status_id",           limit: 4,                    null: false
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -696,9 +776,9 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.integer  "board_resolution_file_size",                limit: 4
     t.datetime "board_resolution_updated_at"
     t.integer  "kyc_status_id",                             limit: 4
+    t.integer  "company_id",                                limit: 4,     null: false
     t.datetime "created_at",                                              null: false
     t.datetime "updated_at",                                              null: false
-    t.integer  "company_id",                                limit: 4,     null: false
     t.date     "date_of_establishment"
     t.text     "street_2",                                  limit: 65535
     t.text     "street_3",                                  limit: 65535
@@ -781,29 +861,6 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.integer  "contactable_id",   limit: 4
     t.string   "contactable_type", limit: 255
     t.string   "designation",      limit: 255
-  end
-
-  create_table "corporate_kycs", force: :cascade do |t|
-    t.integer  "company_id",                    limit: 4
-    t.string   "pan_card_file_name",            limit: 255
-    t.string   "pan_card_content_type",         limit: 255
-    t.integer  "pan_card_file_size",            limit: 4
-    t.datetime "pan_card_updated_at"
-    t.string   "coi_file_name",                 limit: 255
-    t.string   "coi_content_type",              limit: 255
-    t.integer  "coi_file_size",                 limit: 4
-    t.datetime "coi_updated_at"
-    t.string   "agreement_file_name",           limit: 255
-    t.string   "agreement_content_type",        limit: 255
-    t.integer  "agreement_file_size",           limit: 4
-    t.datetime "agreement_updated_at"
-    t.string   "board_resolution_file_name",    limit: 255
-    t.string   "board_resolution_content_type", limit: 255
-    t.integer  "board_resolution_file_size",    limit: 4
-    t.datetime "board_resolution_updated_at"
-    t.integer  "kyc_status_id",                 limit: 4
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
   end
 
   create_table "crono_jobs", force: :cascade do |t|
@@ -1095,7 +1152,6 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.string   "reference_id",                   limit: 255
     t.time     "time"
     t.integer  "amount_id",                      limit: 4
-    t.integer  "expense_data_extract_source_id", limit: 4,     null: false
     t.integer  "category_id",                    limit: 4
     t.integer  "sourcable_id",                   limit: 4
     t.string   "sourcable_type",                 limit: 255
@@ -1105,12 +1161,12 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.string   "extractable_type",               limit: 255,   null: false
     t.text     "note",                           limit: 65535
     t.datetime "datetime"
+    t.integer  "expense_data_extract_source_id", limit: 4
     t.integer  "status_id",                      limit: 4,     null: false
   end
 
   add_index "expense_data_extracts", ["amount_id"], name: "index_expense_data_extracts_on_amount_id", using: :btree
   add_index "expense_data_extracts", ["category_id"], name: "index_expense_data_extracts_on_category_id", using: :btree
-  add_index "expense_data_extracts", ["expense_data_extract_source_id"], name: "index_expense_data_extracts_on_expense_data_extract_source_id", using: :btree
   add_index "expense_data_extracts", ["sourcable_id"], name: "index_expense_data_extracts_on_sourcable_id", using: :btree
   add_index "expense_data_extracts", ["sourcable_type"], name: "index_expense_data_extracts_on_sourcable_type", using: :btree
 
@@ -1327,21 +1383,78 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "individual_kyc_track_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "individual_kyc_track_actions", ["name"], name: "index_individual_kyc_track_actions_on_name", using: :btree
+
+  create_table "individual_kyc_tracks", force: :cascade do |t|
+    t.integer  "individual_kyc_id",    limit: 4,     null: false
+    t.integer  "action_resource_id",   limit: 4
+    t.string   "action_resource_type", limit: 255
+    t.integer  "action_id",            limit: 4,     null: false
+    t.text     "note",                 limit: 65535
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "individual_kyc_tracks", ["action_id"], name: "index_individual_kyc_tracks_on_action_id", using: :btree
+  add_index "individual_kyc_tracks", ["action_resource_id"], name: "index_individual_kyc_tracks_on_action_resource_id", using: :btree
+  add_index "individual_kyc_tracks", ["action_resource_type"], name: "index_individual_kyc_tracks_on_action_resource_type", using: :btree
+  add_index "individual_kyc_tracks", ["individual_kyc_id"], name: "index_individual_kyc_tracks_on_individual_kyc_id", using: :btree
+
+  create_table "individual_kyc_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "individual_kycs", force: :cascade do |t|
     t.string   "id_proof_file_name",         limit: 255
     t.string   "id_proof_content_type",      limit: 255
     t.integer  "id_proof_file_size",         limit: 4
     t.datetime "id_proof_updated_at"
     t.integer  "kyc_status_id",              limit: 4
-    t.integer  "user_id",                    limit: 4,   null: false
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
+    t.integer  "user_id",                    limit: 4,     null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
     t.string   "address_proof_file_name",    limit: 255
     t.string   "address_proof_content_type", limit: 255
     t.integer  "address_proof_file_size",    limit: 4
     t.datetime "address_proof_updated_at"
+    t.integer  "review_position",            limit: 4
+    t.integer  "admin_review_workflow_id",   limit: 4,     null: false
+    t.integer  "upgraded_by_resource_id",    limit: 4
+    t.string   "proof_file_1_file_name",     limit: 255
+    t.string   "proof_file_1_content_type",  limit: 255
+    t.integer  "proof_file_1_file_size",     limit: 4
+    t.datetime "proof_file_1_updated_at"
+    t.string   "proof_file_1",               limit: 255
+    t.string   "proof_file_2_file_name",     limit: 255
+    t.string   "proof_file_2_content_type",  limit: 255
+    t.integer  "proof_file_2_file_size",     limit: 4
+    t.datetime "proof_file_2_updated_at"
+    t.string   "proof_file_2",               limit: 255
+    t.integer  "type_id",                    limit: 4
+    t.string   "kyc_file_1_file_name",       limit: 255
+    t.string   "kyc_file_1_content_type",    limit: 255
+    t.integer  "kyc_file_1_file_size",       limit: 4
+    t.datetime "kyc_file_1_updated_at"
+    t.string   "kyc_file_2_file_name",       limit: 255
+    t.string   "kyc_file_2_content_type",    limit: 255
+    t.integer  "kyc_file_2_file_size",       limit: 4
+    t.datetime "kyc_file_2_updated_at"
+    t.string   "kyc_number",                 limit: 255
+    t.integer  "company_id",                 limit: 4,     null: false
+    t.text     "admin_note",                 limit: 65535
+    t.datetime "submitted_on"
   end
 
+  add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
+  add_index "individual_kycs", ["company_id"], name: "index_individual_kycs_on_company_id", using: :btree
   add_index "individual_kycs", ["user_id"], name: "index_individual_kycs_on_user_id", using: :btree
 
   create_table "itz_cash_card_programs", force: :cascade do |t|
@@ -2043,6 +2156,10 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.datetime "original_source_updated_at"
     t.string   "email_id",                     limit: 255
     t.string   "sender",                       limit: 255
+    t.string   "source_file_name",             limit: 255
+    t.string   "source_content_type",          limit: 255
+    t.integer  "source_file_size",             limit: 4
+    t.datetime "source_updated_at"
     t.boolean  "fixed",                                      default: false
     t.string   "parsed_merchant",              limit: 255
     t.string   "parsed_amount_value",          limit: 255
@@ -2052,10 +2169,6 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.integer  "parsed_category_id",           limit: 4
     t.datetime "created_at",                                                 null: false
     t.datetime "updated_at",                                                 null: false
-    t.string   "source_file_name",             limit: 255
-    t.string   "source_content_type",          limit: 255
-    t.integer  "source_file_size",             limit: 4
-    t.datetime "source_updated_at"
   end
 
   add_index "receipt_email_parse_failures", ["parsed_category_id"], name: "index_receipt_email_parse_failures_on_parsed_category_id", using: :btree
@@ -2440,7 +2553,6 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.string   "city",                limit: 255
     t.integer  "state_id",            limit: 4
     t.string   "pin_code",            limit: 255
-    t.string   "apple_push_token",    limit: 255
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree
@@ -2526,12 +2638,12 @@ ActiveRecord::Schema.define(version: 20170710181130) do
   add_index "user_wallets", ["user_id"], name: "index_user_wallets_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                  limit: 255,   default: ""
-    t.string   "encrypted_password",     limit: 255,   default: "",      null: false
+    t.string   "email",                  limit: 255, default: ""
+    t.string   "encrypted_password",     limit: 255, default: "",    null: false
     t.string   "reset_password_token",   limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          limit: 4,     default: 0,       null: false
+    t.integer  "sign_in_count",          limit: 4,   default: 0,     null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip",     limit: 255
@@ -2540,14 +2652,14 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
     t.string   "unconfirmed_email",      limit: 255
-    t.integer  "failed_attempts",        limit: 4,     default: 0,       null: false
+    t.integer  "failed_attempts",        limit: 4,   default: 0,     null: false
     t.string   "unlock_token",           limit: 255
     t.datetime "locked_at"
-    t.datetime "created_at",                                             null: false
-    t.datetime "updated_at",                                             null: false
-    t.integer  "company_id",             limit: 4,                       null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.integer  "company_id",             limit: 4,                   null: false
     t.string   "mobile_number",          limit: 255
-    t.boolean  "active",                               default: true,    null: false
+    t.boolean  "active",                             default: true,  null: false
     t.string   "invitation_token",       limit: 255
     t.datetime "invitation_created_at"
     t.datetime "invitation_sent_at"
@@ -2555,35 +2667,28 @@ ActiveRecord::Schema.define(version: 20170710181130) do
     t.integer  "invitation_limit",       limit: 4
     t.integer  "invited_by_id",          limit: 4
     t.string   "invited_by_type",        limit: 255
-    t.integer  "invitations_count",      limit: 4,     default: 0
+    t.integer  "invitations_count",      limit: 4,   default: 0
     t.string   "otp",                    limit: 255
     t.datetime "otp_sent_at"
     t.datetime "otp_verified_at"
-    t.boolean  "otp_verified",                         default: false,   null: false
-    t.integer  "otp_count",              limit: 4,     default: 0,       null: false
+    t.boolean  "otp_verified",                       default: false, null: false
+    t.integer  "otp_count",              limit: 4,   default: 0,     null: false
     t.string   "first_name",             limit: 255
     t.string   "last_name",              limit: 255
-    t.boolean  "mobile_only_invite",                   default: false
+    t.boolean  "mobile_only_invite",                 default: false
     t.string   "mothers_maiden_name",    limit: 255
-    t.boolean  "verified",                             default: false
+    t.boolean  "verified",                           default: false
     t.integer  "otp_request_type_id",    limit: 4
-    t.boolean  "default_password",                     default: false
-    t.boolean  "point_of_contact",                     default: false
-    t.text     "tokens",                 limit: 65535
-    t.string   "provider",               limit: 255,   default: "email", null: false
-    t.string   "uid",                    limit: 255,   default: "",      null: false
+    t.boolean  "default_password",                   default: false
+    t.boolean  "point_of_contact",                   default: false
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
-  add_index "users", ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, using: :btree
-  add_index "users", ["email"], name: "index_users_on_email", unique: true, using: :btree
+  add_index "users", ["email"], name: "index_users_on_email", using: :btree
   add_index "users", ["invitation_token"], name: "index_users_on_invitation_token", unique: true, using: :btree
   add_index "users", ["invitations_count"], name: "index_users_on_invitations_count", using: :btree
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
-  add_index "users", ["mobile_number"], name: "index_users_on_mobile_number", unique: true, using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
-  add_index "users", ["uid", "provider"], name: "index_users_on_uid_and_provider", unique: true, using: :btree
-  add_index "users", ["unlock_token"], name: "index_users_on_unlock_token", unique: true, using: :btree
 
   create_table "version_associations", force: :cascade do |t|
     t.integer "version_id",       limit: 4
@@ -2624,6 +2729,7 @@ ActiveRecord::Schema.define(version: 20170710181130) do
   add_index "whitelisted_ips", ["company_id"], name: "index_whitelisted_ips_on_company_id", using: :btree
   add_index "whitelisted_ips", ["ip_address"], name: "index_whitelisted_ips_on_ip_address", using: :btree
 
+  add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
   add_foreign_key "admin_user_role_mappings", "admin_user_roles"
   add_foreign_key "admin_user_role_mappings", "admin_users"
   add_foreign_key "agreements", "agreement_types"
@@ -2639,6 +2745,11 @@ ActiveRecord::Schema.define(version: 20170710181130) do
   add_foreign_key "budget_rules", "periods"
   add_foreign_key "budget_rules", "policies"
   add_foreign_key "budget_rules", "rule_types"
+  add_foreign_key "card_assign_request_tracks", "card_assign_requests"
+  add_foreign_key "card_assign_requests", "admin_review_workflows"
+  add_foreign_key "card_assign_requests", "card_programs"
+  add_foreign_key "card_assign_requests", "cards"
+  add_foreign_key "card_assign_requests", "companies"
   add_foreign_key "card_balance_histories", "amounts"
   add_foreign_key "card_balance_histories", "cards"
   add_foreign_key "card_configurations", "card_statuses"
@@ -2668,7 +2779,6 @@ ActiveRecord::Schema.define(version: 20170710181130) do
   add_foreign_key "email_authorizations", "users"
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"
-  add_foreign_key "expense_data_extracts", "expense_data_extract_sources"
   add_foreign_key "expense_rules", "categories"
   add_foreign_key "expense_rules", "expense_rule_types"
   add_foreign_key "expense_rules", "policies"
@@ -2687,6 +2797,9 @@ ActiveRecord::Schema.define(version: 20170710181130) do
   add_foreign_key "field_configurations", "field_parent_types"
   add_foreign_key "field_configurations", "field_types"
   add_foreign_key "field_drop_down_items", "field_configurations"
+  add_foreign_key "individual_kyc_tracks", "individual_kycs"
+  add_foreign_key "individual_kycs", "admin_review_workflows"
+  add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
   add_foreign_key "itz_cash_dmt_senders", "users"

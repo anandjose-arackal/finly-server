@@ -17,7 +17,7 @@ class User::Login::SendVerificationOtp < BaseOperation
   end
 
   def init
-    self.selected_user = User.find_for_database_authentication(email: params[:email_mobile])
+    self.selected_user = User.find_for_database_authentication(username: params[:email_mobile])
     self.otp_request_type_id = params[:type]
   end
 
