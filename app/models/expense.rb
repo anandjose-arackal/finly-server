@@ -256,7 +256,7 @@ class Expense < ActiveRecord::Base
                                                                   ExpenseType.id_for(:distance),
                                                                   ExpenseType.id_for(:time),
                                                                   ExpenseType.id_for(:per_diem)]) }
-  scope :only_reimbursable_expenses, -> { where reimbursable: true}
+  scope :only_reimbursable_expenses, -> { where(reimbursable: true)}
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }
