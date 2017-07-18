@@ -55,4 +55,16 @@ class UserProfile < ActiveRecord::Base
     end
   end
 
+  def salutation_status
+    return nil if self.gender.blank?
+    case self.gender
+      when 'f'
+        return 'Mrs'
+      when 'm'
+        return 'Mr'
+      else
+        return nil
+    end
+  end
+
 end

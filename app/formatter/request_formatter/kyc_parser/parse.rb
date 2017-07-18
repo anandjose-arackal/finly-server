@@ -21,8 +21,8 @@ class RequestFormatter::KycParser::Parse < RequestFormatter::Base
     if params.dig(:kyc_file_1_file).present?
       params[:kyc_file_1] = extract_image(params[:kyc_file_1_file], params[:kyc_file_1_content_type], params[:kyc_file_1_file_name])
     end
-    if params[:kyc_file_2].present?
-      params[:kyc_file_2] = extract_image(params[:kyc_file_2], params[:kyc_file_2_content_type], params[:kyc_file_2_file_name])
+    if params[:kyc_file_2_file].present?
+      params[:kyc_file_2] = extract_image(params[:kyc_file_2_file], params[:kyc_file_2_content_type], params[:kyc_file_2_file_name])
     end
     # Handling for Android END #
 
@@ -30,6 +30,9 @@ class RequestFormatter::KycParser::Parse < RequestFormatter::Base
     params[:individual_kyc][:kyc_file_2] = params[:kyc_file_2] if params[:kyc_file_2].present?
     params[:individual_kyc][:kyc_number] = params[:kyc_number] if params[:kyc_number].present?
     params[:individual_kyc][:type_id] = params[:type_id] if params[:type_id].present?
+    if params[:type_name].present?
+      params[:individual_kyc][:type_id] = IndividualKycType.id_for(params[:type_name])
+    end
 
     self.formatted_request = params
   end
