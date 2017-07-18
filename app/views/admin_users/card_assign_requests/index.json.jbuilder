@@ -1,5 +1,6 @@
 json.array! @result.card_assign_requests.each do |card_assign_request|
   json.id card_assign_request.id
+  json.received_date DateUtils.date_formatted card_assign_request.created_at
   json.company do
     company = @result.company_for(card_assign_request)
     json.id company&.id
@@ -12,11 +13,16 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
     json.first_name user&.first_name
     json.last_name user&.last_name
     json.mothers_maiden_name user&.mothers_maiden_name
+    json.date_of_birth DateUtils.date_formatted user&.profile&.date_of_birth
+    json.gender user&.profile&.gender
     json.address_1 user&.profile&.address_1
     json.address_2 user&.profile&.address_1
     json.city user&.profile&.city
     json.state user&.profile&.state&.name
+    json.country 'India'
     json.pin_code user&.profile&.pin_code
+    json.nationality 'Indian'
+    json.salutation_status user&.profile&.salutation_status
   end
   json.card do
     card = card_assign_request.card

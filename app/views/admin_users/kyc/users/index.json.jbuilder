@@ -1,5 +1,6 @@
 json.array! @result.individual_kycs.each do |kyc|
   json.id kyc.id
+  json.received_date DateUtils.date_formatted kyc.submitted_on
   json.company do
     company = @result.company_for(kyc)
     json.id company&.id
@@ -12,11 +13,16 @@ json.array! @result.individual_kycs.each do |kyc|
     json.first_name user&.first_name
     json.last_name user&.last_name
     json.mothers_maiden_name user&.mothers_maiden_name
+    json.date_of_birth DateUtils.date_formatted user&.profile&.date_of_birth
+    json.gender user&.profile&.gender
     json.address_1 user&.profile&.address_1
     json.address_2 user&.profile&.address_1
     json.city user&.profile&.city
     json.state user&.profile&.state&.name
+    json.country 'India'
     json.pin_code user&.profile&.pin_code
+    json.nationality 'Indian'
+    json.salutation_status user&.profile&.salutation_status
   end
   cards = kyc.user.cards
   json.cards do

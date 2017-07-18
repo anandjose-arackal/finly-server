@@ -16,7 +16,7 @@ class Admin::KycProcesses::Users::Export::AsXls < Admin::KycProcesses::Users::Ba
         'Address Line 1',
         'Address Line 2',
         'Address Line 3',
-        'Address Lien 4',
+        'Address Line 4',
         'Residence State',
         'Residence City',
         'Residence Country',
