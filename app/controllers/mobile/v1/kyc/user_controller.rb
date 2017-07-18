@@ -28,4 +28,9 @@ class Mobile::V1::Kyc::UserController < ApplicationController
     respond response: @result&.success? ? :success : :failure
   end
 
+  def retract
+    @result = KycProcess::User::Retract.(current_user, params)
+    respond response: @result&.success? ? :success : :failure
+  end
+
 end

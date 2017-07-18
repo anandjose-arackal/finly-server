@@ -72,7 +72,7 @@ class IndividualKyc < ActiveRecord::Base
   end
 
   def editable?
-    [KycStatus.id_for(:incomplete), KycStatus.id_for(:rejected)].include?(kyc_status_id)
+    [KycStatus.id_for(:incomplete), KycStatus.id_for(:rejected), KycStatus.id_for(:retracted)].include?(kyc_status_id)
   end
 
   def retractable?
