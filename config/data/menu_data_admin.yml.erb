@@ -137,13 +137,13 @@ views:
       #   url: assigned_cards
   <% end %>
 
-  <%# if current_user.call_center? %>
+  <% if current_user.call_center? %>
   callcenter:
     menus:
       navbar:
       - name: "Search"
         id: 'helpcenter'
         url: 'helpcenter'
-  <%# end %>
+  <% end %>
 
       
