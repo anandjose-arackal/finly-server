@@ -1,9 +1,10 @@
 json.data do
   json.array! @result.transactions.each do |transaction|
     json.extract! transaction, :id, :transaction_type, :merchant_name,
-                  :reference_id, :auth_transaction_id,  :transaction_mode, :response_code,
-                  :transaction_timestamp, :mcc_code, :transaction_status, :api_reference_id,
-                  :cancelled, :type_of_details
+                  :reference_id, :auth_transaction_id, :transaction_mode, :response_code,
+                  :mcc_code, :transaction_status, :api_reference_id,
+                  :cancelled, :type_of_details, :transaction_timestamp
+    json.date DateUtils.date_formatted transaction.transaction_timestamp
     json.user do
       json.id transaction.user.id
       json.name transaction.user.name

@@ -1,4 +1,4 @@
-class Transcriber::Expenses::Base < BaseOperation
+class Transcriber::Expenses::Base < Transcriber::Base
 
 
   def manual_expense_params

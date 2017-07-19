@@ -1,7 +1,6 @@
 class UsersController < ApplicationController
 
-  allow_oauth!
-  before_action :authenticate_user!, except: [:lookup, :send_verification_otp, :verify_user_otp, :set_new_password]
+  before_action -> { doorkeeper_authorize! :web } , except: [:lookup, :send_verification_otp, :verify_user_otp]
 
   # action to retrieve a particular user's details in the users screen - for everyone with a team - manager, finance manager etc.
   def show
@@ -117,6 +116,13 @@ class UsersController < ApplicationController
     @result = User::Login::VerifyLoginOtp.(params)
     respond
   end
+
+  # # action that lets mobile only users set their password for the first time
+  # # also the action that mobile users use to set their password if they've forgotten it
+  # def set_new_password
+  #   @result = User::Login::SetPassword.(params)
+  #   respond
+  # end
 
   def lookup
     cookies.delete :user_name

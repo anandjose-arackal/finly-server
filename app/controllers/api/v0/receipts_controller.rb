@@ -2,8 +2,8 @@ require "#{Rails.root}/app/operations/expense/manual/create"
 class Api::V0::ReceiptsController < Api::V0::BaseApiController
   protect_from_forgery with: :null_session
 
-  allow_oauth!
-  before_action :authenticate_user!
+  before_action -> { doorkeeper_authorize! :mobile}
+
 
   def create
     RequestFormatter.parse_receipt(current_user, params)

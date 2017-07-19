@@ -1,7 +1,7 @@
 class AdminUsers::UsersController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+
+  before_action -> { doorkeeper_authorize! :admin}
 
   def new
     @states = State.all
@@ -37,13 +37,15 @@ class AdminUsers::UsersController < ApplicationController
 
   # returns the respective menus that a particular user has access to
   def admin_menus
-    @result = Admin::AdminRolePermissions::Show.(current_user, params)
-      emails = []
-    respond_to do |format|
-      format.json {
-        render json: @result.as_json
-      }
-    end
+    @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/menu_data_admin.yml.erb", {current_company: current_company, current_user: current_user})
+    render json: @views.as_json
+    # @result = Admin::AdminRolePermissions::Show.(current_user, params)
+    #   emails = []
+    # respond_to do |format|
+    #   format.json {
+    #     render json: @result.as_json
+    #   }
+    # end
   end
 
   def lookup

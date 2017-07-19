@@ -339,6 +339,10 @@ class Report < ActiveRecord::Base
     self.policy.base_currency.symbol
   end
 
+  def only_card_expenses?
+    self.expenses.count == self.expenses.only_card_expenses.count
+  end
+
 
   private
 

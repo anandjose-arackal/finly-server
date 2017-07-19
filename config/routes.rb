@@ -1395,9 +1395,7 @@
 Rails.application.routes.draw do
 
   get 'qukickbooks_configurations/create'
-
   get 'qukickbooks_configurations/update'
-
   get 'qukickbooks_configurations/show'
 
   # adding this before the devise routes because devise overrides out custom path
@@ -1426,14 +1424,15 @@ Rails.application.routes.draw do
   # get 'home/index'
 
   mount_griddler('/email/incoming')
-  mount_opro_oauth controllers: {
-      oauth_new: 'oauth/auth',
-      oauth_token: 'oauth/token'
-  }
-
-  devise_for :users, controllers: {passwords: "passwords", sessions: "sessions"} do
-    # get 'login', to: 'sessions#new', as: :login
-    # post 'login', to: 'session#create', as: :login
+  # mount_opro_oauth controllers: {
+  #     oauth_new: 'oauth/auth',
+  #     oauth_token: 'oauth/token'
+  # }
+  #
+  devise_for :users, controllers: {passwords: 'passwords', sessions: 'sessions'}
+  use_doorkeeper do
+    # it accepts :authorizations, :tokens, :applications and :authorized_applications
+    controllers :tokens => 'oauth/token'
   end
 
   ######### GEMS SPECIFIC END ###########
@@ -1569,12 +1568,14 @@ Rails.application.routes.draw do
 
       get 'kyc/:id', to: 'kyc/user#show'
       post 'kyc/:id', to: 'kyc/user#update'
+      post 'kyc/:id/submit', to: 'kyc/user#submit'
+      post 'kyc/:id/update_and_submit', to: 'kyc/user#update_and_submit'
+      post 'kyc/:id/retract', to: 'kyc/user#retract'
 
       get 'transactions', to: 'cards#transactions'
       post 'lookup', to: 'users#lookup'
       post 'send_verification_otp', to: 'users#send_verification_otp'
       post 'verify_user_otp', to: 'users#verify_user_otp'
-      post 'set_new_password', to: 'users#set_new_password'
     end
   end
 
@@ -1655,8 +1656,31 @@ Rails.application.routes.draw do
         patch 'reject', to: 'companies#reject', as: :reject
         patch 'confirm', to: 'companies#confirm', as: :confirm
       end
+
+      # Upgrade Card Workflow
+      get 'users/companies', to: 'users#company_index'
+      get 'users', to: 'users#index'
+      post 'users/approve', to: 'users#approve'
+      post 'users/reject', to: 'users#reject'
+      post 'users/mark_as_upgraded', to: 'users#mark_as_upgraded'
+      get 'users/export(.:format)' => 'users#export'
+      get 'users/kycs/download' => 'users#download_kycs'
     end
     resources :agreements, only: [:create, :index]
+
+    namespace :verifier do
+      get 'companies', to: 'company#index'
+    end
+    # Assign Card Workflow
+    get 'card_assign_requests', to: 'card_assign_requests#index'
+    post 'card_assign_requests/approve', to: 'card_assign_requests#approve'
+    post 'card_assign_requests/reject', to: 'card_assign_requests#reject'
+    post 'card_assign_requests/mark_assigned', to: 'card_assign_requests#mark_as_assigned'
+    post 'card_assign_requests/mark_assigned_upgraded', to: 'card_assign_requests#mark_as_assigned_upgraded'
+    get 'card_assign_requests/export(.:format)' => 'card_assign_requests#export'
+    get 'card_assign_requests/kycs/download' => 'card_assign_requests#download_kycs'
+
+    post 'call_center/search', to: 'call_center/users#search', as: :search
   end
 
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
@@ -1673,7 +1697,6 @@ Rails.application.routes.draw do
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
   post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
   get 'download_resource', to: 'registrations#resources_download', as: :resources_download
-
 
   get 'policies/expense_rules' => 'policies#expense_rules'
   get 'policies/budget_rules' => 'policies#budget_rules'
@@ -1730,6 +1753,7 @@ Rails.application.routes.draw do
   post 'cards/update_balance' => 'cards#update_balance', as: :update_balance
   post 'cards/update_status' => 'cards#update_status', as: :update_card_status
   patch 'cards/assign', to: 'cards#assign', as: :assign_card
+  patch 'cards/assign/:id/cancel', to: 'cards#cancel_assign', as: :cancel_assign_request
   get 'cards/unassigned', to: 'cards#unassigned', as: :unassigned_cards
 
   resources :reports, except: [:new, :edit]
