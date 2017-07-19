@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170716085351) do
+ActiveRecord::Schema.define(version: 20170719154103) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1451,6 +1451,7 @@ ActiveRecord::Schema.define(version: 20170716085351) do
     t.integer  "company_id",                 limit: 4,     null: false
     t.text     "admin_note",                 limit: 65535
     t.datetime "submitted_on"
+    t.datetime "upgraded_on"
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
