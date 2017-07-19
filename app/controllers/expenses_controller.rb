@@ -67,7 +67,7 @@ class ExpensesController < ApplicationController
       else
         respond response: :failure, message: "Invalid input"
     end
-    respond response: :success if @result&.success?
+    respond response: (@result.success? ? :success : :failure)
   end
 
   def update_status
