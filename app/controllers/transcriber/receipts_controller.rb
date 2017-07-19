@@ -2,7 +2,7 @@ class Transcriber::ReceiptsController < ApplicationController
 
 
 
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { doorkeeper_authorize! :admin }
 
   def show
 
