@@ -3,6 +3,7 @@ class Transcriber::Base < Admin::Base
   def user_model
     AdminUser
   end
+  
 
   # def pre_validate
   #   # todo - ultimate jugaad, will be changed once login and permissions are integrtaed
