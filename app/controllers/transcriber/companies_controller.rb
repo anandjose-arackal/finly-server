@@ -1,7 +1,7 @@
 class Transcriber::CompaniesController < ApplicationController
 
 
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { doorkeeper_authorize! :admin}
   # before_action :transcriber_accounts
 
   def index
