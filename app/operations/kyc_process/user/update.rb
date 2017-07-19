@@ -28,6 +28,7 @@ class KycProcess::User::Update < KycProcess::User::Base
 
   protected
   def kyc_strong_params
+    return nil unless params&.dig(:individual_kyc).present?
     # params.require(:individual_kyc).permit(:id_proof, :address_proof)
     params = self.params.require(:individual_kyc).permit(:kyc_number, :type_id)
     ## DEPRICATED START ##
