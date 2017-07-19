@@ -16,13 +16,14 @@ class AdminReviewWorkflow < ActiveRecord::Base
   def self.values
     {
         assign_card: {
-            '0': ['admin@demo.io', 'sreeram@demo.io'],
-            '1': 'vivek@demo.io',
-            '2': 'veekshith@demo.io'
+            '0': ['sreeram.nr@finly.io'],
+            '1': 'vivek.a@finly.io',
+            '2': 'veekshith.rai@finly.io'
         },
         kyc_update: {
-            '0': ['admin@demo.io', 'sreeram@demo.io'],
-            '1': 'veekshith@demo.io'
+            '0': ['sreeram.nr@finly.io'],
+            '1': 'vivek.a@finly.io',
+            '2': 'veekshith.rai@finly.io'
         }
     }
   end
