@@ -1,4 +1,4 @@
-class Transcriber::Receipts::Index < BaseOperation
+class Transcriber::Receipts::Index < Transcriber::Base
 
   attr_accessor :receipts, :companies
 
