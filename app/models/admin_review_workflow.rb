@@ -14,18 +14,33 @@ class AdminReviewWorkflow < ActiveRecord::Base
   has_many :levels, class_name: 'AdminReviewWorkflowLevel', dependent: :destroy
 
   def self.values
+    if Rails.env.production?
     {
         assign_card: {
-            '0': ['sreeram.nr@finly.io'],
-            '1': 'vivek.a@finly.io',
-            '2': 'veekshith.rai@finly.io'
+            '0': ['vivek.a@finly.io', 'veekshith.rai@finly.io', 'anushrut.khare@finly.io'],
+            '1': 'kalpitap.itz@intrexindia.net',
+            '2': 'kalpeshg.itz@intrexindia.net'
         },
         kyc_update: {
-            '0': ['sreeram.nr@finly.io'],
-            '1': 'vivek.a@finly.io',
-            '2': 'veekshith.rai@finly.io'
+            '0': ['vivek.a@finly.io', 'veekshith.rai@finly.io', 'anushrut.khare@finly.io'],
+            '1': 'kalpitap.itz@intrexindia.net',
+            '2': 'kalpeshg.itz@intrexindia.net'
         }
     }
+    else
+      {
+          assign_card: {
+              '0': ['admin@demo.io', 'sreeram@demo.io'],
+              '1': 'vivek@demo.io',
+              '2': 'veekshith@demo.io'
+          },
+          kyc_update: {
+              '0': ['admin@demo.io', 'sreeram@demo.io'],
+              '1': 'vivek@demo.io',
+              '2': 'veekshith@demo.io'
+          }
+      }
+    end
   end
 
   def self.id_for(name)

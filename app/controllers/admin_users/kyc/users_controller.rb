@@ -24,7 +24,7 @@ class AdminUsers::Kyc::UsersController < ApplicationController
   end
 
   def mark_as_upgraded
-    @result = Admin::KycProcesses::Users::MarkAsAssigned.(current_user, params)
+    @result = Admin::KycProcesses::Users::MarkAsUpgraded.(current_user, params)
     respond
   end
 

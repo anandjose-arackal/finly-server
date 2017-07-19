@@ -13,7 +13,7 @@ class Admin::KycProcesses::Users::Approve < Admin::KycProcesses::Users::Base
         add_message :error, 'You are not the assigned reviewer for this request'
         return
       end
-      unless [KycStatus.id_for(:processing)].include? individual_kyc.kyc_status_id
+      unless [KycStatus.id_for(:submitted), KycStatus.id_for(:processing)].include? individual_kyc.kyc_status_id
         add_message :error, "Error. KYC for #{individual_kyc.user.name} cannot be approved in this stage"
         return
       end
