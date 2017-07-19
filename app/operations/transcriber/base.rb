@@ -1,4 +1,4 @@
-class Transcriber::Base < BaseOperation
+class Transcriber::Base < Admin::Base
 
   def pre_validate
     # todo - ultimate jugaad, will be changed once login and permissions are integrtaed
