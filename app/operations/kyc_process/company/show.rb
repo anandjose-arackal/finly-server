@@ -54,9 +54,17 @@ class KycProcess::Company::Show < KycProcess::Company::Base
 
     def documents
       docs = []
+
+      # these will be all the compulsory documents that are required for a company - all this is moved to the model
+      docs = company_kyc.required_documents
+
+      # now adding the supporting docs based on company type - all this is also moved to the model
+      docs << company_kyc.supporting_documents
+
+      #return docs
       # pan card is common for all
       id_proof = {}
-      id_proof[:name] = "ID Proof"
+      id_proof[:name] = "PAN Card"
       file = {}
       if company_kyc.pan_card.present?
         file = {
@@ -75,7 +83,13 @@ class KycProcess::Company::Show < KycProcess::Company::Base
          name: "PAN",
          uploaded: company_kyc.pan_card.present?,
          file: file,
-         system_messages: system_messages&.pluck(:content)
+         system_messages: system_messages&.pluck(:content),
+         description: [
+             "This is the first line",
+             "Followed by the second line",
+             "skdgfbsdf",
+             "zsdfgdfsgdsfg"
+         ]
       }
       docs << id_proof
 

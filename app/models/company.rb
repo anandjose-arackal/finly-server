@@ -251,46 +251,6 @@ class Company < ActiveRecord::Base
     !!self.company_kyc&.completed?
   end
 
-  def kyc_documents
-    documents = []
-    # irrespective of company type, all companies need pan card
-    documents << "pan_card"
-    case self.company_kyc.company_type_id
-
-      when CompanyType.id_for(:sole_proprietorship)
-        if company_kyc.aadhar_card.present?
-          documents << "aadhar_card"
-        end
-        if company_kyc.vat_registration_certificate.present?
-          documents << "vat_registration_certificate"
-        end
-      when CompanyType.id_for(:private_ltd_company), CompanyType.id_for(:ltd_liability_partnership)
-        if company_kyc.coi.present?
-          documents << "coi"
-        end
-      when CompanyType.id_for(:partnership_firm), CompanyType.id_for(:limited_company)
-        if company_kyc.certificate_of_registration.present?
-          documents << "certificate_of_registration"
-        end
-      when CompanyType.id_for(:trust_and_societies)
-        if company_kyc.registration_of_trust.present?
-          documents << "registration_of_trust"
-        end
-      when CompanyType.id_for(:individuals)
-        if company_kyc.aadhar_card.present?
-          documents << "aadhar_card"
-        end
-        if company_kyc.passport.present?
-          documents << "passport"
-        end
-        if company_kyc.driving_licence.present?
-          documents << "driving_licence"
-        end
-      else
-        # do nothing, ha!
-    end
-    documents
-  end
 
   private
 

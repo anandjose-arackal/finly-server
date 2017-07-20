@@ -51,8 +51,12 @@
 #  certificate_of_registration_content_type  :string(255)
 #  certificate_of_registration_file_size     :integer
 #  certificate_of_registration_updated_at    :datetime
-#  customer_id                               :string(255)
 #  customer_type_id                          :integer
+#  customer_id                               :string(255)
+#  authorized_signatory_aadhar_file_name     :string(255)
+#  authorized_signatory_aadhar_content_type  :string(255)
+#  authorized_signatory_aadhar_file_size     :integer
+#  authorized_signatory_aadhar_updated_at    :datetime
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

@@ -1,0 +1,22 @@
+# == Schema Information
+#
+# Table name: kyc_documents
+#
+#  id                           :integer          not null, primary key
+#  company_kyc_document_type_id :integer
+#  company_kyc_id               :integer
+#  doc_file_name                :string(255)
+#  doc_content_type             :string(255)
+#  doc_file_size                :integer
+#  doc_updated_at               :datetime
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#
+
+require 'test_helper'
+
+class KycDocumentTest < ActiveSupport::TestCase
+  # test "the truth" do
+  #   assert true
+  # end
+end
