@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170719165424) do
+ActiveRecord::Schema.define(version: 20170720164155) do
 
   create_table "aadhar_card_data", force: :cascade do |t|
     t.string   "loc",                 limit: 255
@@ -622,13 +622,13 @@ ActiveRecord::Schema.define(version: 20170719165424) do
 
   create_table "cards", force: :cascade do |t|
     t.integer  "user_id",                  limit: 4
-    t.string   "ending_number",            limit: 255,                  null: false
-    t.string   "proxy",                    limit: 255,                  null: false
+    t.string   "ending_number",            limit: 255,                   null: false
+    t.string   "proxy",                    limit: 255,                   null: false
     t.integer  "card_type_id",             limit: 4
     t.text     "description",              limit: 65535
-    t.datetime "created_at",                                            null: false
-    t.datetime "updated_at",                                            null: false
-    t.integer  "company_id",               limit: 4,                    null: false
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.integer  "company_id",               limit: 4,                     null: false
     t.integer  "disabled_by_role_id",      limit: 4
     t.integer  "disabled_by_user_id",      limit: 4
     t.boolean  "active"
@@ -638,7 +638,8 @@ ActiveRecord::Schema.define(version: 20170719165424) do
     t.integer  "card_eligibility_id",      limit: 4
     t.boolean  "admin_unblockable",                      default: true
     t.integer  "itz_cash_card_program_id", limit: 4
-    t.integer  "card_status_id",           limit: 4,                    null: false
+    t.integer  "card_status_id",           limit: 4,                     null: false
+    t.boolean  "is_deleted",                             default: false
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -811,6 +812,7 @@ ActiveRecord::Schema.define(version: 20170719165424) do
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+    t.string   "identifier", limit: 255
   end
 
   create_table "company_kycs", force: :cascade do |t|
@@ -1518,6 +1520,7 @@ ActiveRecord::Schema.define(version: 20170719165424) do
     t.integer  "company_id",                 limit: 4,     null: false
     t.text     "admin_note",                 limit: 65535
     t.datetime "submitted_on"
+    t.datetime "upgraded_on"
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
@@ -1603,6 +1606,7 @@ ActiveRecord::Schema.define(version: 20170719165424) do
     t.datetime "doc_updated_at"
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
+    t.string   "identifier",                   limit: 255
   end
 
   add_index "kyc_documents", ["company_kyc_document_type_id"], name: "index_kyc_documents_on_company_kyc_document_type_id", using: :btree

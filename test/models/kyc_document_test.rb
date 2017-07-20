@@ -11,6 +11,7 @@
 #  doc_updated_at               :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
+#  identifier                   :string(255)
 #
 
 require 'test_helper'

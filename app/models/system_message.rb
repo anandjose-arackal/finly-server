@@ -34,5 +34,13 @@ class SystemMessage < ActiveRecord::Base
   scope :pan_card_messages, -> {where message_type: "pan_card"}
   scope :vat_registration_certificate_messages, -> {where message_type: "vat_registration_certificate"}
   scope :certificate_of_registration_messages, -> {where message_type: "certificate_of_registration"}
-  scope :coi_messages, -> {where message_type: "coi"}
+  scope :certificate_of_incorporation_messages, -> {where message_type: "certificate_of_incorporation"}
+  scope :id_proof_messages, -> {where message_type: "id_proof"}
+  scope :address_proof_messages, -> {where message_type: "address_proof"}
+  scope :supporting_document_messages, -> {where message_type: "supporting_document"}
+  scope :list_of_partners_messages, -> {where message_type: "list_of_partners"}
+  scope :list_of_partners_din_messages, -> {where message_type: "list_of_partners_din"}
+  scope :partnership_deed_messages, -> {where message_type: "partnership_deed"}
+  scope :trust_deed_messages, -> {where message_type: "trust_deed"}
+
 end

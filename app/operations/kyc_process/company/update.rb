@@ -88,7 +88,19 @@ class KycProcess::Company::Update < KycProcess::Company::Base
   protected
 
   def kyc_strong_params
-    params.require(:company_kyc).permit(:coi, :pan_card, :passport, :driving_licence, :aadhar_card, :vat_registration_certificate, :registration_of_trust, :certificate_of_registration)
+    p = {}
+    p[:kyc_documents_attributes] = []
+    params[:company_kyc].each do |key, value|
+      p[:kyc_documents_attributes] << {
+          doc: value,
+          identifier: key,
+          company_kyc_document_type_id: CompanyKycDocumentType.id_for(CompanyKycDocumentType.name_for(key))
+      }
+      if company_kyc.kyc_documents.send("#{key}").present?
+        p[:kyc_documents_attributes][0][:id] = company_kyc.kyc_documents.send("#{key}").first.id
+      end
+    end
+    p
   end
 
 end

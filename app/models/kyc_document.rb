@@ -11,6 +11,7 @@
 #  doc_updated_at               :datetime
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
+#  identifier                   :string(255)
 #
 
 class KycDocument < ActiveRecord::Base
@@ -37,9 +38,6 @@ class KycDocument < ActiveRecord::Base
   scope :supporting_document, -> {where company_kyc_document_type_id: CompanyKycDocumentType.id_for('Supporting Document')}
   scope :partnership_deed, -> {where company_kyc_document_type_id: CompanyKycDocumentType.id_for('Partnership Deed')}
   scope :trust_deed, -> {where company_kyc_document_type_id: CompanyKycDocumentType.id_for('Trust Deed')}
-
-  # add individual methods to check what type of doc this is
-
-
+  scope :list_of_trustees_karta, -> {where company_kyc_document_type_id: CompanyKycDocumentType.id_for('List of Trustees / Office Bearers / Karta along with Partners')}
 
 end
