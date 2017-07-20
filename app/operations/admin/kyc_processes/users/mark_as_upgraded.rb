@@ -23,7 +23,7 @@ class Admin::KycProcesses::Users::MarkAsUpgraded < Admin::KycProcesses::Users::B
   def process
     self.individual_kycs.each do |individual_kyc|
       individual_kyc.update(review_position: nil, kyc_status_id: KycStatus.id_for(:completed), upgraded_by_resource: user, upgraded_on: DateTime.now)
-      individual_kyc.card.update(card_status_id: CardStatus.id_for(:upgraded))
+      individual_kyc.user.cards.update_all(card_status_id: CardStatus.id_for(:upgraded))
       track_params = {
           action_resource: user,
           action_id: IndividualKycTrackAction.id_for(:upgraded)
