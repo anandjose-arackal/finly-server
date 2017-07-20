@@ -37,6 +37,8 @@ class Admin::Cards::Create < Admin::Cards::Base
       return
     end
     self.card_create_params[:company_id] = company_id
+    # adding the status of a paricular card as unassigned by default
+    self.card_create_params[:card_status_id] = CardStatus.id_for(:unassigned)
   end
 
   def process
