@@ -167,12 +167,18 @@ class CompanyKyc < ActiveRecord::Base
         file: file,
         system_messages: system_messages&.pluck(:content),
     }
+    documents << pan_card
     # now based on company type, the other document is decided
     case self.company_type_id
       when CompanyType.id_for('Sole Proprietor')
         # sole proprietor
         supporting_doc = {}
         supporting_doc[:name] = "ID Proof"
+        supporting_doc[:options] = sole_proprietor_supporting_documents
+        documents << supporting_doc
+        supporting_doc[:name] = "Address Proof"
+        supporting_doc[:options] = sole_proprietor_supporting_documents
+        documents << supporting_doc
 
       when 3, 5
         address_proof = {}
@@ -256,26 +262,52 @@ class CompanyKyc < ActiveRecord::Base
 
   def sole_proprietor_supporting_documents
     options = []
-    supporting_document_options = ["Aadhar Card", "VAT Registration Certificate", "CST Registration Certificate", "Service Tax Registration Certificate", "Shops and Establishments Licence"]
-    supporting_document_options.each do |option|
+    id_proof_options = ["Aadhar Card", "VAT Registration Certificate", "CST Registration Certificate", "Service Tax Registration Certificate", "Shops and Establishments Licence",
+                                   "Ration Card", "Passport", "Voters ID Card"]
+    id_proof_options.each do |option|
       option = {
-          identifier: "supporting_document",
+          identifier: "id_proof",
           name: option,
-          uploaded: company_kyc.kyc_documents.supporting_document.first.present?
+          uploaded: company_kyc.kyc_documents.id_proof.first.present?
       }
       file = {}
-      if self.kyc_documents.supporting_document.present?
+      if self.kyc_documents.id_proof.present?
         file = {
-            type: company_kyc.kyc_documents.supporting_document.first.doc_content_type,
-            original: company_kyc.kyc_documents.supporting_document.first.doc.url,
-            thumb: company_kyc.kyc_documents.supporting_document.first.doc.url(:thumb)
+            type: company_kyc.kyc_documents.id_proof.first.doc_content_type,
+            original: company_kyc.kyc_documents.id_proof.first.doc.url,
+            thumb: company_kyc.kyc_documents.id_proof.first.doc.url(:thumb)
         }
       end
       option[:file] = file
-      if self.system_messages.supporting_document_messages.present?
-        option[:system_messages] = self.system_messages.supporting_document_messages.pluck(:content)
+      if self.system_messages.id_proof_messages.present?
+        option[:system_messages] = self.system_messages.id_proof_messages.pluck(:content)
       end
+      options << option
     end
+
+    address_proof_options = ["Aadhar Card", "VAT Registration Certificate", "CST Registration Certificate", "Service Tax Registration Certificate", "Shops and Establishments Licence",
+                             "Ration Card", "Passport", "Voters ID Card"]
+    address_proof_options.each do |option|
+      option = {
+          identifier: "id_proof",
+          name: option,
+          uploaded: company_kyc.kyc_documents.address_proof.first.present?
+      }
+      file = {}
+      if self.kyc_documents.address_proof.present?
+        file = {
+            type: company_kyc.kyc_documents.address_proof.first.doc_content_type,
+            original: company_kyc.kyc_documents.address_proof.first.doc.url,
+            thumb: company_kyc.kyc_documents.address_proof.first.doc.url(:thumb)
+        }
+      end
+      option[:file] = file
+      if self.system_messages.address_proof_messages.present?
+        option[:system_messages] = self.system_messages.address_proof_messages.pluck(:content)
+      end
+      options << option
+    end
+
     options
   end
 

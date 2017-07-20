@@ -14,6 +14,8 @@
 #
 
 class KycDocument < ActiveRecord::Base
+  include Attachable
+
   belongs_to :company_kyc_document_type
   belongs_to :company_kyc
 
