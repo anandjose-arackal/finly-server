@@ -1,5 +1,5 @@
 class KycProcess::Company::Update < KycProcess::Company::Base
-  attr_accessor :kyc_params
+  attr_accessor :kyc_params, :uploaded_docs
 
   def pre_validate
     super()
@@ -18,9 +18,11 @@ class KycProcess::Company::Update < KycProcess::Company::Base
   end
 
   def pre_process
-    # self.kyc_params[:aadhar_card] = kyc_params[:aadhar]
-    # self.kyc_params[:pan_card] = kyc_params[:pan_card]
-    # kyc_params.permit!
+    # here we'll be storing the documents that are being uploaded again, for later destroying the system messages associated with them
+    self.uploaded_docs = []
+    kyc_params[:kyc_documents_attributes].each do |doc|
+      self.uploaded_docs << doc[:identifier]
+    end
   end
 
   def process
@@ -32,14 +34,14 @@ class KycProcess::Company::Update < KycProcess::Company::Base
   def post_process
     # update the status based on the company type and documents uploaded
     case company_kyc.company_type_id
-      when 1
-        if company_kyc.pan_card.present? && (company_kyc.aadhar_card.present? || company_kyc.vat_registration_certificate.present?)
+      when CompanyType.id_for('Sole Proprietor')
+        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.id_proof.present? && company_kyc.kyc_documents.address_proof.present?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
-      when 3, 5
-        if company_kyc.pan_card.present? && company_kyc.coi.present?
+      when CompanyType.id_for('Partnership Firm')
+        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents..present?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
@@ -58,16 +60,13 @@ class KycProcess::Company::Update < KycProcess::Company::Base
         end
     end
 
-    # clearing all system messages that were associated with this particular KYC document
-    company_kyc.system_messages.destroy_all
+    # clearing all system messages that were associated with the uploaded KYC documents
+    uploaded_docs.each do |doc|
+      company_kyc.system_messages.send("#{doc}_messages").destroy_all
+    end
 
     add_message :success, "Documents uploaded successfully"
 
-    # if self.company_kyc.coi.present? and self.company_kyc.pan_card.present?
-    #   self.company_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
-    # else
-    #   self.company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
-    # end
   end
 
   def success

@@ -169,7 +169,7 @@ class CompanyKyc < ActiveRecord::Base
         system_messages: system_messages&.pluck(:content),
     }
     documents << pan_card
-
+    
     # now based on company type, the other document is decided
     case self.company_type_id
       when CompanyType.id_for('Sole Proprietor')
@@ -235,7 +235,7 @@ class CompanyKyc < ActiveRecord::Base
         list_of_partners[:options] << {
             identifier: "list_of_partners",
             name: "List of Partners on Company Letterhead",
-            uploaded: self.list_of_partners.present?
+            uploaded: self.kyc_documents.list_of_partners.present?
         }
         if self.kyc_documents.list_of_partners.present?
           file = {
@@ -268,7 +268,7 @@ class CompanyKyc < ActiveRecord::Base
         certificate_of_incorporation[:options] << {
             identifier: "certificate_of_incorporation",
             name: "Certificate of Incorporation",
-            uploaded: self.certificate_of_incorporation.present?
+            uploaded: self.kyc_documents.certificate_of_incorporation.present?
         }
         if self.kyc_documents.certificate_of_incorporation.present?
           file = {
@@ -294,7 +294,7 @@ class CompanyKyc < ActiveRecord::Base
         certificate_of_incorporation[:options] << {
             identifier: "certificate_of_incorporation",
             name: "Certificate of Incorporation",
-            uploaded: self.certificate_of_incorporation.present?
+            uploaded: self.kyc_documents.certificate_of_incorporation.present?
         }
         if self.kyc_documents.certificate_of_incorporation.present?
           file = {
@@ -317,7 +317,7 @@ class CompanyKyc < ActiveRecord::Base
         list_of_partners_din[:options] << {
             identifier: "list_of_partners_din",
             name: "List of Partners with DIN",
-            uploaded: self.list_of_partners_din.present?
+            uploaded: self.kyc_documents.list_of_partners_din.present?
         }
         if self.kyc_documents.list_of_partners_din.present?
           file = {
@@ -392,7 +392,7 @@ class CompanyKyc < ActiveRecord::Base
         list_of_trustees_karta[:options] << {
             identifier: "list_of_trustees_karta",
             name: "List of Trustees / Office Bearers / Karta",
-            uploaded: self.list_of_trustees_karta.present?
+            uploaded: self.kyc_documents.list_of_trustees_karta.present?
         }
         if self.kyc_documents.list_of_trustees_karta.present?
           file = {
