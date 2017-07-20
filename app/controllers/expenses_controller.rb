@@ -65,9 +65,9 @@ class ExpensesController < ApplicationController
       when '5'
         @result = Expense::ExPerDiem::Update.(current_user, params)
       else
-        respond response: :failure, message: "Invalid input"
+        # respond response: :failure, message: "Invalid input"
     end
-    respond response: (@result.success? ? :success : :failure)
+    respond(response: (@result&.success? ? :success : :failure), message: (@result&.success? ? @result.messages[:success] : "Invalid Input"))
   end
 
   def update_status
