@@ -1,6 +1,6 @@
 class AdminUsers::CardAssignRequestsController < ApplicationController
 
-  before_action :set_tokens_in_header_admin, only: :export
+  before_action :set_tokens_in_header_admin, only: [:export, :download_kycs]
   before_action -> { doorkeeper_authorize! :admin }
 
   def index
@@ -34,7 +34,7 @@ class AdminUsers::CardAssignRequestsController < ApplicationController
   end
 
   def download_kycs
-    @result = Admin::Cards::AssignRequests::Export::KycsAs.(current_user, params)
+    @result = Admin::Cards::AssignRequests::Export::KycsAsZip.(current_user, params)
     respond
   end
 

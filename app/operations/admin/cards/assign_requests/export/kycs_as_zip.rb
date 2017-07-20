@@ -1,4 +1,4 @@
-class Admin::Cards::AssignRequests::Export::KycsAsZip < Admin::KycProcesses::Users::Base
+class Admin::Cards::AssignRequests::Export::KycsAsZip < Admin::Cards::AssignRequests::Base
   attr_accessor :files
 
   def process

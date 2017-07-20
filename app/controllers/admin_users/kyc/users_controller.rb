@@ -1,6 +1,6 @@
 class AdminUsers::Kyc::UsersController < ApplicationController
 
-  before_action :set_tokens_in_header_admin, only: :export
+  before_action :set_tokens_in_header_admin, only: [:export, :download_kycs]
   before_action -> { doorkeeper_authorize! :admin }
 
   # def company_index
