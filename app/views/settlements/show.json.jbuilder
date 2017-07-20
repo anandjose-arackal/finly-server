@@ -8,7 +8,7 @@ json.array! @result.items do |item|
     end
     json.reimbursement_amount item.reimbursable_expenses_total.value rescue 0
     json.card_expenses_total item.card_expenses_total.value rescue 0
-    json.cash_expenses_total item.reimbursable_expenses_total.value rescue 0
+    json.cash_expenses_total (item.total_amount - item.card_expenses_total.value) rescue 0
     json.reimbursable_expenses_total item.reimbursable_expenses_total.value rescue 0
     json.non_reimbursable_expenses_total item.non_reimbursable_expenses_total.value rescue 0
     json.currency_symbol item.base_currency_symbol
