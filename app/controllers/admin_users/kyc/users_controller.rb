@@ -34,7 +34,8 @@ class AdminUsers::Kyc::UsersController < ApplicationController
   end
 
   def download_kycs
-    @result = Admin::KycProcesses::Users::Export::Kycs.(current_user, params)
+    @result = Admin::KycProcesses::Users::Export::KycsAsZip.(current_user, params)
     respond
   end
+
 end
