@@ -21,6 +21,7 @@ dump.rdb
 /public/system/company_kycs/*
 /public/system/individual_kycs/*
 /public/system/agreements/*
+/public/system/kyc_documents/*
 /public/common/files/temp_files/*
 /sample_atm_transactions.txt
 /junk_expenses.rb

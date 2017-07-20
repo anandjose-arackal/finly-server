@@ -41,19 +41,25 @@ class KycProcess::Company::Update < KycProcess::Company::Base
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
       when CompanyType.id_for('Partnership Firm')
-        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents..present?
+        if company_kyc.kyc_documents.pan_card.present? && (company_kyc.kyc_documents.partnership_deed.present? || company_kyc.kyc_documents.certificate_of_registration.present?) && company_kyc.kyc_documents.list_of_partners.present? && company_kyc.kyc_documents.supporting_document.present?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
-      when 2, 4
-        if company_kyc.pan_card.present? && company_kyc.certificate_of_registration.present?
+      when CompanyType.id_for('Private Ltd Company')
+        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.certificate_of_incorporation.present?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
-      when 6
-        if company_kyc.pan_card.present? && company_kyc.registration_of_trust.present?
+      when CompanyType.id_for('Ltd Liability Partnership')
+        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.certificate_of_incorporation.present? && company_kyc.kyc_documents.list_of_partners_din.present? && company_kyc.kyc_documents.supporting_document.present?
+          company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
+        else
+          company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
+        end
+      when CompanyType.id_for('Trust and Societies')
+        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.certificate_of_registration.present? && company_kyc.kyc_documents.list_of_trustees_karta.present? && company_kyc.kyc_documents.supporting_document.present?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))

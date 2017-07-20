@@ -20,7 +20,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
 
     def retrieve_actions
       actions = {}
-      if company_kyc.kyc_status_id == KycStatus.id_for(:incomplete)
+      if company_kyc.kyc_status_id == KycStatus.id_for(:incomplete) || company_kyc.kyc_status_id == KycStatus.id_for(:rejected)
         actions[:upload] = Rails.application.routes.url_helpers.kyc_docs_update_path
       elsif company_kyc.kyc_status_id == KycStatus.id_for(:submitted)
         actions[:upload] = Rails.application.routes.url_helpers.kyc_docs_update_path

@@ -169,7 +169,7 @@ class CompanyKyc < ActiveRecord::Base
         system_messages: system_messages&.pluck(:content),
     }
     documents << pan_card
-    
+
     # now based on company type, the other document is decided
     case self.company_type_id
       when CompanyType.id_for('Sole Proprietor')
@@ -199,7 +199,7 @@ class CompanyKyc < ActiveRecord::Base
           file = {
               type: (self.kyc_documents.partnership_deed.first.doc_content_type),
               original: (self.kyc_documents.partnership_deed.first.doc.url),
-              thumb: (self.kyc_documents.partnership_deed.first.url(:thumb))
+              thumb: (self.kyc_documents.partnership_deed.first.doc.url(:thumb))
           }
           partnership_deed[:options][0][:file] = file
         end
@@ -213,11 +213,11 @@ class CompanyKyc < ActiveRecord::Base
             name: "Certificate of Registration",
             uploaded: self.kyc_documents.certificate_of_registration.present?
         }
-        if self.kyc_documents.kyc_documents.certificate_of_registration.present?
+        if self.kyc_documents.certificate_of_registration.present?
           file = {
               type: (self.kyc_documents.certificate_of_registration.first.doc_content_type),
               original: (self.kyc_documents.certificate_of_registration.first.doc.url),
-              thumb: (self.kyc_documents.certificate_of_registration.first.url(:thumb))
+              thumb: (self.kyc_documents.certificate_of_registration.first.doc.url(:thumb))
           }
           partnership_deed[:options][1][:file] = file
         end
@@ -356,7 +356,7 @@ class CompanyKyc < ActiveRecord::Base
           file = {
               type: (self.kyc_documents.trust_deed.first.doc_content_type),
               original: (self.kyc_documents.trust_deed.first.doc.url),
-              thumb: (self.kyc_documents.trust_deed.first.url(:thumb))
+              thumb: (self.kyc_documents.trust_deed.first.doc.url(:thumb))
           }
           trust_deed[:options][0][:file] = file
         end
@@ -370,11 +370,11 @@ class CompanyKyc < ActiveRecord::Base
             name: "Certificate of Registration",
             uploaded: self.kyc_documents.certificate_of_registration.present?
         }
-        if self.kyc_documents.kyc_documents.certificate_of_registration.present?
+        if self.kyc_documents.certificate_of_registration.present?
           file = {
               type: (self.kyc_documents.certificate_of_registration.first.doc_content_type),
               original: (self.kyc_documents.certificate_of_registration.first.doc.url),
-              thumb: (self.kyc_documents.certificate_of_registration.first.url(:thumb))
+              thumb: (self.kyc_documents.certificate_of_registration.first.doc.url(:thumb))
           }
           trust_deed[:options][1][:file] = file
         end

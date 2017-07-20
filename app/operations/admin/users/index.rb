@@ -48,7 +48,8 @@ class Admin::Users::Index < Admin::Users::Base
       convert_scopes
       self.users = params[:users]
       self.users = apply_scopes(users, params)
-      self.paginated_users = users.paginate(page: params[:page], per_page: 30)
+      # self.paginated_users = users.paginate(page: params[:page], per_page: 30)
+      self.paginated_users = users
       self.companies = params[:companies]
     end
 
