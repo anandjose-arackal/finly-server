@@ -39,7 +39,7 @@ class Admin::Users::Base < Admin::Base
             status: {id: card.card_status.id, name: card.card_status.name}
         }
         unless card.assigned?
-          assign_request = card.card_assign_requests.with_user_id(selected_user.id)
+          assign_request = card.card_assign_requests.with_card_owner_id(selected_user.id)
           if assign_request.present?
             data[:assign_request] = {
                 id: assign_request.id,

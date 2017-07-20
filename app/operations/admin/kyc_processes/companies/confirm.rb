@@ -2,6 +2,10 @@ class Admin::KycProcesses::Companies::Confirm < KycProcess::Company::Confirm
 
   attr_accessor :company, :company_kyc
 
+  def user_model
+    AdminUser
+  end
+
   def pre_validate
     unless user.finly_admin?
       raise_unauthorized_exception

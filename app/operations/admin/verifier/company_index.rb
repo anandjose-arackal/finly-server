@@ -11,9 +11,11 @@ class Admin::Verifier::CompanyIndex < Admin::Cards::AssignRequests::Base
   def init
     # Pending Card Assign Requests
     pending_requests_presenter = Admin::Cards::AssignRequests::Index.(user, params)
+    assign_requests_user_ids = []
+    individual_kycs_user_ids = []
     if pending_requests_presenter.success?
       assign_requests = pending_requests_presenter.card_assign_requests
-      assign_requests_user_ids = assign_requests.pluck(:card_owner_id)
+      assign_requests_user_ids = assign_requests&.pluck(:card_owner_id)
       self.assign_requests_users = User.with_id assign_requests_user_ids
     end
 
@@ -23,7 +25,7 @@ class Admin::Verifier::CompanyIndex < Admin::Cards::AssignRequests::Base
         # add_message :error, individual_kycs_presenter.messages[:error]
         # return
       individual_kycs = individual_kycs_presenter.individual_kycs
-      individual_kycs_user_ids = individual_kycs.pluck(:user_id)
+      individual_kycs_user_ids = individual_kycs&.pluck(:user_id)
       self.upgrade_request_users = User.with_id individual_kycs_user_ids
     end
 

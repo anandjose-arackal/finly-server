@@ -41,6 +41,7 @@
 #  company_id                 :integer          not null
 #  admin_note                 :text(65535)
 #  submitted_on               :datetime
+#  upgraded_on                :datetime
 #
 
 class IndividualKyc < ActiveRecord::Base
@@ -51,6 +52,7 @@ class IndividualKyc < ActiveRecord::Base
   belongs_to :type, class_name: 'IndividualKycType'
   belongs_to :admin_review_workflow
   belongs_to :company
+  belongs_to :upgraded_by_resource, class_name: 'AdminUser'
   has_many :tracks, class_name: 'IndividualKycTrack'
   has_many :system_messages, as: :messagable, dependent: :destroy
 

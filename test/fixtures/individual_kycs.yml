@@ -41,6 +41,7 @@
 #  company_id                 :integer          not null
 #  admin_note                 :text(65535)
 #  submitted_on               :datetime
+#  upgraded_on                :datetime
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
