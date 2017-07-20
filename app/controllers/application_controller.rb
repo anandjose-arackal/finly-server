@@ -246,4 +246,11 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def set_tokens_in_header_admin
+    access_token = request.cookies['access_token_admin']
+    if access_token.present?
+      request.headers['Authorization'] = "Bearer #{access_token}"
+    end
+  end
+
 end

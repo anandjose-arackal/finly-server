@@ -1,6 +1,6 @@
 class AdminUsers::Kyc::UsersController < ApplicationController
 
-  before_action :set_tokens_in_header, only: :export
+  before_action :set_tokens_in_header_admin, only: :export
   before_action -> { doorkeeper_authorize! :admin }
 
   # def company_index
@@ -37,5 +37,4 @@ class AdminUsers::Kyc::UsersController < ApplicationController
     @result = Admin::KycProcesses::Users::Export::Kycs.(current_user, params)
     respond
   end
-
 end
