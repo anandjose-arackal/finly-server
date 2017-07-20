@@ -208,7 +208,7 @@ class Report < ActiveRecord::Base
   end
 
   def settlement_pending?
-    approved? and reimbursable_expenses_total.present? and reimbursable_expenses_total.value > 0
+    approved? # (todo - temporary, till the cash on hand workflow is fixed) and reimbursable_expenses_total.present? and reimbursable_expenses_total.value > 0
   end
 
   def can_submit?
