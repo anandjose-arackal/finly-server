@@ -230,6 +230,24 @@ CardAssignRequestStatus.seed_data
 
 CardAssignRequestTrackAction.seed_data
 
+if AdminUser.count == 0
+  # creating admin panel users who can access admin panel
+  AdminUser.create!(email: 'admin@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
+                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:admin)}, {admin_user_role_id: AdminUserRole.id_for(:transcriber)},
+                                                          {admin_user_role_id: AdminUserRole.id_for(:verifier)}])
+  AdminUser.create!(email: 'sreeram@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
+                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:admin)}, {admin_user_role_id: AdminUserRole.id_for(:transcriber)},
+                                                          {admin_user_role_id: AdminUserRole.id_for(:verifier)}])
+  AdminUser.create!(email: 'vivek@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
+                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:itzcash_verifier)}])
+  AdminUser.create!(email: 'veekshith@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
+                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:itzcash_operations)}])
+  AdminUser.create!(email: 'abinash@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
+                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:itzcash_operations)}])
+end
+
+AdminReviewWorkflow.seed_data
+
 ##########################
 
 if Amount.count == 0
@@ -630,19 +648,6 @@ if FieldConfiguration.count == 0
                                                                         field_parent_type_id: FieldParentType.id_for(:per_diem_expense)})
 end
 
-if AdminUser.count == 0
-  # creating admin panel users who can access admin panel
-  AdminUser.create!(email: 'admin@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
-                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:admin)}, {admin_user_role_id: AdminUserRole.id_for(:transcriber)}])
-  AdminUser.create!(email: 'sreeram@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
-                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:admin)}, {admin_user_role_id: AdminUserRole.id_for(:transcriber)}])
-  AdminUser.create!(email: 'vivek@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
-                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:itzcash_verifier)}])
-  AdminUser.create!(email: 'veekshith@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,
-                    admin_user_role_mappings_attributes: [{admin_user_role_id: AdminUserRole.id_for(:itzcash_operations)}])
-end
-
-AdminReviewWorkflow.seed_data
 
 if CardTransaction.filter_refunds(1).count == 0
   User.all.each do |user|

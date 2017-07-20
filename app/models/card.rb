@@ -24,6 +24,8 @@
 #
 
 class Card < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :card_type
   belongs_to :user
   belongs_to :company
@@ -36,9 +38,9 @@ class Card < ActiveRecord::Base
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
 
-  has_one :card_restriction, dependent: :destroy
+  has_one :card_restriction
 
-  has_many :card_balance_history, dependent: :destroy
+  has_many :card_balance_history
   has_many :card_assign_requests
 
   belongs_to :card_balance, class_name: 'Amount'

@@ -13,6 +13,7 @@
 
 
 
+
 class State < ActiveRecord::Base
   include Seedable
 
