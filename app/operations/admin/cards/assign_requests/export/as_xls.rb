@@ -21,7 +21,7 @@ class Admin::Cards::AssignRequests::Export::AsXls < Admin::Cards::AssignRequests
           user.last_name,
           user.mothers_maiden_name,
           card_assign_request.card.proxy,
-          user&.individual_kyc&.kyc_type&.name,
+          user&.individual_kyc&.type&.name,
           user&.individual_kyc&.kyc_number
       ]
     end
