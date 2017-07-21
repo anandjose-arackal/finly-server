@@ -4,6 +4,9 @@ require 'require_all'
 # Dir[File.expand_path "#{Rails.root}/app/operations/expense/card/**/*.rb"].each { |f| require(f) }
 class ApplicationController < ActionController::Base
   include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
+  # include AbstractController::Callbacks
+  # include ActionController::Head
+  include Doorkeeper::Rails::Helpers
   # Prevent CSRF attacks by raising an exception.
   # For APIs, you may want to use :null_session instead.
 
@@ -132,10 +135,14 @@ class ApplicationController < ActionController::Base
     end
     if @result.present?
       if @result.success?
-        respond_to do |format|
-          format.js {}
-          format.json {}
-          format.html {}
+        if [Exporter, Exporter::Spreadsheet, Exporter::Pdf, Exporter::AsZip].include? @result.class
+          @result.render(self)
+        else
+          respond_to do |format|
+            format.js {}
+            format.json {}
+            format.html {}
+          end
         end
       else
         respond_to do |format|
@@ -213,6 +220,37 @@ class ApplicationController < ActionController::Base
   def block_foreign_hosts(type_id)
     return false if whitelisted?(request.remote_ip, type_id)
     head(403)
+  end
+
+  def current_user
+    if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
+      scopes = doorkeeper_token[:scopes]
+      if scopes.include?('admin')
+        @current_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
+      elsif scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome')or scopes.include?('api')
+        @current_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
+      end
+    end
+  end
+
+  def current_company
+    u = current_user
+    return nil unless u.class == User
+    u&.company
+  end
+
+  def set_tokens_in_header
+    access_token = request.cookies['access_token']
+    if access_token.present?
+      request.headers['Authorization'] = "Bearer #{access_token}"
+    end
+  end
+
+  def set_tokens_in_header_admin
+    access_token = request.cookies['access_token_admin']
+    if access_token.present?
+      request.headers['Authorization'] = "Bearer #{access_token}"
+    end
   end
 
 end

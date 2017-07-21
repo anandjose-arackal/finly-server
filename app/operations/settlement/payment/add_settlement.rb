@@ -206,7 +206,12 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     total += outside_amount if reimbursement_type_id == REIMBURSEMENT_TYPE[:outside_finly]
     total += r_amount if reimbursement_type_id == REIMBURSEMENT_TYPE[:reimbursement_card]
 
-    if precision_value(total) > precision_value(report_total)
+    rep_total = 0
+    reports.each do |report|
+      rep_total += report.total_amount
+    end
+
+    if precision_value(total) > precision_value(rep_total)
       add_message :error, 'Settlement amount exceeds report total'
     end
 
@@ -408,7 +413,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     end
 
     reports.each do |report|
-      Report::MarkAsSettled.(user, {payment: payment, cash_in_hand_deduction: self.cash_deduction, report: report, role_id: role, view: params[:view]})
+      op = Report::MarkAsSettled.(user, {payment: payment, cash_in_hand_deduction: self.cash_deduction, report: report, role_id: role, view: params[:view]})
     end
 
     # if outside_settlement_amount == 0

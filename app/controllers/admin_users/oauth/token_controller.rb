@@ -1,15 +1,20 @@
-class AdminUsers::Oauth::TokenController < Opro::Oauth::TokenController
+class AdminUsers::Oauth::TokenController < Oauth::TokenController
 
-  def create
-    super()
+  def on_create_success(response)
+    params[:request] = request
+    params[:application] = 'admin_panel'
+    # self.response.set_cookie 'access_token', {:value => response.token.token, :httponly => true}
+    # self.response.set_cookie 'refresh_token', {:value => response.token.refresh_token, :httponly => true}
+    cookies["access_token_admin"] = {:value => @token.token, :httponly => true}
+    cookies["refresh_token_admin"] = {:value => @token.refresh_token, :httponly => true}
 
-    # Setting access tokens in cookies, will be removed at the time of signing out
-    if @auth_grant
-      params[:request] = request
-      params[:application] = 'admin_panel'
-      User::Track::Login.(@auth_grant.user, params)
-      cookies["access_token"] = { :value => @auth_grant.access_token, :httponly => true }
-      cookies["refresh_token"] = { :value => @auth_grant.refresh_token, :httponly => true }
-    end
+    # render json: {}, status: 200
+    render_json 'admin_users/oauth/token/create.json.jbuilder', response.status
   end
+
+  protected
+  def auth_scope
+    :admin
+  end
+
 end

@@ -1,7 +1,7 @@
 require 'hooks'
-
 class BaseOperation
   include CallbackHandler, MathUtil, HasScope
+  # todo rename user to resource as User is a model and there can be other models such as AdminUser etc
   attr_accessor :user, :company, :params, :messages, :process_complete, :response
 
   # If initializers are over-ridden super() must be called in the inheriting class
@@ -14,11 +14,14 @@ class BaseOperation
   def self.call(user, params={})
     self.new(user, params).run
   end
+
   # Can be called as BaseOperations.(user, params) instead of BaseOperations.call(user, params)
 
   # Used to run the operation
   def run
     clear_messages
+    validate_user_model
+    return failure if has_errors?
     authorize_subscriptions
     return failure if has_errors?
     authorize_user authorized_user_types
@@ -49,10 +52,30 @@ class BaseOperation
     retrieve
   end
 
+  def user_model
+    User
+  end
+
+  # Checks which type of user can access this operation
+  def validate_user_model
+    return unless user.present?
+    required_user_model = user_model
+    return unless required_user_model.present?
+    required_user_model = [required_user_model] unless required_user_model.is_a?(Array)
+    required_user_model.each do |req_model|
+      if req_model == user.class
+        return
+      end
+    end
+    add_message :error, 'Invalid User. Access Denied'
+  end
+
+  # Defined all the required features user should be subscribed to to run this operation
   def subscription
     nil
   end
 
+  # Authorizes the user based on his feature subscription
   def authorize_subscriptions
     required_subscription = subscription
     return if required_subscription.blank? or (user.blank? and company.blank?)

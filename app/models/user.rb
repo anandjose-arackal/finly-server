@@ -52,16 +52,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -133,6 +123,8 @@ class User < ActiveRecord::Base
   has_many :user_login_tracks
   has_many :login_agreement_mappings
   has_many :agreements, through: :login_agreement_mappings
+  has_many :card_assign_requests, foreign_key: :card_owner_id
+  has_many :card_upgrade_requests, foreign_key: :card_owner_id
 
   has_one :individual_kyc
   has_one :itz_cash_dmt_sender
@@ -176,6 +168,7 @@ class User < ActiveRecord::Base
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }
+  # scope :search_by_query, -> (query) { where("first_name like ? or last_name like ? or mobile_number like ? or email like ?", "%#{query}%", "%#{query}%", "%#{query}%", "%#{query}%")}
 
   # Users having cards assigned with the given program
   scope :with_cards_having_card_program, ->(id) do
@@ -370,7 +363,7 @@ class User < ActiveRecord::Base
     self.build_auto_submit_config(period_id: Period.id_for(:week), enabled: false, limit_to_card_expenses: true).save
     self.build_enforce_policy(enabled: false).save
     self.build_auto_reload_config(enabled: false).save
-    self.build_individual_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.individual_kyc.blank?
+    self.build_individual_kyc(company_id: self.company_id, kyc_status_id: KycStatus.id_for(:incomplete), admin_review_workflow: AdminReviewWorkflow.workflow_for(:kyc_update)).save if self.individual_kyc.blank?
   end
 
   def payments
@@ -501,9 +494,9 @@ class User < ActiveRecord::Base
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate
   def self.find_for_database_authentication(conditions={})
-    return nil if conditions.blank? or conditions[:email].blank?
-    email = conditions[:email].delete(' ')
-    find_by(mobile_number: email) || find_by(email: email)
+    return nil if conditions.blank? or conditions[:username].blank?
+    username = conditions[:username].delete(' ')
+    find_by(mobile_number: username) || find_by(email: username)
   end
 
   def manager_activateable?

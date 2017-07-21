@@ -1,6 +1,6 @@
 class ExternalUrlController < ApplicationController
 
-  before_action :authenticate_user!
+
 
   def report
     id = params[:id]

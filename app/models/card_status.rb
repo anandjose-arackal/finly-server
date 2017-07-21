@@ -10,4 +10,10 @@
 
 
 class CardStatus < ActiveRecord::Base
+  include Seedable
+
+  def self.values
+    [:unassigned, :assign_requested, :assigned, :upgrade_requested, :upgraded, :expired, :hotlisted]
+  end
+
 end

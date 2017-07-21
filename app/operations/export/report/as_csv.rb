@@ -35,7 +35,6 @@ class Export::Report::AsCsv < Export::Report::Base
       reports.each do |r|
         r.expenses.each do |e|
           csv << retrieve_data(preferences, r, e, custom_field_column_names)
-          
         end
       end
     end

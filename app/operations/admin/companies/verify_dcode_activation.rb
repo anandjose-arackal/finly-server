@@ -26,7 +26,7 @@ class Admin::Companies::VerifyDcodeActivation < Admin::Companies::Base
       # also save the respective easy account number if it's not saved already
       unless company.itz_cash_property.easy_account_no.present?
         ean = result.wallets[0][:account_number]
-        company.itz_cash_property.update(easy_account_number: ean)
+        company.itz_cash_property.update(easy_account_no: ean)
       end
       add_message :success, "D-Code successfully configured!"
     else

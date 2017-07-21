@@ -1,7 +1,6 @@
 class ExpensesController < ApplicationController
 
-  before_action :authenticate_user!
-  allow_oauth!
+  before_action -> { doorkeeper_authorize! :web}
 
   def create
     case params[:type]
@@ -66,9 +65,9 @@ class ExpensesController < ApplicationController
       when '5'
         @result = Expense::ExPerDiem::Update.(current_user, params)
       else
-        respond response: :failure, message: "Invalid input"
+        # respond response: :failure, message: "Invalid input"
     end
-    respond response: :success
+    respond(response: (@result&.success? ? :success : :failure), message: (@result&.success? ? @result.messages[:success] : "Invalid Input"))
   end
 
   def update_status
