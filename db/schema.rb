@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170720164155) do
+ActiveRecord::Schema.define(version: 20170721173607) do
 
   create_table "aadhar_card_data", force: :cascade do |t|
     t.string   "loc",                 limit: 255
@@ -829,9 +829,9 @@ ActiveRecord::Schema.define(version: 20170720164155) do
     t.integer  "board_resolution_file_size",                limit: 4
     t.datetime "board_resolution_updated_at"
     t.integer  "kyc_status_id",                             limit: 4
-    t.integer  "company_id",                                limit: 4,     null: false
-    t.datetime "created_at",                                              null: false
-    t.datetime "updated_at",                                              null: false
+    t.integer  "company_id",                                limit: 4,                     null: false
+    t.datetime "created_at",                                                              null: false
+    t.datetime "updated_at",                                                              null: false
     t.date     "date_of_establishment"
     t.text     "street_2",                                  limit: 65535
     t.text     "street_3",                                  limit: 65535
@@ -870,6 +870,7 @@ ActiveRecord::Schema.define(version: 20170720164155) do
     t.string   "authorized_signatory_aadhar_content_type",  limit: 255
     t.integer  "authorized_signatory_aadhar_file_size",     limit: 4
     t.datetime "authorized_signatory_aadhar_updated_at"
+    t.boolean  "user_confirmed",                                          default: false
   end
 
   add_index "company_kycs", ["company_id"], name: "index_company_kycs_on_company_id", using: :btree
@@ -2679,6 +2680,7 @@ ActiveRecord::Schema.define(version: 20170720164155) do
   end
 
   add_index "user_profiles", ["default_currency_id"], name: "index_user_profiles_on_default_currency_id", using: :btree
+  add_index "user_profiles", ["state_id"], name: "fk_rails_9207fd1f96", using: :btree
   add_index "user_profiles", ["user_id"], name: "index_user_profiles_on_user_id", using: :btree
 
   create_table "user_role_mappings", force: :cascade do |t|
@@ -3011,6 +3013,7 @@ ActiveRecord::Schema.define(version: 20170720164155) do
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_panel_subscriptions", "users"
+  add_foreign_key "user_profiles", "states"
   add_foreign_key "user_profiles", "users"
   add_foreign_key "user_role_mappings", "user_roles"
   add_foreign_key "user_role_mappings", "users"

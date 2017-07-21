@@ -47,6 +47,11 @@ class Admin::Cards::Import < Admin::Base
     self.file_url = create_response_csv
   end
 
+  def success
+    params[:file_url] = file_url
+    Admin::Cards::Import::FilePresenter.new(user, params, messages)
+  end
+
   class Admin::Cards::Import::FilePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :file_url
@@ -71,7 +76,8 @@ class Admin::Cards::Import < Admin::Base
         card_program_id: card_program_id,
         itz_cash_card_program_id: itz_cash_card_program_id,
         company_id: company_id,
-        ending_number: ending_number
+        ending_number: ending_number,
+        card_status_id: CardStatus.id_for(:unassigned)
 
     }
   end

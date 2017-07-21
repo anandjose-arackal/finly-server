@@ -233,7 +233,7 @@ class CompanyKyc < ActiveRecord::Base
 
         # Document 2 - List of Partners on Company Letterhead
         list_of_partners = {}
-        list_of_partners[:name] = "List of Partners with DIN"
+        list_of_partners[:name] = "List of Partners on Company Letterhead"
         list_of_partners[:options] = []
         list_of_partners[:options] << {
             identifier: "list_of_partners",

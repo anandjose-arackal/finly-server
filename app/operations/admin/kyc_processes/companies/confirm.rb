@@ -15,6 +15,13 @@ class Admin::KycProcesses::Companies::Confirm < KycProcess::Company::Confirm
     end
   end
 
+  def validate
+    super()
+    unless company_kyc.user_confirmed
+      add_message :error, "User has not confirmed their documents yet"
+    end
+  end
+
   def init
     id = params[:id] || params[:company_id]
     self.company = Company.find_by(id: id)

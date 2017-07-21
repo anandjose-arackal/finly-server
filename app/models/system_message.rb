@@ -42,6 +42,6 @@ class SystemMessage < ActiveRecord::Base
   scope :list_of_partners_din_messages, -> {where message_type: "list_of_partners_din"}
   scope :partnership_deed_messages, -> {where message_type: "partnership_deed"}
   scope :trust_deed_messages, -> {where message_type: "trust_deed"}
-  scope :list_of_trustees_karta_messages, -> {where message_type: "list_of_trustees_karta_messages"}
+  scope :list_of_trustees_karta_messages, -> {where message_type: "list_of_trustees_karta"}
 
 end
