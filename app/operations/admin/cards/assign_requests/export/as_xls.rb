@@ -2,7 +2,7 @@ class Admin::Cards::AssignRequests::Export::AsXls < Admin::Cards::AssignRequests
   attr_accessor :headers, :contents
 
   def process
-    self.headers = ['Email ID', 'Mobile No', 'Disty Name', 'Address 1', 'Address 2', 'DOB', 'Gender', 'State', 'PIN code', 'First Name', 'Last Name', 'Mothers Maiden Name']
+    self.headers = ['Email ID', 'Mobile No', 'Disty Name', 'Address 1', 'Address 2', 'DOB', 'Gender', 'State', 'PIN code', 'First Name', 'Last Name', 'Mothers Maiden Name', 'Serial ID', 'KYC Type', 'Kyc Number']
     self.contents = []
     self.card_assign_requests.each do |card_assign_request|
       user = card_assign_request.card_owner
@@ -19,7 +19,10 @@ class Admin::Cards::AssignRequests::Export::AsXls < Admin::Cards::AssignRequests
           profile.pin_code,
           user.first_name,
           user.last_name,
-          user.mothers_maiden_name
+          user.mothers_maiden_name,
+          card_assign_request.card.proxy,
+          user&.individual_kyc&.kyc_type&.name,
+          user&.individual_kyc&.kyc_number
       ]
     end
   end
