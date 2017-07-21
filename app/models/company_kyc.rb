@@ -167,6 +167,7 @@ class CompanyKyc < ActiveRecord::Base
         uploaded: self.kyc_documents.pan_card.present?,
         file: file,
         system_messages: system_messages&.pluck(:content),
+        doc_type: "PAN Card".gsub(' ', '').underscore
     }
     documents << pan_card
 
@@ -193,7 +194,8 @@ class CompanyKyc < ActiveRecord::Base
         partnership_deed[:options] << {
             identifier: "partnership_deed",
             name: "Partnership Deed",
-            uploaded: self.kyc_documents.partnership_deed.present?
+            uploaded: self.kyc_documents.partnership_deed.present?,
+            doc_type: "Partnership Deed".gsub(' ', '').underscore
         }
         if self.kyc_documents.partnership_deed.present?
           file = {
@@ -211,7 +213,8 @@ class CompanyKyc < ActiveRecord::Base
         partnership_deed[:options] << {
             identifier: "certificate_of_registration",
             name: "Certificate of Registration",
-            uploaded: self.kyc_documents.certificate_of_registration.present?
+            uploaded: self.kyc_documents.certificate_of_registration.present?,
+            doc_type: "Certificate of Registration".gsub(' ', '').underscore
         }
         if self.kyc_documents.certificate_of_registration.present?
           file = {
@@ -235,7 +238,8 @@ class CompanyKyc < ActiveRecord::Base
         list_of_partners[:options] << {
             identifier: "list_of_partners",
             name: "List of Partners on Company Letterhead",
-            uploaded: self.kyc_documents.list_of_partners.present?
+            uploaded: self.kyc_documents.list_of_partners.present?,
+            doc_type: "List of Partners on Company Letterhead".gsub(' ', '').underscore
         }
         if self.kyc_documents.list_of_partners.present?
           file = {
@@ -268,7 +272,8 @@ class CompanyKyc < ActiveRecord::Base
         certificate_of_incorporation[:options] << {
             identifier: "certificate_of_incorporation",
             name: "Certificate of Incorporation",
-            uploaded: self.kyc_documents.certificate_of_incorporation.present?
+            uploaded: self.kyc_documents.certificate_of_incorporation.present?,
+            doc_type: "Certificate of Incoroporation".gsub(' ', '').underscore
         }
         if self.kyc_documents.certificate_of_incorporation.present?
           file = {
@@ -294,7 +299,8 @@ class CompanyKyc < ActiveRecord::Base
         certificate_of_incorporation[:options] << {
             identifier: "certificate_of_incorporation",
             name: "Certificate of Incorporation",
-            uploaded: self.kyc_documents.certificate_of_incorporation.present?
+            uploaded: self.kyc_documents.certificate_of_incorporation.present?,
+            doc_type: "Certificate of Incorporation".gsub(' ', '').underscore
         }
         if self.kyc_documents.certificate_of_incorporation.present?
           file = {
@@ -317,7 +323,8 @@ class CompanyKyc < ActiveRecord::Base
         list_of_partners_din[:options] << {
             identifier: "list_of_partners_din",
             name: "List of Partners with DIN",
-            uploaded: self.kyc_documents.list_of_partners_din.present?
+            uploaded: self.kyc_documents.list_of_partners_din.present?,
+            doc_type: "List of Partners with DIN".gsub(' ', '').underscore
         }
         if self.kyc_documents.list_of_partners_din.present?
           file = {
@@ -350,7 +357,8 @@ class CompanyKyc < ActiveRecord::Base
         trust_deed[:options] << {
             identifier: "trust_deed",
             name: "Trust Deed",
-            uploaded: self.kyc_documents.trust_deed.present?
+            uploaded: self.kyc_documents.trust_deed.present?,
+            doc_type: "Trust Deed".gsub(' ', '').underscore
         }
         if self.kyc_documents.trust_deed.present?
           file = {
@@ -368,7 +376,8 @@ class CompanyKyc < ActiveRecord::Base
         trust_deed[:options] << {
             identifier: "certificate_of_registration",
             name: "Certificate of Registration",
-            uploaded: self.kyc_documents.certificate_of_registration.present?
+            uploaded: self.kyc_documents.certificate_of_registration.present?,
+            doc_type: "Certificate of Registration".gsub(' ', '').underscore
         }
         if self.kyc_documents.certificate_of_registration.present?
           file = {
@@ -392,7 +401,8 @@ class CompanyKyc < ActiveRecord::Base
         list_of_trustees_karta[:options] << {
             identifier: "list_of_trustees_karta",
             name: "List of Trustees / Office Bearers / Karta",
-            uploaded: self.kyc_documents.list_of_trustees_karta.present?
+            uploaded: self.kyc_documents.list_of_trustees_karta.present?,
+            doc_type: "List of Trustees Karta".gsub(' ', '').underscore
         }
         if self.kyc_documents.list_of_trustees_karta.present?
           file = {
@@ -438,7 +448,8 @@ class CompanyKyc < ActiveRecord::Base
       option = {
           identifier: "id_proof",
           name: option,
-          uploaded: self.kyc_documents.id_proof.first.present?
+          uploaded: self.kyc_documents.id_proof.first.present?,
+          doc_type: option.gsub(' ', '').underscore
       }
       file = {}
       if self.kyc_documents.id_proof.present?
@@ -474,7 +485,8 @@ class CompanyKyc < ActiveRecord::Base
         file = {
             type: self.kyc_documents.address_proof.first.doc_content_type,
             original: self.kyc_documents.address_proof.first.doc.url,
-            thumb: self.kyc_documents.address_proof.first.doc.url(:thumb)
+            thumb: self.kyc_documents.address_proof.first.doc.url(:thumb),
+            doc_type: option.gsub(' ', '').underscore
         }
       end
       option[:file] = file
@@ -494,7 +506,8 @@ class CompanyKyc < ActiveRecord::Base
       option = {
           identifier: "supporting_document",
           name: option,
-          uploaded: self.kyc_documents.supporting_document.first.present?
+          uploaded: self.kyc_documents.supporting_document.first.present?,
+          doc_type: option.gsub(' ', '').underscore
       }
       file = {}
       if self.kyc_documents.supporting_document.present?
