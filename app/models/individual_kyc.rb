@@ -58,7 +58,7 @@ class IndividualKyc < ActiveRecord::Base
 
   scope :with_admin_review_workflow, -> (workflow_id) { where admin_review_workflow_id: workflow_id }
   scope :with_review_position, ->(review_pos) { where review_position: review_pos }
-  scope :filter_company, ->(company_id) { where company_id: company_id }
+  scope :filter_company_id, ->(company_id) { where company_id: company_id }
   scope :with_user_id, -> (id) { where user_id: id }
   scope :with_id, -> (id) { where id: id }
 

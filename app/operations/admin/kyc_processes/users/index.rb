@@ -31,7 +31,7 @@ class Admin::KycProcesses::Users::Index < Admin::KycProcesses::Users::Base
   class Admin::KycProcesses::Users::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :individual_kycs
 
-    has_scope :filter_company
+    has_scope :filter_company_id
 
     def init
       self.individual_kycs = params[:individual_kycs]
