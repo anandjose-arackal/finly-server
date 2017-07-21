@@ -135,7 +135,7 @@ class ApplicationController < ActionController::Base
     end
     if @result.present?
       if @result.success?
-        if [Exporter, Exporter::Spreadsheet, Exporter::Pdf].include? @result.class
+        if [Exporter, Exporter::Spreadsheet, Exporter::Pdf, Exporter::AsZip].include? @result.class
           @result.render(self)
         else
           respond_to do |format|
@@ -241,6 +241,13 @@ class ApplicationController < ActionController::Base
 
   def set_tokens_in_header
     access_token = request.cookies['access_token']
+    if access_token.present?
+      request.headers['Authorization'] = "Bearer #{access_token}"
+    end
+  end
+
+  def set_tokens_in_header_admin
+    access_token = request.cookies['access_token_admin']
     if access_token.present?
       request.headers['Authorization'] = "Bearer #{access_token}"
     end

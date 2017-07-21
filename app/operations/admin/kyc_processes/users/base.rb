@@ -17,6 +17,9 @@ class Admin::KycProcesses::Users::Base < Admin::Base
       return
     end
     id = (params[:id] or params[:individual_kyc_id])
+    if id.present?
+      id = id.split(',')
+    end
     self.individual_kycs = individual_kycs_presenter.individual_kycs.with_id(id)
   end
 

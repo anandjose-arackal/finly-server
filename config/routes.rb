@@ -1683,7 +1683,7 @@ Rails.application.routes.draw do
       post 'users/reject', to: 'users#reject'
       post 'users/mark_as_upgraded', to: 'users#mark_as_upgraded'
       get 'users/export(.:format)' => 'users#export'
-      get 'users/kycs/download' => 'users#download_kycs'
+      get 'users/export/kycs(.:format)' => 'users#download_kycs'
     end
     resources :agreements, only: [:create, :index]
 
@@ -1697,7 +1697,7 @@ Rails.application.routes.draw do
     post 'card_assign_requests/mark_assigned', to: 'card_assign_requests#mark_as_assigned'
     post 'card_assign_requests/mark_assigned_upgraded', to: 'card_assign_requests#mark_as_assigned_upgraded'
     get 'card_assign_requests/export(.:format)' => 'card_assign_requests#export'
-    get 'card_assign_requests/kycs/download' => 'card_assign_requests#download_kycs'
+    get 'card_assign_requests/export/kycs(.:format)' => 'card_assign_requests#download_kycs'
 
     post 'call_center/search', to: 'call_center/users#search', as: :search
   end
