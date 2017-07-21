@@ -17,6 +17,9 @@ class Admin::Cards::AssignRequests::Base < Admin::Base
       return
     end
     id = (params[:id] or params[:card_assign_request_id])
+    if id.present?
+      id = id.split(',')
+    end
     self.card_assign_requests = assign_requests_presenter.card_assign_requests.with_id(id)
   end
 
