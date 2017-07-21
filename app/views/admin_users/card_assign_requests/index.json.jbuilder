@@ -53,7 +53,7 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
       json.file_1 nil
     else
       json.file_1 do
-        json.original kyc&.kyc_file_1&.url
+        json.original kyc&.kyc_file_1&.url(:normal)
         json.thumb kyc&.kyc_file_1&.url(:thumb)
       end
     end
@@ -61,7 +61,7 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
       json.file_2 nil
     else
       json.file_2 do
-        json.original kyc&.kyc_file_2&.url
+        json.original kyc&.kyc_file_2&.url(:normal)
         json.thumb kyc&.kyc_file_2&.url(:thumb)
       end
     end
