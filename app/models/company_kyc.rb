@@ -52,6 +52,11 @@
 #  certificate_of_registration_file_size     :integer
 #  certificate_of_registration_updated_at    :datetime
 #  customer_type_id                          :integer
+#  customer_id                               :string(255)
+#  authorized_signatory_aadhar_file_name     :string(255)
+#  authorized_signatory_aadhar_content_type  :string(255)
+#  authorized_signatory_aadhar_file_size     :integer
+#  authorized_signatory_aadhar_updated_at    :datetime
 #
 
 class CompanyKyc < ActiveRecord::Base
@@ -61,8 +66,10 @@ class CompanyKyc < ActiveRecord::Base
   belongs_to :kyc_status
   belongs_to :company_type
   has_many :system_messages, as: :messagable, dependent: :destroy
+  has_many :kyc_documents
 
   accepts_nested_attributes_for :system_messages
+  accepts_nested_attributes_for :kyc_documents
 
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
 
@@ -123,6 +130,306 @@ class CompanyKyc < ActiveRecord::Base
     city_code = CityIdCityCodeMapping.find_by(city_id: city_id)
   end
 
+  def required_documents
+    docs = []
+    docs << "pan_card"
+    case self.company_type_id
+      when CompanyType.id_for('Sole Proprietor')
+        # nothing else, lol
+      when CompanyType.id_for('Private Ltd Company')
+        docs << "certificate_of_incorporation"
+      when CompanyType.id_for('Partnership Firm')
+        docs << "certificate_of_registration"
+    end
+  end
+
+  def required_document_files
+    documents = []
+    # irrespective of company type, all companies need pan card
+    pan_card = {}
+    pan_card[:name] = "PAN Card"
+    file = {}
+    if self.kyc_documents.pan_card.present?
+      file = {
+          type: self.kyc_documents.pan_card.first.doc_content_type,
+          original: self.kyc_documents.pan_card.first.doc.url,
+          thumb: self.kyc_documents.pan_card.first.doc.url(:thumb)
+      }
+    end
+    system_messages = nil
+    if self.system_messages.pan_card_messages.present?
+      system_messages = self.system_messages.pan_card_messages
+    end
+    pan_card[:options] = []
+    pan_card[:options] << {
+        identifier: "pan_card",
+        name: "PAN Card",
+        uploaded: self.kyc_documents.pan_card.present?,
+        file: file,
+        system_messages: system_messages&.pluck(:content),
+        doc_type: "PAN Card".gsub(' ', '').underscore
+    }
+    documents << pan_card
+
+    # now based on company type, the other document is decided
+    case self.company_type_id
+      when CompanyType.id_for('Sole Proprietor')
+        # sole proprietor
+        supporting_doc1 = {}
+        supporting_doc1[:name] = "ID Proof"
+        supporting_doc1[:options] = sole_proprietor_id_proof_documents
+        documents << supporting_doc1
+
+        supporting_doc2 = {}
+        supporting_doc2[:name] = "Address Proof"
+        supporting_doc2[:options] = sole_proprietor_address_proof_documents
+        documents << supporting_doc2
+
+      ## PARTNERSHIP FIRM ##
+      when CompanyType.id_for('Partnership Firm')
+        # Document 1 - Partnership Deed or Certificate of Registration
+        partnership_deed = {}
+        partnership_deed[:name] = "Partnership Deed / Certificate of Registration"
+        partnership_deed[:options] = []
+        partnership_deed[:options] << {
+            identifier: "partnership_deed",
+            name: "Partnership Deed",
+            uploaded: self.kyc_documents.partnership_deed.present?,
+            doc_type: "Partnership Deed".gsub(' ', '').underscore
+        }
+        if self.kyc_documents.partnership_deed.present?
+          file = {
+              type: (self.kyc_documents.partnership_deed.first.doc_content_type),
+              original: (self.kyc_documents.partnership_deed.first.doc.url),
+              thumb: (self.kyc_documents.partnership_deed.first.doc.url(:thumb))
+          }
+          partnership_deed[:options][0][:file] = file
+        end
+        if self.system_messages.partnership_deed_messages.present?
+          system_messages = self.system_messages.partnership_deed_messages
+          partnership_deed[:options][0][:system_messages] = system_messages&.pluck(:content)
+        end
+
+        partnership_deed[:options] << {
+            identifier: "certificate_of_registration",
+            name: "Certificate of Registration",
+            uploaded: self.kyc_documents.certificate_of_registration.present?,
+            doc_type: "Certificate of Registration".gsub(' ', '').underscore
+        }
+        if self.kyc_documents.certificate_of_registration.present?
+          file = {
+              type: (self.kyc_documents.certificate_of_registration.first.doc_content_type),
+              original: (self.kyc_documents.certificate_of_registration.first.doc.url),
+              thumb: (self.kyc_documents.certificate_of_registration.first.doc.url(:thumb))
+          }
+          partnership_deed[:options][1][:file] = file
+        end
+        if self.system_messages.certificate_of_registration_messages.present?
+          system_messages = self.system_messages.certificate_of_registration_messages
+          partnership_deed[:options][1][:system_messages] = system_messages&.pluck(:content)
+        end
+
+        documents << partnership_deed
+
+        # Document 2 - List of Partners on Company Letterhead
+        list_of_partners = {}
+        list_of_partners[:name] = "List of Partners on Company Letterhead"
+        list_of_partners[:options] = []
+        list_of_partners[:options] << {
+            identifier: "list_of_partners",
+            name: "List of Partners on Company Letterhead",
+            uploaded: self.kyc_documents.list_of_partners.present?,
+            doc_type: "List of Partners on Company Letterhead".gsub(' ', '').underscore
+        }
+        if self.kyc_documents.list_of_partners.present?
+          file = {
+              type: (self.kyc_documents.list_of_partners.first.doc_content_type),
+              original: (self.kyc_documents.list_of_partners.first.doc.url),
+              thumb: (self.kyc_documents.list_of_partners.first.doc.url(:thumb))
+          }
+          list_of_partners[:options][0][:file] = file
+        end
+        if self.system_messages.list_of_partners_messages.present?
+          system_messages = self.system_messages.list_of_partners_messages
+          list_of_partners[:options][0][:system_messages] = system_messages&.pluck(:content)
+        end
+
+        documents << list_of_partners
+
+        # Document 3 - One of the supporting documents
+        supporting_documents = {}
+        supporting_documents[:name] = "Supporting Documents"
+        supporting_documents[:options] = partnership_firm_supporting_documents
+
+        documents << supporting_documents
+
+      ## PRIVATE LIMITED COMPANY ##
+      when CompanyType.id_for('Private Ltd Company')
+
+        certificate_of_incorporation = {}
+        certificate_of_incorporation[:name] = "Certificate of Incorporation"
+        certificate_of_incorporation[:options] = []
+        certificate_of_incorporation[:options] << {
+            identifier: "certificate_of_incorporation",
+            name: "Certificate of Incorporation",
+            uploaded: self.kyc_documents.certificate_of_incorporation.present?,
+            doc_type: "Certificate of Incoroporation".gsub(' ', '').underscore
+        }
+        if self.kyc_documents.certificate_of_incorporation.present?
+          file = {
+              type: (self.kyc_documents.certificate_of_incorporation.first.doc_content_type),
+              original: (self.kyc_documents.certificate_of_incorporation.first.doc.url),
+              thumb: (self.kyc_documents.certificate_of_incorporation.first.doc.url(:thumb))
+          }
+          certificate_of_incorporation[:options][0][:file] = file
+        end
+        if self.system_messages.certificate_of_incorporation_messages.present?
+          system_messages = self.system_messages.certificate_of_incorporation_messages
+          certificate_of_incorporation[:options][0][:system_messages] = system_messages&.pluck(:content)
+        end
+        documents << certificate_of_incorporation
+
+      ## LIMITED LIABILITY PARTNERSHIP ##
+      when CompanyType.id_for('Ltd Liability Partnership')
+
+        # Document 1 - Certificate of Incorporation
+        certificate_of_incorporation = {}
+        certificate_of_incorporation[:name] = "Certificate of Incorporation"
+        certificate_of_incorporation[:options] = []
+        certificate_of_incorporation[:options] << {
+            identifier: "certificate_of_incorporation",
+            name: "Certificate of Incorporation",
+            uploaded: self.kyc_documents.certificate_of_incorporation.present?,
+            doc_type: "Certificate of Incorporation".gsub(' ', '').underscore
+        }
+        if self.kyc_documents.certificate_of_incorporation.present?
+          file = {
+              type: (self.kyc_documents.certificate_of_incorporation.first.doc_content_type),
+              original: (self.kyc_documents.certificate_of_incorporation.first.doc.url),
+              thumb: (self.kyc_documents.certificate_of_incorporation.first.doc.url(:thumb))
+          }
+          certificate_of_incorporation[:options][0][:file] = file
+        end
+        if self.system_messages.certificate_of_incorporation_messages.present?
+          system_messages = self.system_messages.certificate_of_incorporation_messages
+          certificate_of_incorporation[:options][0][:system_messages] = system_messages&.pluck(:content)
+        end
+        documents << certificate_of_incorporation
+
+        # Document 2 - List of Partners with DIN
+        list_of_partners_din = {}
+        list_of_partners_din[:name] = "List of Partners with DIN"
+        list_of_partners_din[:options] = []
+        list_of_partners_din[:options] << {
+            identifier: "list_of_partners_din",
+            name: "List of Partners with DIN",
+            uploaded: self.kyc_documents.list_of_partners_din.present?,
+            doc_type: "List of Partners with DIN".gsub(' ', '').underscore
+        }
+        if self.kyc_documents.list_of_partners_din.present?
+          file = {
+              type: (self.kyc_documents.list_of_partners_din.first.doc_content_type),
+              original: (self.kyc_documents.list_of_partners_din.first.doc.url),
+              thumb: (self.kyc_documents.list_of_partners_din.first.doc.url(:thumb))
+          }
+          list_of_partners_din[:options][0][:file] = file
+        end
+        if self.system_messages.list_of_partners_din_messages.present?
+          system_messages = self.system_messages.list_of_partners_din_messages
+          list_of_partners_din[:options][0][:system_messages] = system_messages&.pluck(:content)
+        end
+
+        documents << list_of_partners_din
+
+        # Document 3 - Supporting documents
+        supporting_documents = {}
+        supporting_documents[:name] = "Supporting Documents"
+        supporting_documents[:options] = partnership_firm_supporting_documents
+
+        documents << supporting_documents
+
+      ## TRUST AND PARTNERSHIPS ##
+      when CompanyType.id_for('Trust and Societies')
+        # Document 1 - Trust Deed or Certificate of Registration
+        trust_deed = {}
+        trust_deed[:name] = "Trust Deed / Certificate of Registration"
+        trust_deed[:options] = []
+        trust_deed[:options] << {
+            identifier: "trust_deed",
+            name: "Trust Deed",
+            uploaded: self.kyc_documents.trust_deed.present?,
+            doc_type: "Trust Deed".gsub(' ', '').underscore
+        }
+        if self.kyc_documents.trust_deed.present?
+          file = {
+              type: (self.kyc_documents.trust_deed.first.doc_content_type),
+              original: (self.kyc_documents.trust_deed.first.doc.url),
+              thumb: (self.kyc_documents.trust_deed.first.doc.url(:thumb))
+          }
+          trust_deed[:options][0][:file] = file
+        end
+        if self.system_messages.trust_deed_messages.present?
+          system_messages = self.system_messages.trust_deed_messages
+          trust_deed[:options][0][:system_messages] = system_messages&.pluck(:content)
+        end
+
+        trust_deed[:options] << {
+            identifier: "certificate_of_registration",
+            name: "Certificate of Registration",
+            uploaded: self.kyc_documents.certificate_of_registration.present?,
+            doc_type: "Certificate of Registration".gsub(' ', '').underscore
+        }
+        if self.kyc_documents.certificate_of_registration.present?
+          file = {
+              type: (self.kyc_documents.certificate_of_registration.first.doc_content_type),
+              original: (self.kyc_documents.certificate_of_registration.first.doc.url),
+              thumb: (self.kyc_documents.certificate_of_registration.first.doc.url(:thumb))
+          }
+          trust_deed[:options][1][:file] = file
+        end
+        if self.system_messages.certificate_of_registration_messages.present?
+          system_messages = self.system_messages.certificate_of_registration_messages
+          trust_deed[:options][1][:system_messages] = system_messages&.pluck(:content)
+        end
+
+        documents << trust_deed
+
+        # Document 2 - List of Trustees / Office Bearers / Karta
+        list_of_trustees_karta = {}
+        list_of_trustees_karta[:name] = "List of Trustees / Office Bearers / Karta"
+        list_of_trustees_karta[:options] = []
+        list_of_trustees_karta[:options] << {
+            identifier: "list_of_trustees_karta",
+            name: "List of Trustees / Office Bearers / Karta",
+            uploaded: self.kyc_documents.list_of_trustees_karta.present?,
+            doc_type: "List of Trustees Karta".gsub(' ', '').underscore
+        }
+        if self.kyc_documents.list_of_trustees_karta.present?
+          file = {
+              type: (self.kyc_documents.list_of_trustees_karta.first.doc_content_type),
+              original: (self.kyc_documents.list_of_trustees_karta.first.doc.url),
+              thumb: (self.kyc_documents.list_of_trustees_karta.first.doc.url(:thumb))
+          }
+          list_of_trustees_karta[:options][0][:file] = file
+        end
+        if self.system_messages.list_of_trustees_karta_messages.present?
+          system_messages = self.system_messages.list_of_trustees_karta_messages
+          list_of_trustees_karta[:options][0][:system_messages] = system_messages&.pluck(:content)
+        end
+
+        documents << list_of_trustees_karta
+
+        # Document 3 - Supporting documents
+        supporting_documents = {}
+        supporting_documents[:name] = "Supporting Documents"
+        supporting_documents[:options] = partnership_firm_supporting_documents
+
+        documents << supporting_documents
+
+    end
+    documents
+  end
+
   private
 
   def pin_code_format
@@ -132,5 +439,94 @@ class CompanyKyc < ActiveRecord::Base
       end
     end
   end
+
+  def sole_proprietor_id_proof_documents
+    options = []
+    id_proof_options = ["Aadhar Card", "VAT Registration Certificate", "CST Registration Certificate", "Service Tax Registration Certificate", "Shops and Establishments Licence",
+                                   "Ration Card", "Passport", "Voters ID Card"]
+    id_proof_options.each do |option|
+      option = {
+          identifier: "id_proof",
+          name: option,
+          uploaded: self.kyc_documents.id_proof.first.present?,
+          doc_type: option.gsub(' ', '').underscore
+      }
+      file = {}
+      if self.kyc_documents.id_proof.present?
+        file = {
+            type: self.kyc_documents.id_proof.first.doc_content_type,
+            original: self.kyc_documents.id_proof.first.doc.url,
+            thumb: self.kyc_documents.id_proof.first.doc.url(:thumb)
+        }
+      end
+      option[:file] = file
+      if self.system_messages.id_proof_messages.present?
+        option[:system_messages] = self.system_messages.id_proof_messages.pluck(:content)
+      end
+      options << option
+    end
+
+    options
+  end
+
+  def sole_proprietor_address_proof_documents
+    options = []
+
+    address_proof_options = ["Aadhar Card", "VAT Registration Certificate", "CST Registration Certificate", "Service Tax Registration Certificate", "Shops and Establishments Licence",
+                             "Ration Card", "Passport", "Voters ID Card"]
+    address_proof_options.each do |option|
+      option = {
+          identifier: "address_proof",
+          name: option,
+          uploaded: self.kyc_documents.address_proof.first.present?
+      }
+      file = {}
+      if self.kyc_documents.address_proof.present?
+        file = {
+            type: self.kyc_documents.address_proof.first.doc_content_type,
+            original: self.kyc_documents.address_proof.first.doc.url,
+            thumb: self.kyc_documents.address_proof.first.doc.url(:thumb),
+            doc_type: option.gsub(' ', '').underscore
+        }
+      end
+      option[:file] = file
+      if self.system_messages.address_proof_messages.present?
+        option[:system_messages] = self.system_messages.address_proof_messages.pluck(:content)
+      end
+      options << option
+    end
+
+    options
+  end
+
+  def partnership_firm_supporting_documents
+    options = []
+    supporting_document_options = ["Utility Bills (not older than 2 months)", "VAT Registration Certificate", "CST Registration Certificate", "Service Tax Registration Certificate", "Shops and Establishments Licence"]
+    supporting_document_options.each do |option|
+      option = {
+          identifier: "supporting_document",
+          name: option,
+          uploaded: self.kyc_documents.supporting_document.first.present?,
+          doc_type: option.gsub(' ', '').underscore
+      }
+      file = {}
+      if self.kyc_documents.supporting_document.present?
+        file = {
+            type: self.kyc_documents.supporting_document.first.doc_content_type,
+            original: self.kyc_documents.supporting_document.first.doc.url,
+            thumb: self.kyc_documents.supporting_document.first.doc.url(:thumb)
+        }
+      end
+      option[:file] = file
+      if self.system_messages.supporting_document_messages.present?
+        option[:system_messages] = self.system_messages.supporting_document_messages.pluck(:content)
+      end
+      options << option
+    end
+    options
+  end
+
+  alias_method :llp_supporting_documents, :partnership_firm_supporting_documents
+  alias_method :trust_societies_supporting_documents, :partnership_firm_supporting_documents
 
 end

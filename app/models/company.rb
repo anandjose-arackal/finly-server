@@ -251,6 +251,7 @@ class Company < ActiveRecord::Base
     !!self.company_kyc&.completed?
   end
 
+
   private
 
   def init_config_present

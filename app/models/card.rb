@@ -21,6 +21,7 @@
 #  admin_unblockable        :boolean          default(TRUE)
 #  itz_cash_card_program_id :integer
 #  card_status_id           :integer          not null
+#  is_deleted               :boolean          default(FALSE)
 #
 
 class Card < ActiveRecord::Base
@@ -49,6 +50,8 @@ class Card < ActiveRecord::Base
   accepts_nested_attributes_for :card_program
   accepts_nested_attributes_for :card_balance
   accepts_nested_attributes_for :card_eligibility
+
+  default_scope {}
 
   scope :with_id, -> (id) { where id: id }
   scope :with_user, -> (user_id) { where user_id: user_id }
@@ -87,7 +90,7 @@ class Card < ActiveRecord::Base
   after_create do
     user = self.user
 
-    result = ItzCash::AccountDetails.(user, card: self)
+    result = ItzCash::AccountDetails.(user, {card: self, unassigned: true})
 
     # marking the card by default as either active or inactive
     if result.success?

@@ -21,7 +21,7 @@ class KycProcess::Company::Confirm < KycProcess::Company::Base
 
   def process
     # updates the status of the kyc from submitted to processing
-    unless company_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
+    unless company_kyc.update(user_confirmed: true)
       add_message :error, company_kyc.errors.full_messages
     end
   end

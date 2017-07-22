@@ -31,7 +31,7 @@ class Admin::Users::Index < Admin::Users::Base
   class Admin::Users::Index::UsersPresenter < BaseOperation::BasePresenter::SuccessPresenter
     include HasScope
 
-    attr_accessor :users, :companies
+    attr_accessor :users, :companies, :paginated_users
 
     has_scope :company_id
     has_scope :filter_company_id
@@ -42,11 +42,14 @@ class Admin::Users::Index < Admin::Users::Base
     has_scope :filter_role, type: :array
     has_scope :filter_state, type: :array
     has_scope :with_cards_having_card_program, type: :array
+    has_scope :filter_card_number
 
     def init
       convert_scopes
       self.users = params[:users]
       self.users = apply_scopes(users, params)
+      # self.paginated_users = users.paginate(page: params[:page], per_page: 30)
+      self.paginated_users = users
       self.companies = params[:companies]
     end
 
