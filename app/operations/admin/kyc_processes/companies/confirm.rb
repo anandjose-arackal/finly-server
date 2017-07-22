@@ -17,9 +17,9 @@ class Admin::KycProcesses::Companies::Confirm < KycProcess::Company::Confirm
 
   def validate
     super()
-    unless company_kyc.user_confirmed
-      add_message :error, "User has not confirmed their documents yet"
-    end
+    # unless company_kyc.user_confirmed
+    #   add_message :error, "User has not confirmed their documents yet"
+    # end
   end
 
   def init
