@@ -44,4 +44,29 @@ class AdminUsers::CardsController < ApplicationController
 
   end
 
+  def import
+    @result = Admin::Cards::Import.(current_user, params)
+    # sending the link to the frontend so that they can download the results
+    if @result.success?
+      @response = {
+          success: true,
+          file_url: @result.file_url,
+          messages: {
+              error: [],
+              failure: [],
+              success: [],
+              message: [],
+              notice: []
+          }
+      }
+      respond_to do |format|
+        format.json {
+          render json: @response.as_json
+        }
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
 end

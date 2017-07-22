@@ -24,7 +24,7 @@ class ItzCashCardProgram < ActiveRecord::Base
           product_code: "HDFFIN",
       },
       {
-          name: "RBL Expense",
+          name: "RBL Expense (RBL)",
           bank: "RBL",
           product_code: "RBLRFN",
       },

@@ -51,7 +51,7 @@ class Admin::KycProcesses::Companies::Reject < Admin::KycProcesses::Companies::B
     # notification = poc.notification.build()
 
     # set the kyc status as error for this particular company
-    company_kyc.update(kyc_status_id: KycStatus.id_for(:rejected))
+    company_kyc.update(kyc_status_id: KycStatus.id_for(:rejected), user_confirmed: false)
     add_message :success, "User successfully notified"
   end
 
