@@ -28,5 +28,17 @@ class Admin::KycProcesses::Companies::Confirm < KycProcess::Company::Confirm
     self.company_kyc = company.company_kyc
   end
 
+  def process
+    unless company_kyc.update(kyc_status_id: KycStatus.id_for(:processing))
+      add_message :error, company_kyc.errors.full_messages
+    end
+  end
+
+  def post_process
+    CompanyMailer.delay.send_to_itzcash(company)
+
+    add_message :success, "Successfully sent the documents to ItzCash"
+  end
+
 
 end
