@@ -1661,6 +1661,7 @@ Rails.application.routes.draw do
       post 'users/approve', to: 'users#approve'
       post 'users/reject', to: 'users#reject'
       post 'users/mark_as_upgraded', to: 'users#mark_as_upgraded'
+      patch 'users/:id', to: 'users#update'
       get 'users/export(.:format)' => 'users#export'
       get 'users/export/kycs(.:format)' => 'users#download_kycs'
     end
@@ -1675,6 +1676,7 @@ Rails.application.routes.draw do
     post 'card_assign_requests/reject', to: 'card_assign_requests#reject'
     post 'card_assign_requests/mark_assigned', to: 'card_assign_requests#mark_as_assigned'
     post 'card_assign_requests/mark_assigned_upgraded', to: 'card_assign_requests#mark_as_assigned_upgraded'
+    patch 'card_assign_requests/:id', to: 'card_assign_requests#update'
     get 'card_assign_requests/export(.:format)' => 'card_assign_requests#export'
     get 'card_assign_requests/export/kycs(.:format)' => 'card_assign_requests#download_kycs'
 

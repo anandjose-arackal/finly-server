@@ -1,11 +1,23 @@
-class Admin::Cards::AssignRequests::Update < KycProcess::User::Base
-  attr_accessor :kyc_params, :user_params, :user_profile_params
+class Admin::KycProcesses::Users::Update < Admin::KycProcesses::Users::Base
+  attr_accessor :kyc_params, :user_params, :user_profile_params, :selected_user, :individual_kyc
+
+  def pre_validate
+    super
+    return if has_errors?
+    unless user.verifier?
+      add_message :error, 'You do have the required permission to perform this action'
+      return
+    end
+  end
 
   def init
     super
     self.kyc_params = kyc_strong_params
     self.user_params = user_strong_params
     self.user_profile_params = user_profile_strong_params
+
+    self.individual_kyc = self.individual_kycs&.first
+    self.selected_user = self.individual_kyc&.user
   end
 
   def process
@@ -15,12 +27,12 @@ class Admin::Cards::AssignRequests::Update < KycProcess::User::Base
       end
     end
     if self.user_params.present?
-      unless self.individual_kyc.user.update(self.user_params)
+      unless self.selected_user.update(self.user_params)
         add_message :error, self.individual_kyc.user.errors.full_messages
       end
     end
     if self.user_profile_params.present?
-      unless self.individual_kyc.user.profile.update(self.user_profile_params)
+      unless self.selected_user.profile.update(self.user_profile_params)
         add_message :error, self.individual_kyc.user.errors.full_messages
       end
     end
