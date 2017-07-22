@@ -32,43 +32,43 @@ class KycProcess::Company::Update < KycProcess::Company::Base
   end
 
   def post_process
+    # clearing all system messages that were associated with the uploaded KYC documents
+    uploaded_docs.each do |doc|
+      company_kyc.system_messages.send("#{doc}_messages").destroy_all
+    end
+
     # update the status based on the company type and documents uploaded
     case company_kyc.company_type_id
       when CompanyType.id_for('Sole Proprietor')
-        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.id_proof.present? && company_kyc.kyc_documents.address_proof.present?
+        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.id_proof.present? && company_kyc.kyc_documents.address_proof.present? && company_kyc.system_messages.empty?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
       when CompanyType.id_for('Partnership Firm')
-        if company_kyc.kyc_documents.pan_card.present? && (company_kyc.kyc_documents.partnership_deed.present? || company_kyc.kyc_documents.certificate_of_registration.present?) && company_kyc.kyc_documents.list_of_partners.present? && company_kyc.kyc_documents.supporting_document.present?
+        if company_kyc.kyc_documents.pan_card.present? && (company_kyc.kyc_documents.partnership_deed.present? || company_kyc.kyc_documents.certificate_of_registration.present?) && company_kyc.kyc_documents.list_of_partners.present? && company_kyc.kyc_documents.supporting_document.present? && company_kyc.system_messages.empty?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
       when CompanyType.id_for('Private Ltd Company')
-        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.certificate_of_incorporation.present?
+        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.certificate_of_incorporation.present? && company_kyc.system_messages.empty?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
       when CompanyType.id_for('Ltd Liability Partnership')
-        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.certificate_of_incorporation.present? && company_kyc.kyc_documents.list_of_partners_din.present? && company_kyc.kyc_documents.supporting_document.present?
+        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.certificate_of_incorporation.present? && company_kyc.kyc_documents.list_of_partners_din.present? && company_kyc.kyc_documents.supporting_document.present? && company_kyc.system_messages.empty?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
       when CompanyType.id_for('Trust and Societies')
-        if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.certificate_of_registration.present? && company_kyc.kyc_documents.list_of_trustees_karta.present? && company_kyc.kyc_documents.supporting_document.present?
+        if company_kyc.kyc_documents.pan_card.present? && (company_kyc.kyc_documents.certificate_of_registration.present? || company_kyc.kyc_documents.trust_deed.present?) && company_kyc.kyc_documents.list_of_trustees_karta.present? && company_kyc.kyc_documents.supporting_document.present? && company_kyc.system_messages.empty?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
-    end
-
-    # clearing all system messages that were associated with the uploaded KYC documents
-    uploaded_docs.each do |doc|
-      company_kyc.system_messages.send("#{doc}_messages").destroy_all
     end
 
     add_message :success, "Documents uploaded successfully"

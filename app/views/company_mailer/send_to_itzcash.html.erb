@@ -4,8 +4,8 @@
     <p> The documents attached herewith are: </p>
 
     <% @documents.each_with_index do |doc, index| %>
-        <h5><%= index +1 %>. <%= doc.humanize %></h5>
-        <h5> Document uploaded time: <%= @company_kyc.send("#{doc}_updated_at")%> </h5>
+        <h5><%= index +1 %>. <%= doc.company_kyc_document_type.name %></h5>
+        <h5> Document uploaded time: <%= doc.updated_at.strftime("%Y-%M-%d")%> </h5>
     <% end %>
 
     <p>Company Name: <%= @company.name %></p>
