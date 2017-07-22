@@ -26,7 +26,7 @@ class KycProcess::Company::Show < KycProcess::Company::Base
         actions[:upload] = Rails.application.routes.url_helpers.kyc_docs_update_path
         actions[:confirm] = Rails.application.routes.url_helpers.kyc_confirm_path
         # because the admin panel operation inherits this one, and this needs to be shown only if the particular user is a Finly Admin
-        if user.finly_admin?
+        if user.finly_admin? || user.is_a?(AdminUser)
           actions[:reject] = Rails.application.routes.url_helpers.admin_users_kyc_company_reject_path(company_kyc.company)
           actions[:confirm] = Rails.application.routes.url_helpers.admin_users_kyc_company_confirm_path(company_kyc.company)
         end
