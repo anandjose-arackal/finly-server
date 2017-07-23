@@ -79,6 +79,9 @@ class Card::Transaction::Create < BaseOperation
                 return false
               end
 
+              # Check if expense can be created for the card program
+              return true unless card.card_program.create_expense
+
               # add the associated surcharge as a card expense
               @result = Expense::ExCard::Create.(transaction, card)
               unless @result.success?
