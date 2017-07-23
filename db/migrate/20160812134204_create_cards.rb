@@ -6,6 +6,7 @@ class CreateCards < ActiveRecord::Migration
       t.string :proxy, null: false
       t.references :card_type, index: true, foreign_key: true
       t.text :description
+      t.boolean :is_deleted, default: false
 
       t.timestamps null: false
     end
