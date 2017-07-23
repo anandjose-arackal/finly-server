@@ -67,17 +67,15 @@ class User::Team::Index < User::Team::Base
   end
 
   def configure_expense_management
-    request = params[:request]
     # if the url does not include 'disburse' we know it's from expense management, and we only need users enabled for expense management
-    unless request&.referrer&.include?('disburse')
+    if is_expense_management_panel?
       params[:filter_expense_management] = '1'
     end
   end
 
   def configure_disburse
     # adding filters so that only users subscribed to disburse will be shown in the disburse panel
-    request = params[:request]
-    if request&.referrer&.include?('disburse')
+    if is_disburse_panel?
       params[:filter_disburse] = '1'
     end
   end
