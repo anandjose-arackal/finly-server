@@ -1,6 +1,6 @@
 class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
 
-  attr_accessor :errors
+  attr_accessor :errors, :card
 
   def initialize(source_id)
     init(source_id)
@@ -8,29 +8,40 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
 
   def init(source_id)
     self.card = Card.find_by(id: source_id)
+    self.errors = []
   end
 
-  def credit(source_id, amount)
+  def credit(amount)
     # operation that credits a particular card
-    ItzCash::Credit.(source.user, {card: source, amount: amount})
+    op = ItzCash::Credit.(card.user, {card: card, amount: amount})
+    unless op.success?
+      self.errors = op.messages[:error]
+      return false
+    end
+    true
   end
 
-  def debit(source_id, amount)
+  def debit(amount)
     # operation that debits a particular card
-    ItzCash::Credit.(source.user, {card: source, amount: amount})
+    op = ItzCash::Debit.(card.user, {card: card, amount: amount})
+    unless op.success?
+      self.errors = op.messages[:error]
+      return false
+    end
+    true
   end
 
-  def balance(source_id)
+  def balance
     op = ItzCash::AccountDetails.(card.user, card: card)
     balance = op.balance
   end
 
   def creditable_accounts
-    [Card, UserWallet, CompanyBalance]
+    [Card, "Card", UserWallet, "UserWallet", CompanyBalance, "Company"]
   end
 
   def debitable_accounts
-    [Card, UserWallet, CompanyBalance]
+    [Card, "Card", UserWallet, "UserWallet", CompanyBalance, "Company"]
   end
 
   def eligibility(source_id)

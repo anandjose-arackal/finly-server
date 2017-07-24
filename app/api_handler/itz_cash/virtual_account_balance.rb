@@ -10,6 +10,7 @@ class ItzCash::VirtualAccountBalance < ItzCash::Base
     super
     if company.blank?
       add_message :error, 'Company not found'
+      return
     end
     if company.d_code.blank?
       add_message :error, 'Error loading company configuration. Unable to check balance'

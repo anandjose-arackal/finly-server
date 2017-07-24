@@ -5,19 +5,15 @@
 
 class PaymentRequest
 
-  attr_accessor :initiating_account_id, :receiving_account_id, :type, :scheduled_on, :synchronous,
-                :payment_items, :synchronous, :initiating_user_id
+  attr_accessor :company_id, :scheduled_at, :synchronous,
+                :payment_items, :initiating_user_id, :payment_order_type_id
 
   def retrieve_payment_order_status
-    if self.scheduled_on != DateUtils.local_date
+    if self.scheduled_at.present? && self.scheduled_at > DateUtils.local_date
       return PaymentOrderStatus.id_for(:scheduled)
     else
       return PaymentOrderStatus.id_for(:pending)
     end
-  end
-
-  def retrieve_payment_order_type_id
-    PaymentOrderType.id_for(self.type)
   end
 
 end
