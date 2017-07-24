@@ -33,7 +33,7 @@ class Admin::Companies::Base < Admin::Base
     end
 
     def company_balance
-      op = Company::VirtualAccount::Balance.(user, {company: company})
+      op = Admin::Companies::Balance.(user, {company: company})
       op&.success? ? op.balance : nil
     end
   end

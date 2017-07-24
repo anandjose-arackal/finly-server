@@ -478,15 +478,15 @@ class CompanyKyc < ActiveRecord::Base
       option = {
           identifier: "address_proof",
           name: option,
-          uploaded: self.kyc_documents.address_proof.first.present?
+          uploaded: self.kyc_documents.address_proof.first.present?,
+          doc_type: option.gsub(' ', '').underscore
       }
       file = {}
       if self.kyc_documents.address_proof.present?
         file = {
             type: self.kyc_documents.address_proof.first.doc_content_type,
             original: self.kyc_documents.address_proof.first.doc.url,
-            thumb: self.kyc_documents.address_proof.first.doc.url(:thumb),
-            doc_type: option.gsub(' ', '').underscore
+            thumb: self.kyc_documents.address_proof.first.doc.url(:thumb)
         }
       end
       option[:file] = file
