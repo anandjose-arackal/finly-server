@@ -12,6 +12,10 @@ class Admin::Users::Team::Mappings::Destroy < User::Team::Mappings::Destroy
 
   end
 
+  def user_model
+    AdminUser
+  end
+
   def init
     id = params[:id] || params[:user_id]
     self.updating_user = User.find_by(id: id)
