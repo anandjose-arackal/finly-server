@@ -10,7 +10,6 @@
 Gemfile.lock
 /config/database.yml
 /.byebug_history
-dump.rdb
 
 # Ignore all logfiles and tempfiles.
 /log/*
