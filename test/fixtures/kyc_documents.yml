@@ -1,0 +1,25 @@
+# == Schema Information
+#
+# Table name: kyc_documents
+#
+#  id                           :integer          not null, primary key
+#  company_kyc_document_type_id :integer
+#  company_kyc_id               :integer
+#  doc_file_name                :string(255)
+#  doc_content_type             :string(255)
+#  doc_file_size                :integer
+#  doc_updated_at               :datetime
+#  created_at                   :datetime         not null
+#  updated_at                   :datetime         not null
+#  identifier                   :string(255)
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  kyc_document_type_id: 
+  company_kyc_id: 
+
+two:
+  kyc_document_type_id: 
+  company_kyc_id: 

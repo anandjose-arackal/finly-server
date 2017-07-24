@@ -1,4 +1,4 @@
-json.array!(@result.companies) do |company|
+json.array!(@result.paginated_companies) do |company|
   json.extract! company, :name, :id
   json.created_at company.created_at.to_date.strftime("%d %B %y")
   json.active company.active

@@ -24,6 +24,8 @@ module Constants
 
   WHITELISTED_EMAILS = ['manager4@finlytest.io', 'kaley@finlytest.io', 'finance4@finlytest.io']
 
+  ITZ_CASH_KYC_EMAIL = ['sreeram.nr@finly.io']
+
   # MSG91 / SendOTP API keys ######
 
   VERIFICATION_API_KEY = "-C4-IpmaywMnqaBzehqSZiP2aznU6_onhpjfiFDnxAPZBcXH-f_6JT_4fH-Qx1Y54tPjvXuShhZkCwjmroxXa7hV1dQgYede4fqAltJYivA8Cia1IvrW0FzsNaUAUFCyTXDHO1IV5-Q63zwNbzxTFw=="

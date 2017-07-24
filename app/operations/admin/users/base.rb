@@ -3,7 +3,8 @@ class Admin::Users::Base < Admin::Base
 
   class Admin::Users::Base::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :created_user, :selected_user, :cards, :policies, :mapping,
-                  :managers, :finance_managers, :wallet, :user_panel_subscription
+                  :managers, :finance_managers, :wallet, :itz_cash_card_programs,
+                  :user_panel_subscription
 
     def init
       self.created_user = params[:created_user]
@@ -21,6 +22,7 @@ class Admin::Users::Base < Admin::Base
 
       self.managers = selected_user.company.users.signed_up.with_roles.only_managers
       self.finance_managers = selected_user.company.users.signed_up.with_roles.only_finance_managers
+      self.itz_cash_card_programs = ItzCashCardProgram.all
     end
 
     def retrieve_card_data

@@ -136,7 +136,7 @@ class Mobile::V0::ReportsController < Mobile::V0::BaseApiController
   end
 
   def take_control
-    @result = Report::Submit.(current_user, params)
+    @result = Report::TakeControl.(current_user, params)
     @result.config[:mobile_api] = true
     if @result.success?
       respond render: 'mobile/v0/reports/show'
