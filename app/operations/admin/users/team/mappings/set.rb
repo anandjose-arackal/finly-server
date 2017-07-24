@@ -12,6 +12,10 @@ class Admin::Users::Team::Mappings::Set < User::Team::Mappings::Set
     # overriding the parent method of the same name
   end
 
+  def user_model
+    AdminUser
+  end
+
 
   def init
     id = (params[:id] || params[:user_id])

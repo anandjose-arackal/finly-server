@@ -52,6 +52,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -168,7 +169,6 @@ class User < ActiveRecord::Base
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }
-  # scope :search_by_query, -> (query) { where("first_name like ? or last_name like ? or mobile_number like ? or email like ?", "%#{query}%", "%#{query}%", "%#{query}%", "%#{query}%")}
 
   # Users having cards assigned with the given program
   scope :with_cards_having_card_program, ->(id) do

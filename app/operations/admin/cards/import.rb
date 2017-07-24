@@ -1,6 +1,6 @@
 class Admin::Cards::Import < Admin::Base
 
-  attr_accessor :file_url, :file, :result_hash, :params, :missing_params
+  attr_accessor :file_url, :file, :result_hash, :params, :missing_params, :sheet, :header, :card_params
 
   def pre_validate
     if user.blank? || params.blank?
@@ -12,7 +12,7 @@ class Admin::Cards::Import < Admin::Base
     self.file = params[:file]
     self.result_hash = {}
     if file.present?
-      self.sheet = open_spreadsheet(file)
+      self.sheet = ImportUtil.open_spreadsheet(file)
       self.header = sheet.row(1)
     end
   end
@@ -26,14 +26,14 @@ class Admin::Cards::Import < Admin::Base
   def process
     (2..sheet.last_row).each do |i|
       row = sheet.row(i)
-      self.params = process_row(row)
+      self.card_params = process_row(row)
 
       unless validate_params(row)
         result_hash[i] = "#{missing_params.to_sentence} cannot be blank"
         next
       end
 
-      card = Card.new(params)
+      card = Card.new(card_params)
       if card.save
         card.update(active: true)
         result_hash[i] = "Success!"
@@ -47,7 +47,12 @@ class Admin::Cards::Import < Admin::Base
     self.file_url = create_response_csv
   end
 
-  class Admin::Cards::Import < BaseOperation::BasePresenter::SuccessPresenter
+  def success
+    params[:file_url] = file_url
+    Admin::Cards::Import::FilePresenter.new(user, params, messages)
+  end
+
+  class Admin::Cards::Import::FilePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :file_url
 
@@ -59,20 +64,21 @@ class Admin::Cards::Import < Admin::Base
   private
 
   def process_row(row)
-    card_proxy = row[import_fields[:proxy]]
-    card_program_id = row[import_fields[:card_program_id]]
-    itz_cash_card_program_id = row[import_fields[:itz_cash_card_program_id]]
-    company_id = row[import_fields[:company_id]]
-    ending_number = row[import_fields[:ending_number]]
+    card_proxy = row[import_fields[:proxy]].to_s
+    card_program_id = row[import_fields[:card_program_id]].to_i.to_s
+    itz_cash_card_program_id = row[import_fields[:itz_cash_card_program_id]].to_i.to_s
+    company_id = row[import_fields[:company_id]].to_i.to_s
+    ending_number = row[import_fields[:ending_number]].to_i.to_s
 
     params = {
-        card: {
-            proxy: card_proxy,
-            card_program_id: card_program_id,
-            itz_cash_card_program_id: itz_cash_card_program_id,
-            company_id: company_id,
-            ending_number: ending_number
-        }
+
+        proxy: card_proxy,
+        card_program_id: card_program_id,
+        itz_cash_card_program_id: itz_cash_card_program_id,
+        company_id: company_id,
+        ending_number: ending_number,
+        card_status_id: CardStatus.id_for(:unassigned)
+
     }
   end
 
@@ -81,7 +87,7 @@ class Admin::Cards::Import < Admin::Base
         :proxy => 0,
         :company_id => 1,
         :card_program_id => 2,
-        :itz_cash_card_program => 3,
+        :itz_cash_card_program_id => 3,
         :ending_number => 4
     }
   end

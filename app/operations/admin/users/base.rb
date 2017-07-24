@@ -1,12 +1,10 @@
 class Admin::Users::Base < Admin::Base
-
   attr_accessor :selected_user
 
   class Admin::Users::Base::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
     attr_accessor :created_user, :selected_user, :cards, :policies, :mapping,
                   :managers, :finance_managers, :wallet, :user_panel_subscription,
-                  :itz_cash_card_program
+                  :itz_cash_card_programs
 
     def init
       self.created_user = params[:created_user]

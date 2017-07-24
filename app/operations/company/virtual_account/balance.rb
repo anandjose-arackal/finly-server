@@ -16,7 +16,6 @@ class Company::VirtualAccount::Balance < BaseOperation
   end
 
   def init
-
     # self.company = user.company ||
     self.company = params[:company] || user.company
 

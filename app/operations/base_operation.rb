@@ -309,6 +309,14 @@ class BaseOperation
     type.present? and params.present? and params[:view].present? and (params[:view] == type.to_s or params[:view] == type.to_sym)
   end
 
+  def is_expense_management_panel?
+    !is_disburse_panel?
+  end
+
+  def is_disburse_panel?
+    !!params&.dig(:request)&.referrer&.include?('disburse')
+  end
+
   def clear_messages
     self.messages = {error: [], failure: [], success: [], message: [], notice: []}
   end

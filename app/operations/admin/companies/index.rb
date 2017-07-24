@@ -41,7 +41,8 @@ class Admin::Companies::Index < Admin::Companies::Base
     def init
       self.companies = params[:companies]
       self.companies = apply_scopes(companies, params)
-      self.paginated_companies = companies.paginate(page: params[:page], per_page: 30)
+      # self.paginated_companies = companies.paginate(page: params[:page], per_page: 30)
+      self.paginated_companies = companies
       self.company_types = CompanyType.all
     end
   end

@@ -63,6 +63,11 @@ class Oauth::TokenController < Doorkeeper::TokensController
   end
 
   def auth_scope
+    # JUGAARD AS IOS IS CURRENTLY USING THIS ENDPOINT TO GENERATE THE TOKENS
+    if params[:client_id] == '9b342c6060cc1867b371325a469e17e4'
+      return :mobile
+    end
+    # JUGAAD END
     :web
   end
 
