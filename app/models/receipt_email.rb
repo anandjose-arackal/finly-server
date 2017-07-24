@@ -45,7 +45,7 @@ class ReceiptEmail < ActiveRecord::Base
 
   accepts_nested_attributes_for :receipt_email_attachments
 
-  default_scope {order expense_id: :desc, created_at: :desc}
+  default_scope { order expense_id: :desc, created_at: :desc }
   scope :with_email_id, ->(email_id) { where email_id: email_id }
 
   validates :user_id, presence: true
@@ -70,20 +70,19 @@ class ReceiptEmail < ActiveRecord::Base
   def save_receipts
     FileUtils.mkdir_p "#{Rails.root}/tmp/images"
 
+    receipt_files = []
     if receipt_email_attachments.any?
       receipt_email_attachments.each do |email_attachment|
         attachment_content_type = email_attachment.original_attachment_content_type
         next unless ReceiptProcessor::BaseConverter.is_receipt? attachment_content_type
 
-        receipt_files = []
         if ReceiptProcessor::BaseConverter::PDF_CONTENT_TYPES.include? attachment_content_type
           # PDF Attachments
           receipt_files << email_attachment.original_attachment
 
-        # Ignoring Image Attachments
-        # elsif ReceiptProcessor::BaseConverter::IMAGE_CONTENT_TYPES.include? attachment_content_type
-        #   # Image Attachments
-        #   receipt_files << email_attachment.original_attachment
+        elsif ReceiptProcessor::BaseConverter::IMAGE_CONTENT_TYPES.include? attachment_content_type
+          # Image Attachments
+          receipt_files << email_attachment.original_attachment
 
         elsif ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.include? attachment_content_type
           # HTML Attachments
@@ -100,54 +99,43 @@ class ReceiptEmail < ActiveRecord::Base
           # Any other type of attachment
           next
         end
+      end
+    end
 
-        to_be_transcribed = false
-        receipt_files.each do |receipt_file|
-          receipt = receipts.create(user_id: user_id, image: receipt_file, note: self.subject, parent: self.expense)
-          if self.expense_id.blank? and user.company.ocr_enabled?
-            receipt.update(to_be_transcribed: true)
-            to_be_transcribed = true
-          end
-        end
-        if to_be_transcribed and Rails.env.production?
-          ########## Mailer being triggered ###########
-          receipts.each do |receipt|
-            next unless receipt.to_be_transcribed
-            Constants::TRANSCRIBER_EMAILS.each do |email|
-              ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
-            end
-          end
-          #############################################
+    to_be_transcribed = false
+    receipt_files&.each do |receipt_file|
+      receipt = receipts.create(user_id: user_id, image: receipt_file, note: self.subject, parent: self.expense)
+      if self.expense_id.blank? and user.company.ocr_enabled?
+        receipt.update(to_be_transcribed: true)
+        to_be_transcribed = true
+      end
+    end
+    # if receipts.blank?
+    image_tmp_path = "#{Rails.root}/tmp/images/#{id}.jpg"
+    raw_html_text = Paperclip.io_adapters.for(raw_html).read.force_encoding(Encoding::UTF_8)
+    document_converter = ReceiptProcessor::BaseConverter.new raw_html_text,
+                                                             ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
+                                                             image_tmp_path
+    document_converter.convert do |images|
+      images.each do |image|
+        receipt = receipts.create(user_id: user_id, image: image, note: self.subject, parent: self.expense)
+        if self.expense_id.blank? and user.company.ocr_enabled?
+          receipt.update(to_be_transcribed: true)
+          to_be_transcribed = true
         end
       end
     end
-    if receipts.blank?
-      image_tmp_path = "#{Rails.root}/tmp/images/#{id}.jpg"
-      raw_html_text = Paperclip.io_adapters.for(raw_html).read.force_encoding(Encoding::UTF_8)
-      document_converter = ReceiptProcessor::BaseConverter.new raw_html_text,
-                                                               ReceiptProcessor::BaseConverter::HTML_CONTENT_TYPES.first,
-                                                               image_tmp_path
-      to_be_transcribed = false
-      document_converter.convert do |images|
-        images.each do |image|
-          receipt = receipts.create(user_id: user_id, image: image, note: self.subject, parent: self.expense)
-          if self.expense_id.blank? and user.company.ocr_enabled?
-            receipt.update(to_be_transcribed: true)
-            to_be_transcribed = true
-          end
+    if to_be_transcribed and Rails.env.production?
+      ########## Mailer being triggered ###########
+      receipts.each do |receipt|
+        next unless receipt.to_be_transcribed
+        Constants::TRANSCRIBER_EMAILS.each do |email|
+          ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
         end
       end
-      if to_be_transcribed and Rails.env.production?
-        ########## Mailer being triggered ###########
-        receipts.each do |receipt|
-          next unless receipt.to_be_transcribed
-          Constants::TRANSCRIBER_EMAILS.each do |email|
-            ReceiptMailer.delay.notify_receipt_upload(user.company, user, receipt, email)
-          end
-        end
-        #############################################
-      end
+      #############################################
     end
+    # end
   end
 
 end
