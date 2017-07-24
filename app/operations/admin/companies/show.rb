@@ -13,6 +13,7 @@ class Admin::Companies::Show < Admin::Companies::Base
   end
 
   def kyc_actions
+
   end
 
 end
