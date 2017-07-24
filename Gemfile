@@ -169,9 +169,6 @@ end
 
 # gem 'backup', '3.4.0'
 
-# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
-gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
-
 gem 'deep_cloneable', '2.2.1'
 
 gem 'animate-rails', '1.0.10'
