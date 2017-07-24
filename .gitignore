@@ -23,13 +23,9 @@ dump.rdb
 /public/system/agreements/*
 /public/system/kyc_documents/*
 /public/common/files/temp_files/*
-/public/system/kyc_documents/*
 /sample_atm_transactions.txt
 /junk_expenses.rb
 /Sample transactions
-
-# all local executables
-/bin
 
 .idea/*
 .vagrant/
