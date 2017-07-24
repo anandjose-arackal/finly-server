@@ -48,7 +48,7 @@ class Admin::Cards::AssignRequests::Index < Admin::Cards::AssignRequests::Base
       return actions if card_assign_request.blank? or not card_assign_request.processing?
       if user.has_role?(AdminUserRole.id_for(:verifier)) or user.has_role?(AdminUserRole.id_for(:itzcash_verifier))or
           user.has_role?(AdminUserRole.id_for(:itzcash_operations))
-        is_reviewer_presenter = Admin::Cards::AssignRequests::IsReviewer.(user, admin_user: user, card_assign_request: card_assign_request)
+        is_reviewer_presenter = Admin::Cards::AssignRequests::Accessable.(user, admin_user: user, card_assign_request: card_assign_request)
         if is_reviewer_presenter.success? and is_reviewer_presenter.is_reviewer
           actions[:approve] = true
           actions[:reject] = true

@@ -4,7 +4,7 @@ class Admin::Cards::AssignRequests::Reject < Admin::Cards::AssignRequests::Base
     super
     return if has_errors?
     self.card_assign_requests.each do |card_assign_request|
-      reviewer_presenter = Admin::Cards::AssignRequests::IsReviewer.(user, card_assign_request: card_assign_request, admin_user: user)
+      reviewer_presenter = Admin::Cards::AssignRequests::Accessable.(user, card_assign_request: card_assign_request, admin_user: user)
       unless reviewer_presenter.success?
         add_message :error, reviewer_presenter.messages[:error]
         return

@@ -8,6 +8,8 @@
 #  admin_reviewer_id        :integer          not null
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
+#  trigger_email            :boolean          default(FALSE), not null
+#  reviewer                 :boolean          default(FALSE), not null
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
