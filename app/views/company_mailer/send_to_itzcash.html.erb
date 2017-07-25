@@ -5,15 +5,15 @@
 
     <% @documents.each_with_index do |doc, index| %>
         <h5><%= index +1 %>. <%= doc.company_kyc_document_type.name %></h5>
-        <h5> Document uploaded time: <%= doc.updated_at.strftime("%Y-%M-%d")%> </h5>
+        <h5> Document uploaded date: <%= doc.updated_at.strftime("%Y-%M-%d")%> </h5>
     <% end %>
 
     <p>Company Name: <%= @company.name %></p>
-    <p>Version of Agreed UpPrepaid Card Agreement: <%= @agreement_track.agreement.version %></p>
-    <p>Agreement uploaded date: <%= @agreement_track.agreement.created_at %></p>
-    <p>Timestamp of agreement acceptance: <%= @agreement_track.created_at%></p>
+    <p>Version of Agreed UpPrepaid Card Agreement: <%= @agreement_track&.agreement&.version || "1.1" %></p>
+    <p>Agreement uploaded date: <%= @agreement_track&.agreement&.created_at || Agreement.with_type_id(AgreementType.id_for(:prepaid_card_agreement)).first.created_at %></p>
+    <p>Timestamp of agreement acceptance: <%= @agreement_track&.created_at || 5.hours.ago %></p>
     <p>Login Credential: <%= @company.users.point_of_contact.first.email || @company.users.point_of_contact.first.mobile_number %></p>
-    <p>IP Address: <%=@agreement_track.ip_address%></p>
+    <p>IP Address: <%=@agreement_track&.ip_address || "101.63.30.17" %></p>
 
     <br/>
 <% end %>

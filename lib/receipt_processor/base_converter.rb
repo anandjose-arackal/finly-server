@@ -59,7 +59,7 @@ module ReceiptProcessor
     end
 
     def self.is_receipt?(content_type)
-      PDF_CONTENT_TYPES.include? content_type
+      PDF_CONTENT_TYPES.include?(content_type) || IMAGE_CONTENT_TYPES.include?(content_type)
     end
 
   end

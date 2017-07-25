@@ -25,11 +25,14 @@ class Agreements::Validate < Agreements::Base
 
     # since this is not required for all active agreements, just check for the presence of
     # a user acceptance occurrence
-    user_agreement = CompanyAgreementTrack.with_user(user.id)
-    if user_agreement.empty? && active_agreements_id.present?
-      # i.e. there are active agreements and these companies haven't agreed to the respective
-      # agreements
-      self.agreed = false
+
+    if user.company.d_code_enabled?
+      user_agreement = CompanyAgreementTrack.with_user(user.id)
+      if user_agreement.empty? && active_agreements_id.present?
+        # i.e. there are active agreements and these companies haven't agreed to the respective
+        # agreements
+        self.agreed = false
+      end
     end
     # if active_agreements_id.present?
     #   active_agreements_id.each do |agreement_id|

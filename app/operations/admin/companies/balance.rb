@@ -19,7 +19,7 @@ class Admin::Companies::Balance < Company::VirtualAccount::Balance
   end
 
   def validate
-    unless company.d_code_assigned?
+    unless company.d_code_enabled?
       add_message :error, 'Company has not been configured to maintain balance'
     end
   end
