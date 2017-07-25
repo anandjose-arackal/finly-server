@@ -17,6 +17,7 @@ class Admin::Companies::Base < Admin::Base
                                       :medical_card_enabled,
                                       :expense_card_enabled,
                                       :reimbursement_card_enabled,
+                                      :itz_cash_d_code_enabled,
                                       :hard_copy_receipt
                                     ])
   end
