@@ -51,12 +51,9 @@
 #  certificate_of_registration_content_type  :string(255)
 #  certificate_of_registration_file_size     :integer
 #  certificate_of_registration_updated_at    :datetime
-#  customer_type_id                          :integer
 #  customer_id                               :string(255)
-#  authorized_signatory_aadhar_file_name     :string(255)
-#  authorized_signatory_aadhar_content_type  :string(255)
-#  authorized_signatory_aadhar_file_size     :integer
-#  authorized_signatory_aadhar_updated_at    :datetime
+#  customer_type_id                          :integer
+#  user_confirmed                            :boolean          default(FALSE)
 #
 
 class CompanyKyc < ActiveRecord::Base
@@ -67,6 +64,7 @@ class CompanyKyc < ActiveRecord::Base
   belongs_to :company_type
   has_many :system_messages, as: :messagable, dependent: :destroy
   has_many :kyc_documents
+  has_many :company_kyc_trails
 
   accepts_nested_attributes_for :system_messages
   accepts_nested_attributes_for :kyc_documents

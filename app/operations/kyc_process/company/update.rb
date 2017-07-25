@@ -71,6 +71,11 @@ class KycProcess::Company::Update < KycProcess::Company::Base
         end
     end
 
+    # update the company kyc trail for this particular company
+    if company_kyc.submitted?
+      trail = company_kyc.company_kyc_trails.build(action_resource: user, action_id: CompanyKycTrailAction.id_for(:submit)).save
+    end
+
     add_message :success, "Documents uploaded successfully"
 
   end

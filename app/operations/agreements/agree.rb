@@ -43,6 +43,12 @@ class Agreements::Agree < Agreements::Base
   end
 
   def post_process
+    # if the documents are uploaded and confirmed from the admin panel, trigger a mail to ItzCash
+    if company.company_kyc.submitted?
+      trail = company_kyc.company_kyc_trails.build(action_resource: user, action_id: CompanyKycTrailAction.id_for(:sent_to_itzcash)).save
+      CompanyMailer.delay.send_to_itzcash(company)
+    end
+
     add_message :success, "You agreed to all the agreements."
   end
 
