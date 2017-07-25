@@ -42,7 +42,7 @@ class AdminReviewWorkflow < ActiveRecord::Base
             raise "AdminUser with Email ID #{user} not found"
             return
           end
-          workflow.levels.create position: pos.to_s.to_i, admin_reviewer: admin_user, trigger_email: trigger_email, reviewer: reviewer
+          workflow.levels.create position: pos.to_s.to_i, admin_user: admin_user, trigger_email: trigger_email, reviewer: reviewer
         end
       end
     end
