@@ -14,7 +14,7 @@
 
 class CompanyKycTrail< ActiveRecord::Base
   belongs_to :company_kyc
-  belongs_to :action_source, polymorphic: true
+  belongs_to :action_resource, polymorphic: true
   belongs_to :action, class_name: "CompanyKycTrailAction"
 
   validates :company_kyc_id, presence: true
