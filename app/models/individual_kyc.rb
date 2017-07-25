@@ -61,6 +61,7 @@ class IndividualKyc < ActiveRecord::Base
   scope :filter_company_id, ->(company_id) { where company_id: company_id }
   scope :with_user_id, -> (id) { where user_id: id }
   scope :with_id, -> (id) { where id: id }
+  scope :include_tracks, -> { includes :tracks }
 
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
   CONTENT_TYPES_JPG = {content_type: %w(image/jpg image/jpeg)}
