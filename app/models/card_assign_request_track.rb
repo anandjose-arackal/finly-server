@@ -20,6 +20,9 @@ class CardAssignRequestTrack < ActiveRecord::Base
   validates :card_assign_request_id, presence: true
   validates :action_id, presence: true
 
+  scope :with_card_assign_request, -> (card_assign_request_id) { where card_assign_request_id: card_assign_request_id }
+  scope :created_after, -> (datetime) { where 'created_at >= ?', datetime }
+
   def message
     msg = nil
     if action_resource.present?
