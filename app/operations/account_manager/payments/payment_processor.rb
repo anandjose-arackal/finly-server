@@ -12,20 +12,25 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
     self.payment_request = params[:payment_request]
     self.payment_order_params = retrieve_payment_order_params
     self.company = user.company
-  end
 
-  def validate
-    # Check if the respective user can create a payment order?
-  end
-
-  def process
     # creating the payment order first to check for violations and shit
     self.payment_order = company.payment_orders.build(payment_order_params)
 
-    unless payment_order.save
+    unless payment_order.valid?
       add_message :error, payment_order.errors.full_messages
       return
     end
+  end
+
+  def validate
+    # Balance checks happen here
+
+  end
+
+  def process
+    # now the actual execution of the payment order, based on whether it's
+    # synchronous or a background operation
+
     # if payment order has been scheduled for execution right away, process it right now
     if payment_order.payment_order_status_id == PaymentOrderStatus.id_for(:pending)
       # if the order is synchronous, perform it using the regular call method in payment executor

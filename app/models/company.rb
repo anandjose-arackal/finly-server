@@ -31,10 +31,7 @@ class Company < ActiveRecord::Base
   has_many :company_balance_histories
   has_many :field_configurations, as: :configurable
   has_one :feature_subscription, as: :subscribable
-  has_many :initiating_payments, as: :initiating_account
-  has_many :initiating_payment_trails, as: :initiating_account
-  has_many :receiving_payments, as: :receiving_account
-  has_many :receiving_payment_trails, as: :receiving_account
+
   has_many :payment_orders
   has_many :user_groups
   has_many :user_teams
