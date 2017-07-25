@@ -205,6 +205,10 @@ class Company < ActiveRecord::Base
     self.feature_subscription.hard_copy_receipt
   end
 
+  def itz_cash_d_code_enabled?
+    self.feature_subscription.itz_cash_d_code_enabled
+  end
+
   def more_than_one_subscription?
     count = 0
     [:expense_management_enabled, :gift_card_enabled, :medical_card_enabled, :fuel_card_enabled, :meal_card_enabled, :expense_card_enabled, :reimbursement_card_enabled].each do |feature|
@@ -226,8 +230,8 @@ class Company < ActiveRecord::Base
     return balance_history.company_balance_value
   end
 
-  def d_code_assigned?
-    !!self.itz_cash_property&.d_code.present?
+  def d_code_enabled?
+    !!self.feature_subscription.d_code_enabled? || !!self.itz_cash_property&.d_code.present?
   end
 
   def accepted_agreements?
