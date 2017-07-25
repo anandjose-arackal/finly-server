@@ -20,4 +20,48 @@ class CardAssignRequestTrack < ActiveRecord::Base
   validates :card_assign_request_id, presence: true
   validates :action_id, presence: true
 
+  def message
+    message = nil
+    if action_resource.present?
+      name = action_resource&.name
+      case action_id
+        when CardAssignRequestTrackAction.id_for(:submit)
+          message = "#{name} has submitted the request"
+        when CardAssignRequestTrackAction.id_for(:approve)
+          message = "#{name} has approved the request"
+        when CardAssignRequestTrackAction.id_for(:final_approve)
+          message = "#{name} has approved the request. Request is marked as approved."
+        when CardAssignRequestTrackAction.id_for(:assigned)
+          if name.present?
+            message = "#{name} assigned as ASC"
+          else
+            message = "Card #{card_assign_request.card} assigned as ASC"
+          end
+        when CardAssignRequestTrackAction.id_for(:assigned_upgraded)
+          if name.present?
+            message = "#{name} assigned card #{card_assign_request.card} as OLC"
+          else
+            message = "Card #{card_assign_request.card} assigned as OLC"
+          end
+        when CardAssignRequestTrackAction.id_for(:reject)
+          message = "#{name} has rejected the request"
+          if note.present?
+            message += " with note: #{note}"
+          end
+          message = message
+        when CardAssignRequestTrackAction.id_for(:cancel)
+          message = 'Request cancelled'
+          if name.present?
+            message += " by #{name}"
+          end
+          message = message
+        when CardAssignRequestTrackAction.id_for(:download)
+          message = "#{name} has downloaded the request"
+        else
+          nil
+      end
+    end
+    message
+  end
+
 end

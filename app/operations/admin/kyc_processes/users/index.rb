@@ -10,7 +10,7 @@ class Admin::KycProcesses::Users::Index < Admin::KycProcesses::Users::Base
 
   def init
     self.workflow = AdminReviewWorkflow.workflow_for :kyc_update
-    self.reviewer_level = workflow.levels.with_admin_reviewer(user.id)&.first
+    self.reviewer_level = workflow.levels.with_admin_user(user.id)&.first
     if self.workflow.present? and self.reviewer_level.present?
       self.individual_kycs = IndividualKyc.with_admin_review_workflow(self.workflow.id).with_review_position(reviewer_level.position)
     else

@@ -66,4 +66,13 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
       end
     end
   end
+  json.tracks do
+    json.array! card_assign_request.tracks do |track|
+      json.user do
+        json.name track.action_resource&.name
+      end
+      json.datetime DateUtils.datetime_formatted track.created_at
+      json.message track.message
+    end
+  end
 end

@@ -29,7 +29,7 @@ class Admin::Cards::AssignRequests::Accessable < Admin::Cards::AssignRequests::B
     current_review_position = self.card_assign_request.review_position
     # review_ids = workflow.levels.with_position(current_review_position).pluck(:admin_reviewer_id)
     # self.is_reviewer = review_ids.include? admin_user.id
-    self.workflow_level = workflow.levels.with_position(current_review_position).with_admin_reviewer(admin_user.id)&.first
+    self.workflow_level = workflow.levels.with_position(current_review_position).with_admin_user(admin_user.id)&.first
   end
 
   def success

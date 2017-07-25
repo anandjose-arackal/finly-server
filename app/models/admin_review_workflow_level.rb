@@ -5,11 +5,11 @@
 #  id                       :integer          not null, primary key
 #  admin_review_workflow_id :integer          not null
 #  position                 :integer          not null
-#  admin_reviewer_id        :integer          not null
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  trigger_email            :boolean          default(FALSE), not null
 #  reviewer                 :boolean          default(FALSE), not null
+#  admin_user_id            :integer          not null
 #
 
 class AdminReviewWorkflowLevel < ActiveRecord::Base
@@ -18,7 +18,7 @@ class AdminReviewWorkflowLevel < ActiveRecord::Base
 
   default_scope { order position: :asc }
 
-  scope :with_admin_reviewer, -> (reviewer_id) { where admin_reviewer_id: reviewer_id }
+  scope :with_admin_user, -> (user_id) { where admin_user_id: user_id }
   scope :with_position, -> (position) { where position: position }
   scope :trigger_email, -> { where trigger_email: true }
   scope :reviewer, -> { where reviewer: true }

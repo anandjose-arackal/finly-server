@@ -10,9 +10,9 @@ class Admin::Cards::AssignRequests::Index < Admin::Cards::AssignRequests::Base
 
   def init
     self.workflow = AdminReviewWorkflow.workflow_for :assign_card
-    self.reviewer_level = workflow.levels.with_admin_reviewer(user.id)&.first
+    self.reviewer_level = workflow.levels.with_admin_user(user.id)&.first
     if self.workflow.present? and self.reviewer_level.present?
-      self.card_assign_requests = CardAssignRequest.with_admin_review_workflow(self.workflow.id).with_review_position(reviewer_level.position)
+      self.card_assign_requests = CardAssignRequest.with_admin_review_workflow(self.workflow.id).with_review_position(reviewer_level.position).include_tracks
     end
   end
 
@@ -54,12 +54,12 @@ class Admin::Cards::AssignRequests::Index < Admin::Cards::AssignRequests::Base
           actions[:reject] = true
         end
       end
-      next_reviewer_presenter = Admin::Cards::AssignRequests::NextAdminReviewPosition.(user, admin_user: user, card_assign_request: card_assign_request)
-      if next_reviewer_presenter.success? and next_reviewer_presenter.is_final? and user.has_role?(AdminUserRole.id_for(:itzcash_operations))
-        actions.delete(:approve)
-        actions[:mark_as_assigned] = true
-        actions[:mark_as_upgraded] = true
-      end
+      # next_reviewer_presenter = Admin::Cards::AssignRequests::NextAdminReviewPosition.(user, admin_user: user, card_assign_request: card_assign_request)
+      # if next_reviewer_presenter.success? and next_reviewer_presenter.is_final? and user.has_role?(AdminUserRole.id_for(:itzcash_operations))
+      #   actions.delete(:approve)
+      #   actions[:mark_as_assigned] = true
+      #   actions[:mark_as_upgraded] = true
+      # end
       actions
     end
   end

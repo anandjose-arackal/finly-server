@@ -46,6 +46,7 @@ class CardAssignRequest < ActiveRecord::Base
   scope :filter_company_id, ->(company_id) { where company_id: company_id }
   scope :with_card_owner_id, -> (id) { where card_owner_id: id }
   scope :with_id, -> (id) { where id: id }
+  scope :include_tracks, -> { includes :tracks }
 
   def processing?
     self.status_id == CardAssignRequestStatus.id_for(:processing)
