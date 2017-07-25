@@ -17,9 +17,7 @@ class Admin::KycProcesses::Companies::Confirm < KycProcess::Company::Confirm
 
   def validate
     super()
-    # unless company_kyc.user_confirmed
-    #   add_message :error, "User has not confirmed their documents yet"
-    # end
+    # check if the user's agreements have been uploaded yet
   end
 
   def init
@@ -35,7 +33,11 @@ class Admin::KycProcesses::Companies::Confirm < KycProcess::Company::Confirm
   end
 
   def post_process
+    # if company.accepted_agreements?
+      # add a track to say that it has been sent to ItzCash
+    trail = company_kyc.company_kyc_trails.build(action_resource: user, action_id: CompanyKycTrailAction.id_for(:sent_to_itzcash)).save
     CompanyMailer.delay.send_to_itzcash(company)
+    # end
 
     add_message :success, "Successfully sent the documents to ItzCash"
   end
