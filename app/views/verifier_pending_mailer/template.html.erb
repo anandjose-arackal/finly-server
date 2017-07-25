@@ -1,0 +1,15 @@
+<% content_for :body do %>
+    <div class="primary block center" style="background-color: white; text-align: center;">
+      <br>
+      <p style="line-height: 160%; margin: 0 0 20px 0;"><%= "You have pending requests" %></p>
+      <br><br>
+      <p style="line-height: 160%; margin: 0 0 20px 0;"><%= "New User Requests: #{@data.new_assign_requests_count}" %></p>
+      <p style="line-height: 160%; margin: 0 0 20px 0;"><%= "Total Pending New User Requests: #{@data.assign_requests_count}" %></p>
+      <br>
+      <p style="line-height: 160%; margin: 0 0 20px 0;"><%= "Existing User Upgrade Requests: #{@data.new_assign_requests_count}" %></p>
+      <p style="line-height: 160%; margin: 0 0 20px 0;"><%= "Total Pending User Upgrade Requests: #{@data.assign_requests_count}" %></p>
+      <br><br><br>
+    </div>
+<% end %>
+
+<%= render 'application_mailer/template' %>

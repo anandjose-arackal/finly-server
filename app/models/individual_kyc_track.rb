@@ -20,6 +20,9 @@ class IndividualKycTrack < ActiveRecord::Base
   validates :individual_kyc_id, presence: true
   validates :action_id, presence: true
 
+  scope :with_individual_kyc, -> (individual_kyc_id) { where individual_kyc_id: individual_kyc_id }
+  scope :created_after, -> (datetime) { where 'created_at >= ?', datetime }
+
   def message
     msg = nil
     if action_resource.present?

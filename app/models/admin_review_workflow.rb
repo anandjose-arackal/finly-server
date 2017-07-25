@@ -68,18 +68,18 @@ class AdminReviewWorkflow < ActiveRecord::Base
               '1': [
                   {user: 'itzfinlycust@itzcash.com', trigger_email: true, reviewer: false},
                   {user: 'amitsh.itz@intrexindia.net', trigger_email: false, reviewer: true},
-                  {user: 'anandy.itz@intrexindia.net',    trigger_email: false, reviewer: true}
+                  {user: 'anandy.itz@intrexindia.net', trigger_email: false, reviewer: true}
               ],
               '2': [
-                  {user: 'corppayment@itzcash.com',       trigger_email: true, reviewer: false},
-                  {user: 'tusharm.itz@intrexindia.net',   trigger_email: true, reviewer: true},
-                  {user: 'kalpeshg.itz@intrexindia.net',  trigger_email: true, reviewer: true},
-                  {user: 'jimmyb@itzcash.com',            trigger_email: false, reviewer: true},
-                  {user: 'mahesht@itzcash.com',           trigger_email: false, reviewer: true},
-                  {user: 'pramody@itzcash.com',           trigger_email: false, reviewer: true},
-                  {user: 'sandeshd@itzcash.com',          trigger_email: false, reviewer: true},
-                  {user: 'snehalc@itzcash.com',           trigger_email: false, reviewer: true},
-                  {user: 'mangeshm@itzcash.com',          trigger_email: false, reviewer: true}
+                  {user: 'corppayment@itzcash.com', trigger_email: true, reviewer: false},
+                  {user: 'tusharm.itz@intrexindia.net', trigger_email: true, reviewer: true},
+                  {user: 'kalpeshg.itz@intrexindia.net', trigger_email: true, reviewer: true},
+                  {user: 'jimmyb@itzcash.com', trigger_email: false, reviewer: true},
+                  {user: 'mahesht@itzcash.com', trigger_email: false, reviewer: true},
+                  {user: 'pramody@itzcash.com', trigger_email: false, reviewer: true},
+                  {user: 'sandeshd@itzcash.com', trigger_email: false, reviewer: true},
+                  {user: 'snehalc@itzcash.com', trigger_email: false, reviewer: true},
+                  {user: 'mangeshm@itzcash.com', trigger_email: false, reviewer: true}
               ]
           }
       }
