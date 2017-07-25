@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170720201826) do
+ActiveRecord::Schema.define(version: 20170725110155) do
 
   create_table "aadhar_card_data", force: :cascade do |t|
     t.string   "loc",                 limit: 255
@@ -690,15 +690,25 @@ ActiveRecord::Schema.define(version: 20170720201826) do
     t.integer  "base_currency_id", limit: 4,   default: 1
   end
 
+  create_table "company_account_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "company_accounts", force: :cascade do |t|
-    t.integer  "company_id",        limit: 4, null: false
-    t.integer  "wallet_balance_id", limit: 4
-    t.integer  "company",           limit: 4
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.integer  "company_id",              limit: 4, null: false
+    t.integer  "wallet_balance_id",       limit: 4
+    t.integer  "company",                 limit: 4
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+    t.integer  "company_acount_type_id",  limit: 4
+    t.integer  "company_account_type_id", limit: 4
   end
 
   add_index "company_accounts", ["company"], name: "index_company_accounts_on_company", using: :btree
+  add_index "company_accounts", ["company_account_type_id"], name: "index_company_accounts_on_company_account_type_id", using: :btree
+  add_index "company_accounts", ["company_acount_type_id"], name: "index_company_accounts_on_company_acount_type_id", using: :btree
   add_index "company_accounts", ["company_id"], name: "index_company_accounts_on_company_id", using: :btree
   add_index "company_accounts", ["wallet_balance_id"], name: "index_company_accounts_on_wallet_balance_id", using: :btree
 
@@ -802,6 +812,13 @@ ActiveRecord::Schema.define(version: 20170720201826) do
     t.datetime "updated_at",               null: false
   end
 
+  create_table "company_kyc_document_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "identifier", limit: 255
+  end
+
   create_table "company_kycs", force: :cascade do |t|
     t.string   "pan_card_file_name",                        limit: 255
     t.string   "pan_card_content_type",                     limit: 255
@@ -816,9 +833,9 @@ ActiveRecord::Schema.define(version: 20170720201826) do
     t.integer  "board_resolution_file_size",                limit: 4
     t.datetime "board_resolution_updated_at"
     t.integer  "kyc_status_id",                             limit: 4
-    t.integer  "company_id",                                limit: 4,     null: false
-    t.datetime "created_at",                                              null: false
-    t.datetime "updated_at",                                              null: false
+    t.integer  "company_id",                                limit: 4,                     null: false
+    t.datetime "created_at",                                                              null: false
+    t.datetime "updated_at",                                                              null: false
     t.date     "date_of_establishment"
     t.text     "street_2",                                  limit: 65535
     t.text     "street_3",                                  limit: 65535
@@ -853,6 +870,7 @@ ActiveRecord::Schema.define(version: 20170720201826) do
     t.datetime "certificate_of_registration_updated_at"
     t.string   "customer_id",                               limit: 255
     t.integer  "customer_type_id",                          limit: 4
+    t.boolean  "user_confirmed",                                          default: false
   end
 
   add_index "company_kycs", ["company_id"], name: "index_company_kycs_on_company_id", using: :btree
@@ -1273,6 +1291,7 @@ ActiveRecord::Schema.define(version: 20170720201826) do
     t.boolean  "transcribed",                        default: false
     t.boolean  "personal",                           default: false
     t.boolean  "reimbursable",                       default: true
+    t.boolean  "from_cash_on_hand",                  default: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -1517,6 +1536,15 @@ ActiveRecord::Schema.define(version: 20170720201826) do
     t.string   "bank",         limit: 255
   end
 
+  create_table "itz_cash_company_accounts", force: :cascade do |t|
+    t.integer  "company_id",        limit: 4
+    t.integer  "wallet_balance_id", limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "itz_cash_company_accounts", ["company_id"], name: "index_itz_cash_company_accounts_on_company_id", using: :btree
+
   create_table "itz_cash_dmt_beneficiaries", force: :cascade do |t|
     t.string   "first_name",             limit: 255,                 null: false
     t.string   "middle_name",            limit: 255
@@ -1577,6 +1605,21 @@ ActiveRecord::Schema.define(version: 20170720201826) do
   end
 
   add_index "itz_cash_properties", ["company_id"], name: "index_itz_cash_properties_on_company_id", using: :btree
+
+  create_table "kyc_documents", force: :cascade do |t|
+    t.integer  "company_kyc_document_type_id", limit: 4
+    t.integer  "company_kyc_id",               limit: 4
+    t.string   "doc_file_name",                limit: 255
+    t.string   "doc_content_type",             limit: 255
+    t.integer  "doc_file_size",                limit: 4
+    t.datetime "doc_updated_at"
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+    t.string   "identifier",                   limit: 255
+  end
+
+  add_index "kyc_documents", ["company_kyc_document_type_id"], name: "index_kyc_documents_on_company_kyc_document_type_id", using: :btree
+  add_index "kyc_documents", ["company_kyc_id"], name: "index_kyc_documents_on_company_kyc_id", using: :btree
 
   create_table "kyc_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -1978,6 +2021,29 @@ ActiveRecord::Schema.define(version: 20170720201826) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "payment_trails", force: :cascade do |t|
+    t.date     "date"
+    t.integer  "initiating_account_id",              limit: 4
+    t.integer  "receiving_account_id",               limit: 4
+    t.string   "initiating_account_type",            limit: 255
+    t.string   "receiving_account_type",             limit: 255
+    t.integer  "initiating_account_pre_balance_id",  limit: 4
+    t.integer  "initiating_account_post_balance_id", limit: 4
+    t.integer  "receiving_account_pre_balance_id",   limit: 4
+    t.integer  "receiving_account_post_balance_id",  limit: 4
+    t.integer  "payments_id",                        limit: 4
+    t.integer  "payment_status_id",                  limit: 4
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+  end
+
+  add_index "payment_trails", ["initiating_account_id"], name: "index_payment_trails_on_initiating_account_id", using: :btree
+  add_index "payment_trails", ["initiating_account_post_balance_id"], name: "index_payment_trails_on_initiating_account_post_balance_id", using: :btree
+  add_index "payment_trails", ["initiating_account_pre_balance_id"], name: "index_payment_trails_on_initiating_account_pre_balance_id", using: :btree
+  add_index "payment_trails", ["receiving_account_id"], name: "index_payment_trails_on_receiving_account_id", using: :btree
+  add_index "payment_trails", ["receiving_account_post_balance_id"], name: "index_payment_trails_on_receiving_account_post_balance_id", using: :btree
+  add_index "payment_trails", ["receiving_account_pre_balance_id"], name: "index_payment_trails_on_receiving_account_pre_balance_id", using: :btree
 
   create_table "payment_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -2819,6 +2885,15 @@ ActiveRecord::Schema.define(version: 20170720201826) do
   add_index "whitelisted_ips", ["company_id"], name: "index_whitelisted_ips_on_company_id", using: :btree
   add_index "whitelisted_ips", ["ip_address"], name: "index_whitelisted_ips_on_ip_address", using: :btree
 
+  create_table "yes_bank_company_accounts", force: :cascade do |t|
+    t.integer  "company_id",        limit: 4
+    t.integer  "wallet_balance_id", limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "yes_bank_company_accounts", ["company_id"], name: "index_yes_bank_company_accounts_on_company_id", using: :btree
+
   add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
   add_foreign_key "admin_user_role_mappings", "admin_user_roles"
   add_foreign_key "admin_user_role_mappings", "admin_users"
@@ -2854,6 +2929,7 @@ ActiveRecord::Schema.define(version: 20170720201826) do
   add_foreign_key "cards", "users"
   add_foreign_key "categories", "companies"
   add_foreign_key "company_accounts", "companies"
+  add_foreign_key "company_accounts", "company_account_types"
   add_foreign_key "company_agreement_tracks", "agreements"
   add_foreign_key "company_agreement_tracks", "users"
   add_foreign_key "company_balance_histories", "companies"
@@ -2891,9 +2967,12 @@ ActiveRecord::Schema.define(version: 20170720201826) do
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
+  add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
   add_foreign_key "itz_cash_dmt_senders", "users"
   add_foreign_key "itz_cash_properties", "companies"
+  add_foreign_key "kyc_documents", "company_kyc_document_types"
+  add_foreign_key "kyc_documents", "company_kycs"
   add_foreign_key "login_agreement_mappings", "agreements"
   add_foreign_key "login_agreement_mappings", "users"
   add_foreign_key "manual_expenses", "expenses"
@@ -2981,4 +3060,5 @@ ActiveRecord::Schema.define(version: 20170720201826) do
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
   add_foreign_key "whitelisted_ips", "companies"
+  add_foreign_key "yes_bank_company_accounts", "companies"
 end
