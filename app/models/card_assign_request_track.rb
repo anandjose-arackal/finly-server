@@ -21,47 +21,44 @@ class CardAssignRequestTrack < ActiveRecord::Base
   validates :action_id, presence: true
 
   def message
-    message = nil
+    msg = nil
     if action_resource.present?
       name = action_resource&.name
       case action_id
         when CardAssignRequestTrackAction.id_for(:submit)
-          message = "#{name} has submitted the request"
+          msg = "#{name} has submitted the request"
         when CardAssignRequestTrackAction.id_for(:approve)
-          message = "#{name} has approved the request"
+          msg = "#{name} has approved the request"
         when CardAssignRequestTrackAction.id_for(:final_approve)
-          message = "#{name} has approved the request. Request is marked as approved."
+          msg = "#{name} has approved the request. Request is marked as approved."
         when CardAssignRequestTrackAction.id_for(:assigned)
           if name.present?
-            message = "#{name} assigned as ASC"
+            msg = "#{name} assigned as ASC"
           else
-            message = "Card #{card_assign_request.card} assigned as ASC"
+            msg = "Card #{card_assign_request.card} assigned as ASC"
           end
         when CardAssignRequestTrackAction.id_for(:assigned_upgraded)
           if name.present?
-            message = "#{name} assigned card #{card_assign_request.card} as OLC"
+            msg = "#{name} assigned card #{card_assign_request.card} as OLC"
           else
-            message = "Card #{card_assign_request.card} assigned as OLC"
+            msg = "Card #{card_assign_request.card} assigned as OLC"
           end
         when CardAssignRequestTrackAction.id_for(:reject)
-          message = "#{name} has rejected the request"
+          msg = "#{name} has rejected the request"
           if note.present?
-            message += " with note: #{note}"
+            msg += " with note: #{note}"
           end
-          message = message
+          msg = msg
         when CardAssignRequestTrackAction.id_for(:cancel)
-          message = 'Request cancelled'
+          msg = 'Request cancelled'
           if name.present?
-            message += " by #{name}"
+            msg += " by #{name}"
           end
-          message = message
         when CardAssignRequestTrackAction.id_for(:download)
-          message = "#{name} has downloaded the request"
-        else
-          nil
+          msg = "#{name} has downloaded the request"
       end
     end
-    message
+    msg
   end
 
 end

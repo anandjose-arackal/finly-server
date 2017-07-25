@@ -20,4 +20,39 @@ class IndividualKycTrack < ActiveRecord::Base
   validates :individual_kyc_id, presence: true
   validates :action_id, presence: true
 
+  def message
+    msg = nil
+    if action_resource.present?
+      name = action_resource&.name
+      case action_id
+        when IndividualKycTrackAction.id_for(:submit)
+          msg = "#{name} has submitted the request"
+        when IndividualKycTrackAction.id_for(:approve)
+          msg = "#{name} has approved the request"
+        when IndividualKycTrackAction.id_for(:final_approve)
+          msg = "#{name} has approved the request. Request is marked as approved."
+        when IndividualKycTrackAction.id_for(:upgraded)
+          if name.present?
+            msg = "#{name} has upgraded user account as OLC"
+          else
+            msg = "Account upgraded as OLC"
+          end
+        when IndividualKycTrackAction.id_for(:reject)
+          msg = "#{name} has rejected the request"
+          if note.present?
+            msg += " with note: #{note}"
+          end
+          msg = msg
+        when IndividualKycTrackAction.id_for(:retract)
+          msg = 'Request retracted'
+          if name.present?
+            msg += " by #{name}"
+          end
+        when IndividualKycTrackAction.id_for(:download)
+          msg = "#{name} has downloaded the request"
+      end
+    end
+    msg
+  end
+
 end
