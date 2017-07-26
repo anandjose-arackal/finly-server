@@ -41,4 +41,9 @@ class ExpenseTypesConfigurationController < ApplicationController
     render json: @views.as_json
   end
 
+  def menu_data_payments
+    @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/menu_data_payments.yml.erb", {current_company: current_company, current_user: current_user})
+    render json: @views.as_json
+  end
+
 end
