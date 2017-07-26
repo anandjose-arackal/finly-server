@@ -24,13 +24,17 @@ module Constants
 
   WHITELISTED_EMAILS = ['manager4@finlytest.io', 'kaley@finlytest.io', 'finance4@finlytest.io']
 
-  # ITZ_CASH_KYC_EMAIL = ['kalpitap.itz@intrexindia.net']
+  if Rails.env.production?
+    ITZ_CASH_KYC_EMAIL = ['kalpitap.itz@intrexindia.net']
+  else
+    ITZ_CASH_KYC_EMAIL = ['sreeram.nr@finly.io']
+  end
 
-  ITZ_CASH_KYC_EMAIL = ['sreeram.nr@finly.io']
-
-  # ITZ_CASH_KYC_CARBON_COPY_EMAIL = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'anushrut.khare@finly.io', 'sales@finly.io']
-
-  ITZ_CASH_KYC_CARBON_COPY_EMAIL = []
+  if Rails.env.production?
+    ITZ_CASH_KYC_CARBON_COPY_EMAIL = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'anushrut.khare@finly.io', 'sales@finly.io']
+  else
+    ITZ_CASH_KYC_CARBON_COPY_EMAIL = []
+  end
 
   # MSG91 / SendOTP API keys ######
 
