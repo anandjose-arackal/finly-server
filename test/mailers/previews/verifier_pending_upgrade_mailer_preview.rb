@@ -4,7 +4,7 @@ Dir["#{Rails.root}/app/operations/event/*.rb"].each {|file| require file }
 require "minitest/unit"
 require "mocha/mini_test"
 
-class VerifierPendingMailerPreview < ActionMailer::Preview
+class VerifierPendingUpgradeMailerPreview < ActionMailer::Preview
 
   # http://localhost:3001/rails/mailers/verifier_pending_mailer/pending
   def pending
@@ -16,6 +16,6 @@ class VerifierPendingMailerPreview < ActionMailer::Preview
     params[:assign_requests_count] = 20
     params[:new_assign_requests_count] = 0
     presenter = Event::EAdmin::EVerifier::PendingAlert::MailerPresenter.new(user, params)
-    VerifierPendingMailer.send_mail(presenter)
+    VerifierPendingUpgradeMailer.send_mail(presenter)
   end
 end

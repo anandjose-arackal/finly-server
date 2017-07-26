@@ -1,4 +1,4 @@
-class VerifierPendingMailer < ApplicationMailer
+class VerifierPendingUpgradeMailer < ApplicationMailer
 
   def send_mail(presenter)
     @data = presenter

@@ -7,13 +7,13 @@
   <Worksheet ss:Name="Sheet1">
     <Table>
       <Row>
-        <% headers.each do |item| %>
+        <% @item_headers.each do |item| %>
             <Cell>
               <Data ss:Type="String"><%= item %></Data>
             </Cell>
         <% end %>
       </Row>
-      <% contents.each do |item| %>
+      <% @item_contents.each do |item| %>
           <Row>
             <% item.each do |value| %>
                 <Cell>
