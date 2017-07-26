@@ -14,8 +14,10 @@ class AdminPanelVerifierMailer < ActiveJob::Base
 
   protected
   def valid_working_hours
-    # Check if
+    # Check if the current weekday is between monday and friday
     return false unless [*1..5].include? Date.today.wday
+
+    # Check if time is between 9am and 6pm
     today = Date.today
     staring_hours = Time.local(today.year, today.month, today.day, 9, 0, 0)
     ending_hours = Time.local(tomorrow.year, tomorrow.month, tomorrow.day, 18, 0, 0)

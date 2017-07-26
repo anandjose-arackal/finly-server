@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/activeadmin/activeadmin.git
-  revision: 98365c940f3ad8dc788f55a1ca7a63082ce46f79
+  revision: 6ada3ccb66a3418ea8941b98f6b9a2da6a9a3db4
   specs:
-    activeadmin (1.0.0)
+    activeadmin (1.1.0)
       arbre (>= 1.1.1)
       coffee-rails
       formtastic (~> 3.1)
@@ -436,7 +436,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  activeadmin (= 1.0.0)!
+  activeadmin (= 1.1.0)!
   animate-rails (= 1.0.10)
   annotate (= 2.7.1)
   autoprefixer-rails (= 6.5.0.1)
