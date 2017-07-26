@@ -3,7 +3,8 @@
 
 class AccountManager::Payments::PaymentValidator < BaseOperation
 
-  attr_accessor :payment_order, :receiving_account_adapter, :initiating_account_adapter
+  attr_accessor :payment_order, :receiving_account_adapter, :initiating_account_adapter,
+                :errors_present
 
   def initialize(payment_order)
     self.payment_order = payment_order
@@ -18,13 +19,16 @@ class AccountManager::Payments::PaymentValidator < BaseOperation
   end
 
   def init
-
+    self.errors_present = false
   end
 
   def validate
     # this validation is irrespective of the source and destination of the payment
-    # i.e. checking for consistency of initiating and receiving accounts etc.
-
+    # i.e. checking for consistency of initiating and receiving account types etc.
+    unless validate_account_consistency(payment_order)
+      add_message :error, "Transfer failed because of the following errors"
+      return
+    end
   end
 
   # here all the validations required for the respective payment order will happen
@@ -46,5 +50,27 @@ class AccountManager::Payments::PaymentValidator < BaseOperation
       else
         return AccountManager::Company::CompanyBalanceAdapter.new(account_type.id)
     end
+  end
+
+  def validate_account_consistency(payment_order)
+    initiating_account_type = payment_order.payment.first.initiating_account_type
+    receiving_account_type = payment_order.payment.first.receiving_account_type
+    payment_order.payments.each do |payment|
+      unless payment.receiving_account_type == receiving_account_type
+        payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+                                      content: "Receiving account type has to be same for all transfers").save
+        self.errors_present = true
+      end
+      unless payment.initiating_account_type == initiating_account_type
+        payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+                                      content: "Initiating account type has to be same for all transfers").save
+        self.errors_present = true
+      end
+    end
+    errors_present
+  end
+
+  def check_balance
+
   end
 end

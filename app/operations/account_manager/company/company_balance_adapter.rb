@@ -31,4 +31,10 @@ class AccountManager::Company::CompanyBalanceAdapter < AccountManager::BaseAdapt
   def debitable_accounts
     [Card, "Card", UserWallet, "UserWallet"]
   end
+
+  private
+
+  def blocked_amount_for_payments
+
+  end
 end
