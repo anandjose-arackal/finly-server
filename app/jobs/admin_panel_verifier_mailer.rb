@@ -14,7 +14,7 @@ class AdminPanelVerifierMailer < ActiveJob::Base
 
   protected
   def valid_working_hours
-    # Check if 
+    # Check if
     return false unless [*1..5].include? Date.today.wday
     today = Date.today
     staring_hours = Time.local(today.year, today.month, today.day, 9, 0, 0)
