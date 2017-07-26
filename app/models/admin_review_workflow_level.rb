@@ -24,5 +24,6 @@ class AdminReviewWorkflowLevel < ActiveRecord::Base
   scope :with_position, -> (position) { where position: position }
   scope :trigger_email, -> { where trigger_email: true }
   scope :reviewer, -> { where reviewer: true }
+  scope :sort_by_email_triggered_at_desc, -> { order email_triggered_at: :desc }
 
 end
