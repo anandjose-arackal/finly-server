@@ -1,5 +1,7 @@
 class CompanyMailer < ApplicationMailer
 
+  helper Admin::CompanyMailHelper
+
   def balance_update(transaction_details)
     @amount = transaction_details[:amount_attributes][:value] rescue nil
     @reference_id = transaction_details[:reference_id]
@@ -22,5 +24,8 @@ class CompanyMailer < ApplicationMailer
     # can add more details here as we need
     mail to: Constants::ITZ_CASH_KYC_EMAIL, from: "sales@finly.io", cc: Constants::ITZ_CASH_KYC_CARBON_COPY_EMAIL, subject: "KYC Documents for #{company.name}"
   end
+
+  private
+
 
 end
