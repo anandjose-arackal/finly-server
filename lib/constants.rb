@@ -24,7 +24,13 @@ module Constants
 
   WHITELISTED_EMAILS = ['manager4@finlytest.io', 'kaley@finlytest.io', 'finance4@finlytest.io']
 
-  ITZ_CASH_KYC_EMAIL = ['veekshith.rai@finly.io']
+  ITZ_CASH_KYC_EMAIL = ['kalpitap.itz@intrexindia.net']
+
+  # ITZ_CASH_KYC_EMAIL = ['sreeram.nr@finly.io']
+
+  ITZ_CASH_KYC_CARBON_COPY_EMAIL = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'anushrut.khare@finly.io']
+
+  # ITZ_CASH_KYC_CARBON_COPY = []
 
   # MSG91 / SendOTP API keys ######
 
