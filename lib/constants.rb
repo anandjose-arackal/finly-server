@@ -28,9 +28,9 @@ module Constants
 
   # ITZ_CASH_KYC_EMAIL = ['sreeram.nr@finly.io']
 
-  ITZ_CASH_KYC_CARBON_COPY_EMAIL = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'anushrut.khare@finly.io']
+  ITZ_CASH_KYC_CARBON_COPY_EMAIL = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'anushrut.khare@finly.io', 'sales@finly.io']
 
-  # ITZ_CASH_KYC_CARBON_COPY = []
+  # ITZ_CASH_KYC_CARBON_COPY_EMAIL = []
 
   # MSG91 / SendOTP API keys ######
 
