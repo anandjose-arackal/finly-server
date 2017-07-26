@@ -1,7 +1,7 @@
 class Event::EAdmin::EVerifier::PendingAlert < Event::EAdmin::AdminSetNotifier
-  attr_accessor :admin_user,
-                :new_assign_requests_count, :assign_requests_count,
-                :new_upgrade_requests_count, :upgrade_requests_count
+  attr_accessor :admin_user, :after,
+  :new_assign_requests_count, :assign_requests_count,
+      :new_upgrade_requests_count, :upgrade_requests_count
 
   def pre_validate
     unless user.present? or params&.dig(:admin_user).present?
@@ -10,6 +10,7 @@ class Event::EAdmin::EVerifier::PendingAlert < Event::EAdmin::AdminSetNotifier
   end
 
   def init
+    self.after = params&.dig(:after)
     self.admin_user = (params&.dig(:admin_user) or user)
     return unless self.admin_user.present?
     init_assign_requests
@@ -27,8 +28,12 @@ class Event::EAdmin::EVerifier::PendingAlert < Event::EAdmin::AdminSetNotifier
     card_assign_requests = assign_request_presenter.card_assign_requests
     self.assign_requests_count = card_assign_requests.count
 
-    request_ids =  card_assign_requests.pluck(:id)
-    self.new_assign_requests_count = CardAssignRequestTrack.with_card_assign_request(request_ids).created_after(DateTime.now - 1.hour).pluck(:card_assign_request_id).uniq.count
+    request_ids = card_assign_requests.pluck(:id)
+    requests = CardAssignRequestTrack.with_card_assign_request(request_ids)
+    if self.after.present?
+      requests = requests.created_after(self.after)
+    end
+    self.new_assign_requests_count = requests.pluck(:card_assign_request_id).uniq.count
   end
 
   def init_upgrade_requests
@@ -40,10 +45,10 @@ class Event::EAdmin::EVerifier::PendingAlert < Event::EAdmin::AdminSetNotifier
     individual_kycs = upgrade_requests_presenter.individual_kycs
     self.upgrade_requests_count = individual_kycs.count
 
-    request_ids =  individual_kycs.pluck(:id)
+    request_ids = individual_kycs.pluck(:id)
     requests = IndividualKycTrack.with_individual_kyc(request_ids)
-    if self.admin_user
-
+    if self.after.present?
+      requests = requests.created_after(self.after)
     end
     self.new_upgrade_requests_count = requests.pluck(:individual_kyc_id).uniq.count
   end
