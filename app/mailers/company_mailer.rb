@@ -20,7 +20,7 @@ class CompanyMailer < ApplicationMailer
       attachments["#{doc.company_kyc_document_type.name}.#{doc.doc_file_name.split('.').last}"] = File.read(doc.doc.path)
     end
     # can add more details here as we need
-    mail to: Constants::ITZ_CASH_KYC_EMAIL, subject: "KYC Documents for #{company.name}"
+    mail to: Constants::ITZ_CASH_KYC_EMAIL, from: "sales@finly.io", cc: Constants::ITZ_CASH_KYC_CARBON_COPY_EMAIL, subject: "KYC Documents for #{company.name}"
   end
 
 end
