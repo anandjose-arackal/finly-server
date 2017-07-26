@@ -2,6 +2,17 @@ class AdminPanelVerifierMailer < ActiveJob::Base
 
   def perform
     return unless valid_working_hours
+    notify_assign_requests
+    notify_upgrade_requests
+  end
+
+  protected
+  def notify_assign_requests
+
+  end
+
+  # Notify new assign requests with KYC and new KYC Upgrade requests
+  def notify_upgrade_requests
     admin_users = AdminUser.with_id(AdminReviewWorkflowLevel.trigger_email.pluck(:admin_user_id)).uniq
     admin_users.each do |user|
       last_email_triggered_at = AdminReviewWorkflowLevel.with_admin_user(user.id).sort_by_email_triggered_at_desc.first&.email_triggered_at
@@ -12,7 +23,6 @@ class AdminPanelVerifierMailer < ActiveJob::Base
     end
   end
 
-  protected
   def valid_working_hours
     # Check if the current weekday is between monday and friday
     return false unless [*1..5].include? Date.today.wday
