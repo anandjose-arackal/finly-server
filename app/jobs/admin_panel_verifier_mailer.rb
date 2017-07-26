@@ -20,7 +20,7 @@ class AdminPanelVerifierMailer < ActiveJob::Base
     # Check if time is between 9am and 6pm
     today = Date.today
     staring_hours = Time.local(today.year, today.month, today.day, 9, 0, 0)
-    ending_hours = Time.local(tomorrow.year, tomorrow.month, tomorrow.day, 18, 0, 0)
+    ending_hours = Time.local(today.year, today.month, today.day, 18, 0, 0)
     return false unless (staring_hours..ending_hours).include? Time.now
     true
   end
