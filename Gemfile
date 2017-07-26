@@ -20,7 +20,7 @@ gem 'rollbar'
 gem 'oj', '~> 2.18.1'
 
 # gem for admin panel
-gem 'activeadmin', '1.0.0', git: 'https://github.com/activeadmin/activeadmin.git'
+gem 'activeadmin', '1.1.0', git: 'https://github.com/activeadmin/activeadmin.git'
 
 # puma web server
 gem 'figaro', '1.1.1'
