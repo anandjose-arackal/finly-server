@@ -1,22 +1,21 @@
-class Event::EAdmin::EVerifier::PendingAlert < Event::SetNotifier
+class Event::EAdmin::EVerifier::PendingAlert < Event::EAdmin::AdminSetNotifier
   attr_accessor :admin_user,
                 :new_assign_requests_count, :assign_requests_count,
                 :new_upgrade_requests_count, :upgrade_requests_count
 
   def pre_validate
-    unless params&.dig(:admin_user).present?
+    unless user.present? or params&.dig(:admin_user).present?
       add_message :error, 'User not found'
-      return
     end
   end
 
   def init
-    self.admin_user = params[:admin_user]
+    self.admin_user = (params&.dig(:admin_user) or user)
     return unless self.admin_user.present?
     init_assign_requests
-    return unless has_errors?
+    return if has_errors?
     init_upgrade_requests
-    return unless has_errors?
+    return if has_errors?
   end
 
   def init_assign_requests
@@ -29,7 +28,7 @@ class Event::EAdmin::EVerifier::PendingAlert < Event::SetNotifier
     self.assign_requests_count = card_assign_requests.count
 
     request_ids =  card_assign_requests.pluck(:id)
-    self.new_assign_requests_count = CardAssignRequestTrack.with_card_assign_request(request_ids).created_after(DateTime.now - 1.hour).pluck(:card_assign_request_id).uniq
+    self.new_assign_requests_count = CardAssignRequestTrack.with_card_assign_request(request_ids).created_after(DateTime.now - 1.hour).pluck(:card_assign_request_id).uniq.count
   end
 
   def init_upgrade_requests
@@ -42,14 +41,18 @@ class Event::EAdmin::EVerifier::PendingAlert < Event::SetNotifier
     self.upgrade_requests_count = individual_kycs.count
 
     request_ids =  individual_kycs.pluck(:id)
-    self.new_upgrade_requests_count = IndividualKycTrack.with_individual_kyc(request_ids).created_after(DateTime.now - 1.hour).pluck(:individual_kyc_id).uniq
+    requests = IndividualKycTrack.with_individual_kyc(request_ids)
+    if self.admin_user
+
+    end
+    self.new_upgrade_requests_count = requests.pluck(:individual_kyc_id).uniq.count
   end
 
   def validate
     if self.admin_user.blank?
       add_message :error, 'User not found'
     end
-    if self.new_assign_requests_count == 0 and self.new_assign_requests_count == 0
+    if self.new_assign_requests_count == 0 and self.new_upgrade_requests_count == 0
       add_message :error, 'No new requests'
     end
   end
@@ -58,15 +61,12 @@ class Event::EAdmin::EVerifier::PendingAlert < Event::SetNotifier
     [self.admin_user]
   end
 
-  def send_mailer(user)
-    return if user.blank?
-    set_presenter_params(user)
-    return unless params[:subject].present? and params[:body].present?
-    VerifierPendingMailer.delay.send_mail(Event::EAdmin::EVerifier::PendingAlert::MailerPresenter.new(user, params))
-  end
-
   def mailer_subject(user)
     "#{(new_upgrade_requests_count + new_assign_requests_count)} new upgrade requests"
+  end
+
+  def allow_mailer(user, configuration)
+    true
   end
 
   def set_presenter_params(user)
@@ -77,6 +77,13 @@ class Event::EAdmin::EVerifier::PendingAlert < Event::SetNotifier
     params[:new_assign_requests_count] = new_assign_requests_count
   end
 
+  def send_mailer(user)
+    return if user.blank?
+    set_presenter_params(user)
+    return unless params[:subject].present?
+    VerifierPendingMailer.delay.send_mail(Event::EAdmin::EVerifier::PendingAlert::MailerPresenter.new(user, params))
+  end
+
   class Event::EAdmin::EVerifier::PendingAlert::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :user, :subject_val, :company,
                   :upgrade_requests_count, :new_upgrade_requests_count,
@@ -84,7 +91,6 @@ class Event::EAdmin::EVerifier::PendingAlert < Event::SetNotifier
 
     def initialize(user, params)
       self.user = user
-      self.company = user.company
       self.subject_val = params[:subject]
       self.upgrade_requests_count = params[:upgrade_requests_count]
       self.new_upgrade_requests_count = params[:new_upgrade_requests_count]

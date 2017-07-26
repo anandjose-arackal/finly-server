@@ -8,8 +8,14 @@ class VerifierPendingMailerPreview < ActionMailer::Preview
 
   # http://localhost:3001/rails/mailers/verifier_pending_mailer/pending
   def pending
-    @company = Company.last
-    CompanyMailer.send_to_itzcash(@company)
-    VerifierPendingMailer.send_mail()
+    user = AdminUser.first
+    params = {}
+    params[:subject] = 'Test Subject'
+    params[:upgrade_requests_count] = 8
+    params[:new_upgrade_requests_count] = 3
+    params[:assign_requests_count] = 20
+    params[:new_assign_requests_count] = 0
+    presenter = Event::EAdmin::EVerifier::PendingAlert::MailerPresenter.new(user, params)
+    VerifierPendingMailer.send_mail(presenter)
   end
 end

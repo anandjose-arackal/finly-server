@@ -1860,20 +1860,14 @@ Rails.application.routes.draw do
   post 'users/update_default_password', to: 'users#update_default_password', as: :update_default_password
   get 'edit_default_password', to: 'users#edit_default_password', as: :edit_default_password
 
-
   resources :pending_invites, only: [:create, :destroy, :update, :edit]
   resources :pending_invites do
     patch 'accept', to: 'pending_invites#accept', as: :accept
   end
 
-
   get 'settlements/summary' => 'settlements#summary'
   resources :settlements
   post 'settlements/:id/add_payment' => 'settlements#add_payment', as: :settlement_add_payment
-
-  resources :receipts do
-
-  end
 
   get 'expense_type_configurations', to: 'expense_types_configuration#show', as: :expense_type_configuration_show
   patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update

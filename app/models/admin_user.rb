@@ -32,6 +32,8 @@ class AdminUser < ActiveRecord::Base
   accepts_nested_attributes_for :admin_user_role_mappings
 
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
+
+  scope :with_id, ->(id) { where id: id }
   scope :with_email, ->(email) { where email: email }
 
   def finly_admin?

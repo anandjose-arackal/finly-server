@@ -9,7 +9,9 @@
 #  updated_at               :datetime         not null
 #  trigger_email            :boolean          default(FALSE), not null
 #  reviewer                 :boolean          default(FALSE), not null
+#  admin_users_id           :integer          not null
 #  admin_user_id            :integer          not null
+#  email_triggered_at       :datetime
 #
 
 class AdminReviewWorkflowLevel < ActiveRecord::Base
