@@ -36,7 +36,7 @@ user:
   - finance_manager
   <% end %>
 views:
-  <% if current_user.admin? %>
+  <%# if current_user.admin? %>
     admin:
       menus:
         navbar:
@@ -60,4 +60,4 @@ views:
           target: '_blank'
         - name: 'Company Statements'
           url: '#company_statements'
-  <% end %>
+  <%# end %>
