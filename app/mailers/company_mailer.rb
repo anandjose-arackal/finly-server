@@ -18,6 +18,7 @@ class CompanyMailer < ApplicationMailer
     @documents = @company_kyc.kyc_documents
     @pre_paid_card_agreement = Agreement.active.with_type_id(AgreementType.id_for(:prepaid_card_agreement)).first
     @agreement_track = CompanyAgreementTrack.with_company(@company.id).with_agreement(@pre_paid_card_agreement&.id).first
+    @show_itzcash_logo = true
     @documents.each do |doc|
       attachments["#{doc.company_kyc_document_type.name}.#{doc.doc_file_name.split('.').last}"] = File.read(doc.doc.path)
     end
