@@ -4,7 +4,7 @@ class RenameAdminReviewerToAdminUser < ActiveRecord::Migration
     AdminReviewWorkflowLevel.all.each do |level|
       level.update(admin_user_id: level.admin_reviewer_id)
     end
-    remove_foreign_key :admin_review_workflow_levels, :admin_reviewer
+    # remove_foreign_key :admin_review_workflow_levels, column: :admin_reviewer_id
     remove_index :admin_review_workflow_levels, :admin_reviewer_id
     remove_column :admin_review_workflow_levels, :admin_reviewer_id
   end
