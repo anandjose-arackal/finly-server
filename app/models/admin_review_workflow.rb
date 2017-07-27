@@ -74,12 +74,12 @@ class AdminReviewWorkflow < ActiveRecord::Base
                   {user: 'corppayment@itzcash.com', trigger_email: true, reviewer: false},
                   {user: 'tusharm.itz@intrexindia.net', trigger_email: true, reviewer: true},
                   {user: 'kalpeshg.itz@intrexindia.net', trigger_email: true, reviewer: false},
-                  {user: 'jimmyb@itzcash.com', trigger_email: false, reviewer: true},
-                  {user: 'mahesht@itzcash.com', trigger_email: false, reviewer: true},
-                  {user: 'pramody@itzcash.com', trigger_email: false, reviewer: true},
-                  {user: 'sandeshd@itzcash.com', trigger_email: false, reviewer: true},
-                  {user: 'snehalc@itzcash.com', trigger_email: false, reviewer: true},
-                  {user: 'mangeshm@itzcash.com', trigger_email: false, reviewer: true}
+                  {user: 'jimmyb@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'mahesht@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'pramody@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'sandeshd@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'snehalc@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'mangeshm@itzcash.com', trigger_email: false, reviewer: false}
               ]
           },
           kyc_update: {
@@ -95,14 +95,14 @@ class AdminReviewWorkflow < ActiveRecord::Base
               ],
               '2': [
                   {user: 'corppayment@itzcash.com', trigger_email: true, reviewer: false},
-                  {user: 'tusharm.itz@intrexindia.net', trigger_email: true, reviewer: true},
+                  {user: 'tusharm.itz@intrexindia.net', trigger_email: true, reviewer: false},
                   {user: 'kalpeshg.itz@intrexindia.net', trigger_email: true, reviewer: false},
-                  {user: 'jimmyb@itzcash.com', trigger_email: false, reviewer: true},
-                  {user: 'mahesht@itzcash.com', trigger_email: false, reviewer: true},
-                  {user: 'pramody@itzcash.com', trigger_email: false, reviewer: true},
-                  {user: 'sandeshd@itzcash.com', trigger_email: false, reviewer: true},
-                  {user: 'snehalc@itzcash.com', trigger_email: false, reviewer: true},
-                  {user: 'mangeshm@itzcash.com', trigger_email: false, reviewer: true}
+                  {user: 'jimmyb@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'mahesht@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'pramody@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'sandeshd@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'snehalc@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'mangeshm@itzcash.com', trigger_email: false, reviewer: false}
               ]
           }
       }
