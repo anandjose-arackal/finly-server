@@ -1,7 +1,7 @@
 class AdminPanelVerifierMailer < ActiveJob::Base
 
   def perform
-    # return unless valid_working_hours
+    return unless valid_working_hours
     notify_assign_without_kyc
     # notify_assign_with_kyc
     notify_upgrade_requests
