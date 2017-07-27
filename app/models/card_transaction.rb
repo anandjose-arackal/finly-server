@@ -56,7 +56,7 @@ class CardTransaction < ActiveRecord::Base
   accepts_nested_attributes_for :card_amount
   accepts_nested_attributes_for :billing_amount
 
-  default_scope { order(transaction_timestamp: :desc) }
+  default_scope { where.not(type_of_details: "S").order(transaction_timestamp: :desc) }
 
   scope :with_id, ->(id) { where id: id }
   scope :debits, -> { where transaction_type: 'Debit' }
