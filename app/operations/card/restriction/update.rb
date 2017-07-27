@@ -209,6 +209,7 @@ class Card::Restriction::Update < User::Base
                     monthlycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, monthlyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
                     channel_type: 'ATM', channel_type_allowed: 'N'}
     end
+    api_params[:card_id] = selected_card.id
     restriction_api = ItzCash::CardRestriction.(selected_user, api_params)
     unless restriction_api.success?
       add_message :error, restriction_api.messages[:error]
@@ -237,6 +238,7 @@ class Card::Restriction::Update < User::Base
                     monthlycount: Constants::ItzCash::RESTRICTION_TRANS_CONSTANT, monthlyamount: Constants::ItzCash::RESTRICTION_BUDGET_CONSTANT,
                     channel_type: 'POS', channel_type_allowed: 'N'}
     end
+    api_params[:card_id] = selected_card.id
     restriction_api = ItzCash::CardRestriction.(selected_user, api_params)
     unless restriction_api.success?
       add_message :error, restriction_api.messages[:error]
