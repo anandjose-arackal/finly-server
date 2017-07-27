@@ -772,6 +772,24 @@ ActiveRecord::Schema.define(version: 20170727081254) do
     t.string   "identifier", limit: 255
   end
 
+  create_table "company_kyc_trail_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "company_kyc_trails", force: :cascade do |t|
+    t.integer  "company_kyc_id",       limit: 4
+    t.integer  "action_resource_id",   limit: 4
+    t.string   "action_resource_type", limit: 255
+    t.integer  "action_id",            limit: 4
+    t.text     "note",                 limit: 65535
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "company_kyc_trails", ["company_kyc_id"], name: "index_company_kyc_trails_on_company_kyc_id", using: :btree
+
   create_table "company_kycs", force: :cascade do |t|
     t.string   "pan_card_file_name",                        limit: 255
     t.string   "pan_card_content_type",                     limit: 255
@@ -2799,6 +2817,7 @@ ActiveRecord::Schema.define(version: 20170727081254) do
   add_foreign_key "company_configurations", "contacts"
   add_foreign_key "company_funds_load_requests", "amounts"
   add_foreign_key "company_funds_load_requests", "companies"
+  add_foreign_key "company_kyc_trails", "company_kycs"
   add_foreign_key "company_kycs", "companies"
   add_foreign_key "company_tags", "companies"
   add_foreign_key "custom_fields", "field_configurations"

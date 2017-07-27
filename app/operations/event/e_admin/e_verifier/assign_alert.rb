@@ -16,12 +16,12 @@ class Event::EAdmin::EVerifier::AssignAlert < Event::EAdmin::AdminSetNotifier
   end
 
   def init_assign_requests
-    assign_request_presenter = Admin::Cards::AssignRequests::Index.(self.admin_user)
-    unless assign_request_presenter.success?
-      add_message :error, assign_request_presenter.messages[:error]
-      return
-    end
-    card_assign_requests = assign_request_presenter.card_assign_requests.approved
+    # assign_request_presenter = Admin::Cards::AssignRequests::Index.(self.admin_user)
+    # unless assign_request_presenter.success?
+    #   add_message :error, assign_request_presenter.messages[:error]
+    #   return
+    # end
+    card_assign_requests = CardAssignRequest.all.approved
     self.assign_requests_count = card_assign_requests.count
 
     request_ids = card_assign_requests.pluck(:id)
