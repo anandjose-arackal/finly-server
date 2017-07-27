@@ -3,7 +3,7 @@ class RequestFormatter::KycParser::Parse < RequestFormatter::Base
   def process
     params[:individual_kyc] = {}
 
-    # DEPRICATED START #
+    # DEPRECATED START #
     # Handling for Android START #
     if params.dig(:address_proof_file).present?
       params[:address_proof] = extract_image(params[:address_proof_file], params[:address_proof_content_type], params[:address_proof_file_name])
@@ -14,7 +14,7 @@ class RequestFormatter::KycParser::Parse < RequestFormatter::Base
     # Handling for Android END #
     params[:individual_kyc][:address_proof] = params[:address_proof] if params[:address_proof].present?
     params[:individual_kyc][:id_proof] = params[:id_proof] if params[:id_proof].present?
-    # DEPRICATED END #
+    # DEPRECATED END #
 
     # Handling for Android START #
     if params.dig(:kyc_file_1_file).present?

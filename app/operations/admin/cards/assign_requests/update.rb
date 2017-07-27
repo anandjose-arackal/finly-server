@@ -44,10 +44,10 @@ class Admin::Cards::AssignRequests::Update < Admin::Cards::AssignRequests::Base
     return nil unless params&.dig(:individual_kyc).present?
     # params.require(:individual_kyc).permit(:id_proof, :address_proof)
     params = self.params.require(:individual_kyc).permit(:kyc_number, :type_id)
-    ## DEPRICATED START ##
+    ## DEPRECATED START ##
     params[:id_proof]= self.params[:individual_kyc][:id_proof] if self.params[:individual_kyc][:id_proof].present?
     params[:address_proof] = self.params[:individual_kyc][:address_proof] if self.params[:individual_kyc][:address_proof].present?
-    ## DEPRICATED END ##
+    ## DEPRECATED END ##
     if self.params[:individual_kyc][:type_name].present?
       params[:type_id] = IndividualKycType.id_for(self.params[:individual_kyc][:type_name])
     end

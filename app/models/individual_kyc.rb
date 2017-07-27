@@ -63,22 +63,24 @@ class IndividualKyc < ActiveRecord::Base
   scope :with_id, -> (id) { where id: id }
   scope :include_tracks, -> { includes :tracks }
 
-  CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
-  CONTENT_TYPES_JPG = {content_type: %w(image/jpg image/jpeg)}
+  # CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
+  CONTENT_TYPES_IMAGE = {content_type: %w(image/jpg image/jpeg image/png application/pdf)}
 
-  ## DEPRICATED START ##
-  has_attached_file :id_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
+  JPG_SYTLE = { original: ['100%', :jpg], thumb: ['500x500>', :jpg], large: ['2160x2160>', :jpg], normal: ['1080x1080>', :jpg] }
+
+  ## DEPRECATED START ##
+  has_attached_file :id_proof, styles: JPG_SYTLE, default_url: '/assets/:style/missing.png'
   validates_attachment :id_proof, content_type: CONTENT_TYPES
 
-  has_attached_file :address_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
+  has_attached_file :address_proof, styles: JPG_SYTLE, default_url: '/assets/:style/missing.png'
   validates_attachment :address_proof, content_type: CONTENT_TYPES
-  ## DEPRICATED END ##
+  ## DEPRECATED END ##
 
-  has_attached_file :kyc_file_1, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :kyc_file_1, content_type: CONTENT_TYPES_JPG
+  has_attached_file :kyc_file_1, styles: JPG_SYTLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :kyc_file_1, content_type: CONTENT_TYPES_IMAGE
 
-  has_attached_file :kyc_file_2, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
-  validates_attachment :kyc_file_2, content_type: CONTENT_TYPES_JPG
+  has_attached_file :kyc_file_2, styles: JPG_SYTLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :kyc_file_2, content_type: CONTENT_TYPES_IMAGE
 
   def processing?
     [KycStatus.id_for(:processing), KycStatus.id_for(:submitted)].include?(self.kyc_status_id)
