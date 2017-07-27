@@ -15,7 +15,15 @@ class AccountManager::Payments::PaymentValidator < BaseOperation
   end
 
   def pre_validate
-
+    if payment_order.blank?
+      add_message :error, "Payment Order not passed"
+    end
+    # this validation is irrespective of the source and destination of the payment
+    # i.e. checking for consistency of initiating and receiving account types etc.
+    unless validate_account_consistency(payment_order)
+      add_message :error, "Receiving and initiating accounts must be homogenous"
+      return
+    end
   end
 
   def init
@@ -23,12 +31,7 @@ class AccountManager::Payments::PaymentValidator < BaseOperation
   end
 
   def validate
-    # this validation is irrespective of the source and destination of the payment
-    # i.e. checking for consistency of initiating and receiving account types etc.
-    unless validate_account_consistency(payment_order)
-      add_message :error, "Transfer failed because of the following errors"
-      return
-    end
+
   end
 
   # here all the validations required for the respective payment order will happen

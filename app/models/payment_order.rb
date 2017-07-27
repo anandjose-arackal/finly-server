@@ -80,4 +80,9 @@ class PaymentOrder < ActiveRecord::Base
 
   default_scope { order(created_at: :desc) }
 
+  # method for total of all the payments in this particular payment order
+  def request_total
+    self.payments.joins(:amount).sum(:value)
+  end
+
 end

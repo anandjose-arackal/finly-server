@@ -23,8 +23,7 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
   end
 
   def validate
-    # Balance checks happen here
-
+    # Call the payment validator class that validates the payment order
   end
 
   def process
