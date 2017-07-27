@@ -103,7 +103,7 @@ class Card::Transaction::Create < BaseOperation
               # an ATM
               # prepending ATM SURCHARGE to the merchant name for clarity
               params[:merchant_name].insert(0, "ATM USAGE FEES - ") rescue nil
-              self.transaction = CardTransaction.(params)
+              self.transaction = CardTransaction.new(params)
 
               unless transaction.save
                 add_message :error, transaction.errors.full_messages
