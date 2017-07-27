@@ -10,13 +10,12 @@ class Company::VirtualAccount::Balance < BaseOperation
       add_message :error, 'User not found'
       return
     end
-    unless user.company.d_code_assigned?
+    unless user.company.d_code_enabled?
       add_message :error, 'Company has not been configured to maintain balance'
     end
   end
 
   def init
-
     # self.company = user.company ||
     self.company = params[:company] || user.company
 

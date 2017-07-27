@@ -14,6 +14,9 @@ class Expense::Index < Expense::Base
   def init
     self.role_id = params[:role_id]
     if self.role_id.blank? and params[:view].present?
+      if params[:view] == 'finance'
+        params[:view] = 'finance_manager'
+      end
       self.role_id = UserRole::VALUES[params[:view].to_sym]
     end
     self.expense_filters = []

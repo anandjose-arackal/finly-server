@@ -11,6 +11,7 @@ admin:
 
     cog:
       - Organization Account: '#organization_account/params={"view":"admin"}'
+      <% if current_company.d_code_enabled? %>
       - Company Statements: '#company_statements/params={"view": "admin"}'
       - Load Company Balance: '/transfers/register'
       <% if current_company.feature_subscription.cards_enabled and current_user.company_admin? %>
@@ -18,6 +19,7 @@ admin:
       <% end %>
       <% unless current_company.kyc_completed? %>
       - Verify KYC: '/#documents'
+      <% end %>
       <% end %>
       # - Policies: '/policies'
       - My Account: '#settings'

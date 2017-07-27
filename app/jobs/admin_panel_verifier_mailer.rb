@@ -2,24 +2,38 @@ class AdminPanelVerifierMailer < ActiveJob::Base
 
   def perform
     # return unless valid_working_hours
-    notify_assign_requests
+    notify_assign_without_kyc
+    # notify_assign_with_kyc
     notify_upgrade_requests
   end
 
   protected
-  def notify_assign_requests
-    assign_workflow_id = AdminReviewWorkflow.id_for :assign_card
-    admin_user_ids = AdminReviewWorkflowLevel.with_review_workflow(assign_workflow_id).trigger_email.pluck(:admin_user_id).uniq
-    admin_users = AdminUser.with_id(admin_user_ids)
+  def notify_assign_without_kyc
     # admin_users_with_pending_kyc =
-    admin_users.each do |user|
-      last_email_triggered_at = AdminReviewWorkflowLevel.with_admin_user(user.id).sort_by_email_triggered_at_desc.first&.email_triggered_at
-      event_presenter = Event::EAdmin::EVerifier::AssignAlert.(user, after: last_email_triggered_at)
-      if event_presenter.success?
-        AdminReviewWorkflowLevel.with_admin_user(user.id).update_all(email_triggered_at: DateTime.now)
-      end
+    email = 'vivek.a@finly.io'
+    if Rails.env.production?
+      email = 'kalpeshg.itz@intrexindia.net'
+    end
+    user = AdminUser.find_by_email(email)
+    last_email_triggered_at = AdminReviewWorkflowLevel.with_admin_user(user.id).sort_by_email_triggered_at_desc.first&.email_triggered_at
+    event_presenter = Event::EAdmin::EVerifier::AssignAlert.(user, after: last_email_triggered_at)
+    if event_presenter.success?
+      AdminReviewWorkflowLevel.with_admin_user(user.id).update_all(email_triggered_at: DateTime.now)
     end
   end
+
+  # # Notify new assign requests with KYC and new KYC Upgrade requests
+  # def notify_assign_with_kyc
+  #   upgrade_workflow_id = AdminReviewWorkflow.id_for :kyc_update
+  #   admin_users = AdminUser.with_id(AdminReviewWorkflowLevel.with_review_workflow(upgrade_workflow_id).trigger_email.pluck(:admin_user_id)).uniq
+  #   admin_users.each do |user|
+  #     last_email_triggered_at = AdminReviewWorkflowLevel.with_admin_user(user.id).sort_by_email_triggered_at_desc.first&.email_triggered_at
+  #     event_presenter = Event::EAdmin::EVerifier::PendingAlert.(user, after: last_email_triggered_at)
+  #     if event_presenter.success?
+  #       AdminReviewWorkflowLevel.with_admin_user(user.id).update_all(email_triggered_at: DateTime.now)
+  #     end
+  #   end
+  # end
 
   # Notify new assign requests with KYC and new KYC Upgrade requests
   def notify_upgrade_requests

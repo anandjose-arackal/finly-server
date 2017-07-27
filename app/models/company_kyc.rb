@@ -63,6 +63,7 @@ class CompanyKyc < ActiveRecord::Base
   belongs_to :company_type
   has_many :system_messages, as: :messagable, dependent: :destroy
   has_many :kyc_documents
+  has_many :company_kyc_trails
 
   accepts_nested_attributes_for :system_messages
   accepts_nested_attributes_for :kyc_documents
@@ -474,15 +475,15 @@ class CompanyKyc < ActiveRecord::Base
       option = {
           identifier: "address_proof",
           name: option,
-          uploaded: self.kyc_documents.address_proof.first.present?
+          uploaded: self.kyc_documents.address_proof.first.present?,
+          doc_type: option.gsub(' ', '').underscore
       }
       file = {}
       if self.kyc_documents.address_proof.present?
         file = {
             type: self.kyc_documents.address_proof.first.doc_content_type,
             original: self.kyc_documents.address_proof.first.doc.url,
-            thumb: self.kyc_documents.address_proof.first.doc.url(:thumb),
-            doc_type: option.gsub(' ', '').underscore
+            thumb: self.kyc_documents.address_proof.first.doc.url(:thumb)
         }
       end
       option[:file] = file

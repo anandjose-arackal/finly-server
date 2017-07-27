@@ -17,6 +17,7 @@ class Admin::Companies::Base < Admin::Base
                                       :medical_card_enabled,
                                       :expense_card_enabled,
                                       :reimbursement_card_enabled,
+                                      :itz_cash_d_code_enabled,
                                       :hard_copy_receipt
                                     ])
   end
@@ -33,7 +34,7 @@ class Admin::Companies::Base < Admin::Base
     end
 
     def company_balance
-      op = Company::VirtualAccount::Balance.(user, {company: company})
+      op = Admin::Companies::Balance.(user, {company: company})
       op&.success? ? op.balance : nil
     end
   end

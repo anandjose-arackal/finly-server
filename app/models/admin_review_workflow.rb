@@ -73,7 +73,7 @@ class AdminReviewWorkflow < ActiveRecord::Base
               '2': [
                   {user: 'corppayment@itzcash.com', trigger_email: true, reviewer: false},
                   {user: 'tusharm.itz@intrexindia.net', trigger_email: true, reviewer: true},
-                  {user: 'kalpeshg.itz@intrexindia.net', trigger_email: true, reviewer: true},
+                  {user: 'kalpeshg.itz@intrexindia.net', trigger_email: true, reviewer: false},
                   {user: 'jimmyb@itzcash.com', trigger_email: false, reviewer: true},
                   {user: 'mahesht@itzcash.com', trigger_email: false, reviewer: true},
                   {user: 'pramody@itzcash.com', trigger_email: false, reviewer: true},
@@ -96,7 +96,7 @@ class AdminReviewWorkflow < ActiveRecord::Base
               '2': [
                   {user: 'corppayment@itzcash.com', trigger_email: true, reviewer: false},
                   {user: 'tusharm.itz@intrexindia.net', trigger_email: true, reviewer: true},
-                  {user: 'kalpeshg.itz@intrexindia.net', trigger_email: true, reviewer: true},
+                  {user: 'kalpeshg.itz@intrexindia.net', trigger_email: true, reviewer: false},
                   {user: 'jimmyb@itzcash.com', trigger_email: false, reviewer: true},
                   {user: 'mahesht@itzcash.com', trigger_email: false, reviewer: true},
                   {user: 'pramody@itzcash.com', trigger_email: false, reviewer: true},

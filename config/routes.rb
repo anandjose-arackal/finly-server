@@ -430,7 +430,7 @@
 #                            admin_users_kyc_users_reject POST   /admin_users/kyc/users/reject(.:format)                            admin_users/kyc/users#reject
 #                  admin_users_kyc_users_mark_as_upgraded POST   /admin_users/kyc/users/mark_as_upgraded(.:format)                  admin_users/kyc/users#mark_as_upgraded
 #                                         admin_users_kyc GET    /admin_users/kyc/users/export(.:format)                            admin_users/kyc/users#export
-#                     admin_users_kyc_users_kycs_download GET    /admin_users/kyc/users/kycs/download(.:format)                     admin_users/kyc/users#download_kycs
+#                                                         GET    /admin_users/kyc/users/export/kycs(.:format)                       admin_users/kyc/users#download_kycs
 #                                  admin_users_agreements GET    /admin_users/agreements(.:format)                                  admin_users/agreements#index
 #                                                         POST   /admin_users/agreements(.:format)                                  admin_users/agreements#create
 #                          admin_users_verifier_companies GET    /admin_users/verifier/companies(.:format)                          admin_users/verifier/company#index
@@ -440,7 +440,7 @@
 #          admin_users_card_assign_requests_mark_assigned POST   /admin_users/card_assign_requests/mark_assigned(.:format)          admin_users/card_assign_requests#mark_as_assigned
 # admin_users_card_assign_requests_mark_assigned_upgraded POST   /admin_users/card_assign_requests/mark_assigned_upgraded(.:format) admin_users/card_assign_requests#mark_as_assigned_upgraded
 #                                             admin_users GET    /admin_users/card_assign_requests/export(.:format)                 admin_users/card_assign_requests#export
-#          admin_users_card_assign_requests_kycs_download GET    /admin_users/card_assign_requests/kycs/download(.:format)          admin_users/card_assign_requests#download_kycs
+#                                                         GET    /admin_users/card_assign_requests/export/kycs(.:format)            admin_users/card_assign_requests#download_kycs
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                          admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                             admin_users/users#admin_menus
 #                                               junk_show GET    /junk/show(.:format)                                               junk#show

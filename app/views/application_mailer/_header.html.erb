@@ -7,7 +7,7 @@
   <% end %>
 
   <!-- todo - ultimate jugaad for itzcash's logo - needs to be changed -->
-  <% if @data && @data.company.id == 7 %>
+  <% if (@data && @data.company.id == 7) || @show_itzcash_logo %>
     <img src="https://www.finly.io/common/images/logos/itzcash-white.png" class="img-responsive" style="height: 50px;display: inline;margin-right: 10px;float: left">
   <% else %>
     <h2 style="font-size: 40px;text-align: left;font-weight: normal;margin-bottom: 10px"><%=@data.company.name if @data.present?%></h2>

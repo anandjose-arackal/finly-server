@@ -47,6 +47,12 @@ class Event::EReport::Approve < Event::EReport::Base
     end
   end
 
+  def get_token(user)
+    email_authorization = params[:email_authorization]
+    token = email_authorization.token
+    token
+  end
+
   def notification_affected_users
     if approved
       [report.user]
@@ -130,7 +136,7 @@ class Event::EReport::Approve < Event::EReport::Base
           message = "#{message} and has been closed"
         end
       else
-        message = "#{user.name} has approved the report '#{self.report.name}' and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the report '#{self.report.name}' and is currently waiting for your approval"
       end
     end
     message
