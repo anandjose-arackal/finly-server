@@ -63,7 +63,7 @@ class IndividualKyc < ActiveRecord::Base
   scope :with_id, -> (id) { where id: id }
   scope :include_tracks, -> { includes :tracks }
 
-  # CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
+  CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
   CONTENT_TYPES_IMAGE = {content_type: %w(image/jpg image/jpeg image/png application/pdf)}
 
   JPG_SYTLE = { original: ['100%', :jpg], thumb: ['500x500>', :jpg], large: ['2160x2160>', :jpg], normal: ['1080x1080>', :jpg] }

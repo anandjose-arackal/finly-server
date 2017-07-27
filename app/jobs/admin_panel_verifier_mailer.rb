@@ -1,7 +1,7 @@
 class AdminPanelVerifierMailer < ActiveJob::Base
 
   def perform
-    return unless valid_working_hours
+    # return unless valid_working_hours
     notify_assign_requests
     notify_upgrade_requests
   end
@@ -9,7 +9,9 @@ class AdminPanelVerifierMailer < ActiveJob::Base
   protected
   def notify_assign_requests
     assign_workflow_id = AdminReviewWorkflow.id_for :assign_card
-    admin_users = AdminUser.with_id(AdminReviewWorkflowLevel.with_review_workflow(assign_workflow_id).trigger_email.pluck(:admin_user_id)).uniq
+    admin_user_ids = AdminReviewWorkflowLevel.with_review_workflow(assign_workflow_id).trigger_email.pluck(:admin_user_id).uniq
+    admin_users = AdminUser.with_id(admin_user_ids)
+    # admin_users_with_pending_kyc =
     admin_users.each do |user|
       last_email_triggered_at = AdminReviewWorkflowLevel.with_admin_user(user.id).sort_by_email_triggered_at_desc.first&.email_triggered_at
       event_presenter = Event::EAdmin::EVerifier::AssignAlert.(user, after: last_email_triggered_at)

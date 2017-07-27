@@ -88,23 +88,19 @@ class AdminReviewWorkflow < ActiveRecord::Base
           assign_card: {
               '0': [
                   {user: 'admin@demo.io', trigger_email: false, reviewer: true},
-                  {user: 'sreeram@demo.io', trigger_email: true, reviewer: true}
+                  {user: 'vivekagb@gmail.com', trigger_email: true, reviewer: true}
               ],
-              '1': {user: 'vivek@demo.io', trigger_email: true, reviewer: true},
-              '2': [
-                  {user: 'veekshith@demo.io', trigger_email: false, reviewer: true},
-                  {user: 'abinash@demo.io', trigger_email: true, reviewer: false}
-              ]
+              '1': {user: 'vivek.a@finly.io', trigger_email: true, reviewer: false},
           },
           kyc_update: {
               '0': [
                   {user: 'admin@demo.io', trigger_email: false, reviewer: true},
-                  {user: 'sreeram@demo.io', trigger_email: true, reviewer: true}
+                  {user: 'vivekagb@gmail.com', trigger_email: true, reviewer: true}
               ],
-              '1': {user: 'vivek@demo.io', trigger_email: true, reviewer: true},
+              '1': {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
               '2': [
-                  {user: 'veekshith@demo.io', trigger_email: false, reviewer: true},
-                  {user: 'abinash@demo.io', trigger_email: true, reviewer: false}
+                  {user: 'abinash@demo.io', trigger_email: false, reviewer: true},
+                  {user: 'yseeme20@gmail.com', trigger_email: true, reviewer: false}
               ]
           }
       }

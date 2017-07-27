@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170726111650) do
+ActiveRecord::Schema.define(version: 20170727081254) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -35,13 +35,11 @@ ActiveRecord::Schema.define(version: 20170726111650) do
     t.datetime "updated_at",                                         null: false
     t.boolean  "trigger_email",                      default: false, null: false
     t.boolean  "reviewer",                           default: false, null: false
-    t.integer  "admin_users_id",           limit: 4,                 null: false
     t.integer  "admin_user_id",            limit: 4,                 null: false
     t.datetime "email_triggered_at"
   end
 
   add_index "admin_review_workflow_levels", ["admin_review_workflow_id"], name: "index_admin_review_workflow_levels_on_admin_review_workflow_id", using: :btree
-  add_index "admin_review_workflow_levels", ["admin_users_id"], name: "index_admin_review_workflow_levels_on_admin_users_id", using: :btree
   add_index "admin_review_workflow_levels", ["position"], name: "index_admin_review_workflow_levels_on_position", using: :btree
 
   create_table "admin_review_workflows", force: :cascade do |t|

@@ -22,6 +22,10 @@ class Admin::Cards::AssignRequests::Approve < Admin::Cards::AssignRequests::Base
 
   def process
     self.card_assign_requests.each do |card_assign_request|
+      # # :incomplete, :submitted, :retracted, :processing, :rejected, :approved, :completed
+      # if [KycStatus.id_for(:submitted, :retracted, :processing, :approved, :completed)].include? card_assign_request.card_owner.individual_kyc.kyc_status_id
+      #
+      # end
       next_reviewer_presenter = Admin::Cards::AssignRequests::NextAdminReviewPosition.(user, card_assign_request: card_assign_request)
       if next_reviewer_presenter.failure?
         add_message :error, next_reviewer_presenter.messages[:error]

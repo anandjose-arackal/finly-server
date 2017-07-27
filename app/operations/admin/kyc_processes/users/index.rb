@@ -14,7 +14,7 @@ class Admin::KycProcesses::Users::Index < Admin::KycProcesses::Users::Base
     if self.workflow.present? and self.reviewer_level.present?
       self.individual_kycs = IndividualKyc.with_admin_review_workflow(self.workflow.id).with_review_position(reviewer_level.position)
     else
-      add_message :error, 'Error loading configuration'
+      add_message :error, 'User is not a reviewer'
       return
     end
   end
@@ -56,7 +56,8 @@ class Admin::KycProcesses::Users::Index < Admin::KycProcesses::Users::Base
       next_reviewer_presenter = Admin::KycProcesses::Users::NextAdminReviewPosition.(user, admin_user: user, individual_kyc: individual_kyc)
       if next_reviewer_presenter.success? and next_reviewer_presenter.is_final? and user.has_role?(AdminUserRole.id_for(:itzcash_operations))
         actions.delete(:approve)
-        actions[:mark_as_upgraded] = true
+        actions.delete(:reject)
+        # actions[:mark_as_upgraded] = true
       end
       actions
     end

@@ -39,7 +39,7 @@ class Event::EAdmin::EVerifier::PendingAlert < Event::EAdmin::AdminSetNotifier
   def init_upgrade_requests
     upgrade_requests_presenter = Admin::KycProcesses::Users::Index.(self.admin_user)
     unless upgrade_requests_presenter.success?
-      add_message :error, assign_request_presenter.messages[:error]
+      add_message :error, upgrade_requests_presenter.messages[:error]
       return
     end
     individual_kycs = upgrade_requests_presenter.individual_kycs
