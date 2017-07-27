@@ -22,7 +22,12 @@ class Admin::Cards::AssignRequests::NextAdminReviewPosition < Admin::Cards::Assi
 
   def process
     current_review_position = card_assign_request.review_position
-    self.next_review_position = (current_review_position + 1) if workflow.levels.with_position((current_review_position + 1)).present?
+    individual_kyc = card_assign_request.card_owner.individual_kyc
+    if [KycStatus.id_for(:submitted), KycStatus.id_for(:retracted), KycStatus.id_for(:processing), KycStatus.id_for(:approved), KycStatus.id_for(:completed)].include? individual_kyc.kyc_status_id
+      self.next_review_position = (current_review_position + 1) if workflow.levels.with_position((current_review_position + 1)).present?
+    else
+      self.next_review_position = nil
+    end
   end
 
   def success

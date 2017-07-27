@@ -14,7 +14,7 @@ class IndividualKycTrackAction < ActiveRecord::Base
   validates :name, presence: true
 
   def self.values
-    [:pending, :retract, :submit, :approve, :final_approve, :upgraded, :reject]
+    [:pending, :retract, :submit, :approve, :final_approve, :upgraded, :reject, :download]
   end
 
 end

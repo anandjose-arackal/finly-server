@@ -40,6 +40,9 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
   end
   json.kyc do
     kyc = @result.kyc_for(card_assign_request)
+    unless [KycStatus.id_for(:submitted), KycStatus.id_for(:retracted), KycStatus.id_for(:processing), KycStatus.id_for(:approved), KycStatus.id_for(:completed)].include? kyc.kyc_status_id
+      kyc = nil
+    end
     json.id_number kyc&.kyc_number
     if kyc&.type.blank?
       json.type nil
@@ -64,6 +67,15 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
         json.original kyc&.kyc_file_2&.url(:normal)
         json.thumb kyc&.kyc_file_2&.url(:thumb)
       end
+    end
+  end
+  json.tracks do
+    json.array! card_assign_request.tracks do |track|
+      json.user do
+        json.name track.action_resource&.name
+      end
+      json.datetime DateUtils.datetime_formatted track.created_at
+      json.message track.message
     end
   end
 end

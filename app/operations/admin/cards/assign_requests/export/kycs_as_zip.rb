@@ -1,6 +1,19 @@
 class Admin::Cards::AssignRequests::Export::KycsAsZip < Admin::Cards::AssignRequests::Base
   attr_accessor :files
 
+  def init
+    if !!params&.dig(:download_all)
+      assign_requests_presenter = Admin::Cards::AssignRequests::Index.(user, params)
+      unless assign_requests_presenter.success?
+        add_message :error, assign_requests_presenter.messages[:error]
+        return
+      end
+      self.card_assign_requests = assign_requests_presenter.card_assign_requests
+      return
+    end
+    super
+  end
+
   def process
     kycs = IndividualKyc.with_user_id(self.card_assign_requests.pluck(:card_owner_id))
     self.files = []
