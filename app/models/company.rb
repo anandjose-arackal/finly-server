@@ -254,6 +254,10 @@ class Company < ActiveRecord::Base
     !!self.company_kyc&.completed?
   end
 
+  def company_type
+    self.company_kyc&.company_type&.name
+  end
+
 
   private
 

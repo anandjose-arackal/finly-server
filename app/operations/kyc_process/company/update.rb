@@ -14,7 +14,10 @@ class KycProcess::Company::Update < KycProcess::Company::Base
   end
 
   def validate
-    # depending on the type of company, we will be checking the documents that are uploded
+    # if the documents have already been sent to ItzCash, they cannot be changed
+    if company_kyc.kyc_status_id == KycStatus.id_for(:processing)
+      add_message :error, "You cannot upload documents at this stage"
+    end
   end
 
   def pre_process
