@@ -14,7 +14,6 @@ class Admin::Cards::AssignRequests::Export::AsXls < Admin::Cards::AssignRequests
     super
   end
 
-
   def process
     self.headers = ['Email ID', 'Mobile No', 'Disty Name', 'Address 1', 'Address 2', 'DOB', 'Gender', 'State', 'PIN code', 'First Name', 'Last Name', 'Mothers Maiden Name', 'Serial ID', 'KYC Type', 'Kyc Number']
     self.contents = []

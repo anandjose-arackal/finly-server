@@ -22,7 +22,7 @@ class Admin::KycProcesses::Users::NextAdminReviewPosition < Admin::KycProcesses:
 
   def process
     current_review_position = individual_kyc.review_position
-    self.next_review_position = (current_review_position + 1) if workflow.levels.with_position((current_review_position + 1)).present?
+    self.next_review_position = (current_review_position + 1) if workflow.levels.reviewers.with_position((current_review_position + 1)).present?
   end
 
   def success

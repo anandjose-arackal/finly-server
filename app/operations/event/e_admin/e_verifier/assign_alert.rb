@@ -21,7 +21,7 @@ class Event::EAdmin::EVerifier::AssignAlert < Event::EAdmin::AdminSetNotifier
       add_message :error, assign_request_presenter.messages[:error]
       return
     end
-    card_assign_requests = assign_request_presenter.card_assign_requests
+    card_assign_requests = assign_request_presenter.card_assign_requests.approved
     self.assign_requests_count = card_assign_requests.count
 
     request_ids = card_assign_requests.pluck(:id)
