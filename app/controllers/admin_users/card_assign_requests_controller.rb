@@ -8,6 +8,11 @@ class AdminUsers::CardAssignRequestsController < ApplicationController
     respond
   end
 
+  def history_index
+    @result = Admin::Cards::AssignRequests::HistoricalIndex.(current_user, params)
+    respond
+  end
+
   def update
     @result = Admin::Cards::AssignRequests::Update.(current_user, params)
     respond response: @result.success? ? :success : :failure

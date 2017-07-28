@@ -8,6 +8,11 @@ class AdminUsers::Kyc::UsersController < ApplicationController
     respond
   end
 
+  def history_index
+    @result = Admin::KycProcesses::Users::HistoricalIndex.(current_user, params)
+    respond
+  end
+
   def update
     @result = Admin::Cards::AssignRequests::Update.(current_user, params)
     respond response: @result.success? ? :success : :failure
