@@ -1,4 +1,4 @@
-class AccountManager::Company::ItzCashCompanyBalanceAdapter < AccountManager::BaseAdapter
+class AccountManager::ItzCash::ItzCashCompanyAccountAdapter < AccountManager::BaseAdapter
 
   attr_accessor :errors, :company
 

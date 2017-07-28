@@ -78,6 +78,8 @@ class AccountManager::Payments::PaymentValidator < BaseOperation
       when 2, UserWallet, "UserWallet"
         # Wallet for example
         return AccountManager::Wallet::WalletAdapter.new(account_type.id)
+      when 3, YesBankCompanyAccount, "YesBankCompanyAccount"
+        return AccountManager::YesBank::YesBankCompanyAccountAdapter.new(account_type.id)
       else
         return AccountManager::Company::ItzCashCompanyBalanceAdapter.new(account_type.id)
     end

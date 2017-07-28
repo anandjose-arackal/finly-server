@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170728120233) do
+ActiveRecord::Schema.define(version: 20170728161738) do
 
   create_table "aadhar_card_data", force: :cascade do |t|
     t.string   "loc",                 limit: 255
@@ -393,6 +393,22 @@ ActiveRecord::Schema.define(version: 20170728120233) do
   add_index "balance_sheets", ["approved_reports_total_id"], name: "index_balance_sheets_on_approved_reports_total_id", using: :btree
   add_index "balance_sheets", ["cash_in_hand_id"], name: "index_balance_sheets_on_cash_in_hand_id", using: :btree
   add_index "balance_sheets", ["user_id"], name: "index_balance_sheets_on_user_id", using: :btree
+
+  create_table "bank_accounts", force: :cascade do |t|
+    t.integer  "yes_bank_vendor_id", limit: 4
+    t.string   "account_number",     limit: 255
+    t.string   "ifsc",               limit: 255
+    t.string   "name",               limit: 255
+    t.string   "address_1",          limit: 255
+    t.string   "address_2",          limit: 255
+    t.string   "address_3",          limit: 255
+    t.string   "pin_code",           limit: 255
+    t.string   "country",            limit: 255
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "bank_accounts", ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id", using: :btree
 
   create_table "budget_rules", force: :cascade do |t|
     t.integer  "category_id",          limit: 4
@@ -2099,6 +2115,8 @@ ActiveRecord::Schema.define(version: 20170728120233) do
     t.string   "receiving_account_type",  limit: 255
     t.integer  "payment_order_id",        limit: 4
     t.integer  "payment_status_id",       limit: 4,     null: false
+    t.string   "initiating_user_type",    limit: 255
+    t.string   "receiving_user_type",     limit: 255
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -2879,22 +2897,6 @@ ActiveRecord::Schema.define(version: 20170728120233) do
     t.integer  "company_kyc_data_id",     limit: 4
   end
 
-  create_table "vendor_accounts", force: :cascade do |t|
-    t.integer  "yes_bank_vendor_id", limit: 4
-    t.string   "account_number",     limit: 255
-    t.string   "ifsc",               limit: 255
-    t.string   "name",               limit: 255
-    t.string   "address_1",          limit: 255
-    t.string   "address_2",          limit: 255
-    t.string   "address_3",          limit: 255
-    t.string   "pin_code",           limit: 255
-    t.string   "country",            limit: 255
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
-  end
-
-  add_index "vendor_accounts", ["yes_bank_vendor_id"], name: "index_vendor_accounts_on_yes_bank_vendor_id", using: :btree
-
   create_table "version_associations", force: :cascade do |t|
     t.integer "version_id",       limit: 4
     t.string  "foreign_key_name", limit: 255, null: false
@@ -2964,6 +2966,7 @@ ActiveRecord::Schema.define(version: 20170728120233) do
   add_foreign_key "auto_sync_configs", "companies"
   add_foreign_key "auto_sync_configs", "periods"
   add_foreign_key "balance_sheets", "users"
+  add_foreign_key "bank_accounts", "yes_bank_vendors"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "categories"
   add_foreign_key "budget_rules", "periods"
@@ -3120,7 +3123,6 @@ ActiveRecord::Schema.define(version: 20170728120233) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
-  add_foreign_key "vendor_accounts", "yes_bank_vendors"
   add_foreign_key "whitelisted_ips", "companies"
   add_foreign_key "yes_bank_company_accounts", "companies"
   add_foreign_key "yes_bank_vendors", "companies"

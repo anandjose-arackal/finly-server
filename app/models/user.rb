@@ -53,6 +53,8 @@
 
 
 
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -102,6 +104,7 @@ class User < ActiveRecord::Base
   has_one :user_panel_subscription
   has_one :cash_on_hand
 
+  has_many :bank_accounts, as: :account_owner
   has_many :authentications
   has_many :cards, dependent: :destroy
   has_many :card_transactions, dependent: :destroy

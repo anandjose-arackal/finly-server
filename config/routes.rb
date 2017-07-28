@@ -720,6 +720,7 @@
 #                                                feedback POST   /feedback(.:format)                                                feedback#create
 #                                         menu_data_cards GET    /menu_data_cards(.:format)                                         expense_types_configuration#menu_data_cards
 #                                      menu_data_disburse GET    /menu_data_disburse(.:format)                                      expense_types_configuration#menu_data_disburse
+#                                      menu_data_payments GET    /menu_data_payments(.:format)                                      expense_types_configuration#menu_data_payments
 #                                            cards_orders GET    /cards/orders(.:format)                                            orders/order_cards#index
 #                                                         GET    /cards/orders/:id(.:format)                                        orders/order_cards#show
 #                                                         DELETE /cards/orders/:id(.:format)                                        orders/order_cards#destroy
@@ -826,6 +827,9 @@
 #                           quickbooks_sync_payment_types POST   /quickbooks/sync_payment_types(.:format)                           quickbooks#sync_payment_types
 #                                quickbooks_update_config PATCH  /quickbooks/update_config(.:format)                                quickbooks#update
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                       quickbooks#show
+#                                                     tos GET    /tos(.:format)                                                     static_pages#tos
+#                                                 privacy GET    /privacy(.:format)                                                 static_pages#privacy
+#                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                  static_pages#prepaid_card_agreement
 #
 
 #                               crono_web        /crono                                                      Crono::Web

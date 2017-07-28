@@ -17,7 +17,10 @@
 #  receiving_account_type  :string(255)
 #  payment_order_id        :integer
 #  payment_status_id       :integer          not null
+#  initiating_user_type    :string(255)
+#  receiving_user_type     :string(255)
 #
+
 
 
 
@@ -33,8 +36,8 @@ class Payment < ActiveRecord::Base
 
   belongs_to :amount
   belongs_to :payment_type
-  belongs_to :initiating_user, class_name: 'User'
-  belongs_to :receiving_user, class_name: 'User'
+  belongs_to :initiating_user, polymorphic: true
+  belongs_to :receiving_user, polymorphic: true
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
