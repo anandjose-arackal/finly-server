@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170728090528) do
+ActiveRecord::Schema.define(version: 20170728120233) do
 
   create_table "aadhar_card_data", force: :cascade do |t|
     t.string   "loc",                 limit: 255
@@ -645,6 +645,16 @@ ActiveRecord::Schema.define(version: 20170728090528) do
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
   add_index "cards", ["company_id"], name: "index_cards_on_company_id", using: :btree
   add_index "cards", ["user_id"], name: "index_cards_on_user_id", using: :btree
+
+  create_table "cash_on_hands", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4
+    t.integer  "balance_id", limit: 4
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "cash_on_hands", ["balance_id"], name: "index_cash_on_hands_on_balance_id", using: :btree
+  add_index "cash_on_hands", ["user_id"], name: "index_cash_on_hands_on_user_id", using: :btree
 
   create_table "categories", force: :cascade do |t|
     t.integer  "company_id",   limit: 4,                  null: false
@@ -2028,6 +2038,8 @@ ActiveRecord::Schema.define(version: 20170728090528) do
     t.text     "note",                      limit: 65535
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
+    t.string   "initiating_account_type",   limit: 255
+    t.string   "receiving_account_type",    limit: 255
   end
 
   add_index "payment_orders", ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id", using: :btree
@@ -2974,6 +2986,7 @@ ActiveRecord::Schema.define(version: 20170728090528) do
   add_foreign_key "cards", "card_types"
   add_foreign_key "cards", "companies"
   add_foreign_key "cards", "users"
+  add_foreign_key "cash_on_hands", "users"
   add_foreign_key "categories", "companies"
   add_foreign_key "company_accounts", "companies"
   add_foreign_key "company_accounts", "company_account_types"

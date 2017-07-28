@@ -18,6 +18,8 @@
 #  note                      :text(65535)
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  initiating_account_type   :string(255)
+#  receiving_account_type    :string(255)
 #
 
 class PaymentOrder < ActiveRecord::Base
@@ -82,7 +84,11 @@ class PaymentOrder < ActiveRecord::Base
 
   # method for total of all the payments in this particular payment order
   def request_total
-    self.payments.joins(:amount).sum(:value)
+    total = 0
+    self.payments.each do |payment|
+      total += payment.amount_value
+    end
+    total
   end
 
 end

@@ -12,6 +12,9 @@
 
 class ItzCashCompanyAccount < ActiveRecord::Base
   belongs_to :company
+  belongs_to :balance, class_name: "Amount"
+
+  delegate :balance_value, to: :balance
 
   has_many :initiating_payments, as: :initiating_account
   has_many :initiating_payment_trails, as: :initiating_account

@@ -4,7 +4,7 @@
 class AccountManager::Payments::PaymentValidator < BaseOperation
 
   attr_accessor :payment_order, :receiving_account_adapter, :initiating_account_adapter,
-                :errors_present
+                :errors_present, :card_config
 
   def initialize(payment_order)
     self.payment_order = payment_order
@@ -27,7 +27,8 @@ class AccountManager::Payments::PaymentValidator < BaseOperation
   end
 
   def init
-
+    # at this point the payments are all homogenous, so adapters can be initiated with the first payment's details
+    self.initiating_account_adapter = retrieve_adapter(payment_order.payments.first.initiating_account)
   end
 
   def validate
@@ -36,11 +37,34 @@ class AccountManager::Payments::PaymentValidator < BaseOperation
 
   # here all the validations required for the respective payment order will happen
   def process
+    # checking for payment oder schedule date
+    if payment_order.scheduled_at < Date.today
+      add_message :error, "Scheduled date cannot be in the past!"
+      return
+    end
+
     # checking if total order amount is less than the company balance amount
-    payment_order.payment.each do |payment|
-      receiving_adapter = retrieve_adapter(payment.receiving_account)
-      initiating_adapter = retrieve_adapter(payment.initiating_account)
-      # check if initiating account has enough balance for this transaction
+    order_total = payment_order.request_total
+    if order_total > initiating_account_adapter.balance
+      add_message :error, "You do not have enough balance in #{initiating_account_adapter.name} to make this transfer"
+      return
+    end
+
+    # checking if all the users who're being credited have the respective cards
+    # only needs to be done if it's a credit
+    if payment.credit?
+      valid = true
+      payment_order.payments.each do |payment|
+        receiving_account_adapter = retrieve_adapter payment.receiving_account
+        unless receiving_account_adapter.eligibility(payment.amount_value)
+          valid = false
+          payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value}",
+                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+        end
+      end
+      unless valid
+        add_message :error, "Some of the payments have eligibility issues"
+      end
     end
   end
 
@@ -55,7 +79,7 @@ class AccountManager::Payments::PaymentValidator < BaseOperation
         # Wallet for example
         return AccountManager::Wallet::WalletAdapter.new(account_type.id)
       else
-        return AccountManager::Company::CompanyBalanceAdapter.new(account_type.id)
+        return AccountManager::Company::ItzCashCompanyBalanceAdapter.new(account_type.id)
     end
   end
 

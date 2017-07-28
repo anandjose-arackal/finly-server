@@ -24,6 +24,10 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
 
   def validate
     # Call the payment validator class that validates the payment order
+    op = AccountManager::Payments::PaymentValidator.(payment_order)
+    unless op.success?
+      add_message :error, op.messages[:error]
+    end
   end
 
   def process

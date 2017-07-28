@@ -8,6 +8,10 @@ class AccountManager::BaseAdapter
 
   end
 
+  def name
+
+  end
+
   def credit(source_id, amount)
 
   end

@@ -11,6 +11,10 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     self.errors = []
   end
 
+  def name
+    "Card"
+  end
+
   def credit(amount)
     # operation that credits a particular card
     op = ItzCash::Credit.(card.user, {card: card, amount: amount})
@@ -44,7 +48,8 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     [Card, "Card", UserWallet, "UserWallet", CompanyBalance, "Company"]
   end
 
-  def eligibility(source_id)
+  def eligibility(amount)
+    # checks if the particular card can be credited with so and so amount
 
   end
 end

@@ -21,6 +21,8 @@
 
 
 
+
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -132,6 +134,8 @@ class Payment < ActiveRecord::Base
   validates :date, presence: true
   validates :initiating_user_id, presence: true
   validates :receiving_user_id, presence: true
+  validate :initiating_account_presence
+  validate :receiving_account_presence
 
   delegate :completed?, :failed?, :pending?, :in_progress?, :scheduled?, to: :payment_status
 
@@ -186,6 +190,14 @@ class Payment < ActiveRecord::Base
     name
   end
 
+  def credit?
+    self.payment_type_id == PaymentType.id_for(:credit)
+  end
+
+  def debit?
+    self.payment_type_id == PaymentType.id_for(:debit)
+  end
+
   def advance?
     self.payment_type_id == PaymentType.id_for(:add_cash_on_hand)
   end
@@ -209,6 +221,28 @@ class Payment < ActiveRecord::Base
   def clear_system_messages
     if system_messages.present?
       system_messages.destroy_all
+    end
+  end
+
+  private
+
+  def initiating_account_presence
+    unless [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
+            PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement),
+            PaymentType.id_for(:reimbursement_outside_finly)].include?(self.payment_type_id)
+      if initiating_account_id.blank? || receiving_account_type.blank?
+        errors.add(:initiating_account, "cannot be blank")
+      end
+    end
+  end
+
+  def receiving_account_presence
+    unless [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
+            PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement),
+            PaymentType.id_for(:reimbursement_outside_finly)].include?(self.payment_type_id)
+      if receiving_account_id.blank? || receiving_account_type.blank?
+        errors.add(:receiving_account, "cannot be blank")
+      end
     end
   end
 
