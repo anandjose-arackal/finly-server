@@ -2034,6 +2034,10 @@ Rails.application.routes.draw do
   patch 'quickbooks/update_config', to: 'quickbooks#update', as: :quickbooks_update_config
   get 'quickbooks/config', to: 'quickbooks#show', as: :quickbooks_config
 
+  get 'tos', to: 'static_pages#tos'
+  get 'privacy', to: 'static_pages#privacy'
+  get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_agreement'
+
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
