@@ -62,38 +62,60 @@ class AccountManager::Payments::PaymentExecutor < BaseOperation
   end
 
   def process
-    if source_account_adapter.credit(payment.amount.value)
-      unless receiving_account_adapter.debit(payment.amount.value)
-        add_message :error, receiving_account_adapter.errors
-      end
-      # update payment if successful
-      payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-      # payment trail creation
-    else
-      add_message :error, source_account_adapter.errors
-      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-      source_account_adapter.debit(payment.amount.value)
-      # update payment
+    case payment.payment_type_id
+      when PaymentType.id_for(:credit)
+        if source_account_adapter.debit(payment.amount.value)
+          unless receiving_account_adapter.credit(payment.amount.value)
+            add_message :error, receiving_account_adapter.errors
+          end
+          # update payment if successful
+          payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+          # payment trail creation
+        else
+          add_message :error, source_account_adapter.errors
+          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+          source_account_adapter.credit(payment.amount.value)
+          # update payment
+        end
+      when PaymentType.id_for(:debit)
+        if source_account_adapter.credit(payment.amount.value)
+          unless receiving_account_adapter.debit(payment.amount.value)
+            add_message :error, receiving_account_adapter.errors
+          end
+          # update payment if successful
+          payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+          # payment trail creation
+        else
+          add_message :error, source_account_adapter.errors
+          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+          source_account_adapter.debit(payment.amount.value)
+          # update payment
+        end
+      else
+        # do nothing?
     end
   end
 
   def post_process
-    # create a payment out of the repective transaction above
-    # add success message
+
   end
 
   private
 
   def retrieve_adapter(account_type)
     case account_type.class.to_s
-      when 1, Card, "Card"
+      when Card, "Card"
         # Card, for example
         return AccountManager::Cards::CardAdapter.new(account_type.id)
-      when 2, UserWallet, "UserWallet"
+      when UserWallet, "UserWallet"
         # Wallet for example
         return AccountManager::Wallet::WalletAdapter.new(account_type.id)
+      when YesBankCompanyAccount, "YesBankCompanyAccount"
+        return AccountManager::YesBank::YesBankCompanyAccountAdapter.new(account_type.id)
+      when CashOnHand, "CashOnHand"
+        return AccountManager::CashOnHand::CashOnHandAdapter.new(account_type.id)
       else
-        return AccountManager::Company::CompanyBalanceAdapter.new(account_type.id)
+        return AccountManager::Company::ItzCashCompanyBalanceAdapter.new(account_type.id)
     end
   end
 end

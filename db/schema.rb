@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170728161738) do
+ActiveRecord::Schema.define(version: 20170728164037) do
 
   create_table "aadhar_card_data", force: :cascade do |t|
     t.string   "loc",                 limit: 255
@@ -406,6 +406,8 @@ ActiveRecord::Schema.define(version: 20170728161738) do
     t.string   "country",            limit: 255
     t.datetime "created_at",                     null: false
     t.datetime "updated_at",                     null: false
+    t.integer  "account_owner_id",   limit: 4
+    t.string   "account_owner_type", limit: 255
   end
 
   add_index "bank_accounts", ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id", using: :btree

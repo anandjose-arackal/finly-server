@@ -368,6 +368,9 @@ class User < ActiveRecord::Base
     self.build_enforce_policy(enabled: false).save
     self.build_auto_reload_config(enabled: false).save
     self.build_individual_kyc(company_id: self.company_id, kyc_status_id: KycStatus.id_for(:incomplete), admin_review_workflow: AdminReviewWorkflow.workflow_for(:kyc_update)).save if self.individual_kyc.blank?
+
+    # creating the cash on hand account for this user
+    self.build_cash_on_hand(balance_attributes: {value: 0, currency_id: Currency.id_for(:INR)}).save
   end
 
   def payments

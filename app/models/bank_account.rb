@@ -14,6 +14,8 @@
 #  country            :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  account_owner_id   :integer
+#  account_owner_type :string(255)
 #
 
 class BankAccount < ActiveRecord::Base
