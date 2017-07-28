@@ -38,6 +38,16 @@ class Admin::Cards::AssignRequests::Export::KycsAsZip < Admin::Cards::AssignRequ
     end
   end
 
+  def post_process
+    self.card_assign_requests.each do |card_assign_request|
+      track_params = {
+          action_resource: user,
+          action_id: CardAssignRequestTrackAction.id_for(:download)
+      }
+      card_assign_request.tracks.create track_params
+    end
+  end
+
   def success
     date = Date.today
     Exporter::AsZip.new(user, {filename: "kyc_#{date.day}_#{date.month}_#{date.year}", files: self.files}, messages)
