@@ -24,7 +24,7 @@ class Mobile::V1::Kyc::UserController < ApplicationController
   end
 
   def submit
-    @result = KycProcess::User::Submit.(current_user, formatted_request)
+    @result = KycProcess::User::Submit.(current_user, params)
     respond response: @result&.success? ? :success : :failure
   end
 

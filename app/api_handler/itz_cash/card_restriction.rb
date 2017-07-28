@@ -10,6 +10,9 @@ class ItzCash::CardRestriction < ItzCash::Base
       add_message :error, 'User not found'
       return
     end
+    unless params[:card_id].present?
+      add_message :error, "Card ID not present"
+    end
     unless user.cards.present?
       add_message :error, 'A card has not been assigned to the user'
     end
@@ -21,7 +24,7 @@ class ItzCash::CardRestriction < ItzCash::Base
 
   def init
     super()
-    self.card = user.cards.first
+    self.card = user.cards.find_by(id: params[:card_id])
     self.restriction_type = params[:channel_type_allowed] # will always contain Y/N/I
     self.day_trans_limit = (params[:dailycount] > 0) ? params[:dailycount] : [params[:weeklycount].to_i, params[:monthlycount].to_i].max.ceil
     self.day_amount_limit = (params[:dailyamount] > 0) ? params[:dailyamount] : [params[:weeklyamount].to_i, params[:monthlyamount].to_i].max.ceil

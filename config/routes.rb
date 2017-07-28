@@ -1682,6 +1682,7 @@ Rails.application.routes.draw do
       post 'users/approve', to: 'users#approve'
       post 'users/reject', to: 'users#reject'
       post 'users/mark_as_upgraded', to: 'users#mark_as_upgraded'
+      patch 'users/:id', to: 'users#update'
       get 'users/export(.:format)' => 'users#export'
       get 'users/export/kycs(.:format)' => 'users#download_kycs'
     end
@@ -1696,6 +1697,7 @@ Rails.application.routes.draw do
     post 'card_assign_requests/reject', to: 'card_assign_requests#reject'
     post 'card_assign_requests/mark_assigned', to: 'card_assign_requests#mark_as_assigned'
     post 'card_assign_requests/mark_assigned_upgraded', to: 'card_assign_requests#mark_as_assigned_upgraded'
+    patch 'card_assign_requests/:id', to: 'card_assign_requests#update'
     get 'card_assign_requests/export(.:format)' => 'card_assign_requests#export'
     get 'card_assign_requests/export/kycs(.:format)' => 'card_assign_requests#download_kycs'
 
@@ -1858,20 +1860,14 @@ Rails.application.routes.draw do
   post 'users/update_default_password', to: 'users#update_default_password', as: :update_default_password
   get 'edit_default_password', to: 'users#edit_default_password', as: :edit_default_password
 
-
   resources :pending_invites, only: [:create, :destroy, :update, :edit]
   resources :pending_invites do
     patch 'accept', to: 'pending_invites#accept', as: :accept
   end
 
-
   get 'settlements/summary' => 'settlements#summary'
   resources :settlements
   post 'settlements/:id/add_payment' => 'settlements#add_payment', as: :settlement_add_payment
-
-  resources :receipts do
-
-  end
 
   get 'expense_type_configurations', to: 'expense_types_configuration#show', as: :expense_type_configuration_show
   patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update
@@ -2038,6 +2034,10 @@ Rails.application.routes.draw do
   post 'quickbooks/sync_payment_types', to: 'quickbooks#sync_payment_types', as: :quickbooks_sync_payment_types
   patch 'quickbooks/update_config', to: 'quickbooks#update', as: :quickbooks_update_config
   get 'quickbooks/config', to: 'quickbooks#show', as: :quickbooks_config
+
+  get 'tos', to: 'static_pages#tos'
+  get 'privacy', to: 'static_pages#privacy'
+  get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_agreement'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

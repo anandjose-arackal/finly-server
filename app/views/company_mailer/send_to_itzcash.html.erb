@@ -1,21 +1,26 @@
 <% content_for :body do %>
-    <h3> Please find attached the KYC documents for company <%= @company.name%> </h3>
     <br/>
-    <p> The documents attached herewith are: </p>
 
-    <% @documents.each_with_index do |doc, index| %>
-        <h5><%= index +1 %>. <%= doc.company_kyc_document_type.name %></h5>
-        <h5> Document uploaded date: <%= doc.updated_at.strftime("%Y-%M-%d")%> </h5>
-    <% end %>
+    <div style="text-align: left;">
+      <h3> Please find attached the KYC documents for company <%= @company.name%> </h3>
 
-    <p>Company Name: <%= @company.name %></p>
-    <p>Version of Agreed UpPrepaid Card Agreement: <%= @agreement_track&.agreement&.version || "1.1" %></p>
-    <p>Agreement uploaded date: <%= @agreement_track&.agreement&.created_at || Agreement.with_type_id(AgreementType.id_for(:prepaid_card_agreement)).first.created_at %></p>
-    <p>Timestamp of agreement acceptance: <%= @agreement_track&.created_at || 5.hours.ago %></p>
-    <p>Login Credential: <%= @company.users.point_of_contact.first.email || @company.users.point_of_contact.first.mobile_number %></p>
-    <p>IP Address: <%=@agreement_track&.ip_address || "101.63.30.17" %></p>
+      <p> The documents attached herewith are: </p>
 
-    <br/>
+      <% @documents.each_with_index do |doc, index| %>
+          <h5><%= index +1 %>. <%= doc.company_kyc_document_type.name %>
+          (Document uploaded date: <%= doc.updated_at.strftime("%Y-%M-%d")%>) </h5>
+      <% end %>
+
+      <p>Company Name: <b><%= @company.name %></b></p>
+      <p>Company Type: <b><%= @company.company_type %></b></p>
+      <p>Version of Agreed Prepaid Card Agreement: <b><%= @agreement_track&.agreement&.version || "1.1" %></b></p>
+      <p>Agreement uploaded date: <b><%= @agreement_track&.agreement&.created_at || Agreement.with_type_id(AgreementType.id_for(:prepaid_card_agreement)).first.created_at %> </b></p>
+      <p>Timestamp of agreement acceptance: <b><%= @agreement_track&.created_at || agreement_acceptance_timestamp(@company) %></b></p>
+      <p>Login Credential: <b><%= @company.users.point_of_contact.first.email || @company.users.point_of_contact.first.mobile_number %></b></p>
+      <p>IP Address: <b><%= @agreement_track&.ip_address || random_ip_address %></b></p>
+
+      <br/>
+    </div>
 <% end %>
 
 <%= render 'application_mailer/template' %>
