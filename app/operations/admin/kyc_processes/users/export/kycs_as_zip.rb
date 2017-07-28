@@ -1,6 +1,19 @@
 class Admin::KycProcesses::Users::Export::KycsAsZip < Admin::KycProcesses::Users::Base
   attr_accessor :files
 
+  def init
+    if !!params&.dig(:download_all)
+      individual_kycs_presenter = Admin::KycProcesses::Users::Index.(user, params)
+      unless individual_kycs_presenter.success?
+        add_message :error, individual_kycs_presenter.messages[:error]
+        return
+      end
+      self.individual_kycs = individual_kycs_presenter.individual_kycs
+      return
+    end
+    super
+  end
+
   def process
     self.files = []
     self.individual_kycs&.each do |kyc|

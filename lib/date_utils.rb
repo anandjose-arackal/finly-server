@@ -27,6 +27,14 @@ class DateUtils
     datetime
   end
 
+  def self.parse_datetime(date_s)
+    begin
+      return DateTime.parse date_s
+    rescue ArgumentError
+      return nil
+    end
+  end
+
   def self.parse_date(date_s)
     begin
       return Date.parse date_s
@@ -36,7 +44,13 @@ class DateUtils
   end
 
   def self.datetime_formatted(datetime)
-    # Todo pending
+    return datetime if datetime.blank?
+    if datetime.is_a?(String)
+      datetime = parse_datetime datetime
+    end
+    return datetime if datetime.blank?
+    return datetime unless datetime.is_a?(Date) or datetime.is_a?(DateTime) or datetime.is_a?(ActiveSupport::TimeWithZone)
+    datetime.strftime('%I:%M%P, %d %b %Y')
   end
 
   def self.date_formatted(date)

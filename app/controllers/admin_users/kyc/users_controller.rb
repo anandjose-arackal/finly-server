@@ -3,14 +3,14 @@ class AdminUsers::Kyc::UsersController < ApplicationController
   before_action :set_tokens_in_header_admin, only: [:export, :download_kycs]
   before_action -> { doorkeeper_authorize! :admin }
 
-  # def company_index
-  #   @result = Admin::KycProcesses::Users::CompanyIndex.(current_user, params)
-  #   respond
-  # end
-
   def index
     @result = Admin::KycProcesses::Users::Index.(current_user, params)
     respond
+  end
+
+  def update
+    @result = Admin::Cards::AssignRequests::Update.(current_user, params)
+    respond response: @result.success? ? :success : :failure
   end
 
   def approve

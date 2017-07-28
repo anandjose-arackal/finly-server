@@ -59,6 +59,10 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       end
     end
 
+    def generate_pdf
+
+    end
+
     def render_pdf(controller)
       self.filename = 'export' if self.filename.blank?
       self.filename += '.pdf' unless self.filename.include? '.pdf'
@@ -92,7 +96,14 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
     # Handle XLS START
     def render_xls(controller)
-      controller.render xls_template, locals: {headers: self.headers, contents: self.contents}
+      controller.render xls_template, locals: {item_headers: self.headers, item_contents: self.contents}
+    end
+
+    def generate_xls
+      binding_params = {item_headers: self.headers, item_contents: self.contents}
+      view = ActionView::Base.new(ActionController::Base.view_paths, binding_params)
+      view.extend ApplicationHelper
+      view.render(file: "#{xls_template}.xls.erb")
     end
 
     def xls_template

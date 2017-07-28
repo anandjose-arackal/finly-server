@@ -66,4 +66,13 @@ json.array! @result.individual_kycs.each do |kyc|
       end
     end
   end
+  json.tracks do
+    json.array! kyc.tracks do |track|
+      json.user do
+        json.name track.action_resource&.name
+      end
+      json.datetime DateUtils.datetime_formatted track.created_at
+      json.message track.message
+    end
+  end
 end

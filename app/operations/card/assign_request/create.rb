@@ -1,5 +1,5 @@
 class Card::AssignRequest::Create < Card::AssignRequest::Base
-  attr_accessor :selected_user, :card, :card_program, :card_assign_request
+  attr_accessor :selected_user, :card, :card_program, :card_assign_request, :review_workflow
 
   def authorized_user_types
     :company_admin
@@ -38,6 +38,7 @@ class Card::AssignRequest::Create < Card::AssignRequest::Base
     end
     self.card = cards_presenter.unassigned_cards.find_by(id: params[:card_id])
     self.card_program = CardProgram.find_by(id: params[:card_program_id])
+    self.review_workflow = AdminReviewWorkflow.workflow_for(:assign_card)
   end
 
   def validate
@@ -64,15 +65,14 @@ class Card::AssignRequest::Create < Card::AssignRequest::Base
   end
 
   def process
-    review_workflow = AdminReviewWorkflow.workflow_for(:assign_card)
     request_param = {
         card_id: self.card.id,
         card_program_id: self.card_program.id,
         status_id: CardAssignRequestStatus.id_for(:processing),
         card_owner_id: selected_user.id,
         initiating_resource: self.user,
-        admin_review_workflow: review_workflow,
-        review_position: review_workflow.levels.first.position,
+        admin_review_workflow: self.review_workflow,
+        review_position: self.review_workflow.levels.first.position,
         company_id: user.company_id
     }
     self.card_assign_request = card.card_assign_requests.new request_param
@@ -87,6 +87,15 @@ class Card::AssignRequest::Create < Card::AssignRequest::Base
         action_id: CardAssignRequestTrackAction.id_for(:submit)
     }
     self.card_assign_request.tracks.create track_params
+  end
+
+  def post_process
+    # users_to_email = self.review_workflow.levels.trigger_email
+    # users_to_email&.each do |level|
+    #   user = level.admin_user
+    #   # Send mailer to user
+    # end
+
   end
 
   def success

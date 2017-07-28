@@ -13,38 +13,8 @@ class AdminReviewWorkflow < ActiveRecord::Base
 
   has_many :levels, class_name: 'AdminReviewWorkflowLevel', dependent: :destroy
 
-  def self.values
-    if Rails.env.production?
-    {
-        assign_card: {
-            '0': ['vivek.a@finly.io', 'veekshith.rai@finly.io', 'anushrut.khare@finly.io'],
-            '1': 'kalpitap.itz@intrexindia.net',
-            '2': 'kalpeshg.itz@intrexindia.net'
-        },
-        kyc_update: {
-            '0': ['vivek.a@finly.io', 'veekshith.rai@finly.io', 'anushrut.khare@finly.io'],
-            '1': 'kalpitap.itz@intrexindia.net',
-            '2': 'kalpeshg.itz@intrexindia.net'
-        }
-    }
-    else
-      {
-          assign_card: {
-              '0': ['admin@demo.io', 'sreeram@demo.io'],
-              '1': 'vivek@demo.io',
-              '2': 'veekshith@demo.io'
-          },
-          kyc_update: {
-              '0': ['admin@demo.io', 'sreeram@demo.io'],
-              '1': 'vivek@demo.io',
-              '2': 'veekshith@demo.io'
-          }
-      }
-    end
-  end
-
   def self.id_for(name)
-
+    find_by(name: name)&.id
   end
 
   def self.workflow_for(name)
@@ -58,18 +28,109 @@ class AdminReviewWorkflow < ActiveRecord::Base
         # create new workflow
         workflow = AdminReviewWorkflow.create name: name
       end
+      # Destroy and recreate all levels
       workflow.levels.destroy_all
-      config.each do |pos, emails|
-        emails = [emails] unless emails.is_a?(Array)
-        emails.each do |email|
-          reviewer = AdminUser.with_email(email)&.first
-          if reviewer.blank?
-            raise "AdminUser with Email ID #{email} not found"
+      config.each do |pos, users|
+        users = [users] unless users.is_a?(Array)
+        users.each do |user_config|
+          user = user_config[:user]
+          trigger_email = !!user_config[:trigger_email]
+          reviewer = !!user_config[:reviewer]
+
+          admin_user = AdminUser.with_email(user)&.first
+          if admin_user.blank?
+            raise "AdminUser with Email ID #{user} not found"
             return
           end
-          workflow.levels.create position: pos.to_s.to_i, admin_reviewer: reviewer
+          workflow.levels.create position: pos.to_s.to_i, admin_user: admin_user, trigger_email: trigger_email, reviewer: reviewer
         end
       end
+    end
+  end
+
+  def self.values
+    if Rails.env.production?
+      {
+          # assign_card: {
+          #     '0': [
+          #         {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
+          #         {user: 'veekshith.rai@finly.io', trigger_email: true, reviewer: true},
+          #         {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true}
+          #     ],
+          #     '1': {user: 'kalpeshg.itz@intrexindia.net', trigger_email: true, reviewer: true}
+          # },
+          assign_card: {
+              '0': [
+                  {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
+                  {user: 'veekshith.rai@finly.io', trigger_email: true, reviewer: true},
+                  {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true}
+              ],
+              '1': [
+                  {user: 'itzfinlycust@itzcash.com', trigger_email: true, reviewer: false},
+                  {user: 'amitsh.itz@intrexindia.net', trigger_email: false, reviewer: true},
+                  {user: 'anandy.itz@intrexindia.net', trigger_email: false, reviewer: true}
+              ],
+              '2': [
+                  {user: 'corppayment@itzcash.com', trigger_email: true, reviewer: false},
+                  {user: 'tusharm.itz@intrexindia.net', trigger_email: true, reviewer: true},
+                  {user: 'kalpeshg.itz@intrexindia.net', trigger_email: true, reviewer: false},
+                  {user: 'jimmyb@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'mahesht@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'pramody@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'sandeshd@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'snehalc@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'mangeshm@itzcash.com', trigger_email: false, reviewer: false}
+              ]
+          },
+          kyc_update: {
+              '0': [
+                  {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
+                  {user: 'veekshith.rai@finly.io', trigger_email: true, reviewer: true},
+                  {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true}
+              ],
+              '1': [
+                  {user: 'itzfinlycust@itzcash.com', trigger_email: true, reviewer: false},
+                  {user: 'amitsh.itz@intrexindia.net', trigger_email: false, reviewer: true},
+                  {user: 'anandy.itz@intrexindia.net', trigger_email: false, reviewer: true}
+              ],
+              '2': [
+                  {user: 'corppayment@itzcash.com', trigger_email: true, reviewer: false},
+                  {user: 'tusharm.itz@intrexindia.net', trigger_email: true, reviewer: false},
+                  {user: 'kalpeshg.itz@intrexindia.net', trigger_email: true, reviewer: false},
+                  {user: 'jimmyb@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'mahesht@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'pramody@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'sandeshd@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'snehalc@itzcash.com', trigger_email: false, reviewer: false},
+                  {user: 'mangeshm@itzcash.com', trigger_email: false, reviewer: false}
+              ]
+          }
+      }
+    else
+      {
+          assign_card: {
+              '0': [
+                  {user: 'admin@demo.io', trigger_email: false, reviewer: true},
+                  {user: 'vivekagb@gmail.com', trigger_email: true, reviewer: true}
+              ],
+              '1': {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
+              '2': [
+                  {user: 'abinash@demo.io', trigger_email: false, reviewer: true},
+                  {user: 'yseeme20@gmail.com', trigger_email: true, reviewer: false}
+              ]
+          },
+          kyc_update: {
+              '0': [
+                  {user: 'admin@demo.io', trigger_email: false, reviewer: true},
+                  {user: 'vivekagb@gmail.com', trigger_email: true, reviewer: true}
+              ],
+              '1': {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
+              '2': [
+                  {user: 'abinash@demo.io', trigger_email: false, reviewer: true},
+                  {user: 'yseeme20@gmail.com', trigger_email: true, reviewer: false}
+              ]
+          }
+      }
     end
   end
 

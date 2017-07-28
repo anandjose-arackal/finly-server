@@ -1,6 +1,19 @@
 class Admin::Cards::AssignRequests::Export::AsXls < Admin::Cards::AssignRequests::Base
   attr_accessor :headers, :contents
 
+  def init
+    if !!params&.dig(:download_all)
+      assign_requests_presenter = Admin::Cards::AssignRequests::Index.(user, params)
+      unless assign_requests_presenter.success?
+        add_message :error, assign_requests_presenter.messages[:error]
+        return
+      end
+      self.card_assign_requests = assign_requests_presenter.card_assign_requests
+      return
+    end
+    super
+  end
+
   def process
     self.headers = ['Email ID', 'Mobile No', 'Disty Name', 'Address 1', 'Address 2', 'DOB', 'Gender', 'State', 'PIN code', 'First Name', 'Last Name', 'Mothers Maiden Name', 'Serial ID', 'KYC Type', 'Kyc Number']
     self.contents = []
