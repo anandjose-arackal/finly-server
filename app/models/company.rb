@@ -31,6 +31,8 @@ class Company < ActiveRecord::Base
   has_many :company_balance_histories
   has_many :field_configurations, as: :configurable
   has_one :feature_subscription, as: :subscribable
+  has_one :itz_cash_company_account
+  has_one :yes_bank_company_account
 
   has_many :payment_orders
   has_many :user_groups

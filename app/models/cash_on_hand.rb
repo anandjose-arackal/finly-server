@@ -11,6 +11,7 @@
 
 class CashOnHand < ActiveRecord::Base
   belongs_to :user
+  belongs_to :balance, class_name: "User"
 
   has_many :payments, as: :initiating_account
   has_many :payments, as: :receiving_account

@@ -100,6 +100,7 @@ class User < ActiveRecord::Base
   has_one :auto_reload_config, as: :reloadable, dependent: :destroy
   has_one :itz_cash_dmt_sender
   has_one :user_panel_subscription
+  has_one :cash_on_hand
 
   has_many :authentications
   has_many :cards, dependent: :destroy
