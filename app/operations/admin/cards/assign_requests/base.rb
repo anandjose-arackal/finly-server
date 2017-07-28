@@ -5,12 +5,14 @@ class Admin::Cards::AssignRequests::Base < Admin::Base
     if user.blank?
       add_message :error, 'User not found'
     end
-    if params&.dig(:card_assign_request_id).blank? and params&.dig(:id).blank?
+    if params&.dig(:card_assign_request_id).blank? and params&.dig(:id).blank? and params&.dig(:card_assign_requests).blank?
       add_message :error, 'Card Assign Request not found'
     end
   end
 
   def init
+    self.card_assign_requests = params&.dig(:card_assign_requests)
+    return unless self.card_assign_requests.blank?
     assign_requests_presenter = Admin::Cards::AssignRequests::Index.(user, params)
     unless assign_requests_presenter.success?
       add_message :error, assign_requests_presenter.messages[:error]
