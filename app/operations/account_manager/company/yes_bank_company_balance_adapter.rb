@@ -1,4 +1,4 @@
-class AccountManager::Company::CompanyBalanceAdapter < AccountManager::BaseAdapter
+class AccountManager::Company::YesBankCompanyBalanceAdapter < AccountManager::BaseAdapter
 
   attr_accessor :errors, :company
 
@@ -12,24 +12,27 @@ class AccountManager::Company::CompanyBalanceAdapter < AccountManager::BaseAdapt
   end
 
   def credit(amount)
+    # nothing to do here ¯\_(ツ)_/¯
     return true
   end
 
   def debit(amount)
+    # nothing to do here ¯\_(ツ)_/¯
     return true
   end
 
   def balance
-    op = ItzCash::VirtualAccountBalance.(company)
-    balance = op.wallets.first[:balance] # todo - will later subtract pending orders total and then return
+    # can either be an operation or a specific call with
+    # a model call
   end
 
   def creditable_accounts
-    [Card, "Card", UserWallet, "UserWallet"]
+    # none as this account cannot be credited through Finly (only external)
+    []
   end
 
   def debitable_accounts
-    [Card, "Card", UserWallet, "UserWallet"]
+    [VendorAccount, "VendorAccount"]
   end
 
   private

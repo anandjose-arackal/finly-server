@@ -27,7 +27,7 @@ class AccountManager::Payments::PaymentValidator < BaseOperation
   end
 
   def init
-    self.errors_present = false
+
   end
 
   def validate
@@ -37,7 +37,11 @@ class AccountManager::Payments::PaymentValidator < BaseOperation
   # here all the validations required for the respective payment order will happen
   def process
     # checking if total order amount is less than the company balance amount
-
+    payment_order.payment.each do |payment|
+      receiving_adapter = retrieve_adapter(payment.receiving_account)
+      initiating_adapter = retrieve_adapter(payment.initiating_account)
+      # check if initiating account has enough balance for this transaction
+    end
   end
 
   private
@@ -56,6 +60,7 @@ class AccountManager::Payments::PaymentValidator < BaseOperation
   end
 
   def validate_account_consistency(payment_order)
+    self.errors_present = false
     initiating_account_type = payment_order.payment.first.initiating_account_type
     receiving_account_type = payment_order.payment.first.receiving_account_type
     payment_order.payments.each do |payment|

@@ -7,6 +7,7 @@
 #  wallet_balance_id :integer
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
+#  balance_id        :integer
 #
 
 class ItzCashCompanyAccount < ActiveRecord::Base
