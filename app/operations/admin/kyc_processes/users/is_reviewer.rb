@@ -27,7 +27,7 @@ class Admin::KycProcesses::Users::IsReviewer < Admin::KycProcesses::Users::Base
 
   def process
     current_review_position = self.individual_kyc.review_position
-    review_ids = workflow.levels.with_position(current_review_position).pluck(:admin_reviewer_id)
+    review_ids = workflow.levels.with_position(current_review_position).pluck(:admin_user_id)
     self.is_reviewer = review_ids.include? admin_user.id
   end
 

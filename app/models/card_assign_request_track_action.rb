@@ -14,7 +14,7 @@ class CardAssignRequestTrackAction < ActiveRecord::Base
   validates :name, presence: true
 
   def self.values
-    [:submit, :approve, :final_approve, :assigned, :assigned_upgraded, :reject, :cancel]
+    [:submit, :approve, :final_approve, :assigned, :assigned_upgraded, :reject, :cancel, :download]
   end
 
 end

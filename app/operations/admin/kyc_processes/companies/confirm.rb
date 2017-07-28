@@ -15,15 +15,19 @@ class Admin::KycProcesses::Companies::Confirm < KycProcess::Company::Confirm
     end
   end
 
-  def validate
-    super()
-    # check if the user's agreements have been uploaded yet
-  end
-
   def init
     id = params[:id] || params[:company_id]
     self.company = Company.find_by(id: id)
     self.company_kyc = company.company_kyc
+  end
+
+
+  def validate
+    super()
+    # check if there's at least one user who is a point of contact in the company
+    if company.users.point_of_contact.empty?
+      add_message :error, "You need to add at least one point of contact to the company before sending documents"
+    end
   end
 
   def process
@@ -41,6 +45,5 @@ class Admin::KycProcesses::Companies::Confirm < KycProcess::Company::Confirm
 
     add_message :success, "Successfully sent the documents to ItzCash"
   end
-
 
 end

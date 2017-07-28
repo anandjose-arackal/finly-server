@@ -8,6 +8,11 @@ class AdminUsers::CardAssignRequestsController < ApplicationController
     respond
   end
 
+  def update
+    @result = Admin::Cards::AssignRequests::Update.(current_user, params)
+    respond response: @result.success? ? :success : :failure
+  end
+
   def approve
     @result = Admin::Cards::AssignRequests::Approve.(current_user, params)
     respond
