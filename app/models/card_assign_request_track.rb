@@ -22,6 +22,7 @@ class CardAssignRequestTrack < ActiveRecord::Base
 
   scope :with_card_assign_request, -> (card_assign_request_id) { where card_assign_request_id: card_assign_request_id }
   scope :created_after, -> (datetime) { where 'created_at >= ?', datetime }
+  scope :with_action_admin_resource, -> (admin_user_id) { where action_resource_id: admin_user_id, action_resource_type: 'AdminUser' }
 
   def message
     msg = nil
