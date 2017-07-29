@@ -2,17 +2,35 @@ require 'hooks'
 class BaseOperation
   include CallbackHandler, MathUtil, HasScope
   # todo rename user to resource as User is a model and there can be other models such as AdminUser etc
-  attr_accessor :user, :company, :params, :messages, :process_complete, :response
+  attr_accessor :user, :company, :params, :messages, :process_complete, :response, :current_app
 
   # If initializers are over-ridden super() must be called in the inheriting class
   def initialize(user, params={})
     clear_messages
+    self.current_app = params[:current_app]
     self.user = user
     self.params = (ActionController::Parameters.new(params) or {})
   end
 
   def self.call(user, params={})
     self.new(user, params).run
+  end
+
+  # Applications
+  def admin_panel?
+    current_app == :ap ? true : false
+  end
+
+  def vendor_payments?
+    current_app == :vp ? true : false
+  end
+
+  def expense_management?
+    current_app == :em ? true : false
+  end
+
+  def funds_transfer?
+    current_app == :ft ? true : false
   end
 
   # Can be called as BaseOperations.(user, params) instead of BaseOperations.call(user, params)
