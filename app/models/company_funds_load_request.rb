@@ -31,5 +31,5 @@ class CompanyFundsLoadRequest < ActiveRecord::Base
   delegate :requested_by_user_name, to: :requested_by_user
 
   scope :with_amount, -> {joins(:amount).select('expenses.*, amount.*')}
-  scope :with_company_type_id, -> (type_id) { where company_funds_load_request_type: type_id }
+  scope :with_bank_type_id, -> (type_id) { where bank_type_id: type_id }
 end
