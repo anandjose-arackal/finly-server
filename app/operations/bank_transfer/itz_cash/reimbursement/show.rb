@@ -1,4 +1,4 @@
-class BankTransfer::Reimbursement::Show < BankTransfer::Reimbursement::Base
+class BankTransfer::ItzCash::Reimbursement::Show < BankTransfer::ItzCash::Reimbursement::Base
   attr_accessor :reimbursement_accounts, :enabled
 
   def pre_validate
@@ -15,10 +15,10 @@ class BankTransfer::Reimbursement::Show < BankTransfer::Reimbursement::Base
   def success
     params[:enabled] = self.enabled
     params[:reimbursement_accounts] = self.reimbursement_accounts
-    BankTransfer::Reimbursement::Show::SuccessPresenter.new(user, params, messages)
+    BankTransfer::ItzCash::Reimbursement::Show::SuccessPresenter.new(user, params, messages)
   end
 
-  class BankTransfer::Reimbursement::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::ItzCash::Reimbursement::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :reimbursement_accounts, :enabled, :mobile_number
 
     def init

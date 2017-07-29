@@ -12,19 +12,19 @@ class AccountManager::BaseAdapter
 
   end
 
-  def credit(source_id, amount)
+  def credit(payment)
 
   end
 
-  def debit(source_id, amount)
+  def debit(payment)
 
   end
 
-  def balance(source_id)
+  def balance(payment)
 
   end
 
-  def eligibility(source_id)
+  def eligibility(payment)
 
   end
 

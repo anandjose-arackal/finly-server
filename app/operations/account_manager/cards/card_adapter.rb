@@ -15,9 +15,9 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     "Card"
   end
 
-  def credit(amount)
+  def credit(payment)
     # operation that credits a particular card
-    op = ItzCash::Credit.(card.user, {card: card, amount: amount})
+    op = ItzCash::Credit.(card.user, {card: card, amount: payment.amount_value})
     unless op.success?
       self.errors = op.messages[:error]
       return false
@@ -25,9 +25,9 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     true
   end
 
-  def debit(amount)
+  def debit(payment)
     # operation that debits a particular card
-    op = ItzCash::Debit.(card.user, {card: card, amount: amount})
+    op = ItzCash::Debit.(card.user, {card: card, amount: payment.amount_value})
     unless op.success?
       self.errors = op.messages[:error]
       return false

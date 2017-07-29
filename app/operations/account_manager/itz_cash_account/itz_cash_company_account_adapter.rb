@@ -1,6 +1,6 @@
 class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountManager::BaseAdapter
 
-  attr_accessor :errors, :company
+  attr_accessor :errors, :company_account
 
   def initialize(source_id)
     # here source will be a company
@@ -8,7 +8,7 @@ class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountMana
   end
 
   def init(source_id)
-    self.company = Company.find_by(id: source_id)
+    self.company_account = ItzCashCompanyAccount.find_by(id: source_id)
   end
 
   def credit(amount)
@@ -22,8 +22,11 @@ class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountMana
   end
 
   def balance
-    op = ItzCash::VirtualAccountBalance.(company)
-    balance = op.wallets.first[:balance] # todo - will later subtract pending orders total and then return
+    op = ItzCash::VirtualAccountBalance.(company_account.company)
+    balance = op.wallets.first[:balance] # original balance from ItzCash's servers
+    wallets_total = company_account.total_wallet_balance
+    blocked_amount = company_account.blocked_amount_for_pending_payments
+    balance - wallets_total - blocked_amount
   end
 
   def creditable_accounts

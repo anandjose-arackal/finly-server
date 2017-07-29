@@ -71,11 +71,11 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
           # update payment if successful
           payment.update(payment_status_id: PaymentStatus.id_for(:completed))
           # payment trail creation
+
         else
           add_message :error, source_account_adapter.errors
           payment.update(payment_status_id: PaymentStatus.id_for(:failed))
           source_account_adapter.credit(payment.amount.value)
-          # update payment
         end
       when PaymentType.id_for(:debit)
         if source_account_adapter.credit(payment.amount.value)
@@ -85,11 +85,11 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
           # update payment if successful
           payment.update(payment_status_id: PaymentStatus.id_for(:completed))
           # payment trail creation
+
         else
           add_message :error, source_account_adapter.errors
           payment.update(payment_status_id: PaymentStatus.id_for(:failed))
           source_account_adapter.debit(payment.amount.value)
-          # update payment
         end
       else
         # do nothing?
