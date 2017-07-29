@@ -1,4 +1,4 @@
-class AccountManager::Company::YesBankCompanyBalanceAdapter < AccountManager::BaseAdapter
+class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountManager::BaseAdapter
 
   attr_accessor :errors, :company
 
@@ -18,7 +18,7 @@ class AccountManager::Company::YesBankCompanyBalanceAdapter < AccountManager::Ba
 
   def debit(amount)
     # nothing to do here ¯\_(ツ)_/¯
-    return true
+
   end
 
   def balance

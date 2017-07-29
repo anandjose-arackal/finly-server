@@ -49,9 +49,9 @@ class User::Wallet::Credit < User::Wallet::Base
             initiating_user_id: initiating_user.id,
             receiving_user_id: receiving_user.id,
             initiating_account_id: initiating_account.id,
-            initiating_account_type: initiating_account.class,
+            initiating_account_type: initiating_account.class.to_s,
             receiving_account_id: receiving_account.id,
-            receiving_account_type: receiving_account.class,
+            receiving_account_type: receiving_account.class.to_s,
             payment_type_id: PaymentType.id_for(:credit),
             date: Date.today,
             amount_attributes: {

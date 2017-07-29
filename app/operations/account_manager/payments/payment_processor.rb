@@ -25,6 +25,7 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
   def validate
     # Call the payment validator class that validates the payment order
     op = AccountManager::Payments::PaymentValidator.(payment_order)
+    debugger
     unless op.success?
       add_message :error, op.messages[:error]
     end
@@ -33,6 +34,9 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
   def process
     # now the actual execution of the payment order, based on whether it's
     # synchronous or a background operation
+    unless payment_order.save
+      add_message :error, payment_order.errors.full_messages
+    end
 
     # if payment order has been scheduled for execution right away, process it right now
     if payment_order.payment_order_status_id == PaymentOrderStatus.id_for(:pending)

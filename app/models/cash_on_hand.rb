@@ -15,4 +15,6 @@ class CashOnHand < ActiveRecord::Base
 
   has_many :payments, as: :initiating_account
   has_many :payments, as: :receiving_account
+
+  accepts_nested_attributes_for :balance
 end

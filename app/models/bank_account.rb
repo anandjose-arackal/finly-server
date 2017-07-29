@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: vendor_accounts
+# Table name: bank_accounts
 #
 #  id                 :integer          not null, primary key
 #  yes_bank_vendor_id :integer
@@ -14,8 +14,10 @@
 #  country            :string(255)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  account_owner_id   :integer
+#  account_owner_type :string(255)
 #
 
-class VendorAccount < ActiveRecord::Base
-  belongs_to :yes_bank_vendor
+class BankAccount < ActiveRecord::Base
+  belongs_to :account_owner, polymorphic: true
 end
