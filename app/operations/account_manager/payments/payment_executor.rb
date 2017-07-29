@@ -1,6 +1,6 @@
 # this class will take a single payment object and executes it using the respective adapters
 #
-class AccountManager::Payments::PaymentExecutor < BaseOperation
+class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
   attr_accessor :payment, :payment_item, :receiving_account_adapter, :source_account_adapter
 
@@ -102,20 +102,5 @@ class AccountManager::Payments::PaymentExecutor < BaseOperation
 
   private
 
-  def retrieve_adapter(account_type)
-    case account_type.class.to_s
-      when Card, "Card"
-        # Card, for example
-        return AccountManager::Cards::CardAdapter.new(account_type.id)
-      when UserWallet, "UserWallet"
-        # Wallet for example
-        return AccountManager::Wallet::WalletAdapter.new(account_type.id)
-      when YesBankCompanyAccount, "YesBankCompanyAccount"
-        return AccountManager::YesBank::YesBankCompanyAccountAdapter.new(account_type.id)
-      when CashOnHand, "CashOnHand"
-        return AccountManager::CashOnHand::CashOnHandAdapter.new(account_type.id)
-      else
-        return AccountManager::Company::ItzCashCompanyBalanceAdapter.new(account_type.id)
-    end
-  end
+
 end

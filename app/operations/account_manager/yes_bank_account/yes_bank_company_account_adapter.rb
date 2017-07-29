@@ -1,4 +1,4 @@
-class AccountManager::YesBank::YesBankCompanyBalanceAdapter < AccountManager::BaseAdapter
+class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountManager::BaseAdapter
 
   attr_accessor :errors, :company
 

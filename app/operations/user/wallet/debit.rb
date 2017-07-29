@@ -2,27 +2,29 @@
 class User::Wallet::Debit < User::Wallet::Base
 
   def validate_sufficient_funds
-    if receiving_account_type == :wallet and receiving_account.balance_value < self.amount
-      add_message :error, 'Insufficient funds to initiate the transfer'
-      return
-    end
-    if receiving_account_type == :virtual_account
-      balance_presenter = Company::VirtualAccount::Balance.(user, params)
-      if balance_presenter.success?
-        balance_amount = balance_presenter.balance
-        if balance_amount < self.amount
-          add_message :error, 'Insufficient balance in your Finly Account to initiate this transfer'
-        end
-      else
-        add_message :error, balance_presenter.messages[:error]
-      end
-    end
-    if receiving_account_type == :card and receiving_account.card_balance.present? and receiving_account.card_balance.value < self.amount
-      add_message :error, 'Insufficient funds in the card to initiate the transfer'
-    end
-    if initiating_account_type == :card and self.amount > 50000
-      add_message :error, 'Cannot transfer the given amount. Please reduce the amount and try again'
-    end
+    # validations moved to payment processor
+
+    # if receiving_account_type == :wallet and receiving_account.balance_value < self.amount
+    #   add_message :error, 'Insufficient funds to initiate the transfer'
+    #   return
+    # end
+    # if receiving_account_type == :virtual_account
+    #   balance_presenter = Company::VirtualAccount::Balance.(user, params)
+    #   if balance_presenter.success?
+    #     balance_amount = balance_presenter.balance
+    #     if balance_amount < self.amount
+    #       add_message :error, 'Insufficient balance in your Finly Account to initiate this transfer'
+    #     end
+    #   else
+    #     add_message :error, balance_presenter.messages[:error]
+    #   end
+    # end
+    # if receiving_account_type == :card and receiving_account.card_balance.present? and receiving_account.card_balance.value < self.amount
+    #   add_message :error, 'Insufficient funds in the card to initiate the transfer'
+    # end
+    # if initiating_account_type == :card and self.amount > 50000
+    #   add_message :error, 'Cannot transfer the given amount. Please reduce the amount and try again'
+    # end
   end
 
   def process
@@ -38,9 +40,9 @@ class User::Wallet::Debit < User::Wallet::Base
             initiating_user_id: initiating_user.id,
             receiving_user_id: receiving_user.id,
             initiating_account_id: initiating_account.id,
-            initiating_account_type: initiating_account.class,
+            initiating_account_type: initiating_account.class.to_s,
             receiving_account_id: receiving_account.id,
-            receiving_account_type: receiving_account.class,
+            receiving_account_type: receiving_account.class.to_s,
             payment_type_id: PaymentType.id_for(:debit),
             date: Date.today,
             amount_attributes: {

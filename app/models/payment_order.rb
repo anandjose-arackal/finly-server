@@ -91,4 +91,12 @@ class PaymentOrder < ActiveRecord::Base
     total
   end
 
+  def credit?
+    self.payments.first.payment_type_id == PaymentType.id_for(:credit)
+  end
+
+  def debit?
+    self.payments.first.payment_type_id == PaymentType.id_for(:debit)
+  end
+
 end
