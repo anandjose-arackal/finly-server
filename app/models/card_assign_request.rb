@@ -48,6 +48,7 @@ class CardAssignRequest < ActiveRecord::Base
   scope :with_id, -> (id) { where id: id }
   scope :include_tracks, -> { includes :tracks }
   scope :approved, -> { where status_id: CardAssignRequestStatus.id_for(:approved) }
+  scope :processing, -> { where status_id: CardAssignRequestStatus.id_for(:processing) }
   scope :assignable, -> { where status_id: CardAssignRequestStatus.ids_for([:processing, :approved, :rejected]) }
 
   def processing?

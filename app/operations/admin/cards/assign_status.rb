@@ -9,8 +9,11 @@ class Admin::Cards::AssignStatus < Admin::Cards::Base
   end
 
   def init
-    id = params[:id] || params[:card_id] || params[:card]
-    self.selected_card = Card.find_by(id: id)
+    self.selected_card = params[:card]
+    id = params[:id] || params[:card_id]
+    if self.selected_card.blank? and id.present?
+      self.selected_card = Card.find_by(id: id)
+    end
   end
 
   def validate
