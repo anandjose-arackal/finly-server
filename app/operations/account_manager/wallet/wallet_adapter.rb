@@ -38,15 +38,15 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
   end
 
   def creditable_accounts
-    [Card, "Card", UserWallet, "UserWallet", CompanyBalance, "Company"]
+    [Card, "Card", UserWallet, "UserWallet", ItzCashCompanyAccount, "ItzCashCompanyAccount"]
   end
 
   def debitable_accounts
-    [Card, "Card", UserWallet, "UserWallet", CompanyBalance, "Company"]
+    [Card, "Card", UserWallet, "UserWallet", ItzCashCompanyAccount, "ItzCashCompanyAccount"]
   end
 
   def eligibility(amount)
     # checks if the particular wallet can be credited with so and so amount
-    return true
+    true
   end
 end

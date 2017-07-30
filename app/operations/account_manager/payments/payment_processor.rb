@@ -45,8 +45,8 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
         # now iterating through each payment order and performing the respective transfer
         processed_amount = 0
         payment_order.payments.each do |payment|
-          AccountManager::Payments::PaymentExecutor.(payment)
-          if payment.reload.payment_status_id == PaymentStatus.id_for(:completed)
+          op = AccountManager::Payments::PaymentExecutor.(payment)
+          if op.success? && payment.reload.payment_status_id == PaymentStatus.id_for(:completed)
             processed_amount += payment.amount_value
           end
         end
@@ -63,7 +63,7 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
   end
 
   def success
-    params[:payment_oder] = payment_order
+    params[:payment_order] = payment_order
     AccountManager::Payments::PaymentProcessor::PaymentsPresenter.new(user, params, messages)
   end
 
@@ -93,7 +93,7 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
     p[:scheduled_at] = payment_request.scheduled_at
     p[:initiating_account_type] = payment_request.initiating_account_type
     p[:receiving_account_type] = payment_request.receiving_account_type
-    p[:amount_requested] = {
+    p[:amount_requested_attributes] = {
         value: payment_request.request_total,
         currency_id: payment_request.request_currency_id
     }

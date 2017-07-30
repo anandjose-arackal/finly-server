@@ -26,29 +26,23 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     unless receiving_account_adapter.creditable_accounts.include?(payment.initiating_account_type)
       add_message :error, "You cannot credit from this account"
       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                    content: "You cannot credit from #{payment.initiating_account_type.to_s} to #{payment.receiving_account_type.to_s}").save
+                                    content: "You cannot credit from #{initiating_account_adapter.name} to #{receiving_account_adapter.name}").save
       return
     end
 
     unless source_account_adapter.debitable_accounts.include?(payment.receiving_account_type)
       add_message :error, "You cannot debit to this account"
       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                    content: "You cannot debit from #{payment.receiving_account_type.to_s} to #{payment.initiating_account_type.to_s}").save
+                                    content: "You cannot debit from #{receiving_account_adapter.name} to #{initiating_account_adapter.name}").save
       return
     end
 
     unless source_account_adapter.balance > payment.amount_value
-      add_message :error, "This account does not have enough balance for this"
+      add_message :error, "This account does not have enough balance for this transaction"
       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                     content: "Not enough funds in #{payment.initating_account_type.to_s} to initiate the transfer").save
       return
     end
-
-    # unless source_account_adapter.eligibility(payment.receiving_account_id) > payment.amount_value
-    #   add_message :error, "This account does not have the eligibility for this"
-    #   payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-    #                                 content: "Eligibility of #{payment.receiving_account_type.to_s} exceeded.").save
-    # end
 
     unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
       add_message :error, "Payment cannot be processed in this state"
@@ -63,9 +57,10 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
   def process
     case payment.payment_type_id
-      when PaymentType.id_for(:credit)
-        if source_account_adapter.debit(payment.amount.value)
-          unless receiving_account_adapter.credit(payment.amount.value)
+      when PaymentType.id_for(:credit), PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:credit_meal_card),
+        PaymentType.id_for(:credit_expense_card), PaymentType.id_for(:credit_reimbursement_card), PaymentType.id_for(:credit_medical_card)
+        if source_account_adapter.debit(payment)
+          unless receiving_account_adapter.credit(payment)
             add_message :error, receiving_account_adapter.errors
           end
           # update payment if successful
@@ -75,11 +70,11 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         else
           add_message :error, source_account_adapter.errors
           payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-          source_account_adapter.credit(payment.amount.value)
+          source_account_adapter.credit(payment)
         end
-      when PaymentType.id_for(:debit)
-        if source_account_adapter.credit(payment.amount.value)
-          unless receiving_account_adapter.debit(payment.amount.value)
+      when PaymentType.id_for(:debit), PaymentType.id_for(:deduct_cash_on_hand)
+        if source_account_adapter.credit(payment)
+          unless receiving_account_adapter.debit(payment)
             add_message :error, receiving_account_adapter.errors
           end
           # update payment if successful
@@ -89,7 +84,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         else
           add_message :error, source_account_adapter.errors
           payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-          source_account_adapter.debit(payment.amount.value)
+          source_account_adapter.debit(payment)
         end
       else
         # do nothing?

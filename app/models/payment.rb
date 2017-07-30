@@ -144,8 +144,8 @@ class Payment < ActiveRecord::Base
 
   def initiating_account_type_name
     name = ""
-    unless self.initiating_account_type == 'Company'
-      name += "#{self.initiating_user.name}'s"
+    unless self.initiating_account_type == 'ItzCashCompanyAccount'
+      name += "#{self.initiating_user&.name}'s"
     end
     if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
         PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement),
@@ -156,7 +156,7 @@ class Payment < ActiveRecord::Base
     case self.initiating_account_type
       when 'UserWallet'
         name += " Finly Money"
-      when 'Company'
+      when 'ItzCashCompanyAccount'
         name += " Company Credits"
       when 'Card'
         name += " #{self.initiating_account.card_program.name.humanize} Card"
@@ -167,8 +167,8 @@ class Payment < ActiveRecord::Base
   def receiving_account_type_name
     name = ""
 
-    unless self.receiving_account_type == 'Company'
-      name += "#{self.receiving_user.name}'s"
+    unless self.receiving_account_type == 'ItzCashCompanyAccount'
+      name += "#{self.receiving_user&.name}'s"
     end
 
     if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
@@ -185,7 +185,7 @@ class Payment < ActiveRecord::Base
     case self.receiving_account_type
       when 'UserWallet'
         name += " Finly Money"
-      when 'Company'
+      when 'ItzCashCompanyAccount'
         name += " Company Credits"
       when 'Card'
         name += " #{self.receiving_account.card_program.name.humanize} Card"

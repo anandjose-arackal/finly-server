@@ -30,6 +30,9 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
 
   def init
     self.to_user = user.company.users.find_by(id: params[:to_user_id] || params[:id])
+    self.amount = payment_params[:amount]
+    self.currency_id = payment_params[:currency_id] || Currency.first.id
+    init_payment_request(PaymentType.id_for(:deduct_cash_on_hand))
   end
 
   def authorize
@@ -48,13 +51,6 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
   end
 
   def validate
-    value = nil
-    value = payment_params[:amount].to_f if payment_params[:amount].present?
-    cash_in_hand_on_date = to_user.cash_in_hand(payment_params[:date].to_date)
-    unless value <= cash_in_hand_on_date.value
-      add_message :error, "User does not have sufficient cash in hand on #{payment_params[:date]} for the following payment"
-    end
-
     # validating date
     unless validate_date payment_params[:date]
       return false
@@ -63,17 +59,11 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
   end
 
   def process
-    balance_sheet = to_user.balance_sheet
-    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
-                                          payment_type_id: PaymentType.id_for(:deduct_cash_on_hand),
-                                          date: payment_params[:date], note: payment_params[:note],
-                                          amount_attributes: {value: payment_params[:amount], currency_id: payment_params[:currency_id]},
-                                          payment_status_id: PaymentStatus.id_for(:completed))
-    if self.payment.save and balance_sheet.subtract_cash_in_hand(payment_params[:amount], payment_params[:currency_id])
+    op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    if op.success?
       return true
     end
-    add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
-    payment.destroy
+    add_message :error, op.messages[:error]
     false
   end
 

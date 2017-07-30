@@ -11,7 +11,7 @@
 class PaymentOrderType < ActiveRecord::Base
 
   VALUES = {meal_card: 1, medical_card: 2, expense_card: 3, reimbursement_card: 4,
-            bank_transfer: 5}
+            bank_transfer: 5, outside_finly: 6}
   # Fund Transfers, Meal Card, Gift Card, Gift Voucher, Personal
 
   validates :name, presence: true
