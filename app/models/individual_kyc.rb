@@ -81,7 +81,11 @@ class IndividualKyc < ActiveRecord::Base
   validates_attachment :kyc_file_2, content_type: CONTENT_TYPES
 
   def processing?
-    [KycStatus.id_for(:processing), KycStatus.id_for(:submitted)].include?(self.kyc_status_id)
+    KycStatus.ids_for([:processing, :submitted]).include?(self.kyc_status_id)
+  end
+
+  def completed?
+    KycStatus.id_for(:completed).include?(self.kyc_status_id)
   end
 
   def editable?
