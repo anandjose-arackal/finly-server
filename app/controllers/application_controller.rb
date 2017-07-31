@@ -170,7 +170,7 @@ class ApplicationController < ActionController::Base
   def set_current_app
     path = request.path
     if path.is_a?(String)
-      if path.starts_with('/admin')
+      if path.starts_with?('/admin')
         self.current_app = :ap
       elsif path.starts_with?('/payments')
         self.current_app = :vp

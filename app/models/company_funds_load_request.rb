@@ -17,7 +17,7 @@ class CompanyFundsLoadRequest < ActiveRecord::Base
   belongs_to :company
   belongs_to :requested_by_user, class_name: 'User'
   belongs_to :amount
-  belongs_to :bank_type_id, class_name: CompanyFundsLoadRequestType
+  belongs_to :bank_type, class_name: CompanyFundsLoadRequestType
 
   validates :company, presence: true
   validates :requested_by_user, presence: true
