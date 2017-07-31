@@ -1,12 +1,11 @@
 class AdminPanelVerifierMailer < ActiveJob::Base
 
   def perform
-    return unless valid_working_hours
-    notify_assign_without_kyc
-    # notify_assign_with_kyc
-    notify_upgrade_requests
     check_for_assigned_cards
     check_upgraded_cards
+    return unless valid_working_hours
+    notify_assign_without_kyc
+    notify_upgrade_requests
   end
 
   protected
@@ -50,14 +49,20 @@ class AdminPanelVerifierMailer < ActiveJob::Base
   end
 
   def check_for_assigned_cards
-    # CardAssignRequest.processing.each do |assign_request|
-    #   card = assign_request.card
-    #   Admin::Cards::AssignStatus.(user, card: card)
-    # end
+    CardAssignRequest.processing.each do |assign_request|
+      card = assign_request.card
+      user = assign_request.card_owner
+      Admin::Cards::AssignStatus.(user, card: card)
+    end
   end
 
   def check_upgraded_cards
-
+    IndividualKyc.processing.each do |kyc|
+      user = kyc.user
+      card = user&.cards&.first
+      next if card.blank? or user.blank?
+      Admin::Cards::AssignStatus.(user, card: card)
+    end
   end
 
 end
