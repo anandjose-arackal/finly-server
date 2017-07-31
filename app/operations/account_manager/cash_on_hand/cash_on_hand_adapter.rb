@@ -13,11 +13,19 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
   end
 
   def credit(payment)
-    self.cash_on_hand.credit_funds(payment.amount_value)
+    if self.cash_on_hand.credit_funds(payment.amount_value)
+      return true
+    end
+    self.errors = cash_on_hand.errors.full_messages
+    false
   end
 
   def debit(payment)
-    self.cash_on_hand.debit_funds(payment.amount_value)
+    if self.cash_on_hand.debit_funds(payment.amount_value)
+      return true
+    end
+    self.errors = cash_on_hand.errors.full_messages
+    false
   end
 
   def balance
