@@ -10,6 +10,14 @@ module Seedable
       []
     end
 
+    def ids_for(keys)
+      items = self.with_name(keys)
+      if items.present?
+        return items.pluck(:id)
+      end
+      return nil
+    end
+
     def id_for(key)
       items = self.with_name(key)
       if items.present?
