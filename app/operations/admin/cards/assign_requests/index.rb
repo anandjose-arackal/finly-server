@@ -17,6 +17,13 @@ class Admin::Cards::AssignRequests::Index < Admin::Cards::AssignRequests::Base
       add_message :error, 'User is not a reviewer'
       return
     end
+
+    # If the user is kalpesh, do not show once downloaded
+    if is_view?(:itzcash_operations) and self.card_assign_requests.present?
+      assign_request_ids = self.card_assign_requests.pluck(:id)
+      request_ids_to_hide = CardAssignRequestTrack.with_card_assign_request(assign_request_ids).with_action(CardAssignRequestTrackAction.id_for(:download)).with_action_admin_resource(user.id).created_after(24.hours.ago).pluck(:card_assign_request_id)
+      self.card_assign_requests = self.card_assign_requests.without_id(request_ids_to_hide)
+    end
   end
 
   def validate
