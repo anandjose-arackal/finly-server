@@ -32,6 +32,8 @@ class Agreement < ActiveRecord::Base
   scope :with_type_id, ->(type_id) { where agreement_type_id: type_id }
   scope :active, -> { where active: true }
 
+  scope :with_id, ->(id) { where id: id }
+
   CONTENT_TYPES = {content_type: %w(text/plain text/html)}
 
   has_attached_file :file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'

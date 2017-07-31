@@ -1,6 +1,6 @@
 class Authorizer::AgreementsController < ApplicationController
   def index
-    @result = Report::ReportAuthorizer::Show.(params)
+    @result = Agreements::AgreementAuthorizer::Index.(params)
     if @result.failure?
       respond response: :failure
       return
@@ -8,13 +8,11 @@ class Authorizer::AgreementsController < ApplicationController
   end
 
   def agree
-    @result = Report::ReportAuthorizer::Approve.(params)
+    @result = Agreements::AgreementAuthorizer::Agree.(params)
     if @result.failure?
       respond response: :failure
       return
     end
-    respond render: :show
+    respond response: :success
   end
-
-
 end

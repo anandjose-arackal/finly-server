@@ -100,7 +100,7 @@ class AdminUsers::UsersController < ApplicationController
 
   def agreements_mail
     @result = Admin::Users::AgreementsMail.(current_user, params)
-    if @result.succes?
+    if @result.success?
       respond response: :success, message: @result.messages[:success]
     else
       respond response: :failure, message: @result.messages[:error]

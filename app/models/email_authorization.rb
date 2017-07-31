@@ -21,4 +21,5 @@ class EmailAuthorization < ActiveRecord::Base
   scope :with_view_role_id, -> (id) { where view_role_id: id }
   scope :with_valid, -> { where is_valid: true }
   scope :with_user_id, -> (user_id) { where user_id: user_id }
+  scope :with_id, ->(id) { where id: id }
 end
