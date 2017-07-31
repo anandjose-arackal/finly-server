@@ -1,4 +1,4 @@
-class Admin::Cards::TestTransaction < Admin::Cards::IsAssigned
+class Admin::Cards::TestTransaction < Admin::Cards::AssignStatus
 
   def process
     super
