@@ -1,6 +1,10 @@
 class RequestFormatter::Base < BaseOperation
   attr_accessor :formatted_request
 
+  def user_model
+    [User, AdminUser]
+  end
+
   def success
     params[:formatted_request] = self.formatted_request
     RequestFormatter::Base::SuccessPresenter.new(user, params, messages)

@@ -14,7 +14,8 @@ class AdminUsers::Kyc::UsersController < ApplicationController
   end
 
   def update
-    @result = Admin::Cards::AssignRequests::Update.(current_user, params)
+    formatted_request = RequestFormatter::KycParser::Parse.(current_user, params).formatted_request
+    @result = Admin::KycProcesses::Users::Update.(current_user, formatted_request)
     respond response: @result.success? ? :success : :failure
   end
 

@@ -50,10 +50,10 @@ class AdminPanelVerifierMailer < ActiveJob::Base
   end
 
   def check_for_assigned_cards
-    CardAssignRequest.processing.each do |assign_request|
-      card = assign_request.card
-      Admin::Cards::AssignStatus.(user, card: card)
-    end
+    # CardAssignRequest.processing.each do |assign_request|
+    #   card = assign_request.card
+    #   Admin::Cards::AssignStatus.(user, card: card)
+    # end
   end
 
   def check_upgraded_cards
