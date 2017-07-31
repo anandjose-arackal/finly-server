@@ -1,19 +1,19 @@
-<% path = "www.finly.io/authorizer#agreements/params={\"view\":\"admin\", \"token\":\"#{@token}\"}" %>
+<% path = "https://www.finly.io/authorizer#agreements/params={\"view\":\"admin\", \"token\":\"#{@token}\"}" %>
 <% content_for :body do %>
   <div class="primary block center" style="background-color: white; text-align: center;">
     <br>
-    <p style="line-height: 160%; margin: 0 0 20px 0;">We welcome you to your Finly account</p>
-    <p style="line-height: 160%; margin: 0 0 20px 0;">Agreements</p>
+    <p style="line-height: 160%; margin: 0 0 20px 0; font-size: 16px;">You are just one small step away from onboarding your company.</p>
+    <p style="line-height: 160%; margin: 0 0 20px 0; font-weight: bold;">Kindly accept the agreements, to get started with Finly.</p>
     <p style="line-height: 160%; margin: 0 0 20px 0;">
       <a style="background-color: #374F76; border: none; color: white; display: inline-block; font-size: 14px;
         font-weight: 700; letter-spacing: 1px; padding: 13px 25px; text-decoration: none;
         text-transform: uppercase;"
-         href="<%= path %>"
-         class="primaryButton">Create Account</a>
+         href='<%= path.html_safe %>'
+         class="primaryButton" target="_blank">View Agreements</a>
     </p>
     <p style="line-height: 160%; margin: 0 0 20px 0;">
       Or click the link below:<br>
-      <a style="border: none; color: #374F76; text-decoration: none;" href='<%= path %>'><%= "#{path}" %></a>
+      <a style="border: none; color: #374F76; text-decoration: none;" href='<%= path.html_safe %>' target="_blank"><%= "#{path}" %></a>
     </p>
     <br>
 

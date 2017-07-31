@@ -13,4 +13,11 @@ class UserMailerPreview < ActionMailer::Preview
     token = "asdfsdfsadfsdf"
     UserMailer.invite(user, token, "Something")
   end
+
+  # http://localhost:3001/rails/mailers/user_mailer/agreements_mail
+  def agreements_mail
+    user = User.first
+    token = EmailAuthorization.first.token
+    UserMailer.agreements_mail(user, token)
+  end
 end
