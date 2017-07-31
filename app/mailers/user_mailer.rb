@@ -50,6 +50,12 @@ class UserMailer < ApplicationMailer
     mail to: user.email, subject: "Welcome to Finly!"
   end
 
+  def agreements_mail(user, email_authorization_token)
+    @user = user
+    @token = email_authorization_token
+    mail to: user.email, subject: "Finly Agreements"
+  end
+
   def role_updated(user)
     @data = user
     if user.admin?
