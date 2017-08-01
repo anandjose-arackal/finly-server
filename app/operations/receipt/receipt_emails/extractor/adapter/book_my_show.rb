@@ -5,7 +5,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::BookMyShow < Receipt::ReceiptE
   end
 
   def merchant
-    'MakeMyTrip'
+    'BookMyShow'
   end
 
   def amount_data_points
