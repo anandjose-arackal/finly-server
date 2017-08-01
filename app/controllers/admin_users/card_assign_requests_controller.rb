@@ -13,6 +13,10 @@ class AdminUsers::CardAssignRequestsController < ApplicationController
     respond
   end
 
+  def edit
+    @states = State.all
+  end
+
   def update
     formatted_request = RequestFormatter::KycParser::Parse.(current_user, params).formatted_request
     @result = Admin::Cards::AssignRequests::Update.(current_user, formatted_request)
