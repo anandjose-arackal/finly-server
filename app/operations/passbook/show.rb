@@ -1,5 +1,5 @@
 class Passbook::Show < BaseOperation
-  attr_accessor :users
+  attr_accessor :payments, :card_transactions, :account_types
 
   def pre_validate
     if user.blank?
@@ -9,7 +9,20 @@ class Passbook::Show < BaseOperation
   end
 
   def init
+    # company_credits, cash_on_hand, finly_money, :expense_card, :reimbursement_card
+    self.account_types = params[:account_types]
+    users = User::Team::Index.(user, params)
+    accounts = []
+    self.account_types.each do |type|
+      if type == 'company_credits'
+        # todo update to company_credits after yes bank is implemented
+        accounts << user.company
+      else
+        users.each do |user|
 
+        end
+      end
+    end
   end
 
   def validate
@@ -18,14 +31,6 @@ class Passbook::Show < BaseOperation
 
   def process
 
-  end
-
-  protected
-  def fetch_users
-    self.users = User::Index.(user, params)
-    if personal_view?
-
-    end
   end
 
 end
