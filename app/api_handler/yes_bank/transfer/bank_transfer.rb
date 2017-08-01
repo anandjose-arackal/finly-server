@@ -63,7 +63,6 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
     end
-    debugger
   end
 
   def success?
@@ -79,6 +78,7 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
   def set_xml_params
     liquid_template = load_soap_template
     self.template = liquid_template.render(
+        'UNIQUE_REFERENCE_NUMBER' => generated_reference_number,
         'APP_ID' => application_id,
         'CUSTOMER_ID' => customer_id,
         'ACCOUNT_NUMBER' => account_number,
@@ -89,5 +89,9 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
         'TRANSFER_CURRENCY_CODE' => transfer_currency,
         'TRANSFER_AMOUNT' => transfer_amount
     )
+  end
+
+  def generated_reference_number
+
   end
 end

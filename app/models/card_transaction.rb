@@ -39,6 +39,7 @@ class CardTransaction < ActiveRecord::Base
   belongs_to :card
 
   has_one :card_expense, dependent: :destroy
+  has_one :payment, as: :reference_resource
 
   # i.e. a combination of reference ID, type of details and transaction type should be unique
   validates_uniqueness_of :reference_id, scope: [:transaction_type, :type_of_details]

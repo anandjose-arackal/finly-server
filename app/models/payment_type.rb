@@ -10,10 +10,6 @@
 
 
 
-
-
-
-
 class PaymentType < ActiveRecord::Base
   has_many :payments
 
@@ -30,6 +26,11 @@ class PaymentType < ActiveRecord::Base
            credit_expense_card: 23,
            credit_reimbursement_card: 24
          }
+
+  # TYPES = {
+  #     credit: 18,
+  #     debit: 19
+  # }
 
   scope :with_id, -> (id) { where id: id }
   scope :with_name, -> (name) { where name: name }

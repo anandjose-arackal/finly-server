@@ -1,0 +1,19 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  unique_request_number: MyString
+  transfer_type: MyString
+  bank_reference_number: MyString
+  unique_response_number: MyString
+  amount_id: 
+  beneficiary_bank_account_id: 1
+  company_id: 
+
+two:
+  unique_request_number: MyString
+  transfer_type: MyString
+  bank_reference_number: MyString
+  unique_response_number: MyString
+  amount_id: 
+  beneficiary_bank_account_id: 1
+  company_id: 
