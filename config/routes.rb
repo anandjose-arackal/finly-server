@@ -1702,6 +1702,7 @@ Rails.application.routes.draw do
     patch 'card_assign_requests/:id', to: 'card_assign_requests#update'
     get 'card_assign_requests/export(.:format)' => 'card_assign_requests#export'
     get 'card_assign_requests/export/kycs(.:format)' => 'card_assign_requests#download_kycs'
+    get 'card_assign_requests/edit' => 'card_assign_requests#edit'
 
     post 'call_center/search', to: 'call_center/users#search', as: :search
   end
