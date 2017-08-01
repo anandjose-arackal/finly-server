@@ -143,7 +143,8 @@ class Card::Transaction::Create < BaseOperation
               # add to cash on hand
               if user.payments.create(amount_attributes: {value: params[:transaction_amount_attributes][:value], currency_id: Currency.first.id},
                                       date: DateUtils.local_date,
-                                      payment_type_id: PaymentType.id_for(:atm_withdrawal),
+                                      payment_type_id: PaymentType.id_for(:debit),
+                                      payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal),
                                       note: "Atm Withdrawal",
                                       initiating_user: user,
                                       receiving_user: user,

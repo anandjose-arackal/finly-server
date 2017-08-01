@@ -10,7 +10,8 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
   def self.call_async(payment_id)
     # define the operation to accordingly run the operation in the background
-
+    payment = Payment.find_by(id: payment_id)
+    self.new(payment).run
   end
 
   def initialize(payment)
@@ -26,21 +27,21 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     unless receiving_account_adapter.creditable_accounts.include?(payment.initiating_account_type)
       add_message :error, "You cannot credit from this account"
       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                    content: "You cannot credit from #{initiating_account_adapter.name} to #{receiving_account_adapter.name}").save
+                                    content: "You cannot credit from #{source_account_adapter.name} to #{receiving_account_adapter.name}").save
       return
     end
 
     unless source_account_adapter.debitable_accounts.include?(payment.receiving_account_type)
       add_message :error, "You cannot debit to this account"
       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                    content: "You cannot debit from #{receiving_account_adapter.name} to #{initiating_account_adapter.name}").save
+                                    content: "You cannot debit from #{receiving_account_adapter.name} to #{source_account_adapter.name}").save
       return
     end
 
     unless source_account_adapter.balance > payment.amount_value
       add_message :error, "This account does not have enough balance for this transaction"
       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                    content: "Not enough funds in #{payment.initating_account_type.to_s} to initiate the transfer").save
+                                    content: "Not enough funds in #{payment.source_account_type.to_s} to initiate the transfer").save
       return
     end
 

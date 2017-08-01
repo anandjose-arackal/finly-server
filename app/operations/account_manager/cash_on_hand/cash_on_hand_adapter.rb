@@ -33,15 +33,15 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
   end
 
   def eligibility(source_id)
-
+    true
   end
 
   def creditable_accounts
-    ["OutsideFinly"]
+    ["OutsideFinly", nil]
   end
 
   def debitable_accounts
-    ["OutsideFinly"]
+    ["OutsideFinly", nil]
   end
 
   def init(source_id)

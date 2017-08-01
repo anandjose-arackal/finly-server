@@ -67,10 +67,10 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
     AccountManager::Payments::PaymentProcessor::PaymentsPresenter.new(user, params, messages)
   end
 
-  def failure
-    params[:payment_order] = payment_order
-    AccountManager::Payments::PaymentProcessor::PaymentsPresenter.new(user, params, messages)
-  end
+  # def failure
+  #   params[:payment_order] = payment_order
+  #   AccountManager::Payments::PaymentProcessor::PaymentsPresenter.new(user, params, messages)
+  # end
 
   class AccountManager::Payments::PaymentProcessor::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -108,6 +108,7 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
           receiving_account_type: pi[:receiving_account_type],
           receiving_account_id: pi[:receiving_account_id],
           payment_status_id: PaymentStatus.id_for(:pending),
+          payment_purpose_id: pi[:payment_purpose_id],
           amount_attributes: pi[:amount_attributes],
           date: pi[:date]
       }

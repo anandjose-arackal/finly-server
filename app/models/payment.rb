@@ -236,9 +236,8 @@ class Payment < ActiveRecord::Base
   private
 
   def initiating_account_presence
-    unless [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
-            PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement),
-            PaymentType.id_for(:reimbursement_outside_finly)].include?(self.payment_type_id)
+    unless [PaymentPurpose.id_for(:fund_transfer_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly),
+            PaymentPurpose.id_for(:atm_withdrawal), PaymentType.id_for(:card_transaction)].include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")
       end
@@ -246,9 +245,8 @@ class Payment < ActiveRecord::Base
   end
 
   def receiving_account_presence
-    unless [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
-            PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement),
-            PaymentType.id_for(:reimbursement_outside_finly)].include?(self.payment_type_id)
+    unless [PaymentPurpose.id_for(:fund_transfer_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly),
+            PaymentPurpose.id_for(:atm_withdrawal), PaymentType.id_for(:card_transaction)].include?(self.payment_purpose_id)
       if receiving_account_id.blank? || receiving_account_type.blank?
         errors.add(:receiving_account, "cannot be blank")
       end

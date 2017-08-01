@@ -1,6 +1,5 @@
 class CreateBankTransactions < ActiveRecord::Migration
   def change
-
     create_table :bank_transfer_statuses do |t|
       t.string :name
 

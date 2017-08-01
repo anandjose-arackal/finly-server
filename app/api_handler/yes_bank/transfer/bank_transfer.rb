@@ -22,7 +22,6 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
       return
     end
 
-    debugger
     unless transfer_request.class.name == "TransferRequest"
       add_message :error, "Invalid parameters"
     end
