@@ -1,6 +1,5 @@
-# Create is used to create the required payment order and prepare for execution.
-# If the order is scheduled, it schedules the payment_order,
-# or else it calls the Benefits::TaxBenefits::Execute in background to execute the payment order
+# this operation would now create the payment request from the payment order data being passed in the controller
+# and pass it to the payment processor
 class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
   attr_accessor :order_data, :processed_order_data, :payment_order, :scheduled_at
 

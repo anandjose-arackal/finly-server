@@ -11,11 +11,11 @@ class BankTransfer::ReimbursementController < ApplicationController
     end
     case action_type
       when 'request_otp'
-        @result = BankTransfer::Reimbursement::Beneficiary::RequestOtp.(current_user, params)
+        @result = BankTransfer::ItzCash::Reimbursement::Beneficiary::RequestOtp.(current_user, params)
       when 'verify_otp'
-        @result = BankTransfer::Reimbursement::Beneficiary::VerifyOtp.(current_user, params)
+        @result = BankTransfer::ItzCash::Reimbursement::Beneficiary::VerifyOtp.(current_user, params)
       when 'add'
-        @result = BankTransfer::Reimbursement::Beneficiary::Add.(current_user, params)
+        @result = BankTransfer::ItzCash::Reimbursement::Beneficiary::Add.(current_user, params)
     end
     if @result&.success?
       respond response: :success
@@ -25,7 +25,7 @@ class BankTransfer::ReimbursementController < ApplicationController
   end
 
   def show
-    @result = BankTransfer::Reimbursement::Show.(current_user, params)
+    @result = BankTransfer::ItzCash::Reimbursement::Show.(current_user, params)
     respond
   end
 
@@ -37,19 +37,19 @@ class BankTransfer::ReimbursementController < ApplicationController
     end
     case action_type
       when 'enable'
-        @result = BankTransfer::Sender::Enable.(current_user, params)
+        @result = BankTransfer::ItzCash::Sender::Enable.(current_user, params)
       when 'enable_verify_otp'
-        @result = BankTransfer::Sender::VerifyOtp.(current_user, params)
+        @result = BankTransfer::ItzCash::Sender::VerifyOtp.(current_user, params)
       when 'set_default'
-        @result = BankTransfer::Reimbursement::Beneficiary::SetDefault.(current_user, params)
+        @result = BankTransfer::ItzCash::Reimbursement::Beneficiary::SetDefault.(current_user, params)
       when 'resend_otp'
-        @result = BankTransfer::ResendOtp.(current_user, params)
+        @result = BankTransfer::ItzCash::ResendOtp.(current_user, params)
       when 'request_otp'
-        @result = BankTransfer::Reimbursement::Beneficiary::RequestOtp.(current_user, params)
+        @result = BankTransfer::ItzCash::Reimbursement::Beneficiary::RequestOtp.(current_user, params)
       when 'verify_otp'
-        @result = BankTransfer::Reimbursement::Beneficiary::VerifyOtp.(current_user, params)
+        @result = BankTransfer::ItzCash::Reimbursement::Beneficiary::VerifyOtp.(current_user, params)
       when 'add'
-        @result = BankTransfer::Reimbursement::Beneficiary::Add.(current_user, params)
+        @result = BankTransfer::ItzCash::Reimbursement::Beneficiary::Add.(current_user, params)
     end
     if @result&.success?
       respond response: :success

@@ -17,7 +17,13 @@
 #  receiving_account_type  :string(255)
 #  payment_order_id        :integer
 #  payment_status_id       :integer          not null
+#  initiating_user_type    :string(255)
+#  receiving_user_type     :string(255)
 #
+
+
+
+
 
 
 
@@ -31,8 +37,8 @@ class Payment < ActiveRecord::Base
 
   belongs_to :amount
   belongs_to :payment_type
-  belongs_to :initiating_user, class_name: 'User'
-  belongs_to :receiving_user, class_name: 'User'
+  belongs_to :initiating_user, polymorphic: true
+  belongs_to :receiving_user, polymorphic: true
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks
@@ -132,13 +138,15 @@ class Payment < ActiveRecord::Base
   validates :date, presence: true
   validates :initiating_user_id, presence: true
   validates :receiving_user_id, presence: true
+  validate :initiating_account_presence
+  validate :receiving_account_presence
 
   delegate :completed?, :failed?, :pending?, :in_progress?, :scheduled?, to: :payment_status
 
   def initiating_account_type_name
     name = ""
-    unless self.initiating_account_type == 'Company'
-      name += "#{self.initiating_user.name}'s"
+    unless self.initiating_account_type == 'ItzCashCompanyAccount'
+      name += "#{self.initiating_user&.name}'s"
     end
     if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
         PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement),
@@ -149,7 +157,7 @@ class Payment < ActiveRecord::Base
     case self.initiating_account_type
       when 'UserWallet'
         name += " Finly Money"
-      when 'Company'
+      when 'ItzCashCompanyAccount'
         name += " Company Credits"
       when 'Card'
         name += " #{self.initiating_account.card_program.name.humanize} Card"
@@ -160,8 +168,8 @@ class Payment < ActiveRecord::Base
   def receiving_account_type_name
     name = ""
 
-    unless self.receiving_account_type == 'Company'
-      name += "#{self.receiving_user.name}'s"
+    unless self.receiving_account_type == 'ItzCashCompanyAccount'
+      name += "#{self.receiving_user&.name}'s"
     end
 
     if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
@@ -178,12 +186,20 @@ class Payment < ActiveRecord::Base
     case self.receiving_account_type
       when 'UserWallet'
         name += " Finly Money"
-      when 'Company'
+      when 'ItzCashCompanyAccount'
         name += " Company Credits"
       when 'Card'
         name += " #{self.receiving_account.card_program.name.humanize} Card"
     end
     name
+  end
+
+  def credit?
+    self.payment_type_id == PaymentType.id_for(:credit)
+  end
+
+  def debit?
+    self.payment_type_id == PaymentType.id_for(:debit)
   end
 
   def advance?
@@ -209,6 +225,28 @@ class Payment < ActiveRecord::Base
   def clear_system_messages
     if system_messages.present?
       system_messages.destroy_all
+    end
+  end
+
+  private
+
+  def initiating_account_presence
+    unless [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
+            PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement),
+            PaymentType.id_for(:reimbursement_outside_finly)].include?(self.payment_type_id)
+      if initiating_account_id.blank? || receiving_account_type.blank?
+        errors.add(:initiating_account, "cannot be blank")
+      end
+    end
+  end
+
+  def receiving_account_presence
+    unless [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
+            PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement),
+            PaymentType.id_for(:reimbursement_outside_finly)].include?(self.payment_type_id)
+      if receiving_account_id.blank? || receiving_account_type.blank?
+        errors.add(:receiving_account, "cannot be blank")
+      end
     end
   end
 

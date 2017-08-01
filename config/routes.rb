@@ -429,7 +429,8 @@
 #                           admin_users_kyc_users_approve POST   /admin_users/kyc/users/approve(.:format)                           admin_users/kyc/users#approve
 #                            admin_users_kyc_users_reject POST   /admin_users/kyc/users/reject(.:format)                            admin_users/kyc/users#reject
 #                  admin_users_kyc_users_mark_as_upgraded POST   /admin_users/kyc/users/mark_as_upgraded(.:format)                  admin_users/kyc/users#mark_as_upgraded
-#                                         admin_users_kyc GET    /admin_users/kyc/users/export(.:format)                            admin_users/kyc/users#export
+#                                         admin_users_kyc PATCH  /admin_users/kyc/users/:id(.:format)                               admin_users/kyc/users#update
+#                                                         GET    /admin_users/kyc/users/export(.:format)                            admin_users/kyc/users#export
 #                                                         GET    /admin_users/kyc/users/export/kycs(.:format)                       admin_users/kyc/users#download_kycs
 #                                  admin_users_agreements GET    /admin_users/agreements(.:format)                                  admin_users/agreements#index
 #                                                         POST   /admin_users/agreements(.:format)                                  admin_users/agreements#create
@@ -439,7 +440,8 @@
 #                 admin_users_card_assign_requests_reject POST   /admin_users/card_assign_requests/reject(.:format)                 admin_users/card_assign_requests#reject
 #          admin_users_card_assign_requests_mark_assigned POST   /admin_users/card_assign_requests/mark_assigned(.:format)          admin_users/card_assign_requests#mark_as_assigned
 # admin_users_card_assign_requests_mark_assigned_upgraded POST   /admin_users/card_assign_requests/mark_assigned_upgraded(.:format) admin_users/card_assign_requests#mark_as_assigned_upgraded
-#                                             admin_users GET    /admin_users/card_assign_requests/export(.:format)                 admin_users/card_assign_requests#export
+#                                             admin_users PATCH  /admin_users/card_assign_requests/:id(.:format)                    admin_users/card_assign_requests#update
+#                                                         GET    /admin_users/card_assign_requests/export(.:format)                 admin_users/card_assign_requests#export
 #                                                         GET    /admin_users/card_assign_requests/export/kycs(.:format)            admin_users/card_assign_requests#download_kycs
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                          admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                             admin_users/users#admin_menus
@@ -664,14 +666,6 @@
 #                                                         PUT    /settlements/:id(.:format)                                         settlements#update
 #                                                         DELETE /settlements/:id(.:format)                                         settlements#destroy
 #                                  settlement_add_payment POST   /settlements/:id/add_payment(.:format)                             settlements#add_payment
-#                                                         GET    /receipts(.:format)                                                receipts#index
-#                                                         POST   /receipts(.:format)                                                receipts#create
-#                                                         GET    /receipts/new(.:format)                                            receipts#new
-#                                                         GET    /receipts/:id/edit(.:format)                                       receipts#edit
-#                                                         GET    /receipts/:id(.:format)                                            receipts#show
-#                                                         PATCH  /receipts/:id(.:format)                                            receipts#update
-#                                                         PUT    /receipts/:id(.:format)                                            receipts#update
-#                                                         DELETE /receipts/:id(.:format)                                            receipts#destroy
 #                         expense_type_configuration_show GET    /expense_type_configurations(.:format)                             expense_types_configuration#show
 #                       expense_type_configuration_update PATCH  /expense_type_configurations(.:format)                             expense_types_configuration#update
 #                                               per_diems GET    /per_diems(.:format)                                               per_diems#index
@@ -726,6 +720,7 @@
 #                                                feedback POST   /feedback(.:format)                                                feedback#create
 #                                         menu_data_cards GET    /menu_data_cards(.:format)                                         expense_types_configuration#menu_data_cards
 #                                      menu_data_disburse GET    /menu_data_disburse(.:format)                                      expense_types_configuration#menu_data_disburse
+#                                      menu_data_payments GET    /menu_data_payments(.:format)                                      expense_types_configuration#menu_data_payments
 #                                            cards_orders GET    /cards/orders(.:format)                                            orders/order_cards#index
 #                                                         GET    /cards/orders/:id(.:format)                                        orders/order_cards#show
 #                                                         DELETE /cards/orders/:id(.:format)                                        orders/order_cards#destroy
@@ -832,6 +827,9 @@
 #                           quickbooks_sync_payment_types POST   /quickbooks/sync_payment_types(.:format)                           quickbooks#sync_payment_types
 #                                quickbooks_update_config PATCH  /quickbooks/update_config(.:format)                                quickbooks#update
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                       quickbooks#show
+#                                                     tos GET    /tos(.:format)                                                     static_pages#tos
+#                                                 privacy GET    /privacy(.:format)                                                 static_pages#privacy
+#                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                  static_pages#prepaid_card_agreement
 #
 
 #                               crono_web        /crono                                                      Crono::Web
@@ -1931,6 +1929,7 @@ Rails.application.routes.draw do
   # Getting Menu Data for Cards module
   get 'menu_data_cards' => 'expense_types_configuration#menu_data_cards'
   get 'menu_data_disburse' => 'expense_types_configuration#menu_data_disburse'
+  get 'menu_data_payments' => 'expense_types_configuration#menu_data_payments'
 
   # Orders
   get 'cards/orders' => 'orders/order_cards#index'

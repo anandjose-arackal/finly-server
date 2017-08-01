@@ -3,8 +3,8 @@ class Admin::Users::Base < Admin::Base
 
   class Admin::Users::Base::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :created_user, :selected_user, :cards, :policies, :mapping,
-                  :managers, :finance_managers, :wallet, :itz_cash_card_programs,
-                  :user_panel_subscription
+                  :managers, :finance_managers, :wallet, :user_panel_subscription,
+                  :itz_cash_card_programs
 
     def init
       self.created_user = params[:created_user]
@@ -70,7 +70,5 @@ class Admin::Users::Base < Admin::Base
       end
       data
     end
-
-
   end
 end

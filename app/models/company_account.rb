@@ -15,6 +15,7 @@
 class CompanyAccount < ActiveRecord::Base
   belongs_to :company
   belongs_to :wallet_balance, class_name: 'Amount'
+  belongs_to :company_account_type
 
   after_create do
     if self.wallet_balance.blank?

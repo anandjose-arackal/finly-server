@@ -18,6 +18,8 @@
 #  note                      :text(65535)
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  initiating_account_type   :string(255)
+#  receiving_account_type    :string(255)
 #
 
 class PaymentOrder < ActiveRecord::Base
@@ -66,6 +68,7 @@ class PaymentOrder < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount_requested
   accepts_nested_attributes_for :amount_processed
+  accepts_nested_attributes_for :payments
 
   scope :with_type_id, -> (id) { where payment_order_type_id: id }
   scope :with_id, -> (id) { where id: id }
@@ -74,9 +77,27 @@ class PaymentOrder < ActiveRecord::Base
   scope :scheduled_on_or_before, -> (date) { where 'scheduled_at <= ?', date }
   scope :joins_amount_requested, -> { joins :amount_requested }
   scope :total_amount_requested, -> { joins_amount_requested.sum(:value) }
+  scope :with_company_id, ->(company_id) {where company_id: company_id}
 
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
 
   default_scope { order(created_at: :desc) }
+
+  # method for total of all the payments in this particular payment order
+  def request_total
+    total = 0
+    self.payments.each do |payment|
+      total += payment.amount_value
+    end
+    total
+  end
+
+  def credit?
+    self.payments.first.payment_type_id == PaymentType.id_for(:credit)
+  end
+
+  def debit?
+    self.payments.first.payment_type_id == PaymentType.id_for(:debit)
+  end
 
 end

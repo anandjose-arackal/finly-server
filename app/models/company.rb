@@ -31,8 +31,9 @@ class Company < ActiveRecord::Base
   has_many :company_balance_histories
   has_many :field_configurations, as: :configurable
   has_one :feature_subscription, as: :subscribable
-  has_many :initiating_payments, as: :initiating_account
-  has_many :receiving_payments, as: :receiving_account
+  has_one :itz_cash_company_account
+  has_one :yes_bank_company_account
+
   has_many :payment_orders
   has_many :user_groups
   has_many :user_teams
@@ -259,6 +260,9 @@ class Company < ActiveRecord::Base
     self.company_kyc&.company_type&.name
   end
 
+  def yes_bank_account_number
+    self.yes_bank_company_account.account_number
+  end
 
   private
 

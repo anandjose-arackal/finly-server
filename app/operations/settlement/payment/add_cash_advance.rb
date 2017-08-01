@@ -19,6 +19,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     super()
     if params[:payment][:amount].blank? or params[:payment][:amount].to_f < 0
       add_message :error, 'Amount cannot be equal to or less than 0'
+      return
     end
     if params[:password].blank?
       add_message :error, 'You need to provide your password to initiate this transfer'
@@ -43,6 +44,9 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     else
       self.role = UserRole.id_for(:finance_manager)
     end
+    self.amount = payment_param[:amount]
+    self.currency_id = payment_param[:currency_id] || Currency.first.id
+    init_payment_request(PaymentType.id_for(:add_cash_on_hand))
   end
 
   def authorize
@@ -53,9 +57,11 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def validate
     unless validate_date payment_param[:date]
-      # add_message :error, 'Invalid date passed. Try again'
+      # above method already adds the respective error message, so just returning
       return false
     end
+
+    # validations specific to a particular validation in the money request
     if money_requests.present?
       total_amount = 0
       money_requests.each do |request|
@@ -74,27 +80,22 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def process
-    self.payment = to_user.payments.build(initiating_user: user, receiving_user: to_user,
-                                          payment_type_id: PaymentType.id_for(:add_cash_on_hand),
-                                          date: payment_param[:date], note: payment_param[:note],
-                                          amount_attributes: {value: payment_param[:amount],
-                                                              currency_id: payment_param[:currency_id]},
-                                          payment_status_id: PaymentStatus.id_for(:completed))
-    balance_sheet = to_user.balance_sheet
-    if payment.save and balance_sheet.add_cash_in_hand(payment_param[:amount], payment_param[:currency_id])
-      # balance_sheet.subtract_pending_reimbursement
+    # now calling the payment processor with the payment request parameter so that it handles the payment for us
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
+    if op.success?
+      payment = op.payments.first
+      # if there are associated money requests, mark them as credited
       if money_requests.present?
         ids = money_requests.pluck(:id)
         total_amount = MoneyRequestItem.with_money_request(ids).with_amount.sum(:value)
-        balance_sheet.subtract_pending_advance(total_amount)
+        to_user.balance_sheet.subtract_pending_advance(total_amount)
         money_requests.each do |money_request|
           MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role})
         end
       end
       return true
     end
-    add_message :error, payment.errors.full_messages + balance_sheet.errors.full_messages
-    payment.destroy
+    add_message :error, op.messages[:error]
     false
   end
 

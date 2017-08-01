@@ -53,6 +53,9 @@
 
 
 
+
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -100,7 +103,9 @@ class User < ActiveRecord::Base
   has_one :auto_reload_config, as: :reloadable, dependent: :destroy
   has_one :itz_cash_dmt_sender
   has_one :user_panel_subscription
+  has_one :cash_on_hand
 
+  has_many :bank_accounts, as: :account_owner
   has_many :authentications
   has_many :cards, dependent: :destroy
   has_many :card_transactions, dependent: :destroy
@@ -374,6 +379,9 @@ class User < ActiveRecord::Base
     self.build_enforce_policy(enabled: false).save
     self.build_auto_reload_config(enabled: false).save
     self.build_individual_kyc(company_id: self.company_id, kyc_status_id: KycStatus.id_for(:incomplete), admin_review_workflow: AdminReviewWorkflow.workflow_for(:kyc_update)).save if self.individual_kyc.blank?
+
+    # creating the cash on hand account for this user
+    self.build_cash_on_hand(balance_attributes: {value: 0, currency_id: Currency.id_for(:INR)}).save
   end
 
   def payments
