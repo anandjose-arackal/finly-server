@@ -1,7 +1,8 @@
-class YesBank::Base < BaseOperation
+class YesBank::Base < BaseHandler
 
   attr_accessor :client_id, :client_secret, :auth_username,
-                :auth_password, :template, :config_path
+                :auth_password, :template, :config_path, :application_id,
+                :customer_id
 
   def env_key
     'yes_bank'
@@ -9,13 +10,17 @@ class YesBank::Base < BaseOperation
 
   def init
     self.config_path = Rails.root.join('config', 'yes_bank_config.yml').to_s
-    unless path.present?
+    unless config_path.present?
       add_message :error, "Server error, try again later"
     end
-    self.client_id = YAML.load_file(config_path)[Rails.env][:client_id]
-    self.client_secret = YAML.load_file(config_path)[Rails.env][:client_secret]
-    self.auth_username = YAML.load_file(config_path)[Rails.env][:username]
-    self.auth_password = YAML.load_file(config_path)[Rails.env][:password]
+    self.client_id = YAML.load_file(config_path)[Rails.env]['client_id']
+    self.client_secret = YAML.load_file(config_path)[Rails.env]['client_secret']
+    self.auth_username = YAML.load_file(config_path)[Rails.env]['username']
+    self.auth_password = YAML.load_file(config_path)[Rails.env]['password']
+    self.application_id = YAML.load_file(config_path)[Rails.env]['application_id']
+    self.customer_id = YAML.load_file(config_path)[Rails.env]['customer_id']
+    # now calling the load_connection method to initialize the connection
+    super()
   end
 
   def yes_bank_action
@@ -39,9 +44,9 @@ class YesBank::Base < BaseOperation
     # verify certificate only in production
     verify = Rails.env.production? ? true : false
     ssl_options = {
-        client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + 'certificates/finly.crt')),
-        client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + 'certificates/finly.key')),
-        ca_path: ENV['HOME'] + 'certificates/ybl.pem',
+        client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
+        client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
+        ca_path: ENV['HOME'] + '/certificates/ybl.pem',
         verify: verify
     }
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|
@@ -57,6 +62,6 @@ class YesBank::Base < BaseOperation
 
   def load_soap_template
     action = yes_bank_action
-    self.template = Liquid::Template.parse(File.read("./../templates/#{action}.hbs"))
+    self.template = Liquid::Template.parse(File.read("#{Rails.root}/app/api_handler/yes_bank/templates/#{action}.hbs"))
   end
 end

@@ -4,6 +4,9 @@ development:
   username: 'testclient'
   password: 'test@123'
   account_number: '000690600003544'
+  application_id: '448995'
+  customer_id: '448995'
+  account_number: '000690600003544'
 
 production:
   client_id:
@@ -11,3 +14,5 @@ production:
   username:
   password:
   account_number:
+  application_id: '448995'
+  customer_id: '448995'
