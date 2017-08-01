@@ -1,4 +1,4 @@
-class BankTransfer::Sender::VerifyOtp < BankTransfer::Sender::Base
+class BankTransfer::ItzCash::Sender::VerifyOtp < BankTransfer::ItzCash::Sender::Base
   attr_accessor :otp
 
   def pre_validate

@@ -245,6 +245,7 @@ GEM
       activerecord
       kaminari-core (= 1.0.1)
     kaminari-core (1.0.1)
+    liquid (4.0.0)
     loofah (2.0.3)
       nokogiri (>= 1.5.9)
     mail (2.6.6)
@@ -480,6 +481,7 @@ DEPENDENCIES
   jbuilder (= 2.6.1)
   jquery-rails (= 4.2.1)
   jquery-ui-rails (= 5.0.5)
+  liquid
   meta_request
   mocha (= 1.2.1)
   mysql2 (= 0.4.5)
@@ -518,4 +520,4 @@ DEPENDENCIES
   wkhtmltopdf-binary (= 0.12.3.1)
 
 BUNDLED WITH
-   1.14.5
+   1.14.6

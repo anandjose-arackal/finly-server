@@ -1,2 +1,3 @@
-class BankTransfer::Sender::Base < BaseOperation
+class BankTransfer::ItzCash::Sender::Base < BaseOperation
+
 end

@@ -260,6 +260,9 @@ class Company < ActiveRecord::Base
     self.company_kyc&.company_type&.name
   end
 
+  def yes_bank_account_number
+    self.yes_bank_company_account.account_number
+  end
 
   private
 

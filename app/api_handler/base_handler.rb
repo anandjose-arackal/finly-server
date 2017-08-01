@@ -149,7 +149,7 @@ class BaseHandler
           end
         else
           add_message :error, 'Invalid Request Type'
-          return;
+          return
       end
       puts "response : #{self.response.body}"
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed

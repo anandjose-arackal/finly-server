@@ -1,0 +1,56 @@
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:ser="http://www.quantiguous.com/services">
+    <soap:Header/>
+    <soap:Body>
+        <ser:transfer>
+            <ser:version>2</ser:version>
+            <ser:uniqueRequestNo>FINLY3</ser:uniqueRequestNo>
+            <!--Optional:-->
+            <ser:appID>{{APP_ID}}</ser:appID>
+            <!--Optional:-->
+            <!--         <ser:purposeCode>FIN</ser:purposeCode>-->
+            <ser:customerID>{{APP_ID}}</ser:customerID>
+            <ser:debitAccountNo>{{ACCOUNT_NUMBER}}</ser:debitAccountNo>
+            <ser:beneficiary>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <!--            <ser:beneficiaryCode></ser:beneficiaryCode>-->
+                <ser:beneficiaryDetail>
+                    <ser:beneficiaryName>
+                        <ser:fullName>{{BENEFICIARY_NAME}}</ser:fullName>
+                    </ser:beneficiaryName>
+                   <!--Optional:-->
+<!--               <ser:beneficiaryAddress>-->
+<!--                  <ser:address1>Something</ser:address1>-->
+<!--                  <!--Optional:-->-->
+<!--                  <ser:address2>else</ser:address2>-->
+<!--                  <!--Optional:-->-->
+<!--                  <ser:address3>sup</ser:address3>-->
+<!--                  <!--Optional:-->-->
+<!--                  <ser:postalCode>560003</ser:postalCode>-->
+<!--                  <!--Optional:-->-->
+<!--<!--                  <ser:city></ser:city>-->-->
+<!--                  <!--Optional:-->-->
+<!--<!--                  <ser:stateOrProvince></ser:stateOrProvince>-->-->
+<!--                  <!--Optional:-->-->
+<!--                  <ser:country>IN</ser:country>-->
+<!--               </ser:beneficiaryAddress>-->
+<!--               <ser:beneficiaryContact>-->
+<!--                  <!--Optional:-->-->
+<!--                  <ser:mobileNo>9561234523</ser:mobileNo>-->
+<!--                  <!--Optional:-->-->
+<!--                  <ser:emailID>a@a.com</ser:emailID>-->
+<!--               </ser:beneficiaryContact>-->
+                    <ser:beneficiaryAccountNo>{{BENEFICIARY_ACCOUNT_NUMBER}}</ser:beneficiaryAccountNo>
+                    <ser:beneficiaryIFSC>{{BENEFICIARY_IFSC}}</ser:beneficiaryIFSC>
+                   <!--Optional:-->
+<!--               <ser:beneficiaryMobileNo>9560091721</ser:beneficiaryMobileNo>-->
+<!--               <!--Optional:-->-->
+<!--               <ser:beneficiaryMMID>9532870</ser:beneficiaryMMID>-->
+                </ser:beneficiaryDetail>
+            </ser:beneficiary>
+            <ser:transferType>{{TRANSFER_TYPE}}</ser:transferType>
+            <ser:transferCurrencyCode>{{TRANSFER_CURRENCY_CODE}}</ser:transferCurrencyCode>
+            <ser:transferAmount>{{TRANSFER_AMOUNT}}</ser:transferAmount>
+            <ser:remitterToBeneficiaryInfo>FUND TRANSFER</ser:remitterToBeneficiaryInfo>
+        </ser:transfer>
+    </soap:Body>
+</soap:Envelope>
