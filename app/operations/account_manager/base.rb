@@ -3,7 +3,7 @@ class AccountManager::Base < BaseOperation
   protected
 
   def retrieve_adapter(account_type)
-    acc_type = account_type&.class&.to_s || "OutsideFinly"
+    acc_type = account_type&.class&.to_s || 'OutsideFinly'
     case acc_type
       when 1, Card, "Card"
         return AccountManager::Cards::CardAdapter.new(account_type.id)

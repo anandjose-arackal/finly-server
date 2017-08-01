@@ -60,6 +60,7 @@ class Card < ActiveRecord::Base
   scope :unassigned, -> { where user_id: nil }
   scope :active, -> { where active: true }
   scope :expense_cards, -> { where card_program_id: CardProgram.id_for(:expense) }
+  scope :reimbursement_cards, -> { where card_program_id: CardProgram.id_for(:reimbursement) }
   scope :manager_viewable_transactions, -> { where card_program_id: CardProgram.all.with_manager_view_transactions.pluck(:id) }
   scope :with_card_program, ->(id) { where card_program_id: id }
   scope :creditable_cards, -> { with_card_program(CardProgram.all.with_manager_credit) }
