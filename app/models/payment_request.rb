@@ -102,11 +102,6 @@ class PaymentRequest < NonPersistentModel
     end
   end
 
-  def request_currency_id
-    # for now will just be INR, can change in the future
-    Currency.id_for(:INR)
-  end
-
   class PaymentRequest::PaymentItem < NonPersistentModel
     attr_accessor :receiving_resource_id, :receiving_resource_type,
                   :receiving_account_id, :receiving_account_type,
