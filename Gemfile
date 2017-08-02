@@ -80,6 +80,8 @@ gem 'handlebars_assets', '0.23.1'
 #For pushing notifications
 gem 'gcm', '0.1.1'
 
+gem 'activemodel-associations', '0.2.0'
+
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
 

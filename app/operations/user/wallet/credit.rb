@@ -8,7 +8,7 @@ class User::Wallet::Credit < User::Wallet::Base
 
   def init
     super
-    self.payment_request = PaymentRequest.new
+
   end
 
   def validate_sufficient_funds
@@ -39,33 +39,13 @@ class User::Wallet::Credit < User::Wallet::Base
 
   def process
     # create the payment request object and pass it to the payment processor for the actual credit
-    payment_request.initiating_user_id = initiating_user.id
-    payment_request.company_id = initiating_user.company_id
-    payment_request.payment_order_type_id = PaymentOrderType.id_for(:expense_card)
-    payment_request.scheduled_at = Date.today # basically a proxy for executing the request right now
-    payment_request.synchronous = true # because this needs to be executed right away
-    payment_request.payment_items = [
-        {
-            initiating_user_id: initiating_user.id,
-            receiving_user_id: receiving_user.id,
-            initiating_account_id: initiating_account.id,
-            initiating_account_type: initiating_account.class.to_s,
-            receiving_account_id: receiving_account.id,
-            receiving_account_type: receiving_account.class.to_s,
-            payment_type_id: PaymentType.id_for(:credit),
-            date: Date.today,
-            amount_attributes: {
-                value: self.amount,
-                currency_id: Currency.id_for(:INR)
-            }
-        }
-    ]
+    self.payment_request = PaymentRequest.(initiating_user, initiating_account, receiving_account.class, :credit, :fund_transfer)
+    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, self.amount))
 
     # calling the payment processor to complete the transfer using adapters
     op = AccountManager::Payments::PaymentProcessor.(initiating_user, {payment_request: payment_request})
     unless op.success?
       # destroy the payment order that was created for this purpose, and return errors
-      op.payment_order.destroy
       add_message :error, op.messages[:error]
     end
   end

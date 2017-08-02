@@ -32,9 +32,7 @@ class User::Wallet::Debit < User::Wallet::Base
     # create the payment request object and pass it to the payment processor for the actual credit
     payment_request.initiating_user_id = initiating_user.id
     payment_request.company_id = initiating_user.company_id
-    payment_request.payment_order_type_id = PaymentOrderType.id_for(:expense_card)
-    payment_request.scheduled_at = Date.today # basically a proxy for executing the request right now
-    payment_request.synchronous = true # because this needs to be executed right away
+    payment_request.payment_purpose_id = PaymentPurpose.id_for(:advance)
     payment_request.payment_items = [
         {
             initiating_user_id: initiating_user.id,

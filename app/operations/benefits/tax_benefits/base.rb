@@ -32,8 +32,8 @@ class Benefits::TaxBenefits::Base < BaseOperation
     config_for :payment_type_id
   end
 
-  def payment_order_type_id
-    config_for :payment_order_type_id
+  def payment_purpose_id
+    config_for :payment_purpose_id
   end
 
   def config_for(key)

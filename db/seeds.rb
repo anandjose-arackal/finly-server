@@ -204,7 +204,7 @@ CardProgram.seed_data
 
 FeedbackType.seed_data
 
-PaymentOrderType.seed_data
+PaymentPurpose.seed_data
 
 PaymentOrderStatus.seed_data
 
