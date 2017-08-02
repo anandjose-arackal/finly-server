@@ -19,6 +19,7 @@ json.array! @result.card_assign_requests.each do |card_assign_request|
     json.address_2 user&.profile&.address_1
     json.city user&.profile&.city
     json.state user&.profile&.state&.name
+    json.state_id user&.profile&.state&.id
     json.country 'India'
     json.pin_code user&.profile&.pin_code
     json.nationality 'Indian'

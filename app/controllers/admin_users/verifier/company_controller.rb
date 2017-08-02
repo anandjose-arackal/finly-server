@@ -7,4 +7,9 @@ class AdminUsers::Verifier::CompanyController < ApplicationController
     respond
   end
 
+  def history_index
+    @result = Admin::Verifier::CompanyHistoricalIndex.(current_user, params)
+    respond
+  end
+
 end

@@ -62,6 +62,7 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
     end
+    debugger
   end
 
   def success?

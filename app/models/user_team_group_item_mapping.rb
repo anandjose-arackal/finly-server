@@ -23,5 +23,6 @@ class UserTeamGroupItemMapping < ActiveRecord::Base
   scope :with_id, ->(id) { where id: id }
   scope :with_type, ->(type_id) { where type_id: type_id }
   scope :with_user_group_item, ->(item_id) { where user_group_item_id: item_id }
+  scope :with_user_team, ->(team_id) { where user_team_id: team_id }
 
 end

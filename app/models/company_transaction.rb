@@ -40,7 +40,7 @@ class CompanyTransaction < ActiveRecord::Base
   scope :with_date, -> (date) {where('DATE(transaction_date) = ?', date)}
   scope :sort_date, -> (type){ order transaction_date: type}
 
-  scope :manual_fund_credits, -> {where(transaction_mode: "MANUAL FUND CREDIT")}
+  scope :manual_fund_credits, -> {where('transaction_mode LIKE "MANUAL FUND CREDIT" OR merchant_name LIKE "PayU Payments Pvt Ltd%"')}
 
 
 end

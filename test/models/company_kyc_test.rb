@@ -51,7 +51,6 @@
 #  certificate_of_registration_content_type  :string(255)
 #  certificate_of_registration_file_size     :integer
 #  certificate_of_registration_updated_at    :datetime
-#  customer_id                               :string(255)
 #  customer_type_id                          :integer
 #  user_confirmed                            :boolean          default(FALSE)
 #
