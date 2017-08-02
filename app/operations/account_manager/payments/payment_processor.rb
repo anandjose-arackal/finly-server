@@ -86,9 +86,9 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
 
   def retrieve_payment_order_params
     p = {}
-    p[:payment_order_type_id] = payment_request.payment_order_type_id
+    p[:payment_purpose_id] = payment_request.payment_purpose_id
     p[:payment_order_status_id] = payment_request.retrieve_payment_order_status
-    p[:initiating_user_id] = payment_request.initiating_user_id
+    p[:initiating_user_id] = payment_request.initiating_resource_id
     p[:company_id] = user.company_id # assuming there will be a user executing this particular operation
     p[:scheduled_at] = payment_request.scheduled_at
     p[:initiating_account_type] = payment_request.initiating_account_type
@@ -100,17 +100,21 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
     p[:payments_attributes] = []
     payment_request.payment_items.each do |pi|
       p[:payments_attributes] << {
-          payment_type_id: pi[:payment_type_id],
-          receiving_user_id: pi[:receiving_user_id],
-          initiating_user_id: pi[:initiating_user_id],
-          initiating_account_id: pi[:initiating_account_id],
-          initiating_account_type: pi[:initiating_account_type],
-          receiving_account_type: pi[:receiving_account_type],
-          receiving_account_id: pi[:receiving_account_id],
-          payment_status_id: PaymentStatus.id_for(:pending),
-          payment_purpose_id: pi[:payment_purpose_id],
-          amount_attributes: pi[:amount_attributes],
-          date: pi[:date]
+          payment_type_id: pi.payment_type_id,
+          receiving_user_id: pi.receiving_resource_id,
+          receiving_user_type: pi.receiving_resource_type,
+          initiating_user_id: pi.initiating_resource_id,
+          initiating_user_type: pi.initiating_resource_type,
+          initiating_account_id: pi.initiating_account_id,
+          initiating_account_type: pi.initiating_account_type,
+          receiving_account_type: pi.receiving_account_type,
+          receiving_account_id: pi.receiving_account_id,
+          payment_status_id: pi.payment_status_id,
+          payment_purpose_id: pi.payment_purpose_id,
+          amount_attributes: {
+              value: pi.amount,
+              currency_id: pi.currency_id
+          }
       }
     end
     p

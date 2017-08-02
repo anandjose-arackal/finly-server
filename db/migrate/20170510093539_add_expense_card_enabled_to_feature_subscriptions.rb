@@ -4,6 +4,5 @@ class AddExpenseCardEnabledToFeatureSubscriptions < ActiveRecord::Migration
     add_column :feature_subscriptions, :reimbursement_card_enabled, :boolean, default: false
 
     PaymentType.seed_data
-    PaymentOrderType.seed_data
   end
 end

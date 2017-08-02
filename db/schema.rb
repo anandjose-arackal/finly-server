@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170801215159) do
+ActiveRecord::Schema.define(version: 20170802193249) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1989,7 +1989,6 @@ ActiveRecord::Schema.define(version: 20170801215159) do
   end
 
   create_table "payment_orders", force: :cascade do |t|
-    t.integer  "payment_order_type_id",     limit: 4,     null: false
     t.date     "scheduled_at"
     t.datetime "processed_at"
     t.integer  "initiating_user_id",        limit: 4,     null: false
@@ -2006,6 +2005,7 @@ ActiveRecord::Schema.define(version: 20170801215159) do
     t.datetime "updated_at",                              null: false
     t.string   "initiating_account_type",   limit: 255
     t.string   "receiving_account_type",    limit: 255
+    t.integer  "payment_purpose_id",        limit: 4,     null: false
   end
 
   add_index "payment_orders", ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id", using: :btree
@@ -2013,7 +2013,6 @@ ActiveRecord::Schema.define(version: 20170801215159) do
   add_index "payment_orders", ["company_id"], name: "index_payment_orders_on_company_id", using: :btree
   add_index "payment_orders", ["initiating_user_id"], name: "index_payment_orders_on_initiating_user_id", using: :btree
   add_index "payment_orders", ["payment_order_status_id"], name: "index_payment_orders_on_payment_order_status_id", using: :btree
-  add_index "payment_orders", ["payment_order_type_id"], name: "index_payment_orders_on_payment_order_type_id", using: :btree
 
   create_table "payment_purposes", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -3014,7 +3013,6 @@ ActiveRecord::Schema.define(version: 20170801215159) do
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
-  add_foreign_key "payment_orders", "payment_order_types"
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "payment_types"
   add_foreign_key "per_diem_expenses", "expenses"
