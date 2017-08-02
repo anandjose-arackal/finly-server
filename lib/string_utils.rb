@@ -7,4 +7,8 @@ class StringUtils
     return nil
   end
 
+  def self.force_utf_8_encoding(string)
+    string&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''})
+  end
+
 end
