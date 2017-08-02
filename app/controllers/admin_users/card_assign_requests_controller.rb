@@ -8,8 +8,18 @@ class AdminUsers::CardAssignRequestsController < ApplicationController
     respond
   end
 
+  def history_index
+    @result = Admin::Cards::AssignRequests::HistoricalIndex.(current_user, params)
+    respond
+  end
+
+  def edit
+    @states = State.all
+  end
+
   def update
-    @result = Admin::Cards::AssignRequests::Update.(current_user, params)
+    formatted_request = RequestFormatter::KycParser::Parse.(current_user, params).formatted_request
+    @result = Admin::Cards::AssignRequests::Update.(current_user, formatted_request)
     respond response: @result.success? ? :success : :failure
   end
 

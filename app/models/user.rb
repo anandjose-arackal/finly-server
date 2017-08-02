@@ -53,9 +53,6 @@
 
 
 
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -357,6 +354,16 @@ class User < ActiveRecord::Base
   scope :filter_card_number, -> (term) {
     joins(:cards).select('users.*').where('proxy like ?', "%#{term}%")
   }
+
+  scope :filter_team, -> (team_ids) do
+    group_ids = UserTeamGroupItemMapping.with_user_team(team_ids).pluck(:user_group_item_id)
+    filter_group group_ids
+  end
+
+  scope :filter_group, -> (group_ids) do
+    group_user_ids = UserGroupItemMapping.with_group_item(group_ids).pluck(:user_id).uniq
+    with_id group_user_ids
+  end
 
   after_create do
     # self.build_profile.save if self.profile.blank?

@@ -173,8 +173,12 @@ class Card < ActiveRecord::Base
     self.card_status_id == CardStatus.id_for(:unassigned) and self.user_id.blank?
   end
 
+  def upgraded?
+    self.card_status_id == CardStatus.id_for(:upgraded)
+  end
+
   def assigned?
-    return (not [CardStatus.id_for(:unassigned), CardStatus.id_for(:assign_requested)].include?(self.card_status_id))
+    (not [CardStatus.id_for(:unassigned), CardStatus.id_for(:assign_requested)].include?(self.card_status_id) and user_id.present?)
   end
 
   def expense_card?

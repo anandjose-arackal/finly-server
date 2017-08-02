@@ -18,6 +18,8 @@ class User::Team::Index < User::Team::Base
   has_scope :having_cash_on_hand_balance
   has_scope :having_wallet_balance
   has_scope :with_cards_having_card_program, type: :array
+  has_scope :filter_group
+  has_scope :fitler_team
   has_scope :filter_disburse
   has_scope :filter_expense_management
 
@@ -108,9 +110,10 @@ class User::Team::Index < User::Team::Base
     ScopeUtils.fix_for_scoping(params, :filter_role, :array)
     ScopeUtils.fix_for_scoping(params, :filter_state, :array)
     ScopeUtils.fix_for_scoping(params, :with_cards_having_card_program, :array)
+    ScopeUtils.fix_for_scoping(params, :filter_team, :array)
+    ScopeUtils.fix_for_scoping(params, :filter_group, :array)
     apply_scopes(self.response, params) if self.response.present?
   end
-
 
   private
   def admin_team
@@ -127,5 +130,4 @@ class User::Team::Index < User::Team::Base
     messages[:error] << 'User is not an admin'
     false
   end
-
 end

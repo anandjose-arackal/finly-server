@@ -145,7 +145,7 @@ class Card::Transaction::Create < BaseOperation
                                       date: DateUtils.local_date,
                                       payment_type_id: PaymentType.id_for(:debit),
                                       payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal),
-                                      note: "Atm Withdrawal",
+                                      note: self.transaction.merchant_name,
                                       initiating_user: user,
                                       receiving_user: user,
                                       payment_status_id: PaymentStatus.id_for(:completed))
