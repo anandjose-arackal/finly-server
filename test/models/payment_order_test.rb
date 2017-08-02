@@ -18,6 +18,8 @@
 #  note                      :text(65535)
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  initiating_account_type   :string(255)
+#  receiving_account_type    :string(255)
 #
 
 require 'test_helper'
