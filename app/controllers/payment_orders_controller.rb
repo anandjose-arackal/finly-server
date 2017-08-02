@@ -4,7 +4,7 @@ class PaymentOrdersController < ApplicationController
   end
 
   def process_file
-    @result =
+    # @result =
   end
 
   def create
