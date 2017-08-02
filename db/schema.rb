@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170727081254) do
+ActiveRecord::Schema.define(version: 20170726111650) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -530,9 +530,9 @@ ActiveRecord::Schema.define(version: 20170727081254) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
-    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
