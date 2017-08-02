@@ -52,20 +52,20 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
     # checking if all the users who're being credited have the eligibility
     # only needs to be done if it's a credit
-    if payment_order.credit?
-      valid = true
-      payment_order.payments.each do |payment|
-        receiving_account_adapter = retrieve_adapter payment.receiving_account
-        unless receiving_account_adapter.eligibility(payment.amount_value)
-          valid = false
-          payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value}",
-                                        system_message_type_id: SystemMessageType.id_for(:error)).save
-        end
-      end
-      unless valid
-        add_message :error, "Some of the payments have eligibility issues"
+    # if payment_order.credit?
+    valid = true
+    payment_order.payments.each do |payment|
+      receiving_account_adapter = retrieve_adapter payment.receiving_account
+      unless receiving_account_adapter.eligibility(payment.amount_value)
+        valid = false
+        payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value}",
+                                      system_message_type_id: SystemMessageType.id_for(:error)).save
       end
     end
+    unless valid
+      add_message :error, "Some of the payments have eligibility issues"
+    end
+    # end
   end
 
   private

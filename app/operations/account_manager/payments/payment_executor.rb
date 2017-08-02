@@ -24,6 +24,10 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   end
 
   def validate
+    unless receiving_account_adapter.present?
+      add_message :error, 'Error loading payment'
+      return
+    end
     unless receiving_account_adapter.creditable_accounts.include?(payment.initiating_account_type)
       add_message :error, "You cannot credit from this account"
       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
@@ -31,18 +35,27 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       return
     end
 
-    unless source_account_adapter.debitable_accounts.include?(payment.receiving_account_type)
-      add_message :error, "You cannot debit to this account"
-      payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                    content: "You cannot debit from #{receiving_account_adapter.name} to #{source_account_adapter.name}").save
+    unless receiving_account_adapter.eligibility(payment.amount_value)
+      add_message :error, "Insufficient eligibility to transfer the funds"
+      payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value} due to lack of eligibility",
+                                        system_message_type_id: SystemMessageType.id_for(:error)).save
       return
     end
 
-    unless source_account_adapter.balance > payment.amount_value
-      add_message :error, "This account does not have enough balance for this transaction"
-      payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                    content: "Not enough funds in #{payment.source_account_type.to_s} to initiate the transfer").save
-      return
+    if source_account_adapter.present?
+      unless source_account_adapter.debitable_accounts.include?(payment.receiving_account_type)
+        add_message :error, "You cannot debit to this account"
+        payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+                                      content: "You cannot debit from #{receiving_account_adapter.name} to #{source_account_adapter.name}").save
+        return
+      end
+
+      unless source_account_adapter.balance > payment.amount_value
+        add_message :error, "This account does not have enough balance for this transaction"
+        payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+                                      content: "Not enough funds in #{payment.source_account_type.to_s} to initiate the transfer").save
+        return
+      end
     end
 
     unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
