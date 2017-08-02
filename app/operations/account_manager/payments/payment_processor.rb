@@ -7,6 +7,16 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
 
   attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id
 
+  def pre_validate
+    if params&.dig(:payment_request).blank?
+      add_message :error, 'Payment Request not found'
+      return
+    end
+    unless params[:payment_request].valid?
+      add_message :error, params[:payment_request].errors.full_messages
+    end
+  end
+
   def init
     # create the payment order object and associated payments
     self.payment_request = params[:payment_request]
