@@ -7,8 +7,8 @@ json.company do
   json.id @user.company.id
   json.name @user.company.name
   json.logo do
-    logo = @user.company.configuration.logo
-    json.original logo.present? ? logo(:original) : nil
-    json.thumb logo.present? ? logo(:thumb) : nil
+    configuration = @user.company.configuration
+    json.original configuration.logo.present? ? configuration.logo(:original) : nil
+    json.thumb configuration.logo.present? ? configuration.logo(:thumb) : nil
   end
 end
