@@ -40,8 +40,8 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
 
     # if payment order has been scheduled for execution right away, process it right now
     if payment_order.payment_order_status_id == PaymentOrderStatus.id_for(:pending)
-      # if the order is synchronous, perform it using the regular call method in payment executor
-      if payment_request.synchronous
+      # if the order is not background, perform it using the regular call method in payment executor
+      unless payment_request.background
         # now iterating through each payment order and performing the respective transfer
         processed_amount = 0
         payment_order.payments.each do |payment|

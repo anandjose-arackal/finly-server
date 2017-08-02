@@ -42,16 +42,12 @@ class User::Wallet::Credit < User::Wallet::Base
     payment_request.initiating_user_id = initiating_user.id
     payment_request.company_id = initiating_user.company_id
     payment_request.payment_order_type_id = PaymentOrderType.id_for(:expense_card)
-    payment_request.scheduled_at = Date.today # basically a proxy for executing the request right now
-    payment_request.synchronous = true # because this needs to be executed right away
     payment_request.payment_items = [
         {
-            initiating_user_id: initiating_user.id,
-            receiving_user_id: receiving_user.id,
-            initiating_account_id: initiating_account.id,
-            initiating_account_type: initiating_account.class.to_s,
-            receiving_account_id: receiving_account.id,
-            receiving_account_type: receiving_account.class.to_s,
+            initiating_user: initiating_user,
+            receiving_user: receiving_user,
+            initiating_account: initiating_account,
+            receiving_account: receiving_account,
             payment_type_id: PaymentType.id_for(:credit),
             date: Date.today,
             amount_attributes: {

@@ -6,8 +6,6 @@ class Settlement::Payment::Base < Settlement::Base
     payment_request.initiating_user_id = user.id
     payment_request.company_id = user.company_id
     payment_request.payment_order_type_id = PaymentOrderType.id_for(:outside_finly)
-    payment_request.scheduled_at = Date.today # proxy for executing the request right away
-    payment_request.synchronous = true
     payment_request.payment_items = [
         {
             initiating_user_id: user.id,

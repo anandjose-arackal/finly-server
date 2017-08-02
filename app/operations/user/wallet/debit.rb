@@ -33,8 +33,6 @@ class User::Wallet::Debit < User::Wallet::Base
     payment_request.initiating_user_id = initiating_user.id
     payment_request.company_id = initiating_user.company_id
     payment_request.payment_order_type_id = PaymentOrderType.id_for(:expense_card)
-    payment_request.scheduled_at = Date.today # basically a proxy for executing the request right now
-    payment_request.synchronous = true # because this needs to be executed right away
     payment_request.payment_items = [
         {
             initiating_user_id: initiating_user.id,
