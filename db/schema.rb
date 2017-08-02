@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170728164037) do
+ActiveRecord::Schema.define(version: 20170801215159) do
 
   create_table "aadhar_card_data", force: :cascade do |t|
     t.string   "loc",                 limit: 255
@@ -411,6 +411,30 @@ ActiveRecord::Schema.define(version: 20170728164037) do
   end
 
   add_index "bank_accounts", ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id", using: :btree
+
+  create_table "bank_transactions", force: :cascade do |t|
+    t.string   "unique_request_number",       limit: 255
+    t.string   "transfer_type",               limit: 255
+    t.string   "bank_reference_number",       limit: 255
+    t.string   "unique_response_number",      limit: 255
+    t.integer  "amount_id",                   limit: 4
+    t.integer  "beneficiary_bank_account_id", limit: 4
+    t.integer  "company_id",                  limit: 4
+    t.integer  "transfer_status_id",          limit: 4
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+  end
+
+  add_index "bank_transactions", ["amount_id"], name: "index_bank_transactions_on_amount_id", using: :btree
+  add_index "bank_transactions", ["beneficiary_bank_account_id"], name: "index_bank_transactions_on_beneficiary_bank_account_id", using: :btree
+  add_index "bank_transactions", ["company_id"], name: "index_bank_transactions_on_company_id", using: :btree
+  add_index "bank_transactions", ["transfer_status_id"], name: "index_bank_transactions_on_transfer_status_id", using: :btree
+
+  create_table "bank_transfer_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "budget_rules", force: :cascade do |t|
     t.integer  "category_id",          limit: 4
@@ -2067,6 +2091,12 @@ ActiveRecord::Schema.define(version: 20170728164037) do
   add_index "payment_orders", ["payment_order_status_id"], name: "index_payment_orders_on_payment_order_status_id", using: :btree
   add_index "payment_orders", ["payment_order_type_id"], name: "index_payment_orders_on_payment_order_type_id", using: :btree
 
+  create_table "payment_purposes", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "payment_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -2119,6 +2149,9 @@ ActiveRecord::Schema.define(version: 20170728164037) do
     t.integer  "payment_status_id",       limit: 4,     null: false
     t.string   "initiating_user_type",    limit: 255
     t.string   "receiving_user_type",     limit: 255
+    t.integer  "payment_purpose_id",      limit: 4
+    t.integer  "reference_resource_id",   limit: 4
+    t.string   "reference_resource_type", limit: 255
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -2969,6 +3002,8 @@ ActiveRecord::Schema.define(version: 20170728164037) do
   add_foreign_key "auto_sync_configs", "periods"
   add_foreign_key "balance_sheets", "users"
   add_foreign_key "bank_accounts", "yes_bank_vendors"
+  add_foreign_key "bank_transactions", "amounts"
+  add_foreign_key "bank_transactions", "companies"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "categories"
   add_foreign_key "budget_rules", "periods"

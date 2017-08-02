@@ -1,4 +1,4 @@
-class BankTransfer::Reimbursement::Beneficiary::Add < BankTransfer::Reimbursement::Base
+class BankTransfer::ItzCash::Reimbursement::Beneficiary::Add < BankTransfer::ItzCash::Reimbursement::Base
 
   def pre_validate
     if user.blank?

@@ -25,7 +25,7 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
   def validate
     # Call the payment validator class that validates the payment order
     op = AccountManager::Payments::PaymentValidator.(payment_order)
-    debugger
+
     unless op.success?
       add_message :error, op.messages[:error]
     end
@@ -43,9 +43,15 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
       # if the order is synchronous, perform it using the regular call method in payment executor
       if payment_request.synchronous
         # now iterating through each payment order and performing the respective transfer
+        processed_amount = 0
         payment_order.payments.each do |payment|
-          AccountManager::Payments::PaymentExecutor.(payment)
+          op = AccountManager::Payments::PaymentExecutor.(payment)
+          if op.success? && payment.reload.payment_status_id == PaymentStatus.id_for(:completed)
+            processed_amount += payment.amount_value
+          end
         end
+        payment_order.update(amount_processed_attributes: {value: processed_amount,
+                                                           currency_id: payment_request.request_currency_id})
       else
         # call the payment executor that runs the payments in the background
         # passing the payment id here because async operation can retrieve the object
@@ -57,21 +63,20 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
   end
 
   def success
-    params[:payment_oder] = payment_order
-    AccountManager::Payments::PaymentProcessor::PaymentsPresenter.new(user, params, messages)
-  end
-
-  def failure
     params[:payment_order] = payment_order
     AccountManager::Payments::PaymentProcessor::PaymentsPresenter.new(user, params, messages)
   end
+
+  # def failure
+  #   params[:payment_order] = payment_order
+  #   AccountManager::Payments::PaymentProcessor::PaymentsPresenter.new(user, params, messages)
+  # end
 
   class AccountManager::Payments::PaymentProcessor::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :payments, :payment_order
 
     def init
-      
       self.payment_order = params[:payment_order]
       self.payments = payment_order.payments
     end
@@ -86,6 +91,12 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
     p[:initiating_user_id] = payment_request.initiating_user_id
     p[:company_id] = user.company_id # assuming there will be a user executing this particular operation
     p[:scheduled_at] = payment_request.scheduled_at
+    p[:initiating_account_type] = payment_request.initiating_account_type
+    p[:receiving_account_type] = payment_request.receiving_account_type
+    p[:amount_requested_attributes] = {
+        value: payment_request.request_total,
+        currency_id: payment_request.request_currency_id
+    }
     p[:payments_attributes] = []
     payment_request.payment_items.each do |pi|
       p[:payments_attributes] << {
@@ -97,6 +108,7 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
           receiving_account_type: pi[:receiving_account_type],
           receiving_account_id: pi[:receiving_account_id],
           payment_status_id: PaymentStatus.id_for(:pending),
+          payment_purpose_id: pi[:payment_purpose_id],
           amount_attributes: pi[:amount_attributes],
           date: pi[:date]
       }

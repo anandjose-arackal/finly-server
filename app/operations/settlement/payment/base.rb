@@ -1,5 +1,31 @@
 class Settlement::Payment::Base < Settlement::Base
-  attr_accessor :payment
+  attr_accessor :payment, :payment_request, :amount, :currency_id
+
+  def init_payment_request(payment_type_id, payment_purpose_id)
+    self.payment_request = PaymentRequest.new
+    payment_request.initiating_user_id = user.id
+    payment_request.company_id = user.company_id
+    payment_request.payment_order_type_id = PaymentOrderType.id_for(:outside_finly)
+    payment_request.scheduled_at = Date.today # proxy for executing the request right away
+    payment_request.synchronous = true
+    payment_request.payment_items = [
+        {
+            initiating_user_id: user.id,
+            receiving_user_id: to_user.id,
+            initiating_account_id: nil,
+            initiating_account_type: nil,
+            receiving_account_id: to_user.cash_on_hand.id,
+            receiving_account_type: "CashOnHand",
+            payment_type_id: payment_type_id,
+            payment_purpose_id: payment_purpose_id,
+            date: Date.today,
+            amount_attributes: {
+                value: amount,
+                currency_id: currency_id
+            }
+        }
+    ]
+  end
 
   class Settlement::Payment::Base::Presenter < Settlement::Base::BasePresenter::SuccessPresenter
     attr_accessor :payment

@@ -1,4 +1,4 @@
-class BankTransfer::Sender::Enable < BankTransfer::Sender::Base
+class BankTransfer::ItzCash::Sender::Enable < BankTransfer::ItzCash::Sender::Base
 
   def pre_validate
     if user.blank?

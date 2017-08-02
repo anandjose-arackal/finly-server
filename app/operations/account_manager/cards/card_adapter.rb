@@ -15,9 +15,9 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     "Card"
   end
 
-  def credit(amount)
+  def credit(payment)
     # operation that credits a particular card
-    op = ItzCash::Credit.(card.user, {card: card, amount: amount})
+    op = ItzCash::Credit.(card.user, {card: card, amount: payment.amount_value})
     unless op.success?
       self.errors = op.messages[:error]
       return false
@@ -25,9 +25,9 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     true
   end
 
-  def debit(amount)
+  def debit(payment)
     # operation that debits a particular card
-    op = ItzCash::Debit.(card.user, {card: card, amount: amount})
+    op = ItzCash::Debit.(card.user, {card: card, amount: payment.amount_value})
     unless op.success?
       self.errors = op.messages[:error]
       return false
@@ -41,15 +41,15 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
   end
 
   def creditable_accounts
-    [Card, "Card", UserWallet, "UserWallet", CompanyBalance, "Company"]
+    [Card, "Card", UserWallet, "UserWallet", ItzCashCompanyAccount, "ItzCashCompanyAccount"]
   end
 
   def debitable_accounts
-    [Card, "Card", UserWallet, "UserWallet", CompanyBalance, "Company"]
+    [Card, "Card", UserWallet, "UserWallet", ItzCashCompanyAccount, "ItzCashCompanyAccount"]
   end
 
-  def eligibility(amount)
+  def eligibility(payment)
     # checks if the particular card can be credited with so and so amount
-
+    true
   end
 end

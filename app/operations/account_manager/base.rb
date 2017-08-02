@@ -3,17 +3,20 @@ class AccountManager::Base < BaseOperation
   protected
 
   def retrieve_adapter(account_type)
-    case account_type.class.to_s
+    acc_type = account_type&.class&.to_s
+    case acc_type
       when 1, Card, "Card"
-        # Card, for example
         return AccountManager::Cards::CardAdapter.new(account_type.id)
       when 2, UserWallet, "UserWallet"
-        # Wallet for example
         return AccountManager::Wallet::WalletAdapter.new(account_type.id)
       when 3, YesBankCompanyAccount, "YesBankCompanyAccount"
         return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(account_type.id)
-      else
+      when 4, "CashOnHand"
+        return AccountManager::CashOnHand::CashOnHandAdapter.new(account_type.id)
+      when 5, ItzCashCompanyAccount, "ItzCashCompanyAccount"
         return AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter.new(account_type.id)
+      else # i.e. the transaction has happened outside Finly
+        return AccountManager::OutsideFinly::OutsideFinlyAdapter.new
     end
   end
 end

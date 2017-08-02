@@ -76,7 +76,7 @@ class User::Wallet::Base < BaseOperation
     if initiating_user.present?
       case self.initiating_account_type
         when :virtual_account
-          self.initiating_account = initiating_user.company
+          self.initiating_account = initiating_user.company.itz_cash_company_account
         when :wallet
           self.initiating_account = initiating_user.wallet
         when :card

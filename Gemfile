@@ -135,8 +135,11 @@ gem 'doorkeeper', '4.2.6'
 
 gem 'faraday', '0.10.0'
 gem 'faraday_middleware', '0.11.0.1'
+# gem for xml parsing
+gem 'liquid'
 
 gem 'hooks', '0.4.1'
+
 
 gem 'bullet', '5.4.2', :group => 'development'
 

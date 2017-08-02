@@ -15,18 +15,18 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
     "Finly Money"
   end
 
-  def credit(amount)
+  def credit(payment)
     # credit a particular wallet with the respective amount
-    unless self.wallet.add_funds(amount)
+    unless self.wallet.add_funds(payment.amount_value)
       self.errors = wallet.errors.full_messages
       return false
     end
     true
   end
 
-  def debit(amount)
+  def debit(payment)
     # credit a particular wallet with the respective amount
-    unless self.wallet.subtract_funds(amount)
+    unless self.wallet.subtract_funds(payment.amount_value)
       self.errors = wallet.errors.full_messages
       return false
     end
@@ -38,15 +38,15 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
   end
 
   def creditable_accounts
-    [Card, "Card", UserWallet, "UserWallet", CompanyBalance, "Company"]
+    [Card, "Card", UserWallet, "UserWallet", ItzCashCompanyAccount, "ItzCashCompanyAccount"]
   end
 
   def debitable_accounts
-    [Card, "Card", UserWallet, "UserWallet", CompanyBalance, "Company"]
+    [Card, "Card", UserWallet, "UserWallet", ItzCashCompanyAccount, "ItzCashCompanyAccount"]
   end
 
   def eligibility(amount)
     # checks if the particular wallet can be credited with so and so amount
-    return true
+    true
   end
 end

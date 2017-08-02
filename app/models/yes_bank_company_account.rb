@@ -13,6 +13,7 @@
 class YesBankCompanyAccount < ActiveRecord::Base
   belongs_to :company
   belongs_to :balance, class_name: "Amount"
+  belongs_to :wallet_balance, class_name: "Amount"
 
   delegate :balance_value, to: :balance
 
@@ -20,5 +21,7 @@ class YesBankCompanyAccount < ActiveRecord::Base
   has_many :initiating_payment_trails, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
   has_many :receiving_payment_trails, as: :receiving_account
-  
+
+  accepts_nested_attributes_for :balance
+  accepts_nested_attributes_for :wallet_balance
 end

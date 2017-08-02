@@ -1,4 +1,4 @@
-class BankTransfer::Reimbursement::Beneficiary::SetDefault < BankTransfer::Reimbursement::Base
+class BankTransfer::ItzCash::Reimbursement::Beneficiary::SetDefault < BankTransfer::ItzCash::Reimbursement::Base
   attr_accessor :account, :current_default_account
 
   def pre_validate
