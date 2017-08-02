@@ -78,12 +78,12 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
       unless payment.receiving_account_type == receiving_account_type
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "Receiving account type has to be same for all transfers").save
-        self.errors_present = false
+        self.homogenous_accounts = false
       end
       unless payment.initiating_account_type == initiating_account_type
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "Initiating account type has to be same for all transfers").save
-        self.errors_present = false
+        self.homogenous_accounts = false
       end
     end
     homogenous_accounts
