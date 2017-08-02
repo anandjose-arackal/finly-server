@@ -2043,16 +2043,24 @@ Rails.application.routes.draw do
 
 
   # ROUTES FOR VENDOR PAYMENTS
-  namespace :payments do
+  scope :payments do
     resources :companies do
       post 'add_balance', to: 'companies#add_balance', as: :add_balance_payments
+    end
+    post 'payment_orders/process_file', to: 'payment_orders#process_file'
+    resources :payment_orders do
+
     end
   end
 
 
 
-  namespace :admin do
-    'funds'
+  scope :admin do
+    namespace :admin_users do
+      resources :funds_load_requests do
+        patch 'approve', to: 'funds_load_requests#approve'
+      end
+    end
   end
 
   # The priority is based upon order of creation: first created -> highest priority.

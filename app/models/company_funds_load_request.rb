@@ -32,4 +32,7 @@ class CompanyFundsLoadRequest < ActiveRecord::Base
 
   scope :with_amount, -> {joins(:amount).select('expenses.*, amount.*')}
   scope :with_bank_type_id, -> (type_id) { where bank_type_id: type_id }
+  scope :with_active, -> { where is_active: true }
+  scope :with_out_active, -> { where is_active: false }
+  # scope :with_company_id, -> (company_id) {where company_id: comapny_id }
 end
