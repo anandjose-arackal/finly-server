@@ -91,7 +91,6 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
     def initialize(transfer_request)
       self.transfer_request = transfer_request
     end
-
   end
 
   class YesBank::Transfer::BankTransfer::TransactionFailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -101,7 +100,6 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
     def initialize(transfer_request)
       self.transfer_request = transfer_request
     end
-
   end
 
   private
