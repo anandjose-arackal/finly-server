@@ -144,7 +144,7 @@ class Card::Transaction::Create < BaseOperation
               if user.payments.create(amount_attributes: {value: params[:transaction_amount_attributes][:value], currency_id: Currency.first.id},
                                       date: DateUtils.local_date,
                                       payment_type_id: PaymentType.id_for(:atm_withdrawal),
-                                      note: "Atm Withdrawal",
+                                      note: self.transaction.merchant_name,
                                       initiating_user: user,
                                       receiving_user: user,
                                       payment_status_id: PaymentStatus.id_for(:completed))
