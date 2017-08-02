@@ -3,15 +3,20 @@
 # this operation is only called for payment specific operations in the system - other card and wallet related
 # operations are performed through other operations inside account manager
 
-class AccountManager::Payments::PaymentProcessor < BaseOperation
+class AccountManager::Payments::PaymentProcessor < AccountManager::Base
 
-  attr_accessor :payment_order_params, :payment_order, :payment_request, :company
+  attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id
 
   def init
     # create the payment order object and associated payments
     self.payment_request = params[:payment_request]
     self.payment_order_params = retrieve_payment_order_params
-    self.company = user.company
+    if user.is_a?(User)
+      self.company_id = user.company_id
+    else
+      self.company_id = params[:company_id]
+    end
+    self.company = Company.find_by(id: company_id)
 
     # creating the payment order first to check for violations and shit
     self.payment_order = company.payment_orders.build(payment_order_params)
@@ -89,7 +94,7 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
     p[:payment_order_type_id] = payment_request.payment_order_type_id
     p[:payment_order_status_id] = payment_request.retrieve_payment_order_status
     p[:initiating_user_id] = payment_request.initiating_user_id
-    p[:company_id] = user.company_id # assuming there will be a user executing this particular operation
+    p[:company_id] = company_id # if the user is a User object, it directly exatrcts the details, otherwise it's passed explicitly
     p[:scheduled_at] = payment_request.scheduled_at
     p[:initiating_account_type] = payment_request.initiating_account_type
     p[:receiving_account_type] = payment_request.receiving_account_type
@@ -117,3 +122,4 @@ class AccountManager::Payments::PaymentProcessor < BaseOperation
   end
 
 end
+
