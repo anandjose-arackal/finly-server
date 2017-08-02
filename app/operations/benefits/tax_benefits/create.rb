@@ -59,7 +59,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
     # todo update this to dynamically pick an initiating_account
     initiating_account = user.company.itz_cash_company_account
 
-    payment_request = PaymentRequest.(initiating_user, initiating_account, Card, :credit, :corporate_balance_load, {scheduled_at: self.scheduled_at, background: true})
+    payment_request = PaymentRequest.(initiating_user, initiating_account, Card.name, :credit, :corporate_balance_load, {scheduled_at: self.scheduled_at, background: true})
     self.processed_order_data.processed_order.each do |item|
 
       receiving_user = item[:user][:user_details]

@@ -71,13 +71,21 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         return
     end
-    if debit_adapter.debit(payment)
-      if credit_adapter.credit(payment)
-        # update payment if successful
-        payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-        # payment trail creation
-      else
-        # Credit failed
+
+    # Debit funds from account
+    unless debit_adapter.debit(payment)
+       # Debit failed
+      add_message :error, debit_adapter.errors
+      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+      debit_adapter.errors.each do |content|
+        payment.system_messages.build(content: content,
+                                      system_message_type_id: SystemMessageType.id_for(:error)).save
+      end
+    end
+
+    # Credit funds to account
+    unless credit_adapter.credit(payment)
+      # Credit failed
         add_message :error, credit_adapter.errors
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         credit_adapter.errors.each do |content|
@@ -86,16 +94,35 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         end
         # Reverse credit
         debit_adapter.credit(payment)
-      end
-    else
-      # Debit failed
-      add_message :error, debit_adapter.errors
-      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-      debit_adapter.errors.each do |content|
-        payment.system_messages.build(content: content,
-                                      system_message_type_id: SystemMessageType.id_for(:error)).save
-      end
     end
+
+    payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+
+    # if debit_adapter.debit(payment)
+    #   if credit_adapter.credit(payment)
+    #     # update payment if successful
+    #     payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+    #     # payment trail creation
+    #   else
+    #     # Credit failed
+    #     add_message :error, credit_adapter.errors
+    #     payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+    #     credit_adapter.errors.each do |content|
+    #       payment.system_messages.build(content: content,
+    #                                     system_message_type_id: SystemMessageType.id_for(:error)).save
+    #     end
+    #     # Reverse credit
+    #     debit_adapter.credit(payment)
+    #   end
+    # else
+    #   # Debit failed
+    #   add_message :error, debit_adapter.errors
+    #   payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+    #   debit_adapter.errors.each do |content|
+    #     payment.system_messages.build(content: content,
+    #                                   system_message_type_id: SystemMessageType.id_for(:error)).save
+    #   end
+    # end
   end
 
   def post_process
