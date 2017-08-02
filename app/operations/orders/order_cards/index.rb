@@ -18,13 +18,15 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
     self.params_order_cards = order_cards_params
 
     # Show all payment_order_types if no id is given
-    if self.params_order_cards[:order_type_ids].empty?
-      self.params_order_cards[:order_type_ids].push(1, 2, 3, 4)
-    end
+    # if self.params_order_cards[:order_type_ids].empty?
+    #   self.params_order_cards[:order_type_ids].push(1, 2, 3, 4)
+    # end
   end
 
   def process
-    self.payment_orders = user.company.payment_orders.with_type_id(params_order_cards[:order_type_ids])
+    # self.payment_orders = user.company.payment_orders.with_type_id(params_order_cards[:order_type_ids])
+    # todo payment purpose filter to be implemented here
+    self.payment_orders = user.company.payment_orders
   end
 
   def success
