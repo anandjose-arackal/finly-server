@@ -1,5 +1,9 @@
 class AccountManager::Base < BaseOperation
 
+  def user_model
+    [User, AdminUser]
+  end
+
   protected
 
   def retrieve_adapter(account_type)

@@ -24,6 +24,11 @@ class Company::AddBalance < Company::Base
   def init
     self.transaction_details = param
     self.transaction_details[:amount_attributes][:currency_id] = Currency.first.id rescue nil
+    if expense_management?
+      self.transaction_details[:bank_type_id] = CompanyFundsLoadRequestType.id_for(:itzcash)
+    elsif vendor_payments?
+      self.transaction_details[:bank_type_id] = CompanyFundsLoadRequestType.id_for(:yesbank)
+    end
   end
 
   def validate

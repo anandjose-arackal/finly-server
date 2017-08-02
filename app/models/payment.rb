@@ -142,8 +142,10 @@ class Payment < ActiveRecord::Base
 
   # validates :amount_id, presence: true
   validates :date, presence: true
-  validates :initiating_user_id, presence: true
-  validates :receiving_user_id, presence: true
+  # validates :initiating_user_id, presence: true
+  # validates :receiving_user_id, presence: true
+  validate :initiating_user_presence
+  validate :receiving_user_presence
   validate :initiating_account_presence
   validate :receiving_account_presence
 
@@ -254,4 +256,19 @@ class Payment < ActiveRecord::Base
     end
   end
 
+  def initiating_user_presence
+    unless [PaymentPurpose.id_for(:vendor_payment)].include?(self.payment_purpose_id)
+      if initiating_user_id.blank?
+        errors.add(:initiating_user_id, "cannot be blank")
+      end
+    end
+  end
+
+  def receiving_user_presence
+    unless [PaymentPurpose.id_for(:vendor_payment)].include?(self.payment_purpose_id)
+      if receiving_user_id.blank?
+        errors.add(:receiving_user_id, "cannot be blank")
+      end
+    end
+  end
 end

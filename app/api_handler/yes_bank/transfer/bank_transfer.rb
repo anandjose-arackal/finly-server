@@ -62,14 +62,45 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
     end
-    debugger
   end
 
   def success?
-
+    self.parsed_response = Hash.from_xml(response.body)
+    unless parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode") == "SENT_TO_BENEFICIARY" || parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode") == "COMPLETED"
+      return false
+    end
+    set_response_parameters
   end
 
   def failure?
+
+  end
+
+  def success
+    YesBank::Transfer::BankTransfer::TransactionSuccessPresenter.new(transfer_request)
+  end
+
+  def failure
+
+  end
+
+  class YesBank::Transfer::BankTransfer::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :transfer_request
+
+    def initialize(transfer_request)
+      self.transfer_request = transfer_request
+    end
+
+  end
+
+  class YesBank::Transfer::BankTransfer::TransactionFailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :transfer_request
+
+    def initialize(transfer_request)
+      self.transfer_request = transfer_request
+    end
 
   end
 
@@ -78,7 +109,7 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
   def set_xml_params
     liquid_template = load_soap_template
     self.template = liquid_template.render(
-        'UNIQUE_REFERENCE_NUMBER' => generated_reference_number,
+        'UNIQUE_REFERENCE_NUMBER' => payment_request.generated_reference_number,
         'APP_ID' => application_id,
         'CUSTOMER_ID' => customer_id,
         'ACCOUNT_NUMBER' => account_number,
@@ -92,6 +123,11 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
   end
 
   def generated_reference_number
+    transfer_request.unique_reference_number
+  end
 
+  def set_response_parameters
+    self.transfer_request.transaction_status = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
+    self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
   end
 end

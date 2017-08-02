@@ -3,6 +3,7 @@ require 'require_all'
 # Dir[File.expand_path "#{Rails.root}/app/operations/event/**/*.rb"].each { |f| require(f) }
 # Dir[File.expand_path "#{Rails.root}/app/operations/expense/card/**/*.rb"].each { |f| require(f) }
 class ApplicationController < ActionController::Base
+  attr_accessor :current_app
   include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
   # include AbstractController::Callbacks
   # include ActionController::Head
@@ -15,6 +16,7 @@ class ApplicationController < ActionController::Base
 
   before_action :whitelisted_emails
   before_action :add_request_to_params
+  before_action :set_current_app
   # before_action :verify_otp
   # before_action :check_first_time_login
 
@@ -163,6 +165,25 @@ class ApplicationController < ActionController::Base
   def add_request_to_params
     # adding the request object to the params hash
     params[:request] = request
+  end
+
+  def set_current_app
+    path = request.path
+    if path.is_a?(String)
+      if path.starts_with?('/admin')
+        self.current_app = :ap
+      elsif path.starts_with?('/payments')
+        self.current_app = :vp
+      elsif path.starts_with?('/disburse')
+        self.current_app = :ft
+      else
+        self.current_app = :em
+      end
+    else
+      self.current_app = :em
+    end
+
+    params[:current_app] = self.current_app
   end
 
   def respond_failure(message=nil)
