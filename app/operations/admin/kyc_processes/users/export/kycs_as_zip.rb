@@ -1,6 +1,15 @@
 class Admin::KycProcesses::Users::Export::KycsAsZip < Admin::KycProcesses::Users::Base
   attr_accessor :files
 
+  def pre_validate
+    if user.blank?
+      add_message :error, 'User not found'
+    end
+    if params&.dig(:individual_kyc_id).blank? and params&.dig(:id).blank? and params&.dig(:individual_kycs).blank? and not params&.dig(:download_all)
+      add_message :error, 'KYC Upgrade Request not found'
+    end
+  end
+
   def init
     if !!params&.dig(:download_all)
       individual_kycs_presenter = Admin::KycProcesses::Users::Index.(user, params)
@@ -16,6 +25,8 @@ class Admin::KycProcesses::Users::Export::KycsAsZip < Admin::KycProcesses::Users
 
   def process
     self.files = []
+    exported_excel = Admin::KycProcesses::Users::Export::AsXls.(user, individual_kycs: self.individual_kycs).generate_xls
+    self.files << {name: 'upgrade_user_details.xls', file_contents: exported_excel}
     self.individual_kycs&.each do |kyc|
       file_name_prefix = "#{kyc.user.id}"
       if kyc.user.cards.present?
@@ -23,6 +34,16 @@ class Admin::KycProcesses::Users::Export::KycsAsZip < Admin::KycProcesses::Users
       end
       self.files << {name: "#{file_name_prefix}_1.jpg", path: kyc.kyc_file_1.path(:normal)} if kyc.kyc_file_1.present?
       self.files << {name: "#{file_name_prefix}_2.jpg", path: kyc.kyc_file_2.path(:normal)} if kyc.kyc_file_2.present?
+    end
+  end
+
+  def post_process
+    self.individual_kycs.each do |individual_kyc|
+      track_params = {
+          action_resource: user,
+          action_id: CardAssignRequestTrackAction.id_for(:download)
+      }
+      individual_kyc.tracks.create track_params
     end
   end
 

@@ -1677,8 +1677,8 @@ Rails.application.routes.draw do
       end
 
       # Upgrade Card Workflow
-      get 'users/companies', to: 'users#company_index'
       get 'users', to: 'users#index'
+      get 'users/history', to: 'users#history_index'
       post 'users/approve', to: 'users#approve'
       post 'users/reject', to: 'users#reject'
       post 'users/mark_as_upgraded', to: 'users#mark_as_upgraded'
@@ -1690,9 +1690,11 @@ Rails.application.routes.draw do
 
     namespace :verifier do
       get 'companies', to: 'company#index'
+      get 'companies/history', to: 'company#history_index'
     end
     # Assign Card Workflow
     get 'card_assign_requests', to: 'card_assign_requests#index'
+    get 'card_assign_requests/history', to: 'card_assign_requests#history_index'
     post 'card_assign_requests/approve', to: 'card_assign_requests#approve'
     post 'card_assign_requests/reject', to: 'card_assign_requests#reject'
     post 'card_assign_requests/mark_assigned', to: 'card_assign_requests#mark_as_assigned'
@@ -1700,6 +1702,7 @@ Rails.application.routes.draw do
     patch 'card_assign_requests/:id', to: 'card_assign_requests#update'
     get 'card_assign_requests/export(.:format)' => 'card_assign_requests#export'
     get 'card_assign_requests/export/kycs(.:format)' => 'card_assign_requests#download_kycs'
+    get 'card_assign_requests/edit' => 'card_assign_requests#edit'
 
     post 'call_center/search', to: 'call_center/users#search', as: :search
   end

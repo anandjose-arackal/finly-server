@@ -1,6 +1,5 @@
 
 class Admin::Cards::Base < Admin::Base
-
   attr_accessor :card, :company, :created_card
 
   def card_params
