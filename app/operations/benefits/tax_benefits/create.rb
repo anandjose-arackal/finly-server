@@ -54,36 +54,19 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
   end
 
   def process
-    # todo update payment_order_type dynamically based on the order type
-    payment_request = PaymentRequest.new({
-                                             initiating_user_id: user.id,
-                                             company_id: user.company_id,
-                                             scheduled_at: self.scheduled_at,
-                                             background: true,
-                                             payment_purpose_id: PaymentPurpose.id_for(:advance)})
+
     initiating_user = user
     # todo update this to dynamically pick an initiating_account
     initiating_account = user.company.itz_cash_company_account
+
+    payment_request = PaymentRequest.(initiating_user, initiating_account, Card, :credit, :corporate_balance_load, {scheduled_at: self.scheduled_at, background: true})
     self.processed_order_data.processed_order.each do |item|
 
       receiving_user = item[:user][:user_details]
       receiving_account = item[:card]
       amount = item[:amount]
 
-      payment_request.payment_items = [
-          {
-              initiating_resource: initiating_user,
-              receiving_resource: receiving_user,
-              initiating_account: initiating_account,
-              receiving_account: receiving_account,
-              payment_type_id: PaymentType.id_for(:credit),
-              date: Date.today,
-              amount_attributes: {
-                  value: amount,
-                  currency_id: Currency.id_for(:INR)
-              }
-          }
-      ]
+      self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, amount))
     end
     # calling the payment processor to complete the transfer using adapters
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
@@ -92,65 +75,6 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
       add_message :error, op.messages[:error]
     end
   end
-
-  # def process_old
-  #
-  #   # Create payment order
-  #   if scheduled_at.present? and scheduled_at > Date.today
-  #     payment_order_status_id = PaymentOrderStatus.id_for(:scheduled)
-  #   else
-  #     payment_order_status_id = PaymentOrderStatus.id_for(:pending)
-  #   end
-  #
-  #   amount_requested = Amount.new(value: self.processed_order_data.requested_amount, currency_id: 1)
-  #
-  #   payment_order_params = {payment_order_type_id: payment_order_type_id,
-  #                           scheduled_at: self.scheduled_at,
-  #                           processed_at: DateTime.now,
-  #                           initiating_user: user,
-  #                           payment_order_status_id: payment_order_status_id,
-  #                           company_id: user.company_id,
-  #                           amount_requested: amount_requested}
-  #
-  #   self.payment_order = user.payment_orders.build payment_order_params
-  #
-  #   unless self.payment_order.valid?
-  #     add_message :error, self.payment_order.errors.full_messages
-  #     return
-  #   end
-  #
-  #   # Create payment items
-  #   initiating_user = user
-  #   initiating_user_account = user.company
-  #   date = Date.today
-  #   if scheduled_at.present? and scheduled_at > Date.today
-  #     payment_status_id = PaymentStatus.id_for(:scheduled)
-  #   else
-  #     payment_status_id = PaymentStatus.id_for(:pending)
-  #   end
-  #
-  #   self.processed_order_data.processed_order.each do |item|
-  #     receiving_user = item[:user][:user_details]
-  #     receiving_account = item[:card]
-  #     amount = item[:amount]
-  #
-  #     payment_order.payments.build amount_attributes: {value: amount, currency_id: 1},
-  #                                  date: date, payment_type_id: payment_type_id,
-  #                                  initiating_user: initiating_user, receiving_user: receiving_user,
-  #                                  initiating_account: initiating_user_account,
-  #                                  receiving_account: receiving_account,
-  #                                  payment_status_id: payment_status_id
-  #   end
-  #
-  #   if self.payment_order.save
-  #     if scheduled_at.blank? or scheduled_at <= Date.today
-  #       Benefits::TaxBenefits::Execute.call_async(user.id, payment_order_id: self.payment_order.id)
-  #     end
-  #   else
-  #     add_message :error, self.payment_order.errors.full_messages
-  #     self.payment_order.destroy
-  #   end
-  # end
 
   def success
     params[:payment_order] = self.payment_order
