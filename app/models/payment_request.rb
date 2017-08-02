@@ -7,7 +7,7 @@ class PaymentRequest < NonPersistentModel
 
   AVAILABLE_ACCOUNT_TYPES = [nil, ItzCashCompanyAccount.name, YesBankCompanyAccount.name, UserWallet.name, CashOnHand.name, Card.name]
 
-  attr_accessor :company_id, :scheduled_at, :background,
+  attr_accessor :company_id, :scheduled_at, :background, :payment_purpose_id,
                 :payment_items,
                 :initiating_resource_id, :initiating_resource_type,
                 :initiating_account_id, :initiating_account_type,
@@ -114,7 +114,7 @@ class PaymentRequest < NonPersistentModel
                   :payment_request
 
     delegate :initiating_resource,:initiating_resource_id,:initiating_resource_type,
-             :initiating_account, :initiating_account_id, :initiating_account_type,
+             :initiating_account, :initiating_account_id, :initiating_account_type, :scheduled_at,
              :payment_type_id, :currency_id, :payment_purpose_id, to: :payment_request, allow_nil: true
 
     belongs_to :receiving_resource, polymorphic: true
@@ -142,6 +142,10 @@ class PaymentRequest < NonPersistentModel
       unless self.payment_request and self.payment_request.receiving_account_type == self.receiving_account_type
         errors.add :invalid, 'receiving account type'
       end
+    end
+
+    def date
+      (self.payment_request&.scheduled_at or Date.today)
     end
 
   end

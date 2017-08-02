@@ -1,4 +1,4 @@
-class AccountManager::Base < BaseOperation
+class AccountManager::Base < BackgroundOperation
 
   def user_model
     [User, AdminUser]

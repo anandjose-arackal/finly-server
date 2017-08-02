@@ -1,3 +1,4 @@
+
 # == Schema Information
 #
 # Table name: itz_cash_card_programs
@@ -41,7 +42,7 @@ class ItzCashCardProgram < ActiveRecord::Base
   ]
 
   def self.seed_data
-    if not Rails.env.production?
+    if Rails.env.production?
       PROGRAM_DETAILS.each do |detail|
         if ItzCashCardProgram.with_product_code(detail[:product_code]).blank?
           ItzCashCardProgram.create(detail)

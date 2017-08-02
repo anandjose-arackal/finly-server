@@ -57,38 +57,44 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   end
 
   def process
+    debit_adapter = nil
+    credit_adapter = nil
     case payment.payment_type_id
-      when PaymentType.id_for(:credit), PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:credit_meal_card),
-        PaymentType.id_for(:credit_expense_card), PaymentType.id_for(:credit_reimbursement_card), PaymentType.id_for(:credit_medical_card)
-        if source_account_adapter.debit(payment)
-          unless receiving_account_adapter.credit(payment)
-            add_message :error, receiving_account_adapter.errors
-          end
-          # update payment if successful
-          payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-          # payment trail creation
-
-        else
-          add_message :error, source_account_adapter.errors
-          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-          source_account_adapter.credit(payment)
-        end
-      when PaymentType.id_for(:debit), PaymentType.id_for(:deduct_cash_on_hand)
-        if source_account_adapter.credit(payment)
-          unless receiving_account_adapter.debit(payment)
-            add_message :error, receiving_account_adapter.errors
-          end
-          # update payment if successful
-          payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-          # payment trail creation
-
-        else
-          add_message :error, source_account_adapter.errors
-          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-          source_account_adapter.debit(payment)
-        end
+      when PaymentType.id_for(:credit)
+        debit_adapter = source_account_adapter
+        credit_adapter = receiving_account_adapter
+      when PaymentType.id_for(:debit)
+        credit_adapter = source_account_adapter
+        debit_adapter = receiving_account_adapter
       else
-        # do nothing?
+        add_message :error, 'Invalid Payment Type'
+        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        return
+    end
+    if debit_adapter.debit(payment)
+      if credit_adapter.credit(payment)
+        # update payment if successful
+        payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+        # payment trail creation
+      else
+        # Credit failed
+        add_message :error, credit_adapter.errors
+        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        credit_adapter.errors.each do |content|
+          payment.system_messages.build(content: content,
+                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+        end
+        # Reverse credit
+        debit_adapter.credit(payment)
+      end
+    else
+      # Debit failed
+      add_message :error, debit_adapter.errors
+      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+      debit_adapter.errors.each do |content|
+        payment.system_messages.build(content: content,
+                                      system_message_type_id: SystemMessageType.id_for(:error)).save
+      end
     end
   end
 

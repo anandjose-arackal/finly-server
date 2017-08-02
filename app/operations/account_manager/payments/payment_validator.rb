@@ -38,8 +38,8 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
   # here all the validations required for the respective payment order will happen
   def process
     # checking for payment oder schedule date
-    if payment_order.scheduled_at < Date.today
-      add_message :error, "Scheduled date cannot be in the past!"
+    if payment_order.scheduled_at and payment_order.scheduled_at < Date.today
+      add_message :error, "Scheduled date cannot be in the past"
       return
     end
 
