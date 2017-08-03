@@ -13,4 +13,8 @@ class BankTransfer::YesBank::Base < BaseOperation
     [:company_admin]
   end
 
+  def pre_validate
+
+  end
+
 end

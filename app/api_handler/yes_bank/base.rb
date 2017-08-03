@@ -33,8 +33,24 @@ class YesBank::Base < BaseHandler
     end
   end
 
+  # because this is common for all Yes Bank API calls
   def process
+    p = self.path
+    begin
+      puts "Posting Path: #{p}"
+      puts "Post Params: #{self.template}"
 
+      self.response = self.connection.post do |req|
+        req.url p
+        req.headers['Content-Type'] = 'application/xml'
+        req.headers['X-IBM-Client-Id'] = client_id
+        req.headers['X-IBM-Client-Secret'] = client_secret
+        req.body = template
+      end
+    rescue Faraday::TimeoutError, Faraday::ConnectionFailed
+      self.timeout = true
+      add_message :error, "Request timed out. Please try again"
+    end
   end
 
   protected

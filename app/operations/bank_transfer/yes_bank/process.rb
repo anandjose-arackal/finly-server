@@ -18,6 +18,7 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
   end
 
   def init
+    debugger
     self.payment_order_data = params[:payment_order]
     self.errors = []
     self.payment_order_valid = true
@@ -45,6 +46,7 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
       return
     end
 
+    # todo - change this to the adapter method of finding the company balance
     company_balance = Company::VirtualAccount::Balance.(user, company).balance rescue 0
 
     payment_order_data.each do |item|

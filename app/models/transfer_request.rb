@@ -5,7 +5,7 @@ class TransferRequest
 
   attr_accessor :beneficiary_account_number, :ifsc, :beneficiary_name, :transfer_type,
                 :transfer_currency_code, :transfer_amount, :errors, :unique_reference_number,
-                :bank_reference_number, :transaction_status, :company_id
+                :bank_reference_number, :transaction_status, :company_id, :unique_reference
 
   def initialize
     self.transfer_currency_code = "INR" # todo - for now, once international payments are supported, they can be implemented accordingly
@@ -48,7 +48,7 @@ class TransferRequest
     ref = nil
     loop do
       ref = "FINLY#{transfer_type}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
-      if BankTransaction.find_by(unique_reference_number: ref).blank?
+      if BankTransaction.find_by(unique_request_number: ref).blank?
         break
       end
     end

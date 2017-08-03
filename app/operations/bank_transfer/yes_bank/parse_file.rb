@@ -1,5 +1,5 @@
 # Parse_file parses the given file and extract the users and amounts
-class Benefits::TaxBenefits::ParseFile < Benefits::TaxBenefits::Base
+class BankTransfer::YesBank::ParseFile < BankTransfer::YesBank::Base
   attr_accessor :file, :parsed_data, :response_presenter
 
   def pre_validate
@@ -17,7 +17,7 @@ class Benefits::TaxBenefits::ParseFile < Benefits::TaxBenefits::Base
 
   def init
     self.file = params[:file]
-    self.parsed_data = ImportUtil.load_spreadsheet(file, [:user, :amount], {skip_empty_lines: true})
+    self.parsed_data = ImportUtil.load_spreadsheet(file, [:name, :account_number, :ifsc, :amount], {skip_empty_lines: true})
   end
 
   def validate
@@ -28,7 +28,6 @@ class Benefits::TaxBenefits::ParseFile < Benefits::TaxBenefits::Base
 
   def process
     params[:payment_order] = self.parsed_data
-    params[:card_program_id] = card_program_id
     self.response_presenter = BankTransfer::YesBank::Process.(user, params)
   end
 
@@ -41,3 +40,4 @@ class Benefits::TaxBenefits::ParseFile < Benefits::TaxBenefits::Base
   end
 
 end
+
