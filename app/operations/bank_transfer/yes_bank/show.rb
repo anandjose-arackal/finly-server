@@ -1,4 +1,4 @@
-class Benefits::TaxBenefits::Show < Benefits::TaxBenefits::Base
+class BankTransfer::YesBank::Show < BankTransfer::YesBank::Base
   attr_accessor :payment_order, :actions
 
   def pre_validate
@@ -15,7 +15,7 @@ class Benefits::TaxBenefits::Show < Benefits::TaxBenefits::Base
   end
 
   def init
-    self.payment_order = Benefits::TaxBenefits::Index.(config, user, params).payment_orders.with_id(params[:id]).first rescue nil
+    self.payment_order = BankTransfer::YesBank::Index.(config, user, params).payment_orders.with_id(params[:id]).first rescue nil
     self.actions = {}
   end
 
@@ -32,10 +32,10 @@ class Benefits::TaxBenefits::Show < Benefits::TaxBenefits::Base
   def success
     params[:payment_order] = self.payment_order
     params[:actions] = self.actions
-    Benefits::TaxBenefits::Show::SuccessPresenter.new(user, params, messages)
+    BankTransfer::YesBank::Show::SuccessPresenter.new(user, params, messages)
   end
 
-  class Benefits::TaxBenefits::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::YesBank::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order, :actions
 
     def init

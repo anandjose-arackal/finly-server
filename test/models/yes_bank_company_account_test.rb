@@ -8,8 +8,6 @@
 #  created_at        :datetime         not null
 #  updated_at        :datetime         not null
 #  balance_id        :integer
-#  account_number    :string(255)
-#  customer_id       :string(255)
 #
 
 require 'test_helper'

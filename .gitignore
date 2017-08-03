@@ -26,13 +26,7 @@
 /junk_expenses.rb
 /Sample transactions
 
-<<<<<<< HEAD
 /yes_bank_api_call_logs
-
-=======
-.idea/*
-/yes_bank_api_call_logs
->>>>>>> staging
 .vagrant/
 #Vagrantfile
 #bootstrap.sh

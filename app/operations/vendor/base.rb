@@ -1,2 +1,3 @@
-class Base
+class Vendor::Base < BaseOperation
+
 end

@@ -3,8 +3,6 @@ class BankTransfer::YesBank::ParseFile < BankTransfer::YesBank::Base
   attr_accessor :file, :parsed_data, :response_presenter
 
   def pre_validate
-    super
-    return if has_errors?
     if user.blank?
       add_message :error, 'User not found'
       return

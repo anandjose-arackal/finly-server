@@ -18,10 +18,9 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
   end
 
   def init
-    debugger
     self.payment_order_data = params[:payment_order]
     self.errors = []
-    self.payment_order_valid = true
+    self.payment_order_valid = true # setting it true here for now, so that if it fails later that can be taken up
     self.requested_amount = 0
     self.processable_amount = 0
     self.processed_order = []
@@ -47,7 +46,7 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
     end
 
     # todo - change this to the adapter method of finding the company balance
-    company_balance = Company::VirtualAccount::Balance.(user, company).balance rescue 0
+    company_balance = 99999
 
     payment_order_data.each do |item|
       self.requested_amount += (item[:amount].to_d rescue 0)
@@ -69,38 +68,40 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
     end
 
     self.payment_order_data.each do |item|
-      user_email_mob = item[:user]
-      # converting mobile number to a string
-      if user_email_mob.is_a?(Float)
-        user_email_mob = user_email_mob&.to_i&.to_s
-      end
-      user = self.user.company.users.find_for_database_authentication(username: user_email_mob)
-      amount = item[:amount].to_d rescue nil
+      bank_account_no = item[:account_number]
+      ifsc = item[:ifsc]
+      name = item[:name]
+      amount = item[:amount]&.to_f
 
       valid = true
       messages = []
 
-      # Check if user was found
-      if user.blank?
+      # Check if bank account number is present
+      if bank_account_no.blank?
         valid = false
-        messages << 'User not found'
+        messages << 'Bank account not found'
       end
 
-      # Check if the amount is valid
-      if amount.blank?
+      # Check if the amount is present
+      if amount.blank? || !amount.is_a?(Numeric)
         valid = false
         messages << 'Invalid amount'
       end
 
-      # Check if user has a Meal Card
-      card = user.cards.with_card_program(card_program_id).first rescue nil
-      if user.present? and card.blank?
+      # check if name is present
+      if name.blank?
         valid = false
-        program_name = CardProgram.with_id(card_program_id).first.name.humanize rescue nil
-        messages << "#{program_name} Card has not been assigned to the user"
+        messages << 'Name cannot be blank'
       end
 
-      # todo validate card eligibility -> Currently we are not doing this validation
+      # check if the ifsc is present
+      if ifsc.blank?
+        valid = false
+        messages << 'IFSC cannot be blank'
+      end
+
+      # todo - if there's any user specific configuration for this particular user,
+      # add it here
 
       if valid
         self.processable_amount += amount
@@ -108,7 +109,7 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
 
       self.payment_order_valid = false unless valid
 
-      self.processed_order << {user: {identifier: user_email_mob, user_details: user}, card: card, amount: amount, valid: valid, messages: messages}
+      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, amount: amount, valid: valid, messages: messages}
     end
   end
 
@@ -120,10 +121,10 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
     params[:errors] = self.errors
     params[:payment_order_valid] = self.payment_order_valid
     params[:scheduled_at] = self.scheduled_at
-    Benefits::TaxBenefits::Process::SuccessPresenter.new(user, params, messages)
+    BankTransfer::YesBank::Process::SuccessPresenter.new(user, params, messages)
   end
 
-  class Benefits::TaxBenefits::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::YesBank::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :errors,
                   :payment_order_valid, :scheduled_at
 

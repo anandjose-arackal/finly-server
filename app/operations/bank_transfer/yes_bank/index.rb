@@ -1,4 +1,4 @@
-class Benefits::TaxBenefits::Index < Benefits::TaxBenefits::Base
+class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
   attr_accessor :payment_orders
 
   def pre_validate
@@ -21,10 +21,10 @@ class Benefits::TaxBenefits::Index < Benefits::TaxBenefits::Base
 
   def success
     params[:payment_orders] = self.payment_orders
-    Benefits::TaxBenefits::Index::SuccessPresenter.new(user, params, messages)
+    BankTransfer::YesBank::Index::SuccessPresenter.new(user, params, messages)
   end
 
-  class Benefits::TaxBenefits::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::YesBank::Index::OrdersPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_orders
 
     def init
@@ -32,4 +32,7 @@ class Benefits::TaxBenefits::Index < Benefits::TaxBenefits::Base
     end
   end
 
+
 end
+
+

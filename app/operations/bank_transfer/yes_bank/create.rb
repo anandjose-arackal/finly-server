@@ -1,7 +1,8 @@
-# this operation creates the respective payment order and associated payment items from the excel sheet for processing
-# by the payment processor
-class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
-  attr_accessor :order_data, :payment_request, :payment_order, :scheduled_at
+# when the data reaches this state, all payments will be valid and passing the respective
+# basic presence validations
+class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
+  attr_accessor :order_data, :payment_request, :payment_order, :scheduled_at,
+                :processed_order_data, :initiating_account
 
   def pre_validate
     super
@@ -27,9 +28,12 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
     self.order_data = params[:payment_order]
     # below variable will contain the payment_request that holds data about initiating accounts and
     # receiving accounts
-    self.payment_request = BankTransfer::YesBank::Process.(user, scheduled_at: params[:scheduled_at],
+    self.initiating_account = user.company.yes_bank_company_account
+    op = BankTransfer::YesBank::Process.(user, scheduled_at: params[:scheduled_at],
         payment_order: self.order_data, card_program_id: card_program_id)
+    self.processed_order_data = op.payment_order_data
     self.scheduled_at = self.processed_order_data.scheduled_at
+    self.payment_request = build_payment_request(processed_order_data)
   end
 
   def validate
@@ -39,17 +43,18 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
       return
     end
 
-    if self.payment_request.blank?
+    if self.processed_order_data.blank?
       add_message :error, 'Error loading configuration. Please try again'
       return
     end
 
-    unless self.payment_request.valid?
+    unless self.payment_order.valid?
       add_message :error, 'Please fix the issues before confirming the request'
     end
   end
 
   def process
+    
     # calling the payment processor to complete the transfer using adapters
     op = AccountManager::Payments::PaymentProcessor.(initiating_user, {payment_request: payment_request})
     unless op.success?
@@ -61,10 +66,10 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
 
   def success
     params[:payment_order] = self.payment_order
-    Benefits::TaxBenefits::Create::SuccessPresenter.new(user, params, messages)
+    BankTransfer::YesBank::Create::SuccessPresenter.new(user, params, messages)
   end
 
-  class Benefits::TaxBenefits::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::YesBank::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order
 
     def init
@@ -74,3 +79,4 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
   end
 
 end
+
