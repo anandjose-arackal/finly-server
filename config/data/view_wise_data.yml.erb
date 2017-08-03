@@ -11,8 +11,8 @@ admin:
 
     cog:
       - Organization Account: '#organization_account/params={"view":"admin"}'
-      <% if current_company.d_code_enabled? %>
       - Company Statements: '#company_statements/params={"view": "admin"}'
+      <% if current_company.d_code_enabled? %>
       - Load Company Balance: '/transfers/register'
       <% if current_company.feature_subscription.cards_enabled and current_user.company_admin? %>
       - Employee Cards: '/disburse'
