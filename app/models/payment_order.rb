@@ -20,6 +20,7 @@
 #  initiating_account_type   :string(255)
 #  receiving_account_type    :string(255)
 #  payment_purpose_id        :integer          not null
+#  currency_id               :integer          not null
 #
 
 class PaymentOrder < ActiveRecord::Base
@@ -54,6 +55,7 @@ class PaymentOrder < ActiveRecord::Base
   belongs_to :amount_requested, class_name: 'Amount'
   belongs_to :amount_processed, class_name: 'Amount'
   belongs_to :initiating_user, class_name: 'User'
+  belongs_to :currency
 
   has_many :payments, dependent: :destroy
 
@@ -65,6 +67,7 @@ class PaymentOrder < ActiveRecord::Base
   validates :initiating_user_id, presence: true
   validates :payment_order_status_id, presence: true
   validates :company_id, presence: true
+  validates :currency_id, presence: true
 
   accepts_nested_attributes_for :amount_requested
   accepts_nested_attributes_for :amount_processed

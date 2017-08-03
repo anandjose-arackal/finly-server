@@ -2,27 +2,9 @@ class Settlement::Payment::Base < Settlement::Base
   attr_accessor :payment, :payment_request, :amount, :currency_id
 
   def init_payment_request(payment_type_id, payment_purpose_id)
-    self.payment_request = PaymentRequest.new
-    payment_request.initiating_user_id = user.id
-    payment_request.company_id = user.company_id
-    payment_request.payment_purpose_id = PaymentPurpose.id_for(:advance_outside_finly)
-    payment_request.payment_items = [
-        {
-            initiating_user_id: user.id,
-            receiving_user_id: to_user.id,
-            initiating_account_id: nil,
-            initiating_account_type: nil,
-            receiving_account_id: to_user.cash_on_hand.id,
-            receiving_account_type: "CashOnHand",
-            payment_type_id: payment_type_id,
-            payment_purpose_id: payment_purpose_id,
-            date: Date.today,
-            amount_attributes: {
-                value: amount,
-                currency_id: currency_id
-            }
-        }
-    ]
+    # Add Company Balance for the particular company
+    self.payment_request = PaymentRequest.(user, nil, to_user.cash_on_hand.class.name, :credit, :advance)
+    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(nil, to_user.cash_on_hand, amount))
   end
 
   class Settlement::Payment::Base::Presenter < Settlement::Base::BasePresenter::SuccessPresenter
