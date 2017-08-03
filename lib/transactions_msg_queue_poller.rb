@@ -31,11 +31,11 @@ class TransactionsMsgQueuePoller
 
       data = message.body.split(delimiter)
 
-      # FAILED, TimeStamp, Amount, RequestType, MerchantKey, MerchantName, ResponseCode, SerialID, ProductCode, AcquirerID, MID, TID, MCC, ErrorMessage
       transaction_timestamp = DateUtils.datetime_in_ist(data[1]) rescue nil
       transaction_amount = data[2] rescue nil
       if data.present? and data[0].downcase == 'failed'
         # Failed transaction
+        # Format: FAILED, TimeStamp, Amount, RequestType, MerchantKey, MerchantName, ResponseCode, SerialID, ProductCode, AcquirerID, MID, TID, MCC, ErrorMessage
         success = false
         reference_id = nil
         transaction_type = data[3]
