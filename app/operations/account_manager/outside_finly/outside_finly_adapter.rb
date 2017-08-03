@@ -31,9 +31,4 @@ class AccountManager::OutsideFinly::OutsideFinlyAdapter < AccountManager::BaseAd
     [CashOnHand]
   end
 
-  def init
-    # method that retrieves the correct account to debit from
-
-  end
-
 end
