@@ -10,17 +10,17 @@ class BankTransfer::PaymentOrdersController < ApplicationController
   end
 
   def create
-    @result =BankTransfer::YesBank::ParseFile.(current_user, params)
+    @result = BankTransfer::YesBank::Create.(current_user, params)
     respond
   end
 
   def index
-    @result =BankTransfer::YesBank::Index.(current_user, params)
+    @result = BankTransfer::YesBank::Index.(current_user, params)
     respond
   end
 
   def show
-    @result =BankTransfer::YesBank::Show.(current_user, params)
+    @result = BankTransfer::YesBank::Show.(current_user, params)
     respond
   end
 

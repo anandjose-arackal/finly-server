@@ -15,13 +15,13 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
       add_message :error, 'Error loading request'
       return
     end
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate the transfer'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-    end
+    # if params[:password].blank?
+    #   add_message :error, 'You need to provide your password to initiate the transfer'
+    #   return
+    # end
+    # unless user.valid_password?(params[:password])
+    #   add_message :error, 'Invalid Password'
+    # end
   end
 
   def init
@@ -30,9 +30,10 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
     # receiving accounts
     self.initiating_account = user.company.yes_bank_company_account
     op = BankTransfer::YesBank::Process.(user, scheduled_at: params[:scheduled_at],
-        payment_order: self.order_data, card_program_id: card_program_id)
+        payment_order: self.order_data)
     self.processed_order_data = op.payment_order_data
-    self.scheduled_at = self.processed_order_data.scheduled_at
+
+    self.scheduled_at = op.scheduled_at
     self.payment_request = build_payment_request(processed_order_data)
   end
 
@@ -54,7 +55,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   end
 
   def process
-    
+
     # calling the payment processor to complete the transfer using adapters
     op = AccountManager::Payments::PaymentProcessor.(initiating_user, {payment_request: payment_request})
     unless op.success?

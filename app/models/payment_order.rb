@@ -80,6 +80,12 @@ class PaymentOrder < ActiveRecord::Base
   scope :joins_amount_requested, -> { joins :amount_requested }
   scope :total_amount_requested, -> { joins_amount_requested.sum(:value) }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
+  scope :vendor_payments, -> (enabled){
+    if enabled == 1 || enabled == '1'
+      where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
+    end
+  }
+
 
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
 
