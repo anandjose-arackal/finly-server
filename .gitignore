@@ -27,6 +27,7 @@
 /Sample transactions
 
 .idea/*
+/yes_bank_api_call_logs
 .vagrant/
 #Vagrantfile
 #bootstrap.sh
