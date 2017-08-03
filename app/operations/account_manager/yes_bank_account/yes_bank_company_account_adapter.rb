@@ -1,14 +1,7 @@
 class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountManager::BaseAdapter
 
-  attr_accessor :errors, :company
-
-  def initialize(source_id)
-    # here source will be a company
-    init(source_id)
-  end
-
-  def init(source_id)
-    self.company = Company.find_by(id: source_id)
+  def account_class
+    YesBankCompanyAccount
   end
 
   def credit(amount)
@@ -32,7 +25,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
   end
 
   def debitable_accounts
-    [VendorAccount, "VendorAccount"]
+    [BankAccount]
   end
 
   private

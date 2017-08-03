@@ -50,6 +50,8 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       self.requested_amount += (item[:amount].to_d rescue 0)
     end
 
+    debugger
+
     if self.requested_amount > company_balance
       self.errors << 'Insufficient funds to initiate the transfer'
       self.payment_order_valid = false

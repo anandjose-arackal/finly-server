@@ -1,14 +1,7 @@
 class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountManager::BaseAdapter
 
-  attr_accessor :errors, :company_account
-
-  def initialize(source_id)
-    # here source will be a company
-    init(source_id)
-  end
-
-  def init(source_id)
-    self.company_account = ItzCashCompanyAccount.find_by(id: source_id)
+  def account_class
+    ItzCashCompanyAccount
   end
 
   def credit(amount)
@@ -22,24 +15,19 @@ class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountMana
   end
 
   def balance
-    op = ItzCash::VirtualAccountBalance.(company_account.company)
+    op = ItzCash::VirtualAccountBalance.(account.company)
     balance = op.wallets.first[:balance] # original balance from ItzCash's servers
-    wallets_total = company_account.total_wallet_balance
-    blocked_amount = company_account.blocked_amount_for_pending_payments
+    wallets_total = account.total_wallet_balance
+    blocked_amount = account.blocked_amount_for_pending_payments
     balance - wallets_total - blocked_amount
   end
 
   def creditable_accounts
-    [Card, "Card", UserWallet, "UserWallet"]
+    [Card, UserWallet]
   end
 
   def debitable_accounts
-    [Card, "Card", UserWallet, "UserWallet"]
+    [Card, UserWallet]
   end
 
-  private
-
-  def blocked_amount_for_payments
-
-  end
 end

@@ -6,21 +6,22 @@ class AccountManager::Base < BackgroundOperation
 
   protected
 
-  def retrieve_adapter(account_type)
-    acc_type = account_type&.class&.to_s
+  def retrieve_adapter(account)
+    acc_type = account&.class&.to_s
     case acc_type
-      when 1, Card, "Card"
-        return AccountManager::Cards::CardAdapter.new(account_type.id)
-      when 2, UserWallet, "UserWallet"
-        return AccountManager::Wallet::WalletAdapter.new(account_type.id)
-      when 3, YesBankCompanyAccount, "YesBankCompanyAccount"
-        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(account_type.id)
-      when 4, "CashOnHand"
-        return AccountManager::CashOnHand::CashOnHandAdapter.new(account_type.id)
-      when 5, ItzCashCompanyAccount, "ItzCashCompanyAccount"
-        return AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter.new(account_type.id)
+      when 'Card'
+        return AccountManager::Cards::CardAdapter.new(account)
+      when 'UserWallet'
+        return AccountManager::Wallet::WalletAdapter.new(account)
+      when 'YesBankCompanyAccount'
+        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(account)
+      when 'CashOnHand'
+        return AccountManager::CashOnHand::CashOnHandAdapter.new(account)
+      when 'ItzCashCompanyAccount'
+        return AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter.new(account)
       else # i.e. the transaction has happened outside Finly
         return AccountManager::OutsideFinly::OutsideFinlyAdapter.new
     end
   end
+
 end
