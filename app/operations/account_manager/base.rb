@@ -19,6 +19,8 @@ class AccountManager::Base < BackgroundOperation
         return AccountManager::CashOnHand::CashOnHandAdapter.new(account)
       when 'ItzCashCompanyAccount'
         return AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter.new(account)
+      when 'BankAccount'
+        return AccountManager::BankAccount::BankAccountYesBankAdapter.new(account)
       else # i.e. the transaction has happened outside Finly
         return AccountManager::OutsideFinly::OutsideFinlyAdapter.new
     end

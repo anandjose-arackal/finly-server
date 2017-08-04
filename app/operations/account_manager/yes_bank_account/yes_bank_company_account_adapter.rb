@@ -23,6 +23,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
   def balance
     # can either be an operation or a specific call with
     # a model call
+    self.yes_bank_account.balance_value
   end
 
   def creditable_accounts
