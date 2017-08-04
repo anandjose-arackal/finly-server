@@ -15,13 +15,13 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
       add_message :error, 'Error loading request'
       return
     end
-    # if params[:password].blank?
-    #   add_message :error, 'You need to provide your password to initiate the transfer'
-    #   return
-    # end
-    # unless user.valid_password?(params[:password])
-    #   add_message :error, 'Invalid Password'
-    # end
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate the transfer'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+    end
   end
 
   def init
@@ -49,7 +49,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
       return
     end
 
-    unless self.payment_order.valid?
+    unless self.payment_request.valid?
       add_message :error, 'Please fix the issues before confirming the request'
     end
   end

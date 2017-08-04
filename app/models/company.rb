@@ -30,7 +30,7 @@ class Company < ActiveRecord::Base
   has_many :per_diems, as: :configurable
   has_many :company_balance_histories
   has_many :field_configurations, as: :configurable
-  has_many
+  has_many :bank_transactions
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
