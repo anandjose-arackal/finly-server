@@ -38,7 +38,6 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   end
 
   def validate
-
     if scheduled_at && scheduled_at < Date.today
       add_message :error, 'Scheduled Date cannot be less than the current date'
       return
@@ -57,7 +56,8 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   def process
 
     # calling the payment processor to complete the transfer using adapters
-    op = AccountManager::Payments::PaymentProcessor.(initiating_user, {payment_request: payment_request})
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
+    # debugger
     unless op.success?
       # destroy the payment order that was created for this purpose, and return errors
       add_message :error, op.messages[:error]
@@ -68,6 +68,10 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   def success
     params[:payment_order] = self.payment_order
     BankTransfer::YesBank::Create::SuccessPresenter.new(user, params, messages)
+  end
+
+  def failure
+    # todo - destroy the vendors and associated bank accounts if the payment order fails for some reason
   end
 
   class BankTransfer::YesBank::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter

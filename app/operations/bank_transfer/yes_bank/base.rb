@@ -22,9 +22,9 @@ class BankTransfer::YesBank::Base < BaseOperation
   # this will create the respective vendors for each transaction, and create the payment request
   # for each of them - at this point, all of them will be valid
   def build_payment_request(order_data)
-    self.payment_request = PaymentRequest.(user, initiating_account, BankAccount, :credit, :vendor_payment)
+    self.payment_request = PaymentRequest.(user, initiating_account, BankAccount.name, :credit, :vendor_payment)
     order_data.each do |data|
-      account_number = data[:account_number]
+      account_number = data[:bank_account_number]
       ifsc = data[:ifsc]
       name = data[:name]
       amount = data[:amount]

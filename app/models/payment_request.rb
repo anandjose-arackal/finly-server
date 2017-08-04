@@ -5,7 +5,7 @@
 
 class PaymentRequest < NonPersistentModel
 
-  AVAILABLE_ACCOUNT_TYPES = [nil, ItzCashCompanyAccount.name, YesBankCompanyAccount.name, UserWallet.name, CashOnHand.name, Card.name]
+  AVAILABLE_ACCOUNT_TYPES = [nil, ItzCashCompanyAccount.name, YesBankCompanyAccount.name, UserWallet.name, CashOnHand.name, Card.name, BankAccount.name]
 
   attr_accessor :company_id, :scheduled_at, :background, :payment_purpose_id,
                 :payment_items,
