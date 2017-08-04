@@ -21,10 +21,10 @@ json.data do
     json.array! payment_order.payments.each do |payment|
       json.amount payment.amount
       json.date payment.date
-      json.receving_account do
-        json.name payment.receiving_account.
-            json.email payment.receiving_user.email
-        json.mobile_number payment.receiving_user.mobile_number
+      json.receiving_user do
+        json.name payment.receiving_account.name
+        json.account_number payment.receiving_account.account_number
+        json.ifsc payment.receiving_account.ifsc
       end
       json.note payment.note
       json.initiating_account payment.initiating_account_type_name

@@ -26,6 +26,7 @@ class BankTransfer::PaymentOrdersController < ApplicationController
 
   # the operation used to cancel the particular payment order
   def destroy
-
+    @result = BankTransfer::YesBank::Cancel.(current_user, params)
+    respond
   end
 end
