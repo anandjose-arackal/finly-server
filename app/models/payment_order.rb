@@ -3,7 +3,6 @@
 # Table name: payment_orders
 #
 #  id                        :integer          not null, primary key
-#  payment_order_type_id     :integer          not null
 #  scheduled_at              :date
 #  processed_at              :datetime
 #  initiating_user_id        :integer          not null
@@ -20,6 +19,8 @@
 #  updated_at                :datetime         not null
 #  initiating_account_type   :string(255)
 #  receiving_account_type    :string(255)
+#  payment_purpose_id        :integer
+#  currency_id               :integer          not null
 #
 
 class PaymentOrder < ActiveRecord::Base

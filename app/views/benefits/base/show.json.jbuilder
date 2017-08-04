@@ -21,8 +21,8 @@ json.data do
     json.array! payment_order.payments.each do |payment|
       json.amount payment.amount
       json.date payment.date
-      json.receving_account do
-        json.name payment.receiving_account.
+      json.receiving_user do
+        json.name payment.receiving_user.name
         json.email payment.receiving_user.email
         json.mobile_number payment.receiving_user.mobile_number
       end

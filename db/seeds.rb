@@ -693,19 +693,20 @@ end
 10.times do
   # create a bank account first
   vendor = YesBankVendor.create(name: "Seomthing", company_id: 1)
-  ba1 = vendor.bank_accounts.build(account_number: random_string_of_numbers(8),
+  ba1 = vendor.bank_accounts.create(account_number: random_string_of_numbers(8),
                                  ifsc: random_string_of_numbers(7),
-                                 name: "Sreeram").save
-  ba2 = ba1 = vendor.bank_accounts.build(account_number: random_string_of_numbers(8),
+                                 name: "Sreeram")
+  ba2 = vendor.bank_accounts.create(account_number: random_string_of_numbers(8),
                                          ifsc: random_string_of_numbers(7),
-                                         name: "Sreeram Two").save
-  p = PaymentOrder.create(
-                      payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+                                         name: "Sreeram Two")
+  p = PaymentOrder.create(payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
                       initiating_user: User.first,
                       receiving_account_type: "BankAccount",
                       amount_requested_attributes: {value: 2000, currency_id: 1},
+                      currency_id: 1,
                       amount_processed_attributes: {value: 2000, currency_id: 1},
                       payment_order_status_id: random_integer(1, 7),
+                      company_id: 1,
                       payments_attributes: [
                           {
                               date: Date.today,
@@ -713,6 +714,8 @@ end
                               initiating_user: User.first,
                               receiving_user: vendor,
                               receiving_account: ba1,
+                              payment_type_id: PaymentType.id_for(:credit),
+                              initiating_account: Company.first.yes_bank_company_account,
                               payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
                               amount_attributes: {
                                   value: 1000,
@@ -725,7 +728,9 @@ end
                               payment_status_id: random_integer(1, 7),
                               initiating_user: User.first,
                               receiving_user: vendor,
-                              receiving_account: ba1,
+                              receiving_account: ba2,
+                              payment_type_id: PaymentType.id_for(:credit),
+                              initiating_account: Company.first.yes_bank_company_account,
                               payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
                               amount_attributes: {
                                   value: 1000,
@@ -734,6 +739,7 @@ end
                           }
                       ]
   )
+
 end
 
 # Expense.all.each do |expense|
