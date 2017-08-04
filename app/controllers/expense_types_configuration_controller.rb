@@ -1,7 +1,7 @@
 class ExpenseTypesConfigurationController < ApplicationController
 
 
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { finly_authorize! :web}
 
   def show
     @result = ExpenseTypes::Show.(current_user, params)

@@ -1,7 +1,7 @@
 class ThirdPartyAuthController < ApplicationController
 
 
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { finly_authorize! :web}
 
   def quickbooks
     # action will save the authentication object to the db based on the callback

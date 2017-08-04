@@ -1,6 +1,6 @@
 class AdminUsers::AgreementsController < ApplicationController
 
-  before_action -> { doorkeeper_authorize! :admin }
+  before_action -> { finly_authorize! :admin }
 
   def create
     @result = Admin::Agreement::Create.(current_user, params)

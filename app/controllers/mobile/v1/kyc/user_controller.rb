@@ -1,6 +1,6 @@
 class Mobile::V1::Kyc::UserController < ApplicationController
 
-  before_action -> { doorkeeper_authorize! :mobile}
+  before_action -> { finly_authorize! :mobile}
 
   def show
     @result = KycProcess::User::Show.(current_user, params)

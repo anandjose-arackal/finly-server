@@ -2,7 +2,7 @@ class CardTransactionsController < ApplicationController
 
 
 
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { finly_authorize! :web}
 
   def index
     @result = Card::Transaction::Index.(current_user, params)

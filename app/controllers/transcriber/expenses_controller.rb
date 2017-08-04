@@ -1,7 +1,7 @@
 class Transcriber::ExpensesController < ApplicationController
 
 
-  before_action -> { doorkeeper_authorize! :admin}
+  before_action -> { finly_authorize! :admin}
 
   def create
     @result = Transcriber::Expenses::Create.(current_user, params)

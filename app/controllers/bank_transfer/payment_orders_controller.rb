@@ -2,7 +2,7 @@
 
 class BankTransfer::PaymentOrdersController < ApplicationController
 
-  before_action {doorkeeper_authorize! :web}
+  before_action {finly_authorize! :web}
 
   def process_file
     @result = BankTransfer::YesBank::ParseFile.(current_user, params)

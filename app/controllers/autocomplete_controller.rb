@@ -1,5 +1,5 @@
 class AutocompleteController < ApplicationController
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { finly_authorize! :web}
   def merchant
     merchants = Autocomplete::Merchant.(current_user, params)
 
