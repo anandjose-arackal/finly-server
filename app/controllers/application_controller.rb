@@ -14,11 +14,6 @@ class ApplicationController < ActionController::Base
   before_filter :set_paper_trail_whodunnit
 
   before_action :load_global_variables
-  # before_action :verify_otp
-  # before_action :check_first_time_login
-
-  # to add custom parameters to the user hash being taken as input
-  before_action :configure_permitted_parameters if :devise_controller?
 
   before_filter :store_location
 
@@ -208,29 +203,9 @@ class ApplicationController < ActionController::Base
     @action_success = true
   end
 
-  def configure_permitted_parameters
-    # devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :avatar, :dob, :address, :pin, :number, :company_name, :admin, :manager_id, :user_type_id, :company_id])
-    # devise_parameter_sanitizer.permit(:account_update, keys: [:name])
-  end
-
   def after_sign_out_path_for(resource)
     root_url
   end
-
-  def verify_otp
-    if logged_in? && !current_user.otp_verified && !(params[:controller] == 'otp') and not
-    params[:controller] == 'sessions' and not params[:controller] == 'pending_invites'
-      params[:type] = 'verification'
-      User::Verification::Otp::Create.(current_user, params)
-      redirect_to verify_mobile_path
-    end
-  end
-
-  # def check_first_time_login
-  #   if logged_in? and current_user.default_password and not params[:action].include?('edit_default_password')
-  #     redirect_to edit_default_password_path
-  #   end
-  # end
 
   def whitelisted?(ip, type_id)
     return true if WhitelistedIp.with_type(type_id).with_ip(ip).present?
