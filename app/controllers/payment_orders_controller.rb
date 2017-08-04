@@ -1,6 +1,5 @@
 class PaymentOrdersController < ApplicationController
   def index
-
   end
 
   def process_file
@@ -8,6 +7,8 @@ class PaymentOrdersController < ApplicationController
   end
 
   def create
+  end
 
+  def show
   end
 end
