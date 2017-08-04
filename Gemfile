@@ -30,6 +30,8 @@ gem 'crono', '1.0.3'
 gem 'haml'
 gem 'sinatra', require: nil
 
+gem 'request_store', '1.3.2'
+
 # gems for quickbooks integration
 gem 'omniauth'
 gem 'omniauth-quickbooks'
