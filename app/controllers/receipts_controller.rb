@@ -1,7 +1,7 @@
 class ReceiptsController < ApplicationController
 
 
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { finly_authorize! :web}
 
   def create
     @result = Receipt::Create.(current_user, params)

@@ -3,7 +3,7 @@ class ExportController < ApplicationController
 
   before_action :set_tokens_in_header
   #
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { finly_authorize! :web}
 
   def report
     respond_to do |format|

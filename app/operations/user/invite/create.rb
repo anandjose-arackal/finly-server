@@ -19,14 +19,14 @@ class User::Invite::Create < User::Invite::Base
     type == 'email' if type.nil?
 
     case type
-      when 'mobile','1'
+      when 'mobile', '1'
         self.numbers = invite_params[:mobile].delete(' ').split(',').collect(&:strip) rescue nil
         invite_params.delete(:mobile) # because mobile is not a field in the User model
         if self.numbers.present?
           self.numbers.compact!
           self.numbers.uniq!
         end
-      when 'email','2'
+      when 'email', '2'
         self.emails = invite_params[:email].delete(' ').split(',').collect(&:strip) rescue nil
         invite_params.delete(:mobile) # because mobile is not a field in the User model
         if self.emails.present?
@@ -183,19 +183,13 @@ class User::Invite::Create < User::Invite::Base
   end
 
   def configure_expense_management
-    request = params[:request]
-    unless request.referrer.include?('disburse')
-      invite_params[:user_panel_subscription_attributes] = {expense_management: true}
-      invite_params.permit!
-    end
+    invite_params[:user_panel_subscription_attributes] = {expense_management: true}
+    invite_params.permit!
   end
 
   def configure_disburse
-    request = params[:request]
-    if request.referrer.include?('disburse')
-      invite_params[:user_panel_subscription_attributes] = {disburse: true}
-      invite_params.permit!
-    end
+    invite_params[:user_panel_subscription_attributes] = {disburse: true}
+    invite_params.permit!
   end
 
   def pre_process
@@ -245,7 +239,7 @@ class User::Invite::Create < User::Invite::Base
     if invited_users.empty?
       messages[:error] << 'Invites failed. Please try again'
     end
-    
+
   end
 
   def post_process

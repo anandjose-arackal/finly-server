@@ -1,7 +1,7 @@
 class AdminUsers::Kyc::CompaniesController < ApplicationController
 
 
-  before_action -> { doorkeeper_authorize! :admin}
+  before_action -> { finly_authorize! :admin}
 
   def show
     @result = Admin::KycProcesses::Companies::Show.(current_user, params)

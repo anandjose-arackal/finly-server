@@ -1,6 +1,6 @@
 class Api::Fm::V1::FundsController < ApiApplicationController
 
-  before_action -> { doorkeeper_authorize! :api}
+  before_action -> { finly_authorize! :api}
 
   def credit
     formatted_param = RequestFormatter::ApiParser::FmParser::V1::Funds::CreditDebit.(current_user, params)&.formatted_request

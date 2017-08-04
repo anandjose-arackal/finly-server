@@ -2,12 +2,11 @@ require 'hooks'
 class BaseOperation
   include CallbackHandler, MathUtil, HasScope
   # todo rename user to resource as User is a model and there can be other models such as AdminUser etc
-  attr_accessor :user, :company, :params, :messages, :process_complete, :response, :current_app
+  attr_accessor :user, :company, :params, :messages, :process_complete, :response
 
   # If initializers are over-ridden super() must be called in the inheriting class
   def initialize(user, params={})
     clear_messages
-    self.current_app = params[:current_app]
     self.user = user
     self.params = (ActionController::Parameters.new(params) or {})
   end
@@ -56,10 +55,16 @@ class BaseOperation
     return failure if has_errors?
     subscribe
     return failure if has_errors?
-    configure_expense_management
-    return failure if has_errors?
-    configure_disburse
-    return failure if has_errors?
+    if expense_management?
+      configure_expense_management
+      return failure if has_errors?
+    elsif funds_transfer?
+      configure_disburse
+      return failure if has_errors?
+    elsif vendor_payments?
+      configure_vendor_payment
+      return failure if has_errors?
+    end
     pre_process
     return failure if has_errors?
     process
@@ -167,6 +172,10 @@ class BaseOperation
 
   end
 
+  def configure_vendor_payment
+
+  end
+
   # This would be sent as a return value
   def retrieve
     if self.response.present?
@@ -192,6 +201,34 @@ class BaseOperation
 
   def failure?
     self.process_complete and has_errors?
+  end
+
+  def current_app
+    RequestStore.store[:current_app]
+  end
+
+  def current_devise
+    RequestStore.store[:current_devise]
+  end
+
+  def current_user
+    RequestStore.store[:current_user]
+  end
+
+  def authorized_scopes
+    RequestStore.store[:authorized_scopes]
+  end
+
+  def current_company
+    RequestStore.store[:current_company]
+  end
+
+  def current_request
+    RequestStore.store[:request]
+  end
+
+  def request_params
+    RequestStore.store[:params]
   end
 
   # Used to present the data to the UI
@@ -325,14 +362,6 @@ class BaseOperation
 
   def is_view?(type)
     type.present? and params.present? and params[:view].present? and (params[:view] == type.to_s or params[:view] == type.to_sym)
-  end
-
-  def is_expense_management_panel?
-    !is_disburse_panel?
-  end
-
-  def is_disburse_panel?
-    !!params&.dig(:request)&.referrer&.include?('disburse')
   end
 
   def clear_messages

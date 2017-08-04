@@ -3,7 +3,6 @@ require 'require_all'
 # Dir[File.expand_path "#{Rails.root}/app/operations/event/**/*.rb"].each { |f| require(f) }
 # Dir[File.expand_path "#{Rails.root}/app/operations/expense/card/**/*.rb"].each { |f| require(f) }
 class ApplicationController < ActionController::Base
-  attr_accessor :current_app
   include SessionsHelper, AccessibilityCheckHelper, ApplicationHelper
   # include AbstractController::Callbacks
   # include ActionController::Head
@@ -14,14 +13,7 @@ class ApplicationController < ActionController::Base
   # protect_from_forgery with: :exception
   before_filter :set_paper_trail_whodunnit
 
-  before_action :whitelisted_emails
-  before_action :add_request_to_params
-  before_action :set_current_app
-  # before_action :verify_otp
-  # before_action :check_first_time_login
-
-  # to add custom parameters to the user hash being taken as input
-  before_action :configure_permitted_parameters if :devise_controller?
+  before_action :load_global_variables
 
   before_filter :store_location
 
@@ -86,7 +78,6 @@ class ApplicationController < ActionController::Base
       format.json {}
     end
   end
-
 
   def after_sign_in_path_for(resource)
     if resource.is_a?(AdminUser)
@@ -162,28 +153,40 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def add_request_to_params
-    # adding the request object to the params hash
-    params[:request] = request
+  def load_global_variables
+    RequestStore.store[:request] = request
+    RequestStore.store[:params] = params
+    RequestStore.store[:current_app] = current_app
+    RequestStore.store[:current_devise] = current_devise
   end
 
-  def set_current_app
+  def current_app
     path = request.path
     if path.is_a?(String)
       if path.starts_with?('/admin')
-        self.current_app = :ap
+        return :ap
       elsif path.starts_with?('/payments')
-        self.current_app = :vp
+        return :vp
       elsif path.starts_with?('/disburse')
-        self.current_app = :ft
-      else
-        self.current_app = :em
+        return :ft
       end
-    else
-      self.current_app = :em
     end
+    :em
+  end
 
-    params[:current_app] = self.current_app
+  def current_devise
+    path = request.path
+    if path.is_a?(String)
+      if path.starts_with?('/api')
+        return :api
+      elsif path.starts_with?('/mobile')
+        return :mobile
+      elsif path.starts_with?('/desktop')
+        # todo desktop login
+        return :desktop
+      end
+    end
+    :web
   end
 
   def respond_failure(message=nil)
@@ -200,38 +203,9 @@ class ApplicationController < ActionController::Base
     @action_success = true
   end
 
-  def configure_permitted_parameters
-    # devise_parameter_sanitizer.permit(:sign_up, keys: [:name, :avatar, :dob, :address, :pin, :number, :company_name, :admin, :manager_id, :user_type_id, :company_id])
-    # devise_parameter_sanitizer.permit(:account_update, keys: [:name])
-  end
-
   def after_sign_out_path_for(resource)
     root_url
   end
-
-  def whitelisted_emails
-    if params[:user] and Constants::WHITELISTED_EMAILS.include?(params[:user][:email])
-      if request.format == :html
-        sign_out current_user
-        redirect_to root_url
-      end
-    end
-  end
-
-  def verify_otp
-    if logged_in? && !current_user.otp_verified && !(params[:controller] == 'otp') and not
-    params[:controller] == 'sessions' and not params[:controller] == 'pending_invites'
-      params[:type] = 'verification'
-      User::Verification::Otp::Create.(current_user, params)
-      redirect_to verify_mobile_path
-    end
-  end
-
-  # def check_first_time_login
-  #   if logged_in? and current_user.default_password and not params[:action].include?('edit_default_password')
-  #     redirect_to edit_default_password_path
-  #   end
-  # end
 
   def whitelisted?(ip, type_id)
     return true if WhitelistedIp.with_type(type_id).with_ip(ip).present?
@@ -243,7 +217,19 @@ class ApplicationController < ActionController::Base
     head(403)
   end
 
+  def finly_authorize!(*scopes)
+    doorkeeper_authorize! *scopes
+    if current_user.present?
+      RequestStore.store[:authorized_scopes] = scopes
+    end
+  end
+
   def current_user
+    if RequestStore.store[:current_user].present?
+      if RequestStore.store[:current_company].present? or RequestStore.store[:current_user].class.name != 'User'
+        return RequestStore.store[:current_user]
+      end
+    end
     if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
       if scopes.include?('admin')
@@ -252,12 +238,16 @@ class ApplicationController < ActionController::Base
         @current_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       end
     end
+    RequestStore.store[:current_user] = @current_user
+    if @current_user.class.name == 'User'
+      RequestStore.store[:current_company] = @current_user&.company
+    end
+    @current_user
   end
 
   def current_company
-    u = current_user
-    return nil unless u.class == User
-    u&.company
+    current_user
+    RequestStore.store[:current_company]
   end
 
   def set_tokens_in_header
