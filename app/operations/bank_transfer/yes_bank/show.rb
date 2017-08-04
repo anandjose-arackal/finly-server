@@ -26,7 +26,8 @@ class BankTransfer::YesBank::Show < BankTransfer::YesBank::Base
   end
 
   def process
-    actions[:cancel] = true if self.payment_order.scheduled?
+    # actions[:cancel] = true if self.payment_order.scheduled?
+    actions[:cancel] = Rails.application.routes.url_helpers.bank_transfer_payment_order_path(payment_order)
   end
 
   def success
