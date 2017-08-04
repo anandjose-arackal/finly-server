@@ -1,24 +1,13 @@
 class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
 
-  attr_accessor :errors, :wallet
-
-  def initialize(source_id)
-    init(source_id)
-  end
-
-  def init(source_id)
-    self.wallet = UserWallet.find_by(id: source_id)
-    self.errors = []
-  end
-
-  def name
-    "Finly Money"
+  def account_class
+    UserWallet
   end
 
   def credit(payment)
     # credit a particular wallet with the respective amount
-    unless self.wallet.add_funds(payment.amount_value)
-      self.errors = wallet.errors.full_messages
+    unless self.account.add_funds(payment.amount_value)
+      self.errors = account.errors.full_messages
       return false
     end
     true
@@ -26,23 +15,23 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
 
   def debit(payment)
     # credit a particular wallet with the respective amount
-    unless self.wallet.subtract_funds(payment.amount_value)
-      self.errors = wallet.errors.full_messages
+    unless self.account.subtract_funds(payment.amount_value)
+      self.errors = account.errors.full_messages
       return false
     end
     true
   end
 
   def balance
-    self.wallet.balance_value
+    self.account.balance_value
   end
 
   def creditable_accounts
-    [Card, "Card", UserWallet, "UserWallet", ItzCashCompanyAccount, "ItzCashCompanyAccount"]
+    [Card, UserWallet, ItzCashCompanyAccount]
   end
 
   def debitable_accounts
-    [Card, "Card", UserWallet, "UserWallet", ItzCashCompanyAccount, "ItzCashCompanyAccount"]
+    [Card, UserWallet, ItzCashCompanyAccount]
   end
 
   def eligibility(amount)

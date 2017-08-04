@@ -1,0 +1,31 @@
+# currently this controller is only for admins of companies
+
+class BankTransfer::PaymentOrdersController < ApplicationController
+
+  before_action {doorkeeper_authorize! :web}
+
+  def process_file
+    @result = BankTransfer::YesBank::ParseFile.(current_user, params)
+    respond
+  end
+
+  def create
+    @result = BankTransfer::YesBank::Create.(current_user, params)
+    respond
+  end
+
+  def index
+    @result = BankTransfer::YesBank::Index.(current_user, params)
+    respond
+  end
+
+  def show
+    @result = BankTransfer::YesBank::Show.(current_user, params)
+    respond
+  end
+
+  # the operation used to cancel the particular payment order
+  def destroy
+
+  end
+end

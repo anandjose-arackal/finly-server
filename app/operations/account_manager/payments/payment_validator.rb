@@ -63,7 +63,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
       end
     end
     unless valid
-      add_message :error, "Some of the payments have eligibility issues"
+      add_message :error, 'Some of the payments have eligibility issues'
     end
     # end
   end
@@ -77,12 +77,12 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     payment_order.payments.each do |payment|
       unless payment.receiving_account_type == receiving_account_type
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                      content: "Receiving account type has to be same for all transfers").save
+                                      content: 'Receiving account type has to be same for all transfers').save
         self.homogenous_accounts = false
       end
       unless payment.initiating_account_type == initiating_account_type
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                      content: "Initiating account type has to be same for all transfers").save
+                                      content: 'Initiating account type has to be same for all transfers').save
         self.homogenous_accounts = false
       end
     end

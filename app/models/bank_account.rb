@@ -20,4 +20,6 @@
 
 class BankAccount < ActiveRecord::Base
   belongs_to :account_owner, polymorphic: true
+
+  has_many :receiving_payments, as: :receiving_account
 end

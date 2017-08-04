@@ -45,27 +45,9 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
     set_xml_params
   end
 
-  def process
-    p = self.path
-    begin
-      puts "Posting Path: #{p}"
-      puts "Post Params: #{self.template}"
-
-      self.response = self.connection.post do |req|
-        req.url p
-        req.headers['Content-Type'] = 'application/xml'
-        req.headers['X-IBM-Client-Id'] = client_id
-        req.headers['X-IBM-Client-Secret'] = client_secret
-        req.body = template
-      end
-    rescue Faraday::TimeoutError, Faraday::ConnectionFailed
-      self.timeout = true
-      add_message :error, "Request timed out. Please try again"
-    end
-  end
-
   def success?
     self.parsed_response = Hash.from_xml(response.body)
+    ap parsed_response
     unless parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode") == "SENT_TO_BENEFICIARY" || parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode") == "COMPLETED"
       return false
     end
@@ -91,7 +73,6 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
     def initialize(transfer_request)
       self.transfer_request = transfer_request
     end
-
   end
 
   class YesBank::Transfer::BankTransfer::TransactionFailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -101,7 +82,6 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
     def initialize(transfer_request)
       self.transfer_request = transfer_request
     end
-
   end
 
   private
@@ -109,7 +89,7 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
   def set_xml_params
     liquid_template = load_soap_template
     self.template = liquid_template.render(
-        'UNIQUE_REFERENCE_NUMBER' => payment_request.generated_reference_number,
+        'UNIQUE_REFERENCE_NUMBER' => transfer_request.generate_unique_reference,
         'APP_ID' => application_id,
         'CUSTOMER_ID' => customer_id,
         'ACCOUNT_NUMBER' => account_number,

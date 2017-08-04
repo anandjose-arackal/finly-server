@@ -66,14 +66,16 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
       receiving_account = item[:card]
       amount = item[:amount]
 
-      self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, amount))
+      payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, amount))
     end
     # calling the payment processor to complete the transfer using adapters
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     unless op.success?
       # destroy the payment order that was created for this purpose, and return errors
       add_message :error, op.messages[:error]
+      return
     end
+    self.payment_order = op.payment_order
   end
 
   def success

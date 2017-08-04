@@ -34,7 +34,7 @@ default: &default
     base: 'http://staging.itzcash.com'
     path: 'api/customer/register'
   yes_bank:
-    base: 'https://uatsky.yesbank.in'
+    base: 'https://uatsky.yesbank.in:444'
     path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
 
 

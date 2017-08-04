@@ -689,6 +689,53 @@ if CardTransaction.filter_refunds(1).count == 0
   end
 end
 
+# creating junk payment order data
+10.times do
+  # create a bank account first
+  vendor = YesBankVendor.create(name: "Seomthing", company_id: 1)
+  ba1 = vendor.bank_accounts.build(account_number: random_string_of_numbers(8),
+                                 ifsc: random_string_of_numbers(7),
+                                 name: "Sreeram").save
+  ba2 = ba1 = vendor.bank_accounts.build(account_number: random_string_of_numbers(8),
+                                         ifsc: random_string_of_numbers(7),
+                                         name: "Sreeram Two").save
+  p = PaymentOrder.create(
+                      payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+                      initiating_user: User.first,
+                      receiving_account_type: "BankAccount",
+                      amount_requested_attributes: {value: 2000, currency_id: 1},
+                      amount_processed_attributes: {value: 2000, currency_id: 1},
+                      payment_order_status_id: random_integer(1, 7),
+                      payments_attributes: [
+                          {
+                              date: Date.today,
+                              payment_status_id: random_integer(1, 7),
+                              initiating_user: User.first,
+                              receiving_user: vendor,
+                              receiving_account: ba1,
+                              payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+                              amount_attributes: {
+                                  value: 1000,
+                                  currency_id: 1
+                              }
+
+                          },
+                          {
+                              date: Date.today,
+                              payment_status_id: random_integer(1, 7),
+                              initiating_user: User.first,
+                              receiving_user: vendor,
+                              receiving_account: ba1,
+                              payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+                              amount_attributes: {
+                                  value: 1000,
+                                  currency_id: 1
+                              }
+                          }
+                      ]
+  )
+end
+
 # Expense.all.each do |expense|
 #   expense.update_other_currencies
 # end

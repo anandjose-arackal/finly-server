@@ -8,6 +8,7 @@
 #  company                 :integer
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
+#  company_acount_type_id  :integer
 #  company_account_type_id :integer
 #
 
