@@ -29,4 +29,9 @@ class BankTransfer::PaymentOrdersController < ApplicationController
     @result = BankTransfer::YesBank::Cancel.(current_user, params)
     respond
   end
+
+  def balance
+    @result = AccountManager::Balance::Check.(current_company.yes_bank_company_account, params)
+    respond
+  end
 end

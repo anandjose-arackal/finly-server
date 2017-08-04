@@ -5,6 +5,7 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
   end
 
   def credit(payment)
+    super
     # credit a particular wallet with the respective amount
     unless self.account.add_funds(payment.amount_value)
       self.errors = account.errors.full_messages
@@ -14,6 +15,7 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
   end
 
   def debit(payment)
+    super
     # credit a particular wallet with the respective amount
     unless self.account.subtract_funds(payment.amount_value)
       self.errors = account.errors.full_messages

@@ -12,6 +12,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   end
 
   def credit(payment, transfer_type)
+    super
     # this will be done by creating the respective payment request for the bank account
     transfer_request = create_transfer_request(payment, transfer_type)
     op = YesBank::Transfer::BankTransfer.(transfer_request)
@@ -40,6 +41,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   end
 
   def debit(payment)
+    super
     # nothing to do here ¯\_(ツ)_/¯
   end
 
@@ -64,7 +66,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   end
 
   def create_transfer_request(payment, transfer_type)
-    tr = TransferRequest.(bank_account.name, bank_account.account_number, bank_account.ifsc, payment.amount_value, transfer_type)
+    tr = TransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type)
   end
 
 end

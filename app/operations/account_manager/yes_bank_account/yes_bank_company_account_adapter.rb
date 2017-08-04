@@ -8,8 +8,8 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
 
   def credit(amount)
     # this will add money to this company's balance
-    balance = self.yes_bank_account.balance.value
-    if self.yes_bank_account.update(balance: (balance + amount))
+    balance = self.account.balance.value
+    if self.account.update(balance: (balance + amount))
       return true
     end
     false
@@ -23,7 +23,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
   def balance
     # can either be an operation or a specific call with
     # a model call
-    self.yes_bank_account.balance_value
+    self.account.balance_value
   end
 
   def creditable_accounts

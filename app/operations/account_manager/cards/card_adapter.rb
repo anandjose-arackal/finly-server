@@ -5,6 +5,7 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
   end
 
   def credit(payment)
+    super
     # operation that credits a particular card
     op = ItzCash::Credit.(account.user, {card: account, amount: payment.amount_value})
     unless op.success?
@@ -15,6 +16,7 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
   end
 
   def debit(payment)
+    super
     # operation that debits a particular card
     op = ItzCash::Debit.(account.user, {card: account, amount: payment.amount_value})
     unless op.success?

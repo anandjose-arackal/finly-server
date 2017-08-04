@@ -24,19 +24,19 @@ class AccountManager::BaseAdapter
   end
 
   def credit(payment)
-
+    self.errors = []
   end
 
   def debit(payment)
-
+    self.errors = []
   end
 
   def balance(payment)
-
+    self.errors = []
   end
 
   def eligibility(payment)
-
+    self.errors = []
   end
 
   def creditable_accounts

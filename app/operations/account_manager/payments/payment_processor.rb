@@ -56,20 +56,20 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     # if payment order has been scheduled for execution right away, process it right now
     if payment_order.payment_order_status_id == PaymentOrderStatus.id_for(:pending)
       # if the order is not background, perform it using the regular call method in payment executor
-      unless payment_request.background
-        # Process the order synchronously
-        result = AccountManager::Payments::PaymentOrderExecutor.(payment_order)
-        if result.success?
-          add_message :success, 'Payment processed successfully'
-        else
-          add_message :error, result.messages[:error]
-        end
-      else
+      if payment_request.background
         # call the payment executor that runs the payments in the background
         # passing the payment id here because async operation can retrieve the object
         result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order)
         if result.success?
           add_message :success, 'Processing payments'
+        else
+          add_message :error, result.messages[:error]
+        end
+      else
+        # Process the order synchronously
+        result = AccountManager::Payments::PaymentOrderExecutor.(payment_order)
+        if result.success?
+          add_message :success, 'Payment processed successfully'
         else
           add_message :error, result.messages[:error]
         end
