@@ -2072,9 +2072,6 @@ Rails.application.routes.draw do
 
 
 
-
-
-
   # ROUTES FOR VENDOR PAYMENTS
   scope :payments do
     resources :companies do
@@ -2087,7 +2084,6 @@ Rails.application.routes.draw do
 
     end
   end
-
 
 
   scope :admin do

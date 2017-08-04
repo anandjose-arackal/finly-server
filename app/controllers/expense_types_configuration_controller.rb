@@ -1,6 +1,5 @@
 class ExpenseTypesConfigurationController < ApplicationController
 
-
   before_action -> { finly_authorize! :web}
 
   def show

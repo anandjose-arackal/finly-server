@@ -654,6 +654,7 @@ ActiveRecord::Schema.define(version: 20170803175526) do
     t.string   "proxy",                    limit: 255,                   null: false
     t.integer  "card_type_id",             limit: 4
     t.text     "description",              limit: 65535
+    t.boolean  "is_deleted",                             default: false
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
     t.integer  "company_id",               limit: 4,                     null: false
@@ -667,7 +668,6 @@ ActiveRecord::Schema.define(version: 20170803175526) do
     t.boolean  "admin_unblockable",                      default: true
     t.integer  "itz_cash_card_program_id", limit: 4
     t.integer  "card_status_id",           limit: 4,                     null: false
-    t.boolean  "is_deleted",                             default: false
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
