@@ -3,7 +3,8 @@
 
 class YesBank::Status::GetStatus < YesBank::Base
 
-  attr_accessor :request_reference_number, :request_status
+  attr_accessor :request_reference_number, :request_status, :transaction_status,
+                :bank_error_message
 
   def initialize(params)
     self.params = params
@@ -39,6 +40,15 @@ class YesBank::Status::GetStatus < YesBank::Base
       return false
     end
     set_response_parameters
+    # now that we have the response status, we can determine is the request is legit or not
+    unless self.request_status.downcase == "request not found"
+      return true
+    end
+    false
+  end
+
+  def post_process
+
   end
 
   def failure?

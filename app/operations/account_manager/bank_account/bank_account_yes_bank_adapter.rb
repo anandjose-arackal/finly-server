@@ -5,7 +5,7 @@
 
 class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::BaseAdapter
 
-  attr_accessor :errors, :bank_account
+  attr_accessor :errors, :company
 
   def account_class
     BankAccount
@@ -20,14 +20,17 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       # logic for setting whether a particular payment was successful or is processing
       if op.transfer_request.transaction_status == "COMPLETED"
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+        create_bank_transaction(payment, op.transfer_request)
       elsif op.transfer_request.transaction_status == "SENT_TO_BENEFICIARY"
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        create_bank_transaction(payment, op.transfer_request)
       elsif op.transfer_request.transaction_status.nil?
         # i.e. there was an error processing the transaction
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         error_message = op.transfer_request.bank_error_message || "Payment could not be processed at this time"
         payment.system_messages.build(content: error_message,
                                       system_message_type_id: SystemMessageType.id_for(:error)).save
+        self.errors << error_message
         return false
       end
     else
@@ -36,8 +39,10 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       error_message = op.transfer_request.bank_error_message || "Payment could not be processed at this time"
       payment.system_messages.build(content: error_message,
                                     system_message_type_id: SystemMessageType.id_for(:error)).save
+      self.errors << error_message
       return false
     end
+    true
   end
 
   def debit(payment)
@@ -61,8 +66,25 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
   private
 
-  def blocked_amount_for_payments
-
+  def create_bank_transaction(payment, payment_request)
+    self.company = account.company
+    case payment.payment_status_id
+      when PaymentStatus.id_for(:completed)
+        transfer_status_id = BankTransferStatus.id_for(:completed)
+      when PaymentStatus.id_for(:processing)
+        transfer_status_id = BankTransferStatus.id_for(:processing)
+      else
+        transfer_status_id = BankTransferStatus.id_for(:failed)
+    end
+    bt = company.bank_transactions.build(unique_request_number: payment_request.unique_request_number,
+                                         transfer_type: payment_request.transfer_type,
+                                         bank_reference_number: payment_request.bank_reference_number,
+                                         beneficiary_bank_account: self.account,
+                                         transfer_status_id: transfer_status_id,
+                                         amount_attributes: {
+                                             value: payment.amount_value,
+                                             currency_id: Currency.first.id
+                                         }).save
   end
 
   def create_transfer_request(payment, transfer_type)

@@ -17,7 +17,11 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
 
   def debit(amount)
     # nothing to do here ¯\_(ツ)_/¯
-
+    balance = self.account.balance.value
+    if self.account.update(balance: (balance - amount))
+      return true
+    end
+    false
   end
 
   def balance
