@@ -1,12 +1,20 @@
 class AccountManager::OutsideFinly::OutsideFinlyAdapter < AccountManager::BaseAdapter
 
+  # overriding initialize because this is a special case
+  def initialize
+    # source is the source from where the credit / debit is supposed to happen
+    # params is general, can be anything
+    self.errors = []
+
+  end
+
   def account_class
     nil
   end
 
   def name
     # NilClass because the receiving account will be nil
-    [nil, "NilClass"]
+    "Outside Finly"
   end
 
   def credit(payment, options)
@@ -22,11 +30,11 @@ class AccountManager::OutsideFinly::OutsideFinlyAdapter < AccountManager::BaseAd
   def balance
     # no such thing as balance for this, so returning an insanely high number
     # so that balance checks pass
-    return 9999999999999999
+    return 999999999999999999
   end
 
   def eligibility(payment)
-
+    true
   end
 
   def creditable_accounts
@@ -37,7 +45,7 @@ class AccountManager::OutsideFinly::OutsideFinlyAdapter < AccountManager::BaseAd
 
   def debitable_accounts
     # i.e. cash on hand can be deducted against this
-    [CashOnHand]
+    [CashOnHand, nil]
   end
 
 end

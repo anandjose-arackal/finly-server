@@ -68,7 +68,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
         end
       end
       unless valid
-        add_message :error, 'Some of the payments have eligibility issues'
+        add_message :error, 'Some of the payments cannot be processed because of lack of eligibility'
       end
     end
 
@@ -78,12 +78,12 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
         receiving_account_adapter = retrieve_adapter payment.receiving_account
         unless receiving_account_adapter.balance > payment.amount_value
           valid = false
-          payment.system_messages.build(content: "The source account has insufficient balance",
+          payment.system_messages.build(content: "#{receiving_account_adapter.name} has insufficient balance",
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
       end
       unless valid
-        add_message :error, "You do not have enough balance in the source account"
+        add_message :error, "There isn't enough balance in the source account for this transaction"
       end
     end
   end

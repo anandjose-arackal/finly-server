@@ -4,6 +4,10 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
     CashOnHand
   end
 
+  def name
+    ["Cash On Hand", "CashOnHand"]
+  end
+
   def credit(payment, options)
     if self.account.credit_funds(payment.amount_value)
       return true
