@@ -65,7 +65,8 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
       end
     end
     payment_order.update(amount_processed_attributes: {value: processed_amount,
-                                                       currency_id: payment_order.currency_id})
+                                                       currency_id: payment_order.currency_id},
+                         processed_at: DateUtils.local_date_time)
 
     # Check if all transactions have passed successfully, or if it is a partial success or if its a complete failure
     if failed_transactions and not succeeded_transactions
