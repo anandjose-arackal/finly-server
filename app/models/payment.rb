@@ -170,13 +170,13 @@ class Payment < ActiveRecord::Base
   def receiving_account_type_name
     name = "#{receiving_user&.name.to_s}'s "
 
-    case self.initiating_account_type
+    case self.receiving_account_type
       when "Company", "ItzCashCompanyAccount"
         name = "Company Credits"
       when "CashOnHand"
         name += "Cash on Hand"
       when "Card"
-        name += "#{self.initiating_account.card_program.name.humanize} Card"
+        name += "#{self.receiving_account.card_program.name.humanize} Card"
       when "UserWallet"
         name += "Finly Money"
       else

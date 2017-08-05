@@ -12,9 +12,8 @@ class User::Wallet::Debit < User::Wallet::Base
   end
 
   def process
-
     # create the payment request object and pass it to the payment processor for the actual credit
-    self.payment_request = PaymentRequest.(initiating_user, initiating_account, receiving_account.class.name, :debit, :advance)
+    self.payment_request = PaymentRequest.(initiating_user, initiating_account, receiving_account.class.name, :debit, :balance_clearance)
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, self.amount))
 
     # calling the payment processor to complete the transfer using adapters
