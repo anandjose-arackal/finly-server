@@ -21,9 +21,9 @@ class BankTransfer::YesBank::Base < BaseOperation
 
   # this will create the respective vendors for each transaction, and create the payment request
   # for each of them - at this point, all of them will be valid
-  def build_payment_request(order_data, bank_transfer_type)
-    self.payment_request = PaymentRequest.(user, initiating_account, BankAccount.name, :credit, :vendor_payment, {bank_transfer_type: bank_transfer_type})
-    self.payment_request.bank_transfer_type = "NEFT" # todo - will change this based on parameters
+  def build_payment_request(order_data, bank_transfer_type, scheduled_at)
+    self.payment_request = PaymentRequest.(user, initiating_account, BankAccount.name, :credit, :vendor_payment, {bank_transfer_type: bank_transfer_type, scheduled_at: scheduled_at, background: true})
+    self.payment_request.bank_transfer_type = bank_transfer_type
     order_data.each do |data|
       account_number = data[:bank_account_number]
       ifsc = data[:ifsc]

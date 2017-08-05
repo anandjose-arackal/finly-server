@@ -8,21 +8,12 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
       add_message :error, 'User not found'
       return
     end
-    # if params.blank?
-    #   add_message :error, 'Error loading configuration'
-    #   return
-    # end
   end
 
   def init
     self.params_order_cards = order_cards_params
     # this is to ensure only payment orders that are processed from the disburse panel show up
     params[:with_application] = RequestStore.store[:current_app]
-
-    # Show all payment_order_types if no id is given
-    # if self.params_order_cards[:order_type_ids].empty?
-    #   self.params_order_cards[:order_type_ids].push(1, 2, 3, 4)
-    # end
   end
 
   def process
