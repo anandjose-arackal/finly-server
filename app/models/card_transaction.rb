@@ -30,6 +30,11 @@
 #  cancelled                    :boolean          default(FALSE)
 #  cancelled_against_expense_id :integer
 #  type_of_details              :string(255)
+#  success                      :boolean
+#  acquirer_id                  :string(255)
+#  mid                          :string(255)
+#  tid                          :string(255)
+#  transaction_message          :text(65535)
 #
 
 class CardTransaction < ActiveRecord::Base
@@ -64,6 +69,8 @@ class CardTransaction < ActiveRecord::Base
   scope :credits, -> { where transaction_type: 'Credit' }
   scope :on_date, -> (date) { where('DATE(transaction_timestamp) = ?', date) }
   scope :joins_billing_amount, -> { joins(:billing_amount) }
+  scope :successful, -> {where success: true}
+  scope :failed, -> {where success: false}
 
   # scope for timestamp range
   scope :with_transaction_timestamp_range, -> (start_time, end_time) { where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_time, end_time) }

@@ -20,7 +20,7 @@ class QuickbooksFinlyIntegrationsCategory
           quickbooks_id: self.quickbooks_id)
         elsif is_expense?(additional_information_json) || self.category_sub_type == QUICKBOOKS_CATEGORY_SUB_TYPES.last
           finly_integrations_category = QuickbooksCategory.find_or_initialize_by(quickbooks_integration_type: self.quickbooks_integration_type,
-          quickbooks_id: self.quickbooks_id, quickbooks_category_type: self.category_sub_type)
+          quickbooks_id: self.quickbooks_id, quickbooks_category_type: self.category_sub_type, company_id: self.company_id)
         end
         if finly_integrations_category&.present?
           if finly_integrations_category.is_a?(QuickbooksCategory)

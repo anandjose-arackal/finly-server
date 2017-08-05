@@ -78,11 +78,12 @@ class TransactionsMsgQueuePoller
         transaction_message = nil
       end
 
+      transaction_amount_attributes = transaction_amount.present? ? {value: transaction_amount, currency_id: 1} : nil
+      billing_amount_attributes = billing_amount.present? ? {value: billing_amount, currency_id: 1} : nil
+
       trans_params = {
           reference_id: reference_id,
           transaction_timestamp: transaction_timestamp,
-          transaction_amount_attributes: {value: transaction_amount, currency_id: 1},
-          billing_amount_attributes: {value: billing_amount, currency_id: 1},
           auth_transaction_id: auth_transaction_id,
           transaction_mode: transaction_mode,
           itzcash_merchant_key: itzcash_merchant_key,
@@ -99,8 +100,12 @@ class TransactionsMsgQueuePoller
           acquirer_id: acquirer_id,
           mid: mid,
           tid: tid,
-          transaction_message: transaction_message
+          transaction_message: transaction_message,
+          success: success
       }
+
+      trans_params[:billing_amount_attributes] = billing_amount_attributes if billing_amount_attributes.present?
+      trans_params[:transaction_amount_attributes] = transaction_amount_attributes if transaction_amount_attributes
 
       rescued = false
       @result = nil
