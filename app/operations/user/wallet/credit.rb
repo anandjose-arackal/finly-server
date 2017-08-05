@@ -12,29 +12,7 @@ class User::Wallet::Credit < User::Wallet::Base
   end
 
   def validate_sufficient_funds
-    # todo - move all balance and eligibility checks to payment processor
 
-    # if initiating_account_type == :wallet and initiating_account.balance_value < self.amount
-    #   add_message :error, 'Insufficient funds to initiate the transfer'
-    #   return
-    # end
-    # if initiating_account_type == :virtual_account
-    #   balance_presenter = Company::VirtualAccount::Balance.(user, params)
-    #   if balance_presenter.success?
-    #     balance_amount = balance_presenter.balance
-    #     if balance_amount < self.amount
-    #       add_message :error, 'Insufficient balance in your Finly Account to initiate this transfer'
-    #     end
-    #   else
-    #     add_message :error, balance_presenter.messages[:error]
-    #   end
-    # end
-    # if initiating_account_type == :card and initiating_account.card_balance.present? and initiating_account.card_balance.value < self.amount
-    #   add_message :error, 'Insufficient funds in the card to initiate the transfer'
-    # end
-    # if receiving_account_type == :card and self.amount > 50000
-    #   add_message :error, 'Cannot transfer the given amount. Please reduce the amount and try again'
-    # end
   end
 
   def process
@@ -46,6 +24,7 @@ class User::Wallet::Credit < User::Wallet::Base
     op = AccountManager::Payments::PaymentProcessor.(initiating_user, {payment_request: payment_request})
     unless op.success?
       # destroy the payment order that was created for this purpose, and return errors
+      op.payment_order.destroy
       add_message :error, op.messages[:error]
     end
   end
@@ -56,6 +35,7 @@ class User::Wallet::Credit < User::Wallet::Base
   end
 
   def post_process
+    add_message :success, "Payment was successful"
     Event::EWallet::Credit.(self.user, payment: self.payment)
   end
 

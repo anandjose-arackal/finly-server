@@ -3,7 +3,7 @@
 # this operation is only called for payment specific operations in the system - other card and wallet related
 # operations are performed through other operations inside account manager
 
-class AccountManager::Payments::PaymentProcessor < AccountManager::BaseAsync
+class AccountManager::Payments::PaymentProcessor < AccountManager::Base
 
   attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id, :options
 
@@ -84,7 +84,22 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::BaseAsync
     AccountManager::Payments::PaymentProcessor::PaymentsPresenter.new(user, params, messages)
   end
 
+  def failure
+    params[:payment_order] = payment_order
+    AccountManager::Payments::PaymentProcessor::PaymentsFailurePresenter.new(user, params, messages)
+  end
+
   class AccountManager::Payments::PaymentProcessor::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :payments, :payment_order
+
+    def init
+      self.payment_order = params[:payment_order]
+      self.payments = payment_order.payments
+    end
+  end
+
+  class AccountManager::Payments::PaymentProcessor::PaymentsFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
     attr_accessor :payments, :payment_order
 

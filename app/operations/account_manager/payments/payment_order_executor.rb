@@ -6,7 +6,7 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     if payment_order_id.present? and payment_order_id.is_a?(PaymentOrder)
       payment_order_id = payment_order_id.id
     end
-    self.new.perform(payment_order_id, options).run
+    self.new.perform(payment_order_id, options)
   end
 
   def self.call_async(payment_order_id, options = {})
