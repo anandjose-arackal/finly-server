@@ -4,12 +4,12 @@ class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountMana
     ItzCashCompanyAccount
   end
 
-  def credit(amount)
+  def credit(payment, options = {})
     # nothing to do here ¯\_(ツ)_/¯
     return true
   end
 
-  def debit(amount)
+  def debit(payment, options = {})
     # nothing to do here ¯\_(ツ)_/¯
     return true
   end

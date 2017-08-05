@@ -4,7 +4,8 @@
 class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
   attr_accessor :payment_order, :receiving_account_adapter, :initiating_account_adapter,
-                :homogenous_accounts, :card_config
+                :homogenous_accounts, :source_account_adapter, :source_account_name,
+                :receiving_account_name
 
   def initialize(payment_order)
     self.payment_order = payment_order
@@ -28,7 +29,9 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
   def init
     # at this point the payments are all homogenous, so adapters can be initiated with the first payment's details
-    self.initiating_account_adapter = retrieve_adapter(payment_order.payments.first.initiating_account)
+    self.source_account_adapter = retrieve_adapter(payment_order.payments.first.initiating_account)
+    self.source_account_name = source_account_adapter.name.is_a?(Array) ? source_account_adapter.name.first : source_account_adapter.name
+    # self.receiving_account_name = receiving_account_adapter.name.is_a?(Array) ? receiving_account_adapter.name.first : receiving_account_adapter.name
   end
 
   def validate
@@ -44,35 +47,52 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     end
 
     # checking if total order amount is less than the company balance amount
-    order_total = payment_order.request_total
-    if order_total > initiating_account_adapter.balance
-      add_message :error, "You do not have enough balance in #{initiating_account_adapter.name} to make this transfer"
-      return
+    if payment_order.credit?
+      order_total = payment_order.request_total
+      if order_total > source_account_adapter.balance
+        add_message :error, "You do not have enough balance in #{source_account_name} to make this transfer"
+        return
+      end
     end
 
     # checking if all the users who're being credited have the eligibility
     # only needs to be done if it's a credit
-    # if payment_order.credit?
-    valid = true
-    payment_order.payments.each do |payment|
-      receiving_account_adapter = retrieve_adapter payment.receiving_account
-      unless receiving_account_adapter.eligibility(payment.amount_value)
-        valid = false
-        payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value}",
-                                      system_message_type_id: SystemMessageType.id_for(:error)).save
+    if payment_order.credit?
+      valid = true
+      payment_order.payments.each do |payment|
+        receiving_account_adapter = retrieve_adapter payment.receiving_account
+        unless receiving_account_adapter.eligibility(payment.amount_value)
+          valid = false
+          payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value}",
+                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+        end
+      end
+      unless valid
+        add_message :error, 'Some of the payments cannot be processed because of lack of eligibility'
       end
     end
-    unless valid
-      add_message :error, 'Some of the payments have eligibility issues'
+
+    if payment_order.debit?
+      valid = true
+      payment_order.payments.each do |payment|
+        receiving_account_adapter = retrieve_adapter payment.receiving_account
+        unless receiving_account_adapter.balance > payment.amount_value
+          valid = false
+          payment.system_messages.build(content: "#{receiving_account_adapter.name} has insufficient balance",
+                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+        end
+      end
+      unless valid
+        add_message :error, "There isn't enough balance in the source account for this transaction"
+      end
     end
-    # end
   end
 
   private
 
   def validate_account_consistency(payment_order)
     self.homogenous_accounts = true
-    initiating_account_type = payment_order.payments.first.initiating_account_type
+    source_account_type = payment_order.payments.first.initiating_account_type
     receiving_account_type = payment_order.payments.first.receiving_account_type
     payment_order.payments.each do |payment|
       unless payment.receiving_account_type == receiving_account_type
@@ -80,7 +100,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
                                       content: 'Receiving account type has to be same for all transfers').save
         self.homogenous_accounts = false
       end
-      unless payment.initiating_account_type == initiating_account_type
+      unless payment.initiating_account_type == source_account_type
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: 'Initiating account type has to be same for all transfers').save
         self.homogenous_accounts = false

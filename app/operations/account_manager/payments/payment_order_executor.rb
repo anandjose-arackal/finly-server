@@ -1,18 +1,41 @@
 class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
-  attr_accessor :payment_order
+  attr_accessor :payment_order, :options
 
-  def self.call(payment_order)
-    self.new(payment_order).run
+  def self.call(payment_order, options = {})
+    payment_order_id = payment_order
+    if payment_order_id.present? and payment_order_id.is_a?(PaymentOrder)
+      payment_order_id = payment_order_id.id
+    end
+    self.new.perform(payment_order_id, options)
   end
 
-  def self.call_async(payment_order_id)
+  def self.call_async(payment_order_id, options = {})
     # define the operation to accordingly run the operation in the background
-    payment_order = PaymentOrder.find_by(id: payment_order_id)
-    self.new(payment_order).run
+    self.perform_async(payment_order_id, options)
   end
 
-  def initialize(payment_order)
-    self.payment_order = payment_order
+  def perform(payment_order_id, options)
+    if options.present? and options.is_a?(Hash)
+      options = options.with_indifferent_access
+    end
+    self.payment_order = PaymentOrder.find_by_id(payment_order_id)
+    self.options = options
+    self.run
+  end
+
+  def perform_async(payment_order_id, options)
+    # in case the object is passed directly instead of an id
+    payment_order_id = payment_order_id
+    if payment_order_id.present? && payment_order_id.is_a?(PaymentOrder)
+      payment_order_id = payment_order_id.id
+    end
+    # calls the Sidekiq::Worker method
+    super(payment_order_id, options)
+  end
+
+  def initialize
+    # self.payment_order = payment_order
+    # self.options = options
   end
 
   def pre_validate
@@ -32,7 +55,7 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     processed_amount = 0
     error_messages = []
     payment_order.payments.each do |payment|
-      op = AccountManager::Payments::PaymentExecutor.(payment)
+      op = AccountManager::Payments::PaymentExecutor.(payment, options)
       if op.success? && payment.reload.payment_status_id == PaymentStatus.id_for(:completed)
         processed_amount += payment.amount_value
         succeeded_transactions = true
@@ -42,7 +65,8 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
       end
     end
     payment_order.update(amount_processed_attributes: {value: processed_amount,
-                                                       currency_id: payment_order.currency_id})
+                                                       currency_id: payment_order.currency_id},
+                         processed_at: DateUtils.local_date_time)
 
     # Check if all transactions have passed successfully, or if it is a partial success or if its a complete failure
     if failed_transactions and not succeeded_transactions

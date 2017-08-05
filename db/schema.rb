@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170803175526) do
+ActiveRecord::Schema.define(version: 20170804163109) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -572,9 +572,9 @@ ActiveRecord::Schema.define(version: 20170803175526) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
-    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -631,11 +631,6 @@ ActiveRecord::Schema.define(version: 20170803175526) do
     t.boolean  "cancelled",                                  default: false
     t.integer  "cancelled_against_expense_id", limit: 4
     t.string   "type_of_details",              limit: 255
-    t.boolean  "success"
-    t.string   "acquirer_id",                  limit: 255
-    t.string   "mid",                          limit: 255
-    t.string   "tid",                          limit: 255
-    t.text     "transaction_message",          limit: 65535
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
@@ -654,7 +649,6 @@ ActiveRecord::Schema.define(version: 20170803175526) do
     t.string   "proxy",                    limit: 255,                   null: false
     t.integer  "card_type_id",             limit: 4
     t.text     "description",              limit: 65535
-    t.boolean  "is_deleted",                             default: false
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
     t.integer  "company_id",               limit: 4,                     null: false
@@ -668,6 +662,7 @@ ActiveRecord::Schema.define(version: 20170803175526) do
     t.boolean  "admin_unblockable",                      default: true
     t.integer  "itz_cash_card_program_id", limit: 4
     t.integer  "card_status_id",           limit: 4,                     null: false
+    t.boolean  "is_deleted",                             default: false
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -1366,6 +1361,7 @@ ActiveRecord::Schema.define(version: 20170803175526) do
     t.boolean  "reimbursement_card_enabled",             default: false
     t.boolean  "hard_copy_receipt",                      default: false
     t.boolean  "itz_cash_d_code_enabled",                default: false
+    t.boolean  "yes_bank_account"
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -2687,11 +2683,12 @@ ActiveRecord::Schema.define(version: 20170803175526) do
   add_index "user_manager_mappings", ["user_id"], name: "index_user_manager_mappings_on_user_id", using: :btree
 
   create_table "user_panel_subscriptions", force: :cascade do |t|
-    t.integer  "user_id",            limit: 4
+    t.integer  "user_id",                   limit: 4
     t.boolean  "disburse"
     t.boolean  "expense_management"
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.boolean  "yes_bank_account_transfer"
   end
 
   add_index "user_panel_subscriptions", ["user_id"], name: "index_user_panel_subscriptions_on_user_id", using: :btree
@@ -2896,11 +2893,9 @@ ActiveRecord::Schema.define(version: 20170803175526) do
   create_table "yes_bank_company_accounts", force: :cascade do |t|
     t.integer  "company_id",        limit: 4
     t.integer  "wallet_balance_id", limit: 4
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
     t.integer  "balance_id",        limit: 4
-    t.string   "account_number",    limit: 255
-    t.string   "customer_id",       limit: 255
   end
 
   add_index "yes_bank_company_accounts", ["company_id"], name: "index_yes_bank_company_accounts_on_company_id", using: :btree

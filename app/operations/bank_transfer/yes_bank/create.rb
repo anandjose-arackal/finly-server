@@ -15,13 +15,13 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
       add_message :error, 'Error loading request'
       return
     end
-    # if params[:password].blank?
-    #   add_message :error, 'You need to provide your password to initiate the transfer'
-    #   return
-    # end
-    # unless user.valid_password?(params[:password])
-    #   add_message :error, 'Invalid Password'
-    # end
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate the transfer'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+    end
   end
 
   def init
@@ -33,12 +33,16 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
         payment_order: self.order_data)
     self.processed_order_data = op.payment_order_data
 
+
+    # todo - will change it later to input from params
+    params[:bank_transfer_type] = "NEFT"
+    ##################################################
+
     self.scheduled_at = op.scheduled_at
-    self.payment_request = build_payment_request(processed_order_data)
+    self.payment_request = build_payment_request(processed_order_data, params[:bank_transfer_type])
   end
 
   def validate
-
     if scheduled_at && scheduled_at < Date.today
       add_message :error, 'Scheduled Date cannot be less than the current date'
       return
@@ -49,7 +53,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
       return
     end
 
-    unless self.payment_order.valid?
+    unless self.payment_request.valid?
       add_message :error, 'Please fix the issues before confirming the request'
     end
   end
@@ -57,10 +61,11 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   def process
 
     # calling the payment processor to complete the transfer using adapters
-    op = AccountManager::Payments::PaymentProcessor.(initiating_user, {payment_request: payment_request})
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_request.bank_transfer_type})
     unless op.success?
       # destroy the payment order that was created for this purpose, and return errors
       add_message :error, op.messages[:error]
+      return
     end
     self.payment_order = op.payment_order
   end
@@ -68,6 +73,10 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   def success
     params[:payment_order] = self.payment_order
     BankTransfer::YesBank::Create::SuccessPresenter.new(user, params, messages)
+  end
+
+  def failure
+    # todo - destroy the vendors and associated bank accounts if the payment order fails for some reason
   end
 
   class BankTransfer::YesBank::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter

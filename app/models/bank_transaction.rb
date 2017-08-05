@@ -20,4 +20,19 @@ class BankTransaction < ActiveRecord::Base
   belongs_to :company
   belongs_to :beneficiary_bank_account, class_name: "BankAccount"
   belongs_to :transfer_status, class_name: "BankTransferStatus"
+
+  has_one :bank_transaction, as: :reference_resource
+
+  validates :bank_reference_number, presence: true
+  validates :unique_response_number, presence: true
+  validates :beneficiary_bank_account_id, presence: true
+  validates :transfer_status_id, presence: true
+  validates :amount, presence: true
+  validates :company, presence: true
+  validates :transfer_type, presence: true
+
+  accepts_nested_attributes_for :amount
+
+  scope :processing_transactions, -> {where transfer_status_id: BankTransferStatus.id_for(:processing)}
+
 end

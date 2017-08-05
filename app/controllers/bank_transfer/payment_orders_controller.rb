@@ -11,6 +11,7 @@ class BankTransfer::PaymentOrdersController < ApplicationController
 
   def create
     @result = BankTransfer::YesBank::Create.(current_user, params)
+    # @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, {})
     respond
   end
 
@@ -27,6 +28,11 @@ class BankTransfer::PaymentOrdersController < ApplicationController
   # the operation used to cancel the particular payment order
   def destroy
     @result = BankTransfer::YesBank::Cancel.(current_user, params)
+    respond
+  end
+
+  def balance
+    @result = AccountManager::Balance::Check.(current_company.yes_bank_company_account, params)
     respond
   end
 end
