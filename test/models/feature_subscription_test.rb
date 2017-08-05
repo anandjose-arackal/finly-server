@@ -18,6 +18,7 @@
 #  reimbursement_card_enabled :boolean          default(FALSE)
 #  hard_copy_receipt          :boolean          default(FALSE)
 #  itz_cash_d_code_enabled    :boolean          default(FALSE)
+#  yes_bank_account           :boolean
 #
 
 require 'test_helper'

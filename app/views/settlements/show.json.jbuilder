@@ -40,9 +40,10 @@ json.array! @result.items do |item|
     json.payment_amount item.amount.value
     json.receiving_account item.receiving_account_type_name
     json.initiating_account item.initiating_account_type_name
-    json.initiating_user item.initiating_user.name
+    json.initiating_user item.initiating_user&.name
     json.payment_type payment_type_s
     json.total_amount item.total_amount
+    json.payment_purpose item.payment_purpose.name.humanize
   elsif item.is_a?(MoneyRequest)
     json.extract! item, :id, :name, :memo, :required_by_date
     json.type 'money_request'

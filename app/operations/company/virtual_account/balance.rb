@@ -19,7 +19,7 @@ class Company::VirtualAccount::Balance < BaseOperation
     # self.company = user.company ||
     self.company = params[:company] || user.company
 
-    self.total_wallet_balance = company.account.wallet_balance.value
+    self.total_wallet_balance = retrieve_wallet_balance
     self.scheduled_payment_orders_balance = company.payment_orders.scheduled.total_amount_requested
   end
 
@@ -53,6 +53,13 @@ class Company::VirtualAccount::Balance < BaseOperation
       self.company = params[:company]
     end
 
+  end
+
+  private
+
+  def retrieve_wallet_balance
+    user_ids = company.users.pluck(:id)
+    UserWallet.with_user(user_ids).joins(:balance).sum(:value)
   end
 
 end

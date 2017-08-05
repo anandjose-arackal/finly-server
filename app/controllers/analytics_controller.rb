@@ -1,5 +1,5 @@
 class AnalyticsController < ApplicationController
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { finly_authorize! :web}
 
   def show
     # params[:page] = 1

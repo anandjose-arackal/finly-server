@@ -1,0 +1,33 @@
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:ser="http://www.quantiguous.com/services">
+    <soap:Header/>
+    <soap:Body>
+        <ser:transfer>
+            <ser:version>1</ser:version>
+            <ser:uniqueRequestNo>{{UNIQUE_REFERENCE_NUMBER}}</ser:uniqueRequestNo>
+            <!--Optional:-->
+            <ser:appID>{{APP_ID}}</ser:appID>
+            <ser:customerID>{{APP_ID}}</ser:customerID>
+            <ser:debitAccountNo>{{ACCOUNT_NUMBER}}</ser:debitAccountNo>
+            <ser:beneficiary>
+                <!--You have a CHOICE of the next 2 items at this level-->
+                <ser:beneficiaryDetail>
+                    <ser:beneficiaryName>
+                        <ser:fullName>{{BENEFICIARY_NAME}}</ser:fullName>
+                    </ser:beneficiaryName>
+                    <ser:beneficiaryContact>
+                        <!--Optional:-->
+                        <ser:mobileNo>8105739684</ser:mobileNo>
+                        <!--Optional:-->
+                        <ser:emailID>a@a.com</ser:emailID>
+                    </ser:beneficiaryContact>
+                    <ser:beneficiaryAccountNo>{{BENEFICIARY_ACCOUNT_NUMBER}}</ser:beneficiaryAccountNo>
+                    <ser:beneficiaryIFSC>{{BENEFICIARY_IFSC}}</ser:beneficiaryIFSC>
+                </ser:beneficiaryDetail>
+            </ser:beneficiary>
+            <ser:transferType>{{TRANSFER_TYPE}}</ser:transferType>
+            <ser:transferCurrencyCode>{{TRANSFER_CURRENCY_CODE}}</ser:transferCurrencyCode>
+            <ser:transferAmount>{{TRANSFER_AMOUNT}}</ser:transferAmount>
+            <ser:remitterToBeneficiaryInfo>FUND TRANSFER</ser:remitterToBeneficiaryInfo>
+        </ser:transfer>
+    </soap:Body>
+</soap:Envelope>

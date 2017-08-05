@@ -37,7 +37,9 @@ class Card < ActiveRecord::Base
   belongs_to :card_status
   has_many :transactions, class_name: 'CardTransaction'
   has_many :initiating_payments, as: :initiating_account
+  has_many :initiating_payment_trails, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
+  has_many :receiving_payment_trails, as: :receiving_account
 
   has_one :card_restriction
 

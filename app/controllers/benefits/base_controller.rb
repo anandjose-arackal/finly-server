@@ -1,7 +1,7 @@
 class Benefits::BaseController < ApplicationController
 
 
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { finly_authorize! :web}
 
   def process_file
     @result = Benefits::TaxBenefits::ParseFile.(config, current_user, params)

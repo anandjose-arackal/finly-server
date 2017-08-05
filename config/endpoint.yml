@@ -33,6 +33,10 @@ default: &default
   generate_customer_id:
     base: 'http://staging.itzcash.com'
     path: 'api/customer/register'
+  yes_bank:
+    base: 'https://uatsky.yesbank.in:444'
+    path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
+
 
 staging:
   <<: *default
@@ -81,6 +85,9 @@ itzcash_uat:
   generate_customer_id:
     base: 'http://staging.itzcash.com'
     path: 'api/customer/register'
+  yes_bank:
+    base: 'https://uatsky.yesbank.in'
+    path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
 
 production:
   base_url: "http://naradaapp.itzcash.com:8280"

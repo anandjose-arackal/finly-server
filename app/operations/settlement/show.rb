@@ -2,6 +2,10 @@ require "#{Rails.root}/app/operations/settlement/index"
 class Settlement::Show < Settlement::Base
   attr_accessor :selected_user, :reports, :payments, :money_requests, :type, :view_to_load
 
+  include HasScope
+
+  has_scope :with_application
+
   def pre_validate
     unless user.present?
       messages[:error] << 'User not found'
@@ -15,6 +19,13 @@ class Settlement::Show < Settlement::Base
     self.type = {}
     self.view_to_load = params[:view_to_load]
     load_selected_user
+  end
+
+  def configure_expense_management
+    params[:with_application] = RequestStore.store[:current_app]
+  end
+
+  def process
     if self.view_to_load == 'payments'
       load_payments
     elsif self.view_to_load.include?('money_request')

@@ -18,7 +18,8 @@ class Admin::Companies::Base < Admin::Base
                                       :expense_card_enabled,
                                       :reimbursement_card_enabled,
                                       :itz_cash_d_code_enabled,
-                                      :hard_copy_receipt
+                                      :hard_copy_receipt,
+                                      :yes_bank_account
                                     ])
   end
 

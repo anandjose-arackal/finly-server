@@ -1,0 +1,12 @@
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:ser="http://www.quantiguous.com/services">
+   <soap:Header/>
+   <soap:Body>
+      <ser:getBalance>
+         <ser:version>1</ser:version>
+         <!--Optional:-->
+         <ser:appID>{{CUSTOMER_ID}}</ser:appID>
+         <ser:customerID>{{CUSTOMER_ID}}</ser:customerID>
+         <ser:AccountNumber>{{ACCOUNT_NUMBER}}</ser:AccountNumber>
+      </ser:getBalance>a
+   </soap:Body>
+</soap:Envelope>

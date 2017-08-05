@@ -139,5 +139,4 @@ class Payment::ProcessPayment < BaseOperation
       self.payment = params[:payment]
     end
   end
-
 end

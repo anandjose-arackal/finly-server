@@ -30,9 +30,11 @@ class Company < ActiveRecord::Base
   has_many :per_diems, as: :configurable
   has_many :company_balance_histories
   has_many :field_configurations, as: :configurable
+  has_many :bank_transactions
   has_one :feature_subscription, as: :subscribable
-  has_many :initiating_payments, as: :initiating_account
-  has_many :receiving_payments, as: :receiving_account
+  has_one :itz_cash_company_account
+  has_one :yes_bank_company_account
+
   has_many :payment_orders
   has_many :user_groups
   has_many :user_teams
@@ -209,6 +211,10 @@ class Company < ActiveRecord::Base
     self.feature_subscription.itz_cash_d_code_enabled
   end
 
+  def vendor_payments_enabled?
+    self.feature_subscription.yes_bank_account
+  end
+
   def more_than_one_subscription?
     count = 0
     [:expense_management_enabled, :gift_card_enabled, :medical_card_enabled, :fuel_card_enabled, :meal_card_enabled, :expense_card_enabled, :reimbursement_card_enabled].each do |feature|
@@ -259,6 +265,9 @@ class Company < ActiveRecord::Base
     self.company_kyc&.company_type&.name
   end
 
+  def yes_bank_account_number
+    self.yes_bank_company_account.account_number
+  end
 
   private
 

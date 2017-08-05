@@ -44,7 +44,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       return
     end
 
-    company_balance = Company::VirtualAccount::Balance.(user, company).balance rescue 0
+    company_balance = AccountManager::Balance::Check.(user.company.itz_cash_company_account).balance
 
     payment_order_data.each do |item|
       self.requested_amount += (item[:amount].to_d rescue 0)
