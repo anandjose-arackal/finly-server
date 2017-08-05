@@ -42,7 +42,7 @@ class CardTransaction < ActiveRecord::Base
   has_one :payment, as: :reference_resource
 
   # i.e. a combination of reference ID, type of details and transaction type should be unique
-  validates_uniqueness_of :reference_id, scope: [:transaction_type, :type_of_details]
+  validates_uniqueness_of :reference_id, scope: [:transaction_type, :type_of_details], if: lambda { |t| t.success }
 
   belongs_to :cancelled_against_expense, class_name: 'CardExpense'
   belongs_to :transaction_amount, class_name: 'Amount', dependent: :destroy
@@ -62,9 +62,7 @@ class CardTransaction < ActiveRecord::Base
   scope :with_id, ->(id) { where id: id }
   scope :debits, -> { where transaction_type: 'Debit' }
   scope :credits, -> { where transaction_type: 'Credit' }
-
   scope :on_date, -> (date) { where('DATE(transaction_timestamp) = ?', date) }
-
   scope :joins_billing_amount, -> { joins(:billing_amount) }
 
   # scope for timestamp range
@@ -104,7 +102,7 @@ class CardTransaction < ActiveRecord::Base
     where user_id: user_id
   }
 
-  scope :filter_user_search, -> (term){
+  scope :filter_user_search, -> (term) {
     user_ids = self.pluck(:user_id)
     matching_user_ids = User.where(id: user_ids).where('first_name LIKE ? OR last_name LIKE ? OR email like ?', "%#{term}%", "%#{term}%", "%#{term}%")
     self.where(user_id: matching_user_ids)
