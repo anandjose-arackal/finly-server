@@ -121,6 +121,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     p[:initiating_account_type] = payment_request.initiating_account_type
     p[:receiving_account_type] = payment_request.receiving_account_type
     p[:currency_id] = payment_request.currency_id
+    p[:application] = RequestStore.store[:current_app]
     p[:amount_requested_attributes] = {
         value: payment_request.request_total,
         currency_id: payment_request.currency_id
@@ -129,6 +130,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     payment_request.payment_items.each do |pi|
       p[:payments_attributes] << {
           payment_type_id: pi.payment_type_id,
+          application: RequestStore.store[:current_app],
           receiving_user_id: pi.receiving_resource_id,
           receiving_user_type: pi.receiving_resource_type,
           initiating_user_id: pi.initiating_resource_id,

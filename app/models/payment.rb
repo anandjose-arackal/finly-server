@@ -131,6 +131,8 @@ class Payment < ActiveRecord::Base
   scope :personal_transfer_to_card, -> { personal.transfer_to_card }
   scope :non_personal_transfer_to_card, -> { non_personal.transfer_to_card }
 
+  scope :with_application, -> (application) {where application: application}
+
   # { personal.where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card), PaymentType.id_for(:debit_from_wallet_to_card)]) }
   # scope :non_personal_transfer_to_card, -> { non_personal.where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card), PaymentType.id_for(:debit_from_wallet_to_card)]) }
 

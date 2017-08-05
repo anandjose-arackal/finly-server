@@ -16,6 +16,8 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
 
   def init
     self.params_order_cards = order_cards_params
+    # this is to ensure only payment orders that are processed from the disburse panel show up
+    params[:with_application] = RequestStore.store[:current_app]
 
     # Show all payment_order_types if no id is given
     # if self.params_order_cards[:order_type_ids].empty?
@@ -37,8 +39,13 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
   class Orders::OrderCards::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_orders
 
+    include HasScope
+
+    has_scope :with_application
+
     def init
       self.payment_orders = params[:payment_orders]
+      self.payment_orders = apply_scopes(payment_orders, params)
     end
   end
 end

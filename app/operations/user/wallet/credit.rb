@@ -4,7 +4,7 @@
 
 class User::Wallet::Credit < User::Wallet::Base
 
-  attr_accessor :payment_request
+  attr_accessor :payment_request, :payment
 
   def init
     super
@@ -24,9 +24,10 @@ class User::Wallet::Credit < User::Wallet::Base
     op = AccountManager::Payments::PaymentProcessor.(initiating_user, {payment_request: payment_request})
     unless op.success?
       # destroy the payment order that was created for this purpose, and return errors
-      # op.payment_order.destroy
       add_message :error, op.messages[:error]
+      return
     end
+    self.payment = op.payment_order.payments.first
   end
 
   def success
