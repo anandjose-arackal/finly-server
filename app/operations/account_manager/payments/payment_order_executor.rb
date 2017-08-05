@@ -2,18 +2,40 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
   attr_accessor :payment_order, :options
 
   def self.call(payment_order, options = {})
-    self.new(payment_order, options).run
+    payment_order_id = payment_order
+    if payment_order_id.present? and payment_order_id.is_a?(PaymentOrder)
+      payment_order_id = payment_order_id.id
+    end
+    self.new.perform(payment_order_id, options).run
   end
 
   def self.call_async(payment_order_id, options = {})
     # define the operation to accordingly run the operation in the background
-    payment_order = PaymentOrder.find_by(id: payment_order_id)
-    self.new(payment_order, options).run
+    self.perform_async(payment_order_id, options)
   end
 
-  def initialize(payment_order, options = {})
-    self.payment_order = payment_order
+  def perform(payment_order_id, options)
+    if options.present? and options.is_a?(Hash)
+      options = options.with_indifferent_access
+    end
+    self.payment_order = PaymentOrder.find_by_id(payment_order_id)
     self.options = options
+    self.run
+  end
+
+  def perform_async(payment_order_id, options)
+    # in case the object is passed directly instead of an id
+    payment_order_id = payment_order_id
+    if payment_order_id.present? && payment_order_id.is_a?(PaymentOrder)
+      payment_order_id = payment_order_id.id
+    end
+    # calls the Sidekiq::Worker method
+    super(payment_order_id, options)
+  end
+
+  def initialize
+    # self.payment_order = payment_order
+    # self.options = options
   end
 
   def pre_validate

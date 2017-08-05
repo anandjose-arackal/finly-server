@@ -3,7 +3,7 @@
 # this operation is only called for payment specific operations in the system - other card and wallet related
 # operations are performed through other operations inside account manager
 
-class AccountManager::Payments::PaymentProcessor < AccountManager::Base
+class AccountManager::Payments::PaymentProcessor < AccountManager::BaseAsync
 
   attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id, :options
 
@@ -59,12 +59,13 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       if payment_request.background
         # call the payment executor that runs the payments in the background
         # passing the payment id here because async operation can retrieve the object
-        result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order, options)
-        if result.success?
-          add_message :success, 'Processing payments'
-        else
-          add_message :error, result.messages[:error]
-        end
+        result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order.id, options)
+        # if result.success?
+        #   add_message :success, 'Processing payments'
+        # else
+        #   add_message :error, result.messages[:error]
+        # end
+        add_message :success, "Payments have been scheduled, you can check their status from the order screen"
       else
         # Process the order synchronously
         result = AccountManager::Payments::PaymentOrderExecutor.(payment_order, options)
