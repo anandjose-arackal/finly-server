@@ -23,11 +23,14 @@ class BankTransfer::YesBank::Show < BankTransfer::YesBank::Base
     if self.payment_order.blank?
       add_message :error, 'Order not found'
     end
+
   end
 
   def process
     # actions[:cancel] = true if self.payment_order.scheduled?
-    actions[:cancel] = Rails.application.routes.url_helpers.bank_transfer_payment_order_path(payment_order)
+    if payment_order.scheduled?
+      actions[:cancel] = Rails.application.routes.url_helpers.bank_transfer_payment_order_path(payment_order)
+    end
   end
 
   def success

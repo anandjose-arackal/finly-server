@@ -2,10 +2,10 @@
 #
 class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
-  attr_accessor :payment, :payment_item, :receiving_account_adapter, :source_account_adapter
+  attr_accessor :payment, :payment_item, :receiving_account_adapter, :source_account_adapter, :options
 
-  def self.call(payment)
-    self.new(payment).run
+  def self.call(payment, options = {})
+    self.new(payment, options).run
   end
 
   def self.call_async(payment_id)
@@ -14,8 +14,9 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     self.new(payment).run
   end
 
-  def initialize(payment)
+  def initialize(payment, options = {})
     self.payment = payment
+    self.options = options
   end
 
   def init
@@ -86,7 +87,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     end
 
     # Debit funds from account
-    unless debit_adapter.blank? or debit_adapter.debit(payment)
+    unless debit_adapter.blank? or debit_adapter.debit(payment, options)
        # Debit failed
       add_message :error, debit_adapter.errors
       payment.update(payment_status_id: PaymentStatus.id_for(:failed))
@@ -98,7 +99,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     end
 
     # Credit funds to account
-    unless credit_adapter.blank? or credit_adapter.credit(payment)
+    unless credit_adapter.blank? or credit_adapter.credit(payment, options)
       # Credit failed
         add_message :error, credit_adapter.errors
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
@@ -107,10 +108,11 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
         # Reverse credit
-        debit_adapter.credit(payment)
+        debit_adapter.credit(payment, options)
       return
     end
 
+    # todo - probably should be moved to the adapter itself
     payment.update(payment_status_id: PaymentStatus.id_for(:completed))
   end
 

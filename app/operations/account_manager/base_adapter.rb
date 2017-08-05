@@ -23,11 +23,11 @@ class AccountManager::BaseAdapter
     self.account_class&.name
   end
 
-  def credit(payment)
+  def credit(payment, options = {})
     self.errors = []
   end
 
-  def debit(payment)
+  def debit(payment, options = {})
     self.errors = []
   end
 

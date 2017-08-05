@@ -1,4 +1,4 @@
-class Benefits::TaxBenefits::Cancel < Benefits::TaxBenefits::Base
+class BankTransfer::YesBank::Cancel < BankTransfer::YesBank::Base
   attr_accessor :payment_order
 
   def pre_validate
@@ -15,7 +15,7 @@ class Benefits::TaxBenefits::Cancel < Benefits::TaxBenefits::Base
   end
 
   def init
-    self.payment_order = Benefits::TaxBenefits::Index.(config, user, params).payment_orders.with_id(params[:id]).first rescue nil
+    self.payment_order = BankTransfer::YesBank::Index.(user, params).payment_orders.with_id(params[:id]).first rescue nil
   end
 
   def validate
@@ -23,6 +23,7 @@ class Benefits::TaxBenefits::Cancel < Benefits::TaxBenefits::Base
       add_message :error, 'Order not found'
       return
     end
+
     unless self.payment_order.scheduled?
       add_message :error, 'Order cannot be cancelled at this stage'
     end
@@ -42,10 +43,10 @@ class Benefits::TaxBenefits::Cancel < Benefits::TaxBenefits::Base
 
   def success
     params[:payment_order] = self.payment_order
-    Benefits::TaxBenefits::Cancel::SuccessPresenter.new(user, params, messages)
+    BankTransfer::YesBank::Cancel::SuccessPresenter.new(user, params, messages)
   end
 
-  class Benefits::TaxBenefits::Cancel::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::YesBank::Cancel::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order
 
     def init

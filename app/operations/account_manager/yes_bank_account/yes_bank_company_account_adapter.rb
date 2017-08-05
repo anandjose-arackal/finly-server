@@ -6,19 +6,19 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     YesBankCompanyAccount
   end
 
-  def credit(amount)
+  def credit(payment, options = {})
     # this will add money to this company's balance
     balance = self.account.balance.value
-    if self.account.update(balance: (balance + amount))
+    if self.account.balance.update(value: balance + payment.amount_value)
       return true
     end
     false
   end
 
-  def debit(amount)
+  def debit(payment, options = {})
     # nothing to do here ¯\_(ツ)_/¯
     balance = self.account.balance.value
-    if self.account.update(balance: (balance - amount))
+    if self.account.balance.update(value: balance - payment.amount_value)
       return true
     end
     false

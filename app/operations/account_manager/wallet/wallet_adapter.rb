@@ -4,7 +4,7 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
     UserWallet
   end
 
-  def credit(payment)
+  def credit(payment, options)
     super
     # credit a particular wallet with the respective amount
     unless self.account.add_funds(payment.amount_value)
@@ -14,7 +14,7 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
     true
   end
 
-  def debit(payment)
+  def debit(payment, options)
     super
     # credit a particular wallet with the respective amount
     unless self.account.subtract_funds(payment.amount_value)

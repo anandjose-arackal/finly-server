@@ -12,6 +12,6 @@
 class YesBankVendor < ActiveRecord::Base
   belongs_to :company
 
-  has_many :bank_accounts, as: :account_owner
+  has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user
 end

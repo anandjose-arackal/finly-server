@@ -15,7 +15,8 @@ class PaymentRequest < NonPersistentModel
                 :payment_order_status_id,
                 :payment_items,
                 :payment_type_id,
-                :currency_id
+                :currency_id,
+                :bank_transfer_type
 
   belongs_to :company
   belongs_to :initiating_resource, polymorphic: true
@@ -41,7 +42,8 @@ class PaymentRequest < NonPersistentModel
                  payment_type_id: PaymentType.id_for(payment_type&.to_sym),
                  scheduled_at: options[:scheduled_at],
                  currency_id: options[:currency_id],
-                 background: !!options[:background]
+                 background: !!options[:background],
+                 bank_transfer_type: options[:bank_transfer_type]
              })
   end
 

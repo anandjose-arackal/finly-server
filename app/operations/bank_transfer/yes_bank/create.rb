@@ -33,8 +33,13 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
         payment_order: self.order_data)
     self.processed_order_data = op.payment_order_data
 
+
+    # todo - will change it later to input from params
+    params[:bank_transfer_type] = "NEFT"
+    ##################################################
+
     self.scheduled_at = op.scheduled_at
-    self.payment_request = build_payment_request(processed_order_data)
+    self.payment_request = build_payment_request(processed_order_data, params[:bank_transfer_type])
   end
 
   def validate
@@ -56,11 +61,11 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   def process
 
     # calling the payment processor to complete the transfer using adapters
-    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
-    # debugger
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_request.bank_transfer_type})
     unless op.success?
       # destroy the payment order that was created for this purpose, and return errors
       add_message :error, op.messages[:error]
+      return
     end
     self.payment_order = op.payment_order
   end

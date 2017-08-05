@@ -5,7 +5,7 @@
 
 class AccountManager::Payments::PaymentProcessor < AccountManager::Base
 
-  attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id
+  attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id, :options
 
   def pre_validate
     if params&.dig(:payment_request).blank?
@@ -27,7 +27,8 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.company_id = params[:company_id]
     end
     self.company = Company.find_by(id: company_id)
-
+    self.options = {}
+    self.options[:bank_transfer_type] = params[:bank_transfer_type]
     # creating the payment order first to check for violations and shit
     self.payment_order = company.payment_orders.build(payment_order_params)
 
@@ -52,14 +53,13 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     unless payment_order.save
       add_message :error, payment_order.errors.full_messages
     end
-
     # if payment order has been scheduled for execution right away, process it right now
     if payment_order.payment_order_status_id == PaymentOrderStatus.id_for(:pending)
       # if the order is not background, perform it using the regular call method in payment executor
       if payment_request.background
         # call the payment executor that runs the payments in the background
         # passing the payment id here because async operation can retrieve the object
-        result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order)
+        result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order, options)
         if result.success?
           add_message :success, 'Processing payments'
         else
@@ -67,7 +67,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         end
       else
         # Process the order synchronously
-        result = AccountManager::Payments::PaymentOrderExecutor.(payment_order)
+        result = AccountManager::Payments::PaymentOrderExecutor.(payment_order, options)
         if result.success?
           add_message :success, 'Payment processed successfully'
         else

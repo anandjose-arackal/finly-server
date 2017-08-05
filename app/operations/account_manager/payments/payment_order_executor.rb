@@ -1,18 +1,19 @@
 class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
-  attr_accessor :payment_order
+  attr_accessor :payment_order, :options
 
-  def self.call(payment_order)
-    self.new(payment_order).run
+  def self.call(payment_order, options = {})
+    self.new(payment_order, options).run
   end
 
-  def self.call_async(payment_order_id)
+  def self.call_async(payment_order_id, options = {})
     # define the operation to accordingly run the operation in the background
     payment_order = PaymentOrder.find_by(id: payment_order_id)
-    self.new(payment_order).run
+    self.new(payment_order, options).run
   end
 
-  def initialize(payment_order)
+  def initialize(payment_order, options = {})
     self.payment_order = payment_order
+    self.options = options
   end
 
   def pre_validate
@@ -32,7 +33,7 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     processed_amount = 0
     error_messages = []
     payment_order.payments.each do |payment|
-      op = AccountManager::Payments::PaymentExecutor.(payment)
+      op = AccountManager::Payments::PaymentExecutor.(payment, options)
       if op.success? && payment.reload.payment_status_id == PaymentStatus.id_for(:completed)
         processed_amount += payment.amount_value
         succeeded_transactions = true
