@@ -46,7 +46,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     end
     self.amount = payment_param[:amount]
     self.currency_id = payment_param[:currency_id] || Currency.first.id
-    init_payment_request(PaymentType.id_for(:credit), PaymentPurpose.id_for(:advance_outside_finly))
+    init_payment_request(:credit, :advance_outside_finly)
   end
 
   def authorize
