@@ -4,7 +4,8 @@
 class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
   attr_accessor :payment_order, :receiving_account_adapter, :initiating_account_adapter,
-                :homogenous_accounts, :card_config
+                :homogenous_accounts, :source_account_adapter, :source_account_name,
+                :receiving_account_name
 
   def initialize(payment_order)
     self.payment_order = payment_order
@@ -28,7 +29,9 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
   def init
     # at this point the payments are all homogenous, so adapters can be initiated with the first payment's details
-    self.initiating_account_adapter = retrieve_adapter(payment_order.payments.first.initiating_account)
+    self.source_account_adapter = retrieve_adapter(payment_order.payments.first.initiating_account)
+    self.source_account_name = source_account_adapter.name.is_a?(Array) ? source_account_adapter.name.first : source_account_adapter.name
+    # self.receiving_account_name = receiving_account_adapter.name.is_a?(Array) ? receiving_account_adapter.name.first : receiving_account_adapter.name
   end
 
   def validate
@@ -45,8 +48,8 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
     # checking if total order amount is less than the company balance amount
     order_total = payment_order.request_total
-    if order_total > initiating_account_adapter.balance
-      add_message :error, "You do not have enough balance in #{initiating_account_adapter.name} to make this transfer"
+    if order_total > source_account_adapter.balance
+      add_message :error, "You do not have enough balance in #{source_account_name} to make this transfer"
       return
     end
 
@@ -72,7 +75,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
   def validate_account_consistency(payment_order)
     self.homogenous_accounts = true
-    initiating_account_type = payment_order.payments.first.initiating_account_type
+    source_account_type = payment_order.payments.first.initiating_account_type
     receiving_account_type = payment_order.payments.first.receiving_account_type
     payment_order.payments.each do |payment|
       unless payment.receiving_account_type == receiving_account_type
@@ -80,7 +83,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
                                       content: 'Receiving account type has to be same for all transfers').save
         self.homogenous_accounts = false
       end
-      unless payment.initiating_account_type == initiating_account_type
+      unless payment.initiating_account_type == source_account_type
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: 'Initiating account type has to be same for all transfers').save
         self.homogenous_accounts = false

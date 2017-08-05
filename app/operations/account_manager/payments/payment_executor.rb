@@ -2,7 +2,8 @@
 #
 class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
-  attr_accessor :payment, :payment_item, :receiving_account_adapter, :source_account_adapter, :options
+  attr_accessor :payment, :payment_item, :receiving_account_adapter, :source_account_adapter, :options,
+                :source_account_name, :receiving_account_name
 
   def self.call(payment, options = {})
     self.new(payment, options).run
@@ -22,6 +23,8 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   def init
     self.receiving_account_adapter = retrieve_adapter(payment.receiving_account)
     self.source_account_adapter = retrieve_adapter(payment.initiating_account)
+    self.source_account_name = source_account_adapter.name.is_a?(Array) ? source_account_adapter.name.first : source_account_adapter.name
+    self.receiving_account_name = receiving_account_adapter.name.is_a?(Array) ? receiving_account_adapter.name.first : receiving_account_adapter.name
   end
 
   def validate
@@ -32,7 +35,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     unless receiving_account_adapter.creditable_account?(payment.initiating_account)
       add_message :error, 'You cannot credit from this account'
       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                    content: "You cannot credit from #{source_account_adapter.name} to #{receiving_account_adapter.name}").save
+                                    content: "You cannot credit from #{source_account_name} to #{receiving_account_name}").save
       return
     end
 
@@ -47,7 +50,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       unless source_account_adapter.debitable_account?(payment.receiving_account)
         add_message :error, "You cannot debit to this account"
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                      content: "You cannot debit from #{receiving_account_adapter.name} to #{source_account_adapter.name}").save
+                                      content: "You cannot debit from #{receiving_account_name} to #{source_account_name}").save
         return
       end
 

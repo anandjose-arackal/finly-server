@@ -4,6 +4,10 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
     UserWallet
   end
 
+  def name
+    ["Finly Money", "UserWallet"]
+  end
+
   def credit(payment, options)
     super
     # credit a particular wallet with the respective amount
