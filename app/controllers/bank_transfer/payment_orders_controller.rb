@@ -11,6 +11,7 @@ class BankTransfer::PaymentOrdersController < ApplicationController
 
   def create
     @result = BankTransfer::YesBank::Create.(current_user, params)
+    # @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, {})
     respond
   end
 

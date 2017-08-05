@@ -3,8 +3,8 @@ class Settlement::Payment::Base < Settlement::Base
 
   def init_payment_request(payment_type_id, payment_purpose_id)
     # Add Company Balance for the particular company
-    self.payment_request = PaymentRequest.(user, nil, to_user.cash_on_hand.class.name, :credit, :advance)
-    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(nil, to_user.cash_on_hand, amount))
+    self.payment_request = PaymentRequest.(user, nil, to_user.cash_on_hand.class.name, PaymentType.find_by(id: payment_type_id)&.name, :advance)
+    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, to_user.cash_on_hand, amount))
   end
 
   class Settlement::Payment::Base::Presenter < Settlement::Base::BasePresenter::SuccessPresenter

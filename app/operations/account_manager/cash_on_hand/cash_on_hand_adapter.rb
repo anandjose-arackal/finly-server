@@ -4,7 +4,7 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
     CashOnHand
   end
 
-  def credit(payment)
+  def credit(payment, options)
     if self.account.credit_funds(payment.amount_value)
       return true
     end
@@ -12,7 +12,7 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
     false
   end
 
-  def debit(payment)
+  def debit(payment, options)
     if self.account.debit_funds(payment.amount_value)
       return true
     end

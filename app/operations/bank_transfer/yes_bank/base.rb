@@ -31,9 +31,11 @@ class BankTransfer::YesBank::Base < BaseOperation
       amount = data[:amount]
 
       ba = BankAccount.find_by(account_number: account_number)
+
+      vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: name, company_id: payment_request.company_id)
+
       if ba.nil?
-        vendor = YesBankVendor.create(name: name, company_id: payment_request.company_id)
-        ba = BankAccount.create(name: name, account_number: account_number, ifsc: ifsc, account_owner_attributes: {name: name, company_id: payment_request.company_id})
+        ba = BankAccount.create(name: name, account_number: account_number, ifsc: ifsc, account_owner: vendor)
       end
       self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(ba.account_owner, ba, amount))
     end

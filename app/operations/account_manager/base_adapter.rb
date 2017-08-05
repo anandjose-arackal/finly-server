@@ -9,7 +9,7 @@ class AccountManager::BaseAdapter
     if account_class.present? and account.nil?
       raise 'Account cannot be blank'
     end
-    if account.class.name != name
+    unless name.include?(account.class.name)
       raise 'Account mismatch. Incorrect adapter'
     end
     self.account = account

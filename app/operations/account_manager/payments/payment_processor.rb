@@ -31,7 +31,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     self.options[:bank_transfer_type] = params[:bank_transfer_type]
     # creating the payment order first to check for violations and shit
     self.payment_order = company.payment_orders.build(payment_order_params)
-
+    
     unless payment_order.valid?
       add_message :error, payment_order.errors.full_messages
       return

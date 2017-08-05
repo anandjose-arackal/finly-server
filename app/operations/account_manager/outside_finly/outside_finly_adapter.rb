@@ -1,11 +1,20 @@
 class AccountManager::OutsideFinly::OutsideFinlyAdapter < AccountManager::BaseAdapter
 
-  def credit(payment)
+  def account_class
+    nil
+  end
+
+  def name
+    # NilClass because the receiving account will be nil
+    [nil, "NilClass"]
+  end
+
+  def credit(payment, options)
     # nothing to do here ¯\_(ツ)_/¯
     return true
   end
 
-  def debit(payment)
+  def debit(payment, options)
     # nothing to do here ¯\_(ツ)_/¯
     return true
   end
