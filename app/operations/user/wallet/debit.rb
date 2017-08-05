@@ -20,7 +20,7 @@ class User::Wallet::Debit < User::Wallet::Base
     op = AccountManager::Payments::PaymentProcessor.(initiating_user, {payment_request: payment_request})
     unless op.success?
       # destroy the payment order that was created for this purpose, and return errors
-      op.payment_order.destroy
+      # op.payment_order.destroy
       add_message :error, op.messages[:error]
     end
 

@@ -572,9 +572,9 @@ ActiveRecord::Schema.define(version: 20170804163109) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
+    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
-    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -631,6 +631,11 @@ ActiveRecord::Schema.define(version: 20170804163109) do
     t.boolean  "cancelled",                                  default: false
     t.integer  "cancelled_against_expense_id", limit: 4
     t.string   "type_of_details",              limit: 255
+    t.boolean  "success"
+    t.string   "acquirer_id",                  limit: 255
+    t.string   "mid",                          limit: 255
+    t.string   "tid",                          limit: 255
+    t.text     "transaction_message",          limit: 65535
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
@@ -2893,9 +2898,11 @@ ActiveRecord::Schema.define(version: 20170804163109) do
   create_table "yes_bank_company_accounts", force: :cascade do |t|
     t.integer  "company_id",        limit: 4
     t.integer  "wallet_balance_id", limit: 4
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
     t.integer  "balance_id",        limit: 4
+    t.string   "account_number",    limit: 255
+    t.string   "customer_id",       limit: 255
   end
 
   add_index "yes_bank_company_accounts", ["company_id"], name: "index_yes_bank_company_accounts_on_company_id", using: :btree

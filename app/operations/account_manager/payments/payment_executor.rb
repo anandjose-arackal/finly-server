@@ -54,10 +54,10 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         return
       end
 
-      unless source_account_adapter.balance > payment.amount_value
+      unless source_account_adapter.balance >= payment.amount_value
         add_message :error, "This account does not have enough balance for this transaction"
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                      content: "Not enough funds in #{payment.source_account_type.to_s} to initiate the transfer").save
+                                      content: "Not enough funds in #{payment.initiating_account_type.to_s} to initiate the transfer").save
         return
       end
     end

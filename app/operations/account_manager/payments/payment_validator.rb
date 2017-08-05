@@ -76,7 +76,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
       valid = true
       payment_order.payments.each do |payment|
         receiving_account_adapter = retrieve_adapter payment.receiving_account
-        unless receiving_account_adapter.balance > payment.amount_value
+        unless receiving_account_adapter.balance >= payment.amount_value
           valid = false
           payment.system_messages.build(content: "#{receiving_account_adapter.name} has insufficient balance",
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
@@ -92,7 +92,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
 
   def validate_account_consistency(payment_order)
     self.homogenous_accounts = true
-    source_account_type = payment_order.payments.first.initiating_account_type
+    initiating_account_type = payment_order.payments.first.initiating_account_type
     receiving_account_type = payment_order.payments.first.receiving_account_type
     payment_order.payments.each do |payment|
       unless payment.receiving_account_type == receiving_account_type
@@ -100,7 +100,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
                                       content: 'Receiving account type has to be same for all transfers').save
         self.homogenous_accounts = false
       end
-      unless payment.initiating_account_type == source_account_type
+      unless payment.initiating_account_type == initiating_account_type
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: 'Initiating account type has to be same for all transfers').save
         self.homogenous_accounts = false
