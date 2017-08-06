@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170805211722) do
+ActiveRecord::Schema.define(version: 20170805230721) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -631,6 +631,11 @@ ActiveRecord::Schema.define(version: 20170805211722) do
     t.boolean  "cancelled",                                  default: false
     t.integer  "cancelled_against_expense_id", limit: 4
     t.string   "type_of_details",              limit: 255
+    t.boolean  "success"
+    t.string   "acquirer_id",                  limit: 255
+    t.string   "mid",                          limit: 255
+    t.string   "tid",                          limit: 255
+    t.text     "transaction_message",          limit: 65535
   end
 
   add_index "card_transactions", ["card_id"], name: "index_card_transactions_on_card_id", using: :btree
@@ -2214,6 +2219,7 @@ ActiveRecord::Schema.define(version: 20170805211722) do
     t.text     "quickbooks_additional_information", limit: 16777215
     t.datetime "created_at",                                         null: false
     t.datetime "updated_at",                                         null: false
+    t.integer  "company_id",                        limit: 4
   end
 
   create_table "quickbooks_company_tag", force: :cascade do |t|

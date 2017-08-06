@@ -19,8 +19,9 @@
 #  updated_at                :datetime         not null
 #  initiating_account_type   :string(255)
 #  receiving_account_type    :string(255)
-#  payment_purpose_id        :integer
+#  payment_purpose_id        :integer          not null
 #  currency_id               :integer          not null
+#  application               :string(255)
 #
 
 class PaymentOrder < ActiveRecord::Base

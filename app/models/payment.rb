@@ -22,7 +22,9 @@
 #  payment_purpose_id      :integer
 #  reference_resource_id   :integer
 #  reference_resource_type :string(255)
+#  application             :string(255)
 #
+
 
 
 
