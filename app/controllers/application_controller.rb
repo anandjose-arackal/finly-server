@@ -161,7 +161,21 @@ class ApplicationController < ActionController::Base
   end
 
   def current_app
-    # todo Referrer is jugaad as current urls are not set for disburse
+    # Check header to identify app
+    header_app = request.headers['App']
+    if header_app.present?
+      case header_app
+        when 'ap', :ap
+          return :ap
+        when 'fm', :fm
+          return :fm
+        when 'vp', :vp
+          return :vp
+        when 'em', :em
+          return :em
+      end
+    end
+    # todo Referrer is jugaad as disburse is using expense management endpoints.
     path = nil
     path = URI(request.referrer).path if request.referrer.present?
     path = request.path if path.blank?
