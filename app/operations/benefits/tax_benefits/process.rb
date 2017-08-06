@@ -1,7 +1,7 @@
 # Process validates the request for payment order wrt tax benefits and generates the respective output to be sent for confirmation or for creating payment order
 class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
   attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount,
-                :errors, :payment_order_valid, :scheduled_at
+                :errors, :payment_order_valid, :scheduled_at, :company_balance
 
   def pre_validate
     super
@@ -44,7 +44,13 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       return
     end
 
-    company_balance = AccountManager::Balance::Check.(user.company.itz_cash_company_account).balance
+    op = AccountManager::Balance::Check.(user.company.itz_cash_company_account)
+    if op.success?
+      self.company_balance = op.balance
+    else
+      add_message :error, op.messages[:error]
+      return
+    end
 
     payment_order_data.each do |item|
       self.requested_amount += (item[:amount].to_d rescue 0)

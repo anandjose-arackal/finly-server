@@ -19,9 +19,10 @@ class User::Team::Index < User::Team::Base
   has_scope :having_wallet_balance
   has_scope :with_cards_having_card_program, type: :array
   has_scope :filter_group
-  has_scope :fitler_team
+  has_scope :filter_team
   has_scope :filter_disburse
   has_scope :filter_expense_management
+  has_scope :yes_bank_account_transfer
 
   def pre_validate
     unless user.present?
