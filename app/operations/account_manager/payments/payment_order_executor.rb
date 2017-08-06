@@ -41,6 +41,11 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
   def pre_validate
     if self.payment_order.blank?
       add_message :error, 'Payment Order not found'
+      return
+    end
+    if payment_order.completed?
+      add_message :error, "This Payment order has already been processed"
+      return
     end
   end
 
