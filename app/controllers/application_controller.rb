@@ -161,7 +161,10 @@ class ApplicationController < ActionController::Base
   end
 
   def current_app
-    path = request.path
+    # todo Referrer is jugaad as current urls are not set for disburse
+    path = nil
+    path = URI(request.referrer).path if request.referrer.present?
+    path = request.path if path.blank?
     if path.is_a?(String)
       if path.starts_with?('/admin')
         return :ap
