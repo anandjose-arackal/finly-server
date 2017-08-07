@@ -30,10 +30,14 @@ user:
   mobile_number: <%= current_user.mobile_number %>
   roles:
   <% if current_user.admin? %>
-  - admin
+  - id: admin
+    name: Admin
+    default_url: 'orders'
   <% end %>
   <% if current_user.finance_manager? %>
-  - finance_manager
+  - id: finance_manager
+    name: 'Finance Manager'
+    default_url: 'orders'
   <% end %>
 views:
   <%# if current_user.admin? %>
