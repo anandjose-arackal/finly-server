@@ -63,11 +63,11 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
     # calling the payment processor to complete the transfer using adapters
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_request.bank_transfer_type})
     unless op.success?
-      # destroy the payment order that was created for this purpose, and return errors
+
       add_message :error, op.messages[:error]
-      op.payment_order.payments.each do |payment|
-        payment.receiving_account.destroy # just the bogus bank account
-      end
+      # op.payment_order.payments.each do |payment|
+      #   payment.receiving_account.destroy # just the bogus bank account
+      # end
       return
     end
     self.payment_order = op.payment_order

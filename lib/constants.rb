@@ -218,4 +218,10 @@ module Constants
                    307 => 'Card is already activated',
                    3100 => 'Transaction is already confirmed'}
   end
+
+  class Constants::YesBank
+    PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
+    FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
+    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+  end
 end
