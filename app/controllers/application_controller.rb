@@ -167,8 +167,8 @@ class ApplicationController < ActionController::Base
       case header_app
         when 'ap', :ap
           return :ap
-        when 'fm', :fm
-          return :fm
+        when 'ft', :ft
+          return :ft
         when 'vp', :vp
           return :vp
         when 'em', :em
