@@ -2,6 +2,8 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
 
   attr_accessor :account_number, :transaction_result, :error_message, :transfer_request
 
+  SUCCESS_RESPONSE_CODES = ["COMPLETED", "SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
+
   def initialize(transfer_request)
     self.transfer_request = transfer_request
     self.params = {}
@@ -44,7 +46,7 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
 
   def success?
     ap parsed_response
-    unless ["COMPLETED", "SENT_TO_BENEFICIARY"].include?(transfer_request.transaction_result)
+    unless SUCCESS_RESPONSE_CODES.include?(transfer_request.transaction_result)
       false
     end
     true

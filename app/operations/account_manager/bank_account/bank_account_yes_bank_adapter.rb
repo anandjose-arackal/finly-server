@@ -5,6 +5,10 @@
 
 class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::BaseAdapter
 
+  PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
+  FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
+  SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+
   attr_accessor :errors, :company
 
   def account_class
@@ -19,10 +23,10 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     op = YesBank::Transfer::BankTransfer.(transfer_request)
     if op.success?
       # logic for setting whether a particular payment was successful or is processing
-      if op.transfer_request.transaction_result == "COMPLETED"
+      if SUCCESSFUL_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
         create_bank_transaction(payment, op.transfer_request)
-      elsif op.transfer_request.transaction_result == "SENT_TO_BENEFICIARY"
+      elsif PROCESSING_TRANSACTION_STATUSES.include? op.transfer_request.transaction_result
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_bank_transaction(payment, op.transfer_request)
       elsif op.transfer_request.transaction_result.nil?

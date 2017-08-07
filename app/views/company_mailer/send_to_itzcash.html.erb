@@ -8,7 +8,7 @@
 
       <% @documents.each_with_index do |doc, index| %>
           <h5><%= index +1 %>. <%= doc.company_kyc_document_type.name %>
-          (Document uploaded date: <%= doc.updated_at.strftime("%Y-%M-%d")%>) </h5>
+          (Document uploaded date: <%= doc.updated_at.strftime("%Y-%m-%d")%>) </h5>
       <% end %>
 
       <p>Company Name: <b><%= @company.name %></b></p>
