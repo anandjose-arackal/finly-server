@@ -101,7 +101,6 @@ production:
   itzcash_corporate_balance:
     path: "itzgift/servlet/CorporateBalanceServlet"
   itzcash_card_restriction:
-    base_url: "https://freedomcard.itzcash.com"
     path: "itzgift/servlet/NaradaSetTransactionLimitsServlet"
   itzcash_mcc_group_restriction:
     path: "itzgift/servlet/NaradaSetAdditionalRestrictionsServlet"

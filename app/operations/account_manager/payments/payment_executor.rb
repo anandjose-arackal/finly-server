@@ -116,7 +116,11 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     end
 
     # todo - probably should be moved to the adapter itself
-    payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+    if payment.in_progress?
+      # i.e. if the payment was not modified in any way during the execution, update it here.
+      payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+    end
+
   end
 
   def post_process

@@ -1,4 +1,4 @@
-class BankTransactionStatusChecker < ActiveJob::Base
+class BankTransferStatusChecker < ActiveJob::Base
 
   def perform
     pending_transactions = BankTransaction.processing_transaction.all

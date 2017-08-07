@@ -2,6 +2,8 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
 
   attr_accessor :account_number, :transaction_result, :error_message, :transfer_request
 
+  SUCCESS_RESPONSE_CODES = ["COMPLETED", "SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
+
   def initialize(transfer_request)
     self.transfer_request = transfer_request
     self.params = {}
@@ -44,7 +46,7 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
 
   def success?
     ap parsed_response
-    unless ["COMPLETED", "SENT_TO_BENEFICIARY"].include?(transfer_request.transaction_result)
+    unless SUCCESS_RESPONSE_CODES.include?(transfer_request.transaction_result)
       false
     end
     true
@@ -54,6 +56,7 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
     self.parsed_response = Hash.from_xml(response.body)
     # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
     self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
+    self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
     # if the transfer failed, we will see it the error message here, else it'll be nil
     self.transfer_request.bank_error_message = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Reason")&.dig("Text")
   end
