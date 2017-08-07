@@ -144,7 +144,6 @@ gem 'liquid'
 
 gem 'hooks', '0.4.1'
 
-
 gem 'bullet', '5.4.2', :group => 'development'
 
 # todo - temporary, will be removed during final deployment.
