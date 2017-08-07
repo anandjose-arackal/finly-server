@@ -6,7 +6,7 @@ class Expense::ExCard::Create < Expense::ExCard::Base
   attr_accessor :expense_params
 
   # overriding initialize because the only info available will be the transaction and card
-  def initialize(transaction, card)
+  def initialize(transaction, card, params = {})
     self.messages = []
     self.transaction = transaction
     self.card = card
@@ -28,14 +28,15 @@ class Expense::ExCard::Create < Expense::ExCard::Base
 
   def validate
     unless user
-      messages[:error] << "Card does not belong to any user" # probably indicates a pretty serious problem. todo - deal with ghost card
+      messages[:error] << 'Card does not belong to any user' # probably indicates a pretty serious problem. todo - deal with ghost card
     end
   end
 
   def process
     self.expense = user.expenses.build(expense_params)
+    set_custom_fields false
     unless self.expense.save
-      messages[:error] = self.expense.errors.full_messages
+      add_message :error, self.expense.errors.full_messages
       return false
     end
   end
@@ -48,16 +49,24 @@ class Expense::ExCard::Create < Expense::ExCard::Base
     Expense::ExCard::Base::CardExpensePresenter.new(user, {expense: expense}, messages)
   end
 
+  protected
+  def set_custom_fields(save)
+    custom_fields = {}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(self.expense.card_expense, FieldParentType.id_for(:card_expense), custom_fields)
+  end
+
   private
 
   # this will be called when the expense is being created - i.e. the moment the card is used, parameters will be created from the transaction object
   def card_expense_params
-
     params[:amount_attributes] = {value: transaction.billing_amount_value, currency_id: 1} # todo - temporary, will change once currencies are implemented
     params[:card_expense_attributes] = {editable_merchant: transaction[:merchant_name],
                                         surcharge_attributes: {value: (transaction.billing_amount_value - transaction.transaction_amount_value), currency_id: 1},
                                         card_transaction_id: transaction.id
-                                       }
+    }
     params[:expense_type_id] = ExpenseType.card_expense_id
     params[:expense_status_id] = ExpenseStatus.unreported_id
     params[:date] = transaction[:transaction_timestamp]
@@ -67,10 +76,8 @@ class Expense::ExCard::Create < Expense::ExCard::Base
     end
 
     # todo - temporary, category will be extracted from the mcc-category mapping henceforth
-    params[:category_id] = user.company.categories.find_by(name: "Other").id
+    params[:category_id] = user.company.categories.find_by(name: 'Other').id
     #######################################################################################
-
-
     params.permit(:expense_type_id, :expense_status_id, :note, :category_id, :date, :reimbursable,
                   amount_attributes: [:value, :currency_id],
                   card_expense_attributes: [:editable_merchant, :card_transaction_id, :atm_surcharge, surcharge_attributes: [:value, :currency_id]])

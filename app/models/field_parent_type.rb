@@ -23,8 +23,9 @@ class FieldParentType < ActiveRecord::Base
   end
 
   def self.expense_ids
-    [FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:time_expense),
-     FieldParentType.id_for(:distance_expense), FieldParentType.id_for(:per_diem_expense)]
+    [FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:card_expense),
+     FieldParentType.id_for(:time_expense), FieldParentType.id_for(:distance_expense),
+     FieldParentType.id_for(:per_diem_expense)]
   end
 
 end
