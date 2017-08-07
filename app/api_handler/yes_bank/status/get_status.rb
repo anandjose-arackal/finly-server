@@ -1,5 +1,5 @@
 # this API retrieves the balance of Finly's current account as a whole
-# which is the sum of all account we are maintaining in the system
+# which is the sum of all accounts we are maintaining in the system
 
 class YesBank::Status::GetStatus < YesBank::Base
 

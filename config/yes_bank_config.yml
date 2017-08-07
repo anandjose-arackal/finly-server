@@ -9,10 +9,10 @@ development:
   account_number: '000690600003544'
 
 production:
-  client_id:
-  client_secret:
-  username:
-  password:
-  account_number:
-  application_id: '448995'
-  customer_id: '448995'
+  client_id: '698b59d5-6f22-4e16-818c-32ccb2f0cfab'
+  client_secret: 'O2nH7eW5cS7hC3kB3nX3hY5rJ2lM1yS2rE8cU0dV3aX8lB1fY2'
+  username: '8240621'
+  password: 'Yesbank@123'
+  account_number: '002267800001249'
+  application_id: '8240621'
+  customer_id: '8240621'

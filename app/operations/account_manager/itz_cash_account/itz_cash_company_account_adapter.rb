@@ -16,10 +16,15 @@ class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountMana
 
   def balance
     op = ItzCash::VirtualAccountBalance.(account.company)
-    balance = op.wallets.first[:balance] # original balance from ItzCash's servers
-    wallets_total = account.total_wallet_balance
-    blocked_amount = account.blocked_amount_for_pending_payments
-    balance - wallets_total - blocked_amount
+    if op.success?
+      balance = op.wallets.first[:balance] # original balance from ItzCash's servers
+      wallets_total = account.total_wallet_balance
+      blocked_amount = account.blocked_amount_for_pending_payments
+      return (balance - wallets_total - blocked_amount)
+    else
+      self.errors << "Could not fetch company credits. Try again later"
+      return false
+    end
   end
 
   def creditable_accounts

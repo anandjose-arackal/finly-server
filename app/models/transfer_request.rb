@@ -34,6 +34,7 @@ class TransferRequest < NonPersistentModel
     loop do
       ref = "FINLY#{transfer_type}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"
       if BankTransaction.find_by(unique_request_number: ref).blank?
+        self.unique_reference_number = ref
         break
       end
     end
