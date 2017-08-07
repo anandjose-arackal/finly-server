@@ -56,9 +56,9 @@ class Admin::Cards::AssignStatus < Admin::Cards::Base
 
   def update_card_assign_requests
     if is_upgraded
-      if CardStatus.ids_for([:unassigned, :assign_requested, :assigned, :upgrade_requested]).include? card.card_status_id
-        card.update(card_status_id: CardStatus.id_for(:upgraded))
-        upgradable_requests = card.card_assign_requests.assignable
+      if CardStatus.ids_for([:unassigned, :assign_requested, :assigned, :upgrade_requested]).include? selected_card.card_status_id
+        selected_card.update(card_status_id: CardStatus.id_for(:upgraded))
+        upgradable_requests = selected_card.card_assign_requests.assignable
         upgradable_requests&.each do |assign_request|
           assign_request.update(status_id: CardAssignRequestStatus.id_for(:assigned_and_upgraded))
           track_params = {
@@ -68,9 +68,9 @@ class Admin::Cards::AssignStatus < Admin::Cards::Base
         end
       end
     elsif is_assigned
-      if CardStatus.ids_for([:unassigned, :assign_requested, :assigned, :upgrade_requested]).include? card.card_status_id
-        card.update(card_status_id: CardStatus.id_for(:assigned))
-        upgradable_requests = card.card_assign_requests.assignable
+      if CardStatus.ids_for([:unassigned, :assign_requested, :assigned, :upgrade_requested]).include? selected_card.card_status_id
+        selected_card.update(card_status_id: CardStatus.id_for(:assigned))
+        upgradable_requests = selected_card.card_assign_requests.assignable
         upgradable_requests&.each do |assign_request|
           assign_request.update(status_id: CardAssignRequestStatus.id_for(:assigned))
           track_params = {
@@ -84,7 +84,7 @@ class Admin::Cards::AssignStatus < Admin::Cards::Base
 
   def update_individual_kyc_requests
     return unless is_upgraded
-    kyc = card.user.individual_kyc
+    kyc = selected_card.user.individual_kyc
     return unless kyc.completed?
     kyc.update(kyc_status_id: KycStatus.id_for(:completed))
     track_params = {

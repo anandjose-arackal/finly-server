@@ -33,8 +33,13 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
         payment_order: self.order_data)
     self.processed_order_data = op.payment_order_data
 
+
+    #### setting the bank transfer type from the front end ####
+    params[:bank_transfer_type] = params[:transfer_type].upcase
+    ###########################################################
+
     self.scheduled_at = op.scheduled_at
-    self.payment_request = build_payment_request(processed_order_data)
+    self.payment_request = build_payment_request(processed_order_data, params[:bank_transfer_type], scheduled_at)
   end
 
   def validate
@@ -56,13 +61,20 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   def process
 
     # calling the payment processor to complete the transfer using adapters
-    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
-    # debugger
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_request.bank_transfer_type})
     unless op.success?
       # destroy the payment order that was created for this purpose, and return errors
       add_message :error, op.messages[:error]
+      op.payment_order.payments.each do |payment|
+        payment.receiving_account.destroy # just the bogus bank account
+      end
+      return
     end
     self.payment_order = op.payment_order
+  end
+
+  def post_process
+    add_message :success, "Transfers scheduled successfully!"
   end
 
   def success
@@ -71,10 +83,21 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   end
 
   def failure
-    # todo - destroy the vendors and associated bank accounts if the payment order fails for some reason
+    params[:payment_order] = self.payment_order
+    BankTransfer::YesBank::Create::SuccessPresenter.new(user, params, messages)
   end
 
   class BankTransfer::YesBank::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :payment_order
+
+    def init
+      self.payment_order = params[:payment_order]
+    end
+
+  end
+
+  class BankTransfer::YesBank::Create::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
+
     attr_accessor :payment_order
 
     def init

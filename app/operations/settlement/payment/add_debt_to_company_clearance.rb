@@ -32,7 +32,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
     self.to_user = user.company.users.find_by(id: params[:to_user_id] || params[:id])
     self.amount = payment_params[:amount]
     self.currency_id = payment_params[:currency_id] || Currency.first.id
-    init_payment_request(PaymentType.id_for(:debit), PaymentPurpose.id_for(:fund_transfer_outsode_finly))
+    init_payment_request(:debit, :balance_clearance_outside_finly)
   end
 
   def authorize

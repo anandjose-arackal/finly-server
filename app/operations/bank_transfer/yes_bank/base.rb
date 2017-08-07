@@ -21,16 +21,23 @@ class BankTransfer::YesBank::Base < BaseOperation
 
   # this will create the respective vendors for each transaction, and create the payment request
   # for each of them - at this point, all of them will be valid
-  def build_payment_request(order_data)
-    self.payment_request = PaymentRequest.(user, initiating_account, BankAccount.name, :credit, :vendor_payment)
+  def build_payment_request(order_data, bank_transfer_type, scheduled_at)
+    self.payment_request = PaymentRequest.(user, initiating_account, BankAccount.name, :credit, :vendor_payment, {bank_transfer_type: bank_transfer_type, scheduled_at: scheduled_at, background: true})
+    self.payment_request.bank_transfer_type = bank_transfer_type
     order_data.each do |data|
       account_number = data[:bank_account_number]
       ifsc = data[:ifsc]
       name = data[:name]
       amount = data[:amount]
-      vendor = YesBankVendor.create(name: name, company_id: user.company_id)
-      ba = BankAccount.create(name: name, account_number: account_number, ifsc: ifsc, account_owner: vendor)
-      self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(vendor, ba, amount))
+
+      ba = BankAccount.find_by(account_number: account_number)
+
+      vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: name, company_id: payment_request.company_id)
+
+      if ba.nil?
+        ba = BankAccount.create(name: name, account_number: account_number, ifsc: ifsc, account_owner: vendor)
+      end
+      self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(ba.account_owner, ba, amount))
     end
     payment_request
   end

@@ -103,7 +103,7 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
         'BENEFICIARY_ACCOUNT_NUMBER' => transfer_request.beneficiary_account_number,
         'BENEFICIARY_IFSC' => transfer_request.ifsc,
         'TRANSFER_TYPE' => transfer_request.transfer_type,
-        'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency,
+        'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,
         'TRANSFER_AMOUNT' => transfer_request.transfer_amount
     )
   end

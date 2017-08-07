@@ -11,25 +11,24 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     BankAccount
   end
 
-  def credit(payment, transfer_type)
+  def credit(payment, options = {})
     super
+    transfer_type = options[:bank_transfer_type]
     # this will be done by creating the respective payment request for the bank account
     transfer_request = create_transfer_request(payment, transfer_type)
     op = YesBank::Transfer::BankTransfer.(transfer_request)
     if op.success?
       # logic for setting whether a particular payment was successful or is processing
-      if op.transfer_request.transaction_status == "COMPLETED"
+      if op.transfer_request.transaction_result == "COMPLETED"
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
         create_bank_transaction(payment, op.transfer_request)
-      elsif op.transfer_request.transaction_status == "SENT_TO_BENEFICIARY"
+      elsif op.transfer_request.transaction_result == "SENT_TO_BENEFICIARY"
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_bank_transaction(payment, op.transfer_request)
-      elsif op.transfer_request.transaction_status.nil?
+      elsif op.transfer_request.transaction_result.nil?
         # i.e. there was an error processing the transaction
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         error_message = op.transfer_request.bank_error_message || "Payment could not be processed at this time"
-        payment.system_messages.build(content: error_message,
-                                      system_message_type_id: SystemMessageType.id_for(:error)).save
         self.errors << error_message
         return false
       end
@@ -37,15 +36,13 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       # i.e. there was an error processing the transaction
       payment.update(payment_status_id: PaymentStatus.id_for(:failed))
       error_message = op.transfer_request.bank_error_message || "Payment could not be processed at this time"
-      payment.system_messages.build(content: error_message,
-                                    system_message_type_id: SystemMessageType.id_for(:error)).save
       self.errors << error_message
       return false
     end
     true
   end
 
-  def debit(payment)
+  def debit(payment, options = {})
     super
     # nothing to do here ¯\_(ツ)_/¯
   end
@@ -66,7 +63,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
   private
 
-  def create_bank_transaction(payment, payment_request)
+  def create_bank_transaction(payment, transfer_request)
     self.company = account.company
     case payment.payment_status_id
       when PaymentStatus.id_for(:completed)
@@ -76,9 +73,9 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       else
         transfer_status_id = BankTransferStatus.id_for(:failed)
     end
-    bt = company.bank_transactions.build(unique_request_number: payment_request.unique_request_number,
-                                         transfer_type: payment_request.transfer_type,
-                                         bank_reference_number: payment_request.bank_reference_number,
+    bt = company.bank_transactions.build(unique_request_number: transfer_request.unique_request_number,
+                                         transfer_type: transfer_request.transfer_type,
+                                         bank_reference_number: transfer_request.bank_reference_number,
                                          beneficiary_bank_account: self.account,
                                          transfer_status_id: transfer_status_id,
                                          amount_attributes: {

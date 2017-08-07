@@ -21,7 +21,6 @@
 #
 
 
-
 class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
@@ -43,12 +42,12 @@ class Receipt < ActiveRecord::Base
       content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)
   }
 
-  default_scope {order(created_at: :desc)}
+  default_scope { order(created_at: :desc) }
 
-  scope :with_user_id, -> (user_ids) {where user_id: user_ids}
+  scope :with_user_id, -> (user_ids) { where user_id: user_ids }
   scope :with_id, ->(id) { where id: id }
   scope :without_parent, -> { where(parent_id: nil) }
-  scope :with_expense_id, -> (expense_ids) {where(parent_type: 'Expense').where(parent_id: expense_ids)}
+  scope :with_expense_id, -> (expense_ids) { where(parent_type: 'Expense').where(parent_id: expense_ids) }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     unless date_from.blank? && date_to.blank?
       type_val = :created_at
@@ -65,7 +64,7 @@ class Receipt < ActiveRecord::Base
     joins(:users).select('receipts.*').where(company_id: company_id)
   }
 
-  scope :filter_user, -> (user_id) {where user_id: user_id}
+  scope :filter_user, -> (user_id) { where user_id: user_id }
 
   # this scope is basically to separately retrieve receipts from companies that have OCR enabled
   scope :untranscribed, -> { where(to_be_transcribed: true) }
@@ -102,12 +101,13 @@ class Receipt < ActiveRecord::Base
 
   def file_format
     if self.image_content_type == 'application/pdf'
-    type = "pdf"
+      type = "pdf"
     elsif ["image/jpg", "image/jpeg", "image/png", "image/gif"].include?(self.image_content_type)
       type = "image"
     else
       type = "image"
     end
+    type
   end
 
 end

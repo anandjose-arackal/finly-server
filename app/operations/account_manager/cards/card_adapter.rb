@@ -4,7 +4,7 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     Card
   end
 
-  def credit(payment)
+  def credit(payment, options)
     super
     # operation that credits a particular card
     op = ItzCash::Credit.(account.user, {card: account, amount: payment.amount_value})
@@ -15,7 +15,7 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     true
   end
 
-  def debit(payment)
+  def debit(payment, options)
     super
     # operation that debits a particular card
     op = ItzCash::Debit.(account.user, {card: account, amount: payment.amount_value})

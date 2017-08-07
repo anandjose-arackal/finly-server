@@ -178,7 +178,11 @@ class Card::Transaction::Create < BaseOperation
         end
       # gets added to user's card balance, so do nothing
       else
-        # do nothing
+        # create a vanilla transaction out of it for future reference
+        self.transaction = CardTransaction.new(params)
+        unless transaction.save
+          add_message :errors, transaction.errors.full_messages
+        end
     end
   end
 

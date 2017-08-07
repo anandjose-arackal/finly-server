@@ -26,9 +26,13 @@ class Benefits::TaxBenefits::Index < Benefits::TaxBenefits::Base
 
   class Benefits::TaxBenefits::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_orders
+    include HasScope
+
+    has_scope :with_application
 
     def init
       self.payment_orders = params[:payment_orders]
+      self.payment_orders = apply_scopes(payment_orders, params)
     end
   end
 

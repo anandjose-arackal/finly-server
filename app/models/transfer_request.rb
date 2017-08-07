@@ -14,7 +14,7 @@ class TransferRequest < NonPersistentModel
   validates :beneficiary_account_number, presence: true
   validates :beneficiary_name, presence: true
   validates :ifsc, presence: true
-  validates :transfer_currency, presence: true
+  validates :transfer_currency_code, presence: true
   validates :transfer_amount, presence: true
   validates :transfer_type, presence: true
 
@@ -25,7 +25,7 @@ class TransferRequest < NonPersistentModel
         ifsc: ifsc,
         transfer_type: transfer_type,
         transfer_amount: transfer_amount,
-        transfer_currency: transfer_currency
+        transfer_currency_code: transfer_currency
     })
   end
 

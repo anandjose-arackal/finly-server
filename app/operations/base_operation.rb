@@ -17,19 +17,19 @@ class BaseOperation
 
   # Applications
   def admin_panel?
-    current_app == :ap ? true : false
+    current_app == :ap
   end
 
   def vendor_payments?
-    current_app == :vp ? true : false
+    current_app == :vp
   end
 
   def expense_management?
-    current_app == :em ? true : false
+    current_app == :em
   end
 
   def funds_transfer?
-    current_app == :ft ? true : false
+    current_app == :ft
   end
 
   # Can be called as BaseOperations.(user, params) instead of BaseOperations.call(user, params)

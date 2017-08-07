@@ -15,7 +15,8 @@ class PaymentRequest < NonPersistentModel
                 :payment_order_status_id,
                 :payment_items,
                 :payment_type_id,
-                :currency_id
+                :currency_id,
+                :bank_transfer_type
 
   belongs_to :company
   belongs_to :initiating_resource, polymorphic: true
@@ -41,7 +42,8 @@ class PaymentRequest < NonPersistentModel
                  payment_type_id: PaymentType.id_for(payment_type&.to_sym),
                  scheduled_at: options[:scheduled_at],
                  currency_id: options[:currency_id],
-                 background: !!options[:background]
+                 background: !!options[:background],
+                 bank_transfer_type: options[:bank_transfer_type]
              })
   end
 
@@ -115,10 +117,10 @@ class PaymentRequest < NonPersistentModel
     belongs_to :receiving_resource, polymorphic: true
     belongs_to :receiving_account, polymorphic: true
 
-    validates :receiving_account, presence: true
     validates :amount, presence: true
     validates :payment_request, presence: true
     validate :payment_request_receiving_account_type
+    validate :receiving_account_presence
 
     def self.call(receiving_resource, receiving_account, amount)
       self.new({
@@ -130,6 +132,14 @@ class PaymentRequest < NonPersistentModel
 
     def payment_status_id
       PaymentStatus.id_for(:pending)
+    end
+
+    def receiving_account_presence
+      unless [PaymentPurpose.id_for(:reimbursement_outside_finly)].include?(self.payment_purpose_id)
+        if receiving_account.nil?
+          errors.add(:receiving_account, "cannot be blank")
+        end
+      end
     end
 
     def payment_request_receiving_account_type

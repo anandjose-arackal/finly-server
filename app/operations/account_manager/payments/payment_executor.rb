@@ -2,10 +2,11 @@
 #
 class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
-  attr_accessor :payment, :payment_item, :receiving_account_adapter, :source_account_adapter
+  attr_accessor :payment, :payment_item, :receiving_account_adapter, :source_account_adapter, :options,
+                :source_account_name, :receiving_account_name
 
-  def self.call(payment)
-    self.new(payment).run
+  def self.call(payment, options = {})
+    self.new(payment, options).run
   end
 
   def self.call_async(payment_id)
@@ -14,13 +15,16 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     self.new(payment).run
   end
 
-  def initialize(payment)
+  def initialize(payment, options = {})
     self.payment = payment
+    self.options = options
   end
 
   def init
     self.receiving_account_adapter = retrieve_adapter(payment.receiving_account)
     self.source_account_adapter = retrieve_adapter(payment.initiating_account)
+    self.source_account_name = source_account_adapter.name.is_a?(Array) ? source_account_adapter.name.first : source_account_adapter.name
+    self.receiving_account_name = receiving_account_adapter.name.is_a?(Array) ? receiving_account_adapter.name.first : receiving_account_adapter.name
   end
 
   def validate
@@ -31,7 +35,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     unless receiving_account_adapter.creditable_account?(payment.initiating_account)
       add_message :error, 'You cannot credit from this account'
       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                    content: "You cannot credit from #{source_account_adapter.name} to #{receiving_account_adapter.name}").save
+                                    content: "You cannot credit from #{source_account_name} to #{receiving_account_name}").save
       return
     end
 
@@ -46,14 +50,14 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       unless source_account_adapter.debitable_account?(payment.receiving_account)
         add_message :error, "You cannot debit to this account"
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                      content: "You cannot debit from #{receiving_account_adapter.name} to #{source_account_adapter.name}").save
+                                      content: "You cannot debit from #{receiving_account_name} to #{source_account_name}").save
         return
       end
 
-      unless source_account_adapter.balance > payment.amount_value
+      unless source_account_adapter.balance >= payment.amount_value
         add_message :error, "This account does not have enough balance for this transaction"
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                      content: "Not enough funds in #{payment.source_account_type.to_s} to initiate the transfer").save
+                                      content: "Not enough funds in #{payment.initiating_account_type.to_s} to initiate the transfer").save
         return
       end
     end
@@ -86,7 +90,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     end
 
     # Debit funds from account
-    unless debit_adapter.blank? or debit_adapter.debit(payment)
+    unless debit_adapter.blank? or debit_adapter.debit(payment, options)
        # Debit failed
       add_message :error, debit_adapter.errors
       payment.update(payment_status_id: PaymentStatus.id_for(:failed))
@@ -98,7 +102,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
     end
 
     # Credit funds to account
-    unless credit_adapter.blank? or credit_adapter.credit(payment)
+    unless credit_adapter.blank? or credit_adapter.credit(payment, options)
       # Credit failed
         add_message :error, credit_adapter.errors
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
@@ -107,10 +111,11 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
         end
         # Reverse credit
-        debit_adapter.credit(payment)
+        debit_adapter.credit(payment, options)
       return
     end
 
+    # todo - probably should be moved to the adapter itself
     payment.update(payment_status_id: PaymentStatus.id_for(:completed))
   end
 
