@@ -66,7 +66,7 @@ class Report::Violation < Report::Base
       # existence of a policy
       check_compatible_expenses(expense)
       check_non_base_currency(expense)
-
+      check_custom_fields(expense)
       # i.e. if the expense does not have a possible currency computation skip rule checking because the amount isn't clear
       if expense.amount&.currency_id != base_currency_id && expense.date == DateUtils.local_date
         next
@@ -295,7 +295,6 @@ class Report::Violation < Report::Base
   end
 
   def check_non_base_currency(expense)
-
     if expense.date == DateUtils.local_date
       if expense&.amount.currency_id == base_currency_id
         return
@@ -304,4 +303,15 @@ class Report::Violation < Report::Base
       end
     end
   end
+
+  def check_custom_fields(expense)
+    exp = (expense.card_expense || expense.manual_expense || expense.distance_expense || expense.manual_expense)
+    valid = CustomField::Validate.(exp)
+    unless valid.success?
+      valid.messages[:error]&.each do |message|
+        self.warning_messages[expense.id]['expense_blocking'] << {type: 'custom_fields', message: message}
+      end
+    end
+  end
+
 end
