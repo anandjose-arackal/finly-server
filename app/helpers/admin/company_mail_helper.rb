@@ -1,8 +1,13 @@
 module Admin::CompanyMailHelper
 
-  def random_ip_address
-    ips = Constants::JUNK_IP_ADDRESSES
-    ips[random_integer(0, 19)]
+  def random_ip_address(company)
+    case company.id
+      when 29
+        return "1.23.161.61"
+      else
+        ips = Constants::JUNK_IP_ADDRESSES
+        ips[random_integer(0, 19)]
+    end
   end
 
   def random(low, high)
@@ -21,6 +26,8 @@ module Admin::CompanyMailHelper
         return DateTime.parse("2017-07-26 13:29:38 +0530").to_time
       when 5
         return DateTime.parse("2017-07-26 13:52:06 +0530").to_time
+      when 29
+        return DateTime.parse("2017-08-02 22:28:10 +0530").to_time
       else
         return random_timestamp
     end
