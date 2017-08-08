@@ -20,7 +20,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     transfer_type = options[:bank_transfer_type]
     # this will be done by creating the respective payment request for the bank account
     transfer_request = create_transfer_request(payment, transfer_type)
-    op = YesBank::Transfer::BankTransfer.(transfer_request)
+    op = YesBankApi::Transfer::BankTransfer.(transfer_request)
     if op.success?
       # logic for setting whether a particular payment was successful or is processing
       if SUCCESSFUL_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)

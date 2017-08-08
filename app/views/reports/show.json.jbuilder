@@ -66,8 +66,7 @@ else
 end
 
 json.expense_sections sorted_expenses do |category|
-  json.extract! category, :section_name, :section_total
-
+  json.extract! category, :section_name, :section_total, :has_custom_fields
   json.expenses category[:expenses] do |expense|
     json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id, :category_name,
                            :distance_value, :distance_rate_value, :time_value, :time_rate_value
@@ -91,6 +90,31 @@ json.expense_sections sorted_expenses do |category|
       json.locations expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
     end
     json.potential_duplicate expense.has_duplicate_expenses?
+    json.custom_fields do
+      case expense.expense_type_id
+        when ExpenseType.id_for(:manual)
+          json.array! expense.manual_expense.custom_fields
+        when ExpenseType.id_for(:card)
+          json.array! expense.card_expense.custom_fields
+        when ExpenseType.id_for(:distance)
+          json.array! expense.distance_expense.custom_fields
+        when ExpenseType.id_for(:time)
+          json.array! expense.time_expense.custom_fields
+        when ExpenseType.id_for(:per_diem)
+          json.array! expense.per_diem_expense.custom_fields
+      end
+    end
+    json.receipts do
+      json.array! expense.receipts do |receipt|
+        json.id receipt.id
+        json.hard_copy_received receipt.hard_copy_received
+        json.image do
+          json.file_type receipt.file_format
+          json.original receipt.image.url
+          json.thumb receipt.image.url(:thumb)
+        end
+      end
+    end
   end
 end
 

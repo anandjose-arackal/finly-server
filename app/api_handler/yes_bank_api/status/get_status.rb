@@ -1,7 +1,7 @@
 # this API retrieves the balance of Finly's current account as a whole
 # which is the sum of all accounts we are maintaining in the system
 
-class YesBank::Status::GetStatus < YesBank::Base
+class YesBankApi::Status::GetStatus < YesBankApi::Base
 
   attr_accessor :request_reference_number, :request_status, :transaction_status,
                 :bank_error_message
@@ -40,7 +40,7 @@ class YesBank::Status::GetStatus < YesBank::Base
       return false
     end
     set_response_parameters
-    # now that we have the response status, we can determine is the request is legit or not
+    # now that we have the response status, we can determine if the request is legit or not
     unless self.request_status.downcase == "request not found"
       return true
     end
@@ -57,19 +57,15 @@ class YesBank::Status::GetStatus < YesBank::Base
 
   def success
     params[:request_status] = request_status
-    YesBank::Transfer::BankTransfer::TransactionSuccessPresenter.new(transfer_request)
+    YesBankApi::Status::GetStatus::SuccessStatusPresenter.new(params)
   end
 
-  def failure
+  class YesBankApi::Status::GetStatus::SuccessStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-  end
+    attr_accessor :request_status
 
-  class YesBank::Transfer::BankTransfer::SuccessStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
-    attr_accessor :transfer_request
-
-    def initialize(transfer_request)
-      self.transfer_request = transfer_request
+    def initialize(params)
+      self.request_status = params[:request_status]
     end
   end
 
