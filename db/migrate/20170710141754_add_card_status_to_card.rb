@@ -3,7 +3,7 @@ class AddCardStatusToCard < ActiveRecord::Migration
     if Company.count > 0
       CardStatus.seed_data
     end
-    if Card.column_names.include?('is_deleted')
+    unless Card.column_names.include?('is_deleted')
       add_column :cards, :is_deleted, :boolean
     end
     # add_column :cards, :card_status_id, :integer, references: 'CardStatus', index: true, foreign_key: true
