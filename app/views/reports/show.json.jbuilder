@@ -104,6 +104,17 @@ json.expense_sections sorted_expenses do |category|
           json.array! expense.per_diem_expense.custom_fields
       end
     end
+    json.receipts do
+      json.array! expense.receipts do |receipt|
+        json.id receipt.id
+        json.hard_copy_received receipt.hard_copy_received
+        json.image do
+          json.file_type receipt.file_format
+          json.original receipt.image.url
+          json.thumb receipt.image.url(:thumb)
+        end
+      end
+    end
   end
 end
 
