@@ -26,6 +26,8 @@
 #  initiating_account_closing_balance_id :integer
 #  receiving_account_closing_balance_id  :integer
 #  payment_mode                          :string(255)
+#  initiating_account_opening_balance_id :integer
+#  receiving_account_opening_balance_id  :integer
 #
 
 
@@ -49,6 +51,10 @@ class Payment < ActiveRecord::Base
   end
 
   belongs_to :amount
+  belongs_to :initiating_account_closing_balance, class_name: "Amount"
+  belongs_to :receiving_account_closing_balance, class_name: "Amount"
+  belongs_to :initiating_account_opening_balance, class_name: "Amount"
+  belongs_to :receiving_account_opening_balance, class_name: "Amount"
   belongs_to :payment_type
   belongs_to :initiating_user, polymorphic: true
   belongs_to :receiving_user, polymorphic: true
@@ -70,6 +76,10 @@ class Payment < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :payment_order
+  accepts_nested_attributes_for :initiating_account_opening_balance
+  accepts_nested_attributes_for :initiating_account_closing_balance
+  accepts_nested_attributes_for :receiving_account_closing_balance
+  accepts_nested_attributes_for :receiving_account_opening_balance
   delegate :amount_value, to: :amount
 
   default_scope { order date: :desc, created_at: :desc }

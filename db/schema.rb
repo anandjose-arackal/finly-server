@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170808122332) do
+ActiveRecord::Schema.define(version: 20170808153642) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2091,6 +2091,8 @@ ActiveRecord::Schema.define(version: 20170808122332) do
     t.integer  "initiating_account_closing_balance_id", limit: 4
     t.integer  "receiving_account_closing_balance_id",  limit: 4
     t.string   "payment_mode",                          limit: 255
+    t.integer  "initiating_account_opening_balance_id", limit: 4
+    t.integer  "receiving_account_opening_balance_id",  limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree

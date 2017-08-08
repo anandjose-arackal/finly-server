@@ -71,6 +71,15 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   def pre_process
     # update payment to in progress
     payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
+    # storing opening balances
+    unless source_account_adapter.blank? || source_account_adapter.is_a?(AccountManager::OutsideFinly::OutsideFinlyAdapter)
+      source_balance = source_account_adapter.balance
+      payment.update(initiating_account_opening_balance_attributes: {value: source_balance, currency_id: Currency.first.id})
+    end
+    unless receiving_account_adapter.blank? || receiving_account_adapter.is_a?(AccountManager::OutsideFinly::OutsideFinlyAdapter)
+      receiving_balance = receiving_account_adapter.balance
+      payment.update(receiving_account_opening_balance_attributes: {value: receiving_balance, currency_id: Currency.first.id})
+    end
   end
 
   def process
@@ -127,7 +136,15 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   end
 
   def post_process
-
+    # updating closing balances
+    unless source_account_adapter.blank? || source_account_adapter.is_a?(AccountManager::OutsideFinly::OutsideFinlyAdapter)
+      source_balance = source_account_adapter.balance
+      payment.update(initiating_account_closing_balance_attributes: {value: source_balance, currency_id: Currency.first.id})
+    end
+    unless receiving_account_adapter.blank? || receiving_account_adapter.is_a?(AccountManager::OutsideFinly::OutsideFinlyAdapter)
+      receiving_balance = receiving_account_adapter.balance
+      payment.update(receiving_account_closing_balance_attributes: {value: receiving_balance, currency_id: Currency.first.id})
+    end
   end
 
   private
