@@ -7,7 +7,7 @@
 #  date                                  :date             not null
 #  payment_type_id                       :integer          not null
 #  initiating_user_id                    :integer          not null
-#  receiving_user_id                     :integer          not null
+#  receiving_user_id                     :integer
 #  note                                  :text(65535)
 #  created_at                            :datetime         not null
 #  updated_at                            :datetime         not null

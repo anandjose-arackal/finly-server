@@ -7,7 +7,7 @@
 #  date                                  :date             not null
 #  payment_type_id                       :integer          not null
 #  initiating_user_id                    :integer          not null
-#  receiving_user_id                     :integer          not null
+#  receiving_user_id                     :integer
 #  note                                  :text(65535)
 #  created_at                            :datetime         not null
 #  updated_at                            :datetime         not null
@@ -27,6 +27,7 @@
 #  receiving_account_closing_balance_id  :integer
 #  payment_mode                          :string(255)
 #
+
 
 
 
@@ -277,7 +278,7 @@ class Payment < ActiveRecord::Base
 
   def initiating_account_presence
     unless [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:balance_clearance_outside_finly),
-            PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:card_transaction), PaymentPurpose.id_for(:advance)].include?(self.payment_purpose_id)
+            PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:card_transaction), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:corporate_balance_load)].include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")
       end
@@ -302,7 +303,7 @@ class Payment < ActiveRecord::Base
   end
 
   def receiving_user_presence
-    unless [PaymentPurpose.id_for(:vendor_payment)].include?(self.payment_purpose_id)
+    unless [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:corporate_balance_load)].include?(self.payment_purpose_id)
       if receiving_user_id.blank?
         errors.add(:receiving_user_id, "cannot be blank")
       end
