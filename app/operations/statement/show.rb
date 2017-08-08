@@ -33,22 +33,12 @@ class Statement::Show < BaseOperation
           when :finly_money
             self.account = sel_user.wallet
         end
-      # when :group
-      #   user_presenter = User::Team::Index.(user, params)
-      #   unless user_presenter.success?
-      #     add_message :error, user_presenter.messages[:error]
-      #     return
-      #   end
-      #   team = user_presenter.team
-      #
-      # when :team
     end
   end
 
   def validate
     if self.account.blank?
       add_message :error, 'Account not found'
-      return
     end
   end
 
@@ -75,6 +65,24 @@ class Statement::Show < BaseOperation
       self.account = params[:account]
       self.card_transactions = params[:card_transactions]
       self.payments = apply_scopes(params[:payments], params)&.paginate(page: params[:page], per_page: 30)
+    end
+
+    def credit_statement
+      return unless self.payments.present? and self.account.present?
+      self.payments.credits_for_account(self.account)
+    end
+
+    def debits_statement
+      return unless self.payments.present? and self.account.present?
+      self.payments.debits_for_account(self.account)
+    end
+
+    def opening_balance
+
+    end
+
+    def closing_balance
+
     end
 
   end

@@ -134,6 +134,8 @@ class Payment < ActiveRecord::Base
   scope :cash_additions_to_employee, -> { where(payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)]) }
   scope :cash_deductions_from_employee, -> { where(payment_type_id: [PaymentPurpose.id_for(:balance_clearance_outside_finly)]) }
 
+  scope :credits_for_account, ->(account) { where("(initiating_account_id = ? AND initiating_account_type = ? AND payment_type_id = #{PaymentType.id_for(:debit)}) OR (receiving_account_id = ? and receiving_account_type = ? AND payment_type_id = #{PaymentType.id_for(:credit)})", account.id, account.class.name, account.id, account.class.name) }
+  scope :debits_for_account, ->(account) { where("(initiating_account_id = ? AND initiating_account_type = ? AND payment_type_id = #{PaymentType.id_for(:credit)}) OR (receiving_account_id = ? and receiving_account_type = ? AND payment_type_id = #{PaymentType.id_for(:debit)})", account.id, account.class.name, account.id, account.class.name) }
   # validates :amount_id, presence: true
   validates :date, presence: true
   # validates :initiating_user_id, presence: true
