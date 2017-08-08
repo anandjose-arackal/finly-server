@@ -112,4 +112,13 @@ class PaymentOrder < ActiveRecord::Base
     self.payments.first.payment_type_id == PaymentType.id_for(:debit)
   end
 
+  def payment_order_status_name
+    case self.payment_order_status_id
+      when PaymentOrderStatus.id_for(:processing)
+        return "Transaction successful. Awaiting confirmation"
+      else
+        self.payment_order_status.name.humanize
+    end
+  end
+
 end

@@ -31,10 +31,10 @@ json.data do
       json.receiving_account payment.receiving_account_type_name
       json.status do
         json.id payment.payment_status.id
-        json.name payment.payment_status.name.humanize
+        json.name payment.payment_status_name
       end
       json.system_messages do
-        json.array! payment.system_messages
+        json.array! (payment.system_messages)
       end
     end
   end
