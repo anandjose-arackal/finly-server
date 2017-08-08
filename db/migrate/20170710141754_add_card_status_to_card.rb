@@ -6,7 +6,7 @@ class AddCardStatusToCard < ActiveRecord::Migration
     unless Card.column_names.include?('is_deleted')
       add_column :cards, :is_deleted, :boolean
     end
-    # add_column :cards, :card_status_id, :integer, references: 'CardStatus', index: true, foreign_key: true
+    add_column :cards, :card_status_id, :integer, references: 'CardStatus', index: true, foreign_key: true
     Card.all.each do |card|
       # :assigned, :upgrade_requested, :upgraded
       acc_details = ItzCash::AccountDetails.(card.user, card: card)
