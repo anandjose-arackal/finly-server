@@ -1,7 +1,7 @@
 class CreatePaymentOrders < ActiveRecord::Migration
   def change
     create_table :payment_orders do |t|
-      t.references :payment_order_type, index: true, foreign_key: true, null: false
+      # t.references :payment_order_type, index: true, foreign_key: true, null: false
       t.date :scheduled_at
       t.datetime :processed_at
       t.integer :initiating_user_id, null: false, index: true, foreign_key: true, references: 'User'
