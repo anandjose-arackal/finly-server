@@ -57,14 +57,10 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
 
   def success
     params[:request_status] = request_status
-    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(params)
+    YesBankApi::Status::GetStatus::SuccessStatusPresenter.new(params)
   end
 
-  def failure
-
-  end
-
-  class YesBankApi::Transfer::BankTransfer::SuccessStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class YesBankApi::Status::GetStatus::SuccessStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :request_status
 
