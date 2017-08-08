@@ -7,6 +7,12 @@ development:
   application_id: '448995'
   customer_id: '448995'
 
+itzcash_uat:
+  <<: *development
+
+staging:
+  <<: *development
+
 production:
   client_id: '698b59d5-6f22-4e16-818c-32ccb2f0cfab'
   client_secret: 'O2nH7eW5cS7hC3kB3nX3hY5rJ2lM1yS2rE8cU0dV3aX8lB1fY2'
