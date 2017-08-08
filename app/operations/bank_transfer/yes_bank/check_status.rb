@@ -43,9 +43,12 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     if op.success?
       if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+        bank_transaction.payment&.update(payment_status_id: PaymentStatus.id_for(:completed))
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
+        bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+        bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
       else
         # do nothing?
