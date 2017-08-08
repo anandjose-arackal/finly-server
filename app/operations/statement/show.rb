@@ -78,7 +78,7 @@ class Statement::Show < BaseOperation
     end
 
     def opening_balance
-
+      # self.payments.last
     end
 
     def closing_balance
