@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170808113145) do
+ActiveRecord::Schema.define(version: 20170808122332) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -404,6 +404,7 @@ ActiveRecord::Schema.define(version: 20170808113145) do
     t.integer  "transfer_status_id",          limit: 4
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
+    t.string   "bank_response",               limit: 255
   end
 
   add_index "bank_transactions", ["amount_id"], name: "index_bank_transactions_on_amount_id", using: :btree
