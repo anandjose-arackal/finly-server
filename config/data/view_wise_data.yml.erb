@@ -15,7 +15,7 @@ admin:
       <% if current_company.d_code_enabled? %>
       - Load Company Balance: '/transfers/register'
       <% if current_company.feature_subscription.cards_enabled and current_user.company_admin? %>
-      - Employee Cards: '/disburse'
+      - Fund Disbursement: '/disburse'
       <% end %>
       <% if current_company.feature_subscription.yes_bank_account and current_user.company_admin? %>
       - Vendor Payments: '/payments'

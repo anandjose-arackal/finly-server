@@ -25,7 +25,9 @@
 #  application                           :string(255)
 #  initiating_account_closing_balance_id :integer
 #  receiving_account_closing_balance_id  :integer
+#  payment_mode                          :string(255)
 #
+
 
 
 

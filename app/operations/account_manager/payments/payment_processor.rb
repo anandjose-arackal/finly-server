@@ -141,6 +141,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
           receiving_account_id: pi.receiving_account_id,
           payment_status_id: pi.payment_status_id,
           payment_purpose_id: pi.payment_purpose_id,
+          payment_mode: payment_request.bank_transfer_type,
           amount_attributes: {
               value: pi.amount,
               currency_id: pi.currency_id
