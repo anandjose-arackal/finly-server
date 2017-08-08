@@ -5,6 +5,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   attr_accessor :bank_transaction
 
+  def self.call(bank_transaction)
+    self.new(bank_transaction).run
+  end
+
   def initialize(bank_transaction)
     self.bank_transaction = bank_transaction
   end
