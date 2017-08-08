@@ -13,6 +13,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     self.bank_transaction = bank_transaction
   end
 
+  def authorized_user_types
+    []
+  end
+
   def pre_validate
     if bank_transaction.nil?
       add_message :error, "Invalid parameters"
@@ -33,9 +37,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def process
     params = {
-        bank_transaction: bank_transaction.unique_request_number
+        request_reference_number: bank_transaction.unique_request_number
     }
-    op = YesBank::Status::GetStatus.(params)
+    op = YesBankApi::Status::GetStatus.(params)
     if op.success?
       if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.downcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
