@@ -86,7 +86,7 @@ class BaseOperation
     return unless required_user_model.present?
     required_user_model = [required_user_model] unless required_user_model.is_a?(Array)
     required_user_model.each do |req_model|
-      if req_model == user.class
+      if req_model.name == user.class.name
         return
       end
     end

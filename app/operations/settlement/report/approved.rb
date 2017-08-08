@@ -34,17 +34,11 @@ class Settlement::Report::Approved < Report::Base
 
   def process
     balance_sheet = report.user.balance_sheet
-    total_reimbursable_amount = report.total_amount([:only_manual_expenses, :reimbursable])
-                      + report.total_amount([:only_distance_expenses, :reimbursable])
-                      + report.total_amount([:only_time_expenses, :reimbursable])
-                      + report.total_amount([:only_per_diem_expenses, :reimbursable])
+    total_reimbursable_amount = report.total_amount(:reimbursable)
 
     total_card_amount = report.total_amount(:only_card_expenses)
 
-    total_non_reimbursable_amount = total_card_amount + report.total_amount([:only_manual_expenses, :non_reimbursable])
-                                    + report.total_amount([:only_distance_expenses, :non_reimbursable])
-                                    + report.total_amount([:only_time_expenses, :non_reimbursable])
-                                    + report.total_amount([:only_per_diem_expenses, :non_reimbursable])
+    total_non_reimbursable_amount = report.total_amount(:non_reimbursable) - total_card_amount
 
     currency = Currency.first
     balance_sheet.add_approved_reports_total total_reimbursable_amount, currency

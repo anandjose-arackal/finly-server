@@ -83,7 +83,7 @@ class User::Balance < User::Base
     if params[:current_user_pending_reports] or params[:current_user_all]
       total = 0
       user.reports.approved.each do |report|
-        total += report.total_amount(:only_manual_expenses)
+        total += report.total_amount(:reimbursable)
       end
 
       self.balances[:current_user][:pending_reports] = {type: :pending_reports, id: user.id, name: 'Approved Reports', balance: total, count: user.reports.approved.count}
@@ -152,7 +152,7 @@ class User::Balance < User::Base
       if params[:target_user_pending_reports] or params[:target_user_all]
         total = 0
         target_user.reports.approved.each do |report|
-          total += report.total_amount(:only_manual_expenses)
+          total += report.total_amount(:reimbursable)
         end
 
         self.balances[:target_user][:pending_reports] = {type: :pending_reports, id: target_user.id, name: 'Approved Reports', balance: total, count: target_user.reports.approved.count}
