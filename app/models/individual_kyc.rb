@@ -61,6 +61,7 @@ class IndividualKyc < ActiveRecord::Base
   scope :filter_company_id, ->(company_id) { where company_id: company_id }
   scope :with_user_id, -> (id) { where user_id: id }
   scope :with_id, -> (id) { where id: id }
+  scope :without_id, -> (id) { where.not id: id }
   scope :include_tracks, -> { includes :tracks }
 
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png)}
@@ -81,7 +82,11 @@ class IndividualKyc < ActiveRecord::Base
   validates_attachment :kyc_file_2, content_type: CONTENT_TYPES
 
   def processing?
-    [KycStatus.id_for(:processing), KycStatus.id_for(:submitted)].include?(self.kyc_status_id)
+    KycStatus.ids_for([:processing, :submitted]).include?(self.kyc_status_id)
+  end
+
+  def completed?
+    KycStatus.id_for(:completed).include?(self.kyc_status_id)
   end
 
   def editable?

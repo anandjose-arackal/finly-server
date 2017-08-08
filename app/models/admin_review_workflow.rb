@@ -63,7 +63,8 @@ class AdminReviewWorkflow < ActiveRecord::Base
               '0': [
                   {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
                   {user: 'veekshith.rai@finly.io', trigger_email: true, reviewer: true},
-                  {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true}
+                  {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true},
+                  {user: 'abhinandanyadavg@gmail.com', trigger_email: true, reviewer: true}
               ],
               '1': [
                   {user: 'itzfinlycust@itzcash.com', trigger_email: true, reviewer: false},
@@ -86,7 +87,8 @@ class AdminReviewWorkflow < ActiveRecord::Base
               '0': [
                   {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
                   {user: 'veekshith.rai@finly.io', trigger_email: true, reviewer: true},
-                  {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true}
+                  {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true},
+                  {user: 'abhinandanyadavg@gmail.com', trigger_email: true, reviewer: true}
               ],
               '1': [
                   {user: 'itzfinlycust@itzcash.com', trigger_email: true, reviewer: false},
@@ -111,23 +113,23 @@ class AdminReviewWorkflow < ActiveRecord::Base
           assign_card: {
               '0': [
                   {user: 'admin@demo.io', trigger_email: false, reviewer: true},
-                  {user: 'vivekagb@gmail.com', trigger_email: true, reviewer: true}
+                  {user: 'sreeram@demo.io', trigger_email: true, reviewer: true}
               ],
-              '1': {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
+              '1': {user: 'vivek@demo.io', trigger_email: true, reviewer: true},
               '2': [
                   {user: 'abinash@demo.io', trigger_email: false, reviewer: true},
-                  {user: 'yseeme20@gmail.com', trigger_email: true, reviewer: false}
+                  {user: 'veekshith@demo.io', trigger_email: true, reviewer: false}
               ]
           },
           kyc_update: {
               '0': [
                   {user: 'admin@demo.io', trigger_email: false, reviewer: true},
-                  {user: 'vivekagb@gmail.com', trigger_email: true, reviewer: true}
+                  {user: 'abinash@demo.io', trigger_email: true, reviewer: true}
               ],
-              '1': {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
+              '1': {user: 'vivek@demo.io', trigger_email: true, reviewer: true},
               '2': [
                   {user: 'abinash@demo.io', trigger_email: false, reviewer: true},
-                  {user: 'yseeme20@gmail.com', trigger_email: true, reviewer: false}
+                  {user: 'sreeram@demo.io', trigger_email: true, reviewer: false}
               ]
           }
       }

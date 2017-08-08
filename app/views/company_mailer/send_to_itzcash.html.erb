@@ -8,7 +8,7 @@
 
       <% @documents.each_with_index do |doc, index| %>
           <h5><%= index +1 %>. <%= doc.company_kyc_document_type.name %>
-          (Document uploaded date: <%= doc.updated_at.strftime("%Y-%M-%d")%>) </h5>
+          (Document uploaded date: <%= doc.updated_at.strftime("%Y-%m-%d")%>) </h5>
       <% end %>
 
       <p>Company Name: <b><%= @company.name %></b></p>
@@ -17,7 +17,7 @@
       <p>Agreement uploaded date: <b><%= @agreement_track&.agreement&.created_at || Agreement.with_type_id(AgreementType.id_for(:prepaid_card_agreement)).first.created_at %> </b></p>
       <p>Timestamp of agreement acceptance: <b><%= @agreement_track&.created_at || agreement_acceptance_timestamp(@company) %></b></p>
       <p>Login Credential: <b><%= @company.users.point_of_contact.first.email || @company.users.point_of_contact.first.mobile_number %></b></p>
-      <p>IP Address: <b><%= @agreement_track&.ip_address || random_ip_address %></b></p>
+      <p>IP Address: <b><%= @agreement_track&.ip_address || random_ip_address(@company) %></b></p>
 
       <br/>
     </div>

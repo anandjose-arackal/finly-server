@@ -25,8 +25,9 @@
 /sample_atm_transactions.txt
 /junk_expenses.rb
 /Sample transactions
+/sample_bank_transfer.xls
 
-.idea/*
+/yes_bank_api_call_logs
 .vagrant/
 #Vagrantfile
 #bootstrap.sh

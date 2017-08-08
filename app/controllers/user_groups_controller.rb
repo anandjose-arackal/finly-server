@@ -1,7 +1,7 @@
 class UserGroupsController < ApplicationController
 
 
-  before_action -> { doorkeeper_authorize! :web}
+  before_action -> { finly_authorize! :web}
 
   def create
     @result = UserGroup::Create.(current_user, params)

@@ -1,16 +1,16 @@
 # == Schema Information
 #
-# Table name: payment_order_types
+# Table name: payment_purposes
 #
 #  id         :integer          not null, primary key
-#  name       :string(255)      not null
+#  name       :string(255)
 #  created_at :datetime         not null
 #  updated_at :datetime         not null
 #
 
 require 'test_helper'
 
-class PaymentOrderTypeTest < ActiveSupport::TestCase
+class PaymentPurposeTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end

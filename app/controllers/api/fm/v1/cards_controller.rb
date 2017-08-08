@@ -1,6 +1,6 @@
 class Api::Fm::V1::CardsController < ApiApplicationController
 
-  before_action -> { doorkeeper_authorize! :api}
+  before_action -> { finly_authorize! :api}
 
   def index
     @result = Card::Index.(current_user, params)

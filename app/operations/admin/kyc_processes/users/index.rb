@@ -17,6 +17,13 @@ class Admin::KycProcesses::Users::Index < Admin::KycProcesses::Users::Base
       add_message :error, 'User is not a reviewer'
       return
     end
+
+    # If the user is kalpesh, do not show once downloaded
+    if is_view?(:itzcash_operations) and self.individual_kycs.present?
+      kyc_ids = self.individual_kycs.pluck(:id)
+      kyc_ids_to_hide = IndividualKycTrack.with_individual_kyc(kyc_ids).with_action(IndividualKycTrackAction.id_for(:download)).with_action_admin_resource(user.id).created_after(24.hours.ago).pluck(:individual_kyc_id)
+      self.individual_kycs = self.individual_kycs.without_id(kyc_ids_to_hide)
+    end
   end
 
   def validate

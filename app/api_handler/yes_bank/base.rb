@@ -33,8 +33,24 @@ class YesBank::Base < BaseHandler
     end
   end
 
+  # because this is common for all Yes Bank API calls
   def process
+    p = self.path
+    begin
+      puts "Posting Path: #{p}"
+      puts "Post Params: #{self.template}"
 
+      self.response = self.connection.post do |req|
+        req.url p
+        req.headers['Content-Type'] = 'application/xml'
+        req.headers['X-IBM-Client-Id'] = client_id
+        req.headers['X-IBM-Client-Secret'] = client_secret
+        req.body = template
+      end
+    rescue Faraday::TimeoutError, Faraday::ConnectionFailed
+      self.timeout = true
+      add_message :error, "Request timed out. Please try again"
+    end
   end
 
   protected
@@ -43,10 +59,10 @@ class YesBank::Base < BaseHandler
     # adding the ssl options here for the request
     # verify certificate only in production
     verify = Rails.env.production? ? true : false
+    # since we're using the default keystore, no need to import Yes Bank's certificates as they're signed
     ssl_options = {
         client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
         client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
-        ca_path: ENV['HOME'] + '/certificates/ybl.pem',
         verify: verify
     }
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|

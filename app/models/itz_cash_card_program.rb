@@ -1,3 +1,4 @@
+
 # == Schema Information
 #
 # Table name: itz_cash_card_programs
@@ -15,7 +16,7 @@ class ItzCashCardProgram < ActiveRecord::Base
 
   scope :with_product_code, -> (product_code) { where product_code: product_code }
 
-  BANKS = {hdfc: 1, rbl: 2, kotak: 3}
+  BANKS = {hdfc: 1, rbl: 2, kotak: 3, rbl_visa: 16}
 
   PROGRAM_DETAILS = [
       {
@@ -41,7 +42,7 @@ class ItzCashCardProgram < ActiveRecord::Base
   ]
 
   def self.seed_data
-    if not Rails.env.production?
+    if Rails.env.production?
       PROGRAM_DETAILS.each do |detail|
         if ItzCashCardProgram.with_product_code(detail[:product_code]).blank?
           ItzCashCardProgram.create(detail)

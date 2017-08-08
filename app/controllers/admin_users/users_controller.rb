@@ -1,7 +1,5 @@
 class AdminUsers::UsersController < ApplicationController
-
-
-  before_action -> { doorkeeper_authorize! :admin}
+  before_action -> { finly_authorize! :admin}
 
   def new
     @states = State.all

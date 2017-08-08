@@ -68,6 +68,20 @@ class ItzCash::AccountDetails < ItzCash::Base
       nil
     end
 
+    def assigned?
+      if distributor_id == card.user&.company.d_code
+        return true
+      end
+      false
+    end
+
+    def upgraded?
+      return false unless assigned?
+      bal = (self.balance or 0)
+      eligibility = (self.available_card_eligibility or 0)
+      (bal + eligibility) > 25000
+    end
+
   end
 
   protected

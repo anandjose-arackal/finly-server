@@ -1,38 +1,42 @@
 class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountManager::BaseAdapter
 
-  attr_accessor :errors, :company
+  attr_accessor :errors, :yes_bank_account
 
-  def initialize(source_id)
-    # here source will be a company
-    init(source_id)
+  def account_class
+    YesBankCompanyAccount
   end
 
-  def init(source_id)
-    self.company = Company.find_by(id: source_id)
+  def credit(payment, options = {})
+    # this will add money to this company's balance
+    balance = self.account.balance.value
+    if self.account.balance.update(value: balance + payment.amount_value)
+      return true
+    end
+    false
   end
 
-  def credit(amount)
+  def debit(payment, options = {})
     # nothing to do here ¯\_(ツ)_/¯
-    return true
-  end
-
-  def debit(amount)
-    # nothing to do here ¯\_(ツ)_/¯
-
+    balance = self.account.balance.value
+    if self.account.balance.update(value: balance - payment.amount_value)
+      return true
+    end
+    false
   end
 
   def balance
     # can either be an operation or a specific call with
     # a model call
+    self.account.balance_value
   end
 
   def creditable_accounts
     # none as this account cannot be credited through Finly (only external)
-    []
+    [nil, "OutsideFinly"]
   end
 
   def debitable_accounts
-    [VendorAccount, "VendorAccount"]
+    [BankAccount]
   end
 
   private

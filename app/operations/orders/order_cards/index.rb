@@ -8,23 +8,18 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
       add_message :error, 'User not found'
       return
     end
-    # if params.blank?
-    #   add_message :error, 'Error loading configuration'
-    #   return
-    # end
   end
 
   def init
     self.params_order_cards = order_cards_params
-
-    # Show all payment_order_types if no id is given
-    if self.params_order_cards[:order_type_ids].empty?
-      self.params_order_cards[:order_type_ids].push(1, 2, 3, 4)
-    end
+    # this is to ensure only payment orders that are processed from the disburse panel show up
+    params[:with_application] = RequestStore.store[:current_app]
   end
 
   def process
-    self.payment_orders = user.company.payment_orders.with_type_id(params_order_cards[:order_type_ids])
+    # self.payment_orders = user.company.payment_orders.with_type_id(params_order_cards[:order_type_ids])
+    # todo payment purpose filter to be implemented here
+    self.payment_orders = user.company.payment_orders
   end
 
   def success
@@ -35,8 +30,13 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
   class Orders::OrderCards::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_orders
 
+    include HasScope
+
+    has_scope :with_application
+
     def init
       self.payment_orders = params[:payment_orders]
+      self.payment_orders = apply_scopes(payment_orders, params)
     end
   end
 end

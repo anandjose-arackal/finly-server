@@ -1,23 +1,13 @@
 class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
 
-  attr_accessor :errors, :card
-
-  def initialize(source_id)
-    init(source_id)
+  def account_class
+    Card
   end
 
-  def init(source_id)
-    self.card = Card.find_by(id: source_id)
-    self.errors = []
-  end
-
-  def name
-    "Card"
-  end
-
-  def credit(payment)
+  def credit(payment, options)
+    super
     # operation that credits a particular card
-    op = ItzCash::Credit.(card.user, {card: card, amount: payment.amount_value})
+    op = ItzCash::Credit.(account.user, {card: account, amount: payment.amount_value})
     unless op.success?
       self.errors = op.messages[:error]
       return false
@@ -25,9 +15,10 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     true
   end
 
-  def debit(payment)
+  def debit(payment, options)
+    super
     # operation that debits a particular card
-    op = ItzCash::Debit.(card.user, {card: card, amount: payment.amount_value})
+    op = ItzCash::Debit.(account.user, {card: account, amount: payment.amount_value})
     unless op.success?
       self.errors = op.messages[:error]
       return false
@@ -36,16 +27,16 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
   end
 
   def balance
-    op = ItzCash::AccountDetails.(card.user, card: card)
+    op = ItzCash::AccountDetails.(account.user, card: account)
     balance = op.balance
   end
 
   def creditable_accounts
-    [Card, "Card", UserWallet, "UserWallet", ItzCashCompanyAccount, "ItzCashCompanyAccount"]
+    [Card, UserWallet, ItzCashCompanyAccount]
   end
 
   def debitable_accounts
-    [Card, "Card", UserWallet, "UserWallet", ItzCashCompanyAccount, "ItzCashCompanyAccount"]
+    [Card, UserWallet, ItzCashCompanyAccount]
   end
 
   def eligibility(payment)

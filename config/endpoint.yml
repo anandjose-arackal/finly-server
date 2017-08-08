@@ -34,7 +34,7 @@ default: &default
     base: 'http://staging.itzcash.com'
     path: 'api/customer/register'
   yes_bank:
-    base: 'https://uatsky.yesbank.in'
+    base: 'https://uatsky.yesbank.in:444'
     path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
 
 
@@ -101,7 +101,6 @@ production:
   itzcash_corporate_balance:
     path: "itzgift/servlet/CorporateBalanceServlet"
   itzcash_card_restriction:
-    base_url: "https://freedomcard.itzcash.com"
     path: "itzgift/servlet/NaradaSetTransactionLimitsServlet"
   itzcash_mcc_group_restriction:
     path: "itzgift/servlet/NaradaSetAdditionalRestrictionsServlet"
@@ -116,6 +115,7 @@ production:
   currency_layer_currency_conversion:
     base: "http://apilayer.net"
     path: "api/historical"
-  generate_customer_id:
-    base: 'http://staging.itzcash.com'
-    path: 'api/customer/register'
+  yes_bank:
+    base: "https://sky.yesbank.in:444"
+    path: "app/live/fundsTransferByCustomerService2"
+

@@ -30,6 +30,8 @@ gem 'crono', '1.0.3'
 gem 'haml'
 gem 'sinatra', require: nil
 
+gem 'request_store', '1.3.2'
+
 # gems for quickbooks integration
 gem 'omniauth'
 gem 'omniauth-quickbooks'
@@ -79,6 +81,8 @@ gem 'handlebars_assets', '0.23.1'
 
 #For pushing notifications
 gem 'gcm', '0.1.1'
+
+gem 'activemodel-associations', '0.2.0'
 
 # Use ActiveModel has_secure_password
 # gem 'bcrypt', '~> 3.1.7'
@@ -139,7 +143,6 @@ gem 'faraday_middleware', '0.11.0.1'
 gem 'liquid'
 
 gem 'hooks', '0.4.1'
-
 
 gem 'bullet', '5.4.2', :group => 'development'
 

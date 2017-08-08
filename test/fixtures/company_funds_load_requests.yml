@@ -11,6 +11,8 @@
 #  remark               :text(65535)
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
+#  bank_type_id         :integer
+#  is_active            :boolean          default(TRUE)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

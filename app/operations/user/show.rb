@@ -21,7 +21,7 @@ class User::Show < User::Base
         elsif self.selected_user.cards.present?
           self.balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true,
               target_user_card: true, current_user_card: true, current_user_wallet: true, virtual_account: true,
-              target_user_cash_in_hand: true, view: params[:view], request: params[:request]).balances
+              target_user_cash_in_hand: true, view: params[:view]).balances
         end
       else
         messages[:error] = operation.messages[:error]

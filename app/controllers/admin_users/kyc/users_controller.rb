@@ -1,15 +1,21 @@
 class AdminUsers::Kyc::UsersController < ApplicationController
 
   before_action :set_tokens_in_header_admin, only: [:export, :download_kycs]
-  before_action -> { doorkeeper_authorize! :admin }
+  before_action -> { finly_authorize! :admin }
 
   def index
     @result = Admin::KycProcesses::Users::Index.(current_user, params)
     respond
   end
 
+  def history_index
+    @result = Admin::KycProcesses::Users::HistoricalIndex.(current_user, params)
+    respond
+  end
+
   def update
-    @result = Admin::Cards::AssignRequests::Update.(current_user, params)
+    formatted_request = RequestFormatter::KycParser::Parse.(current_user, params).formatted_request
+    @result = Admin::KycProcesses::Users::Update.(current_user, formatted_request)
     respond response: @result.success? ? :success : :failure
   end
 

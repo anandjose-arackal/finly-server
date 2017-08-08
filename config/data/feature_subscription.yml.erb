@@ -16,3 +16,4 @@ company:
 user:
   expense_management: <%= current_user.user_panel_subscription.expense_management && current_user.company.expense_management_enabled? %>
   disburse: <%= current_user.user_panel_subscription.disburse && current_user.company.feature_subscription.cards_enabled %>
+  vendor_payments: <%= current_user.user_panel_subscription.yes_bank_account_transfer && current_user.company.feature_subscription.yes_bank_account %>

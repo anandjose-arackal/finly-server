@@ -30,36 +30,48 @@ user:
   mobile_number: <%= current_user.mobile_number %>
   roles:
   <% if current_user.admin? %>
-  - admin
+  - id: admin
+    name: Admin
+    default_url: 'orders'
   <% end %>
   <% if current_user.finance_manager? %>
-  - finance_manager
+  - id: finance_manager
+    name: 'Finance Manager'
+    default_url: 'orders'
   <% end %>
 views:
   <%# if current_user.admin? %>
     admin:
       menus:
         navbar:
-        - name: Individual Payments
-          url: payments
-          id: payments
+#        - name: Individual Payments
+#          url: payments
+#          id: payments
         - name: Payment Orders
           url: orders
           id: orders
-        - name: Users
-          url: users
-          id: users
-        - name: Vendors
-          url: vendors
-          id: 'vendors'
-        - name: Analytics
-          url: analytics
-          id: analytics
+#        - name: Users
+#          url: users
+#          id: users
+#        - name: Vendors
+#          url: vendors
+#          id: 'vendors'
+#        - name: Analytics
+#          url: analytics
+#          id: analytics
         cog:
-        - name: Organization Account
-          url: '#organization_account'
+#        - name: Organization Account
+#          url: '#organization_account'
         - name: Load Company Balance
           url: '#load-company-balance'
-        - name: 'Company Statements'
-          url: '#company_statements'
+        <% if current_user.company.expense_management_enabled? %>
+        - name: Expense Management
+          url: '/'
+        <% end %>
+        <% if current_user.user_panel_subscription.disburse && current_user.company.cards_enabled? %>
+        - name: Employee Cards
+          url: '/disburse'
+        <% end %>
+#        - name: 'Company Statements'
+#          url: '#company_statements'
   <%# end %>

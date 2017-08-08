@@ -5,16 +5,12 @@ class User::Track::Login < BaseOperation
     if user.blank?
       add_message :error, 'User not found'
     end
-    if params&.dig(:request).blank?
-      add_message :error, 'Request not found'
-    end
   end
 
   def init
-    self.request = params[:request]
     request = {
-        ip_address: self.request&.remote_ip,
-        referrer: self.request&.referrer,
+        ip_address: current_request&.remote_ip,
+        referrer: current_request&.referrer,
         application: params&.dig(:application)
     }
     self.login_track = user.user_login_tracks.new request

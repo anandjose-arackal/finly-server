@@ -1,45 +1,38 @@
 class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountManager::BaseAdapter
 
-  attr_accessor :errors, :company_account
-
-  def initialize(source_id)
-    # here source will be a company
-    init(source_id)
+  def account_class
+    ItzCashCompanyAccount
   end
 
-  def init(source_id)
-    self.company_account = ItzCashCompanyAccount.find_by(id: source_id)
-  end
-
-  def credit(amount)
+  def credit(payment, options = {})
     # nothing to do here ¯\_(ツ)_/¯
     return true
   end
 
-  def debit(amount)
+  def debit(payment, options = {})
     # nothing to do here ¯\_(ツ)_/¯
     return true
   end
 
   def balance
-    op = ItzCash::VirtualAccountBalance.(company_account.company)
-    balance = op.wallets.first[:balance] # original balance from ItzCash's servers
-    wallets_total = company_account.total_wallet_balance
-    blocked_amount = company_account.blocked_amount_for_pending_payments
-    balance - wallets_total - blocked_amount
+    op = ItzCash::VirtualAccountBalance.(account.company)
+    if op.success?
+      balance = op.wallets.first[:balance] # original balance from ItzCash's servers
+      wallets_total = account.total_wallet_balance
+      blocked_amount = account.blocked_amount_for_pending_payments
+      return (balance - wallets_total - blocked_amount)
+    else
+      self.errors << "Could not fetch company credits. Try again later"
+      return false
+    end
   end
 
   def creditable_accounts
-    [Card, "Card", UserWallet, "UserWallet"]
+    [Card, UserWallet]
   end
 
   def debitable_accounts
-    [Card, "Card", UserWallet, "UserWallet"]
+    [Card, UserWallet]
   end
 
-  private
-
-  def blocked_amount_for_payments
-
-  end
 end

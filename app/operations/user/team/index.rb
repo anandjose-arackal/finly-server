@@ -19,9 +19,10 @@ class User::Team::Index < User::Team::Base
   has_scope :having_wallet_balance
   has_scope :with_cards_having_card_program, type: :array
   has_scope :filter_group
-  has_scope :fitler_team
+  has_scope :filter_team
   has_scope :filter_disburse
   has_scope :filter_expense_management
+  has_scope :yes_bank_account_transfer
 
   def pre_validate
     unless user.present?
@@ -73,16 +74,12 @@ class User::Team::Index < User::Team::Base
 
   def configure_expense_management
     # if the url does not include 'disburse' we know it's from expense management, and we only need users enabled for expense management
-    if is_expense_management_panel?
-      params[:filter_expense_management] = '1'
-    end
+    params[:filter_expense_management] = '1'
   end
 
   def configure_disburse
     # adding filters so that only users subscribed to disburse will be shown in the disburse panel
-    if is_disburse_panel?
-      params[:filter_disburse] = '1'
-    end
+    params[:filter_disburse] = '1'
   end
 
   def process
