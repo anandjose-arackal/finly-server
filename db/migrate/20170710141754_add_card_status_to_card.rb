@@ -25,6 +25,6 @@ class AddCardStatusToCard < ActiveRecord::Migration
         card.update(card_status_id: CardStatus.id_for(:assigned))
       end
     end
-    change_column_null :cards, :card_status_id, false
+    change_column_null :cards, :card_status_id, false, 0
   end
 end
