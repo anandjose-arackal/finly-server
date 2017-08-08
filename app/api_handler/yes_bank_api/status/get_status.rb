@@ -1,7 +1,7 @@
 # this API retrieves the balance of Finly's current account as a whole
 # which is the sum of all accounts we are maintaining in the system
 
-class YesBank::Status::GetStatus < YesBank::Base
+class YesBankApi::Status::GetStatus < YesBankApi::Base
 
   attr_accessor :request_reference_number, :request_status, :transaction_status,
                 :bank_error_message
@@ -57,14 +57,14 @@ class YesBank::Status::GetStatus < YesBank::Base
 
   def success
     params[:request_status] = request_status
-    YesBank::Transfer::BankTransfer::TransactionSuccessPresenter.new(transfer_request)
+    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(transfer_request)
   end
 
   def failure
 
   end
 
-  class YesBank::Transfer::BankTransfer::SuccessStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class YesBankApi::Transfer::BankTransfer::SuccessStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :transfer_request
 
