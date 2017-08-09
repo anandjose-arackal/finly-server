@@ -98,6 +98,15 @@ class Report::Base < BaseOperation
       report.total_amount(:non_reimbursable)
     end
 
+    def has_custom_fields?
+      self.expenses&.each do |expense|
+        if expense.has_custom_fields?
+          return true
+        end
+      end
+      false
+    end
+
     def expenses_category_sorted
       categorized_expenses = []
       self.categories.each do |category|
@@ -105,14 +114,7 @@ class Report::Base < BaseOperation
         if item_expenses.present?
           item_name = category.name
           item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
-          has_custom_fields = false
-          item_expenses.all.each do |expense|
-            if expense.has_custom_fields?
-              has_custom_fields = true
-              break
-            end
-          end
-          categorized_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum, has_custom_fields: has_custom_fields}
+          categorized_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
         end
       end
       categorized_expenses
@@ -126,14 +128,7 @@ class Report::Base < BaseOperation
         if item_expenses.present?
           item_name = DateUtils.date_formatted date
           item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
-          has_custom_fields = false
-          item_expenses.all.each do |expense|
-            if expense.has_custom_fields?
-              has_custom_fields = true
-              break
-            end
-          end
-          date_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum, has_custom_fields: has_custom_fields}
+          date_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
         end
       end
       date_expenses
