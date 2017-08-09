@@ -150,7 +150,7 @@ class ReportComment < ActiveRecord::Base
       when ReportCommentAction.id_for(:expense_reject)
         # Expense reject
         comment = "#{name} rejected the #{type} expense #{merchant}"
-        if expense.note.present?
+        if content.present?
           comment += " with a note : #{content}"
         end
       when ReportCommentAction.id_for(:expense_update)
