@@ -65,8 +65,9 @@ else
   sorted_expenses = @result.expenses_category_sorted
 end
 
+json.has_custom_fields @result.has_custom_fields?
 json.expense_sections sorted_expenses do |category|
-  json.extract! category, :section_name, :section_total, :has_custom_fields
+  json.extract! category, :section_name, :section_total
   json.expenses category[:expenses] do |expense|
     json.extract! expense, :id, :merchant_name, :amount_value, :expense_type_id, :category_name,
                            :distance_value, :distance_rate_value, :time_value, :time_rate_value
