@@ -21,3 +21,4 @@ Crono.perform(TaxBenefitProcess).every 1.day, at: {hour: 00, min: 25}
 Crono.perform(FetchCurrencyConversionRates).every 1.day, at: {hour: 05, min: 35}
 Crono.perform(UpdateConvertedAmountValues).every 1.day, at: {hour: 05, min: 40}
 Crono.perform(AdminPanelVerifierMailer).every 1.hour
+Crono.perform(BankTransferStatusChecker).every 1.hour

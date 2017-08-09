@@ -62,7 +62,7 @@ module Constants
   #########################
 
   if Rails.env.production?
-    TRANSCRIBER_EMAILS = %w(veekshith.rai@finly.io vivek.a@finly.io anushrut.khare@finly.io)
+    TRANSCRIBER_EMAILS = %w(veekshith.rai@finly.io vivek.a@finly.io anushrut.khare@finly.io abhinandanyadavg@gmail.com)
   else
     TRANSCRIBER_EMAILS = ['sreeram.nr@finly.io']
   end
@@ -217,5 +217,11 @@ module Constants
                    306 => 'Card Activation was successful. Error during reload',
                    307 => 'Card is already activated',
                    3100 => 'Transaction is already confirmed'}
+  end
+
+  class Constants::YesBank
+    PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
+    FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
+    SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
   end
 end

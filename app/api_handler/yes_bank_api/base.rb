@@ -1,4 +1,4 @@
-class YesBank::Base < BaseHandler
+class YesBankApi::Base < BaseHandler
 
   attr_accessor :client_id, :client_secret, :auth_username,
                 :auth_password, :template, :config_path, :application_id,
@@ -78,6 +78,6 @@ class YesBank::Base < BaseHandler
 
   def load_soap_template
     action = yes_bank_action
-    self.template = Liquid::Template.parse(File.read("#{Rails.root}/app/api_handler/yes_bank/templates/#{action}.hbs"))
+    self.template = Liquid::Template.parse(File.read("#{Rails.root}/app/api_handler/yes_bank_api/templates/#{action}.hbs"))
   end
 end

@@ -211,6 +211,10 @@ class Company < ActiveRecord::Base
     self.feature_subscription.itz_cash_d_code_enabled
   end
 
+  def cards_enabled?
+    expense_card_enabled? || medical_card_enabled? || reimbursement_card_enabled? || gift_card_enabled? || gift_voucher_enabled?
+  end
+
   def vendor_payments_enabled?
     self.feature_subscription.yes_bank_account
   end

@@ -5,8 +5,16 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   attr_accessor :bank_transaction
 
+  def self.call(bank_transaction)
+    self.new(bank_transaction).run
+  end
+
   def initialize(bank_transaction)
     self.bank_transaction = bank_transaction
+  end
+
+  def authorized_user_types
+    []
   end
 
   def pre_validate
@@ -19,17 +27,28 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   end
 
+  def validates
+    # confirm that the bank transaction is, in fact in processing state
+    unless bank_transaction.processing?
+      add_message :error, "This transaction is not in processing state"
+      return
+    end
+  end
+
   def process
     params = {
-        bank_transaction: bank_transaction.unique_request_number
+        request_reference_number: bank_transaction.unique_request_number
     }
-    op = YesBank::Status::GetStatus.(params)
+    op = YesBankApi::Status::GetStatus.(params)
     if op.success?
-      if op.request_status.downcase == "completed"
+      if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
-      elsif op.request_status.downcase == "sent_to_beneficiary"
+        bank_transaction.payment&.update(payment_status_id: PaymentStatus.id_for(:completed))
+      elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
-      elsif op.request_status.downcase == "failed"
+        bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+      elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+        bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
       else
         # do nothing?

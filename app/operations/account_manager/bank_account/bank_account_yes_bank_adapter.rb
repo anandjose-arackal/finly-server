@@ -5,6 +5,10 @@
 
 class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::BaseAdapter
 
+  PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
+  FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
+  SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+
   attr_accessor :errors, :company
 
   def account_class
@@ -16,13 +20,13 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     transfer_type = options[:bank_transfer_type]
     # this will be done by creating the respective payment request for the bank account
     transfer_request = create_transfer_request(payment, transfer_type)
-    op = YesBank::Transfer::BankTransfer.(transfer_request)
+    op = YesBankApi::Transfer::BankTransfer.(transfer_request)
     if op.success?
       # logic for setting whether a particular payment was successful or is processing
-      if op.transfer_request.transaction_result == "COMPLETED"
+      if SUCCESSFUL_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
         create_bank_transaction(payment, op.transfer_request)
-      elsif op.transfer_request.transaction_result == "SENT_TO_BENEFICIARY"
+      elsif PROCESSING_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_bank_transaction(payment, op.transfer_request)
       elsif op.transfer_request.transaction_result.nil?
@@ -64,7 +68,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   private
 
   def create_bank_transaction(payment, transfer_request)
-    self.company = account.company
+    self.company = account.account_owner.company
     case payment.payment_status_id
       when PaymentStatus.id_for(:completed)
         transfer_status_id = BankTransferStatus.id_for(:completed)
@@ -73,7 +77,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       else
         transfer_status_id = BankTransferStatus.id_for(:failed)
     end
-    bt = company.bank_transactions.build(unique_request_number: transfer_request.unique_request_number,
+    bt = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
                                          transfer_type: transfer_request.transfer_type,
                                          bank_reference_number: transfer_request.bank_reference_number,
                                          beneficiary_bank_account: self.account,
@@ -81,7 +85,8 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
                                          amount_attributes: {
                                              value: payment.amount_value,
                                              currency_id: Currency.first.id
-                                         }).save
+                                         })
+    payment.update(reference_resource: bt)
   end
 
   def create_transfer_request(payment, transfer_type)
