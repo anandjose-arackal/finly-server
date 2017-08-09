@@ -20,7 +20,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     transfer_type = options[:bank_transfer_type]
     # this will be done by creating the respective payment request for the bank account
     transfer_request = create_transfer_request(payment, transfer_type)
-    op = YesBank::Transfer::BankTransfer.(transfer_request)
+    op = YesBankApi::Transfer::BankTransfer.(transfer_request)
     if op.success?
       # logic for setting whether a particular payment was successful or is processing
       if SUCCESSFUL_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
@@ -28,6 +28,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         create_bank_transaction(payment, op.transfer_request)
       elsif PROCESSING_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        create_system_message_for_processing(payment)
         create_bank_transaction(payment, op.transfer_request)
       elsif op.transfer_request.transaction_result.nil?
         # i.e. there was an error processing the transaction
@@ -77,16 +78,22 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       else
         transfer_status_id = BankTransferStatus.id_for(:failed)
     end
-    bt = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
+    bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
                                          transfer_type: transfer_request.transfer_type,
                                          bank_reference_number: transfer_request.bank_reference_number,
                                          beneficiary_bank_account: self.account,
                                          transfer_status_id: transfer_status_id,
+                                         bank_response: transfer_request.transaction_result,
                                          amount_attributes: {
                                              value: payment.amount_value,
                                              currency_id: Currency.first.id
                                          })
-    payment.update(reference_resource: bt)
+    payment.update(reference_resource: bank_transaction)
+  end
+
+  def create_system_message_for_processing(payment)
+    payment.system_messages.create(system_message_type_id: SystemMessageType.id_for(:info),
+                                  content: "Payment processed. Awaiting credit confirmation")
   end
 
   def create_transfer_request(payment, transfer_type)

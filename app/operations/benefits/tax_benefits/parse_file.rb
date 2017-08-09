@@ -37,7 +37,7 @@ class Benefits::TaxBenefits::ParseFile < Benefits::TaxBenefits::Base
   end
 
   def failure
-    self.response_presenter
+    self.response_presenter || super
   end
 
 end

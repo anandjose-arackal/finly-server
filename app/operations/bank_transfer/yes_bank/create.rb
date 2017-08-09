@@ -21,6 +21,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
     end
     unless user.valid_password?(params[:password])
       add_message :error, 'Invalid Password'
+      return
     end
   end
 
@@ -84,7 +85,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
 
   def failure
     params[:payment_order] = self.payment_order
-    BankTransfer::YesBank::Create::SuccessPresenter.new(user, params, messages)
+    BankTransfer::YesBank::Create::FailurePresenter.new(user, params, messages)
   end
 
   class BankTransfer::YesBank::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter

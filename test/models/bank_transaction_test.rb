@@ -13,6 +13,7 @@
 #  transfer_status_id          :integer
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
+#  bank_response               :string(255)
 #
 
 require 'test_helper'

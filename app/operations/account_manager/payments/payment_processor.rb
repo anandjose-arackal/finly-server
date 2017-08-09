@@ -36,12 +36,13 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       add_message :error, payment_order.errors.full_messages
       return
     end
+
   end
 
   def validate
     # Call the payment validator class that validates the payment order
     op = AccountManager::Payments::PaymentValidator.(payment_order)
-    
+
     unless op.success?
       add_message :error, op.messages[:error]
     end
@@ -141,6 +142,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
           receiving_account_id: pi.receiving_account_id,
           payment_status_id: pi.payment_status_id,
           payment_purpose_id: pi.payment_purpose_id,
+          payment_mode: payment_request.bank_transfer_type,
           amount_attributes: {
               value: pi.amount,
               currency_id: pi.currency_id

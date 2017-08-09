@@ -78,7 +78,7 @@ class PaymentOrder < ActiveRecord::Base
   scope :with_id, -> (id) { where id: id }
   scope :with_status, ->(status_id) { where payment_order_status_id: status_id }
   scope :scheduled, -> { with_status(PaymentOrderStatus.id_for(:scheduled)) }
-  scope :scheduled_on_or_before, -> (date) { where 'scheduled_at <= ?', date }
+  scope :scheduled_on_or_before, -> (date) { where('scheduled_at <= ?', date).where(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled)) }
   scope :joins_amount_requested, -> { joins :amount_requested }
   scope :total_amount_requested, -> { joins_amount_requested.sum(:value) }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
@@ -110,6 +110,15 @@ class PaymentOrder < ActiveRecord::Base
 
   def debit?
     self.payments.first.payment_type_id == PaymentType.id_for(:debit)
+  end
+
+  def payment_order_status_name
+    case self.payment_order_status_id
+      when PaymentOrderStatus.id_for(:processing)
+        return "Transaction successful. Awaiting confirmation"
+      else
+        self.payment_order_status.name.humanize
+    end
   end
 
 end

@@ -8,13 +8,16 @@ class Admin::FundsLoadRequests::Approve < Admin::Base
       return
     end
     self.company = funds_load_request.company
+  end
+
+  def validate
 
   end
 
   def process
     # Add Company Balance for the particular company
     self.payment_request = PaymentRequest.(user, nil, company.yes_bank_company_account.class.name, :credit, :corporate_balance_load, company_id: self.company.id)
-    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(nil, receiving_account, self.funds_load_request.amount.value))
+    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(nil, company.yes_bank_company_account, self.funds_load_request.amount.value))
 
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     unless op.success?

@@ -9,6 +9,7 @@
 #
 
 
+
 class PaymentType < ActiveRecord::Base
   include Seedable
 

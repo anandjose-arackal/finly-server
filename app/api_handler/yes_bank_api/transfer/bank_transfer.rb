@@ -1,7 +1,8 @@
-class YesBank::Transfer::BankTransfer < YesBank::Base
+class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
   attr_accessor :account_number, :transaction_result, :error_message, :transfer_request
 
+  # in this context, success would imply one of these transactions
   SUCCESS_RESPONSE_CODES = ["COMPLETED", "SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
 
   def initialize(transfer_request)
@@ -68,14 +69,14 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
   end
 
   def success
-    YesBank::Transfer::BankTransfer::TransactionSuccessPresenter.new(transfer_request)
+    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(transfer_request)
   end
 
   def failure
-    YesBank::Transfer::BankTransfer::TransactionFailurePresenter.new(transfer_request)
+    YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter.new(transfer_request)
   end
 
-  class YesBank::Transfer::BankTransfer::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :transfer_request
 
@@ -84,7 +85,7 @@ class YesBank::Transfer::BankTransfer < YesBank::Base
     end
   end
 
-  class YesBank::Transfer::BankTransfer::TransactionFailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :transfer_request
 

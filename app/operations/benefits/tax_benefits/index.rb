@@ -15,8 +15,8 @@ class Benefits::TaxBenefits::Index < Benefits::TaxBenefits::Base
   end
 
   def init
-    # self.payment_orders = user.company.payment_orders.with_type_id(payment_order_type_id)
     self.payment_orders = user.company.payment_orders
+    params[:nwith_application] = RequestStore.store[:current_app].to_s
   end
 
   def success
