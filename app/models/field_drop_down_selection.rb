@@ -11,6 +11,14 @@
 class FieldDropDownSelection < ActiveRecord::Base
   has_one :custom_field, as: :value
   has_one :field_configuration, as: :default_value
+  belongs_to :value, class_name: 'FieldDropDownItem'
 
   validates :value_id, presence: true
+
+  def as_json(options={})
+    {
+        id: value_id,
+        name: value&.name
+    }
+  end
 end
