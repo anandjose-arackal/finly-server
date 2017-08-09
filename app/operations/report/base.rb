@@ -105,7 +105,14 @@ class Report::Base < BaseOperation
         if item_expenses.present?
           item_name = category.name
           item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
-          categorized_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
+          has_custom_fields = false
+          item_expenses.all.each do |expense|
+            if expense.has_custom_fields?
+              has_custom_fields = true
+              break
+            end
+          end
+          categorized_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum, has_custom_fields: has_custom_fields}
         end
       end
       categorized_expenses
@@ -119,7 +126,14 @@ class Report::Base < BaseOperation
         if item_expenses.present?
           item_name = DateUtils.date_formatted date
           item_sum = precision_value item_expenses.with_amount.sum(report.base_currency_code)
-          date_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum}
+          has_custom_fields = false
+          item_expenses.all.each do |expense|
+            if expense.has_custom_fields?
+              has_custom_fields = true
+              break
+            end
+          end
+          date_expenses << {section_name: item_name, expenses: item_expenses, section_total: item_sum, has_custom_fields: has_custom_fields}
         end
       end
       date_expenses
@@ -139,13 +153,13 @@ class Report::Base < BaseOperation
         elsif self.report.processing? and self.report.controlling_user?(user)
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
           actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
-          actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])} 
+          actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}
         end
       elsif finance_view? or manager_view?
         if self.report.processing? and self.report.controlling_user?(user)
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
           actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
-          actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])} 
+          actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}
         elsif (self.report.can_unapprove?) and Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.controlling_user).include?(user)
           actions[:unapprove] = {url: Rails.application.routes.url_helpers.report_unapprove_path(report_id: report.id, view: params[:view])}
         end
@@ -155,7 +169,7 @@ class Report::Base < BaseOperation
           actions[:delete] = {url: Rails.application.routes.url_helpers.report_path(id: report.id, view: params[:view])}
           actions[:editable] = {value: true}
           actions[:submit] = {url: Rails.application.routes.url_helpers.report_submit_path(report_id: report.id, view: params[:view])}
-          actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])} 
+          actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}
         elsif self.report.processing?
           actions[:retract] = {url: Rails.application.routes.url_helpers.report_retract_path(report_id: report.id, view: params[:view])}
         elsif self.report.settled?
