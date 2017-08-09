@@ -124,9 +124,9 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       return
     end
 
-    # creating the payment trail for this particular transaction
-
+    # creating the payment trail for this particular transaction (if it was successful i.e.)
     create_payment_trail
+
     # todo - probably should be moved to the adapter itself
     if payment.in_progress?
       # i.e. if the payment was not modified in any way during the execution, update it here.
@@ -150,7 +150,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   private
 
   def create_payment_trail
-
+    # is this even necessary now?
   end
 
 end
