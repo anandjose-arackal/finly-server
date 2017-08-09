@@ -1,4 +1,4 @@
-development:
+default: &default
   client_id: '7b1f3f3e-c77a-445f-8471-1fe808b7836c'
   client_secret: 'eI5bR5yL5tT3jO0yP0wO8cT1xI4dD7uS1mU3rW8nN1bN0iI2iM'
   username: 'testclient'
@@ -7,11 +7,14 @@ development:
   application_id: '448995'
   customer_id: '448995'
 
+development:
+  <<: *default
+
 itzcash_uat:
-  <<: *development
+  <<: *default
 
 staging:
-  <<: *development
+  <<: *default
 
 production:
   client_id: '698b59d5-6f22-4e16-818c-32ccb2f0cfab'
