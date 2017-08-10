@@ -1,6 +1,5 @@
 class StatementsController < ApplicationController
 
-
   before_action -> { finly_authorize! :web}
 
   def index
@@ -49,4 +48,10 @@ class StatementsController < ApplicationController
       format.json {}
     end
   end
+
+  def show_new
+    @result = Statement::Show.(current_user, params)
+    respond
+  end
+
 end

@@ -109,6 +109,54 @@ class Statement::Show < BaseOperation
       end
     end
 
+    def has_transactions_tab?
+      self.account.class.name == 'Card'
+    end
+
+    def payment_type(payment)
+      if payment.initiating_account == self.account
+        payment.credit? ? 'Sent' : 'Received'
+      else
+        payment.credit? ? 'Received' : 'Sent'
+      end
+    end
+
+    def purpose(payment)
+      payment.purpose.name.humanize
+    end
+
+    def merchant(payment)
+      if payment.initiating_account == self.account
+        if payment.credit?
+          "To #{payment.receiving_user.name}'s #{payment.receiving_account.name}"
+        else
+
+        end
+      else
+        if payment.credit?
+
+        else
+
+        end
+      end
+    end
+
+    def credit(payment)
+      if payment.initiating_account == self.account
+        payment.debit? ? payment.amount.value : nil
+      else
+        payment.debit? ? nil : payment.amount.value
+      end
+    end
+
+    def debit(payment)
+      if payment.initiating_account == self.account
+        payment.credit? ? payment.amount.value : nil
+      else
+        payment.credit? ? nil : payment.amount.value
+      end
+    end
+
   end
 
 end
