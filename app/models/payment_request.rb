@@ -43,7 +43,8 @@ class PaymentRequest < NonPersistentModel
                  scheduled_at: options[:scheduled_at],
                  currency_id: options[:currency_id],
                  background: !!options[:background],
-                 bank_transfer_type: options[:bank_transfer_type]
+                 bank_transfer_type: options[:bank_transfer_type],
+                 company_id: options[:company_id]
              })
   end
 

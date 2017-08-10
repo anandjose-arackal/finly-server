@@ -1,5 +1,7 @@
 json.data do
   payment_order = @result.payment_order
+  json.bank_transfer_type @result.payment_order.payments&.first&.payment_mode
+  json.payment_type payment_order.payments.first&.payment_type&.name
   json.created_at DateUtils.date_formatted payment_order.created_at
   json.scheduled_at DateUtils.date_formatted payment_order.scheduled_at
   json.processed_at DateUtils.date_formatted payment_order.processed_at

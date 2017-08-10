@@ -22,7 +22,7 @@ class Settlement::Show < Settlement::Base
   end
 
   def configure_expense_management
-    params[:with_application] = RequestStore.store[:current_app]
+    params[:with_application] = RequestStore.store[:current_app].to_s
   end
 
   def process
@@ -56,9 +56,11 @@ class Settlement::Show < Settlement::Base
   class Settlement::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :selected_user, :items, :type
 
+    has_scope :with_application
+
     def init
       self.selected_user = params[:selected_user]
-      self.items = (params[:reports] or params[:payments] or params[:money_requests])
+      self.items = (params[:reports] or apply_scopes(params[:payments], params) or params[:money_requests])
       self.type = params[:type]
     end
 
