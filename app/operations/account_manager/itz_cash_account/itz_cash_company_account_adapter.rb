@@ -4,6 +4,10 @@ class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountMana
     ItzCashCompanyAccount
   end
 
+  def name
+    "Company Credits"
+  end
+
   def credit(payment, options = {})
     # nothing to do here ¯\_(ツ)_/¯
     return true

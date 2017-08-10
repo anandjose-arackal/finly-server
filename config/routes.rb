@@ -853,6 +853,14 @@
 #                                                         PATCH  /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#update
 #                                                         PUT    /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#update
 #                                                         DELETE /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#destroy
+#                                   bank_transfer_vendors GET    /bank_transfer/vendors(.:format)                                                bank_transfer/vendors#index
+#                                                         POST   /bank_transfer/vendors(.:format)                                                bank_transfer/vendors#create
+#                                new_bank_transfer_vendor GET    /bank_transfer/vendors/new(.:format)                                            bank_transfer/vendors#new
+#                               edit_bank_transfer_vendor GET    /bank_transfer/vendors/:id/edit(.:format)                                       bank_transfer/vendors#edit
+#                                    bank_transfer_vendor GET    /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#show
+#                                                         PATCH  /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#update
+#                                                         PUT    /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#update
+#                                                         DELETE /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#destroy
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format) admin_users/funds_load_requests#approve
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#index
 #                                                         POST   /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#create
@@ -2087,6 +2095,7 @@ Rails.application.routes.draw do
     resources :payment_orders do
 
     end
+    resources :vendors
   end
 
 
