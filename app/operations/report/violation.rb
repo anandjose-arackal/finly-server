@@ -305,7 +305,7 @@ class Report::Violation < Report::Base
   end
 
   def check_custom_fields(expense)
-    exp = (expense.card_expense || expense.manual_expense || expense.distance_expense || expense.manual_expense)
+    exp = expense.sub_expense
     valid = CustomField::Validate.(exp)
     unless valid.success?
       valid.messages[:error]&.each do |message|

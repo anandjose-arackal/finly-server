@@ -39,7 +39,7 @@ class Settlement::Report::Approved < Report::Base
     total_card_amount = report.total_amount(:only_card_expenses)
 
     total_non_reimbursable_amount = report.total_amount(:non_reimbursable) - total_card_amount
-
+    
     currency = Currency.first
     balance_sheet.add_approved_reports_total total_reimbursable_amount, currency
 
@@ -55,9 +55,8 @@ class Settlement::Report::Approved < Report::Base
         return
       end
     else
-      reimbursable_amount = report.reimbursable_expenses_total
-      unless reimbursable_amount.update_attributes(value: total_reimbursable_amount, currency: Currency.first)
-        messages[:error] = reimbursable_amount.errors.full_messages
+      unless report.reimbursable_expenses_total.update_attributes(value: total_reimbursable_amount, currency: Currency.first)
+        messages[:error] = report.errors.full_messages
         return
       end
     end
@@ -74,9 +73,8 @@ class Settlement::Report::Approved < Report::Base
         return
       end
     else
-      non_reimbursable_amount = report.non_reimbursable_expenses_total
-      unless non_reimbursable_amount.update_attributes(value: non_reimbursable_amount, currency: Currency.first)
-        messages[:error] = non_reimbursable_amount.errors.full_messages
+      unless report.non_reimbursable_expenses_total.update_attributes(value: total_non_reimbursable_amount, currency: Currency.first)
+        messages[:error] = report.errors.full_messages
         return
       end
     end
@@ -93,9 +91,8 @@ class Settlement::Report::Approved < Report::Base
         return
       end
     else
-      card_amount = report.card_expenses_total
-      unless card_amount.update_attributes(value: total_card_amount, currency: Currency.first)
-        messages[:error] = card_amount.errors.full_messages
+      unless report.card_expenses_total.update_attributes(value: total_card_amount, currency: Currency.first)
+        messages[:error] = report.errors.full_messages
         return
       end
     end
