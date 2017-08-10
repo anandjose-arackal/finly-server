@@ -194,8 +194,8 @@ class Card::Transaction::Create < BaseOperation
     if card.expense_card?
       Event::ECard::ETransaction::Create.(self.user, params)
     end
-    # trigger auto reload of the card to match the amount in the config
-    if type == 'DEBIT' && %w(POS ATM ECOM).include?(mode)
+    # trigger auto reload of the card to match the amount in the config - IF the user has auto reload configuration enabled
+    if type == 'DEBIT' && %w(POS ATM ECOM).include?(mode) && user.auto_reload_config.enabled
       # check if auto reload needs to be performed for this particular card
       card_balance_value = ItzCash::AccountDetails.(user, {card: card}).balance rescue 0
       if user.auto_reload_config.enabled && user.auto_reload_config.minimum_balance_value > card_balance_value

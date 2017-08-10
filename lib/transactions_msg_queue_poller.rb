@@ -1,6 +1,5 @@
 class TransactionsMsgQueuePoller
 
-
   def self.run
 
     username = ENV["MSG_QUEUE_USERNAME"]
@@ -31,24 +30,26 @@ class TransactionsMsgQueuePoller
 
       data = message.body.split(delimiter)
 
-      transaction_timestamp = DateUtils.datetime_in_ist(data[1]) rescue nil
-      transaction_amount = data[2] rescue nil
+      transaction_timestamp = nil
+      transaction_amount = nil
       if data.present? and data[0].downcase == 'failed'
         # Failed transaction
         # Format: FAILED, TimeStamp, Amount, RequestType, MerchantKey, MerchantName, ResponseCode, SerialID, ProductCode, AcquirerID, MID, TID, MCC, ErrorMessage
         success = false
-        reference_id = nil
-        transaction_type = data[3]
-        itzcash_merchant_key = data[4]
-        merchant_name = data[5]
-        response_code = data[6]
-        serial_id = data[7]
-        product_code = data[8]
-        acquirer_id = data[9]
-        mid = data[10]
-        tid = data[11]
-        mcc_code = data[12]
-        transaction_message = data[13]
+        reference_id = data[1]
+        transaction_timestamp = self.parse_timestamp(data[2])
+        transaction_amount = data[3]
+        transaction_type = data[4]
+        itzcash_merchant_key = data[5]
+        merchant_name = data[6]
+        response_code = data[7]
+        serial_id = data[8]
+        product_code = data[9]
+        acquirer_id = data[10]
+        mid = data[11]
+        tid = data[12]
+        mcc_code = data[13]
+        transaction_message = data[14]
         billing_amount = nil
         auth_transaction_id = nil
         transaction_mode = nil
@@ -59,6 +60,8 @@ class TransactionsMsgQueuePoller
         # Successful transactions
         success = true
         reference_id = data[0] rescue nil
+        transaction_timestamp = data[1] rescue nil
+        transaction_amount = data[2]
         billing_amount = data[3] rescue nil
         auth_transaction_id = data[4] rescue nil
         transaction_mode = data[5] rescue nil
@@ -143,6 +146,16 @@ class TransactionsMsgQueuePoller
 
     # disconnect from the client before exiting
     client.disconnect
+  end
+
+  def self.parse_timestamp(string)
+    year = Date.today.year
+    month = string[0..1]&.to_i
+    day = string[2..3]&.to_i
+    hour = string[4..5]&.to_i
+    minute = string[6..7]&.to_i
+    second = string[8..9]&.to_i
+    timestamp = DateTime.new(year, month, day, hour, minute, second, 'IST') rescue nil
   end
 
 end

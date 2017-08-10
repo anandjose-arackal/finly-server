@@ -61,7 +61,7 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     error_messages = []
     payment_order.payments.each do |payment|
       op = AccountManager::Payments::PaymentExecutor.(payment, options)
-      if op.success? && ((payment.payment_status_id == PaymentStatus.id_for(:completed)) || (payment.payment_status_id == PaymentStatus.id_for(:processing)))
+      if op.success? && (payment.payment_status_id == PaymentStatus.id_for(:completed)) || (payment.payment_status_id == PaymentStatus.id_for(:processing))
         processed_amount += payment.amount_value
         succeeded_transactions = true
       else
@@ -69,14 +69,14 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
         error_messages += op.messages[:error] if op.messages[:error].present?
       end
     end
-    payment_order.update(amount_processed_attributes: {value: processed_amount,
+    payment_order.reload.update(amount_processed_attributes: {value: processed_amount,
                                                        currency_id: payment_order.currency_id},
                          processed_at: DateUtils.local_date_time)
 
     # Check if all transactions have passed successfully, or if it is a partial success or if its a complete failure
     if failed_transactions and not succeeded_transactions
       # Failed
-      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
+      payment_order.reload.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
       if error_messages.present?
         add_message :error, error_messages.uniq
       else
@@ -84,11 +84,11 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
       end
     elsif not failed_transactions and succeeded_transactions
       # Completed
-      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+      payment_order.reload.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
       add_message :success, 'Funds transferred successfully'
     else
       # Partially Completed
-      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
+      payment_order.reload.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
       add_message :error, 'Some payments have failed'
       add_message :error, error_messages
     end
