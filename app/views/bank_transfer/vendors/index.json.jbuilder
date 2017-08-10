@@ -1,4 +1,5 @@
 json.array!(@result.vendors) do |vendor|
+  json.id vendor.id
   json.name vendor.name
   json.email vendor.email
   json.mobile_number vendor.mobile_number
