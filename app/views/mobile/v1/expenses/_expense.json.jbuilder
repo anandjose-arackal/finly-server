@@ -38,17 +38,8 @@ json.receipts expense.receipts.each do |receipt|
   json.normal receipt.image(:normal)
   json.thumb receipt.image(:thumb)
 end
-# if expense.distance_expense?
-#   json.locations expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
-# end
-
-if @result.expense.distance_expense?
-  json.array! @result.expense&.distance_expense&.locations&.each do |location|
-    if location.latitude.present? and location.longitude.present?
-      json.extract! location, :name, :address, :latitude, :longitude, :order, :maps_id
-    end
-  end
-  # json.locations @result.expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
+if expense.distance_expense?
+  json.locations expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
 end
 json.custom_fields do
   case expense.expense_type_id
