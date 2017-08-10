@@ -74,11 +74,11 @@ class Report::Index < Report::Base
   class Report::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :reports, :counts, :paginated_reports
 
-    has_scope :filter_search
-    has_scope :filter_status
-    has_scope :filter_user_id
-    has_scope :filter_date, using: [:from, :to], type: :hash
-    has_scope :filter_policy
+    # has_scope :filter_search
+    # has_scope :filter_status
+    # has_scope :filter_user_id
+    # has_scope :filter_date, using: [:from, :to], type: :hash
+    # has_scope :filter_policy
 
     def init
       self.reports = params[:reports]
