@@ -69,7 +69,7 @@ views:
           url: '/'
         <% end %>
         <% if current_user.user_panel_subscription.disburse && current_user.company.cards_enabled? %>
-        - name: Employee Cards
+        - name: Fund Disbursement
           url: '/disburse'
         <% end %>
 #        - name: 'Company Statements'

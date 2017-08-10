@@ -13,7 +13,7 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
   def init
     self.params_order_cards = order_cards_params
     # this is to ensure only payment orders that are processed from the disburse panel show up
-    params[:with_application] = RequestStore.store[:current_app]
+    params[:with_application] = RequestStore.store[:current_app].to_s
   end
 
   def process
