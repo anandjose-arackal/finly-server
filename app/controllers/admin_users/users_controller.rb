@@ -36,14 +36,6 @@ class AdminUsers::UsersController < ApplicationController
   # returns the respective menus that a particular user has access to
   def admin_menus
     @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/menu_data_admin.yml.erb", {current_company: current_company, current_user: current_user})
-    render json: @views.as_json
-    # @result = Admin::AdminRolePermissions::Show.(current_user, params)
-    #   emails = []
-    # respond_to do |format|
-    #   format.json {
-    #     render json: @result.as_json
-    #   }
-    # end
   end
 
   def lookup
@@ -120,6 +112,15 @@ class AdminUsers::UsersController < ApplicationController
           render json: @response.as_json
         }
       end
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def update_panel
+    @result =  Admin::Users::Panel::Update.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
     else
       respond response: :failure, message: @result.messages[:error]
     end

@@ -40,7 +40,7 @@ class Settlement::Report::Approved < Report::Base
 
     total_non_reimbursable_amount = report.total_amount(:non_reimbursable) - total_card_amount
 
-    
+
     currency = Currency.first
     balance_sheet.add_approved_reports_total total_reimbursable_amount, currency
 
