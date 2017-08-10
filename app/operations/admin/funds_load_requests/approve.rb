@@ -8,7 +8,6 @@ class Admin::FundsLoadRequests::Approve < Admin::Base
       return
     end
     self.company = funds_load_request.company
-
   end
 
   def process
@@ -17,12 +16,12 @@ class Admin::FundsLoadRequests::Approve < Admin::Base
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(nil, company.yes_bank_company_account, self.funds_load_request.amount.value))
 
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
-    unless op.success?
-      # op.payment_order.destroy
-      add_message :error, op.messages[:error]
-    else
+    if op.success?
       self.funds_load_request.update(is_active: false)
       add_message :success, 'Successfully added balance for Company'
+    else
+      # op.payment_order.destroy
+      add_message :error, op.messages[:error]
     end
   end
 end

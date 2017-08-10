@@ -45,7 +45,7 @@ class AccountManager::OutsideFinly::OutsideFinlyAdapter < AccountManager::BaseAd
 
   def debitable_accounts
     # i.e. cash on hand can be deducted against this
-    [CashOnHand, nil]
+    [CashOnHand, nil, YesBankCompanyAccount, ItzCashCompanyAccount]
   end
 
 end
