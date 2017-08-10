@@ -52,6 +52,9 @@ class PaymentRequest < NonPersistentModel
     if self.initiating_resource.present? and self.initiating_resource.class.name == 'User'
       self.company_id = self.initiating_resource.company_id
     end
+    if self.company_id.blank?
+      self.company_id = (attributes&.dig(:company_id) or attributes&.dig(:company)&.id)
+    end
     self.currency_id ||= Currency.id_for(:INR)
     self.payment_order_status_id ||= retrieve_payment_order_status
     self.payment_items ||= []
