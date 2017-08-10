@@ -36,7 +36,7 @@ class User::Configuration::PanelSubscription::Update < BaseOperation
 
 
   def subscription_params
-    params.require(:user_panel_config).permit(:disburse, :expense_management)
+    params.require(:user_panel_config).permit(:disburse, :expense_management, :yes_bank_account_transfer)
   end
 
 end
