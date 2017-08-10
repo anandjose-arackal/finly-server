@@ -22,6 +22,7 @@
 #
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -707,7 +708,6 @@ class Expense < ActiveRecord::Base
     !!self.sub_expense&.custom_fields.present?
   end
 
-  protected
   def sub_expense
     case self.expense_type_id
       when ExpenseType.id_for(:manual)

@@ -26,25 +26,28 @@ class Report::Index < Report::Base
     case self.role_id
       when UserRole.id_for(:admin)
         if self.user.company_admin?
-          self.reports = Report.not_open.with_user(user.company.users.pluck(:id))
+          team_ids = User::Team::Index.(user, UserRole.id_for(:admin))&.pluck(:id)
+          self.reports = Report.not_open.with_user(team_ids)
         elsif user.policy_admin?
-          user_ids = User::Team::Index.(user, UserRole.admin_id).pluck(:id)
+          team_ids = User::Team::Index.(user, UserRole.id_for(:admin))&.pluck(:id)
           policy_ids = user.admin_policies.pluck(:id)
-          self.reports = Report.not_open.with_user(user_ids).with_policy(policy_ids)
+          self.reports = Report.not_open.with_user(team_ids).with_policy(policy_ids)
         end
         unless user.admin?
           messages[:error] << 'User is not an admin'
           return false
         end
       when UserRole.id_for(:manager)
-        controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.manager_id)
+        team_ids = User::Team::Index.(user, UserRole.id_for(:manager))&.pluck(:id)
+        controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids)
         interacted_reports_query= user.manager_reports
         sql = Report.connection.unprepared_statement {
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
         }
         self.reports = Report.from([Arel.sql(sql)])
       when UserRole.id_for(:finance_manager)
-        controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id)
+        team_ids = User::Team::Index.(user, UserRole.id_for(:finance_manager))&.pluck(:id)
+        controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id).with_user(team_ids)
         interacted_reports_query = user.finance_reports
         sql = Report.connection.unprepared_statement {
           "((#{controlling_report_query.to_sql}) UNION (#{interacted_reports_query.to_sql})) AS reports"
@@ -81,7 +84,7 @@ class Report::Index < Report::Base
       self.reports = params[:reports]
       get_counts
       if self.reports.present?
-          self.reports = apply_scopes(self.reports, params)
+        self.reports = apply_scopes(self.reports, params)
         self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30)
       end
     end
