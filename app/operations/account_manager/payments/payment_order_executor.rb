@@ -69,7 +69,7 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
         error_messages += op.messages[:error] if op.messages[:error].present?
       end
     end
-    payment_order.update(amount_processed_attributes: {value: processed_amount,
+    payment_order.reload.update(amount_processed_attributes: {value: processed_amount,
                                                        currency_id: payment_order.currency_id},
                          processed_at: DateUtils.local_date_time)
 
