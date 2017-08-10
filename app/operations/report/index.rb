@@ -84,7 +84,7 @@ class Report::Index < Report::Base
       self.reports = params[:reports]
       get_counts
       if self.reports.present?
-        # self.reports = apply_scopes(self.reports, params)
+        self.reports = apply_scopes(self.reports, params)
         self.paginated_reports = self.reports.paginate(page: params[:page], per_page: 30)
       end
     end
