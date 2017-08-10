@@ -26,7 +26,8 @@ class BankTransfer::VendorsController < ApplicationController
   end
 
   def show
-
+    @result = BankTransfer::Vendor::Show.(current_user, params)
+    respond
   end
 
 end
