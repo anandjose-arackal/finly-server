@@ -123,19 +123,14 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         debit_adapter.credit(payment, options)
       return
     end
-
-    # creating the payment trail for this particular transaction (if it was successful i.e.)
-    create_payment_trail
-
-    # todo - probably should be moved to the adapter itself
-    if payment.in_progress?
-      # i.e. if the payment was not modified in any way during the execution, update it here.
-      payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-    end
-
   end
 
   def post_process
+    # todo - probably should be moved to the adapter itself
+    if payment.in_progress?
+      # i.e. if the payment was not modified in any way during the execution, update it here.
+      payment.reload.update(payment_status_id: PaymentStatus.id_for(:completed))
+    end
     # updating closing balances
     unless source_account_adapter.blank? || source_account_adapter.is_a?(AccountManager::OutsideFinly::OutsideFinlyAdapter)
       source_balance = source_account_adapter.balance
@@ -145,12 +140,6 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       receiving_balance = receiving_account_adapter.balance
       payment.update(receiving_account_closing_balance_attributes: {value: receiving_balance, currency_id: Currency.first.id})
     end
-  end
-
-  private
-
-  def create_payment_trail
-    # is this even necessary now?
   end
 
 end

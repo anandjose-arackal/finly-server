@@ -95,7 +95,6 @@ class Settlement::Show < Settlement::Base
 
   def load_payments
     self.payments = self.selected_user.payments.non_settlement.with_details
-    # self.payments = payments.with_application(RequestStore.store[:current_app])
   end
 
   def load_money_requests
