@@ -42,7 +42,7 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     if params[:receipt_id].present?
       self.receipt = user.receipts.with_id(params[:receipt_id]).first rescue nil
     end
-    if expense_params[:receipts_attributes] == [nil]
+    if expense_params[:receipts_attributes] == [nil] or expense_params[:receipts_attributes] == ['']
       expense_params.delete(:receipts_attributes)
     end
 
