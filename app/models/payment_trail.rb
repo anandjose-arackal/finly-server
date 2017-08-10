@@ -2,20 +2,20 @@
 #
 # Table name: payment_trails
 #
-#  id                                 :integer          not null, primary key
-#  date                               :date
-#  initiating_account_id              :integer
-#  receiving_account_id               :integer
-#  initiating_account_type            :string(255)
-#  receiving_account_type             :string(255)
-#  initiating_account_pre_balance_id  :integer
-#  initiating_account_post_balance_id :integer
-#  receiving_account_pre_balance_id   :integer
-#  receiving_account_post_balance_id  :integer
-#  payments_id                        :integer
-#  payment_status_id                  :integer
-#  created_at                         :datetime         not null
-#  updated_at                         :datetime         not null
+#  id                      :integer          not null, primary key
+#  date                    :date
+#  initiating_account_id   :integer
+#  receiving_account_id    :integer
+#  initiating_account_type :string(255)
+#  receiving_account_type  :string(255)
+#  payment_status_id       :integer
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  payment_id              :integer
+#  initiating_user_id      :integer
+#  initiating_user_type    :string(255)
+#  receiving_user_id       :integer
+#  receiving_user_type     :string(255)
 #
 
 class PaymentTrail < ActiveRecord::Base
