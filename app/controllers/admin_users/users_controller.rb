@@ -36,6 +36,7 @@ class AdminUsers::UsersController < ApplicationController
   # returns the respective menus that a particular user has access to
   def admin_menus
     @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/menu_data_admin.yml.erb", {current_company: current_company, current_user: current_user})
+    render json: @views.as_json
   end
 
   def lookup
