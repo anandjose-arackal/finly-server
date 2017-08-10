@@ -44,23 +44,26 @@ user:
     name: 'Manager'
     default_url: 'orders'
   <% end %>
+  - id: personal
+    name: 'Personal'
+    default_url: 'orders'
 views:
   <%# if current_user.admin? %>
     admin:
       menus:
         navbar:
-#        - name: Individual Payments
-#          url: payments
-#          id: payments
+        - name: Individual Payments
+          url: payments
+          id: payments
         - name: Payment Orders
           url: orders
           id: orders
-#        - name: Users
-#          url: users
-#          id: users
-#        - name: Vendors
-#          url: vendors
-#          id: 'vendors'
+        - name: Users
+          url: users
+          id: users
+        - name: Vendors
+          url: vendors
+          id: 'vendors'
 #        - name: Analytics
 #          url: analytics
 #          id: analytics
