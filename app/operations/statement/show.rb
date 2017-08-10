@@ -34,6 +34,16 @@ class Statement::Show < BaseOperation
             self.account = sel_user.wallet
         end
     end
+
+    if params[:with_date_range].nil?
+      params[:with_date_range] = {}
+    end
+    if params[:with_date_range][:from].blank?
+      params[:with_date_range][:from] = 30.days.ago
+    end
+    if params[:with_date_range][:to].blank?
+      params[:with_date_range][:to] = Date.today
+    end
   end
 
   def validate
@@ -57,32 +67,46 @@ class Statement::Show < BaseOperation
   end
 
   class Statement::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :payments, :account, :card_transactions
+    attr_accessor :payments, :account, :card_transactions, :scoped_payments, :scoped_transactions
 
     has_scope :with_date_range, using: [:from, :to], type: :hash
 
     def init
       self.account = params[:account]
+      self.payments = params[:payments]
+      self.scoped_payments = apply_scopes(params[:payments], params)&.paginate(page: params[:page], per_page: 30)
       self.card_transactions = params[:card_transactions]
-      self.payments = apply_scopes(params[:payments], params)&.paginate(page: params[:page], per_page: 30)
+      if self.card_transactions.present?
+        self.scoped_transactions = apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
+      end
     end
 
-    def credit_statement
-      return unless self.payments.present? and self.account.present?
-      self.payments.credits_for_account(self.account)
+    def credits_count
+      return if self.payments.nil? or self.account.nil?
+      self.payments.credits_for_account(self.account).count
     end
 
-    def debits_statement
-      return unless self.payments.present? and self.account.present?
-      self.payments.debits_for_account(self.account)
+    def debits_count
+      return if self.payments.nil? or self.account.nil?
+      self.payments.debits_for_account(self.account).count
     end
 
     def opening_balance
-      # self.payments.last
+      opening_payment = self.payments.last
+      if opening_payment.initiating_account == self.account
+        opening_payment.initiating_account_opening_balance
+      else
+        opening_payment.receiving_account_opening_balance
+      end
     end
 
     def closing_balance
-
+      closing_payment = self.payments.first
+      if closing_payment.initiating_account == self.account
+        closing_payment.initiating_account_closing_balance
+      else
+        closing_payment.receiving_account_closing_balance
+      end
     end
 
   end
