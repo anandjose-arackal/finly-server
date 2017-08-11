@@ -4,6 +4,7 @@ json.array! @result.payment_orders.each do |item|
   if scheduled_at.present?
     scheduled_at = scheduled_at.strftime('%d %b %Y')
   end
+  json.payment_type item.payments.first&.payment_type&.name&.humanize
   json.scheduled_at scheduled_at
   processed_date = item.processed_at
   if processed_date.present?
