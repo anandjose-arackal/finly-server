@@ -48,10 +48,6 @@ class Payment < ActiveRecord::Base
   end
 
   belongs_to :amount
-  belongs_to :initiating_account_closing_balance, class_name: "Amount"
-  belongs_to :receiving_account_closing_balance, class_name: "Amount"
-  belongs_to :initiating_account_opening_balance, class_name: "Amount"
-  belongs_to :receiving_account_opening_balance, class_name: "Amount"
   belongs_to :payment_type
   belongs_to :initiating_user, polymorphic: true
   belongs_to :receiving_user, polymorphic: true
@@ -73,10 +69,6 @@ class Payment < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :payment_order
-  accepts_nested_attributes_for :initiating_account_opening_balance
-  accepts_nested_attributes_for :initiating_account_closing_balance
-  accepts_nested_attributes_for :receiving_account_closing_balance
-  accepts_nested_attributes_for :receiving_account_opening_balance
   delegate :amount_value, to: :amount
 
   default_scope { order date: :desc, created_at: :desc }
@@ -273,11 +265,10 @@ class Payment < ActiveRecord::Base
   end
 
   def payment_status_name
-    case self.payment_status_id
-      when PaymentStatus.id_for(:processing)
-        return "Processed. Awaiting credit confirmation"
-      else
-        self.payment_status.name.humanize
+    if self.payment_status_id == PaymentStatus.id_for(:processing)
+      return "Processed. Awaiting credit confirmation"
+    else
+      self.payment_status.name.humanize
     end
   end
 
@@ -285,7 +276,7 @@ class Payment < ActiveRecord::Base
 
   def initiating_account_presence
     unless [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:balance_clearance_outside_finly),
-            PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:card_transaction), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:corporate_balance_load)].include?(self.payment_purpose_id)
+            PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:card_transaction), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:corporate_balance_load), PaymentPurpose.id_for(:corporate_balance_refund)].include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")
       end
@@ -310,7 +301,7 @@ class Payment < ActiveRecord::Base
   end
 
   def receiving_user_presence
-    unless [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:corporate_balance_load)].include?(self.payment_purpose_id)
+    unless [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:corporate_balance_load), PaymentPurpose.id_for(:corporate_balance_refund)].include?(self.payment_purpose_id)
       if receiving_user_id.blank?
         errors.add(:receiving_user_id, "cannot be blank")
       end
