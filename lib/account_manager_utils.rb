@@ -1,0 +1,45 @@
+class AccountManagerUtils
+
+  ACCOUNTS = [
+      {class: Card, name: 'Card'},
+      {class: UserWallet, name: 'Finly Money'},
+      {class: ItzCashCompanyAccount, name: 'Company Credits'},
+      {class: YesBankCompanyAccount, name: 'Bank Transfer Credits'},
+      {class: CashOnHand, name: 'Cash on Hand'},
+      {class: BankAccount, name: 'Bank Account'},
+  ]
+
+  def self.available_accounts(options = {})
+    options = {} if options.nil?
+    options[:format] = :class if options[:format].blank?
+    classes = []
+    ACCOUNTS.each do |account|
+      case options[:format]
+        when :class
+          classes << account[:class]
+        when :string
+          classes << account[:class].to_s
+      end
+    end
+    classes
+  end
+
+  def self.name_for(account)
+    return nil if account.blank?
+    if account.is_a?(Class)
+      # Class is being passed
+      class_string = account.name
+    elsif account.class.name == 'String'
+      # Account type being passed
+      class_string = account
+    else
+      # Object
+      class_string = account.class.name
+    end
+    ACCOUNTS.each do |account|
+      return account[:name] if account[:class].to_s == class_string
+    end
+    nil
+  end
+
+end

@@ -10,21 +10,31 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
 
   def credit(payment, options)
     super
+    opening_balance = balance
     # credit a particular wallet with the respective amount
     unless self.account.add_funds(payment.amount_value)
       self.errors = account.errors.full_messages
+      closing_balance = balance
+      store_transaction payment, :credit, :failure, opening_balance, closing_balance, nil, account.user.company_id, error: self.errors
       return false
     end
+    closing_balance = balance
+    store_transaction payment, :credit, :success, opening_balance, closing_balance, nil, account.user.company_id
     true
   end
 
   def debit(payment, options)
     super
-    # credit a particular wallet with the respective amount
+    opening_balance = balance
+    # debit a particular wallet with the respective amount
     unless self.account.subtract_funds(payment.amount_value)
       self.errors = account.errors.full_messages
+      closing_balance = balance
+      store_transaction payment, :debit, :failure, opening_balance, closing_balance, nil, account.user.company_id, error: self.errors
       return false
     end
+    closing_balance = balance
+    store_transaction payment, :debit, :success, opening_balance, closing_balance, nil, account.user.company_id
     true
   end
 

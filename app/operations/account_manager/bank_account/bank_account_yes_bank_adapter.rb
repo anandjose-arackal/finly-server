@@ -26,22 +26,25 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       if SUCCESSFUL_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
         create_bank_transaction(payment, op.transfer_request)
+        store_transaction payment, :credit, :success, nil, nil, payment.reference_resource, payment.initiating_user&.company_id
       elsif PROCESSING_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_system_message_for_processing(payment)
         create_bank_transaction(payment, op.transfer_request)
+        store_transaction payment, :credit, :processing, nil, nil, payment.reference_resource, payment.initiating_user&.company_id
       elsif op.transfer_request.transaction_result.nil?
         # i.e. there was an error processing the transaction
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         error_message = op.transfer_request.bank_error_message || "Payment could not be processed at this time"
+        store_transaction payment, :credit, :failure, nil, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message
         return false
       end
     else
       # i.e. there was an error processing the transaction
       payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-      error_message = op.transfer_request.bank_error_message || "Payment could not be processed at this time"
-      self.errors << error_message
+      self.errors = op.transfer_request.bank_error_message || 'Payment could not be processed at this time'
+      store_transaction payment, :credit, :failure, nil, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
       return false
     end
     true
@@ -59,7 +62,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
   def creditable_accounts
     # none as this account cannot be credited through Finly (only external)
-    [YesBankCompanyAccount, "YesBankCompanyAccount"]
+    [YesBankCompanyAccount]
   end
 
   def debitable_accounts
