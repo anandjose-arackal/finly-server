@@ -12,7 +12,7 @@ class PaymentPurpose < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:atm_withdrawal, :card_transaction, :advance_outside_finly, :reimbursement_outside_finly, :advance, :medical_benefit, :meal_benefit, :reimbursement, :payroll, :vendor_payment, :corporate_balance_load, :balance_clearance_outside_finly, :balance_clearance]
+    [:atm_withdrawal, :card_transaction, :advance_outside_finly, :reimbursement_outside_finly, :advance, :medical_benefit, :meal_benefit, :reimbursement, :payroll, :vendor_payment, :corporate_balance_load, :balance_clearance_outside_finly, :balance_clearance, :corporate_balance_refund]
   end
 
 end

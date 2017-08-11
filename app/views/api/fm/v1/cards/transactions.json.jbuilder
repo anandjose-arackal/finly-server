@@ -11,9 +11,8 @@ json.transactions do
       json.mobile_number transaction.user.mobile_number
     end
     json.card do
-      json.id transaction.card.id
-      json.serial_id transaction.card.serial_id
-      json.ending_number transaction.card.ending_number
+      json.id transaction.card_id
+      json.serial_id transaction.serial_id
     end
     json.transaction_amount do
       json.partial! 'shared/amount', amount: transaction.transaction_amount

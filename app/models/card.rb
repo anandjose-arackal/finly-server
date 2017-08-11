@@ -22,6 +22,7 @@
 #  itz_cash_card_program_id :integer
 #  card_status_id           :integer          not null
 #  is_deleted               :boolean          default(FALSE)
+#  hotlisted                :boolean          default(FALSE)
 #
 
 class Card < ActiveRecord::Base
@@ -53,7 +54,7 @@ class Card < ActiveRecord::Base
   accepts_nested_attributes_for :card_balance
   accepts_nested_attributes_for :card_eligibility
 
-  default_scope {}
+  default_scope {where hotlisted: false}
 
   scope :with_id, -> (id) { where id: id }
   scope :with_user, -> (user_id) { where user_id: user_id }
@@ -66,6 +67,11 @@ class Card < ActiveRecord::Base
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
   scope :meal_cards, -> {where card_program_id: CardProgram.id_for(:meal)}
+  scope :non_hotlisted, -> {
+    # if applied == '1'
+      where hotlisted: false
+    # end
+  }
 
   scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
   scope :reimbursement_cards_only, -> { where card_program_id: CardProgram.id_for(:reimbursement) }

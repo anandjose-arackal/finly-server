@@ -14,6 +14,7 @@
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  bank_response               :string(255)
+#  refunded                    :boolean
 #
 
 class BankTransaction < ActiveRecord::Base
@@ -33,6 +34,8 @@ class BankTransaction < ActiveRecord::Base
   validates :transfer_type, presence: true
 
   accepts_nested_attributes_for :amount
+
+  delegate :amount_value, to: :amount
 
   scope :processing_transactions, -> {where transfer_status_id: BankTransferStatus.id_for(:processing)}
 

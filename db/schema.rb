@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170810132246) do
+ActiveRecord::Schema.define(version: 20170811175033) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -405,6 +405,7 @@ ActiveRecord::Schema.define(version: 20170810132246) do
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
     t.string   "bank_response",               limit: 255
+    t.boolean  "refunded"
   end
 
   add_index "bank_transactions", ["amount_id"], name: "index_bank_transactions_on_amount_id", using: :btree
@@ -669,6 +670,7 @@ ActiveRecord::Schema.define(version: 20170810132246) do
     t.integer  "itz_cash_card_program_id", limit: 4
     t.integer  "card_status_id",           limit: 4,                     null: false
     t.boolean  "is_deleted",                             default: false
+    t.boolean  "hotlisted",                              default: false
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
