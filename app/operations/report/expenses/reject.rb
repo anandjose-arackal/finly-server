@@ -56,7 +56,8 @@ class Report::Expenses::Reject < Report::Base
   def post_process
     if success?
       expenses.each do |expense|
-        comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:expense_reject), expense_id: expense.id, content: params[:memo]
+        comment_content = (params[:memo] or params[:reject_note])
+        comment = report.comments.build user: user, report_comment_action_id: ReportCommentAction.id_for(:expense_reject), expense_id: expense.id, content: comment_content
         comment.save
 
         # also set the amount for these expense as nil if they're distance/Time/Per Diem

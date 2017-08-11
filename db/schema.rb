@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170808153642) do
+ActiveRecord::Schema.define(version: 20170810132246) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2911,10 +2911,12 @@ ActiveRecord::Schema.define(version: 20170808153642) do
   add_index "yes_bank_company_accounts", ["company_id"], name: "index_yes_bank_company_accounts_on_company_id", using: :btree
 
   create_table "yes_bank_vendors", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.integer  "company_id", limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "name",          limit: 255
+    t.integer  "company_id",    limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.string   "email",         limit: 255
+    t.string   "mobile_number", limit: 255
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree

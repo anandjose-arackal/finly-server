@@ -383,6 +383,7 @@
 #                          admin_users_user_update_status PATCH  /admin_users/users/:user_id/update_status(.:format)                             admin_users/users#update_status
 #                         admin_users_user_update_mapping PATCH  /admin_users/users/:user_id/update_mapping(.:format)                            admin_users/users#update_mapping
 #                        admin_users_user_destroy_mapping DELETE /admin_users/users/:user_id/destroy_mapping(.:format)                           admin_users/users#destroy_mapping
+#                           admin_users_user_update_panel PATCH  /admin_users/users/:user_id/update_panel(.:format)                              admin_users/users#update_panel
 #                                       admin_users_users GET    /admin_users/users(.:format)                                                    admin_users/users#index
 #                                                         POST   /admin_users/users(.:format)                                                    admin_users/users#create
 #                                    new_admin_users_user GET    /admin_users/users/new(.:format)                                                admin_users/users#new
@@ -852,6 +853,14 @@
 #                                                         PATCH  /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#update
 #                                                         PUT    /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#update
 #                                                         DELETE /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#destroy
+#                                   bank_transfer_vendors GET    /bank_transfer/vendors(.:format)                                                bank_transfer/vendors#index
+#                                                         POST   /bank_transfer/vendors(.:format)                                                bank_transfer/vendors#create
+#                                new_bank_transfer_vendor GET    /bank_transfer/vendors/new(.:format)                                            bank_transfer/vendors#new
+#                               edit_bank_transfer_vendor GET    /bank_transfer/vendors/:id/edit(.:format)                                       bank_transfer/vendors#edit
+#                                    bank_transfer_vendor GET    /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#show
+#                                                         PATCH  /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#update
+#                                                         PUT    /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#update
+#                                                         DELETE /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#destroy
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format) admin_users/funds_load_requests#approve
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#index
 #                                                         POST   /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#create
@@ -1688,6 +1697,7 @@ Rails.application.routes.draw do
       patch 'update_status', to: 'users#update_status', as: :update_status
       patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping
       delete 'destroy_mapping', to: 'users#destroy_mapping', as: :destroy_mapping
+      patch 'update_panel', to: 'users#update_panel', as: :update_panel
     end
     post 'welcome', to: 'users#admin_welcome', as: :welcome
     post 'users/set_role', to: 'users#set_role', as: :set_role
@@ -2085,6 +2095,7 @@ Rails.application.routes.draw do
     resources :payment_orders do
 
     end
+    resources :vendors
   end
 
 

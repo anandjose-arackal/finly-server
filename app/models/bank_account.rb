@@ -27,4 +27,6 @@ class BankAccount < ActiveRecord::Base
   validates :ifsc, presence: true
 
   accepts_nested_attributes_for :account_owner
+
+  delegate :name, to: :account_owner
 end
