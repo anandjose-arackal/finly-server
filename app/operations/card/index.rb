@@ -30,8 +30,10 @@ class Card::Index < Card::Base
   class Card::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :cards, :paginated_cards
 
+
     def init
       self.cards = params[:cards]
+      self.cards = cards
       if self.cards.present?
         self.paginated_cards = self.cards.paginate(page: params[:page], per_page: 30)
       end
