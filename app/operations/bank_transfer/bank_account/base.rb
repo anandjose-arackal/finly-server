@@ -1,4 +1,4 @@
-class BankAccount::Base < BaseOperation
+class BankTransfer::BankAccount::Base < BaseOperation
 
   def authorized_user_types
     []
@@ -9,9 +9,6 @@ class BankAccount::Base < BaseOperation
       add_message :error, "Invalid parameters, try again"
     end
   end
-
-
-  private
 
   def bank_account_params
     params.require(:bank_account).permit(:account_number, :ifsc, :name, :address_1, :address_2, :pin_code, :country, :account_owner_id)
