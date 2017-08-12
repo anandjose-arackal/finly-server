@@ -16,6 +16,7 @@
 #  updated_at         :datetime         not null
 #  account_owner_id   :integer
 #  account_owner_type :string(255)
+#  company_id         :integer
 #
 
 class BankAccount < ActiveRecord::Base

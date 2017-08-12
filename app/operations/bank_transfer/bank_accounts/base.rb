@@ -1,4 +1,4 @@
-class BankTransfer::BankAccount::Base < BaseOperation
+class BankTransfer::BankAccounts::Base < BaseOperation
 
   def authorized_user_types
     []

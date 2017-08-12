@@ -1,6 +1,6 @@
 class BankTransfer::Vendor::Base < BaseOperation
 
-  attr_accessor :company
+  attr_accessor :company, :vendor
 
   def pre_validate
     if user.blank? || params.blank?
@@ -10,6 +10,21 @@ class BankTransfer::Vendor::Base < BaseOperation
 
   def init
     self.company = user.company
+  end
+
+  def success
+    params[:vendor] = vendor
+    BankTransfer::Vendor::Base::VendorPresenter.new(user, params, messages)
+
+  end
+
+  class BankTransfer::Vendor::Base::VendorPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :vendor
+
+    def init
+      self.vendor = params[:vendor]
+    end
   end
 
   protected

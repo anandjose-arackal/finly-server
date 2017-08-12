@@ -3,7 +3,7 @@ class BankTransfer::BankAccountsController < ApplicationController
   before_action {finly_authorize! :web}
 
   def create
-    @result = BankTransfer::BankAccount::Create.(cucurrent_user, params)
+    @result = BankTransfer::BankAccounts::Create.(current_user, params)
     if @result.success?
       respond response: :success
     else
@@ -12,7 +12,7 @@ class BankTransfer::BankAccountsController < ApplicationController
   end
 
   def index
-    @result = BankTransfer::BankAccount::Index.(current_user, params)
+    @result = BankTransfer::BankAccounts::Index.(current_user, params)
     respond
   end
 
