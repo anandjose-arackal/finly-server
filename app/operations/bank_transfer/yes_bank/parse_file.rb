@@ -16,6 +16,7 @@ class BankTransfer::YesBank::ParseFile < BankTransfer::YesBank::Base
   def init
     self.file = params[:file]
     self.parsed_data = ImportUtil.load_spreadsheet(file, [:name, :account_number, :ifsc, :amount], {skip_empty_lines: true})
+    debugger
   end
 
   def validate

@@ -11,7 +11,6 @@ class BankTransfer::PaymentOrdersController < ApplicationController
 
   def create
     @result = BankTransfer::YesBank::Create.(current_user, params)
-    # @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, {})
     respond
   end
 
@@ -31,6 +30,7 @@ class BankTransfer::PaymentOrdersController < ApplicationController
     respond
   end
 
+  # returns the Yes Bank Account Balance for the given account
   def balance
     @result = AccountManager::Balance::Check.(current_company.yes_bank_company_account, params)
     respond
