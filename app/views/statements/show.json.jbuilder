@@ -1,3 +1,4 @@
+json.account_name @result.account_name
 json.opening_balance @result.opening_balance
 json.closing_balance @result.closing_balance
 json.credits_count @result.credits_count

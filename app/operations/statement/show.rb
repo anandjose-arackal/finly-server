@@ -113,6 +113,10 @@ class Statement::Show < BaseOperation
       self.account.class.name == 'Card'
     end
 
+    def account_name
+      AccountManagerUtils.name_for self.account
+    end
+
     def merchant(finly_transaction)
       merchant = ''
       if finly_transaction.credit?

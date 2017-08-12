@@ -36,10 +36,15 @@ class AccountManagerUtils
       # Object
       class_string = account.class.name
     end
+    account_name = nil
     ACCOUNTS.each do |account|
-      return account[:name] if account[:class].to_s == class_string
+      account_name = account[:name] if account[:class].to_s == class_string
+      break
     end
-    nil
+    if account_name == 'Card'
+      account_name = "#{account.card_program.name.humanize} Card"
+    end
+    account_name
   end
 
 end
