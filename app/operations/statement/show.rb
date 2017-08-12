@@ -67,7 +67,7 @@ class Statement::Show < BaseOperation
   end
 
   class Statement::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :finly_transactions, :account, :card_transactions, :scoped_finly_transactions, :scoped_transactions
+    attr_accessor :finly_transactions, :account, :card_transactions, :scoped_finly_transactions, :scoped_card_transactions
 
     has_scope :with_date_range, using: [:from, :to], type: :hash
 
@@ -77,7 +77,7 @@ class Statement::Show < BaseOperation
       self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 30)
       self.card_transactions = params[:card_transactions]
       if self.card_transactions.present?
-        self.scoped_transactions = self.card_transactions#apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
+        self.scoped_card_transactions = self.card_transactions#apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
       end
     end
 

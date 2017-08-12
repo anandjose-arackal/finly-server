@@ -6,7 +6,7 @@ json.credit_amount @result.credit_amount
 json.debit_amount @result.debit_amount
 json.transactions_tab @result.has_transactions_tab?
 json.finly_transactions do
-  json.array! @result.finly_transactions do |finly_transaction|
+  json.array! @result.scoped_finly_transactions do |finly_transaction|
     json.date DateUtils.date_formatted finly_transaction.created_at
     json.transaction_type finly_transaction.transaction_type.name.humanize
     json.purpose finly_transaction.payment_purpose.name.humanize
@@ -29,7 +29,7 @@ json.finly_transactions do
   end
 end
 if @result.has_transactions_tab?
-  json.transactions do
+  json.scoped_card_transactions do
     json.array! @result.card_transactions do |card_transaction|
 
     end
