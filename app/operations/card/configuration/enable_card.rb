@@ -49,7 +49,7 @@ class Card::Configuration::EnableCard < Card::Base
       end
       # if manager view, user must be employee's manager
     elsif user.manager? and !params[:self]
-      unless User::Team::Index.call(user, 3).include?(employee) and card.disabled_by_role_id >= 3
+      unless User::Team::Index.call(user, role_id: 3).include?(employee) and card.disabled_by_role_id >= 3
         messages[:error] << 'You are not authorized to enable this card'
       end
       # if employee, he must own the card and should have been disabled by him

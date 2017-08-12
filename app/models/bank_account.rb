@@ -29,4 +29,18 @@ class BankAccount < ActiveRecord::Base
   accepts_nested_attributes_for :account_owner
 
   delegate :name, to: :account_owner
+
+  scope :with_account_owner, -> (user_ids, vendor_ids) {
+    where('(account_owner_type = ? AND account_owner_id IN (?)) OR (account_owner_type - ? AND account_owner_id IN (?)', "User", user_ids, "YesBankVendor", vendor_ids)
+  }
+
+  scope :filter_owner_type, -> (owner_type) {
+    if owner_type == '1'
+      where account_owner_type: "User"
+    elsif owner_type == '2'
+      where account_owner_type: "YesBankVendor"
+    else
+      # do nothing?
+    end
+  }
 end

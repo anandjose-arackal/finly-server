@@ -18,8 +18,11 @@ class Settlement::Show < Settlement::Base
   def init
     self.type = {}
     self.view_to_load = params[:view_to_load]
-    params[:with_application] = RequestStore.store[:current_app].to_s
     load_selected_user
+  end
+
+  def configure_expense_management
+    params[:with_application] = RequestStore.store[:current_app].to_s
   end
 
   def process
