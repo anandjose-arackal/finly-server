@@ -51,6 +51,8 @@ class FinlyTransaction < ActiveRecord::Base
   scope :with_date_range, -> (start_date, end_date) { where('created_at >= ? AND created_at <= ?', start_date, end_date) }
   scope :sum_amounts, -> { joins(:amount).sum(:value) }
 
+  default_scope { order(created_at: :desc) }
+
   delegate :credit?, :debit?, to: :transaction_type
 
 end

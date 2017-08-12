@@ -24,6 +24,7 @@ json.finly_transactions do
     json.credit_amount credit_amount
     json.debit_amount debit_amount
     json.closing_balance finly_transaction.closing_balance&.value&.to_s
+    json.status finly_transaction.status.name.humanize
     json.system_messages do
       json.system_messages do
         json.array! finly_transaction.system_messages
