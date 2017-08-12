@@ -15,4 +15,12 @@ class TransactionType < ActiveRecord::Base
     [:credit, :debit]
   end
 
+  def credit?
+    self.id == TransactionType.id_for(:credit)
+  end
+
+  def debit?
+    self.id == TransactionType.id_for(:debit)
+  end
+
 end

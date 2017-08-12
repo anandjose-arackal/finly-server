@@ -12,7 +12,7 @@ class TransactionStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:success, :processing, :failure]
+    [:success, :failure]
   end
 
 end

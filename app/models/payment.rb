@@ -157,7 +157,7 @@ class Payment < ActiveRecord::Base
   validate :initiating_account_presence
   validate :receiving_account_presence
 
-  delegate :completed?, :failed?, :pending?, :in_progress?, :scheduled?, to: :payment_status
+  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, to: :payment_status
 
   before_create do
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, self.amount&.value, date)

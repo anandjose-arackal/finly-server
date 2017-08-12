@@ -6,14 +6,16 @@ class StatementsController < ApplicationController
   end
 
   def show
-    @result = EmployeeStatement::Show.(current_user, params)
-    if @result.success?
-      respond_to do |format|
-        format.json {render json: @result.items.as_json}
-      end
-    else
-      respond
-    end
+    # @result = EmployeeStatement::Show.(current_user, params)
+    # if @result.success?
+    #   respond_to do |format|
+    #     format.json {render json: @result.items.as_json}
+    #   end
+    # else
+    #   respond
+    # end
+    @result = Statement::Show.(current_user, params)
+    respond
   end
 
   def summary

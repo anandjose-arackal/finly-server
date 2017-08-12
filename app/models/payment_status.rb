@@ -47,4 +47,8 @@ class PaymentStatus < ActiveRecord::Base
     self.id == PaymentStatus.id_for(:scheduled)
   end
 
+  def processing?
+    self.id == PaymentStatus.id_for(:processing)
+  end
+
 end

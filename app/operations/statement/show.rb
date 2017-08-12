@@ -1,5 +1,5 @@
 class Statement::Show < BaseOperation
-  attr_accessor :account, :payments, :card_transactions
+  attr_accessor :account, :finly_transactions, :card_transactions
 
   def pre_validate
     if user.blank?
@@ -53,108 +53,93 @@ class Statement::Show < BaseOperation
   end
 
   def process
-    self.payments = Payment.involving_account(self.account)
+    self.finly_transactions = FinlyTransaction.with_account(self.account)
     if self.account.class.name == 'Card'
       self.card_transactions = self.account.transactions
     end
   end
 
   def success
-    params[:payments] = self.payments
+    params[:finly_transactions] = self.finly_transactions
     params[:account] = self.account
     params[:card_transactions] = self.card_transactions
     Statement::Show::SuccessPresenter.new(user, params, messages)
   end
 
   class Statement::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :payments, :account, :card_transactions, :scoped_payments, :scoped_transactions
+    attr_accessor :finly_transactions, :account, :card_transactions, :scoped_finly_transactions, :scoped_transactions
 
     has_scope :with_date_range, using: [:from, :to], type: :hash
 
     def init
       self.account = params[:account]
-      self.payments = params[:payments]
-      self.scoped_payments = apply_scopes(params[:payments], params)&.paginate(page: params[:page], per_page: 30)
+      self.finly_transactions = params[:finly_transactions]
+      self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 30)
       self.card_transactions = params[:card_transactions]
       if self.card_transactions.present?
-        self.scoped_transactions = apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
+        self.scoped_transactions = self.card_transactions#apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
       end
     end
 
     def credits_count
-      return if self.payments.nil? or self.account.nil?
-      self.payments.credits_for_account(self.account).count
+      return if self.finly_transactions.nil? or self.account.nil?
+      self.finly_transactions.credits.count
     end
 
     def debits_count
-      return if self.payments.nil? or self.account.nil?
-      self.payments.debits_for_account(self.account).count
+      return if self.finly_transactions.nil? or self.account.nil?
+      self.finly_transactions.debits.count
     end
 
     def opening_balance
-      opening_payment = self.payments.last
-      if opening_payment.initiating_account == self.account
-        opening_payment.initiating_account_opening_balance
-      else
-        opening_payment.receiving_account_opening_balance
-      end
+      self.finly_transactions.last&.opening_balance&.value&.to_s
     end
 
     def closing_balance
-      closing_payment = self.payments.first
-      if closing_payment.initiating_account == self.account
-        closing_payment.initiating_account_closing_balance
-      else
-        closing_payment.receiving_account_closing_balance
-      end
+      self.finly_transactions.first&.closing_balance&.value&.to_s
+    end
+
+    def credit_amount
+      self.finly_transactions.credits.sum_amounts || 0
+    end
+
+    def debit_amount
+      self.finly_transactions.debits.sum_amounts || 0
     end
 
     def has_transactions_tab?
       self.account.class.name == 'Card'
     end
 
-    def payment_type(payment)
-      if payment.initiating_account == self.account
-        payment.credit? ? 'Sent' : 'Received'
+    def merchant(finly_transaction)
+      merchant = ""
+      if finly_transaction.credit?
+        merchant = "To "
       else
-        payment.credit? ? 'Received' : 'Sent'
+        merchant = "From "
       end
-    end
-
-    def purpose(payment)
-      payment.purpose.name.humanize
-    end
-
-    def merchant(payment)
-      if payment.initiating_account == self.account
-        if payment.credit?
-          "To #{payment.receiving_user.name}'s #{payment.receiving_account.name}"
-        else
-
-        end
-      else
-        if payment.credit?
-
-        else
-
-        end
+      case finly_transaction.payment_purpose_id
+        when :atm_withdrawal
+          merchant += 'ATM withdrawal'
+        when :card_transaction
+        when :advance_outside_finly, :reimbursement_outside_finly, :advance, :balance_clearance, :reimbursement, :medical_benefit, :meal_benefit, :payroll, :balance_clearance_outside_finly
+          if finly_transaction.payment.initiating_account == finly_transaction.finly_account
+            if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
+              merchant += "#{finly_transaction.payment.receiving_account.user.name}'s "
+            end
+            merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.receiving_account)}"
+          elsif finly_transaction.payment.receiving_account == finly_transaction.finly_account
+            if [UserWallet, Card].include? finly_transaction.payment.initiating_account.class
+              merchant += "#{finly_transaction.payment.initiating_account.user.name}'s "
+            end
+            merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.initiating_account)}"
+          end
+        when :vendor_payment
+          merchant = 'Vendor Payment'
+        when :corporate_balance_load
+          merchant = 'Corporate Balance Load'
       end
-    end
-
-    def credit(payment)
-      if payment.initiating_account == self.account
-        payment.debit? ? payment.amount.value : nil
-      else
-        payment.debit? ? nil : payment.amount.value
-      end
-    end
-
-    def debit(payment)
-      if payment.initiating_account == self.account
-        payment.credit? ? payment.amount.value : nil
-      else
-        payment.credit? ? nil : payment.amount.value
-      end
+      merchant
     end
 
   end

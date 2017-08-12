@@ -3,32 +3,27 @@ json.closing_balance @result.closing_balance
 json.credits_count @result.credits_count
 json.debits_count @result.debits_count
 json.transactions_tab @result.has_transactions_tab?
-json.payments do
-  json.array! @result.payments do |payment|
-    json.date DateUtils.date_formatted payment.date
-    json.payment_type @result.payment_type(payment)
-    json.purpose @result.purpose(payment)
+json.finly_transactions do
+  json.array! @result.finly_transactions do |finly_transaction|
+    json.date DateUtils.date_formatted finly_transaction.date
+    json.transaction_type finly_transaction.transaction_type.name.humanize
+    json.purpose finly_transaction.payment_purpose.humanize
     json.merchant @result.merchant(payment)
-    json.credit @result.credit(payment)
-    json.debit @result.debit(payment)
-    json.initiating_user do
-
+    credit_amount = nil
+    debit_amount = nil
+    if finly_transaction.credit?
+      credit_amount = finly_transaction.amount.value.to_s
+    else
+      debit_amount = finly_transaction.amount.value.to_s
     end
-    json.receiving_user do
-
+    json.credit_amount credit_amount
+    json.debit_amount debit_amount
+    json.closing_balance finly_transaction.closing_balance&.value&.to_s
+    json.system_messages do
+      json.system_messages do
+        json.array! finly_transaction.system_messages
+      end
     end
-    json.note
-    json.initiating_account do
-
-    end
-    json.receiving_account do
-
-    end
-    json.status do
-
-    end
-    json.purpose
-    json.closing_balance
   end
 end
 if @result.has_transactions_tab?
