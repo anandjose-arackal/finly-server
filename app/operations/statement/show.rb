@@ -53,7 +53,7 @@ class Statement::Show < BaseOperation
   end
 
   def process
-    self.finly_transactions = FinlyTransaction.with_account(self.account)
+    self.finly_transactions = self.account.finly_transactions
     if self.account.class.name == 'Card'
       self.card_transactions = self.account.transactions
     end
@@ -77,7 +77,7 @@ class Statement::Show < BaseOperation
       self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 30)
       self.card_transactions = params[:card_transactions]
       if self.card_transactions.present?
-        self.scoped_card_transactions = apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
+        self.scoped_card_transactions = self.card_transactions#apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
       end
     end
 
@@ -112,7 +112,7 @@ class Statement::Show < BaseOperation
     end
 
     def merchant(finly_transaction)
-      merchant = ""
+      merchant = ''
       if finly_transaction.credit?
         prefix = 'To '
       else
