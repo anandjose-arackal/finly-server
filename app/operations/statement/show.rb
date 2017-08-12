@@ -74,10 +74,12 @@ class Statement::Show < BaseOperation
     def init
       self.account = params[:account]
       self.finly_transactions = params[:finly_transactions]
+      # ft_scoped_params = scoped_params_for(:finly_transactions)
       self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 30)
+      # ct_scoped_params = scoped_params_for(:card_transactions)
       self.card_transactions = params[:card_transactions]
       if self.card_transactions.present?
-        self.scoped_card_transactions = self.card_transactions#apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
+        self.scoped_card_transactions = apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
       end
     end
 
@@ -144,6 +146,16 @@ class Statement::Show < BaseOperation
       end
       merchant
     end
+
+    # protected
+    # def scoped_params_for(item)
+    #   case item
+    #     when :finly_transactions
+    #       params.permit(with_date_range: [:from, :to])
+    #     when :card_transactions
+    #       params.permit()
+    #   end
+    # end
 
   end
 

@@ -8,7 +8,7 @@ json.transactions_tab @result.has_transactions_tab?
 json.finly_transactions do
   json.array! @result.scoped_finly_transactions do |finly_transaction|
     # todo - remove id. just for testing
-    json.id finly_transaction.id
+    # json.id finly_transaction.id
     json.date DateUtils.date_formatted finly_transaction.created_at
     json.transaction_type finly_transaction.transaction_type.name.humanize
     json.purpose finly_transaction.payment_purpose.name.humanize
@@ -33,7 +33,14 @@ end
 if @result.has_transactions_tab?
   json.card_transactions do
     json.array! @result.scoped_card_transactions do |card_transaction|
-
+      json.date '12 August 2017'
+      json.transaction_type 'Debit'
+      json.purpose 'Payment'
+      json.merchant 'Test Merchant'
+      json.credit_amount 2
+      json.debit_amount 1
+      json.closing_balance 500
+      json.status 'Verified'
     end
   end
 end

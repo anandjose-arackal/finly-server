@@ -68,6 +68,7 @@ class CardTransaction < ActiveRecord::Base
   scope :debits, -> { where transaction_type: 'Debit' }
   scope :credits, -> { where transaction_type: 'Credit' }
   scope :on_date, -> (date) { where('DATE(transaction_timestamp) = ?', date) }
+  scope :with_date_range, -> (start_date, end_date) { where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_date, end_date) }
   scope :joins_billing_amount, -> { joins(:billing_amount) }
   scope :successful, -> {where success: true}
   scope :failed, -> {where success: false}
