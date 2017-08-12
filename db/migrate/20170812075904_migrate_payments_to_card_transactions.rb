@@ -40,7 +40,8 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
             closing_balance: nil,
             associated_transaction: payment.reference_resource,
             payment: payment,
-            company_id: company_id
+            company_id: company_id,
+            created_at: payment.date
         }
         t = FinlyTransaction.create credit_params
         unless t.valid?
@@ -62,7 +63,8 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
             closing_balance: nil,
             associated_transaction: payment.reference_resource,
             payment: payment,
-            company_id: company_id
+            company_id: company_id,
+            created_at: payment.date
         }
         t = FinlyTransaction.create debit_params
         unless t.valid?

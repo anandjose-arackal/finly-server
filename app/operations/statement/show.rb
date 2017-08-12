@@ -41,8 +41,8 @@ class Statement::Show < BaseOperation
     if params[:with_date_range][:from].blank?
       params[:with_date_range][:from] = 30.days.ago
     end
-    if params[:with_date_range][:to].blank?
-      params[:with_date_range][:to] = Date.today
+    if params[:with_date_range][:to].blank? or DateUtils.parse_date(params[:with_date_range][:to]) == Date.today
+      params[:with_date_range][:to] = Date.tomorrow
     end
   end
 
@@ -77,7 +77,7 @@ class Statement::Show < BaseOperation
       self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 30)
       self.card_transactions = params[:card_transactions]
       if self.card_transactions.present?
-        self.scoped_card_transactions = self.card_transactions#apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
+        self.scoped_card_transactions = apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
       end
     end
 
@@ -114,15 +114,22 @@ class Statement::Show < BaseOperation
     def merchant(finly_transaction)
       merchant = ""
       if finly_transaction.credit?
-        merchant = "To "
+        prefix = 'To '
       else
-        merchant = "From "
+        prefix = 'From '
       end
       case finly_transaction.payment_purpose_id
-        when :atm_withdrawal
-          merchant += 'ATM withdrawal'
-        when :card_transaction
-        when :advance_outside_finly, :reimbursement_outside_finly, :advance, :balance_clearance, :reimbursement, :medical_benefit, :meal_benefit, :payroll, :balance_clearance_outside_finly
+        when PaymentPurpose.id_for(:atm_withdrawal)
+          merchant = 'ATM withdrawal'
+        when PaymentPurpose.id_for(:card_transaction)
+
+        when PaymentPurpose.id_for(:vendor_payment)
+          merchant = 'Vendor Payment'
+        when PaymentPurpose.id_for(:corporate_balance_load)
+          merchant = 'Corporate Balance Load'
+        when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:balance_clearance),
+            PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit), PaymentPurpose.id_for(:payroll), PaymentPurpose.id_for(:balance_clearance_outside_finly)
+          merchant = prefix
           if finly_transaction.payment.initiating_account == finly_transaction.finly_account
             if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
               merchant += "#{finly_transaction.payment.receiving_account.user.name}'s "
@@ -134,10 +141,6 @@ class Statement::Show < BaseOperation
             end
             merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.initiating_account)}"
           end
-        when :vendor_payment
-          merchant = 'Vendor Payment'
-        when :corporate_balance_load
-          merchant = 'Corporate Balance Load'
       end
       merchant
     end
