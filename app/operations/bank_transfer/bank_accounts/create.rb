@@ -1,4 +1,4 @@
-class BankTransfer::BankAccount::Create < BankAccount::Base
+class BankTransfer::BankAccounts::Create < BankTransfer::BankAccounts::Base
 
   attr_accessor :bank_account, :account_params
 
@@ -25,3 +25,4 @@ class BankTransfer::BankAccount::Create < BankAccount::Base
     add_message :success, "Bank account ceated!"
   end
 end
+

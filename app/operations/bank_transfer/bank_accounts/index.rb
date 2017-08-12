@@ -1,4 +1,4 @@
-class BankTransfer::BankAccount::Index < BankTransfer::BankAccount::Base
+class BankTransfer::BankAccounts::Index < BankTransfer::BankAccounts::Base
 
   attr_accessor :user_ids, :vendor_ids, :company, :bank_accounts
 
@@ -10,15 +10,15 @@ class BankTransfer::BankAccount::Index < BankTransfer::BankAccount::Base
 
   def process
     # extracting the bank accounts owned by users and vendors
-    self.bank_accounts = BankAccount.with_account_owner(user_ids, vendor_ids)
+    self.bank_accounts = company.bank_accounts
   end
 
   def success
     params[:bank_accounts] = bank_accounts
-    BankTransfer::BankAccount::Index::IndexPresenter.new(user, params, messages)
+    BankTransfer::BankAccounts::Index::IndexPresenter.new(user, params, messages)
   end
 
-  class BankTransfer::BankAccount::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::BankAccounts::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :bank_accounts
 
