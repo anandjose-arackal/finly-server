@@ -32,6 +32,7 @@ json.category do
   json.name expense.category.name
 end
 json.receipts expense.receipts.each do |receipt|
+  json.original receipt.image(:original)
   json.large receipt.image(:large)
   json.normal receipt.image(:normal)
   json.thumb receipt.image(:thumb)
