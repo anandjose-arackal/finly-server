@@ -35,6 +35,15 @@ class BankAccount < ActiveRecord::Base
     where('(account_owner_type = ? AND account_owner_id IN (?)) OR (account_owner_type - ? AND account_owner_id IN (?)', "User", user_ids, "YesBankVendor", vendor_ids)
   }
 
+  scope :with_owner_ids, -> (type, ids) {
+    case type
+      when 1, '1'
+        where(account_owner_type: "User").where(id: ids)
+      when 2, '2'
+        where(account_owner_type: "YesBankVendor").where(id: ids)
+    end
+  }
+
   scope :filter_owner_type, -> (owner_type) {
     if owner_type == '1'
       where account_owner_type: "User"

@@ -845,6 +845,8 @@
 #                                                         DELETE /payments/companies/:id(.:format)                                               companies#destroy
 #               bank_transfer_payment_orders_process_file POST   /bank_transfer/payment_orders/process_file(.:format)                            bank_transfer/payment_orders#process_file
 #                    bank_transfer_payment_orders_balance GET    /bank_transfer/payment_orders/balance(.:format)                                 bank_transfer/payment_orders#balance
+#            bank_transfer_payment_orders_account_details POST   /bank_transfer/payment_orders/account_details(.:format)                         bank_transfer/payment_orders#account_details
+#        bank_transfer_payment_orders_process_account_ids POST   /bank_transfer/payment_orders/process_account_ids(.:format)                     bank_transfer/payment_orders#process_account_ids
 #                            bank_transfer_payment_orders GET    /bank_transfer/payment_orders(.:format)                                         bank_transfer/payment_orders#index
 #                                                         POST   /bank_transfer/payment_orders(.:format)                                         bank_transfer/payment_orders#create
 #                         new_bank_transfer_payment_order GET    /bank_transfer/payment_orders/new(.:format)                                     bank_transfer/payment_orders#new
@@ -2100,6 +2102,8 @@ Rails.application.routes.draw do
   namespace :bank_transfer do
     post 'payment_orders/process_file', to: 'payment_orders#process_file'
     get 'payment_orders/balance', to: 'payment_orders#balance'
+    post 'payment_orders/account_details', to: 'payment_orders#account_details'
+    post 'payment_orders/process_account_ids', to: 'payment_orders#process_account_ids'
     resources :payment_orders do
 
     end

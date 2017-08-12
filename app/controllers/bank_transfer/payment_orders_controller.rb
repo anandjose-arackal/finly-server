@@ -14,6 +14,20 @@ class BankTransfer::PaymentOrdersController < ApplicationController
     respond
   end
 
+  def process_account_ids
+    @result = BankTransfer::YesBank::ProcessFromAccountIds.(current_user, params)
+    if @result.success?
+      render 'process_file'
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def account_details
+    @result = BankTransfer::YesBank::AccountDetails.(current_user, params)
+    respond
+  end
+
   def index
     @result = BankTransfer::YesBank::Index.(current_user, params)
     respond
