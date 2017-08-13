@@ -14,7 +14,7 @@ class StatementsController < ApplicationController
     # else
     #   respond
     # end
-    @result = Statement::Show.(current_user, params)
+    @result = Statements::Show.(current_user, params)
     respond
   end
 

@@ -1,5 +1,51 @@
 class MigratePaymentsToCardTransactions < ActiveRecord::Migration
   def change
+    add_column :finly_transactions, :date, :datetime, index: true
+    Company.all.each do |company|
+      next unless company.itz_cash_company_account.present?
+      company.company_transactions.each do |company_transaction|
+        # Ignore card transfers are these transactions would be generated from payments
+        next if company_transaction.card_transfer?
+        transaction_type = TransactionType.id_for(company_transaction.transaction_type.downcase)
+        reference_id = Generator.reference_id_for(company.itz_cash_company_account, nil, nil, company_transaction.transaction_date)
+        if company_transaction.transaction_type.downcase == 'debit'
+          purpose_id =  PaymentPurpose.id_for(:advance)
+        else
+          if company_transaction.merchant_name.downcase.include?('manual') || company_transaction.merchant_name.downcase.include?('payu')
+            purpose_id = PaymentPurpose.id_for(:corporate_balance_load)
+          else
+            purpose_id = PaymentPurpose.id_for(:balance_clearance)
+          end
+        end
+        closing_balance = company_transaction.balance_amount.value
+        if company_transaction.transaction_type.downcase == 'credit'
+          opening_balance = (company_transaction.balance_amount.value - company_transaction.transaction_amount.value)
+        else
+          opening_balance = (company_transaction.balance_amount.value + company_transaction.transaction_amount.value)
+        end
+        params = {
+            transaction_type_id: transaction_type,
+            amount_attributes: {
+                value: company_transaction.transaction_amount.value,
+                currency_id: Currency.id_for(:INR)
+            },
+            transaction_reference_id: reference_id,
+            status_id: TransactionStatus.id_for(:success),
+            payment_purpose_id: purpose_id,
+            opening_balance: nil,
+            closing_balance: nil,
+            associated_transaction: company_transaction,
+            payment: nil,
+            company_id: company.id,
+            date: company_transaction.transaction_date
+        }
+        transaction = company.itz_cash_company_account.finly_transactions.create(params)
+        unless transaction.valid?
+          raise "#{transaction.errors.full_messages}"
+        end
+      end
+    end
+
     Payment.all.each do |payment|
       next unless payment.completed? or payment.failed? or payment.processing?
       next unless payment.initiating_account.present? or payment.receiving_account.present?
@@ -41,7 +87,7 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
             associated_transaction: payment.reference_resource,
             payment: payment,
             company_id: company_id,
-            created_at: payment.date
+            date: payment.date
         }
         t = FinlyTransaction.create credit_params
         unless t.valid?
@@ -50,7 +96,7 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
       end
       if debit_account.present?
         debit_params = {
-            finly_account: credit_account,
+            finly_account: debit_account,
             transaction_type_id: TransactionType.id_for(:debit),
             amount_attributes: {
                 value: payment.amount.value,
@@ -64,7 +110,7 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
             associated_transaction: payment.reference_resource,
             payment: payment,
             company_id: company_id,
-            created_at: payment.date
+            date: payment.date
         }
         t = FinlyTransaction.create debit_params
         unless t.valid?
@@ -72,5 +118,7 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
         end
       end
     end
+
+
   end
 end

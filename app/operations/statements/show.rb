@@ -1,4 +1,4 @@
-class Statement::Show < BaseOperation
+class Statements::Show < BaseOperation
   attr_accessor :account, :finly_transactions, :card_transactions
 
   def pre_validate
@@ -39,10 +39,10 @@ class Statement::Show < BaseOperation
       params[:with_date_range] = {}
     end
     if params[:with_date_range][:from].blank?
-      params[:with_date_range][:from] = 30.days.ago
+      params[:with_date_range][:from] = 50.days.ago
     end
     if params[:with_date_range][:to].blank? or DateUtils.parse_date(params[:with_date_range][:to]) == Date.today
-      params[:with_date_range][:to] = Date.tomorrow
+      params[:with_date_range][:to] = 30.days.ago
     end
   end
 
@@ -63,10 +63,10 @@ class Statement::Show < BaseOperation
     params[:finly_transactions] = self.finly_transactions
     params[:account] = self.account
     params[:card_transactions] = self.card_transactions
-    Statement::Show::SuccessPresenter.new(user, params, messages)
+    Statements::Show::SuccessPresenter.new(user, params, messages)
   end
 
-  class Statement::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Statements::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :finly_transactions, :account, :card_transactions, :scoped_finly_transactions, :scoped_card_transactions
 
     has_scope :with_date_range, using: [:from, :to], type: :hash
@@ -74,39 +74,54 @@ class Statement::Show < BaseOperation
     def init
       self.account = params[:account]
       self.finly_transactions = params[:finly_transactions]
-      # ft_scoped_params = scoped_params_for(:finly_transactions)
-      self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 30)
-      # ct_scoped_params = scoped_params_for(:card_transactions)
+      self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)#&.paginate(page: params[:page], per_page: 30)
       self.card_transactions = params[:card_transactions]
       if self.card_transactions.present?
-        self.scoped_card_transactions = apply_scopes(self.card_transactions, params)&.paginate(page: params[:page], per_page: 30)
+        self.scoped_card_transactions = apply_scopes(self.card_transactions, params) #&.paginate(page: params[:page], per_page: 30)
       end
     end
 
     def credits_count
-      return if self.finly_transactions.nil? or self.account.nil?
-      self.finly_transactions.credits.count
+      return if self.scoped_finly_transactions.nil? or self.account.nil?
+      self.scoped_finly_transactions.credits.count
     end
 
     def debits_count
-      return if self.finly_transactions.nil? or self.account.nil?
-      self.finly_transactions.debits.count
+      return if self.scoped_finly_transactions.nil? or self.account.nil?
+      self.scoped_finly_transactions.debits.count
     end
 
     def opening_balance
-      self.finly_transactions.last&.opening_balance&.value&.to_s
+      balance = self.scoped_finly_transactions.last&.opening_balance&.value&.to_s
+      return balance unless balance.nil?
+
+      # todo Jugaad to access historical data
+      from = (params&.dig(:with_date_range)&.dig(:from) - 1.day)
+      case self.account.class.name
+        when ItzCashCompanyAccount.name
+          self.account.company.company_balance_histories.with_date(from)&.first&.company_balance&.value.to_s || 0
+      end
+      # self.account.user.user_balance_histories.with_date(from)&.first.card_balance.value.to_s
     end
 
     def closing_balance
-      self.finly_transactions.first&.closing_balance&.value&.to_s
+      balance = self.scoped_finly_transactions.first&.closing_balance&.value&.to_s
+      return balance unless balance.nil?
+
+      # todo Jugaad to access historical data
+      to = params&.dig(:with_date_range)&.dig(:to)
+      case self.account.class.name
+        when ItzCashCompanyAccount.name
+          self.account.company.company_balance_histories.with_date(to)&.first&.company_balance&.value.to_s || 0
+      end
     end
 
     def credit_amount
-      self.finly_transactions.credits.sum_amounts || 0
+      self.scoped_finly_transactions.credits.sum_amounts || 0
     end
 
     def debit_amount
-      self.finly_transactions.debits.sum_amounts || 0
+      self.scoped_finly_transactions.debits.sum_amounts || 0
     end
 
     def has_transactions_tab?
@@ -120,9 +135,9 @@ class Statement::Show < BaseOperation
     def merchant(finly_transaction)
       merchant = ''
       if finly_transaction.credit?
-        prefix = 'To '
-      else
         prefix = 'From '
+      else
+        prefix = 'To '
       end
       case finly_transaction.payment_purpose_id
         when PaymentPurpose.id_for(:atm_withdrawal)
@@ -136,16 +151,22 @@ class Statement::Show < BaseOperation
         when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:balance_clearance),
             PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit), PaymentPurpose.id_for(:payroll), PaymentPurpose.id_for(:balance_clearance_outside_finly)
           merchant = prefix
-          if finly_transaction.payment.initiating_account == finly_transaction.finly_account
-            if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
-              merchant += "#{finly_transaction.payment.receiving_account.user.name}'s "
+          if finly_transaction.payment.blank?
+            if finly_transaction.associated_transaction.class.name == CompanyTransaction.name
+              merchant = finly_transaction.associated_transaction.merchant_name
             end
-            merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.receiving_account)}"
-          elsif finly_transaction.payment.receiving_account == finly_transaction.finly_account
-            if [UserWallet, Card].include? finly_transaction.payment.initiating_account.class
-              merchant += "#{finly_transaction.payment.initiating_account.user.name}'s "
+          else
+            if finly_transaction.payment.initiating_account == finly_transaction.finly_account
+              if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
+                merchant += "#{finly_transaction.payment.receiving_account.user.name}'s "
+              end
+              merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.receiving_account)}"
+            elsif finly_transaction.payment.receiving_account == finly_transaction.finly_account
+              if [UserWallet, Card].include? finly_transaction.payment.initiating_account.class
+                merchant += "#{finly_transaction.payment.initiating_account.user.name}'s "
+              end
+              merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.initiating_account)}"
             end
-            merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.initiating_account)}"
           end
       end
       merchant

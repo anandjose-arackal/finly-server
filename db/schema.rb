@@ -573,9 +573,9 @@ ActiveRecord::Schema.define(version: 20170812075904) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
-    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -1487,22 +1487,22 @@ ActiveRecord::Schema.define(version: 20170812075904) do
   end
 
   create_table "finly_transactions", force: :cascade do |t|
-    t.integer  "finly_account_id",            limit: 4,     null: false
-    t.string   "finly_account_type",          limit: 255,   null: false
-    t.integer  "transaction_type_id",         limit: 4,     null: false
-    t.integer  "amount_id",                   limit: 4,     null: false
-    t.string   "transaction_reference_id",    limit: 255,   null: false
-    t.integer  "status_id",                   limit: 4,     null: false
-    t.integer  "payment_purpose_id",          limit: 4,     null: false
+    t.integer  "finly_account_id",            limit: 4,   null: false
+    t.string   "finly_account_type",          limit: 255, null: false
+    t.integer  "transaction_type_id",         limit: 4,   null: false
+    t.integer  "amount_id",                   limit: 4,   null: false
+    t.string   "transaction_reference_id",    limit: 255, null: false
+    t.integer  "status_id",                   limit: 4,   null: false
+    t.integer  "payment_purpose_id",          limit: 4,   null: false
     t.integer  "opening_balance_id",          limit: 4
     t.integer  "closing_balance_id",          limit: 4
     t.integer  "associated_transaction_id",   limit: 4
     t.string   "associated_transaction_type", limit: 255
     t.integer  "payment_id",                  limit: 4
     t.integer  "company_id",                  limit: 4
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
-    t.text     "note",                        limit: 65535
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.datetime "date"
   end
 
   add_index "finly_transactions", ["amount_id"], name: "index_finly_transactions_on_amount_id", using: :btree
@@ -2945,11 +2945,9 @@ ActiveRecord::Schema.define(version: 20170812075904) do
   create_table "yes_bank_company_accounts", force: :cascade do |t|
     t.integer  "company_id",        limit: 4
     t.integer  "wallet_balance_id", limit: 4
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
     t.integer  "balance_id",        limit: 4
-    t.string   "account_number",    limit: 255
-    t.string   "customer_id",       limit: 255
   end
 
   add_index "yes_bank_company_accounts", ["company_id"], name: "index_yes_bank_company_accounts_on_company_id", using: :btree
