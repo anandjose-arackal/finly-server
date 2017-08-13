@@ -1,7 +1,7 @@
 class MigratePaymentsToCardTransactions < ActiveRecord::Migration
-  def up
+  def change
     PaymentPurpose.seed_data
-    # add_column :finly_transactions, :date, :datetime, index: true
+    add_column :finly_transactions, :date, :datetime, index: true
     Company.all.each do |company|
       next unless company.itz_cash_company_account.present?
       company.company_transactions.each do |company_transaction|
