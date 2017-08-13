@@ -1,6 +1,7 @@
 class MigratePaymentsToCardTransactions < ActiveRecord::Migration
-  def change
-    add_column :finly_transactions, :date, :datetime, index: true
+  def up
+    PaymentPurpose.seed_data
+    # add_column :finly_transactions, :date, :datetime, index: true
     Company.all.each do |company|
       next unless company.itz_cash_company_account.present?
       company.company_transactions.each do |company_transaction|
@@ -119,6 +120,30 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
       end
     end
 
+    Expense.all.only_card_expenses.personal.each do |expense|
+      cash_on_hand = expense.user.cash_on_hand
+      cash_on_hand_params = {
+          finly_account: cash_on_hand,
+          transaction_type_id: TransactionType.id_for(:credit),
+          amount_attributes: {
+              value: expense.amount.value,
+              currency_id: expense.amount.currency_id
+          },
+          transaction_reference_id: Generator.reference_id_for(cash_on_hand, nil, expense.amount.value, expense.date),
+          status_id: TransactionStatus.id_for(:success),
+          payment_purpose_id: PaymentPurpose.id_for(:personal_expense),
+          opening_balance: nil,
+          closing_balance: nil,
+          associated_transaction: expense.card_expense.card_transaction,
+          payment: nil,
+          company_id: expense.user.company_id,
+          date: expense.date
+      }
+      t = cash_on_hand.finly_transactions.create cash_on_hand_params
+      unless t.valid?
+        raise "#{t.errors.full_messages}"
+      end
+    end
 
   end
 end

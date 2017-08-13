@@ -35,14 +35,16 @@ class Statements::Show < BaseOperation
         end
     end
 
+    self.account = sel_user.cash_on_hand
+
     if params[:with_date_range].nil?
       params[:with_date_range] = {}
     end
     if params[:with_date_range][:from].blank?
-      params[:with_date_range][:from] = 50.days.ago
+      params[:with_date_range][:from] = 1000.days.ago
     end
     if params[:with_date_range][:to].blank? or DateUtils.parse_date(params[:with_date_range][:to]) == Date.today
-      params[:with_date_range][:to] = 30.days.ago
+      params[:with_date_range][:to] = Date.today
     end
   end
 
@@ -74,7 +76,7 @@ class Statements::Show < BaseOperation
     def init
       self.account = params[:account]
       self.finly_transactions = params[:finly_transactions]
-      self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)#&.paginate(page: params[:page], per_page: 30)
+      self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params) #&.paginate(page: params[:page], per_page: 30)
       self.card_transactions = params[:card_transactions]
       if self.card_transactions.present?
         self.scoped_card_transactions = apply_scopes(self.card_transactions, params) #&.paginate(page: params[:page], per_page: 30)
@@ -100,6 +102,10 @@ class Statements::Show < BaseOperation
       case self.account.class.name
         when ItzCashCompanyAccount.name
           self.account.company.company_balance_histories.with_date(from)&.first&.company_balance&.value.to_s || 0
+        when UserWallet.name
+          self.account.user.user_balance_histories.with_date(from)&.first&.finly_money_balance&.value.to_s || 0
+        when CashOnHand.name
+          self.account.user.user_balance_histories.with_date(from)&.first&.cash_on_hand_balance&.value.to_s || 0
       end
       # self.account.user.user_balance_histories.with_date(from)&.first.card_balance.value.to_s
     end
@@ -113,6 +119,10 @@ class Statements::Show < BaseOperation
       case self.account.class.name
         when ItzCashCompanyAccount.name
           self.account.company.company_balance_histories.with_date(to)&.first&.company_balance&.value.to_s || 0
+        when UserWallet.name
+          self.account.user.user_balance_histories.with_date(to)&.first&.finly_money_balance&.value.to_s || 0
+        when CashOnHand.name
+          self.account.user.user_balance_histories.with_date(to)&.first&.cash_on_hand_balance&.value.to_s || 0
       end
     end
 
@@ -141,7 +151,9 @@ class Statements::Show < BaseOperation
       end
       case finly_transaction.payment_purpose_id
         when PaymentPurpose.id_for(:atm_withdrawal)
-          merchant = 'ATM withdrawal'
+          merchant = finly_transaction&.associated_transaction&.merchant_name
+        when PaymentPurpose.id_for(:personal_expense)
+          merchant = finly_transaction&.associated_transaction&.merchant_name
         when PaymentPurpose.id_for(:card_transaction)
 
         when PaymentPurpose.id_for(:vendor_payment)
@@ -150,18 +162,19 @@ class Statements::Show < BaseOperation
           merchant = 'Corporate Balance Load'
         when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:balance_clearance),
             PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit), PaymentPurpose.id_for(:payroll), PaymentPurpose.id_for(:balance_clearance_outside_finly)
-          merchant = prefix
           if finly_transaction.payment.blank?
             if finly_transaction.associated_transaction.class.name == CompanyTransaction.name
               merchant = finly_transaction.associated_transaction.merchant_name
             end
           else
-            if finly_transaction.payment.initiating_account == finly_transaction.finly_account
+            if finly_transaction.payment.initiating_account == finly_transaction.finly_account and finly_transaction.payment.receiving_account.present?
+              merchant = prefix
               if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
                 merchant += "#{finly_transaction.payment.receiving_account.user.name}'s "
               end
               merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.receiving_account)}"
-            elsif finly_transaction.payment.receiving_account == finly_transaction.finly_account
+            elsif finly_transaction.payment.receiving_account == finly_transaction.finly_account and finly_transaction.payment.initiating_account.present?
+              merchant = prefix
               if [UserWallet, Card].include? finly_transaction.payment.initiating_account.class
                 merchant += "#{finly_transaction.payment.initiating_account.user.name}'s "
               end

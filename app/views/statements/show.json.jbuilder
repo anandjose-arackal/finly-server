@@ -13,7 +13,7 @@ json.finly_transactions do
     json.date DateUtils.date_formatted finly_transaction.date
     json.transaction_type finly_transaction.transaction_type.name.humanize
     json.purpose finly_transaction.payment_purpose.name.humanize
-    json.merchant "#{@result.merchant(finly_transaction)} - ID : #{finly_transaction.id}"
+    json.merchant @result.merchant(finly_transaction)
     credit_amount = nil
     debit_amount = nil
     if finly_transaction.credit?
