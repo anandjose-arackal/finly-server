@@ -153,4 +153,8 @@ class CardTransaction < ActiveRecord::Base
     false
   end
 
+  def funds_transfer?
+    # ['EASY_EXP_CARDDEBIT', 'EASY_EXP_CARDTOPUP'].include? merchant_name
+  end
+
 end

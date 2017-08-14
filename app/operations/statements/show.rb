@@ -35,7 +35,7 @@ class Statements::Show < BaseOperation
         end
     end
 
-    self.account = sel_user.cash_on_hand
+    self.account = sel_user.cards.expense_cards.first
 
     if params[:with_date_range].nil?
       params[:with_date_range] = {}
@@ -44,7 +44,7 @@ class Statements::Show < BaseOperation
       params[:with_date_range][:from] = 1000.days.ago
     end
     if params[:with_date_range][:to].blank? or DateUtils.parse_date(params[:with_date_range][:to]) == Date.today
-      params[:with_date_range][:to] = Date.today
+      params[:with_date_range][:to] = 1.week.ago
     end
   end
 
@@ -134,10 +134,6 @@ class Statements::Show < BaseOperation
       self.scoped_finly_transactions.debits.sum_amounts || 0
     end
 
-    def has_transactions_tab?
-      self.account.class.name == 'Card'
-    end
-
     def account_name
       AccountManagerUtils.name_for self.account
     end
@@ -150,12 +146,8 @@ class Statements::Show < BaseOperation
         prefix = 'To '
       end
       case finly_transaction.payment_purpose_id
-        when PaymentPurpose.id_for(:atm_withdrawal)
+        when PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:personal_expense), PaymentPurpose.id_for(:card_transaction)
           merchant = finly_transaction&.associated_transaction&.merchant_name
-        when PaymentPurpose.id_for(:personal_expense)
-          merchant = finly_transaction&.associated_transaction&.merchant_name
-        when PaymentPurpose.id_for(:card_transaction)
-
         when PaymentPurpose.id_for(:vendor_payment)
           merchant = 'Vendor Payment'
         when PaymentPurpose.id_for(:corporate_balance_load)

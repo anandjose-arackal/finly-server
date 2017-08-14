@@ -1,7 +1,7 @@
 class MigratePaymentsToCardTransactions < ActiveRecord::Migration
-  def change
+  def up
     PaymentPurpose.seed_data
-    add_column :finly_transactions, :date, :datetime, index: true
+    # add_column :finly_transactions, :date, :datetime, index: true
     Company.all.each do |company|
       next unless company.itz_cash_company_account.present?
       company.company_transactions.each do |company_transaction|
@@ -10,7 +10,7 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
         transaction_type = TransactionType.id_for(company_transaction.transaction_type.downcase)
         reference_id = Generator.reference_id_for(company.itz_cash_company_account, nil, nil, company_transaction.transaction_date)
         if company_transaction.transaction_type.downcase == 'debit'
-          purpose_id =  PaymentPurpose.id_for(:advance)
+          purpose_id = PaymentPurpose.id_for(:advance)
         else
           if company_transaction.merchant_name.downcase.include?('manual') || company_transaction.merchant_name.downcase.include?('payu')
             purpose_id = PaymentPurpose.id_for(:corporate_balance_load)
@@ -140,6 +140,45 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
           date: expense.date
       }
       t = cash_on_hand.finly_transactions.create cash_on_hand_params
+      unless t.valid?
+        raise "#{t.errors.full_messages}"
+      end
+    end
+
+    CardTransaction.successful.group(:reference_id, :transaction_type, :type_of_details).each do |transaction|
+      if ['Branch TopUp', 'Balance Adjustment Debit'].include?(transaction.merchant_name)
+        next
+      end
+      if transaction.credit?
+        transaction_type_id = TransactionType.id_for(:credit)
+      else
+        transaction_type_id = TransactionType.id_for(:debit)
+      end
+      account = transaction.card
+      purpose_id = PaymentPurpose.id_for(:card_transaction)
+      amount = transaction.billing_amount
+      if transaction.transaction_mode == 'ATM'
+        amount = transaction.transaction_amount
+        purpose_id = PaymentPurpose.id_for(:atm_withdrawal)
+      end
+      params = {
+          finly_account: account,
+          transaction_type_id: transaction_type_id,
+          amount_attributes: {
+              value: amount.value,
+              currency_id: amount.currency_id
+          },
+          transaction_reference_id: Generator.reference_id_for(account, nil, amount.value, transaction.transaction_timestamp),
+          status_id: TransactionStatus.id_for(:success),
+          payment_purpose_id: purpose_id,
+          opening_balance: nil,
+          closing_balance: nil,
+          associated_transaction: transaction,
+          payment: nil,
+          company_id: transaction.user.company_id,
+          date: transaction.transaction_timestamp
+      }
+      t = account.finly_transactions.create params
       unless t.valid?
         raise "#{t.errors.full_messages}"
       end
