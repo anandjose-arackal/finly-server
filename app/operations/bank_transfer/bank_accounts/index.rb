@@ -22,7 +22,7 @@ class BankTransfer::BankAccounts::Index < BankTransfer::BankAccounts::Base
 
     attr_accessor :bank_accounts
 
-    has_scope :filter_owner_type
+    has_scope :beneficiary_type
 
     def init
       self.bank_accounts = params[:bank_accounts]

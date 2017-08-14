@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170812091008) do
+ActiveRecord::Schema.define(version: 20170814093248) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2071,31 +2071,27 @@ ActiveRecord::Schema.define(version: 20170812091008) do
   end
 
   create_table "payments", force: :cascade do |t|
-    t.integer  "amount_id",                             limit: 4,     null: false
-    t.date     "date",                                                null: false
-    t.integer  "payment_type_id",                       limit: 4,     null: false
-    t.integer  "initiating_user_id",                    limit: 4,     null: false
-    t.integer  "receiving_user_id",                     limit: 4
-    t.text     "note",                                  limit: 65535
-    t.datetime "created_at",                                          null: false
-    t.datetime "updated_at",                                          null: false
-    t.integer  "initiating_account_id",                 limit: 4
-    t.string   "initiating_account_type",               limit: 255
-    t.integer  "receiving_account_id",                  limit: 4
-    t.string   "receiving_account_type",                limit: 255
-    t.integer  "payment_order_id",                      limit: 4
-    t.integer  "payment_status_id",                     limit: 4,     null: false
-    t.string   "initiating_user_type",                  limit: 255
-    t.string   "receiving_user_type",                   limit: 255
-    t.integer  "payment_purpose_id",                    limit: 4
-    t.integer  "reference_resource_id",                 limit: 4
-    t.string   "reference_resource_type",               limit: 255
-    t.string   "application",                           limit: 255
-    t.integer  "initiating_account_closing_balance_id", limit: 4
-    t.integer  "receiving_account_closing_balance_id",  limit: 4
-    t.string   "payment_mode",                          limit: 255
-    t.integer  "initiating_account_opening_balance_id", limit: 4
-    t.integer  "receiving_account_opening_balance_id",  limit: 4
+    t.integer  "amount_id",               limit: 4,     null: false
+    t.date     "date",                                  null: false
+    t.integer  "payment_type_id",         limit: 4,     null: false
+    t.integer  "initiating_user_id",      limit: 4,     null: false
+    t.integer  "receiving_user_id",       limit: 4
+    t.text     "note",                    limit: 65535
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "initiating_account_id",   limit: 4
+    t.string   "initiating_account_type", limit: 255
+    t.integer  "receiving_account_id",    limit: 4
+    t.string   "receiving_account_type",  limit: 255
+    t.integer  "payment_order_id",        limit: 4
+    t.integer  "payment_status_id",       limit: 4,     null: false
+    t.string   "initiating_user_type",    limit: 255
+    t.string   "receiving_user_type",     limit: 255
+    t.integer  "payment_purpose_id",      limit: 4
+    t.integer  "reference_resource_id",   limit: 4
+    t.string   "reference_resource_type", limit: 255
+    t.string   "application",             limit: 255
+    t.string   "payment_mode",            limit: 255
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree

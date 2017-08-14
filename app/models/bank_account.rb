@@ -53,4 +53,14 @@ class BankAccount < ActiveRecord::Base
       # do nothing?
     end
   }
+
+  scope :beneficiary_type, -> (owner_type) {
+    if owner_type == '1'
+      where account_owner_type: "User"
+    elsif owner_type == '2'
+      where account_owner_type: "YesBankVendor"
+    else
+      # do nothing?
+    end
+  }
 end
