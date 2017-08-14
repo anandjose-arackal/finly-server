@@ -1,7 +1,7 @@
 class MigratePaymentsToCardTransactions < ActiveRecord::Migration
-  def up
+  def change
     PaymentPurpose.seed_data
-    # add_column :finly_transactions, :date, :datetime, index: true
+    add_column :finly_transactions, :date, :datetime, index: true
     Company.all.each do |company|
       next unless company.itz_cash_company_account.present?
       company.company_transactions.each do |company_transaction|
@@ -17,12 +17,6 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
           else
             purpose_id = PaymentPurpose.id_for(:balance_clearance)
           end
-        end
-        closing_balance = company_transaction.balance_amount.value
-        if company_transaction.transaction_type.downcase == 'credit'
-          opening_balance = (company_transaction.balance_amount.value - company_transaction.transaction_amount.value)
-        else
-          opening_balance = (company_transaction.balance_amount.value + company_transaction.transaction_amount.value)
         end
         params = {
             transaction_type_id: transaction_type,

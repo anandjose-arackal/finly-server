@@ -32,6 +32,8 @@ class Statements::Show < BaseOperation
             self.account = sel_user.cards.reimbursement_cards.first
           when :finly_money
             self.account = sel_user.wallet
+          when :cash_on_hand
+            self.account = sel_user.cash_on_hand
         end
     end
 
@@ -70,7 +72,7 @@ class Statements::Show < BaseOperation
     def init
       self.account = params[:account]
       self.finly_transactions = params[:finly_transactions]
-      self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 2)
+      self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 30)
     end
 
     def credits_count

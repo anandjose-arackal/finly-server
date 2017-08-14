@@ -184,9 +184,52 @@ class Card::Transaction::Create < BaseOperation
           add_message :errors, transaction.errors.full_messages
         end
     end
+
   end
 
   def post_process
+    # Create Finly Transaction
+    if self.transaction.present? and transaction.success? and not ['Branch TopUp', 'Balance Adjustment Debit'].include?(self.transaction.merchant_name)
+      account = self.transaction.card
+      if transaction.credit?
+        transaction_type_id = TransactionType.id_for(:credit)
+      else
+        transaction_type_id = TransactionType.id_for(:debit)
+      end
+      purpose_id = PaymentPurpose.id_for(:card_transaction)
+      amount = transaction.billing_amount
+      if transaction.transaction_mode == 'ATM'
+        amount = transaction.transaction_amount
+        purpose_id = PaymentPurpose.id_for(:atm_withdrawal)
+      end
+      closing_balance = nil
+      bal_check = AccountManager::Balance::Check.(account)
+      if bal_check&.success?
+        closing_balance = Amount.new(value: bal_check.balance, currency_id: Currency.id_for(:INR))
+      end
+      ft_params = {
+          finly_account: account,
+          transaction_type_id: transaction_type_id,
+          amount_attributes: {
+              value: amount.value,
+              currency_id: amount.currency_id
+          },
+          transaction_reference_id: Generator.reference_id_for(account, nil, amount.value, transaction.transaction_timestamp),
+          status_id: TransactionStatus.id_for(:success),
+          payment_purpose_id: purpose_id,
+          opening_balance: nil,
+          closing_balance: closing_balance,
+          associated_transaction: transaction,
+          payment: nil,
+          company_id: transaction.user.company_id,
+          date: transaction.transaction_timestamp
+      }
+      transaction = account.finly_transactions.create ft_params
+      unless transaction.valid?
+        raise "#{transaction.errors.full_messages}"
+      end
+    end
+
     # send mailer regarding usage of card?
     return unless success?
     params = self.params
