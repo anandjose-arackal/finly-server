@@ -35,8 +35,6 @@ class Statements::Show < BaseOperation
         end
     end
 
-    self.account = sel_user.cards.expense_cards.first
-
     if params[:with_date_range].nil?
       params[:with_date_range] = {}
     end
