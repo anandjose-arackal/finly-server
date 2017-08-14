@@ -66,7 +66,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   private
 
   def create_refund_payment
-    admin_user = AdminUser.find_by(email: "vivek.a@finly.io")
+    admin_user = AdminUser.find_by(email: 'vivek.a@finly.io')
     self.payment_request = PaymentRequest.(admin_user, nil, company.yes_bank_company_account.class.name, :credit, :corporate_balance_refund, company_id: self.company.id)
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(nil, company.yes_bank_company_account, self.bank_transaction.amount_value))
 
