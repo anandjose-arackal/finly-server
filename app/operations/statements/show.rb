@@ -43,8 +43,8 @@ class Statements::Show < BaseOperation
     if params[:with_date_range][:from].blank?
       params[:with_date_range][:from] = 30.days.ago
     end
-    if params[:with_date_range][:to].blank? or DateUtils.parse_date(params[:with_date_range][:to]) == Date.today
-      params[:with_date_range][:to] = Date.today
+    if params[:with_date_range][:to].blank? or DateUtils.parse_date(params[:with_date_range][:to]) >= Date.today
+      params[:with_date_range][:to] = Date.yesterday
     end
   end
 
@@ -86,35 +86,35 @@ class Statements::Show < BaseOperation
     end
 
     def opening_balance
-      balance = self.scoped_finly_transactions.last&.opening_balance&.value&.to_s
+      balance = self.scoped_finly_transactions.last&.opening_balance&.value
       return balance unless balance.nil?
 
       # todo Jugaad to access historical data
       from = (params&.dig(:with_date_range)&.dig(:from) - 1.day)
       case self.account.class.name
         when ItzCashCompanyAccount.name
-          self.account.company.company_balance_histories.with_date(from)&.first&.company_balance&.value.to_s || 0
+          self.account.company.company_balance_histories.with_date(from)&.first&.company_balance&.value || 0
         when UserWallet.name
-          self.account.user.user_balance_histories.with_date(from)&.first&.finly_money_balance&.value.to_s || 0
+          self.account.user.user_balance_histories.with_date(from)&.first&.finly_money_balance&.value || 0
         when CashOnHand.name
-          self.account.user.user_balance_histories.with_date(from)&.first&.cash_on_hand_balance&.value.to_s || 0
+          self.account.user.user_balance_histories.with_date(from)&.first&.cash_on_hand_balance&.value || 0
       end
       # self.account.user.user_balance_histories.with_date(from)&.first.card_balance.value.to_s
     end
 
     def closing_balance
-      balance = self.scoped_finly_transactions.first&.closing_balance&.value&.to_s
+      balance = self.scoped_finly_transactions.first&.closing_balance&.value
       return balance unless balance.nil?
 
       # todo Jugaad to access historical data
       to = params&.dig(:with_date_range)&.dig(:to)
       case self.account.class.name
         when ItzCashCompanyAccount.name
-          self.account.company.company_balance_histories.with_date(to)&.first&.company_balance&.value.to_s || 0
+          self.account.company.company_balance_histories.with_date(to)&.first&.company_balance&.value || 0
         when UserWallet.name
-          self.account.user.user_balance_histories.with_date(to)&.first&.finly_money_balance&.value.to_s || 0
+          self.account.user.user_balance_histories.with_date(to)&.first&.finly_money_balance&.value || 0
         when CashOnHand.name
-          self.account.user.user_balance_histories.with_date(to)&.first&.cash_on_hand_balance&.value.to_s || 0
+          self.account.user.user_balance_histories.with_date(to)&.first&.cash_on_hand_balance&.value || 0
       end
     end
 
