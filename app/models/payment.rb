@@ -170,7 +170,8 @@ class Payment < ActiveRecord::Base
       when "CashOnHand"
         name += "Cash on Hand"
       when "Card"
-        name += "#{self.initiating_account.card_program.name.humanize} Card"
+        card_type = Card.unscoped.find_by(id: self.initiating_account_id)&.card_program&.name&.humanize
+        name += "#{card_type} Card"
       when "UserWallet"
         name += "Finly Money"
       else
@@ -188,43 +189,14 @@ class Payment < ActiveRecord::Base
       when "CashOnHand"
         name += "Cash on Hand"
       when "Card"
-        name += "#{self.receiving_account.card_program.name.humanize} Card"
+        card_type = Card.unscoped.find_by(id: self.initiating_account_id)&.card_program&.name&.humanize
+        name += "#{card_type} Card"
       when "UserWallet"
         name += "Finly Money"
       else
         name = ""
     end
     name
-    # name = ""
-    #
-    # unless self.receiving_account_type == 'ItzCashCompanyAccount'
-    #   name += "#{self.receiving_user&.name}'s"
-    # end
-    #
-    # if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
-    #     PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement)].include?(self.payment_type_id)
-    #   name += " Cash on Hand"
-    #   return name
-    # end
-    #
-    # if [PaymentType.id_for(:reimbursement_outside_finly)].include?(self.payment_type_id)
-    #   name = 'Settled Outside Finly'
-    #   return name
-    # end
-    #
-    # case self.receiving_account_type
-    #   when 'UserWallet'
-    #     name += " Finly Money"
-    #   when 'ItzCashCompanyAccount'
-    #     name += " Company Credits"
-    #   when 'Card'
-    #     name += " #{self.receiving_account.card_program.name.humanize} Card"
-    #   when 'CashOnHand'
-    #     name += "Cash on Hand"
-    #   else
-    #     name = ""
-    # end
-    # name
   end
 
   def credit?
