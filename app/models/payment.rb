@@ -36,6 +36,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -158,7 +159,6 @@ class Payment < ActiveRecord::Base
 
   def initiating_account_type_name
     name = "#{initiating_user&.name&.to_s}'s "
-
 
     case self.initiating_account_type
       when "Company", "ItzCashCompanyAccount"

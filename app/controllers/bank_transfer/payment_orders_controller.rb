@@ -25,7 +25,6 @@ class BankTransfer::PaymentOrdersController < ApplicationController
 
   def account_details
     @result = BankTransfer::YesBank::AccountDetails.(current_user, params)
-    debugger
     respond
   end
 
