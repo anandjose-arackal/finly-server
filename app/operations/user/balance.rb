@@ -55,7 +55,7 @@ class User::Balance < User::Base
 
       card_id = params[:current_user_card_id]
       if card_id.present?
-      card = user.cards.find_by_id(card_id)
+        card = user.cards.find_by_id(card_id)
         if card.present?
           presenter = User::PrepaidCard::Show.(user, user: user, card_id: card.id)
           balance = presenter.balance rescue 0
