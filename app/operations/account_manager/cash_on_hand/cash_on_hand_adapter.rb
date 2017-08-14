@@ -22,6 +22,7 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
   end
 
   def debit(payment, options)
+    opening_balance = balance
     if self.account.debit_funds(payment.amount_value)
       closing_balance = balance
       store_transaction payment, :debit, :success, opening_balance, closing_balance, nil, account.user.company_id

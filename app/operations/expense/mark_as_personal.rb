@@ -2,7 +2,7 @@
 
 class Expense::MarkAsPersonal < Expense::Base
 
-  attr_accessor :selected_expense
+  attr_accessor :selected_expense, :payment_request
 
   def pre_validate
 
@@ -35,12 +35,16 @@ class Expense::MarkAsPersonal < Expense::Base
     # if the expense is a card expense add the amount to cash on hand
     if selected_expense.card_expense?
       # add the amount to cash on hand
-      unless user.balance_sheet.add_cash_in_hand(selected_expense.amount_value)
-        add_message :error, "Could not add cash on hand. Please try again"
+      self.payment_request = PaymentRequest.(user, nil, CashOnHand.name, :credit, :personal_expense)
+      self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, selected_expense.amount_value))
+      op = AccountManager::Payments::PaymentProcessor.(user, payment_request: self.payment_request)
+      unless op.success?
+        add_message :error, op.messages[:error]
         selected_expense.update(personal: false)
+        return
       end
     end
-    add_message :success, "Expense marked as personal"
+    add_message :success, 'Expense marked as personal'
   end
 
   def success

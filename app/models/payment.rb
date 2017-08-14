@@ -281,7 +281,7 @@ class Payment < ActiveRecord::Base
   private
 
   def initiating_account_presence
-    unless [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:balance_clearance_outside_finly),
+    unless [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:balance_clearance_outside_finly), PaymentPurpose.id_for(:personal_expense),
             PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:card_transaction), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:corporate_balance_load)].include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")
