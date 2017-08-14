@@ -7,7 +7,7 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
 
   def init
     self.payment_order_ids = user.company.payment_orders.pluck(:id)
-    params[:with_application] = RequestStore.store[:current_app]
+    params[:with_application] = RequestStore.store[:current_app].to_s
   end
 
   def process

@@ -27,16 +27,6 @@
 #
 
 
-
-
-
-
-
-
-
-
-
-
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -140,8 +130,9 @@ class Payment < ActiveRecord::Base
     where application: application.to_s
   }
 
-  # { personal.where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card), PaymentType.id_for(:debit_from_wallet_to_card)]) }
-  # scope :non_personal_transfer_to_card, -> { non_personal.where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card), PaymentType.id_for(:debit_from_wallet_to_card)]) }
+  scope :with_payment_order_id, -> (ids) {
+    where payment_order_id: ids
+  }
 
   scope :cash_additions_to_employee, -> { where(payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)]) }
   scope :cash_deductions_from_employee, -> { where(payment_type_id: [PaymentPurpose.id_for(:balance_clearance_outside_finly)]) }
@@ -191,36 +182,6 @@ class Payment < ActiveRecord::Base
         name = ""
     end
     name
-    # name = ""
-    #
-    # unless self.receiving_account_type == 'ItzCashCompanyAccount'
-    #   name += "#{self.receiving_user&.name}'s"
-    # end
-    #
-    # if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
-    #     PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement)].include?(self.payment_type_id)
-    #   name += " Cash on Hand"
-    #   return name
-    # end
-    #
-    # if [PaymentType.id_for(:reimbursement_outside_finly)].include?(self.payment_type_id)
-    #   name = 'Settled Outside Finly'
-    #   return name
-    # end
-    #
-    # case self.receiving_account_type
-    #   when 'UserWallet'
-    #     name += " Finly Money"
-    #   when 'ItzCashCompanyAccount'
-    #     name += " Company Credits"
-    #   when 'Card'
-    #     name += " #{self.receiving_account.card_program.name.humanize} Card"
-    #   when 'CashOnHand'
-    #     name += "Cash on Hand"
-    #   else
-    #     name = ""
-    # end
-    # name
   end
 
   def credit?
