@@ -18,7 +18,7 @@
 #  company_id                  :integer
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
-#  note                        :text(65535)
+#  date                        :datetime
 #
 
 require 'test_helper'
