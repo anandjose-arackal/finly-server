@@ -100,8 +100,8 @@ class User < ActiveRecord::Base
   has_one :enforce_policy, as: :enforceable, dependent: :destroy
   has_one :auto_reload_config, as: :reloadable, dependent: :destroy
   has_one :itz_cash_dmt_sender
-  has_one :user_panel_subscription
-  has_one :cash_on_hand
+  has_one :user_panel_subscription, dependent: :destroy
+  has_one :cash_on_hand, dependent: :destroy
 
   has_many :bank_accounts, as: :account_owner
   has_many :authentications
@@ -117,20 +117,20 @@ class User < ActiveRecord::Base
   has_many :finance_money_requests, -> { distinct }, source: :money_request, through: :finance_money_request_tracks
   has_many :notifications, dependent: :destroy
   has_many :notifier_type_configurations
-  has_many :user_balance_histories
+  has_many :user_balance_histories, dependent: :destroy
   has_many :feedbacks
   has_many :payment_orders, foreign_key: :initiating_user_id
   has_many :user_group_item_mappings
   has_many :user_group_items, through: :user_group_item_mappings
   has_many :expense_data_extracts, as: :sourcable
   has_many :receipt_email_parse_failures
-  has_many :user_login_tracks
+  has_many :user_login_tracks, dependent: :destroy
   has_many :login_agreement_mappings
   has_many :agreements, through: :login_agreement_mappings
   has_many :card_assign_requests, foreign_key: :card_owner_id
   has_many :card_upgrade_requests, foreign_key: :card_owner_id
 
-  has_one :individual_kyc
+  has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
 
   # has_one :feature_access, as: :accessible

@@ -22,6 +22,10 @@ class Settlement::Show < Settlement::Base
     load_selected_user
   end
 
+  def configure_expense_management
+    params[:with_application] = RequestStore.store[:current_app].to_s
+  end
+
   def process
     if self.view_to_load == 'payments'
       load_payments

@@ -297,6 +297,8 @@ class Company < ActiveRecord::Base
     end
 
     self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
+    self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+    self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
   end
 
 end

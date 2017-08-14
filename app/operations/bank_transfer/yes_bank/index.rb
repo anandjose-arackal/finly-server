@@ -17,6 +17,7 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
   def init
     # self.payment_orders = user.company.payment_orders.with_type_id(payment_order_type_id)
     self.payment_orders = user.company.payment_orders
+    params[:with_application] = RequestStore.store[:current_app]
   end
 
   def pre_process

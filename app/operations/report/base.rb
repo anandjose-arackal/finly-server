@@ -1,6 +1,7 @@
 # report retrieval requires the role id in which capacity the user is viewing the report:
 # i.e. personal, manager, finance manager, or admin
 
+require "#{Rails.root}/lib/formatter.rb"
 class Report::Base < BaseOperation
   attr_accessor :report, :report_id
 

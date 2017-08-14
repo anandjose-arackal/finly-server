@@ -37,7 +37,8 @@ json.receipts expense.receipts.each do |receipt|
   json.thumb receipt.image(:thumb)
 end
 if expense.distance_expense?
-  json.locations expense.distance_expense.locations, :name, :address, :latitude, :longitude, :order, :maps_id
+  exp_locations = expense&.distance_expense&.locations.reject { |loc| loc.latitude.blank? or loc.longitude.blank? or loc.name.blank? or loc.address.blank? }
+  json.locations exp_locations, :name, :address, :latitude, :longitude, :order, :maps_id
 end
 json.custom_fields do
   case expense.expense_type_id

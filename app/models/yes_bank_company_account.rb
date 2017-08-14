@@ -25,4 +25,9 @@ class YesBankCompanyAccount < ActiveRecord::Base
 
   accepts_nested_attributes_for :balance
   accepts_nested_attributes_for :wallet_balance
+
+  def blocked_amount_for_pending_payments
+    PaymentOrder.with_company_id(self.company_id).scheduled.joins(:amount_requested).sum(:value)
+  end
+
 end

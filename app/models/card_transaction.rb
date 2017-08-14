@@ -62,7 +62,7 @@ class CardTransaction < ActiveRecord::Base
   accepts_nested_attributes_for :card_amount
   accepts_nested_attributes_for :billing_amount
 
-  default_scope { order(transaction_timestamp: :desc) }
+  default_scope { successful.order(transaction_timestamp: :desc) }
 
   scope :with_id, ->(id) { where id: id }
   scope :debits, -> { where transaction_type: 'Debit' }
@@ -70,7 +70,7 @@ class CardTransaction < ActiveRecord::Base
   scope :on_date, -> (date) { where('DATE(transaction_timestamp) = ?', date) }
   scope :with_date_range, -> (start_date, end_date) { where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_date, end_date) }
   scope :joins_billing_amount, -> { joins(:billing_amount) }
-  scope :successful, -> {where success: true}
+  scope :successful, -> {where.not success: false}
   scope :failed, -> {where success: false}
 
   # scope for timestamp range

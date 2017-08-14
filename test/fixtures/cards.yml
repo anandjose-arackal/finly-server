@@ -22,6 +22,7 @@
 #  itz_cash_card_program_id :integer
 #  card_status_id           :integer          not null
 #  is_deleted               :boolean          default(FALSE)
+#  hotlisted                :boolean          default(FALSE)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

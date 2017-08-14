@@ -14,6 +14,7 @@
 #  created_at                  :datetime         not null
 #  updated_at                  :datetime         not null
 #  bank_response               :string(255)
+#  refunded                    :boolean
 #
 
 require 'test_helper'

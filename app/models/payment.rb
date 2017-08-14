@@ -2,30 +2,41 @@
 #
 # Table name: payments
 #
-#  id                      :integer          not null, primary key
-#  amount_id               :integer          not null
-#  date                    :date             not null
-#  payment_type_id         :integer          not null
-#  initiating_user_id      :integer          not null
-#  receiving_user_id       :integer
-#  note                    :text(65535)
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  initiating_account_id   :integer
-#  initiating_account_type :string(255)
-#  receiving_account_id    :integer
-#  receiving_account_type  :string(255)
-#  payment_order_id        :integer
-#  payment_status_id       :integer          not null
-#  initiating_user_type    :string(255)
-#  receiving_user_type     :string(255)
-#  payment_purpose_id      :integer
-#  reference_resource_id   :integer
-#  reference_resource_type :string(255)
-#  application             :string(255)
-#  payment_mode            :string(255)
-#  reference_id            :string(255)      not null
+#  id                                    :integer          not null, primary key
+#  amount_id                             :integer          not null
+#  date                                  :date             not null
+#  payment_type_id                       :integer          not null
+#  initiating_user_id                    :integer          not null
+#  receiving_user_id                     :integer
+#  note                                  :text(65535)
+#  created_at                            :datetime         not null
+#  updated_at                            :datetime         not null
+#  initiating_account_id                 :integer
+#  initiating_account_type               :string(255)
+#  receiving_account_id                  :integer
+#  receiving_account_type                :string(255)
+#  payment_order_id                      :integer
+#  payment_status_id                     :integer          not null
+#  initiating_user_type                  :string(255)
+#  receiving_user_type                   :string(255)
+#  payment_purpose_id                    :integer
+#  reference_resource_id                 :integer
+#  reference_resource_type               :string(255)
+#  application                           :string(255)
+#  initiating_account_closing_balance_id :integer
+#  receiving_account_closing_balance_id  :integer
+#  payment_mode                          :string(255)
+#  initiating_account_opening_balance_id :integer
+#  receiving_account_opening_balance_id  :integer
 #
+
+
+
+
+
+
+
+
 
 
 
@@ -174,7 +185,8 @@ class Payment < ActiveRecord::Base
       when "CashOnHand"
         name += "Cash on Hand"
       when "Card"
-        name += "#{self.initiating_account.card_program.name.humanize} Card"
+        card_type = Card.unscoped.find_by(id: self.initiating_account_id)&.card_program&.name&.humanize
+        name += "#{card_type} Card"
       when "UserWallet"
         name += "Finly Money"
       else
@@ -192,43 +204,14 @@ class Payment < ActiveRecord::Base
       when "CashOnHand"
         name += "Cash on Hand"
       when "Card"
-        name += "#{self.receiving_account.card_program.name.humanize} Card"
+        card_type = Card.unscoped.find_by(id: self.initiating_account_id)&.card_program&.name&.humanize
+        name += "#{card_type} Card"
       when "UserWallet"
         name += "Finly Money"
       else
         name = ""
     end
     name
-    # name = ""
-    #
-    # unless self.receiving_account_type == 'ItzCashCompanyAccount'
-    #   name += "#{self.receiving_user&.name}'s"
-    # end
-    #
-    # if [PaymentType.id_for(:add_cash_on_hand), PaymentType.id_for(:deduct_cash_on_hand),
-    #     PaymentType.id_for(:reimbursement), PaymentType.id_for(:settlement)].include?(self.payment_type_id)
-    #   name += " Cash on Hand"
-    #   return name
-    # end
-    #
-    # if [PaymentType.id_for(:reimbursement_outside_finly)].include?(self.payment_type_id)
-    #   name = 'Settled Outside Finly'
-    #   return name
-    # end
-    #
-    # case self.receiving_account_type
-    #   when 'UserWallet'
-    #     name += " Finly Money"
-    #   when 'ItzCashCompanyAccount'
-    #     name += " Company Credits"
-    #   when 'Card'
-    #     name += " #{self.receiving_account.card_program.name.humanize} Card"
-    #   when 'CashOnHand'
-    #     name += "Cash on Hand"
-    #   else
-    #     name = ""
-    # end
-    # name
   end
 
   def credit?
@@ -270,19 +253,18 @@ class Payment < ActiveRecord::Base
   end
 
   def payment_status_name
-    case self.payment_status_id
-      when PaymentStatus.id_for(:processing)
-        return "Processed. Awaiting credit confirmation"
-      else
-        self.payment_status.name.humanize
+    if self.payment_status_id == PaymentStatus.id_for(:processing)
+      return "Processed. Awaiting credit confirmation"
+    else
+      self.payment_status.name.humanize
     end
   end
 
   private
 
   def initiating_account_presence
-    unless [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:balance_clearance_outside_finly), PaymentPurpose.id_for(:personal_expense),
-            PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:card_transaction), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:corporate_balance_load)].include?(self.payment_purpose_id)
+    unless [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:balance_clearance_outside_finly),PaymentPurpose.id_for(:personal_expense),
+            PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:card_transaction), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:corporate_balance_load), PaymentPurpose.id_for(:corporate_balance_refund)].include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")
       end
@@ -307,7 +289,7 @@ class Payment < ActiveRecord::Base
   end
 
   def receiving_user_presence
-    unless [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:corporate_balance_load)].include?(self.payment_purpose_id)
+    unless [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:corporate_balance_load), PaymentPurpose.id_for(:corporate_balance_refund)].include?(self.payment_purpose_id)
       if receiving_user_id.blank?
         errors.add(:receiving_user_id, "cannot be blank")
       end
