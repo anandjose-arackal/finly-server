@@ -101,7 +101,7 @@ class User < ActiveRecord::Base
   has_one :auto_reload_config, as: :reloadable, dependent: :destroy
   has_one :itz_cash_dmt_sender
   has_one :user_panel_subscription
-  has_one :cash_on_hand
+  has_one :cash_on_hand, dependent: :destroy
 
   has_many :bank_accounts, as: :account_owner
   has_many :authentications
@@ -130,7 +130,7 @@ class User < ActiveRecord::Base
   has_many :card_assign_requests, foreign_key: :card_owner_id
   has_many :card_upgrade_requests, foreign_key: :card_owner_id
 
-  has_one :individual_kyc
+  has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
 
   # has_one :feature_access, as: :accessible
