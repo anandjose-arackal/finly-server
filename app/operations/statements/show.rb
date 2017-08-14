@@ -1,5 +1,5 @@
 class Statements::Show < BaseOperation
-  attr_accessor :account, :finly_transactions, :card_transactions
+  attr_accessor :account, :finly_transactions
 
   def pre_validate
     if user.blank?
@@ -41,10 +41,10 @@ class Statements::Show < BaseOperation
       params[:with_date_range] = {}
     end
     if params[:with_date_range][:from].blank?
-      params[:with_date_range][:from] = 1000.days.ago
+      params[:with_date_range][:from] = 30.days.ago
     end
     if params[:with_date_range][:to].blank? or DateUtils.parse_date(params[:with_date_range][:to]) == Date.today
-      params[:with_date_range][:to] = 1.week.ago
+      params[:with_date_range][:to] = Date.today
     end
   end
 
@@ -56,31 +56,23 @@ class Statements::Show < BaseOperation
 
   def process
     self.finly_transactions = self.account.finly_transactions
-    if self.account.class.name == 'Card'
-      self.card_transactions = self.account.transactions
-    end
   end
 
   def success
     params[:finly_transactions] = self.finly_transactions
     params[:account] = self.account
-    params[:card_transactions] = self.card_transactions
     Statements::Show::SuccessPresenter.new(user, params, messages)
   end
 
   class Statements::Show::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :finly_transactions, :account, :card_transactions, :scoped_finly_transactions, :scoped_card_transactions
+    attr_accessor :finly_transactions, :account, :scoped_finly_transactions
 
     has_scope :with_date_range, using: [:from, :to], type: :hash
 
     def init
       self.account = params[:account]
       self.finly_transactions = params[:finly_transactions]
-      self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params) #&.paginate(page: params[:page], per_page: 30)
-      self.card_transactions = params[:card_transactions]
-      if self.card_transactions.present?
-        self.scoped_card_transactions = apply_scopes(self.card_transactions, params) #&.paginate(page: params[:page], per_page: 30)
-      end
+      self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 2)
     end
 
     def credits_count
@@ -176,16 +168,6 @@ class Statements::Show < BaseOperation
       end
       merchant
     end
-
-    # protected
-    # def scoped_params_for(item)
-    #   case item
-    #     when :finly_transactions
-    #       params.permit(with_date_range: [:from, :to])
-    #     when :card_transactions
-    #       params.permit()
-    #   end
-    # end
 
   end
 
