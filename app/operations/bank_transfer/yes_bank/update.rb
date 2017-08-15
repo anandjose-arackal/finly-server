@@ -1,7 +1,5 @@
-# Create is used to create the required payment order and prepare for execution.
-# If the order is scheduled, it schedules the payment_order,
-# or else it calls the Benefits::TaxBenefits::Execute in background to execute the payment order
-class Benefits::TaxBenefits::Update < Benefits::TaxBenefits::Base
+# operation that updates a particular payment order from the changes that the user mentions in the beginning of the
+class BankTransfer::YesBank::Update < BankTransfer::YesBank::Base
   attr_accessor :response_presenter
 
   def pre_validate
@@ -20,8 +18,8 @@ class Benefits::TaxBenefits::Update < Benefits::TaxBenefits::Base
   def process
     order_data = params[:payment_order]
     scheduled_at = params[:scheduled_at]
-    self.response_presenter = Benefits::TaxBenefits::Process.(config, user, scheduled_at: scheduled_at,
-        payment_order: order_data, card_program_id: card_program_id)
+    self.response_presenter = BankTransfer::YesBank::Process.(user, scheduled_at: scheduled_at,
+        payment_order: order_data)
     unless self.response_presenter.success?
       add_message :error, self.response_presenter.messages[:error]
     end
