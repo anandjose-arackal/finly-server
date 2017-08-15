@@ -23,4 +23,13 @@ class BankTransfer::BankAccountsController < ApplicationController
   def destroy
 
   end
+
+  def update
+    @result = BankTransfer::BankAccounts::Update.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
 end

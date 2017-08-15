@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170814093248) do
+ActiveRecord::Schema.define(version: 20170815203611) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2860,6 +2860,16 @@ ActiveRecord::Schema.define(version: 20170814093248) do
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
+  create_table "vendor_payment_wallets", force: :cascade do |t|
+    t.integer  "balance_id", limit: 4
+    t.integer  "user_id",    limit: 4
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "vendor_payment_wallets", ["balance_id"], name: "index_vendor_payment_wallets_on_balance_id", using: :btree
+  add_index "vendor_payment_wallets", ["user_id"], name: "index_vendor_payment_wallets_on_user_id", using: :btree
+
   create_table "version_associations", force: :cascade do |t|
     t.integer "version_id",       limit: 4
     t.string  "foreign_key_name", limit: 255, null: false
@@ -3089,6 +3099,7 @@ ActiveRecord::Schema.define(version: 20170814093248) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
+  add_foreign_key "vendor_payment_wallets", "users"
   add_foreign_key "whitelisted_ips", "companies"
   add_foreign_key "yes_bank_company_accounts", "companies"
   add_foreign_key "yes_bank_vendors", "companies"
