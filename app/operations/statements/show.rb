@@ -44,10 +44,14 @@ class Statements::Show < BaseOperation
       params[:with_date_range] = {}
     end
     if params[:with_date_range][:from].blank?
-      params[:with_date_range][:from] = 30.days.ago
+      params[:with_date_range][:from] = 30.days.ago.end_of_day
+    else
+      params[:with_date_range][:from] = Date.parse(params[:with_date_range][:from]).end_of_day
     end
     if params[:with_date_range][:to].blank? or DateUtils.parse_date(params[:with_date_range][:to]) >= Date.today
-      params[:with_date_range][:to] = Date.yesterday
+      params[:with_date_range][:to] = Date.today.end_of_day
+    else
+      params[:with_date_range][:to] = Date.parse(params[:with_date_range][:to]).end_of_day
     end
   end
 

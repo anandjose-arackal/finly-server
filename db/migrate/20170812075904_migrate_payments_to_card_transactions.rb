@@ -1,14 +1,13 @@
 class MigratePaymentsToCardTransactions < ActiveRecord::Migration
   def up
     PaymentPurpose.seed_data
-    # add_column :finly_transactions, :date, :datetime, index: true
+    Payment.where(payment_purpose_id: nil).update_all(payment_purpose_id: PaymentPurpose.id_for(:advance))
     Company.all.each do |company|
       next unless company.itz_cash_company_account.present?
       company.company_transactions.each do |company_transaction|
         # Ignore card transfers are these transactions would be generated from payments
         next if company_transaction.card_transfer?
         transaction_type = TransactionType.id_for(company_transaction.transaction_type.downcase)
-        reference_id = Generator.reference_id_for(company.itz_cash_company_account, nil, nil, company_transaction.transaction_date)
         if company_transaction.transaction_type.downcase == 'debit'
           purpose_id = PaymentPurpose.id_for(:advance)
         else
@@ -24,7 +23,6 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
                 value: company_transaction.transaction_amount.value,
                 currency_id: Currency.id_for(:INR)
             },
-            transaction_reference_id: reference_id,
             status_id: TransactionStatus.id_for(:success),
             payment_purpose_id: purpose_id,
             opening_balance: nil,
@@ -74,7 +72,6 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
                 value: payment.amount.value,
                 currency_id: payment.amount.currency_id
             },
-            transaction_reference_id: payment.reference_id,
             status_id: status_id,
             payment_purpose_id: payment.payment_purpose_id,
             opening_balance: nil,
@@ -97,7 +94,6 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
                 value: payment.amount.value,
                 currency_id: payment.amount.currency_id
             },
-            transaction_reference_id: payment.reference_id,
             status_id: status_id,
             payment_purpose_id: payment.payment_purpose_id,
             opening_balance: nil,
@@ -123,7 +119,6 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
               value: expense.amount.value,
               currency_id: expense.amount.currency_id
           },
-          transaction_reference_id: Generator.reference_id_for(cash_on_hand, nil, expense.amount.value, expense.date),
           status_id: TransactionStatus.id_for(:success),
           payment_purpose_id: PaymentPurpose.id_for(:personal_expense),
           opening_balance: nil,
@@ -148,7 +143,8 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
       else
         transaction_type_id = TransactionType.id_for(:debit)
       end
-      account = transaction.card
+      account = Card.include_hotlisted.find_by_id(transaction.card_id)
+      next unless account.present?
       purpose_id = PaymentPurpose.id_for(:card_transaction)
       amount = transaction.billing_amount
       if transaction.transaction_mode == 'ATM'
@@ -162,7 +158,6 @@ class MigratePaymentsToCardTransactions < ActiveRecord::Migration
               value: amount.value,
               currency_id: amount.currency_id
           },
-          transaction_reference_id: Generator.reference_id_for(account, nil, amount.value, transaction.transaction_timestamp),
           status_id: TransactionStatus.id_for(:success),
           payment_purpose_id: purpose_id,
           opening_balance: nil,

@@ -63,4 +63,5 @@ class UserWallet < ActiveRecord::Base
     end
     true
   end
+
 end

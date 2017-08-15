@@ -93,7 +93,7 @@ class AccountManager::BaseAdapter
         associated_transaction: associated_transaction,
         payment: payment,
         company_id: company_id,
-        transaction_reference_id: payment.reference_id
+        date: DateTime.now
     }
     transaction = self.account.finly_transactions.create params
     if system_messages.present?

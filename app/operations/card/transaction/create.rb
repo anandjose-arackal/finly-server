@@ -214,7 +214,6 @@ class Card::Transaction::Create < BaseOperation
               value: amount.value,
               currency_id: amount.currency_id
           },
-          transaction_reference_id: Generator.reference_id_for(account, nil, amount.value, transaction.transaction_timestamp),
           status_id: TransactionStatus.id_for(:success),
           payment_purpose_id: purpose_id,
           opening_balance: nil,

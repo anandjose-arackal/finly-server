@@ -39,7 +39,7 @@ class FinlyTransaction < ActiveRecord::Base
   validates :finly_account_id, presence: true
   validates :finly_account_type, presence: true, :inclusion => {:in => AccountManagerUtils.available_accounts(format: :string)}
   validates :transaction_type_id, presence: true
-  validates :transaction_reference_id, presence: true
+  # validates :transaction_reference_id, presence: true
   validates :company_id, presence: true
   validates :status_id, presence: true
   validates :payment_purpose_id, presence: true
@@ -52,6 +52,15 @@ class FinlyTransaction < ActiveRecord::Base
   scope :with_date_range, -> (start_date, end_date) { where('finly_transactions.date >= ? AND finly_transactions.date <= ?', start_date, end_date) }
   scope :sum_amounts, -> { joins(:amount).sum(:value) }
   scope :success, -> { where status_id: TransactionStatus.id_for(:success) }
+  scope :with_reference_id, -> (ref_id) { where transaction_reference_id: ref_id }
+
+  before_create do
+    ref_id = payment&.reference_id
+    if ref_id.blank?
+      ref_id = Generator.reference_id_for(finly_account, nil, date)
+    end
+    self.transaction_reference_id = ref_id
+  end
 
   default_scope { order(date: :desc) }
 

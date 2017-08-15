@@ -105,7 +105,6 @@ class Company::Transaction::Show < Company::Base
       # Ignore card transfers are these transactions would be generated from payments
       next if company_transaction.card_transfer?
       transaction_type = TransactionType.id_for(company_transaction.transaction_type.downcase)
-      reference_id = Generator.reference_id_for(company.itz_cash_company_account, nil, nil, company_transaction.transaction_date)
       if company_transaction.transaction_type.downcase == 'debit'
         purpose_id = PaymentPurpose.id_for(:advance)
       else
@@ -121,7 +120,6 @@ class Company::Transaction::Show < Company::Base
               value: company_transaction.transaction_amount.value,
               currency_id: Currency.id_for(:INR)
           },
-          transaction_reference_id: reference_id,
           status_id: TransactionStatus.id_for(:success),
           payment_purpose_id: purpose_id,
           opening_balance: nil,

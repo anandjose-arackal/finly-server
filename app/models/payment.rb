@@ -160,6 +160,8 @@ class Payment < ActiveRecord::Base
 
   scope :credits_for_account, ->(account) { where("(initiating_account_id = ? AND initiating_account_type = ? AND payment_type_id = #{PaymentType.id_for(:debit)}) OR (receiving_account_id = ? and receiving_account_type = ? AND payment_type_id = #{PaymentType.id_for(:credit)})", account.id, account.class.name, account.id, account.class.name) }
   scope :debits_for_account, ->(account) { where("(initiating_account_id = ? AND initiating_account_type = ? AND payment_type_id = #{PaymentType.id_for(:credit)}) OR (receiving_account_id = ? and receiving_account_type = ? AND payment_type_id = #{PaymentType.id_for(:debit)})", account.id, account.class.name, account.id, account.class.name) }
+  scope :with_reference_id, -> (ref_id) { where reference_id: ref_id }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   # validates :initiating_user_id, presence: true
@@ -172,7 +174,7 @@ class Payment < ActiveRecord::Base
   delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, to: :payment_status
 
   before_create do
-    self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, self.amount&.value, date)
+    self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)
   end
 
   def initiating_account_type_name
