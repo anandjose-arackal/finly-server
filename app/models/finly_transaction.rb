@@ -51,6 +51,7 @@ class FinlyTransaction < ActiveRecord::Base
   scope :with_date, -> (date) { where(date: date) }
   scope :with_date_range, -> (start_date, end_date) { where('finly_transactions.date >= ? AND finly_transactions.date <= ?', start_date, end_date) }
   scope :sum_amounts, -> { joins(:amount).sum(:value) }
+  scope :success, -> { where status_id: TransactionStatus.id_for(:success) }
 
   default_scope { order(date: :desc) }
 

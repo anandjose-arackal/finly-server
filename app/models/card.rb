@@ -74,6 +74,7 @@ class Card < ActiveRecord::Base
       where hotlisted: false
     # end
   }
+  scope :include_hotlisted, -> { unscope(where: :hotlisted) }
 
   scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
   scope :reimbursement_cards_only, -> { where card_program_id: CardProgram.id_for(:reimbursement) }

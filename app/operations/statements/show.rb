@@ -13,6 +13,9 @@ class Statements::Show < BaseOperation
   end
 
   def init
+    # todo Jugaad to counter url id issue
+    params[:id] = params[:user_id]
+
     statement_type = params[:statement_type]&.to_sym
     account_type = params[:account_type]&.to_sym
     case statement_type
@@ -24,7 +27,7 @@ class Statements::Show < BaseOperation
           add_message :error, user_presenter.messages[:error]
           return
         end
-        sel_user = user_presenter.user
+        sel_user = user_presenter.selected_user
         case account_type
           when :expense_card
             self.account = sel_user.cards.expense_cards.first
@@ -92,6 +95,8 @@ class Statements::Show < BaseOperation
       # todo Jugaad to access historical data
       from = (params&.dig(:with_date_range)&.dig(:from) - 1.day)
       case self.account.class.name
+        when Card.name
+          self.account.user.user_balance_histories.with_date(from)&.first&.card_balance&.value || 0
         when ItzCashCompanyAccount.name
           self.account.company.company_balance_histories.with_date(from)&.first&.company_balance&.value || 0
         when UserWallet.name
@@ -109,6 +114,8 @@ class Statements::Show < BaseOperation
       # todo Jugaad to access historical data
       to = params&.dig(:with_date_range)&.dig(:to)
       case self.account.class.name
+        when Card.name
+          self.account.user.user_balance_histories.with_date(to)&.first&.card_balance&.value || 0
         when ItzCashCompanyAccount.name
           self.account.company.company_balance_histories.with_date(to)&.first&.company_balance&.value || 0
         when UserWallet.name
@@ -119,11 +126,11 @@ class Statements::Show < BaseOperation
     end
 
     def credit_amount
-      self.scoped_finly_transactions.credits.sum_amounts || 0
+      self.scoped_finly_transactions.credits.success.sum_amounts || 0
     end
 
     def debit_amount
-      self.scoped_finly_transactions.debits.sum_amounts || 0
+      self.scoped_finly_transactions.debits.success.sum_amounts || 0
     end
 
     def account_name
