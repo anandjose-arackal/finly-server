@@ -23,7 +23,7 @@ class Generator
   end
 
   def self.validate_reference_id(reference_id)
-    not Payment.with_reference_id(reference_id).present? and not FinlyTransaction.with_reference_id(reference_id).present?
+    (not Payment.with_reference_id(reference_id).present? and not FinlyTransaction.with_reference_id(reference_id).present?)
   end
 
   def self.random_number(length)
