@@ -21,6 +21,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
     end
     unless user.valid_password?(params[:password])
       add_message :error, 'Invalid Password'
+      return
     end
   end
 

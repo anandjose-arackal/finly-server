@@ -44,6 +44,7 @@ class Company < ActiveRecord::Base
   has_many :card_assign_requests
   has_many :card_upgrade_requests
   has_many :individual_kycs
+  has_many :yes_bank_vendors
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property

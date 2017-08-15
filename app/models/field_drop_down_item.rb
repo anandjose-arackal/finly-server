@@ -15,4 +15,9 @@ class FieldDropDownItem < ActiveRecord::Base
   validates :name, presence: true
 
   scope :with_id, -> (id){ where id: id }
+
+  def as_json(options={})
+    {id: id, name: name}
+  end
+
 end

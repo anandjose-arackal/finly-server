@@ -22,6 +22,7 @@ class BankAccount < ActiveRecord::Base
   belongs_to :account_owner, polymorphic: true
 
   has_many :receiving_payments, as: :receiving_account
+  has_many :finly_transactions, as: :finly_account
 
   validates :account_number, presence: true
   validates :ifsc, presence: true

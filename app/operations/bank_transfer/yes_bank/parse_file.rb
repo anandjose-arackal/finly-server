@@ -34,7 +34,7 @@ class BankTransfer::YesBank::ParseFile < BankTransfer::YesBank::Base
   end
 
   def failure
-    self.response_presenter
+    self.response_presenter || super
   end
 
 end

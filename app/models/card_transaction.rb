@@ -68,6 +68,7 @@ class CardTransaction < ActiveRecord::Base
   scope :debits, -> { where transaction_type: 'Debit' }
   scope :credits, -> { where transaction_type: 'Credit' }
   scope :on_date, -> (date) { where('DATE(transaction_timestamp) = ?', date) }
+  scope :with_date_range, -> (start_date, end_date) { where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_date, end_date) }
   scope :joins_billing_amount, -> { joins(:billing_amount) }
   scope :successful, -> {where.not success: false}
   scope :failed, -> {where success: false}
@@ -82,13 +83,13 @@ class CardTransaction < ActiveRecord::Base
   scope :online_expenses, -> { where('UPPER(transaction_mode) = ?', "ECOM") }
   scope :expensed_transactions, -> { where('UPPER(transaction_mode) IN (?)', ["POS", "ECOM"]) }
   scope :refunds, -> {
-    credits.where.not(cancelled: true).where('UPPER(merchant_name) like ? OR UPPER(merchant_name) like ?', "%Refund%", "%refund%")
+    credits.where.not(cancelled: true).where('UPPER(merchant_name) like ? OR UPPER(merchant_name) like ? OR UPPER(merchant_name) like ?', '%refund%'.upcase, '%cash back%'.upcase, '%cashback%'.upcase)
   }
 
   # this will include manual refunds from ItzCash as well as transaction cancellations from any merchant or vendor
   scope :filter_refunds, -> (flag) {
     if ['1', 1].include?(flag)
-      credits.where.not(cancelled: true).where('UPPER(merchant_name) like ? OR UPPER(merchant_name) like ?', "%Refund%", "%refund%")
+      self.refunds
     else
       # do nothing
     end
@@ -150,6 +151,10 @@ class CardTransaction < ActiveRecord::Base
       end
     end
     false
+  end
+
+  def funds_transfer?
+    # ['EASY_EXP_CARDDEBIT', 'EASY_EXP_CARDTOPUP'].include? merchant_name
   end
 
 end

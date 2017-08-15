@@ -39,6 +39,11 @@ user:
     name: 'Finance Manager'
     default_url: 'orders'
   <% end %>
+  <% if current_user.manager? %>
+  - id: manager
+    name: 'Manager'
+    default_url: 'orders'
+  <% end %>
 views:
   <%# if current_user.admin? %>
     admin:

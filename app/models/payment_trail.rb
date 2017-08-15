@@ -20,11 +20,11 @@
 
 class PaymentTrail < ActiveRecord::Base
 
-  belongs_to :initiating_account_pre_balance, class_name: "Amount"
-  belongs_to :initiating_account_post_balance, class_name: "Amount"
-  belongs_to :receiving_account_pre_balance, class_name: "Amount"
-  belongs_to :receiving_account_post_balance, class_name: "Amount"
-
   belongs_to :initiating_account, polymorphic: true
   belongs_to :receiving_account, polymorphic: true
+
+  belongs_to :initiating_user, polymorphic: true
+  belongs_to :receiving_user, polymorphic: true
+
+  belongs_to :payment_purpose
 end

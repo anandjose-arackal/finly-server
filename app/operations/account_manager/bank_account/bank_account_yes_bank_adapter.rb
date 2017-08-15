@@ -26,21 +26,25 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       if SUCCESSFUL_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
         create_bank_transaction(payment, op.transfer_request)
+        store_transaction payment, :credit, :success, nil, nil, payment.reference_resource, payment.initiating_user&.company_id
       elsif PROCESSING_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        create_system_message_for_processing(payment)
         create_bank_transaction(payment, op.transfer_request)
+        store_transaction payment, :credit, :processing, nil, nil, payment.reference_resource, payment.initiating_user&.company_id
       elsif op.transfer_request.transaction_result.nil?
         # i.e. there was an error processing the transaction
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         error_message = op.transfer_request.bank_error_message || "Payment could not be processed at this time"
+        store_transaction payment, :credit, :failure, nil, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message
         return false
       end
     else
       # i.e. there was an error processing the transaction
       payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-      error_message = op.transfer_request.bank_error_message || "Payment could not be processed at this time"
-      self.errors << error_message
+      self.errors = op.transfer_request.bank_error_message || 'Payment could not be processed at this time'
+      store_transaction payment, :credit, :failure, nil, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
       return false
     end
     true
@@ -58,7 +62,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
   def creditable_accounts
     # none as this account cannot be credited through Finly (only external)
-    [YesBankCompanyAccount, "YesBankCompanyAccount"]
+    [YesBankCompanyAccount]
   end
 
   def debitable_accounts
@@ -77,7 +81,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       else
         transfer_status_id = BankTransferStatus.id_for(:failed)
     end
-    bt = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
+    bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
                                          transfer_type: transfer_request.transfer_type,
                                          bank_reference_number: transfer_request.bank_reference_number,
                                          beneficiary_bank_account: self.account,
@@ -87,7 +91,12 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
                                              value: payment.amount_value,
                                              currency_id: Currency.first.id
                                          })
-    payment.update(reference_resource: bt)
+    payment.update(reference_resource: bank_transaction)
+  end
+
+  def create_system_message_for_processing(payment)
+    payment.system_messages.create(system_message_type_id: SystemMessageType.id_for(:info),
+                                  content: "Payment processed. Awaiting credit confirmation")
   end
 
   def create_transfer_request(payment, transfer_type)

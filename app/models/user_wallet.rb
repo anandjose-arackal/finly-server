@@ -17,6 +17,7 @@ class UserWallet < ActiveRecord::Base
   has_many :initiating_payment_trails, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
   has_many :receiving_payment_trails, as: :receiving_account
+  has_many :finly_transactions, as: :finly_account
 
   validates :user, presence: true
 
@@ -62,4 +63,5 @@ class UserWallet < ActiveRecord::Base
     end
     true
   end
+
 end

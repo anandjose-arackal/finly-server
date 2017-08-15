@@ -1,5 +1,4 @@
 class AccountManager::BaseAdapter
-
   attr_accessor :errors, :account
 
   def initialize(account=nil)
@@ -9,7 +8,7 @@ class AccountManager::BaseAdapter
     if account_class.present? and account.nil?
       raise 'Account cannot be blank'
     end
-    unless name.include?(account.class.name)
+    unless account_class.name == account.class.name
       raise 'Account mismatch. Incorrect adapter'
     end
     self.account = account
@@ -20,7 +19,7 @@ class AccountManager::BaseAdapter
   end
 
   def name
-    self.account_class&.name
+    AccountManagerUtils.name_for self.account_class
   end
 
   def credit(payment, options = {})
@@ -69,6 +68,49 @@ class AccountManager::BaseAdapter
 
   def valid?
     self.errors.blank?
+  end
+
+  def store_transaction(payment, type, status, opening_balance, closing_balance, associated_transaction, company_id, system_messages = {})
+    type_id = TransactionType.id_for(type)
+    status_id = TransactionStatus.id_for(status)
+    currency_id = Currency.id_for(:INR)
+    params = {
+        transaction_type_id: type_id,
+        status_id: status_id,
+        amount_attributes: {
+            value: payment.amount_value,
+            currency_id: currency_id
+        },
+        payment_purpose_id: payment.payment_purpose_id,
+        opening_balance_attributes: {
+            value: opening_balance,
+            currency_id: currency_id
+        },
+        closing_balance_attributes: {
+            value: closing_balance,
+            currency_id: currency_id
+        },
+        associated_transaction: associated_transaction,
+        payment: payment,
+        company_id: company_id,
+        date: DateTime.now
+    }
+    transaction = self.account.finly_transactions.create params
+    if system_messages.present?
+      # Setting system messages
+      errors = system_messages[:error] + system_messages[:failure]
+      success = system_messages[:success]
+      info = system_messages[:message] + system_messages[:notice]
+      errors.each do |error_message|
+        transaction.system_messages.create system_message_type_id: SystemMessageType.id_for(:error), content: error_message
+      end
+      success.each do |success_message|
+        transaction.system_messages.create system_message_type_id: SystemMessageType.id_for(:success), content: success_message
+      end
+      info.each do |info_message|
+        transaction.system_messages.create system_message_type_id: SystemMessageType.id_for(:info), content: info_message
+      end
+    end
   end
 
 end

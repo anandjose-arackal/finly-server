@@ -36,7 +36,7 @@ json.data do
         json.name payment.payment_status_name
       end
       json.system_messages do
-        json.array! payment.system_messages
+        json.array! (payment.system_messages)
       end
     end
   end
