@@ -43,7 +43,7 @@ class AccountManagerUtils
         break
       end
     end
-    if account_name == 'Card'
+    if account_name == 'Card' and self.account.class.name == Card.name
       account_name = "#{account.card_program.name.humanize} Card"
     end
     account_name
