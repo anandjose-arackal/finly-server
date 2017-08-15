@@ -41,6 +41,7 @@ class Card < ActiveRecord::Base
   has_many :initiating_payment_trails, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
   has_many :receiving_payment_trails, as: :receiving_account
+  has_many :finly_transactions, as: :finly_account
 
   has_one :card_restriction
 
@@ -61,6 +62,7 @@ class Card < ActiveRecord::Base
   scope :unassigned, -> { where user_id: nil }
   scope :active, -> { where active: true }
   scope :expense_cards, -> { where card_program_id: CardProgram.id_for(:expense) }
+  scope :reimbursement_cards, -> { where card_program_id: CardProgram.id_for(:reimbursement) }
   scope :manager_viewable_transactions, -> { where card_program_id: CardProgram.all.with_manager_view_transactions.pluck(:id) }
   scope :with_card_program, ->(id) { where card_program_id: id }
   scope :creditable_cards, -> { with_card_program(CardProgram.all.with_manager_credit) }
@@ -72,6 +74,7 @@ class Card < ActiveRecord::Base
       where hotlisted: false
     # end
   }
+  scope :include_hotlisted, -> { unscope(where: :hotlisted) }
 
   scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
   scope :reimbursement_cards_only, -> { where card_program_id: CardProgram.id_for(:reimbursement) }

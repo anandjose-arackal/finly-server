@@ -2,6 +2,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
   attr_accessor :account_number, :transaction_result, :error_message, :transfer_request
 
+  # in this context, success would imply one of these transactions
   SUCCESS_RESPONSE_CODES = ["COMPLETED", "SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
 
   def initialize(transfer_request)

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170812075904) do
+ActiveRecord::Schema.define(version: 20170815114034) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1505,6 +1505,7 @@ ActiveRecord::Schema.define(version: 20170812075904) do
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
     t.text     "note",                        limit: 65535
+    t.datetime "date"
   end
 
   add_index "finly_transactions", ["amount_id"], name: "index_finly_transactions_on_amount_id", using: :btree

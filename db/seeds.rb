@@ -230,6 +230,9 @@ CardAssignRequestStatus.seed_data
 
 CardAssignRequestTrackAction.seed_data
 
+TransactionStatus.seed_data
+TransactionType.seed_data
+
 if AdminUser.count == 0
   # creating admin panel users who can access admin panel
   AdminUser.create!(email: 'admin@demo.io', password: 'demo1234', password_confirmation: 'demo1234', mobile_number: random_mobile_number,

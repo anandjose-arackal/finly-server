@@ -1,6 +1,6 @@
 class Expense::Personal::Unmark < Expense::Personal::Mark
 
-  attr_accessor :other_category_id
+  attr_accessor :other_category_id, :payment_request
 
   def init
     super()
@@ -23,7 +23,7 @@ class Expense::Personal::Unmark < Expense::Personal::Mark
     end
 
     if selected_expense.card_expense?
-      if selected_expense.user.balance_sheet.cash_in_hand&.value < selected_expense.amount_value
+      if selected_expense.user.cash_in_hand&.balance_value < selected_expense.amount_value
         add_message :error, "You do not have enough cash on hand to unmark this expense as personal"
       end
     end
@@ -36,9 +36,23 @@ class Expense::Personal::Unmark < Expense::Personal::Mark
   end
 
   def post_process
+    # if the expense is a card expense add the amount to cash on hand
     if selected_expense.card_expense?
-      user.balance_sheet.subtract_cash_in_hand(selected_expense.amount_value)
+      # add the amount to cash on hand
+      self.payment_request = PaymentRequest.(user, nil, CashOnHand.name, :debit, :personal_expense)
+      self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, selected_expense.amount_value))
+      op = AccountManager::Payments::PaymentProcessor.(user, payment_request: self.payment_request)
+      unless op.success?
+        add_message :error, op.messages[:error]
+        selected_expense.update(personal: true)
+        return
+      end
     end
-    add_message :success, "Expense unmarked as personal"
+    add_message :success, 'Expense unmarked as personal'
+
+    # if selected_expense.card_expense?
+    #   user.balance_sheet.subtract_cash_in_hand(selected_expense.amount_value)
+    # end
+    # add_message :success, "Expense unmarked as personal"
   end
 end

@@ -8,19 +8,28 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
 
   def credit(payment, options = {})
     # this will add money to this company's balance
-    balance = self.account.balance.value
-    if self.account.balance.update(value: balance + payment.amount_value)
+    opening_balance = balance
+    if self.account.balance.update(value: opening_balance + payment.amount_value)
+      closing_balance = balance
+      store_transaction payment, :credit, :success, opening_balance, closing_balance, nil, account.user.company_id
       return true
     end
+    self.errors = self.account.errors.full_messages
+    closing_balance = balance
+    store_transaction payment, :credit, :failure, opening_balance, closing_balance, nil, account.user.company_id, error: self.errors
     false
   end
 
   def debit(payment, options = {})
     # nothing to do here ¯\_(ツ)_/¯
-    balance = self.account.balance.value
-    if self.account.balance.update(value: balance - payment.amount_value)
+    opening_balance = balance
+    if self.account.balance.update(value: opening_balance - payment.amount_value)
+      closing_balance = balance
+      store_transaction payment, :debit, :success, opening_balance, closing_balance, nil, account.user.company_id
       return true
     end
+    closing_balance = balance
+    store_transaction payment, :debit, :failure, opening_balance, closing_balance, nil, account.user.company_id, error: self.errors
     false
   end
 

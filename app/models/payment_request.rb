@@ -24,7 +24,7 @@ class PaymentRequest < NonPersistentModel
   belongs_to :initiating_account, polymorphic: true
   belongs_to :currency
 
-  validates :company_id, presence: true
+  validate :company_id_presence
   validates :initiating_resource, presence: true
   validates :initiating_resource_type, inclusion: {in: [User.name, AdminUser.name]}
   validates :payment_purpose_id, presence: true
@@ -101,6 +101,14 @@ class PaymentRequest < NonPersistentModel
     self.payment_items&.each do |payment_item|
       unless payment_item.valid?
         payment_item.errors.full_messages.each { |error| errors.add :payment, error }
+      end
+    end
+  end
+
+  def company_id_presence
+    if self.initiating_resource_type == "User"
+      if company_id.blank?
+        errors.add(:company_id, "can't be blank")
       end
     end
   end
