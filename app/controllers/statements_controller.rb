@@ -1,20 +1,21 @@
 class StatementsController < ApplicationController
 
-
   before_action -> { finly_authorize! :web}
 
   def index
   end
 
   def show
-    @result = EmployeeStatement::Show.(current_user, params)
-    if @result.success?
-      respond_to do |format|
-        format.json {render json: @result.items.as_json}
-      end
-    else
-      respond
-    end
+    # @result = EmployeeStatement::Show.(current_user, params)
+    # if @result.success?
+    #   respond_to do |format|
+    #     format.json {render json: @result.items.as_json}
+    #   end
+    # else
+    #   respond
+    # end
+    @result = Statements::Show.(current_user, params)
+    respond
   end
 
   def summary
@@ -30,7 +31,7 @@ class StatementsController < ApplicationController
 
   # Company Statements
   def company_balance_summary
-    @result = Company::Statement::BalanceSummary.(current_user, params)
+    @result = ::Company::Statement::BalanceSummary.(current_user, params)
     respond_to do |format|
       format.json {}
     end
@@ -49,4 +50,10 @@ class StatementsController < ApplicationController
       format.json {}
     end
   end
+
+  def show_new
+    @result = Statement::Show.(current_user, params)
+    respond
+  end
+
 end

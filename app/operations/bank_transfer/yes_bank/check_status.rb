@@ -45,13 +45,13 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
       if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
         bank_transaction.payment&.update(payment_status_id: PaymentStatus.id_for(:completed))
-        payment.system_messages.destroy_all
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "The amount will be refunded to your bank account shortly").save
         # creating a refund payment for this amount
@@ -69,7 +69,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   private
 
   def create_refund_payment
-    admin_user = AdminUser.find_by(email: "vivek.a@finly.io")
+    admin_user = AdminUser.find_by(email: 'vivek.a@finly.io')
     self.payment_request = PaymentRequest.(admin_user, nil, company.yes_bank_company_account.class.name, :credit, :corporate_balance_refund, company_id: self.company.id)
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(nil, company.yes_bank_company_account, self.bank_transaction.amount_value))
 
@@ -83,5 +83,4 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     end
   end
 
-  # nothing else to do because this is a backgrund operation
 end

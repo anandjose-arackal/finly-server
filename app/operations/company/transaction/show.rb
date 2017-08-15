@@ -4,7 +4,7 @@
 #
 
 class Company::Transaction::Show < Company::Base
-  attr_accessor :start_date, :end_date, :last_transaction_date, :last_transaction, :required_transactions
+  attr_accessor :start_date, :end_date, :last_transaction_date, :last_transaction, :required_transactions, :transactions
 
   def self.call(company, params={})
     self.new(company, params).run
@@ -79,18 +79,61 @@ class Company::Transaction::Show < Company::Base
       return
     end
     transactions = response.transactions
+    new_company_transactions = []
     # Store all company transactions. All duplicate transactions will not be fetched
     transactions.each do |t|
-      company.company_transactions.create request_id: t[:request_id], merchant_name: t[:merchant_name],
-                                          transaction_date: DateUtils.datetime_in_ist(t[:transaction_date]),
-                                          transaction_amount_attributes: {value: t[:transaction_amount], currency_id: 1},
-                                          transaction_type: t[:transaction_type],
-                                          transaction_id: t[:transaction_id],
-                                          balance_amount_attributes: {value: t[:balance], currency_id: 1},
-                                          transaction_mode: t[:transaction_mode],
-                                          merchant_type_key: t[:merchant_type_key]
+      company_transaction = company.company_transactions.create request_id: t[:request_id], merchant_name: t[:merchant_name],
+                                                                transaction_date: DateUtils.datetime_in_ist(t[:transaction_date]),
+                                                                transaction_amount_attributes: {value: t[:transaction_amount], currency_id: 1},
+                                                                transaction_type: t[:transaction_type],
+                                                                transaction_id: t[:transaction_id],
+                                                                balance_amount_attributes: {value: t[:balance], currency_id: 1},
+                                                                transaction_mode: t[:transaction_mode],
+                                                                merchant_type_key: t[:merchant_type_key]
+      if company_transaction.valid?
+        new_company_transactions << company_transaction
+      end
     end
+    # Create Finly Transactions from all newly created transactions
+    create_finly_transactions new_company_transactions
+
     self.required_transactions = company.company_transactions.with_date_range(start_date.beginning_of_day, end_date.end_of_day)
+  end
+
+  def create_finly_transactions(transactions)
+    transactions&.each do |company_transaction|
+      # Ignore card transfers are these transactions would be generated from payments
+      next if company_transaction.card_transfer?
+      transaction_type = TransactionType.id_for(company_transaction.transaction_type.downcase)
+      if company_transaction.transaction_type.downcase == 'debit'
+        purpose_id = PaymentPurpose.id_for(:advance)
+      else
+        if company_transaction.merchant_name.downcase.include?('manual') || company_transaction.merchant_name.downcase.include?('payu')
+          purpose_id = PaymentPurpose.id_for(:corporate_balance_load)
+        else
+          purpose_id = PaymentPurpose.id_for(:balance_clearance)
+        end
+      end
+      params = {
+          transaction_type_id: transaction_type,
+          amount_attributes: {
+              value: company_transaction.transaction_amount.value,
+              currency_id: Currency.id_for(:INR)
+          },
+          status_id: TransactionStatus.id_for(:success),
+          payment_purpose_id: purpose_id,
+          opening_balance: nil,
+          closing_balance: nil,
+          associated_transaction: company_transaction,
+          payment: nil,
+          company_id: company.id,
+          date: company_transaction.transaction_date
+      }
+      transaction = company.itz_cash_company_account.finly_transactions.create(params)
+      unless transaction.valid?
+        raise "#{transaction.errors.full_messages}"
+      end
+    end
   end
 
   def success

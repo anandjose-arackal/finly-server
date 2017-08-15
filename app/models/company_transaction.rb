@@ -42,5 +42,15 @@ class CompanyTransaction < ActiveRecord::Base
 
   scope :manual_fund_credits, -> {where('transaction_mode LIKE "MANUAL FUND CREDIT" OR merchant_name LIKE "PayU Payments Pvt Ltd%"')}
 
+  # "EASY_EXP_CARDDEBIT" -> Card Transfer Debit
+  # "EASY_EXP_CARDTOPUP" ->  Card Transfer Credit
+  # "EASY_PAYU_RELDIS_NB" -> PayU Reload
+  # "NA" -> Manual Actions
+  # "EASY_GPR_ACTIVATION" -> Card Activation
+  # "EASY_ZEROSER" -> 460rs deduction
+  # "EASY_CCA_RELDIS_DC" -> Load using bank transfer
+  def card_transfer?
+    ['EASY_EXP_CARDDEBIT', 'EASY_EXP_CARDTOPUP'].include? merchant_type_key
+  end
 
 end

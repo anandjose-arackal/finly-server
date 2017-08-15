@@ -2,6 +2,7 @@ module Seedable
   extend ActiveSupport::Concern
 
   included do
+    scope :with_id, -> (id) { where id: id }
     scope :with_name, -> (name) { where name: name }
   end
 
@@ -24,6 +25,10 @@ module Seedable
         return items.first.id
       end
       return nil
+    end
+
+    def name_for(id)
+      self.find_by_id(id)&.name&.to_s
     end
 
     def seed_data
