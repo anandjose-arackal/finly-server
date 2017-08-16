@@ -10,7 +10,7 @@
 #  spend_restrictions            :boolean
 #  end_date_restrictions         :boolean
 #  manager_credit                :boolean
-#  manager_credit                 :boolean
+#  manager_debit                 :boolean
 #  manager_blockable             :boolean
 #  manager_view_balance          :boolean
 #  manager_view_eligibility      :boolean
