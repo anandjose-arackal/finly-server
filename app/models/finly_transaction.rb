@@ -68,7 +68,7 @@ class FinlyTransaction < ActiveRecord::Base
     self.transaction_reference_id = ref_id
   end
 
-  default_scope { order(date: :desc) }
+  default_scope { order(date: :desc).order(id: :desc) }
 
   delegate :credit?, :debit?, to: :transaction_type
 
