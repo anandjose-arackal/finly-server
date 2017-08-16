@@ -6,7 +6,7 @@ json.debits_count @result.debits_count
 json.credit_amount @result.credit_amount
 json.debit_amount @result.debit_amount
 json.finly_transactions do
-  json.array! @result.scoped_finly_transactions do |finly_transaction|
+  json.array! @result.account_transactions do |finly_transaction|
     json.reference_id finly_transaction.transaction_reference_id
     json.date DateUtils.date_formatted finly_transaction.date
     json.transaction_type finly_transaction.transaction_type.name.humanize
