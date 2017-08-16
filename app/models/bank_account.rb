@@ -64,4 +64,8 @@ class BankAccount < ActiveRecord::Base
       # do nothing?
     end
   }
+
+  after_create do
+    self.update(company_id: self.account_owner.company_id)
+  end
 end
