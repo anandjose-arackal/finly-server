@@ -82,17 +82,39 @@ class Statements::Show < BaseOperation
       self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 30)
     end
 
+    def account_transactions
+      if can_view_transactions?
+        return self.scoped_finly_transactions
+      elsif can_view_credit? and can_view_debit?
+        return self.scoped_finly_transactions.through_finly_dashboard
+      elsif can_view_debit?
+        return self.scoped_finly_transactions.through_finly_dashboard.debits
+      elsif can_view_credit?
+        return self.scoped_finly_transactions.through_finly_dashboard.credits
+      end
+      FinlyTransaction.none
+    end
+
     def credits_count
-      return if self.scoped_finly_transactions.nil? or self.account.nil?
-      self.scoped_finly_transactions.credits.count
+      return nil unless can_view_credit?
+      if can_view_transactions?
+        self.scoped_finly_transactions.credits.success.count || 0
+      else
+        self.scoped_finly_transactions.credits.success.through_finly_dashboard.count || 0
+      end
     end
 
     def debits_count
-      return if self.scoped_finly_transactions.nil? or self.account.nil?
-      self.scoped_finly_transactions.debits.count
+      return nil unless can_view_debit?
+      if can_view_transactions?
+        self.scoped_finly_transactions.debits.success.count || 0
+      else
+        self.scoped_finly_transactions.debits.success.through_finly_dashboard.count || 0
+      end
     end
 
     def opening_balance
+      return nil unless can_view_balance?
       balance = self.scoped_finly_transactions.last&.opening_balance&.value
       return balance unless balance.nil?
 
@@ -112,6 +134,7 @@ class Statements::Show < BaseOperation
     end
 
     def closing_balance
+      return nil unless can_view_balance?
       balance = self.scoped_finly_transactions.first&.closing_balance&.value
       return balance unless balance.nil?
 
@@ -130,15 +153,33 @@ class Statements::Show < BaseOperation
     end
 
     def credit_amount
-      self.scoped_finly_transactions.credits.success.sum_amounts || 0
+      return nil unless can_view_credit?
+      if can_view_transactions?
+        self.scoped_finly_transactions.credits.success.sum_amounts || 0
+      else
+        self.scoped_finly_transactions.credits.success.through_finly_dashboard.sum_amounts || 0
+      end
     end
 
     def debit_amount
-      self.scoped_finly_transactions.debits.success.sum_amounts || 0
+      return nil unless can_view_debit?
+      if can_view_transactions?
+        self.scoped_finly_transactions.debits.success.sum_amounts || 0
+      else
+        self.scoped_finly_transactions.debits.success.through_finly_dashboard.sum_amounts || 0
+      end
     end
 
     def account_name
-      AccountManagerUtils.name_for self.account
+      account_name = AccountManagerUtils.name_for self.account
+      if [UserWallet.name, CashOnHand.name, Card.name].include? self.account.class.name
+        if user == self.account.user
+          account_name = "Your #{account_name}"
+        else
+          account_name = "#{self.account.user.name}'s #{account_name}"
+        end
+      end
+      account_name
     end
 
     def merchant(finly_transaction)
@@ -178,6 +219,34 @@ class Statements::Show < BaseOperation
           end
       end
       merchant
+    end
+
+    def can_view_transactions?
+      if self.account.class.name == Card.name and not self.account.card_program.manager_view_transactions and not personal_view? and user != self.account.user
+        return false
+      end
+      true
+    end
+
+    def can_view_credit?
+      if self.account.class.name == Card.name and not self.account.card_program.manager_credit and not personal_view? and user != self.account.user
+        return false
+      end
+      true
+    end
+
+    def can_view_debit?
+      if self.account.class.name == Card.name and not self.account.card_program.manager_debit and not personal_view? and user != self.account.user
+        return false
+      end
+      true
+    end
+
+    def can_view_balance?
+      if self.account.class.name == Card.name and not self.account.card_program.manager_view_balance and not personal_view? and user != self.account.user
+        return false
+      end
+      true
     end
 
   end

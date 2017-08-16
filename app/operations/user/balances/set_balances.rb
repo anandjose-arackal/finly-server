@@ -25,7 +25,7 @@ class User::Balances::SetBalances < BaseOperation
   private
 
   def retrieve_balances(selected_user)
-    card_balance = User::PrepaidCard::Show.(selected_user, {id: selected_user.id, view: 'admin'}).balance rescue 0
+    card_balance = ItzCash::AccountDetails.(selected_user, {card: selected_user.cards.first}).balance rescue 0
 
     card_withdrawal = selected_user.receiving_payments.with_date(params[:date]).debit_from_card.joins(:amount).sum(:value)
     card_withdrawal += selected_user.initiating_payments.with_date(params[:date]).credit_from_card.joins(:amount).sum(:value)
@@ -48,19 +48,20 @@ class User::Balances::SetBalances < BaseOperation
     cash_on_hand_load = selected_user.receiving_payments.with_date(params[:date]).cash_on_hand_additions.joins(:amount).sum(:value)
     cash_on_hand_withdrawal = selected_user.receiving_payments.with_date(params[:date]).cash_on_hand_deductions.joins(:amount).sum(:value)
 
-    {company_id: selected_user.company_id,
-     date: params[:date],
-     card_balance_attributes: {value: card_balance, currency: Currency.first},
-     card_withdrawal_attributes: {value: card_withdrawal, currency: Currency.first},
-     card_load_attributes: {value: card_load, currency: Currency.first},
-     card_expenses_attributes: {value: card_expenses, currency: Currency.first},
-     card_atm_withdrawal_attributes: {value: card_atm_withdrawal, currency: Currency.first},
-     finly_money_balance_attributes: {value: finly_money_balance, currency: Currency.first},
-     finly_money_load_attributes: {value: finly_money_load, currency: Currency.first},
-     finly_money_withdrawal_attributes: {value: finly_money_withdrawal, currency: Currency.first},
-     cash_on_hand_balance_attributes: {value: cash_on_hand_balance, currency: Currency.first},
-     cash_on_hand_load_attributes: {value: cash_on_hand_load, currency: Currency.first},
-     cash_on_hand_withdrawal_attributes: {value: cash_on_hand_withdrawal, currency: Currency.first},
+    {
+        company_id: selected_user.company_id,
+        date: params[:date],
+        card_balance_attributes: {value: card_balance, currency: Currency.first},
+        card_withdrawal_attributes: {value: card_withdrawal, currency: Currency.first},
+        card_load_attributes: {value: card_load, currency: Currency.first},
+        card_expenses_attributes: {value: card_expenses, currency: Currency.first},
+        card_atm_withdrawal_attributes: {value: card_atm_withdrawal, currency: Currency.first},
+        finly_money_balance_attributes: {value: finly_money_balance, currency: Currency.first},
+        finly_money_load_attributes: {value: finly_money_load, currency: Currency.first},
+        finly_money_withdrawal_attributes: {value: finly_money_withdrawal, currency: Currency.first},
+        cash_on_hand_balance_attributes: {value: cash_on_hand_balance, currency: Currency.first},
+        cash_on_hand_load_attributes: {value: cash_on_hand_load, currency: Currency.first},
+        cash_on_hand_withdrawal_attributes: {value: cash_on_hand_withdrawal, currency: Currency.first},
     }
 
   end

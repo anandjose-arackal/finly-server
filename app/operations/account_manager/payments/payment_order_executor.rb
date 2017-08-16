@@ -18,7 +18,7 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
-    self.payment_order = PaymentOrder.find_by_id(payment_order_id)
+    self.payment_order = PaymentOrder.unscoped.find_by_id(payment_order_id)
     self.options = options
     self.run
   end

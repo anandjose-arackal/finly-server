@@ -75,6 +75,7 @@ class PaymentOrder < ActiveRecord::Base
   accepts_nested_attributes_for :payments
 
   scope :with_purpose_id, -> (id) { where payment_purpose_id: id }
+  scope :without_purpose_id, -> (id) { where.not payment_purpose_id: id }
   scope :with_id, -> (id) { where id: id }
   scope :with_status, ->(status_id) { where payment_order_status_id: status_id }
   scope :scheduled, -> { with_status(PaymentOrderStatus.id_for(:scheduled)) }
@@ -93,7 +94,8 @@ class PaymentOrder < ActiveRecord::Base
 
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
 
-  default_scope { order(created_at: :desc) }
+  # Avoid showing orders created for ATM withdrawals and Personal Expenses
+  default_scope { order(created_at: :desc).without_purpose_id(PaymentPurpose.ids_for([:personal_expense, :atm_withdrawal])) }
 
   # method for total of all the payments in this particular payment order
   def request_total

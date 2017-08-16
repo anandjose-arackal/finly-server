@@ -39,7 +39,7 @@ class Expense::Personal::Mark < Expense::Base
     # if the expense is a card expense add the amount to cash on hand
     if selected_expense.card_expense?
       # add the amount to cash on hand
-      unless user.balance_sheet.add_cash_in_hand(selected_expense.amount_value)
+      unless user.cash_on_hand.credit_funds(selected_expense.amount_value)
         add_message :error, "Could not add cash on hand. Please try again"
         selected_expense.update(personal: false)
       end
