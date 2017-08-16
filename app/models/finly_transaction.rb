@@ -53,6 +53,12 @@ class FinlyTransaction < ActiveRecord::Base
   scope :sum_amounts, -> { joins(:amount).sum(:value) }
   scope :success, -> { where status_id: TransactionStatus.id_for(:success) }
   scope :with_reference_id, -> (ref_id) { where transaction_reference_id: ref_id }
+  scope :through_finly_dashboard, -> { where payment_purpose_id: PaymentPurpose.ids_for([:advance_outside_finly,
+                                                                               :reimbursement_outside_finly, :advance,
+                                                                               :medical_benefit,
+                                                                               :meal_benefit, :reimbursement, :payroll,
+                                                                               :vendor_payment,
+                                                                               :balance_clearance_outside_finly, :balance_clearance]) }
 
   before_create do
     ref_id = payment&.reference_id
