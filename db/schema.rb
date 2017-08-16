@@ -1489,6 +1489,39 @@ ActiveRecord::Schema.define(version: 20170815203611) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "finly_transactions", force: :cascade do |t|
+    t.integer  "finly_account_id",            limit: 4,   null: false
+    t.string   "finly_account_type",          limit: 255, null: false
+    t.integer  "transaction_type_id",         limit: 4,   null: false
+    t.integer  "amount_id",                   limit: 4,   null: false
+    t.string   "transaction_reference_id",    limit: 255, null: false
+    t.integer  "status_id",                   limit: 4,   null: false
+    t.integer  "payment_purpose_id",          limit: 4,   null: false
+    t.integer  "opening_balance_id",          limit: 4
+    t.integer  "closing_balance_id",          limit: 4
+    t.integer  "associated_transaction_id",   limit: 4
+    t.string   "associated_transaction_type", limit: 255
+    t.integer  "payment_id",                  limit: 4
+    t.integer  "company_id",                  limit: 4
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.datetime "date"
+  end
+
+  add_index "finly_transactions", ["amount_id"], name: "index_finly_transactions_on_amount_id", using: :btree
+  add_index "finly_transactions", ["associated_transaction_id"], name: "index_finly_transactions_on_associated_transaction_id", using: :btree
+  add_index "finly_transactions", ["associated_transaction_type"], name: "index_finly_transactions_on_associated_transaction_type", using: :btree
+  add_index "finly_transactions", ["closing_balance_id"], name: "index_finly_transactions_on_closing_balance_id", using: :btree
+  add_index "finly_transactions", ["company_id"], name: "index_finly_transactions_on_company_id", using: :btree
+  add_index "finly_transactions", ["finly_account_id"], name: "index_finly_transactions_on_finly_account_id", using: :btree
+  add_index "finly_transactions", ["finly_account_type"], name: "index_finly_transactions_on_finly_account_type", using: :btree
+  add_index "finly_transactions", ["opening_balance_id"], name: "index_finly_transactions_on_opening_balance_id", using: :btree
+  add_index "finly_transactions", ["payment_id"], name: "index_finly_transactions_on_payment_id", using: :btree
+  add_index "finly_transactions", ["payment_purpose_id"], name: "index_finly_transactions_on_payment_purpose_id", using: :btree
+  add_index "finly_transactions", ["status_id"], name: "index_finly_transactions_on_status_id", using: :btree
+  add_index "finly_transactions", ["transaction_reference_id"], name: "index_finly_transactions_on_transaction_reference_id", using: :btree
+  add_index "finly_transactions", ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id", using: :btree
+
   create_table "individual_kyc_track_actions", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -2092,6 +2125,7 @@ ActiveRecord::Schema.define(version: 20170815203611) do
     t.string   "reference_resource_type", limit: 255
     t.string   "application",             limit: 255
     t.string   "payment_mode",            limit: 255
+    t.string   "reference_id",            limit: 255,   null: false
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -2576,6 +2610,18 @@ ActiveRecord::Schema.define(version: 20170815203611) do
 
   add_index "time_objects", ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id", using: :btree
 
+  create_table "transaction_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "transaction_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "transcribed_expenses", force: :cascade do |t|
     t.integer  "amount_id",  limit: 4
     t.date     "date"
@@ -3004,6 +3050,11 @@ ActiveRecord::Schema.define(version: 20170815203611) do
   add_foreign_key "field_configurations", "field_parent_types"
   add_foreign_key "field_configurations", "field_types"
   add_foreign_key "field_drop_down_items", "field_configurations"
+  add_foreign_key "finly_transactions", "amounts"
+  add_foreign_key "finly_transactions", "companies"
+  add_foreign_key "finly_transactions", "payment_purposes"
+  add_foreign_key "finly_transactions", "payments"
+  add_foreign_key "finly_transactions", "transaction_types"
   add_foreign_key "individual_kyc_tracks", "individual_kycs"
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"

@@ -6,11 +6,16 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
   attr_accessor :payment_order_ids, :payments
 
   def init
-    self.payment_order_ids = user.company.payment_orders.pluck(:id)
     params[:with_application] = RequestStore.store[:current_app].to_s
   end
 
   def process
+    op = BankTransfer::YesBank::Index.(current_user, params)
+    if op.success?
+      self.payment_order_ids = op.payment_orders.pluck(:id)
+    else
+      add_message :error, op.messages[:error]
+    end
     self.payments = Payment.with_payment_order_id(payment_order_ids)
   end
 

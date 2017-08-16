@@ -30,10 +30,14 @@ class BankAccount < ActiveRecord::Base
 
   accepts_nested_attributes_for :account_owner
 
-  delegate :name, to: :account_owner
-
   scope :with_account_owner, -> (user_ids, vendor_ids) {
     where('(account_owner_type = ? AND account_owner_id IN (?)) OR (account_owner_type - ? AND account_owner_id IN (?)', "User", user_ids, "YesBankVendor", vendor_ids)
+  }
+  scope :with_id, -> (id) {where id: id}
+  scope :only_vendors, -> {where account_owner_type: "YesBankVendor"}
+  scope :only_users, -> {where account_owner_type: "User"}
+  scope :with_owner_id, -> (owner_id) {
+    where account_owner_id: owner_id
   }
 
   scope :with_owner_ids, -> (type, ids) {
@@ -64,4 +68,8 @@ class BankAccount < ActiveRecord::Base
       # do nothing?
     end
   }
+
+  after_create do
+    self.update(company_id: self.account_owner.company_id)
+  end
 end

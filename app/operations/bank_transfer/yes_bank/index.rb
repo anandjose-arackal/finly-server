@@ -1,5 +1,5 @@
 class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
-  attr_accessor :payment_orders
+  attr_accessor :payment_orders, :role_id
 
   def pre_validate
     super
@@ -15,14 +15,25 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
   end
 
   def init
-    # self.payment_orders = user.company.payment_orders.with_type_id(payment_order_type_id)
-    self.payment_orders = user.company.payment_orders
-    params[:with_application] = RequestStore.store[:current_app]
+    self.role_id = params[:role_id]
+    if self.role_id.blank? and params[:view].present?
+      self.role_id = UserRole::VALUES[params[:view].to_sym]
+    end
+    params[:with_application] = RequestStore.store[:current_app].to_s
   end
 
-  def pre_process
-    # adding a scope to just include vendor payment parameters
-    params[:vendor_payments] = 1
+  def process
+    case role_id
+      when UserRole.id_for(:admin)
+        self.payment_orders = user.company.payment_orders
+      when UserRole.id_for(:manager)
+        # insert logic for getting payment orders from a particular manager team
+      when UserRole.id_for(:finance_manager)
+        # insert logic for getting payment orders from a particular finance manager team
+      else
+        # i.e. personal view
+        self.payment_orders = user.payment_orders
+    end
   end
 
   def success
@@ -35,7 +46,7 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
 
     include HasScope
 
-    has_scope :vendor_payments
+    has_scope :with_application
 
     def init
       self.payment_orders = params[:payment_orders]

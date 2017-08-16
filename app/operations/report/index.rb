@@ -64,6 +64,9 @@ class Report::Index < Report::Base
     if self.reports.present?
       self.reports = self.reports.exclude_deleted.includes(:expenses, :policy, :status) rescue self.reports
     end
+    if params[:ref] == '1' and params[:n_id].present?
+      Event::EReport::Unset.(user, params)
+    end
   end
 
   def success
