@@ -145,7 +145,8 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
               value: pi.amount,
               currency_id: pi.currency_id
           },
-          date: pi.date
+          date: pi.date,
+          reference_resource: pi.reference_resource
       }
     end
     p

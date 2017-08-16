@@ -141,15 +141,10 @@ class Card::Transaction::Create < BaseOperation
               return true unless card.card_program.create_expense
 
               # add to cash on hand
-              if user.payments.create(amount_attributes: {value: params[:transaction_amount_attributes][:value], currency_id: Currency.first.id},
-                                      date: DateUtils.local_date,
-                                      payment_type_id: PaymentType.id_for(:debit),
-                                      payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal),
-                                      note: self.transaction.merchant_name,
-                                      initiating_user: user,
-                                      receiving_user: user,
-                                      payment_status_id: PaymentStatus.id_for(:completed))
-                user.balance_sheet.add_cash_in_hand(params[:transaction_amount_attributes][:value])
+              payment_request = PaymentRequest.(user, nil, CashOnHand.name, :credit, :atm_withdrawal)
+              payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, transaction.transaction_amount_value, reference_resource: self.transaction))
+              op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+              if op.success?
                 return true
               else
                 add_message :error, "Could not add credited amount to cash on hand"
