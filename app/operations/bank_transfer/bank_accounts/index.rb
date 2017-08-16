@@ -1,16 +1,28 @@
 class BankTransfer::BankAccounts::Index < BankTransfer::BankAccounts::Base
 
-  attr_accessor :user_ids, :vendor_ids, :company, :bank_accounts
+  attr_accessor :company, :bank_accounts, :role_id
 
   def init
     self.company = user.company
-    self.user_ids = company.users.pluck(:id)
-    self.vendor_ids = company.yes_bank_vendors.pluck(:id)
+    self.role_id = params[:role_id]
+    if self.role_id.blank? and params[:view].present?
+      self.role_id = UserRole::VALUES[params[:view].to_sym]
+    end
   end
 
   def process
-    # extracting the bank accounts owned by users and vendors
-    self.bank_accounts = company.bank_accounts
+    case role_id
+      when UserRole.id_for(:admin)
+        self.bank_accounts = company.bank_accounts
+      when UserRole.id_for(:manager)
+        # for now only show vendor bank accounts - will later have team details
+      when UserRole.id_for(:finance_manager)
+        # for now only show vendor accounts - will later have team details
+      else
+        account_ids = company.bank_accounts.only_vendors.pluck(:id)
+        account_ids += company.bank_accounts.only_users.with_owner_id(user.id).pluck(:id)
+        self.bank_accounts = BankAccount.with_id(account_ids)
+    end
   end
 
   def success
