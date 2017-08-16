@@ -81,10 +81,18 @@ class Statements::Show < BaseOperation
       self.finly_transactions = params[:finly_transactions]
       self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 30)
     end
-    
+
     def account_transactions
-      return FinlyTransaction.none unless can_view_transactions?
-      self.scoped_finly_transactions
+      if can_view_transactions?
+        return self.scoped_finly_transactions
+      elsif can_view_credit? and can_view_debit?
+        return self.scoped_finly_transactions.through_finly_dashboard
+      elsif can_view_debit?
+        return self.scoped_finly_transactions.through_finly_dashboard.debits
+      elsif can_view_credit?
+        return self.scoped_finly_transactions.through_finly_dashboard.credits
+      end
+      FinlyTransaction.none
     end
 
     def credits_count
@@ -92,7 +100,7 @@ class Statements::Show < BaseOperation
       if can_view_transactions?
         self.scoped_finly_transactions.credits.success.count || 0
       else
-        self.scoped_finly_transactions.credits.success.through_finly.count || 0
+        self.scoped_finly_transactions.credits.success.through_finly_dashboard.count || 0
       end
     end
 
@@ -101,7 +109,7 @@ class Statements::Show < BaseOperation
       if can_view_transactions?
         self.scoped_finly_transactions.debits.success.count || 0
       else
-        self.scoped_finly_transactions.debits.success.through_finly.count || 0
+        self.scoped_finly_transactions.debits.success.through_finly_dashboard.count || 0
       end
     end
 
@@ -149,7 +157,7 @@ class Statements::Show < BaseOperation
       if can_view_transactions?
         self.scoped_finly_transactions.credits.success.sum_amounts || 0
       else
-        self.scoped_finly_transactions.credits.success.through_finly.sum_amounts || 0
+        self.scoped_finly_transactions.credits.success.through_finly_dashboard.sum_amounts || 0
       end
     end
 
@@ -158,7 +166,7 @@ class Statements::Show < BaseOperation
       if can_view_transactions?
         self.scoped_finly_transactions.debits.success.sum_amounts || 0
       else
-        self.scoped_finly_transactions.debits.success.through_finly.sum_amounts || 0
+        self.scoped_finly_transactions.debits.success.through_finly_dashboard.sum_amounts || 0
       end
     end
 

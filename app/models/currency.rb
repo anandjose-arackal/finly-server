@@ -830,6 +830,10 @@ class Currency < ActiveRecord::Base
       Currency.find_by(country_code: country_code)&.id
   end
 
+  def self.currency_for(country_code)
+      Currency.find_by(country_code: country_code)
+  end
+
   def self.seed_data
     CURRENCIES.each do |currency, index|
       if Currency.find_by(country_code: currency[:country_code]).present?
