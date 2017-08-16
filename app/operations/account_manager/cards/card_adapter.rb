@@ -25,15 +25,15 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     unless op.success?
       self.errors = op.messages[:error]
       closing_balance = balance
-      store_transaction payment, :credit, :failure, opening_balance, closing_balance, nil, account.user.company_id, op.messages
+      store_transaction payment, :credit, :failure, opening_balance, closing_balance, account.user.company_id, op.messages
       return false
     end
     closing_balance = balance
-    store_transaction payment, :credit, :success, opening_balance, closing_balance, nil, account.user.company_id
+    store_transaction payment, :credit, :success, opening_balance, closing_balance, account.user.company_id
 
     if company_adapter.present?
       closing_company_balance = company_adapter.balance
-      company_adapter.store_transaction payment, :debit, :success, company_balance, closing_company_balance, nil, company_adapter.account.id
+      company_adapter.store_transaction payment, :debit, :success, company_balance, closing_company_balance, company_adapter.account.id
     end
     true
   end
@@ -59,15 +59,15 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     unless op.success?
       self.errors = op.messages[:error]
       closing_balance = balance
-      store_transaction payment, :debit, :failure, opening_balance, closing_balance, nil, account.user.company_id, op.messages
+      store_transaction payment, :debit, :failure, opening_balance, closing_balance, account.user.company_id, op.messages
       return false
     end
     closing_balance = balance
-    store_transaction payment, :debit, :success, opening_balance, closing_balance, nil, account.user.company_id
+    store_transaction payment, :debit, :success, opening_balance, closing_balance, account.user.company_id
 
     if company_adapter.present?
       closing_company_balance = company_adapter.balance
-      company_adapter.store_transaction payment, :credit, :success, company_balance, closing_company_balance, nil, company_adapter.account.id
+      company_adapter.store_transaction payment, :credit, :success, company_balance, closing_company_balance, company_adapter.account.id
     end
 
     true

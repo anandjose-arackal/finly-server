@@ -117,7 +117,8 @@ class PaymentRequest < NonPersistentModel
     attr_accessor :receiving_resource_id, :receiving_resource_type,
                   :receiving_account_id, :receiving_account_type,
                   :amount,
-                  :payment_request
+                  :payment_request,
+                  :reference_resource
 
     delegate :initiating_resource,:initiating_resource_id,:initiating_resource_type,
              :initiating_account, :initiating_account_id, :initiating_account_type, :scheduled_at,
@@ -131,11 +132,15 @@ class PaymentRequest < NonPersistentModel
     validate :payment_request_receiving_account_type
     validate :receiving_account_presence
 
-    def self.call(receiving_resource, receiving_account, amount)
+    def self.call(receiving_resource, receiving_account, amount, options = {})
+      if options.nil?
+        options = {}
+      end
       self.new({
                    receiving_resource: receiving_resource,
                    receiving_account: receiving_account,
-                   amount: amount
+                   amount: amount,
+                   reference_resource: options[:reference_resource]
                })
     end
 

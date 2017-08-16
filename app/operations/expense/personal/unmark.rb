@@ -49,10 +49,5 @@ class Expense::Personal::Unmark < Expense::Personal::Mark
       end
     end
     add_message :success, 'Expense unmarked as personal'
-
-    # if selected_expense.card_expense?
-    #   user.balance_sheet.subtract_cash_in_hand(selected_expense.amount_value)
-    # end
-    # add_message :success, "Expense unmarked as personal"
   end
 end

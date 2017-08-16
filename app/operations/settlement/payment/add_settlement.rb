@@ -288,8 +288,8 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
 
     if self.cash_in_hand_deduction_amount.present?
       # creating a payment request that can handle this case
-      self.payment_request = PaymentRequest.(user, nil, to_user.cash_on_hand.class.name, :debit, :balance_clearance_outside_finly)
-      self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, to_user.cash_on_hand, cash_in_hand_deduction_amount))
+      payment_request = PaymentRequest.(user, nil, to_user.cash_on_hand.class.name, :debit, :balance_clearance_outside_finly)
+      payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, to_user.cash_on_hand, cash_in_hand_deduction_amount))
 
       op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
       unless op.success?
@@ -327,13 +327,15 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
 
     end
 
-    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
-    unless op.success?
-      add_message :error, op.messages[:error]
-      return
+    unless self.payment_request.nil?
+      op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: self.payment_request})
+      unless op.success?
+        add_message :error, op.messages[:error]
+        return
+      end
+      self.payment = op.payment_order.payments.first
     end
-    self.payment = op.payment_order.payments.first
-    
+
     reports.each do |report|
       op = Report::MarkAsSettled.(user, {payment: payment, cash_in_hand_deduction: self.cash_deduction, report: report, role_id: role, view: params[:view]})
     end
