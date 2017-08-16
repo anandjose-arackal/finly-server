@@ -171,7 +171,15 @@ class Statements::Show < BaseOperation
     end
 
     def account_name
-      AccountManagerUtils.name_for self.account
+      account_name = AccountManagerUtils.name_for self.account
+      if [UserWallet.name, CashOnHand.name, Card.name].include? self.account.class.name
+        if user == self.account.user
+          account_name = "Your #{account_name}"
+        else
+          account_name = "#{self.account.user.name}'s #{account_name}"
+        end
+      end
+      account_name
     end
 
     def merchant(finly_transaction)
