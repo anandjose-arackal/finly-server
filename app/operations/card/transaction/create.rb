@@ -149,7 +149,7 @@ class Card::Transaction::Create < BaseOperation
               else
                 add_message :error, "Could not add credited amount to cash on hand"
                 transaction.expensed = false
-                transaction.error_message = @result.messages[:error]
+                transaction.error_message = op.messages[:error]
                 transaction.save
                 return false
               end

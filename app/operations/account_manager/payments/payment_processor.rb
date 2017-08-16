@@ -51,6 +51,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     # synchronous or a background operation
     unless payment_order.save
       add_message :error, payment_order.errors.full_messages
+      return
     end
     # if payment order has been scheduled for execution right away, process it right now
     if payment_order.payment_order_status_id == PaymentOrderStatus.id_for(:pending)
