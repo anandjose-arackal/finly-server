@@ -7,4 +7,5 @@ class AmountUtils
     symbol = currency.symbol || currency.country_code
     "#{symbol}#{value}"
   end
+
 end

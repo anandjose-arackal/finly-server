@@ -80,8 +80,23 @@ class Company::Transaction::Show < Company::Base
     end
     transactions = response.transactions
     new_company_transactions = []
+
     # Store all company transactions. All duplicate transactions will not be fetched
     transactions.each do |t|
+
+      # Handle negative amount cases,
+      # switch credit as debit if amount is negative
+      # switch debit as credit if amount is negative
+      if t[:transaction_amount].present? and t[:transaction_amount] < 0
+        t[:transaction_amount] = t[:transaction_amount].abs
+        case t[:transaction_type]
+          when 'Credit'
+            t[:transaction_type] = 'Debit'
+          when 'Debit'
+            t[:transaction_type] = 'Credit'
+        end
+      end
+
       company_transaction = company.company_transactions.create request_id: t[:request_id], merchant_name: t[:merchant_name],
                                                                 transaction_date: DateUtils.datetime_in_ist(t[:transaction_date]),
                                                                 transaction_amount_attributes: {value: t[:transaction_amount], currency_id: 1},
