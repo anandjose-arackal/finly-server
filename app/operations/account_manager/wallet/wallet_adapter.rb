@@ -36,7 +36,7 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
 
     if company_adapter.present?
       closing_company_balance = company_adapter.balance
-      company_adapter.store_transaction payment, :debit, :success, company_balance, closing_company_balance, nil, company_adapter.account.id
+      company_adapter.store_transaction payment, :debit, :success, company_balance, closing_company_balance, nil, company_adapter.account.company_id
     end
     true
   end
@@ -69,7 +69,7 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
 
     if company_adapter.present?
       closing_company_balance = company_adapter.balance
-      company_adapter.store_transaction payment, :credit, :success, company_balance, closing_company_balance, nil, company_adapter.account.id
+      company_adapter.store_transaction payment, :credit, :success, company_balance, closing_company_balance, nil, company_adapter.account.company_id
     end
     true
   end
