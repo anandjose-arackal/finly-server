@@ -24,7 +24,16 @@
 #  reference_resource_type :string(255)
 #  application             :string(255)
 #  payment_mode            :string(255)
+#  reference_id            :string(255)      not null
 #
+
+
+
+
+
+
+
+
 
 
 
@@ -81,6 +90,12 @@ class Payment < ActiveRecord::Base
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
+  scope :with_receiving_account_type, -> (receiving_account_type){
+    where receiving_account_type: receiving_account_type
+  }
+  scope :with_receiving_account_id, -> (ids) {
+    where receiving_account_id: ids
+  }
 
   # Personal are card transactions from own wallet to own card
 
@@ -90,9 +105,8 @@ class Payment < ActiveRecord::Base
   scope :non_personal, -> { where.not('initiating_user_id = receiving_user_id AND (payment_purpose_id IN (?) OR (payment_type_id IN (?) AND initiating_account_type IN (?) AND receiving_account_type IN (?)))',
                                       [PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:card_transaction)], [PaymentType.id_for(:credit), PaymentType.id_for(:debit)], [Payment::AccountType::WALLET, Payment::AccountType::CARD],
                                       [Payment::AccountType::WALLET, Payment::AccountType::CARD]) }
-  scope :non_settlement, -> { where.not('initiating_user_id = receiving_user_id AND payment_type_id IN (?) AND initiating_account_type IN (?) AND receiving_account_type IN (?)',
-                                        [PaymentType.id_for(:credit), PaymentType.id_for(:debit)], [Payment::AccountType::WALLET, Payment::AccountType::CARD],
-                                        [Payment::AccountType::WALLET, Payment::AccountType::CARD]).where.not(payment_purpose_id: [PaymentPurpose.id_for(:atm_withdrawal)]) }
+  scope :non_settlement, -> { where.not('initiating_user_id = receiving_user_id AND initiating_account_type IN (?) AND receiving_account_type IN (?)',
+                                        [Payment::AccountType::WALLET, Payment::AccountType::CARD], [Payment::AccountType::WALLET, Payment::AccountType::CARD]).where.not(payment_purpose_id: [PaymentPurpose.id_for(:atm_withdrawal)]) }
 
 
   scope :with_date, -> (date) { where(date: date) }

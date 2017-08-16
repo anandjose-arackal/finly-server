@@ -11,12 +11,12 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     opening_balance = balance
     if self.account.balance.update(value: opening_balance + payment.amount_value)
       closing_balance = balance
-      store_transaction payment, :credit, :success, opening_balance, closing_balance, nil, account.company_id
+      store_transaction payment, :credit, :success, opening_balance, closing_balance, account.user.company_id
       return true
     end
     self.errors = self.account.errors.full_messages
     closing_balance = balance
-    store_transaction payment, :credit, :failure, opening_balance, closing_balance, nil, account.company_id, error: self.errors
+    store_transaction payment, :credit, :failure, opening_balance, closing_balance, account.user.company_id, error: self.errors
     false
   end
 
@@ -25,11 +25,11 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     opening_balance = balance
     if self.account.balance.update(value: opening_balance - payment.amount_value)
       closing_balance = balance
-      store_transaction payment, :debit, :success, opening_balance, closing_balance, nil, account.company_id
+      store_transaction payment, :debit, :success, opening_balance, closing_balance, account.user.company_id
       return true
     end
     closing_balance = balance
-    store_transaction payment, :debit, :failure, opening_balance, closing_balance, nil, account.company_id, error: self.errors
+    store_transaction payment, :debit, :failure, opening_balance, closing_balance, account.user.company_id, error: self.errors
     false
   end
 

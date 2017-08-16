@@ -55,6 +55,9 @@ views:
         - name: Analytics
           url: analytics
           id: analytics
+        - name: Statements
+          url: company_statements
+          id: statements
         cog:
         <% unless current_company.kyc_completed? %>
         - name: Verify KYC
@@ -89,6 +92,9 @@ views:
         - name: Analytics
           url: analytics
           id: analytics
+        - name: Statements
+          url: company_statements
+          id: statements
         # - name: Personal
         #   url: personal
         #   id: personal
@@ -116,3 +122,6 @@ views:
             - name: Finly Money & Cards
               id: personal_accounts
               url: personal/accounts
+            - name: Statements
+              url: personal/statements
+              id: personal_statements

@@ -70,7 +70,7 @@ class AccountManager::BaseAdapter
     self.errors.blank?
   end
 
-  def store_transaction(payment, type, status, opening_balance, closing_balance, associated_transaction, company_id, system_messages = {})
+  def store_transaction(payment, type, status, opening_balance, closing_balance, company_id, system_messages = {})
     type_id = TransactionType.id_for(type)
     status_id = TransactionStatus.id_for(status)
     currency_id = Currency.id_for(:INR)
@@ -90,7 +90,7 @@ class AccountManager::BaseAdapter
             value: closing_balance,
             currency_id: currency_id
         },
-        associated_transaction: associated_transaction,
+        associated_transaction: payment.reference_resource,
         payment: payment,
         company_id: company_id,
         date: DateTime.now
