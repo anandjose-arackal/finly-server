@@ -22,7 +22,6 @@
 #
 
 
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -209,7 +208,6 @@ class Expense < ActiveRecord::Base
     expense_ids = ManualExpense.where('merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
     expense_ids += CardExpense.where('editable_merchant like ?', "%#{merchant_name}%").pluck(:expense_id)
     expense_ids += PerDiemExpense.joins(:per_diem).where('per_diems.name LIKE ?', "%#{merchant_name}%").pluck(:expense_id)
-
     where(id: expense_ids)
   end
 
@@ -270,6 +268,7 @@ class Expense < ActiveRecord::Base
   scope :with_category, ->(category_id) { where category_id: category_id }
   scope :include_manual_expense, -> { joins :manual_expense }
   scope :filter_user_id, ->(id) { where user_id: id }
+  scope :with_status_id, -> (id) { where status_id: id }
 
   scope :transcribed, -> { where transcribed: true }
   scope :untranscribed, -> { where transcribed: false }
@@ -280,10 +279,20 @@ class Expense < ActiveRecord::Base
 
   scope :joins_card_expenses, -> { only_card_expenses.joins(:card_expense) }
   scope :pluck_card_transaction_id, -> { joins_card_expenses.pluck('card_expense.card_transaction_id') }
+  scope :filter_report_status_id, -> (status) {
+    case status
+      when 1
+        with_status_id(ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected]))
+      when 2
+        with_status_id(ExpenseStatus.id_for(:submitted))
+      when 3
+        with_status_id(ExpenseStatus.id_for(:verified))
+    end
+    where expense_status_id: status
+  }
 
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount
-
 
   def currency_id
     if self.amount.present?
@@ -292,7 +301,6 @@ class Expense < ActiveRecord::Base
       return nil
     end
   end
-
 
   # this method is to purely show the amount values for the carious expenses
   def amount_value
@@ -720,6 +728,17 @@ class Expense < ActiveRecord::Base
         self.time_expense
       when ExpenseType.id_for(:per_diem)
         self.per_diem_expense
+    end
+  end
+
+  def report_status
+    case expense_status_id
+      when ExpenseStatus.id_for(:unreported), ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:rejected)
+        'Unreported'
+      when ExpenseStatus.id_for(:submitted)
+        'Submitted'
+      when ExpenseStatus.id_for(:verified)
+        'Verified'
     end
   end
 

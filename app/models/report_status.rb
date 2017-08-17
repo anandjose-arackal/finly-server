@@ -16,13 +16,13 @@
 
 
 class ReportStatus < ActiveRecord::Base
+  include Seedable
 
   scope :open, -> { find_by(id: ReportStatus.open_id) }
   scope :retracted, -> { find_by(id: ReportStatus.retracted_id) }
   scope :rejected, -> { find_by(id: ReportStatus.rejected_id) }
   scope :processing, -> { find_by(id: ReportStatus.processing_id) }
   scope :approved, -> { find_by(id: ReportStatus.approved_id) }
-  scope :with_name, -> (name) { find_by(name: name)}
 
   STATES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, settled: 6, settlement_confirmed: 7, closed: 8}
 
@@ -31,8 +31,8 @@ class ReportStatus < ActiveRecord::Base
      ReportStatus.id_for(:approved), ReportStatus.id_for(:settled), ReportStatus.id_for(:settlement_confirmed), ReportStatus.id_for(:closed)]
   end
 
-  def self.id_for(status)
-    STATES[status]
+  def self.values
+    [:open, :processing, :retracted, :rejected, :approved, :settled, :settlement_confirmed, :closed]
   end
 
   def status_name
@@ -72,35 +72,35 @@ class ReportStatus < ActiveRecord::Base
   end
 
   def self.open_id
-    1
+    self.id_for(:open)
   end
 
   def self.processing_id
-    2
+    self.id_for(:processing)
   end
 
   def self.retracted_id
-    3
+    self.id_for(:retracted)
   end
 
   def self.rejected_id
-    4
+    self.id_for(:rejected)
   end
 
   def self.approved_id
-    5
+    self.id_for(:approved)
   end
 
   def self.settled_id
-    6
+    self.id_for(:settled)
   end
 
   def self.settlement_confirmed_id
-    7
+    self.id_for(:settlement_confirmed)
   end
 
   def self.closed_id
-    8
+    self.id_for(:closed)
   end
 
 end

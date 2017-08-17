@@ -12,10 +12,13 @@
 
 
 class ExpenseStatus < ActiveRecord::Base
+  include Seedable
 
   validates :name, presence: true
 
-  VALUES = {unreported: 1, unsubmitted: 2, submitted: 3, rejected: 4}
+  def self.values
+    [:unreported, :unsubmitted, :rejected, :submitted, :verified]
+  end
 
   # delegated from expense model
   def expense_status_name
@@ -23,23 +26,23 @@ class ExpenseStatus < ActiveRecord::Base
   end
 
   def self.unreported_id
-    1
+    self.id_for(:unreported)
   end
 
   def self.unsubmitted_id
-    2
+    self.id_for(:unsubmitted)
   end
 
   def self.submitted_id
-    3
+    self.id_for(:submitted)
   end
 
   def self.rejected_id
-    4
+    self.id_for(:rejected)
   end
 
-  def self.id_for(item)
-    VALUES[item]
+  def self.verified_id
+    self.id_for(:verified)
   end
 
 end
