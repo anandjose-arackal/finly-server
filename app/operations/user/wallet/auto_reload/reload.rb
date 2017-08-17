@@ -46,25 +46,15 @@ class User::Wallet::AutoReload::Reload < BackgroundOperation
   end
 
   def process
-    credit_presenter = ItzCash::Credit.(selected_user, card_id: expense_card.id, amount: load_amount_value)
-    if credit_presenter.success?
-      wallet.subtract_funds(load_amount_value)
-      # Reduce company wallet balance when funds are transferred from wallet to card
-      selected_user.company.account.funds_debited_from_wallet(self.load_amount_value)
-      # creating a payment for the respective card and wallet reload
-      self.payment = Payment.new(initiating_user: selected_user,
-                            receiving_user: selected_user,
-                            date: DateUtils.local_date,
-                            note: "Auto reload of Card from Wallet",
-                            payment_type_id: PaymentType.id_for(:credit),
-                            amount_attributes: {value: self.load_amount_value, currency_id: Currency.first.id},
-                            initiating_account: selected_user.wallet,
-                            receiving_account: expense_card,
-                            payment_status_id: PaymentStatus.id_for(:completed))
-      payment.save
-      add_message :success, 'Auto reload successful'
+    # moving this to the new structure of payment order
+    payment_request = PaymentRequest.(selected_user, selected_user.wallet, Card.name, :credit, :card_auto_reload)
+    payment_request.add_payment_item(PaymentRequest::PaymentItem.(selected_user, expense_card, load_amount_value))
+    op = AccountManager::Payments::PaymentProcessor.(selected_user, payment_request: payment_request)
+    if op.success?
+      self.payment = op.payment_order.payments.first
+      add_message :success, "Auto reload successful!"
     else
-      add_message :error, credit_presenter.messages[:error]
+      add_message :error, op.messages[:error]
     end
   end
 

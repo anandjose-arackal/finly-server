@@ -36,7 +36,7 @@ class Export::Report::Base < Export::Base
 
   def retrieve_data(preferences, report, expense, custom_field_names)
     data_arr = []
-    user = report.user
+    user = report&.user || expense.user
     preferences.each do |pref|
       case pref.export_field_id
         when ExportField.type_report_id
@@ -65,6 +65,8 @@ class Export::Report::Base < Export::Base
           data_arr << expense.date
         when ExportField.type_expense_note
           data_arr << expense.note
+        when ExportField.type_expense_status
+          data_arr << expense.expense_status&.name&.humanize
         else
           data_arr << ''
       end
@@ -98,7 +100,7 @@ class Export::Report::Base < Export::Base
         end
       end
     end
-    field_names
+    field_names.uniq!
   end
 
 end
