@@ -28,16 +28,6 @@
 #
 
 
-
-
-
-
-
-
-
-
-
-
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -158,6 +148,20 @@ class Payment < ActiveRecord::Base
   scope :debits_for_account, ->(account) { where("(initiating_account_id = ? AND initiating_account_type = ? AND payment_type_id = #{PaymentType.id_for(:credit)}) OR (receiving_account_id = ? and receiving_account_type = ? AND payment_type_id = #{PaymentType.id_for(:debit)})", account.id, account.class.name, account.id, account.class.name) }
   scope :with_reference_id, -> (ref_id) { where reference_id: ref_id }
 
+  scope :filter_search, -> (term) {
+    #todo - need to think about this
+  }
+
+  scope :filter_date, -> (date_from, date_to) {
+    type_val = :date
+    date_from = "1990-01-01" if date_from.blank?
+    date_to = DateUtils.local_date if date_to.blank?
+    date_from = date_from.to_date if date_from.present?
+    date_to = date_to.to_date if date_to.present?
+    payments = arel_table
+    where(payments[type_val].gteq(date_from).and(payments[type_val].lteq(date_to)))
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   # validates :initiating_user_id, presence: true
@@ -186,6 +190,10 @@ class Payment < ActiveRecord::Base
         name += "#{card_type} Card"
       when "UserWallet"
         name += "Finly Money"
+      when "YesBankCompanyAccount"
+        name = "Company Credits"
+      when "VendorPaymentWallet"
+        name += "Finly Credits"
       else
         name = ""
     end
@@ -205,6 +213,10 @@ class Payment < ActiveRecord::Base
         name += "#{card_type} Card"
       when "UserWallet"
         name += "Finly Money"
+      when "YesBankCompanyAccount"
+        name = "Company Credits"
+      when "VendorPaymentWallet"
+        name += "Finly Credits"
       else
         name = ""
     end

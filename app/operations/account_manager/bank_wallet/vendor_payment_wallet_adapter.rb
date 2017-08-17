@@ -25,11 +25,16 @@ class AccountManager::BankWallet::VendorPaymentWalletAdapter < AccountManager::B
 
   def debit(payment, options)
     super
+    opening_balance = balance
     # credit a particular wallet with the respective amount
     unless self.account.subtract_funds(payment.amount_value)
       self.errors = account.errors.full_messages
       return false
+      closing_balance = balance
+      store_transaction payment, :debit, :failure, opening_balance, closing_balance, account.user.company_id
     end
+    closing_balance = balance
+    store_transaction payment, :debit, :failure, opening_balance, closing_balance, account.user.company_id
     true
   end
 

@@ -35,6 +35,7 @@ class BankTransfer::BankAccounts::Index < BankTransfer::BankAccounts::Base
     attr_accessor :bank_accounts
 
     has_scope :beneficiary_type
+    has_scope :filter_search
 
     def init
       self.bank_accounts = params[:bank_accounts]

@@ -69,6 +69,15 @@ class BankAccount < ActiveRecord::Base
     end
   }
 
+  scope :filter_search, -> (term) {
+    # todo - dirty code, see if this can be improved
+    ids = self.where('name like ? OR account_number like ? OR ifsc like ?', "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    user_ids = User.where('first_name like ? OR last_name like ?', "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = YesBankVendor.where('name like ?', "%#{term}%").pluck(:id)
+    ids += BankAccount.where('(account_owner_type = ? AND account_owner_id IN (?)) OR (account_owner_type = ? AND account_owner_id IN (?))', "User", user_ids, "YesBankVendor", vendor_ids)
+    where(id: ids)
+  }
+
   after_create do
     self.update(company_id: self.account_owner.company_id)
   end
