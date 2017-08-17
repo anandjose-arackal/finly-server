@@ -1,7 +1,8 @@
 # this operation would now create the payment request from the payment order data being passed in the controller
 # and pass it to the payment processor
 class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
-  attr_accessor :order_data, :processed_order_data, :payment_order, :scheduled_at
+  attr_accessor :order_data, :processed_order_data, :payment_order, :scheduled_at,
+                :payment_purpose
 
   def pre_validate
     super
@@ -28,6 +29,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
     self.processed_order_data = Benefits::TaxBenefits::Process.(config, user, scheduled_at: params[:scheduled_at],
         payment_order: self.order_data, card_program_id: card_program_id)
     self.scheduled_at = self.processed_order_data.scheduled_at
+    self.payment_purpose = retrieve_payment_purpose
   end
 
   def validate
@@ -59,7 +61,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
     # todo update this to dynamically pick an initiating_account
     initiating_account = user.company.itz_cash_company_account
 
-    payment_request = PaymentRequest.(initiating_user, initiating_account, Card.name, :credit, :corporate_balance_load, {scheduled_at: self.scheduled_at, background: true})
+    payment_request = PaymentRequest.(initiating_user, initiating_account, Card.name, :credit, payment_purpose, {scheduled_at: self.scheduled_at, background: true})
     self.processed_order_data.processed_order.each do |item|
 
       receiving_user = item[:user][:user_details]
@@ -90,6 +92,23 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
       self.payment_order = params[:payment_order]
     end
 
+  end
+
+  private
+
+  def retrieve_payment_purpose
+    case card_program_id
+      when CardProgram.id_for(:expense)
+        return :advance
+      when CardProgram.id_for(:medical)
+        return :medical_benefit
+      when CardProgram.id_for(:meal)
+        return :meal_benefit
+      when CardProgram.id_for(:reimbursement)
+        return :reimbursement
+      else
+        # do nothing?
+    end
   end
 
 end

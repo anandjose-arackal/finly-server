@@ -32,7 +32,7 @@ class BankTransfer::YesBank::Cancel < BankTransfer::YesBank::Base
   def process
     if self.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:cancelled))
       self.payment_order.payments.each do |payment|
-        if payment.scheduled?
+        unless payment.in_progress?
           payment.update(payment_status_id: PaymentStatus.id_for(:cancelled))
         end
       end

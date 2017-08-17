@@ -50,6 +50,7 @@ class Payment < ActiveRecord::Base
   has_many :report_tracks
   has_many :money_requests
   has_many :money_request_tracks
+  has_many :finly_transactions
 
   belongs_to :payment_order
   belongs_to :payment_status
@@ -193,7 +194,7 @@ class Payment < ActiveRecord::Base
       when "CashOnHand"
         name += "Cash on Hand"
       when "Card"
-        card_type = Card.unscoped.find_by(id: self.initiating_account_id)&.card_program&.name&.humanize
+        card_type = Card.unscoped.find_by(id: self.receiving_account_id)&.card_program&.name&.humanize
         name += "#{card_type} Card"
       when "UserWallet"
         name += "Finly Money"
