@@ -46,6 +46,7 @@ class Payment < ActiveRecord::Base
   has_many :report_tracks
   has_many :money_requests
   has_many :money_request_tracks
+  has_many :finly_transactions
 
   belongs_to :payment_order
   belongs_to :payment_status
@@ -209,7 +210,7 @@ class Payment < ActiveRecord::Base
       when "CashOnHand"
         name += "Cash on Hand"
       when "Card"
-        card_type = Card.unscoped.find_by(id: self.initiating_account_id)&.card_program&.name&.humanize
+        card_type = Card.unscoped.find_by(id: self.receiving_account_id)&.card_program&.name&.humanize
         name += "#{card_type} Card"
       when "UserWallet"
         name += "Finly Money"
@@ -272,8 +273,9 @@ class Payment < ActiveRecord::Base
   private
 
   def initiating_account_presence
-    unless [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:balance_clearance_outside_finly),PaymentPurpose.id_for(:personal_expense),
-            PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:card_transaction), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:corporate_balance_load), PaymentPurpose.id_for(:corporate_balance_refund)].include?(self.payment_purpose_id)
+    unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly, :balance_clearance_outside_finly,
+                                   :personal_expense, :atm_withdrawal, :card_transaction, :advance, :corporate_balance_load,
+                                   :corporate_balance_refund]).include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")
       end
@@ -281,8 +283,9 @@ class Payment < ActiveRecord::Base
   end
 
   def receiving_account_presence
-    unless [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:balance_clearance_outside_finly),
-            PaymentPurpose.id_for(:atm_withdrawal), PaymentType.id_for(:card_transaction)].include?(self.payment_purpose_id)
+    unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly,
+                                   :balance_clearance_outside_finly,
+                                   :card_transaction, :atm_withdrawal]).include?(self.payment_purpose_id)
       if receiving_account_id.blank? || receiving_account_type.blank?
         errors.add(:receiving_account, "cannot be blank")
       end
