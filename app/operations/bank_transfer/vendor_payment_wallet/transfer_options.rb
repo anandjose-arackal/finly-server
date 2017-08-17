@@ -34,7 +34,7 @@ class BankTransfer::VendorPaymentWallet::TransferOptions < BankTransfer::VendorP
       # from account
       company_account_adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
       action = {type: :company_credits, id: user.company.yes_bank_company_account.id, name: 'Company Credits',
-                balance: company_account_adapter.balance}
+                balance: company_account_adapter.balance, active: true}
       credit_actions[:initiating_accounts] << action
       debit_actions[:initiating_accounts] << action
     end
@@ -42,7 +42,8 @@ class BankTransfer::VendorPaymentWallet::TransferOptions < BankTransfer::VendorP
     # from account
     source_wallet_adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
     action = {type: :vendor_wallet, id: user.bank_wallet.id, name: "#{user.name}'s Finly Bank Wallet",
-              balance: source_wallet_adapter.balance
+              balance: source_wallet_adapter.balance,
+              active: true
               }
     credit_actions[:initiating_accounts] << action
     debit_actions[:initiating_accounts] << action
@@ -50,8 +51,9 @@ class BankTransfer::VendorPaymentWallet::TransferOptions < BankTransfer::VendorP
     # to account - always receiving user's wallet
     receiving_wallet_adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(selected_user.bank_wallet)
     action = {type: :vendor_wallet, id: selected_user.bank_wallet.id, name: "#{selected_user.name}'s Finly Bank Wallet",
-              balance: receiving_wallet_adapter.balance
-    }
+              balance: receiving_wallet_adapter.balance,
+              active: true
+             }
     credit_actions[:receiving_accounts] << action
     debit_actions[:receiving_accounts] << action
 
