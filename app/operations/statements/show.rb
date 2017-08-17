@@ -1,4 +1,4 @@
-class Statements::Show < BaseOperation
+class Statements::Show < Statements::Base
   attr_accessor :account, :finly_transactions
 
   def pre_validate
@@ -219,6 +219,11 @@ class Statements::Show < BaseOperation
           end
       end
       merchant
+    end
+
+    def summary
+      credit_summary = self.scoped_finly_transactions.credits.purpose_wise_amount
+      debit_summary = self.scoped_finly_transactions.debits.purpose_wise_amount
     end
 
     def can_view_transactions?
