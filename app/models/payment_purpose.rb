@@ -17,7 +17,7 @@ class PaymentPurpose < ActiveRecord::Base
      :meal_benefit, :reimbursement, :payroll,
      :vendor_payment, :corporate_balance_load,
      :balance_clearance_outside_finly, :balance_clearance, :corporate_balance_refund,
-     :personal_expense]
+     :personal_expense, :card_auto_reload]
   end
 
 end
