@@ -28,16 +28,6 @@
 #
 
 
-
-
-
-
-
-
-
-
-
-
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -262,8 +252,9 @@ class Payment < ActiveRecord::Base
   private
 
   def initiating_account_presence
-    unless [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:balance_clearance_outside_finly),PaymentPurpose.id_for(:personal_expense),
-            PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:card_transaction), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:corporate_balance_load), PaymentPurpose.id_for(:corporate_balance_refund)].include?(self.payment_purpose_id)
+    unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly, :balance_clearance_outside_finly,
+                                   :personal_expense, :atm_withdrawal, :card_transaction, :advance, :corporate_balance_load,
+                                   :corporate_balance_refund]).include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")
       end
@@ -271,8 +262,9 @@ class Payment < ActiveRecord::Base
   end
 
   def receiving_account_presence
-    unless [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:balance_clearance_outside_finly),
-            PaymentPurpose.id_for(:atm_withdrawal), PaymentType.id_for(:card_transaction)].include?(self.payment_purpose_id)
+    unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly,
+                                   :balance_clearance_outside_finly,
+                                   :card_transaction, :atm_withdrawal]).include?(self.payment_purpose_id)
       if receiving_account_id.blank? || receiving_account_type.blank?
         errors.add(:receiving_account, "cannot be blank")
       end
