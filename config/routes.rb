@@ -879,6 +879,7 @@
 #                                                         PATCH  /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#update
 #                                                         PUT    /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#update
 #                                                         DELETE /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#destroy
+#     bank_transfer_vendor_payment_wallets_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                  bank_transfer/vendor_payment_wallets#update_balance
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format) admin_users/funds_load_requests#approve
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#index
 #                                                         POST   /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#create
@@ -2118,6 +2119,7 @@ Rails.application.routes.draw do
     resources :vendors
     resources :bank_accounts
     resources :payments
+    post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance'
   end
 
 

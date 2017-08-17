@@ -24,6 +24,7 @@
 #  reference_resource_type :string(255)
 #  application             :string(255)
 #  payment_mode            :string(255)
+#  reference_id            :string(255)      not null
 #
 
 

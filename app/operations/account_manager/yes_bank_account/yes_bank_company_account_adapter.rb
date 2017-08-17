@@ -43,11 +43,11 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
 
   def creditable_accounts
     # none as this account cannot be credited through Finly (only external)
-    [nil, 'OutsideFinly']
+    [nil, 'OutsideFinly', VendorPaymentWallet]
   end
 
   def debitable_accounts
-    [BankAccount]
+    [BankAccount, VendorPaymentWallet]
   end
 
   private
