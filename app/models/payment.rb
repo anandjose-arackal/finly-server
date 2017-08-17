@@ -98,9 +98,8 @@ class Payment < ActiveRecord::Base
   scope :non_personal, -> { where.not('initiating_user_id = receiving_user_id AND (payment_purpose_id IN (?) OR (payment_type_id IN (?) AND initiating_account_type IN (?) AND receiving_account_type IN (?)))',
                                       [PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:card_transaction)], [PaymentType.id_for(:credit), PaymentType.id_for(:debit)], [Payment::AccountType::WALLET, Payment::AccountType::CARD],
                                       [Payment::AccountType::WALLET, Payment::AccountType::CARD]) }
-  scope :non_settlement, -> { where.not('initiating_user_id = receiving_user_id AND payment_type_id IN (?) AND initiating_account_type IN (?) AND receiving_account_type IN (?)',
-                                        [PaymentType.id_for(:credit), PaymentType.id_for(:debit)], [Payment::AccountType::WALLET, Payment::AccountType::CARD],
-                                        [Payment::AccountType::WALLET, Payment::AccountType::CARD]).where.not(payment_purpose_id: [PaymentPurpose.id_for(:atm_withdrawal)]) }
+  scope :non_settlement, -> { where.not('initiating_user_id = receiving_user_id AND initiating_account_type IN (?) AND receiving_account_type IN (?)',
+                                        [Payment::AccountType::WALLET, Payment::AccountType::CARD], [Payment::AccountType::WALLET, Payment::AccountType::CARD]).where.not(payment_purpose_id: [PaymentPurpose.id_for(:atm_withdrawal)]) }
 
 
   scope :with_date, -> (date) { where(date: date) }

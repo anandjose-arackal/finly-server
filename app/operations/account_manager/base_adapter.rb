@@ -19,7 +19,7 @@ class AccountManager::BaseAdapter
   end
 
   def name
-    AccountManagerUtils.name_for self.account_class
+    AccountManagerUtils.name_for ((self.account || self.account_class))
   end
 
   def credit(payment, options = {})
