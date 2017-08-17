@@ -49,4 +49,16 @@ class BankTransfer::PaymentOrdersController < ApplicationController
     @result = AccountManager::Balance::Check.(current_company.yes_bank_company_account, params)
     respond
   end
+
+  def update_details
+    @result = BankTransfer::YesBank::Update.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json { render 'bank_transfer/payment_orders/process_file' }
+        format.html {}
+      end
+      return
+    end
+    respond
+  end
 end
