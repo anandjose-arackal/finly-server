@@ -280,15 +280,21 @@ class Expense < ActiveRecord::Base
   scope :joins_card_expenses, -> { only_card_expenses.joins(:card_expense) }
   scope :pluck_card_transaction_id, -> { joins_card_expenses.pluck('card_expense.card_transaction_id') }
   scope :filter_report_status_id, -> (status) {
-    case status
-      when 1
-        with_status_id(ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected]))
-      when 2
-        with_status_id(ExpenseStatus.id_for(:submitted))
-      when 3
-        with_status_id(ExpenseStatus.id_for(:verified))
+    filter_status = []
+    status = [status] unless status.is_a?(Array)
+    if status.include?("1")
+      filter_status += ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected])
     end
-    where expense_status_id: status
+    if status.include?("2")
+      filter_status << ExpenseStatus.id_for(:submitted)
+    end
+    if status.include?("3")
+      filter_status << ExpenseStatus.id_for(:verified)
+    end
+    if status.blank?
+      filter_status = ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :verified, :submitted])
+    end
+    where expense_status_id: filter_status
   }
 
   delegate :category_name, to: :category
