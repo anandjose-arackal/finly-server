@@ -35,7 +35,7 @@ class Settlement::Show < Settlement::Base
       load_reports
     end
     return if has_errors?
-    self.type[view_to_load.to_sym] = true
+    self.type = view_to_load.to_s
   end
 
   def post_process
@@ -47,24 +47,29 @@ class Settlement::Show < Settlement::Base
 
   def success
     params[:selected_user] = selected_user
-    params[:reports] = reports.reorder(updated_at: :desc) if reports.present?
-    params[:payments] = payments.reorder(updated_at: :desc) if payments.present?
-    params[:money_requests] = money_requests.reorder(updated_at: :desc) if money_requests.present?
+    params[:reports] = reports
+    params[:payments] = payments
+    params[:money_requests] = money_requests
     params[:type] = type
     Settlement::Show::Presenter.new(user, params, messages)
   end
 
   class Settlement::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :selected_user, :items, :type
+
+    attr_accessor :selected_user, :reports, :money_requests, :payments, :type
 
     has_scope :with_application
 
     def init
       self.selected_user = params[:selected_user]
-      self.items = (params[:reports] or apply_scopes(params[:payments], params) or params[:money_requests])
       self.type = params[:type]
+      self.reports = params[:reports]
+      self.reports = reports.reorder(created_at: :desc) if reports.present?
+      self.payments = params[:payments]
+      self.payments = apply_scopes(payments.reorder(created_at: :desc), params) if payments.present?
+      self.money_requests = params[:money_requests]
+      self.money_requests = money_requests.reorder(created_at: :desc) if money_requests.present?
     end
-
   end
 
   private
