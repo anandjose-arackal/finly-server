@@ -1925,6 +1925,7 @@ Rails.application.routes.draw do
   get 'statements/:id/summary' => 'statements#summary'
   get 'export/:id/statements(.:format)', to: 'export#statement', as: :export_statement
   resources :statements
+  get 'statements/:id/export', to: 'statements#export'
 
   # get 'settlements/summary' => 'settlements#summary'
 

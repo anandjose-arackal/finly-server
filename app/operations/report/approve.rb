@@ -126,6 +126,8 @@ class Report::Approve < Report::Base
         Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
         report.reload
 
+        report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:verified))
+
         # Mark all previous tokens as invalid
         email_auth_invalidate_presenter = EmailAuthorization::Invalidate.(user, authorizable: report)
         # unless email_auth_invalidate_presenter.success?
