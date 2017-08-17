@@ -50,7 +50,7 @@ class Payment < ActiveRecord::Base
   has_many :report_tracks
   has_many :money_requests
   has_many :money_request_tracks
-  has_many :payments
+  has_many :finly_transactions
 
   belongs_to :payment_order
   belongs_to :payment_status
