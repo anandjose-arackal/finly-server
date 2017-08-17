@@ -92,8 +92,10 @@ class Expense::Index < Expense::Base
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_expense_cancelled # shows only cancelled expenses
     has_scope :filter_expense_personal # shows only personal expenses
+    has_scope :filter_report_status_id, type: :array # shows only personal expenses
 
     def init
+      ScopeUtils.fix_for_scoping(params, :filter_report_status_id, :array)
       self.expenses = params[:expenses]
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)
