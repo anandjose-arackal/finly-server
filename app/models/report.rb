@@ -96,6 +96,7 @@ class Report < ActiveRecord::Base
   scope :with_reimbursable_expenses_total, -> { joins :reimbursable_expenses_total }
   scope :with_non_reimbursable_expenses_total, -> { joins :non_reimbursable_expenses_total }
   scope :with_card_expenses_total, -> { joins :card_expenses_total }
+  scope :with_status_id, ->(id) {where report_status_id: id}
   scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }

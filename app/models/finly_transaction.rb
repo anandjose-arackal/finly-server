@@ -59,6 +59,9 @@ class FinlyTransaction < ActiveRecord::Base
                                                                                :meal_benefit, :reimbursement, :payroll,
                                                                                :vendor_payment,
                                                                                :balance_clearance_outside_finly, :balance_clearance]) }
+  scope :joins_amounts, -> { joins :amount }
+  scope :group_by_purpose, -> { group :payment_purpose_id }
+  scope :purpose_wise_amount, -> { joins_amounts.group_by_purpose.sum('amounts.value') }
 
   before_create do
     ref_id = payment&.reference_id

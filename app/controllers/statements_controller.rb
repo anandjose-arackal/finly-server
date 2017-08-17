@@ -51,8 +51,8 @@ class StatementsController < ApplicationController
     end
   end
 
-  def show_new
-    @result = Statement::Show.(current_user, params)
+  def export
+    @result = Statements::AsSpreadsheet.(current_user, params)
     respond
   end
 
