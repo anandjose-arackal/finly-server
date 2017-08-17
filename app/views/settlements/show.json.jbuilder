@@ -1,22 +1,6 @@
-json.array! @result.items do |item|
-  # json.merge! item.attributes
-  if item.is_a?(Report)
-    json.extract! item, :id, :name
-    json.type 'report'
-    if item.final_approver
-      json.final_approver item.final_approver.name
-    end
-    json.reimbursement_amount item.reimbursable_expenses_total.value rescue 0
-    json.card_expenses_total item.card_expenses_total.value rescue 0
-    json.cash_expenses_total (item.total_amount - item.card_expenses_total.value) rescue 0
-    json.reimbursable_expenses_total item.reimbursable_expenses_total.value rescue 0
-    json.non_reimbursable_expenses_total item.non_reimbursable_expenses_total.value rescue 0
-    json.currency_symbol item.base_currency_symbol
-    json.currency_code item.base_currency_code
-    json.status item.status_name
-    json.total_amount item.total_amount
-  elsif item.is_a?(Payment)
-    payment_type_id = item.payment_type_id
+if @result.type.include?('payments')
+  json.array!(@result.payments) do |payment|
+    payment_type_id = payment.payment_type_id
     payment_type_s = PaymentType.name_for(payment_type_id)
     if [PaymentType.id_for(:credit_from_virtual_account_to_wallet),
         PaymentType.id_for(:credit_from_virtual_account_to_card),
@@ -24,44 +8,57 @@ json.array! @result.items do |item|
         PaymentType.id_for(:credit_from_wallet_to_card),
         PaymentType.id_for(:debit_from_wallet_to_wallet),
         PaymentType.id_for(:debit_from_wallet_to_virtual_account)].include?(payment_type_id)
-      if @result.selected_user == item.receiving_user
+      if @result.selected_user == payment.receiving_user
         payment_type_s = "Receive #{PaymentType.name_for(payment_type_id).downcase}"
-      elsif @result.selected_user == item.initiating_user
+      elsif @result.selected_user == payment.initiating_user
         next if [PaymentType.id_for(:credit_from_virtual_account_to_wallet),
-                  PaymentType.id_for(:credit_from_virtual_account_to_card),
-                  PaymentType.id_for(:debit_from_wallet_to_virtual_account)].include?(payment_type_id)
+                 PaymentType.id_for(:credit_from_virtual_account_to_card),
+                 PaymentType.id_for(:debit_from_wallet_to_virtual_account)].include?(payment_type_id)
         payment_type_s = "Initiate #{PaymentType.name_for(payment_type_id).downcase}"
       else
         next
       end
     end
-    json.extract! item, :note, :date
+    json.extract! payment, :note, :date
     json.type 'payment'
-    json.payment_amount item.amount.value
-    json.receiving_account item.receiving_account_type_name
-    json.initiating_account item.initiating_account_type_name
-    json.initiating_user item.initiating_user&.name
+    json.payment_amount payment.amount.value
+    json.receiving_account payment.receiving_account_type_name
+    json.initiating_account payment.initiating_account_type_name
+    json.initiating_user payment.initiating_user&.name
     json.payment_type payment_type_s
-    json.total_amount item.total_amount
-    json.payment_purpose item.payment_purpose.name.humanize
-  elsif item.is_a?(MoneyRequest)
-    json.extract! item, :id, :name, :memo, :required_by_date
-    json.type 'money_request'
-    if item.final_approver
-      json.final_approver item.final_approver.name
-    end
-    if item.payment.present?
-      json.credited_date item.payment.date
-    end
-    json.request_amount item.total_amount
-    json.status item.status_name
-    json.payment_mode item.payment_mode_name
-    json.total_amount item.total_amount
+    json.total_amount payment.total_amount
+    json.payment_purpose payment.payment_purpose.name.humanize
   end
-
-  # json.merge! report.attributes
-  # json.total_amount 10
-  # json.total_amount report.total_amount
-  # json.final_approver report[:final_approver]
-  # ap report
+elsif @result.type.include?('reports')
+  json.array!(@result.reports) do |report|
+    json.extract! report, :id, :name
+    json.type 'report'
+    if report.final_approver
+      json.final_approver report.final_approver.name
+    end
+    json.reimbursement_amount report.reimbursable_expenses_total.value rescue 0
+    json.card_expenses_total report.card_expenses_total.value rescue 0
+    json.cash_expenses_total (report.total_amount - report.card_expenses_total.value) rescue 0
+    json.reimbursable_expenses_total report.reimbursable_expenses_total.value rescue 0
+    json.non_reimbursable_expenses_total report.non_reimbursable_expenses_total.value rescue 0
+    json.currency_symbol report.base_currency_symbol
+    json.currency_code report.base_currency_code
+    json.status report.status_name
+    json.total_amount report.total_amount
+  end
+elsif @result.type.include?('money_requests')
+  json.array!(@result.money_requests) do |money_request|
+    json.extract! money_request, :id, :name, :memo, :required_by_date
+    json.type 'money_request'
+    if money_request.final_approver
+      json.final_approver money_request.final_approver.name
+    end
+    if money_request.payment.present?
+      json.credited_date money_request.payment.date
+    end
+    json.request_amount money_request.total_amount
+    json.status money_request.status_name
+    json.payment_mode money_request.payment_mode_name
+    json.total_amount money_request.total_amount
+  end
 end

@@ -63,6 +63,8 @@ class Export::Report::Base < Export::Base
           data_arr << expense.amount.value
         when ExportField.type_expense_date
           data_arr << expense.date
+        when ExportField.type_expense_note
+          data_arr << expense.note
         else
           data_arr << ''
       end
