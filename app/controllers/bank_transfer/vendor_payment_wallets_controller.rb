@@ -1,5 +1,7 @@
 class BankTransfer::VendorPaymentWalletsController < ApplicationController
 
+  before_action {finly_authorize! :web}
+
   def update_balance
     action_type = params[:type] || params[:action_type] rescue nil
     case action_type
@@ -10,6 +12,11 @@ class BankTransfer::VendorPaymentWalletsController < ApplicationController
         # Value = 2
         @result = BankTransfer::VendorPaymentWallet::Debit.(current_user, params)
     end
+    respond
+  end
+
+  def transfer_options
+    @result = BankTransfer::VendorPaymentWallet::TransferOptions.(current_user, params)
     respond
   end
 

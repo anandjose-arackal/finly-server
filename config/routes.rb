@@ -833,7 +833,7 @@
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                                    quickbooks#show
 #                                                     tos GET    /tos(.:format)                                                                  static_pages#tos
 #                                                 privacy GET    /privacy(.:format)                                                              static_pages#privacy
-#                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                               static_pages#prepaid_card_agreement
+#                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                               static_pages#prepaid_card_ agreement
 #                            company_add_balance_payments POST   /payments/companies/:company_id/add_balance(.:format)                           companies#add_balance
 #                                                         GET    /payments/companies(.:format)                                                   companies#index
 #                                                         POST   /payments/companies(.:format)                                                   companies#create
@@ -879,7 +879,8 @@
 #                                                         PATCH  /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#update
 #                                                         PUT    /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#update
 #                                                         DELETE /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#destroy
-#     bank_transfer_vendor_payment_wallets_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                  bank_transfer/vendor_payment_wallets#update_balance
+#                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                  bank_transfer/vendor_payment_wallets#update_balance
+#                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)            bank_transfer/vendor_payment_wallets#transfer_options
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format) admin_users/funds_load_requests#approve
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#index
 #                                                         POST   /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#create
@@ -2098,7 +2099,7 @@ Rails.application.routes.draw do
 
   get 'tos', to: 'static_pages#tos'
   get 'privacy', to: 'static_pages#privacy'
-  get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_agreement'
+  get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_ agreement'
 
 
 
@@ -2119,7 +2120,8 @@ Rails.application.routes.draw do
     resources :vendors
     resources :bank_accounts
     resources :payments
-    post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance'
+    post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
+    get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
   end
 
 

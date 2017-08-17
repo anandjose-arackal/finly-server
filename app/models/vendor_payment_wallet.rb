@@ -21,6 +21,8 @@ class VendorPaymentWallet < ActiveRecord::Base
 
   accepts_nested_attributes_for :balance
 
+  delegate :balance_value, to: :balance
+
   def add_funds(amount)
     if amount.blank? or amount.to_d <= 0
       errors.add(:amount, 'cannot be less than or equal to 0')

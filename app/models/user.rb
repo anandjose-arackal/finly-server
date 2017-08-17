@@ -55,6 +55,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -73,6 +74,7 @@ class User < ActiveRecord::Base
 
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
+  has_one :bank_wallet, class_name: 'VendorPaymentWallet', foreign_key: :user_id, dependent: :destroy
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
   has_many :user_roles, through: :role_mapping, dependent: :destroy
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
@@ -381,6 +383,7 @@ class User < ActiveRecord::Base
 
     # creating the cash on hand account for this user
     self.build_cash_on_hand(balance_attributes: {value: 0, currency_id: Currency.id_for(:INR)}).save
+    self.build_bank_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
   end
 
   def payments
