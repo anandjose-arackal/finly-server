@@ -55,7 +55,7 @@ class BankTransfer::VendorPaymentWallet::TransferOptions < BankTransfer::VendorP
     credit_actions[:receiving_accounts] << action
     debit_actions[:receiving_accounts] << action
 
-    self.transfer_options = {meta: {base_url: Rails.application.routes.url_helpers.bank_transfer_update_balance_path(receiving_user_id: selected_user.id, view: params[:view])}, credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}
+    self.transfer_options = {transfer_options: {meta: {base_url: Rails.application.routes.url_helpers.bank_transfer_update_balance_path(receiving_user_id: selected_user.id, view: params[:view])}, credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}}
   end
 
   def success

@@ -45,7 +45,6 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
       return
     end
 
-    # todo - change this to the adapter method of finding the company balance
     op = AccountManager::Balance::Check.(current_user.company.yes_bank_company_account, params)
     company_balance = op.balance rescue 0
 
@@ -69,7 +68,7 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
     end
 
     self.payment_order_data.each do |item|
-      bank_account_no = item[:account_number]
+      bank_account_no = item[:account_number] || item[:bank_account_number]
       ifsc = item[:ifsc]
       name = item[:name]
       amount = item[:amount]&.to_f

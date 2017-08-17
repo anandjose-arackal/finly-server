@@ -52,13 +52,6 @@ class BankTransfer::PaymentOrdersController < ApplicationController
 
   def update_details
     @result = BankTransfer::YesBank::Update.(current_user, params)
-    if @result.success?
-      respond_to do |format|
-        format.json { render 'bank_transfer/payment_orders/process_file' }
-        format.html {}
-      end
-      return
-    end
     respond
   end
 end
