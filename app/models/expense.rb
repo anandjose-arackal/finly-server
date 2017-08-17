@@ -274,8 +274,9 @@ class Expense < ActiveRecord::Base
   scope :untranscribed, -> { where transcribed: false }
   scope :limit_to, ->(count) { limit count }
 
-  scope :verified, -> { where expense_status_id: ExpenseStatus.submitted_id }
-  scope :unverified, -> { where expense_status_id: [ExpenseStatus.unsubmitted_id, ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
+  scope :verified, -> { where expense_status_id: ExpenseStatus.verified_id }
+  scope :unreported, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected]) }
+  scope :unverified, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :submitted]) }
 
   scope :joins_card_expenses, -> { only_card_expenses.joins(:card_expense) }
   scope :pluck_card_transaction_id, -> { joins_card_expenses.pluck('card_expense.card_transaction_id') }

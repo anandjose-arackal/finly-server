@@ -150,7 +150,7 @@ class Analytics::Charts < BaseOperation
         case status_id
           when '1'
             # i.e. all unreported expenses
-            exp_ids += expenses.unverified.pluck(:id)
+            exp_ids += expenses.unreported.pluck(:id)
           when '2'
             r = Report.processing.all
             exp_ids += expenses.with_report_id(r).pluck(:id)
