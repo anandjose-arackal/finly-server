@@ -40,12 +40,12 @@ user:
 #    default_url: 'orders'
   <% end %>
   <% if current_user.manager? %>
-  - id: manager
-    name: 'Manager'
-    default_url: 'orders'
+#  - id: manager
+#    name: 'Manager'
+#    default_url: 'orders'
   <% end %>
   - id: personal
-    name: 'Personal'
+    name: 'Finance'
     default_url: 'orders'
 views:
   <% if current_user.admin? %>

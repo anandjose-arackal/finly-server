@@ -3,7 +3,7 @@ class BankTransfer::VendorPaymentWallet::Credit < BankTransfer::VendorPaymentWal
   attr_accessor :payment_request
 
   def process
-    self.payment_request = PaymentRequest.(user, initiating_account. receiving_account.class.name, :credit, :advance)
+    self.payment_request = PaymentRequest.(user, initiating_account, receiving_account.class.name, :credit, :advance)
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, self.amount))
 
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
