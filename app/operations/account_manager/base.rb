@@ -22,7 +22,7 @@ class AccountManager::Base < BackgroundOperation
       when 'BankAccount'
         return AccountManager::BankAccount::BankAccountYesBankAdapter.new(account)
       when 'VendorPaymentWallet'
-        return AccountManager::BankAccount::VendorPaymentWalletAdapter.new(account)
+        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(account)
       else # i.e. the transaction has happened outside Finly
         return AccountManager::OutsideFinly::OutsideFinlyAdapter.new
     end

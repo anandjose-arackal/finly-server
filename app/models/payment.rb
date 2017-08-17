@@ -153,6 +153,12 @@ class Payment < ActiveRecord::Base
     #todo - need to think about this
   }
 
+  scope :filter_vendor_payments, -> (enabled){
+    if ['1', 1].include?(enabled)
+      where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
+    end
+  }
+
   scope :filter_date, -> (date_from, date_to) {
     type_val = :date
     date_from = "1990-01-01" if date_from.blank?

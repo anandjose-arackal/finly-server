@@ -7,6 +7,7 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
 
   def init
     params[:with_application] = RequestStore.store[:current_app].to_s
+    params[:filter_vendor_payments] = 1
   end
 
   def process
@@ -31,6 +32,7 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
     has_scope :with_application
     has_scope :filter_search
     has_scope :filter_date, using: [:from, :to], type: :hash
+    has_scope :filter_vendor_payments
 
     def init
       self.payments = apply_scopes(params[:payments], params)
