@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170817181531) do
+ActiveRecord::Schema.define(version: 20170818144621) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2474,6 +2474,12 @@ ActiveRecord::Schema.define(version: 20170817181531) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "report_sync_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "report_tracking_actions", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -2529,6 +2535,7 @@ ActiveRecord::Schema.define(version: 20170817181531) do
     t.integer  "card_expenses_total_id",             limit: 4
     t.integer  "non_reimbursable_expenses_total_id", limit: 4
     t.boolean  "synced_with_quickbooks"
+    t.integer  "sync_status_id",                     limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree

@@ -10,6 +10,7 @@ class QuickbooksController < ApplicationController
 
   def sync_reports
     @result = Integrations::Quickbooks::SyncReports.call_async(current_user.id, params)
+    debugger
     respond response: :success, message: "Reports Sync initiated"
   end
 

@@ -580,6 +580,7 @@
 #                                                         PATCH  /money_request/:id(.:format)                                                    money_request#update
 #                                                         PUT    /money_request/:id(.:format)                                                    money_request#update
 #                                                         DELETE /money_request/:id(.:format)                                                    money_request#destroy
+#                                         expenses_export POST   /expenses/export(.:format)                                                      expenses#export
 #                                                expenses DELETE /expenses(.:format)                                                             expenses#destroy
 #                                  expense_attach_receipt POST   /expenses/:expense_id/attach_receipt(.:format)                                  expenses#attach_receipt
 #                                  expense_detach_receipt POST   /expenses/:expense_id/detach_receipt(.:format)                                  expenses#detach_receipt
@@ -704,6 +705,7 @@
 #                                                         PATCH  /statements/:id(.:format)                                                       statements#update
 #                                                         PUT    /statements/:id(.:format)                                                       statements#update
 #                                                         DELETE /statements/:id(.:format)                                                       statements#destroy
+#                                                         GET    /statements/:id/export(.:format)                                                statements#export
 #                                                    root GET    /                                                                               home#index
 #                                                 welcome GET    /welcome(.:format)                                                              home#welcome
 #                                                   about GET    /about(.:format)                                                                home#about

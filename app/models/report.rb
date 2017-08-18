@@ -29,7 +29,9 @@
 #  card_expenses_total_id             :integer
 #  non_reimbursable_expenses_total_id :integer
 #  synced_with_quickbooks             :boolean
+#  sync_status_id                     :integer
 #
+
 
 
 
