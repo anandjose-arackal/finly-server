@@ -880,6 +880,14 @@
 #                                                         PATCH  /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#update
 #                                                         PUT    /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#update
 #                                                         DELETE /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#destroy
+#                                     bank_transfer_users GET    /bank_transfer/users(.:format)                                                  bank_transfer/users#index
+#                                                         POST   /bank_transfer/users(.:format)                                                  bank_transfer/users#create
+#                                  new_bank_transfer_user GET    /bank_transfer/users/new(.:format)                                              bank_transfer/users#new
+#                                 edit_bank_transfer_user GET    /bank_transfer/users/:id/edit(.:format)                                         bank_transfer/users#edit
+#                                      bank_transfer_user GET    /bank_transfer/users/:id(.:format)                                              bank_transfer/users#show
+#                                                         PATCH  /bank_transfer/users/:id(.:format)                                              bank_transfer/users#update
+#                                                         PUT    /bank_transfer/users/:id(.:format)                                              bank_transfer/users#update
+#                                                         DELETE /bank_transfer/users/:id(.:format)                                              bank_transfer/users#destroy
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                  bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)            bank_transfer/vendor_payment_wallets#transfer_options
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format) admin_users/funds_load_requests#approve
@@ -2121,6 +2129,7 @@ Rails.application.routes.draw do
     resources :vendors
     resources :bank_accounts
     resources :payments
+    resources :users
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
   end
