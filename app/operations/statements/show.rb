@@ -79,18 +79,19 @@ class Statements::Show < Statements::Base
     def init
       self.account = params[:account]
       self.finly_transactions = params[:finly_transactions]
-      self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)&.paginate(page: params[:page], per_page: 30)
+      self.scoped_finly_transactions = apply_scopes(params[:finly_transactions], params)
     end
 
     def account_transactions
+      page_size = (params&.dig(:page_size) || 30)
       if can_view_transactions?
-        return self.scoped_finly_transactions
+        return self.scoped_finly_transactions&.paginate(page: params[:page], per_page: page_size)
       elsif can_view_credit? and can_view_debit?
-        return self.scoped_finly_transactions.through_finly_dashboard
+        return self.scoped_finly_transactions.through_finly_dashboard&.paginate(page: params[:page], per_page: page_size)
       elsif can_view_debit?
-        return self.scoped_finly_transactions.through_finly_dashboard.debits
+        return self.scoped_finly_transactions.through_finly_dashboard.debits&.paginate(page: params[:page], per_page: page_size)
       elsif can_view_credit?
-        return self.scoped_finly_transactions.through_finly_dashboard.credits
+        return self.scoped_finly_transactions.through_finly_dashboard.credits&.paginate(page: params[:page], per_page: page_size)
       end
       FinlyTransaction.none
     end
@@ -222,8 +223,16 @@ class Statements::Show < Statements::Base
     end
 
     def summary
-      credit_summary = self.scoped_finly_transactions.credits.purpose_wise_amount
-      debit_summary = self.scoped_finly_transactions.debits.purpose_wise_amount
+      credit_summary = self.scoped_finly_transactions.success.credits.purpose_wise_amount
+      debit_summary = self.scoped_finly_transactions.success.debits.purpose_wise_amount
+      summary = []
+      PaymentPurpose.all.each do |payment_purpose|
+        credits = credit_summary[payment_purpose.id]
+        debits = debit_summary[payment_purpose.id]
+        next unless credits.present? or debits.present?
+        summary << {purpose: StringUtils.titleize(payment_purpose.name), credits: (credits or 0), debits: (debits or 0)}
+      end
+      summary
     end
 
     def can_view_transactions?
