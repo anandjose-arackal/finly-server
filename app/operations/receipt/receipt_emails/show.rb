@@ -20,7 +20,7 @@ class Receipt::ReceiptEmails::Show < BaseOperation
   def process
     if self.receipt_email.present? and self.receipt_email.expense_data_extracts.present?
       expense_data_extract = self.receipt_email.expense_data_extracts&.first
-      merchant = expense_data_extract
+      merchant = expense_data_extract.merchant
       amount_value = expense_data_extract.amount&.value
       currency_id = expense_data_extract.amount&.currency_id
       category_id = expense_data_extract.category_id
