@@ -9,6 +9,10 @@ set :branch, ENV['BRANCH'] || :master
 
 case fetch(:stage)
   when :itzcash_production
+    branch = fetch :branch
+    unless ['staging', 'master'].include?(branch)
+      raise 'This branch cannot be deploy to production. Please select the correct branch'
+    end
     set :deploy_to, '/home/viveka/app'
     set :rails_env, 'production'
   when :itzcash
