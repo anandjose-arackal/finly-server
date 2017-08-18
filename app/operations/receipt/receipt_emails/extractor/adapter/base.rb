@@ -143,7 +143,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Base < BaseOperation
   end
 
   def category_id
-    categories = self.user.company.categories
+    categories = self.user.company.categories.active
     categories.others&.first or categories.last.id
   end
 
