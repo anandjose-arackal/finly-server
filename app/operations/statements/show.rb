@@ -230,7 +230,7 @@ class Statements::Show < Statements::Base
         credits = credit_summary[payment_purpose.id]
         debits = debit_summary[payment_purpose.id]
         next unless credits.present? or debits.present?
-        summary << {purpose: StringUtils.titleize(payment_purpose.name), credits: (credits or 0), debits: (debits or 0)}
+        summary << {purpose: StringUtils.titleize(payment_purpose.name), credits: AmountUtils.format(credits or 0), debits: AmountUtils.format(debits or 0)}
       end
       summary
     end
