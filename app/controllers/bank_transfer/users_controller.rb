@@ -6,7 +6,8 @@ class BankTransfer::UsersController < ApplicationController
   end
 
   def show
-
+    @result = BankTransfer::Users::Show.(current_user, params)
+    respond
   end
 
 end
