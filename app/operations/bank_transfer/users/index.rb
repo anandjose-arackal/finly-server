@@ -47,7 +47,7 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
 
   class BankTransfer::Users::Index::UsersPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :users
+    attr_accessor :users, :paginated_team
 
     has_scope :with_application
 

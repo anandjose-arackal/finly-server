@@ -20,6 +20,7 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
       self.role_id = UserRole::VALUES[params[:view].to_sym]
     end
     params[:with_application] = RequestStore.store[:current_app].to_s
+    params[:filter_vendor_payments] = '1'
   end
 
   def process
@@ -47,6 +48,7 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
     include HasScope
 
     has_scope :with_application
+    has_scope :filter_vendor_payments
 
     def init
       self.payment_orders = params[:payment_orders]

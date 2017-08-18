@@ -46,7 +46,7 @@ class BankTransfer::PaymentOrdersController < ApplicationController
 
   # returns the Yes Bank Account Balance for the given account
   def balance
-    @result = AccountManager::Balance::Check.(current_company.yes_bank_company_account, params)
+    @result = BankTransfer::Users::Balance.(current_user, params)
     respond
   end
 

@@ -91,6 +91,12 @@ class PaymentOrder < ActiveRecord::Base
     end
   }
 
+  scope :filter_vendor_payments, -> (enabled) {
+    if enabled == 1 || enabled == '1'
+      where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
+    end
+  }
+
 
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
 
