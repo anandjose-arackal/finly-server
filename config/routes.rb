@@ -2111,6 +2111,8 @@ Rails.application.routes.draw do
   get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_ agreement'
 
 
+  # Bank Accounts
+  resources :bank_accounts
 
   # ROUTES FOR VENDOR PAYMENTS
   scope :payments do
