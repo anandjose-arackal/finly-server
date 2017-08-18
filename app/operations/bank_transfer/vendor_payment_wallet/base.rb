@@ -50,15 +50,16 @@ class BankTransfer::VendorPaymentWallet::Base < BaseOperation
       when :company_credits
         self.initiating_account = user.company.yes_bank_company_account
       when :vendor_wallet
-        self.initiating_account = user.vendor_payment_wallet
+        self.initiating_account = user.bank_wallet
       else
         # do nothing?
     end
+    self.receiving_account_type = params[:receiving_account_type].to_sym
     case receiving_account_type
       when :company_credits
         self.receiving_account = receiving_user.company.yes_bank_company_account
       when :vendor_wallet
-        self.receiving_account = receiving_user.vendor_payment_wallet
+        self.receiving_account = receiving_user.bank_wallet
       else
         # do nothing?
     end

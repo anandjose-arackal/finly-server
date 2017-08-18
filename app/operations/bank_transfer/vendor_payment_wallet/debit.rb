@@ -1,11 +1,12 @@
 class BankTransfer::VendorPaymentWallet::Debit < BankTransfer::VendorPaymentWallet::Base
 
-  attr_accessor :payment_request
+  attr_accessor :payment_request, :payment
 
   def process
     self.payment_request = PaymentRequest.(user, initiating_account, receiving_account.class.name, :debit, :balance_clearance)
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, self.amount))
 
+    debugger
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     unless op.success?
       add_message :error, op.messages[:error]

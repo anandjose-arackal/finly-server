@@ -41,7 +41,7 @@ class BankTransfer::VendorPaymentWallet::TransferOptions < BankTransfer::VendorP
 
     # from account
     source_wallet_adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
-    action = {type: :vendor_wallet, id: user.bank_wallet.id, name: "#{user.name}'s Finly Bank Wallet",
+    action = {type: :vendor_wallet, id: user.bank_wallet.id, name: "#{user.name}'s Finly Credits",
               balance: source_wallet_adapter.balance,
               active: true
               }
@@ -50,7 +50,7 @@ class BankTransfer::VendorPaymentWallet::TransferOptions < BankTransfer::VendorP
 
     # to account - always receiving user's wallet
     receiving_wallet_adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(selected_user.bank_wallet)
-    action = {type: :vendor_wallet, id: selected_user.bank_wallet.id, name: "#{selected_user.name}'s Finly Bank Wallet",
+    action = {type: :vendor_wallet, id: selected_user.bank_wallet.id, name: "#{selected_user.name}'s Finly Credits",
               balance: receiving_wallet_adapter.balance,
               active: true
              }
