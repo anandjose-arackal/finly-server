@@ -144,7 +144,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Base < BaseOperation
 
   def category_id
     categories = self.user.company.categories.active
-    categories.others&.first.id or categories.last.id
+    categories.others&.first&.id or categories.last.id
   end
 
   def status(merchant, amount_value, currency_id, datetime, note, category_id)
