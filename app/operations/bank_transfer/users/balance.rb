@@ -3,7 +3,7 @@ class BankTransfer::Users::Balance < BankTransfer::Users::Base
   attr_accessor :role_id, :company_balance, :wallet_balance
 
   def authorized_user_types
-    [:company_admin, :finance]
+
   end
 
   def init
@@ -15,12 +15,12 @@ class BankTransfer::Users::Balance < BankTransfer::Users::Base
 
 
   def process
-    case role_id
-      when UserRole.id_for(:admin) && user.company_admin?
-        self.company_balance = AccountManager::Balance::Check.(user.company.yes_bank_company_account, params).balance
-        self.wallet_balance = AccountManager::Balance::Check.(user.bank_wallet, params).balance
-      else
-        self.wallet_balance = AccountManager::Balance::Check.(user.bank_wallet, params).balance
+    # for now the only distinction is company admin or not
+    if user.company_admin?
+      self.company_balance = AccountManager::Balance::Check.(user.company.yes_bank_company_account, params).balance
+      self.wallet_balance = AccountManager::Balance::Check.(user.bank_wallet, params).balance
+    else
+      self.wallet_balance = AccountManager::Balance::Check.(user.bank_wallet, params).balance
     end
   end
 
