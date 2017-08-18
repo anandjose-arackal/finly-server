@@ -5,7 +5,7 @@ json.array!(@result.paginated_team) do |user|
   json.finly_money do
     json.balance user.bank_wallet.balance.value
     json.currency do
-      json.country_code user.bank_wallet.balance.country.country_code
+      json.country_code user.bank_wallet.balance.currency.country_code
       json.symbol user.bank_wallet.balance.currency.symbol
     end
   end
