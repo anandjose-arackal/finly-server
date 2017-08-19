@@ -101,9 +101,9 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
     def generate_xls
       binding_params = {item_headers: self.headers, item_contents: self.contents}
-      view = ActionView::Base.new(ActionController::Base.view_paths, binding_params)
+      view = ActionView::Base.new(ActionController::Base.view_paths)
       view.extend ApplicationHelper
-      view.render(file: "#{xls_template}.xls.erb")
+      view.render(file: "#{xls_template}.xls.erb", locals: binding_params)
     end
 
     def xls_template
