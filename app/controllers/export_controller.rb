@@ -35,13 +35,6 @@ class ExportController < ApplicationController
       format.xls {
         @result = Expense::Export::AsXml.(current_user, params)
       }
-      # format.pdf {
-      #   @result = Report::Show.(current_user, params)
-      #   @report = @result.report
-      #   @current_user = current_user
-      #   @include_comments = true
-      #   render pdf: "report-#{@report.name}", layout: "pdf.html.erb", print_media_type: true
-      # }
     end
   end
 

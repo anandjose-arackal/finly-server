@@ -135,4 +135,9 @@ class ExpensesController < ApplicationController
     respond
   end
 
+  def export
+    @result = Export::Expense::AsSpreadsheet.(current_user, params)
+    respond
+  end
+
 end

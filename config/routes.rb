@@ -1835,6 +1835,7 @@ Rails.application.routes.draw do
     post 'comment' => 'money_request#comment', as: :comment
   end
 
+  post 'expenses/export', to: 'expenses#export'
   delete 'expenses', to: 'expenses#destroy'
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'
