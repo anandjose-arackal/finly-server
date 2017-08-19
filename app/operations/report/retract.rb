@@ -13,7 +13,7 @@ class Report::Retract < Report::Base
     super
     id = (params[:id] or params[:report_id])
     if id.blank?
-      messages[:error] << 'Error loading report'
+      add_message :error, 'Error loading report'
     end
   end
 
@@ -28,13 +28,13 @@ class Report::Retract < Report::Base
   def authorize
     super
     unless report.user_id == user.id
-      messages[:error] << 'Only report owners can retract report'
+      add_message :error, 'Only report owners can retract report'
     end
   end
 
   def validate
     unless report.can_retract?
-      messages[:error] << 'Cannot retract report which is not in processing state'
+      add_message :error, 'Cannot retract report which is not in processing state'
     end
   end
 
@@ -59,7 +59,7 @@ class Report::Retract < Report::Base
       report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:unsubmitted))
       return
     end
-    messages[:error] = report.errors.full_messages
+    add_message :error, report.errors.full_messages
   end
 
   def post_process
@@ -76,7 +76,7 @@ class Report::Retract < Report::Base
 
     Event::EReport::Retract.(user, report: report, from_user: from_user)
 
-    messages[:success] << 'Report retracted!'
+    add_message :success, 'Report retracted!'
   end
 
 end
