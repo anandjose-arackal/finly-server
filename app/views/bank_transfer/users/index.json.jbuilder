@@ -1,5 +1,5 @@
 json.array!(@result.paginated_team) do |user|
-  json.extract! user, :id, :email, :mobile_number, :name
+  json.extract! user, :id, :email, :mobile_number, :name, :active
 
   # Finly Credits
   json.finly_money do
