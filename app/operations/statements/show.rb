@@ -236,7 +236,7 @@ class Statements::Show < Statements::Base
             end
           when PaymentPurpose.id_for(:card_transaction)
             if credits.present?
-              summary[:credits] << "Received via cashback/refunds/reversals: <b>₹#{credits}</b>"
+              summary[:credits] << "Received via Cashback / Refunds / Reversals: <b>₹#{credits}</b>"
             end
             if debits.present?
               summary[:debits] << "Spent using Finly Card: <b>₹#{debits}</b>"
