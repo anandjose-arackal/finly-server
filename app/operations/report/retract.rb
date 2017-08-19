@@ -3,7 +3,7 @@
 # report_id: id of the report that is being retracted
 
 class Report::Retract < Report::Base
-  attr_accessor :from_user
+  attr_accessor :from_user, :prev_status
 
   def authorized_user_types
     :employee
@@ -13,7 +13,7 @@ class Report::Retract < Report::Base
     super
     id = (params[:id] or params[:report_id])
     if id.blank?
-      messages[:error] << 'Error loading report'
+      add_message :error, 'Error loading report'
     end
   end
 
@@ -28,17 +28,18 @@ class Report::Retract < Report::Base
   def authorize
     super
     unless report.user_id == user.id
-      messages[:error] << 'Only report owners can retract report'
+      add_message :error, 'Only report owners can retract report'
     end
   end
 
   def validate
-    unless report.processing?
-      messages[:error] << 'Cannot retract report which is not in processing state'
+    unless report.can_retract?
+      add_message :error, 'Cannot retract report which is not in processing state'
     end
   end
 
   def process
+    self.prev_status = report.status
     prev_controlling_user = (report.controlling_for_user or report.controlling_user)
     prev_controlling_user_role = User::Team::Review::UserRole.(prev_controlling_user, self.report)
     role_id = UserRole.id_for(:employee)
@@ -55,25 +56,27 @@ class Report::Retract < Report::Base
                                   report_tracking_action_id: ReportTrackingAction.id_for(:retract),
                                   report_status_id: ReportStatus.retracted_id
       track.save
-      report.expenses.each do |expense|
-        expense.update_attribute(:expense_status_id, ExpenseStatus.unsubmitted_id)
-      end
+      report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:unsubmitted))
       return
     end
-    messages[:error] = report.errors.full_messages
+    add_message :error, report.errors.full_messages
   end
 
   def post_process
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_retract)
     # destroying the submitted amount field
-    report.submitted_amount.destroy
+    report.submitted_amount&.destroy
+
+    if prev_status.approved?
+      Settlement::Report::Unapproved.(user, report: report)
+    end
 
     # Invalidate All existing Email Authorizations
     email_auth_invalidate_presenter = EmailAuthorization::Invalidate.(user, authorizable: report)
 
     Event::EReport::Retract.(user, report: report, from_user: from_user)
 
-    messages[:success] << 'Report retracted!'
+    add_message :success, 'Report retracted!'
   end
 
 end

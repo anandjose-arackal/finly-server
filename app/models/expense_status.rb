@@ -11,6 +11,7 @@
 
 
 
+
 class ExpenseStatus < ActiveRecord::Base
   include Seedable
 

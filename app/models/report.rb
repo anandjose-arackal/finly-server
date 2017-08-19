@@ -41,6 +41,7 @@
 
 
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -216,6 +217,10 @@ class Report < ActiveRecord::Base
 
   def can_submit?
     open? or retracted? or rejected?
+  end
+
+  def can_retract?
+    processing? or (approved? and auto_approve) or (closed? and auto_approve)
   end
 
   def can_destroy?

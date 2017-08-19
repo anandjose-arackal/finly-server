@@ -166,7 +166,7 @@ class Report::Base < BaseOperation
           actions[:editable] = {value: true}
           actions[:submit] = {url: Rails.application.routes.url_helpers.report_submit_path(report_id: report.id, view: params[:view])}
           actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}
-        elsif self.report.processing?
+        elsif self.report.can_retract?
           actions[:retract] = {url: Rails.application.routes.url_helpers.report_retract_path(report_id: report.id, view: params[:view])}
         elsif self.report.settled?
           actions[:settlement_confirm] = {url: Rails.application.routes.url_helpers.report_settlement_confirm_path(report_id: report.id, view: params[:view])}
