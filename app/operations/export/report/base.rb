@@ -100,7 +100,7 @@ class Export::Report::Base < Export::Base
         end
       end
     end
-    field_names.uniq!
+    field_names.uniq! || []
   end
 
 end
