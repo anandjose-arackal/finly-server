@@ -98,9 +98,9 @@ class AccountManager::BaseAdapter
     transaction = self.account.finly_transactions.create params
     if system_messages.present?
       # Setting system messages
-      errors = system_messages[:error] + system_messages[:failure]
-      success = system_messages[:success]
-      info = system_messages[:message] + system_messages[:notice]
+      errors = system_messages[:error].to_a + system_messages[:failure].to_a
+      success = system_messages[:success].to_a
+      info = system_messages[:message].to_a + system_messages[:notice].to_a
       errors.each do |error_message|
         transaction.system_messages.create system_message_type_id: SystemMessageType.id_for(:error), content: error_message
       end

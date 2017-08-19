@@ -67,7 +67,7 @@ class BankTransfer::YesBank::ProcessFromAccountIds < BankTransfer::YesBank::Base
       bank_account = BankAccount.find_by(id: account_id)
       data << {
           name: bank_account.account_owner.name,
-          account_number: bank_account.account_number,
+          bank_account_number: bank_account.account_number,
           ifsc: bank_account.ifsc,
           amount: amounts[index]
       }

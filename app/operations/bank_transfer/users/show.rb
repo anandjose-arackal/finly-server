@@ -42,11 +42,35 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
 
   class BankTransfer::Users::Show::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :selected_user, :user_panel_subscription
+    attr_accessor :selected_user, :user_panel_subscription, :actions
 
     def init
       self.selected_user = params[:selected_user]
       self.user_panel_subscription = selected_user.user_panel_subscription
+      self.actions = load_actions
+    end
+
+    def load_actions
+      actions = {}
+      # adding actions for updating the panel subscriptions for the selected user
+      if user.company_admin?
+        actions[:update_subscriptions] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
+      end
+      credit_actions = {initiating_accounts: [], receiving_accounts: []}
+      debit_actions = {receiving_accounts: [], initiating_accounts: []}
+      action = {type: :wallet, id: user.bank_wallet.id, name: "#{user.name} Finly Credits", active: true}
+      credit_actions[:initiating_accounts] << action
+      debit_actions[:initiating_accounts] << action
+      action = {type: :wallet, id: selected_user.bank_wallet.id, name: "#{selected_user} Finly Credits", active: true}
+      credit_actions[:receiving_accounts] << action
+      debit_actions[:receiving_accounts] << action
+      actions[:transfer_options] = {
+          credit_actions: credit_actions,
+          debit_actions: debit_actions,
+          credit: true,
+          debit: true
+      }
+      actions
     end
   end
 

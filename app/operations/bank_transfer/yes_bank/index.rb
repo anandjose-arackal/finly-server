@@ -49,6 +49,7 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
 
     has_scope :with_application
     has_scope :filter_vendor_payments
+    has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
       self.payment_orders = params[:payment_orders]

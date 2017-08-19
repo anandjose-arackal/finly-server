@@ -1,3 +1,12 @@
+json.user do
+  json.extract! @result.selected_user, :email, :name, :mobile_number,
+              :address_1, :address_2
+  json.gender @result.selected_user.gender_name
+
+end
+
+json.actions @result.actions
+
 json.bank_accounts do
   json.array!(@result.selected_user.bank_accounts) do |bank_account|
     json.account do

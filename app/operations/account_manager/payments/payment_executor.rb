@@ -71,7 +71,6 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   def pre_process
     # update payment to in progress
     payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
-
   end
 
   def process

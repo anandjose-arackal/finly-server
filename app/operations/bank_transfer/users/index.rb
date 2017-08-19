@@ -24,6 +24,10 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
     params[:with_application] = RequestStore.store[:current_app].to_s
   end
 
+  def configure_vendor_payment
+    params[:filter_vendor_payments] = '1'
+  end
+
   def validate
     unless role_id.present?
       add_message :error, "User role not defined"
@@ -49,11 +53,20 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
 
     attr_accessor :users, :paginated_team
 
-    has_scope :with_application
+    has_scope :filter_state, type: :array
+    has_scope :filter_role, type: :array
+    has_scope :filter_vendor_payments
 
     def init
+      fix_scopes
       self.users = params[:users]
+      self.users = apply_scopes(users, params)
       self.paginated_team = users.paginate(page: params[:page], per_page: 30)
+    end
+
+    def fix_scopes
+      ScopeUtils.fix_for_scoping(params, :filter_role, :array)
+      ScopeUtils.fix_for_scoping(params, :filter_state, :array)
     end
   end
 

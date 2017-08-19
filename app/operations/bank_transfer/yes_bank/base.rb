@@ -22,7 +22,7 @@ class BankTransfer::YesBank::Base < BaseOperation
   # this will create the respective vendors for each transaction, and create the payment request
   # for each of them - at this point, all of them will be valid
   def build_payment_request(order_data, bank_transfer_type, scheduled_at, source_account)
-    self.payment_request = PaymentRequest.(user, source_account, BankAccount.name, :credit, :vendor_payment, {bank_transfer_type: bank_transfer_type, scheduled_at: scheduled_at, payment_mode: bank_transfer_type, background: true})
+    self.payment_request = PaymentRequest.(user, source_account, BankAccount.name, :credit, :vendor_payment, {bank_transfer_type: bank_transfer_type, scheduled_at: scheduled_at, payment_mode: bank_transfer_type})
     self.payment_request.bank_transfer_type = bank_transfer_type
     order_data.each do |data|
       account_number = data[:bank_account_number]
@@ -45,9 +45,9 @@ class BankTransfer::YesBank::Base < BaseOperation
   def retrieve_initiating_account
     if user.company_admin?
       case params[:initiating_account_type]
-        when 1, "CompanyAccount"
+        when 1, '1', "CompanyAccount"
           self.initiating_account = user.company.yes_bank_company_account
-        when 2, "FinlyCredits"
+        when 2, '2', "FinlyCredits"
           self.initiating_account = user.bank_wallet
       end
     else

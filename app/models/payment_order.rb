@@ -97,6 +97,16 @@ class PaymentOrder < ActiveRecord::Base
     end
   }
 
+  scope :filter_date, -> (date_from, date_to) {
+    type_val = :processed_at
+    date_from = "1990-01-01" if date_from.blank?
+    date_to = DateUtils.local_date if date_to.blank?
+    date_from = date_from.to_date if date_from.present?
+    date_to = date_to.to_date if date_to.present?
+    payment_orders = arel_table
+    where(payment_orders[type_val].gteq(date_from).and(payment_orders[type_val].lteq(date_to)))
+  }
+
 
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
 

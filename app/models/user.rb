@@ -176,6 +176,7 @@ class User < ActiveRecord::Base
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }
 
+
   # Users having cards assigned with the given program
   scope :with_cards_having_card_program, ->(id) do
     user_ids = pluck(:id)
@@ -348,6 +349,14 @@ class User < ActiveRecord::Base
       joins(:user_panel_subscription).select('users.*').where('expense_management = ?', true)
     else
       joins(:user_panel_subscription).select('users.*').where('expense_management = ? or expense_management = ?', false, nil)
+    end
+  }
+
+  scope :filter_vendor_payments, -> (enabled) {
+    if enabled == '1' || enabled == 1
+      joins(:user_panel_subscription).select('users.*').where('yes_bank_account_transfer = ?', true)
+    else
+      joins(:user_panel_subscription).select('users.*').where('yes_bank_account_transfer = ? or yes_bank_account_transfer = ?', false, nil)
     end
   }
 
