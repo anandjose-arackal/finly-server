@@ -249,6 +249,12 @@ class Statements::Show < Statements::Base
               summary[:debits] << "Sent as Advance: <b>₹#{debits}</b>"
             end
           when PaymentPurpose.id_for(:reimbursement_outside_finly)
+            if credits.present?
+              summary[:credits] << "Received as Reimbursement (Outside Finly ): <b>₹#{credits}</b>"
+            end
+            if debits.present?
+              summary[:debits] << "Sent Reimbursement (Outside Finly ): <b>₹#{debits}</b>"
+            end
           when PaymentPurpose.id_for(:reimbursement)
             if credits.present?
               summary[:credits] << "Received as Reimbursement: <b>₹#{credits}</b>"
@@ -283,6 +289,14 @@ class Statements::Show < Statements::Base
             end
           when PaymentPurpose.id_for(:corporate_balance_refund)
 
+          when PaymentPurpose.id_for(:fees)
+            if credits.present?
+              # summary[:credits] << "Added from Personal Expenses: <b>₹#{credits}</b>"
+              # Not possible?
+            end
+            if debits.present?
+              summary[:debits] << "Fees: <b>₹#{debits}</b>"
+            end
           when PaymentPurpose.id_for(:personal_expense)
             if credits.present?
               summary[:credits] << "Added from Personal Expenses: <b>₹#{credits}</b>"
