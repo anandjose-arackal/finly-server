@@ -5,6 +5,11 @@ class BankTransfer::PaymentsController < ApplicationController
     respond
   end
 
+  def count
+    @result = BankTransfer::Payments::Count.(current_user, params)
+    render json: @result.as_json
+  end
+
   def show
 
   end

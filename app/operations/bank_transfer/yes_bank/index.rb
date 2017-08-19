@@ -26,14 +26,14 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
   def process
     case role_id
       when UserRole.id_for(:admin)
-        self.payment_orders = user.company.payment_orders
+        self.payment_orders = user.company.payment_orders.paginate(page: params[:page], per_page: params[:per_page] || 30)
       when UserRole.id_for(:manager)
         # insert logic for getting payment orders from a particular manager team
       when UserRole.id_for(:finance_manager)
         # insert logic for getting payment orders from a particular finance manager team
       else
         # i.e. personal view
-        self.payment_orders = user.payment_orders
+        self.payment_orders = user.payment_orders.paginate(page: params[:page], per_page: params[:per_page] || 30)
     end
   end
 

@@ -25,6 +25,11 @@ class BankTransfer::VendorsController < ApplicationController
     respond
   end
 
+  def count
+    @result = BankTransfer::Vendor::Count.(current_user, params)
+    render json: @result.as_json
+  end
+
   def show
     @result = BankTransfer::Vendor::Transfers::Show.(current_user, params)
     respond

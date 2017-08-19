@@ -13,7 +13,7 @@ class BankTransfer::BankAccounts::Index < BankTransfer::BankAccounts::Base
   def process
     case role_id
       when UserRole.id_for(:admin)
-        self.bank_accounts = company.bank_accounts
+        self.bank_accounts = company.bank_accounts.paginate(page: params[:page], per_page: params[:per_page])
       when UserRole.id_for(:manager)
         # for now only show vendor bank accounts - will later have team details
       when UserRole.id_for(:finance_manager)
@@ -21,7 +21,7 @@ class BankTransfer::BankAccounts::Index < BankTransfer::BankAccounts::Base
       else
         account_ids = company.bank_accounts.only_vendors.pluck(:id)
         account_ids += company.bank_accounts.only_users.with_owner_id(user.id).pluck(:id)
-        self.bank_accounts = BankAccount.with_id(account_ids)
+        self.bank_accounts = BankAccount.with_id(account_ids).paginate(page: params[:page], per_page: params[:per_page])
     end
   end
 

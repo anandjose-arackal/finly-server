@@ -34,7 +34,7 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
     # insert logic here for teams once that has been implemented in vendor payments
     case role_id
       when UserRole.id_for(:admin)
-        self.users = user.company.users
+        self.users = user.company.users.paginate(page: params[:page], per_page: params[:per_page].to_i || 30)
       else
         self.users = []
     end

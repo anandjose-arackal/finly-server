@@ -33,6 +33,11 @@ class BankTransfer::PaymentOrdersController < ApplicationController
     respond
   end
 
+  def count
+    @result = BankTransfer::YesBank::Count.(current_user, params)
+    render json: @result.as_json
+  end
+
   def show
     @result = BankTransfer::YesBank::Show.(current_user, params)
     respond
