@@ -253,9 +253,18 @@ class Statements::Show < Statements::Base
             if credits.present?
               summary[:credits] << "Received as Reimbursement: <b>₹#{credits}</b>"
             end
-          when PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit),
-              PaymentPurpose.id_for(:payroll)
-
+          when PaymentPurpose.id_for(:medical_benefit)
+            if credits.present?
+              summary[:credits] << "Received for Medical Benefits: <b>₹#{credits}</b>"
+            end
+          when PaymentPurpose.id_for(:meal_benefit)
+            if credits.present?
+              summary[:credits] << "Received for Meal Benefits: <b>₹#{credits}</b>"
+            end
+          when PaymentPurpose.id_for(:payroll)
+            if credits.present?
+              summary[:credits] << "Received as Payroll: <b>₹#{credits}</b>"
+            end
           when PaymentPurpose.id_for(:vendor_payment)
 
           when PaymentPurpose.id_for(:corporate_balance_load)
