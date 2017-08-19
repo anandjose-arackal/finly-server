@@ -279,8 +279,7 @@ class Statements::Show < Statements::Base
               summary[:credits] << "Retracted back to your account: <b>₹#{credits}</b>"
             end
             if debits.present?
-              # Prolly not possible
-              summary[:credits] << "Retracted from your account: <b>₹#{credits}</b>"
+              summary[:debits] << "Retracted from your account: <b>₹#{debits}</b>"
             end
           when PaymentPurpose.id_for(:corporate_balance_refund)
 
@@ -289,7 +288,7 @@ class Statements::Show < Statements::Base
               summary[:credits] << "Added from Personal Expenses: <b>₹#{credits}</b>"
             end
             if debits.present?
-              summary[:credits] << "Reversed Personal Expenses: <b>₹#{credits}</b>"
+              summary[:debits] << "Reversed Personal Expenses: <b>₹#{debits}</b>"
             end
         end
       end
