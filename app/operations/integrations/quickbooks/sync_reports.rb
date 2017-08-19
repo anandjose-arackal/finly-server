@@ -12,6 +12,12 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
     self.date_type = quickbooks_configuration.transaction_date_field
   end
 
+  def self.call_async(user_id, params)
+    super(user_id, params)
+    user = User.find_by(id: user_id)
+    BaseOperation::BasePresenter::SuccessPresenter.new(user, params, [])
+  end
+
   def validate
     # if Quickbooks hasn't been configured yet, throw an error asking them to configure it
     unless user.company.quickbooks_configuration.present? && user.company.quickbooks_configuration.reimbursable_account_id.present? && user.company.quickbooks_configuration.non_reimbursable_account_id.present?
@@ -30,7 +36,7 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
     # if any of the reports are already synced with quickbooks, stop the sync and mention their names
     synced_report_names = []
     reports.each do |report|
-      if report.synced_with_quickbooks
+      if report.synced_with_quickbooks?
         synced_report_names << report.name
       end
     end

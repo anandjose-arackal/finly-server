@@ -67,6 +67,7 @@ class Report < ActiveRecord::Base
   belongs_to :card_expenses_total, class_name: 'Amount'
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
+  belongs_to :sync_status, class_name: "ReportSyncStatus"
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 

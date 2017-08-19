@@ -9,4 +9,9 @@
 #
 
 class ReportSyncStatus < ActiveRecord::Base
+  include Seedable
+
+  def self.values
+    [:not_synced, :in_progress, :synced]
+  end
 end
