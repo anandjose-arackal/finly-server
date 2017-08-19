@@ -62,6 +62,7 @@ class FinlyTransaction < ActiveRecord::Base
   scope :joins_amounts, -> { joins :amount }
   scope :group_by_purpose, -> { group :payment_purpose_id }
   scope :purpose_wise_amount, -> { joins_amounts.group_by_purpose.sum('amounts.value') }
+  scope :sort_date_asc, -> { unscope(:order).order(date: :asc) }
 
   before_create do
     ref_id = payment&.reference_id
