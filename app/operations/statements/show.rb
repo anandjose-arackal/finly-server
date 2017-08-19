@@ -232,26 +232,26 @@ class Statements::Show < Statements::Base
         case payment_purpose.id
           when PaymentPurpose.id_for(:atm_withdrawal)
             if debits.present?
-              summary[:debits] << "ATM Withdrawals of <b>₹#{debits}</b>"
+              summary[:debits] << "ATM Withdrawals of <b><b>₹#{debits}</b></b>"
             end
           when PaymentPurpose.id_for(:card_transaction)
             if credits.present?
-              summary[:credits] << "Received ₹#{credits} via cashback/refunds/reversals"
+              summary[:credits] << "Received <b>₹#{credits}</b> via cashback/refunds/reversals"
             end
             if debits.present?
-              summary[:debits] << "Spent ₹#{debits} using Finly Card"
+              summary[:debits] << "Spent <b>₹#{debits}</b> using Finly Card"
             end
           when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:advance)
             if credits.present?
-              summary[:credits] << "Received ₹#{credits} as Advance"
+              summary[:credits] << "Received <b>₹#{credits}</b> as Advance"
             end
             if debits.present?
-              summary[:debits] << "Sent ₹#{debits} as Advance"
+              summary[:debits] << "Sent <b>₹#{debits}</b> as Advance"
             end
           when PaymentPurpose.id_for(:reimbursement_outside_finly)
           when PaymentPurpose.id_for(:reimbursement)
             if credits.present?
-              summary[:credits] << "Received ₹#{credits} as Reimbursement"
+              summary[:credits] << "Received <b>₹#{credits}</b> as Reimbursement"
             end
           when PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit),
               PaymentPurpose.id_for(:payroll)
@@ -260,27 +260,27 @@ class Statements::Show < Statements::Base
 
           when PaymentPurpose.id_for(:corporate_balance_load)
             if credits.present?
-              summary[:credits] << "Added ₹#{credits} to Company Credits"
+              summary[:credits] << "Added <b>₹#{credits}</b> to Company Credits"
             end
             if debits.present?
               # Prolly not possible
             end
           when PaymentPurpose.id_for(:balance_clearance_outside_finly), PaymentPurpose.id_for(:balance_clearance)
             if credits.present?
-              summary[:credits] << "Withdrawn ₹#{credits} back to your account"
+              summary[:credits] << "Withdrawn <b>₹#{credits}</b> back to your account"
             end
             if debits.present?
               # Prolly not possible
-              summary[:credits] << "₹#{credits} was retracted from your account"
+              summary[:credits] << "<b>₹#{credits}</b> was retracted from your account"
             end
           when PaymentPurpose.id_for(:corporate_balance_refund)
 
           when PaymentPurpose.id_for(:personal_expense)
             if credits.present?
-              summary[:credits] << "Added ₹#{credits} from Personal Expenses"
+              summary[:credits] << "Added <b>₹#{credits}</b> from Personal Expenses"
             end
             if debits.present?
-              summary[:credits] << "Reversed Personal Expenses of ₹#{credits}"
+              summary[:credits] << "Reversed Personal Expenses of <b>₹#{credits}</b>"
             end
         end
       end
