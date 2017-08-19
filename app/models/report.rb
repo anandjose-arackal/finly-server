@@ -349,6 +349,10 @@ class Report < ActiveRecord::Base
     self.expenses.count == self.expenses.only_card_expenses.count
   end
 
+  def synced_with_quickbooks?
+    self.sync_status_id == ReportSyncStatus.id_for(:synced)
+  end
+
 
   private
 

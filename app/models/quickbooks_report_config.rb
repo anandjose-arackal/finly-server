@@ -8,6 +8,7 @@ class QuickbooksReportConfig
     self.user = user
     self.reimbursable = reimbursable
     self.expenses = expenses
+    self.report = expenses.first.report
   end
 
   def payment_type_quickbooks_id(reimbursable)
