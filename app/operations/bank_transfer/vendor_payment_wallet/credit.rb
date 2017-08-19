@@ -6,7 +6,6 @@ class BankTransfer::VendorPaymentWallet::Credit < BankTransfer::VendorPaymentWal
     self.payment_request = PaymentRequest.(user, initiating_account, receiving_account.class.name, :credit, :advance)
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, self.amount))
 
-    debugger
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     unless op.success?
       add_message :error, op.messages[:error]

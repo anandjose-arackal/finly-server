@@ -1,6 +1,6 @@
 json.payment do
   json.items do
-    json.array! @result.payment_order_data.each do |item|
+    json.array! @result.processed_order.each do |item|
       json.bank_account_number item[:bank_account_no]
       json.amount item[:amount]
       json.ifsc item[:ifsc]
