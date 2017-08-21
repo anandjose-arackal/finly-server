@@ -10,17 +10,9 @@ class BankTransfer::BankAccounts::Count < BankTransfer::BankAccounts::Base
   end
 
   def process
-    case role_id
-      when UserRole.id_for(:admin)
-        self.bank_accounts_count = company.bank_accounts.count
-      when UserRole.id_for(:manager)
-        # for now only show vendor bank accounts - will later have team details
-      when UserRole.id_for(:finance_manager)
-        # for now only show vendor accounts - will later have team details
-      else
-        account_ids = company.bank_accounts.only_vendors.pluck(:id)
-        account_ids += company.bank_accounts.only_users.with_owner_id(user.id).pluck(:id)
-        self.bank_accounts_count = account_ids.size
+    op = BankTransfer::BankAccounts::Index.(user, params)
+    if op.success?
+      self.bank_accounts_count = op.bank_accounts.count
     end
   end
 

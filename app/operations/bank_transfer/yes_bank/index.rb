@@ -53,7 +53,7 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
 
     def init
       self.payment_orders = params[:payment_orders]
-      self.payment_orders = apply_scopes(payment_orders, params)
+      self.payment_orders = apply_scopes(payment_orders, params) if payment_orders.present?
       self.paginated_payment_orders = payment_orders.paginate(page: params[:page], per_page: params[:per_page] || 30)
     end
   end

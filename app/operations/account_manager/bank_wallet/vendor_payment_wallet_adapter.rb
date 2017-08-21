@@ -39,7 +39,9 @@ class AccountManager::BankWallet::VendorPaymentWalletAdapter < AccountManager::B
   end
 
   def balance
-    self.account.balance_value
+    balance = self.account.balance_value
+    blocked_amount = self.account.blocked_amount_for_pending_payments
+    return (balance - blocked_amount)
   end
 
   def creditable_accounts

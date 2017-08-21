@@ -514,6 +514,7 @@ class User < ActiveRecord::Base
   alias_method :finance_manager_name, :user_name
   alias_method :approves_to_name, :user_name
   alias_method :approves_finance_to_name, :user_name
+  alias_method :finance?, :finance_manager?
 
   def as_json(options = {})
     json = super(options)

@@ -24,7 +24,7 @@ json.data do
       json.amount payment.amount
       json.date payment.date
       json.receiving_user do
-        json.name payment.receiving_account.name
+        json.name payment.receiving_account.account_owner.name
         json.account_number payment.receiving_account.account_number
         json.ifsc payment.receiving_account.ifsc
       end

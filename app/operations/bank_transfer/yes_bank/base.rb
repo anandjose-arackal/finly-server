@@ -10,7 +10,7 @@ class BankTransfer::YesBank::Base < BaseOperation
   end
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :finance_manager, :manager, :personal]
   end
 
   def pre_validate

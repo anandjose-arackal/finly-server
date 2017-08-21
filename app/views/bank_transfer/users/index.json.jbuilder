@@ -1,9 +1,10 @@
 json.array!(@result.paginated_team) do |user|
   json.extract! user, :id, :email, :mobile_number, :name, :active
 
+  wallet_adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
   # Finly Credits
   json.finly_money do
-    json.balance user.bank_wallet.balance.value
+    json.balance wallet_adapter.balance
     json.currency do
       json.country_code user.bank_wallet.balance.currency.country_code
       json.symbol user.bank_wallet.balance.currency.symbol
