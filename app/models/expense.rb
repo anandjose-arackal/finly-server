@@ -23,6 +23,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -298,6 +299,8 @@ class Expense < ActiveRecord::Base
     end
     where expense_status_id: filter_status
   }
+  scope :not_synced_with_quickbooks, -> {where synced_with_quickbooks: [false, nil]}
+  scope :synced_with_quickbooks, -> {where synced_with_quickbooks: true}
 
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount

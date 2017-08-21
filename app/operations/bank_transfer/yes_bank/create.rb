@@ -62,7 +62,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   def process
 
     # calling the payment processor to complete the transfer using adapters
-    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_request.bank_transfer_type})
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_request.bank_transfer_type, background: true})
     unless op.success?
 
       add_message :error, op.messages[:error]

@@ -389,6 +389,7 @@ ActiveRecord::Schema.define(version: 20170821103554) do
     t.datetime "updated_at",                     null: false
     t.integer  "account_owner_id",   limit: 4
     t.string   "account_owner_type", limit: 255
+    t.integer  "company_id",         limit: 4
   end
 
   add_index "bank_accounts", ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id", using: :btree
@@ -1318,22 +1319,23 @@ ActiveRecord::Schema.define(version: 20170821103554) do
   end
 
   create_table "expenses", force: :cascade do |t|
-    t.integer  "amount_id",            limit: 4
-    t.integer  "expense_status_id",    limit: 4
-    t.text     "note",                 limit: 65535
+    t.integer  "amount_id",              limit: 4
+    t.integer  "expense_status_id",      limit: 4
+    t.text     "note",                   limit: 65535
     t.date     "date"
-    t.integer  "user_id",              limit: 4
-    t.integer  "expense_type_id",      limit: 4
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
-    t.text     "manager_memo",         limit: 65535
-    t.integer  "rejecting_manager_id", limit: 4
-    t.integer  "report_id",            limit: 4
-    t.integer  "category_id",          limit: 4
-    t.boolean  "is_deleted",                         default: false, null: false
-    t.boolean  "transcribed",                        default: false
-    t.boolean  "personal",                           default: false
-    t.boolean  "reimbursable",                       default: true
+    t.integer  "user_id",                limit: 4
+    t.integer  "expense_type_id",        limit: 4
+    t.datetime "created_at",                                           null: false
+    t.datetime "updated_at",                                           null: false
+    t.text     "manager_memo",           limit: 65535
+    t.integer  "rejecting_manager_id",   limit: 4
+    t.integer  "report_id",              limit: 4
+    t.integer  "category_id",            limit: 4
+    t.boolean  "is_deleted",                           default: false, null: false
+    t.boolean  "transcribed",                          default: false
+    t.boolean  "personal",                             default: false
+    t.boolean  "reimbursable",                         default: true
+    t.boolean  "synced_with_quickbooks"
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -2480,6 +2482,12 @@ ActiveRecord::Schema.define(version: 20170821103554) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "report_sync_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "report_tracking_actions", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -2534,7 +2542,7 @@ ActiveRecord::Schema.define(version: 20170821103554) do
     t.integer  "reimbursable_expenses_total_id",     limit: 4
     t.integer  "card_expenses_total_id",             limit: 4
     t.integer  "non_reimbursable_expenses_total_id", limit: 4
-    t.boolean  "synced_with_quickbooks"
+    t.integer  "sync_status_id",                     limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -2912,6 +2920,16 @@ ActiveRecord::Schema.define(version: 20170821103554) do
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
+  create_table "vendor_payment_wallets", force: :cascade do |t|
+    t.integer  "balance_id", limit: 4
+    t.integer  "user_id",    limit: 4
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "vendor_payment_wallets", ["balance_id"], name: "index_vendor_payment_wallets_on_balance_id", using: :btree
+  add_index "vendor_payment_wallets", ["user_id"], name: "index_vendor_payment_wallets_on_user_id", using: :btree
+
   create_table "version_associations", force: :cascade do |t|
     t.integer "version_id",       limit: 4
     t.string  "foreign_key_name", limit: 255, null: false
@@ -2962,10 +2980,12 @@ ActiveRecord::Schema.define(version: 20170821103554) do
   add_index "yes_bank_company_accounts", ["company_id"], name: "index_yes_bank_company_accounts_on_company_id", using: :btree
 
   create_table "yes_bank_vendors", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.integer  "company_id", limit: 4
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.string   "name",          limit: 255
+    t.integer  "company_id",    limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.string   "email",         limit: 255
+    t.string   "mobile_number", limit: 255
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
@@ -3144,6 +3164,7 @@ ActiveRecord::Schema.define(version: 20170821103554) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
+  add_foreign_key "vendor_payment_wallets", "users"
   add_foreign_key "whitelisted_ips", "companies"
   add_foreign_key "yes_bank_company_accounts", "companies"
   add_foreign_key "yes_bank_vendors", "companies"
