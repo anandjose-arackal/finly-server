@@ -1,4 +1,4 @@
-json.array!(@result.vendors) do |vendor|
+json.array!(@result.paginated_vendors) do |vendor|
   json.id vendor.id
   json.name vendor.name
   json.email vendor.email

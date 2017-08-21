@@ -8,7 +8,7 @@ class BankTransfer::Vendor::Count < BankTransfer::Vendor::Base
 
   def process
     # todo - in the future, with finance and manager view, we can implement team view for vendors and shit
-    self.vendors_count = company.yes_bank_vendors.including_bank_accounts.count
+    self.vendors_count = company.yes_bank_vendors.count
   end
 
   def success

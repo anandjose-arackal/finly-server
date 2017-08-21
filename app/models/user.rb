@@ -338,25 +338,25 @@ class User < ActiveRecord::Base
 
   scope :filter_disburse, -> (enabled) {
     if enabled == '1' || enabled == 1
-      joins(:user_panel_subscription).select('users.*').where('disburse = ?', true)
+      joins(:user_panel_subscription).where('user_panel_subscriptions.disburse = ?', true)
     else
-      joins(:user_panel_subscription).select('users.*').where('disburse = ? or disburse = ?', false, nil)
+      joins(:user_panel_subscription).where('user_panel_subscriptions.disburse = ? or disburse = ?', false, nil)
     end
   }
 
   scope :filter_expense_management, -> (enabled) {
     if enabled == '1' || enabled == 1
-      joins(:user_panel_subscription).select('users.*').where('expense_management = ?', true)
+      joins(:user_panel_subscription).where('user_panel_subscriptions.expense_management = ?', true)
     else
-      joins(:user_panel_subscription).select('users.*').where('expense_management = ? or expense_management = ?', false, nil)
+      joins(:user_panel_subscription).where('user_panel_subscriptions.expense_management = ? or expense_management = ?', false, nil)
     end
   }
 
   scope :filter_vendor_payments, -> (enabled) {
     if enabled == '1' || enabled == 1
-      joins(:user_panel_subscription).select('users.*').where('yes_bank_account_transfer = ?', true)
+      joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true)
     else
-      joins(:user_panel_subscription).select('users.*').where('yes_bank_account_transfer = ? or yes_bank_account_transfer = ?', false, nil)
+      joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ? or yes_bank_account_transfer = ?', false, nil)
     end
   }
 

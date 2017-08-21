@@ -38,7 +38,7 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
     # insert logic here for teams once that has been implemented in vendor payments
     case role_id
       when UserRole.id_for(:admin)
-        self.users = user.company.users.paginate(page: params[:page], per_page: params[:per_page].to_i || 30)
+        self.users = user.company.users
       else
         self.users = []
     end
@@ -61,7 +61,7 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
       fix_scopes
       self.users = params[:users]
       self.users = apply_scopes(users, params)
-      self.paginated_team = users.paginate(page: params[:page], per_page: 30)
+      self.paginated_team = users.paginate(page: params[:page], per_page: params[:per_page] || 30)
     end
 
     def fix_scopes

@@ -8,7 +8,7 @@ class BankTransfer::Vendor::Index < BankTransfer::Vendor::Base
 
   def process
     # todo - in the future, with finance and manager view, we can implement team view for vendors and shit
-    self.vendors = company.yes_bank_vendors.including_bank_accounts.paginate(page: params[:page], per_page: params[:per_page] || 30)
+    self.vendors = company.yes_bank_vendors
   end
 
   def success
@@ -18,10 +18,11 @@ class BankTransfer::Vendor::Index < BankTransfer::Vendor::Base
 
   class BankTransfer::Vendor::Index::VendorsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :vendors
+    attr_accessor :vendors, :paginated_vendors
 
     def init
       self.vendors = params[:vendors]
+      self.paginated_vendors = vendors.paginate(page: params[:page], per_page: 10)
     end
   end
 end
