@@ -32,6 +32,7 @@ json.subscriptions do
 end
 
 json.wallet do
-  json.balance @result.selected_user.bank_wallet.balance_value
+  wallet_adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(@result.selected_user.bank_wallet)
+  json.balance wallet_adapter.balance
 end
 
