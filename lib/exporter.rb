@@ -96,18 +96,21 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
     # Handle XLS START
     def render_xls(controller)
-      controller.render xls_template, locals: {item_headers: self.headers, item_contents: self.contents}
+      controller.render xls_template, locals: binding_params
     end
 
     def generate_xls
-      binding_params = {item_headers: self.headers, item_contents: self.contents}
-      view = ActionView::Base.new(ActionController::Base.view_paths, binding_params)
+      view = ActionView::Base.new(ActionController::Base.view_paths)
       view.extend ApplicationHelper
-      view.render(file: "#{xls_template}.xls.erb")
+      view.render(file: "#{xls_template}.xls.erb", locals: binding_params)
     end
 
     def xls_template
       'export_template/template'
+    end
+
+    def binding_params
+      {item_headers: self.headers, item_contents: self.contents}
     end
 
     # Handle XLS END
