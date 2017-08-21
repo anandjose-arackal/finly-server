@@ -26,14 +26,14 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
   def process
     case role_id
       when UserRole.id_for(:admin)
-        self.payment_orders = user.company.payment_orders.paginate(page: params[:page], per_page: params[:per_page] || 30)
+        self.payment_orders = user.company.payment_orders
       when UserRole.id_for(:manager)
         # insert logic for getting payment orders from a particular manager team
       when UserRole.id_for(:finance_manager)
         # insert logic for getting payment orders from a particular finance manager team
       else
         # i.e. personal view
-        self.payment_orders = user.payment_orders.paginate(page: params[:page], per_page: params[:per_page] || 30)
+        self.payment_orders = user.payment_orders
     end
   end
 
@@ -43,7 +43,7 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
   end
 
   class BankTransfer::YesBank::Index::OrdersPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :payment_orders
+    attr_accessor :payment_orders, :paginated_payment_orders
 
     include HasScope
 
@@ -53,7 +53,8 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
 
     def init
       self.payment_orders = params[:payment_orders]
-      self.payment_orders = apply_scopes(payment_orders)
+      self.payment_orders = apply_scopes(payment_orders, params)
+      self.paginated_payment_orders = payment_orders.paginate(page: params[:page], per_page: params[:per_page] || 30)
     end
   end
 

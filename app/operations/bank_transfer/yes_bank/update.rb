@@ -18,8 +18,10 @@ class BankTransfer::YesBank::Update < BankTransfer::YesBank::Base
   def process
     order_data = params[:payment_order]
     scheduled_at = params[:scheduled_at]
+    initiating_account_type = params[:initiating_account_type]
     self.response_presenter = BankTransfer::YesBank::Process.(user, {scheduled_at: scheduled_at,
-                                                                    payment_order: order_data})
+                                                                    payment_order: order_data,
+                                                                    initiating_account_type: initiating_account_type})
     unless self.response_presenter.success?
       add_message :error, self.response_presenter.messages[:error]
     end
