@@ -1668,6 +1668,15 @@ Rails.application.routes.draw do
   end
   ######### API END ###########
 
+  ######### DESKTOP START ###########
+  namespace :desktop do
+    namespace :v1 do
+      post 'desktop_users', to: 'desktop_users#create'
+    end
+  end
+
+  ######### DESKTOP END ###########
+
   ######### ADMIN PANEL START ###########
 
   namespace :transcriber do

@@ -221,6 +221,10 @@ class Report < ActiveRecord::Base
     open? or retracted? or rejected?
   end
 
+  def can_retract?
+    processing? or (approved? and auto_approve) or (closed? and auto_approve)
+  end
+
   def can_destroy?
     # same as can_submit
     can_submit?

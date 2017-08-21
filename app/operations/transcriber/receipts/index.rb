@@ -1,6 +1,6 @@
 class Transcriber::Receipts::Index < Transcriber::Base
 
-  attr_accessor :receipts, :companies
+  attr_accessor :receipts, :companies, :sort_by, :sort_order
 
   class Transcriber::Receipts::Index::TranscriberPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -12,6 +12,7 @@ class Transcriber::Receipts::Index < Transcriber::Base
     def init
       self.receipts = params[:receipts]
       self.receipts = apply_scopes(receipts, params)
+
     end
 
   end
@@ -28,6 +29,8 @@ class Transcriber::Receipts::Index < Transcriber::Base
       self.companies = Company.ocr_enabled
     end
     self.receipts = []
+    self.sort_by = params[:filter_sort_by] || 'id'
+    self.sort_order = params[:filter_sort_order] || 'desc'
   end
 
   def authorize
@@ -40,10 +43,10 @@ class Transcriber::Receipts::Index < Transcriber::Base
       user_ids += company.users.pluck(:id)
     end
     if params[:filter_parent] == '1'
-      self.receipts = Receipt.untranscribed.without_parent.with_user_id(user_ids)
+      self.receipts = Receipt.untranscribed.without_parent.with_user_id(user_ids).reorder("#{self.sort_by} #{self.sort_order}")
     elsif params[:filter_parent] == '2'
       expense_ids = Expense.transcribed.with_user_id(user_ids).pluck(:id)
-      self.receipts = Receipt.with_expense_id(expense_ids)
+      self.receipts = Receipt.with_expense_id(expense_ids).reorder("#{self.sort_by} #{self.sort_order}")
     end
   end
 
