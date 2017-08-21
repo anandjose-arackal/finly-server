@@ -51,7 +51,7 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
     payment_order_data.each do |item|
       self.requested_amount += (item[:amount].to_d rescue 0)
     end
-    
+
     case params[:initiating_account_type]
       when '1', 1
         if self.requested_amount > company_balance
@@ -69,7 +69,6 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
   end
 
   def process
-
     if payment_order_data.is_a?(Hash)
       arr = []
       self.payment_order_data.map {|k, v| arr << v }
