@@ -17,7 +17,7 @@ class DesktopUser::Create < BaseOperation
   end
 
   def init
-    desktop_user = ::DesktopUser.new(strong_params)
+    self.desktop_user = ::DesktopUser.new(strong_params)
   end
 
   def validate
