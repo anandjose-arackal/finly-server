@@ -126,7 +126,7 @@ class Company::Transaction::Show < Company::Base
         if company_transaction.merchant_name.downcase.include?('manual') || company_transaction.merchant_name.downcase.include?('payu')
           purpose_id = PaymentPurpose.id_for(:corporate_balance_load)
         else
-          purpose_id = PaymentPurpose.id_for(:balance_clearance)
+          purpose_id = PaymentPurpose.id_for(:fees)
         end
       end
       params = {
