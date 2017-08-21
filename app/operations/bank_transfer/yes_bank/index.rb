@@ -27,10 +27,12 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
     case role_id
       when UserRole.id_for(:admin)
         self.payment_orders = user.company.payment_orders
-      when UserRole.id_for(:manager)
-        # insert logic for getting payment orders from a particular manager team
-      when UserRole.id_for(:finance_manager)
-        # insert logic for getting payment orders from a particular finance manager team
+      # when UserRole.id_for(:manager)
+      #   # insert logic for getting payment orders from a particular manager team
+      #   self.payment_orders = user.payment_orders
+      # when UserRole.id_for(:finance_manager)
+      #   # insert logic for getting payment orders from a particular finance manager team
+      #   self.payment_orders = user.payment_orders
       else
         # i.e. personal view
         self.payment_orders = user.payment_orders

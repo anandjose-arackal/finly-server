@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170817082101) do
+ActiveRecord::Schema.define(version: 20170821103554) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1177,6 +1177,13 @@ ActiveRecord::Schema.define(version: 20170817082101) do
   add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
   add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
+
+  create_table "desktop_users", force: :cascade do |t|
+    t.string   "email",      limit: 255, null: false
+    t.string   "country",    limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "distance_expense_configs", force: :cascade do |t|
     t.datetime "created_at",                    null: false

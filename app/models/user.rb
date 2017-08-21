@@ -282,18 +282,18 @@ class User < ActiveRecord::Base
     # "99" is for filtering only employees who are not admins / managers / finance managers
     include_employee_only = (role.include?(99) or role.include?('99'))
 
-    users_with_mapping = joins(:role_mapping).select('users.*')
+    users_with_mapping = joins(:role_mapping)
 
     if include_employee_only
 
       if role.size == 1
         # If requested for employee only, then select users who are not managers, admins and finance managers
-        ids = users_with_mapping.where('user_role_id IN (?)', [UserRole.id_for(:admin), UserRole.id_for(:manager), UserRole.id_for(:finance_manager)]).pluck(:id)
+        ids = users_with_mapping.where('user_role_mappings.user_role_id IN (?)', [UserRole.id_for(:admin), UserRole.id_for(:manager), UserRole.id_for(:finance_manager)]).pluck(:id)
         where.not id: ids
       else
         # If requested in combination with employees only and (admin or manager or finance manager)
-        ids = users_with_mapping.where('user_role_id IN (?)', [UserRole.id_for(:admin), UserRole.id_for(:manager), UserRole.id_for(:finance_manager)]).pluck(:id)
-        users_with_mapping.where('user_role_id IN (?) OR users.id NOT IN (?)', role, ids)
+        ids = users_with_mapping.where('user_role_mappings.user_role_id IN (?)', [UserRole.id_for(:admin), UserRole.id_for(:manager), UserRole.id_for(:finance_manager)]).pluck(:id)
+        users_with_mapping.where('user_role_mappings.user_role_id IN (?) OR users.id NOT IN (?)', role, ids)
       end
 
     else
