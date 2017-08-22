@@ -5,6 +5,6 @@ json.array!(@result.payments) do |payment|
   json.amount payment.amount_value
   json.scheduled_date payment.payment_order&.scheduled_at&.strftime("%Y-%m-%d")
   json.processed_date payment.payment_order&.processed_at&.strftime("%Y-%m-%d")
-  json.status payment.payment_status&.name
+  json.status payment.payment_status&.name.humanize
   json.initiating_user payment.initiating_user&.name
 end

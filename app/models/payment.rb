@@ -154,6 +154,12 @@ class Payment < ActiveRecord::Base
     #todo - need to think about this
   }
 
+  scope :filter_user_id, -> (user_id) {
+    if user_id.present?
+      where('initiating_user_id = ? OR receiving_user_id = ?', user_id, user_id)
+    end
+  }
+
   scope :filter_vendor_payments, -> (enabled){
     if ['1', 1].include?(enabled)
       where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)

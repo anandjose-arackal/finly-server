@@ -30,9 +30,9 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
     attr_accessor :payments
 
     has_scope :with_application
-    has_scope :filter_search
     has_scope :filter_date, using: [:from, :to], type: :hash
     has_scope :filter_vendor_payments
+    has_scope :filter_user_id
 
     def init
       self.payments = apply_scopes(params[:payments], params)
