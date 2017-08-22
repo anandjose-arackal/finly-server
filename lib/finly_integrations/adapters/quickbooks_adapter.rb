@@ -21,6 +21,7 @@ module FinlyIntegrations
         service = Quickbooks::Service::CompanyInfo.new
         initialize_service(service)
         company_info = service.query
+        @error_logger = Logger.new("#{Rails.root}/log/quickbooks_errors.log")
         @payroll_enabled = false
         company_info.entries.first.name_values.each do |name_value|
           if name_value.name == 'PayrollFeature'
@@ -42,7 +43,7 @@ module FinlyIntegrations
         finly_purchase.account_id = qb_report.payment_type_quickbooks_id(qb_report.reimbursable)
         finly_purchase.payment_type = ( qb_report.reimbursable ? "Cash" : "CreditCard" )
         finly_purchase.txn_date = qb_report.date
-        qb_report.expenses.each do |expense|
+        qb_report.expenses.not_synced_with_quickbooks.each do |expense|
           category = expense.category
           if category.nil? || category.quickbooks_category.nil?
             return "Expense at #{expense.merchant_name} doesn't belong to a Quickbooks category. Please update the expenses and try again"
@@ -68,8 +69,17 @@ module FinlyIntegrations
           finly_purchase.line_items << line_item
         end
         purchase_service = Quickbooks::Service::Purchase.new
-        initialize_service(purchase_service)
-        created_purchase = purchase_service.create(finly_purchase)
+        begin
+          initialize_service(purchase_service)
+          created_purchase = purchase_service.create(finly_purchase)
+          qb_report.expenses.update_all(synced_with_quickbooks: true)
+        rescue => error
+          @error_logger.error("Sync of report: #{qb_report.report.name} because of the following error: #{error.message}")
+          error.backtrace.each do |line|
+            @error_logger.error "\t #{line}"
+          end
+        end
+
         puts "Created Report in Quickbooks!"
         # puts created_purchase
         return true

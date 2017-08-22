@@ -12,3 +12,5 @@ end
   :authorize_url        => "https://appcenter.intuit.com/Connect/Begin",
   :access_token_path    => "/oauth/v1/get_access_token"
 })
+
+Quickbooks.log = true
