@@ -3,7 +3,7 @@ class BankTransfer::BankAccounts::Base < BaseOperation
   attr_accessor :bank_account
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :finance_manager, :manager, :personal]
   end
 
   def pre_validate
