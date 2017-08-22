@@ -835,7 +835,15 @@
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                                    quickbooks#show
 #                                                     tos GET    /tos(.:format)                                                                  static_pages#tos
 #                                                 privacy GET    /privacy(.:format)                                                              static_pages#privacy
-#                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                               static_pages#prepaid_card_agreement
+#                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                               static_pages#prepaid_card_ agreement
+#                                           bank_accounts GET    /bank_accounts(.:format)                                                        bank_accounts#index
+#                                                         POST   /bank_accounts(.:format)                                                        bank_accounts#create
+#                                        new_bank_account GET    /bank_accounts/new(.:format)                                                    bank_accounts#new
+#                                       edit_bank_account GET    /bank_accounts/:id/edit(.:format)                                               bank_accounts#edit
+#                                            bank_account GET    /bank_accounts/:id(.:format)                                                    bank_accounts#show
+#                                                         PATCH  /bank_accounts/:id(.:format)                                                    bank_accounts#update
+#                                                         PUT    /bank_accounts/:id(.:format)                                                    bank_accounts#update
+#                                                         DELETE /bank_accounts/:id(.:format)                                                    bank_accounts#destroy
 #                            company_add_balance_payments POST   /payments/companies/:company_id/add_balance(.:format)                           companies#add_balance
 #                                                         GET    /payments/companies(.:format)                                                   companies#index
 #                                                         POST   /payments/companies(.:format)                                                   companies#create
@@ -847,6 +855,10 @@
 #                                                         DELETE /payments/companies/:id(.:format)                                               companies#destroy
 #               bank_transfer_payment_orders_process_file POST   /bank_transfer/payment_orders/process_file(.:format)                            bank_transfer/payment_orders#process_file
 #                    bank_transfer_payment_orders_balance GET    /bank_transfer/payment_orders/balance(.:format)                                 bank_transfer/payment_orders#balance
+#            bank_transfer_payment_orders_account_details POST   /bank_transfer/payment_orders/account_details(.:format)                         bank_transfer/payment_orders#account_details
+#        bank_transfer_payment_orders_process_account_ids POST   /bank_transfer/payment_orders/process_account_ids(.:format)                     bank_transfer/payment_orders#process_account_ids
+#             bank_transfer_payment_orders_update_details PATCH  /bank_transfer/payment_orders/update_details(.:format)                          bank_transfer/payment_orders#update_details
+#                      bank_transfer_payment_orders_count GET    /bank_transfer/payment_orders/count(.:format)                                   bank_transfer/payment_orders#count
 #                            bank_transfer_payment_orders GET    /bank_transfer/payment_orders(.:format)                                         bank_transfer/payment_orders#index
 #                                                         POST   /bank_transfer/payment_orders(.:format)                                         bank_transfer/payment_orders#create
 #                         new_bank_transfer_payment_order GET    /bank_transfer/payment_orders/new(.:format)                                     bank_transfer/payment_orders#new
@@ -855,6 +867,44 @@
 #                                                         PATCH  /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#update
 #                                                         PUT    /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#update
 #                                                         DELETE /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#destroy
+#                             bank_transfer_vendors_count GET    /bank_transfer/vendors/count(.:format)                                          bank_transfer/vendors#count
+#                                   bank_transfer_vendors GET    /bank_transfer/vendors(.:format)                                                bank_transfer/vendors#index
+#                                                         POST   /bank_transfer/vendors(.:format)                                                bank_transfer/vendors#create
+#                                new_bank_transfer_vendor GET    /bank_transfer/vendors/new(.:format)                                            bank_transfer/vendors#new
+#                               edit_bank_transfer_vendor GET    /bank_transfer/vendors/:id/edit(.:format)                                       bank_transfer/vendors#edit
+#                                    bank_transfer_vendor GET    /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#show
+#                                                         PATCH  /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#update
+#                                                         PUT    /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#update
+#                                                         DELETE /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#destroy
+#                        bank_transfer_bank_account_count GET    /bank_transfer/bank_accounts/:bank_account_id/count(.:format)                   bank_transfer/bank_accounts#count
+#                             bank_transfer_bank_accounts GET    /bank_transfer/bank_accounts(.:format)                                          bank_transfer/bank_accounts#index
+#                                                         POST   /bank_transfer/bank_accounts(.:format)                                          bank_transfer/bank_accounts#create
+#                          new_bank_transfer_bank_account GET    /bank_transfer/bank_accounts/new(.:format)                                      bank_transfer/bank_accounts#new
+#                         edit_bank_transfer_bank_account GET    /bank_transfer/bank_accounts/:id/edit(.:format)                                 bank_transfer/bank_accounts#edit
+#                              bank_transfer_bank_account GET    /bank_transfer/bank_accounts/:id(.:format)                                      bank_transfer/bank_accounts#show
+#                                                         PATCH  /bank_transfer/bank_accounts/:id(.:format)                                      bank_transfer/bank_accounts#update
+#                                                         PUT    /bank_transfer/bank_accounts/:id(.:format)                                      bank_transfer/bank_accounts#update
+#                                                         DELETE /bank_transfer/bank_accounts/:id(.:format)                                      bank_transfer/bank_accounts#destroy
+#                            bank_transfer_payments_count GET    /bank_transfer/payments/count(.:format)                                         bank_transfer/payments#count
+#                                  bank_transfer_payments GET    /bank_transfer/payments(.:format)                                               bank_transfer/payments#index
+#                                                         POST   /bank_transfer/payments(.:format)                                               bank_transfer/payments#create
+#                               new_bank_transfer_payment GET    /bank_transfer/payments/new(.:format)                                           bank_transfer/payments#new
+#                              edit_bank_transfer_payment GET    /bank_transfer/payments/:id/edit(.:format)                                      bank_transfer/payments#edit
+#                                   bank_transfer_payment GET    /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#show
+#                                                         PATCH  /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#update
+#                                                         PUT    /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#update
+#                                                         DELETE /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#destroy
+#                               bank_transfer_users_count GET    /bank_transfer/users/count(.:format)                                            bank_transfer/users#count
+#                                     bank_transfer_users GET    /bank_transfer/users(.:format)                                                  bank_transfer/users#index
+#                                                         POST   /bank_transfer/users(.:format)                                                  bank_transfer/users#create
+#                                  new_bank_transfer_user GET    /bank_transfer/users/new(.:format)                                              bank_transfer/users#new
+#                                 edit_bank_transfer_user GET    /bank_transfer/users/:id/edit(.:format)                                         bank_transfer/users#edit
+#                                      bank_transfer_user GET    /bank_transfer/users/:id(.:format)                                              bank_transfer/users#show
+#                                                         PATCH  /bank_transfer/users/:id(.:format)                                              bank_transfer/users#update
+#                                                         PUT    /bank_transfer/users/:id(.:format)                                              bank_transfer/users#update
+#                                                         DELETE /bank_transfer/users/:id(.:format)                                              bank_transfer/users#destroy
+#                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                  bank_transfer/vendor_payment_wallets#update_balance
+#                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)            bank_transfer/vendor_payment_wallets#transfer_options
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format) admin_users/funds_load_requests#approve
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#index
 #                                                         POST   /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#create
@@ -2084,9 +2134,11 @@ Rails.application.routes.draw do
 
   get 'tos', to: 'static_pages#tos'
   get 'privacy', to: 'static_pages#privacy'
-  get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_agreement'
+  get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_ agreement'
 
 
+  # Bank Accounts
+  resources :bank_accounts
 
   # ROUTES FOR VENDOR PAYMENTS
   scope :payments do
@@ -2097,9 +2149,26 @@ Rails.application.routes.draw do
   namespace :bank_transfer do
     post 'payment_orders/process_file', to: 'payment_orders#process_file'
     get 'payment_orders/balance', to: 'payment_orders#balance'
+    post 'payment_orders/account_details', to: 'payment_orders#account_details'
+    post 'payment_orders/process_account_ids', to: 'payment_orders#process_account_ids'
+    patch 'payment_orders/update_details', to: 'payment_orders#update_details'
+    get 'payment_orders/count', to: 'payment_orders#count'
     resources :payment_orders do
-
     end
+
+    get 'vendors/count', to: 'vendors#count'
+    resources :vendors
+
+    get 'bank_accounts/count', to: 'bank_accounts#count'
+    resources :bank_accounts
+
+    get 'payments/count', to: 'payments#count'
+    resources :payments
+
+    get 'users/count', to: 'users#count'
+    resources :users
+    post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
+    get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
   end
 
 

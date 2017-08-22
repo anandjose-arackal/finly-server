@@ -51,6 +51,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
+
+        payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+                                      content: "The amount will be refunded to your bank account shortly").save
         # creating a refund payment for this amount
         create_refund_payment
       else
@@ -80,5 +83,4 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     end
   end
 
-  # nothing else to do because this is a backgrund operation
 end

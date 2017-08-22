@@ -29,4 +29,58 @@ class BankAccount < ActiveRecord::Base
   validates :ifsc, presence: true
 
   accepts_nested_attributes_for :account_owner
+
+  default_scope {order(created_at: :desc)}
+
+  scope :with_account_owner, -> (user_ids, vendor_ids) {
+    where('(account_owner_type = ? AND account_owner_id IN (?)) OR (account_owner_type - ? AND account_owner_id IN (?)', "User", user_ids, "YesBankVendor", vendor_ids)
+  }
+  scope :with_id, -> (id) {where id: id}
+  scope :only_vendors, -> {where account_owner_type: "YesBankVendor"}
+  scope :only_users, -> {where account_owner_type: "User"}
+  scope :with_owner_id, -> (owner_id) {
+    where account_owner_id: owner_id
+  }
+
+  scope :with_owner_ids, -> (type, ids) {
+    case type
+      when 1, '1'
+        where(account_owner_type: "User").where(id: ids)
+      when 2, '2'
+        where(account_owner_type: "YesBankVendor").where(id: ids)
+    end
+  }
+
+  scope :filter_owner_type, -> (owner_type) {
+    if owner_type == '1'
+      where account_owner_type: "User"
+    elsif owner_type == '2'
+      where account_owner_type: "YesBankVendor"
+    else
+      # do nothing?
+    end
+  }
+
+  scope :beneficiary_type, -> (owner_type) {
+    if owner_type == '1'
+      where account_owner_type: "User"
+    elsif owner_type == '2'
+      where account_owner_type: "YesBankVendor"
+    else
+      # do nothing?
+    end
+  }
+
+  scope :filter_search, -> (term) {
+    # todo - dirty code, see if this can be improved
+    ids = self.where('name like ? OR account_number like ? OR ifsc like ?', "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    user_ids = User.where('first_name like ? OR last_name like ?', "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = YesBankVendor.where('name like ?', "%#{term}%").pluck(:id)
+    ids += BankAccount.where('(account_owner_type = ? AND account_owner_id IN (?)) OR (account_owner_type = ? AND account_owner_id IN (?))', "User", user_ids, "YesBankVendor", vendor_ids)
+    where(id: ids)
+  }
+
+  after_create do
+    self.update(company_id: self.account_owner.company_id)
+  end
 end

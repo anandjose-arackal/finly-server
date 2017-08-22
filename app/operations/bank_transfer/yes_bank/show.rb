@@ -15,7 +15,8 @@ class BankTransfer::YesBank::Show < BankTransfer::YesBank::Base
   end
 
   def init
-    self.payment_order = BankTransfer::YesBank::Index.(user, params).payment_orders.with_id(params[:id]).first rescue nil
+    id = params[:id] || params[:payment_order_id]
+    self.payment_order = BankTransfer::YesBank::Index.(user, params).payment_orders.with_id(id).first rescue nil
     self.actions = {}
   end
 

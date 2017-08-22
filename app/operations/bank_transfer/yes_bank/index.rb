@@ -1,5 +1,5 @@
 class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
-  attr_accessor :payment_orders
+  attr_accessor :payment_orders, :role_id
 
   def pre_validate
     super
@@ -15,14 +15,28 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
   end
 
   def init
-    # self.payment_orders = user.company.payment_orders.with_type_id(payment_order_type_id)
-    self.payment_orders = user.company.payment_orders
-    params[:with_application] = RequestStore.store[:current_app]
+    self.role_id = params[:role_id]
+    if self.role_id.blank? and params[:view].present?
+      self.role_id = UserRole::VALUES[params[:view].to_sym]
+    end
+    params[:with_application] = RequestStore.store[:current_app].to_s
+    params[:filter_vendor_payments] = '1'
   end
 
-  def pre_process
-    # adding a scope to just include vendor payment parameters
-    params[:vendor_payments] = 1
+  def process
+    case role_id
+      when UserRole.id_for(:admin)
+        self.payment_orders = user.company.payment_orders
+      # when UserRole.id_for(:manager)
+      #   # insert logic for getting payment orders from a particular manager team
+      #   self.payment_orders = user.payment_orders
+      # when UserRole.id_for(:finance_manager)
+      #   # insert logic for getting payment orders from a particular finance manager team
+      #   self.payment_orders = user.payment_orders
+      else
+        # i.e. personal view
+        self.payment_orders = user.payment_orders
+    end
   end
 
   def success
@@ -31,15 +45,18 @@ class BankTransfer::YesBank::Index < BankTransfer::YesBank::Base
   end
 
   class BankTransfer::YesBank::Index::OrdersPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :payment_orders
+    attr_accessor :payment_orders, :paginated_payment_orders
 
     include HasScope
 
-    has_scope :vendor_payments
+    has_scope :with_application
+    has_scope :filter_vendor_payments
+    has_scope :filter_date, using: [:from, :to], type: :hash
 
     def init
       self.payment_orders = params[:payment_orders]
-      self.payment_orders = apply_scopes(payment_orders)
+      self.payment_orders = apply_scopes(payment_orders, params) if payment_orders.present?
+      self.paginated_payment_orders = payment_orders.paginate(page: params[:page], per_page: params[:per_page] || 30)
     end
   end
 
