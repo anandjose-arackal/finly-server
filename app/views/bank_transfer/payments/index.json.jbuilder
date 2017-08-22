@@ -1,4 +1,4 @@
-json.array!(@result.payments) do |payment|
+json.array!(@result.paginated_payments) do |payment|
   json.account_number payment.receiving_account&.account_number
   json.name payment.receiving_user&.name
   json.ifsc payment.receiving_account&.ifsc

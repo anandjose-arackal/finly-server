@@ -27,7 +27,7 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
 
   class BankTransfer::Payments::Index::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :payments
+    attr_accessor :payments, :paginated_payments
 
     has_scope :with_application
     has_scope :filter_date, using: [:from, :to], type: :hash
@@ -36,6 +36,7 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
 
     def init
       self.payments = apply_scopes(params[:payments], params)
+      self.paginated_payments = payments.paginate(page: params[:page], per_page: params[:per_page] || 30)
     end
   end
 end
