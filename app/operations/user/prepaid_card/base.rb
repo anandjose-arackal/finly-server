@@ -16,7 +16,7 @@ class User::PrepaidCard::Base < BaseOperation
     self.params = {} if self.params.blank?
 
     self.card = params[:card]
-    if self.card.blank? and params[:card_id].present?
+    if (self.card.blank? or self.card.class.name != Card.name) and params[:card_id].present?
       card_id = params[:card_id]
       cards = Card::Index.(user, params)
       self.card = cards.cards.find_by(id: card_id)
