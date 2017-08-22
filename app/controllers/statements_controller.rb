@@ -1,5 +1,6 @@
 class StatementsController < ApplicationController
 
+  before_action :set_tokens_in_header, only: [:export]
   before_action -> { finly_authorize! :web}
 
   def index
@@ -51,8 +52,8 @@ class StatementsController < ApplicationController
     end
   end
 
-  def show_new
-    @result = Statement::Show.(current_user, params)
+  def export
+    @result = Statements::AsSpreadsheet.(current_user, params)
     respond
   end
 

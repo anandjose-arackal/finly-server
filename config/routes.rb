@@ -580,6 +580,7 @@
 #                                                         PATCH  /money_request/:id(.:format)                                                    money_request#update
 #                                                         PUT    /money_request/:id(.:format)                                                    money_request#update
 #                                                         DELETE /money_request/:id(.:format)                                                    money_request#destroy
+#                                         expenses_export POST   /expenses/export(.:format)                                                      expenses#export
 #                                                expenses DELETE /expenses(.:format)                                                             expenses#destroy
 #                                  expense_attach_receipt POST   /expenses/:expense_id/attach_receipt(.:format)                                  expenses#attach_receipt
 #                                  expense_detach_receipt POST   /expenses/:expense_id/detach_receipt(.:format)                                  expenses#detach_receipt
@@ -704,6 +705,7 @@
 #                                                         PATCH  /statements/:id(.:format)                                                       statements#update
 #                                                         PUT    /statements/:id(.:format)                                                       statements#update
 #                                                         DELETE /statements/:id(.:format)                                                       statements#destroy
+#                                                         GET    /statements/:id/export(.:format)                                                statements#export
 #                                                    root GET    /                                                                               home#index
 #                                                 welcome GET    /welcome(.:format)                                                              home#welcome
 #                                                   about GET    /about(.:format)                                                                home#about
@@ -1716,6 +1718,15 @@ Rails.application.routes.draw do
   end
   ######### API END ###########
 
+  ######### DESKTOP START ###########
+  namespace :desktop do
+    namespace :v1 do
+      post 'desktop_users', to: 'desktop_users#create'
+    end
+  end
+
+  ######### DESKTOP END ###########
+
   ######### ADMIN PANEL START ###########
 
   namespace :transcriber do
@@ -1885,6 +1896,7 @@ Rails.application.routes.draw do
     post 'comment' => 'money_request#comment', as: :comment
   end
 
+  post 'expenses/export', to: 'expenses#export'
   delete 'expenses', to: 'expenses#destroy'
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'
@@ -1974,6 +1986,7 @@ Rails.application.routes.draw do
   get 'statements/:id/summary' => 'statements#summary'
   get 'export/:id/statements(.:format)', to: 'export#statement', as: :export_statement
   resources :statements
+  get 'statements/:id/export', to: 'statements#export'
 
   # get 'settlements/summary' => 'settlements#summary'
 

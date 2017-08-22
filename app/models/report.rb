@@ -29,7 +29,9 @@
 #  card_expenses_total_id             :integer
 #  non_reimbursable_expenses_total_id :integer
 #  synced_with_quickbooks             :boolean
+#  sync_status_id                     :integer
 #
+
 
 
 
@@ -65,6 +67,7 @@ class Report < ActiveRecord::Base
   belongs_to :card_expenses_total, class_name: 'Amount'
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
+  belongs_to :sync_status, class_name: "ReportSyncStatus"
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -96,6 +99,7 @@ class Report < ActiveRecord::Base
   scope :with_reimbursable_expenses_total, -> { joins :reimbursable_expenses_total }
   scope :with_non_reimbursable_expenses_total, -> { joins :non_reimbursable_expenses_total }
   scope :with_card_expenses_total, -> { joins :card_expenses_total }
+  scope :with_status_id, ->(id) {where report_status_id: id}
   scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }
@@ -215,6 +219,10 @@ class Report < ActiveRecord::Base
 
   def can_submit?
     open? or retracted? or rejected?
+  end
+
+  def can_retract?
+    processing? or (approved? and auto_approve) or (closed? and auto_approve)
   end
 
   def can_destroy?
@@ -343,6 +351,10 @@ class Report < ActiveRecord::Base
 
   def only_card_expenses?
     self.expenses.count == self.expenses.only_card_expenses.count
+  end
+
+  def synced_with_quickbooks?
+    self.sync_status_id == ReportSyncStatus.id_for(:synced)
   end
 
 

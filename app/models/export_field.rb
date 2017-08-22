@@ -11,6 +11,7 @@
 
 
 
+
 class ExportField < ActiveRecord::Base
 
   scope :with_id, ->(id) { where id: id }
@@ -29,7 +30,9 @@ class ExportField < ActiveRecord::Base
       10 => "Expense Amount",
       11 => "Expense Date",
       12 => "Expense Category Name",
-      13 => "Custom Field"
+      13 => "Custom Field",
+      14 => "Expense Note",
+      15 => "Expense Status"
   }
 
   def self.seed_data
@@ -92,6 +95,14 @@ class ExportField < ActiveRecord::Base
 
   def self.type_custom_field_name
     13
+  end
+
+  def self.type_expense_note
+    14
+  end
+
+  def self.type_expense_status
+    15
   end
 
 end

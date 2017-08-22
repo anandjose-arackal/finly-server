@@ -4,16 +4,22 @@
           xmlns:x="urn:schemas-microsoft-com:office:excel"
           xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
           xmlns:html="http://www.w3.org/TR/REC-html40">
-  <Worksheet ss:Name="Sheet1">
-    <Table>
-      <Row>
-        <% @item_headers.each do |item| %>
-            <Cell>
+  <ss:Styles>
+    <ss:Style ss:ID="header">
+      <ss:Font ss:Bold="1"/>
+      <ss:Interior ss:Color="#a5ccb0" ss:Pattern="Solid"/>
+    </ss:Style>
+  </ss:Styles>
+  <ss:Worksheet ss:Name="Sheet1">
+    <ss:Table>
+      <ss:Row>
+        <% item_headers&.each do |item| %>
+            <Cell ss:StyleID="header">
               <Data ss:Type="String"><%= item %></Data>
             </Cell>
         <% end %>
-      </Row>
-      <% @item_contents.each do |item| %>
+      </ss:Row>
+      <% item_contents&.each do |item| %>
           <Row>
             <% item.each do |value| %>
                 <Cell>
@@ -22,6 +28,6 @@
             <% end %>
           </Row>
       <% end %>
-    </Table>
-  </Worksheet>
+    </ss:Table>
+  </ss:Worksheet>
 </Workbook>

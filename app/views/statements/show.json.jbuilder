@@ -5,12 +5,13 @@ json.credits_count AmountUtils.format(@result.credits_count, placeholder: '-')
 json.debits_count AmountUtils.format(@result.debits_count, placeholder: '-')
 json.credit_amount AmountUtils.format(@result.credit_amount, placeholder: '-')
 json.debit_amount AmountUtils.format(@result.debit_amount, placeholder: '-')
+json.summary @result.summary
 json.finly_transactions do
   json.array! @result.account_transactions do |finly_transaction|
     json.reference_id finly_transaction.transaction_reference_id
     json.date DateUtils.date_formatted finly_transaction.date
-    json.transaction_type finly_transaction.transaction_type.name.humanize
-    json.purpose finly_transaction.payment_purpose.name.humanize
+    json.transaction_type StringUtils.titleize(finly_transaction.transaction_type.name)
+    json.purpose StringUtils.titleize(finly_transaction.payment_purpose.name)
     json.merchant @result.merchant(finly_transaction)
     credit_amount = nil
     debit_amount = nil
@@ -22,7 +23,7 @@ json.finly_transactions do
     json.credit_amount AmountUtils.format(credit_amount, placeholder: '-')
     json.debit_amount AmountUtils.format(debit_amount, placeholder: '-')
     json.closing_balance AmountUtils.format(finly_transaction.closing_balance&.value, placeholder: '-')
-    json.status finly_transaction.status.name.humanize
+    json.status StringUtils.titleize(finly_transaction.status.name)
     json.system_messages do
       json.system_messages do
         json.array! finly_transaction.system_messages

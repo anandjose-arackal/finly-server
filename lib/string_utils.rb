@@ -11,4 +11,8 @@ class StringUtils
     string&.encode(Encoding.find('UTF-8'), {invalid: :replace, undef: :replace, replace: ''}).force_encoding('UTF-8')
   end
 
+  def self.titleize(text)
+    text&.humanize&.gsub(/\b(?<!['’`])[a-z]/) { $&.capitalize }
+  end
+
 end
