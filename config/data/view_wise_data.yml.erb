@@ -42,6 +42,9 @@ personal:
       - Expenses: expenses
     cog:
       - My Account: '#settings'
+      <% if current_company.feature_subscription.yes_bank_account and current_user.company_admin? %>
+      - Vendor Payments: '/payments'
+      <% end %>
       # - My Balance: '#modal-balance'
       # - FAQ: '#faq/params={"view":"personal"}'
       # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
@@ -80,6 +83,9 @@ finance_manager:
 
     cog:
       - My Account: '#settings'
+      <% if current_company.feature_subscription.yes_bank_account and current_user.finance_manager? %>
+      - Vendor Payments: '/payments'
+      <% end %>
       # - My Balance: '#modal-balance'
       # - FAQ: '#faq/params={"view":"finance"}'
       # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'

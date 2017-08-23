@@ -11,13 +11,31 @@ class BankTransfer::PaymentOrdersController < ApplicationController
 
   def create
     @result = BankTransfer::YesBank::Create.(current_user, params)
-    # @result = BaseOperation::BasePresenter::SuccessPresenter.new(current_user, params, {})
+    respond
+  end
+
+  def process_account_ids
+    @result = BankTransfer::YesBank::ProcessFromAccountIds.(current_user, params)
+    if @result&.success?
+      render 'process_file'
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def account_details
+    @result = BankTransfer::YesBank::AccountDetails.(current_user, params)
     respond
   end
 
   def index
     @result = BankTransfer::YesBank::Index.(current_user, params)
     respond
+  end
+
+  def count
+    @result = BankTransfer::YesBank::Count.(current_user, params)
+    render json: @result.as_json
   end
 
   def show
@@ -31,8 +49,14 @@ class BankTransfer::PaymentOrdersController < ApplicationController
     respond
   end
 
+  # returns the Yes Bank Account Balance for the given account
   def balance
-    @result = AccountManager::Balance::Check.(current_company.yes_bank_company_account, params)
+    @result = BankTransfer::Users::Balance.(current_user, params)
+    respond
+  end
+
+  def update_details
+    @result = BankTransfer::YesBank::Update.(current_user, params)
     respond
   end
 end

@@ -55,6 +55,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -73,6 +74,7 @@ class User < ActiveRecord::Base
 
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
+  has_one :bank_wallet, class_name: 'VendorPaymentWallet', foreign_key: :user_id, dependent: :destroy
   has_many :role_mapping, class_name: 'UserRoleMapping', dependent: :destroy
   has_many :user_roles, through: :role_mapping, dependent: :destroy
   has_many :team_mapping, class_name: 'UserManagerMapping', dependent: :destroy
@@ -173,6 +175,7 @@ class User < ActiveRecord::Base
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }
+
 
   # Users having cards assigned with the given program
   scope :with_cards_having_card_program, ->(id) do
@@ -279,18 +282,18 @@ class User < ActiveRecord::Base
     # "99" is for filtering only employees who are not admins / managers / finance managers
     include_employee_only = (role.include?(99) or role.include?('99'))
 
-    users_with_mapping = joins(:role_mapping).select('users.*')
+    users_with_mapping = joins(:role_mapping)
 
     if include_employee_only
 
       if role.size == 1
         # If requested for employee only, then select users who are not managers, admins and finance managers
-        ids = users_with_mapping.where('user_role_id IN (?)', [UserRole.id_for(:admin), UserRole.id_for(:manager), UserRole.id_for(:finance_manager)]).pluck(:id)
+        ids = users_with_mapping.where('user_role_mappings.user_role_id IN (?)', [UserRole.id_for(:admin), UserRole.id_for(:manager), UserRole.id_for(:finance_manager)]).pluck(:id)
         where.not id: ids
       else
         # If requested in combination with employees only and (admin or manager or finance manager)
-        ids = users_with_mapping.where('user_role_id IN (?)', [UserRole.id_for(:admin), UserRole.id_for(:manager), UserRole.id_for(:finance_manager)]).pluck(:id)
-        users_with_mapping.where('user_role_id IN (?) OR users.id NOT IN (?)', role, ids)
+        ids = users_with_mapping.where('user_role_mappings.user_role_id IN (?)', [UserRole.id_for(:admin), UserRole.id_for(:manager), UserRole.id_for(:finance_manager)]).pluck(:id)
+        users_with_mapping.where('user_role_mappings.user_role_id IN (?) OR users.id NOT IN (?)', role, ids)
       end
 
     else
@@ -335,17 +338,25 @@ class User < ActiveRecord::Base
 
   scope :filter_disburse, -> (enabled) {
     if enabled == '1' || enabled == 1
-      joins(:user_panel_subscription).select('users.*').where('disburse = ?', true)
+      joins(:user_panel_subscription).where('user_panel_subscriptions.disburse = ?', true)
     else
-      joins(:user_panel_subscription).select('users.*').where('disburse = ? or disburse = ?', false, nil)
+      joins(:user_panel_subscription).where('user_panel_subscriptions.disburse = ? or disburse = ?', false, nil)
     end
   }
 
   scope :filter_expense_management, -> (enabled) {
     if enabled == '1' || enabled == 1
-      joins(:user_panel_subscription).select('users.*').where('expense_management = ?', true)
+      joins(:user_panel_subscription).where('user_panel_subscriptions.expense_management = ?', true)
     else
-      joins(:user_panel_subscription).select('users.*').where('expense_management = ? or expense_management = ?', false, nil)
+      joins(:user_panel_subscription).where('user_panel_subscriptions.expense_management = ? or expense_management = ?', false, nil)
+    end
+  }
+
+  scope :filter_vendor_payments, -> (enabled) {
+    if enabled == '1' || enabled == 1
+      joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true)
+    else
+      joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ? or yes_bank_account_transfer = ?', false, nil)
     end
   }
 
@@ -383,6 +394,7 @@ class User < ActiveRecord::Base
 
     # creating the cash on hand account for this user
     self.build_cash_on_hand(balance_attributes: {value: 0, currency_id: Currency.id_for(:INR)}).save
+    self.build_bank_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
   end
 
   def strip_whitespace
@@ -509,6 +521,7 @@ class User < ActiveRecord::Base
   alias_method :finance_manager_name, :user_name
   alias_method :approves_to_name, :user_name
   alias_method :approves_finance_to_name, :user_name
+  alias_method :finance?, :finance_manager?
 
   def as_json(options = {})
     json = super(options)

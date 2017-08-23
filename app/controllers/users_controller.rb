@@ -20,6 +20,7 @@ class UsersController < ApplicationController
     respond
   end
 
+
   # For destroying user manager mapping
   # params= { id: 22, mapping_id: 43 }
   def destroy

@@ -21,7 +21,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
   end
 
   def debit(payment, options = {})
-    # nothing to do here ¯\_(ツ)_/¯
+    # this will debit money from the company balance
     opening_balance = balance
     if self.account.balance.update(value: opening_balance - payment.amount_value)
       closing_balance = balance
@@ -43,11 +43,11 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
 
   def creditable_accounts
     # none as this account cannot be credited through Finly (only external)
-    [nil, 'OutsideFinly']
+    [nil, 'OutsideFinly', VendorPaymentWallet]
   end
 
   def debitable_accounts
-    [BankAccount]
+    [BankAccount, VendorPaymentWallet]
   end
 
   private

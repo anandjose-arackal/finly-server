@@ -75,11 +75,11 @@ class Expense::ExCard::Update < Expense::ExCard::Base
       add_message :error, set_fields.messages[:error]
       return
     end
-    valid = CustomField::Validate.(self.expense.card_expense)
-    unless valid.success?
-      add_message :error, valid.messages[:error]
-      return
-    end
+    # valid = CustomField::Validate.(self.expense.card_expense)
+    # unless valid.success?
+    #   add_message :error, valid.messages[:error]
+    #   return
+    # end
 
     if expense.update(updated_expense_params)
       if self.destroy_receipts
