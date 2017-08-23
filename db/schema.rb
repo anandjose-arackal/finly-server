@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170821103554) do
+ActiveRecord::Schema.define(version: 20170823094653) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -393,6 +393,43 @@ ActiveRecord::Schema.define(version: 20170821103554) do
   end
 
   add_index "bank_accounts", ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id", using: :btree
+
+  create_table "bank_payment_request_comment_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "bank_payment_request_comments", force: :cascade do |t|
+    t.text     "content",    limit: 65535
+    t.integer  "action_id",  limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "bank_payment_request_comments", ["action_id"], name: "index_bank_payment_request_comments_on_action_id", using: :btree
+
+  create_table "bank_payment_request_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "bank_payment_requests", force: :cascade do |t|
+    t.integer  "owner_id",            limit: 4
+    t.integer  "status_id",           limit: 4
+    t.integer  "controlling_user_id", limit: 4
+    t.integer  "payment_order_id",    limit: 4
+    t.string   "name",                limit: 255
+    t.integer  "requested_amount_id", limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
+  add_index "bank_payment_requests", ["owner_id"], name: "index_bank_payment_requests_on_owner_id", using: :btree
+  add_index "bank_payment_requests", ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id", using: :btree
+  add_index "bank_payment_requests", ["status_id"], name: "index_bank_payment_requests_on_status_id", using: :btree
 
   create_table "bank_transactions", force: :cascade do |t|
     t.string   "unique_request_number",       limit: 255
@@ -2034,6 +2071,49 @@ ActiveRecord::Schema.define(version: 20170821103554) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "payment_order_approval_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "payment_order_attachment_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "payment_order_attachments", force: :cascade do |t|
+    t.integer  "attachment_type_id",         limit: 4
+    t.string   "attached_file_file_name",    limit: 255
+    t.string   "attached_file_content_type", limit: 255
+    t.integer  "attached_file_file_size",    limit: 4
+    t.datetime "attached_file_updated_at"
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+  end
+
+  add_index "payment_order_attachments", ["attachment_type_id"], name: "index_payment_order_attachments_on_attachment_type_id", using: :btree
+
+  create_table "payment_order_comment_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "payment_order_comments", force: :cascade do |t|
+    t.text     "content",          limit: 65535
+    t.integer  "user_id",          limit: 4
+    t.integer  "action_id",        limit: 4
+    t.integer  "payment_order_id", limit: 4
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "payment_order_comments", ["action_id"], name: "index_payment_order_comments_on_action_id", using: :btree
+  add_index "payment_order_comments", ["payment_order_id"], name: "index_payment_order_comments_on_payment_order_id", using: :btree
+  add_index "payment_order_comments", ["user_id"], name: "index_payment_order_comments_on_user_id", using: :btree
+
   create_table "payment_order_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -3105,6 +3185,8 @@ ActiveRecord::Schema.define(version: 20170821103554) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "payment_order_comments", "payment_orders"
+  add_foreign_key "payment_order_comments", "users"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
   add_foreign_key "payments", "amounts"

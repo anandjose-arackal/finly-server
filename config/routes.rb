@@ -340,6 +340,7 @@
 #                                                         DELETE /api/fm/v1/cards/:id(.:format)                                                  api/fm/v1/cards#destroy
 #                                  api_fm_v1_funds_credit POST   /api/fm/v1/funds/credit(.:format)                                               api/fm/v1/funds#credit
 #                                   api_fm_v1_funds_debit POST   /api/fm/v1/funds/debit(.:format)                                                api/fm/v1/funds#debit
+#                                desktop_v1_desktop_users POST   /desktop/v1/desktop_users(.:format)                                             desktop/v1/desktop_users#create
 #                 transcriber_transcribed_expenses_create POST   /transcriber/expenses/create(.:format)                                          transcriber/receipts#create_expense
 #                 transcriber_transcribed_expenses_update PATCH  /transcriber/expenses/:id/update(.:format)                                      transcriber/receipts#update_expense
 #                    transcriber_transcribed_receipt_show GET    /transcriber/expenses/:id/show(.:format)                                        transcriber/receipts#show
@@ -876,7 +877,7 @@
 #                                                         PATCH  /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#update
 #                                                         PUT    /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#update
 #                                                         DELETE /bank_transfer/vendors/:id(.:format)                                            bank_transfer/vendors#destroy
-#                        bank_transfer_bank_account_count GET    /bank_transfer/bank_accounts/:bank_account_id/count(.:format)                   bank_transfer/bank_accounts#count
+#                       bank_transfer_bank_accounts_count GET    /bank_transfer/bank_accounts/count(.:format)                                    bank_transfer/bank_accounts#count
 #                             bank_transfer_bank_accounts GET    /bank_transfer/bank_accounts(.:format)                                          bank_transfer/bank_accounts#index
 #                                                         POST   /bank_transfer/bank_accounts(.:format)                                          bank_transfer/bank_accounts#create
 #                          new_bank_transfer_bank_account GET    /bank_transfer/bank_accounts/new(.:format)                                      bank_transfer/bank_accounts#new
