@@ -17,7 +17,7 @@ end
 json.comments @result.comments do |comment|
   json.extract! comment, :id, :user_id, :money_request_id, :comment_action_id, :created_at
   json.content comment.generate
-  json.user_name comment.user.name rescue nil
+  json.user_name comment&.user&.name
 end
 json.policies @result.policies, :id, :name
 
