@@ -9,4 +9,9 @@
 #
 
 class BankPaymentRequestStatus < ActiveRecord::Base
+  include Seedable
+
+  def self.values
+    [:open, :submitted, :retracted, :rejected, :approved, :credited]
+  end
 end

@@ -2156,6 +2156,9 @@ Rails.application.routes.draw do
     get 'payment_orders/count', to: 'payment_orders#count'
     resources :payment_orders do
     end
+    resources :bank_payment_requests do
+      # in case we need anything
+    end
 
     get 'vendors/count', to: 'vendors#count'
     resources :vendors

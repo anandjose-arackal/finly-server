@@ -14,11 +14,7 @@
 #
 
 class BankPaymentRequest < ActiveRecord::Base
-  include Seedable
 
-  def self.values
-    [:open, :submitted, :retracted, :rejected, :approved, :credited]
-  end
 
   belongs_to :bank_payment_request_status
   belongs_to :payment_order

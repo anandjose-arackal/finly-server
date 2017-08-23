@@ -13,7 +13,9 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  policy_id              :integer          not null
+#  purpose_id             :integer
 #
+
 
 
 
@@ -31,6 +33,8 @@ class UserManagerMapping < ActiveRecord::Base
   belongs_to :approves_finance_to, class_name: 'User'
   belongs_to :greater_than_amount, class_name: 'Amount'
   belongs_to :policy
+  belongs_to :purpose, class_name: "MappingPurpose"
+
   accepts_nested_attributes_for :greater_than_amount
 
   delegate :greater_than_amount_value, to: :greater_than_amount
