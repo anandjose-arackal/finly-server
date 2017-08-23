@@ -10,4 +10,6 @@
 #
 
 class BankPaymentRequestComment < ActiveRecord::Base
+
+  belongs_to :action, class_name: "BankPaymentRequestCommentAction"
 end

@@ -59,6 +59,7 @@ class PaymentOrder < ActiveRecord::Base
   belongs_to :currency
 
   has_many :payments, dependent: :destroy
+  has_many :payment_order_attachments, dependent: :destroy
 
   has_attached_file :payment_file, default_url: '/images/:style/missing.png'
   validates_attachment_content_type :payment_file,
@@ -73,6 +74,7 @@ class PaymentOrder < ActiveRecord::Base
   accepts_nested_attributes_for :amount_requested
   accepts_nested_attributes_for :amount_processed
   accepts_nested_attributes_for :payments
+  accepts_nested_attributes_for :payment_order_attachments
 
   scope :with_purpose_id, -> (id) { where payment_purpose_id: id }
   scope :without_purpose_id, -> (id) { where.not payment_purpose_id: id }

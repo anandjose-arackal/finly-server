@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170823094653) do
+ActiveRecord::Schema.define(version: 20170823100250) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2077,20 +2077,16 @@ ActiveRecord::Schema.define(version: 20170823094653) do
     t.datetime "updated_at",             null: false
   end
 
-  create_table "payment_order_attachment_types", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
   create_table "payment_order_attachments", force: :cascade do |t|
     t.integer  "attachment_type_id",         limit: 4
     t.string   "attached_file_file_name",    limit: 255
     t.string   "attached_file_content_type", limit: 255
     t.integer  "attached_file_file_size",    limit: 4
     t.datetime "attached_file_updated_at"
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+    t.integer  "payment_order_id",           limit: 4
+    t.text     "description",                limit: 65535
   end
 
   add_index "payment_order_attachments", ["attachment_type_id"], name: "index_payment_order_attachments_on_attachment_type_id", using: :btree
