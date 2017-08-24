@@ -378,6 +378,8 @@ class User < ActiveRecord::Base
     with_id group_user_ids
   end
 
+  before_save :strip_whitespace
+
   after_create do
     # self.build_profile.save if self.profile.blank?
     default_policy_id = self.company.default_policy.id
@@ -393,6 +395,11 @@ class User < ActiveRecord::Base
     # creating the cash on hand account for this user
     self.build_cash_on_hand(balance_attributes: {value: 0, currency_id: Currency.id_for(:INR)}).save
     self.build_bank_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+  end
+
+  def strip_whitespace
+    self.first_name = self.first_name.strip unless self.first_name.nil?
+    self.last_name = self.last_name.strip unless self.last_name.nil?
   end
 
   def payments
