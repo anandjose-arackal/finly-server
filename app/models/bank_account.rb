@@ -41,6 +41,9 @@ class BankAccount < ActiveRecord::Base
   scope :with_owner_id, -> (owner_id) {
     where account_owner_id: owner_id
   }
+  scope :with_company, -> (company_id) {
+    where company_id: company_id
+  }
 
   scope :with_owner_ids, -> (type, ids) {
     case type

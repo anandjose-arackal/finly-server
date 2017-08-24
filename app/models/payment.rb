@@ -30,6 +30,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -61,6 +62,8 @@ class Payment < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :payment_order
+  accepts_nested_attributes_for :receiving_account
+
   delegate :amount_value, to: :amount
 
   default_scope { order date: :desc, created_at: :desc }

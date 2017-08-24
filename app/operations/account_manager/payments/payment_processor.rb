@@ -29,8 +29,13 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     self.company = Company.find_by(id: company_id)
     self.options = {}
     self.options[:bank_transfer_type] = params[:bank_transfer_type]
-    # creating the payment order first to check for violations and shit
-    self.payment_order = company.payment_orders.build(payment_order_params)
+    # creating the payment order first to check for violations and shit - if it already exists
+    # just use the existing payment order object - which would have been approved and
+    # checked appropriately
+    self.payment_order = params[:payment_order]
+    if payment_order.blank?
+      self.payment_order = company.payment_orders.build(payment_order_params)
+    end
 
     unless payment_order.valid?
       add_message :error, payment_order.errors.full_messages

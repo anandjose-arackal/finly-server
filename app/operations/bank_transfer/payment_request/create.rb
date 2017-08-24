@@ -128,6 +128,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     p[:payment_order_attributes][:payment_purpose_id] = PaymentPurpose.id_for(:vendor_payment)
     p[:payment_order_attributes][:payments_attributes] = []
     p[:payment_order_attributes][:appplication] = RequestStore.store[:current_app]
+    p[:payment_order_attributes][:description] = params[:description]
     payment_order_data.each do |order_details|
       bank_account = retrieve_bank_account order_details
       p[:payment_order_attributes][:payments_attributes] << {

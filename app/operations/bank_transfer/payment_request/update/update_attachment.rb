@@ -1,15 +1,13 @@
 class BankTransfer::PaymentRequest::Update::UpdateAttachment < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :payment_request, :payment_order, :attachment_params
+  attr_accessor :attachment_params
 
   def pre_validate
 
   end
 
   def init
-    id = params[:id] || params[:bank_payment_request_id]
-    self.payment_request = BankPaymentRequest.find_by(id: id)
-    self.payment_order = payment_request.payment_order
+    super
     self.attachment_params = request_params
   end
 

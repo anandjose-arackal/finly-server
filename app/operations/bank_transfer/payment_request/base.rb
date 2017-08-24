@@ -1,4 +1,4 @@
-class BankTransfer::PaymentReuqest::Base < BaseOperation
+class BankTransfer::PaymentRequest::Base < BaseOperation
 
   def retrieve_initiating_account
     if user.company_admin?
