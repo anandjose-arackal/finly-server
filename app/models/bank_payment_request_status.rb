@@ -14,4 +14,28 @@ class BankPaymentRequestStatus < ActiveRecord::Base
   def self.values
     [:open, :submitted, :retracted, :rejected, :approved, :credited]
   end
+
+  def open?
+    self.id == BankPaymentRequestStatus.id_for(:open)
+  end
+
+  def retracted?
+    self.id == BankPaymentRequestStatus.id_for(:retracted)
+  end
+
+  def submitted?
+    self.id == BankPaymentRequestStatus.id_for(:submitted)
+  end
+
+  def rejected?
+    self.id == BankPaymentRequestStatus.id_for(:rejected)
+  end
+
+  def approved?
+    self.id == BankPaymentRequestStatus.id_for(:approved)
+  end
+
+  def credited?
+    self.id == BankPaymentRequestStatus.id_for(:credited)
+  end
 end

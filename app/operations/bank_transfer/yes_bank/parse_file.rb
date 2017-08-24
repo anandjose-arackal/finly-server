@@ -27,7 +27,6 @@ class BankTransfer::YesBank::ParseFile < BankTransfer::YesBank::Base
   def process
     params[:payment_order] = self.parsed_data
     self.response_presenter = BankTransfer::YesBank::Process.(user, params)
-    debugger
   end
 
   def success

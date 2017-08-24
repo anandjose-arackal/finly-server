@@ -16,7 +16,7 @@
 class BankPaymentRequest < ActiveRecord::Base
 
 
-  belongs_to :bank_payment_request_status
+  belongs_to :status, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order
   belongs_to :requested_amount, class_name: "Amount"
 
@@ -24,4 +24,6 @@ class BankPaymentRequest < ActiveRecord::Base
 
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :requested_amount
+
+  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, to: :status
 end
