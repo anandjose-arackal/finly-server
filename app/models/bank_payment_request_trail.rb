@@ -21,5 +21,4 @@ class BankPaymentRequestTrail < ActiveRecord::Base
   belongs_to :action_user_role, class_name: "UserRole"
   belongs_to :modified_user_role, class_name: "UserRole"
   belongs_to :action, class_name: "BankPaymentRequestTrailAction"
-
 end

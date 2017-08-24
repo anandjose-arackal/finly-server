@@ -1,5 +1,7 @@
 # when the data reaches this state, all payments will be valid and passing the respective
 # basic presence validations
+# this operation should also decide if the payment request can be processed directly from the
+# owner's Finly Credits - because if so, it can directly be passed to the payment processor
 class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   attr_accessor :order_data, :payment_request, :payment_order, :scheduled_at,
                 :processed_order_data, :initiating_account, :request_params,
@@ -62,6 +64,9 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   end
 
   def process
+    # checks if the user has enough balance to initiate the payment themselves,
+    # and pass it to the payment processor if they do
+    # todo - by pass the approval workflow
     # this should now create a BankPaymentRequest and save it in the DB
     self.bank_payment_request = BankPaymentRequest.new(request_params)
     unless bank_payment_request.save
