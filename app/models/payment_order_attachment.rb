@@ -3,7 +3,6 @@
 # Table name: payment_order_attachments
 #
 #  id                         :integer          not null, primary key
-#  attachment_type_id         :integer
 #  attached_file_file_name    :string(255)
 #  attached_file_content_type :string(255)
 #  attached_file_file_size    :integer

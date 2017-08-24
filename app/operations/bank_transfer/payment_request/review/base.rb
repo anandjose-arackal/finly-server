@@ -2,6 +2,13 @@ class BankTransfer::PaymentRequest::Review::Base < BaseOperation
 
   attr_accessor :bank_payment_request
 
+  def pre_validate
+    if user.blank? || params.blank?
+      add_message :error, "Invalid parameters, try again"
+      return
+    end
+  end
+
   def init
     id = params[:id] || params[:bank_payment_request_id]
     self.bank_payment_request = BankPaymentRequest.find_by(id: id)
