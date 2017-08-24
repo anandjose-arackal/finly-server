@@ -18,6 +18,10 @@ class BankPaymentRequest < ActiveRecord::Base
 
   belongs_to :bank_payment_request_status
   belongs_to :payment_order
+  belongs_to :requested_amount, class_name: "Amount"
 
   has_many :bank_payment_request_comments
+
+  accepts_nested_attributes_for :payment_order
+  accepts_nested_attributes_for :requested_amount
 end
