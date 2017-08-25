@@ -16,6 +16,7 @@
 !/log/.keep
 /tmp
 /public/system/receipts/*
+/public/system/receipt_emails/*
 /public/system/company_configurations/*
 /public/system/company_kycs/*
 /public/system/individual_kycs/*
