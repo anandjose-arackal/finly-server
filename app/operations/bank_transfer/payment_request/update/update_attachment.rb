@@ -1,4 +1,4 @@
-class BankTransfer::PaymentRequest::Update::UpdateAttachment < BankTransfer::PaymentRequest::Base
+class BankTransfer::PaymentRequest::Update::UpdateAttachment < BankTransfer::PaymentRequest::Update::Base
 
   attr_accessor :attachment_params
 
@@ -28,3 +28,4 @@ class BankTransfer::PaymentRequest::Update::UpdateAttachment < BankTransfer::Pay
     params.require(:bank_payment_request).permit(:attached_file, :description)
   end
 end
+

@@ -1,28 +1,33 @@
 # this operation will update details like scheduled on, description, bank transfer type etc.
 # about the payment order, which is independent of the payment items
 
-class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::PaymentRequest::Base
+class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::PaymentRequest::Update::Base
 
-  attr_accessor :summary_params
+  attr_accessor :payment_order_params, :payment_request_params
 
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
       return
     end
-    if params[:bank_transfer_request].blank?
+    if params[:bank_payment_request].blank?
       add_message :error, "Invalid parameters, try again"
     end
   end
 
   def init
     super
-    self.summary_params = order_summary_params
+    self.payment_order_params = order_params
+    self.payment_request_params = request_params
   end
 
   def process
-    unless payment_order.update(summary_params)
+    unless payment_order.update(order_params)
       add_message :error, payment_order.errors.full_messages
+      return
+    end
+    unless payment_request.update(request_params)
+      add_message :error, payment_request.errors.full_messages
     end
   end
 
@@ -32,18 +37,22 @@ class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::Paymen
 
   private
 
-  def order_summary_params
+  def order_params
     p = {}
-    p = params.require(:bank_transfer_request).permit(:scheduled_at, :description)
+    p = params.require(:bank_payment_request).permit(:scheduled_at)
     p[:payments_attributes] = []
-    if params[:bank_transfer_request][:bank_transfer_type].present?
+    if params[:bank_payment_request][:bank_transfer_type].present?
       payment_order.payments.each do |payment|
         p[:payments_attributes] << {
             id: payment.id,
-            payment_mode: params[:bank_transfer_request][:bank_transfer_type]
+            payment_mode: params[:bank_payment_request][:bank_transfer_type]
         }
       end
     end
-    p
+    p.permit!
+  end
+
+  def request_params
+    params.require(:bank_payment_request).permit(:description)
   end
 end

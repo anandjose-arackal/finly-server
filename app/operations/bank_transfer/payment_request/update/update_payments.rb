@@ -1,4 +1,4 @@
-class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::PaymentRequest::Base
+class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::PaymentRequest::Update::Base
 
   attr_accessor :order_params
 

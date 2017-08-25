@@ -58,6 +58,7 @@ class PaymentOrder < ActiveRecord::Base
   belongs_to :initiating_user, class_name: 'User'
   belongs_to :currency
 
+  has_one :bank_payment_request
   has_many :payments, dependent: :destroy
   has_many :payment_order_attachments, dependent: :destroy
 
@@ -116,6 +117,7 @@ class PaymentOrder < ActiveRecord::Base
 
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
   delegate :amount_requested_value, to: :amount_requested
+  delegate :amount_processed_value, to: :amount_processed
 
   # Avoid showing orders created for ATM withdrawals and Personal Expenses
   default_scope { order(created_at: :desc).without_purpose_id(PaymentPurpose.ids_for([:personal_expense, :atm_withdrawal])) }

@@ -15,6 +15,7 @@
 #
 
 class PaymentOrderAttachment < ActiveRecord::Base
+  include Attachable
 
   belongs_to :payment_order
 

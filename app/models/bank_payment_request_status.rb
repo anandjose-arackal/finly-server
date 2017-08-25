@@ -12,11 +12,15 @@ class BankPaymentRequestStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:open, :submitted, :retracted, :rejected, :approved, :unapprove, :credited]
+    [:open, :processing, :submitted, :retracted, :rejected, :approved, :unapprove, :credited]
   end
 
   def open?
     self.id == BankPaymentRequestStatus.id_for(:open)
+  end
+
+  def processing?
+    self.id == BankPaymentRequestStatus.id_for(:processing)
   end
 
   def retracted?

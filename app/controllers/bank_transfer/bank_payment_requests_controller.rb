@@ -64,20 +64,21 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     operation = nil
     # success_message = nil
     case type
-      when 1
+      when 1, '1'
         # i.e. update of summary
         operation = BankTransfer::PaymentRequest::Update::UpdateSummary.new(current_user, params)
-      when 2
+      when 2, '2'
         # i.e. update of payment items
         operation = BankTransfer::PaymentRequest::Update::UpdatePayments.new(current_user, params)
-      when 3
+      when 3, '3'
         # i.e. update of attachments
         operation = BankTransfer::PaymentRequest::Update::UpdateAttachment.new(current_user, params)
       else
         # do nothing?
     end
-    unless operation.present?
+    if operation.blank?
       respond response: :failure, message: "Invalid update type"
+      return
     end
     @result = operation.run
     if @result.success?
