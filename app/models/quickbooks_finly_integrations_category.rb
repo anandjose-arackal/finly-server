@@ -25,8 +25,11 @@ class QuickbooksFinlyIntegrationsCategory
         if finly_integrations_category&.present?
           if finly_integrations_category.is_a?(QuickbooksCategory)
             category_params = {category_attributes: {}}
+            if finly_integrations_category.category.present?
+              category_params[:category_attributes][:id] = finly_integrations_category.category.id
+            end
             category_params[:category_attributes][:company_id] = self.company_id
-            category_params[:category_attributes][:name] = self.name
+            category_params[:category_attributes][:name] = additional_information_json["fully_qualified_name"] # todo - change this to fully qualified name
             category_params[:quickbooks_updated_at] = self.quickbooks_updated_at
             category_params[:category_attributes][:active] = self.active
             category_params[:quickbooks_additional_information] = self.quickbooks_additional_information

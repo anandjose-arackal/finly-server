@@ -14,14 +14,23 @@ class Integrations::Quickbooks::Authentication::Create < BaseOperation
   end
 
   def process
-    if user_auth
-      unless user_auth.update(uid: auth[:uid], token: auth[:credentials][:token], secret: auth[:credentials][:secret], expires_at: 180.days.from_now)
-        add_message :error, user_auth.errors.full_messages
+    # adding this authentication for all finance managers and admins in the company so that anyone can sync reports with quickbooks
+    finance_managers = user.company.users.only_finance_managers
+    finance_managers.each do |fm|
+      auth_obj = fm.authentications.with_provider(auth[:provider]).first
+      if auth_obj.present?
+        auth_obj.update(uid: auth[:uid], token: auth[:credentials][:token], secret: auth[:credentials][:secret], expires_at: 180.days.from_now)
+      else
+        fm.authentications.build(provider: auth[:provider], uid: auth[:uid], token: auth[:credentials][:token], secret: auth[:credentials][:secret], expires_at: 180.days.from_now).save
       end
-    else
-      user_auth = user.authentications.build(provider: auth[:provider], uid: auth[:uid], token: auth[:credentials][:token], secret: auth[:credentials][:secret], expires_at: 180.days.from_now)
-      unless user_auth.save
-        add_message :error, user_auth.errors.full_messages
+    end
+    admins = user.company.users.only_admins
+    admins.each do |admin|
+      auth_obj = admin.authentications.with_provider(auth[:provider])
+      if auth_obj.present?
+        auth_obj.update(uid: auth[:uid], token: auth[:credentials][:token], secret: auth[:credentials][:secret], expires_at: 180.days.from_now)
+      else
+        admin.authentications.build(provider: auth[:provider], uid: auth[:uid], token: auth[:credentials][:token], secret: auth[:credentials][:secret], expires_at: 180.days.from_now).save
       end
     end
   end
