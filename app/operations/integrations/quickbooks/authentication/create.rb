@@ -26,7 +26,7 @@ class Integrations::Quickbooks::Authentication::Create < BaseOperation
     end
     admins = user.company.users.only_admins
     admins.each do |admin|
-      auth_obj = admin.authentications.with_provider(auth[:provider])
+      auth_obj = admin.authentications.with_provider(auth[:provider]).first
       if auth_obj.present?
         auth_obj.update(uid: auth[:uid], token: auth[:credentials][:token], secret: auth[:credentials][:secret], expires_at: 180.days.from_now)
       else
