@@ -84,30 +84,30 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   end
 
   def success
-    params[:payment_order] = self.payment_order
+    params[:bank_payment_request] = self.bank_payment_request
     BankTransfer::PaymentRequest::Create::SuccessPresenter.new(user, params, messages)
   end
 
   def failure
-    params[:payment_order] = self.payment_order
+    params[:bank_payment_request] = self.bank_payment_request
     BankTransfer::PaymentRequest::Create::FailurePresenter.new(user, params, messages)
   end
 
   class BankTransfer::PaymentRequest::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :payment_order
+    attr_accessor :bank_payment_request
 
     def init
-      self.payment_order = params[:payment_order]
+      self.bank_payment_request = params[:bank_payment_request]
     end
 
   end
 
   class BankTransfer::PaymentRequest::Create::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
-    attr_accessor :payment_order
+    attr_accessor :bank_payment_request
 
     def init
-      self.payment_order = params[:payment_order]
+      self.bank_payment_request = params[:bank_payment_request]
     end
 
   end
