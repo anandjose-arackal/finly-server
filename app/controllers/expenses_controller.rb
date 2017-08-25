@@ -5,7 +5,11 @@ class ExpensesController < ApplicationController
   def create
     case params[:type]
       when '1'
-        @result = Expense::Manual::Create.(current_user, params)
+        if params[:split]
+          @result = Expense::Manual::Split.(current_user, params)
+        else
+          @result = Expense::Manual::Create.(current_user, params)
+        end
       when '3'
         @result = Expense::ExDistance::Create.(current_user, params)
       when '4'
