@@ -54,6 +54,15 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def review
+    review_handler(params[:type])
+  end
+
+  def comment
+    @result = BankTransfer::PaymentRequest::Comment::Create.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type)
@@ -75,6 +84,37 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
         operation = BankTransfer::PaymentRequest::Update::UpdateAttachment.new(current_user, params)
       else
         # do nothing?
+    end
+    if operation.blank?
+      respond response: :failure, message: "Invalid update type"
+      return
+    end
+    @result = operation.run
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error] || 'Error while updating details'
+    end
+  end
+
+  def review_handler(type)
+    unless type.present?
+      respond response: :failure, message: "Invalid request"
+      return
+    end
+    operation = nil
+    # todo - add operations here based on type
+    case type
+      when 1, '1'
+        # i.e. approve
+      when 2, '2'
+        # i.e. submit
+      when 3, '3'
+        # i.e. retract
+      when 4, '4'
+        # i.e. reject
+      when 5, '5'
+        # i.e. unapprove
     end
     if operation.blank?
       respond response: :failure, message: "Invalid update type"

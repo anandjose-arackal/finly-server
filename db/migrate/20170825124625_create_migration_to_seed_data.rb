@@ -4,5 +4,6 @@ class CreateMigrationToSeedData < ActiveRecord::Migration
     BankPaymentRequestTrailAction.seed_data
     PaymentOrderStatus.seed_data
     PaymentStatus.seed_data
+    BankPaymentRequestCommentAction.seed_data
   end
 end

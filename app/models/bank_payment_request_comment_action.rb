@@ -9,4 +9,9 @@
 #
 
 class BankPaymentRequestCommentAction < ActiveRecord::Base
+  include Seedable
+
+  def self.values
+    [:submit, :approve, :unapprove, :retract, :reject, :credit, :comment]
+  end
 end

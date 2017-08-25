@@ -29,3 +29,11 @@ json.attachments do
     json.description attachment.description
   end
 end
+
+json.comments do
+  json.array!(@result.bank_payment_request.bank_payment_request_comments) do |comment|
+    json.content comment.retrieve_content
+  end
+end
+
+json.actions @result.actions

@@ -6,7 +6,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
   def init
     id = params[:id] || params[:payment_request_id]
-    # todo - implement the velow index operation to determine who can be in the list of people with access to the payment request
+    # todo - implement the below index operation to determine who can be in the list of people with access to the payment request
     # self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
     self.bank_payment_request = BankPaymentRequest.find_by(id: id)
   end
@@ -29,11 +29,22 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
   class BankTransfer::PaymentRequest::Show::RequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :bank_payment_request, :payment_order
+    attr_accessor :bank_payment_request, :payment_order, :actions
 
     def init
       self.bank_payment_request = params[:payment_request]
       self.payment_order = bank_payment_request.payment_order
+      self.actions = retrieve_actions
+    end
+
+    def retrieve_actions
+      {
+          editable: true,
+          submit: {
+              method: "patch",
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)
+          }
+      }
     end
   end
 end

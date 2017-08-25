@@ -868,6 +868,8 @@
 #          bank_transfer_payment_requests_account_details POST   /bank_transfer/payment_requests/account_details(.:format)                       bank_transfer/bank_payment_requests#account_details
 #      bank_transfer_payment_requests_process_account_ids POST   /bank_transfer/payment_requests/process_account_ids(.:format)                   bank_transfer/bank_payment_requests#process_account_ids
 #           bank_transfer_payment_requests_update_details PATCH  /bank_transfer/payment_requests/update_details(.:format)                        bank_transfer/bank_payment_requests#update_details
+#              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format) bank_transfer/bank_payment_requests#comment
+#               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)  bank_transfer/bank_payment_requests#review
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                  bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                  bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                              bank_transfer/bank_payment_requests#new
@@ -2166,7 +2168,8 @@ Rails.application.routes.draw do
     post 'payment_requests/process_account_ids', to: 'bank_payment_requests#process_account_ids'
     patch 'payment_requests/update_details', to: 'bank_payment_requests#update_details'
     resources :bank_payment_requests do
-
+      post 'comment', to: 'bank_payment_requests#comment', as: :comment
+      patch 'review', to: 'bank_payment_requests#review', as: :review
     end
 
     get 'vendors/count', to: 'vendors#count'
