@@ -13,6 +13,7 @@
 #  updated_at               :datetime         not null
 #  submitted_at             :datetime
 #  controlling_user_role_id :integer
+#  description              :text(65535)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

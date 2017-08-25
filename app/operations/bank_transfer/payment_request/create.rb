@@ -5,7 +5,7 @@
 class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   attr_accessor :order_data, :payment_request, :payment_order, :scheduled_at,
                 :processed_order_data, :initiating_account, :request_params,
-                :company_id, :bank_payment_request
+                :company_id, :bank_payment_request, :requested_amount
 
   def pre_validate
     super
@@ -18,14 +18,14 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       add_message :error, 'Error loading request'
       return
     end
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate the transfer'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-      return
-    end
+    # if params[:password].blank?
+    #   add_message :error, 'You need to provide your password to initiate the transfer'
+    #   return
+    # end
+    # unless user.valid_password?(params[:password])
+    #   add_message :error, 'Invalid Password'
+    #   return
+    # end
   end
 
   def init
@@ -33,6 +33,12 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     op = BankTransfer::PaymentRequest::Process.(user, scheduled_at: params[:scheduled_at],
         payment_order: self.order_data)
     self.processed_order_data = op.payment_order_data
+
+    # calculating the requested amount here
+    self.requested_amount = 0
+    processed_order_data.each do |details|
+      self.requested_amount += details[:amount]&.to_f
+    end
 
     # setting the initiating account based on the type of user creating the
     # request as well as the option chosen by the admin
@@ -64,9 +70,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   end
 
   def process
-    # checks if the user has enough balance to initiate the payment themselves,
-    # and pass it to the payment processor if they do
-    # todo - by pass the approval workflow
+    # if the user has enough balance for the transaction themselves, the request will get auto approved
+    # and credited to the respective bank accounts
     # this should now create a BankPaymentRequest and save it in the DB
     self.bank_payment_request = BankPaymentRequest.new(request_params)
     unless bank_payment_request.save
@@ -97,7 +102,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
   end
 
-  class BankTransfer::YesBank::Create::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
+  class BankTransfer::PaymentRequest::Create::FailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
     attr_accessor :payment_order
 
@@ -114,27 +119,27 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     p[:owner_id] = user.id
     p[:status_id] = BankPaymentRequestStatus.id_for(:open)
     p[:controlling_user_id] = user.id
-    # todo - need to ask Abi to provide this info in the request
     p[:requested_amount_attributes] = {
-        value: params[:requested_amount],
+        value: self.requested_amount,
         currency_id: Currency.first.id
     }
     p[:name] = "#{user.name}'s payment request"
+    p[:description] = params[:description]
     p[:payment_order_attributes] = {}
     p[:payment_order_attributes][:initiating_user] = user
     p[:payment_order_attributes][:payment_order_status_id] = PaymentOrderStatus.id_for(:pending_approval)
     p[:payment_order_attributes][:company_id] = self.company_id
     p[:payment_order_attributes][:amount_requested_attributes] = {
-        value: params[:requested_amount],
+        value: self.requested_amount,
         currency_id: Currency.first.id
     }
     p[:payment_order_attributes][:initiating_account_type] = initiating_account.class.name
     p[:payment_order_attributes][:receiving_account_type] = BankAccount.name
     p[:payment_order_attributes][:payment_purpose_id] = PaymentPurpose.id_for(:vendor_payment)
     p[:payment_order_attributes][:payments_attributes] = []
-    p[:payment_order_attributes][:appplication] = RequestStore.store[:current_app]
-    p[:payment_order_attributes][:description] = params[:description]
-    payment_order_data.each do |order_details|
+    p[:payment_order_attributes][:application] = RequestStore.store[:current_app]
+    p[:payment_order_attributes][:currency_id] = Currency.first.id
+    processed_order_data.each do |order_details|
       bank_account = retrieve_bank_account order_details
       p[:payment_order_attributes][:payments_attributes] << {
           payment_type_id: PaymentType.id_for(:credit),
@@ -157,6 +162,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
           date: DateUtils.local_date,
       }
     end
+    p
   end
 
   def retrieve_bank_account(order_details)

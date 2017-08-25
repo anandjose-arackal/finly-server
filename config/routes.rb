@@ -855,6 +855,7 @@
 #                                                         PUT    /payments/companies/:id(.:format)                                               companies#update
 #                                                         DELETE /payments/companies/:id(.:format)                                               companies#destroy
 #                      bank_transfer_payment_orders_count GET    /bank_transfer/payment_orders/count(.:format)                                   bank_transfer/payment_orders#count
+#                    bank_transfer_payment_orders_balance GET    /bank_transfer/payment_orders/balance(.:format)                                 bank_transfer/payment_orders#balance
 #                            bank_transfer_payment_orders GET    /bank_transfer/payment_orders(.:format)                                         bank_transfer/payment_orders#index
 #                                                         POST   /bank_transfer/payment_orders(.:format)                                         bank_transfer/payment_orders#create
 #                         new_bank_transfer_payment_order GET    /bank_transfer/payment_orders/new(.:format)                                     bank_transfer/payment_orders#new
@@ -864,7 +865,6 @@
 #                                                         PUT    /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#update
 #                                                         DELETE /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#destroy
 #             bank_transfer_payment_requests_process_file POST   /bank_transfer/payment_requests/process_file(.:format)                          bank_transfer/bank_payment_requests#process_file
-#                  bank_transfer_payment_requests_balance GET    /bank_transfer/payment_requests/balance(.:format)                               bank_transfer/bank_payment_requests#balance
 #          bank_transfer_payment_requests_account_details POST   /bank_transfer/payment_requests/account_details(.:format)                       bank_transfer/bank_payment_requests#account_details
 #      bank_transfer_payment_requests_process_account_ids POST   /bank_transfer/payment_requests/process_account_ids(.:format)                   bank_transfer/bank_payment_requests#process_account_ids
 #           bank_transfer_payment_requests_update_details PATCH  /bank_transfer/payment_requests/update_details(.:format)                        bank_transfer/bank_payment_requests#update_details
@@ -2157,12 +2157,11 @@ Rails.application.routes.draw do
   end
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
+    get 'payment_orders/balance', to: 'payment_orders#balance'
     resources :payment_orders do
 
     end
-
     post 'payment_requests/process_file', to: 'bank_payment_requests#process_file'
-    get 'payment_requests/balance', to: 'bank_payment_requests#balance'
     post 'payment_requests/account_details', to: 'bank_payment_requests#account_details'
     post 'payment_requests/process_account_ids', to: 'bank_payment_requests#process_account_ids'
     patch 'payment_requests/update_details', to: 'bank_payment_requests#update_details'
