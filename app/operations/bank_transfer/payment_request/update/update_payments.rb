@@ -29,7 +29,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
 
   def payment_order_params
     p = {}
-    p = params.require(:payment_order).permit(payments_attributes: [:bank_account_number, :ifsc, :amount, :name, :id])
+    p = params.require(:bank_payment_request).permit(payments_attributes: [:bank_account_number, :ifsc, :amount, :name, :id])
     p[:payments_attributes].each do |account_details|
       bank_account = BankAccount.with_company(user.company_id).find_by(account_number: account_details[:bank_account_number])
       vendor = bank_account&.account_owner || YesBankVendor.find_or_create_by(name: account_details[:name], company_id: user.company_id)

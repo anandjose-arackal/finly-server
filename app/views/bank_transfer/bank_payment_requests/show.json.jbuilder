@@ -19,6 +19,7 @@ json.payments do
     json.ifsc payment.receiving_account.ifsc
     json.amount payment.amount_value
     json.status payment.payment_status.name
+    json.id payment.id
   end
 end
 
