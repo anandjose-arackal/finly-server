@@ -15,7 +15,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
-  def parse_file
+  def process_file
     @result = BankTransfer::PaymentRequest::ParseFile.(current_user, params)
     respond
   end
@@ -27,6 +27,34 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def update
     update_handler(params[:type])
+  end
+
+  def process_account_ids
+    @result = BankTransfer::PaymentRequest::ProcessFromAccountIds.(current_user, params)
+    if @result&.success?
+      render 'process_file'
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def account_details
+    @result = BankTransfer::PaymentRequest::AccountDetails.(current_user, params)
+    respond
+  end
+
+  def destroy
+    @result = BankTransfer::PaymentRequest::Destroy.(current_user, params)
+    if @result.success?
+      respond response: :success, message: "Payment order successfully deleted"
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def update_details
+    @result = BankTransfer::PaymentRequest::Update.(current_user, params)
+    respond
   end
 
   private
@@ -44,7 +72,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
         operation = BankTransfer::PaymentRequest::Update::UpdateSummary.new(current_user, params)
       when 2
         # i.e. update of payment items
-        operation = operation = BankTransfer::PaymentRequest::Update::UpdatePayments.new(current_user, params)
+        operation = BankTransfer::PaymentRequest::Update::UpdatePayments.new(current_user, params)
       when 3
         # i.e. update of attachments
         operation = BankTransfer::PaymentRequest::Update::UpdateAttachment.new(current_user, params)
