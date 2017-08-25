@@ -178,6 +178,8 @@ json.wallet do
   json.balance @result.wallet.balance_value
 end
 
+json.cash_on_hand @result.cash_on_hand
+
 json.auto_submit_config do
   json.extract! @result.auto_submit_config, :enabled, :limit_to_card_expenses, :default_memo
   json.period do
