@@ -1,5 +1,7 @@
 class BankTransfer::BankPaymentRequestsController < ApplicationController
 
+  before_action {finly_authorize! :web}
+
   def show
     @result = BankTransfer::PaymentRequest::Show.(current_user, params)
     respond
@@ -17,11 +19,6 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def process_file
     @result = BankTransfer::PaymentRequest::ParseFile.(current_user, params)
-    respond
-  end
-
-  def process
-    @result = BankTransfer::PaymentRequest::Process.(current_user, params)
     respond
   end
 

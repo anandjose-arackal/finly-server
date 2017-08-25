@@ -2105,7 +2105,14 @@ ActiveRecord::Schema.define(version: 20170824225203) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "payment_order_approval_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "payment_order_attachments", force: :cascade do |t|
+    t.integer  "attachment_type_id",         limit: 4
     t.string   "attached_file_file_name",    limit: 255
     t.string   "attached_file_content_type", limit: 255
     t.integer  "attached_file_file_size",    limit: 4
@@ -2115,6 +2122,27 @@ ActiveRecord::Schema.define(version: 20170824225203) do
     t.integer  "payment_order_id",           limit: 4
     t.text     "description",                limit: 65535
   end
+
+  add_index "payment_order_attachments", ["attachment_type_id"], name: "index_payment_order_attachments_on_attachment_type_id", using: :btree
+
+  create_table "payment_order_comment_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "payment_order_comments", force: :cascade do |t|
+    t.text     "content",          limit: 65535
+    t.integer  "user_id",          limit: 4
+    t.integer  "action_id",        limit: 4
+    t.integer  "payment_order_id", limit: 4
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "payment_order_comments", ["action_id"], name: "index_payment_order_comments_on_action_id", using: :btree
+  add_index "payment_order_comments", ["payment_order_id"], name: "index_payment_order_comments_on_payment_order_id", using: :btree
+  add_index "payment_order_comments", ["user_id"], name: "index_payment_order_comments_on_user_id", using: :btree
 
   create_table "payment_order_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -3189,6 +3217,8 @@ ActiveRecord::Schema.define(version: 20170824225203) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "payment_order_comments", "payment_orders"
+  add_foreign_key "payment_order_comments", "users"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
   add_foreign_key "payments", "amounts"
