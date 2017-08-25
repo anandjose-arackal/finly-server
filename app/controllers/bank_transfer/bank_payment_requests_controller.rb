@@ -1,23 +1,28 @@
 class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def show
-
+    @result = BankTransfer::PaymentRequest::Show.(current_user, params)
+    respond
   end
 
   def create
-
+    @result = BankTransfer::PaymentRequest::Create.(current_user, params)
+    respond
   end
 
   def index
-
+    @result = BankTransfer::PaymentRequest::Index.(current_user, params)
+    respond
   end
 
   def parse_file
-
+    @result = BankTransfer::PaymentRequest::ParseFile.(current_user, params)
+    respond
   end
 
   def process
-
+    @result = BankTransfer::PaymentRequest::Process.(current_user, params)
+    respond
   end
 
   def update
