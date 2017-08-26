@@ -38,11 +38,21 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     end
 
     def retrieve_actions
+      actions = {}
+      if personal_view? && bank_payment_request.owner_id == user.id
+        editable = true
+      elsif bank_payment_request.controlling_user_id == user.id
+        editable = true
+      else
+        editable = false
+      end
+      # todo - logics for actions to be added
       {
-          editable: true,
+          editable: editable,
           submit: {
               method: "patch",
-              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
+              type: 2 # i.e. 2 is submit
           }
       }
     end
