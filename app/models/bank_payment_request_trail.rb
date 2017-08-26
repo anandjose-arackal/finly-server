@@ -21,4 +21,8 @@ class BankPaymentRequestTrail < ActiveRecord::Base
   belongs_to :action_user_role, class_name: "UserRole"
   belongs_to :modified_user_role, class_name: "UserRole"
   belongs_to :action, class_name: "BankPaymentRequestTrailAction"
+
+  scope :manager_role, -> { where('modified_user_role_id = ?', "#{UserRole.id_for(:manager)}") }
+  scope :finance_manager_role, -> { where('modified_user_role_id = ?', "#{UserRole.id_for(:finance_manager)}") }
+  scope :involving_user, -> (user_id) { where('modified_user_id = ? OR action_user_id = ?', user_id, user_id) }
 end

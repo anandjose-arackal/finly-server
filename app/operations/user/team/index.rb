@@ -4,7 +4,7 @@
 # if role_id is not passed, the view of the particular user is used
 
 class User::Team::Index < User::Team::Base
-  attr_accessor :role_id
+  attr_accessor :role_id, :purpose_id
 
   # has_scope :filter_search
   # has_scope :filter_role
@@ -82,6 +82,15 @@ class User::Team::Index < User::Team::Base
     params[:filter_disburse] = '1'
   end
 
+  def pre_process
+    case RequestStore.store[:current_app]
+      when :vp, 'vp'
+        self.purpose_id = MappingPurpose.id_for(:vendor_payments)
+      when :em, 'em', 'ft', :ft
+        self.purpose_id = MappingPurpose.id_for(:expense_management)
+    end
+  end
+
   def process
     user_ids = []
     manager_association = nil
@@ -98,7 +107,7 @@ class User::Team::Index < User::Team::Base
         approves_to_association = :has_approves_to
     end
     return if manager_association.blank? or approves_to_association.blank?
-    user_ids += UserManagerMapping.send(manager_association, user.id).pluck(:user_id)
+    user_ids += UserManagerMapping.send(manager_association, user.id).send('with_purpose', purpose_id).pluck(:user_id)
     user_ids.uniq! if user_ids.present?
     self.response = user.company.users.with_id(user_ids)
   end

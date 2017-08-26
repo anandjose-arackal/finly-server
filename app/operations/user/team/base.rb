@@ -1,5 +1,6 @@
 class User::Team::Base < BaseOperation
-  attr_accessor :currency_id, :amount_value, :mappings, :policy_id, :money_request, :report
+  attr_accessor :currency_id, :amount_value, :mappings, :policy_id, :money_request, :report,
+                :payment_request, :purpose_id
 
   def init_values
     return if params.blank?
@@ -18,6 +19,8 @@ class User::Team::Base < BaseOperation
       load_report
     elsif params[:money_request].present?
       load_money_request
+    elsif params[:payment_request].present?
+      load_payment_request
     end
   end
 
@@ -64,6 +67,14 @@ class User::Team::Base < BaseOperation
     else
       self.amount_value = self.money_request.total_amount
     end
+  end
+
+  def load_payment_request
+    self.payment_request = params[:payment_request]
+    # use the default company policy for retrieving the reviewers
+    self.policy_id = payment_request.owner.company.policies.default.first
+    self.currency_id = 1
+    self.amount_value = payment_request.requested_amount_value
   end
 
   class User::Team::Base::TeamPresenter < BaseOperation::BasePresenter::SuccessPresenter

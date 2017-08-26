@@ -15,4 +15,15 @@ class MappingPurpose < ActiveRecord::Base
   def self.values
     [:expense_management, :vendor_payments]
   end
+
+  def id_from_application_for(application)
+    case application
+      when :vp, 'vp'
+        return MappingPurpose.id_for(:vendor_payments)
+      when 'em', :em, :vp, 'vp'
+        return MappingPurpose.id_for(:expense_management)
+      else
+        # do nothing?
+    end
+  end
 end
