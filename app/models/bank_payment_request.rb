@@ -21,6 +21,7 @@ class BankPaymentRequest < ActiveRecord::Base
   belongs_to :status, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order
   belongs_to :requested_amount, class_name: "Amount"
+  belongs_to :owner, class_name: "User"
 
   has_many :bank_payment_request_comments
   has_many :bank_payment_request_trails
@@ -28,5 +29,30 @@ class BankPaymentRequest < ActiveRecord::Base
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :requested_amount
 
-  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, to: :status
+  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
+  delegate :requested_amount_value, to: :requested_amount
+
+  def can_submit?
+    open? || retracted? || rejected?
+  end
+
+  def can_approve?
+    processing?
+  end
+
+  def can_reject?
+    processing?
+  end
+
+  def can_retract?
+    processing?
+  end
+
+  def can_credit?
+    approved?
+  end
+
+  def user
+    self.owner
+  end
 end

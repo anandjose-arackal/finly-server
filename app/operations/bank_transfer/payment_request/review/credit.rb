@@ -6,7 +6,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   attr_accessor :initiating_account
 
   def validate
-    unless bank_payment_request.can_credit?
+    unless bank_payment_request.can_credit? || params[:auto_credit]
       add_message :error, "Payment Order cannot be credited at this time"
       return
     end

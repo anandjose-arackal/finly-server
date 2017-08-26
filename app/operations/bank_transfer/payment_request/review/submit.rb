@@ -23,10 +23,9 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
 
   def process
     # todo - add logic to retrieve manager here
-
-
-    manager = nil #setting mamager as blank for now
-    manager_role_id = nil
+    presenter = User::Team::Review::NextReviewer.(report)
+    manager = presenter.user
+    manager_role_id = presenter.role_id
     #######################################
     if manager.nil?
       approve_op = BankTransfer::PaymentRequest::Approve.(user, id: bank_payment_request.id)
@@ -46,7 +45,9 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
 
       bank_payment_request.bank_payment_request_trails.create action_user: user,
                                          action_user_role_id: UserRole.id_for(:employee),
-                                         action_id: BankPaymentRequestTrailAction.id_for(:submit)
+                                         action_id: BankPaymentRequestTrailAction.id_for(:submit),
+                                         modified_user_id: manager&.id,
+                                         modified_user_role_id: manager_role_id
       return true
     end
     add_message :error, bank_payment_request.errors.full_messages

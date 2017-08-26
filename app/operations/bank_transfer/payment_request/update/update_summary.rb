@@ -32,7 +32,7 @@ class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::Paymen
   end
 
   def post_process
-    add_message :error, "Successfully updated summary"
+    add_message :success, "Successfully updated summary"
   end
 
   private

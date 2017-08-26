@@ -57,6 +57,8 @@
 
 
 
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -133,6 +135,16 @@ class User < ActiveRecord::Base
   has_many :agreements, through: :login_agreement_mappings
   has_many :card_assign_requests, foreign_key: :card_owner_id
   has_many :card_upgrade_requests, foreign_key: :card_owner_id
+
+  # adding associations for the user manager mapping for payment requests
+  has_many :bank_payment_requests, foreign_key: :owner_id
+  has_many :bank_payment_request_trails
+  has_many :controlling_payment_requests, class_name: "BankPaymentRequest", foreign_key: :controlling_user_id
+  has_many :interacted_payment_requests, -> { distinct }, source: :bank_payment_request, through: :bank_payment_request_trails
+  has_many :manager_payment_request_trails, -> { manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
+  has_many :manager_payment_requests, -> { distinct }, source: :bank_payment_request, through: :bank_payment_request_trails
+  has_many :finance_payment_request_tracks, -> { finance_manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
+  has_many :finance_payment_requests, -> { distinct }, source: :bank_payment_request, through: :bank_payment_request_trails
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
@@ -633,6 +645,10 @@ class User < ActiveRecord::Base
     else
       return false
     end
+  end
+
+  def payment_initiator?
+    self.role_mapping.vendor_payments.employee.present?
   end
 
   private

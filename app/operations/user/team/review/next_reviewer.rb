@@ -23,6 +23,8 @@ class User::Team::Review::NextReviewer < BaseOperation
       next_reviewer(:money_request, obj)
     elsif obj.is_a?(Report)
       next_reviewer(:report, obj)
+    elsif obj.is_a?(BankPaymentRequest)
+      next_reviewer(:payment_request, obj)
     elsif obj.is_a?(Hash)
       user = obj[:user]
       if user.blank?
@@ -59,7 +61,7 @@ class User::Team::Review::NextReviewer < BaseOperation
 
   private
   def next_reviewer(sym, obj)
-    user = (obj.controlling_for_user or obj.controlling_user or obj.user)
+    user = (obj.controlling_for_user or obj.controlling_user or obj.user or obj.owner)
     role = (obj.controlling_for_user_role_id or obj.controlling_user_role_id)
     role = UserRole.id_for(:employee) if role.blank? and obj.controlling_user == obj.user
     arg_hash={}

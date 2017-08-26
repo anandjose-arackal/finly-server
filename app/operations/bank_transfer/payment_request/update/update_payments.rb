@@ -1,14 +1,36 @@
 class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::PaymentRequest::Update::Base
 
-  attr_accessor :order_params
+  attr_accessor :order_params, :requested_total
 
   def pre_validate
-
+    super
+    if params[:bank_payment_request][:payments_attributes].blank?
+      add_message :error, "Missing payment details, try again"
+      return
+    end
   end
 
   def init
     super
     self.order_params = payment_order_params
+  end
+
+  def validate
+    self.requested_total = 0
+    params[:bank_payment_request][:payments_attributes].each do |details|
+      self.requested_total += details[:amount]&.to_f
+    end
+    adapter = nil
+    case payment_order.initiating_account_type
+      when "VendorPaymentWallet"
+        adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(payment_order.payments.first.initiating_account)
+      when "YesBankCompanyAccount"
+        adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+    end
+    if requested_total > adapter.balance
+      add_message :error, "Amount being requested is greater than the source account's balance"
+      return
+    end
   end
 
   def pre_process
@@ -17,8 +39,9 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
 
   def process
     unless payment_order.update(order_params)
-      add_message :error, payment_order_params.errors.full_messages
+      add_message :error, payment_order.errors.full_messages
     end
+    payment_order.amount_requested.update(value: requested_total)
   end
 
   def post_process
@@ -45,7 +68,9 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
           value: account_details[:amount],
           currency_id: Currency.first.id
       }
+      account_details.delete(:amount)
+
     end
-    p
+    p.permit!
   end
 end

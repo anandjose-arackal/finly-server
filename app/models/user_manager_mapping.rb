@@ -23,6 +23,7 @@
 
 
 
+
 class UserManagerMapping < ActiveRecord::Base
   include PolicyVersion
 
@@ -61,6 +62,7 @@ class UserManagerMapping < ActiveRecord::Base
   scope :finance_manager, -> { where 'finance_manager_id IS NOT NULL' }
   scope :approves_to, -> { where 'approves_to_id IS NOT NULL' }
   scope :approves_finance_to, -> { where 'approves_finance_to_id IS NOT NULL' }
+  scope :with_purpose, -> (purpose_id) {where purpose_id: purpose_id}
 
   scope :amount, ->(currency_id, value) do
     if value.blank? or currency_id.blank?

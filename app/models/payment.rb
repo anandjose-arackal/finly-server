@@ -218,6 +218,8 @@ class Payment < ActiveRecord::Base
     name
   end
 
+  alias_method :initiating_account_name, :initiating_account_type_name
+
   def receiving_account_type_name
     name = "#{receiving_user&.name.to_s}'s "
 
@@ -240,6 +242,8 @@ class Payment < ActiveRecord::Base
     end
     name
   end
+
+  alias_method :receiving_account_name, :receiving_account_type_name
 
   def credit?
     self.payment_type_id == PaymentType.id_for(:credit)
