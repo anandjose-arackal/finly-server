@@ -2170,6 +2170,7 @@ Rails.application.routes.draw do
     resources :bank_payment_requests do
       post 'comment', to: 'bank_payment_requests#comment', as: :comment
       patch 'review', to: 'bank_payment_requests#review', as: :review
+      patch 'credit', to: 'bank_payment_requests#credit', as: :credit
     end
 
     get 'vendors/count', to: 'vendors#count'

@@ -61,9 +61,9 @@ class User::Team::Review::NextReviewer < BaseOperation
 
   private
   def next_reviewer(sym, obj)
-    user = (obj.controlling_for_user or obj.controlling_user or obj.user or obj.owner)
+    user = (obj.controlling_for_user or obj.controlling_user or obj.user)
     role = (obj.controlling_for_user_role_id or obj.controlling_user_role_id)
-    role = UserRole.id_for(:employee) if role.blank? and obj.controlling_user == obj.user
+    role = ::UserRole.id_for(:employee) if role.blank? and obj.controlling_user == obj.user
     arg_hash={}
     arg_hash[sym] = obj
     if role.blank?

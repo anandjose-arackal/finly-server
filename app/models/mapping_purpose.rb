@@ -20,7 +20,7 @@ class MappingPurpose < ActiveRecord::Base
     case application
       when :vp, 'vp'
         return MappingPurpose.id_for(:vendor_payments)
-      when 'em', :em, :vp, 'vp'
+      when 'em', :em, :ft, 'ft'
         return MappingPurpose.id_for(:expense_management)
       else
         # do nothing?

@@ -22,6 +22,7 @@ class BankPaymentRequest < ActiveRecord::Base
   belongs_to :payment_order
   belongs_to :requested_amount, class_name: "Amount"
   belongs_to :owner, class_name: "User"
+  belongs_to :controlling_user, class_name: "User"
 
   has_many :bank_payment_request_comments
   has_many :bank_payment_request_trails
@@ -55,4 +56,17 @@ class BankPaymentRequest < ActiveRecord::Base
   def user
     self.owner
   end
+
+  def initiating_account
+    self.payment_order.payments.first.initiating_account
+  end
+
+  # todo - jugaad till we generalize the approval flow for
+  # user manager mapping
+  def controlling_for_user
+    nil
+  end
+
+  alias_method :controlling_for_user_id, :controlling_for_user
+  alias_method :controlling_for_user_role_id, :controlling_for_user
 end

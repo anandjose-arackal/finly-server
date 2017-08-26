@@ -23,12 +23,13 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
 
   def process
     # todo - add logic to retrieve manager here
-    presenter = User::Team::Review::NextReviewer.(report)
+    presenter = User::Team::Review::NextReviewer.(bank_payment_request)
     manager = presenter.user
     manager_role_id = presenter.role_id
     #######################################
     if manager.nil?
-      approve_op = BankTransfer::PaymentRequest::Review::Approve.(user, id: bank_payment_request.id)
+      # i.e. if there is no manager, the payment request directly goes to approved state
+      approve_op = BankTransfer::PaymentRequest::Review::Approve.(user, id: bank_payment_request.id, auto_approve: true)
       unless approve_op.success?
         add_message :error, approve_op.messages[:error]
         return false
@@ -38,7 +39,7 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
 
     # if there is a manager after all
     submitted_at = DateTime.now
-    if bank_payment_request.update_attributes status_id: BankPaymentRequestStatus.id_for(:submitted),
+    if bank_payment_request.update_attributes status_id: BankPaymentRequestStatus.id_for(:processing),
                                               controlling_user_id: manager&.id,
                                               controlling_user_role_id: manager_role_id,
                                               submitted_at: submitted_at

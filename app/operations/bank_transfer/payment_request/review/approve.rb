@@ -15,8 +15,8 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
       return
     end
 
-    unless bank_payment_request.can_approve?
-      add_message :error, "Report cannot be submitted in this state"
+    unless bank_payment_request.can_approve? || params[:auto_approve]
+      add_message :error, "Payment Order cannot be submitted in this state"
       return
     end
   end
