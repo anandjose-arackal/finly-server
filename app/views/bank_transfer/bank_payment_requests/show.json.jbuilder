@@ -9,6 +9,7 @@ json.summary do
   json.amount_processed @result.payment_order.amount_processed&.value
   json.description @result.bank_payment_request.description
   json.note @result.payment_order.note
+  json.initiating_account @result.payment_order.payments.first.initiating_account_name
 end
 
 json.payments do
