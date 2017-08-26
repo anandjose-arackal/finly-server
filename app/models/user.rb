@@ -429,7 +429,7 @@ class User < ActiveRecord::Base
   end
 
   def company_admin?
-    role_mapping.admin.present?
+    role_mapping.expense_management.admin.present?
   end
 
   # If policy is passed checks if the user is the admin of the given policy
@@ -452,22 +452,22 @@ class User < ActiveRecord::Base
 
   def finance_manager?
     mapping = self.role_mapping
-    mapping.finance_manager.present?
+    mapping.expense_management.finance_manager.present?
   end
 
   def manager?
     mapping = self.role_mapping
-    mapping.manager.present?
+    mapping.expense_management.manager.present?
   end
 
   def employee?
     mapping = role_mapping
-    mapping.employee.present?
+    mapping.expense_management.employee.present?
   end
 
   def auditor?
     mapping = role_mapping
-    mapping.auditor.present?
+    mapping.expense_management.auditor.present?
   end
 
   def has_role?(role_id)

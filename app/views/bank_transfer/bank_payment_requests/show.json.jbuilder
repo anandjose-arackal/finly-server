@@ -36,8 +36,8 @@ json.comments do
   json.array!(@result.bank_payment_request.bank_payment_request_comments) do |comment|
     json.content comment.retrieve_content
     json.timestamp comment.created_at.strftime "%I:%M %p, %d %b %Y"
-    json.user comment.user.name
-    json.action comment.action.name
+    json.user comment.user&.name
+    json.action comment.action&.name
   end
 end
 

@@ -29,6 +29,7 @@ class BankTransfer::PaymentOrdersController < ApplicationController
   # end
 
   def index
+    # todo - this action will not exist here anymore, just for testing purposes this is
     @result = BankTransfer::YesBank::Index.(current_user, params)
     respond
   end

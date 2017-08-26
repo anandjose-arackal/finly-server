@@ -5,6 +5,20 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
   attr_accessor :initiating_account
 
+
+  def pre_validate
+    super
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate the transfer'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
+  end
+
+
   def validate
     unless bank_payment_request.can_credit? || params[:auto_credit]
       add_message :error, "Payment Order cannot be credited at this time"
