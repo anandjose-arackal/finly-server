@@ -28,5 +28,25 @@ class BankPaymentRequest < ActiveRecord::Base
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :requested_amount
 
-  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, to: :status
+  delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
+
+  def can_submit?
+    open? || retracted? || rejected?
+  end
+
+  def can_approve?
+    processing?
+  end
+
+  def can_reject?
+    processing?
+  end
+
+  def can_retract?
+    processing?
+  end
+
+  def can_credit?
+    approved?
+  end
 end

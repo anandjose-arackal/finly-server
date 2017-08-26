@@ -9,4 +9,10 @@
 #
 
 class MappingPurpose < ActiveRecord::Base
+
+  include Seedable
+
+  def self.values
+    [:expense_management, :vendor_payments]
+  end
 end
