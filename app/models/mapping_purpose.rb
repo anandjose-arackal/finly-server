@@ -16,7 +16,7 @@ class MappingPurpose < ActiveRecord::Base
     [:expense_management, :vendor_payments]
   end
 
-  def id_from_application_for(application)
+  def self.id_from_application_for(application)
     case application
       when :vp, 'vp'
         return MappingPurpose.id_for(:vendor_payments)

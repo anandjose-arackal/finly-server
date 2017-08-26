@@ -28,7 +28,7 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
     manager_role_id = presenter.role_id
     #######################################
     if manager.nil?
-      approve_op = BankTransfer::PaymentRequest::Approve.(user, id: bank_payment_request.id)
+      approve_op = BankTransfer::PaymentRequest::Review::Approve.(user, id: bank_payment_request.id)
       unless approve_op.success?
         add_message :error, approve_op.messages[:error]
         return false

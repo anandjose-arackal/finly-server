@@ -42,12 +42,16 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
 
   class BankTransfer::Users::Show::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :selected_user, :user_panel_subscription, :actions
+    attr_accessor :selected_user, :user_panel_subscription, :actions,
+                  :mapping, :policy
 
     def init
       self.selected_user = params[:selected_user]
       self.user_panel_subscription = selected_user.user_panel_subscription
       self.actions = load_actions
+      # todo - temporary, will be updated to all policies later
+      self.policy = selected_user.company.policies.default.first
+      self.mapping = retrieve_mappings
     end
 
     def load_actions
@@ -71,6 +75,11 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
           debit: true
       }
       actions
+    end
+
+    def retrieve_mappings
+      mapping = []
+      mapping << Policy::Mappings::Show.(user, user: selected_user, policy: policy).map
     end
   end
 

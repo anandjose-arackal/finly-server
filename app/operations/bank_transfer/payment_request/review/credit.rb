@@ -18,11 +18,16 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     end
   end
 
-
   def validate
     unless bank_payment_request.can_credit? || params[:auto_credit]
       add_message :error, "Payment Order cannot be credited at this time"
       return
+    end
+
+    if params[:auto_credit]
+      unless bank_payment_request.owner_id == user.id
+        add_message :error, "Only request owners can perform this operation"
+      end
     end
   end
 
