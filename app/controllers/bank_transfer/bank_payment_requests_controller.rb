@@ -107,14 +107,19 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     case type
       when 1, '1'
         # i.e. approve
+        operation = BankTransfer::PaymentRequest::Review::Approve.new(current_user, params)
       when 2, '2'
         # i.e. submit
+        operation = BankTransfer::PaymentRequest::Review::Submit.new(current_user, params)
       when 3, '3'
         # i.e. retract
+        operation = BankTransfer::PaymentRequest::Review::Retract.new(current_user, params)
       when 4, '4'
         # i.e. reject
+        operation = BankTransfer::PaymentRequest::Review::Retract.new(current_user, params)
       when 5, '5'
         # i.e. unapprove
+        operation = BankTransfer::PaymentRequest::Review::Unapprove.new(current_user, params)
     end
     if operation.blank?
       respond response: :failure, message: "Invalid update type"

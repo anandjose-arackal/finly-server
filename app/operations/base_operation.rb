@@ -253,11 +253,11 @@ class BaseOperation
     end
 
     def manager_view?
-      is_view?(:manager)
+      is_view?(:manager) or is_view?(:approver)
     end
 
     def finance_view?
-      is_view?(:finance) or is_view?(:finance_manager)
+      is_view?(:finance) or is_view?(:finance_manager) or is_view?(:creditor)
     end
 
     def auditor_view?
@@ -265,7 +265,7 @@ class BaseOperation
     end
 
     def personal_view?
-      is_view?(:employee) or is_view?(:personal) or params[:view].blank?
+      is_view?(:employee) or is_view?(:personal) or is_view?(:initiator) or params[:view].blank?
     end
 
     def is_view?(type)
@@ -345,11 +345,11 @@ class BaseOperation
   end
 
   def manager_view?
-    is_view?(:manager)
+    is_view?(:manager) or is_view?(:approver)
   end
 
   def finance_view?
-    is_view?(:finance) or is_view? :finance_manager
+    is_view?(:finance) or is_view? :finance_manager or is_view?(:creditor)
   end
 
   def auditor_view?
@@ -357,7 +357,7 @@ class BaseOperation
   end
 
   def personal_view?
-    is_view?(:employee) or is_view?(:personal) or params[:view].blank?
+    is_view?(:employee) or is_view?(:personal) or is_view?(:initiator) or params[:view].blank?
   end
 
   def is_view?(type)
