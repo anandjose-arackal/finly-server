@@ -35,17 +35,17 @@ user:
     default_url: 'orders'
   <% end %>
   <% if current_user.finance_manager? %>
-#  - id: finance_manager
-#    name: 'Finance Manager'
-#    default_url: 'orders'
+  - id: creditor
+    name: 'Creditor'
+    default_url: 'orders'
   <% end %>
   <% if current_user.manager? %>
-#  - id: manager
-#    name: 'Manager'
-#    default_url: 'orders'
+  - id: approver
+    name: 'Approver'
+    default_url: 'orders'
   <% end %>
-  - id: personal
-    name: 'Finance'
+  - id: initiator
+    name: 'Initator'
     default_url: 'orders'
 views:
   <% if current_user.admin? %>
@@ -84,7 +84,7 @@ views:
 #        - name: 'Company Statements'
 #          url: '#company_statements'
   <% end %>
-    personal:
+    initiator:
       menus:
         navbar:
         - name: Individual Payments
