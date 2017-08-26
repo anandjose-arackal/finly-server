@@ -31,10 +31,6 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
         if self.user.company_admin?
           team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:admin))&.pluck(:id)
           self.payment_requests = BankPaymentRequest.not_open.with_user(team_ids)
-        elsif user.policy_admin?
-          team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:admin))&.pluck(:id)
-          policy_ids = user.admin_policies.pluck(:id)
-          self.payment_requests = BankPaymentRequest.not_open.with_user(team_ids).with_policy(policy_ids)
         end
         unless user.admin?
           messages[:error] << 'User is not an admin'

@@ -23,9 +23,11 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
 
   def process
     # todo - add logic for getting the next reviewer here
-    next_reviewer = nil
-    next_reviewer_role_id = nil
-    current_user_role = nil
+    presenter = User::Team::Review::NextReviewer.(bank_payment_request)
+    next_reviewer = presenter.user
+    next_reviewer_role_id = presenter.role_id
+    # this returns the role under which this particular user is viewing the payment request
+    current_user_role = User::Team::Review::UserRole.(user, self.bank_payment_request)
     if next_reviewer.nil?
       payment_status = BankPaymentRequestStatus.id_for(:approved)
     else

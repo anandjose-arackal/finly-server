@@ -23,9 +23,9 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
 
   def process
     # todo - add logic to retrieve manager here
-
-    manager = nil #setting mamager as blank for now
-    manager_role_id = nil
+    presenter = User::Team::Review::NextReviewer.(report)
+    manager = presenter.user
+    manager_role_id = presenter.role_id
     #######################################
     if manager.nil?
       approve_op = BankTransfer::PaymentRequest::Approve.(user, id: bank_payment_request.id)
