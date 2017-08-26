@@ -1,7 +1,7 @@
 
 json.summary do
   json.order_status_id @result.bank_payment_request.status.name.humanize
-  json.bank_transfer_type @result.payment_order.payment_mode
+  json.bank_transfer_type @result.payment_order.payment_mode&.upcase
   json.payment_type @result.payment_order.payment_type.humanize
   json.scheduled_at @result.payment_order.scheduled_at&.strftime "%d %b %Y"
   json.processed_at @result.payment_order.processed_at&.strftime "%d %b %Y"
@@ -34,6 +34,8 @@ end
 json.comments do
   json.array!(@result.bank_payment_request.bank_payment_request_comments) do |comment|
     json.content comment.retrieve_content
+    json.user comment.user.name
+    json.action comment.action.name
   end
 end
 

@@ -17,7 +17,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
 
   def process
     unless payment_order.update(order_params)
-      add_message :error, payment_order_params.errors.full_messages
+      add_message :error, payment_order.errors.full_messages
     end
   end
 
@@ -45,7 +45,9 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
           value: account_details[:amount],
           currency_id: Currency.first.id
       }
+      account_details.delete(:amount)
+
     end
-    p
+    p.permit!
   end
 end
