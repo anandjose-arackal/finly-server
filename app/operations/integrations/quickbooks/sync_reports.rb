@@ -86,7 +86,15 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
         result = adapter.save_report(qb_report)
         if result.is_a?(String)
           add_message :error, result
-          return
+          if qb_report.report.expenses.pluck(:synced_with_quickbooks).include?(nil) || report.expenses.pluck(:synced_with_quickbooks).include?(false)
+            if qb_report.report.expenses.pluck(:synced_with_quickbooks).include?(true)
+              self.sync_status = 2
+              qb_report.report.update(sync_status_id: ReportSyncStatus.id_for(:partially_synced))
+            else
+              self.sync_status = 1
+              qb_report.report.update(sync_status_id: ReportSyncStatus.id_for(:not_synced))
+            end
+          end
         end
       end
     end
@@ -96,8 +104,13 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
     self.sync_status = 1
     reports.each do |report|
       if report.expenses.pluck(:synced_with_quickbooks).include?(nil) || report.expenses.pluck(:synced_with_quickbooks).include?(false)
-        self.sync_status = 2
-        report.update(sync_status_id: ReportSyncStatus.id_for(:partially_synced))
+        if report.expenses.pluck(:synced_with_quickbooks).include?(true)
+          self.sync_status = 2
+          report.update(sync_status_id: ReportSyncStatus.id_for(:partially_synced))
+        else
+          self.sync_status = 1
+          report.update(sync_status_id: ReportSyncStatus.id_for(:not_synced))
+        end
         next
       end
       report.update(sync_status_id: ReportSyncStatus.id_for(:synced))
