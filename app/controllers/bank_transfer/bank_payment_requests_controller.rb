@@ -63,6 +63,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def credit
+    @result = BankTransfer::PaymentRequest::Review::Credit.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type)

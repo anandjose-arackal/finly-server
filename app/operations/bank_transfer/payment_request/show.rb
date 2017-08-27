@@ -40,12 +40,18 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
     def retrieve_actions
       actions = {}
+      debugger
       if admin_view?
-        if bank_payment_request.processing? and bank_payment_request.controlling_user_id == user.id
+        if bank_payment_request.processing? && bank_payment_request.controlling_user_id == user.id
           actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         elsif bank_payment_request.processing?
           actions[:take_control] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+        elsif bank_payment_request.open? && bank_payment_request.owner_id == user.id
+          actions[:submit] = actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+          actions[:destroy] = actions[:destroy] = {method: "destroy", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
+        elsif bank_payment_request.approved?
+          actions[:credit] = actions[:credit] = {method: "patch", url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
         end
       elsif finance_view? || manager_view?
         actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}

@@ -171,7 +171,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
 
     if ba.nil?
-      ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: ifsc, account_owner: vendor, company_id: self.company_id)
+      ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc], account_owner: vendor, company_id: self.company_id)
     end
     return ba
   end
