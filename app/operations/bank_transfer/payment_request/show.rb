@@ -40,7 +40,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
     def retrieve_actions
       actions = {}
-      debugger
       if admin_view?
         if bank_payment_request.processing? && bank_payment_request.controlling_user_id == user.id
           actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
