@@ -870,6 +870,7 @@
 #           bank_transfer_payment_requests_update_details PATCH  /bank_transfer/payment_requests/update_details(.:format)                        bank_transfer/bank_payment_requests#update_details
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format) bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)  bank_transfer/bank_payment_requests#review
+#               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)  bank_transfer/bank_payment_requests#credit
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                  bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                  bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                              bank_transfer/bank_payment_requests#new

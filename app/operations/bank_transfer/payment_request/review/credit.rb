@@ -5,7 +5,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
   attr_accessor :initiating_account
 
-
   def pre_validate
     super
     if params[:password].blank?
