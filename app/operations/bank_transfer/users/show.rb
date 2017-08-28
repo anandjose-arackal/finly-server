@@ -43,7 +43,7 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
   class BankTransfer::Users::Show::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :selected_user, :user_panel_subscription, :actions,
-                  :mapping, :policy
+                  :mapping, :policy, :roles
 
     def init
       self.selected_user = params[:selected_user]
@@ -52,6 +52,11 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
       # todo - temporary, will be updated to all policies later
       self.policy = selected_user.company.policies.default.first
       self.mapping = retrieve_mappings
+      self.roles = {admin: selected_user.vendor_payment_admin?,
+                    finance_manager: user.vendor_payment_finance?,
+                    manager: user.vendor_payment_manager?,
+                    initiator: user.vendor_payment_initiator?
+                    }
     end
 
     def load_actions

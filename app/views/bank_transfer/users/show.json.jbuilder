@@ -36,6 +36,14 @@ json.wallet do
   json.balance wallet_adapter.balance
 end
 
+json.role do
+  json.admin @result.roles[:admin]
+  json.finance_manager @result.roles[:finance_manager]
+  json.manager @result.roles[:manager]
+  json.initiator @result.roles[:initiator]
+  # since only admins can see this screen, they can edit the fields by default
+end
+
 json.mapping @result.mapping.each do |mapping|
   json.company_default mapping[:company_default]
   if mapping[:policy]

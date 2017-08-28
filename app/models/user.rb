@@ -470,6 +470,24 @@ class User < ActiveRecord::Base
     mapping.expense_management.auditor.present?
   end
 
+  def vendor_payment_manager?
+    self.role_mapping.vendor_payments.manager.present?
+  end
+
+  def vendor_payment_finance?
+    self.role_mapping.vendor_payments.finance_manager.present?
+  end
+
+  def vendor_payment_admin?
+    self.role_mapping.vendor_payments.admin.present?
+  end
+
+  def vendor_payment_initiator?
+    self.role_mapping.vendor_payments.initiator.present?
+  end
+
+  alias_method :vendor_payment_finance_manager?, :vendor_payment_finance?
+
   def has_role?(role_id)
     return false unless role_id.present?
     mapping = role_mapping
