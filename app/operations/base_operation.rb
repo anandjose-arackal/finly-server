@@ -253,7 +253,7 @@ class BaseOperation
     end
 
     def manager_view?
-      is_view?(:manager) or is_view?(:approver)
+      is_view?(:manager) or is_view?(:reviewer)
     end
 
     def finance_view?
@@ -345,7 +345,7 @@ class BaseOperation
   end
 
   def manager_view?
-    is_view?(:manager) or is_view?(:approver)
+    is_view?(:manager) or is_view?(:reviewer)
   end
 
   def finance_view?

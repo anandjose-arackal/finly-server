@@ -139,7 +139,7 @@ class User < ActiveRecord::Base
 
   # adding associations for the user manager mapping for payment requests
   has_many :bank_payment_requests, foreign_key: :owner_id
-  has_many :bank_payment_request_trails
+  has_many :bank_payment_request_trails, class_name: "BankPaymentRequestTrail", foreign_key: :action_user_id
   has_many :controlling_payment_requests, class_name: "BankPaymentRequest", foreign_key: :controlling_user_id
   has_many :interacted_payment_requests, -> { distinct }, source: :bank_payment_request, through: :bank_payment_request_trails
   has_many :manager_payment_request_trails, -> { manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id

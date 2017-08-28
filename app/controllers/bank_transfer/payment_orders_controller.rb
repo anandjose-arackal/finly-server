@@ -4,30 +4,6 @@ class BankTransfer::PaymentOrdersController < ApplicationController
 
   before_action {finly_authorize! :web}
 
-  # def process_file
-  #   @result = BankTransfer::YesBank::ParseFile.(current_user, params)
-  #   respond
-  # end
-
-  # def create
-  #   @result = BankTransfer::YesBank::Create.(current_user, params)
-  #   respond
-  # end
-
-  # def process_account_ids
-  #   @result = BankTransfer::YesBank::ProcessFromAccountIds.(current_user, params)
-  #   if @result&.success?
-  #     render 'process_file'
-  #   else
-  #     respond response: :failure, message: @result.messages[:error]
-  #   end
-  # end
-  #
-  # def account_details
-  #   @result = BankTransfer::YesBank::AccountDetails.(current_user, params)
-  #   respond
-  # end
-
   def index
     # todo - this action will not exist here anymore, just for testing purposes this is
     @result = BankTransfer::YesBank::Index.(current_user, params)

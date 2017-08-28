@@ -29,7 +29,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
     case self.role_id
       when UserRole.id_for(:admin)
         if self.user.company_admin?
-          team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:admin))&.pluck(:id)
+          team_ids = user.company.users.pluck(:id)
           self.payment_requests = BankPaymentRequest.not_open.with_user(team_ids)
         end
         unless user.admin?
@@ -53,7 +53,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
         }
         self.payment_requests = BankPaymentRequest.from([Arel.sql(sql)])
       else
-        self.payment_requests = user.payment_requests
+        self.payment_requests = user.bank_payment_requests
     end
   end
 

@@ -39,8 +39,9 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   end
 
   def pre_process
-    # setting the status as pending because it will be processed immediately
+    # setting the status as pending because it will be processed immediately - for both payments and payment orders
     payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
+    payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
   end
 
 

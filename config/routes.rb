@@ -2164,6 +2164,8 @@ Rails.application.routes.draw do
     resources :payment_orders do
 
     end
+
+    get 'bank_payment_requests/count', to: 'bank_payment_requests#count', as: :count
     post 'payment_requests/process_file', to: 'bank_payment_requests#process_file'
     post 'payment_requests/account_details', to: 'bank_payment_requests#account_details'
     post 'payment_requests/process_account_ids', to: 'bank_payment_requests#process_account_ids'

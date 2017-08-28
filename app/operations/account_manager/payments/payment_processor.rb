@@ -48,6 +48,8 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       if payment_order.blank?
         self.payment_order = company.payment_orders.build(payment_order_params)
       end
+      self.options = {}
+      self.options[:bank_transfer_type] = payment_order.bank_transfer_type
       # todo - change below before deploy
       self.background = false # because transfers that happen through the approval flow are always bank transfers (which are in the background, always)
     end
@@ -80,11 +82,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         # call the payment executor that runs the payments in the background
         # passing the payment id here because async operation can retrieve the object
         result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order.id, options)
-        # if result.success?
-        #   add_message :success, 'Processing payments'
-        # else
-        #   add_message :error, result.messages[:error]
-        # end
         add_message :success, "Payments have been scheduled, you can check their status from the order screen"
       else
         # Process the order synchronously
