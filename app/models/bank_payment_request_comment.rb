@@ -20,6 +20,8 @@ class BankPaymentRequestComment < ActiveRecord::Base
   # this will generate the comment body from the
   # parameters in the DB
 
+  default_scope { order created_at: :desc}
+
   def retrieve_content
     case self.action_id
       when BankPaymentRequestCommentAction.id_for(:comment)

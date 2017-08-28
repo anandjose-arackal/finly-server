@@ -140,7 +140,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
           receiving_user_id: bank_account.account_owner_id,
           initiating_user_type: "User",
           initiating_user_id: user.id,
-          initiating_account_type: "User",
+          initiating_account_type: initiating_account.class.name,
           initiating_account_id: initiating_account.id,
           receiving_account_type: "BankAccount",
           receiving_account_id: bank_account.id,

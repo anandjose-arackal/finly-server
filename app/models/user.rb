@@ -184,17 +184,18 @@ class User < ActiveRecord::Base
   scope :filter_user_id, ->(user_id) { where id: user_id }
   scope :with_roles, -> { joins :role_mapping }
   scope :only_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:expense_management)) }
-  # scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments))}
-  scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id) }
+  scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments))}
+  # scope :only_vendor_payment_reviewers, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id) }
   scope :only_finance_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:expense_management)) }
-  scope :only_vendor_payment_creditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id) }
-  # scope :only_vendor_payment_creditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments)) }
+  # scope :only_vendor_payment_creditors, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id) }
+  scope :only_vendor_payment_creditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments)) }
   scope :only_admins, -> { with_roles.where 'user_role_mappings.user_role_id = ?', UserRole.admin_id }
-  scope :only_vendor_payment_admins, -> { with_roles.where 'user_role_mappings.user_role_id = ?', UserRole.admin_id }
+  scope :only_vendor_payment_admins, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.admin_id) }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }
-
+  scope :with_vendor_payments_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
+  scope :with_expense_management_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
 
   # Users having cards assigned with the given program
   scope :with_cards_having_card_program, ->(id) do
@@ -480,9 +481,14 @@ class User < ActiveRecord::Base
     self.role_mapping.vendor_payments.manager.present?
   end
 
+  alias_method :vendor_payment_reviewer?, :vendor_payment_manager?
+
   def vendor_payment_finance?
     self.role_mapping.vendor_payments.finance_manager.present?
   end
+
+  alias_method :vendor_payment_finance_manager?, :vendor_payment_finance?
+  alias_method :vendor_payment_creditor?, :vendor_payment_finance?
 
   def vendor_payment_admin?
     self.role_mapping.vendor_payments.admin.present?
@@ -492,7 +498,6 @@ class User < ActiveRecord::Base
     self.role_mapping.vendor_payments.initiator.present?
   end
 
-  alias_method :vendor_payment_finance_manager?, :vendor_payment_finance?
 
   def has_role?(role_id)
     return false unless role_id.present?
