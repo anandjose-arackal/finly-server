@@ -399,9 +399,11 @@ class User < ActiveRecord::Base
   end
 
   after_create do
-    # self.build_profile.save if self.profile.blank?
     default_policy_id = self.company.default_policy.id
-    self.team_mapping.build(default: true, policy_id: default_policy_id).save if self.team_mapping.count == 0
+    if self.team_mapping.count == 0
+      self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: MappingPurpose.id_for(:expense_management)).save
+      self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: MappingPurpose.id_for(:vendor_payments)).save
+    end
     self.policy_user_mappings.build(policy_id: default_policy_id).save
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?

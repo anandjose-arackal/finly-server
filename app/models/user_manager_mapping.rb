@@ -58,6 +58,8 @@ class UserManagerMapping < ActiveRecord::Base
   scope :approves_to, -> { where 'approves_to_id IS NOT NULL' }
   scope :approves_finance_to, -> { where 'approves_finance_to_id IS NOT NULL' }
   scope :with_purpose, -> (purpose_id) {where purpose_id: purpose_id}
+  scope :expense_management, -> { where purpose_id: MappingPurpose.id_for(:expense_management)}
+  scope :vendor_payments, -> {where purpose_id: MappingPurpose.id_for(:vendor_payments)}
 
   scope :amount, ->(currency_id, value) do
     if value.blank? or currency_id.blank?
