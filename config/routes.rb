@@ -2184,6 +2184,7 @@ Rails.application.routes.draw do
     resources :payments
 
     get 'users/count', to: 'users#count'
+    get 'users/managers', to: 'users#get_managers'
     resources :users
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
