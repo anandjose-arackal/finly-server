@@ -1,5 +1,7 @@
 class BankTransfer::PaymentRequest::Base < BaseOperation
 
+  attr_accessor :initiating_account
+
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
@@ -8,7 +10,7 @@ class BankTransfer::PaymentRequest::Base < BaseOperation
   end
 
   def retrieve_initiating_account
-    if user.company_admin?
+    if user.company_admin? && params[:initiating_account_type]
       case params[:initiating_account_type]
         when 1, '1', "CompanyAccount"
           self.initiating_account = user.company.yes_bank_company_account

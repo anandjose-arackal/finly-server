@@ -3,7 +3,7 @@
 class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   attr_accessor :order_data, :payment_request, :payment_order, :scheduled_at,
                 :processed_order_data, :initiating_account,
-                :bank_payment_request
+                :bank_payment_request, :bank_transfer_type
 
   def pre_validate
     super
@@ -12,18 +12,18 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
       add_message :error, 'User not found'
       return
     end
-    if params.blank? or params[:payment_order].blank?
+    if params.blank? or params[:bank_payment_request].blank?
       add_message :error, 'Error loading request'
       return
     end
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate the transfer'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-      return
-    end
+    # if params[:password].blank?
+    #   add_message :error, 'You need to provide your password to initiate the transfer'
+    #   return
+    # end
+    # unless user.valid_password?(params[:password])
+    #   add_message :error, 'Invalid Password'
+    #   return
+    # end
   end
 
   def init
@@ -32,6 +32,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
     # because now all orders will be through a bank payment request
     self.bank_payment_request = params[:bank_payment_request]
     self.payment_order = bank_payment_request.payment_order
+    self.bank_transfer_type = payment_order.bank_transfer_type
     ################################################################
 
     # op = BankTransfer::YesBank::Process.(user, scheduled_at: params[:scheduled_at],
@@ -74,7 +75,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   def process
 
     # calling the payment processor to complete the transfer using adapters
-    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, payment_order: bank_payment_request&.payment_order, bank_transfer_type: payment_request.bank_transfer_type, background: true})
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_order: bank_payment_request&.payment_order, bank_transfer_type: self.bank_transfer_type, background: true})
     unless op.success?
 
       add_message :error, op.messages[:error]

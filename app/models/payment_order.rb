@@ -156,4 +156,14 @@ class PaymentOrder < ActiveRecord::Base
     end
   end
 
+  # for convenience, just picks this up from the individual payments
+  def initiating_account
+    self.payments.first.initiating_account
+  end
+
+  # again, for convenience, and only applies to bank transfer poyments
+  def bank_transfer_type
+    self.payments.first.payment_mode
+  end
+
 end

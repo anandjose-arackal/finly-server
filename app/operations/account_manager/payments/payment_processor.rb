@@ -8,33 +8,44 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id, :options
 
   def pre_validate
-    if params&.dig(:payment_request).blank?
+    if params&.dig(:payment_request).blank? && params&.dig(:payment_order).blank?
       add_message :error, 'Payment Request not found'
       return
     end
-    unless params[:payment_request].valid?
-      add_message :error, params[:payment_request].errors.full_messages
+    if params&.dig(:payment_request).present?
+      unless params[:payment_request].valid?
+        add_message :error, params[:payment_request].errors.full_messages
+      end
     end
   end
 
   def init
-    # create the payment order object and associated payments
-    self.payment_request = params[:payment_request]
-    self.payment_order_params = retrieve_payment_order_params
+    # setting the company id based on whether it's a user or an AdminUser
     if user.is_a?(User)
       self.company_id = user.company_id
     else
       self.company_id = payment_request.company_id
     end
-    self.company = Company.find_by(id: company_id)
-    self.options = {}
-    self.options[:bank_transfer_type] = params[:bank_transfer_type]
+
+    # create the payment order object and associated payments, if the payment request is present
+    self.payment_request = params[:payment_request]
+    if payment_request.present?
+      self.payment_order_params = retrieve_payment_order_params
+
+      self.company = Company.find_by(id: company_id)
+      self.options = {}
+      self.options[:bank_transfer_type] = params[:bank_transfer_type]
+    end
+
+    # in case there is not payment request, use the payment order that is passed
     # creating the payment order first to check for violations and shit - if it already exists
     # just use the existing payment order object - which would have been approved and
     # checked appropriately
-    self.payment_order = params[:payment_order]
-    if payment_order.blank?
-      self.payment_order = company.payment_orders.build(payment_order_params)
+    if params[:payment_order].present?
+      self.payment_order = params[:payment_order]
+      if payment_order.blank?
+        self.payment_order = company.payment_orders.build(payment_order_params)
+      end
     end
 
     unless payment_order.valid?
