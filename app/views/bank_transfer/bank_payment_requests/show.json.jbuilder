@@ -39,7 +39,7 @@ json.comments do
     json.user do
       json.first_name comment.user&.first_name
       json.name comment.user&.name
-      json.user_id comment.user&.id
+      json.id comment.user&.id
     end
     json.action comment.action&.name
   end
