@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170825105424) do
+ActiveRecord::Schema.define(version: 20170828071814) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1336,6 +1336,7 @@ ActiveRecord::Schema.define(version: 20170825105424) do
     t.boolean  "personal",                             default: false
     t.boolean  "reimbursable",                         default: true
     t.boolean  "synced_with_quickbooks"
+    t.string   "split_link",             limit: 255
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
