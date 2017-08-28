@@ -14,6 +14,8 @@ class BankTransfer::PaymentRequest::Base < BaseOperation
           self.initiating_account = user.company.yes_bank_company_account
         when 2, '2', "FinlyCredits"
           self.initiating_account = user.bank_wallet
+        else
+          # do nothing?
       end
     else
       self.initiating_account = user.bank_wallet

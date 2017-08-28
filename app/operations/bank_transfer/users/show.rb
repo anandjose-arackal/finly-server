@@ -43,7 +43,7 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
   class BankTransfer::Users::Show::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :selected_user, :user_panel_subscription, :actions,
-                  :mapping, :policy, :roles
+                  :mapping, :policy, :roles, :managers, :finance_managers
 
     def init
       self.selected_user = params[:selected_user]
@@ -57,6 +57,8 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
                     manager: user.vendor_payment_manager?,
                     initiator: user.vendor_payment_initiator?
                     }
+      self.managers = selected_user.company.users.only_vendor_payment_reviewers
+      self.finance_managers = selected_user.company.users.only_vendor_payment_creditors
     end
 
     def load_actions

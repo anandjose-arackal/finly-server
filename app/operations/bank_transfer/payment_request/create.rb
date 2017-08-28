@@ -18,14 +18,6 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       add_message :error, 'Error loading request'
       return
     end
-    # if params[:password].blank?
-    #   add_message :error, 'You need to provide your password to initiate the transfer'
-    #   return
-    # end
-    # unless user.valid_password?(params[:password])
-    #   add_message :error, 'Invalid Password'
-    #   return
-    # end
   end
 
   def init
