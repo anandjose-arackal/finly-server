@@ -5,7 +5,8 @@
 
 class AccountManager::Payments::PaymentProcessor < AccountManager::Base
 
-  attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id, :options
+  attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id, :options,
+                :background
 
   def pre_validate
     if params&.dig(:payment_request).blank? && params&.dig(:payment_order).blank?
@@ -35,6 +36,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.company = Company.find_by(id: company_id)
       self.options = {}
       self.options[:bank_transfer_type] = params[:bank_transfer_type]
+      self.background = payment_request.background
     end
 
     # in case there is not payment request, use the payment order that is passed
@@ -46,6 +48,8 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       if payment_order.blank?
         self.payment_order = company.payment_orders.build(payment_order_params)
       end
+      # todo - change below before deploy
+      self.background = false # because transfers that happen through the approval flow are always bank transfers (which are in the background, always)
     end
 
     unless payment_order.valid?
@@ -72,7 +76,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     # if payment order has been scheduled for execution right away, process it right now
     if payment_order.payment_order_status_id == PaymentOrderStatus.id_for(:pending)
       # if the order is not background, perform it using the regular call method in payment executor
-      if payment_request.background
+      if self.background
         # call the payment executor that runs the payments in the background
         # passing the payment id here because async operation can retrieve the object
         result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order.id, options)

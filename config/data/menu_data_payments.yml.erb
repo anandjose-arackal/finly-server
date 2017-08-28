@@ -40,13 +40,15 @@ user:
     default_url: 'orders'
   <% end %>
   <% if current_user.manager? %>
-  - id: approver
-    name: 'Approver'
+  - id: reviewer
+    name: 'Reviewer'
     default_url: 'orders'
   <% end %>
+  <% if current_user.vendor_payment_initiator? %>
   - id: initiator
-    name: 'Initator'
+    name: 'Initiator'
     default_url: 'orders'
+  <% end %>
 views:
   <% if current_user.admin? %>
     admin:
@@ -84,6 +86,41 @@ views:
 #        - name: 'Company Statements'
 #          url: '#company_statements'
   <% end %>
+  <% if current_user.vendor_payment_reviewer? %>
+    reviewer:
+      menus:
+        navbar:
+        - name: Individual Payments
+          url: payments
+          id: payments
+        - name: Payment Orders
+          url: orders
+          id: orders
+        - name: Vendors
+          url: vendors
+          id: 'vendors'
+        - name: Beneficiaries
+          url: beneficiaries
+          id: beneficiaries
+  <% end %>
+  <% if current_user.vendor_payment_creditor? %>
+    creditor:
+      menus:
+        navbar:
+        - name: Individual Payments
+          url: payments
+          id: payments
+        - name: Payment Orders
+          url: orders
+          id: orders
+        - name: Vendors
+          url: vendors
+          id: 'vendors'
+        - name: Beneficiaries
+          url: beneficiaries
+          id: beneficiaries
+  <% end %>
+  <% if current_user.vendor_payment_initiator? %>
     initiator:
       menus:
         navbar:
@@ -99,3 +136,4 @@ views:
         - name: Beneficiaries
           url: beneficiaries
           id: beneficiaries
+  <% end %>

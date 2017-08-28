@@ -38,6 +38,11 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     end
   end
 
+  def pre_process
+    # setting the status as pending because it will be processed immediately
+    payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
+  end
+
 
   def process
     # first update the payment order to the initiating account that's being requested
@@ -45,7 +50,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
     # now pass to the Create operation
     op = BankTransfer::YesBank::Create.(user, bank_payment_request: bank_payment_request)
-    debugger
     unless op.success?
       add_message :error, op.messages[:error]
       return

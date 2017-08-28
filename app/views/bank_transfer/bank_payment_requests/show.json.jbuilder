@@ -18,8 +18,11 @@ json.payments do
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.amount payment.amount_value
-    json.status payment.payment_status.name
+    json.status payment.payment_status.name.humanize
     json.id payment.id
+    json.system_messages do
+      json.array! (payment.system_messages)
+    end
   end
 end
 
