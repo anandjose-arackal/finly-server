@@ -109,3 +109,6 @@ json.currencies do
     json.id currency.id
   end
 end
+
+json.is_split @result.expense.is_split?
+json.split_count @result.expense.split_count

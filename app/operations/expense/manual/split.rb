@@ -1,5 +1,5 @@
 class Expense::Manual::Split < Expense::Manual::Base
-  attr_accessor :expenses_params, :receipt, :expenses, :receipt
+  attr_accessor :expenses_params, :receipt, :expenses, :receipt, :split_link
 
   def authorized_user_types
     [:employee]
@@ -46,6 +46,10 @@ class Expense::Manual::Split < Expense::Manual::Base
       end
       return if has_errors?
     end
+    split_link_prefix = "#{Date.today.strftime('%y%m%d')}#{user.id}"
+    while self.split_link.blank? or Expense.with_split_link(self.split_link).present?
+      self.split_link = "#{split_link_prefix}#{Generator.random_number(5)}"
+    end
   end
 
   def validate
@@ -54,6 +58,7 @@ class Expense::Manual::Split < Expense::Manual::Base
 
   def process
     self.expenses.each do |expense|
+      expense.split_link = self.split_link
       if expense.save and self.receipt.present?
         expense.receipts << expense.receipts.create(image: self.receipt.image, user: expense.user)
       end
