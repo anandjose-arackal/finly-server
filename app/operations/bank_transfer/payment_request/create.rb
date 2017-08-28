@@ -115,7 +115,6 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
         value: self.requested_amount,
         currency_id: Currency.first.id
     }
-    p[:name] = "#{user.name}'s payment request"
     p[:description] = params[:description]
     p[:payment_order_attributes] = {}
     p[:payment_order_attributes][:initiating_user] = user

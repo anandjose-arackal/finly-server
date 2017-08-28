@@ -74,6 +74,10 @@ class BankPaymentRequest < ActiveRecord::Base
     self.payment_order.payments.first.initiating_account
   end
 
+  def initiating_account_name
+    self.payment_order.payments.first.initiating_account_type_name
+  end
+
   # todo - jugaad till we generalize the approval flow for
   # user manager mapping
   def controlling_for_user

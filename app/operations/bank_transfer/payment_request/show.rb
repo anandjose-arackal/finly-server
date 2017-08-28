@@ -29,13 +29,16 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
   class BankTransfer::PaymentRequest::Show::RequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :bank_payment_request, :payment_order, :actions, :bank_wallet_balance
+    attr_accessor :bank_payment_request, :payment_order, :actions, :bank_wallet_balance,
+                  :manager, :finance_manager
 
     def init
       self.bank_payment_request = params[:payment_request]
       self.payment_order = bank_payment_request.payment_order
       self.bank_wallet_balance = AccountManager::Balance::Check.(user.bank_wallet).balance rescue 0
       self.actions = retrieve_actions
+      self.manager = User::Team::Approver.(bank_payment_request.owner, payment_request: bank_payment_request, type: :manager)
+      self.finance_manager = User::Team::Approver.(bank_payment_request.owner, payment_request: bank_payment_request, type: :finance_manager)
     end
 
     def retrieve_actions

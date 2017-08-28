@@ -10,6 +10,12 @@ json.summary do
   json.description @result.bank_payment_request.description
   json.note @result.payment_order.note
   json.initiating_account @result.payment_order.payments.first.initiating_account_name
+  json.initiating_user @result.bank_payment_request.owner.name
+  json.initiating_account @result.bank_payment_request.initiating_account_name
+  reviewer = (@result.manager.name rescue '--')
+  json.reviewing_user reviewer
+  creditor = (@result.finance_manager.name rescue '--')
+  json.crediting_user creditor
 end
 
 json.payments do

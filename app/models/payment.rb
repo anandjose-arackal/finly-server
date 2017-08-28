@@ -197,7 +197,7 @@ class Payment < ActiveRecord::Base
   end
 
   def initiating_account_type_name
-    name = "#{initiating_user&.name&.to_s}'s "
+    name = "#{initiating_user&.first_name&.to_s}'s "
 
     case self.initiating_account_type
       when "Company", "ItzCashCompanyAccount"
@@ -212,7 +212,7 @@ class Payment < ActiveRecord::Base
       when "YesBankCompanyAccount"
         name = "Company Credits"
       when "VendorPaymentWallet"
-        name += "Finly Credits"
+        name += "Finly Money (Bank Transfer Pocket)"
       else
         name = ""
     end
@@ -222,7 +222,7 @@ class Payment < ActiveRecord::Base
   alias_method :initiating_account_name, :initiating_account_type_name
 
   def receiving_account_type_name
-    name = "#{receiving_user&.name.to_s}'s "
+    name = "#{receiving_user&.first_name.to_s}'s "
 
     case self.receiving_account_type
       when "Company", "ItzCashCompanyAccount"
@@ -237,7 +237,7 @@ class Payment < ActiveRecord::Base
       when "YesBankCompanyAccount"
         name = "Company Credits"
       when "VendorPaymentWallet"
-        name += "Finly Credits"
+        name += "Finly Money (Bank Transfer Pocket)"
       else
         name = ""
     end

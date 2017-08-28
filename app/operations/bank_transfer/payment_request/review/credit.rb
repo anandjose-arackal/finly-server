@@ -86,7 +86,10 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     #   else
     #     # do nothing, ha
     # end
-    self.bank_payment_request.payment_order.initiating_account
+    # self.bank_payment_request.payment_order.initiating_account
+
+    # todo - temporary - currently always goes from the crediting user's finly money
+    user.bank_wallet
   end
 
 end

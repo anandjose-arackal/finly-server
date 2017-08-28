@@ -21,8 +21,25 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
     end
   end
 
+  def pre_process
+    #### todo - temporary until we implement the flow for anyone along the approcal chain to credit the money
+    creditor = User::Team::Approver.(bank_payment_request.owner, payment_request: bank_payment_request, type: :finance_manager)
+    fowards_credits_to = nil
+    unless creditor.nil?
+      forwards_credits_to = User::Team::Approver.(creditor, payment_request: bank_payment_request, type: :approves_finance_to)
+    end
+    if forwards_credits_to.present?
+      bank_payment_request.payment_order.payments.update_all(initiating_account_id: forwards_credits_to.bank_wallet, initiating_account_type: "VendorPaymentWallet")
+    elsif creditor.present?
+      bank_payment_request.payment_order.payments.update_all(initiating_account_id: creditor.bank_wallet, initiating_account_type: "VendorPaymentWallet")
+    else
+      # nothing changes
+    end
+    ########################################################################################################
+  end
+
   def process
-    # todo - add logic to retrieve manager here
+
     presenter = User::Team::Review::NextReviewer.(bank_payment_request)
     manager = presenter.user
     manager_role_id = presenter.role_id
