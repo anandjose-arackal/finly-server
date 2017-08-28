@@ -1,6 +1,7 @@
 class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBase
 
-  attr_accessor :reports, :temp_errors, :qb_reports, :date_type, :quickbooks_configuration, :company
+  attr_accessor :reports, :temp_errors, :qb_reports, :date_type, :quickbooks_configuration, :company,
+                :sync_status
 
   def init
     super()
@@ -10,6 +11,12 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
     self.reports = Report.with_user(user_ids).where(id: params[:report_ids])
     self.qb_reports = []
     self.date_type = quickbooks_configuration.transaction_date_field
+  end
+
+  def self.call_async(user_id, params)
+    super(user_id, params)
+    user = User.find_by(id: user_id)
+    BaseOperation::BasePresenter::SuccessPresenter.new(user, params, [])
   end
 
   def validate
@@ -30,7 +37,7 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
     # if any of the reports are already synced with quickbooks, stop the sync and mention their names
     synced_report_names = []
     reports.each do |report|
-      if report.synced_with_quickbooks
+      if report.synced_with_quickbooks?
         synced_report_names << report.name
       end
     end
@@ -44,7 +51,7 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
     # splitting the reports into two sections for syncing with quickbooks online
     reports.each do |report|
       # if the report is already synced, skip to the next one
-      if report.synced_with_quickbooks
+      if report.synced_with_quickbooks?
         next
       end
       reimbursable_expenses = report.expenses.reimbursable
@@ -75,29 +82,65 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
 
   def process
     qb_reports.each do |qb_report|
-      unless qb_report.expenses.empty?
+      unless qb_report.expenses.not_synced_with_quickbooks.empty?
         result = adapter.save_report(qb_report)
         if result.is_a?(String)
           add_message :error, result
-          return
+          if qb_report.report.expenses.pluck(:synced_with_quickbooks).include?(nil) || report.expenses.pluck(:synced_with_quickbooks).include?(false)
+            if qb_report.report.expenses.pluck(:synced_with_quickbooks).include?(true)
+              self.sync_status = 2
+              qb_report.report.update(sync_status_id: ReportSyncStatus.id_for(:partially_synced))
+            else
+              self.sync_status = 1
+              qb_report.report.update(sync_status_id: ReportSyncStatus.id_for(:not_synced))
+            end
+          end
         end
       end
+    end
+  end
+
+  def post_process
+    self.sync_status = 1
+    reports.each do |report|
+      if report.expenses.pluck(:synced_with_quickbooks).include?(nil) || report.expenses.pluck(:synced_with_quickbooks).include?(false)
+        if report.expenses.pluck(:synced_with_quickbooks).include?(true)
+          self.sync_status = 2
+          report.update(sync_status_id: ReportSyncStatus.id_for(:partially_synced))
+        else
+          self.sync_status = 1
+          report.update(sync_status_id: ReportSyncStatus.id_for(:not_synced))
+        end
+        next
+      end
+      report.update(sync_status_id: ReportSyncStatus.id_for(:synced))
     end
   end
 
   # this should create a successful notification entry saying the reports have been synced
   def success
     view_role = 1
-    user.notifications.create(notification_type_id: NotificationType.id_for(:report),
-                                       action_type_id: NotificationActionType.id_for(:notify_quickbooks_sync_success),
-                                       action_user_id: user.id,
-                                       path_object_type: "Reports",
-                                       object_type: "Report",
-                                       read: false,
-                                       timestamp: DateUtils.local_date_time,
-                                       view_role_id: view_role)
-    reports.each do |report|
-      report.update(synced_with_quickbooks: true)
+    case self.sync_status
+      when 1
+        # fully synced
+        user.notifications.create(notification_type_id: NotificationType.id_for(:report),
+                                         action_type_id: NotificationActionType.id_for(:notify_quickbooks_sync_success),
+                                         action_user_id: user.id,
+                                         path_object_type: "Reports",
+                                         object_type: "Report",
+                                         read: false,
+                                         timestamp: DateUtils.local_date_time,
+                                         view_role_id: view_role)
+      when 2
+        # partially synced
+        user.notifications.create(notification_type_id: NotificationType.id_for(:report),
+                                  action_type_id: NotificationActionType.id_for(:notify_quickbooks_sync_partial_success),
+                                  action_user_id: user.id,
+                                  path_object_type: "Reports",
+                                  object_type: "Report",
+                                  read: false,
+                                  timestamp: DateUtils.local_date_time,
+                                  view_role_id: view_role)
     end
   end
 

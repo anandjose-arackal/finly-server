@@ -102,6 +102,23 @@ end
 end
 json.actions @result.actions
 
+json.bank_accounts do
+  json.array!(@result.bank_accounts) do |bank_account|
+    json.account do
+      json.account_number bank_account.account_number
+      json.ifsc bank_account.ifsc
+      json.name bank_account.name
+      json.id bank_account.id
+    end
+    json.account_owner do
+      json.owner_name bank_account.account_owner.name
+
+      json.email bank_account.account_owner.email
+      json.mobile_number bank_account.account_owner.mobile_number
+    end
+  end
+end
+
 json.cards do
   json.array! @result.cards.each do |card_details|
     card = card_details[:card]
@@ -160,6 +177,8 @@ end
 json.wallet do
   json.balance @result.wallet.balance_value
 end
+
+json.cash_on_hand @result.cash_on_hand
 
 json.auto_submit_config do
   json.extract! @result.auto_submit_config, :enabled, :limit_to_card_expenses, :default_memo

@@ -97,6 +97,7 @@ class Card < ActiveRecord::Base
   validates :company_id, presence: true
   # validates :itz_cash_card_program_id, presence: true
   validate :card_program_with_user
+  validates :card_status_id, presence: true
 
   after_create do
     user = self.user

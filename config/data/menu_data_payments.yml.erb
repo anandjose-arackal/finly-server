@@ -35,38 +35,42 @@ user:
     default_url: 'orders'
   <% end %>
   <% if current_user.finance_manager? %>
-  - id: finance_manager
-    name: 'Finance Manager'
-    default_url: 'orders'
+#  - id: finance_manager
+#    name: 'Finance Manager'
+#    default_url: 'orders'
   <% end %>
   <% if current_user.manager? %>
-  - id: manager
-    name: 'Manager'
-    default_url: 'orders'
+#  - id: manager
+#    name: 'Manager'
+#    default_url: 'orders'
   <% end %>
+  - id: personal
+    name: 'Finance'
+    default_url: 'orders'
 views:
-  <%# if current_user.admin? %>
+  <% if current_user.admin? %>
     admin:
       menus:
         navbar:
-#        - name: Individual Payments
-#          url: payments
-#          id: payments
+        - name: Individual Payments
+          url: payments
+          id: payments
         - name: Payment Orders
           url: orders
           id: orders
-#        - name: Users
-#          url: users
-#          id: users
-#        - name: Vendors
-#          url: vendors
-#          id: 'vendors'
-#        - name: Analytics
-#          url: analytics
-#          id: analytics
+        - name: Users
+          url: users
+          id: users
+        - name: Vendors
+          url: vendors
+          id: 'vendors'
+        - name: Beneficiaries
+          url: beneficiaries
+          id: beneficiaries
+#        - name: Statements
+#          url: statements
+#          id: statements
         cog:
-#        - name: Organization Account
-#          url: '#organization_account'
         - name: Load Company Balance
           url: '#load-company-balance'
         <% if current_user.company.expense_management_enabled? %>
@@ -79,4 +83,19 @@ views:
         <% end %>
 #        - name: 'Company Statements'
 #          url: '#company_statements'
-  <%# end %>
+  <% end %>
+    personal:
+      menus:
+        navbar:
+        - name: Individual Payments
+          url: payments
+          id: payments
+        - name: Payment Orders
+          url: orders
+          id: orders
+        - name: Vendors
+          url: vendors
+          id: 'vendors'
+        - name: Beneficiaries
+          url: beneficiaries
+          id: beneficiaries

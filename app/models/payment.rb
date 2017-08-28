@@ -38,10 +38,6 @@ class Payment < ActiveRecord::Base
   end
 
   belongs_to :amount
-  belongs_to :initiating_account_closing_balance, class_name: "Amount"
-  belongs_to :receiving_account_closing_balance, class_name: "Amount"
-  belongs_to :initiating_account_opening_balance, class_name: "Amount"
-  belongs_to :receiving_account_opening_balance, class_name: "Amount"
   belongs_to :payment_type
   belongs_to :initiating_user, polymorphic: true
   belongs_to :receiving_user, polymorphic: true
@@ -64,10 +60,6 @@ class Payment < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :payment_order
-  accepts_nested_attributes_for :initiating_account_opening_balance
-  accepts_nested_attributes_for :initiating_account_closing_balance
-  accepts_nested_attributes_for :receiving_account_closing_balance
-  accepts_nested_attributes_for :receiving_account_opening_balance
   delegate :amount_value, to: :amount
 
   default_scope { order date: :desc, created_at: :desc }
@@ -91,6 +83,12 @@ class Payment < ActiveRecord::Base
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
+  scope :with_receiving_account_type, -> (receiving_account_type){
+    where receiving_account_type: receiving_account_type
+  }
+  scope :with_receiving_account_id, -> (ids) {
+    where receiving_account_id: ids
+  }
 
   # Personal are card transactions from own wallet to own card
 
@@ -141,8 +139,9 @@ class Payment < ActiveRecord::Base
     where application: application.to_s
   }
 
-  # { personal.where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card), PaymentType.id_for(:debit_from_wallet_to_card)]) }
-  # scope :non_personal_transfer_to_card, -> { non_personal.where(payment_type_id: [PaymentType.id_for(:credit_from_wallet_to_card), PaymentType.id_for(:debit_from_wallet_to_card)]) }
+  scope :with_payment_order_id, -> (ids) {
+    where payment_order_id: ids
+  }
 
   scope :cash_additions_to_employee, -> { where(payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)]) }
   scope :cash_deductions_from_employee, -> { where(payment_type_id: [PaymentPurpose.id_for(:balance_clearance_outside_finly)]) }
@@ -150,6 +149,32 @@ class Payment < ActiveRecord::Base
   scope :credits_for_account, ->(account) { where("(initiating_account_id = ? AND initiating_account_type = ? AND payment_type_id = #{PaymentType.id_for(:debit)}) OR (receiving_account_id = ? and receiving_account_type = ? AND payment_type_id = #{PaymentType.id_for(:credit)})", account.id, account.class.name, account.id, account.class.name) }
   scope :debits_for_account, ->(account) { where("(initiating_account_id = ? AND initiating_account_type = ? AND payment_type_id = #{PaymentType.id_for(:credit)}) OR (receiving_account_id = ? and receiving_account_type = ? AND payment_type_id = #{PaymentType.id_for(:debit)})", account.id, account.class.name, account.id, account.class.name) }
   scope :with_reference_id, -> (ref_id) { where reference_id: ref_id }
+
+  scope :filter_search, -> (term) {
+    #todo - need to think about this
+  }
+
+  scope :filter_user_id, -> (user_id) {
+    if user_id.present?
+      where('initiating_user_id = ? OR receiving_user_id = ?', user_id, user_id)
+    end
+  }
+
+  scope :filter_vendor_payments, -> (enabled){
+    if ['1', 1].include?(enabled)
+      where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
+    end
+  }
+
+  scope :filter_date, -> (date_from, date_to) {
+    type_val = :date
+    date_from = "1990-01-01" if date_from.blank?
+    date_to = DateUtils.local_date if date_to.blank?
+    date_from = date_from.to_date if date_from.present?
+    date_to = date_to.to_date if date_to.present?
+    payments = arel_table
+    where(payments[type_val].gteq(date_from).and(payments[type_val].lteq(date_to)))
+  }
 
   # validates :amount_id, presence: true
   validates :date, presence: true
@@ -169,7 +194,6 @@ class Payment < ActiveRecord::Base
   def initiating_account_type_name
     name = "#{initiating_user&.name&.to_s}'s "
 
-
     case self.initiating_account_type
       when "Company", "ItzCashCompanyAccount"
         name = "Company Credits"
@@ -180,6 +204,10 @@ class Payment < ActiveRecord::Base
         name += "#{card_type} Card"
       when "UserWallet"
         name += "Finly Money"
+      when "YesBankCompanyAccount"
+        name = "Company Credits"
+      when "VendorPaymentWallet"
+        name += "Finly Credits"
       else
         name = ""
     end
@@ -199,6 +227,10 @@ class Payment < ActiveRecord::Base
         name += "#{card_type} Card"
       when "UserWallet"
         name += "Finly Money"
+      when "YesBankCompanyAccount"
+        name = "Company Credits"
+      when "VendorPaymentWallet"
+        name += "Finly Credits"
       else
         name = ""
     end

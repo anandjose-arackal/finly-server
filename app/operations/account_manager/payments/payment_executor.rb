@@ -54,11 +54,20 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         return
       end
 
-      unless source_account_adapter.balance >= payment.amount_value
-        add_message :error, "This account does not have enough balance for this transaction"
-        payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                      content: "Not enough funds in #{payment.initiating_account_type.to_s} to initiate the transfer").save
-        return
+      if payment.credit?
+        unless source_account_adapter.balance >= payment.amount_value
+          add_message :error, "The source account does not have enough balance for this transaction"
+          payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+                                        content: "Not enough funds in #{payment.initiating_account_type.to_s} to initiate the transfer").save
+          return
+        end
+      else
+        unless receiving_account_adapter.balance >= payment.amount_value
+          add_message :error, "This source account does not have enough balance for this transaction"
+          payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+                                        content: "Not enough funds in #{payment.receiving_account_type.to_s} to initiate the transfer").save
+          return
+        end
       end
     end
 
@@ -71,15 +80,6 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
   def pre_process
     # update payment to in progress
     payment.update(payment_status_id: PaymentStatus.id_for(:in_progress))
-    # # storing opening balances
-    # unless source_account_adapter.blank? || source_account_adapter.is_a?(AccountManager::OutsideFinly::OutsideFinlyAdapter)
-    #   source_balance = source_account_adapter.balance
-    #   payment.update(initiating_account_opening_balance_attributes: {value: source_balance, currency_id: Currency.first.id})
-    # end
-    # unless receiving_account_adapter.blank? || receiving_account_adapter.is_a?(AccountManager::OutsideFinly::OutsideFinlyAdapter)
-    #   receiving_balance = receiving_account_adapter.balance
-    #   payment.update(receiving_account_opening_balance_attributes: {value: receiving_balance, currency_id: Currency.first.id})
-    # end
   end
 
   def process
@@ -124,9 +124,6 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       return
     end
 
-    # creating the payment trail for this particular transaction (if it was successful i.e.)
-    create_payment_trail
-
     # todo - probably should be moved to the adapter itself
     if payment.in_progress?
       # i.e. if the payment was not modified in any way during the execution, update it here.
@@ -135,22 +132,5 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
   end
 
-  # def post_process
-  #   # updating closing balances
-  #   unless source_account_adapter.blank? || source_account_adapter.is_a?(AccountManager::OutsideFinly::OutsideFinlyAdapter)
-  #     source_balance = source_account_adapter.balance
-  #     payment.update(initiating_account_closing_balance_attributes: {value: source_balance, currency_id: Currency.first.id})
-  #   end
-  #   unless receiving_account_adapter.blank? || receiving_account_adapter.is_a?(AccountManager::OutsideFinly::OutsideFinlyAdapter)
-  #     receiving_balance = receiving_account_adapter.balance
-  #     payment.update(receiving_account_closing_balance_attributes: {value: receiving_balance, currency_id: Currency.first.id})
-  #   end
-  # end
-
-  private
-
-  def create_payment_trail
-    # is this even necessary now?
-  end
 
 end

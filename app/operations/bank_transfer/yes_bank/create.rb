@@ -27,20 +27,23 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
 
   def init
     self.order_data = params[:payment_order]
-    # below variable will contain the payment_request that holds data about initiating accounts and
-    # receiving accounts
-    self.initiating_account = user.company.yes_bank_company_account
     op = BankTransfer::YesBank::Process.(user, scheduled_at: params[:scheduled_at],
         payment_order: self.order_data)
     self.processed_order_data = op.payment_order_data
 
+    # setting the initiating account based on the type of user creating the
+    # request as well as the option chosen by the admin
+    self.initiating_account = retrieve_initiating_account
+    ##########################################################
 
     #### setting the bank transfer type from the front end ####
     params[:bank_transfer_type] = params[:transfer_type].upcase
     ###########################################################
 
     self.scheduled_at = op.scheduled_at
-    self.payment_request = build_payment_request(processed_order_data, params[:bank_transfer_type], scheduled_at)
+    # below variable will contain the payment_request that holds data about initiating accounts and
+    # receiving accounts
+    self.payment_request = build_payment_request(processed_order_data, params[:bank_transfer_type], scheduled_at, initiating_account)
   end
 
   def validate
@@ -62,7 +65,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   def process
 
     # calling the payment processor to complete the transfer using adapters
-    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_request.bank_transfer_type})
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_request.bank_transfer_type, background: true})
     unless op.success?
 
       add_message :error, op.messages[:error]

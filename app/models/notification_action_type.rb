@@ -34,7 +34,8 @@ class NotificationActionType < ActiveRecord::Base
              notify_auto_reload_card_failure: 22,
              notify_auto_reload_card_success: 23,
              notify_quickbooks_sync_success: 24,
-             notify_quickbooks_sync_failure: 25
+             notify_quickbooks_sync_failure: 25,
+             notify_quickbooks_sync_partial_success: 26
             }
 
   self.class.instance_eval do

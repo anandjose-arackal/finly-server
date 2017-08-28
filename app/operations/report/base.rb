@@ -23,7 +23,7 @@ class Report::Base < BaseOperation
     # self.report = Report::Index.(user, params).reports.with_id(id).first rescue nil
 
     # todo - temporary fix for notifications
-    self.report = Report::Index.(user, params).reports.unscoped.with_id(id).first rescue nil
+    self.report = Report::Index.(user, params).reports&.unscoped.with_id(id)&.first
     # self.report = Report.find_by(id: params[:report_id])
   end
 
@@ -56,7 +56,7 @@ class Report::Base < BaseOperation
       self.report = params[:report]
       report.reload
       self.categories = report.user.company.categories
-      self.expenses = report.expenses
+      self.expenses = report.expenses.includes(:amount)
       self.status = report.relative_status_name user
       self.total = report.total_amount
       self.dates = report.date_as_string

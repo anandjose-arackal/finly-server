@@ -209,6 +209,9 @@ class Notification < ActiveRecord::Base
         content = "Syncing of reports with Quickbooks was partially successful or failed because : #{self.message}"
         # returning content directly because further constructions are not required
         return content
+      when NotificationActionType.id_for(:notify_quickbooks_sync_partial_success)
+        content = "Syncing with Quickbooks was partially successful - refer to reports list to see what all were successful"
+        return content
       else
         action = ""
     end

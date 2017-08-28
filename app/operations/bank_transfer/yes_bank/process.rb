@@ -45,7 +45,6 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
       return
     end
 
-    # todo - change this to the adapter method of finding the company balance
     op = AccountManager::Balance::Check.(current_user.company.yes_bank_company_account, params)
     company_balance = op.balance rescue 0
 
@@ -53,15 +52,23 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
       self.requested_amount += (item[:amount].to_d rescue 0)
     end
 
-    if self.requested_amount > company_balance
-      self.errors << 'Insufficient funds to initiate the transfer'
-      self.payment_order_valid = false
+    case params[:initiating_account_type]
+      when '1', 1
+        if self.requested_amount > company_balance
+          self.errors << 'Insufficient funds to initiate the transfer'
+          self.payment_order_valid = false
+          return
+        end
+      when '2', 2
+        if self.requested_amount > user.bank_wallet.balance_value
+          self.errors << 'Insufficient funds to initiate the transfer'
+          self.payment_order_valid = false
+          return
+        end
     end
-
   end
 
   def process
-
     if payment_order_data.is_a?(Hash)
       arr = []
       self.payment_order_data.map {|k, v| arr << v }
@@ -69,10 +76,10 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
     end
 
     self.payment_order_data.each do |item|
-      bank_account_no = item[:account_number]
-      ifsc = item[:ifsc]
-      name = item[:name]
-      amount = item[:amount]&.to_f
+      bank_account_no = item[:bank_account_number] || item["bank_account_number"]
+      ifsc = item[:ifsc] || item["ifsc"]
+      name = item[:name] || item["name"]
+      amount = item[:amount]&.to_f || item["amount"]&.to_f
 
       valid = true
       messages = []

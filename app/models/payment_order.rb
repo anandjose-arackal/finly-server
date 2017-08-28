@@ -84,11 +84,31 @@ class PaymentOrder < ActiveRecord::Base
   scope :total_amount_requested, -> { joins_amount_requested.sum(:value) }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
   scope :with_application, -> (application) {where application: application}
+  scope :with_initiating_account_type, -> (receiving_account_type) {
+    where initiating_account_type: receiving_account_type
+  }
+  scope :with_initiating_user_id, -> (user_id){
+    where initiating_user_id: user_id
+  }
 
   scope :vendor_payments, -> (enabled){
     if enabled == 1 || enabled == '1'
       where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
     end
+  }
+
+  scope :filter_vendor_payments, -> (enabled) {
+    if enabled == 1 || enabled == '1'
+      where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
+    end
+  }
+
+  scope :filter_date, -> (date_from, date_to) {
+    date_from = "1990-01-01" if date_from.blank?
+    date_to = DateUtils.local_date_time if date_to.blank?
+    date_from = date_from.to_time if date_from.present?
+    date_to = date_to.to_time if date_to.present?
+    where('processed_at >= ? AND processed_at <= ?', date_from, date_to)
   }
 
 

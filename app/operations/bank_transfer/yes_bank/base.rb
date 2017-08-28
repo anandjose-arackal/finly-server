@@ -10,7 +10,7 @@ class BankTransfer::YesBank::Base < BaseOperation
   end
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :finance_manager, :manager, :personal]
   end
 
   def pre_validate
@@ -21,8 +21,8 @@ class BankTransfer::YesBank::Base < BaseOperation
 
   # this will create the respective vendors for each transaction, and create the payment request
   # for each of them - at this point, all of them will be valid
-  def build_payment_request(order_data, bank_transfer_type, scheduled_at)
-    self.payment_request = PaymentRequest.(user, initiating_account, BankAccount.name, :credit, :vendor_payment, {bank_transfer_type: bank_transfer_type, scheduled_at: scheduled_at, payment_mode: bank_transfer_type, background: true})
+  def build_payment_request(order_data, bank_transfer_type, scheduled_at, source_account)
+    self.payment_request = PaymentRequest.(user, source_account, BankAccount.name, :credit, :vendor_payment, {bank_transfer_type: bank_transfer_type, scheduled_at: scheduled_at, payment_mode: bank_transfer_type, background: true})
     self.payment_request.bank_transfer_type = bank_transfer_type
     order_data.each do |data|
       account_number = data[:bank_account_number]
@@ -30,16 +30,29 @@ class BankTransfer::YesBank::Base < BaseOperation
       name = data[:name]
       amount = data[:amount]
 
-      ba = BankAccount.find_by(account_number: account_number)
+      ba = BankAccount.find_by(account_number: account_number, company_id: payment_request.company_id)
 
       vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: name, company_id: payment_request.company_id)
 
       if ba.nil?
-        ba = BankAccount.create(name: name, account_number: account_number, ifsc: ifsc, account_owner: vendor)
+        ba = BankAccount.create(name: name, account_number: account_number, ifsc: ifsc, account_owner: vendor, company_id: payment_request.company_id)
       end
       self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(ba.account_owner, ba, amount))
     end
     payment_request
+  end
+
+  def retrieve_initiating_account
+    if user.company_admin?
+      case params[:initiating_account_type]
+        when 1, '1', "CompanyAccount"
+          self.initiating_account = user.company.yes_bank_company_account
+        when 2, '2', "FinlyCredits"
+          self.initiating_account = user.bank_wallet
+      end
+    else
+      self.initiating_account = user.bank_wallet
+    end
   end
 
 end
