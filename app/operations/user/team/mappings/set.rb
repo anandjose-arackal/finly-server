@@ -105,7 +105,7 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
   protected
 
   def update_params(params)
-    params.permit(:policy_id, :manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id, :user_id, greater_than_amount_attributes: [:id, :value, :currency_id])
+    params.permit(:policy_id, :manager_id, :finance_manager_id, :approves_to_id, :approves_finance_to_id, :user_id, :purpose_id, greater_than_amount_attributes: [:id, :value, :currency_id])
   end
 
   def load_updating_records

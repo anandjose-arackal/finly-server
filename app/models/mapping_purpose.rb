@@ -24,6 +24,8 @@ class MappingPurpose < ActiveRecord::Base
         return MappingPurpose.id_for(:expense_management)
       else
         # do nothing?
+        # # todo - temporary for testing
+        # return MappingPurpose.id_for(:vendor_payments)
     end
   end
 end
