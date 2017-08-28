@@ -78,7 +78,7 @@ class Expense::Manual::Split < Expense::Manual::Base
   def split_expense_params
     expenses_params = []
     base_params = params.require(:expense).permit(:expense_type_id, :expense_status_id,
-                                                  :report_id, :reimbursable,
+                                                  :report_id, :reimbursable, :date,
                                                   manual_expense_attributes: [:merchant],
                                                   receipts_attributes: [:image],
                                                   receipt_email_attributes: [:source, :email_id, :sender, :raw_html,
@@ -103,7 +103,6 @@ class Expense::Manual::Split < Expense::Manual::Base
       expense_item_params[:note] = split[:note]
       expense_item_params[:category_id] = split[:category_id]
       expense_item_params[:amount_attributes] = split[:amount_attributes]
-      expense_item_params[:date] = split[:date]
       expense_custom_fields = base_custom_fields
       if split[:custom_fields].present?
         expense_custom_fields[:custom_fields].merge split[:custom_fields]
