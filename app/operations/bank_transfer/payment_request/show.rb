@@ -6,8 +6,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
   def init
     id = params[:id] || params[:payment_request_id]
-    # todo - implement the below index operation to determine who can be in the list of people with access to the payment request
-    # self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
     self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
     # self.bank_payment_request = BankPaymentRequest.find_by(id: id)
   end
@@ -44,7 +42,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
     def retrieve_actions
       actions = {}
-      if admin_view?
+      if admin_view? && user.vendor_payments_admin?
         if bank_payment_request.processing? && bank_payment_request.controlling_user_id == user.id
           actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
@@ -55,6 +53,15 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:destroy] ={method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
         elsif bank_payment_request.approved?
           actions[:credit] = true
+          balance = retrieve_balance(:vendor_payment_wallet, user)
+          enabled = false
+          admin = false
+          if balance > bank_payment_request.requested_amount_value
+            enabled = true
+          end
+          if user.vendor_payments_admin?
+            admin = true
+          end
           admins = []
           user.company.users.only_vendor_payment_admins.each do |admin|
             admins << {
