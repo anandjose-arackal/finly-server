@@ -21,6 +21,7 @@ class Agreement < ActiveRecord::Base
   belongs_to :agreement_type
   has_many :login_agreement_mappings
   has_many :users, through: :login_agreement_mappings
+  has_many :email_authorizations, as: :authorizable
 
   validates :agreement_type, presence: true
   validates :file, presence: true
@@ -30,6 +31,8 @@ class Agreement < ActiveRecord::Base
   scope :without_id, -> (id) { where.not id: id }
   scope :with_type_id, ->(type_id) { where agreement_type_id: type_id }
   scope :active, -> { where active: true }
+
+  scope :with_id, ->(id) { where id: id }
 
   CONTENT_TYPES = {content_type: %w(text/plain text/html)}
 

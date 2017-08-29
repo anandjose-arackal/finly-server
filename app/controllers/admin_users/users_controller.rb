@@ -89,6 +89,15 @@ class AdminUsers::UsersController < ApplicationController
     end
   end
 
+  def agreements_mail
+    @result = Admin::Users::AgreementsMail.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
   def temp_import
 
   end

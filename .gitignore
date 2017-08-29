@@ -20,6 +20,7 @@
 /public/system/company_configurations/*
 /public/system/company_kycs/*
 /public/system/individual_kycs/*
+/public/system/payment_order_attachments/*
 /public/system/agreements/*
 /public/system/kyc_documents/*
 /public/common/files/temp_files/*
