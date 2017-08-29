@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170828090230) do
+ActiveRecord::Schema.define(version: 20170829132711) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -445,17 +445,19 @@ ActiveRecord::Schema.define(version: 20170828090230) do
   add_index "bank_payment_request_trails", ["request_status_id"], name: "index_bank_payment_request_trails_on_request_status_id", using: :btree
 
   create_table "bank_payment_requests", force: :cascade do |t|
-    t.integer  "owner_id",                 limit: 4
-    t.integer  "status_id",                limit: 4
-    t.integer  "controlling_user_id",      limit: 4
-    t.integer  "payment_order_id",         limit: 4
-    t.string   "name",                     limit: 255
-    t.integer  "requested_amount_id",      limit: 4
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
+    t.integer  "owner_id",                     limit: 4
+    t.integer  "status_id",                    limit: 4
+    t.integer  "controlling_user_id",          limit: 4
+    t.integer  "payment_order_id",             limit: 4
+    t.string   "name",                         limit: 255
+    t.integer  "requested_amount_id",          limit: 4
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
     t.datetime "submitted_at"
-    t.integer  "controlling_user_role_id", limit: 4
-    t.text     "description",              limit: 65535
+    t.integer  "controlling_user_role_id",     limit: 4
+    t.text     "description",                  limit: 65535
+    t.integer  "controlling_for_user_id",      limit: 4
+    t.integer  "controlling_for_user_role_id", limit: 4
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree

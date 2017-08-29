@@ -80,14 +80,19 @@ class BankPaymentRequest < ActiveRecord::Base
     self.payment_order.payments.first.initiating_account_type_name
   end
 
-  # todo - jugaad till we generalize the approval flow for
-  # user manager mapping
-  def controlling_for_user
-    nil
+  def status_name(user_id)
+    if self.status_id == BankPaymentRequestStatus.id_for(:processing)
+      if user_id == owner_id
+        return "awaiting_approval"
+      else
+        return "processing"
+      end
+    end
+    if [BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:credited)].include?(self.status_id)
+      return self.payment_order.payment_order_status.name
+    end
+    self.status.name&.to_s
   end
-
-  alias_method :controlling_for_user_id, :controlling_for_user
-  alias_method :controlling_for_user_role_id, :controlling_for_user
 
   private
 

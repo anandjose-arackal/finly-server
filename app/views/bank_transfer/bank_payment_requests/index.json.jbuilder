@@ -22,6 +22,7 @@ json.array! @result.payment_requests.each do |payment_request|
   json.payment_order_status do
     json.id item.payment_order_status.id
     json.name item.payment_order_status.name.humanize
+    json.identifier item.bank_payment_request&.status_name(current_user.id)
   end
   json.amount_processed item.amount_processed
   json.amount_requested item.amount_requested

@@ -49,7 +49,7 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
       self.selected_user = params[:selected_user]
       self.user_panel_subscription = selected_user.user_panel_subscription
       self.actions = load_actions
-      # todo - temporary, will be updated to all policies later
+      # todo - temporary, will be updated to all policies later - as of now only the default company policy
       self.policy = selected_user.company.policies.default.first
       self.mapping = retrieve_mappings
       self.roles = {admin: selected_user.vendor_payment_admin?,
