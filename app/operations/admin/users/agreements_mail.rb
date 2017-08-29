@@ -34,9 +34,6 @@ class Admin::Users::AgreementsMail < Admin::Base
       add_message :error, "User not found"
       return
     end
-    unless selected_user&.default_password
-      add_message :error, "This user has already changed their default passsword"
-    end
   end
 
   def process
