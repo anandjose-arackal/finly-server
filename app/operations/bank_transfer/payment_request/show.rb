@@ -70,11 +70,13 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           admin = true
         end
         actions[:credit_options] = {
-            url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
-            enabled: enabled,
-            messages: "You can directly credit this payment order from your Finly Money",
-            require_password: true,
-            initiating_account: admin
+            credit: {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+              enabled: enabled,
+              messages: "You can directly credit this payment order from your Finly Money",
+              require_password: true,
+              initiating_account: admin
+            }
         }
         op = User::Team::Review::NextReviewer.(bank_payment_request)
         reviewer = op.user
@@ -85,7 +87,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           button_type = "button"
           users = []
         end
-        actions[:approve_forward] = {
+        actions[:credit_options][:approve_forward] = {
             url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
             message: "",
             enabled: true,
@@ -126,7 +128,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           button_type = "button"
           users = []
         end
-        actions[:credit][:approve_forward] = {
+        actions[:credit_options][:approve_forward] = {
             url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
             message: "",
             enabled: true,
