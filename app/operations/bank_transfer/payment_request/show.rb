@@ -54,6 +54,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:destroy] ={method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
         elsif bank_payment_request.approved?
           actions[:credit] = true
+          actions[:credit] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
           actions[:credit_options] = {
               credit: {
                   url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
@@ -81,6 +82,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:credit] = true
+        actions[:credit] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
         balance = retrieve_balance(:vendor_payment_wallet, user)
         enabled = false
         admin = false
@@ -125,6 +127,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:credit] = true
+        # todo - temporary
+        actions[:credit] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
         balance = retrieve_balance(:vendor_payment_wallet, user)
         enabled = false
         admin = false
@@ -170,6 +174,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:editable] = true
           actions[:destroy] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
           actions[:credit] = true
+          actions[:credit] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
           admin = false
