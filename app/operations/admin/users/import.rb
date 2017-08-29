@@ -238,6 +238,10 @@ class Admin::Users::Import < Admin::Base
     mobile = row[import_fields[:mobile_number]].to_i.to_s if row[import_fields[:mobile_number]]
     mobile ||= nil
 
+    expense_management_enabled = row[import_fields[:expense_management_enabled]]
+    disburse_enabled = row[import_fields[:disburse_enabled]]
+    vendor_payments_enabled = row[import_fields[:vp_enabled]]
+
     # generating a password for the user
     generated_password = generate_default_password
     company = Company.find_by(id: row[import_fields[:company_id]])
@@ -267,8 +271,9 @@ class Admin::Users::Import < Admin::Base
                     mothers_maiden_name: row[import_fields[:mothers_maiden_name]],
                     error_messages: errors,
                     user_panel_subscription_attributes: {
-                        expense_management: company.feature_subscription.expense_management_enabled,
-                        disburse: company.feature_subscription.cards_enabled
+                        expense_management: expense_management_enabled,
+                        disburse: disburse_enabled,
+                        yes_bank_account_transfer: vendor_payments_enabled
                     }
     }
 
@@ -303,7 +308,10 @@ class Admin::Users::Import < Admin::Base
         :approves_to => 16,
         :approves_finance_to => 17,
         :company_id => 18,
-        :mothers_maiden_name => 19
+        :mothers_maiden_name => 19,
+        :expense_management_enabled => 20,
+        :disburse_enabled => 21,
+        :vp_enabled => 22
     }
   end
 
