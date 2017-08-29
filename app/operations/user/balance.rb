@@ -74,7 +74,7 @@ class User::Balance < User::Base
     end
 
     # Cash In Hand
-    self.balances[:current_user][:cash_on_hand] = {type: :cash_on_hand, id: user.id, name: 'Cash On Hand', balance: (user.balance_sheet.cash_in_hand.amount_value rescue nil)} if params[:current_user_cash_in_hand] or params[:current_user_all]
+    self.balances[:current_user][:cash_on_hand] = {type: :cash_on_hand, id: user.id, name: 'Cash On Hand', balance: (user.cash_on_hand&.balance&.value)} if params[:current_user_cash_in_hand] or params[:current_user_all]
 
     # Pending Cash Advance
     self.balances[:current_user][:pending_money_requests] = {type: :pending_money_requests, id: user.id, name: 'Approved Money Requests', balance: user.balance_sheet.pending_advance.amount_value, count: user.money_requests.approved.count} if params[:current_user_pending_money_request] or params[:current_user_all]
@@ -143,7 +143,7 @@ class User::Balance < User::Base
       end
 
       # Cash In Hand
-      self.balances[:target_user][:cash_on_hand] = {type: :cash_on_hand, id: target_user.id, name: 'Cash On Hand', balance: (target_user.balance_sheet.cash_in_hand.amount_value rescue nil)} if params[:target_user_cash_in_hand] or params[:target_user_all]
+      self.balances[:target_user][:cash_on_hand] = {type: :cash_on_hand, id: target_user.id, name: 'Cash On Hand', balance: (target_user.cash_on_hand&.balance&.value rescue nil)} if params[:target_user_cash_in_hand] or params[:target_user_all]
 
       # Pending Cash Advance
       self.balances[:target_user][:pending_money_requests] = {type: :pending_money_requests, id: target_user.id, name: 'Approved Money Requests', balance: target_user.balance_sheet.pending_advance.amount_value, count: target_user.money_requests.approved.count} if params[:target_user_pending_money_request] or params[:target_user_all]

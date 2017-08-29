@@ -42,6 +42,12 @@ end
 # flag to show whether a particular expense has been converted or not
 json.converted @result.converted
 
+json.per_diems @result.per_diems do |per_diem|
+  json.id per_diem.id
+  json.name "#{per_diem.configurable.name} - #{per_diem.name}"
+  json.rate_value per_diem.rate_value
+end
+
 json.receipts @result.expense.receipts do |receipt|
   json.id receipt.id
   json.image do
@@ -49,12 +55,6 @@ json.receipts @result.expense.receipts do |receipt|
     json.original receipt.image.url
     json.thumb receipt.image.url(:thumb)
   end
-end
-
-json.per_diems @result.per_diems do |per_diem|
-  json.id per_diem.id
-  json.name "#{per_diem.configurable.name} - #{per_diem.name}"
-  json.rate_value per_diem.rate_value
 end
 
 json.violations @result.violation

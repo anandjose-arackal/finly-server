@@ -8,5 +8,14 @@ if expense.note
     json.note expense.note
   end
 end
+
+json.receipts expense.receipts do |receipt|
+  json.id receipt.id
+  json.image do
+    json.file_type receipt.file_format
+    json.original receipt.image.url
+    json.thumb receipt.image.url(:thumb)
+  end
+end
 json.date DateUtils.date_formatted expense.date
 json.potential_duplicate expense.has_duplicate_expenses?
