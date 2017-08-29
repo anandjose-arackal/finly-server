@@ -88,11 +88,18 @@ class Payment < ActiveRecord::Base
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
+  scope :scheduled, -> {where payment_status_id: PaymentStatus.id_for(:scheduled)}
   scope :with_receiving_account_type, -> (receiving_account_type){
     where receiving_account_type: receiving_account_type
   }
   scope :with_receiving_account_id, -> (ids) {
     where receiving_account_id: ids
+  }
+  scope :with_initiating_account_type, -> (initiating_account_type){
+    where initiating_account_type: initiating_account_type
+  }
+  scope :with_initiating_account_id, -> (ids) {
+    where initiating_account_id: ids
   }
 
   # Personal are card transactions from own wallet to own card

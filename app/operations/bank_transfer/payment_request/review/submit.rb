@@ -73,6 +73,8 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
   end
 
   def post_process
+    # add comment
+
     add_message :success, "Payment Order successfully submitted!"
   end
 

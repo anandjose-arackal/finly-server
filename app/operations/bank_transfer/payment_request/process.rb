@@ -48,9 +48,9 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     # op = AccountManager::Balance::Check.(current_user.company.yes_bank_company_account, params)
     # company_balance = op.balance rescue 0
     #
-    # payment_order_data.each do |item|
-    #   self.requested_amount += (item[:amount].to_d rescue 0)
-    # end
+    payment_order_data.each do |item|
+      self.requested_amount += (item[:amount].to_d rescue 0)
+    end
 
     # case params[:initiating_account_type]
     #   when '1', 1

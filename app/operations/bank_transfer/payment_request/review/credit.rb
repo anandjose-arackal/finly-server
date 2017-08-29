@@ -3,7 +3,7 @@
 
 class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentRequest::Review::Base
 
-  attr_accessor :initiating_account, :auto_credit
+  attr_accessor :initiating_account, :initiating_account_adapter
 
   def pre_validate
     super
@@ -19,15 +19,17 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
   def init
     super
-    self.auto_credit = true
-    # if bank_payment_request&.payment_order&.initiating_account&.id == user.bank_wallet.id
-    #   self.auto_credit = true
-    # end
     self.initiating_account = retrieve_initiating_account
+    self.initiating_account_adapter = retrieve_initiating_account_adapter
   end
 
   def validate
-    # no validations as the payment request can be credited at any state
+    # check whether the respective account has enough balance for this transaction
+    requested_amount = payment_order.amount_requested.value
+    if requested_amount > initiating_account_adapter.balance
+      add_message :error, "You do not have enough money in your account for this transaction"
+      return
+    end
   end
 
   def pre_process
@@ -66,6 +68,17 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
         return user.bank_wallet
       else
         user.bank_wallet # i.e. finly money by default
+    end
+  end
+
+  def retrieve_initiating_account_adapter
+    case params[:initiating_account_type]
+      when 1, '1'
+        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+      when 2, '2'
+        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+      else
+        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
     end
   end
 

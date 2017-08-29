@@ -9,10 +9,6 @@ class BankTransfer::YesBank::Base < BaseOperation
     super(user, params)
   end
 
-  def authorized_user_types
-    [:company_admin, :finance_manager, :manager, :personal]
-  end
-
   def pre_validate
 
   end

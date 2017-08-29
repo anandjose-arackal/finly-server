@@ -30,6 +30,8 @@ class BankTransfer::PaymentRequest::Review::Retract < BankTransfer::PaymentReque
   end
 
   def post_process
+    # add comments
+
     add_message :success, "Payment Order retracted successfully"
   end
 

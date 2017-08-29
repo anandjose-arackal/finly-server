@@ -1,6 +1,6 @@
 class BankTransfer::PaymentRequest::Review::AssociatedUsers < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :associated_users, :trails, :user_before
+  attr_accessor :associated_users, :bank_payment_trails, :user_before, :bank_payment_request
 
   def pre_validate
     unless user.present?
@@ -15,7 +15,7 @@ class BankTransfer::PaymentRequest::Review::AssociatedUsers < BankTransfer::Paym
     self.bank_payment_request = params[:bank_payment_request]
     super if self.bank_payment_request.blank?
     if self.bank_payment_request.present?
-      self.trails = bank_payment_request.bank_payment_request_trails
+      self.bank_payment_trails = bank_payment_request.bank_payment_request_trails
     end
     self.user_before = params[:user_before]
   end
