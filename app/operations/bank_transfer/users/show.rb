@@ -53,9 +53,9 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
       self.policy = selected_user.company.policies.default.first
       self.mapping = retrieve_mappings
       self.roles = {admin: selected_user.vendor_payment_admin?,
-                    finance_manager: user.vendor_payment_finance?,
-                    manager: user.vendor_payment_manager?,
-                    initiator: user.vendor_payment_initiator?
+                    finance_manager: selected_user.vendor_payment_finance?,
+                    manager: selected_user.vendor_payment_manager?,
+                    initiator: selected_user.vendor_payment_initiator?
                     }
       self.managers = selected_user.company.users.only_vendor_payment_reviewers
       self.finance_managers = selected_user.company.users.only_vendor_payment_creditors

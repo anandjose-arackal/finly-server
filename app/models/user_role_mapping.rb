@@ -28,6 +28,7 @@ class UserRoleMapping < ActiveRecord::Base
   scope :auditor, -> { where(user_role_id: UserRole.auditor_id) }
   scope :vendor_payments, -> { where purpose_id: MappingPurpose.id_for(:vendor_payments)}
   scope :expense_management, -> { where purpose_id: MappingPurpose.id_for(:expense_management)}
+  scope :with_purpose, -> (purpose_id) { where purpose_id: purpose_id}
 
   def is_admin?
     self.user_role_id == UserRole.admin_id

@@ -45,13 +45,15 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     # checked appropriately
     if params[:payment_order].present?
       self.payment_order = params[:payment_order]
-      if payment_order.blank?
-        self.payment_order = company.payment_orders.build(payment_order_params)
-      end
       self.options = {}
       self.options[:bank_transfer_type] = payment_order.bank_transfer_type
       # todo - change below before deploy
       self.background = false # because transfers that happen through the approval flow are always bank transfers (which are in the background, always)
+    end
+
+    # building the payment order if it wasn't already passed from the payment request
+    if payment_order.blank?
+      self.payment_order = company.payment_orders.build(payment_order_params)
     end
 
     unless payment_order.valid?
