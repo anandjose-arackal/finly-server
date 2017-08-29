@@ -60,10 +60,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         # do nothing?
       end
     end
-    # bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-    # bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
-    # # creating a refund payment for this amount
-    # create_refund_payment
+
   end
 
   private

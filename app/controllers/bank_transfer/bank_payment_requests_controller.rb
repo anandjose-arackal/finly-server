@@ -125,7 +125,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
         operation = BankTransfer::PaymentRequest::Review::Retract.new(current_user, params)
       when 4, '4'
         # i.e. reject
-        operation = BankTransfer::PaymentRequest::Review::Retract.new(current_user, params)
+        operation = BankTransfer::PaymentRequest::Review::Reject.new(current_user, params)
       when 5, '5'
         # i.e. unapprove
         operation = BankTransfer::PaymentRequest::Review::Unapprove.new(current_user, params)

@@ -33,6 +33,6 @@ class BankTransfer::PaymentRequest::Review::Reject < BankTransfer::PaymentReques
   end
 
   def post_process
-    add_message :error, "Report successfully rejected"
+    add_message :success, "Payment Request successfully rejected"
   end
 end

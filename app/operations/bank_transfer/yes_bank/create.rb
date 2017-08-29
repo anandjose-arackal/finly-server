@@ -16,14 +16,6 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
       add_message :error, 'Error loading request'
       return
     end
-    # if params[:password].blank?
-    #   add_message :error, 'You need to provide your password to initiate the transfer'
-    #   return
-    # end
-    # unless user.valid_password?(params[:password])
-    #   add_message :error, 'Invalid Password'
-    #   return
-    # end
   end
 
   def init
@@ -78,6 +70,14 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
     if self.bank_payment_request.present?
       bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
     end
+
+    # also set the payment order's status id as either scheduled or as pending
+    if scheduled_at.present? && scheduled_at > DateUtils.local_date
+      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
+    else
+      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
+    end
+
   end
 
   def process

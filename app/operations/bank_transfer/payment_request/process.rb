@@ -45,27 +45,27 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       return
     end
 
-    op = AccountManager::Balance::Check.(current_user.company.yes_bank_company_account, params)
-    company_balance = op.balance rescue 0
+    # op = AccountManager::Balance::Check.(current_user.company.yes_bank_company_account, params)
+    # company_balance = op.balance rescue 0
+    #
+    # payment_order_data.each do |item|
+    #   self.requested_amount += (item[:amount].to_d rescue 0)
+    # end
 
-    payment_order_data.each do |item|
-      self.requested_amount += (item[:amount].to_d rescue 0)
-    end
-
-    case params[:initiating_account_type]
-      when '1', 1
-        if self.requested_amount > company_balance
-          self.errors << 'Insufficient funds to initiate the transfer'
-          self.payment_order_valid = false
-          return
-        end
-      when '2', 2
-        if self.requested_amount > user.bank_wallet.balance_value
-          self.errors << 'Insufficient funds to initiate the transfer'
-          self.payment_order_valid = false
-          return
-        end
-    end
+    # case params[:initiating_account_type]
+    #   when '1', 1
+    #     if self.requested_amount > company_balance
+    #       self.errors << 'Insufficient funds to initiate the transfer'
+    #       self.payment_order_valid = false
+    #       return
+    #     end
+    #   when '2', 2
+    #     if self.requested_amount > user.bank_wallet.balance_value
+    #       self.errors << 'Insufficient funds to initiate the transfer'
+    #       self.payment_order_valid = false
+    #       return
+    #     end
+    # end
   end
 
   def process

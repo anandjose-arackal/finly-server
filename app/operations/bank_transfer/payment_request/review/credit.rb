@@ -65,7 +65,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       when 2, '2'
         return user.bank_wallet
       else
-        # do nothing?
+        user.bank_wallet # i.e. finly money by default
     end
   end
 
