@@ -130,6 +130,12 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
       when 5, '5'
         # i.e. unapprove
         operation = BankTransfer::PaymentRequest::Review::Unapprove.new(current_user, params)
+      when 6, '6'
+        # i.e. take control
+        operation = BankTransfer::PaymentRequest::Review::TakeControl.new(current_user, params)
+      when 7, '7'
+        # approve and forward
+        operation = BankTransfer::PaymentRequest::Review::ApproveAndForward.new(current_user, params)
     end
     if operation.blank?
       respond response: :failure, message: "Invalid update type"

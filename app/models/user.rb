@@ -490,7 +490,10 @@ class User < ActiveRecord::Base
     self.role_mapping.vendor_payments.manager.present?
   end
 
+  alias_method :vendor_payments_manager? , :vendor_payment_manager?
+
   alias_method :vendor_payment_reviewer?, :vendor_payment_manager?
+  alias_method :vendor_payments_reviewer?, :vendor_payment_manager?
 
   def vendor_payment_finance?
     self.role_mapping.vendor_payments.finance_manager.present?
@@ -498,10 +501,13 @@ class User < ActiveRecord::Base
 
   alias_method :vendor_payment_finance_manager?, :vendor_payment_finance?
   alias_method :vendor_payment_creditor?, :vendor_payment_finance?
+  alias_method :vendor_payments_creditor?, :vendor_payment_finance?
 
   def vendor_payment_admin?
     self.role_mapping.vendor_payments.admin.present?
   end
+
+  alias_method :vendor_payments_admin? , :vendor_payment_admin?
 
   def vendor_payment_initiator?
     self.role_mapping.vendor_payments.initiator.present?

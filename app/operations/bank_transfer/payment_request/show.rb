@@ -74,7 +74,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:editable] = true
           actions[:destroy] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
-          # todo - below will be implemented next sprint
           if bank_wallet_balance >= bank_payment_request.requested_amount_value && bank_payment_request.initiating_account == user.bank_wallet
             actions[:credit] = {method: "patch", url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
           end
