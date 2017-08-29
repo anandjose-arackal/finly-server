@@ -18,7 +18,7 @@
 class BankPaymentRequest < ActiveRecord::Base
 
   belongs_to :status, class_name: "BankPaymentRequestStatus"
-  belongs_to :payment_order
+  belongs_to :payment_order, dependent: :destroy
   belongs_to :requested_amount, class_name: "Amount"
   belongs_to :owner, class_name: "User"
   belongs_to :controlling_user, class_name: "User"
