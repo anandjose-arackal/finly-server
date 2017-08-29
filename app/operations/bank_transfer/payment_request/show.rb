@@ -8,7 +8,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     id = params[:id] || params[:payment_request_id]
     # todo - implement the below index operation to determine who can be in the list of people with access to the payment request
     # self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
-    self.bank_payment_request = BankPaymentRequest.find_by(id: id)
+    self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
+    # self.bank_payment_request = BankPaymentRequest.find_by(id: id)
   end
 
   def validate
@@ -55,6 +56,13 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         elsif bank_payment_request.approved?
           actions[:credit] = true
           actions[:credit] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
+          admins = []
+          user.company.users.only_admins.each do |admin|
+            admins << {
+                id: admin.id,
+                name: admin.name
+            }
+          end
           actions[:credit_options] = {
               credit: {
                   url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
@@ -106,10 +114,16 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         reviewer = op.user
         if reviewer.nil?
           button_type = "dropdown"
-          users = user.company.users.only_admins.pluck(:id, :first_name)
+          admins = []
+          user.company.users.only_admins.each do |user|
+            admins << {
+                id: user.id,
+                name: user.name
+            }
+          end
         else
           button_type = "button"
-          users = []
+          admins = []
         end
         actions[:credit_options][:approve_forward] = {
             url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
@@ -117,7 +131,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             enabled: true,
             require_password: true,
             button_type: button_type,
-            users: users,
+            users: admins,
             method: "patch",
             type: 7
         }
@@ -152,10 +166,16 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         reviewer = op.user
         if reviewer.nil?
           button_type = "dropdown"
-          users = user.company.users.only_admins.pluck(:id, :first_name)
+          admins = []
+          user.company.users.only_admins.each do |user|
+            admins << {
+                id: user.id,
+                name: user.name
+            }
+          end
         else
           button_type = "button"
-          users = []
+          admins = []
         end
         actions[:credit_options][:approve_forward] = {
             url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
@@ -163,7 +183,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             enabled: true,
             require_password: true,
             button_type: button_type,
-            users: users,
+            users: admins,
             method: "patch",
             type: 7
         }
