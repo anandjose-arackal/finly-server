@@ -1753,6 +1753,7 @@ Rails.application.routes.draw do
       patch 'update_panel', to: 'users#update_panel', as: :update_panel
     end
     post 'welcome', to: 'users#admin_welcome', as: :welcome
+    post 'agreements_mail', to: 'users#agreements_mail', as: :agreements_mail
     post 'users/set_role', to: 'users#set_role', as: :set_role
     get 'lookup', to: 'users#lookup', as: :lookup
     post 'import', to: 'users#import', as: :import
@@ -2108,6 +2109,9 @@ Rails.application.routes.draw do
       patch 'approve' => 'reports#approve', as: :approve
       patch 'reject' => 'reports#reject', as: :reject
     end
+
+    patch 'agreements/agree' => 'agreements#agree', as: :agreements_agree
+    resources :agreements
   end
 
   get 'export/expense', to: 'export#expense'
@@ -2179,6 +2183,9 @@ Rails.application.routes.draw do
       end
     end
   end
+
+
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
