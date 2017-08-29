@@ -42,6 +42,8 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
   scope :with_id, -> (id) { where id: id }
 
+  attr_accessor :cache_users
+
   before_save do
     self.name = generate_name
   end

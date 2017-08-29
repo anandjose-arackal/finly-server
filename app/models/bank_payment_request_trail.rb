@@ -25,4 +25,5 @@ class BankPaymentRequestTrail < ActiveRecord::Base
   scope :manager_role, -> { where('modified_user_role_id = ?', "#{UserRole.id_for(:manager)}") }
   scope :finance_manager_role, -> { where('modified_user_role_id = ?', "#{UserRole.id_for(:finance_manager)}") }
   scope :involving_user, -> (user_id) { where('modified_user_id = ? OR action_user_id = ?', user_id, user_id) }
+  scope :Created_before, -> (created_before) {where 'created_at < ?', created_before}
 end

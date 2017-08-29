@@ -1,21 +1,21 @@
 class BankTransfer::PaymentRequest::Review::AssociatedUsers < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :associated_users, :tracks, :user_before
+  attr_accessor :associated_users, :trails, :user_before
 
   def pre_validate
     unless user.present?
       add_message :error, 'User not found'
     end
-    if params.blank? or (params[:id].blank? and params[:report_id].blank? and params[:report].blank?)
-      add_message :error, 'Report not found'
+    if params.blank? or (params[:id].blank? and params[:bank_payment_request_id].blank? and params[:bank_payment_request].blank?)
+      add_message :error, 'Payment Request not found'
     end
   end
 
   def init
-    self.report = params[:report]
-    super if self.report.blank?
-    if self.report.present?
-      self.tracks = report.tracks
+    self.bank_payment_request = params[:bank_payment_request]
+    super if self.bank_payment_request.blank?
+    if self.bank_payment_request.present?
+      self.trails = bank_payment_request.bank_payment_request_trails
     end
     self.user_before = params[:user_before]
   end
@@ -38,7 +38,7 @@ class BankTransfer::PaymentRequest::Review::AssociatedUsers < BankTransfer::Paym
 
   protected
   def load_interacted_users
-    tracking = self.tracks.includes(:modified_user, :action_user)
+    tracking = self.bank_payment_trails.includes(:modified_user, :action_user)
     if self.user_before.present?
       track = tracking.find_by(action_user_id: user_before.id)
       unless track.blank?
@@ -54,15 +54,15 @@ class BankTransfer::PaymentRequest::Review::AssociatedUsers < BankTransfer::Paym
     user_ids = (tracking.map(&:action_user_id) + tracking.map(&:modified_user_id))
 
     # If unapprove, adding the current controlling user
-    if self.report.controlling_user_id.present? and (user_before.blank? or user_before.id != self.report.controlling_user_id)
-      if self.report.controlling_for_user_id.present?
-        user_ids << self.report.controlling_for_user_id
+    if self.bank_payment_request.controlling_user_id.present? and (user_before.blank? or user_before.id != self.bank_payment_request.controlling_user_id)
+      if self.bank_payment_request.controlling_for_user_id.present?
+        user_ids << self.bank_payment_request.controlling_for_user_id
       else
-        user_ids << self.report.controlling_user_id
+        user_ids << self.bank_payment_request.controlling_user_id
       end
     end
 
-    # User IDs was blank when an admin was taking control of his own report and rejecting it. This is the fix
+    # User IDs was blank when an admin was taking control of his own bank_payment_request and rejecting it. This is the fix
     if user_ids.present?
       user_ids.uniq!
     else
@@ -73,20 +73,20 @@ class BankTransfer::PaymentRequest::Review::AssociatedUsers < BankTransfer::Paym
 
   def cache_user_roles(tracking, type)
     return if tracking.blank?
-    # Load Report Cache from tracking
-    self.report.cache_users = {} if self.report.cache_users.blank?
+    # Load bank_payment_request Cache from tracking
+    self.bank_payment_request.cache_users = {} if self.bank_payment_request.cache_users.blank?
     tracking.each do |track|
       [[track.action_user_id, track.action_user_role_id], [track.modified_user_id, track.modified_user_role_id]].each do |item|
 
         id = item[0]
-        if self.report.cache_users[id].blank?
-          self.report.cache_users[id] = {}
+        if self.bank_payment_request.cache_users[id].blank?
+          self.bank_payment_request.cache_users[id] = {}
         end
-        if self.report.cache_users[id][type].blank?
-          self.report.cache_users[id][type] = []
+        if self.bank_payment_request.cache_users[id][type].blank?
+          self.bank_payment_request.cache_users[id][type] = []
         end
 
-        map = self.report.cache_users[id][type]
+        map = self.bank_payment_request.cache_users[id][type]
         map << item[1] unless map.include?(item[1]) or item[1].nil?
       end
     end
