@@ -93,7 +93,7 @@ class BankPaymentRequest < ActiveRecord::Base
       end
     end
     if [BankPaymentRequestStatus.id_for(:approved), BankPaymentRequestStatus.id_for(:credited)].include?(self.status_id)
-      return self.payment_order.payment_order_status.name
+      return self.payment_order.payment_order_status&.name
     end
     self.status.name&.to_s
   end
