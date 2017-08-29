@@ -29,7 +29,8 @@ class PaymentPurpose < ActiveRecord::Base
         :corporate_balance_refund,
         :personal_expense,
         :card_auto_reload,
-        :fees
+        :fees,
+        :reissue_transfer
     ]
   end
 
