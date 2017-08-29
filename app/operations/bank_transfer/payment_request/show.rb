@@ -159,17 +159,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                 initiating_account: admin
               }
           }
-          # todo - add logic here to determine if this user is the last in the approval chain
-          button_type = ""
-          users = []
-          actions[:credit_options][:approve_forward] = {
-              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
-              message: "",
-              enabled: false,
-              require_password: true,
-              button_type: button_type,
-              users: users
-          }
         elsif bank_payment_request.processing? && bank_payment_request.owner_id == user.id
           actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         end
