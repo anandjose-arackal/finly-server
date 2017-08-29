@@ -23,4 +23,16 @@ class BankTransfer::PaymentRequest::Base < BaseOperation
       self.initiating_account = user.bank_wallet
     end
   end
+
+  def retrieve_balance(account, user)
+    if account.blank? || user.blank?
+      return 0
+    end
+    case account
+      when :vendor_payment_wallet
+        adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+        return adapter.balance
+    end
+  end
+
 end

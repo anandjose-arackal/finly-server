@@ -47,17 +47,17 @@ class User::Team::Index < User::Team::Base
   def authorize
     case role_id
       when UserRole.admin_id
-        unless user.admin?
+        unless user.admin? || user.vendor_payments_admin?
           messages[:error] << 'User is not an Admin'
           raise_unauthorized_exception
         end
       when UserRole.finance_manager_id
-        unless user.finance_manager?
+        unless user.finance_manager? || user.vendor_payments_creditor?
           messages[:error] << 'User is not a Finance Manager'
           raise_unauthorized_exception
         end
       when UserRole.manager_id
-        unless user.manager?
+        unless user.manager? || user.vendor_payments_reviewer?
           messages[:error] << 'User is not a Manager'
           raise_unauthorized_exception
         end

@@ -59,29 +59,118 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
-        if finance_view?
-          actions[:credit] = {method: "patch", url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
+        actions[:credit] = true
+        balance = retrieve_balance(:vendor_payment_wallet, user)
+        enabled = false
+        admin = false
+        if balance > bank_payment_request.requested_amount_value
+           enabled = true
         end
+        if user.vendor_payments_admin?
+          admin = true
+        end
+        actions[:credit_options] = {
+            url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+            enabled: enabled,
+            messages: "You can directly credit this payment order from your Finly Money",
+            require_password: true,
+            initiating_account: admin
+        }
+        # todo - add logic here to determine if this user is the last in the approval chain
+        button_type = "dropdown"
+        users = user.company.users.only_admins.pluck(:id, :name)
+        actions[:approve_forward] = {
+            url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
+            message: "",
+            enabled: true,
+            require_password: true,
+            button_type: button_type,
+            users: users
+        }
         # todo - implement unapprove
-      elsif finance_view?
+      elsif finance_view? && bank_payment_request.controlling_user_id == user.id
+        actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+        actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+        actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:finance_manager))&.pluck(:id)
-        if bank_payment_request.approved? && team_ids.include?(bank_payment_request.owner_id)
-          actions[:credit] = {method: "patch", url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
+        actions[:credit] = true
+        balance = retrieve_balance(:vendor_payment_wallet, user)
+        enabled = false
+        admin = false
+        if balance > bank_payment_request.requested_amount_value
+          enabled = true
         end
+        if user.vendor_payments_admin?
+          admin = true
+        end
+        actions[:credit_options] = {
+            url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+            enabled: enabled,
+            messages: "You can directly credit this payment order from your Finly Money",
+            require_password: true,
+            initiating_account: admin
+        }
+        # todo - add logic here to determine if this user is the last in the approval chain
+        button_type = "dropdown"
+        users = user.company.users.only_admins.pluck(:id, :name)
+        actions[:approve_forward] = {
+            url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
+            message: "",
+            enabled: true,
+            require_password: true,
+            button_type: button_type,
+            users: users
+        }
         # todo - implement unapprove
       else
         if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
           actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:editable] = true
           actions[:destroy] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
-          if bank_wallet_balance >= bank_payment_request.requested_amount_value && bank_payment_request.initiating_account == user.bank_wallet
-            actions[:credit] = {method: "patch", url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
+          actions[:credit] = true
+          balance = retrieve_balance(:vendor_payment_wallet, user)
+          enabled = false
+          admin = false
+          if balance > bank_payment_request.requested_amount_value
+            enabled = true
           end
-        elsif bank_payment_request.processing? && bank_payment_request.controlling_user_id == user.id
+          if user.vendor_payments_admin?
+            admin = true
+          end
+          actions[:credit_options] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+              enabled: enabled,
+              messages: "You can directly credit this payment order from your Finly Money",
+              require_password: true,
+              initiating_account: admin
+          }
+          # todo - add logic here to determine if this user is the last in the approval chain
+          button_type = ""
+          users = []
+          actions[:approve_forward] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
+              message: "",
+              enabled: false,
+              require_password: true,
+              button_type: button_type,
+              users: users
+          }
+        elsif bank_payment_request.processing? && bank_payment_request.owner_id == user.id
           actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         end
       end
       actions
+    end
+
+    def retrieve_balance(account, user)
+      if account.blank? || user.blank?
+        return 0
+      end
+      case account
+        when :vendor_payment_wallet
+          adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+          return adapter.balance
+      end
     end
   end
 end

@@ -9,9 +9,10 @@ json.summary do
   json.amount_processed @result.payment_order.amount_processed&.value
   json.description @result.bank_payment_request.description
   json.note @result.payment_order.note
-  json.initiating_account @result.payment_order.payments.first.initiating_account_name
+  # json.initiating_account @result.payment_order.payments.first.initiating_account_name
+  # todo - temporarily, for now it will always be from the controlling user's finly money
+  json.initiating_account "#{@result.user.name}'s Finly Money"
   json.initiating_user @result.bank_payment_request.owner.name
-  json.initiating_account @result.bank_payment_request.initiating_account_name
   reviewer = (@result.manager.name rescue '--')
   json.reviewing_user reviewer
   creditor = (@result.finance_manager.name rescue '--')

@@ -29,17 +29,17 @@ user:
   email: <%= current_user.email %>
   mobile_number: <%= current_user.mobile_number %>
   roles:
-  <% if current_user.admin? %>
+  <% if current_user.vendor_payments_admin? %>
   - id: admin
     name: Admin
     default_url: 'orders'
   <% end %>
-  <% if current_user.finance_manager? %>
+  <% if current_user.vendor_payments_creditor? %>
   - id: creditor
     name: 'Creditor'
     default_url: 'orders'
   <% end %>
-  <% if current_user.manager? %>
+  <% if current_user.vendor_payments_reviewer? %>
   - id: reviewer
     name: 'Reviewer'
     default_url: 'orders'
