@@ -2,23 +2,25 @@
 #
 # Table name: expenses
 #
-#  id                   :integer          not null, primary key
-#  amount_id            :integer
-#  expense_status_id    :integer
-#  note                 :text(65535)
-#  date                 :date
-#  user_id              :integer
-#  expense_type_id      :integer
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  manager_memo         :text(65535)
-#  rejecting_manager_id :integer
-#  report_id            :integer
-#  category_id          :integer
-#  is_deleted           :boolean          default(FALSE), not null
-#  transcribed          :boolean          default(FALSE)
-#  personal             :boolean          default(FALSE)
-#  reimbursable         :boolean          default(TRUE)
+#  id                     :integer          not null, primary key
+#  amount_id              :integer
+#  expense_status_id      :integer
+#  note                   :text(65535)
+#  date                   :date
+#  user_id                :integer
+#  expense_type_id        :integer
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  manager_memo           :text(65535)
+#  rejecting_manager_id   :integer
+#  report_id              :integer
+#  category_id            :integer
+#  is_deleted             :boolean          default(FALSE), not null
+#  transcribed            :boolean          default(FALSE)
+#  personal               :boolean          default(FALSE)
+#  reimbursable           :boolean          default(TRUE)
+#  synced_with_quickbooks :boolean
+#  split_link             :string(255)
 #
 
 
@@ -83,7 +85,7 @@ class Expense < ActiveRecord::Base
   before_destroy do
     errors.add(:expense, "associated with a report can't be destroyed.") if self.report_id
 
-    self.receipts.update_all(parent_id: nil, parent_type: nil) if self.receipts.present?
+    self.receipts.update_all(to_be_transcribed: false, parent_id: nil, parent_type: nil) if self.receipts.present?
   end
 
   before_save do
