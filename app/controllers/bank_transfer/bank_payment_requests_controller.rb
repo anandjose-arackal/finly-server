@@ -107,8 +107,8 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     end
   end
 
-  def review_handler(type = 7) # todo - temporary
-    type = 7
+  def review_handler(type) # todo - temporary
+    # type = 7
     unless type.present?
       respond response: :failure, message: "Invalid request"
       return
