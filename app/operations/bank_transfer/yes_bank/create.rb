@@ -72,6 +72,14 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
     # end
   end
 
+  def pre_process
+    # updating the state of the payment request, because if it gets here, the status is credited,
+    # irrespective of if whether the actual payments succeeded or not
+    if self.bank_payment_request.present?
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+    end
+  end
+
   def process
 
     # calling the payment processor to complete the transfer using adapters

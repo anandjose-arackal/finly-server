@@ -189,7 +189,7 @@ class User < ActiveRecord::Base
   scope :only_finance_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:expense_management)) }
   # scope :only_vendor_payment_creditors, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id) }
   scope :only_vendor_payment_creditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments)) }
-  scope :only_admins, -> { with_roles.where 'user_role_mappings.user_role_id = ?', UserRole.admin_id }
+  scope :only_admins, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.user_role_id = ?', MappingPurpose.id_for(:expense_management)) }
   scope :only_vendor_payment_admins, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.admin_id) }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }

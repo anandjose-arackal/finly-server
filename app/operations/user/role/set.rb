@@ -37,8 +37,10 @@ class User::Role::Set < BaseOperation
       new_role_ids << UserRole.id_for(:initiator) if params[:user_roles][:initiator].present? && ['1', 'true'].include?(params[:user_roles][:initiator])
     end
     new_role_ids = [new_role_ids] unless new_role_ids.is_a?(Array)
-    # To ensure all users have a personal view
-    new_role_ids << UserRole.id_for(:employee)
+    # To ensure all users have a personal view, only in expense management
+    if expense_management?
+      new_role_ids << UserRole.id_for(:employee)
+    end
     # new_role_ids << UserRole.id_for(:admin) if (being_updated_user.company_admin? and user.id == being_updated_user.id)
     new_role_ids.uniq!
     self.roles_to_add = new_role_ids - existing_role_ids

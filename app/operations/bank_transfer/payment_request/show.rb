@@ -55,9 +55,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:destroy] ={method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
         elsif bank_payment_request.approved?
           actions[:credit] = true
-          actions[:credit] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
           admins = []
-          user.company.users.only_admins.each do |admin|
+          user.company.users.only_vendor_payment_admins.each do |admin|
             admins << {
                 id: admin.id,
                 name: admin.name
@@ -78,7 +77,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                   enabled: true,
                   require_password: true,
                   button_type: "dropdown",
-                  users: user.company.users.only_admins.pluck(:id, :name),
+                  users: admins,
                   method: "patch",
                   type: 7
               }
@@ -90,7 +89,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:credit] = true
-        actions[:credit] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
         balance = retrieve_balance(:vendor_payment_wallet, user)
         enabled = false
         admin = false
@@ -115,7 +113,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         if reviewer.nil?
           button_type = "dropdown"
           admins = []
-          user.company.users.only_admins.each do |user|
+          user.company.users.only_vendor_payment_admins.each do |user|
             admins << {
                 id: user.id,
                 name: user.name
@@ -141,8 +139,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:credit] = true
-        # todo - temporary
-        actions[:credit] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
         balance = retrieve_balance(:vendor_payment_wallet, user)
         enabled = false
         admin = false
@@ -167,7 +163,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         if reviewer.nil?
           button_type = "dropdown"
           admins = []
-          user.company.users.only_admins.each do |user|
+          user.company.users.only_vendor_payment_admins.each do |user|
             admins << {
                 id: user.id,
                 name: user.name
@@ -189,12 +185,11 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         }
         # todo - implement unapprove
       else
-        if bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?
+        if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
           actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:editable] = true
           actions[:destroy] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
           actions[:credit] = true
-          actions[:credit] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
           admin = false

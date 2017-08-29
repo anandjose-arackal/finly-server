@@ -23,6 +23,8 @@ class BankPaymentRequest < ActiveRecord::Base
   belongs_to :owner, class_name: "User"
   belongs_to :controlling_user, class_name: "User"
   belongs_to :controlling_user_role, class_name: "User"
+  belongs_to :controlling_for_user, class_name: "User"
+  belongs_to :controlling_for_user_role, class_name: "User"
 
   has_many :bank_payment_request_comments
   has_many :bank_payment_request_trails
@@ -82,7 +84,7 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def status_name(user_id)
     if self.status_id == BankPaymentRequestStatus.id_for(:processing)
-      if user_id == owner_id
+      if user_id == self.controlling_user_id
         return "awaiting_approval"
       else
         return "processing"
