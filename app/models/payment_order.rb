@@ -115,7 +115,7 @@ class PaymentOrder < ActiveRecord::Base
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
 
   # Avoid showing orders created for ATM withdrawals and Personal Expenses
-  default_scope { order(created_at: :desc).without_purpose_id(PaymentPurpose.ids_for([:personal_expense, :atm_withdrawal])) }
+  default_scope { order(created_at: :desc).without_purpose_id(PaymentPurpose.ids_for([:personal_expense, :atm_withdrawal, :reissue_transfer])) }
 
   # method for total of all the payments in this particular payment order
   def request_total
