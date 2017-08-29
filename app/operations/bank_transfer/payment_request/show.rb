@@ -76,9 +76,15 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             require_password: true,
             initiating_account: admin
         }
-        # todo - add logic here to determine if this user is the last in the approval chain
-        button_type = "dropdown"
-        users = user.company.users.only_admins.pluck(:id, :name)
+        op = User::Team::Review::NextReviewer.(bank_payment_request)
+        reviewer = op.user
+        if reviewer.nil?
+          button_type = "dropdown"
+          users = user.company.users.only_admins.pluck(:id, :name)
+        else
+          button_type = "button"
+          users = []
+        end
         actions[:approve_forward] = {
             url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
             message: "",
@@ -92,7 +98,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
-        team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:finance_manager))&.pluck(:id)
         actions[:credit] = true
         balance = retrieve_balance(:vendor_payment_wallet, user)
         enabled = false
@@ -104,16 +109,24 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           admin = true
         end
         actions[:credit_options] = {
-            url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
-            enabled: enabled,
-            messages: "You can directly credit this payment order from your Finly Money",
-            require_password: true,
-            initiating_account: admin
+            credit: {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+              enabled: enabled,
+              messages: "You can directly credit this payment order from your Finly Money",
+              require_password: true,
+              initiating_account: admin
+            }
         }
-        # todo - add logic here to determine if this user is the last in the approval chain
-        button_type = "dropdown"
-        users = user.company.users.only_admins.pluck(:id, :name)
-        actions[:approve_forward] = {
+        op = User::Team::Review::NextReviewer.(bank_payment_request)
+        reviewer = op.user
+        if reviewer.nil?
+          button_type = "dropdown"
+          users = user.company.users.only_admins.pluck(:id, :name)
+        else
+          button_type = "button"
+          users = []
+        end
+        actions[:credit][:approve_forward] = {
             url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
             message: "",
             enabled: true,
@@ -138,16 +151,18 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             admin = true
           end
           actions[:credit_options] = {
-              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
-              enabled: enabled,
-              messages: "You can directly credit this payment order from your Finly Money",
-              require_password: true,
-              initiating_account: admin
+              credit: {
+                url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+                enabled: enabled,
+                messages: "You can directly credit this payment order from your Finly Money",
+                require_password: true,
+                initiating_account: admin
+              }
           }
           # todo - add logic here to determine if this user is the last in the approval chain
           button_type = ""
           users = []
-          actions[:approve_forward] = {
+          actions[:credit_options][:approve_forward] = {
               url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
               message: "",
               enabled: false,
