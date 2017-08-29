@@ -83,12 +83,7 @@ class User::Team::Index < User::Team::Base
   end
 
   def pre_process
-    case RequestStore.store[:current_app]
-      when :vp, 'vp'
-        self.purpose_id = MappingPurpose.id_for(:vendor_payments)
-      when :em, 'em', 'ft', :ft
-        self.purpose_id = MappingPurpose.id_for(:expense_management)
-    end
+    self.purpose_id = MappingPurpose.id_from_application_for(RequestStore.store[:current_app])
   end
 
   def process

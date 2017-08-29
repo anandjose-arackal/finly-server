@@ -39,7 +39,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
       when UserRole.id_for(:manager)
         team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:manager))&.pluck(:id)
         controlling_payment_requests_query = user.controlling_payment_requests.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids)
-        interacted_payment_requests_query= user.manager_payment_requests
+        interacted_payment_requests_query = user.manager_payment_requests
         sql = BankPaymentRequest.connection.unprepared_statement {
           "((#{controlling_payment_requests_query.to_sql}) UNION (#{interacted_payment_requests_query.to_sql})) AS bank_payment_requests"
         }

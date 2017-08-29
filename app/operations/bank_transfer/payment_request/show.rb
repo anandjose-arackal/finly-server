@@ -126,7 +126,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           }
         end
       elsif (manager_view?) && bank_payment_request.controlling_user_id == user.id && bank_payment_request.processing?
-        actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:credit] = true
@@ -165,6 +164,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           button_type = "button"
           message = "The payment request will move to #{reviewer.name} for approval"
           admins = []
+          actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         end
         actions[:credit_options][:approve_forward] = {
             url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),

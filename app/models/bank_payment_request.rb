@@ -22,9 +22,9 @@ class BankPaymentRequest < ActiveRecord::Base
   belongs_to :requested_amount, class_name: "Amount"
   belongs_to :owner, class_name: "User"
   belongs_to :controlling_user, class_name: "User"
-  belongs_to :controlling_user_role, class_name: "User"
+  belongs_to :controlling_user_role, class_name: "UserRole"
   belongs_to :controlling_for_user, class_name: "User"
-  belongs_to :controlling_for_user_role, class_name: "User"
+  belongs_to :controlling_for_user_role, class_name: "UserRole"
 
   has_many :bank_payment_request_comments
   has_many :bank_payment_request_trails
