@@ -32,6 +32,6 @@ class BankTransfer::PaymentRequest::Review::ApproveAndForward < BankTransfer::Pa
   end
 
   def post_process
-    add_message :error, "Forwarded to #{forwarded_to_user.name}"
+    add_message :success, "Forwarded to #{forwarded_to_user.name}"
   end
 end

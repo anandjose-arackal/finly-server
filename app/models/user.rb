@@ -143,9 +143,9 @@ class User < ActiveRecord::Base
   has_many :controlling_payment_requests, class_name: "BankPaymentRequest", foreign_key: :controlling_user_id
   has_many :interacted_payment_requests, -> { distinct }, source: :bank_payment_request, through: :bank_payment_request_trails
   has_many :manager_payment_request_trails, -> { manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
-  has_many :manager_payment_requests, -> { distinct }, source: :bank_payment_request, through: :bank_payment_request_trails
+  has_many :manager_payment_requests, -> { distinct }, source: :bank_payment_request, through: :manager_payment_request_trails
   has_many :finance_payment_request_trails, -> { finance_manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
-  has_many :finance_payment_requests, -> { distinct }, source: :bank_payment_request, through: :bank_payment_request_trails
+  has_many :finance_payment_requests, -> { distinct }, source: :bank_payment_request, through: :finance_payment_request_trails
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender

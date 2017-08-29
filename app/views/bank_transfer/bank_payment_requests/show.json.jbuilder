@@ -1,6 +1,6 @@
 
 json.summary do
-  json.order_status_id @result.bank_payment_request.status&.name&.humanize
+  json.order_status_id @result.bank_payment_request.status_name(current_user.id)&.humanize
   json.bank_transfer_type @result.payment_order.payment_mode&.upcase
   json.payment_type @result.payment_order.payment_type.humanize
   json.scheduled_at @result.payment_order.scheduled_at&.strftime "%d %b %Y"
@@ -9,9 +9,8 @@ json.summary do
   json.amount_processed @result.payment_order.amount_processed&.value
   json.description @result.bank_payment_request.description
   json.note @result.payment_order.note
-  # json.initiating_account @result.payment_order.payments.first.initiating_account_name
-  # todo - temporarily, for now it will always be from the controlling user's finly money
-  json.initiating_account "#{@result.user.name}'s Finly Money"
+  # # json.initiating_account @result.payment_order.payments.first.initiating_account_name
+  # json.initiating_account "#{@result.user.name}'s Finly Money"
   json.initiating_user @result.bank_payment_request.owner.name
   reviewer = (@result.manager.name rescue '--')
   json.reviewing_user reviewer

@@ -107,14 +107,12 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     end
   end
 
-  def review_handler(type) # todo - temporary
-    # type = 7
-    unless type.present?
-      respond response: :failure, message: "Invalid request"
-      return
-    end
+  def review_handler(type)
+    # unless type.present?
+    #   respond response: :failure, message: "Invalid request"
+    #   return
+    # end
     operation = nil
-    # todo - add operations here based on type
     case type
       when 1, '1'
         # i.e. approve
@@ -136,6 +134,9 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
         operation = BankTransfer::PaymentRequest::Review::TakeControl.new(current_user, params)
       when 7, '7'
         # approve and forward
+        operation = BankTransfer::PaymentRequest::Review::ApproveAndForward.new(current_user, params)
+      else
+        # todo - temporary until the front end is fixes
         operation = BankTransfer::PaymentRequest::Review::ApproveAndForward.new(current_user, params)
     end
     if operation.blank?
