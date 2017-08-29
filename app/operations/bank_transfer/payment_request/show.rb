@@ -73,7 +73,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
               },
               approve_forward: {
                   url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
-                  message: "",
+                  message: "You can forward this payment request to another admin to credit it",
                   enabled: true,
                   require_password: true,
                   button_type: "dropdown",
@@ -84,7 +84,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           }
               {method: "patch", url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
         end
-      elsif (manager_view?) && bank_payment_request.controlling_user_id == user.id
+      elsif (manager_view?) && bank_payment_request.controlling_user_id == user.id && bank_payment_request.processing?
         actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
@@ -112,6 +112,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         reviewer = op.user
         if reviewer.nil?
           button_type = "dropdown"
+          message = "You can forward this request to another admin for them to credit it"
           admins = []
           user.company.users.only_vendor_payment_admins.each do |user|
             admins << {
@@ -121,11 +122,12 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           end
         else
           button_type = "button"
+          message = "The payment request will move to #{reviewer.name} for approval"
           admins = []
         end
         actions[:credit_options][:approve_forward] = {
             url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
-            message: "",
+            message: message,
             enabled: true,
             require_password: true,
             button_type: button_type,
@@ -134,7 +136,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             type: 7
         }
         # todo - implement unapprove
-      elsif finance_view? && bank_payment_request.controlling_user_id == user.id
+      elsif finance_view? && bank_payment_request.controlling_user_id == user.id && bank_payment_request.processing?
+
         actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
@@ -184,7 +187,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             type: 7
         }
         # todo - implement unapprove
-      else
+      elsif initiator_view?
         if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
           actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:editable] = true
@@ -226,5 +229,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           return adapter.balance
       end
     end
+
   end
 end

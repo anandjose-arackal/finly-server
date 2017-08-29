@@ -268,6 +268,10 @@ class BaseOperation
       is_view?(:employee) or is_view?(:personal) or is_view?(:initiator) or params[:view].blank?
     end
 
+    def initiator_view?
+      is_view?(:initiator)
+    end
+
     def is_view?(type)
       type.present? and params.present? and params[:view].present? and (params[:view] == type.to_s or params[:view] == type.to_sym)
     end
@@ -358,6 +362,10 @@ class BaseOperation
 
   def personal_view?
     is_view?(:employee) or is_view?(:personal) or is_view?(:initiator) or params[:view].blank?
+  end
+
+  def initiator_view?
+    is_view?(:initiator)
   end
 
   def is_view?(type)
