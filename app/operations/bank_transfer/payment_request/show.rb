@@ -106,7 +106,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         reviewer = op.user
         if reviewer.nil?
           button_type = "dropdown"
-          users = user.company.users.only_admins.pluck(:id, :name)
+          users = user.company.users.only_admins.pluck(:id, :first_name)
         else
           button_type = "button"
           users = []
@@ -152,7 +152,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         reviewer = op.user
         if reviewer.nil?
           button_type = "dropdown"
-          users = user.company.users.only_admins.pluck(:id, :name)
+          users = user.company.users.only_admins.pluck(:id, :first_name)
         else
           button_type = "button"
           users = []
