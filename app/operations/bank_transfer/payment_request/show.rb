@@ -53,7 +53,28 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:destroy] ={method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
         elsif bank_payment_request.approved?
-          actions[:credit] = {method: "patch", url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
+          actions[:credit] = true
+          actions[:credit_options] = {
+              credit: {
+                  url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+                  enabled: enabled,
+                  messages: "You can directly credit this payment order from your Finly Money",
+                  require_password: true,
+                  initiating_account: true,
+                  method: "patch"
+              },
+              approve_forward: {
+                  url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
+                  message: "",
+                  enabled: true,
+                  require_password: true,
+                  button_type: "dropdown",
+                  users: user.company.users.only_admins.pluck(:id, :name),
+                  method: "patch",
+                  type: 7
+              }
+          }
+              {method: "patch", url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request)}
         end
       elsif (manager_view?) && bank_payment_request.controlling_user_id == user.id
         actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
@@ -75,7 +96,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
               enabled: enabled,
               messages: "You can directly credit this payment order from your Finly Money",
               require_password: true,
-              initiating_account: admin
+              initiating_account: admin,
+              method: "patch"
             }
         }
         op = User::Team::Review::NextReviewer.(bank_payment_request)
@@ -93,7 +115,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             enabled: true,
             require_password: true,
             button_type: button_type,
-            users: users
+            users: users,
+            method: "patch",
+            type: 7
         }
         # todo - implement unapprove
       elsif finance_view? && bank_payment_request.controlling_user_id == user.id
@@ -116,7 +140,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
               enabled: enabled,
               messages: "You can directly credit this payment order from your Finly Money",
               require_password: true,
-              initiating_account: admin
+              initiating_account: admin,
+              method: "patch"
             }
         }
         op = User::Team::Review::NextReviewer.(bank_payment_request)
@@ -134,7 +159,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             enabled: true,
             require_password: true,
             button_type: button_type,
-            users: users
+            users: users,
+            method: "patch",
+            type: 7
         }
         # todo - implement unapprove
       else
@@ -158,7 +185,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                 enabled: enabled,
                 messages: "You can directly credit this payment order from your Finly Money",
                 require_password: true,
-                initiating_account: admin
+                initiating_account: admin,
+                method: "patch"
               }
           }
         elsif bank_payment_request.processing? && bank_payment_request.owner_id == user.id
