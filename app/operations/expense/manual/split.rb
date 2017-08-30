@@ -39,7 +39,7 @@ class Expense::Manual::Split < Expense::Manual::Base
       # Create custom fields only for validations. Fields will be saved later
       custom_fields = expense_params[:custom_fields]
       if custom_fields.present?
-        validate_custom_fields(expense, custom_fields, expense_params[:index])
+        validate_custom_fields(expense, custom_fields, expense_params[:index]&.to_i)
         unless has_errors?
           self.expenses << expense
         end
