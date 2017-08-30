@@ -36,12 +36,14 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     # setting the status as pending because it will be processed immediately - for both payments and payment orders
     payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
     payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
+
+    # updating the initiating account for the payment order and paymets
+    payment_order.update(initiating_account_type: initiating_account.class.name)
+    payment_order.payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
   end
 
 
   def process
-    # first update the payment order to the initiating account that's being requested
-    payment_order.payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
 
     # now pass to the Create operation
     op = BankTransfer::YesBank::Create.(user, bank_payment_request: bank_payment_request)
