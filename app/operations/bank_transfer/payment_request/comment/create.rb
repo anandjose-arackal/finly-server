@@ -14,11 +14,11 @@ class BankTransfer::PaymentRequest::Comment::Create < BankTransfer::PaymentReque
 
   def pre_process
     request_comment_params[:action_id] = BankPaymentRequestCommentAction.id_for(:comment)
-    request_comment_params[:user_id] = user.id
+    request_comment_params[:action_user_id] = user.id
   end
 
   def process
-    comment = payment_request.bank_payment_request_comments.build(request_comment_params)
+    comment = payment_request.comments.build(request_comment_params)
     unless comment.save
       add_message :error, comment.errors.full_messages
     end

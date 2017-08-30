@@ -29,7 +29,7 @@ class BankPaymentRequest < ActiveRecord::Base
   belongs_to :controlling_for_user, class_name: "User"
   belongs_to :controlling_for_user_role, class_name: "UserRole"
 
-  has_many :bank_payment_request_comments
+  has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
 
   accepts_nested_attributes_for :payment_order
@@ -95,8 +95,8 @@ class BankPaymentRequest < ActiveRecord::Base
     if self.status_id == BankPaymentRequestStatus.id_for(:processing)
       if user_id == self.controlling_user_id
         return "awaiting_approval"
-      elsif user_id == self.owner_id
-        return "submitted"
+      # elsif user_id == self.owner_id
+      #   return "submitted"
       else
         return "processing"
       end
