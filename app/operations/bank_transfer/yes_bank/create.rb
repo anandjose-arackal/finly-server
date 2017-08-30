@@ -1,8 +1,9 @@
-# when the data reaches this state, all payments will be valid and passing the respective
-# basic presence validations
+# according to the new flow, once the data is here, the payment request will be validated
+# and approved through the flow and will be used to create a payment order from the parameters
 class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   attr_accessor :order_data, :payment_request, :payment_order, :scheduled_at,
-                :processed_order_data, :initiating_account
+                :processed_order_data, :initiating_account,
+                :bank_payment_request, :bank_transfer_type
 
   def pre_validate
     super
@@ -11,61 +12,79 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
       add_message :error, 'User not found'
       return
     end
-    if params.blank? or params[:payment_order].blank?
+    if params.blank? or params[:bank_payment_request].blank?
       add_message :error, 'Error loading request'
-      return
-    end
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate the transfer'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
       return
     end
   end
 
   def init
-    self.order_data = params[:payment_order]
-    op = BankTransfer::YesBank::Process.(user, scheduled_at: params[:scheduled_at],
-        payment_order: self.order_data)
-    self.processed_order_data = op.payment_order_data
+    # self.order_data = params[:payment_order]
 
-    # setting the initiating account based on the type of user creating the
-    # request as well as the option chosen by the admin
-    self.initiating_account = retrieve_initiating_account
-    ##########################################################
+    # because now all orders will be through a bank payment request
+    self.bank_payment_request = params[:bank_payment_request]
+    self.payment_order = bank_payment_request.payment_order
+    self.bank_transfer_type = payment_order.bank_transfer_type
+    ################################################################
 
-    #### setting the bank transfer type from the front end ####
-    params[:bank_transfer_type] = params[:transfer_type].upcase
-    ###########################################################
-
-    self.scheduled_at = op.scheduled_at
-    # below variable will contain the payment_request that holds data about initiating accounts and
-    # receiving accounts
-    self.payment_request = build_payment_request(processed_order_data, params[:bank_transfer_type], scheduled_at, initiating_account)
+    # op = BankTransfer::YesBank::Process.(user, scheduled_at: params[:scheduled_at],
+    #     payment_order: self.order_data)
+    # self.processed_order_data = op.payment_order_data
+    #
+    # # setting the initiating account based on the type of user creating the
+    # # request as well as the option chosen by the admin
+    # self.initiating_account = retrieve_initiating_account
+    # ##########################################################
+    #
+    # #### setting the bank transfer type from the front end ####
+    # params[:bank_transfer_type] = params[:transfer_type].upcase
+    # ###########################################################
+    #
+    # self.scheduled_at = op.scheduled_at
+    # # below variable will contain the payment_request that holds data about initiating accounts and
+    # # receiving accounts
+    #
+    # self.payment_request = build_payment_request(processed_order_data, params[:bank_transfer_type], scheduled_at, initiating_account)
   end
 
   def validate
-    if scheduled_at && scheduled_at < Date.today
-      add_message :error, 'Scheduled Date cannot be less than the current date'
-      return
+
+    # if scheduled_at && scheduled_at < Date.today
+    #   add_message :error, 'Scheduled Date cannot be less than the current date'
+    #   return
+    # end
+    #
+    # if self.processed_order_data.blank? && payment_order.blank?
+    #   add_message :error, 'Error loading configuration. Please try again'
+    #   return
+    # end
+    #
+    # unless self.payment_request.valid? || payment_order.blank?
+    #   add_message :error, 'Please fix the issues before confirming the request'
+    # end
+  end
+
+  def pre_process
+    # updating the state of the payment request, because if it gets here, the status is credited,
+    # irrespective of if whether the actual payments succeeded or not
+    if self.bank_payment_request.present?
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
     end
 
-    if self.processed_order_data.blank?
-      add_message :error, 'Error loading configuration. Please try again'
-      return
-    end
-
-    unless self.payment_request.valid?
-      add_message :error, 'Please fix the issues before confirming the request'
+    # also set the payment order's status id as either scheduled or as pending
+    if payment_order.scheduled_at.present? && payment_order.scheduled_at > DateUtils.local_date
+      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
+      payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled))
+    else
+      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
+      payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
     end
   end
 
   def process
 
     # calling the payment processor to complete the transfer using adapters
-    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_request.bank_transfer_type, background: true})
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_order: bank_payment_request&.payment_order, bank_transfer_type: self.bank_transfer_type, background: true})
     unless op.success?
 
       add_message :error, op.messages[:error]

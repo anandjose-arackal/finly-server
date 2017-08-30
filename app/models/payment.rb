@@ -30,6 +30,9 @@
 
 
 
+
+
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -61,6 +64,8 @@ class Payment < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :payment_order
+  accepts_nested_attributes_for :receiving_account
+
   delegate :amount_value, to: :amount
 
   default_scope { order date: :desc, created_at: :desc }
@@ -84,11 +89,18 @@ class Payment < ActiveRecord::Base
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
+  scope :scheduled, -> {where payment_status_id: PaymentStatus.id_for(:scheduled)}
   scope :with_receiving_account_type, -> (receiving_account_type){
     where receiving_account_type: receiving_account_type
   }
   scope :with_receiving_account_id, -> (ids) {
     where receiving_account_id: ids
+  }
+  scope :with_initiating_account_type, -> (initiating_account_type){
+    where initiating_account_type: initiating_account_type
+  }
+  scope :with_initiating_account_id, -> (ids) {
+    where initiating_account_id: ids
   }
 
   # Personal are card transactions from own wallet to own card
@@ -193,7 +205,7 @@ class Payment < ActiveRecord::Base
   end
 
   def initiating_account_type_name
-    name = "#{initiating_user&.name&.to_s}'s "
+    name = "#{initiating_user&.first_name&.to_s}'s "
 
     case self.initiating_account_type
       when "Company", "ItzCashCompanyAccount"
@@ -208,15 +220,17 @@ class Payment < ActiveRecord::Base
       when "YesBankCompanyAccount"
         name = "Company Credits"
       when "VendorPaymentWallet"
-        name += "Finly Credits"
+        name += "Finly Money (Bank Transfer Pocket)"
       else
         name = ""
     end
     name
   end
 
+  alias_method :initiating_account_name, :initiating_account_type_name
+
   def receiving_account_type_name
-    name = "#{receiving_user&.name.to_s}'s "
+    name = "#{receiving_user&.first_name.to_s}'s "
 
     case self.receiving_account_type
       when "Company", "ItzCashCompanyAccount"
@@ -231,12 +245,14 @@ class Payment < ActiveRecord::Base
       when "YesBankCompanyAccount"
         name = "Company Credits"
       when "VendorPaymentWallet"
-        name += "Finly Credits"
+        name += "Finly Money (Bank Transfer Pocket)"
       else
         name = ""
     end
     name
   end
+
+  alias_method :receiving_account_name, :receiving_account_type_name
 
   def credit?
     self.payment_type_id == PaymentType.id_for(:credit)

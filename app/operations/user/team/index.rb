@@ -4,7 +4,7 @@
 # if role_id is not passed, the view of the particular user is used
 
 class User::Team::Index < User::Team::Base
-  attr_accessor :role_id
+  attr_accessor :role_id, :purpose_id
 
   # has_scope :filter_search
   # has_scope :filter_role
@@ -47,17 +47,17 @@ class User::Team::Index < User::Team::Base
   def authorize
     case role_id
       when UserRole.admin_id
-        unless user.admin?
+        unless user.admin? || user.vendor_payments_admin?
           messages[:error] << 'User is not an Admin'
           raise_unauthorized_exception
         end
       when UserRole.finance_manager_id
-        unless user.finance_manager?
+        unless user.finance_manager? || user.vendor_payments_creditor?
           messages[:error] << 'User is not a Finance Manager'
           raise_unauthorized_exception
         end
       when UserRole.manager_id
-        unless user.manager?
+        unless user.manager? || user.vendor_payments_reviewer?
           messages[:error] << 'User is not a Manager'
           raise_unauthorized_exception
         end
@@ -82,6 +82,10 @@ class User::Team::Index < User::Team::Base
     params[:filter_disburse] = '1'
   end
 
+  def pre_process
+    self.purpose_id = MappingPurpose.id_from_application_for(RequestStore.store[:current_app])
+  end
+
   def process
     user_ids = []
     manager_association = nil
@@ -98,7 +102,7 @@ class User::Team::Index < User::Team::Base
         approves_to_association = :has_approves_to
     end
     return if manager_association.blank? or approves_to_association.blank?
-    user_ids += UserManagerMapping.send(manager_association, user.id).pluck(:user_id)
+    user_ids += UserManagerMapping.send(manager_association, user.id).send('with_purpose', purpose_id).pluck(:user_id)
     user_ids.uniq! if user_ids.present?
     self.response = user.company.users.with_id(user_ids)
   end

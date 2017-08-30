@@ -245,6 +245,9 @@ class Amount < ActiveRecord::Base
 
   alias_method :rate_value, :amount_value
   alias_method :balance_value, :amount_value
+  alias_method :amount_requested_value, :amount_value
+  alias_method :amount_processed_value, :amount_value
+  alias_method :requested_amount_value, :amount_value
 
   scope :with_id, -> (id) { where id: id }
 

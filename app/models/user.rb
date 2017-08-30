@@ -57,6 +57,10 @@
 
 
 
+
+
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -134,6 +138,16 @@ class User < ActiveRecord::Base
   has_many :card_assign_requests, foreign_key: :card_owner_id
   has_many :card_upgrade_requests, foreign_key: :card_owner_id
 
+  # adding associations for the user manager mapping for payment requests
+  has_many :bank_payment_requests, foreign_key: :owner_id
+  has_many :bank_payment_request_trails, class_name: "BankPaymentRequestTrail", foreign_key: :action_user_id
+  has_many :controlling_payment_requests, class_name: "BankPaymentRequest", foreign_key: :controlling_user_id
+  has_many :interacted_payment_requests, -> { distinct }, source: :bank_payment_request, through: :bank_payment_request_trails
+  has_many :manager_payment_request_trails, -> { manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
+  has_many :manager_payment_requests, -> { distinct }, source: :bank_payment_request, through: :manager_payment_request_trails
+  has_many :finance_payment_request_trails, -> { finance_manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
+  has_many :finance_payment_requests, -> { distinct }, source: :bank_payment_request, through: :finance_payment_request_trails
+
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
 
@@ -170,13 +184,19 @@ class User < ActiveRecord::Base
   scope :filter_email, -> (email) { where('email like ?', "%#{email}%") }
   scope :filter_user_id, ->(user_id) { where id: user_id }
   scope :with_roles, -> { joins :role_mapping }
-  scope :only_managers, -> { with_roles.where 'user_role_mappings.user_role_id = ?', UserRole.manager_id }
-  scope :only_finance_managers, -> { with_roles.where 'user_role_mappings.user_role_id = ?', UserRole.finance_manager_id }
-  scope :only_admins, -> { with_roles.where 'user_role_mappings.user_role_id = ?', UserRole.admin_id }
+  scope :only_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:expense_management)) }
+  # scope :only_vendor_payment_reviewers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments))}
+  scope :only_vendor_payment_reviewers, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments)) }
+  scope :only_finance_managers, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:expense_management)) }
+  scope :only_vendor_payment_creditors, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments)) }
+  # scope :only_vendor_payment_creditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments)) }
+  scope :only_admins, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.user_role_id = ?', MappingPurpose.id_for(:expense_management)) }
+  scope :only_vendor_payment_admins, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments)) }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }
-
+  scope :with_vendor_payments_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
+  scope :with_expense_management_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
 
   # Users having cards assigned with the given program
   scope :with_cards_having_card_program, ->(id) do
@@ -382,9 +402,11 @@ class User < ActiveRecord::Base
   before_save :strip_whitespace
 
   after_create do
-    # self.build_profile.save if self.profile.blank?
     default_policy_id = self.company.default_policy.id
-    self.team_mapping.build(default: true, policy_id: default_policy_id).save if self.team_mapping.count == 0
+    if self.team_mapping.count == 0
+      self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: MappingPurpose.id_for(:expense_management)).save
+      self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: MappingPurpose.id_for(:vendor_payments)).save
+    end
     self.policy_user_mappings.build(policy_id: default_policy_id).save
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
@@ -424,7 +446,7 @@ class User < ActiveRecord::Base
   end
 
   def company_admin?
-    role_mapping.admin.present?
+    role_mapping.expense_management.admin.present?
   end
 
   # If policy is passed checks if the user is the admin of the given policy
@@ -447,23 +469,51 @@ class User < ActiveRecord::Base
 
   def finance_manager?
     mapping = self.role_mapping
-    mapping.finance_manager.present?
+    mapping.expense_management.finance_manager.present?
   end
 
   def manager?
     mapping = self.role_mapping
-    mapping.manager.present?
+    mapping.expense_management.manager.present?
   end
 
   def employee?
     mapping = role_mapping
-    mapping.employee.present?
+    mapping.expense_management.employee.present?
   end
 
   def auditor?
     mapping = role_mapping
-    mapping.auditor.present?
+    mapping.expense_management.auditor.present?
   end
+
+  def vendor_payment_manager?
+    self.role_mapping.vendor_payments.manager.present?
+  end
+
+  alias_method :vendor_payments_manager? , :vendor_payment_manager?
+
+  alias_method :vendor_payment_reviewer?, :vendor_payment_manager?
+  alias_method :vendor_payments_reviewer?, :vendor_payment_manager?
+
+  def vendor_payment_finance?
+    self.role_mapping.vendor_payments.finance_manager.present?
+  end
+
+  alias_method :vendor_payment_finance_manager?, :vendor_payment_finance?
+  alias_method :vendor_payment_creditor?, :vendor_payment_finance?
+  alias_method :vendor_payments_creditor?, :vendor_payment_finance?
+
+  def vendor_payment_admin?
+    self.role_mapping.vendor_payments.admin.present?
+  end
+
+  alias_method :vendor_payments_admin? , :vendor_payment_admin?
+
+  def vendor_payment_initiator?
+    self.role_mapping.vendor_payments.initiator.present?
+  end
+
 
   def has_role?(role_id)
     return false unless role_id.present?
@@ -640,6 +690,10 @@ class User < ActiveRecord::Base
     else
       return false
     end
+  end
+
+  def payment_initiator?
+    self.role_mapping.vendor_payments.employee.present?
   end
 
   private

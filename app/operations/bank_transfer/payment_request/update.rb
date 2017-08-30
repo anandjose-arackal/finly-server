@@ -1,5 +1,5 @@
 # operation that updates a particular payment order from the changes that the user mentions in the beginning of the
-class BankTransfer::YesBank::Update < BankTransfer::YesBank::Base
+class BankTransfer::PaymentRequest::Update < BankTransfer::PaymentRequest::Base
   attr_accessor :response_presenter
 
   def pre_validate
@@ -19,7 +19,7 @@ class BankTransfer::YesBank::Update < BankTransfer::YesBank::Base
     order_data = params[:payment_order]
     scheduled_at = params[:scheduled_at]
     initiating_account_type = params[:initiating_account_type]
-    self.response_presenter = BankTransfer::YesBank::Process.(user, {scheduled_at: scheduled_at,
+    self.response_presenter = BankTransfer::PaymentRequest::Process.(user, {scheduled_at: scheduled_at,
                                                                     payment_order: order_data,
                                                                     initiating_account_type: initiating_account_type})
     unless self.response_presenter.success?

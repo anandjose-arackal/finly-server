@@ -7,6 +7,7 @@
 #  user_role_id :integer          not null
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
+#  purpose_id   :integer
 #
 
 
