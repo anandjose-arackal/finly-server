@@ -34,10 +34,12 @@ class CreateCardPrograms < ActiveRecord::Migration
                          manager_view_transactions: false, non_personal_fund_transfer: false
     end
 
-    cards = Card.all.with_card_program([nil, 0])
-    new_card_program_id = CardProgram.first.id
-    cards.each do |card|
-      card.update_attribute(:card_program_id, new_card_program_id)
+    if Company.count > 0
+      cards = Card.all.with_card_program([nil, 0])
+      new_card_program_id = CardProgram.first.id
+      cards.each do |card|
+        card.update_attribute(:card_program_id, new_card_program_id)
+      end
     end
   end
 end

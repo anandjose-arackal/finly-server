@@ -27,6 +27,7 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
     params[:field_configuration][:company_id] = self.user.company_id
     self.config_params = config_strong_params
     self.default_value = params[:field_configuration][:default_value] if config_params.present? and params[:field_configuration][:default_value].present?
+    self.config_params[:global] = !!config_params[:global]
   end
 
   def authorize
@@ -63,7 +64,7 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
     params.require(:field_configuration).permit(:field_name, :enabled, :field_type_id,
                                                 :mandatory, :field_parent_type_id,
                                                 :configurable, :configurable_id,
-                                                :configurable_type, :company_id,
+                                                :configurable_type, :company_id, :global,
                                                 drop_down_items_attributes: [:name])
   end
 

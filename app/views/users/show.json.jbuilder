@@ -1,5 +1,6 @@
 json.company_card_enabled @result.user.company.itz_cash_property.d_code.present? rescue false
 json.user do
+  json.id @result.selected_user.id
   json.name @result.selected_user.name
   json.email @result.selected_user.email
   json.mobile_number @result.selected_user.mobile_number

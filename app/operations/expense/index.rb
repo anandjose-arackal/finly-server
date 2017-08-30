@@ -93,6 +93,7 @@ class Expense::Index < Expense::Base
     has_scope :filter_expense_cancelled # shows only cancelled expenses
     has_scope :filter_expense_personal # shows only personal expenses
     has_scope :filter_report_status_id, type: :array # shows only personal expenses
+    has_scope :filter_split_link
 
     def init
       ScopeUtils.fix_for_scoping(params, :filter_report_status_id, :array)

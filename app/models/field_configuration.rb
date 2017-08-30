@@ -46,7 +46,7 @@ class FieldConfiguration < ActiveRecord::Base
   accepts_nested_attributes_for :custom_fields
 
   scope :with_id, -> (id) { where id: id }
-  scope :with_parent_type, ->(type_id) {where field_parent_type_id: type_id}
+  scope :with_parent_type, ->(type_id) { where field_parent_type_id: type_id }
   scope :enabled, -> { where enabled: true }
   scope :disabled, -> { where enabled: false }
 
@@ -68,7 +68,7 @@ class FieldConfiguration < ActiveRecord::Base
 
     # IMP CONDITION - Report and Money Request Field Configurations are always defined inside a policy while Expense Field Configuration are always defined inside Company
     if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(self.field_parent_type_id) and configurable_type != 'Policy'
-        self.errors.add :invalid, 'config. Custom Fields for Reports and Money Requests can only be configured at policy level'
+      self.errors.add :invalid, 'config. Custom Fields for Reports and Money Requests can only be configured at policy level'
     end
     # # Policy custom fields can only be added for expenses as policy is not captured at the time of expense
     # if field_parent_type_id == FieldParentType.id_for(:expense) and configurable_type == 'Policy'
@@ -152,13 +152,16 @@ class FieldConfiguration < ActiveRecord::Base
     if field_type_id == FieldType.id_for(:drop_down)
       options = drop_down_items
     end
-    {id: id,
-     label: field_name,
-     field_type: {id: field_type.id,
-                  name: field_type.name},
-     mandatory: mandatory,
-     value: self.default_value,
-     options: options}
+    {
+        id: id,
+        label: field_name,
+        field_type: {id: field_type.id,
+                     name: field_type.name},
+        mandatory: mandatory,
+        global: self.global,
+        value: self.default_value,
+        options: options
+    }
   end
 
 end
