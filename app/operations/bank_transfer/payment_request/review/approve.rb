@@ -54,7 +54,7 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
     else
       action_id = BankPaymentRequestCommentAction.id_for(:approve)
     end
-    bank_payment_request.comments.create action_user_id: user.id,
+    bank_payment_request.comments.create user_id: user.id,
                                          action_id: action_id
 
     add_message :success, "Succesfully approved the payment request"

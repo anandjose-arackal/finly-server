@@ -46,9 +46,9 @@ json.comments do
     json.content comment.retrieve_content(current_user)
     json.timestamp comment.created_at.strftime "%I:%M %p, %d %b %Y"
     json.user do
-      json.first_name comment.action_user&.first_name
-      json.name comment.action_user&.name
-      json.id comment.action_user&.id
+      json.first_name comment.user&.first_name
+      json.name comment.user&.name
+      json.id comment.user&.id
     end
     json.action comment.action&.name
   end

@@ -16,7 +16,7 @@ class BankPaymentRequestComment < ActiveRecord::Base
 
   belongs_to :action, class_name: "BankPaymentRequestCommentAction"
   belongs_to :bank_payment_request
-  belongs_to :action_user, class_name: "User"
+  belongs_to :user, class_name: "User"
   belongs_to :forwarded_to_user, class_name: "User"
 
   # this will generate the comment body from the
@@ -27,15 +27,15 @@ class BankPaymentRequestComment < ActiveRecord::Base
   def retrieve_content(user)
     comment_content = ""
 
-    if user.id == self.action_user_id
+    if user.id == self.user_id
       comment_content += "You have"
     else
-      comment_content += "#{self.action_user.name} has"
+      comment_content += "#{self.user&.name} has"
     end
 
     case self.action_id
       when BankPaymentRequestCommentAction.id_for(:comment)
-        return "#{action_user.name} commented: #{self.content}"
+        return "#{self.user&.name} commented: #{self.content}"
       when BankPaymentRequestCommentAction.id_for(:submit)
         comment_content += " submitted the Payment Order"
       when BankPaymentRequestCommentAction.id_for(:approve)
@@ -58,4 +58,5 @@ class BankPaymentRequestComment < ActiveRecord::Base
 
     comment_content
   end
+
 end

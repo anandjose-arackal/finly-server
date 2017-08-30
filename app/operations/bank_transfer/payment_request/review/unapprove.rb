@@ -49,7 +49,7 @@ class BankTransfer::PaymentRequest::Review::Unapprove < BankTransfer::PaymentReq
   end
 
   def post_process
-    bank_payment_request.comments.create action_user_id: user.id,
+    bank_payment_request.comments.create user_id: user.id,
                                          action_id: BankPaymentRequestCommentAction.id_for(:unapprove)
 
     add_message :success, 'Payment Order unapproved'
