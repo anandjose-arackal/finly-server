@@ -136,8 +136,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
         # approve and forward
         operation = BankTransfer::PaymentRequest::Review::ApproveAndForward.new(current_user, params)
       else
-        # todo - temporary until the front end is fixes
-        operation = BankTransfer::PaymentRequest::Review::ApproveAndForward.new(current_user, params)
+        # do nothing?
     end
     if operation.blank?
       respond response: :failure, message: "Invalid update type"

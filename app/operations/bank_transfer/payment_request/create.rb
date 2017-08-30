@@ -130,6 +130,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     p[:payment_order_attributes][:payments_attributes] = []
     p[:payment_order_attributes][:application] = RequestStore.store[:current_app]
     p[:payment_order_attributes][:currency_id] = Currency.first.id
+    p[:payment_order_attributes][:scheduled_at] = self.scheduled_at
     processed_order_data.each do |order_details|
       bank_account = retrieve_bank_account order_details
       p[:payment_order_attributes][:payments_attributes] << {
