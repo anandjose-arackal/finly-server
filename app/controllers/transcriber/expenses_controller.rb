@@ -33,4 +33,9 @@ class Transcriber::ExpensesController < ApplicationController
       respond response: :failure, message: @result.messages[:error]
     end
   end
+
+  def currencies
+    currencies = Currency.all
+    render json: currencies.as_json
+  end
 end
