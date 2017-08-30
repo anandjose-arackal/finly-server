@@ -1,8 +1,7 @@
 class AddCardEligibilityToCards < ActiveRecord::Migration
   def change
     add_column :cards, :card_eligibility_id, :integer, references: 'Amount', foreign_key: true, index: true, null: true
-
-    if Card.count > 0
+    if Company.count > 0 and Card.count > 0
       default_params = {value: 0, currency_id: Currency.first.id}
       Card.all.each do |card|
         save = false
