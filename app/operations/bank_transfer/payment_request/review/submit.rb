@@ -28,7 +28,6 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
     # unless creditor.nil?
     #   forwards_credits_to = User::Team::Approver.(creditor, payment_request: bank_payment_request, type: :approves_finance_to)
     # end
-    # debugger
     # if forwards_credits_to.present?
     #   bank_payment_request.payment_order.payments.update_all(initiating_account_id: forwards_credits_to.bank_wallet, initiating_account_type: "VendorPaymentWallet")
     # elsif creditor.present?

@@ -34,7 +34,6 @@ class FieldConfiguration < ActiveRecord::Base
   validates :field_name, presence: true
   validates :enabled, presence: true
   validates :field_type_id, presence: true
-  # validates :mandatory, presence: true
   validates :company_id, presence: true
   validates :field_parent_type_id, presence: true
   validates :configurable_id, presence: true
@@ -49,6 +48,8 @@ class FieldConfiguration < ActiveRecord::Base
   scope :with_parent_type, ->(type_id) { where field_parent_type_id: type_id }
   scope :enabled, -> { where enabled: true }
   scope :disabled, -> { where enabled: false }
+
+  default_scope { unscope(where: :is_deleted) }
 
   def validate_config
     case field_type_id
