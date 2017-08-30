@@ -20,7 +20,6 @@
 #  personal               :boolean          default(FALSE)
 #  reimbursable           :boolean          default(TRUE)
 #  synced_with_quickbooks :boolean
-#  split_link             :string(255)
 #
 
 require 'test_helper'

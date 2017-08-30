@@ -346,6 +346,7 @@
 #                    transcriber_transcribed_receipt_show GET    /transcriber/expenses/:id/show(.:format)                                        transcriber/receipts#show
 #                      transcriber_untranscribed_receipts GET    /transcriber/companies/:id(.:format)                                            transcriber/companies#show
 #                                   transcriber_companies GET    /transcriber/companies(.:format)                                                transcriber/companies#index
+#                         transcriber_expenses_currencies GET    /transcriber/expenses/currencies(.:format)                                      transcriber/expenses#currencies
 #                                    transcriber_expenses GET    /transcriber/expenses(.:format)                                                 transcriber/expenses#index
 #                                                         POST   /transcriber/expenses(.:format)                                                 transcriber/expenses#create
 #                                 new_transcriber_expense GET    /transcriber/expenses/new(.:format)                                             transcriber/expenses#new
@@ -394,6 +395,7 @@
 #                                                         PUT    /admin_users/users/:id(.:format)                                                admin_users/users#update
 #                                                         DELETE /admin_users/users/:id(.:format)                                                admin_users/users#destroy
 #                                     admin_users_welcome POST   /admin_users/welcome(.:format)                                                  admin_users/users#admin_welcome
+#                             admin_users_agreements_mail POST   /admin_users/agreements_mail(.:format)                                          admin_users/users#agreements_mail
 #                                    admin_users_set_role POST   /admin_users/users/set_role(.:format)                                           admin_users/users#set_role
 #                                      admin_users_lookup GET    /admin_users/lookup(.:format)                                                   admin_users/users#lookup
 #                                      admin_users_import POST   /admin_users/import(.:format)                                                   admin_users/users#import
@@ -819,6 +821,15 @@
 #                                                         PATCH  /authorizer/reports/:id(.:format)                                               authorizer/reports#update
 #                                                         PUT    /authorizer/reports/:id(.:format)                                               authorizer/reports#update
 #                                                         DELETE /authorizer/reports/:id(.:format)                                               authorizer/reports#destroy
+#                             authorizer_agreements_agree PATCH  /authorizer/agreements/agree(.:format)                                          authorizer/agreements#agree
+#                                   authorizer_agreements GET    /authorizer/agreements(.:format)                                                authorizer/agreements#index
+#                                                         POST   /authorizer/agreements(.:format)                                                authorizer/agreements#create
+#                                new_authorizer_agreement GET    /authorizer/agreements/new(.:format)                                            authorizer/agreements#new
+#                               edit_authorizer_agreement GET    /authorizer/agreements/:id/edit(.:format)                                       authorizer/agreements#edit
+#                                    authorizer_agreement GET    /authorizer/agreements/:id(.:format)                                            authorizer/agreements#show
+#                                                         PATCH  /authorizer/agreements/:id(.:format)                                            authorizer/agreements#update
+#                                                         PUT    /authorizer/agreements/:id(.:format)                                            authorizer/agreements#update
+#                                                         DELETE /authorizer/agreements/:id(.:format)                                            authorizer/agreements#destroy
 #                                          export_expense GET    /export/expense(.:format)                                                       export#expense
 #                                  export_atm_transaction GET    /export/atm_transaction(.:format)                                               export#atm_transactions
 #                                              agreements GET    /agreements(.:format)                                                           agreements#index
@@ -864,6 +875,7 @@
 #                                                         PATCH  /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#update
 #                                                         PUT    /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#update
 #                                                         DELETE /bank_transfer/payment_orders/:id(.:format)                                     bank_transfer/payment_orders#destroy
+#                                     bank_transfer_count GET    /bank_transfer/bank_payment_requests/count(.:format)                            bank_transfer/bank_payment_requests#count
 #             bank_transfer_payment_requests_process_file POST   /bank_transfer/payment_requests/process_file(.:format)                          bank_transfer/bank_payment_requests#process_file
 #          bank_transfer_payment_requests_account_details POST   /bank_transfer/payment_requests/account_details(.:format)                       bank_transfer/bank_payment_requests#account_details
 #      bank_transfer_payment_requests_process_account_ids POST   /bank_transfer/payment_requests/process_account_ids(.:format)                   bank_transfer/bank_payment_requests#process_account_ids
@@ -907,6 +919,7 @@
 #                                                         PUT    /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#update
 #                                                         DELETE /bank_transfer/payments/:id(.:format)                                           bank_transfer/payments#destroy
 #                               bank_transfer_users_count GET    /bank_transfer/users/count(.:format)                                            bank_transfer/users#count
+#                            bank_transfer_users_managers GET    /bank_transfer/users/managers(.:format)                                         bank_transfer/users#get_managers
 #                                     bank_transfer_users GET    /bank_transfer/users(.:format)                                                  bank_transfer/users#index
 #                                                         POST   /bank_transfer/users(.:format)                                                  bank_transfer/users#create
 #                                  new_bank_transfer_user GET    /bank_transfer/users/new(.:format)                                              bank_transfer/users#new
@@ -918,6 +931,7 @@
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                  bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)            bank_transfer/vendor_payment_wallets#transfer_options
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format) admin_users/funds_load_requests#approve
+#                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)  admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#index
 #                                                         POST   /admin/admin_users/funds_load_requests(.:format)                                admin_users/funds_load_requests#create
 #                      new_admin_users_funds_load_request GET    /admin/admin_users/funds_load_requests/new(.:format)                            admin_users/funds_load_requests#new
@@ -1747,6 +1761,7 @@ Rails.application.routes.draw do
     get 'expenses/:id/show', to: 'receipts#show', as: :transcribed_receipt_show
     get 'companies/:id', to: 'companies#show', as: :untranscribed_receipts
     get 'companies', to: 'companies#index', as: :companies
+    get 'expenses/currencies', to: 'expenses#currencies'
     resources :expenses
     resources :companies
     resources :receipts

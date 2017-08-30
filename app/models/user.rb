@@ -61,6 +61,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -250,8 +251,11 @@ class User < ActiveRecord::Base
   # scopes for filters
   # scope :filter_search, -> (term) { where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_search, ->(term) do
-    where "first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ? or mobile_number like ?",
-          "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%"
+    ids = self.where("first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ? or mobile_number like ?",
+                      "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+    ids += self.joins(:cards).where('proxy like ?', "%#{term}%")
+    ids.uniq!
+    self.where(id: ids)
   end
 
   scope :filter_state, -> (state) do
