@@ -48,7 +48,7 @@ class CustomField::SetFields < CustomField::Base
       # If policy has been set, fetch all the custom fields from the policy, else retrieve it from organisation account
       if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(parent_type_id) and item.policy.present?
         policy = item.policy
-        self.field_configurations = policy.field_configurations
+        self.field_configurations = policy.field_configurations.exclude_deleted
       else
         if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(parent_type_id)
           # For reports and money requests
@@ -59,7 +59,7 @@ class CustomField::SetFields < CustomField::Base
           if user.blank?
             user = params[:user]
           end
-          self.field_configurations = user.company.field_configurations
+          self.field_configurations = user.company.field_configurations.exclude_deleted
         end
 
       end
