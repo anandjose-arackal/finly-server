@@ -14,7 +14,7 @@ class BankTransfer::PaymentRequest::Comment::Create < BankTransfer::PaymentReque
 
   def pre_process
     request_comment_params[:action_id] = BankPaymentRequestCommentAction.id_for(:comment)
-    request_comment_params[:action_user_id] = user.id
+    request_comment_params[:user_id] = user.id
   end
 
   def process
