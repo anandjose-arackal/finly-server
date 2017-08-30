@@ -1,8 +1,8 @@
 class User::Team::IsApprover < User::Team::Base
-  attr_accessor :report, :money_request, :for_user, :type, :result
+  attr_accessor :report, :money_request, :for_user, :type, :result, :payment_request
 
   def pre_validate
-    unless params[:report].present? or params[:money_request].present? or params[:user].present?
+    unless params[:report].present? or params[:money_request].present? or params[:user].present? or params[:payment_request].present?
       messages[:error] << 'Error validating approver'
     end
     unless params[:type].present?
@@ -20,6 +20,7 @@ class User::Team::IsApprover < User::Team::Base
     self.type = params[:type]
     self.report = params[:report]
     self.money_request = params[:money_request]
+    self.payment_request = params[:payment_request]
     self.for_user = params[:user]
   end
 
@@ -34,6 +35,14 @@ class User::Team::IsApprover < User::Team::Base
     end
     if self.money_request.present?
       if process_money_request
+        self.response = true
+        return
+      end
+      self.response = false
+      return
+    end
+    if self.payment_request.present?
+      if process_payment_request
         self.response = true
         return
       end
@@ -75,6 +84,10 @@ class User::Team::IsApprover < User::Team::Base
 
   def process_money_request
     process_request :money_request, money_request
+  end
+
+  def process_payment_request
+    process_request :payment_request, payment_request
   end
 
   def process_request(symbol, obj)

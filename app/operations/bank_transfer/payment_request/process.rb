@@ -1,6 +1,6 @@
 # this extracts the payment data from the parsed excel file and creates the payment
 # request object out of it
-class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
+class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
   attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount,
                 :errors, :payment_order_valid, :scheduled_at
 
@@ -45,27 +45,27 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
       return
     end
 
-    op = AccountManager::Balance::Check.(current_user.company.yes_bank_company_account, params)
-    company_balance = op.balance rescue 0
-
+    # op = AccountManager::Balance::Check.(current_user.company.yes_bank_company_account, params)
+    # company_balance = op.balance rescue 0
+    #
     payment_order_data.each do |item|
       self.requested_amount += (item[:amount].to_d rescue 0)
     end
 
-    case params[:initiating_account_type]
-      when '1', 1
-        if self.requested_amount > company_balance
-          self.errors << 'Insufficient funds to initiate the transfer'
-          self.payment_order_valid = false
-          return
-        end
-      when '2', 2
-        if self.requested_amount > user.bank_wallet.balance_value
-          self.errors << 'Insufficient funds to initiate the transfer'
-          self.payment_order_valid = false
-          return
-        end
-    end
+    # case params[:initiating_account_type]
+    #   when '1', 1
+    #     if self.requested_amount > company_balance
+    #       self.errors << 'Insufficient funds to initiate the transfer'
+    #       self.payment_order_valid = false
+    #       return
+    #     end
+    #   when '2', 2
+    #     if self.requested_amount > user.bank_wallet.balance_value
+    #       self.errors << 'Insufficient funds to initiate the transfer'
+    #       self.payment_order_valid = false
+    #       return
+    #     end
+    # end
   end
 
   def process
@@ -129,10 +129,10 @@ class BankTransfer::YesBank::Process < BankTransfer::YesBank::Base
     params[:errors] = self.errors
     params[:payment_order_valid] = self.payment_order_valid
     params[:scheduled_at] = self.scheduled_at
-    BankTransfer::YesBank::Process::SuccessPresenter.new(user, params, messages)
+    BankTransfer::PaymentRequest::Process::SuccessPresenter.new(user, params, messages)
   end
 
-  class BankTransfer::YesBank::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::PaymentRequest::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :errors,
                   :payment_order_valid, :scheduled_at
 

@@ -58,7 +58,9 @@ class PaymentOrder < ActiveRecord::Base
   belongs_to :initiating_user, class_name: 'User'
   belongs_to :currency
 
+  has_one :bank_payment_request
   has_many :payments, dependent: :destroy
+  has_many :payment_order_attachments, dependent: :destroy
 
   has_attached_file :payment_file, default_url: '/images/:style/missing.png'
   validates_attachment_content_type :payment_file,
@@ -73,6 +75,7 @@ class PaymentOrder < ActiveRecord::Base
   accepts_nested_attributes_for :amount_requested
   accepts_nested_attributes_for :amount_processed
   accepts_nested_attributes_for :payments
+  accepts_nested_attributes_for :payment_order_attachments
 
   scope :with_purpose_id, -> (id) { where payment_purpose_id: id }
   scope :without_purpose_id, -> (id) { where.not payment_purpose_id: id }
@@ -113,6 +116,8 @@ class PaymentOrder < ActiveRecord::Base
 
 
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
+  delegate :amount_requested_value, to: :amount_requested
+  delegate :amount_processed_value, to: :amount_processed
 
   # Avoid showing orders created for ATM withdrawals and Personal Expenses
   default_scope { order(created_at: :desc).without_purpose_id(PaymentPurpose.ids_for([:personal_expense, :atm_withdrawal, :reissue_transfer])) }
@@ -124,6 +129,14 @@ class PaymentOrder < ActiveRecord::Base
       total += payment.amount_value
     end
     total
+  end
+
+  def payment_mode
+    self.payments.first.payment_mode
+  end
+
+  def payment_type
+    self.payments.first.payment_type.name.humanize
   end
 
   def credit?
@@ -141,6 +154,16 @@ class PaymentOrder < ActiveRecord::Base
       else
         self.payment_order_status.name.humanize
     end
+  end
+
+  # for convenience, just picks this up from the individual payments
+  def initiating_account
+    self.payments.first.initiating_account
+  end
+
+  # again, for convenience, and only applies to bank transfer poyments
+  def bank_transfer_type
+    self.payments.first.payment_mode
   end
 
 end

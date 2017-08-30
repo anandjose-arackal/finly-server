@@ -1,5 +1,5 @@
 json.array! @result.payment_orders.each do |item|
-  json.id item.id
+  json.id item.bank_payment_request&.id
   scheduled_at = item.scheduled_at
   if scheduled_at.present?
     scheduled_at = scheduled_at.strftime('%d %b %Y')

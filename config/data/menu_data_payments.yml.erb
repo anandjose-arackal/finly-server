@@ -29,24 +29,26 @@ user:
   email: <%= current_user.email %>
   mobile_number: <%= current_user.mobile_number %>
   roles:
-  <% if current_user.admin? %>
+  <% if current_user.vendor_payments_admin? %>
   - id: admin
     name: Admin
     default_url: 'orders'
   <% end %>
-  <% if current_user.finance_manager? %>
-#  - id: finance_manager
-#    name: 'Finance Manager'
-#    default_url: 'orders'
-  <% end %>
-  <% if current_user.manager? %>
-#  - id: manager
-#    name: 'Manager'
-#    default_url: 'orders'
-  <% end %>
-  - id: personal
-    name: 'Finance'
+  <% if current_user.vendor_payments_creditor? %>
+  - id: creditor
+    name: 'Creditor'
     default_url: 'orders'
+  <% end %>
+  <% if current_user.vendor_payments_reviewer? %>
+  - id: reviewer
+    name: 'Reviewer'
+    default_url: 'orders'
+  <% end %>
+  <% if current_user.vendor_payment_initiator? %>
+  - id: initiator
+    name: 'Initiator'
+    default_url: 'orders'
+  <% end %>
 views:
   <% if current_user.admin? %>
     admin:
@@ -84,7 +86,8 @@ views:
 #        - name: 'Company Statements'
 #          url: '#company_statements'
   <% end %>
-    personal:
+  <% if current_user.vendor_payment_reviewer? %>
+    reviewer:
       menus:
         navbar:
         - name: Individual Payments
@@ -99,3 +102,38 @@ views:
         - name: Beneficiaries
           url: beneficiaries
           id: beneficiaries
+  <% end %>
+  <% if current_user.vendor_payment_creditor? %>
+    creditor:
+      menus:
+        navbar:
+        - name: Individual Payments
+          url: payments
+          id: payments
+        - name: Payment Orders
+          url: orders
+          id: orders
+        - name: Vendors
+          url: vendors
+          id: 'vendors'
+        - name: Beneficiaries
+          url: beneficiaries
+          id: beneficiaries
+  <% end %>
+  <% if current_user.vendor_payment_initiator? %>
+    initiator:
+      menus:
+        navbar:
+        - name: Individual Payments
+          url: payments
+          id: payments
+        - name: Payment Orders
+          url: orders
+          id: orders
+        - name: Vendors
+          url: vendors
+          id: 'vendors'
+        - name: Beneficiaries
+          url: beneficiaries
+          id: beneficiaries
+  <% end %>

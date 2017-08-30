@@ -17,7 +17,7 @@
 #
 #
 # }
-class BankTransfer::YesBank::ProcessFromAccountIds < BankTransfer::YesBank::Base
+class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::PaymentRequest::Base
 
   attr_accessor :bank_accounts, :account_ids, :amounts, :response_presenter, :parsed_data
 
@@ -40,7 +40,7 @@ class BankTransfer::YesBank::ProcessFromAccountIds < BankTransfer::YesBank::Base
     # this will create the data in the format we want and process it
     self.parsed_data = parse_order_information
     params[:payment_order] = self.parsed_data
-    self.response_presenter = BankTransfer::YesBank::Process.(user, params)
+    self.response_presenter = BankTransfer::PaymentRequest::Process.(user, params)
   end
 
   def success
