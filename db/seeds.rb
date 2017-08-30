@@ -565,6 +565,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Employee ID',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:report)})
@@ -572,6 +573,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Name',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:report)})
@@ -580,6 +582,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Location',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:money_request)})
@@ -587,6 +590,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Project Name',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:money_request)})
@@ -595,6 +599,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Location',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:manual_expense)})
@@ -602,6 +607,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Duration of Meeting',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:manual_expense)})
@@ -610,6 +616,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Reason',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:distance_expense)})
@@ -617,6 +624,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Name',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:distance_expense)})
@@ -625,6 +633,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Reason',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:time_expense)})
@@ -632,6 +641,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Name',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:time_expense)})
@@ -639,6 +649,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Reason',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:per_diem_expense)})
@@ -646,6 +657,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Name',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:per_diem_expense)})

@@ -187,7 +187,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       elsif finance_view? && bank_payment_request.processing?
         if bank_payment_request.controlling_user_id == user.id
           actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
-          actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:credit] = true
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
@@ -249,6 +248,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           admin = false
           if balance > bank_payment_request.requested_amount_value
             credit_enabled = true
+          elsif user.vendor_payments_admin?
+            credit_enabled = true
           end
           if user.vendor_payments_admin?
             admin = true
@@ -280,6 +281,22 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
           return adapter.balance
       end
+    end
+
+    def retrieve_initiator_actions
+
+    end
+
+    def retrieve_reviewer_actions
+
+    end
+
+    def retrieve_creditor_actions
+
+    end
+
+    def retrieve_admin_actions
+
     end
 
   end

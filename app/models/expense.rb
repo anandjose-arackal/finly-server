@@ -25,7 +25,6 @@
 
 
 
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -301,8 +300,10 @@ class Expense < ActiveRecord::Base
     end
     where expense_status_id: filter_status
   }
-  scope :not_synced_with_quickbooks, -> {where synced_with_quickbooks: [false, nil]}
-  scope :synced_with_quickbooks, -> {where synced_with_quickbooks: true}
+  scope :not_synced_with_quickbooks, -> { where synced_with_quickbooks: [false, nil] }
+  scope :synced_with_quickbooks, -> { where synced_with_quickbooks: true }
+  scope :with_split_link, -> (split_link) { where split_link: split_link }
+  scope :filter_split_link, -> (split_link) { where split_link: split_link }
 
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount
@@ -753,6 +754,15 @@ class Expense < ActiveRecord::Base
       when ExpenseStatus.id_for(:verified)
         'Verified'
     end
+  end
+
+  def is_split?
+    self.split_link.present?
+  end
+
+  def split_count
+    return 1 if self.split_link.blank?
+    Expense.with_split_link(self.split_link).count
   end
 
   private
