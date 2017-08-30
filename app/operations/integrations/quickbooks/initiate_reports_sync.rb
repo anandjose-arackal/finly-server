@@ -22,7 +22,7 @@ class Integrations::Quickbooks::InitiateReportsSync < Integrations::Quickbooks::
   end
 
   def authorized_user_types
-    [:company_admin, :finance]
+    [:company_admin, :finance_manager]
   end
 
   def init
@@ -46,6 +46,13 @@ class Integrations::Quickbooks::InitiateReportsSync < Integrations::Quickbooks::
     unless invalid_reports.empty?
       add_message :error, "Some of these reports have already been synced or are currently being synced in quickbooks - please uncheck them and try again"
       return
+    end
+
+    reports.each do |report|
+      unless report.processed?
+        add_message :error, "Only processed reports can be exported to Quickbooks. Some of these reports have not been processed yet"
+        return
+      end
     end
   end
 

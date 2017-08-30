@@ -48,6 +48,15 @@ json.per_diems @result.per_diems do |per_diem|
   json.rate_value per_diem.rate_value
 end
 
+json.receipts @result.expense.receipts do |receipt|
+  json.id receipt.id
+  json.image do
+    json.file_type receipt.file_format
+    json.original receipt.image.url
+    json.thumb receipt.image.url(:thumb)
+  end
+end
+
 json.violations @result.violation
 
 json.editable @result.editable
