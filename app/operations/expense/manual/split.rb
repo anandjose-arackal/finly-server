@@ -105,10 +105,7 @@ class Expense::Manual::Split < Expense::Manual::Base
       expense_item_params[:amount_attributes] = split[:amount_attributes] if split[:amount_attributes].present?
       expense_custom_fields = base_custom_fields
       if split[:custom_fields].present?
-        if expense_custom_fields[:custom_fields].blank?
-          expense_custom_fields[:custom_fields] = {}
-        end
-        expense_custom_fields[:custom_fields].merge split[:custom_fields]
+        expense_custom_fields.merge! split[:custom_fields]
       end
       expenses_params << {index: index, expense_params: expense_item_params.permit!, custom_fields: expense_custom_fields.permit!}
     end
