@@ -16,7 +16,6 @@
 #  default_value_id     :integer
 #  default_value_type   :string(255)
 #  is_deleted           :boolean          default(FALSE), not null
-#  global               :boolean          default(TRUE)
 #
 
 require 'test_helper'
