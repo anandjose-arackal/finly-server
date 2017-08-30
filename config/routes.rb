@@ -2201,6 +2201,7 @@ Rails.application.routes.draw do
     namespace :admin_users do
       resources :funds_load_requests do
         patch 'approve', to: 'funds_load_requests#approve'
+        patch 'reject', to: 'funds_load_requests#reject'
       end
     end
   end

@@ -17,7 +17,8 @@ class BankTransfer::PaymentRequest::Review::Unapprove < BankTransfer::PaymentReq
       return false
     end
 
-    unless bank_payment_request.approved?
+
+    unless bank_payment_request.processing? || bank_payment_request.approved?
       add_message :error, 'The Payment Order cannot be unapproved at this stage'
     end
   end

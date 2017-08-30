@@ -72,6 +72,10 @@ class BankPaymentRequest < ActiveRecord::Base
     approved?
   end
 
+  def can_take_control?
+    processing?
+  end
+
   def user
     self.owner
   end
