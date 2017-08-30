@@ -157,6 +157,7 @@ class FieldConfiguration < ActiveRecord::Base
      field_type: {id: field_type.id,
                   name: field_type.name},
      mandatory: mandatory,
+     global: self.global,
      value: self.default_value,
      options: options}
   end
