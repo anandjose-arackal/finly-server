@@ -1,5 +1,5 @@
 # Parse_file parses the given file and extract the users and amounts
-class BankTransfer::YesBank::ParseFile < BankTransfer::YesBank::Base
+class BankTransfer::PaymentRequest::ParseFile < BankTransfer::PaymentRequest::Base
   attr_accessor :file, :parsed_data, :response_presenter
 
   def pre_validate
@@ -26,7 +26,7 @@ class BankTransfer::YesBank::ParseFile < BankTransfer::YesBank::Base
 
   def process
     params[:payment_order] = self.parsed_data
-    self.response_presenter = BankTransfer::YesBank::Process.(user, params)
+    self.response_presenter = BankTransfer::PaymentRequest::Process.(user, params)
   end
 
   def success

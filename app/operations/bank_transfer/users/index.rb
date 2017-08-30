@@ -1,3 +1,6 @@
+# this operation is for listing the users in the 'Users' tab in the vendor payments
+# application
+
 class BankTransfer::Users::Index < BankTransfer::Users::Base
 
   attr_accessor :users, :role_id
@@ -35,7 +38,6 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
   end
 
   def process
-    # insert logic here for teams once that has been implemented in vendor payments
     case role_id
       when UserRole.id_for(:admin)
         self.users = user.company.users

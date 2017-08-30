@@ -5,7 +5,7 @@
 #   array of bank account ids
 # }
 
-class BankTransfer::YesBank::AccountDetails < BankTransfer::YesBank::Base
+class BankTransfer::PaymentRequest::AccountDetails < BankTransfer::PaymentRequest::Base
 
   attr_accessor :bank_accounts, :account_ids
 
@@ -25,10 +25,10 @@ class BankTransfer::YesBank::AccountDetails < BankTransfer::YesBank::Base
 
   def success
     params[:bank_accounts] = bank_accounts
-    BankTransfer::YesBank::AccountDetails::AccountsPresenter.new(user, params, messages)
+    BankTransfer::PaymentRequest::AccountDetails::AccountsPresenter.new(user, params, messages)
   end
 
-  class BankTransfer::YesBank::AccountDetails::AccountsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::PaymentRequest::AccountDetails::AccountsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :bank_accounts
 

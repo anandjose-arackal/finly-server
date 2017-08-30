@@ -1,0 +1,40 @@
+class BankTransfer::PaymentRequest::Review::Reject < BankTransfer::PaymentRequest::Review::Base
+
+  def init
+    super
+
+  end
+
+  def validate
+    unless bank_payment_request.can_reject?
+      add_message :error, "Report cannot be rejected at this state"
+      return
+    end
+
+    unless bank_payment_request.controlling_user_id == user.id
+      add_message :error, "You cannot reject this report"
+      return
+    end
+  end
+
+  def process
+    current_user_role = nil
+    if bank_payment_request.update status_id: BankPaymentRequestStatus.id_for(:rejected),
+                                   controlling_user_id: bank_payment_request.owner_id,
+                                   controlling_user_role_id: UserRole.employee_id
+      bank_payment_request.bank_payment_request_trails.create action_user: user,
+                                                              action_user_role_id: current_user_role,
+                                                              action_id: BankPaymentRequestTrailAction.id_for(:reject),
+                                                              modified_user_id: bank_payment_request.owner_id,
+                                                              modified_user_role_id: UserRole.employee_id
+      return true
+    end
+    add_message :error, bank_payment_request.errors.full_messages
+  end
+
+  def post_process
+    # add comments
+
+    add_message :success, "Payment Request successfully rejected"
+  end
+end
