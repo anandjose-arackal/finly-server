@@ -112,6 +112,7 @@ class Expense::Manual::Split < Expense::Manual::Base
     expenses_params
   end
 
+
   def validate_custom_fields(expense, custom_fields, index)
     if expense.valid?
       set_fields = set_custom_fields expense, custom_fields, false
