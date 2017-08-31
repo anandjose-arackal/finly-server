@@ -80,7 +80,7 @@ class CustomField < ActiveRecord::Base
         end
         self.value.value = DateUtils.datetime_in_ist(value)
       when FieldType.id_for(:amount)
-        if self. value.blank?
+        if self.value.blank?
           self.value = FieldAmount.new
         end
         if self.value.value_id.blank?
@@ -95,17 +95,26 @@ class CustomField < ActiveRecord::Base
     self.value.save if self.value.present? and save
   end
 
+  def string_value
+    case field_type_id
+      when FieldType.id_for(:text)
+        return self.value&.value
+      when FieldType.id_for(:drop_down)
+        return self.value&.value&.name
+    end
+  end
+
   def as_json(options = {})
     options = []
     if field_configuration.field_type_id == FieldType.id_for(:drop_down)
       options = field_configuration.drop_down_items
     end
-    json =  {id: field_configuration.id,
-     label: field_configuration.field_name,
-     field_type: {id: field_configuration.field_type.id,
-                  name: field_configuration.field_type.name},
-     mandatory: field_configuration.mandatory,
-     options: options}
+    json = {id: field_configuration.id,
+            label: field_configuration.field_name,
+            field_type: {id: field_configuration.field_type.id,
+                         name: field_configuration.field_type.name},
+            mandatory: field_configuration.mandatory,
+            options: options}
     json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
     json
   end
