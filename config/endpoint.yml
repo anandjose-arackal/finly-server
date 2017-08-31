@@ -99,7 +99,7 @@ production:
     base: "http://cvms1.itzcash.com:8080"
     path: "myaccount/servlet/ItzCashAccountDetailsServlet"
   itzcash_account_details_yse:
-    path: "user/servlet/NaradaAccountDetailsServlet"
+    path: "itzgift/servlet/NaradaAccountDetailsServlet"
   itzcash_credit_debit:
     path: "itzgift/servlet/NaradaCreditDebitServlet"
   itzcash_block_unblock:
