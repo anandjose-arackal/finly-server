@@ -124,7 +124,7 @@ class Admin::Users::Import < Admin::Base
   private
 
   def create_response_csv
-    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    file_name = "#{Rails.root}/public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
     CSV.open(file_name, 'wb') do |csv|
       self.header << 'Result'
       csv << header
@@ -238,6 +238,11 @@ class Admin::Users::Import < Admin::Base
     mobile = row[import_fields[:mobile_number]].to_i.to_s if row[import_fields[:mobile_number]]
     mobile ||= nil
 
+    # deciding on whether a particular use is enabled for a particular application - i.e. expense management, disburse, or vendor payments
+    expense_management = row[import_fields[:expense_management]] == 'Y' ? true : false
+    disburse = row[import_fields[:disburse]] == 'Y' ? true : false
+    vendor_payments = row[import_fields[:vendor_payments]] == 'Y' ? true : false
+
     # generating a password for the user
     generated_password = generate_default_password
     company = Company.find_by(id: row[import_fields[:company_id]])
@@ -267,8 +272,9 @@ class Admin::Users::Import < Admin::Base
                     mothers_maiden_name: row[import_fields[:mothers_maiden_name]],
                     error_messages: errors,
                     user_panel_subscription_attributes: {
-                        expense_management: company.feature_subscription.expense_management_enabled,
-                        disburse: company.feature_subscription.cards_enabled
+                        expense_management: expense_management,
+                        disburse: disburse,
+                        yes_bank_account_transfer: vendor_payments
                     }
     }
 
@@ -303,7 +309,10 @@ class Admin::Users::Import < Admin::Base
         :approves_to => 16,
         :approves_finance_to => 17,
         :company_id => 18,
-        :mothers_maiden_name => 19
+        :mothers_maiden_name => 19,
+        :expense_management => 20,
+        :disburse => 21,
+        :vendor_payments => 22
     }
   end
 
