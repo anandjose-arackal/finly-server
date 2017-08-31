@@ -80,7 +80,9 @@ class Export::Report::Base < Export::Base
     configuration_ids = custom_fields_data[:configuration_ids]
     expense_custom_fields_data = custom_fields_data[:values][expense.id]
     values = []
-
+      configuration_ids.each do |id|
+        values << expense_custom_fields_data[id]
+      end
     values
   end
 
