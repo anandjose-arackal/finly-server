@@ -34,6 +34,8 @@ class BankTransfer::PaymentRequest::Review::Reject < BankTransfer::PaymentReques
 
   def post_process
     # add comments
+    bank_payment_request.comments.create user_id: user.id,
+                                         action_id: BankPaymentRequestCommentAction.id_for(:reject)
 
     add_message :success, "Payment Request successfully rejected"
   end

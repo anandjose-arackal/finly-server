@@ -8,26 +8,55 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  bank_payment_request_id :integer
-#  user_id                 :integer
+#  action_user_id          :integer
+#  forwarded_to_user_id    :integer
 #
 
 class BankPaymentRequestComment < ActiveRecord::Base
 
   belongs_to :action, class_name: "BankPaymentRequestCommentAction"
   belongs_to :bank_payment_request
-  belongs_to :user
+  belongs_to :user, class_name: "User"
+  belongs_to :forwarded_to_user, class_name: "User"
 
   # this will generate the comment body from the
   # parameters in the DB
 
   default_scope { order created_at: :desc}
 
-  def retrieve_content
+  def retrieve_content(user)
+    comment_content = ""
+
+    if user.id == self.user_id
+      comment_content += "You have"
+    else
+      comment_content += "#{self.user&.name} has"
+    end
+
     case self.action_id
       when BankPaymentRequestCommentAction.id_for(:comment)
-        return content
+        return "#{self.user&.name} commented: #{self.content}"
+      when BankPaymentRequestCommentAction.id_for(:submit)
+        comment_content += " submitted the Payment Order"
+      when BankPaymentRequestCommentAction.id_for(:approve)
+        comment_content += " approved the Payment Order"
+      when BankPaymentRequestCommentAction.id_for(:retract)
+        comment_content += " retracted the Payment Order"
+      when BankPaymentRequestCommentAction.id_for(:reject)
+        comment_content += " rejected the Payment Order"
+      when BankPaymentRequestCommentAction.id_for(:credit)
+        comment_content += " initiated the credit for this Payment Order"
+      when BankPaymentRequestCommentAction.id_for(:forward)
+        comment_content += " forwarded the Payment Order to #{forwarded_to_user&.name} for further approval"
+      when BankPaymentRequestCommentAction.id_for(:auto_approve)
+        comment_content = "Payment Order has been auto approved as there is no reviewer assigned"
+      when BankPaymentRequestCommentAction.id_for(:unapprove)
+        comment_content += " unapproved the Payment Order"
       else
-        # do nothing?
+        return nil
     end
+
+    comment_content
   end
+
 end
