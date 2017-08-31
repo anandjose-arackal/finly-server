@@ -547,6 +547,10 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def custom_fields
+    self.sub_expense&.custom_fields
+  end
+
   def custom_field_names
     case self.expense_type_id
       when ExpenseType.id_for(:manual)
@@ -558,7 +562,7 @@ class Expense < ActiveRecord::Base
       when ExpenseType.id_for(:per_diem)
         return self.per_diem_expense.custom_field_names
       when ExpenseType.id_for(:card)
-        return []
+        return self.card_expense.custom_fields
       else
         return []
     end
@@ -575,7 +579,7 @@ class Expense < ActiveRecord::Base
       when ExpenseType.id_for(:per_diem)
         return self.per_diem_expense.custom_field_values
       when ExpenseType.id_for(:card)
-        return []
+        return self.card_expense.custom_fields
       else
         return []
     end
@@ -592,7 +596,7 @@ class Expense < ActiveRecord::Base
       when ExpenseType.id_for(:per_diem)
         return self.per_diem_expense.custom_field_value_by_name(name)
       when ExpenseType.id_for(:card)
-        return []
+        return self.card_expense.custom_fields
       else
         return []
     end

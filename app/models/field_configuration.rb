@@ -22,6 +22,8 @@
 class FieldConfiguration < ActiveRecord::Base
   include SoftDeletable
 
+  # Global - When expense is split, used to determine if the custom field should appear in the split or in the root
+
   belongs_to :field_type
   belongs_to :company
   belongs_to :field_parent_type
@@ -148,6 +150,7 @@ class FieldConfiguration < ActiveRecord::Base
     self.default_value.save if self.default_value.present?
   end
 
+  # Global - When expense is split, used to determine if the custom field should appear in the split or in the root
   def as_json(options = {})
     options = []
     if field_type_id == FieldType.id_for(:drop_down)

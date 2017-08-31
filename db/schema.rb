@@ -406,12 +406,12 @@ ActiveRecord::Schema.define(version: 20170830180428) do
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
     t.integer  "bank_payment_request_id", limit: 4
-    t.integer  "action_user_id",          limit: 4
+    t.integer  "user_id",                 limit: 4
     t.integer  "forwarded_to_user_id",    limit: 4
   end
 
   add_index "bank_payment_request_comments", ["action_id"], name: "index_bank_payment_request_comments_on_action_id", using: :btree
-  add_index "bank_payment_request_comments", ["action_user_id"], name: "index_bank_payment_request_comments_on_action_user_id", using: :btree
+  add_index "bank_payment_request_comments", ["user_id"], name: "index_bank_payment_request_comments_on_user_id", using: :btree
 
   create_table "bank_payment_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -647,9 +647,9 @@ ActiveRecord::Schema.define(version: 20170830180428) do
     t.boolean  "manager_view_balance"
     t.boolean  "manager_view_eligibility"
     t.boolean  "manager_view_transactions"
-    t.boolean  "non_personal_fund_transfer"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.boolean  "non_personal_fund_transfer"
   end
 
   create_table "card_request_statuses", force: :cascade do |t|
@@ -729,10 +729,9 @@ ActiveRecord::Schema.define(version: 20170830180428) do
     t.string   "proxy",                    limit: 255,                   null: false
     t.integer  "card_type_id",             limit: 4
     t.text     "description",              limit: 65535
-    t.boolean  "is_deleted",                             default: false
     t.datetime "created_at",                                             null: false
     t.datetime "updated_at",                                             null: false
-    t.integer  "company_id",               limit: 4
+    t.integer  "company_id",               limit: 4,                     null: false
     t.integer  "disabled_by_role_id",      limit: 4
     t.integer  "disabled_by_user_id",      limit: 4
     t.boolean  "active"
@@ -742,7 +741,8 @@ ActiveRecord::Schema.define(version: 20170830180428) do
     t.integer  "card_eligibility_id",      limit: 4
     t.boolean  "admin_unblockable",                      default: true
     t.integer  "itz_cash_card_program_id", limit: 4
-    t.integer  "card_status_id",           limit: 4
+    t.integer  "card_status_id",           limit: 4,                     null: false
+    t.boolean  "is_deleted",                             default: false
     t.boolean  "hotlisted",                              default: false
   end
 
@@ -2131,6 +2131,12 @@ ActiveRecord::Schema.define(version: 20170830180428) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "payment_order_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "payment_orders", force: :cascade do |t|
     t.date     "scheduled_at"
     t.datetime "processed_at"
@@ -3089,7 +3095,7 @@ ActiveRecord::Schema.define(version: 20170830180428) do
   add_foreign_key "auto_sync_configs", "periods"
   add_foreign_key "balance_sheets", "users"
   add_foreign_key "bank_accounts", "yes_bank_vendors"
-  add_foreign_key "bank_payment_request_comments", "users", column: "action_user_id"
+  add_foreign_key "bank_payment_request_comments", "users"
   add_foreign_key "bank_payment_request_trails", "bank_payment_requests"
   add_foreign_key "bank_transactions", "amounts"
   add_foreign_key "bank_transactions", "companies"
