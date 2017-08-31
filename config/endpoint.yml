@@ -3,6 +3,8 @@ default: &default
   itzcash_account_details:
     base: "http://demo.itzcash.com"
     path: "myaccount/servlet/ItzCashAccountDetailsServlet"
+  itzcash_account_details_yse:
+    path: "user/servlet/NaradaAccountDetailsServlet"
   itzcash_credit_debit:
     path: "user/servlet/NaradaCreditDebitServlet"
   itzcash_block_unblock:
@@ -58,6 +60,8 @@ itzcash_uat:
   itzcash_account_details:
     base: "http://cvmstest.itzcash.com:8080"
     path: "myaccount/servlet/ItzCashAccountDetailsServlet"
+  itzcash_account_details_yse:
+    path: "user/servlet/NaradaAccountDetailsServlet"
   itzcash_credit_debit:
     path: "user/servlet/NaradaCreditDebitServlet"
   itzcash_block_unblock:
@@ -94,6 +98,8 @@ production:
   itzcash_account_details:
     base: "http://cvms1.itzcash.com:8080"
     path: "myaccount/servlet/ItzCashAccountDetailsServlet"
+  itzcash_account_details_yse:
+    path: "user/servlet/NaradaAccountDetailsServlet"
   itzcash_credit_debit:
     path: "itzgift/servlet/NaradaCreditDebitServlet"
   itzcash_block_unblock:
