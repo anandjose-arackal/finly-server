@@ -30,6 +30,9 @@ json.array!(@result.receipts) do |receipt|
       json.system_messages do
         json.array!(expense.system_messages.pluck(:content))
       end
+      json.currency_country_code expense.amount&.currency&.country_code
+      json.currency_symbol expense.amount&.currency&.symbol
+      json.currency_id expense.amount&.currency&.id
     end
   end
 end
