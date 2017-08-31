@@ -1,4 +1,4 @@
-class ItzCash::AccountDetails < ItzCash::Base
+class ItzCash::AccountDetailsYse < ItzCash::Base
   attr_accessor :card
 
   def pre_validate
