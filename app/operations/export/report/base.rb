@@ -111,11 +111,11 @@ class Export::Report::Base < Export::Base
         values[expense.id] = {}
         cf = expense.custom_fields
         cf&.each do |custom_field|
-          unless configuration_ids.include?(custom_field.field_configuration)
+          unless configuration_ids.include?(custom_field.field_configuration_id)
             configuration_ids << custom_field.field_configuration_id
-            headers << custom_field.field_configuration.label
+            headers << custom_field.field_configuration.field_name
           end
-          values[expense.id][cf.field_configuration_id] = custom_field.string_value
+          values[expense.id][custom_field.field_configuration_id] = custom_field.string_value
         end
       end
     end

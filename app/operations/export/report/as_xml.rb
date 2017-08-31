@@ -26,11 +26,13 @@ class Export::Report::AsXml < Export::Report::Base
   end
 
   def process
-    @column_names = (default_column_names + custom_field_column_names)
+    cf_data = generate_custom_field_data reports
+    cf_headers = cf_data[:headers]
+    @column_names = default_column_names + cf_headers
     @data = []
     reports.each do |r|
       r.expenses.each do |e|
-        @data << retrieve_data(preferences, r, e, custom_field_column_names)
+        @data << retrieve_data(preferences, r, e, cf_data)
       end
     end
   end

@@ -96,7 +96,7 @@ class CustomField < ActiveRecord::Base
   end
 
   def string_value
-    case field_type_id
+    case field_configuration.field_type_id
       when FieldType.id_for(:text)
         return self.value&.value
       when FieldType.id_for(:drop_down)
