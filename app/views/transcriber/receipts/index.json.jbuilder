@@ -32,6 +32,7 @@ json.array!(@result.receipts) do |receipt|
       end
       json.currency_country_code expense.amount&.currency&.country_code
       json.currency_symbol expense.amount&.currency&.symbol
+      json.currency_id expense.amount&.currency&.id
     end
   end
 end
