@@ -56,6 +56,10 @@ class BankPaymentRequestComment < ActiveRecord::Base
         return nil
     end
 
+    if self.note.present?
+      comment_content += " with a note: #{self.note}"
+    end
+
     comment_content
   end
 
