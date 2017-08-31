@@ -42,8 +42,8 @@ json.attachments do
 end
 
 json.comments do
-  json.array!(@result.bank_payment_request.bank_payment_request_comments) do |comment|
-    json.content comment.retrieve_content
+  json.array!(@result.bank_payment_request.comments) do |comment|
+    json.content comment.retrieve_content(current_user)
     json.timestamp comment.created_at.strftime "%I:%M %p, %d %b %Y"
     json.user do
       json.first_name comment.user&.first_name

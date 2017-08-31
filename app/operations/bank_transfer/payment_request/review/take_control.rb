@@ -34,6 +34,9 @@ class BankTransfer::PaymentRequest::Review::TakeControl < BankTransfer::PaymentR
   end
 
   def post_process
+    bank_payment_request.comments.create user_id: user.id,
+                                         action_id: BankPaymentRequestCommentAction.id_for(:take_control)
+
     add_message :success, "Report taken control of successfully!"
   end
 

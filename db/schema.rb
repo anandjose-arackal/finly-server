@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170829132711) do
+ActiveRecord::Schema.define(version: 20170830180428) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -406,11 +406,12 @@ ActiveRecord::Schema.define(version: 20170829132711) do
     t.datetime "created_at",                            null: false
     t.datetime "updated_at",                            null: false
     t.integer  "bank_payment_request_id", limit: 4
-    t.integer  "user_id",                 limit: 4
+    t.integer  "action_user_id",          limit: 4
+    t.integer  "forwarded_to_user_id",    limit: 4
   end
 
   add_index "bank_payment_request_comments", ["action_id"], name: "index_bank_payment_request_comments_on_action_id", using: :btree
-  add_index "bank_payment_request_comments", ["user_id"], name: "index_bank_payment_request_comments_on_user_id", using: :btree
+  add_index "bank_payment_request_comments", ["action_user_id"], name: "index_bank_payment_request_comments_on_action_user_id", using: :btree
 
   create_table "bank_payment_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -3088,7 +3089,7 @@ ActiveRecord::Schema.define(version: 20170829132711) do
   add_foreign_key "auto_sync_configs", "periods"
   add_foreign_key "balance_sheets", "users"
   add_foreign_key "bank_accounts", "yes_bank_vendors"
-  add_foreign_key "bank_payment_request_comments", "users"
+  add_foreign_key "bank_payment_request_comments", "users", column: "action_user_id"
   add_foreign_key "bank_payment_request_trails", "bank_payment_requests"
   add_foreign_key "bank_transactions", "amounts"
   add_foreign_key "bank_transactions", "companies"

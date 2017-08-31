@@ -18,7 +18,7 @@ class BankTransfer::PaymentRequest::Comment::Create < BankTransfer::PaymentReque
   end
 
   def process
-    comment = payment_request.bank_payment_request_comments.build(request_comment_params)
+    comment = payment_request.comments.build(request_comment_params)
     unless comment.save
       add_message :error, comment.errors.full_messages
     end

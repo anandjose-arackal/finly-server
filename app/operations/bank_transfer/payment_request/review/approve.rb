@@ -1,5 +1,7 @@
 class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentRequest::Review::Base
 
+  attr_accessor :auto_approve
+
   def authorized_user_type
     [:manager, :finance_manager, :admin]
   end
@@ -22,7 +24,6 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
   end
 
   def process
-    # todo - add logic for getting the next reviewer here
     presenter = User::Team::Review::NextReviewer.(bank_payment_request)
     next_reviewer = presenter.user
     next_reviewer_role_id = presenter.role_id
@@ -30,6 +31,7 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
     current_user_role = User::Team::Review::UserRole.(user, self.bank_payment_request)
     if next_reviewer.nil?
       payment_status = BankPaymentRequestStatus.id_for(:approved)
+      self.auto_approve = true
     else
       payment_status = BankPaymentRequestStatus.id_for(:processing)
     end
@@ -47,6 +49,14 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
   end
 
   def post_process
+    if self.auto_approve
+      action_id = BankPaymentRequestCommentAction.id_for(:auto_approve)
+    else
+      action_id = BankPaymentRequestCommentAction.id_for(:approve)
+    end
+    bank_payment_request.comments.create user_id: user.id,
+                                         action_id: action_id
+
     add_message :success, "Succesfully approved the payment request"
   end
 
