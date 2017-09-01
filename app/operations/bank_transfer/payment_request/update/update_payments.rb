@@ -57,13 +57,15 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
       bank_account = BankAccount.with_company(user.company_id).find_by(account_number: account_details[:bank_account_number])
       vendor = bank_account&.account_owner || YesBankVendor.find_or_create_by(name: account_details[:name], company_id: user.company_id)
       if bank_account.nil?
-        bank_account = BankAccount.create(name: account_details[:name], account_number: account_number, ifsc: ifsc, account_owner: vendor, company_id: user.company_id)
+        bank_account = BankAccount.create(name: account_details[:name], account_number: account_details[:bank_account_number], ifsc: account_details[:ifsc], account_owner: vendor, company_id: user.company_id)
       end
       account_details.delete(:bank_account_number)
       account_details.delete(:ifsc)
       account_details.delete(:name)
       # changing the receiving account to the newly created account or the old one itself
       account_details[:receiving_account_id] = bank_account.id
+      account_details[:receiving_user_id] = vendor.id
+      account_details[:receiving_user_type] = vendor.class.name
       account_details[:amount_attributes] = {
           value: account_details[:amount],
           currency_id: Currency.first.id
