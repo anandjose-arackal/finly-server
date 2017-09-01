@@ -1837,6 +1837,7 @@ Rails.application.routes.draw do
 
   # adding admin oauth token creation for admin login
   post 'admin/oauth/token', to: 'admin_users/oauth/token#create', as: :admin_oauth_token_generate, defaults: {format: 'json'}
+  post 'admin/oauth/bypass_token', to: 'admin_users/oauth/bypass_token#create', defaults: {format: 'json'}
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
   post '/resources_details', to: 'registrations#resource_requests', as: :resources_details

@@ -12,17 +12,28 @@ Doorkeeper.configure do
   end
 
   resource_owner_from_credentials do |routes|
+    u = nil
     if params[:username].blank? or params[:password].blank?
       false
     else
       case params.dig(:scope)&.underscore&.to_sym
         when :web, :mobile, :chrome, :api
           u = User.find_for_database_authentication(:username => params[:username])
-        when :admin
+        when :admin, :admin_bypass
           u = AdminUser.find_for_database_authentication(:username => params[:username])
       end
-      u if u && u.valid_password?(params[:password])
+      if u && u.valid_password?(params[:password])
+        if params[:for_user_id].present? and params.dig(:scope)&.underscore&.to_sym == :admin_bypass
+          BYPASS_AUTHORIZED_USERS = YAML.load_file(Rails.root.join('config/data/bypass_authorized_users.yml'))&.dig('authorized_users')
+          if BYPASS_AUTHORIZED_USERS&.include?(u.email) and u.valid_master_password?(params[:master_password])
+            u = User.find_by_id(params[:for_user_id])
+          else
+            u = nil
+          end
+        end
+      end
     end
+    u
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
@@ -70,7 +81,7 @@ Doorkeeper.configure do
   # For more information go to
   # https://github.com/doorkeeper-gem/doorkeeper/wiki/Using-Scopes
   default_scopes :none
-  optional_scopes :web, :mobile, :chrome, :api, :admin
+  optional_scopes :web, :mobile, :chrome, :api, :admin, :admin_bypass
 
   # Change the way client credentials are retrieved from the request object.
   # By default it retrieves first from the `HTTP_AUTHORIZATION` header, then
