@@ -52,6 +52,8 @@ class BankPaymentRequestComment < ActiveRecord::Base
         comment_content = "Payment Order has been auto approved as there is no reviewer assigned"
       when BankPaymentRequestCommentAction.id_for(:unapprove)
         comment_content += " unapproved the Payment Order"
+      when BankPaymentRequestCommentAction.id_for(:take_control)
+        comment_content += " taken control of the Payment Order"
       else
         return nil
     end
