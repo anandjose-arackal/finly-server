@@ -9,8 +9,6 @@ json.summary do
   json.amount_processed @result.payment_order.amount_processed&.value
   json.description @result.bank_payment_request.description
   json.note @result.payment_order.note
-  # # json.initiating_account @result.payment_order.payments.first.initiating_account_name
-  # json.initiating_account "#{@result.user.name}'s Finly Money"
   json.initiating_user @result.bank_payment_request.owner.name
   reviewer = (@result.manager.name rescue '--')
   json.reviewing_user reviewer
@@ -20,7 +18,7 @@ end
 
 json.payments do
   json.array!(@result.payment_order.payments) do |payment|
-    json.name payment.receiving_user.name
+    json.name payment.receiving_account.account_owner.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.amount payment.amount_value
