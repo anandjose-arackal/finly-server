@@ -45,6 +45,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       self.role = UserRole.id_for(:finance_manager)
     end
     self.amount = payment_param[:amount]
+    self.note = payment_param[:note]
     self.currency_id = payment_param[:currency_id] || Currency.first.id
     init_payment_request(:credit, :advance_outside_finly)
   end
