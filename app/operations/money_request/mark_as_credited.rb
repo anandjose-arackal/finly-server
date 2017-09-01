@@ -23,7 +23,12 @@ class MoneyRequest::MarkAsCredited < MoneyRequest::Base
                                        controlling_user_role_id: nil,
                                        controlling_for_user_role_id: nil,
                                        status_id: MoneyRequestStatus.id_for(:credited),
-                                       payment: self.payment
+                                       payment: self.payment,
+                                       processed_amount_attributes: {
+                                           value: self.amount_credited,
+                                           currency_id: Currency.first.id
+                                       }
+      
       role_id = (self.user.finance_manager? and params.present? and finance_view?) ? UserRole.id_for(:finance_manager) : UserRole.id_for(:admin)
       money_request.tracks.create action_user: user,
                                   action_user_role_id: role_id,
