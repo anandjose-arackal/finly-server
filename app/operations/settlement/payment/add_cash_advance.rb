@@ -9,7 +9,7 @@
 
 class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   include MathUtil
-  attr_accessor :money_requests, :payment_param, :role
+  attr_accessor :money_requests, :payment_param, :role, :money_request_amounts
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -47,7 +47,14 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     self.amount = payment_param[:amount]
     self.note = payment_param[:note]
     self.currency_id = payment_param[:currency_id] || Currency.first.id
-    init_payment_request(:credit, :advance_outside_finly)
+
+    # keeping track of the individual money requests and the respective amounts being credited to them
+    params[:money_requests].each do |money_request|
+      self.money_request_amounts << {money_request[:id] => money_request[:processed_amount]}
+    end
+    params.delete(:money_requests)
+
+    init_payment_request(:credit, :advance_outside_finly, amount)
   end
 
   def authorize
@@ -91,7 +98,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
         total_amount = MoneyRequestItem.with_money_request(ids).with_amount.sum(:value)
         to_user.balance_sheet.subtract_pending_advance(total_amount)
         money_requests.each do |money_request|
-          MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role})
+          MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role, amount_processed: self.money_request_amounts[money_request.id.to_s]})
         end
       end
       return true

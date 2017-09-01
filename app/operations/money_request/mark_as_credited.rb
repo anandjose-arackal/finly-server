@@ -1,5 +1,5 @@
 class MoneyRequest::MarkAsCredited < MoneyRequest::Base
-  attr_accessor :payment, :money_requests
+  attr_accessor :payment, :money_requests, :amount_credited
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -8,6 +8,7 @@ class MoneyRequest::MarkAsCredited < MoneyRequest::Base
   def init
     self.money_request = (params[:money_request] or params[:money_requests])
     self.payment = params[:payment]
+    self.amount_credited = params[:amount_processed]
   end
 
   def validate
