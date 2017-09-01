@@ -23,6 +23,7 @@
 #  updated_at                   :datetime         not null
 #  is_deleted                   :boolean          default(FALSE), not null
 #  submitted_amount_id          :integer
+#  processed_amount_id          :integer
 #
 
 
@@ -55,7 +56,10 @@ class MoneyRequest < ActiveRecord::Base
 
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, class_name: "Amount"
+  belongs_to :processed_amount, class_name: "Amount"
+
   accepts_nested_attributes_for :submitted_amount
+  accepts_nested_attributes_for :processed_amount
   delegate :submitted_amount_value, to: :submitted_amount
 
   scope :with_id, ->(id) { where id: id }
