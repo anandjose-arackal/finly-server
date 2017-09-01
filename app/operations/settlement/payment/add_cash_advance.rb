@@ -49,8 +49,9 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     self.currency_id = payment_param[:currency_id] || Currency.first.id
 
     # keeping track of the individual money requests and the respective amounts being credited to them
+    self.money_request_amounts = {}
     params[:money_requests].each do |money_request|
-      self.money_request_amounts << {money_request[:id] => money_request[:processed_amount]}
+      self.money_request_amounts[money_request[:id]] = money_request[:processed_amount]
     end
     params.delete(:money_requests)
 
@@ -71,12 +72,13 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
     # validations specific to a particular validation in the money request
     if money_requests.present?
+
       total_amount = 0
       money_requests.each do |request|
         total_amount += request.total_amount
       end
-      unless total_amount <= payment_param[:amount].to_f
-        add_message :error, 'Payment amount cannot be less than the money requests total amount'
+      if payment_param[:amount].to_f >= total_amount
+        add_message :error, 'You cannot credit more than the total of the money requests'
       end
 
       date = Date.parse(payment_params[:date])
@@ -98,7 +100,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
         total_amount = MoneyRequestItem.with_money_request(ids).with_amount.sum(:value)
         to_user.balance_sheet.subtract_pending_advance(total_amount)
         money_requests.each do |money_request|
-          MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role, amount_processed: self.money_request_amounts[money_request.id.to_s]})
+          MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role, amount_processed: self.money_request_amounts["#{money_request.id}"]})
         end
       end
       return true

@@ -8,7 +8,7 @@ class MoneyRequest::MarkAsCredited < MoneyRequest::Base
   def init
     self.money_request = (params[:money_request] or params[:money_requests])
     self.payment = params[:payment]
-    self.amount_credited = params[:amount_processed]
+    self.amount_credited = params[:amount_processed].to_f
   end
 
   def validate
