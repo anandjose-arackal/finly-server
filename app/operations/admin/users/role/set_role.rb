@@ -1,6 +1,6 @@
 class Admin::Users::Role::SetRole < Admin::Users::Base
 
-  attr_accessor :roles_to_add, :roles_to_remove, :being_updated_user
+  attr_accessor :roles_to_add, :roles_to_remove, :being_updated_user, :purpose_id
 
   def pre_validate
     super()
@@ -11,6 +11,12 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
   end
 
   def init
+
+    # as of now setting the purpose as Expense Management because VP doesn't exist in the front
+    # end as of yet
+    self.purpose_id = MappingPurpose.id_for(:expense_management)
+    ##############################################################
+
     id = (params[:id] or params[:user_id])
     self.being_updated_user = User.with_id(id).first rescue nil
     return unless being_updated_user.present?
@@ -38,7 +44,8 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
     return unless roles_to_add.present? or roles_to_remove.present?
     create = []
     roles_to_add.each do |role_id|
-      create << {user_id: being_updated_user.id, user_role_id: role_id}
+      create << {user_id: being_updated_user.id, user_role_id: role_id,
+                 purpose_id: purpose_id}
     end
     UserRoleMapping.create(create) if create.present?
     being_updated_user.role_mapping.role(roles_to_remove).destroy_all if roles_to_remove.present?
