@@ -34,7 +34,12 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     id = (params[:id] or params[:to_user_id])
     team = User::Team::Index.(user, params)
     self.to_user = team.with_id(id).first rescue nil if team.present?
-    money_request_id = (params[:money_request_id] or params[:money_request_ids])
+    if params[:money_request_ids].is_a?(Array)
+      money_request_id = (params[:money_request_id] or params[:money_request_ids])
+    else
+      money_request_id = params[:money_request_id]&.split(',') || params[:money_request_ids].split(',')
+    end
+
     if money_request_id.present?
       self.money_requests = to_user.money_requests.with_id(money_request_id) if to_user.present?
     end

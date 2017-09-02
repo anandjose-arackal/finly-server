@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170901130848) do
+ActiveRecord::Schema.define(version: 20170902133222) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -459,6 +459,7 @@ ActiveRecord::Schema.define(version: 20170901130848) do
     t.text     "description",                  limit: 65535
     t.integer  "controlling_for_user_id",      limit: 4
     t.integer  "controlling_for_user_role_id", limit: 4
+    t.boolean  "require_approval"
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
