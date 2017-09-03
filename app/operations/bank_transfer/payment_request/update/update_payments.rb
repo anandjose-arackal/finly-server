@@ -16,21 +16,22 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
   end
 
   def validate
-    self.requested_total = 0
-    params[:bank_payment_request][:payments_attributes].each do |details|
-      self.requested_total += details[:amount]&.to_f
-    end
-    adapter = nil
-    case payment_order.initiating_account_type
-      when "VendorPaymentWallet"
-        adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(payment_order.payments.first.initiating_account)
-      when "YesBankCompanyAccount"
-        adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-    end
-    if requested_total > adapter.balance
-      add_message :error, "Amount being requested is greater than the source account's balance"
-      return
-    end
+    # below no longer necessary because the logic for determining the balances are being done in the credit action
+    # self.requested_total = 0
+    # params[:bank_payment_request][:payments_attributes].each do |details|
+    #   self.requested_total += details[:amount]&.to_f
+    # end
+    # adapter = nil
+    # case payment_order.initiating_account_type
+    #   when "VendorPaymentWallet"
+    #     adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(payment_order.payments.first.initiating_account)
+    #   when "YesBankCompanyAccount"
+    #     adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+    # end
+    # if requested_total > adapter.balance
+    #   add_message :error, "Amount being requested is greater than the source account's balance"
+    #   return
+    # end
   end
 
   def pre_process
