@@ -16,6 +16,7 @@
 #  description                  :text(65535)
 #  controlling_for_user_id      :integer
 #  controlling_for_user_role_id :integer
+#  require_approval             :boolean
 #
 
 require 'test_helper'

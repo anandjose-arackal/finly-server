@@ -135,7 +135,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
           admin = false
-          if balance > bank_payment_request.requested_amount_value
+          if balance > bank_payment_request.requested_amount_value && !bank_payment_request.require_approval
              enabled = true
           end
           if user.vendor_payments_admin?
@@ -246,7 +246,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           balance = retrieve_balance(:vendor_payment_wallet, user)
           credit_enabled = false
           admin = false
-          if balance > bank_payment_request.requested_amount_value
+          if balance > bank_payment_request.requested_amount_value && !bank_payment_request.require_approval
             credit_enabled = true
           elsif user.vendor_payments_admin?
             credit_enabled = true
