@@ -518,6 +518,8 @@ class User < ActiveRecord::Base
     self.role_mapping.vendor_payments.initiator.present?
   end
 
+  alias_method :vendor_payments_initiator?, :vendor_payment_initiator?
+
 
   def has_role?(role_id)
     return false unless role_id.present?
