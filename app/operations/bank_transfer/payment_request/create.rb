@@ -5,7 +5,8 @@
 class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   attr_accessor :order_data, :payment_request, :payment_order, :scheduled_at,
                 :processed_order_data, :initiating_account, :request_params,
-                :company_id, :bank_payment_request, :requested_amount
+                :company_id, :bank_payment_request, :requested_amount,
+                :unauthorized_vendors_presence
 
   def pre_validate
     super
@@ -69,9 +70,15 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     unless bank_payment_request.save
       add_message :error, bank_payment_request.errors.full_messages
     end
+
   end
 
   def post_process
+    # if there are unauthorized vendors, mandate an approval flow
+    if self.unauthorized_vendors_presence
+      bank_payment_request.update(require_approval: true)
+    end
+
     add_message :success, "Payment Request created successfully!"
   end
 
@@ -162,8 +169,11 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
                              company_id: self.company_id)
     vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
 
+    self.unauthorized_vendors_presence = false
     if ba.nil?
       ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc], account_owner: vendor, company_id: self.company_id)
+      # setting unauthorized vendors as true so that after creation, the approval flow is mandated
+      self.unauthorized_vendors_presence = true
     end
     return ba
   end

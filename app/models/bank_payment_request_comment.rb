@@ -8,7 +8,7 @@
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  bank_payment_request_id :integer
-#  action_user_id          :integer
+#  user_id                 :integer
 #  forwarded_to_user_id    :integer
 #
 

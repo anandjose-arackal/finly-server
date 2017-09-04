@@ -136,6 +136,11 @@ class AdminUsers::UsersController < ApplicationController
     end
   end
 
+  def reset_password
+    @result = Admin::Users::ResetPassword.(current_user, params)
+    respond
+  end
+
   private
 
 end

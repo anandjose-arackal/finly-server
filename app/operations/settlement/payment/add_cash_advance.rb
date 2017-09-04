@@ -9,7 +9,7 @@
 
 class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   include MathUtil
-  attr_accessor :money_requests, :payment_param, :role
+  attr_accessor :money_requests, :payment_param, :role, :money_request_amounts
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -34,7 +34,12 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     id = (params[:id] or params[:to_user_id])
     team = User::Team::Index.(user, params)
     self.to_user = team.with_id(id).first rescue nil if team.present?
-    money_request_id = (params[:money_request_id] or params[:money_request_ids])
+    if params[:money_request_ids].is_a?(Array)
+      money_request_id = (params[:money_request_id] or params[:money_request_ids])
+    else
+      money_request_id = params[:money_request_id]&.split(',') || params[:money_request_ids].split(',')
+    end
+
     if money_request_id.present?
       self.money_requests = to_user.money_requests.with_id(money_request_id) if to_user.present?
     end
@@ -45,8 +50,17 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       self.role = UserRole.id_for(:finance_manager)
     end
     self.amount = payment_param[:amount]
+    self.note = payment_param[:note]
     self.currency_id = payment_param[:currency_id] || Currency.first.id
-    init_payment_request(:credit, :advance_outside_finly)
+
+    # keeping track of the individual money requests and the respective amounts being credited to them
+    self.money_request_amounts = {}
+    params[:money_requests].each do |money_request|
+      self.money_request_amounts[money_request[:id]] = money_request[:processed_amount]
+    end
+    params.delete(:money_requests)
+
+    init_payment_request(:credit, :advance_outside_finly, amount)
   end
 
   def authorize
@@ -63,12 +77,13 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
     # validations specific to a particular validation in the money request
     if money_requests.present?
+
       total_amount = 0
       money_requests.each do |request|
         total_amount += request.total_amount
       end
-      unless total_amount <= payment_param[:amount].to_f
-        add_message :error, 'Payment amount cannot be less than the money requests total amount'
+      if payment_param[:amount].to_f >= total_amount
+        add_message :error, 'You cannot credit more than the total of the money requests'
       end
 
       date = Date.parse(payment_params[:date])
@@ -90,7 +105,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
         total_amount = MoneyRequestItem.with_money_request(ids).with_amount.sum(:value)
         to_user.balance_sheet.subtract_pending_advance(total_amount)
         money_requests.each do |money_request|
-          MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role})
+          MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role, amount_processed: self.money_request_amounts["#{money_request.id}"]})
         end
       end
       return true
