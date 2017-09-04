@@ -266,7 +266,8 @@ class Admin::Users::Import < Admin::Base
                                                finance_manager: finance_manager,
                                                approves_to: approves_to,
                                                approves_finance_to: approves_finance_to,
-                                               policy_id: (company.policies.default.first.id rescue nil)
+                                               policy_id: (company.policies.default.first.id rescue nil),
+                                               purpose_id: MappingPurpose.id_for(:expense_management)
                                               }],
                     profile_attributes: {address_1: row[import_fields[:address_1]],
                                          address_2: row[import_fields[:address_2]],

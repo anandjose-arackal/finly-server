@@ -175,7 +175,9 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
                     team_mapping_attributes: [{default: true, manager: manager,
                                                finance_manager: finance_manager,
                                                approves_to: approves_to,
-                                               approves_finance_to: approves_finance_to
+                                               approves_finance_to: approves_finance_to,
+                                               policy_id: company.policies.first.id,
+                                               purpose_id: MappingPurpose.id_for(:expense_management)
                                               }],
                     error_messages: errors
                   }
