@@ -47,6 +47,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       associated_users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.controlling_user) rescue []
       if admin_view? && user.vendor_payments_admin?
         if bank_payment_request.processing? && bank_payment_request.controlling_user_id == user.id
+          actions[:summary_editable] = true
+          actions[:payments_editable] = true
+          actions[:attachments_editable] = true
           actions[:credit] = true
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
@@ -131,6 +134,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       elsif (manager_view?) && bank_payment_request.processing?
         if bank_payment_request.controlling_user_id == user.id
           actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+          actions[:summary_editable] = true
+          actions[:payments_editable] = true
+          actions[:attachments_editable] = true
           actions[:credit] = true
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
@@ -187,6 +193,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       elsif finance_view? && bank_payment_request.processing?
         if bank_payment_request.controlling_user_id == user.id
           actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+          actions[:summary_editable] = true
+          actions[:payments_editable] = true
+          actions[:attachments_editable] = true
           actions[:credit] = true
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
@@ -241,7 +250,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       elsif initiator_view?
         if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
           actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
-          actions[:editable] = true
+          actions[:summary_editable] = true
+          actions[:payments_editable] = true
+          actions[:attachments_editable] = true
           actions[:destroy] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
           balance = retrieve_balance(:vendor_payment_wallet, user)
           credit_enabled = false

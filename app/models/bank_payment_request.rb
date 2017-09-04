@@ -49,6 +49,31 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :with_user, -> (user_id) { where owner_id: user_id}
   scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
   scope :with_id, -> (id) { where id: id }
+  scope :filter_status_id, -> (status_id) {
+    case status_id
+      when 1, '1' # i.e. open
+        where status_id: BankPaymentRequestStatus.id_for(:open)
+      when 2, '2' # i.e. processing
+        where status_id: BankPaymentRequestStatus.id_for(:processing)
+      when 3, '3' # i.e. retracted
+        where status_id: BankPaymentRequestStatus.id_for(:retracted)
+      when 4, '4' # i.e. rejected
+        where status_id: BankPaymentRequestStatus.id_for(:rejected)
+      when 5, '5' # i.e. approved
+        where status_id: BankPaymentRequestStatus.id_for(:approved)
+      when 6, '6' # i.e. credited
+        where status_id: BankPaymentRequestStatus.id_for(:credited)
+      when 7, '7' # i.e. failed
+        joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:failed))
+      when 8, '8' # i.e. scheduled
+        joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
+      when 9, '9' # i.e. pending
+        joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
+      else
+        # do nothing?
+    end
+  }
+
 
   attr_accessor :cache_users
 
