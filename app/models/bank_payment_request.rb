@@ -43,6 +43,7 @@ class BankPaymentRequest < ActiveRecord::Base
 
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
   delegate :requested_amount_value, to: :requested_amount
+  delegate :scheduled?, to: :payment_order
 
   scope :non_owner, -> (user_id) { where.not owner_id: user_id }
   scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
