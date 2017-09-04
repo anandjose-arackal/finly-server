@@ -66,8 +66,12 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
     attr_accessor :payment_requests
 
+    has_scope :filter_status_id
+    has_scope :filter_date, using: [:from, :to], type: :hash
+
     def init
       self.payment_requests = params[:payment_requests]
+      self.payment_requests = apply_scopes(payment_requests)
     end
   end
 
