@@ -1,11 +1,12 @@
 class BankTransfer::PaymentRequest::Review::ApproveAndForward < BankTransfer::PaymentRequest::Review::Base
 
-  attr_accessor :forwarded_to_user
+  attr_accessor :forwarded_to_user, :forwarded_note
 
   def init
     super
     forwarded_to_user_id = params[:forward_to_user_id]
     self.forwarded_to_user = user.company.users.find_by(id: forwarded_to_user_id)
+    self.forwarded_note = params[:note]
   end
 
   def validate
@@ -34,7 +35,8 @@ class BankTransfer::PaymentRequest::Review::ApproveAndForward < BankTransfer::Pa
   def post_process
     bank_payment_request.comments.create user_id: user.id,
                                          action_id: BankPaymentRequestCommentAction.id_for(:forward),
-                                         forwarded_to_user_id: self.forwarded_to_user.id
+                                         forwarded_to_user_id: self.forwarded_to_user.id,
+                                         note: self.forwarded_note
 
     add_message :success, "Forwarded to #{forwarded_to_user.name}"
   end

@@ -10,6 +10,10 @@
 #  bank_payment_request_id :integer
 #  user_id                 :integer
 #  forwarded_to_user_id    :integer
+#  note                    :text(65535)
+#  previous_value          :text(65535)
+#  new_value               :text(65535)
+#  edited_field            :text(65535)
 #
 
 require 'test_helper'

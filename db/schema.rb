@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170902133222) do
+ActiveRecord::Schema.define(version: 20170904151023) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -408,6 +408,10 @@ ActiveRecord::Schema.define(version: 20170902133222) do
     t.integer  "bank_payment_request_id", limit: 4
     t.integer  "user_id",                 limit: 4
     t.integer  "forwarded_to_user_id",    limit: 4
+    t.text     "note",                    limit: 65535
+    t.text     "previous_value",          limit: 65535
+    t.text     "new_value",               limit: 65535
+    t.text     "edited_field",            limit: 65535
   end
 
   add_index "bank_payment_request_comments", ["action_id"], name: "index_bank_payment_request_comments_on_action_id", using: :btree

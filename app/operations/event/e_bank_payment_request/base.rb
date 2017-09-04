@@ -9,7 +9,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
       add_message :error, 'Report not found'
       return
     end
-    unless params[:bank_payment_request].is_a?(::Report)
+    unless params[:bank_payment_request].is_a?(::BankPaymentRequest)
       add_message :error, 'Error loading report'
     end
   end
