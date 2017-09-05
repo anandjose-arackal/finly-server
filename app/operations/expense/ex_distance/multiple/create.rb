@@ -41,6 +41,7 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
 
     self.valid = true
 
+
     for key, params_each_expense in multiple_expense_params
 
       current_expense_params = distance_multiple_expense_params(params_each_expense)
@@ -65,22 +66,6 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
       set_custom_fields_multiple(self.multiple_expenses[key][:expense], params_each_expense)
     end
 
-
-
-
-
-
-
-
-
-    # self.expense_params = distance_expense_params
-    # self.expense_params[:expense_type_id] = ExpenseType.distance_expense_id
-    # if params[:receipt_id].present?
-    #   self.receipt = user.receipts.with_id(params[:receipt_id]).first rescue nil
-    # end
-    # if expense_params[:receipts_attributes] == [nil]
-    #   expense_params.delete(:receipts_attributes)
-    # end
   end
 
   def validate
@@ -123,36 +108,6 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
       end
     end
 
-
-
-
-
-
-
-
-
-
-
-
-
-    # if expense_params[:receipt_id].present? and receipt.blank?
-    #   messages[:error] << 'Receipt not found'
-    #   return false
-    # end
-
-    # # checking if distance expense has been enabled for the user at the company or policy level
-    # unless user.distance_expense_enabled?
-    #   add_message :error, "Distance expense creation is not enabled"
-    #   return false
-    # end
-
-    # checking if the report is editable for personal view
-    # if personal_view? and expense_params[:report_id].present?
-    #   report = user.reports.find_by(id: expense_params[:report_id])
-    #   unless report&.editable?
-    #     messages[:error] << "Expense cannot be added to the report in this state"
-    #   end
-    # end
   end
 
   def process
@@ -174,25 +129,6 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
       add_message :failure, "Cannot create expenses. Please fix the errors and try again."
     end
 
-
-
-
-
-    # self.expense = user.expenses.build(expense_params)
-
-    # # Create custom fields only for validations. Fields will be saved later
-    # validate_custom_fields
-    # return if has_errors?
-
-    # if self.expense.save
-    #   # Attach an existing receipt to the expense
-    #   if self.receipt.present?
-    #     self.receipt.parent = expense
-    #     self.receipt.save
-    #   end
-    # else
-    #   messages[:error] = self.expense.errors.full_messages
-    # end
   end
 
   # Hack
