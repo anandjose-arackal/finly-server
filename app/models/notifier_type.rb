@@ -80,7 +80,22 @@ class NotifierType < ActiveRecord::Base
              {key: :card_transaction, has_push_notification: true, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
              {key: :auto_reload_card, has_push_notification: false, has_mailer: false,
-              configurable_push_notification: false, configurable_mailer: false}]
+              configurable_push_notification: false, configurable_mailer: false},
+             {key: :bank_payment_request_submit, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :bank_payment_request_approve, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :bank_payment_request_unapprove, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :bank_payment_request_retract, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :bank_payment_request_reject, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :bank_payment_request_comment, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
+             {key: :bank_payment_request_take_control, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true}
+              ]
 
   self.class.instance_eval do
     ACTIONS.each do |item|
