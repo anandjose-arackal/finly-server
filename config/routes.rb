@@ -1998,6 +1998,7 @@ Rails.application.routes.draw do
 
   get 'expense_type_configurations', to: 'expense_types_configuration#show', as: :expense_type_configuration_show
   patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update
+  get 'groups_teams', to: 'expense_types_configuration#groups_teams'
 
   resources :per_diems
 
