@@ -15,6 +15,18 @@ class Admin::Users::Create < Admin::Users::Base
     self.new_user_params = user_params
   end
 
+  def pre_process
+    # creating a default initiator role for vendor payments
+    new_user_params[:role_mapping_attributes].each do |mapping|
+      mapping[:purpose_id] = MappingPurpose.id_for(:expense_management)
+    end
+    new_user_params[:role_mapping_attributes] << {
+        purpose_id: MappingPurpose.id_for(:vendor_payments),
+        user_role_id: UserRole.id_for(:initiator)
+    }
+    new_user_params.permit!
+  end
+
   def process
     self.created_user = company.users.build(new_user_params)
     created_user.skip_confirmation_notification!
@@ -35,15 +47,6 @@ class Admin::Users::Create < Admin::Users::Base
     end
 
     add_message :success, "User created"
-  end
-
-  def pre_process
-    # from admin panel subscribing users to both by default
-    # new_user_params[:user_panel_subscription_attributes] = {
-    #     expense_management: true,
-    #     disburse: true
-    # }
-    # new_user_params.permit!
   end
 
   def success

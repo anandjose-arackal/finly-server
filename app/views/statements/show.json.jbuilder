@@ -29,5 +29,6 @@ json.finly_transactions do
         json.array! finly_transaction.system_messages
       end
     end
+    json.note finly_transaction.payment&.note
   end
 end

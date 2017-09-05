@@ -1,10 +1,10 @@
 class Settlement::Payment::Base < Settlement::Base
-  attr_accessor :payment, :payment_request, :amount, :currency_id
+  attr_accessor :payment, :payment_request, :amount, :currency_id, :note
 
-  def init_payment_request(payment_type, payment_purpose)
+  def init_payment_request(payment_type, payment_purpose, amount = self.amount)
     # Add Company Balance for the particular company
     self.payment_request = PaymentRequest.(user, nil, to_user.cash_on_hand.class.name, payment_type, payment_purpose)
-    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, to_user.cash_on_hand, amount))
+    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, to_user.cash_on_hand, amount, note: self.note))
   end
 
   class Settlement::Payment::Base::Presenter < Settlement::Base::BasePresenter::SuccessPresenter

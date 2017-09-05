@@ -124,7 +124,7 @@ class Admin::Users::Import < Admin::Base
   private
 
   def create_response_csv
-    file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    file_name = "#{Rails.root}/public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
     CSV.open(file_name, 'wb') do |csv|
       self.header << 'Result'
       csv << header
@@ -171,16 +171,24 @@ class Admin::Users::Import < Admin::Base
 
 
     # creating role mapping attributes
-    role_mapping_attributes = [{user_role_id: UserRole.employee_id}]
+    role_mapping_attributes = [{user_role_id: UserRole.employee_id,
+                                purpose_id: MappingPurpose.id_for(:expense_management)}]
     if row[import_fields[:manager_role]] and row[import_fields[:manager_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.manager_id}
+      role_mapping_attributes << {user_role_id: UserRole.manager_id,
+                                  purpose_id: MappingPurpose.id_for(:expense_management)}
     end
     if row[import_fields[:finance_manager_role]] and row[import_fields[:finance_manager_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.finance_manager_id}
+      role_mapping_attributes << {user_role_id: UserRole.finance_manager_id,
+                                  purpose_id: MappingPurpose.id_for(:expense_management)}
     end
     if row[import_fields[:admin_role]] and row[import_fields[:admin_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.admin_id}
+      role_mapping_attributes << {user_role_id: UserRole.admin_id,
+                                  purpose_id: MappingPurpose.id_for(:expense_management)}
     end
+
+    # adding a default initiator role for vendor payments
+    role_mapping_attributes << {user_role_id: UserRole.id_for(:initiator),
+                                purpose_id: MappingPurpose.id_for(:vendor_payments)}
 
     manager = finance_manager = approves_to = approves_finance_to = nil
     manager_email = finance_manager_email = approves_to_email = approves_finance_to_email = nil
@@ -238,6 +246,11 @@ class Admin::Users::Import < Admin::Base
     mobile = row[import_fields[:mobile_number]].to_i.to_s if row[import_fields[:mobile_number]]
     mobile ||= nil
 
+    # deciding on whether a particular use is enabled for a particular application - i.e. expense management, disburse, or vendor payments
+    expense_management = row[import_fields[:expense_management]] == 'Y' ? true : false
+    disburse = row[import_fields[:disburse]] == 'Y' ? true : false
+    vendor_payments = row[import_fields[:vendor_payments]] == 'Y' ? true : false
+
     # generating a password for the user
     generated_password = generate_default_password
     company = Company.find_by(id: row[import_fields[:company_id]])
@@ -253,7 +266,8 @@ class Admin::Users::Import < Admin::Base
                                                finance_manager: finance_manager,
                                                approves_to: approves_to,
                                                approves_finance_to: approves_finance_to,
-                                               policy_id: (company.policies.default.first.id rescue nil)
+                                               policy_id: (company.policies.default.first.id rescue nil),
+                                               purpose_id: MappingPurpose.id_for(:expense_management)
                                               }],
                     profile_attributes: {address_1: row[import_fields[:address_1]],
                                          address_2: row[import_fields[:address_2]],
@@ -267,8 +281,9 @@ class Admin::Users::Import < Admin::Base
                     mothers_maiden_name: row[import_fields[:mothers_maiden_name]],
                     error_messages: errors,
                     user_panel_subscription_attributes: {
-                        expense_management: company.feature_subscription.expense_management_enabled,
-                        disburse: company.feature_subscription.cards_enabled
+                        expense_management: expense_management,
+                        disburse: disburse,
+                        yes_bank_account_transfer: vendor_payments
                     }
     }
 
@@ -303,7 +318,10 @@ class Admin::Users::Import < Admin::Base
         :approves_to => 16,
         :approves_finance_to => 17,
         :company_id => 18,
-        :mothers_maiden_name => 19
+        :mothers_maiden_name => 19,
+        :expense_management => 20,
+        :disburse => 21,
+        :vendor_payments => 22
     }
   end
 

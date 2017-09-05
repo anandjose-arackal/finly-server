@@ -28,7 +28,8 @@ class Admin::Companies::Balance < Company::VirtualAccount::Balance
     # self.company = user.company ||
     self.company = params[:company]
 
-    self.total_wallet_balance = company.account.wallet_balance.value
+    user_ids = company.users.pluck(:id)
+    self.total_wallet_balance = UserWallet.with_user(user_ids).joins(:balance).sum(:value)
     self.scheduled_payment_orders_balance = company.payment_orders.scheduled.total_amount_requested
   end
 end

@@ -84,6 +84,15 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       valid = true
       messages = []
 
+      # # if the user is not an admin or creditor, they can't credit to unauthorized vendors
+      # unless user.vendor_payments_admin? || user.vendor_payments_creditor?
+      #   ba = BankAccount.find_by(account_number: bank_account_no, ifsc: ifsc)
+      #   if ba.nil?
+      #     messages << "You cannot credit to unaithorized bank accounts. Please request the admin or creditor to add this bank account"
+      #     valid = false
+      #   end
+      # end
+
       # Check if bank account number is present
       if bank_account_no.blank?
         valid = false
