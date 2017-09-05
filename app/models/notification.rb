@@ -21,6 +21,7 @@
 #  link                 :text(65535)
 #  view_role_id         :integer
 #  message              :text(65535)
+#  application          :string(255)
 #
 
 class Notification < ActiveRecord::Base
@@ -37,6 +38,7 @@ class Notification < ActiveRecord::Base
   scope :expense, -> {where(notification_type_id: NotificationType.id_for(:expense))}
   scope :settlement, -> {where(notification_type_id: NotificationType.id_for(:settlement))}
   scope :advance_request, -> {where(notification_type_id: NotificationType.id_for(:advance_request))}
+  scope :with_application, -> (application) {where application: application&.to_s}
 
   accepts_nested_attributes_for :amount
 
