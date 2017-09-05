@@ -132,7 +132,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
           end
         end
     end
-
+    self.note = payment_params[:note]
   end
 
   def authorize

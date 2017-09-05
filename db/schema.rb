@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170901083647) do
+ActiveRecord::Schema.define(version: 20170904151023) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -67,22 +67,21 @@ ActiveRecord::Schema.define(version: 20170901083647) do
   end
 
   create_table "admin_users", force: :cascade do |t|
-    t.string   "email",                     limit: 255, default: "", null: false
-    t.string   "encrypted_password",        limit: 255, default: "", null: false
-    t.string   "reset_password_token",      limit: 255
+    t.string   "email",                  limit: 255, default: "", null: false
+    t.string   "encrypted_password",     limit: 255, default: "", null: false
+    t.string   "reset_password_token",   limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",             limit: 4,   default: 0,  null: false
+    t.integer  "sign_in_count",          limit: 4,   default: 0,  null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip",        limit: 255
-    t.string   "last_sign_in_ip",           limit: 255
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
-    t.string   "first_name",                limit: 255
-    t.string   "last_name",                 limit: 255
-    t.string   "mobile_number",             limit: 255,              null: false
-    t.string   "encrypted_master_password", limit: 255
+    t.string   "current_sign_in_ip",     limit: 255
+    t.string   "last_sign_in_ip",        limit: 255
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.string   "first_name",             limit: 255
+    t.string   "last_name",              limit: 255
+    t.string   "mobile_number",          limit: 255,              null: false
   end
 
   add_index "admin_users", ["email"], name: "index_admin_users_on_email", unique: true, using: :btree
@@ -460,6 +459,7 @@ ActiveRecord::Schema.define(version: 20170901083647) do
     t.text     "description",                  limit: 65535
     t.integer  "controlling_for_user_id",      limit: 4
     t.integer  "controlling_for_user_role_id", limit: 4
+    t.boolean  "require_approval"
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
@@ -1942,6 +1942,7 @@ ActiveRecord::Schema.define(version: 20170901083647) do
     t.datetime "updated_at",                                                             null: false
     t.boolean  "is_deleted",                                             default: false, null: false
     t.integer  "submitted_amount_id",          limit: 4
+    t.integer  "processed_amount_id",          limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree

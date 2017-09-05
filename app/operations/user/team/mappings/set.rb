@@ -121,8 +121,11 @@ class User::Team::Mappings::Set < User::Team::Mappings::Base
       updated_params = map[:mapping]
       # this is only when the policy user mappings are being updated
       updated_params[:policy_id] = params[:policy_id] if params[:policy_id]
+      # the purpose can be picked up from either the parameters being sent, or can be extracted from
+      # the application details that are sent in the header
+      self.purpose_id = params[:purpose_id] || MappingPurpose.id_from_application_for(RequestStore.store[:current_app])
       # while creating new user mapping, set the mapping purpose based on the application
-      updated_params[:purpose_id] = MappingPurpose.id_from_application_for(RequestStore.store[:current_app])
+      updated_params[:purpose_id] = self.purpose_id
       if id.present?
         updating_map = self.mappings.with_id(id).first rescue nil
         if updating_map.blank?

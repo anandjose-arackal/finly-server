@@ -16,21 +16,22 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
   end
 
   def validate
-    self.requested_total = 0
-    params[:bank_payment_request][:payments_attributes].each do |details|
-      self.requested_total += details[:amount]&.to_f
-    end
-    adapter = nil
-    case payment_order.initiating_account_type
-      when "VendorPaymentWallet"
-        adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(payment_order.payments.first.initiating_account)
-      when "YesBankCompanyAccount"
-        adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-    end
-    if requested_total > adapter.balance
-      add_message :error, "Amount being requested is greater than the source account's balance"
-      return
-    end
+    # below no longer necessary because the logic for determining the balances are being done in the credit action
+    # self.requested_total = 0
+    # params[:bank_payment_request][:payments_attributes].each do |details|
+    #   self.requested_total += details[:amount]&.to_f
+    # end
+    # adapter = nil
+    # case payment_order.initiating_account_type
+    #   when "VendorPaymentWallet"
+    #     adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(payment_order.payments.first.initiating_account)
+    #   when "YesBankCompanyAccount"
+    #     adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+    # end
+    # if requested_total > adapter.balance
+    #   add_message :error, "Amount being requested is greater than the source account's balance"
+    #   return
+    # end
   end
 
   def pre_process
@@ -53,17 +54,24 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
   def payment_order_params
     p = {}
     p = params.require(:bank_payment_request).permit(payments_attributes: [:bank_account_number, :ifsc, :amount, :name, :id])
+    # setting the approval flow as false for now, till it's determined that the
+    # bank account being credited to is unauthorized or not
+    payment_request.update(require_approval: false)
+
     p[:payments_attributes].each do |account_details|
       bank_account = BankAccount.with_company(user.company_id).find_by(account_number: account_details[:bank_account_number])
       vendor = bank_account&.account_owner || YesBankVendor.find_or_create_by(name: account_details[:name], company_id: user.company_id)
       if bank_account.nil?
-        bank_account = BankAccount.create(name: account_details[:name], account_number: account_number, ifsc: ifsc, account_owner: vendor, company_id: user.company_id)
+        bank_account = BankAccount.create(name: account_details[:name], account_number: account_details[:bank_account_number], ifsc: account_details[:ifsc], account_owner: vendor, company_id: user.company_id)
+        payment_request.update(require_approval: true)
       end
       account_details.delete(:bank_account_number)
       account_details.delete(:ifsc)
       account_details.delete(:name)
       # changing the receiving account to the newly created account or the old one itself
       account_details[:receiving_account_id] = bank_account.id
+      account_details[:receiving_user_id] = vendor.id
+      account_details[:receiving_user_type] = vendor.class.name
       account_details[:amount_attributes] = {
           value: account_details[:amount],
           currency_id: Currency.first.id
