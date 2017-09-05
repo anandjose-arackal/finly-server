@@ -17,4 +17,5 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
   def init
 
   end
+
 end
