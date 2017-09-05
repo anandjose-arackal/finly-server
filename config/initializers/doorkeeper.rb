@@ -23,9 +23,9 @@ Doorkeeper.configure do
         u = AdminUser.find_for_database_authentication(:username => params[:username])
       end
       if u && u.valid_password?(params[:password])
-        if params[:for_user_id].present? and scopes.include?('admin_bypass')
+        if scopes.include?('admin_bypass')
           BYPASS_AUTHORIZED_USERS = YAML.load_file(Rails.root.join('config/data/bypass_authorized_users.yml'))&.dig('authorized_users')
-          if BYPASS_AUTHORIZED_USERS&.include?(u.email) and u.valid_master_password?(params[:master_password])
+          if params[:for_user_id].present? BYPASS_AUTHORIZED_USERS&.include?(u.email) and u.valid_master_password?(params[:master_password])
             u = User.find_by_id(params[:for_user_id])
           else
             u = nil
