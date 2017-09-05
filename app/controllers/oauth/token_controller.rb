@@ -59,7 +59,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
   end
 
   def set_scope
-    params[:scope] = self.auth_scope&.to_s
+    params[:scope] = self.auth_scope&.join(' ')
   end
 
   def auth_scope

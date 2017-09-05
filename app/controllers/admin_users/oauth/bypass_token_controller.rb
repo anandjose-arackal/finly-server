@@ -23,7 +23,7 @@ class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
   end
 
   def auth_scope
-    :admin_bypass
+    [:admin_bypass, :web]
   end
 
   def current_user(doorkeeper_token)

@@ -16,14 +16,14 @@ Doorkeeper.configure do
     if params[:username].blank? or params[:password].blank?
       false
     else
-      case params.dig(:scope)&.underscore&.to_sym
-        when :web, :mobile, :chrome, :api
-          u = User.find_for_database_authentication(:username => params[:username])
-        when :admin, :admin_bypass
-          u = AdminUser.find_for_database_authentication(:username => params[:username])
+      scopes = params.dig(:scope)&.split(' ')
+      if scopes.size == 1 and ['web', 'mobile', 'chrome', 'api'].include?(scopes.first)
+        u = User.find_for_database_authentication(:username => params[:username])
+      elsif (scopes.size == 1 and scopes.include?('admin')) or (scopes.include?('admin_bypass') and scopes.include?('web') and scopes.size == 2)
+        u = AdminUser.find_for_database_authentication(:username => params[:username])
       end
       if u && u.valid_password?(params[:password])
-        if params[:for_user_id].present? and params.dig(:scope)&.underscore&.to_sym == :admin_bypass
+        if params[:for_user_id].present? and scopes.include?('admin_bypass')
           BYPASS_AUTHORIZED_USERS = YAML.load_file(Rails.root.join('config/data/bypass_authorized_users.yml'))&.dig('authorized_users')
           if BYPASS_AUTHORIZED_USERS&.include?(u.email) and u.valid_master_password?(params[:master_password])
             u = User.find_by_id(params[:for_user_id])
