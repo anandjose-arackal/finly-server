@@ -31,9 +31,9 @@ Doorkeeper.configure do
             u = nil
           end
         end
+        u
       end
     end
-    u
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.
