@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170905120859) do
+ActiveRecord::Schema.define(version: 20170905150641) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -390,6 +390,7 @@ ActiveRecord::Schema.define(version: 20170905120859) do
     t.integer  "account_owner_id",   limit: 4
     t.string   "account_owner_type", limit: 255
     t.integer  "company_id",         limit: 4
+    t.boolean  "reimbursable"
   end
 
   add_index "bank_accounts", ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id", using: :btree

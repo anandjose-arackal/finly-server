@@ -31,24 +31,27 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def init
+    # extracting the user to whom the money request belongs
     id = (params[:id] or params[:to_user_id])
     team = User::Team::Index.(user, params)
     self.to_user = team.with_id(id).first rescue nil if team.present?
-    if params[:money_request_ids].is_a?(Array)
-      money_request_id = (params[:money_request_id] or params[:money_request_ids])
-    else
-      money_request_id = params[:money_request_id]&.split(',') || params[:money_request_ids].split(',')
-    end
 
-    if money_request_id.present?
-      self.money_requests = to_user.money_requests.with_id(money_request_id) if to_user.present?
+    # if there is a money request that is being credited, handle its details
+    if params[:money_request_ids]&.is_a?(Array)
+      money_request_ids = (params[:money_request_id] or params[:money_request_ids])
+      self.money_requests = to_user.money_requests.with_id(money_request_ids)
+    else
+      money_request_ids = params[:money_request_id]&.split(',') || params[:money_request_ids].split(',')
+      self.money_requests = to_user.money_requests.with_id(money_request_ids)
     end
+    
     self.payment_param = payment_params
     if user.admin? and admin_view?
       self.role = UserRole.id_for(:admin)
     else
       self.role = UserRole.id_for(:finance_manager)
     end
+
     self.amount = payment_param[:amount]
     self.note = payment_param[:note]
     self.currency_id = payment_param[:currency_id] || Currency.first.id
