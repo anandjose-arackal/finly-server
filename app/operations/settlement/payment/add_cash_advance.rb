@@ -82,7 +82,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       money_requests.each do |request|
         total_amount += request.total_amount
       end
-      if payment_param[:amount].to_f >= total_amount
+      if payment_param[:amount].to_f > total_amount
         add_message :error, 'You cannot credit more than the total of the money requests'
       end
 
