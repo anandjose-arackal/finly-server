@@ -23,47 +23,67 @@ class User::Balances::Show < User::Base
         # Adding expense management balances in this section if it's enabled for that user
         if selected_user.company.expense_management_enabled? && selected_user.expense_management_enabled?
           if selected_user.admin?
-            self.balances[:card_balance_credits] = selected_user.company.itz_cash_company_account.balance_value
+            company_adapter = retrieve_adapter(user.company.itz_cash_company_account)
+            self.balances[:card_balance_credits] = company_adapter.balance
           end
-          self.balances[:finly_money_card_transfer_pocket] = selected_user.wallet.balance_value
+          wallet_adapter = retrieve_adapter(user.wallet)
+          self.balances[:finly_money_card_transfer_pocket] = wallet_adapter.balance
+          self.balances[:expense_management] = true
+        else
+          self.balances[:expense_management] = false
         end
 
         if selected_user.cards.present?
           self.balances[:cards] = []
           selected_user.cards.each do |card|
-            details = ItzCash::AccountDetails.(card.user, card: card)
-            if details.success?
-              self.balances[:cards] << {
-                  type: card.card_program.name,
-                  balance: details.balance,
-                  id: card.id,
-                  eligibility: details.available_card_eligibility
-              }
-            end
+            card_adapter = retrieve_adapter(card)
+            self.balances[:cards] << {
+                type: card.card_program.name,
+                balance: card_adapter.balance,
+                id: card.id
+            }
           end
         end
 
         # adding vendor payment balances in this section if it is enabled for that selected_user
         if selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?
           if selected_user.vendor_payments_admin?
-            self.balances[:bank_transfer_credits] = selected_user.company.yes_bank_company_account.balance_value
+            company_adapter = retrieve_adapter(user.company.yes_bank_company_account)
+            self.balances[:bank_transfer_credits] = company_adapter.balance
           end
-          self.balances[:finly_money_bank_transfer_pocket] = selected_user.bank_wallet.balance_value
+          wallet_adapter = retrieve_adapter(user.bank_wallet)
+          self.balances[:finly_money_bank_transfer_pocket] = wallet_adapter.balance
+          self.balances[:vendor_payments] = true
+        else
+          self.balances[:vendor_payments] = false
         end
+
       when 'vp'
         if selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?
           if selected_user.vendor_payments_admin?
-            self.balances[:bank_transfer_credits] = selected_user.company.yes_bank_company_account.balance_value
+            company_adapter = retrieve_adapter(user.company.yes_bank_company_account)
+            self.balances[:bank_transfer_credits] = company_adapter.balance
           end
-          self.balances[:finly_money_bank_transfer_pocket] = selected_user.bank_wallet.balance_value
+          wallet_adapter = retrieve_adapter(user.bank_wallet)
+          self.balances[:finly_money_bank_transfer_pocket] = wallet_adapter.balance
+          self.balances[:vendor_payments] = true
+        else
+          self.balances[:vendor_payments] = false
         end
+
       when 'ft'
-        # Adding expense management balances in this section if it's enabled for that selected_user
-        if selected_user.company.expense_management_enabled? && selected_user.expense_management_enabled?
+
+        # Adding expense management balances in this section if it's enabled for that user
+        if selected_user.company.cards_enabled && selected_user.expense_management_enabled?
           if selected_user.admin?
-            self.balances[:card_balance_credits] = selected_user.company.itz_cash_company_account.balance_value
+            company_adapter = retrieve_adapter(user.company.itz_cash_company_account)
+            self.balances[:card_balance_credits] = company_adapter.balance
           end
-          self.balances[:finly_money_card_transfer_pocket] = selected_user.wallet.balance_value
+          wallet_adapter = retrieve_adapter(user.wallet)
+          self.balances[:finly_money_card_transfer_pocket] = wallet_adapter.balance
+          self.balances[:disburse] = true
+        else
+          self.balances[:disburse] = false
         end
       else
         # do nothing?
@@ -85,6 +105,28 @@ class User::Balances::Show < User::Base
 
     def init
       self.balances = params[:balances]
+    end
+  end
+
+  private
+
+  def retrieve_adapter(account)
+    acc_type = account&.class&.to_s
+    case acc_type
+      when 'Card'
+        return AccountManager::Cards::CardAdapter.new(account)
+      when 'UserWallet'
+        return AccountManager::Wallet::WalletAdapter.new(account)
+      when 'YesBankCompanyAccount'
+        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(account)
+      when 'CashOnHand'
+        return AccountManager::CashOnHand::CashOnHandAdapter.new(account)
+      when 'ItzCashCompanyAccount'
+        return AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter.new(account)
+      when 'VendorPaymentWallet'
+        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(account)
+      else # i.e. the transaction has happened outside Finly
+        return AccountManager::OutsideFinly::OutsideFinlyAdapter.new
     end
   end
 

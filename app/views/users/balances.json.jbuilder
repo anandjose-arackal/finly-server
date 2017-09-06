@@ -3,6 +3,9 @@ json.balances do
   json.bank_transfer_credits @result.balances[:bank_transfer_credits]
   json.finly_money_card_transfer_pocket @result.balances[:finly_money_card_transfer_pocket]
   json.finly_money_bank_transfer_pocket @result.balances[:finly_money_bank_transfer_pocket]
+  json.expense_management @result.balances[:expense_management]
+  json.disburse @result.balances[:disburse]
+  json.vendor_payments @result.balances[:vendor_payments]
 
   if @result.balances[:cards].present?
     json.cards do

@@ -526,6 +526,10 @@ class User < ActiveRecord::Base
     self.user_panel_subscription.expense_management
   end
 
+  def disburse_enabled?
+    self.user_panel_subscription.disburse
+  end
+
   def vendor_payments_enabled?
     self.user_panel_subscription.yes_bank_account_transfer
   end
