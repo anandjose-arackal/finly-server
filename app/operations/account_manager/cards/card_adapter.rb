@@ -90,4 +90,9 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     # checks if the particular card can be credited with so and so amount
     true
   end
+
+  def credit_eligibility
+    op = ItzCash::AccountDetails.(account.user, card: account)
+    op.available_card_eligibility
+  end
 end
