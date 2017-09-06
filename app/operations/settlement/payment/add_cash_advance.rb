@@ -44,7 +44,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       money_request_ids = params[:money_request_id]&.split(',') || params[:money_request_ids].split(',')
       self.money_requests = to_user.money_requests.with_id(money_request_ids)
     end
-    
+
     self.payment_param = payment_params
     if user.admin? and admin_view?
       self.role = UserRole.id_for(:admin)

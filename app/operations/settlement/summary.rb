@@ -92,6 +92,10 @@ class Settlement::Summary < Settlement::Base
                                        reimbursement: reimbursement,
                                        meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:reimbursement).to_s)}}
 
+    # adding bank accounts of the user if any
+    if selected_user.bank_accounts.present?
+      self.balances[:bank_accounts] = selected_user.bank_accounts
+    end
   end
 
   def load_reimbursement(personal, balances)

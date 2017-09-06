@@ -100,6 +100,11 @@ class UsersController < ApplicationController
     respond
   end
 
+  def balances
+    @result = User::Balances::Show.(current_user, params)
+    respond
+  end
+
   def summary
     @result = User::Summary.(current_user, params)
     respond
