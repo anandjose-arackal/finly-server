@@ -4,9 +4,14 @@ json.balances do
   json.finly_money_card_transfer_pocket @result.balances[:finly_money_card_transfer_pocket]
   json.finly_money_bank_transfer_pocket @result.balances[:finly_money_bank_transfer_pocket]
 
-  json.cards do
-    json.array!(@result.balances[:cards]) do |card|
-
+  if @result.balances[:cards].present?
+    json.cards do
+      json.array!(@result.balances[:cards]) do |card|
+        json.id card[:id]
+        json.balance card[:balance]
+        json.type card[:type]
+        json.eligibility card[:eligibility]
+      end
     end
   end
 end

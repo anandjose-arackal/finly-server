@@ -522,6 +522,16 @@ class User < ActiveRecord::Base
   alias_method :vendor_payments_initiator?, :vendor_payment_initiator?
 
 
+  def expense_management_enabled?
+    self.user_panel_subscription.expense_management
+  end
+
+  def vendor_payments_enabled?
+    self.user_panel_subscription.yes_bank_account_transfer
+  end
+
+  alias_method :vendor_payment_enabled?, :vendor_payments_enabled?
+
   def has_role?(role_id)
     return false unless role_id.present?
     mapping = role_mapping

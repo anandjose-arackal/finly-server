@@ -4,7 +4,7 @@ class User::Balances::Show < User::Base
 
   def init
     self.current_app = RequestStore.store[:current_app].to_s
-    self.balance = {}
+    self.balances = {}
     if admin_panel?
       id = params[:id] || params[:user_id]
       self.selected_user = User.find_by(id: id)
@@ -32,11 +32,14 @@ class User::Balances::Show < User::Base
           self.balances[:cards] = []
           selected_user.cards.each do |card|
             details = ItzCash::AccountDetails.(card.user, card: card)
-            self.balances[:cards] << {
-                type: card.card_program.name,
-                balance: details.balance,
-                eligibility: details.available_card_eligibility
-            }
+            if details.success?
+              self.balances[:cards] << {
+                  type: card.card_program.name,
+                  balance: details.balance,
+                  id: card.id,
+                  eligibility: details.available_card_eligibility
+              }
+            end
           end
         end
 

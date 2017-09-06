@@ -17,6 +17,7 @@
 #  account_owner_id   :integer
 #  account_owner_type :string(255)
 #  company_id         :integer
+#  reimbursable       :boolean
 #
 
 class BankAccount < ActiveRecord::Base

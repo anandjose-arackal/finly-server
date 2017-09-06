@@ -633,6 +633,7 @@
 #                                            user_profile GET    /users/:user_id/profile(.:format)                                               users#profile
 #                                    user_update_password POST   /users/:user_id/update_password(.:format)                                       users#update_password
 #                                            user_balance GET    /users/:user_id/balance(.:format)                                               users#balance
+#                                           user_balances GET    /users/:user_id/balances(.:format)                                              users#balances
 #                          user_verify_reset_password_otp GET    /users/:user_id/verify_reset_otp(.:format)                                      users#verify_reset_password_otp
 #                                                         GET    /users(.:format)                                                                users#index
 #                                                         POST   /users(.:format)                                                                users#create
@@ -1969,6 +1970,7 @@ Rails.application.routes.draw do
     get 'profile', to: 'users#profile', as: :profile
     post 'update_password', to: 'users#update_password', as: :update_password
     get 'balance', to: 'users#balance', as: :balance
+    get 'balances', to: 'users#balances', as: :balances
     get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
   end
   get 'available_expense_types', to: 'users#available_expense_types', as: :available_expense_types
