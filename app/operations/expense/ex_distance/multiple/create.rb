@@ -48,6 +48,13 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
 
       current_expense_params[:expense_type_id] = ExpenseType.distance_expense_id
 
+      # Setting order for each of the locations
+      pos = 1
+      current_expense_params&.dig(:distance_expense_attributes)&.dig(:locations_attributes)&.each do |location|
+        location[:order] = pos
+        pos += 1
+      end
+
       multiple_expenses[key] = {}
 
       if params_each_expense[:receipt_id].present?
