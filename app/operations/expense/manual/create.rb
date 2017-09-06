@@ -10,6 +10,10 @@ class Expense::Manual::Create < Expense::Manual::Base
     [:employee]
   end
 
+  def personalizer_pre_validate
+    Personalizer::Process.(:expense, :create, params)
+  end
+
   def pre_validate
     super
     if params.blank?
