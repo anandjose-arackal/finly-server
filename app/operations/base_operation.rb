@@ -37,6 +37,10 @@ class BaseOperation
   # Used to run the operation
   def run
     clear_messages
+    personalizer_config = personalizer
+    if personalizer_config.nil?
+
+    end
     validate_user_model
     return failure if has_errors?
     authorize_subscriptions
@@ -114,6 +118,10 @@ class BaseOperation
         raise_unauthorized_exception
       end
     end
+  end
+
+  def personalizer
+    {}
   end
 
   # Define the authorized user types for the action
