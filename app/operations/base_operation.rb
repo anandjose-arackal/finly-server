@@ -188,7 +188,7 @@ class BaseOperation
   end
 
   def has_errors?
-    self.messages[:error].present? or self.messages[:failure].present?
+    self.messages.present? and (self.messages[:error].present? or self.messages[:failure].present?)
   end
 
   def processing?
