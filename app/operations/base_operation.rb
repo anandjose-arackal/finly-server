@@ -119,8 +119,8 @@ class BaseOperation
 
   #   {
   #       pre_validate: {
-  #           before: Personalizer::Process.new(:expense, :create, :pre_validate, params),
-  #           after: Personalizer::Process.new(:expense, :create, :pre_validate, params)
+  #           before: Personalizer::Process.new([:expense, :create], :pre_validate, params),
+  #           after: Personalizer::Process.new([:expense, :create], :pre_validate, params)
   #       }
   #   }
   def personalizer
@@ -427,14 +427,26 @@ class BaseOperation
     end
 
     # Run personalizer if present
-    before_operation = personalizer_config&.dig(:function, :before)
+    before_operation = personalizer_config&.dig(function, :before)
     before_operation&.run
 
-    result = self.send function
+    if before_operation&.has_errors?
+      add_message :error, before_operation.messages[:error]
+      return
+    end
 
+    result = self.send function
+    if has_errors?
+      return
+    end
     # Run personalizer if present
-    after_operation = personalizer_config&.dig(:function, :after)
+    after_operation = personalizer_config&.dig(function, :after)
     after_operation&.run
+
+    if after_operation&.has_errors?
+      add_message :error, after_operation.messages[:error]
+      return
+    end
 
     # Return the result provided by the function
     result

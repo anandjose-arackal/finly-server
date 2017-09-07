@@ -1,43 +1,59 @@
 class Personalizer::Process < BaseOperation
-  attr_accessor :params, :entity, :action, :function, :company, :class_object
+  attr_accessor :params, :path, :function, :company, :class_object, :show_errors
+  # Show errors is used to show failure only if a personalization exists and the personalization is throwing an error. Else success presenter is returned
 
-  def self.call(entity, action, function, params)
-    self.new(entity, action, function, params).run
+  def self.call(path, function, params)
+    self.new(path, function, params).run
   end
 
-  def initialize(entity, action, function, params)
-    self.entity = entity
-    self.action = action
-    self.params = params
+  def initialize(path, function, params)
+    self.path = path
     self.function = function
+    self.params = params
   end
 
   def pre_validate
-    unless action.present?
-      add_message :error, 'Action cannot be empty'
-      return nil
-    end
-    unless function.present?
-      add_message :error, 'Function cannot be empty'
+    unless path.present? or function.blank?
+      add_message :error, 'Path cannot be empty'
       return nil
     end
   end
 
   def init
+    self.show_errors = false
     company = current_company
     if company.blank?
       add_message :error, 'Company not found'
       return nil
     end
     company_id = company.id
-    file_path = "#{Rails.root}/lib/personalizer/adapters/company#{company_id}/#{entity}#{company_id}/#{action}#{company_id}/#{function}.rb"
+
+    # Generate the path to the file to check if file exists
+    self.path = [self.path] unless self.path.is_a?(Array)
+    dir_path = ''
+    self.path.each do |s|
+      if dir_path.length > 0
+        dir_path += '/'
+      end
+      dir_path += "#{s}#{company_id}"
+    end
+    file_path = "#{Rails.root}/lib/personalizer/adapters/company#{company_id}/#{dir_path}/#{function}.rb"
     unless File.exists?(file_path)
-      add_message :message, 'No personalization applied'
+      add_message :error, 'No personalization applied'
       return nil
     end
+    # Load the required personalizer file
     Dir[file_path].each{|f| load f}
-    class_name = "Personalizer::Adapters::Company#{company_id}::#{entity.to_s.camelize}#{company_id}::#{action.to_s.camelize}#{company_id}::#{function.to_s.camelize}"
-    self.class_object = (Object.const_get(class_name).new(self.entity, self.action, self.params) rescue nil)
+
+    # Generate class name
+    class_name = "Personalizer::Adapters::Company#{company_id}"
+    self.path.each do |s|
+      class_name += "::#{s.to_s.camelize}#{company_id}"
+    end
+    class_name += "::#{function.to_s.camelize}"
+
+    # Execute class
+    self.class_object = (Object.const_get(class_name).new(self.params) rescue nil)
   end
 
   def validate
@@ -54,8 +70,19 @@ class Personalizer::Process < BaseOperation
   def process
     self.class_object.run
     if self.class_object.has_errors?
+      self.show_errors = true
       add_message :error, self.class_object.messages[:error]
       return
+    end
+  end
+
+  # This is overridden to show failure only if a personalization exists and the personalization is throwing an error
+  def failure
+    if self.show_errors
+      super
+    else
+      clear_messages
+      success
     end
   end
 

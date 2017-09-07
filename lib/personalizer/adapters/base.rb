@@ -1,13 +1,11 @@
 class Personalizer::Adapters::Base < BaseOperation
-  attr_accessor :params, :action, :entity
+  attr_accessor :params
 
-  def self.call(entity, action, params)
-    self.new(entity, action, params).run
+  def self.call(params)
+    self.new(params).run
   end
 
-  def initialize(entity, action, params)
-    self.entity = entity
-    self.action = action
+  def initialize(params)
     self.params = params
   end
 

@@ -1,6 +1,14 @@
 class Expense::Manual::Split < Expense::Manual::Base
   attr_accessor :expenses_params, :receipt, :expenses, :receipt, :split_link
 
+  def personalizer
+    {
+        init: {
+            before: Personalizer::Process.new([:expense, :manual_split], :init, params)
+        }
+    }
+  end
+
   def authorized_user_types
     [:employee]
   end
