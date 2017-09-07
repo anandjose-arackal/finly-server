@@ -18,7 +18,7 @@ class User::Team::Index < User::Team::Base
   has_scope :having_cash_on_hand_balance
   has_scope :having_wallet_balance
   has_scope :with_cards_having_card_program, type: :array
-  has_scope :filter_group
+  has_scope :filter_group, type: :array
   has_scope :filter_team, type: :array
   has_scope :filter_disburse
   has_scope :filter_expense_management
