@@ -653,11 +653,16 @@ class User < ActiveRecord::Base
 
   def per_diem_expense_enabled?
     if self.company.per_diem_expense_enabled?
-      return true
+      unless self.enforce_policy_enabled?
+        return true
+      end
     end
     policies = self.policies
     policies.each do |policy|
       if policy.per_diem_expense_enabled?
+        if self.enforce_policy_enabled? && policy.default
+          next
+        end
         return true
       end
     end
