@@ -280,7 +280,8 @@ class User::Balances::Show < User::Base
     end
     self.actions = {
         credit_actions: credit_actions,
-        debit_actions: debit_actions
+        debit_actions: debit_actions,
+        meta: meta
     }
   end
 
