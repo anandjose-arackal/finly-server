@@ -26,6 +26,11 @@ class StaticPagesController < ApplicationController
     render json: @agreement.as_json
   end
 
+  def bank_transfer_agreement
+    @agreement = get_agreement(:bank_transfer_agreement)
+    render json: @agreement.as_json
+  end
+
   private
 
   def get_agreement(type)
