@@ -284,6 +284,34 @@ class BaseOperation
       false
     end
 
+    def current_app
+      RequestStore.store[:current_app]
+    end
+
+    def current_devise
+      RequestStore.store[:current_devise]
+    end
+
+    def current_user
+      RequestStore.store[:current_user]
+    end
+
+    def authorized_scopes
+      RequestStore.store[:authorized_scopes]
+    end
+
+    def current_company
+      RequestStore.store[:current_company]
+    end
+
+    def current_request
+      RequestStore.store[:request]
+    end
+
+    def request_params
+      RequestStore.store[:params]
+    end
+
     class BaseOperation::BasePresenter::SuccessPresenter < BaseOperation::BasePresenter
       def success?
         true
