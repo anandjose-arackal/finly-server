@@ -37,46 +37,42 @@ class BaseOperation
   # Used to run the operation
   def run
     clear_messages
-    personalizer_config = personalizer
-    if personalizer_config.nil?
-
-    end
     validate_user_model
     return failure if has_errors?
     authorize_subscriptions
     return failure if has_errors?
     authorize_user authorized_user_types
     return failure if has_errors?
-    pre_validate
+    execute_function :pre_validate
     return failure if has_errors?
-    pre_authorize
+    execute_function :pre_authorize
     return failure if has_errors?
-    init
+    execute_function :init
     return failure if has_errors?
-    authorize
+    execute_function :authorize
     return failure if has_errors?
-    validate
+    execute_function :validate
     return failure if has_errors?
-    subscribe
+    execute_function :subscribe
     return failure if has_errors?
     if expense_management?
-      configure_expense_management
+      execute_function :configure_expense_management
       return failure if has_errors?
     elsif funds_transfer?
-      configure_disburse
+      execute_function :configure_disburse
       return failure if has_errors?
     elsif vendor_payments?
-      configure_vendor_payment
+      execute_function :configure_vendor_payment
       return failure if has_errors?
     end
-    pre_process
+    execute_function :pre_process
     return failure if has_errors?
-    process
+    execute_function :process
     return failure if has_errors?
     self.process_complete = true
-    post_process
+    execute_function :post_process
     return failure if has_errors?
-    retrieve
+    execute_function :retrieve
   end
 
   def user_model
@@ -120,6 +116,13 @@ class BaseOperation
     end
   end
 
+
+  #   {
+  #       pre_validate: {
+  #           before: Personalizer::Process.new(:expense, :create, :pre_validate, params),
+  #           after: Personalizer::Process.new(:expense, :create, :pre_validate, params)
+  #       }
+  #   }
   def personalizer
     {}
   end
@@ -412,6 +415,29 @@ class BaseOperation
 
   def clear_messages
     self.messages = {error: [], failure: [], success: [], message: [], notice: []}
+  end
+
+  # Used for executing custom functions. All functions defined in personalizer would be executed here
+  def execute_function(function)
+    return unless function.present?
+
+    personalizer_config = personalizer
+    if personalizer_config.nil?
+      personalizer_config = {}
+    end
+
+    # Run personalizer if present
+    before_operation = personalizer_config&.dig(:function, :before)
+    before_operation&.run
+
+    result = self.send function
+
+    # Run personalizer if present
+    after_operation = personalizer_config&.dig(:function, :after)
+    after_operation&.run
+
+    # Return the result provided by the function
+    result
   end
 
 end
