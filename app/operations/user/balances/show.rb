@@ -194,20 +194,24 @@ class User::Balances::Show < User::Base
     meta = {base_url: nil}
     if expense_management? && selected_user.expense_management_enabled?
       # first add wallet balance
-      credit_actions[:initiating_accounts] = credit_actions[:receiving_accounts] = debit_actions[:initiating_accounts] = debit_actions[:receiving_accounts] << {
-                  type: "wallet",
-                  id: selected_user.wallet.id,
-                  name: "#{selected_user.name}'s Finly Money (Card Transfer Pocket)",
-                  balance: self.wallet_info[:itz_cash][:balance],
-                  active: selected_user.active
+      wallet_action = {
+          type: "wallet",
+          id: selected_user.wallet.id,
+          name: "#{selected_user.name}'s Finly Money (Card Transfer Pocket)",
+          balance: self.wallet_info[:itz_cash][:balance],
+          active: selected_user.active
       }
+      credit_actions[:initiating_accounts] << wallet_action
+      credit_actions[:receiving_accounts] << wallet_action
+      debit_actions[:initiating_accounts] << wallet_action
+      debit_actions[:receiving_accounts] << wallet_action
 
       # now add card balances
       if selected_user.cards.expense_cards.present?
         selected_user.cards.expense_cards.each do |card|
           disabler = card.disabled_by_user&.name
           disabler_role = card.disabled_by_role&.name
-          credit_actions[:initiating_accounts] = debit_actions[:initiating_accounts] = credit_actions[:receiving_accounts] = debit_actions[:receiving_accounts] << {
+          card_action = {
               type: "card",
               id: card.id,
               name: "#{selected_user.name}'s Expense Card",
@@ -217,18 +221,26 @@ class User::Balances::Show < User::Base
               disabler: disabler,
               disabler_role: disabler_role
           }
+          credit_actions[:initiating_accounts] << card_action
+          credit_actions[:receiving_accounts] << card_action
+          debit_actions[:initiating_accounts] << card_action
+          debit_actions[:receiving_accounts] << card_action
         end
       end
 
       # now based on whether the user is an admin or not, add company credits
       if selected_user.admin?
-        credit_actions[:initiating_accounts] = credit_actions[:receiving_accounts] = debit_actions[:initiating_accounts] = debit_actions[:receiving_accounts] << {
+        company_action = {
             type: "company",
             id: selected_user.company.itz_cash_company_account.id,
             name: "Company Credits (Card Transfer Pocket)",
             balance: self.company_credits_info[:itz_cash][:balance],
             active: true
         }
+        credit_actions[:initiating_accounts] << company_action
+        credit_actions[:receiving_accounts] << company_action
+        debit_actions[:initiating_accounts] << company_action
+        debit_actions[:receiving_accounts] << company_action
       end
 
       # sending the base url for transferring money between accounts
@@ -236,28 +248,35 @@ class User::Balances::Show < User::Base
 
     elsif vendor_payments? && selected_user.vendor_payments_enabled?
       # first add wallet balance
-      credit_actions[:initiating_accounts] = credit_actions[:receiving_accounts] = debit_actions[:initiating_accounts] = debit_actions[:receiving_accounts] << {
+      wallet_action = {
           type: "wallet",
           id: selected_user.bank_wallet.id,
           name: "#{selected_user.name}'s Finly Money (Bank Transfer Pocket)",
           balance: self.wallet_info[:yes_bank][:balance],
           active: selected_user.active
       }
+      credit_actions[:initiating_accounts] << wallet_action
+      credit_actions[:receiving_accounts] << wallet_action
+      debit_actions[:initiating_accounts] << wallet_action
+      debit_actions[:receiving_accounts] << wallet_action
 
       # now based on whether the user is an admin or not, add company credits
       if selected_user.admin?
-        credit_actions[:initiating_accounts] = credit_actions[:receiving_accounts] = debit_actions[:initiating_accounts] = debit_actions[:receiving_accounts] << {
+        company_action = {
             type: "company",
             id: selected_user.company.yes_bank_company_account.id,
             name: "Company Credits (Bank Transfer Pocket)",
             balance: self.company_credits_info[:yes_bank][:balance],
             active: true
         }
+        credit_actions[:initiating_accounts] << company_action
+        credit_actions[:receiving_accounts] << company_action
+        debit_actions[:initiating_accounts] << company_action
+        debit_actions[:receiving_accounts] << company_action
       end
 
       # sending the base url for transferring money from company account to wallets
       meta[:base_url] = Rails.application.routes.url_helpers.bank_transfer_update_balance_path
-      
     end
     self.actions = {
         credit_actions: credit_actions,
