@@ -67,8 +67,14 @@ class ExportController < ApplicationController
     end
   end
 
-  private
+  def index_template
+    @result = Personalizer::ExportTemplates.(current_user)
+    respond
+  end
 
-
+  def export_template
+    @result = Personalizer::ProcessTemplate.(current_user, params)
+    respond
+  end
 
 end

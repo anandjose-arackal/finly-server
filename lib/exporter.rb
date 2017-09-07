@@ -3,7 +3,7 @@ require 'zip'
 # Usage Exporter is a parent class
 # Example: Exporter.new(user, spreadsheet: {headers: self.headers, contents: self.contents, filename: 'assign_card'}, pdf: {template: 'report.pdf.erb', filename: 'assign_card', local_variables: {report: self.report}}, messages)
 class Exporter < BaseOperation::BasePresenter::SuccessPresenter
-  attr_accessor :pdf_exporter, :spreadsheet_exporter, :zip_exporter
+  attr_accessor :pdf_exporter, :spreadsheet_exporter, :zip_exporter, :xml_exporter
 
   def init
     if params[:spreadsheet].present?
@@ -14,6 +14,9 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
     end
     if params[:zip].present?
       self.zip_exporter = Exporter::AsZip.new user, params[:zip], messages
+    end
+    if params[:xml].present?
+      self.xml_exporter = Exporter::Xml.new user, params[:xml], messages
     end
   end
 
@@ -28,6 +31,9 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       end
       if self.zip_exporter.present?
         format.zip { self.zip_exporter.render_zip controller }
+      end
+      if self.xml_exporter.present?
+        format.xml { self.xml_exporter.render_xml controller }
       end
     end
   end
@@ -173,6 +179,40 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
         end
       end
       zip_buffer&.string
+    end
+
+  end
+
+  # NOTE: THIS CAN BE USED INDEPENDENTLY. I.E THIS CAN BE INSTANTIATED AND USED like in the example below
+  # Usage
+  # Example: Exporter::Pdf.new(user, {template: 'report.xml.erb', filename: 'assign_card', local_variables: {report: self.report}}, messages)
+  class Exporter::Xml < Exporter::BaseSuccessPresenter
+    attr_accessor :template, :local_variables
+
+    def init
+      super
+      self.template = params[:template]
+      self.local_variables = params[:local_variables]
+    end
+
+    def render(controller)
+      controller.respond_to do |format|
+        format.xml { render_xml controller }
+      end
+    end
+
+    def generate_xml
+
+    end
+
+    def render_xml(controller)
+      self.filename = 'export' if self.filename.blank?
+      self.filename += '.xml' unless self.filename.include? '.xml'
+      if self.template.blank?
+        raise 'XML template not found'
+        return
+      end
+      controller.render xml: self.filename, layout: self.template, print_media_type: true, locals: local_variables
     end
 
   end

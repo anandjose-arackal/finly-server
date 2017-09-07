@@ -1,20 +1,16 @@
 class Personalizer::ExportTemplates < BaseOperation
   attr_accessor :company, :company_id, :templates
 
-  def self.call
-    self.new.run
-  end
-
-  def initialize
+  def self.call(user)
+    self.new(user, nil).run
   end
 
   def init
-    self.company = current_company
-    self.company_id = self.company&.id
+    self.company_id = user&.company_id
   end
 
   def validate
-    if company.blank?
+    if company_id.blank?
       add_message :error, 'Company not found'
       return nil
     end

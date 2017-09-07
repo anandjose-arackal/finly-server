@@ -1905,6 +1905,8 @@ Rails.application.routes.draw do
 
   resources :reports, except: [:new, :edit]
   get 'export/report(.:format)' => 'export#report', as: :export_report
+  get 'export/templates/index' => 'export#index_template'
+
   resources :reports do
     post 'comment' => 'reports#comment', as: :comment
     patch 'retract' => 'reports#retract', as: :retract
