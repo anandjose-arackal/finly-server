@@ -2168,7 +2168,7 @@ Rails.application.routes.draw do
 
   get 'tos', to: 'static_pages#tos'
   get 'privacy', to: 'static_pages#privacy'
-  get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_ agreement'
+  get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_agreement'
 
 
   # Bank Accounts
