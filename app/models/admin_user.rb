@@ -19,7 +19,7 @@
 #  last_name              :string(255)
 #  mobile_number          :string(255)      not null
 #
-
+require 'bcrypt'
 class AdminUser < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -81,5 +81,16 @@ class AdminUser < ActiveRecord::Base
     return nil if first_name.blank? and last_name.blank?
     name = first_name
     "#{name} #{last_name}"
+  end
+
+  def set_master_password(password)
+    return unless self.admin? and password.present?
+    self.update(encrypted_master_password: BCrypt::Password.create(password))
+  end
+
+  def valid_master_password?(password)
+    return false unless self.admin? and password.present? and self.encrypted_master_password.present?
+    hashed_password = BCrypt::Password.new self.encrypted_master_password
+    (hashed_password == password)
   end
 end
