@@ -261,7 +261,7 @@ class User::Balances::Show < User::Base
       debit_actions[:receiving_accounts] << wallet_action
 
       # now based on whether the user is an admin or not, add company credits
-      if selected_user.admin?
+      if selected_user.vendor_payments_admin?
         company_action = {
             type: "company",
             id: selected_user.company.yes_bank_company_account.id,

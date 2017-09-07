@@ -53,6 +53,8 @@ class Payment < ActiveRecord::Base
   has_many :money_request_tracks
   has_many :finly_transactions
 
+  has_one :payment, as: :reference_resource
+
   belongs_to :payment_order
   belongs_to :payment_status
   belongs_to :payment_purpose

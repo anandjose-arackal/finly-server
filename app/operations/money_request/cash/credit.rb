@@ -52,9 +52,6 @@ class MoneyRequest::Cash::Credit < MoneyRequest::Base
     end
     params.delete(:money_requests)
 
-    self.payment_params = payment_parameters
-    self.payment_mode = params[:payment_mode] # 1 - outside finly, 2 - bank transfer
-
   end
 
   def validate
@@ -70,6 +67,24 @@ class MoneyRequest::Cash::Credit < MoneyRequest::Base
       add_message :error, "No amount passed, please try again"
       return
     end
+
+    # validations specific to a particular validation in the money request
+    if money_requests.present?
+
+      total_amount = 0
+      money_requests.each do |request|
+        total_amount += request.total_amount
+      end
+      if payment_param[:amount].to_f > total_amount
+        add_message :error, 'You cannot credit more than the total of the money requests'
+      end
+
+      date = Date.parse(payment_params[:date])
+      # validating date of money request against payment date
+      if date < money_requests.order(submitted_at: :asc).first.updated_at.to_date
+        add_message :error, 'Payment date cannot be before money request date'
+      end
+    end
   end
 
   def process
@@ -77,6 +92,16 @@ class MoneyRequest::Cash::Credit < MoneyRequest::Base
     op = Settlement::Payment::AddCashAdvance.(user, params)
     if op.success?
       # i.e. the money (outside of finly, or through bank transfer)
+      payment = op.payment
+      ids = self.money_requests.pluck(:id)
+      total_amount = money_requests.with_id(ids).with_amount.sum(:value)
+      selected_user.balance_sheet.subtract_pending_advance(total_amount)
+      money_requests.each do |money_request|
+        MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role, amount_processed: self.money_request_amounts["#{money_request.id}"]})
+      end
+    else
+      add_message :error, op.messages[:success]
+      return
     end
   end
 
