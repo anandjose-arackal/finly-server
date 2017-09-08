@@ -14,7 +14,7 @@ class AgreementType < ActiveRecord::Base
   validates :name, presence: true
 
   def self.values
-    [:privacy_policy, :terms_and_conditions, :prepaid_card_agreement]
+    [:privacy_policy, :terms_and_conditions, :prepaid_card_agreement, :bank_transfer_agreement]
   end
 
 end
