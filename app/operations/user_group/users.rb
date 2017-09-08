@@ -39,13 +39,24 @@ class UserGroup::Users < UserGroup::Base
     # # Include users assigned to the selected group items. Exclude other users who belong to other groups items
     # self.selected_users = users.without_id(exclude_users)
 
-    self.selected_users = user.company.users
-    group_ids = user.company.user_groups.pluck(:id)
-    group_items = UserGroupItem.with_user_group(group_ids).with_id(self.filter_group_items)
-    selected_group_ids = group_items.pluck(:user_group_id).uniq
-    selected_group_ids.each do |id|
-      user_ids = UserGroupItemMapping.with_group(id).with_group_item(self.filter_group_items).pluck(:user_id)
-      self.selected_users = self.selected_users.with_id(user_ids)
+    # self.selected_users = user.company.users
+    # group_ids = user.company.user_groups.pluck(:id)
+    # group_items = UserGroupItem.with_user_group(group_ids).with_id(self.filter_group_items)
+    # selected_group_ids = group_items.pluck(:user_group_id).uniq
+    # selected_group_ids.each do |id|
+    #   user_ids = UserGroupItemMapping.with_group(id).with_group_item(self.filter_group_items).pluck(:user_id)
+    #   self.selected_users = self.selected_users.with_id(user_ids)
+    # end
+    if self.filter_group_items.present?
+      users_op = User::Team::Index.new(user, params)
+      result = users_op.run
+      unless users_op.success?
+        add_message :error, users_op.messages[:error]
+        return
+      end
+      self.selected_users = result
+    else
+      self.selected_users = User.none
     end
   end
 

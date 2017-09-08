@@ -110,20 +110,21 @@ class User::Team::Index < User::Team::Base
     ScopeUtils.fix_for_scoping(params, :filter_state, :array)
     ScopeUtils.fix_for_scoping(params, :with_cards_having_card_program, :array)
     filter_team
-    filter_group
+    filter_group_items = (params&.dig(:filter_group) or params&.dig(:filter_group_items))
+    filter_group(filter_group_items) if filter_group_items.present?
     apply_scopes(self.response, params) if self.response.present?
   end
 
   protected
-  def filter_group
-    return unless self.response.present?
-    filter_group_items = (params&.dig(:filter_group) or params&.dig(:filter_group_items))
-    return unless filter_group_items.present?
+  def filter_group(filter_group_items)
+    return unless self.response.present? and filter_group_items.present?
+    # filter_group_items = (params&.dig(:filter_group) or params&.dig(:filter_group_items))
+    # return unless filter_group_items.present?
     group_ids = user.company.user_groups.pluck(:id)
-    group_items = UserGroupItem.with_user_group(group_ids).with_id(self.filter_group_items)
+    group_items = UserGroupItem.with_user_group(group_ids).with_id(filter_group_items)
     selected_group_ids = group_items.pluck(:user_group_id).uniq
     selected_group_ids.each do |id|
-      user_ids = UserGroupItemMapping.with_group(id).with_group_item(self.filter_group_items).pluck(:user_id)
+      user_ids = UserGroupItemMapping.with_group(id).with_group_item(filter_group_items).pluck(:user_id)
       self.response = self.response.with_id(user_ids)
     end
   end
@@ -134,6 +135,7 @@ class User::Team::Index < User::Team::Base
     return unless filter_team.present?
     user_team = user.company.user_teams.find_by(id: filter_team)
     return unless user_team.present?
+    filter_group user_team.user_group_items.pluck(:id).uniq
   end
 
   private
