@@ -107,7 +107,13 @@ class Expense::Manual::Split < Expense::Manual::Base
       if split[:custom_fields].present?
         expense_custom_fields.merge! split[:custom_fields]
       end
-      expenses_params << {index: index, expense_params: expense_item_params.permit!, custom_fields: expense_custom_fields.permit!}
+      if expense_item_params.present?
+        expense_item_params = (expense_item_params.permit! rescue expense_item_params)
+      end
+      if expense_custom_fields.present?
+        expense_custom_fields = (expense_custom_fields.permit! rescue expense_custom_fields)
+      end
+      expenses_params << {index: index, expense_params: expense_item_params, custom_fields: expense_custom_fields}
     end
     expenses_params
   end
