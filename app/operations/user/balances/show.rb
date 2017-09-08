@@ -141,17 +141,20 @@ class User::Balances::Show < User::Base
     if selected_user.admin?
       self.balances[:company_credits] << {
           name: "Card Transfer Credits",
+          type: "card",
           balance: self.company_credits_info[:itz_cash][:balance]
       }
     end
     # adding finly money
     self.balances[:finly_money] << {
         name: "Card Transfer Pocket",
+        type: "card",
         balance: self.wallet_info[:itz_cash][:balance]
     }
     # adding cash on hand
     self.balances[:cash_on_hand] << {
         name: "Cash On Hand",
+        type: "cash",
         balance: self.wallet_info[:itz_cash][:balance]
     }
   end
@@ -160,11 +163,13 @@ class User::Balances::Show < User::Base
     if selected_user.vendor_payments_admin?
       self.balances[:company_credits] << {
           name: "Bank Transfer Credits",
+          type: "bank",
           balance: self.company_credits_info[:yes_bank][:balance]
       }
     end
     self.balances[:finly_money] << {
         name: "Bank Transfer Pocket",
+        type: "bank",
         balance: self.wallet_info[:yes_bank][:balance]
     }
   end
@@ -244,7 +249,7 @@ class User::Balances::Show < User::Base
       end
 
       # sending the base url for transferring money between accounts
-      meta[:base_url] = Rails.application.routes.url_helpers.update_balance_path
+      meta[:base_url] = Rails.application.routes.url_helpers.update_balance_path(receiving_user_id: selected_user.id)
 
     elsif vendor_payments? && selected_user.vendor_payments_enabled?
       # first add wallet balance

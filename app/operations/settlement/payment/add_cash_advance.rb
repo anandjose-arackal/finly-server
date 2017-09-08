@@ -81,8 +81,10 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     if op.success?
       self.payment = op.payments.first
+      bank_transaction = payment.reference_resource
+      # only if the bank transaction has been completed, will the cash on hand be added to the user's account
       # if the payment was done through a bank transfer, create a payment request for crediting the user's cash on hand
-      if payment_purpose == :advance
+      if payment_purpose == :advance && bank_transaction.completed?
         init_payment_request(:credit, :advance, {amount: amount, initiating_account: initiating_account, receiving_account: receiving_account})
         # now payment request will have the new details of money to be added - so add it to the cash on hand
         op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
