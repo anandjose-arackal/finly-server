@@ -43,6 +43,8 @@ class Expense::Manual::Split < Expense::Manual::Base
         unless has_errors?
           self.expenses << expense
         end
+      else
+        self.expenses << expense
       end
       return if has_errors?
     end
