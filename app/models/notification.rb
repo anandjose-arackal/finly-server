@@ -21,6 +21,7 @@
 #  link                 :text(65535)
 #  view_role_id         :integer
 #  message              :text(65535)
+#  application          :string(255)
 #
 
 class Notification < ActiveRecord::Base

@@ -456,6 +456,7 @@
 #                                               junk_show GET    /junk/show(.:format)                                                            junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                            users#menu_data
 #                              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                                    admin_users/oauth/token#create {:format=>"json"}
+#                                admin_oauth_bypass_token POST   /admin/oauth/bypass_token(.:format)                                             admin_users/oauth/bypass_token#create {:format=>"json"}
 #                                    preview_registration POST   /welcome/preview(.:format)                                                      registrations#preview
 #                                       resources_details POST   /resources_details(.:format)                                                    registrations#resource_requests
 #                                      resources_download GET    /download_resource(.:format)                                                    registrations#resources_download
@@ -848,7 +849,8 @@
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                                    quickbooks#show
 #                                                     tos GET    /tos(.:format)                                                                  static_pages#tos
 #                                                 privacy GET    /privacy(.:format)                                                              static_pages#privacy
-#                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                               static_pages#prepaid_card_ agreement
+#                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                               static_pages#prepaid_card_agreement
+#                                 bank_transfer_agreement GET    /bank_transfer_agreement(.:format)                                              static_pages#bank_transfer_agreement
 #                                           bank_accounts GET    /bank_accounts(.:format)                                                        bank_accounts#index
 #                                                         POST   /bank_accounts(.:format)                                                        bank_accounts#create
 #                                        new_bank_account GET    /bank_accounts/new(.:format)                                                    bank_accounts#new

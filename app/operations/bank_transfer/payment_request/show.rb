@@ -48,15 +48,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       if admin_view? && user.vendor_payments_admin?
         if bank_payment_request.processing? && bank_payment_request.controlling_user_id == user.id
           actions[:credit] = true
-          balance = retrieve_balance(:vendor_payment_wallet, user)
-          enabled = false
-          admin = false
-          if balance > bank_payment_request.requested_amount_value
-            enabled = true
-          end
-          if user.vendor_payments_admin?
-            admin = true
-          end
           admins = []
           user.company.users.only_vendor_payment_admins.each do |admin|
             admins << {
@@ -72,8 +63,10 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                   require_password: true,
                   initiating_account: true,
                   method: "patch"
-              },
-              approve_forward: {
+              }
+          }
+          unless admins.empty?
+            actions[:credit_options][:approve_forward] = {
                   url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
                   messages: "You can forward this payment request to another admin to credit it",
                   enabled: true,
@@ -82,8 +75,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                   users: admins,
                   method: "patch",
                   type: 7
-              }
-          }
+            }
+          end
+
         elsif bank_payment_request.processing?
           actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         elsif bank_payment_request.open? && bank_payment_request.owner_id == user.id
@@ -91,15 +85,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:destroy] ={method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
         elsif bank_payment_request.approved?
           actions[:credit] = true
-          balance = retrieve_balance(:vendor_payment_wallet, user)
-          enabled = false
-          admin = false
-          if balance > bank_payment_request.requested_amount_value
-            enabled = true
-          end
-          if user.vendor_payments_admin?
-            admin = true
-          end
           admins = []
           user.company.users.only_vendor_payment_admins.each do |admin|
             admins << {
@@ -135,8 +120,17 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
           admin = false
-          if balance > bank_payment_request.requested_amount_value && !bank_payment_request.require_approval
+          if balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval
              enabled = true
+          else
+            # i.e if the user is an admin, even from the reviewer view, they should be able to
+            # credit the payment request from company credits
+            if user.vendor_payments_admin?
+              balance = retrieve_balance(:company_credits, user)
+              if balance >= bank_payment_request.requested_amount_value
+                enabled = true
+              end
+            end
           end
           if user.vendor_payments_admin?
             admin = true
@@ -169,7 +163,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             admins = []
             actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           end
-          if reviewer.nil?
+          if reviewer.nil? && !admins.empty?
             actions[:credit_options][:approve_forward] = {
                 url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
                 messages: message,
@@ -191,8 +185,17 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
           admin = false
-          if balance > bank_payment_request.requested_amount_value
+          if balance >= bank_payment_request.requested_amount_value
             enabled = true
+          else
+            # i.e if the user is an admin, even from the creditor view, they should be able to
+            # credit the payment request from company credits
+            if user.vendor_payments_admin?
+              balance = retrieve_balance(:company_credits, user)
+              if balance >= bank_payment_request.requested_amount_value
+                enabled = true
+              end
+            end
           end
           if user.vendor_payments_admin?
             admin = true
@@ -223,7 +226,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             admins = []
             actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           end
-          if reviewer.nil?
+          if reviewer.nil? && !admins.empty?
             actions[:credit_options][:approve_forward] = {
                 url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
                 messages: "",
@@ -246,7 +249,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           balance = retrieve_balance(:vendor_payment_wallet, user)
           credit_enabled = false
           admin = false
-          if balance > bank_payment_request.requested_amount_value && !bank_payment_request.require_approval
+          if balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval
             credit_enabled = true
           elsif user.vendor_payments_admin?
             credit_enabled = true
@@ -279,6 +282,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       case account
         when :vendor_payment_wallet
           adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+          return adapter.balance
+        when :company_credits
+          adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
           return adapter.balance
       end
     end
