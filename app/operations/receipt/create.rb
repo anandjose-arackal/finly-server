@@ -2,8 +2,8 @@ class Receipt::Create < Receipt::Base
   attr_accessor :receipt, :receipt_params
 
   def pre_validate
-    if params.blank? or user.blank?
-      messages[:error] << 'No user or parameters present'
+    if params.blank? or params&.dig(:receipt).blank? or user.blank?
+      add_message :error, 'Image cannot be blank'
     end
   end
 
