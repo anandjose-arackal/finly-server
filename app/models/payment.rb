@@ -295,6 +295,8 @@ class Payment < ActiveRecord::Base
   def payment_status_name
     if self.payment_status_id == PaymentStatus.id_for(:processing)
       return "Processed. Awaiting credit confirmation"
+    elsif self.payment_order&.bank_payment_request&.status&.name == 'approved'
+      return "Approved"
     else
       self.payment_status.name.humanize
     end
