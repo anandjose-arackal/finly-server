@@ -13,11 +13,13 @@ json.type do
 end
 json.file_1 do
   json.file_type kyc&.file_format(kyc&.kyc_file_1)
+  json.file_format kyc&.file_format(kyc&.kyc_file_1)
   json.original kyc&.kyc_file_1&.url
   json.thumb kyc&.kyc_file_1&.url(:thumb)
 end
 json.file_2 do
   json.file_type kyc&.file_format(kyc&.kyc_file_2)
+  json.file_format kyc&.file_format(kyc&.kyc_file_2)
   json.original kyc&.kyc_file_2&.url
   json.thumb kyc&.kyc_file_2&.url(:thumb)
 end
