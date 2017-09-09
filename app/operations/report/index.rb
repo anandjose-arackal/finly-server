@@ -11,6 +11,7 @@ class Report::Index < Report::Base
     self.role_id = params[:role_id]
     if self.role_id.blank? and params[:view].present?
       self.role_id = UserRole::VALUES[params[:view].to_sym]
+      params[:role_id] = self.role_id
     end
   end
 
@@ -26,10 +27,10 @@ class Report::Index < Report::Base
     case self.role_id
       when UserRole.id_for(:admin)
         if self.user.company_admin?
-          team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:admin))&.pluck(:id)
+          team_ids = User::Team::Index.(user, params)&.pluck(:id)
           self.reports = Report.not_open.with_user(team_ids)
         elsif user.policy_admin?
-          team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:admin))&.pluck(:id)
+          team_ids = User::Team::Index.(user, params)&.pluck(:id)
           policy_ids = user.admin_policies.pluck(:id)
           self.reports = Report.not_open.with_user(team_ids).with_policy(policy_ids)
         end
@@ -38,7 +39,7 @@ class Report::Index < Report::Base
           return false
         end
       when UserRole.id_for(:manager)
-        team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:manager))&.pluck(:id)
+        team_ids = User::Team::Index.(user, params)&.pluck(:id)
         controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids)
         interacted_reports_query= user.manager_reports
         sql = Report.connection.unprepared_statement {
@@ -46,7 +47,7 @@ class Report::Index < Report::Base
         }
         self.reports = Report.from([Arel.sql(sql)])
       when UserRole.id_for(:finance_manager)
-        team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:finance_manager))&.pluck(:id)
+        team_ids = User::Team::Index.(user, params)&.pluck(:id)
         controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id).with_user(team_ids)
         interacted_reports_query = user.finance_reports
         sql = Report.connection.unprepared_statement {

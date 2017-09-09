@@ -2,7 +2,7 @@ class UserTeam::Index < UserTeam::Base
   attr_accessor :user_teams
 
   def authorized_user_types
-    [:company_admin]
+    [:admin, :manager, :finance_manager]
   end
 
   def pre_validate

@@ -32,12 +32,12 @@ class Expense::Index < Expense::Base
 
   def pre_process
     # removing all 'filter_*' because we don't want them applied on the user index screen
-    params.each do |key, value|
-      if key.to_s.include?("filter_")
-        expense_filters << {key => value}
-        params.delete(key)
-      end
-    end
+    # params.each do |key, value|
+    #   if key.to_s.include?("filter_")
+    #     expense_filters << {key => value}
+    #     params.delete(key)
+    #   end
+    # end
   end
 
   def process
