@@ -75,11 +75,11 @@ class ExpensesController < ApplicationController
   end
 
   def split_existing
-    @result = Expense::Manual::Split.(current_user, params)
+    @result = Expense::SplitExisting.(current_user, params)
     if @result&.success?
       respond(response: (@result&.success? ? :success : :failure), message: (@result&.success? ? @result.messages[:success] : @result.messages[:error]))
     else
-      respond response: :failure&.messages[:error]
+      respond response: :failure, message: @result&.messages[:error]
     end
   end
 

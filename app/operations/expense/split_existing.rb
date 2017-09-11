@@ -29,6 +29,22 @@ class Expense::SplitExisting < Expense::Manual::Split
       add_message :error, 'Expense not found'
       return
     end
+
+    # validate expense that is being split is an Card or Cash Expense
+    unless self.existing_expense.card_expense? or self.existing_expense.manual_expense?
+      add_message :error, 'This expense cannot be split. Only Cash and Card expenses can be split'
+      return
+    end
+
+    # Validate split currency cannot be different from original expense currency
+    currency_id = self.existing_expense.amount.currency_id
+    self.expenses&.each_with_index do |expense, index|
+      unless expense&.amount&.currency_id == currency_id
+        add_message :error, "Split #{(index + 1)}: Cannot split expense with a different Currency ID"
+        return
+      end
+    end
+
     # Validate that the sum of split is equal to existing expenses
     total = 0
     self.expenses&.each do |expense|
@@ -36,14 +52,14 @@ class Expense::SplitExisting < Expense::Manual::Split
       total += value if StringUtils.is_number?(value)
     end
     unless total == self.existing_expense.amount&.value
-      add_message :error, "Split amount is not matching the expense total. Split Total: #{total}, Expense Total: #{total}"
+      add_message :error, "Split amount is not matching the expense total. Split Total: #{total}, Expense Total: #{self.existing_expense.amount&.value}"
       return
     end
   end
 
   def post_process
     super
-    self.expense.update(is_deleted: true, deleted_to_split: true, split_link: self.split_link)
+    self.existing_expense.update(is_deleted: true, deleted_to_split: true, split_link: self.split_link)
   end
 
   protected
@@ -52,7 +68,7 @@ class Expense::SplitExisting < Expense::Manual::Split
   end
 
   def receipt_id
-    self.existing_expense&.receipt_id
+    self.existing_expense&.receipts&.first&.id
   end
 
 end
