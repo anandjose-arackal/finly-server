@@ -2000,6 +2000,7 @@ Rails.application.routes.draw do
 
   get 'expense_type_configurations', to: 'expense_types_configuration#show', as: :expense_type_configuration_show
   patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update
+  get 'groups_teams', to: 'expense_types_configuration#groups_teams'
 
   resources :per_diems
 
@@ -2170,7 +2171,8 @@ Rails.application.routes.draw do
 
   get 'tos', to: 'static_pages#tos'
   get 'privacy', to: 'static_pages#privacy'
-  get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_ agreement'
+  get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_agreement'
+  get 'bank_transfer_agreement', to: 'static_pages#bank_transfer_agreement'
 
 
   # Bank Accounts

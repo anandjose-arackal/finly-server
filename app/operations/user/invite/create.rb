@@ -200,6 +200,12 @@ class User::Invite::Create < User::Invite::Base
     end
     # adding the company's default policy to all invitation parameters
     invite_params[:team_mapping_attributes][0][:policy_id] = user.company.policies.default.first.id rescue nil
+    invite_params[:team_mapping_attributes].each do |mapping|
+      mapping[:purpose_id] = MappingPurpose.id_from_application_for(RequestStore.store[:current_app])
+    end
+    invite_params[:role_mapping_attributes].each do |role|
+      role[:purpose_id] = MappingPurpose.id_from_application_for(RequestStore.store[:current_app])
+    end
   end
 
   def process
