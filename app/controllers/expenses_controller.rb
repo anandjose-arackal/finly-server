@@ -74,6 +74,15 @@ class ExpensesController < ApplicationController
     respond(response: (@result&.success? ? :success : :failure), message: (@result&.success? ? @result.messages[:success] : "Invalid Input"))
   end
 
+  def split_existing
+    @result = Expense::Manual::Split.(current_user, params)
+    if @result&.success?
+      respond(response: (@result&.success? ? :success : :failure), message: (@result&.success? ? @result.messages[:success] : @result.messages[:error]))
+    else
+      respond response: :failure&.messages[:error]
+    end
+  end
+
   def update_status
 
   end

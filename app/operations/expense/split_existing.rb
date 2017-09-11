@@ -1,0 +1,54 @@
+class Expense::SplitExisting < Expense::Manual::Split
+  attr_accessor :expenses_params, :receipt, :expenses, :receipt, :split_link, :existing_expense
+
+  def authorized_user_types
+    [:employee]
+  end
+
+  def pre_validate
+    super
+    return if has_errors?
+    if params[:expense_id].blank?
+      add_message :error, 'Expense not found'
+      return
+    end
+  end
+
+  def init
+    if params[:expense_id].present?
+      self.existing_expense = user.expenses.find_by_id(params[:expense_id])
+    end
+    return unless self.existing_expense.present?
+    super
+  end
+
+  def validate
+    super
+    return if has_errors?
+    if params[:expense_id].present? and self.existing_expense.blank?
+      add_message :error, 'Expense not found'
+      return
+    end
+    # Validate that the sum of split is equal to existing expenses
+    total = 0
+    self.expenses&.each do |expense|
+      value = expense.amount&.value
+      total += value if StringUtils.is_number?(value)
+    end
+    unless total == self.existing_expense.amount&.value
+      add_message :error, "Split amount is not matching the expense total. Split Total: #{total}, Expense Total: #{total}"
+      return
+    end
+  end
+
+  def post_process
+    super
+    self.expense.update(is_deleted: true, deleted_to_split: true, split_link: self.split_link)
+  end
+
+  protected
+  def expense_type_id
+    self.existing_expense&.expense_type_id
+  end
+
+end
