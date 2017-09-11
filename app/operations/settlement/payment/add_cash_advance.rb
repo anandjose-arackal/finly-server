@@ -32,11 +32,6 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def init
-    # # todo - adding test values for testing
-    # params[:payment][:receiving_account_id] = '15'
-    # params[:payment][:receiving_account_type] = '1'
-    # params[:payment][:initiating_account_type] = '1'
-    # ################################################
 
     # extracting the user to whom the money request belongs
     id = (params[:id] or params[:to_user_id])
@@ -78,13 +73,16 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def process
     # now calling the payment processor with the payment request parameter so that it handles the payment for us
+    # if it's a bank transfer, it will first be executed, and then the user's cash on hand will be added
+    # else it directly adds to the user's cash on hand and returns
+    debugger
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     if op.success?
       self.payment = op.payments.first
       bank_transaction = payment.reference_resource
       # only if the bank transaction has been completed, will the cash on hand be added to the user's account
       # if the payment was done through a bank transfer, create a payment request for crediting the user's cash on hand
-      if payment_purpose == :advance && bank_transaction.completed?
+      if payment_purpose == :advance && bank_transaction&.completed?
         init_payment_request(:credit, :advance, {amount: amount, initiating_account: initiating_account, receiving_account: receiving_account})
         # now payment request will have the new details of money to be added - so add it to the cash on hand
         op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
@@ -136,6 +134,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def retrieve_receiving_account(account_type)
+    debugger
     case account_type
       when 1, '1' # i.e. user's bank account
         id = payment_param[:receiving_account_id]

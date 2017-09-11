@@ -11,6 +11,7 @@
 #  updated_at                 :datetime         not null
 #  payment_order_id           :integer
 #  description                :text(65535)
+#  uploader_id                :integer
 #
 
 class PaymentOrderAttachment < ActiveRecord::Base

@@ -138,6 +138,7 @@
 #                                                         PUT    /api/v1/money_requests/:id(.:format)                                            api/v1/money_requests#update
 #                                                         DELETE /api/v1/money_requests/:id(.:format)                                            api/v1/money_requests#destroy
 #                            api_v1_money_request_comment POST   /api/v1/money_requests/:money_request_id/comment(.:format)                      api/v1/money_requests#comment
+#                             api_v1_money_request_credit PATCH  /api/v1/money_requests/:money_request_id/credit_cash(.:format)                  api/v1/money_requests#credit_cash
 #                                                         GET    /api/v1/money_requests(.:format)                                                api/v1/money_requests#index
 #                                                         POST   /api/v1/money_requests(.:format)                                                api/v1/money_requests#create
 #                                new_api_v1_money_request GET    /api/v1/money_requests/new(.:format)                                            api/v1/money_requests#new
@@ -260,6 +261,7 @@
 #                                                         PUT    /mobile/v1/money_requests/:id(.:format)                                         mobile/v1/money_requests#update
 #                                                         DELETE /mobile/v1/money_requests/:id(.:format)                                         mobile/v1/money_requests#destroy
 #                         mobile_v1_money_request_comment POST   /mobile/v1/money_requests/:money_request_id/comment(.:format)                   mobile/v1/money_requests#comment
+#                          mobile_v1_money_request_credit PATCH  /mobile/v1/money_requests/:money_request_id/credit_cash(.:format)               mobile/v1/money_requests#credit_cash
 #                                                         GET    /mobile/v1/money_requests(.:format)                                             mobile/v1/money_requests#index
 #                                                         POST   /mobile/v1/money_requests(.:format)                                             mobile/v1/money_requests#create
 #                             new_mobile_v1_money_request GET    /mobile/v1/money_requests/new(.:format)                                         mobile/v1/money_requests#new
@@ -456,6 +458,7 @@
 #                                               junk_show GET    /junk/show(.:format)                                                            junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                            users#menu_data
 #                              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                                    admin_users/oauth/token#create {:format=>"json"}
+#                                admin_oauth_bypass_token POST   /admin/oauth/bypass_token(.:format)                                             admin_users/oauth/bypass_token#create {:format=>"json"}
 #                                    preview_registration POST   /welcome/preview(.:format)                                                      registrations#preview
 #                                       resources_details POST   /resources_details(.:format)                                                    registrations#resource_requests
 #                                      resources_download GET    /download_resource(.:format)                                                    registrations#resources_download
@@ -576,6 +579,7 @@
 #                                                         PUT    /money_request/:id(.:format)                                                    money_request#update
 #                                                         DELETE /money_request/:id(.:format)                                                    money_request#destroy
 #                                   money_request_comment POST   /money_request/:money_request_id/comment(.:format)                              money_request#comment
+#                                    money_request_credit PATCH  /money_request/:money_request_id/credit_cash(.:format)                          money_requests#credit_cash
 #                                                         GET    /money_request(.:format)                                                        money_request#index
 #                                                         POST   /money_request(.:format)                                                        money_request#create
 #                                       new_money_request GET    /money_request/new(.:format)                                                    money_request#new
@@ -678,6 +682,7 @@
 #                                  settlement_add_payment POST   /settlements/:id/add_payment(.:format)                                          settlements#add_payment
 #                         expense_type_configuration_show GET    /expense_type_configurations(.:format)                                          expense_types_configuration#show
 #                       expense_type_configuration_update PATCH  /expense_type_configurations(.:format)                                          expense_types_configuration#update
+#                                            groups_teams GET    /groups_teams(.:format)                                                         expense_types_configuration#groups_teams
 #                                               per_diems GET    /per_diems(.:format)                                                            per_diems#index
 #                                                         POST   /per_diems(.:format)                                                            per_diems#create
 #                                            new_per_diem GET    /per_diems/new(.:format)                                                        per_diems#new
@@ -849,7 +854,8 @@
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                                    quickbooks#show
 #                                                     tos GET    /tos(.:format)                                                                  static_pages#tos
 #                                                 privacy GET    /privacy(.:format)                                                              static_pages#privacy
-#                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                               static_pages#prepaid_card_ agreement
+#                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                               static_pages#prepaid_card_agreement
+#                                 bank_transfer_agreement GET    /bank_transfer_agreement(.:format)                                              static_pages#bank_transfer_agreement
 #                                           bank_accounts GET    /bank_accounts(.:format)                                                        bank_accounts#index
 #                                                         POST   /bank_accounts(.:format)                                                        bank_accounts#create
 #                                        new_bank_account GET    /bank_accounts/new(.:format)                                                    bank_accounts#new
@@ -1605,6 +1611,7 @@ Rails.application.routes.draw do
       resources :money_requests, only: [:create, :index, :show, :destroy, :update]
       resources :money_requests do
         post 'comment' => 'money_requests#comment', as: :comment
+        patch 'credit_cash', to: 'money_requests#credit_cash', as: :credit
       end
       resources :receipts, only: [:create, :index, :destroy, :update]
       resources :receipts do
@@ -1674,6 +1681,7 @@ Rails.application.routes.draw do
       resources :money_requests, only: [:create, :index, :show, :destroy, :update]
       resources :money_requests do
         post 'comment' => 'money_requests#comment', as: :comment
+        patch 'credit_cash', to: 'money_requests#credit_cash', as: :credit
       end
       resources :receipts, only: [:create, :index, :destroy, :update]
       resources :receipts do
@@ -1926,6 +1934,7 @@ Rails.application.routes.draw do
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do
     post 'comment' => 'money_request#comment', as: :comment
+    patch 'credit_cash', to: 'money_requests#credit_cash', as: :credit
   end
 
   post 'expenses/export', to: 'expenses#export'
