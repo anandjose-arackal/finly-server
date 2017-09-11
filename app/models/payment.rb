@@ -297,6 +297,8 @@ class Payment < ActiveRecord::Base
       return "Processed. Awaiting credit confirmation"
     elsif self.payment_order&.bank_payment_request&.status&.name == 'approved'
       return "Approved"
+    elsif self.payment_order&.bank_payment_request&.status&.name == 'open'
+      return "Open"
     else
       self.payment_status.name.humanize
     end
