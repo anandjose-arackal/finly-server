@@ -51,4 +51,8 @@ class Expense::SplitExisting < Expense::Manual::Split
     self.existing_expense&.expense_type_id
   end
 
+  def receipt_id
+    self.existing_expense&.receipt_id
+  end
+
 end
