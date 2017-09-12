@@ -58,6 +58,7 @@ class ItzCash::AccountDetailsYse < ItzCash::Base
       self.charge_code = params[:charge_code]
       self.product_code = params[:product_code]
       self.available_card_eligibility = params[:available_card_eligibility]
+      self.yse_status = params[:card_yse_status]
       self.description = params[:description]
       self.card = params[:card]
     end
@@ -124,6 +125,7 @@ class ItzCash::AccountDetailsYse < ItzCash::Base
     end
     card.card_balance.update_attributes(value: parsed_response[2].to_d)
     card.card_eligibility.update_attributes(value: parsed_response[9].to_d)
+    card.update(yse_status: params[:card_yse_status])
   end
 
 end

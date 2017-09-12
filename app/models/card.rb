@@ -25,6 +25,7 @@
 #  hotlisted                :boolean          default(FALSE)
 #
 
+
 class Card < ActiveRecord::Base
   include SoftDeletable
 
