@@ -1608,10 +1608,10 @@ Rails.application.routes.draw do
       resources :reports do
         post 'comment' => 'reports#comment', as: :comment
       end
+      patch 'money_requests/credit_cash', to: 'money_requests#credit_cash', as: :credit
       resources :money_requests, only: [:create, :index, :show, :destroy, :update]
       resources :money_requests do
         post 'comment' => 'money_requests#comment', as: :comment
-        patch 'credit_cash', to: 'money_requests#credit_cash', as: :credit
       end
       resources :receipts, only: [:create, :index, :destroy, :update]
       resources :receipts do
