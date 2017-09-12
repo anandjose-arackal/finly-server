@@ -2,7 +2,6 @@ class Settlement::Payment::Base < Settlement::Base
   attr_accessor :payment, :payment_request, :amount, :currency_id, :note
 
   def init_payment_request(payment_type, payment_purpose, options = {})
-    # Add Company Balance for the particular company
     initiating_account = options[:initiating_account]
     amount = options[:amount]
     receiving_account = options[:receiving_account] || to_user.cash_on_hand

@@ -3,7 +3,7 @@
 
 class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
-  attr_accessor :bank_transaction, :company
+  attr_accessor :bank_transaction, :company, :payment, :payment_request
 
   def self.call(bank_transaction)
     self.new(bank_transaction).run
@@ -12,6 +12,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   def initialize(bank_transaction)
     self.bank_transaction = bank_transaction
     self.company = bank_transaction.company
+    self.payment = bank_transaction.payment
   end
 
   def authorized_user_types
@@ -79,8 +80,23 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     end
   end
 
-  def handle_successful_payment
-    
+  def handle_successful_transaction
+    if payment&.cash_on_hand_credit?
+      init_payment_request
+      # now execute the payment that adds to the user's cash on hand
+      AccountManager::Payments::PaymentProcessor(payment.initiating_user, {payment_request: self.payment_request})
+    end
+    # now mark the respective bank transaction and payment as completed
+    bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+    bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+  end
+
+  def init_payment_request
+    receiving_user = payment.receiving_user
+    amount = payment.amount_value
+    receiving_account = receiving_user.cash_on_hand
+    self.payment_request = PaymentRequest.(payment.initiating_user, nil, (receiving_account&.class&.name), :credit, :advance)
+    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, amount, note: self.payment.note))
   end
 
 end

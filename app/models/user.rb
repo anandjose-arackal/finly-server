@@ -723,6 +723,17 @@ class User < ActiveRecord::Base
     self.role_mapping.vendor_payments.employee.present?
   end
 
+  def bank_transfer_enabled?
+    user.vendor_payments_enabled? && user.bank_accounts.present?
+  end
+
+  # method that determines whether a particular user has
+  # cash on hand payments that are pending confirmation
+  # from the bank - eg. NEFT transfers
+  def credits_awaiting_confirmation?
+    user.receiving_payments.cash_on_hand_credits.processing.present?
+  end
+
   private
 
 # def valid_role

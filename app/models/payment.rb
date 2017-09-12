@@ -303,6 +303,10 @@ class Payment < ActiveRecord::Base
     end
   end
 
+  def cash_on_hand_credit?
+    payment.receiving_account.class.name == "CashOnHand" && payment.credit?
+  end
+
   private
 
   def initiating_account_presence
