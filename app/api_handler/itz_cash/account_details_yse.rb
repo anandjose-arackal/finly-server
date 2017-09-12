@@ -35,7 +35,7 @@ class ItzCash::AccountDetailsYse < ItzCash::Base
     params[:charge_code] = parsed_response[7]
     params[:product_code] = parsed_response[8]
     params[:available_card_eligibility] = parsed_response[9].to_d
-    params[:card_yse_status] = parsed_response[10] # This is from YSE's system to track if card is locked or not. Possible values
+    params[:card_processor_status] = parsed_response[10] # This is from YSE's system to track if card is locked or not. Possible values
     params[:description] = parsed_response[12]
     update_card
     params[:card] = card
@@ -45,7 +45,7 @@ class ItzCash::AccountDetailsYse < ItzCash::Base
   class ItzCash::AccountDetails::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
     attr_accessor :response_code, :serial_id, :balance, :status_code, :suspended_status, :rate_group_id,
                   :distributor_id, :charge_code, :product_code, :description, :available_card_eligibility,
-                  :card, :yse_status
+                  :card, :card_processor_status
 
     def init
       self.response_code =params[:response_code]
@@ -58,7 +58,7 @@ class ItzCash::AccountDetailsYse < ItzCash::Base
       self.charge_code = params[:charge_code]
       self.product_code = params[:product_code]
       self.available_card_eligibility = params[:available_card_eligibility]
-      self.yse_status = params[:card_yse_status]
+      self.card_processor_status = params[:card_processor_status]
       self.description = params[:description]
       self.card = params[:card]
     end
@@ -101,7 +101,7 @@ class ItzCash::AccountDetailsYse < ItzCash::Base
     # Pin Mailer Printed - Embossing pending
     # Embossed
     def active?
-      (self.yse_status&.downcase == 'active' and self.status_code == 'A')
+      (self.card_processor_status == Constants::CARD_PROCESSOR_STATUS[:active] and self.status_code == 'A')
     end
 
   end
@@ -125,7 +125,7 @@ class ItzCash::AccountDetailsYse < ItzCash::Base
     end
     card.card_balance.update_attributes(value: parsed_response[2].to_d)
     card.card_eligibility.update_attributes(value: parsed_response[9].to_d)
-    card.update(yse_status: params[:card_yse_status])
+    card.update(card_processor_status: params[:card_processor_status])
   end
 
 end

@@ -177,7 +177,7 @@ class Card < ActiveRecord::Base
   end
 
   def active?
-    self.active
+    self.active and self.card_processor_status == Constants::CARD_PROCESSOR_STATUS[:active]
   end
 
   def unassigned?

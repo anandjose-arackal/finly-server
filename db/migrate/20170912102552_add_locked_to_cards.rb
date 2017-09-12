@@ -1,5 +1,5 @@
 class AddLockedToCards < ActiveRecord::Migration
   def change
-    add_column :cards, :yse_status, :string, index: true
+    add_column :cards, :card_processor_status, :string, index: true
   end
 end
