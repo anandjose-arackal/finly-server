@@ -254,6 +254,7 @@
 #                                                         PATCH  /mobile/v1/reports/:id(.:format)                                                mobile/v1/reports#update
 #                                                         PUT    /mobile/v1/reports/:id(.:format)                                                mobile/v1/reports#update
 #                                                         DELETE /mobile/v1/reports/:id(.:format)                                                mobile/v1/reports#destroy
+#                                        mobile_v1_credit PATCH  /mobile/v1/money_requests/credit_cash(.:format)                                 mobile/v1/money_requests#credit_cash
 #                                mobile_v1_money_requests GET    /mobile/v1/money_requests(.:format)                                             mobile/v1/money_requests#index
 #                                                         POST   /mobile/v1/money_requests(.:format)                                             mobile/v1/money_requests#create
 #                                 mobile_v1_money_request GET    /mobile/v1/money_requests/:id(.:format)                                         mobile/v1/money_requests#show
@@ -261,7 +262,6 @@
 #                                                         PUT    /mobile/v1/money_requests/:id(.:format)                                         mobile/v1/money_requests#update
 #                                                         DELETE /mobile/v1/money_requests/:id(.:format)                                         mobile/v1/money_requests#destroy
 #                         mobile_v1_money_request_comment POST   /mobile/v1/money_requests/:money_request_id/comment(.:format)                   mobile/v1/money_requests#comment
-#                          mobile_v1_money_request_credit PATCH  /mobile/v1/money_requests/:money_request_id/credit_cash(.:format)               mobile/v1/money_requests#credit_cash
 #                                                         GET    /mobile/v1/money_requests(.:format)                                             mobile/v1/money_requests#index
 #                                                         POST   /mobile/v1/money_requests(.:format)                                             mobile/v1/money_requests#create
 #                             new_mobile_v1_money_request GET    /mobile/v1/money_requests/new(.:format)                                         mobile/v1/money_requests#new
@@ -572,6 +572,7 @@
 #                                                         PUT    /reports/:id(.:format)                                                          reports#update
 #                                                         DELETE /reports/:id(.:format)                                                          reports#destroy
 #                                    reports_bulk_approve POST   /reports/bulk_approve(.:format)                                                 reports#bulk_approve
+#                                                  credit PATCH  /money_requests/credit_cash(.:format)                                           money_requests#credit_cash
 #                                     money_request_index GET    /money_request(.:format)                                                        money_request#index
 #                                                         POST   /money_request(.:format)                                                        money_request#create
 #                                           money_request GET    /money_request/:id(.:format)                                                    money_request#show
@@ -579,7 +580,6 @@
 #                                                         PUT    /money_request/:id(.:format)                                                    money_request#update
 #                                                         DELETE /money_request/:id(.:format)                                                    money_request#destroy
 #                                   money_request_comment POST   /money_request/:money_request_id/comment(.:format)                              money_request#comment
-#                                    money_request_credit PATCH  /money_request/:money_request_id/credit_cash(.:format)                          money_requests#credit_cash
 #                                                         GET    /money_request(.:format)                                                        money_request#index
 #                                                         POST   /money_request(.:format)                                                        money_request#create
 #                                       new_money_request GET    /money_request/new(.:format)                                                    money_request#new
@@ -1678,7 +1678,7 @@ Rails.application.routes.draw do
       resources :reports do
         post 'comment' => 'reports#comment', as: :comment
       end
-      patch 'credit_cash', to: 'money_requests#credit_cash', as: :credit
+      patch 'money_requests/credit_cash', to: 'money_requests#credit_cash', as: :credit
       resources :money_requests, only: [:create, :index, :show, :destroy, :update]
       resources :money_requests do
         post 'comment' => 'money_requests#comment', as: :comment
@@ -1931,7 +1931,7 @@ Rails.application.routes.draw do
   post 'reports/bulk_approve' => 'reports#bulk_approve', as: :reports_bulk_approve
 
 
-  patch 'credit_cash', to: 'money_requests#credit_cash', as: :credit
+  patch 'money_requests/credit_cash', to: 'money_requests#credit_cash', as: :credit
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do
     post 'comment' => 'money_request#comment', as: :comment
