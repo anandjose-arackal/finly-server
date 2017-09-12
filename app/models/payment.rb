@@ -34,6 +34,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -147,6 +148,8 @@ class Payment < ActiveRecord::Base
   scope :debit_from_card_to_wallet, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::WALLET, receiving_account_type: Payment::AccountType::CARD }
   scope :debit_from_card_to_card, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::CARD, receiving_account_type: Payment::AccountType::CARD }
   scope :cash_on_hand_credits, -> {where(receiving_account_type: "CashOnHand")}
+  scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
+
 
   scope :transfer_to_card, -> { where('(payment_type_id = ? AND receiving_account_type = ?) OR (payment_type_id = ? AND initiating_account_type = ?)',
                                       PaymentType.id_for(:credit), Payment::AccountType::CARD, PaymentType.id_for(:debit), Payment::AccountType::CARD) }

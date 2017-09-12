@@ -131,6 +131,7 @@
 #                                                         PATCH  /api/v1/reports/:id(.:format)                                                   api/v1/reports#update
 #                                                         PUT    /api/v1/reports/:id(.:format)                                                   api/v1/reports#update
 #                                                         DELETE /api/v1/reports/:id(.:format)                                                   api/v1/reports#destroy
+#                                           api_v1_credit PATCH  /api/v1/money_requests/credit_cash(.:format)                                    api/v1/money_requests#credit_cash
 #                                   api_v1_money_requests GET    /api/v1/money_requests(.:format)                                                api/v1/money_requests#index
 #                                                         POST   /api/v1/money_requests(.:format)                                                api/v1/money_requests#create
 #                                    api_v1_money_request GET    /api/v1/money_requests/:id(.:format)                                            api/v1/money_requests#show
@@ -138,7 +139,6 @@
 #                                                         PUT    /api/v1/money_requests/:id(.:format)                                            api/v1/money_requests#update
 #                                                         DELETE /api/v1/money_requests/:id(.:format)                                            api/v1/money_requests#destroy
 #                            api_v1_money_request_comment POST   /api/v1/money_requests/:money_request_id/comment(.:format)                      api/v1/money_requests#comment
-#                             api_v1_money_request_credit PATCH  /api/v1/money_requests/:money_request_id/credit_cash(.:format)                  api/v1/money_requests#credit_cash
 #                                                         GET    /api/v1/money_requests(.:format)                                                api/v1/money_requests#index
 #                                                         POST   /api/v1/money_requests(.:format)                                                api/v1/money_requests#create
 #                                new_api_v1_money_request GET    /api/v1/money_requests/new(.:format)                                            api/v1/money_requests#new

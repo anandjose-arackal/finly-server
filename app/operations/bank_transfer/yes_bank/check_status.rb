@@ -53,7 +53,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                      content: "The amount will be refunded to your bank account shortly").save
+                                      content: "The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
         create_refund_payment
       else
@@ -84,11 +84,12 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     if payment&.cash_on_hand_credit?
       init_payment_request
       # now execute the payment that adds to the user's cash on hand
-      AccountManager::Payments::PaymentProcessor(payment.initiating_user, {payment_request: self.payment_request})
+      AccountManager::Payments::PaymentProcessor(self.payment.initiating_user, {payment_request: self.payment_request})
     end
     # now mark the respective bank transaction and payment as completed
     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
-    bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+    self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+    self.payment.system_messages.destroy_all # deleting the previous system messages
   end
 
   def init_payment_request

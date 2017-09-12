@@ -102,7 +102,7 @@ class Settlement::Show < Settlement::Base
   end
 
   def load_payments
-    self.payments = self.selected_user.payments.non_settlement.with_details
+    self.payments = self.selected_user.payments.successful.non_settlement.with_details
   end
 
   def load_money_requests
