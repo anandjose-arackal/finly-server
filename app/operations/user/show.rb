@@ -63,9 +63,7 @@ class User::Show < User::Base
       self.user_panel_subscription = selected_user.user_panel_subscription
       self.cash_on_hand = {
           balance: self.balances&.dig(:target_user, :cash_on_hand, :balance),
-          creditable: (user.company_admin? or user.finance_manager?),
-          pending_credits: user.credits_awaiting_confirmation?,
-          message: "Some money has been added to your cash on hand. They will reflect once the payment is confirmed"
+          creditable: (user.company_admin? or user.finance_manager?)
       }
       self.cards = []
       personal = (selected_user == user)
@@ -111,8 +109,13 @@ class User::Show < User::Base
             end
           end
 
-          # checking if the user has associated bank accounts, and sending the flag accordingly
+          # checking if the user has associated bank accounts, and sending the flag accordingly'
+          # also, if the user's cash on hand has been credited with any payments pending confirmation
           actions[:bank_transfer_enabled] = selected_user.bank_transfer_enabled?
+          actions[:pending_cash_on_hand_credits] = {
+              present: self.selected_user.cash_on_hand_credits_awaiting_confirmation?,
+              message: "Some money has been added to your cash on hand. They will reflect once the payment is confirmed"
+          }
           #####################################################################################
 
           assign_request_data = nil

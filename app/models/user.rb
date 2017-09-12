@@ -731,8 +731,8 @@ class User < ActiveRecord::Base
   # method that determines whether a particular user has
   # cash on hand payments that are pending confirmation
   # from the bank - eg. NEFT transfers
-  def credits_awaiting_confirmation?
-    self.receiving_payments.cash_on_hand_credits.processing.present?
+  def cash_on_hand_credits_awaiting_confirmation?
+    self.receiving_payments.cash_advance.processing.present?
   end
 
   private

@@ -52,7 +52,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     # setting the initiating account based on what is sent from the front end
     self.initiating_account = retrieve_initiating_account(payment_param[:initiating_account_type])
     self.receiving_account = retrieve_receiving_account(payment_param[:receiving_account_type])
-    self.payment_purpose = [1, '1'].include?(payment_param[:receiving_account_id]) ? :advance : :advance_outside_finly
+    self.payment_purpose = [1, '1'].include?(payment_param[:receiving_account_type]) ? :cash_advance : :advance_outside_finly
 
     # this is creating the payment request for crediting money to the bank account, if at all they choose to
     init_payment_request(:credit, payment_purpose, {amount: amount, initiating_account: self.initiating_account, receiving_account: self.receiving_account})

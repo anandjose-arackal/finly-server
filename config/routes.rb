@@ -574,7 +574,7 @@
 #                                    reports_bulk_approve POST   /reports/bulk_approve(.:format)                                                 reports#bulk_approve
 #                                                  credit PATCH  /money_requests/credit_cash(.:format)                                           money_requests#credit_cash
 #                                     money_request_index GET    /money_request(.:format)                                                        money_request#index
-#                                                         POST   /money_request(.:format)                                                        money_request#create
+#                                                         POST   /money_request(.:format)    ''                                                    money_request#create
 #                                           money_request GET    /money_request/:id(.:format)                                                    money_request#show
 #                                                         PATCH  /money_request/:id(.:format)                                                    money_request#update
 #                                                         PUT    /money_request/:id(.:format)                                                    money_request#update
