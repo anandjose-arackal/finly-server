@@ -79,6 +79,8 @@ class Settlement::Summary < Settlement::Base
     end
 
     self.balances[:cash_on_hand] = {balance: result[:target_user][:cash_on_hand][:balance], name: 'Cash on Hand',
+                                    pending_credits: user.credits_awaiting_confirmation?,
+                                    message: "Some money has been added to your cash on hand. They will reflect once the payment is confirmed",
                                     meta: {credit: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:add_cash_on_hand))},
                                            debit: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:deduct_cash_on_hand))}}}
     self.balances[:pending_money_requests] = {balance: result[:target_user][:pending_money_requests][:balance], count: result[:target_user][:pending_money_requests][:count],

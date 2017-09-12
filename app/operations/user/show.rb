@@ -63,7 +63,9 @@ class User::Show < User::Base
       self.user_panel_subscription = selected_user.user_panel_subscription
       self.cash_on_hand = {
           balance: self.balances&.dig(:target_user, :cash_on_hand, :balance),
-          creditable: (user.company_admin? or user.finance_manager?)
+          creditable: (user.company_admin? or user.finance_manager?),
+          pending_credits: user.credits_awaiting_confirmation?,
+          message: "Some money has been added to your cash on hand. They will reflect once the payment is confirmed"
       }
       self.cards = []
       personal = (selected_user == user)
