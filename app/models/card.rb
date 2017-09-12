@@ -180,6 +180,10 @@ class Card < ActiveRecord::Base
     self.active and self.card_processor_status == Constants::CARD_PROCESSOR_STATUS[:active]
   end
 
+  def locked?
+    [Constants::CARD_PROCESSOR_STATUS[:locked], Constants::CARD_PROCESSOR_STATUS[:blocked]].include?(self.card_processor_status)
+  end
+
   def unassigned?
     self.card_status_id == CardStatus.id_for(:unassigned) and self.user_id.blank?
   end
