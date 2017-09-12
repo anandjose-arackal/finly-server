@@ -118,6 +118,7 @@ class Payment < ActiveRecord::Base
                                         [Payment::AccountType::WALLET, Payment::AccountType::CARD], [Payment::AccountType::WALLET, Payment::AccountType::CARD]).where.not(payment_purpose_id: [PaymentPurpose.id_for(:atm_withdrawal)]) }
 
 
+  scope :processing, -> {where payment_status_id: PaymentStatus.id_for(:processing)}
   scope :with_date, -> (date) { where(date: date) }
   scope :with_date_range, -> (start_date, end_date) { where('date >= ? AND date <= ?', start_date, end_date) }
   scope :with_payment_type_id, -> (payment_type_id) { where payment_type_id: payment_type_id }
@@ -145,6 +146,7 @@ class Payment < ActiveRecord::Base
   scope :debit_from_card_to_virtual_account, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::VIRTUAL_ACCOUNT, receiving_account_type: Payment::AccountType::CARD }
   scope :debit_from_card_to_wallet, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::WALLET, receiving_account_type: Payment::AccountType::CARD }
   scope :debit_from_card_to_card, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::CARD, receiving_account_type: Payment::AccountType::CARD }
+  scope :cash_on_hand_credits, -> {where(receiving_account_type: "CashOnHand")}
 
   scope :transfer_to_card, -> { where('(payment_type_id = ? AND receiving_account_type = ?) OR (payment_type_id = ? AND initiating_account_type = ?)',
                                       PaymentType.id_for(:credit), Payment::AccountType::CARD, PaymentType.id_for(:debit), Payment::AccountType::CARD) }
