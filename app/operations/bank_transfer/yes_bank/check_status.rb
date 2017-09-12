@@ -43,8 +43,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?
       if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
-        bank_transaction.payment&.update(payment_status_id: PaymentStatus.id_for(:completed))
+        handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
@@ -78,6 +77,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
       # op.payment_order.destroy
       add_message :error, op.messages[:error]
     end
+  end
+
+  def handle_successful_payment
+    
   end
 
 end

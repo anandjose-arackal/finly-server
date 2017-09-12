@@ -28,6 +28,7 @@ class BankAccount < ActiveRecord::Base
 
   validates :account_number, presence: true
   validates :ifsc, presence: true
+  validates :name, presence: true
 
   accepts_nested_attributes_for :account_owner
 

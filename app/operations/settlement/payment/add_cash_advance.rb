@@ -75,8 +75,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     # now calling the payment processor with the payment request parameter so that it handles the payment for us
     # if it's a bank transfer, it will first be executed, and then the user's cash on hand will be added
     # else it directly adds to the user's cash on hand and returns
-    debugger
-    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_param[:payment_mode]&.upcase})
     if op.success?
       self.payment = op.payments.first
       bank_transaction = payment.reference_resource
@@ -134,7 +133,6 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def retrieve_receiving_account(account_type)
-    debugger
     case account_type
       when 1, '1' # i.e. user's bank account
         id = payment_param[:receiving_account_id]
