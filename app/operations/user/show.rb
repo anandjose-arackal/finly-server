@@ -110,6 +110,11 @@ class User::Show < User::Base
               end
             end
           end
+
+          # checking if the user has associated bank accounts, and sending the flag accordingly
+          actions[:bank_transfer_enabled] = selected_user.bank_transfer_enabled?
+          #####################################################################################
+
           assign_request_data = nil
           unless card.assigned?
             assign_request = card.card_assign_requests.with_card_owner_id(selected_user.id)&.first

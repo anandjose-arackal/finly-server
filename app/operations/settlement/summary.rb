@@ -232,7 +232,8 @@ class Settlement::Summary < Settlement::Base
     end
 
     self.actions = {meta: {base_url: Rails.application.routes.url_helpers.update_balance_path(receiving_user_id: selected_user.id, view: params[:view])},
-                    credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}
+                    credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions,
+                    bank_transfer_enabled: selected_user.bank_transfer_enabled?}
   end
 
 end
