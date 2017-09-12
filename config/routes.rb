@@ -1608,7 +1608,7 @@ Rails.application.routes.draw do
       resources :reports do
         post 'comment' => 'reports#comment', as: :comment
       end
-      patch 'money_requests/credit_cash', to: 'money_requests#credit_cash', as: :credit
+      patch 'money_requests/credit_cash', to: 'money_request#credit_cash', as: :credit
       resources :money_requests, only: [:create, :index, :show, :destroy, :update]
       resources :money_requests do
         post 'comment' => 'money_requests#comment', as: :comment
@@ -1678,7 +1678,7 @@ Rails.application.routes.draw do
       resources :reports do
         post 'comment' => 'reports#comment', as: :comment
       end
-      patch 'money_requests/credit_cash', to: 'money_requests#credit_cash', as: :credit
+      patch 'money_requests/credit_cash', to: 'money_request#credit_cash', as: :credit
       resources :money_requests, only: [:create, :index, :show, :destroy, :update]
       resources :money_requests do
         post 'comment' => 'money_requests#comment', as: :comment
@@ -1931,7 +1931,7 @@ Rails.application.routes.draw do
   post 'reports/bulk_approve' => 'reports#bulk_approve', as: :reports_bulk_approve
 
 
-  patch 'money_requests/credit_cash', to: 'money_requests#credit_cash', as: :credit
+  patch 'money_requests/credit_cash', to: 'money_request#credit_cash', as: :credit
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do
     post 'comment' => 'money_request#comment', as: :comment
