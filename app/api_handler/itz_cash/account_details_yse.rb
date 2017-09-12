@@ -35,7 +35,8 @@ class ItzCash::AccountDetailsYse < ItzCash::Base
     params[:charge_code] = parsed_response[7]
     params[:product_code] = parsed_response[8]
     params[:available_card_eligibility] = parsed_response[9].to_d
-    params[:description] = parsed_response[10]
+    params[:card_yse_status] = parsed_response[10] # This is from YSE's system to track if card is locked or not. Possible values
+    params[:description] = parsed_response[12]
     update_card
     params[:card] = card
     ItzCash::AccountDetails::SuccessPresenter.new(self.user, self.params, self.messages)
@@ -44,7 +45,7 @@ class ItzCash::AccountDetailsYse < ItzCash::Base
   class ItzCash::AccountDetails::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
     attr_accessor :response_code, :serial_id, :balance, :status_code, :suspended_status, :rate_group_id,
                   :distributor_id, :charge_code, :product_code, :description, :available_card_eligibility,
-                  :card
+                  :card, :yse_status
 
     def init
       self.response_code =params[:response_code]
@@ -80,6 +81,26 @@ class ItzCash::AccountDetailsYse < ItzCash::Base
       bal = (self.balance or 0)
       eligibility = (self.available_card_eligibility or 0)
       (bal + eligibility) > 25000
+    end
+
+    # YSE CARD STATUS
+    # Active
+    # Locked
+    # Blocked
+    # Hot Listed
+    # Hot Listed for Damage
+    # Closed
+    # Blocked for Damage
+    # Blocked - Card Stolen
+    # Kept Aside
+    # Dispatched
+    # Generated
+    # Generated - Pin Mailer Pending
+    # Pin Mailer Printed
+    # Pin Mailer Printed - Embossing pending
+    # Embossed
+    def active?
+      (self.yse_status&.downcase == 'active' and self.status_code == 'A')
     end
 
   end

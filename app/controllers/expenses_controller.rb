@@ -42,6 +42,7 @@ class ExpensesController < ApplicationController
         end
       else
         respond response: :failure, message: "Invalid input"
+        return
     end
     respond response: :success
   end
