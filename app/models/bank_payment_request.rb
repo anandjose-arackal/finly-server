@@ -106,6 +106,10 @@ class BankPaymentRequest < ActiveRecord::Base
     processing?
   end
 
+  def credit_pending?
+    approved? && !credited?
+  end
+
   def user
     self.owner
   end

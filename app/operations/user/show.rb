@@ -211,13 +211,12 @@ class User::Show < User::Base
       if user.company_admin?
         actions[:update_subscriptions] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
       end
-
       actions
     end
 
     def load_transfer_options(balances)
       credit_actions = {initiating_accounts: [], receiving_accounts: []}
-      debit_actions={receiving_accounts: [], initiating_accounts: []}
+      debit_actions = {receiving_accounts: [], initiating_accounts: []}
 
       from_user_transferable_cards = user.cards.with_non_personal_fund_transfer
       to_user_creditable_cards = selected_user.cards.creditable_cards

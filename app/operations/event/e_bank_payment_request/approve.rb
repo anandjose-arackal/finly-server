@@ -22,14 +22,14 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
       if auto_approve
         return [self.bank_payment_request.owner]
       end
-      return [self.bank_payment_request.bank_payment_request_trails.last.action_user, self.bank_payment_request.owner]
+      [self.bank_payment_request.bank_payment_request_trails.last.action_user, self.bank_payment_request.owner]
     else
       [self.bank_payment_request.bank_payment_request_trails.last.action_user, self.bank_payment_request.controlling_user]
     end
   end
 
   def event_id
-
+    NotifierType.id_for(:bank_payment_request_approve)
   end
 
   def set_notification(user)
@@ -43,15 +43,55 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
       notify_type = NotificationActionType.id_for(:notify_awaiting_approval)
     end
     view_role_id = bank_payment_request.controlling_user_role_id
-
+    notification = user.notifications.create(notification_type_id: NotificationType.id_for(:bank_payment_request),
+                                             action_type_id: notify_type,
+                                             action_user_id: (self.bank_payment_request.bank_payment_request_trails.last.action_user.id rescue nil),
+                                             object_id: bank_payment_request.id,
+                                             object_type: "PaymentOrder",
+                                             path_object_id: bank_payment_request.id,
+                                             path_object_type: "PaymentOrder",
+                                             read: false,
+                                             timestamp: DateUtils.local_date_time,
+                                             view_role_id: view_role_id)
+    notification.save
   end
 
   def mailer_subject
-
+    approver_id = self.bank_payment_request.bank_payment_request_trails.last.action_user.id rescue nil
+    if approver_id.present? and user.id == approver_id
+      "Payment Order approved : #{self.bank_payment_request.name}"
+    else
+      if approved and user.id == self.bank_payment_request.owner.id
+        if auto_approve
+          return "Congratulations! Your payment order #{bank_payment_request.name} has been auto-approved"
+        else
+          return "Congratulations! Your payment order #{bank_payment_request.name} has been approved"
+        end
+      else
+        "#{approving_user.name} has approved the payment order: #{self.bank_payment_request.name}"
+      end
+    end
   end
 
   def mailer_body
-
+    approver_id = self.bank_payment_request.tracks.last.action_user.id rescue nil
+    if approver_id.present? and user.id == approver_id
+      message = "You have successfully approved the payment order : #{self.bank_payment_request.name}"
+    else
+      if approved and user.id == bank_payment_request.user.id
+        if auto_approve
+          message = "Congratulations! Your payment order #{bank_payment_request.name} has been auto-approved"
+        else
+          message = "Congratulations! Your payment order #{bank_payment_request.name} has been approved"
+        end
+        if bank_payment_request.credit_pending?
+          message = "#{message} and is awaiting credit!"
+        end
+      else
+        message = "#{approving_user.name} has approved the payment order '#{self.bank_payment_request.name}' and is currently waiting for your approval"
+      end
+    end
+    message
   end
 
 end

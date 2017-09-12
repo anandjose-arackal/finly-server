@@ -68,6 +68,8 @@ class Notification < ActiveRecord::Base
         object = "Finly Money"
       when "Payment"
         object = "Cash"
+      when "PaymentOrder"
+        object = "Payment Order"
       else
         # do nothing
     end
@@ -262,6 +264,21 @@ class Notification < ActiveRecord::Base
         if action_type_id == NotificationActionType.id_for(:notify_awaiting_approval)
           object_name += " and is awaiting your further approval"
         end
+      when "PaymentOrder"
+        if action_type_id == NotificationActionType.id_for(:notify_credit)
+          object = " against your payment order"
+        end
+        bpr = BankPaymentRequest.unscoped.find_by(id: self.object_id)
+        object_name = " : \"#{bpr.name}\""
+        if action_type_id == NotificationActionType.id_for(:notify_auto_approve)
+          object_name += " has been auto approved"
+        end
+        if action_type_id == NotificationActionType.id_for(:notify_awaiting_approval)
+          object_name += " and is awaiting your further approval"
+        end
+      when "PaymentOrderItem"
+        # this is when an individual payment order item is rejected - will hold its details
+         # todo - add logic to handle this
       when "Expense"
         object = " an expense"
         e = Expense.unscoped.find_by(id: self.object_id)
