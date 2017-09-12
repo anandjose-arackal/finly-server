@@ -26,17 +26,16 @@ class MoneyRequest::Cash::Credit < MoneyRequest::Base
 
   def init
     team = User::Team::Index.(user, params)
-    if team.success?
-      id = params[:id]
-      self.selected_user = team.with_id(id).first
-    end
+    id = params[:id]
+    self.selected_user = team.with_id(id).first rescue nil
+
     if selected_user.nil?
       add_message :error, "User not found"
       return
     end
     ids = params[:money_request_ids].split(',')
     self.money_requests = selected_user.money_requests.with_id(ids)
-    self.amount = params[:amount]
+    self.payment_params = payment_parameters
 
     # setting the role of the creditor of the money request
     if user.admin? and admin_view?
@@ -46,11 +45,18 @@ class MoneyRequest::Cash::Credit < MoneyRequest::Base
     end
 
     # keeping track of the individual money requests and the respective amounts being credited to them
+    self.amount = 0
     self.money_request_amounts = {}
     params[:money_requests].each do |money_request|
       self.money_request_amounts[money_request[:id]] = money_request[:processed_amount]
+      self.amount += money_request[:processed_amount].to_f
     end
+    # replacing the amount we're getting from the front end to the new one.
+    params[:payment][:amount] = self.amount
     params.delete(:money_requests)
+  end
+
+  def authorize
 
   end
 
@@ -75,7 +81,7 @@ class MoneyRequest::Cash::Credit < MoneyRequest::Base
       money_requests.each do |request|
         total_amount += request.total_amount
       end
-      if payment_param[:amount].to_f > total_amount
+      if self.amount&.to_f > total_amount
         add_message :error, 'You cannot credit more than the total of the money requests'
       end
 
@@ -94,15 +100,19 @@ class MoneyRequest::Cash::Credit < MoneyRequest::Base
       # i.e. the money (outside of finly, or through bank transfer)
       payment = op.payment
       ids = self.money_requests.pluck(:id)
-      total_amount = money_requests.with_id(ids).with_amount.sum(:value)
+      total_amount = MoneyRequestItem.with_money_request(ids).with_amount.sum(:value)
       selected_user.balance_sheet.subtract_pending_advance(total_amount)
       money_requests.each do |money_request|
         MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role, amount_processed: self.money_request_amounts["#{money_request.id}"]})
       end
     else
-      add_message :error, op.messages[:success]
+      add_message :error, op.messages[:error]
       return
     end
+  end
+
+  def success
+    BaseOperation::BasePresenter::SuccessPresenter.new(user, params, messages)
   end
 
   private

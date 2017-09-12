@@ -181,7 +181,7 @@ class User::Balances::Show < User::Base
         disabler = card.disabled_by_user&.name
         disabler_role = card.disabled_by_role&.name
         self.balances[:cards] << {
-            name: "#{selected_user.name}'s #{card.card_program.name.humanize} card",
+            name: "#{card.card_program.name.humanize} card",
             balance: balance,
             eligibility: self.card_info[card.id][:eligibility],
             active: card.active,
