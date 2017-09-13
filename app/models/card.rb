@@ -152,7 +152,6 @@ class Card < ActiveRecord::Base
     self.itz_cash_card_program.product_code
   end
 
-
   # attr_accessor :balance, :available_card_eligibility
   def balance
     if card_balance.blank?
@@ -180,12 +179,20 @@ class Card < ActiveRecord::Base
     self.active and self.card_processor_status == Constants::CARD_PROCESSOR_STATUS[:active]
   end
 
+  def temporary_block?
+    !self.active and self.card_processor_status == Constants::CARD_PROCESSOR_STATUS[:active]
+  end
+
   def locked?
     [Constants::CARD_PROCESSOR_STATUS[:locked], Constants::CARD_PROCESSOR_STATUS[:blocked]].include?(self.card_processor_status)
   end
 
   def unassigned?
     self.card_status_id == CardStatus.id_for(:unassigned) and self.user_id.blank?
+  end
+
+  def assign_requested?
+    self.card_status_id == CardStatus.id_for(:assign_requested)
   end
 
   def upgraded?
