@@ -56,7 +56,7 @@ class Card < ActiveRecord::Base
   accepts_nested_attributes_for :card_balance
   accepts_nested_attributes_for :card_eligibility
 
-  default_scope {where hotlisted: false}
+  default_scope { where hotlisted: false }
 
   scope :with_id, -> (id) { where id: id }
   scope :with_user, -> (user_id) { where user_id: user_id }
@@ -69,10 +69,10 @@ class Card < ActiveRecord::Base
   scope :creditable_cards, -> { with_card_program(CardProgram.all.with_manager_credit) }
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
-  scope :meal_cards, -> {where card_program_id: CardProgram.id_for(:meal)}
+  scope :meal_cards, -> { where card_program_id: CardProgram.id_for(:meal) }
   scope :non_hotlisted, -> {
     # if applied == '1'
-      where hotlisted: false
+    where hotlisted: false
     # end
   }
   scope :include_hotlisted, -> { unscope(where: :hotlisted) }
@@ -217,6 +217,15 @@ class Card < ActiveRecord::Base
     false
   end
 
+  def suspend_status
+    status = self.card_processor_status
+    if status == Constants::CARD_PROCESSOR_STATUS[:active] and !self.active
+      status = 'Blocked'
+    else status != Constants::CARD_PROCESSOR_STATUS[:active]
+      status = 'Locked'
+    end
+    status
+  end
 
   private
 

@@ -78,7 +78,10 @@ class User::Show < User::Base
           balance = show_balance ? balances[:target_user][:card][card.id][:balance] : nil
           eligibility = show_eligibility ? balances[:target_user][:card][card.id][:eligibility] : nil
           disabled_by = card.disabled_by_role.name rescue nil
-          active = card.active
+          active = card.active?
+          locked = card.locked?
+          temporary_block = card.temporary_block?
+          suspend_status = card.suspend_status
           name = "#{card.card_program.name} Card"
           # ending_number = card.ending_number
           proxy = card.proxy
@@ -139,17 +142,23 @@ class User::Show < User::Base
                   balance: balance,
                   eligibility: eligibility,
                   disabled_by: disabled_by,
-                  active: active,
                   name: name,
                   id: id,
                   status: {
                       id: card.card_status.id,
                       name: card.card_status.name
                   },
+                  suspend_status: {
+                      active: active,
+                      temporary_block: temporary_block,
+                      locked: locked,
+                      name: suspend_status
+                  },
                   assign_request: assign_request_data
               },
               actions: actions,
-              card_restriction: card.card_restriction}
+              card_restriction: card.card_restriction
+          }
         end
       end
       self.auto_submit_config = self.selected_user.auto_submit_config
