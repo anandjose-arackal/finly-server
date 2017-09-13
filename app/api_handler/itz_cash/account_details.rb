@@ -125,6 +125,7 @@ class ItzCash::AccountDetails < ItzCash::Base
 
   # This checks if a card has in blocked at itzcash or at YSE
   def update_suspend_status
+    update_params = {}
     if params[:suspended_status] == 'Y'
       # attributes_to_update[:active] = false if card.active
       update_params[:active] = false if card.active

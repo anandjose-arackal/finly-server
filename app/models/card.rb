@@ -221,7 +221,7 @@ class Card < ActiveRecord::Base
     status = self.card_processor_status
     if status == Constants::CARD_PROCESSOR_STATUS[:active] and !self.active
       status = 'Blocked'
-    else status != Constants::CARD_PROCESSOR_STATUS[:active]
+    elsif status != Constants::CARD_PROCESSOR_STATUS[:active]
       status = 'Locked'
     end
     status
