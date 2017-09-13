@@ -119,7 +119,7 @@ class User::Show < User::Base
                   id: assign_request.id,
                   status: {
                       id: assign_request.status.id,
-                      name: assign_request.status.name
+                      name: StringUtils.titleize(assign_request.status.name)
                   },
                   admin_note: assign_request.admin_note
               }
@@ -146,7 +146,7 @@ class User::Show < User::Base
                   id: id,
                   status: {
                       id: card.card_status.id,
-                      name: card.card_status.name
+                      name: StringUtils.titleize(card.card_status.name)
                   },
                   suspend_status: {
                       active: active,

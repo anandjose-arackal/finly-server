@@ -2,7 +2,7 @@ class KycProcess::User::Show < KycProcess::User::Base
 
   def post_process
     # This will update the kyc status if card has been upgraded
-    unless KycStatus.ids_for(:completed, :approved).include? self.individual_kyc&.kyc_status_id
+    unless KycStatus.ids_for([:completed, :approved]).include? self.individual_kyc&.kyc_status_id
       self.individual_kyc.user.cards&.each do |card|
         ItzCash::AccountDetails.(individual_kyc.user, card: card)
       end
