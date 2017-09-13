@@ -1927,6 +1927,7 @@ Rails.application.routes.draw do
     post 'comment' => 'money_request#comment', as: :comment
   end
 
+  post 'expenses/split', to: 'expenses#split_existing'
   post 'expenses/export', to: 'expenses#export'
   delete 'expenses', to: 'expenses#destroy'
   resources :expenses do

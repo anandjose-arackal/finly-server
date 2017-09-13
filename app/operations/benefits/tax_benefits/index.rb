@@ -32,7 +32,7 @@ class Benefits::TaxBenefits::Index < Benefits::TaxBenefits::Base
 
     def init
       self.payment_orders = params[:payment_orders]
-      self.payment_orders = apply_scopes(payment_orders, params)
+      self.payment_orders = apply_scopes(payment_orders, params)&.paginate(page: params[:page], per_page: 30)
     end
   end
 

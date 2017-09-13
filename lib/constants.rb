@@ -219,6 +219,40 @@ module Constants
                    3100 => 'Transaction is already confirmed'}
   end
 
+  # YSE CARD STATUS
+  # Active
+  # Locked
+  # Blocked
+  # Hot Listed
+  # Hot Listed for Damage
+  # Closed
+  # Blocked for Damage
+  # Blocked - Card Stolen
+  # Kept Aside
+  # Dispatched
+  # Generated
+  # Generated - Pin Mailer Pending
+  # Pin Mailer Printed
+  # Pin Mailer Printed - Embossing pending
+  # Embossed
+  CARD_PROCESSOR_STATUS = {
+      active: 'Active',
+      locked: 'Locked',
+      blocked: 'Blocked',
+      hotlisted: 'Hot Listed',
+      hotlisted_for_damage: 'Hot Listed for Damage',
+      closed: 'Closed',
+      blocked_for_damage: 'Blocked for Damage',
+      blocked_card_stolen: 'Blocked - Card Stolen',
+      kept_aside: 'Kept Aside',
+      dispatched: 'Dispatched',
+      generated: 'Generated',
+      generated_pin_mailer_pending: 'Generated - Pin Mailer Pending',
+      pin_mailer_printed: 'Pin Mailer Printed',
+      pin_mailer_printed_embossing_pending: 'Pin Mailer Printed - Embossing pending',
+      embossed: 'Embossed'
+  }
+
   class Constants::YesBank
     PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN-PROCESS","IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
     FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]

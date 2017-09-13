@@ -89,11 +89,11 @@ class Expense::Manual::Split < Expense::Manual::Base
 
     # Set custom Fields
     base_custom_fields = (params[:custom_fields] or params[:expense][:custom_fields] or {})
-    base_params[:expense_type_id] = ExpenseType.id_for(:manual)
+    base_params[:expense_type_id] = expense_type_id
     # Keep a copy of the receipt to be attached. Create images for each expenses from the receipt and finally destroy the receipt
-    if params&.dig(:expense, :receipt_id).present? or params&.dig(:receipt_id).present?
-      id = (params&.dig(:expense, :receipt_id) or params&.dig(:receipt_id))
-      self.receipt = user.receipts.find_by_id(id)
+    receipt_id = self.receipt_id
+    if receipt_id.present?
+      self.receipt = user.receipts.find_by_id(receipt_id)
     elsif base_params[:receipts_attributes].present?
       base_params[:receipts_attributes][:user_id] = user.id
     end
@@ -150,6 +150,14 @@ class Expense::Manual::Split < Expense::Manual::Base
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
     CustomField::SetFields.(expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
+  end
+
+  def expense_type_id
+    ExpenseType.id_for(:manual)
+  end
+
+  def receipt_id
+    (params&.dig(:expense, :receipt_id) or params&.dig(:receipt_id))
   end
 
 end
