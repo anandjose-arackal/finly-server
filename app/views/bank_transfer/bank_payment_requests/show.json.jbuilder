@@ -36,6 +36,7 @@ json.attachments do
     json.url attachment.attached_file.url
     json.thumb attachment.attached_file.url(:thumb)
     json.description attachment.description
+    json.file_type attachment.file_format(attachment.attached_file)
   end
 end
 
