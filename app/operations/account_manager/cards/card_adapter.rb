@@ -75,7 +75,7 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
 
   def balance
     op = ItzCash::AccountDetails.(account.user, card: account)
-    op.balance
+    op.balance rescue 0
   end
 
   def creditable_accounts
