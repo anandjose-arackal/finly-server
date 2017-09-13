@@ -31,7 +31,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     require 'bank_transfer/payment_request/review/associated_users'
 
     attr_accessor :bank_payment_request, :payment_order, :actions, :bank_wallet_balance,
-                  :manager, :finance_manager
+                  :manager, :finance_manager, :associated_users
 
     def init
       self.bank_payment_request = params[:payment_request]
@@ -40,11 +40,15 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       self.actions = retrieve_actions
       self.manager = User::Team::Approver.(bank_payment_request.owner, payment_request: bank_payment_request, type: :manager)
       self.finance_manager = User::Team::Approver.(bank_payment_request.owner, payment_request: bank_payment_request, type: :finance_manager)
+      self.associated_users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.controlling_user) rescue []
+      if bank_payment_request.credited?
+        self.manager = associated_users.include?(manager) ? manager : nil
+        self.finance_manager = associated_users.include?(finance_manager) ? finance_manager : nil
+      end
     end
 
     def retrieve_actions
       actions = {}
-      associated_users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.controlling_user) rescue []
       if admin_view? && user.vendor_payments_admin?
         if bank_payment_request.processing? && bank_payment_request.controlling_user_id == user.id
           actions[:summary_editable] = true

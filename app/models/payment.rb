@@ -217,7 +217,7 @@ class Payment < ActiveRecord::Base
 
     case self.initiating_account_type
       when "Company", "ItzCashCompanyAccount"
-        name = "Company Credits"
+        name = "Company Credits (Card Transfer Pocket)"
       when "CashOnHand"
         name += "Cash on Hand"
       when "Card"
@@ -226,9 +226,11 @@ class Payment < ActiveRecord::Base
       when "UserWallet"
         name += "Finly Money"
       when "YesBankCompanyAccount"
-        name = "Company Credits"
+        name = "Company Credits (Bank Transfer Pocket)"
       when "VendorPaymentWallet"
         name += "Finly Money (Bank Transfer Pocket)"
+      when "BankAccount"
+        name += "Bank Account (Number: #{self.initiating_account.account_number})"
       else
         name = ""
     end
@@ -254,6 +256,8 @@ class Payment < ActiveRecord::Base
         name = "Company Credits"
       when "VendorPaymentWallet"
         name += "Finly Money (Bank Transfer Pocket)"
+      when "BankAccount"
+        name += "Bank Account (Number: #{self.receiving_account.account_number})"
       else
         name = ""
     end
