@@ -27,7 +27,8 @@ class Integrations::Quickbooks::InitiateReportsSync < Integrations::Quickbooks::
 
   def init
     user_ids = user.company.users.pluck(:id)
-    self.reports = Report.with_user(user_ids).where(id: params[:report_ids])
+    ids = params[:report_ids] || params[:report_id]
+    self.reports = Report.with_user(user_ids).where(id: ids)
   end
 
   def validate
