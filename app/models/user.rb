@@ -735,6 +735,10 @@ class User < ActiveRecord::Base
     self.receiving_payments.cash_advance.processing.present?
   end
 
+  def reimbursements_awaiting_confirmation?
+
+  end
+
   private
 
 # def valid_role

@@ -110,7 +110,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       when REIMBURSEMENT_TYPE[:reimbursement_bank_account]
         # add logic here for determining whether the reimbursement is through company credits or
         # Finly Money
-        self.reimbursement_amount = payment_params[:amount].to_f
+        self.reimbursement_amount = payment_params[:from_bank_transfer].to_f
         self.initiating_account_type = payment_params[:initiating_account_type]
         case self.initiating_account_type
           when 1, '1'
@@ -118,8 +118,9 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
           when 2, '2'
             self.initiating_account = user.bank_wallet
           else
-            self.initiating_account = user.company.yes_bank_company_account
+            # self.initiating_account = user.company.yes_bank_company_account
             # self.initiating_account = user.bank_wallet
+            # do nothing?
         end
 
         self.transfer_mode = payment_params[:payment_mode]&.upcase
@@ -285,7 +286,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
 
   def process
 
-    if self.cash_in_hand_deduction_amount.present?
+    if self.cash_in_hand_deduction_amount.present? && cash_in_hand_deduction_amount > 0
       # creating a payment request that can handle this case
       payment_request = PaymentRequest.(user, nil, to_user.cash_on_hand.class.name, :debit, :balance_clearance_outside_finly)
       payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, to_user.cash_on_hand, cash_in_hand_deduction_amount))

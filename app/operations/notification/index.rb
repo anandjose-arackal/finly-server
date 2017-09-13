@@ -28,8 +28,8 @@ class Notification::Index < Notification::Base
     has_scope :with_application
 
     def init
-      self.unread_count = params[:notifications].unread.count rescue 0
       self.notifications = apply_scopes(params[:notifications], params)
+      self.unread_count = notifications.unread.count rescue 0
       self.notifications = notifications.paginate(page: params[:page], per_page: 10)
     end
 
