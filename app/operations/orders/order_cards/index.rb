@@ -36,7 +36,7 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
 
     def init
       self.payment_orders = params[:payment_orders]
-      self.payment_orders = apply_scopes(payment_orders, params)&.paginate(page: params[:page], per_page: 5)
+      self.payment_orders = apply_scopes(payment_orders, params)#&.paginate(page: params[:page], per_page: 5)
     end
   end
 end
