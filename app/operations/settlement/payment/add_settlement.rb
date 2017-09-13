@@ -303,7 +303,9 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     if self.reimbursement_type_id == REIMBURSEMENT_TYPE[:reimbursement_bank_account] and reimbursement_amount.present?
       payment_request = PaymentRequest.(user, initiating_account, receiving_account, :credit, :reimbursement_bank_transfer, {bank_transfer_type: payment_params[:payment_mode], payment_mode: payment_params[:payment_mode]})
       payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, receiving_account, reimbursement_amount))
+      debugger
       op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
+      debugger
       if op.success?
         self.payment = op.payment_order.payments.first
         return
