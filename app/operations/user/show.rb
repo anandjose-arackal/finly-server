@@ -69,6 +69,7 @@ class User::Show < User::Base
       personal = (selected_user == user)
       if balances.present?
         selected_user.cards.each do |card|
+          ItzCash::AccountDetails.(card.user, card: card)
           actions = {}
           # Card Actions
           assigned = card.assigned?
