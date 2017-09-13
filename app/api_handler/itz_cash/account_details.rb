@@ -89,7 +89,6 @@ class ItzCash::AccountDetails < ItzCash::Base
     [0, -513]
   end
 
-
   protected
   def update_card
     update_assign_status
