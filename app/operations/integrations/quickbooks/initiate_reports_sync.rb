@@ -39,7 +39,7 @@ class Integrations::Quickbooks::InitiateReportsSync < Integrations::Quickbooks::
 
     invalid_reports = []
     reports.each do |report|
-      unless [ReportSyncStatus.id_for(:not_synced), ReportSyncStatus.id_for(:partially_synced)].include?(report.sync_status_id)
+      unless [ReportSyncStatus.id_for(:not_synced), ReportSyncStatus.id_for(:partially_synced), nil].include?(report.sync_status_id)
         invalid_reports << report
       end
     end
