@@ -137,6 +137,7 @@ class User::Show < User::Base
                   show_balance: show_balance,
                   show_eligibility: show_eligibility,
                   # ending_number: ending_number,
+                  active: active,
                   proxy: proxy,
                   configurable_restrictions: configurable_restrictions,
                   balance: balance,
