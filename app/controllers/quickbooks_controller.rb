@@ -4,8 +4,8 @@ class QuickbooksController < ApplicationController
   before_action -> { finly_authorize! :web}
 
   def sync_report
-    @result = Integrations::Quickbooks::SyncReport.call_async(current_user.id, params)
-    respond response: :success, message: "Report Sync initiated"
+    @result = Integrations::Quickbooks::InitiateReportsSync.(current_user, params)
+    respond
   end
 
   def sync_reports
