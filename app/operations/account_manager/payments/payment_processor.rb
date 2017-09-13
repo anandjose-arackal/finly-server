@@ -171,6 +171,5 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     end
     p
   end
-
 end
 

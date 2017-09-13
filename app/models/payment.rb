@@ -33,8 +33,6 @@
 
 
 
-
-
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -244,7 +242,7 @@ class Payment < ActiveRecord::Base
 
     case self.receiving_account_type
       when "Company", "ItzCashCompanyAccount"
-        name = "Company Credits"
+        name = "Company Credits (Card Transfer Pocket)"
       when "CashOnHand"
         name += "Cash on Hand"
       when "Card"
@@ -253,7 +251,7 @@ class Payment < ActiveRecord::Base
       when "UserWallet"
         name += "Finly Money"
       when "YesBankCompanyAccount"
-        name = "Company Credits"
+        name = "Company Credits (Bank Transfer Pocket)"
       when "VendorPaymentWallet"
         name += "Finly Money (Bank Transfer Pocket)"
       when "BankAccount"
@@ -307,6 +305,10 @@ class Payment < ActiveRecord::Base
   def payment_status_name
     if self.payment_status_id == PaymentStatus.id_for(:processing)
       return "Processed. Awaiting credit confirmation"
+    elsif self.payment_order&.bank_payment_request&.status&.name == 'approved'
+      return "Approved"
+    elsif self.payment_order&.bank_payment_request&.status&.name == 'open'
+      return "Open"
     else
       self.payment_status.name.humanize
     end

@@ -33,13 +33,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   end
 
   def pre_process
-    # setting the status as pending because it will be processed immediately - for both payments and payment orders
-    payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
-    payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
 
-    # updating the initiating account for the payment order and paymets
-    payment_order.update(initiating_account_type: initiating_account.class.name)
-    payment_order.payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
   end
 
 
@@ -47,13 +41,14 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
     # now pass to the Create operation
     op = BankTransfer::YesBank::Create.(user, bank_payment_request: bank_payment_request)
-    unless op.success?
+    if op.success?
+      # update the bank_payment_request to credited
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+    else
       add_message :error, op.messages[:error]
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:failed))
       return
     end
-
-    # update the bank_payment_request to credited
-    bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
   end
 
   def post_process

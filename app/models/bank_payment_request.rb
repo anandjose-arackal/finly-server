@@ -126,14 +126,12 @@ class BankPaymentRequest < ActiveRecord::Base
     if self.status_id == BankPaymentRequestStatus.id_for(:processing)
       if user_id == self.controlling_user_id
         return "awaiting_approval"
-      # elsif user_id == self.owner_id
-      #   return "submitted"
       else
         return "processing"
       end
     end
-    if [BankPaymentRequestStatus.id_for(:credited)].include?(self.status_id)
-      return self.payment_order.payment_order_status&.name
+    if [BankPaymentRequestStatus.id_for(:credited), BankPaymentRequestStatus.id_for(:approved)].include?(self.status_id)
+      self.payment_order.payment_order_status&.name
     end
     self.status.name&.to_s
   end
