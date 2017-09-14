@@ -43,7 +43,8 @@ class Event::EMoneyRequest::Reject < Event::EMoneyRequest::Base
                                             path_object_type: 'Money Request',
                                             read: false,
                                             timestamp: DateUtils.local_date_time,
-                                            view_role_id: roles.first
+                                            view_role_id: roles.first,
+                                            application: RequestStore.store[:current_app]
     )
     notification.save
   end

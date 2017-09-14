@@ -27,7 +27,8 @@ class Event::EBankPaymentRequest::Submit < Event::EBankPaymentRequest::Base
                                              path_object_type: "Payment Order",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: bank_payment_request.controlling_user_role_id
+                                             view_role_id: bank_payment_request.controlling_user_role_id,
+                                             application: RequestStore.store[:current_app]
     )
     notification.save
   end

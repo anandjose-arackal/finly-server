@@ -98,8 +98,9 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
   def set_xml_params
     liquid_template = load_soap_template
+    beneficiary_name = transfer_request.beneficiary_name
     ILLEGAL_CHARACTERS.each do |character|
-      beneficiary_name = transfer_request.beneficiary_name.sub(character, '')
+      beneficiary_name = beneficiary_name.sub(character, '')
     end
     self.template = liquid_template.render(
         'UNIQUE_REFERENCE_NUMBER' => transfer_request.generate_unique_reference,

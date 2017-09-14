@@ -41,7 +41,8 @@ class Event::EWallet::Credit < Event::EWallet::Base
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: nil,
-                                             amount_attributes: {value: payment.amount_value, currency_id: 1})
+                                             amount_attributes: {value: payment.amount_value, currency_id: 1},
+                                             application: RequestStore.store[:current_app])
     notification.save
   end
 

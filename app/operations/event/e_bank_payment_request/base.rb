@@ -27,10 +27,10 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
   end
 
   def send_mailer(user)
-    return if user.blank?
-    set_presenter_params(user)
-    return unless params[:subject].present? && params[:body].present?
-    BankPaymentRequestMailer.delay.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestPresenter.new(user, params))
+    # return if user.blank?
+    # set_presenter_params(user)
+    # return unless params[:subject].present? && params[:body].present?
+    # BankPaymentRequestMailer.delay.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestPresenter.new(user, params))
   end
 
   def mailer_subject
@@ -53,6 +53,9 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
 
     attr_accessor :bank_payment_request
 
+    def init
+      self.bank_payment_request = params[:bank_payment_request]
+    end
 
   end
 

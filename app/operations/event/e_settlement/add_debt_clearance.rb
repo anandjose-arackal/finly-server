@@ -23,7 +23,8 @@ class Event::ESettlement::AddDebtClearance < Event::ESettlement::Base
                                               read: false,
                                               timestamp: DateUtils.local_date_time,
                                               amount_attributes: {value: payment.amount.value,
-                                                                  currency_id: 1}
+                                                                  currency_id: 1},
+                                              application: RequestStore.store[:current_app]
     )
     notification.save
   end

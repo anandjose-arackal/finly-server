@@ -52,7 +52,8 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
                                              path_object_type: "PaymentOrder",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: view_role_id)
+                                             view_role_id: view_role_id,
+                                             application: RequestStore.store[:current_app])
     notification.save
   end
 
