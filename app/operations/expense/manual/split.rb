@@ -65,6 +65,13 @@ class Expense::Manual::Split < Expense::Manual::Base
       expense.split_link = self.split_link
       if expense.save and self.receipt.present?
         expense.receipts << expense.receipts.create(image: self.receipt.image, user: expense.user)
+
+        # calculate the equivalent amount in all currencies in the amounts table
+        if expense.date == DateUtils.local_date
+          expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+        else
+          expense.update_other_currencies
+        end
       end
     end
     if self.receipt.present?
