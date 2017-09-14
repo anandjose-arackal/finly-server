@@ -132,7 +132,7 @@ class Expense::Manual::Split < Expense::Manual::Base
         end
         return
       end
-      valid = CustomField::Validate.(expense.manual_expense)
+      valid = CustomField::Validate.(expense.sub_expense)
       unless valid.success?
         valid.messages[:error]&.each do |error|
           add_message :error, "Split #{(index)}: #{error}"
@@ -150,7 +150,20 @@ class Expense::Manual::Split < Expense::Manual::Base
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
-    CustomField::SetFields.(expense.sub_expense, FieldParentType.id_for(:manual_expense), custom_fields)
+    parent_type = nil
+    case expense.expense_type_id
+      when ExpenseType.id_for(:manual)
+        parent_type = :manual_expense
+      when ExpenseType.id_for(:card)
+        parent_type = :card_expense
+      when ExpenseType.id_for(:distance)
+        parent_type = :distance_expense
+      when ExpenseType.id_for(:time)
+        parent_type = :time_expense
+      when ExpenseType.id_for(:per_diem)
+        parent_type = :per_diem_expense
+    end
+    CustomField::SetFields.(expense.sub_expense, FieldParentType.id_for(parent_type), custom_fields)
   end
 
   def expense_type_id
