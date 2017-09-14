@@ -18,10 +18,10 @@ class EmailProcessor
     receipt_email = user.receipt_emails.create subject: StringUtils.force_utf_8_encoding(@email.subject),
                                                sent_at: DateTime.parse(@email.headers['Date'])
     id = receipt_email.id
-    receipt_email.body = FakeFileIO.new("#{id}_body.txt", @email.body)
-    receipt_email.raw_text = FakeFileIO.new("#{id}_raw_body.txt", @email.raw_body)
-    receipt_email.raw_html = FakeFileIO.new("#{id}_raw_html.txt", @email.raw_html)
-    receipt_email.raw_header = FakeFileIO.new("#{id}_raw_headers.txt", @email.raw_headers)
+    receipt_email.body = FakeFileIO.new("#{id}_body.txt", (@email.body || ""))
+    receipt_email.raw_text = FakeFileIO.new("#{id}_raw_body.txt", (@email.raw_body || ""))
+    receipt_email.raw_html = FakeFileIO.new("#{id}_raw_html.txt", (@email.raw_html || ""))
+    receipt_email.raw_header = FakeFileIO.new("#{id}_raw_headers.txt", (@email.raw_headers || ""))
     receipt_email.save
     if @email.attachments.any?
       @email.attachments.each do |attachment|
