@@ -40,6 +40,8 @@ class BankTransfer::PaymentRequest::Review::Reject < BankTransfer::PaymentReques
                                          action_id: BankPaymentRequestCommentAction.id_for(:reject),
                                          note: rejection_note
 
+    Event::EBankPaymentRequest::Reject.(user, bank_payment_request: bank_payment_request)
+
     add_message :success, "Payment Request successfully rejected"
   end
 end

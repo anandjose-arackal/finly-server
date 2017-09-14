@@ -12,11 +12,8 @@ class Event::EBankPaymentRequest::Unapprove < Event::EBankPaymentRequest::Base
     [self.bank_payment_request.controlling_user, self.bank_payment_request.bank_payment_request_trails.last.modified_user]
   end
 
-  def send_push_notification(user)
-    return if user.id == bank_payment_request.controlling_user_id
-    message = "#{self.bank_payment_request.controlling_user.name} unapproved the Payment Order: #{self.bank_payment_request.name}"
-    view = UserRole.name_for(self.bank_payment_request.bank_payment_request_trails.last.modified_user_role_id)
-    GcmMessenger.push user, bank_payment_request_id: self.bank_payment_request.id, message: message, event_id: event_id, view: view
+  def notification_affected_users
+    [self.bank_payment_request.bank_payment_request_trails.last.modified_user]
   end
 
   def set_notification(user)

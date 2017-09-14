@@ -55,6 +55,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     bank_payment_request.comments.create user_id: user.id,
                                          action_id: BankPaymentRequestCommentAction.id_for(:credit)
 
+    Event::EBankPaymentRequest::Credit.(user, bank_payment_request: bank_payment_request)
+
     add_message :success, "Payment Order credit initiated!"
   end
 

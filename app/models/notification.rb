@@ -68,7 +68,7 @@ class Notification < ActiveRecord::Base
         object = "Finly Money"
       when "Payment"
         object = "Cash"
-      when "PaymentOrder"
+      when "PaymentOrder", "Payment Order"
         object = "Payment Order"
       else
         # do nothing
@@ -320,7 +320,7 @@ class Notification < ActiveRecord::Base
     view = ""
 
     # now depending on the object type, the URL will be loaded
-    if object_type == "PaymentOrder" || object_type = "Payment Order"
+    if self.object_type == "PaymentOrder" || self.object_type == "Payment Order"
       case view_role_id
         when 3
           view = "\"reviewer\""
@@ -331,7 +331,7 @@ class Notification < ActiveRecord::Base
         else
           view = "\"initiator\""
       end
-      suffix = "/params={\"view\":#{view}"
+      suffix = "/params={\"view\":#{view},\"ref\":1,\"n_id\":#{self.id}"
       path = ""
     else
       case view_role_id

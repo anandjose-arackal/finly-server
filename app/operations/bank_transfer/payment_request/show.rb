@@ -37,7 +37,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       self.bank_payment_request = params[:payment_request]
       self.payment_order = bank_payment_request.payment_order
       self.bank_wallet_balance = AccountManager::Balance::Check.(user.bank_wallet).balance rescue 0
-      self.actions = retrieve_actions
       self.manager = User::Team::Approver.(bank_payment_request.owner, payment_request: bank_payment_request, type: :manager)
       self.finance_manager = User::Team::Approver.(bank_payment_request.owner, payment_request: bank_payment_request, type: :finance_manager)
       self.associated_users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.bank_payment_request.controlling_user) rescue []
@@ -45,6 +44,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         self.manager = associated_users.include?(manager) ? manager : nil
         self.finance_manager = associated_users.include?(finance_manager) ? finance_manager : nil
       end
+      self.actions = retrieve_actions
     end
 
     def retrieve_actions
@@ -190,7 +190,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                 type: 7
             }
           end
-        elsif associated_users.include?(user)
+        elsif associated_users&.include?(user)
           actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         elsif bank_payment_request.scheduled?
           # if the payment request is scheduled, give the option to cancel it here

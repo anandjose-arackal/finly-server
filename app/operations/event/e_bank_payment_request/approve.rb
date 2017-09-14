@@ -5,7 +5,7 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
   def init
     super
     self.approving_user = self.bank_payment_request.bank_payment_request_trails.last.action_user
-    self.approved = (self.bank_payment_request.approved? || self.bank_payment_request.closed?) ? true : false
+    self.approved = (self.bank_payment_request.approved? || self.bank_payment_request.credited?) ? true : false
     self.auto_approve = params[:approve]
   end
 
@@ -22,9 +22,9 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
       if auto_approve
         return [self.bank_payment_request.owner]
       end
-      [self.bank_payment_request.bank_payment_request_trails.last.action_user, self.bank_payment_request.owner]
+      [self.bank_payment_request.owner]
     else
-      [self.bank_payment_request.bank_payment_request_trails.last.action_user, self.bank_payment_request.controlling_user]
+      [self.bank_payment_request.controlling_user]
     end
   end
 

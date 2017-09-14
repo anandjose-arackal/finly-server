@@ -4,7 +4,7 @@ class Event::EBankPaymentRequest::Reject < Event::EBankPaymentRequest::Base
 
   def init
     super
-    self.rejecting_user = self.report.tracks.last.action_user rescue nil
+    self.rejecting_user = self.bank_payment_request.bank_payment_request_trails.last.action_user rescue nil
   end
 
   def validate
@@ -15,33 +15,27 @@ class Event::EBankPaymentRequest::Reject < Event::EBankPaymentRequest::Base
   end
 
   def event_id
-    NotifierType.id_for(:report_reject)
+    NotifierType.id_for(:bank_payment_request_reject)
   end
 
   def action_name
-    "Report Rejected"
+    "Payment Order Rejected"
   end
 
   def affected_users
-    Report::AssociatedUsers.(self.user, report: self.report, user_before: self.user)
-  end
-
-  def send_push_notification(user)
-    return unless user.id == report.user_id
-    message = "#{rejecting_user.name} rejected the report: #{self.report.name}"
-    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
+    BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request, user_before: self.user)
   end
 
   def set_notification(user)
-    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+    self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
     notification = user.notifications.build(user: user,
-                                            notification_type_id: NotificationType.id_for(:report),
+                                            notification_type_id: NotificationType.id_for(:bank_payment_request),
                                             action_type_id: NotificationActionType.id_for(:notify_reject),
-                                            action_user_id: report.tracks.last.action_user.id,
-                                            object_id: report.id,
-                                            object_type: "Report",
-                                            path_object_id: report.id,
-                                            path_object_type: "Report",
+                                            action_user_id: bank_payment_request.bank_payment_request_trails.last.action_user.id,
+                                            object_id: bank_payment_request.id,
+                                            object_type: "PaymentOrder",
+                                            path_object_id: bank_payment_request.id,
+                                            path_object_type: "PaymentOrder",
                                             read: false,
                                             timestamp: DateUtils.local_date_time,
                                             view_role_id: roles.first,
@@ -51,23 +45,23 @@ class Event::EBankPaymentRequest::Reject < Event::EBankPaymentRequest::Base
   end
 
   def mailer_subject(user)
-    unless user == self.rejecting_user
-      "#{rejecting_user.name} has rejected the report: #{self.report.name}"
+    if user == self.rejecting_user
+      "You rejected the Payment Order : #{self.bank_payment_request.name}"
     else
-      "You rejected the report : #{self.report.name}"
+      "#{rejecting_user.name} has rejected the Payment Order: #{self.bank_payment_request.name}"
     end
   end
 
   def mailer_body(user)
-    unless user == self.rejecting_user
-      "#{rejecting_user.name} has rejected the report: '#{self.report.name}'"
+    if user == self.rejecting_user
+      "You have rejected the Payment Order : #{self.bank_payment_request.name}"
     else
-      "You have rejected the report : #{self.report.name}"
+      "#{rejecting_user.name} has rejected the Payment Order: '#{self.bank_payment_request.name}'"
     end
   end
 
-  def report_view_role(user)
-    self.roles = Report::ActionUserRole.(user, {report: report, user_id: user.id})
+  def bank_payment_request_view_role(user)
+    self.roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
     return roles.first
   end
 end

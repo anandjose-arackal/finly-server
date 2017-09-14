@@ -38,6 +38,8 @@ class BankTransfer::PaymentRequest::Review::ApproveAndForward < BankTransfer::Pa
                                          forwarded_to_user_id: self.forwarded_to_user.id,
                                          note: self.forwarded_note
 
+
+
     add_message :success, "Forwarded to #{forwarded_to_user.name}"
   end
 end

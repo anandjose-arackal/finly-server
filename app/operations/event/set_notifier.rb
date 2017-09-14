@@ -64,7 +64,6 @@ class Event::SetNotifier < Event::Base
 
     # sending notifications
     users = notification_affected_users
-    debugger
     if users.present?
       users.each do |user|
         next if user.blank? # or not user.is_a?(User)
