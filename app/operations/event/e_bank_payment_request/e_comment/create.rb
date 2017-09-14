@@ -1,4 +1,4 @@
-class Event::EBankPaymentRequest::Comment::Create < Event::EBankPaymentRequest::Base
+class Event::EBankPaymentRequest::EComment::Create < Event::EBankPaymentRequest::Base
 
 
 end

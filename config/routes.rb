@@ -131,7 +131,7 @@
 #                                                         PATCH  /api/v1/reports/:id(.:format)                                                   api/v1/reports#update
 #                                                         PUT    /api/v1/reports/:id(.:format)                                                   api/v1/reports#update
 #                                                         DELETE /api/v1/reports/:id(.:format)                                                   api/v1/reports#destroy
-#                                           api_v1_credit PATCH  /api/v1/money_requests/credit_cash(.:format)                                    api/v1/money_requests#credit_cash
+#                                           api_v1_credit PATCH  /api/v1/money_requests/credit_cash(.:format)                                    api/v1/money_request#credit_cash
 #                                   api_v1_money_requests GET    /api/v1/money_requests(.:format)                                                api/v1/money_requests#index
 #                                                         POST   /api/v1/money_requests(.:format)                                                api/v1/money_requests#create
 #                                    api_v1_money_request GET    /api/v1/money_requests/:id(.:format)                                            api/v1/money_requests#show
@@ -254,7 +254,7 @@
 #                                                         PATCH  /mobile/v1/reports/:id(.:format)                                                mobile/v1/reports#update
 #                                                         PUT    /mobile/v1/reports/:id(.:format)                                                mobile/v1/reports#update
 #                                                         DELETE /mobile/v1/reports/:id(.:format)                                                mobile/v1/reports#destroy
-#                                        mobile_v1_credit PATCH  /mobile/v1/money_requests/credit_cash(.:format)                                 mobile/v1/money_requests#credit_cash
+#                                        mobile_v1_credit PATCH  /mobile/v1/money_requests/credit_cash(.:format)                                 mobile/v1/money_request#credit_cash
 #                                mobile_v1_money_requests GET    /mobile/v1/money_requests(.:format)                                             mobile/v1/money_requests#index
 #                                                         POST   /mobile/v1/money_requests(.:format)                                             mobile/v1/money_requests#create
 #                                 mobile_v1_money_request GET    /mobile/v1/money_requests/:id(.:format)                                         mobile/v1/money_requests#show
@@ -572,9 +572,9 @@
 #                                                         PUT    /reports/:id(.:format)                                                          reports#update
 #                                                         DELETE /reports/:id(.:format)                                                          reports#destroy
 #                                    reports_bulk_approve POST   /reports/bulk_approve(.:format)                                                 reports#bulk_approve
-#                                                  credit PATCH  /money_requests/credit_cash(.:format)                                           money_requests#credit_cash
+#                                                  credit PATCH  /money_requests/credit_cash(.:format)                                           money_request#credit_cash
 #                                     money_request_index GET    /money_request(.:format)                                                        money_request#index
-#                                                         POST   /money_request(.:format)    ''                                                    money_request#create
+#                                                         POST   /money_request(.:format)                                                        money_request#create
 #                                           money_request GET    /money_request/:id(.:format)                                                    money_request#show
 #                                                         PATCH  /money_request/:id(.:format)                                                    money_request#update
 #                                                         PUT    /money_request/:id(.:format)                                                    money_request#update

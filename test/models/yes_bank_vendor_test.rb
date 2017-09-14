@@ -9,6 +9,7 @@
 #  updated_at    :datetime         not null
 #  email         :string(255)
 #  mobile_number :string(255)
+#  authorized    :boolean
 #
 
 require 'test_helper'

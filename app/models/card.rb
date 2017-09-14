@@ -23,6 +23,7 @@
 #  card_status_id           :integer          not null
 #  is_deleted               :boolean          default(FALSE)
 #  hotlisted                :boolean          default(FALSE)
+#  card_processor_status    :string(255)
 #
 
 class Card < ActiveRecord::Base

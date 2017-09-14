@@ -1,4 +1,4 @@
-class Event::BankPaymentRequest::Reject <Event::BankPaymentRequest::Base
+class Event::EBankPaymentRequest::Reject < Event::EBankPaymentRequest::Base
 
   attr_accessor :rejecting_user, :roles
 
