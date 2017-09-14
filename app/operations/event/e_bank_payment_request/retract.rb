@@ -33,6 +33,7 @@ class Event::EBankPaymentRequest::Retract < Event::EBankPaymentRequest::Base
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: roles.first,
                                              application: RequestStore.store[:current_app])
+    debugger
     notification.save
   end
 

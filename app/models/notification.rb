@@ -264,9 +264,11 @@ class Notification < ActiveRecord::Base
         if action_type_id == NotificationActionType.id_for(:notify_awaiting_approval)
           object_name += " and is awaiting your further approval"
         end
-      when "PaymentOrder"
+      when "PaymentOrder", "Payment Order"
         if action_type_id == NotificationActionType.id_for(:notify_credit)
           object = " against your payment order"
+        else
+          object = " payment order"
         end
         bpr = BankPaymentRequest.unscoped.find_by(id: self.object_id)
         object_name = " : \"#{bpr.name}\""
@@ -316,18 +318,36 @@ class Notification < ActiveRecord::Base
 
     # base = Constants::BASE_URL
     view = ""
-    case view_role_id
-      when 3
-        view = "\"manager\""
-      when 2
-        view = "\"finance_manager\""
-      when 1
-        view = "\"admin\""
-      else
-        view = "\"personal\""
+
+    # now depending on the object type, the URL will be loaded
+    if object_type == "PaymentOrder" || object_type = "Payment Order"
+      case view_role_id
+        when 3
+          view = "\"reviewer\""
+        when 2
+          view = "\"creditor\""
+        when 1
+          view = "\"admin\""
+        else
+          view = "\"initiator\""
+      end
+      suffix = "/params={\"view\":#{view}"
+      path = ""
+    else
+      case view_role_id
+        when 3
+          view = "\"manager\""
+        when 2
+          view = "\"finance_manager\""
+        when 1
+          view = "\"admin\""
+        else
+          view = "\"personal\""
+      end
+      suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id}"
+      path = ""
     end
-    suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id}"
-    path = ""
+
     case self.path_object_type
       when "Report"
         path_object = Report.unscoped.find_by(id: self.path_object_id)
@@ -363,6 +383,13 @@ class Notification < ActiveRecord::Base
           # do nothing
         else
           path = "employees"
+        end
+      when "PaymentOrder", "Payment Order"
+        path_object = BankPaymentRequest.unscoped.find_by(id: self.path_object_id)
+        if path_object.blank?
+          path = "orders"
+        else
+          path = "orders/#{self.path_object_id}"
         end
       else
         # do nothing

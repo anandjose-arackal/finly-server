@@ -1,6 +1,6 @@
 class BankTransfer::PaymentRequest::ActionUserRole < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :selected_user_id, :roles, :user_before
+  attr_accessor :selected_user_id, :roles, :user_before, :bank_payment_request
 
   def pre_validate
     unless user.present?
