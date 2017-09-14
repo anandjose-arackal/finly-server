@@ -150,7 +150,7 @@ class Expense::Manual::Split < Expense::Manual::Base
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
-    CustomField::SetFields.(expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
+    CustomField::SetFields.(expense.sub_expense, FieldParentType.id_for(:manual_expense), custom_fields)
   end
 
   def expense_type_id
