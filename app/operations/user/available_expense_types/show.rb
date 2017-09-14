@@ -104,6 +104,7 @@ class User::AvailableExpenseTypes::Show < User::Base
     configurations = user.company.field_configurations.exclude_deleted
     self.custom_fields_config = {}
     self.custom_fields_config[:manual_expense] = configurations.with_parent_type(FieldParentType.id_for(:manual_expense))
+    self.custom_fields_config[:card_expense] = configurations.with_parent_type(FieldParentType.id_for(:card_expense))
     self.custom_fields_config[:distance_expense] = configurations.with_parent_type(FieldParentType.id_for(:distance_expense)) if distance_config[:enabled]
     self.custom_fields_config[:time_expense] = configurations.with_parent_type(FieldParentType.id_for(:time_expense)) if time_config[:enabled]
     self.custom_fields_config[:per_diem_expense] = configurations.with_parent_type(FieldParentType.id_for(:per_diem_expense)) if per_diem_config[:enabled]

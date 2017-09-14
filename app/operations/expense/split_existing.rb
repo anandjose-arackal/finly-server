@@ -19,6 +19,9 @@ class Expense::SplitExisting < Expense::Manual::Split
       self.existing_expense = user.expenses.find_by_id(params[:expense_id])
     end
     return unless self.existing_expense.present?
+    if self.existing_expense.card_expense? and params&.dig(:expense, :card_expense_attributes).present?
+      params[:expense][:card_expense_attributes][:card_transaction_id] = self.existing_expense.card_expense&.card_transaction_id
+    end
     super
   end
 
@@ -62,7 +65,6 @@ class Expense::SplitExisting < Expense::Manual::Split
     self.existing_expense.update(is_deleted: true, deleted_to_split: true, split_link: self.split_link)
   end
 
-  protected
   def expense_type_id
     self.existing_expense&.expense_type_id
   end
