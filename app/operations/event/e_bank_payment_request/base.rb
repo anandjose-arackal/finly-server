@@ -32,7 +32,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     return unless params[:subject].present? && params[:body].present?
     # BankPaymentRequestMailer.delay.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestPresenter.new(user, params))
     # todo - temporary, for testing. Will be moved to delay before production
-    BankPaymentRequestMailer.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestPresenter.new(user, params))
+    BankPaymentRequestMailer.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)
@@ -44,6 +44,10 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
   end
 
   def mailer_button_name
+
+  end
+
+  def bank_payment_request_view_role(user)
 
   end
 
@@ -59,7 +63,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
   class Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter < Event::SetNotifier::MailerPresenter
 
     attr_accessor :bank_payment_request, :action_name, :subject_val, :body_val,
-                  :event_id, :company, :view_role
+                  :event_id, :company, :view_role_id, :view_url
 
     def init
       self.bank_payment_request = params[:bank_payment_request]
@@ -89,7 +93,20 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     end
 
     def generate_view_url
-
+      view = ""
+      case view_role_id
+        when 4, '4' # i.e. initiator
+          view = "initiator"
+        when 3, '3' # i.e. reviewer
+          view = "reviewer"
+        when 2, '2' # i.e. creditor
+          view = "creditor"
+        when 1, '1' # i.e. admin
+          view = "admin"
+        else
+          view = "initiator"
+      end
+      url = "#{Constants::BASE_URL_VP}orders/#{bank_payment_request.id}/params={\"view\":\"#{view}\"}"
     end
 
   end

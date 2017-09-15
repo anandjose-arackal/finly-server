@@ -51,4 +51,8 @@ class Event::EBankPaymentRequest::Credit < Event::EBankPaymentRequest::Base
     end
   end
 
+  def bank_payment_request_view_role
+    return UserRole.id_for(:initiator)
+  end
+
 end

@@ -76,25 +76,33 @@ module Constants
     # url = "http://192.168.81.157:3000/#"
     url = "http://localhost/#"
     authorizer_url = "http://localhost/authorizer#"
+    vendor_payments_url = "http://localhost/payments#"
   elsif Rails.env.staging?
     url = "http://staging.finly.io/#"
     authorizer_url = "http://staging.finly.io/authorizer#"
+    vendor_payments_url = "http://staging.finly.io/payments#"
   elsif Rails.env.itzcash_uat?
     url = "http://demo.finly.io/#"
     authorizer_url = "http://demo.finly.io/authorizer#"
+    vendor_payments_url = "http://demo.finly.io/payments#"
   elsif Rails.env.local_vm?
     url = "http://192.168.56.101/#"
     authorizer_url = "http://192.168.56.101/authorizer#"
+    vendor_payments_url = "http://192.168.56.101/payments#"
   elsif Rails.env.production?
     url = "https://www.finly.io/#"
     authorizer_url = "https://www.finly.io/authorizer#"
+    vendor_payments_url = "http://www.finly.io/payments#"
   else
     url = ""
     authorizer_url = ""
+    vendor_payments_url = ""
   end
 
   BASE_URL = url
   BASE_URL_AUTHORIZER = authorizer_url
+  BASE_URL_VP = vendor_payments_url
+
 
   DEFAULT_PASSWORD = "lqskmclkmsal1k"
 

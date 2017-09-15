@@ -49,4 +49,12 @@ class Event::EBankPaymentRequest::Submit < Event::EBankPaymentRequest::Base
     end
   end
 
+  def bank_payment_request_view_role(user)
+    if user.id == bank_payment_request.controlling_user_id
+      return UserRole.id_for(:initiator)
+    else
+      return bank_payment_request.controlling_user_role_id
+    end
+  end
+
 end
