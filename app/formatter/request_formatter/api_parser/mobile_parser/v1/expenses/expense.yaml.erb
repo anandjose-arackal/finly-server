@@ -37,6 +37,10 @@ expense:
       value: <%= params[:time] %>
       physical_unit_id: <%= PhysicalUnit.hour_id %>
     <% end %>
+  <% elsif type == '5' or type == 5 %>
+  per_diem_expense_attributes:
+    per_diem_id: <%= params[:per_diem_id] %>
+    quantity: <%= params[:quantity] %>
   <% end %>
   <% if params[:amount].present? %>
   amount_attributes:

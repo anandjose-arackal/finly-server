@@ -65,6 +65,13 @@ class Expense::Manual::Split < Expense::Manual::Base
       expense.split_link = self.split_link
       if expense.save and self.receipt.present?
         expense.receipts << expense.receipts.create(image: self.receipt.image, user: expense.user)
+
+        # calculate the equivalent amount in all currencies in the amounts table
+        if expense.date == DateUtils.local_date
+          expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+        else
+          expense.update_other_currencies
+        end
       end
     end
     if self.receipt.present?
@@ -82,7 +89,7 @@ class Expense::Manual::Split < Expense::Manual::Base
     base_params = params.require(:expense).permit(:expense_type_id, :expense_status_id,
                                                   :report_id, :reimbursable, :date,
                                                   manual_expense_attributes: [:merchant],
-                                                  card_expense_attributes: [:merchant, :card_transaction_id],
+                                                  card_expense_attributes: [:editable_merchant, :card_transaction_id],
                                                   receipts_attributes: [:image],
                                                   receipt_email_attributes: [:source, :email_id, :sender, :raw_html,
                                                                              :subject, :sent_at, :body,
@@ -132,7 +139,7 @@ class Expense::Manual::Split < Expense::Manual::Base
         end
         return
       end
-      valid = CustomField::Validate.(expense.manual_expense)
+      valid = CustomField::Validate.(expense.sub_expense)
       unless valid.success?
         valid.messages[:error]&.each do |error|
           add_message :error, "Split #{(index)}: #{error}"
@@ -150,7 +157,20 @@ class Expense::Manual::Split < Expense::Manual::Base
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
-    CustomField::SetFields.(expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
+    parent_type = nil
+    case expense.expense_type_id
+      when ExpenseType.id_for(:manual)
+        parent_type = :manual_expense
+      when ExpenseType.id_for(:card)
+        parent_type = :card_expense
+      when ExpenseType.id_for(:distance)
+        parent_type = :distance_expense
+      when ExpenseType.id_for(:time)
+        parent_type = :time_expense
+      when ExpenseType.id_for(:per_diem)
+        parent_type = :per_diem_expense
+    end
+    CustomField::SetFields.(expense.sub_expense, FieldParentType.id_for(parent_type), custom_fields)
   end
 
   def expense_type_id
