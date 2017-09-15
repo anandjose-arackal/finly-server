@@ -15,16 +15,22 @@ class DistanceExpense < ActiveRecord::Base
 
   belongs_to :expense
   belongs_to :distance
+  belongs_to :maps_distance, class_name: 'Distance'
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :locations, as: :locatable, dependent: :destroy
 
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :locations
   accepts_nested_attributes_for :distance
+  accepts_nested_attributes_for :maps_distance
 
   validates :distance, presence: true
 
-  delegate :distance_value, to: :distance
+  delegate :distance_value, to: :distance, allow_nil: true
+
+  def maps_distance_value
+    maps_distance&.value
+  end
 
   # returns an array of all the associated custom field's names
   def custom_field_names
