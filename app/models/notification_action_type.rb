@@ -38,7 +38,8 @@ class NotificationActionType < ActiveRecord::Base
              notify_quickbooks_sync_success: 24,
              notify_quickbooks_sync_failure: 25,
              notify_quickbooks_sync_partial_success: 26,
-             notify_forward: 27
+             notify_forward: 27,
+             notify_credit_confirmation: 28
             }
 
   self.class.instance_eval do

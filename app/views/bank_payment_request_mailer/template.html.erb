@@ -14,12 +14,12 @@
       <div style="text-align: center;">
         <a href="<%=@data.view_url%>" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
             border-radius: 2px;
-            text-decoration: none;">View Report</a>
+            text-decoration: none;">View Payment Order</a>
       </div>
 
       <br/><br/>
 
-      <% if @data.event_id == NotifierType.id_for(:bank_payment_request_credit) %>
+      <% if @data.event_id == NotifierType.id_for(:bank_payment_request_credit_confirm) %>
         <div style="text-align: right; padding-right: 3%;">
           <label style="font-size: 20px; font-weight: bold;">Credited Amount&nbsp;:&nbsp;<%= @data.bank_payment_request.payment_order.amount_processed&.value%></label>
         </div>
@@ -37,7 +37,6 @@
           </div>
       <% end %>
       <br>
-
 
       <%= render 'payments' %>
 
