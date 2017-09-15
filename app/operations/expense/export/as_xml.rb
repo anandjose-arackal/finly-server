@@ -26,7 +26,7 @@ class Expense::Export::AsXml < Expense::Export::Base
   end
 
   def post_process
-    self.file_name = 'export'
+    self.file_name = 'export.xls'
   end
 
   def success

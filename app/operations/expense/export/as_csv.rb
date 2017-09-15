@@ -46,7 +46,7 @@ class Expense::Export::AsCsv < Expense::Export::Base
     # end
     # self.report_names = names.to_sentence
     # todo add time stamp to file name
-    self.file_name = 'export'
+    self.file_name = 'export.csv'
   end
 
   def success
