@@ -11,25 +11,6 @@
       <p style="font-size: 17px; margin-left: 3%;text-align: left"><%=@data.body_val.html_safe%></p>
       <br>
 
-      <!--<% #if @data.event_id == NotifierType.id_for(:report_comment) %>-->
-          <!--<div style="height: 50px; width: 96.5%; margin: auto; display: table; border-left: 2px solid #dcdcdc;">-->
-            <!--<p style="display: table-cell; vertical-align: middle; padding-left: 3%;text-align: left"><%=@data.comment_body%></p>-->
-          <!--</div><br>-->
-      <!--<% #end %>-->
-
-      <!--<% #if @data.action_url %>-->
-          <!--<div style="text-align: center;">-->
-            <a href="<%=#@data.action_url%>" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
-                /*border-radius: 2px;*/
-                text-decoration: none;">Review Report</a>
-          <!--</div>-->
-      <!--<% #else %>-->
-          <!--<div style="text-align: center;">-->
-            <a href="<%=#@data.view_url%>" style="height: 33px; width: 200px; background-color: #3adb76; color: white; border: none; font-size: 16px;padding: 10px 20px;
-                /*border-radius: 2px;*/
-                text-decoration: none;">View Report</a>
-          <!--</div>-->
-      <!--<% #end %>-->
 
       <br>
       <!-- <h3>Report Total:<span>&#8377;</span></h3> -->
@@ -40,13 +21,6 @@
       <% end %>
       <br>
 
-      <!--<% #if @data.event_id == NotifierType.id_for(:report_comment)%>-->
-          <!--&lt;!&ndash; do nothing &ndash;&gt;-->
-      <!--<% #elsif @data.event_id == NotifierType.id_for(:report_expense_reject) %>-->
-          <!--<%= #render 'rejected_expense' %>-->
-      <!--<% #else %>-->
-          <!--<%= #render 'expenses' %>-->
-      <!--<% #end %>-->
 
       <%= render 'payments' %>
 

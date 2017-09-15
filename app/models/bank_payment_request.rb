@@ -136,6 +136,10 @@ class BankPaymentRequest < ActiveRecord::Base
     self.status.name&.to_s
   end
 
+  def total_amount
+    self.requested_amount.value
+  end
+
   private
 
   def generate_name
