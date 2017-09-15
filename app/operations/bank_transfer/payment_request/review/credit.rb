@@ -3,7 +3,7 @@
 
 class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentRequest::Review::Base
 
-  attr_accessor :initiating_account, :initiating_account_adapter
+  attr_accessor :initiating_account, :initiating_account_adapter, :view_role
 
   def pre_validate
     super
@@ -21,6 +21,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     super
     self.initiating_account = retrieve_initiating_account
     self.initiating_account_adapter = retrieve_initiating_account_adapter
+    self.view_role = UserRole.id_for(params[:view].to_sym)
   end
 
   def validate
@@ -47,7 +48,11 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       # update the bank_payment_request to credited
       bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
       # create a trail to show that the BPR was credited
-      # todo
+      bank_payment_request.bank_payment_request_trails.create action_user: user,
+                                                              action_user_role_id: self.view_role,
+                                                              action_id: BankPaymentRequestTrailAction.id_for(:credit),
+                                                              modified_user_id: nil,
+                                                              modified_user_role_id: nil
     else
       add_message :error, op.messages[:error]
       bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:failed))
