@@ -1,0 +1,148 @@
+class ItzCash::AccountDetailsItz < ItzCash::Base
+  attr_accessor :card
+
+  def pre_validate
+    # if user.blank? && !params[:unassigned]
+    #   add_message :error, 'User not found'
+    #   return
+    # end
+    if params[:card].blank?
+      add_message :error, 'Card not found'
+    end
+  end
+
+  def env_key
+    'itzcash_account_details'
+  end
+
+  def post_params
+    {serialid: card.serial_id, itzmodule: Constants::ItzCash::MODULE}
+  end
+
+  def init
+    super
+    self.card = params[:card]
+  end
+
+  def success
+    params[:response_code] = parsed_response[0]
+    params[:serial_id] = parsed_response[1]
+    params[:balance] = parsed_response[2].to_d
+    params[:status] = parsed_response[3]
+    params[:suspended_status] = parsed_response[4]
+    params[:rate_group_id] = parsed_response[5]
+    params[:distributor_id] = parsed_response[6]
+    params[:charge_code] = parsed_response[7]
+    params[:product_code] = parsed_response[8]
+    params[:available_card_eligibility] = parsed_response[9].to_d
+    params[:description] = parsed_response[10]
+    update_card
+    params[:card] = card
+    ItzCash::AccountDetails::SuccessPresenter.new(self.user, self.params, self.messages)
+  end
+
+  class ItzCash::AccountDetails::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
+    attr_accessor :response_code, :serial_id, :balance, :status_code, :suspended_status, :rate_group_id,
+                  :distributor_id, :charge_code, :product_code, :description, :available_card_eligibility,
+                  :card
+
+    def init
+      self.response_code =params[:response_code]
+      self.serial_id = params[:serial_id]
+      self.balance = params[:balance]
+      self.status_code = params[:status]
+      self.suspended_status = params[:suspended_status]
+      self.rate_group_id = params[:rate_group_id]
+      self.distributor_id = params[:distributor_id]
+      self.charge_code = params[:charge_code]
+      self.product_code = params[:product_code]
+      self.available_card_eligibility = params[:available_card_eligibility]
+      self.description = params[:description]
+      self.card = params[:card]
+    end
+
+    def status
+      if self.status_code.present?
+        return Constants::ItzCash::CARD_STATUS_CODE[self.status_code.to_sym]
+      end
+      nil
+    end
+
+    def assigned?
+      if distributor_id == card.user&.company.d_code
+        return true
+      end
+      false
+    end
+
+    def upgraded?
+      return false unless assigned?
+      bal = (self.balance or 0)
+      eligibility = (self.available_card_eligibility or 0)
+      (bal + eligibility) > 25000
+    end
+
+  end
+
+  protected
+
+
+  protected
+  def update_card
+    update_assign_status
+    update_suspend_status
+    update_balances
+  end
+
+  # This checks if a card has in assigned or upgraded
+  def update_assign_status
+    status = :unassigned
+    if card.user_id.present?
+      status = :assign_requested
+      if params[:distributor_id] == card.user.company.d_code
+        status = :assigned
+        balance = (params[:balance] or 0)
+        eligibility = (params[:available_card_eligibility] or 0)
+        if balance + eligibility > 21000
+          status = :upgraded
+        elsif KycStatus.ids_for([:submitted, :processing, :approved, :completed]).include?(card.user.individual_kyc.kyc_status_id)
+          status = :upgrade_requested
+        end
+      end
+    end
+    status_id = CardStatus.id_for(status)
+    unless card.card_status_id == status_id
+      card.update(card_status_id: status_id)
+    end
+    if status == :upgraded and card.user.individual_kyc.kyc_status_id != KycStatus.id_for(:completed)
+      card.user.individual_kyc.update(kyc_status_id: KycStatus.id_for(:completed))
+    end
+  end
+
+  # This checks if a card has in blocked at itzcash or at YSE
+  def update_suspend_status
+    if params[:suspended_status] == 'Y'
+      # attributes_to_update[:active] = false if card.active
+      update_params[:active] = false if card.active
+    elsif params[:suspended_status] == 'N'
+      # attributes_to_update[:active] = true if card.active
+      update_params[:active] = true unless card.active
+    end
+    card.update update_params if update_params.present?
+  end
+
+  # This sets the balances in the card
+  def update_balances
+    if card.card_balance.blank?
+      id = Amount.create(value: 0, currency_id: Currency.first.id).id
+      card.update_attributes(card_balance_id: id)
+    end
+    if card.card_eligibility.blank?
+      id = Amount.create(value: 0, currency_id: Currency.first.id).id
+      card.update_attributes(card_eligibility_id: id)
+    end
+    card.card_balance.update_attributes(value: params[:balance])
+    card.card_eligibility.update_attributes(value: params[:available_card_eligibility])
+  end
+
+end

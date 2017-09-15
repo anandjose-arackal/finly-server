@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170904151023) do
+ActiveRecord::Schema.define(version: 20170912102552) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -746,6 +746,7 @@ ActiveRecord::Schema.define(version: 20170904151023) do
     t.integer  "card_status_id",           limit: 4,                     null: false
     t.boolean  "is_deleted",                             default: false
     t.boolean  "hotlisted",                              default: false
+    t.string   "card_processor_status",    limit: 255
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -1411,6 +1412,7 @@ ActiveRecord::Schema.define(version: 20170904151023) do
     t.boolean  "reimbursable",                         default: true
     t.boolean  "synced_with_quickbooks"
     t.string   "split_link",             limit: 255
+    t.boolean  "deleted_to_split",                     default: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree

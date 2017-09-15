@@ -27,7 +27,7 @@ class Expense::Manual::Split < Expense::Manual::Base
     # checking if the report is editable for personal view
     if personal_view? and params.dig(:expense, :report_id).present?
       report = user.reports.find_by(id: params.dig(:expense, :report_id))
-      unless report&.editable?
+      unless report&.editable? or (report.controlling_user_id == user.id and report.processing?)
         add_message :error, 'Expense cannot be added to the report in this state'
       end
     end
@@ -51,6 +51,8 @@ class Expense::Manual::Split < Expense::Manual::Base
         unless has_errors?
           self.expenses << expense
         end
+      else
+        self.expenses << expense
       end
       return if has_errors?
     end
@@ -71,6 +73,13 @@ class Expense::Manual::Split < Expense::Manual::Base
       expense.split_link = self.split_link
       if expense.save and self.receipt.present?
         expense.receipts << expense.receipts.create(image: self.receipt.image, user: expense.user)
+
+        # calculate the equivalent amount in all currencies in the amounts table
+        if expense.date == DateUtils.local_date
+          expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+        else
+          expense.update_other_currencies
+        end
       end
     end
     if self.receipt.present?
@@ -88,6 +97,7 @@ class Expense::Manual::Split < Expense::Manual::Base
     base_params = params.require(:expense).permit(:expense_type_id, :expense_status_id,
                                                   :report_id, :reimbursable, :date,
                                                   manual_expense_attributes: [:merchant],
+                                                  card_expense_attributes: [:editable_merchant, :card_transaction_id],
                                                   receipts_attributes: [:image],
                                                   receipt_email_attributes: [:source, :email_id, :sender, :raw_html,
                                                                              :subject, :sent_at, :body,
@@ -95,10 +105,11 @@ class Expense::Manual::Split < Expense::Manual::Base
 
     # Set custom Fields
     base_custom_fields = (params[:custom_fields] or params[:expense][:custom_fields] or {})
-    base_params[:expense_type_id] = ExpenseType.id_for(:manual)
+    base_params[:expense_type_id] = expense_type_id
     # Keep a copy of the receipt to be attached. Create images for each expenses from the receipt and finally destroy the receipt
-    if params&.dig(:expense, :receipt_id).present?
-      self.receipt = user.receipts.find_by_id(params&.dig(:expense, :receipt_id))
+    receipt_id = self.receipt_id
+    if receipt_id.present?
+      self.receipt = user.receipts.find_by_id(receipt_id)
     elsif base_params[:receipts_attributes].present?
       base_params[:receipts_attributes][:user_id] = user.id
     end
@@ -136,7 +147,7 @@ class Expense::Manual::Split < Expense::Manual::Base
         end
         return
       end
-      valid = CustomField::Validate.(expense.manual_expense)
+      valid = CustomField::Validate.(expense.sub_expense)
       unless valid.success?
         valid.messages[:error]&.each do |error|
           add_message :error, "Split #{(index)}: #{error}"
@@ -154,7 +165,28 @@ class Expense::Manual::Split < Expense::Manual::Base
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
-    CustomField::SetFields.(expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
+    parent_type = nil
+    case expense.expense_type_id
+      when ExpenseType.id_for(:manual)
+        parent_type = :manual_expense
+      when ExpenseType.id_for(:card)
+        parent_type = :card_expense
+      when ExpenseType.id_for(:distance)
+        parent_type = :distance_expense
+      when ExpenseType.id_for(:time)
+        parent_type = :time_expense
+      when ExpenseType.id_for(:per_diem)
+        parent_type = :per_diem_expense
+    end
+    CustomField::SetFields.(expense.sub_expense, FieldParentType.id_for(parent_type), custom_fields)
+  end
+
+  def expense_type_id
+    ExpenseType.id_for(:manual)
+  end
+
+  def receipt_id
+    (params&.dig(:expense, :receipt_id) or params&.dig(:receipt_id))
   end
 
 end

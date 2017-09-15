@@ -122,11 +122,11 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       add_message :error, set_fields.messages[:error]
       return
     end
-    valid = CustomField::Validate.(self.expense.distance_expense)
-    unless valid.success?
-      add_message :error, valid.messages[:error]
-      return
-    end
+    # valid = CustomField::Validate.(self.expense.distance_expense)
+    # unless valid.success?
+    #   add_message :error, valid.messages[:error]
+    #   return
+    # end
 
     if expense.update(updated_expense_params)
       expense.distance_expense.locations.with_id(locations_marked_for_destruction).destroy_all if self.locations_marked_for_destruction.present?

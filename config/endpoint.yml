@@ -1,7 +1,7 @@
 default: &default
   base_url: "https://staging.itzcash.com"
   itzcash_account_details:
-    base: "http://demo.itzcash.com"
+    base: "https://staging.itzcash.com"
     path: "myaccount/servlet/ItzCashAccountDetailsServlet"
   itzcash_account_details_yse:
     path: "user/servlet/NaradaAccountDetailsServlet"

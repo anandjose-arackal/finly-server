@@ -42,11 +42,17 @@ class User::Summary < User::Base
         item[:id] = card.id
         item[:name] = "#{card.card_program.name} Card"
         item[:card_program] = {name: card.card_program.name, id: card.card_program.id}
-        item[:active] = card.active
-        unless card.active
-          disabled_by_role_name = card.disabled_by_role.name rescue nil
-          disabled_by_user_name = card.disabled_by_user.name rescue nil
-          item[:disabler] = {role: {id: card.disabled_by_role_id, name: disabled_by_role_name}, user: {id: card.disabled_by_user_id, name: disabled_by_user_name}}
+        item[:active] = card.active?
+        item[:suspend_status] = card.suspend_status
+        item[:assign_status] = StringUtils.titleize(card.card_status.name)
+        unless card.active?
+          if card.temporary_block?
+            disabled_by_role_name = card.disabled_by_role.name rescue nil
+            disabled_by_user_name = card.disabled_by_user.name rescue nil
+            item[:disabler] = {role: {id: card.disabled_by_role_id, name: disabled_by_role_name}, user: {id: card.disabled_by_user_id, name: disabled_by_user_name}}
+          else
+            item[:disabler] = nil
+          end
         end
         item[:balance] = balances[:target_user][:card][card.id][:balance] rescue nil
         item[:available_eligibility] = balances[:target_user][:card][card.id][:eligibility] rescue nil
@@ -136,7 +142,7 @@ class User::Summary < User::Base
         eligibility = balances[:current_user][:card][card.id][:balance] rescue nil
         action = {type: :card, id: card.id, name: "#{initiating_user_name}'s #{card.card_program.name} Card",
                   balance: balance, eligibility: eligibility,
-                  show_balance: true, show_eligbility: true, active: card.active}
+                  show_balance: true, show_eligbility: true, active: card.active?}
         card_program = card.card_program
         if personal_transfer
           next unless card_program.personal_wallet_fund_transfer
@@ -168,7 +174,7 @@ class User::Summary < User::Base
 
         action = {type: :card, id: card.id, name: "#{receiving_user_name}'s #{card.card_program.name} Card",
                   balance: balance, eligibility: eligibility, show_balance: show_balance,
-                  show_eligibility: show_eligibility, active: card.active}
+                  show_eligibility: show_eligibility, active: card.active?}
 
         card_program = card.card_program
         # Verify is user is allowed to credit / debit from the card based on the card program
