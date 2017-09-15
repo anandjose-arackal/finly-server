@@ -51,10 +51,11 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
 
   class Event::EBankPaymentRequest::Base::PaymentRequestPresenter < Event::SetNotifier::MailerPresenter
 
-    attr_accessor :bank_payment_request
+    attr_accessor :bank_payment_request, :action_name
 
     def init
       self.bank_payment_request = params[:bank_payment_request]
+      self.action_name = params[:action_name]
     end
 
   end

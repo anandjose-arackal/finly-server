@@ -1,25 +1,23 @@
-<% @data.payments.each do |section| %>
-    <table style="width: 94%; margin: auto;">
-      <tr>
-        <td style="width: 50%; font-size: 20px; font-weight: bold; text-align: left; font-family: Helvetica, Arial, sans-serif;" colspan="2";><%=section[:section_name]%></td>
-        <td style="width: 50%; font-size: 20px; font-weight: bold; text-align: right; font-family: Helvetica, Arial, sans-serif;" colspan="2">Category Total&nbsp;:&nbsp;&#8377;<%=section[:section_total]%></td>
-      </tr>
-    </table><br>
+    <!--<table style="width: 94%; margin: auto;">-->
+      <!--<tr>-->
+        <!--<td style="width: 50%; font-size: 20px; font-weight: bold; text-align: left; font-family: Helvetica, Arial, sans-serif;" colspan="2";><%=section[:section_name]%></td>-->
+        <!--<td style="width: 50%; font-size: 20px; font-weight: bold; text-align: right; font-family: Helvetica, Arial, sans-serif;" colspan="2">Category Total&nbsp;:&nbsp;&#8377;<%=section[:section_total]%></td>-->
+      <!--</tr>-->
+    <!--</table><br>-->
 
-    <table style="width: 94%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
-      <tr style="background-color: #dcdcdc;">
-        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">DATE</td>
-        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">MERCHANT</td>
-        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">CATEGORY</td>
-        <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">AMOUNT</td>
-      </tr>
-      <% section[:expenses].each do |expense| %>
+  <table style="width: 94%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
+    <tr style="background-color: #dcdcdc;">
+      <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">NAME</td>
+      <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">ACCOUNT NUMBER</td>
+      <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">IFSC</td>
+      <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">AMOUNT</td>
+    </tr>
+      <% @data.bank_payment_request.payment_order.payments.each do |payment| %>
           <tr>
-            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.date%></td>
-            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.merchant_name %></td>
-            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=expense.category_name%></td>
-            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;">&#8377;<%=expense.amount_value%></td>
+            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=payment.receiving_account.name%></td>
+            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=payment.receiving_account.account_number %></td>
+            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=payment.receiving_account.ifsc%></td>
+            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;">&#8377;<%=payment.amount_value%></td>
           </tr>
       <% end %>
-    </table><br>
-<% end %>
+  </table><br>
