@@ -52,12 +52,14 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     params[:body] = self.mailer_body(user)
     params[:event_id] = event_id
     params[:action_name] = action_name
+    params[:role_id] = bank_payment_request_view_role user
+
   end
 
   class Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter < Event::SetNotifier::MailerPresenter
 
     attr_accessor :bank_payment_request, :action_name, :subject_val, :body_val,
-                  :event_id, :company
+                  :event_id, :company, :view_role
 
     def init
       self.bank_payment_request = params[:bank_payment_request]
@@ -66,6 +68,8 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
       self.body_val = params[:body]
       self.event_id = params[:event_id]
       self.company = user.company
+      self.view_role_id = params[:role_id]
+      self.view_url = generate_view_url
     end
 
     def validate
@@ -82,6 +86,10 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
 
     def body
       self.body_val
+    end
+
+    def generate_view_url
+
     end
 
   end

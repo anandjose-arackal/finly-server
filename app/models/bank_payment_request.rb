@@ -140,6 +140,10 @@ class BankPaymentRequest < ActiveRecord::Base
     self.requested_amount.value
   end
 
+  def payment_mode
+    self.payment_order.payment_mode
+  end
+
   private
 
   def generate_name

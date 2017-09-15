@@ -95,4 +95,14 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
     message
   end
 
+  def bank_payment_request_view_role(user)
+    if user.id == report.user_id
+      return UserRole.id_for(:initiator)
+    elsif user.id == bank_payment_request.controlling_user_id
+      return report.controlling_user_role_id
+    elsif user.id == self.bank_payment_request.tracks.last.action_user_id
+      return self.bank_payment_request.bank_payment_request_trails.last.action_user_role_id
+    end
+  end
+
 end
