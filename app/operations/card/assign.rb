@@ -47,6 +47,7 @@ class Card::Assign < Card::Base
   end
 
   def post_process
-    add_message :success, "Card assigned"
+    ItzCash::AccountDetails.(card.user, card: card)
+    add_message :success, 'Card assigned'
   end
 end

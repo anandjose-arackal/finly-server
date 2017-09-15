@@ -1,27 +1,8 @@
-class ItzCash::AccountDetailsYse < ItzCash::Base
+class ItzCash::AccountDetailsYse < ItzCash::AccountDetails
   attr_accessor :card
-
-  def pre_validate
-    # if user.blank? && !params[:unassigned]
-    #   add_message :error, 'User not found'
-    #   return
-    # end
-    if params[:card].blank?
-      add_message :error, 'Card not found'
-    end
-  end
 
   def env_key
     'itzcash_account_details_yse'
-  end
-
-  def post_params
-    {serialid: card.serial_id, itzmodule: Constants::ItzCash::MODULE}
-  end
-
-  def init
-    super
-    self.card = params[:card]
   end
 
   def success
@@ -35,74 +16,18 @@ class ItzCash::AccountDetailsYse < ItzCash::Base
     params[:charge_code] = parsed_response[7]
     params[:product_code] = parsed_response[8]
     params[:available_card_eligibility] = parsed_response[9].to_d
-    params[:description] = parsed_response[10]
+    # This is from YSE's system to track if card is locked or not. Possible values given in CONSTANTS
+    params[:card_processor_status] = parsed_response[10]
+    params[:description] = parsed_response[12]
     update_card
     params[:card] = card
     ItzCash::AccountDetails::SuccessPresenter.new(self.user, self.params, self.messages)
   end
 
-  class ItzCash::AccountDetails::SuccessPresenter < BaseHandler::BasePresenter::SuccessPresenter
-    attr_accessor :response_code, :serial_id, :balance, :status_code, :suspended_status, :rate_group_id,
-                  :distributor_id, :charge_code, :product_code, :description, :available_card_eligibility,
-                  :card
-
-    def init
-      self.response_code =params[:response_code]
-      self.serial_id = params[:serial_id]
-      self.balance = params[:balance]
-      self.status_code = params[:status]
-      self.suspended_status = params[:suspended_status]
-      self.rate_group_id = params[:rate_group_id]
-      self.distributor_id = params[:distributor_id]
-      self.charge_code = params[:charge_code]
-      self.product_code = params[:product_code]
-      self.available_card_eligibility = params[:available_card_eligibility]
-      self.description = params[:description]
-      self.card = params[:card]
-    end
-
-    def status
-      if self.status_code.present?
-        return Constants::ItzCash::CARD_STATUS_CODE[self.status_code.to_sym]
-      end
-      nil
-    end
-
-    def assigned?
-      if distributor_id == card.user&.company.d_code
-        return true
-      end
-      false
-    end
-
-    def upgraded?
-      return false unless assigned?
-      bal = (self.balance or 0)
-      eligibility = (self.available_card_eligibility or 0)
-      (bal + eligibility) > 25000
-    end
-
-  end
-
   protected
   def update_card
-    if params[:suspended_status] == 'Y'
-      # attributes_to_update[:active] = false if card.active
-      card.update_attribute(:active, false) if card.active
-    elsif params[:suspended_status] == 'N'
-      # attributes_to_update[:active] = true if card.active
-      card.update_attribute(:active, true) unless card.active
-    end
-    if card.card_balance.blank?
-      id = Amount.create(value: 0, currency_id: Currency.first.id).id
-      card.update_attributes(card_balance_id: id)
-    end
-    if card.card_eligibility.blank?
-      id = Amount.create(value: 0, currency_id: Currency.first.id).id
-      card.update_attributes(card_eligibility_id: id)
-    end
-    card.card_balance.update_attributes(value: parsed_response[2].to_d)
-    card.card_eligibility.update_attributes(value: parsed_response[9].to_d)
+    super
+    card.update(card_processor_status: params[:card_processor_status])
   end
 
 end

@@ -15,4 +15,8 @@ class StringUtils
     text&.humanize&.gsub(/\b(?<!['’`])[a-z]/) { $&.capitalize }
   end
 
+  def self.is_number?(string)
+    true if Float(string) rescue false
+  end
+
 end

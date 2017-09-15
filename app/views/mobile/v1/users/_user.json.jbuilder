@@ -9,6 +9,8 @@ json.card do
   json.assigned assigned
   if assigned
     json.extract! card, :id, :ending_number, :description, :active, :serial_id, :balance, :available_card_eligibility
+    json.assign_status StringUtils.titleize(card&.card_status&.name)
+    json.suspend_status StringUtils.titleize(card&.suspend_status)
     json.disabled_by do
       json.name card.disabled_by_user.name rescue nil
       role_name = nil

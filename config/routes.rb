@@ -1938,6 +1938,7 @@ Rails.application.routes.draw do
   end
 
 
+  post 'expenses/split', to: 'expenses#split_existing'
   post 'expenses/export', to: 'expenses#export'
   delete 'expenses', to: 'expenses#destroy'
   resources :expenses do
