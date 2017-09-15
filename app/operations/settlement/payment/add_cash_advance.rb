@@ -37,7 +37,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     if params[:money_request_ids].is_a?(Array)
       money_request_id = (params[:money_request_id] or params[:money_request_ids])
     else
-      money_request_id = params[:money_request_id]&.split(',') || params[:money_request_ids].split(',')
+      money_request_id = params[:money_request_id]&.split(',') || params[:money_request_ids]&.split(',')
     end
 
     if money_request_id.present?
