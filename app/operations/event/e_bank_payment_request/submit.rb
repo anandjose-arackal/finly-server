@@ -43,7 +43,7 @@ class Event::EBankPaymentRequest::Submit < Event::EBankPaymentRequest::Base
 
   def mailer_body(user)
     if user.id == bank_payment_request.user.id
-      "Congratulations, you have successfully submitted the payment order : #{self.bank_payment_request.name}"
+      "Congratulations, you have successfully submitted the payment order : #{self.bank_payment_request.name} to #{bank_payment_request.controlling_user.name}"
     else
       "#{self.bank_payment_request.owner.name} has submitted the payment order: #{self.bank_payment_request.name} and is currently awaiting your approval."
     end

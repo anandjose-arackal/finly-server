@@ -33,7 +33,9 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   end
 
   def pre_process
-
+    # updating the initiating account for the payment order and payments
+    payment_order.update(initiating_account_type: initiating_account.class.name)
+    payment_order.payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
   end
 
 
@@ -44,6 +46,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     if op.success?
       # update the bank_payment_request to credited
       bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+      # create a trail to show that the BPR was credited
+      # todo
     else
       add_message :error, op.messages[:error]
       bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:failed))

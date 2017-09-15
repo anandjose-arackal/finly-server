@@ -40,12 +40,12 @@ class Event::EBankPaymentRequest::Credit < Event::EBankPaymentRequest::Base
   end
 
   def mailer_subject
-    return "Your payment order: #{bank_payment_request.name} has been successfully credited!"
+    return "Credit for your payment order: #{bank_payment_request.name} has been successfully processed!"
   end
 
   def mailer_body
     if bank_payment_request.owner_id == crediting_user.id
-      return "You have successfully credited your Payment Order: #{bank_payment_request.name}"
+      return "You have successfully initiated credit for your Payment Order: #{bank_payment_request.name}"
     else
       return "#{crediting_user.name} has successfully processed the credit of your Payment Order: #{bank_payment_request.name}"
     end

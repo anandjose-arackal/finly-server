@@ -97,6 +97,8 @@ class NotifierType < ActiveRecord::Base
               configurable_push_notification: true, configurable_mailer: true},
              {key: :bank_payment_request_approve_and_forward, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
+             {key: :bank_payment_request_credit, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: true, configurable_mailer: true},
             ]
 
   self.class.instance_eval do
