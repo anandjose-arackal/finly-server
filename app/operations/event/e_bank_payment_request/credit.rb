@@ -7,6 +7,9 @@ class Event::EBankPaymentRequest::Credit < Event::EBankPaymentRequest::Base
     self.crediting_user = self.bank_payment_request.bank_payment_request_trails.last.action_user
   end
 
+  def action_name
+    "Payment Order Credit Initiated"
+  end
 
   def validate
     super
@@ -39,11 +42,11 @@ class Event::EBankPaymentRequest::Credit < Event::EBankPaymentRequest::Base
     notification.save
   end
 
-  def mailer_subject
+  def mailer_subject(user)
     return "Credit for your payment order: #{bank_payment_request.name} has been successfully processed!"
   end
 
-  def mailer_body
+  def mailer_body(user)
     if bank_payment_request.owner_id == crediting_user.id
       return "You have successfully initiated credit for your Payment Order: #{bank_payment_request.name}"
     else
@@ -51,7 +54,7 @@ class Event::EBankPaymentRequest::Credit < Event::EBankPaymentRequest::Base
     end
   end
 
-  def bank_payment_request_view_role
+  def bank_payment_request_view_role(user)
     return UserRole.id_for(:initiator)
   end
 
