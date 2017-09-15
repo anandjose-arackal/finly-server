@@ -24,6 +24,7 @@ json.payments do
     json.amount payment.amount_value
     json.status payment.payment_status_name
     json.id payment.id
+    json.account_id payment.receiving_account.id
     json.system_messages do
       json.array! (payment.system_messages)
     end
