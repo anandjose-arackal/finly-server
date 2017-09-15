@@ -19,7 +19,7 @@ class Expense::Manual::Split < Expense::Manual::Base
     # checking if the report is editable for personal view
     if personal_view? and params.dig(:expense, :report_id).present?
       report = user.reports.find_by(id: params.dig(:expense, :report_id))
-      unless report&.editable?
+      unless report&.editable? or (report.controlling_user_id == user.id and report.processing?)
         add_message :error, 'Expense cannot be added to the report in this state'
       end
     end
