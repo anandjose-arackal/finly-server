@@ -1,4 +1,4 @@
-json.extract! report, :id, :name, :report_status_id, :user_id, :policy_id, :submitted_at
+json.extract! report, :id, :name, :report_status_id, :user_id, :policy_id, :submitted_at, :memo
 policy_name = report.policy.name if report.policy.present?
 json.policy_name policy_name
 json.user_name report.user.name

@@ -478,6 +478,14 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def maps_distance_value
+    if self.distance_expense?
+      return self.distance_expense.maps_distance_value
+    else
+      return nil
+    end
+  end
+
   def distance_rate_value
     if self.distance_expense?
       if self.report_id.present?
