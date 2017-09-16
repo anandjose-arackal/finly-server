@@ -37,7 +37,11 @@ class ExportController < ApplicationController
       }
       format.zip {
         @result = Expense::Export::WithReceipts.(current_user, params)
-        @result.render self
+        if @result.success?
+          @result.render self
+        else
+          render json: {success: false}
+        end
       }
     end
   end
