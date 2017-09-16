@@ -10,6 +10,22 @@ class Personalizer::Adapters::Company1::ExportTemplates1::Config
                 {name: 'Export as Excel', extension: 'xls'},
                 {name: 'Export as CSV', extension: 'csv'}
             ]
+        },
+        sap: {
+            class: Personalizer::Adapters::Company1::ExportTemplates1::Sap,
+            name: 'SAP Accounting',
+            description: 'SAP Account format. Exports expenses',
+            formats: [
+                {name: 'Export for SAP', extension: 'csv'}
+            ]
+        },
+        quickbooks: {
+            class: Personalizer::Adapters::Company1::ExportTemplates1::Quickbooks,
+            name: 'Quickbooks',
+            description: 'Quickbooks Online Export',
+            formats: [
+                {name: 'Export to Quickbooks', extension: 'xls'}
+            ]
         }
     }
   end
