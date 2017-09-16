@@ -7,6 +7,7 @@ end
 
 json.distance do
   json.value @result.expense.distance_value
+  json.maps_distance_value @result.expense.maps_distance_value
   json.rate_value @result.expense.distance_rate_value
 end
 

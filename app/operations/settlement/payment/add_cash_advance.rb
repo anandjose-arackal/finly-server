@@ -37,7 +37,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     if params[:money_request_ids].is_a?(Array)
       money_request_id = (params[:money_request_id] or params[:money_request_ids])
     else
-      money_request_id = params[:money_request_id]&.split(',') || params[:money_request_ids].split(',')
+      money_request_id = params[:money_request_id]&.split(',') || params[:money_request_ids]&.split(',')
     end
 
     if money_request_id.present?
@@ -55,7 +55,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
     # keeping track of the individual money requests and the respective amounts being credited to them
     self.money_request_amounts = {}
-    params[:money_requests].each do |money_request|
+    params[:money_requests]&.each do |money_request|
       self.money_request_amounts[money_request[:id]] = money_request[:processed_amount]
     end
     params.delete(:money_requests)
