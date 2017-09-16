@@ -17,9 +17,12 @@
 #  controlling_for_user_id      :integer
 #  controlling_for_user_role_id :integer
 #  require_approval             :boolean
+#  is_deleted                   :boolean
 #
 
 class BankPaymentRequest < ActiveRecord::Base
+
+  include SoftDeletable
 
   belongs_to :status, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, dependent: :destroy
