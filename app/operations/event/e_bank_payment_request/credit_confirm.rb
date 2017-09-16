@@ -8,7 +8,7 @@ class Event::EBankPaymentRequest::CreditConfirm < Event::EBankPaymentRequest::Ba
   end
 
   def action_name
-    "Payment Order Credit Initiated"
+    "Payment Order Credit Completed"
   end
 
   def validate
@@ -39,7 +39,7 @@ class Event::EBankPaymentRequest::CreditConfirm < Event::EBankPaymentRequest::Ba
                                              timestamp: DateUtils.local_date_time,
                                              view_role_id: view_role_id,
                                              application: RequestStore.store[:current_app],
-                                             amount_attributes: {value: bank_payment_request.amount_processed&.value, currency_id: 1}
+                                             amount_attributes: {value: bank_payment_request&.payment_order&.amount_processed&.value, currency_id: 1}
     )
     notification.save
   end
@@ -50,9 +50,7 @@ class Event::EBankPaymentRequest::CreditConfirm < Event::EBankPaymentRequest::Ba
 
   def mailer_body(user)
     if bank_payment_request.owner_id == crediting_user.id
-      return "Credit for your Payment Order: #{bank_payment_request.name}"
-    else
-      return "#{crediting_user.name} has successfully processed the credit of your Payment Order: #{bank_payment_request.name}"
+      return "Credit for your Payment Order: #{bank_payment_request.name} has been successfully completed!"
     end
   end
 

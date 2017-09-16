@@ -19,8 +19,13 @@ class Expense::SplitExisting < Expense::Manual::Split
       self.existing_expense = user.expenses.find_by_id(params[:expense_id])
     end
     return unless self.existing_expense.present?
-    if self.existing_expense.card_expense? and params&.dig(:expense, :card_expense_attributes).present?
-      params[:expense][:card_expense_attributes][:card_transaction_id] = self.existing_expense.card_expense&.card_transaction_id
+    if self.existing_expense.card_expense?
+      if params&.dig(:expense, :card_expense_attributes).present?
+        params[:expense][:card_expense_attributes][:card_transaction_id] = self.existing_expense.card_expense&.card_transaction_id
+      end
+      if params[:expense].present?
+        params[:expense][:date] = DateUtils.date_formatted(self.existing_expense.date)
+      end
     end
     super
   end

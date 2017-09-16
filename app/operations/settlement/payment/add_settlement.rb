@@ -113,9 +113,9 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
         self.reimbursement_amount = payment_params[:from_bank_transfer].to_f
         self.initiating_account_type = payment_params[:initiating_account_type]
         case self.initiating_account_type
-          when 1, '1'
-            self.initiating_account = user.company.yes_bank_company_account
           when 2, '2'
+            self.initiating_account = user.company.yes_bank_company_account
+          when 1, '1'
             self.initiating_account = user.bank_wallet
           else
             # self.initiating_account = user.company.yes_bank_company_account
