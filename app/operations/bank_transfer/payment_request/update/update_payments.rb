@@ -37,7 +37,6 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
   end
 
   def process
-    debugger
     unless payment_order.update(order_params)
       add_message :error, payment_order.errors.full_messages
     end
@@ -46,17 +45,19 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
 
   def post_process
     # now peruse through each payment and find out what has changed where
-    self.original_values.each do |old_payment_values|
-      id = old_payment_values[:id]
-      payment = payment_order.payments.find_by(id: id)
-      if payment.amount_value.to_f != old_payment_values[:amount].to_f
-        # add comment indicating the change in value
-        self.payment_request.comments.build(action_id: BankPaymentRequestCommentAction.id_for(:payment_edit),
-                                            previous_value: old_payment_values[:amount],
-                                            new_value: payment.amount_value,
-                                            beneficiary_id: payment.receiving_account.id,
-                                            edited_field: "Amount",
-                                            user_id: user.id).save
+    if payment_request.retracted? || payment_request.rejected?
+      self.original_values.each do |old_payment_values|
+        id = old_payment_values[:id]
+        payment = payment_order.payments.find_by(id: id)
+        if payment.amount_value.to_f != old_payment_values[:amount].to_f
+          # add comment indicating the change in value
+          self.payment_request.comments.build(action_id: BankPaymentRequestCommentAction.id_for(:payment_edit),
+                                              previous_value: old_payment_values[:amount],
+                                              new_value: payment.amount_value,
+                                              beneficiary_id: payment.receiving_account.id,
+                                              edited_field: "Amount",
+                                              user_id: user.id).save
+        end
       end
     end
 
