@@ -73,21 +73,20 @@ class Payment < ActiveRecord::Base
 
   default_scope { order date: :desc, created_at: :desc }
 
-  scope :atm_withdrawals, -> { where payment_type_id: PaymentType.id_for(:atm_withdrawal) }
-  scope :advance, -> { where payment_type_id: PaymentType.id_for(:add_cash_on_hand) }
-  scope :cash_on_hand_additions, -> { where payment_type_id: PaymentType.id_for(:add_cash_on_hand) }
-  scope :reimbursement, -> { where payment_type_id: PaymentType.id_for(:reimbursement) }
-  scope :debt_clearance, -> { where payment_type_id: PaymentType.id_for(:deduct_cash_on_hand) }
-  scope :cash_on_hand_deductions, -> { where payment_type_id: PaymentType.id_for(:deduct_cash_on_hand) }
-  scope :settlement, -> { where payment_type_id: PaymentType.id_for(:settlement) }
+  scope :atm_withdrawals, -> { where payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal) }
+  scope :advance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:advance_outside_finly)] }
+  scope :cash_on_hand_additions, -> { where payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:cash_advance)] }
+  scope :reimbursement, -> { where payment_purpose_id: [PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)] }
+  scope :debt_clearance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:balance_clearance), PaymentPurpose.id_for(:balance_clearance_outside_finly)] }
+  scope :cash_on_hand_deductions, -> { where payment_purpose_id: [PaymentPurpose.id_for(:balance_clearance_outside_finly)] }
+  scope :settlement, -> { where payment_purpose_id: PaymentType.id_for(:settlement) }
   scope :involving_user, ->(user_id) { where('receiving_user_id = ? OR initiating_user_id = ?', user_id, user_id) }
   scope :involving_account, ->(account) { where('(initiating_account_id = ? AND initiating_account_type = ?) OR (receiving_account_id = ? and receiving_account_type = ?)', account.id, account.class.name, account.id, account.class.name) }
   scope :received_by_user, ->(user_id) { where receiving_user_id: user_id }
   scope :initiated_by_user, ->(user_id) { where initiating_user_id: user_id }
-  scope :transferred_cash_to_user, -> { where payment_type: [PaymentType.id_for(:add_cash_on_hand),
-                                                             PaymentType.id_for(:reimbursement),
-                                                             PaymentType.id_for(:settlement),
-                                                             PaymentType.id_for(:atm_withdrawal)] }
+  scope :transferred_cash_to_user, -> { where payment_type: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:cash_advance),
+                                                             PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly),
+                                                             PaymentPurpose.id_for(:atm_withdrawal)] }
   scope :with_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
@@ -316,7 +315,7 @@ class Payment < ActiveRecord::Base
   end
 
   def cash_on_hand_credit?
-    payment.receiving_account.class.name == "CashOnHand" && payment.credit?
+    self.payment_purpose_id == PaymentPurpose.id_for(:cash_advance)
   end
 
   private

@@ -315,6 +315,12 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: self.transfer_mode})
       if op.success?
         self.payment = op.payment_order.payments.first
+        if payment.processing?
+          payment.system_messages.create(content: "Reimbursement processed. Awaiting credit confirmation",
+                                         system_message_type_id: SystemMessagesType.id_for(:error)
+                                        )
+          payment.update(note: "Reimbursemet processed. Awaiting credit confirmation")
+        end
         return
       else
         add_message :error, op.messages[:error]
