@@ -4,6 +4,9 @@
     <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">ACCOUNT NUMBER</td>
     <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">IFSC</td>
     <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">AMOUNT</td>
+    <% if @data.event_id == NotifierType.id_for(:bank_payment_request_credit_confirm) %>
+      <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">COMMENTS</td>
+    <% end %>
   </tr>
     <% @data.bank_payment_request.payment_order.payments.each do |payment| %>
         <tr>
@@ -11,6 +14,9 @@
           <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=payment.receiving_account.account_number %></td>
           <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=payment.receiving_account.ifsc%></td>
           <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;">&#8377;<%=payment.amount_value%></td>
+          <% if @data.event_id == NotifierType.id_for(:bank_payment_request_credit_confirm) %>
+              <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=payment.system_messages.pluck(:content)&.to_sentence%></td>
+          <% end %>
         </tr>
     <% end %>
 </table><br>

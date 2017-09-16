@@ -35,7 +35,10 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
   end
 
   def pre_process
-    # nothing to do here, I guess?
+    self.requested_total = 0
+    params[:bank_payment_request][:payments_attributes].each do |details|
+      self.requested_total += details[:amount]&.to_f
+    end
   end
 
   def process

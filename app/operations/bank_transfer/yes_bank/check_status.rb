@@ -3,7 +3,7 @@
 
 class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
-  attr_accessor :bank_transaction, :company, :payment, :payment_request
+  attr_accessor :bank_transaction, :company, :payment, :payment_request, :payment_order
 
   def self.call(bank_transaction)
     self.new(bank_transaction).run
@@ -13,6 +13,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     self.bank_transaction = bank_transaction
     self.company = bank_transaction.company
     self.payment = bank_transaction.payment
+    self.payment_order = payment&.payment_order
   end
 
   def authorized_user_types
@@ -63,6 +64,25 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   end
 
+  def post_process
+    # here check if the payment order has associated bank payment requests and accordingly send notification
+    if payment_order.bank_payment_request.present?
+      # now check if all the payments in this order are either successes or failures.
+      # i.e. none processing or awaiting credit confirmation
+      completed = true
+      bank_payment_request = payment_order.bank_payment_request
+      payment_order.payments.each do |payment|
+        unless [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)].include?(payment.payment_status_id)
+          completed = false
+        end
+      end
+      if completed
+        # this will trigger the mailer and notification that a particular credit has been successfully completed
+        Event::EBankPaymentRequest::CreditConfirm.(bank_payment_request.owner, bank_payment_request: bank_payment_request)
+      end
+    end
+  end
+
   private
 
   def create_refund_payment
@@ -84,7 +104,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     if payment&.cash_on_hand_credit?
       init_payment_request
       # now execute the payment that adds to the user's cash on hand
-      AccountManager::Payments::PaymentProcessor(self.payment.initiating_user, {payment_request: self.payment_request})
+      AccountManager::Payments::PaymentProcessor.(self.payment.initiating_user, {payment_request: self.payment_request})
     end
     # now mark the respective bank transaction and payment as completed
     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
