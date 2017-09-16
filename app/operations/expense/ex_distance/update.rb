@@ -78,6 +78,16 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       if self.updated_expense_params&.dig(:distance_expense_attributes, :distance_attributes, :value).present? and expense.distance_expense.distance_id.present?
         self.updated_expense_params[:distance_expense_attributes][:distance_attributes][:id] = expense.distance_expense.distance.id
       end
+      if not self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).nil? and expense.distance_expense.maps_distance_id.present?
+        self.updated_expense_params[:distance_expense_attributes][:maps_distance_attributes][:id] = expense.distance_expense.maps_distance_id
+        if self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes, :value).nil?
+          self.updated_expense_params[:distance_expense_attributes][:maps_distance_attributes][:_destroy] = true
+        end
+      end
+      if not self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).nil? and not
+          self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).present?
+        self.updated_expense_params[:distance_expense_attributes].delete(:maps_distance_attributes)
+      end
       if expense.receipts.present? and updated_expense_params[:receipts_attributes].present?
         self.updated_expense_params[:receipts_attributes][0][:id] = expense.receipts.first.id
       end
