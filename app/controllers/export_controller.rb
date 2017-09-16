@@ -82,7 +82,11 @@ class ExportController < ApplicationController
 
   def export_template
     @result = Personalizer::ProcessTemplate.(current_user, params)
-    respond
+    if @result.success?
+      @result.render(self)
+    else
+      respond resposne: :failure
+    end
   end
 
 end
