@@ -1943,6 +1943,7 @@ Rails.application.routes.draw do
 
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
 
+  get 'receipts/export', to: 'receipts#export'
   resources :receipts do
     post 'add_note', to: 'receipts#add_note', as: :add_note
     patch 'enable', to: 'receipts#enable_transcription', as: :enable_transcription

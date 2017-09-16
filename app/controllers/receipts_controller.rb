@@ -28,6 +28,11 @@ class ReceiptsController < ApplicationController
     respond response: :success
   end
 
+  def export
+    @result = Receipt::Export.(current_user, params)
+    respond
+  end
+
   def enable_transcription
     @result = Receipt::Transcription::Enable.(current_user, params)
     if @result.success?
