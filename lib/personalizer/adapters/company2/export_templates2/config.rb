@@ -6,7 +6,7 @@ class Personalizer::Adapters::Company2::ExportTemplates2::Config
             class: Personalizer::Adapters::Company2::ExportTemplates2::Tally,
             name: 'Tally',
             description: 'Tally exportable format. Exports expenses',
-            formats: [:xml]
+            formats: [:csv]
             # formats: [:xls, :csv]
         }
     }
