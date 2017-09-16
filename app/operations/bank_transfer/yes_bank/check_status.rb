@@ -44,7 +44,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     }
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?
-      if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+      # if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+      if true
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
@@ -116,8 +117,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     receiving_user = payment.receiving_user
     amount = payment.amount_value
     receiving_account = receiving_user.cash_on_hand
-    self.payment_request = PaymentRequest.(payment.initiating_user, nil, (receiving_account&.class&.name), :credit, :advance)
-    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, amount, note: self.payment.note))
+    self.payment_request = ::PaymentRequest.(payment.initiating_user, nil, (receiving_account&.class&.name), :credit, :advance)
+    self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(receiving_user, receiving_account, amount, note: self.payment.note))
   end
 
 end
