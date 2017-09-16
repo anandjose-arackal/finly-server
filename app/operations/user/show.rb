@@ -113,15 +113,6 @@ class User::Show < User::Base
             end
           end
 
-          # checking if the user has associated bank accounts, and sending the flag accordingly'
-          # also, if the user's cash on hand has been credited with any payments pending confirmation
-          actions[:bank_transfer_enabled] = selected_user.bank_transfer_enabled?
-          actions[:pending_cash_on_hand_credits] = {
-              present: self.selected_user.cash_on_hand_credits_awaiting_confirmation?,
-              message: "Some money has been added to your cash on hand. They will reflect once the payment is confirmed"
-          }
-          #####################################################################################
-
           assign_request_data = nil
           unless card.assigned?
             assign_request = card.card_assign_requests.with_card_owner_id(selected_user.id)&.first
@@ -222,6 +213,16 @@ class User::Show < User::Base
       if user.company_admin?
         actions[:update_subscriptions] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
       end
+
+      # checking if the user has associated bank accounts, and sending the flag accordingly'
+      # also, if the user's cash on hand has been credited with any payments pending confirmation
+      actions[:bank_transfer_enabled] = selected_user.bank_transfer_enabled?
+      actions[:pending_cash_on_hand_credits] = {
+          present: self.selected_user.cash_on_hand_credits_awaiting_confirmation?,
+          message: "Some money has been added to your cash on hand. They will reflect once the payment is confirmed"
+      }
+      #####################################################################################
+
       actions
     end
 
