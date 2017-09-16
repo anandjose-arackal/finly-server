@@ -35,6 +35,10 @@ class ExportController < ApplicationController
       format.xls {
         @result = Expense::Export::AsXml.(current_user, params)
       }
+      format.zip {
+        @result = Expense::Export::WithReceipts.(current_user, params)
+        @result.render self
+      }
     end
   end
 
