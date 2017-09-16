@@ -1,4 +1,4 @@
-class BankTransfer::PaymentRequest::Remove < BankTransfer::PaymentRequest::Base
+class BankTransfer::PaymentRequest::Payment::Remove < BankTransfer::PaymentRequest::Payment::Base
 
   attr_accessor :removed_payment
 

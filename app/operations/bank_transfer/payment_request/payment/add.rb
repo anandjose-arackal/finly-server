@@ -33,12 +33,14 @@ class BankTransfer::PaymentRequest::Payment::Add < BankTransfer::PaymentRequest:
     self.payments_data = []
     params[:bank_accounts].each do |bank_account|
       id = bank_account[:id]
-      bank_account = user.company.bank_accounts.find_by(id: id)
+      account = user.company.bank_accounts.find_by(id: id)
       self.payments_data << {
           initiating_account: bank_payment_request.payment_order.initiating_account,
-          receiving_account: bank_account,
-          receiving_user: bank_account.account_owner,
+          receiving_account: account,
+          receiving_user: account.account_owner,
+          initiating_user: user,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
+          payment_type_id: PaymentType.id_for(:credit),
           payment_purpose_id: PaymentPurpose.id_for(:vendor_payments),
           payment_mode: bank_payment_request.payment_order.payments.first.payment_mode,
           amount_attributes: {
@@ -61,7 +63,7 @@ class BankTransfer::PaymentRequest::Payment::Add < BankTransfer::PaymentRequest:
       payment = self.payment_order.payments.build(data)
       unless payment.valid?
         valid = false
-        error_messages << payment.error.full_messages.to_sentence
+        error_messages << payment.errors.full_messages.to_sentence
       end
     end
     unless valid
@@ -77,7 +79,7 @@ class BankTransfer::PaymentRequest::Payment::Add < BankTransfer::PaymentRequest:
   end
 
   def post_process
-    add_message :error, "Beneficiaries added!"
+    add_message :success, "Beneficiaries added!"
   end
 
 
