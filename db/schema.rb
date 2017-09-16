@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170914140426) do
+ActiveRecord::Schema.define(version: 20170916151057) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -414,6 +414,7 @@ ActiveRecord::Schema.define(version: 20170914140426) do
     t.text     "previous_value",          limit: 65535
     t.text     "new_value",               limit: 65535
     t.text     "edited_field",            limit: 65535
+    t.integer  "beneficiary_id",          limit: 4
   end
 
   add_index "bank_payment_request_comments", ["action_id"], name: "index_bank_payment_request_comments_on_action_id", using: :btree
@@ -1276,11 +1277,12 @@ ActiveRecord::Schema.define(version: 20170914140426) do
   end
 
   create_table "distance_expenses", force: :cascade do |t|
-    t.integer  "expense_id",  limit: 4
-    t.boolean  "is_deleted",            default: false
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.integer  "distance_id", limit: 4
+    t.integer  "expense_id",       limit: 4
+    t.boolean  "is_deleted",                 default: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+    t.integer  "distance_id",      limit: 4
+    t.integer  "maps_distance_id", limit: 4
   end
 
   add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree

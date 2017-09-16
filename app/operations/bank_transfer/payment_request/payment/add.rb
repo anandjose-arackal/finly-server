@@ -80,6 +80,17 @@ class BankTransfer::PaymentRequest::Payment::Add < BankTransfer::PaymentRequest:
 
   def post_process
     add_message :success, "Beneficiaries added!"
+
+    if bank_payment_request.retracted? || bank_payment_request.rejected?
+      # adding comments for all the beneficiaries removed in the comments
+      params[:bank_accounts].each do |data|
+        id = data[:id]
+        account = user.company.bank_accounts.find_by(id: id)
+        bank_payment_request.comments.build(action_id: BankPaymentRequestCommentAction.id_for(:add_beneficiary),
+                                            user_id: user.id,
+                                            beneficiary_id: account.id).save
+      end
+    end
   end
 
 

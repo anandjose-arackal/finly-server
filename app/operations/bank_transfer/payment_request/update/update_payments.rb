@@ -1,6 +1,6 @@
 class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::PaymentRequest::Update::Base
 
-  attr_accessor :order_params, :requested_total
+  attr_accessor :order_params, :requested_total, :original_values
 
   def pre_validate
     super
@@ -13,25 +13,11 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
   def init
     super
     self.order_params = payment_order_params
+    self.original_values = []
   end
 
   def validate
-    # below no longer necessary because the logic for determining the balances are being done in the credit action
-    # self.requested_total = 0
-    # params[:bank_payment_request][:payments_attributes].each do |details|
-    #   self.requested_total += details[:amount]&.to_f
-    # end
-    # adapter = nil
-    # case payment_order.initiating_account_type
-    #   when "VendorPaymentWallet"
-    #     adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(payment_order.payments.first.initiating_account)
-    #   when "YesBankCompanyAccount"
-    #     adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-    # end
-    # if requested_total > adapter.balance
-    #   add_message :error, "Amount being requested is greater than the source account's balance"
-    #   return
-    # end
+
   end
 
   def pre_process
@@ -39,9 +25,19 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
     params[:bank_payment_request][:payments_attributes].each do |details|
       self.requested_total += details[:amount]&.to_f
     end
+    self.payment_order.payments.each do |payment|
+      self.original_values << {
+          name: payment.receiving_account.name,
+          account_number: payment.receiving_account.account_number,
+          ifsc: payment.receiving_account.ifsc,
+          amount: payment.amount_value,
+          id: payment.id
+      }
+    end
   end
 
   def process
+    debugger
     unless payment_order.update(order_params)
       add_message :error, payment_order.errors.full_messages
     end
@@ -49,39 +45,41 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
   end
 
   def post_process
+    # now peruse through each payment and find out what has changed where
+    self.original_values.each do |old_payment_values|
+      id = old_payment_values[:id]
+      payment = payment_order.payments.find_by(id: id)
+      if payment.amount_value.to_f != old_payment_values[:amount].to_f
+        # add comment indicating the change in value
+        self.payment_request.comments.build(action_id: BankPaymentRequestCommentAction.id_for(:payment_edit),
+                                            previous_value: old_payment_values[:amount],
+                                            new_value: payment.amount_value,
+                                            beneficiary_id: payment.receiving_account.id,
+                                            edited_field: "Amount",
+                                            user_id: user.id).save
+      end
+    end
 
+    add_message :success, "Payment Details edited!"
   end
 
   private
 
   def payment_order_params
-    p = {}
-    p = params.require(:bank_payment_request).permit(payments_attributes: [:bank_account_number, :ifsc, :amount, :name, :id])
-    # setting the approval flow as false for now, till it's determined that the
-    # bank account being credited to is unauthorized or not
-    payment_request.update(require_approval: false)
+    parameters = {payments_attributes: []}
+    p = params.require(:bank_payment_request).permit(payments_attributes: [:amount, :id])
 
     p[:payments_attributes].each do |account_details|
-      bank_account = BankAccount.with_company(user.company_id).find_by(account_number: account_details[:bank_account_number])
-      vendor = bank_account&.account_owner || YesBankVendor.find_or_create_by(name: account_details[:name], company_id: user.company_id)
-      if bank_account.nil?
-        bank_account = BankAccount.create(name: account_details[:name], account_number: account_details[:bank_account_number], ifsc: account_details[:ifsc], account_owner: vendor, company_id: user.company_id)
-        payment_request.update(require_approval: true)
-      end
-      account_details.delete(:bank_account_number)
-      account_details.delete(:ifsc)
-      account_details.delete(:name)
-      # changing the receiving account to the newly created account or the old one itself
-      account_details[:receiving_account_id] = bank_account.id
-      account_details[:receiving_user_id] = vendor.id
-      account_details[:receiving_user_type] = vendor.class.name
-      account_details[:amount_attributes] = {
-          value: account_details[:amount],
-          currency_id: Currency.first.id
+      id = account_details[:id]
+      payment = payment_order.payments.find_by(id: id)
+      parameters[:payments_attributes] << {
+          id: account_details[:id],
+          amount_attributes: {
+              id: payment.amount.id,
+              value: account_details[:amount]
+        }
       }
-      account_details.delete(:amount)
-
     end
-    p.permit!
+    parameters
   end
 end

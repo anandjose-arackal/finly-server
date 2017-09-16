@@ -34,6 +34,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -302,13 +303,14 @@ class Payment < ActiveRecord::Base
     end
   end
 
+  # only used in the show action of the payment request
   def payment_status_name
     if self.payment_status_id == PaymentStatus.id_for(:processing)
       return "Processed. Awaiting credit confirmation"
     elsif self.payment_order&.bank_payment_request&.status&.name == 'approved'
       return "Approved"
-    elsif self.payment_order&.bank_payment_request&.status&.name == 'open'
-      return "Open"
+    elsif ['open', 'retracted', 'rejected'].include?(self.payment_order&.bank_payment_request&.status&.name)
+      return self.payment_order&.bank_payment_request&.status&.name&.humanize
     else
       self.payment_status.name.humanize
     end

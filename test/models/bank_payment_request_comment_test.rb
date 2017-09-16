@@ -14,6 +14,7 @@
 #  previous_value          :text(65535)
 #  new_value               :text(65535)
 #  edited_field            :text(65535)
+#  beneficiary_id          :integer
 #
 
 require 'test_helper'
