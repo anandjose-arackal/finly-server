@@ -4,7 +4,7 @@
     <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">ACCOUNT NUMBER</td>
     <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">IFSC</td>
     <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">AMOUNT</td>
-    <% if @data.event_id == NotifierType.id_for(:bank_payment_request_credit_confirm) %>
+    <% if [NotifierType.id_for(:bank_payment_request_credit_confirm), NotifierType.id_for(:bank_payment_request_credit)].include?(@data.event_id) %>
       <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">COMMENTS</td>
     <% end %>
   </tr>
@@ -15,7 +15,9 @@
           <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=payment.receiving_account.ifsc%></td>
           <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;">&#8377;<%=payment.amount_value%></td>
           <% if @data.event_id == NotifierType.id_for(:bank_payment_request_credit_confirm) %>
-              <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%=payment.system_messages.pluck(:content)&.to_sentence%></td>
+              <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;">Payment Processed. Awaiting credit confirmation</td>
+          <% elsif @data.event_id == NotifierType.id_for(:bank_payment_request_credit) %>
+              <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;">Completed</td>
           <% end %>
         </tr>
     <% end %>
