@@ -45,7 +45,7 @@ class Personalizer::ExportTemplates < BaseOperation
     def index
       index = []
       self.templates&.each do |key, template|
-        index << {name: template[:name], description: template[:description], key: key}
+        index << {name: template[:name], description: template[:description], key: key, formats: template[:formats]}
       end
       index
     end
