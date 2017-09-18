@@ -18,6 +18,7 @@
 #  controlling_for_user_role_id :integer
 #  require_approval             :boolean
 #  is_deleted                   :boolean
+#  beneficiary_type_id          :integer
 #
 
 require 'test_helper'
