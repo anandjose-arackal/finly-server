@@ -80,11 +80,10 @@ class Expense::SplitExisting < Expense::Manual::Split
 
   protected
   def generate_split_link
-    link = self.existing_expense&.split_link
-    if link.blank?
-      link = super
+    self.split_link = self.existing_expense&.split_link
+    if split_link.blank?
+      super
     end
-    link
   end
 
 end
