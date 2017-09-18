@@ -23,7 +23,7 @@ class DistanceExpense < ActiveRecord::Base
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :locations
   accepts_nested_attributes_for :distance
-  accepts_nested_attributes_for :maps_distance
+  accepts_nested_attributes_for :maps_distance, allow_destroy: true
 
   validates :distance, presence: true
 
