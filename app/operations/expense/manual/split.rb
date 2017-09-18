@@ -48,10 +48,7 @@ class Expense::Manual::Split < Expense::Manual::Base
       end
       return if has_errors?
     end
-    split_link_prefix = "#{Date.today.strftime('%y%m%d')}#{user.id}"
-    while self.split_link.blank? or Expense.with_split_link(self.split_link).present?
-      self.split_link = "#{split_link_prefix}#{Generator.random_number(5)}"
-    end
+    generate_split_link
   end
 
   def validate
@@ -84,6 +81,13 @@ class Expense::Manual::Split < Expense::Manual::Base
   end
 
   protected
+  def generate_split_link
+    split_link_prefix = "#{Date.today.strftime('%y%m%d')}#{user.id}"
+    while self.split_link.blank? or Expense.with_split_link(self.split_link).present?
+      self.split_link = "#{split_link_prefix}#{Generator.random_number(5)}"
+    end
+  end
+
   def split_expense_params
     expenses_params = []
     base_params = params.require(:expense).permit(:expense_type_id, :expense_status_id,

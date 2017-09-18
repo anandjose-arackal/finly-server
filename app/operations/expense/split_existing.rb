@@ -78,4 +78,13 @@ class Expense::SplitExisting < Expense::Manual::Split
     self.existing_expense&.receipts&.first&.id
   end
 
+  protected
+  def generate_split_link
+    link = self.existing_expense&.split_link
+    if link.blank?
+      link = super
+    end
+    link
+  end
+
 end
