@@ -7,7 +7,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
   def init
     id = params[:id] || params[:payment_request_id]
     self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
-    # self.bank_payment_request = BankPaymentRequest.find_by(id: id)
   end
 
   def validate
@@ -18,6 +17,14 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
   end
 
   def process
+
+  end
+
+  def post_process
+    super()
+    if params[:ref] == '1' and params[:n_id].present?
+      Event::EBankPaymentRequest::Unset.(user, params)
+    end
 
   end
 
