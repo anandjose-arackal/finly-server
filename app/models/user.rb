@@ -49,23 +49,6 @@
 #
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -471,8 +454,15 @@ class User < ActiveRecord::Base
   end
 
   # todo - temporarily disabling policy admin screen for the admin? role
-  def admin?
-    company_admin?
+  def admin?(application = "em")
+    case application
+      when "em"
+        company_admin?
+      when "vp"
+        vendor_payment_admin?
+      else
+        company_admin?
+    end
   end
 
   def finance_manager?
@@ -726,7 +716,7 @@ class User < ActiveRecord::Base
   end
 
   def bank_transfer_enabled?
-    self.vendor_payments_enabled? && self.bank_accounts.present?
+    (self.vendor_payments_enabled? && self.bank_accounts.present?)
   end
 
   # method that determines whether a particular user has

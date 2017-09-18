@@ -72,7 +72,7 @@ class User::Balances::Show < User::Base
       self.balances = params[:balances]
       self.selected_user = params[:selected_user]
       self.actions = params[:actions]
-      self.show_company_credits = (self.selected_user.admin?) ? true : false
+      self.show_company_credits = (self.selected_user.admin?(current_app)) ? true : false
     end
   end
 
