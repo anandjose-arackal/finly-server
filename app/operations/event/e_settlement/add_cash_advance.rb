@@ -30,11 +30,19 @@ class Event::ESettlement::AddCashAdvance < Event::ESettlement::Base
   end
 
   def mailer_subject(user)
-    "Money Added to Cash on Hand"
+    if payment.processing?
+      "Money Added to Cash On Hand"
+    else
+      "Money Added to Cash on Hand"
+    end
   end
 
   def mailer_body(user)
-    "This is to notify you that an amount of ₹#{payment.amount.value} has been added to your Cash on Hand by #{payment.initiating_user.name}"
+    if payment.processing?
+      "This is to notify you that a bank transfer for an amount of ₹#{payment.amount.value} has been initiated to your Cash on Hand by #{payment.initiating_user}. This will reflect in your Finly Dashboard as soon as we get confirmation from the bank"
+    else
+      "This is to notify you that an amount of ₹#{payment.amount.value} has been added to your Cash on Hand by #{payment.initiating_user.name}"
+    end
   end
 
 end
