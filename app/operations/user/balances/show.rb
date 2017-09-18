@@ -61,17 +61,19 @@ class User::Balances::Show < User::Base
     params[:balances] = self.balances
     params[:actions] = self.actions
     params[:selected_user] = self.selected_user
+    params[:current_app] = self.current_app
     User::Balances::Show::BalancePresenter.new(user, params, messages)
   end
 
   class User::Balances::Show::BalancePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :balances, :selected_user, :show_company_credits, :actions
+    attr_accessor :balances, :selected_user, :show_company_credits, :actions, :current_app
 
     def init
       self.balances = params[:balances]
       self.selected_user = params[:selected_user]
       self.actions = params[:actions]
+      self.current_app = params[:current_app]
       self.show_company_credits = (self.selected_user.admin?(current_app)) ? true : false
     end
   end
