@@ -57,7 +57,7 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
     notification.save
   end
 
-  def mailer_subject
+  def mailer_subject(user)
     approver_id = self.bank_payment_request.bank_payment_request_trails.last.action_user.id rescue nil
     if approver_id.present? and user.id == approver_id
       "Payment Order approved : #{self.bank_payment_request.name}"
@@ -74,7 +74,7 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
     end
   end
 
-  def mailer_body
+  def mailer_body(user)
     approver_id = self.bank_payment_request.tracks.last.action_user.id rescue nil
     if approver_id.present? and user.id == approver_id
       message = "You have successfully approved the payment order : #{self.bank_payment_request.name}"
