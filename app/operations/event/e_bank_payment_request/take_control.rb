@@ -55,7 +55,7 @@ class Event::EBankPaymentRequest::TakeControl < Event::EBankPaymentRequest::Base
   end
 
   def bank_payment_request_view_role(user)
-    roles = BankPaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
+    roles = BankTransfer::PaymentRequest::ActionUserRole.(user, {bank_payment_request: bank_payment_request, user_id: user.id})
     roles.first
   end
 end

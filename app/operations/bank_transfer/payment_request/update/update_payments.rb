@@ -17,7 +17,12 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
   end
 
   def validate
-
+    # check if any of the amounts are zero and add appropriate error message
+    params[:bank_payment_request][:payments_attributes].each do |account_details|
+      if account_details[:amount].blank? || account_details[:amount]&.to_f <= 0
+        add_message :error, "Amount cannot be less than or equal to zero"
+      end
+    end
   end
 
   def pre_process
