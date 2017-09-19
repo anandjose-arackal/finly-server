@@ -45,12 +45,14 @@ class Event::EBankPaymentRequest::CreditConfirm < Event::EBankPaymentRequest::Ba
   end
 
   def mailer_subject(user)
-    return "Credit for your payment order: #{bank_payment_request.name} is complete!"
+    status = bank_payment_request.payment_order&.payment_order_status&.name&.humanize
+    return "Credit for your payment order: #{bank_payment_request.name} was #{status}!"
   end
 
   def mailer_body(user)
     if bank_payment_request.owner_id == crediting_user.id
-      return "Credit for your Payment Order: #{bank_payment_request.name} has been successfully completed!"
+      status = bank_payment_request.payment_order&.payment_order_status&.name&.humanize
+      return "Credit for your Payment Order: #{bank_payment_request.name} has been successfully executed, and was #{status}!"
     end
   end
 
