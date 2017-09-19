@@ -1,5 +1,6 @@
 class ReceiptsController < ApplicationController
 
+  before_action :set_tokens_in_header, only: [:export]
 
   before_action -> { finly_authorize! :web}
 

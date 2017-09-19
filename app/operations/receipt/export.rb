@@ -18,6 +18,10 @@ class Receipt::Export < Receipt::Base
       return
     end
     self.receipts = receipts_presenter.receipts
+    if params[:id].present? or params[:receipt_id].present?
+      id = (params[:receipt_id] or params[:id])
+      self.receipts = self.receipts.with_id(id)
+    end
   end
 
   def validate
@@ -34,17 +38,6 @@ class Receipt::Export < Receipt::Base
   end
 
   def success
-    params[:receipts] = self.receipts
-    Receipt::Show::ReceiptsPresenter.new(user, params, messages)
-  end
-
-  class Receipt::Show::ReceiptsPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :receipt, :categories
-
-    def init
-      self.receipt = params[:receipt]
-      self.categories = user.company.categories.active
-    end
     Exporter::AsZip.new(user, {name: 'receipts', files: self.files}, messages)
   end
 
