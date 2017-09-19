@@ -2,7 +2,7 @@ class ReceiptsController < ApplicationController
 
   before_action :set_tokens_in_header, only: [:export]
 
-  before_action -> { finly_authorize! :web}
+  before_action -> { finly_authorize! :web }
 
   def create
     @result = Receipt::Create.(current_user, params)
@@ -31,7 +31,15 @@ class ReceiptsController < ApplicationController
 
   def export
     @result = Receipt::Export.(current_user, params)
-    respond
+    if @result.success?
+      respond_to do |format|
+        format.zip {
+          @result.render self
+        }
+      end
+    else
+      respond
+    end
   end
 
   def enable_transcription

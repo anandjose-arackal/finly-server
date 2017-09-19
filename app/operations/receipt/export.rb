@@ -19,7 +19,7 @@ class Receipt::Export < Receipt::Base
     end
     self.receipts = receipts_presenter.receipts
     if params[:id].present? or params[:receipt_id].present?
-      id = (params[:receipt_id] or params[:id])
+      id = (params[:receipt_id] or params[:id])&.split(',')
       self.receipts = self.receipts.with_id(id)
     end
   end
