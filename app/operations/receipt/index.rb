@@ -5,9 +5,14 @@ class Receipt::Index < Receipt::Base
     if personal_view?
       self.receipts = user.receipts.without_parent
     else
-      expenses = Expense::Index.(user, params)&.expenses
-      expense_ids = expenses.pluck(:id)
-      self.receipts = Receipt.with_expense_id(expense_ids)
+      expense_presenter = Expense::Index.(user, params)
+      if expense_presenter.success?
+        expense_ids = expense_presenter.expenses.pluck(:id)
+        self.receipts = Receipt.with_expense_ids(expense_ids)
+      else
+        add_message :error, expense_presenter.messages[:error]
+        return
+      end
     end
   end
 
