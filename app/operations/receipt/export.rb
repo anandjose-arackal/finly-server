@@ -6,9 +6,6 @@ class Receipt::Export < Receipt::Base
       add_message :error, 'User not found'
       return
     end
-    unless params&.dig(:id).present? or params&.dig(:receipt_id).present?
-      add_message :error, 'Receipt not found'
-    end
   end
 
   def init

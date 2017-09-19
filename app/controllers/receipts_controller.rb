@@ -38,7 +38,11 @@ class ReceiptsController < ApplicationController
         }
       end
     else
-      respond
+      # respond_to do |format|
+      #   format.zip {
+          render json: {success: false}
+        # }
+      # end
     end
   end
 
