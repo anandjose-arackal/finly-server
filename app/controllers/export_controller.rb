@@ -23,6 +23,14 @@ class ExportController < ApplicationController
         @include_comments = true
         render pdf: "report-#{@report.name}", layout: "pdf.html.erb", print_media_type: true
       }
+      format.zip {
+        @result = Export::Report::WithReceipts.(current_user, params)
+        if @result.success?
+          @result.render self
+        else
+          render json: {success: false}
+        end
+      }
     end
   end
 
