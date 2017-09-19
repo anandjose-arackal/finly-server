@@ -29,14 +29,14 @@ class ExportController < ApplicationController
   def expense
     respond_to do |format|
       format.csv {
-        @result = Expense::Export::AsCsv.(current_user, params)
+        @result = Expense::Exports::AsCsv.(current_user, params)
         send_data @result.data, filename: "#{@result.file_name}"
       }
       format.xls {
-        @result = Expense::Export::AsXml.(current_user, params)
+        @result = Expense::Exports::AsXml.(current_user, params)
       }
       format.zip {
-        @result = Expense::Export::WithReceipts.(current_user, params)
+        @result = Expense::Exports::WithReceipts.(current_user, params)
         if @result.success?
           @result.render self
         else

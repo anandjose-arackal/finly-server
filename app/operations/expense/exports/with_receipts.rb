@@ -1,4 +1,4 @@
-class Expense::Export::WithReceipts < Expense::Export::Base
+class Expense::Exports::WithReceipts < Expense::Exports::Base
   attr_accessor :expenses, :data, :files
 
   def authorized_user_types
@@ -12,11 +12,6 @@ class Expense::Export::WithReceipts < Expense::Export::Base
     end
   end
 
-  def init
-    expense_presenter = Expense::Index.(user, params)
-    self.expenses = expense_presenter.expenses
-  end
-
   def authorize
   end
 
@@ -25,20 +20,20 @@ class Expense::Export::WithReceipts < Expense::Export::Base
 
   def process
     self.files = []
-    headers = ['Merchant', 'Amount', 'User', 'Mobile', 'Surcharge', 'Created At']
+    headers = (default_column_names + cf_headers)
     contents = []
     # csv << column_names
     expenses.each do |expense|
-      contents << retrieve_data(headers, expense)
+      contents << retrieve_data(preferences, expense.report, expense, self.cf_data)
       expense.receipts&.each do |receipt|
         self.files << {name: receipt.image_file_name, path: receipt.image.path}
       end
     end
     case params[:type]
       when 'xls'
-        self.files << {name: 'export', file_contents: Exporter::Spreadsheet.new(user, {headers: headers, contents: contents}).generate_xls}
+        self.files << {name: 'finly_export.xls', file_contents: Exporter::Spreadsheet.new(user, {headers: headers, contents: contents}).generate_xls}
       when 'csv'
-        self.files << {name: 'export', file_contents: Exporter::Spreadsheet.new(user, {headers: headers, contents: contents}).generate_csv}
+        self.files << {name: 'finly_export.csv', file_contents: Exporter::Spreadsheet.new(user, {headers: headers, contents: contents}).generate_csv}
     end
   end
 
