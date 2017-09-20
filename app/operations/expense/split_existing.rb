@@ -75,7 +75,15 @@ class Expense::SplitExisting < Expense::Manual::Split
   end
 
   def receipt_id
-    self.existing_expense&.receipts&.first&.id
+    params[:receipt_id]
+  end
+
+  def load_receipt
+    if self.existing_expense&.receipts&.first&.id == self.receipt_id
+      self.existing_expense.receipts.first
+    else
+      super
+    end
   end
 
   protected

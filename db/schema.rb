@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170915105135) do
+ActiveRecord::Schema.define(version: 20170920070352) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -391,7 +391,6 @@ ActiveRecord::Schema.define(version: 20170915105135) do
     t.integer  "account_owner_id",   limit: 4
     t.string   "account_owner_type", limit: 255
     t.integer  "company_id",         limit: 4
-    t.boolean  "reimbursable"
   end
 
   add_index "bank_accounts", ["yes_bank_vendor_id"], name: "index_bank_accounts_on_yes_bank_vendor_id", using: :btree
@@ -410,10 +409,6 @@ ActiveRecord::Schema.define(version: 20170915105135) do
     t.integer  "bank_payment_request_id", limit: 4
     t.integer  "user_id",                 limit: 4
     t.integer  "forwarded_to_user_id",    limit: 4
-    t.text     "note",                    limit: 65535
-    t.text     "previous_value",          limit: 65535
-    t.text     "new_value",               limit: 65535
-    t.text     "edited_field",            limit: 65535
   end
 
   add_index "bank_payment_request_comments", ["action_id"], name: "index_bank_payment_request_comments_on_action_id", using: :btree
@@ -2011,7 +2006,6 @@ ActiveRecord::Schema.define(version: 20170915105135) do
     t.text     "link",                 limit: 65535
     t.integer  "view_role_id",         limit: 4
     t.text     "message",              limit: 65535
-    t.string   "application",          limit: 255
   end
 
   add_index "notifications", ["action_type_id"], name: "index_notifications_on_action_type_id", using: :btree
@@ -2135,7 +2129,6 @@ ActiveRecord::Schema.define(version: 20170915105135) do
     t.datetime "updated_at",                               null: false
     t.integer  "payment_order_id",           limit: 4
     t.text     "description",                limit: 65535
-    t.integer  "uploader_id",                limit: 4
   end
 
   create_table "payment_order_statuses", force: :cascade do |t|
@@ -2834,6 +2827,14 @@ ActiveRecord::Schema.define(version: 20170915105135) do
 
   add_index "user_login_tracks", ["user_id"], name: "index_user_login_tracks_on_user_id", using: :btree
 
+  create_table "user_mailer_subscriptions", force: :cascade do |t|
+    t.integer  "user_id",    limit: 4, null: false
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "user_mailer_subscriptions", ["user_id"], name: "index_user_mailer_subscriptions_on_user_id", using: :btree
+
   create_table "user_manager_mappings", force: :cascade do |t|
     t.integer  "user_id",                limit: 4
     t.integer  "manager_id",             limit: 4
@@ -3092,7 +3093,6 @@ ActiveRecord::Schema.define(version: 20170915105135) do
     t.datetime "updated_at",                null: false
     t.string   "email",         limit: 255
     t.string   "mobile_number", limit: 255
-    t.boolean  "authorized"
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
@@ -3257,6 +3257,7 @@ ActiveRecord::Schema.define(version: 20170915105135) do
   add_foreign_key "user_group_items", "user_groups"
   add_foreign_key "user_groups", "companies"
   add_foreign_key "user_login_tracks", "users"
+  add_foreign_key "user_mailer_subscriptions", "users"
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_panel_subscriptions", "users"

@@ -21,7 +21,6 @@
 #
 
 
-
 class Receipt < ActiveRecord::Base
   belongs_to :parent, polymorphic: true # so that it can be attached to expense as well as report
   belongs_to :user
@@ -48,6 +47,7 @@ class Receipt < ActiveRecord::Base
   scope :with_user_id, -> (user_ids) { where user_id: user_ids }
   scope :with_id, ->(id) { where id: id }
   scope :without_parent, -> { where(parent_id: nil) }
+  scope :with_parent, -> { where.not(parent_id: nil)}
   scope :with_expense_id, -> (expense_ids) { where(parent_type: 'Expense').where(parent_id: expense_ids) }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     unless date_from.blank? && date_to.blank?

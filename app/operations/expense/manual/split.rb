@@ -1,6 +1,14 @@
 class Expense::Manual::Split < Expense::Manual::Base
   attr_accessor :expenses_params, :receipt, :expenses, :receipt, :split_link
 
+  def personalizer
+    {
+        init: {
+            before: Personalizer::Process.new([:expense, :manual_split], :init, params)
+        }
+    }
+  end
+
   def authorized_user_types
     [:employee]
   end
@@ -105,7 +113,7 @@ class Expense::Manual::Split < Expense::Manual::Base
     # Keep a copy of the receipt to be attached. Create images for each expenses from the receipt and finally destroy the receipt
     receipt_id = self.receipt_id
     if receipt_id.present?
-      self.receipt = user.receipts.find_by_id(receipt_id)
+      load_receipt
     elsif base_params[:receipts_attributes].present?
       base_params[:receipts_attributes][:user_id] = user.id
     end
@@ -183,6 +191,10 @@ class Expense::Manual::Split < Expense::Manual::Base
 
   def receipt_id
     (params&.dig(:expense, :receipt_id) or params&.dig(:receipt_id))
+  end
+
+  def load_receipt
+    self.receipt = user.receipts.without_parent.find_by_id(receipt_id)
   end
 
 end
