@@ -6,13 +6,14 @@ class CreateUserMailerSubscriptions < ActiveRecord::Migration
       t.boolean :report_scheduled_mailer, index: true
       t.boolean :money_request_instant_mailer, index: true
       t.boolean :money_request_scheduled_mailer, index: true
-      t.boolean :personal_summary, index: true
+      t.boolean :personal_report_summary, index: true
       t.boolean :manager_report_summary, index: true
       t.boolean :finance_report_summary, index: true
       t.boolean :admin_report_summary, index: true
-      t.boolean :manager_report_summary, index: true
-      t.boolean :finance_report_summary, index: true
-      t.boolean :admin_report_summary, index: true
+      t.boolean :personal_money_request_summary, index: true
+      t.boolean :manager_money_request_summary, index: true
+      t.boolean :finance_money_request_summary, index: true
+      t.boolean :admin_money_request_summary, index: true
 
       t.timestamps null: false
     end
