@@ -1895,7 +1895,6 @@ Rails.application.routes.draw do
   post 'otp/verify' => 'otp#verify', as: :verify_otp
   post 'otp/resend' => 'otp#resend', as: :resend_otp
 
-
   post 'cards/details' => 'cards#details', as: :card_details
   post 'cards/update_balance' => 'cards#update_balance', as: :update_balance
   post 'cards/update_status' => 'cards#update_status', as: :update_card_status
@@ -1905,6 +1904,9 @@ Rails.application.routes.draw do
 
   resources :reports, except: [:new, :edit]
   get 'export/report(.:format)' => 'export#report', as: :export_report
+  get 'export/templates/index' => 'export#index_template'
+  get 'export/templates/:template_key' => 'export#export_template'
+
   resources :reports do
     post 'comment' => 'reports#comment', as: :comment
     patch 'retract' => 'reports#retract', as: :retract
@@ -1941,6 +1943,7 @@ Rails.application.routes.draw do
 
   post 'expenses/unreported', to: 'expenses#unreported', as: :expenses_unreported
 
+  get 'receipts/export', to: 'receipts#export'
   resources :receipts do
     post 'add_note', to: 'receipts#add_note', as: :add_note
     patch 'enable', to: 'receipts#enable_transcription', as: :enable_transcription
