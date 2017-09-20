@@ -8,7 +8,7 @@ class Receipt::Index < Receipt::Base
       expense_presenter = Expense::Index.(user, params)
       if expense_presenter.success?
         expense_ids = expense_presenter.expenses.pluck(:id)
-        self.receipts = Receipt.with_expense_ids(expense_ids)
+        self.receipts = Receipt.with_expense_id(expense_ids)
       else
         add_message :error, expense_presenter.messages[:error]
         return
