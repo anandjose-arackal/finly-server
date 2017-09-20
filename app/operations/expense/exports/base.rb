@@ -22,7 +22,7 @@ class Expense::Exports::Base < ::Export::Report::Base
     self.cf_headers = cf_data[:headers]
   end
 
-  class Expense::Export::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Expense::Exports::Base::ExportPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :data, :header, :file_name
 
     def init

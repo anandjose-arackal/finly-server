@@ -25,6 +25,6 @@ class Expense::Exports::AsXml < Expense::Exports::Base
   end
 
   def success
-    Expense::Export::Base::ExportPresenter.new(user, {data: data, file_name: file_name, header: column_names}, messages)
+    Expense::Exports::Base::ExportPresenter.new(user, {data: data, file_name: file_name, header: column_names}, messages)
   end
 end
