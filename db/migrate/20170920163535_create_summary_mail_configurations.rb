@@ -1,8 +1,7 @@
-class CreateUserMailerConfigurations < ActiveRecord::Migration
+class CreateSummaryMailConfigurations < ActiveRecord::Migration
   def change
-    create_table :user_mailer_configurations do |t|
+    create_table :summary_mail_configurations do |t|
       t.references :user, index: true, foreign_key: true
-      t.references :user_mailer_types, index: true, foreign_key: true
       t.references :period, index: true, foreign_key: true
       t.integer :scheduled_day_of_month, index: true
       t.string :scheduled_day, index: true
