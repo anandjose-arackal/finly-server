@@ -118,7 +118,7 @@ class ItzCash::AccountDetails < ItzCash::Base
       card.update(card_status_id: status_id)
     end
     if status == :upgraded and card.user.individual_kyc.kyc_status_id != KycStatus.id_for(:completed)
-      card.user.individual_kyc.update(kyc_status_id: KycStatus.id_for(:completed))
+      card.user.individual_kyc.update(kyc_status_id: KycStatus.id_for(:completed), review_position: nil)
     end
   end
 
