@@ -33,6 +33,6 @@ class Expense::Exports::AsCsv < Expense::Exports::Base
   end
 
   def success
-    Expense::Export::Base::ExportPresenter.new(user, {data: result, file_name: file_name}, messages)
+    Expense::Exports::Base::ExportPresenter.new(user, {data: result, file_name: file_name}, messages)
   end
 end
