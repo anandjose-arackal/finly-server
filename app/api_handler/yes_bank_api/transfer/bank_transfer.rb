@@ -101,6 +101,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
     beneficiary_name = transfer_request.beneficiary_name
     ILLEGAL_CHARACTERS.each do |character|
       beneficiary_name = beneficiary_name.sub(character, '')
+      beneficiary_name = beneficiary_name[0..30]
     end
     self.template = liquid_template.render(
         'UNIQUE_REFERENCE_NUMBER' => transfer_request.generate_unique_reference,

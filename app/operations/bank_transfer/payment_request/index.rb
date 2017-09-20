@@ -28,7 +28,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
   def process
     case self.role_id
       when UserRole.id_for(:admin)
-        if self.user.company_admin?
+        if self.user.vendor_payments_admin?
           team_ids = user.company.users.pluck(:id)
           self.payment_requests = BankPaymentRequest.not_open.with_user(team_ids)
         end

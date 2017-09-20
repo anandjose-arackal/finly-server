@@ -93,6 +93,6 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
 
   def credit_eligibility
     op = ItzCash::AccountDetails.(account.user, card: account)
-    op.available_card_eligibility
+    op.available_card_eligibility rescue 0
   end
 end

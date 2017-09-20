@@ -17,7 +17,7 @@ admin:
       <% if current_company.feature_subscription.cards_enabled and current_user.company_admin? %>
       - Fund Disbursement: '/disburse'
       <% end %>
-      <% if current_company.feature_subscription.yes_bank_account and current_user.company_admin? %>
+      <% if current_company.feature_subscription.yes_bank_account and current_user.vendor_payments_admin? %>
       - Vendor Payments: '/payments'
       <% end %>
       <% unless current_company.kyc_completed? %>
