@@ -234,5 +234,6 @@ json.auto_reload_config do
   json.enabled @result.selected_user.auto_reload_config.enabled rescue nil
   if @result.selected_user&.auto_reload_config&.enabled
     json.minimum_balance_value @result.selected_user.auto_reload_config.minimum_balance_value rescue nil
+    json.threshold_balance_value @result.selected_user.auto_reload_config.threshold_balance_value rescue nil
   end
 end

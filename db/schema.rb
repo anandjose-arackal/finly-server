@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170915105135) do
+ActiveRecord::Schema.define(version: 20170920125916) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -314,12 +314,13 @@ ActiveRecord::Schema.define(version: 20170915105135) do
   add_index "authentications", ["user_id"], name: "index_authentications_on_user_id", using: :btree
 
   create_table "auto_reload_configs", force: :cascade do |t|
-    t.integer  "minimum_balance_id", limit: 4
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.boolean  "enabled",                        default: false
-    t.integer  "reloadable_id",      limit: 4
-    t.string   "reloadable_type",    limit: 255
+    t.integer  "minimum_balance_id",   limit: 4
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+    t.boolean  "enabled",                          default: false
+    t.integer  "reloadable_id",        limit: 4
+    t.string   "reloadable_type",      limit: 255
+    t.integer  "threshold_balance_id", limit: 4
   end
 
   add_index "auto_reload_configs", ["reloadable_type", "reloadable_id"], name: "index_auto_reload_configs_on_reloadable_type_and_reloadable_id", using: :btree
@@ -414,6 +415,7 @@ ActiveRecord::Schema.define(version: 20170915105135) do
     t.text     "previous_value",          limit: 65535
     t.text     "new_value",               limit: 65535
     t.text     "edited_field",            limit: 65535
+    t.integer  "beneficiary_id",          limit: 4
   end
 
   add_index "bank_payment_request_comments", ["action_id"], name: "index_bank_payment_request_comments_on_action_id", using: :btree
@@ -466,6 +468,8 @@ ActiveRecord::Schema.define(version: 20170915105135) do
     t.integer  "controlling_for_user_id",      limit: 4
     t.integer  "controlling_for_user_role_id", limit: 4
     t.boolean  "require_approval"
+    t.boolean  "is_deleted"
+    t.integer  "beneficiary_type_id",          limit: 4
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
