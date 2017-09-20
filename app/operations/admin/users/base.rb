@@ -56,7 +56,7 @@ class Admin::Users::Base < Admin::Base
 
     def individual_kyc_data
       data = {}
-      if selected_user.individual_kyc.kyc_status_id > 1
+      if selected_user.individual_kyc.present? && selected_user.individual_kyc.kyc_status_id > 1
         data[:id_proof] = {
           url: selected_user.individual_kyc.id_proof.url,
           file_type: selected_user.individual_kyc.id_proof.content_type
