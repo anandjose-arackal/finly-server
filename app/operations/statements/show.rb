@@ -116,7 +116,8 @@ class Statements::Show < Statements::Base
 
     def opening_balance
       return nil unless can_view_balance?
-      balance = self.scoped_finly_transactions.last&.opening_balance&.value
+      date = params&.dig(:with_date_range)&.dig(:from).beginning_of_day
+      balance = account.finly_transactions.before_date(date).limit_to_one&.first&.closing_balance&.value
       return balance unless balance.nil?
 
       # todo Jugaad to access historical data
@@ -136,7 +137,8 @@ class Statements::Show < Statements::Base
 
     def closing_balance
       return nil unless can_view_balance?
-      balance = self.scoped_finly_transactions.first&.closing_balance&.value
+      date = params&.dig(:with_date_range)&.dig(:to) + 1
+      balance = self.finly_transactions.before_date(date).limit_to_one&.first&.closing_balance&.value
       return balance unless balance.nil?
 
       # todo Jugaad to access historical data
