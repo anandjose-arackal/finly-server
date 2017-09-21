@@ -32,7 +32,7 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
           team_ids = user.company.users.pluck(:id)
           self.payment_requests = BankPaymentRequest.not_open.with_user(team_ids)
         end
-        unless user.admin?
+        unless user.vendor_payments_admin?
           messages[:error] << 'User is not an admin'
           return false
         end

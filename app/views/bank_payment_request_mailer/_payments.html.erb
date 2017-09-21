@@ -4,9 +4,6 @@
     <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">ACCOUNT NUMBER</td>
     <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">IFSC</td>
     <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">AMOUNT</td>
-    <% if [NotifierType.id_for(:bank_payment_request_credit_confirm)].include?(@data.event_id) %>
-      <td style="padding: 15px; font-family: Helvetica, Arial, sans-serif;">COMMENTS</td>
-    <% end %>
   </tr>
     <% @data.bank_payment_request.payment_order.payments.each do |payment| %>
         <tr>
