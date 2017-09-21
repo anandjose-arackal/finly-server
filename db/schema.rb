@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170920125916) do
+ActiveRecord::Schema.define(version: 20170921090738) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -321,6 +321,7 @@ ActiveRecord::Schema.define(version: 20170920125916) do
     t.integer  "reloadable_id",        limit: 4
     t.string   "reloadable_type",      limit: 255
     t.integer  "threshold_balance_id", limit: 4
+    t.integer  "target_balance_id",    limit: 4
   end
 
   add_index "auto_reload_configs", ["reloadable_type", "reloadable_id"], name: "index_auto_reload_configs_on_reloadable_type_and_reloadable_id", using: :btree

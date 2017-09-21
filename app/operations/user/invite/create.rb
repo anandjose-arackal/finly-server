@@ -192,6 +192,11 @@ class User::Invite::Create < User::Invite::Base
     invite_params.permit!
   end
 
+  def configure_vendor_payment
+    invite_params[:user_panel_subscription_attributes] = {yes_bank_account: true}
+    invite_params.permit!
+  end
+
   def pre_process
     # if the user has a policy during invite, temporarily storing that user's policy to add it separately later
     if invite_params[:policy_id]
