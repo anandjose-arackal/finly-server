@@ -2,7 +2,18 @@ class Receipt::Index < Receipt::Base
   attr_accessor :receipts
 
   def process
-    self.receipts = user.receipts.without_parent
+    if personal_view?
+      self.receipts = user.receipts.without_parent
+    else
+      expense_presenter = Expense::Index.(user, params)
+      if expense_presenter.success?
+        expense_ids = expense_presenter.expenses.pluck(:id)
+        self.receipts = Receipt.with_expense_id(expense_ids)
+      else
+        add_message :error, expense_presenter.messages[:error]
+        return
+      end
+    end
   end
 
   def success

@@ -101,7 +101,7 @@ class Expense < ActiveRecord::Base
     end
   end
 
-  default_scope { order('expenses.created_at DESC') }
+  default_scope { order('expenses.date DESC') }
 
   scope :with_id, -> (ids) { where id: ids }
 

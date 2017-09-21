@@ -5,7 +5,6 @@ class Expense::Manual::Create < Expense::Manual::Base
   attr_accessor :expense_params, :receipt
 
   # only employees can create expenses
-
   def authorized_user_types
     [:employee]
   end

@@ -206,7 +206,7 @@ class Card < ActiveRecord::Base
     if Rails.env.production?
       (not [CardStatus.id_for(:unassigned), CardStatus.id_for(:assign_requested)].include?(self.card_status_id) and user_id.present?)
     else
-      return true
+      true
     end
   end
 
