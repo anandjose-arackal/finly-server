@@ -33,7 +33,7 @@ class Settlement::Payment::AddDebtToCompanyClearance < Settlement::Payment::Base
     self.amount = payment_params[:amount]
     self.currency_id = payment_params[:currency_id] || Currency.first.id
     self.note = payment_params[:note]
-    init_payment_request(:debit, :balance_clearance_outside_finly)
+    init_payment_request(:debit, :balance_clearance_outside_finly, {amount: self.amount})
   end
 
   def authorize

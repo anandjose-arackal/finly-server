@@ -50,7 +50,7 @@ user:
     default_url: 'orders'
   <% end %>
 views:
-  <% if current_user.admin? %>
+  <% if current_user.vendor_payments_admin? %>
     admin:
       menus:
         navbar:

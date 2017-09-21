@@ -34,7 +34,8 @@ class Event::EMoneyRequest::Unapprove < Event::EMoneyRequest::Base
                                              path_object_type: "Money Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: view_role_id
+                                             view_role_id: view_role_id,
+                                             application: RequestStore.store[:current_app]
     )
     notification.save
   end

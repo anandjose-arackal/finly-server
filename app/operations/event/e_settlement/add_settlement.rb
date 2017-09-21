@@ -30,7 +30,8 @@ class Event::ESettlement::AddSettlement < Event::ESettlement::Base
                                                   path_object_id: report.id,
                                                   path_object_type: "Report",
                                                   read: false,
-                                                  timestamp: DateUtils.local_date_time
+                                                  timestamp: DateUtils.local_date_time,
+                                                 application: RequestStore.store[:current_app]
                                                 )
         notification.save
       end
@@ -45,7 +46,8 @@ class Event::ESettlement::AddSettlement < Event::ESettlement::Base
                                                  path_object_id: report.id,
                                                  path_object_type: "Report",
                                                  read: false,
-                                                 timestamp: DateUtils.local_date_time
+                                                 timestamp: DateUtils.local_date_time,
+                                                 application: RequestStore.store[:current_app]
                                                 )
         notification.save
       end

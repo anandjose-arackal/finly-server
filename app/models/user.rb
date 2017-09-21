@@ -49,19 +49,6 @@
 #
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -467,8 +454,15 @@ class User < ActiveRecord::Base
   end
 
   # todo - temporarily disabling policy admin screen for the admin? role
-  def admin?
-    company_admin?
+  def admin?(application = "em")
+    case application
+      when "em"
+        company_admin?
+      when "vp"
+        vendor_payment_admin?
+      else
+        company_admin?
+    end
   end
 
   def finance_manager?
@@ -520,6 +514,20 @@ class User < ActiveRecord::Base
 
   alias_method :vendor_payments_initiator?, :vendor_payment_initiator?
 
+
+  def expense_management_enabled?
+    self.user_panel_subscription.expense_management
+  end
+
+  def disburse_enabled?
+    self.user_panel_subscription.disburse
+  end
+
+  def vendor_payments_enabled?
+    self.user_panel_subscription.yes_bank_account_transfer
+  end
+
+  alias_method :vendor_payment_enabled?, :vendor_payments_enabled?
 
   def has_role?(role_id)
     return false unless role_id.present?
@@ -705,6 +713,21 @@ class User < ActiveRecord::Base
 
   def payment_initiator?
     self.role_mapping.vendor_payments.employee.present?
+  end
+
+  def bank_transfer_enabled?
+    (self.vendor_payments_enabled? && self.bank_accounts.present?)
+  end
+
+  # method that determines whether a particular user has
+  # cash on hand payments that are pending confirmation
+  # from the bank - eg. NEFT transfers
+  def cash_on_hand_credits_awaiting_confirmation?
+    self.receiving_payments.cash_advance.processing.present?
+  end
+
+  def reimbursements_awaiting_confirmation?
+
   end
 
   private

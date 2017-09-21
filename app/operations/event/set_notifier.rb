@@ -42,7 +42,7 @@ class Event::SetNotifier < Event::Base
     users = mailer_affected_users
     if users.present?
       users.each do |user|
-        next if user.blank? #or not user.is_a?(User)
+        next if user.blank? # or not user.is_a?(User)
         user_event_configuration = load_configuration(user)
         if allow_mailer(user, user_event_configuration) && user.email.present?
           send_mailer(user)
@@ -66,7 +66,7 @@ class Event::SetNotifier < Event::Base
     users = notification_affected_users
     if users.present?
       users.each do |user|
-        next if user.blank? #or not user.is_a?(User)
+        next if user.blank? # or not user.is_a?(User)
         set_notification(user)
       end
     end

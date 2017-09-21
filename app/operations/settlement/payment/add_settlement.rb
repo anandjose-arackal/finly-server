@@ -13,9 +13,9 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
   attr_accessor :reports, :role, :report_total, :cash_deduction, :report_names, :reimbursement_card, :reimbursement_card_id,
                 :reimbursement_amount, :cash_in_hand_deduction_amount, :outside_settlement_amount,
                 :initiating_account, :initiating_account_type, :initiating_account_id, :reimbursement_type_id, :reimbursement_bank_account,
-                :payment_request
+                :payment_request, :receiving_account, :receiving_account_type, :transfer_mode
 
-  REIMBURSEMENT_TYPE = {:none => 1, :outside_finly => 2, :reimbursement_card => 3, :reimbursement_bank_account => 4}
+  REIMBURSEMENT_TYPE = {:none => 1, :outside_finly => 2, :reimbursement_card => 3, :reimbursement_bank_account => 5}
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -108,29 +108,29 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
           end
         end
       when REIMBURSEMENT_TYPE[:reimbursement_bank_account]
-        return unless payment_params.dig(:reimbursement_bank_account, :amount).present?
-
-        self.reimbursement_bank_account = to_user.itz_cash_dmt_sender&.beneficiaries&.active&.reimbursement_accounts&.default&.first
-
-        if self.reimbursement_bank_account.present?
-          self.reimbursement_amount = payment_params.dig(:reimbursement_bank_account, :amount).to_f rescue 0
-
-          self.initiating_account_type = payment_params[:initiating_account_type]
-
-          case self.initiating_account_type.to_sym
-            when :virtual_account
-              self.initiating_account_id = user.company_id
-              self.initiating_account = user.company
-            when :wallet
-              self.initiating_account_id = user.wallet.id
-              self.initiating_account = user.wallet
-            when :card
-              self.initiating_account_id = payment_params[:initiating_account_id].to_i rescue nil
-              if self.initiating_account_id.present?
-                self.initiating_account = user.cards.with_id(self.initiating_account_id).first rescue nil
-              end
-          end
+        # add logic here for determining whether the reimbursement is through company credits or
+        # Finly Money
+        self.reimbursement_amount = payment_params[:from_bank_transfer].to_f
+        self.initiating_account_type = payment_params[:initiating_account_type]
+        case self.initiating_account_type
+          when 2, '2'
+            self.initiating_account = user.company.yes_bank_company_account
+          when 1, '1'
+            self.initiating_account = user.bank_wallet
+          else
+            # self.initiating_account = user.company.yes_bank_company_account
+            # self.initiating_account = user.bank_wallet
+            # do nothing?
         end
+
+        self.transfer_mode = payment_params[:payment_mode]&.upcase
+        self.receiving_account_type = payment_params[:receiving_account_type]
+        id = payment_params[:receiving_account_id]
+        self.receiving_account = self.reimbursement_bank_account = to_user.bank_accounts.find_by(id: id)
+      else
+        # add error message and return I suppose
+        add_message :error, "Please choose a reimbursement method before proceesing"
+        return
     end
     self.note = payment_params[:note]
   end
@@ -286,7 +286,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
 
   def process
 
-    if self.cash_in_hand_deduction_amount.present?
+    if self.cash_in_hand_deduction_amount.present? && cash_in_hand_deduction_amount > 0
       # creating a payment request that can handle this case
       payment_request = PaymentRequest.(user, nil, to_user.cash_on_hand.class.name, :debit, :balance_clearance_outside_finly)
       payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, to_user.cash_on_hand, cash_in_hand_deduction_amount))
@@ -302,9 +302,36 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     end
     ############ This concludes cash on hand deduction if any ################
 
+    ### if the reimbursement is through the bank account ####################
+    if self.reimbursement_type_id == REIMBURSEMENT_TYPE[:reimbursement_bank_account] and reimbursement_amount.present?
+      payment_request = PaymentRequest.(user,
+                                        initiating_account,
+                                        receiving_account.class.name,
+                                        :credit,
+                                        :reimbursement,
+                                        {bank_transfer_type: self.transfer_mode, payment_mode: self.transfer_mode}
+      )
+      payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, receiving_account, reimbursement_amount))
+      op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: self.transfer_mode})
+      if op.success?
+        self.payment = op.payment_order.payments.first
+        if payment.reload.processing?
+          payment.system_messages.create(content: "Reimbursement processed. Awaiting credit confirmation",
+                                         system_message_type_id: SystemMessageType.id_for(:error)
+                                        )
+          payment.update(note: "Reimbursemet processed. Awaiting credit confirmation")
+        end
+        return
+      else
+        add_message :error, op.messages[:error]
+        return
+      end
+    end
+
+    ##### end of bank account reimbursements #########################
+
     ############ Now the other reimbursement options #################
     if self.reimbursement_type_id == REIMBURSEMENT_TYPE[:reimbursement_card] and reimbursement_amount.present?
-
       initiating_account = nil
       case initiating_account_type
         when :virtual_account
@@ -335,14 +362,14 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
       end
       self.payment = op.payment_order.payments.first
     end
+  end
 
+  def post_process
+    ###### now marking the selected reports as settled if the operation succeeded
     reports.each do |report|
       op = Report::MarkAsSettled.(user, {payment: payment, cash_in_hand_deduction: self.cash_deduction, report: report, role_id: role, view: params[:view]})
     end
 
-  end
-
-  def post_process
     add_message :success, 'Reports settled'
 
     event = Event::ESettlement::AddSettlement.new(user, payment: self.payment, cash_in_hand_deduction: cash_deduction,

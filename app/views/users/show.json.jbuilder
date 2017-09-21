@@ -18,6 +18,7 @@ json.user do
     json.expense_card_assignable @result.selected_user.expense_card_assignable?
     json.unassigned_cards @result.unassigned_cards
   end
+  json.bank_transfer_enabled @result.selected_user.bank_transfer_enabled?
 end
 json.subscriptions do
   json.show_config @result.selected_user.company.more_than_one_subscription?

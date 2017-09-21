@@ -4,12 +4,6 @@ class BankTransfer::PaymentOrdersController < ApplicationController
 
   before_action {finly_authorize! :web}
 
-  def index
-    # todo - this action will not exist here anymore, just for testing purposes this is
-    @result = BankTransfer::YesBank::Index.(current_user, params)
-    respond
-  end
-
   def count
     @result = BankTransfer::YesBank::Count.(current_user, params)
     render json: @result.as_json

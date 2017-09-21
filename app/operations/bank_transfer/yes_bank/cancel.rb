@@ -1,5 +1,5 @@
 class BankTransfer::YesBank::Cancel < BankTransfer::YesBank::Base
-  attr_accessor :payment_order
+  attr_accessor :payment_order, :cancel_note
 
   def pre_validate
     super
@@ -16,6 +16,7 @@ class BankTransfer::YesBank::Cancel < BankTransfer::YesBank::Base
 
   def init
     self.payment_order = BankTransfer::YesBank::Index.(user, params).payment_orders.with_id(params[:id]).first rescue nil
+    self.cancel_note = params[:note]
   end
 
   def validate
@@ -39,6 +40,14 @@ class BankTransfer::YesBank::Cancel < BankTransfer::YesBank::Base
     else
       add_message :error, self.payment_order.errors.full_messages
     end
+  end
+
+  def post_process
+    # add a comment saying that it has been cancelled
+    bank_payment_request = payment_order.bank_payment_request
+    bank_payment_request.comments.create user_id: user.id,
+                                         action_id: BankPaymentRequestCommentAction.id_for(:cancel),
+                                         note: self.cancel_note
   end
 
   def success

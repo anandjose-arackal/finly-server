@@ -1,4 +1,5 @@
 json.array!(@result.bank_accounts) do |bank_account|
+  json.id bank_account.id
   json.account do
     json.account_number bank_account.account_number
     json.ifsc bank_account.ifsc

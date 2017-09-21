@@ -65,10 +65,10 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
   end
 
   def pre_process
-    # updating the state of the payment request, because if it gets here, the status is credited,
+    # updating the state of the payment request, because if it gets here, the status is approved,
     # irrespective of if whether the actual payments succeeded or not
     if self.bank_payment_request.present?
-      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:approved))
     end
 
     # also set the payment order's status id as either scheduled or as pending
@@ -88,9 +88,12 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
     unless op.success?
 
       add_message :error, op.messages[:error]
-      # op.payment_order.payments.each do |payment|
-      #   payment.receiving_account.destroy # just the bogus bank account
-      # end
+      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
+      payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
+      payment_order.payments.each do |payment|
+        payment.system_messages.create(content: op.messages[:error].to_sentence,
+                                       system_message_type_id: SystemMessageType.id_for(:error))
+      end
       return
     end
     self.payment_order = op.payment_order

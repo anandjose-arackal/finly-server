@@ -15,6 +15,7 @@ json.balance @result.company_balance
 json.hard_copy_receipt @result.company.hard_copy_receipt_enabled?
 json.encrypted_params @result.company.configuration.encrypted_easy_login_params
 json.itz_cash_d_code_enabled @result.company.itz_cash_d_code_enabled?
+json.yes_bank_account @result.company.vendor_payments_enabled?
 
 if Rails.env.production?
   json.url "https://www.itzcash.com/finly/servlet/AccountReloadServlet"

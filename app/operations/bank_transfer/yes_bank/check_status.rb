@@ -3,7 +3,7 @@
 
 class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
-  attr_accessor :bank_transaction, :company
+  attr_accessor :bank_transaction, :company, :payment, :payment_request, :payment_order
 
   def self.call(bank_transaction)
     self.new(bank_transaction).run
@@ -12,6 +12,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   def initialize(bank_transaction)
     self.bank_transaction = bank_transaction
     self.company = bank_transaction.company
+    self.payment = bank_transaction.payment
+    self.payment_order = payment&.payment_order
   end
 
   def authorized_user_types
@@ -43,8 +45,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?
       if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
-        bank_transaction.payment&.update(payment_status_id: PaymentStatus.id_for(:completed))
+      # if true
+        handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
@@ -53,7 +55,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
-                                      content: "The amount will be refunded to your bank account shortly").save
+                                      content: "The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
         create_refund_payment
       else
@@ -61,6 +63,25 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
       end
     end
 
+  end
+
+  def post_process
+    # here check if the payment order has associated bank payment requests and accordingly send notification
+    if payment_order.bank_payment_request.present?
+      # now check if all the payments in this order are either successes or failures.
+      # i.e. none processing or awaiting credit confirmation
+      completed = true
+      bank_payment_request = payment_order.bank_payment_request
+      payment_order.payments.each do |payment|
+        unless [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)].include?(payment.payment_status_id)
+          completed = false
+        end
+      end
+      if completed
+        # this will trigger the mailer and notification that a particular credit has been successfully completed
+        Event::EBankPaymentRequest::CreditConfirm.(bank_payment_request.owner, bank_payment_request: bank_payment_request)
+      end
+    end
   end
 
   private
@@ -78,6 +99,26 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
       # op.payment_order.destroy
       add_message :error, op.messages[:error]
     end
+  end
+
+  def handle_successful_transaction
+    if payment&.cash_on_hand_credit?
+      init_payment_request
+      # now execute the payment that adds to the user's cash on hand
+      AccountManager::Payments::PaymentProcessor.(self.payment.initiating_user, {payment_request: self.payment_request})
+    end
+    # now mark the respective bank transaction and payment as completed
+    bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
+    self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+    self.payment.system_messages.destroy_all # deleting the previous system messages
+  end
+
+  def init_payment_request
+    receiving_user = payment.receiving_user
+    amount = payment.amount_value
+    receiving_account = receiving_user.cash_on_hand
+    self.payment_request = ::PaymentRequest.(payment.initiating_user, nil, (receiving_account&.class&.name), :credit, :advance)
+    self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(receiving_user, receiving_account, amount, note: self.payment.note))
   end
 
 end

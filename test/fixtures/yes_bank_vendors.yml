@@ -9,6 +9,7 @@
 #  updated_at    :datetime         not null
 #  email         :string(255)
 #  mobile_number :string(255)
+#  authorized    :boolean
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
