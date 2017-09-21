@@ -141,7 +141,14 @@ class BankPaymentRequest < ActiveRecord::Base
   end
 
   def beneficiary_type
-
+    case self.payment_order.payments.first&.receiving_user&.class&.name
+      when "User"
+        return 1 # i.e. 1 is users
+      when "YesBankVendor"
+        return 2 # i.e. 2 is vendors
+      else
+        return 2 # i.e. it's vendors by default
+    end
   end
 
   def total_amount
