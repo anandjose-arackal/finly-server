@@ -193,7 +193,7 @@ class User::Invite::Create < User::Invite::Base
   end
 
   def configure_vendor_payment
-    invite_params[:user_panel_subscription_attributes] = {yes_bank_account: true}
+    invite_params[:user_panel_subscription_attributes] = {yes_bank_account_transfer: true}
     invite_params.permit!
   end
 
