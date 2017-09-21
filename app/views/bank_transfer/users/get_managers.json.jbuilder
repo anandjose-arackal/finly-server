@@ -11,3 +11,7 @@ json.creditors do
     json.name manager.name
   end
 end
+
+json.company do
+  json.id @result.company_id
+end
