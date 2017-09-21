@@ -14,7 +14,7 @@ json.summary do
   json.reviewing_user reviewer
   creditor = (@result.finance_manager.name rescue '--')
   json.crediting_user creditor
-  json.beneficiary_type @result.bank_payment_request.beneficiary_type_id
+  json.beneficiary_type @result.bank_payment_request.beneficiary_type
 end
 
 json.payments do
