@@ -90,6 +90,9 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         if result.success?
           add_message :success, 'Payment processed successfully'
         else
+          # overriding this for testing
+          # payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:processing))
+          # payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:processing))
           add_message :error, result.messages[:error]
         end
       end
