@@ -45,7 +45,7 @@ class Event::ESummary::Report < Event::SetNotifier
     s = []
     if user.company.d_code_enabled?
       if user.company_admin?
-        # s << {name: 'Company Credits Opening Balance', value: }
+        s << summary_for_company_balance
       end
     end
   end
@@ -109,6 +109,10 @@ class Event::ESummary::Report < Event::SetNotifier
     configurations = SummaryMailConfiguration.configurations_for day_of_month, day_of_week, time_slot
     user_ids = configurations.pluck(:user_id)
     self.users = User.with_id(user_ids)
+  end
+
+  def summary_for_company_balance
+    return nil unless user.company_admin?
   end
 
 end
