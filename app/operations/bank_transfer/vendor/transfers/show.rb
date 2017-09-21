@@ -18,17 +18,19 @@ class BankTransfer::Vendor::Transfers::Show < BankTransfer::Vendor::Base
   def success
     params[:receiving_transactions] = receiving_transactions
     params[:bank_accounts] = bank_accounts
+    params[:vendor] = vendor
+    BankTransfer::Vendor::Transfers::Show::VendorPresenter.new(user, params)
   end
 
   class BankTransfer::Vendor::Transfers::Show::VendorPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :receiving_transactions
+    attr_accessor :receiving_transactions, :bank_accounts, :vendor
 
     def init
       self.receiving_transactions = params[:receiving_transactions]
       self.bank_accounts = params[:bank_accounts]
+      self.vendor = params[:vendor]
     end
 
   end
-
 end
