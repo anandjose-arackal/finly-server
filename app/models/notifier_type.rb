@@ -80,7 +80,9 @@ class NotifierType < ActiveRecord::Base
              {key: :card_transaction, has_push_notification: true, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
              {key: :auto_reload_card, has_push_notification: false, has_mailer: false,
-              configurable_push_notification: false, configurable_mailer: false}]
+              configurable_push_notification: false, configurable_mailer: false},
+             {key: :funds_summary, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true}]
 
   self.class.instance_eval do
     ACTIONS.each do |item|
