@@ -22,17 +22,23 @@ class User::Configuration::AutoReload::Update < BaseOperation
   end
 
   def validate
-    if update_params[:minimum_balance_attributes][:value].to_f <= 0 && update_params[:enabled] == '1'
-      add_message :error, "Minimum balance cannot be less than or equal to 0"
+    if update_params[:target_balance_attributes][:value].to_f <= 0 && update_params[:enabled] == '1'
+      add_message :error, "Target balance cannot be less than or equal to 0"
+      return
+    end
+    if update_params[:threshold_balance_attributes][:value].to_f <= 0 && update_params[:enabled] == '1'
+      add_message :error, "Threshold balance cannot be less than or equal to 0"
       return
     end
   end
 
   def pre_process
     # ensuring that the auto reload configuration is always in Rupees
-    update_params[:minimum_balance_attributes][:currency_id] = "1"
+    update_params[:target_balance_attributes][:currency_id] = "1"
+    update_params[:threshold_balance_attributes][:currency_id] = "1"
     if update_params[:enabled] == '0'
-      update_params.delete(:minimum_balance_attributes)
+      update_params.delete(:target_balance_attributes)
+      update_params.delete(:threshold_balance_attributes)
     end
   end
 
@@ -50,6 +56,6 @@ class User::Configuration::AutoReload::Update < BaseOperation
 
   def auto_reload_config_params
     # here default currency id will be rupee because card reloads can only happen in INR
-    params.require(:auto_reload_config).permit(:enabled, minimum_balance_attributes: [:value, :currency_id])
+    params.require(:auto_reload_config).permit(:enabled, target_balance_attributes: [:value, :currency_id], threshold_balance_attributes: [:value, :currency_id])
   end
 end

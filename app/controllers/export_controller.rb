@@ -23,17 +23,33 @@ class ExportController < ApplicationController
         @include_comments = true
         render pdf: "report-#{@report.name}", layout: "pdf.html.erb", print_media_type: true
       }
+      format.zip {
+        @result = Export::Report::WithReceipts.(current_user, params)
+        if @result.success?
+          @result.render self
+        else
+          render json: {success: false}
+        end
+      }
     end
   end
 
   def expense
     respond_to do |format|
       format.csv {
-        @result = Expense::Export::AsCsv.(current_user, params)
+        @result = Expense::Exports::AsCsv.(current_user, params)
         send_data @result.data, filename: "#{@result.file_name}"
       }
       format.xls {
-        @result = Expense::Export::AsXml.(current_user, params)
+        @result = Expense::Exports::AsXml.(current_user, params)
+      }
+      format.zip {
+        @result = Expense::Exports::WithReceipts.(current_user, params)
+        if @result.success?
+          @result.render self
+        else
+          render json: {success: false}
+        end
       }
     end
   end
@@ -67,8 +83,14 @@ class ExportController < ApplicationController
     end
   end
 
-  private
+  def index_template
+    @result = Personalizer::ExportTemplates.(current_user)
+    respond
+  end
 
-
+  def export_template
+    @result = Personalizer::ProcessTemplate.(current_user, params)
+    respond
+  end
 
 end

@@ -15,14 +15,34 @@ class AutoReloadConfig < ActiveRecord::Base
 
   belongs_to :reloadable, polymorphic: true
   belongs_to :minimum_balance, class_name: 'Amount'
+  belongs_to :threshold_balance, class_name: "Amount"
+  belongs_to :target_balance, class_name: "Amount"
 
   accepts_nested_attributes_for :minimum_balance
+  accepts_nested_attributes_for :threshold_balance
+  accepts_nested_attributes_for :target_balance
 
   # validate :minimum_balance_presence
 
   def minimum_balance_value
     if self.minimum_balance
       return minimum_balance.value
+    else
+      return 0
+    end
+  end
+
+  def threshold_balance_value
+    if self.threshold_balance
+      return threshold_balance.value
+    else
+      return 0
+    end
+  end
+
+  def target_balance_value
+    if self.target_balance
+      return target_balance.value
     else
       return 0
     end

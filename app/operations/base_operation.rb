@@ -43,36 +43,36 @@ class BaseOperation
     return failure if has_errors?
     authorize_user authorized_user_types
     return failure if has_errors?
-    pre_validate
+    execute_function :pre_validate
     return failure if has_errors?
-    pre_authorize
+    execute_function :pre_authorize
     return failure if has_errors?
-    init
+    execute_function :init
     return failure if has_errors?
-    authorize
+    execute_function :authorize
     return failure if has_errors?
-    validate
+    execute_function :validate
     return failure if has_errors?
-    subscribe
+    execute_function :subscribe
     return failure if has_errors?
     if expense_management?
-      configure_expense_management
+      execute_function :configure_expense_management
       return failure if has_errors?
     elsif funds_transfer?
-      configure_disburse
+      execute_function :configure_disburse
       return failure if has_errors?
     elsif vendor_payments?
-      configure_vendor_payment
+      execute_function :configure_vendor_payment
       return failure if has_errors?
     end
-    pre_process
+    execute_function :pre_process
     return failure if has_errors?
-    process
+    execute_function :process
     return failure if has_errors?
     self.process_complete = true
-    post_process
+    execute_function :post_process
     return failure if has_errors?
-    retrieve
+    execute_function :retrieve
   end
 
   def user_model
@@ -114,6 +114,17 @@ class BaseOperation
         raise_unauthorized_exception
       end
     end
+  end
+
+
+  #   {
+  #       pre_validate: {
+  #           before: Personalizer::Process.new([:expense, :create], :pre_validate, params),
+  #           after: Personalizer::Process.new([:expense, :create], :pre_validate, params)
+  #       }
+  #   }
+  def personalizer
+    {}
   end
 
   # Define the authorized user types for the action
@@ -188,7 +199,7 @@ class BaseOperation
   end
 
   def has_errors?
-    self.messages[:error].present? or self.messages[:failure].present?
+    self.messages.present? and (self.messages[:error].present? or self.messages[:failure].present?)
   end
 
   def processing?
@@ -284,6 +295,34 @@ class BaseOperation
       false
     end
 
+    def current_app
+      RequestStore.store[:current_app]
+    end
+
+    def current_devise
+      RequestStore.store[:current_devise]
+    end
+
+    def current_user
+      RequestStore.store[:current_user]
+    end
+
+    def authorized_scopes
+      RequestStore.store[:authorized_scopes]
+    end
+
+    def current_company
+      RequestStore.store[:current_company]
+    end
+
+    def current_request
+      RequestStore.store[:request]
+    end
+
+    def request_params
+      RequestStore.store[:params]
+    end
+
     class BaseOperation::BasePresenter::SuccessPresenter < BaseOperation::BasePresenter
       def success?
         true
@@ -376,6 +415,41 @@ class BaseOperation
 
   def clear_messages
     self.messages = {error: [], failure: [], success: [], message: [], notice: []}
+  end
+
+  # Used for executing custom functions. All functions defined in personalizer would be executed here
+  def execute_function(function)
+    return unless function.present?
+
+    personalizer_config = personalizer
+    if personalizer_config.nil?
+      personalizer_config = {}
+    end
+
+    # Run personalizer if present
+    before_operation = personalizer_config&.dig(function, :before)
+    before_operation&.run
+
+    if before_operation&.has_errors?
+      add_message :error, before_operation.messages[:error]
+      return
+    end
+
+    result = self.send function
+    if has_errors?
+      return
+    end
+    # Run personalizer if present
+    after_operation = personalizer_config&.dig(function, :after)
+    after_operation&.run
+
+    if after_operation&.has_errors?
+      add_message :error, after_operation.messages[:error]
+      return
+    end
+
+    # Return the result provided by the function
+    result
   end
 
 end
