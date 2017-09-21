@@ -1,6 +1,6 @@
 class BankTransfer::Users::GetManagers < BankTransfer::Users::Base
 
-  attr_accessor :managers, :finance_managers
+  attr_accessor :reviewers, :creditors
 
   def authorized_user_types
     [:vendor_payment_admin, :company_admin]
@@ -17,23 +17,23 @@ class BankTransfer::Users::GetManagers < BankTransfer::Users::Base
   end
 
   def process
-    self.managers = user.company.users.only_vendor_payment_admins
-    self.finance_managers = user.company.users.only_vendor_payment_creditors
+    self.reviewers = user.company.users.only_vendor_payment_reviewers
+    self.creditors = user.company.users.only_vendor_payment_creditors
   end
 
   def success
-    params[:managers] = self.managers
-    params[:finance_managers] = self.finance_managers
+    params[:reviewers] = self.reviewers
+    params[:creditors] = self.creditors
     BankTransfer::Users::GetManagers::ManagersPresenter.new(user, params, messages)
   end
 
   class BankTransfer::Users::GetManagers::ManagersPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :managers, :finance_managers
+    attr_accessor :reviewers, :creditors
 
     def init
-      self.managers = params[:managers]
-      self.finance_managers = params[:finance_managers]
+      self.reviewers = params[:reviewers]
+      self.creditors = params[:creditors]
     end
   end
 
