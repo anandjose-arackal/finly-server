@@ -9,6 +9,10 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
     self.auto_approve = params[:approve]
   end
 
+  def action_name
+    "Paymnt Order approved"
+  end
+
 
   def validate
     super
@@ -79,7 +83,7 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
     if approver_id.present? and user.id == approver_id
       message = "You have successfully approved the payment order : #{self.bank_payment_request.name}"
     else
-      if approved and user.id == bank_payment_request.user.id
+      if approved and user.id == bank_payment_request.owner_id
         if auto_approve
           message = "Congratulations! Your payment order #{bank_payment_request.name} has been auto-approved"
         else
@@ -96,10 +100,10 @@ class Event::EBankPaymentRequest::Approve < Event::EBankPaymentRequest::Base
   end
 
   def bank_payment_request_view_role(user)
-    if user.id == report.user_id
+    if user.id == bank_payment_request.owner_id
       return UserRole.id_for(:initiator)
     elsif user.id == bank_payment_request.controlling_user_id
-      return report.controlling_user_role_id
+      return bank_payment_request.controlling_user_role_id
     elsif user.id == self.bank_payment_request.tracks.last.action_user_id
       return self.bank_payment_request.bank_payment_request_trails.last.action_user_role_id
     end

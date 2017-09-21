@@ -216,6 +216,12 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.id_for(:notify_quickbooks_sync_partial_success)
         content = "Syncing with Quickbooks was partially successful - refer to reports list to see what all were successful"
         return content
+      when NotificationActionType.id_for(:notify_credit_confirmation)
+        bank_payment_request = BankPaymentRequest.unscoped.find_by(id: self.object_id)
+        content = "Credit for one of your payments in Payment Order: #{bank_payment_request.name} was successful!"
+        return content
+      when NotificationActionType.id_for(:notify_credit_failure)
+        # todo
       else
         action = ""
     end
