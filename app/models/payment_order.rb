@@ -124,11 +124,7 @@ class PaymentOrder < ActiveRecord::Base
 
   # method for total of all the payments in this particular payment order
   def request_total
-    total = 0
-    self.payments.each do |payment|
-      total += payment.amount_value
-    end
-    total
+    self.payments.joins(:amount).sum(:value)
   end
 
   def payment_mode
