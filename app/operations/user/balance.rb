@@ -42,7 +42,7 @@ class User::Balance < User::Base
 
     # Virtual Account
     if params[:virtual_account] and user.company_admin?
-      op = Company::VirtualAccount::Balance.(user)
+      op = Company::ItzCashVirtualAccount::Balance.(user)
       self.balances[:virtual_account] = {id: user.company.id, name: 'Company Credits', balance: op.balance} rescue nil
     end
 

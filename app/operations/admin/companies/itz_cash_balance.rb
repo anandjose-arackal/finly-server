@@ -1,4 +1,4 @@
-class Admin::Companies::Balance < Company::VirtualAccount::Balance
+class Admin::Companies::ItzCashBalance < Company::ItzCashVirtualAccount::Balance
 
   def user_model
     AdminUser
