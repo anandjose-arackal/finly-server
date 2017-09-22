@@ -116,43 +116,14 @@ class Statements::Show < Statements::Base
 
     def opening_balance
       return nil unless can_view_balance?
-      date = params&.dig(:with_date_range)&.dig(:from).beginning_of_day
-      balance = account.finly_transactions.before_date(date).limit_to_one&.first&.closing_balance&.value
-      return balance unless balance.nil?
-
-      # todo Jugaad to access historical data
-      from = (params&.dig(:with_date_range)&.dig(:from) - 1.day)
-      case self.account.class.name
-        when Card.name
-          self.account.user.user_balance_histories.with_date(from)&.first&.card_balance&.value || 0
-        when ItzCashCompanyAccount.name
-          self.account.company.company_balance_histories.with_date(from)&.first&.company_balance&.value || 0
-        when UserWallet.name
-          self.account.user.user_balance_histories.with_date(from)&.first&.finly_money_balance&.value || 0
-        when CashOnHand.name
-          self.account.user.user_balance_histories.with_date(from)&.first&.cash_on_hand_balance&.value || 0
-      end
-      # self.account.user.user_balance_histories.with_date(from)&.first.card_balance.value.to_s
+      date = params&.dig(:with_date_range)&.dig(:from)
+      account.opening_balance(date)
     end
 
     def closing_balance
       return nil unless can_view_balance?
-      date = params&.dig(:with_date_range)&.dig(:to) + 1
-      balance = self.finly_transactions.before_date(date).limit_to_one&.first&.closing_balance&.value
-      return balance unless balance.nil?
-
-      # todo Jugaad to access historical data
-      to = params&.dig(:with_date_range)&.dig(:to)
-      case self.account.class.name
-        when Card.name
-          self.account.user.user_balance_histories.with_date(to)&.first&.card_balance&.value || 0
-        when ItzCashCompanyAccount.name
-          self.account.company.company_balance_histories.with_date(to)&.first&.company_balance&.value || 0
-        when UserWallet.name
-          self.account.user.user_balance_histories.with_date(to)&.first&.finly_money_balance&.value || 0
-        when CashOnHand.name
-          self.account.user.user_balance_histories.with_date(to)&.first&.cash_on_hand_balance&.value || 0
-      end
+      date = params&.dig(:with_date_range)&.dig(:to)
+      account.closing_balance(date)
     end
 
     def credit_amount

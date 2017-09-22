@@ -91,28 +91,12 @@ class Event::ESummary::Report < Event::SetNotifier
   # slot - times with 30minute difference
   # Identify the slot current time belongs to.
   # Ex: if current time is 5:40, then the slot is 5:30 slab. If the time is 05:25, then the slot is 05:00
-  def fetch_time_slot(datetime)
-    time_slot = datetime.strftime('%H')
-    if datetime.minute < 30
-      time_slot += ':00'
-    else
-      time_slot += ':30'
-    end
-    time_slot
-  end
 
-  def fetch_users
-    datetime = DateTime.today
-    day_of_month = datetime.day
-    day_of_week = datetime.strftime("%A")
-    time_slot = fetch_time_slot datetime
-    configurations = SummaryMailConfiguration.configurations_for day_of_month, day_of_week, time_slot
-    user_ids = configurations.pluck(:user_id)
-    self.users = User.with_id(user_ids)
-  end
 
-  def summary_for_company_balance
+  def opening_company_balance
     return nil unless user.company_admin?
+    account = user.company.itz_cash_company_account
+    # account.opening_balance()
   end
 
 end

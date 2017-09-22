@@ -27,6 +27,7 @@
 
 
 class Card < ActiveRecord::Base
+  include Accountable
   include SoftDeletable
 
   belongs_to :card_type
