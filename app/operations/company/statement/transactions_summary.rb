@@ -28,7 +28,7 @@ class Company::Statement::TransactionsSummary < Company::Statement::Base
 
   def process
     if end_date.to_date == Date.today
-      result = Company::VirtualAccount::Balance.(user)
+      result = Company::ItzCashVirtualAccount::Balance.(user)
       items[:company_account_closing_balance] = result.balance rescue 0
     else
       items[:company_account_closing_balance] = company.company_balance_histories.find_by(date: end_date.to_date).company_balance.value rescue 0

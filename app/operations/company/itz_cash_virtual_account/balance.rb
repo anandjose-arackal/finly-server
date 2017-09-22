@@ -1,4 +1,4 @@
-class Company::VirtualAccount::Balance < BaseOperation
+class Company::ItzCashVirtualAccount::Balance < BaseOperation
   attr_accessor :total_wallet_balance, :balance, :account_number, :scheduled_payment_orders_balance, :company
 
   def authorized_user_types
@@ -41,10 +41,10 @@ class Company::VirtualAccount::Balance < BaseOperation
   end
 
   def success
-    Company::VirtualAccount::Balance::SuccessPresenter.new(user, {balance: self.balance, account_number: self.account_number, company: self.company}, messages)
+    Company::ItzCashVirtualAccount::Balance::SuccessPresenter.new(user, {balance: self.balance, account_number: self.account_number, company: self.company}, messages)
   end
 
-  class Company::VirtualAccount::Balance::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Company::ItzCashVirtualAccount::Balance::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :balance, :account_number, :company
 
     def init

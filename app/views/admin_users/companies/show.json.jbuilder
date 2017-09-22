@@ -11,11 +11,13 @@ json.fuel_card_enabled @result.company.fuel_card_enabled?
 json.medical_card_enabled @result.company.medical_card_enabled?
 json.expense_card_enabled @result.company.expense_card_enabled?
 json.reimbursement_card_enabled @result.company.reimbursement_card_enabled?
-json.balance @result.company_balance
+json.itz_cash_company_balance @result.itz_cash_company_balance
 json.hard_copy_receipt @result.company.hard_copy_receipt_enabled?
 json.encrypted_params @result.company.configuration.encrypted_easy_login_params
 json.itz_cash_d_code_enabled @result.company.itz_cash_d_code_enabled?
 json.yes_bank_account @result.company.vendor_payments_enabled?
+json.registered_mobile_number @result.company.configuration.registered_mobile_number
+json.yes_bank_company_balance @result.yes_bank_company_balance
 
 if Rails.env.production?
   json.url "https://www.itzcash.com/finly/servlet/AccountReloadServlet"

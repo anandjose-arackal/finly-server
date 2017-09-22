@@ -5,7 +5,7 @@ class CompaniesController < ApplicationController
 
   def notify
     # todo
-    @result = Company::VirtualAccount::Balance.(current_user, params)
+    @result = Company::ItzCashVirtualAccount::Balance.(current_user, params)
     if @result.success?
       @company_balance = @result.balance
       @company = @result.company
