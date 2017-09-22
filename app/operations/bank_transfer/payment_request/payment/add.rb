@@ -81,6 +81,10 @@ class BankTransfer::PaymentRequest::Payment::Add < BankTransfer::PaymentRequest:
   def post_process
     add_message :success, "Beneficiaries added!"
 
+    # update the amount requested for this particular payment order
+    amount_requested = self.payment_order.request_total
+    payment_order.amount_requested&.update(value: amount_requested)
+
     if bank_payment_request.retracted? || bank_payment_request.rejected?
       # adding comments for all the beneficiaries removed in the comments
       params[:bank_accounts].each do |data|
