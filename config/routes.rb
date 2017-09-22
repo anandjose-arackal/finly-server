@@ -551,6 +551,8 @@
 #                                                         PUT    /reports/:id(.:format)                                                                     reports#update
 #                                                         DELETE /reports/:id(.:format)                                                                     reports#destroy
 #                                           export_report GET    /export/report(.:format)                                                                   export#report
+#                                  export_templates_index GET    /export/templates/index(.:format)                                                          export#index_template
+#                                                         GET    /export/templates/:template_key(.:format)                                                  export#export_template
 #                                          report_comment POST   /reports/:report_id/comment(.:format)                                                      reports#comment
 #                                          report_retract PATCH  /reports/:report_id/retract(.:format)                                                      reports#retract
 #                                           report_submit PATCH  /reports/:report_id/submit(.:format)                                                       reports#submit
@@ -606,6 +608,7 @@
 #                                                         PUT    /expenses/:id(.:format)                                                                    expenses#update
 #                                                         DELETE /expenses/:id(.:format)                                                                    expenses#destroy
 #                                     expenses_unreported POST   /expenses/unreported(.:format)                                                             expenses#unreported
+#                                         receipts_export GET    /receipts/export(.:format)                                                                 receipts#export
 #                                        receipt_add_note POST   /receipts/:receipt_id/add_note(.:format)                                                   receipts#add_note
 #                            receipt_enable_transcription PATCH  /receipts/:receipt_id/enable(.:format)                                                     receipts#enable_transcription
 #                           receipt_disable_transcription PATCH  /receipts/:receipt_id/disable(.:format)                                                    receipts#disable_transcription

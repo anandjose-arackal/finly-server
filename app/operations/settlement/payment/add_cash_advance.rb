@@ -127,8 +127,6 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
         return nil
       else
         # do nothing?
-        # todo - temporary for testing
-        return nil
     end
   end
 
@@ -141,8 +139,6 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
         return to_user.cash_on_hand
       else
         # do nothing?
-        # todo - temporary for testing
-        return to_user.cash_on_hand
     end
   end
 
