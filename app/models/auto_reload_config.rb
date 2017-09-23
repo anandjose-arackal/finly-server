@@ -11,6 +11,8 @@
 #  reloadable_type      :string(255)
 #  threshold_balance_id :integer
 #  target_balance_id    :integer
+#  source_account_id    :integer
+#  source_account_type  :string(255)
 #
 
 class AutoReloadConfig < ActiveRecord::Base
@@ -19,6 +21,7 @@ class AutoReloadConfig < ActiveRecord::Base
   belongs_to :minimum_balance, class_name: 'Amount'
   belongs_to :threshold_balance, class_name: "Amount"
   belongs_to :target_balance, class_name: "Amount"
+  belongs_to :source_account, polymorphic: true
 
   accepts_nested_attributes_for :minimum_balance
   accepts_nested_attributes_for :threshold_balance
@@ -47,6 +50,17 @@ class AutoReloadConfig < ActiveRecord::Base
       return target_balance.value
     else
       return 0
+    end
+  end
+
+  def source_account_type_id
+    case self.source_account_type
+      when "UserWallet"
+        return 2
+      when "ItzCashCompanyAccount"
+        return 1
+      else
+        # do nothing?
     end
   end
 

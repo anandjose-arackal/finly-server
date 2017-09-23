@@ -50,7 +50,8 @@ class User::Wallet::AutoReload::Reload < BackgroundOperation
   end
 
   def process
-    payment_request = PaymentRequest.(selected_user, selected_user.wallet, Card.name, :credit, :card_auto_reload)
+    source_account = self.auto_reload_config.source_account
+    payment_request = PaymentRequest.(selected_user, source_account, Card.name, :credit, :card_auto_reload)
     payment_request.add_payment_item(PaymentRequest::PaymentItem.(selected_user, expense_card, load_amount_value))
     op = AccountManager::Payments::PaymentProcessor.(selected_user, payment_request: payment_request)
     if op.success?

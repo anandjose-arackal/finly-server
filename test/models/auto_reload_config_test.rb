@@ -11,6 +11,8 @@
 #  reloadable_type      :string(255)
 #  threshold_balance_id :integer
 #  target_balance_id    :integer
+#  source_account_id    :integer
+#  source_account_type  :string(255)
 #
 
 require 'test_helper'
