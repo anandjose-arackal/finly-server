@@ -31,7 +31,8 @@ class PaymentPurpose < ActiveRecord::Base
         :card_auto_reload,
         :fees,
         :reissue_transfer,
-        :cash_advance
+        :cash_advance,
+        :balance_clearance_against_cash_on_hand
     ]
   end
 
