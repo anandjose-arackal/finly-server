@@ -160,14 +160,14 @@ class Card < ActiveRecord::Base
     if card_balance.blank?
       ItzCash::AccountDetails.(user, card: self)
     end
-    self.card_balance.value
+    (self.card_balance&.value || 0)
   end
 
   def available_card_eligibility
     if card_eligibility.blank?
       ItzCash::AccountDetails.(user, card: self)
     end
-    self.card_eligibility.value
+    (self.card_eligibility&.value || 0)
   end
 
   def serial_id
