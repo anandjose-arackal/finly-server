@@ -2675,6 +2675,22 @@ ActiveRecord::Schema.define(version: 20170921090738) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "summary_mail_configurations", force: :cascade do |t|
+    t.integer  "user_id",                limit: 4
+    t.integer  "period_id",              limit: 4
+    t.integer  "scheduled_day_of_month", limit: 4
+    t.string   "scheduled_day_of_week",  limit: 255
+    t.string   "scheduled_time",         limit: 255
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "summary_mail_configurations", ["period_id"], name: "index_summary_mail_configurations_on_period_id", using: :btree
+  add_index "summary_mail_configurations", ["scheduled_day_of_month"], name: "index_summary_mail_configurations_on_scheduled_day_of_month", using: :btree
+  add_index "summary_mail_configurations", ["scheduled_day_of_week"], name: "index_summary_mail_configurations_on_scheduled_day_of_week", using: :btree
+  add_index "summary_mail_configurations", ["scheduled_time"], name: "index_summary_mail_configurations_on_scheduled_time", using: :btree
+  add_index "summary_mail_configurations", ["user_id"], name: "index_summary_mail_configurations_on_user_id", using: :btree
+
   create_table "system_message_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -3245,6 +3261,8 @@ ActiveRecord::Schema.define(version: 20170921090738) do
   add_foreign_key "reports", "policies"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
+  add_foreign_key "summary_mail_configurations", "periods"
+  add_foreign_key "summary_mail_configurations", "users"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"
   add_foreign_key "transcribed_expenses", "amounts"

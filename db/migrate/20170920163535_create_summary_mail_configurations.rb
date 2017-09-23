@@ -6,6 +6,8 @@ class CreateSummaryMailConfigurations < ActiveRecord::Migration
       t.integer :scheduled_day_of_month, index: true
       t.string :scheduled_day_of_week, index: true
       t.string :scheduled_time, index: true
+      t.boolean :personal
+      t.string :application
 
       t.timestamps null: false
     end

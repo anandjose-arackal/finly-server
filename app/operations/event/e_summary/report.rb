@@ -2,6 +2,14 @@ class Event::ESummary::Report < Event::SetNotifier
   attr_accessor :users
 
   def pre_validate
+    if params[:user].blank?
+      add_message :error, 'User not found'
+      return
+    end
+    if params[:summary].blank?
+      add_message :error, 'User not found'
+      return
+    end
   end
 
   def action_name
@@ -9,13 +17,10 @@ class Event::ESummary::Report < Event::SetNotifier
   end
 
   def init
-    fetch_users
   end
 
   def validate
-    unless users.present?
-      add_message :error, 'No user has requested for summary at this time'
-    end
+
   end
 
   def event_id
@@ -23,7 +28,7 @@ class Event::ESummary::Report < Event::SetNotifier
   end
 
   def affected_users
-    self.users
+    [params[:user]]
   end
 
   def send_mailer(user)
@@ -39,15 +44,6 @@ class Event::ESummary::Report < Event::SetNotifier
 
   def mailer_body(user)
     "Please find your Finly Summary for #{DateUtils.date_formatted(Date.today)}"
-  end
-
-  def summary(user)
-    s = []
-    if user.company.d_code_enabled?
-      if user.company_admin?
-        s << summary_for_company_balance
-      end
-    end
   end
 
   def set_presenter_params(user)
@@ -85,18 +81,6 @@ class Event::ESummary::Report < Event::SetNotifier
       self.body_val
     end
 
-  end
-
-  protected
-  # slot - times with 30minute difference
-  # Identify the slot current time belongs to.
-  # Ex: if current time is 5:40, then the slot is 5:30 slab. If the time is 05:25, then the slot is 05:00
-
-
-  def opening_company_balance
-    return nil unless user.company_admin?
-    account = user.company.itz_cash_company_account
-    # account.opening_balance()
   end
 
 end
