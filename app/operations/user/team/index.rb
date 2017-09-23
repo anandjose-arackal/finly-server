@@ -44,7 +44,7 @@ class User::Team::Index < User::Team::Base
 
   def authorize
     case role_id
-      when UserRole.admin_id
+      when UserRole.admin_id, UserRole.id_for(:auditor)
         unless user.admin? || user.vendor_payments_admin?
           messages[:error] << 'User is not an Admin'
           raise_unauthorized_exception

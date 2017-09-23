@@ -4,7 +4,7 @@ class Report::Index < Report::Base
   attr_accessor :reports, :role_id
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin]
+    [:employee, :manager, :finance_manager, :admin, :auditor]
   end
 
   def init
@@ -25,7 +25,7 @@ class Report::Index < Report::Base
 
   def process
     case self.role_id
-      when UserRole.id_for(:admin)
+      when UserRole.id_for(:admin), UserRole.id_for(:auditor)
         if self.user.company_admin?
           team_ids = User::Team::Index.(user, params)&.pluck(:id)
           self.reports = Report.not_open.with_user(team_ids)
