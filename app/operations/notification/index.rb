@@ -9,7 +9,7 @@ class Notification::Index < Notification::Base
   end
 
   def init
-
+    params[:with_application] = RequestStore.store[:current_app].to_s
   end
 
   def process
@@ -25,9 +25,12 @@ class Notification::Index < Notification::Base
 
     attr_accessor :notifications, :unread_count
 
+    has_scope :with_application
+
     def init
-      self.unread_count = params[:notifications].unread.count rescue 0
-      self.notifications = params[:notifications].paginate(page: params[:page], per_page: 10)
+      self.notifications = apply_scopes(params[:notifications], params)
+      self.unread_count = notifications.unread.count rescue 0
+      self.notifications = notifications.paginate(page: params[:page], per_page: 10)
     end
 
   end

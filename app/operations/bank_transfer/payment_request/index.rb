@@ -28,11 +28,11 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
   def process
     case self.role_id
       when UserRole.id_for(:admin)
-        if self.user.company_admin?
+        if self.user.vendor_payments_admin?
           team_ids = user.company.users.pluck(:id)
           self.payment_requests = BankPaymentRequest.not_open.with_user(team_ids)
         end
-        unless user.admin?
+        unless user.vendor_payments_admin?
           messages[:error] << 'User is not an admin'
           return false
         end
@@ -66,8 +66,12 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
     attr_accessor :payment_requests
 
+    has_scope :filter_status_id
+    has_scope :filter_date, using: [:from, :to], type: :hash
+
     def init
       self.payment_requests = params[:payment_requests]
+      self.payment_requests = apply_scopes(payment_requests)
     end
   end
 

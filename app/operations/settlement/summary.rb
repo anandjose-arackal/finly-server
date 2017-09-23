@@ -22,7 +22,6 @@ class Settlement::Summary < Settlement::Base
 
   class Settlement::Summary::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :selected_user, :actions, :balances
-
     def init
       self.selected_user = params[:selected_user]
       self.balances = params[:balances]
@@ -32,6 +31,7 @@ class Settlement::Summary < Settlement::Base
   end
 
   private
+
   def load_selected_user
     if personal_view?
       self.selected_user = self.user
@@ -92,17 +92,29 @@ class Settlement::Summary < Settlement::Base
                                        reimbursement: reimbursement,
                                        meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:reimbursement).to_s)}}
 
+    # adding bank accounts of the user if any
+    if selected_user.bank_accounts.present?
+      self.balances[:bank_accounts] = selected_user.bank_accounts
+    end
   end
 
   def load_reimbursement(personal, balances)
     to_user_reimbursable_card = selected_user.cards.reimbursable_cards&.first
-    to_user_reimbursement_account = selected_user.itz_cash_dmt_sender&.beneficiaries&.active&.reimbursement_accounts&.default&.first
     reimbursement = {associated_reimbursement_card: !!to_user_reimbursable_card&.active,
                      card: {},
-                     associated_reimbursement_bank_account: !!to_user_reimbursement_account&.active?,
+                     associated_reimbursement_bank_account: selected_user.bank_accounts.present?,
                      initiating_accounts: []
                     }
 
+    # adding reimbursement bank accounts for this user
+    reimbursement[:bank_accounts] = []
+    selected_user.bank_accounts.each do |bank_account|
+      reimbursement[:bank_accounts] << {
+          id: bank_account.id,
+          account_number: bank_account.account_number,
+          ifsc: bank_account.ifsc
+      }
+    end
     if to_user_reimbursable_card
       name = personal ? 'Your Reimbursement card' : "#{selected_user.name}'s Reimbursement Card"
       eligibility = balances[:target_user][:card][to_user_reimbursable_card.id][:eligibility]
@@ -217,8 +229,13 @@ class Settlement::Summary < Settlement::Base
       end
     end
 
+    pending_cash_on_hand_credits = {
+        present: self.selected_user.cash_on_hand_credits_awaiting_confirmation?,
+        message: "Some money has been added to your cash on hand. They will reflect once the payment is confirmed"
+    }
     self.actions = {meta: {base_url: Rails.application.routes.url_helpers.update_balance_path(receiving_user_id: selected_user.id, view: params[:view])},
-                    credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions}
+                    credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions,
+                    bank_transfer_enabled: selected_user.bank_transfer_enabled?, pending_cash_on_hand_credits: pending_cash_on_hand_credits}
   end
 
 end

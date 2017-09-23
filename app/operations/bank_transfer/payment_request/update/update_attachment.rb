@@ -11,6 +11,11 @@ class BankTransfer::PaymentRequest::Update::UpdateAttachment < BankTransfer::Pay
     self.attachment_params = request_params
   end
 
+  def pre_process
+    self.attachment_params[:uploader_id] = user.id
+    self.attachment_params.permit!
+  end
+
   def process
     attachment = payment_order.payment_order_attachments.build(attachment_params)
     unless attachment.save

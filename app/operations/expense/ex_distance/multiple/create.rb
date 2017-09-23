@@ -30,10 +30,6 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
       messages[:error] << 'Provide details for at least one expense to proceed'
       return
     end
-    # distance_value = params[:expense][:distance_expense_attributes][:distance_attributes][:value].to_d rescue nil
-    # if distance_value.present? and distance_value <= 0
-    #   messages[:error] << 'Distance cannot be less than or equal to 0'
-    # end
   end
 
   def init

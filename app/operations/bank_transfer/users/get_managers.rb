@@ -29,11 +29,12 @@ class BankTransfer::Users::GetManagers < BankTransfer::Users::Base
 
   class BankTransfer::Users::GetManagers::ManagersPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :reviewers, :creditors
+    attr_accessor :reviewers, :creditors, :company_id
 
     def init
       self.reviewers = params[:reviewers]
       self.creditors = params[:creditors]
+      self.company_id = user.company_id
     end
   end
 

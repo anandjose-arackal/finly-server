@@ -123,6 +123,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
         currency_id: Currency.first.id
     }
     p[:description] = params[:description]
+    p[:beneficiary_type_id] = retrieve_beneficiary_type
     p[:payment_order_attributes] = {}
     p[:payment_order_attributes][:initiating_user] = user
     p[:payment_order_attributes][:payment_order_status_id] = PaymentOrderStatus.id_for(:pending_approval)
@@ -176,6 +177,19 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       self.unauthorized_vendors_presence = true
     end
     return ba
+  end
+
+  def retrieve_beneficiary_type
+    bank_account = retrieve_bank_account processed_order_data.first
+    return if bank_account.blank?
+    case bank_account&.account_owner&.class&.name
+      when "YesBankVendor"
+        return 2
+      when "User"
+        return 1
+      else
+        # do nothing?
+    end
   end
 
 end

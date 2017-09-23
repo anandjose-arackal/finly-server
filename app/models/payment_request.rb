@@ -61,9 +61,9 @@ class PaymentRequest < NonPersistentModel
 
   def retrieve_payment_order_status
     if self.scheduled_at.present? && self.scheduled_at > DateUtils.local_date
-      return PaymentOrderStatus.id_for(:scheduled)
+      PaymentOrderStatus.id_for(:scheduled)
     else
-      return PaymentOrderStatus.id_for(:pending)
+      PaymentOrderStatus.id_for(:pending)
     end
   end
 

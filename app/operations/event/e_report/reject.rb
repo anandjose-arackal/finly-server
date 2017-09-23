@@ -43,7 +43,8 @@ class Event::EReport::Reject < Event::EReport::Base
                                             path_object_type: "Report",
                                             read: false,
                                             timestamp: DateUtils.local_date_time,
-                                            view_role_id: roles.first
+                                            view_role_id: roles.first,
+                                            application: RequestStore.store[:current_app]
                                             )
     notification.save
   end

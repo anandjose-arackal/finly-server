@@ -17,6 +17,7 @@
 #  account_owner_id   :integer
 #  account_owner_type :string(255)
 #  company_id         :integer
+#  reimbursable       :boolean
 #
 
 class BankAccount < ActiveRecord::Base
@@ -28,6 +29,7 @@ class BankAccount < ActiveRecord::Base
 
   validates :account_number, presence: true
   validates :ifsc, presence: true
+  validates :name, presence: true
 
   accepts_nested_attributes_for :account_owner
 

@@ -9,6 +9,10 @@ class BankTransfer::PaymentRequest::Base < BaseOperation
     end
   end
 
+  def init
+    super
+  end
+
   def retrieve_initiating_account
     if user.company_admin? && params[:initiating_account_type]
       case params[:initiating_account_type]

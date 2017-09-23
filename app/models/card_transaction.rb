@@ -148,7 +148,7 @@ class CardTransaction < ActiveRecord::Base
   end
 
   def refund?
-    if self.merchant_name.include?('Refund') || self.merchant_name.include?('refund')
+    if CardTransaction.refunds.include?(self)
       if self.transaction_type == 'Credit'
         return true
       end

@@ -223,7 +223,7 @@ class Company < ActiveRecord::Base
 
   def more_than_one_subscription?
     count = 0
-    [:expense_management_enabled, :gift_card_enabled, :medical_card_enabled, :fuel_card_enabled, :meal_card_enabled, :expense_card_enabled, :reimbursement_card_enabled].each do |feature|
+    [:expense_management_enabled, :gift_card_enabled, :medical_card_enabled, :fuel_card_enabled, :meal_card_enabled, :expense_card_enabled, :reimbursement_card_enabled, :yes_bank_account].each do |feature|
       if self.feature_subscription.send(feature)
         count += 1
       end

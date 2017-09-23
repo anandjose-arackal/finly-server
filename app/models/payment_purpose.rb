@@ -30,7 +30,8 @@ class PaymentPurpose < ActiveRecord::Base
         :personal_expense,
         :card_auto_reload,
         :fees,
-        :reissue_transfer
+        :reissue_transfer,
+        :cash_advance
     ]
   end
 
