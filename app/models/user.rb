@@ -483,7 +483,7 @@ class User < ActiveRecord::Base
 
   def auditor?
     mapping = role_mapping
-    mapping.expense_management.auditor.present?
+    mapping.auditor.present?
   end
 
   def vendor_payment_manager?

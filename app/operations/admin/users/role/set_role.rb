@@ -32,6 +32,8 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
           em_role_params[:user_roles][:manager].to_s == '1'
       new_role_ids << UserRole.finance_manager_id if em_role_params[:user_roles][:finance_manager].present? and
           em_role_params[:user_roles][:finance_manager].to_s == '1'
+      new_role_ids << UserRole.id_for(:auditor) if em_role_params[:user_roles][:auditor].present? and
+          em_role_params[:user_roles][:auditor].to_s == '1'
     end
     new_role_ids = [new_role_ids] unless new_role_ids.is_a?(Array)
     # To ensure all users have a personal view
