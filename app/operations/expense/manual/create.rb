@@ -92,6 +92,7 @@ class Expense::Manual::Create < Expense::Manual::Base
     Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: self.expense)
 
     # check if the expense is from cash on hand, and deduct the respective amount from the COH respectively
+    debugger
     if expense.from_cash_on_hand
       payment_request = PaymentRequest.(user, nil, "CashOnHand", :debit, :balance_clearance_against_cash_on_hand)
       payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, expense.amount_value))
