@@ -43,12 +43,14 @@ class User::Wallet::AutoReload::Reload < BackgroundOperation
         return
       end
     end
-
-
   end
 
   def authorize
 
+  end
+
+  def pre_process
+    RequestStore.store[:current_app] = auto_reload_config.application
   end
 
   def process
