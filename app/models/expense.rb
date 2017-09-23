@@ -113,7 +113,7 @@ class Expense < ActiveRecord::Base
     where personal: true
   }
 
-  scope :non_cancelled, -> {
+  scope :non_cancelled  , -> {
     ids = pluck(:id)
     card_expenses = CardExpense.with_expense_id(ids)
     cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
