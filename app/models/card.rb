@@ -133,6 +133,16 @@ class Card < ActiveRecord::Base
                                                                                                     {period_id: 1, limit_type_id: ChannelType.id_for(:atm)},
                                                                                                     {period_id: 2, limit_type_id: ChannelType.id_for(:atm)},
                                                                                                     {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
+
+    reload
+    if card_balance_id.nil? and card_balance.nil?
+      balance_amount = Amount.create(value: 0, currency_id: Currency.id_for(:INR))
+      self.update(card_balance: balance_amount)
+    end
+    if card_eligibility_id.nil? and card_eligibility.nil?
+      eligibility_amount = Amount.create(value: 0, currency_id: Currency.id_for(:INR))
+      self.update(card_eligibility: eligibility_amount)
+    end
   end
 
 
