@@ -363,6 +363,7 @@ class Expense < ActiveRecord::Base
     return nil unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present? and report_id.present?
     converted_amount = amount_value
     original_amount = original_amount_value
+    return nil unless converted_amount.present? and converted_amount > 0 and original_amount.present? and original_amount > 0
     precision_value converted_amount/original_amount
   end
 
