@@ -2,6 +2,7 @@ json.company_card_enabled @result.user.company.itz_cash_property.d_code.present?
 json.user do
   json.id @result.selected_user.id
   json.name @result.selected_user.name
+  json.first_name @result.selected_user.first_name
   json.email @result.selected_user.email
   json.mobile_number @result.selected_user.mobile_number
   json.current_user_id @result.user.id
@@ -238,4 +239,5 @@ json.auto_reload_config do
     json.target_balance_value @result.selected_user.auto_reload_config.target_balance_value rescue nil
       json.threshold_balance_value @result.selected_user.auto_reload_config.threshold_balance_value rescue nil
   end
+  json.source_account_type @result.selected_user.auto_reload_config.source_account_type_id
 end

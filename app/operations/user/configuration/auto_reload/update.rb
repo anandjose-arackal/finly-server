@@ -1,6 +1,6 @@
 class User::Configuration::AutoReload::Update < BaseOperation
 
-  attr_accessor :reload_config, :update_params, :selected_user
+  attr_accessor :reload_config, :update_params, :selected_user, :source_account_type
 
   def authorized_user_types
     [:admin, :finance_manager, :manager, :employee]
@@ -8,6 +8,10 @@ class User::Configuration::AutoReload::Update < BaseOperation
 
   def pre_validate
     if user.blank? || params.blank?
+      add_message :error, "Invalid parameters"
+      return
+    end
+    if params[:auto_reload_config].blank?
       add_message :error, "Invalid parameters"
     end
   end
@@ -19,6 +23,9 @@ class User::Configuration::AutoReload::Update < BaseOperation
     self.selected_user = user if selected_user.blank?
     self.reload_config = selected_user.auto_reload_config
     self.update_params = auto_reload_config_params
+    self.source_account_type = update_params[:source_account_type]
+    # setting the source account based on the sent params
+    self.update_params[:source_account] = retrieve_source_account
   end
 
   def validate
@@ -40,6 +47,8 @@ class User::Configuration::AutoReload::Update < BaseOperation
       update_params.delete(:target_balance_attributes)
       update_params.delete(:threshold_balance_attributes)
     end
+    # removing the receiving account type attribute from front end
+    update_params.delete(:source_account_type)
   end
 
   def process
@@ -56,6 +65,17 @@ class User::Configuration::AutoReload::Update < BaseOperation
 
   def auto_reload_config_params
     # here default currency id will be rupee because card reloads can only happen in INR
-    params.require(:auto_reload_config).permit(:enabled, target_balance_attributes: [:value, :currency_id], threshold_balance_attributes: [:value, :currency_id])
+    params.require(:auto_reload_config).permit(:enabled, :source_account_type, target_balance_attributes: [:value, :currency_id], threshold_balance_attributes: [:value, :currency_id])
+  end
+
+  def retrieve_source_account
+    case self.source_account_type
+      when '1', 1
+        return user.company.itz_cash_company_account
+      when '2', 2
+        return selected_user.wallet
+      else
+        # do nothing?
+    end
   end
 end
