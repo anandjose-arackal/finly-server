@@ -28,6 +28,7 @@ class AutoReloadConfig < ActiveRecord::Base
   accepts_nested_attributes_for :target_balance
 
   # validate :minimum_balance_presence
+  validate :source_account_presence
 
   def minimum_balance_value
     if self.minimum_balance
@@ -70,6 +71,14 @@ class AutoReloadConfig < ActiveRecord::Base
     if self.enabled
       unless minimum_balance.present?
         errors.add(:minimum_balance, "cannot be blank")
+      end
+    end
+  end
+
+  def source_account_presence
+    if self.enabled
+      if source_account.blank?
+        errors.add("Source account cannot be blank")
       end
     end
   end
