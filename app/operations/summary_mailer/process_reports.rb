@@ -53,9 +53,9 @@ class SummaryMailer::ProcessReports < BaseOperation
         end_date: DateUtils.datetime_formatted(end_date)
     }
     user = configuration.user
+    return unless user.company_admin?
     application = configuration.application
     options = {}
-    if user.company_admin?
       user_presenter = User::Index.(user, view: 'admin')
       if user_presenter.success?
         options[:users] = user_presenter.team
@@ -63,9 +63,8 @@ class SummaryMailer::ProcessReports < BaseOperation
         options[:cards] = Card.with_company(user.company_id).with_user(options[:user_ids]).expense_cards
         options[:card_ids] = options[:cards]&.pluck(:id)
       end
-    end
 
-    if user.company_admin? and user.company.d_code_enabled?
+    if user.company.d_code_enabled?
       set_company_funds_summary(summary, user, start_date, end_date)
     end
     set_company_expenses_summary(summary, user, start_date, end_date, application, options)
