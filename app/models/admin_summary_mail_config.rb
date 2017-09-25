@@ -14,7 +14,7 @@
 #  updated_at             :datetime         not null
 #
 
-class SummaryMailConfiguration < ActiveRecord::Base
+class AdminSummaryMailConfig < ActiveRecord::Base
   belongs_to :user
   belongs_to :period
 
@@ -31,4 +31,11 @@ class SummaryMailConfiguration < ActiveRecord::Base
     query << "scheduled_time == #{time_slot}"
     where query.string
   end
+
+  validate :scheduled_time_validation
+
+  def scheduled_time_validation
+
+  end
+
 end

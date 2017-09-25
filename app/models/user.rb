@@ -100,7 +100,7 @@ class User < ActiveRecord::Base
   has_one :itz_cash_dmt_sender
   has_one :user_panel_subscription, dependent: :destroy
   has_one :cash_on_hand, dependent: :destroy
-  has_many :summary_mail_configurations, dependent: :destroy
+  has_many :admin_summary_mail_configurations, dependent: :destroy
 
   has_many :bank_accounts, as: :account_owner
   has_many :authentications

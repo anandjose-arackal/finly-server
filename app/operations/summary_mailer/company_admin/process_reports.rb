@@ -1,4 +1,4 @@
-class SummaryMailer::ProcessReports < BaseOperation
+class SummaryMailer::CompanyAdmin::ProcessReports < BaseOperation
   attr_accessor :time_slot, :configurations
 
   def self.call
@@ -11,7 +11,7 @@ class SummaryMailer::ProcessReports < BaseOperation
 
   def init
     self.configurations = fetch_configurations
-    # self.configurations = SummaryMailConfiguration.all
+    # self.configurations = AdminSummaryMailConfig.all
   end
 
   def validate
@@ -41,7 +41,7 @@ class SummaryMailer::ProcessReports < BaseOperation
     day_of_month = datetime.day
     day_of_week = datetime.strftime("%A")
     self.time_slot = fetch_time_slot datetime
-    SummaryMailConfiguration.configurations_for day_of_month, day_of_week, self.time_slot
+    AdminSummaryMailConfig.configurations_for day_of_month, day_of_week, self.time_slot
   end
 
   def process_configuration(configuration)
@@ -56,13 +56,13 @@ class SummaryMailer::ProcessReports < BaseOperation
     return unless user.company_admin?
     application = configuration.application
     options = {}
-      user_presenter = User::Index.(user, view: 'admin')
-      if user_presenter.success?
-        options[:users] = user_presenter.team
-        options[:user_ids] = user_presenter.team&.pluck(:id)
-        options[:cards] = Card.with_company(user.company_id).with_user(options[:user_ids]).expense_cards
-        options[:card_ids] = options[:cards]&.pluck(:id)
-      end
+    user_presenter = User::Index.(user, view: 'admin')
+    if user_presenter.success?
+      options[:users] = user_presenter.team
+      options[:user_ids] = user_presenter.team&.pluck(:id)
+      options[:cards] = Card.with_company(user.company_id).with_user(options[:user_ids]).expense_cards
+      options[:card_ids] = options[:cards]&.pluck(:id)
+    end
 
     if user.company.d_code_enabled?
       set_company_funds_summary(summary, user, start_date, end_date)
