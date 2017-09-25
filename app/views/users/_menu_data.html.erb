@@ -11,6 +11,9 @@
     <% if current_user.admin? %>
       <li><a href='#reports/params={"view":"admin"}' class="navbar-view-type" data-view-type="admin">Admin View</a></li>
     <% end %>
+    <% if current_user.auditor? %>
+        <li><a href='#reports/params={"view":"auditor"}' class="navbar-view-type" data-view-type="auditor">Auditor View</a></li>
+    <% end %>
     <% if current_user.finance_manager? %>
       <li><a href='#reports/params={"view":"finance_manager"}' class="navbar-view-type" data-view-type="finance_manager">Finance View</a></li>
     <% end %>
@@ -36,6 +39,16 @@
           <% end %>
         <% end %>
       <% end %>
+    <% elsif current_user.auditor? %>
+        <% views["auditor"]["links"]["cog"].each do |item| %>
+            <% item.select do |key, value| %>
+                <% if value == '#settings' %>
+                    <li><a class="btn btn-primary btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>" data-profile="true"><%= key %></a></li>
+                <% else %>
+                    <li><a target="_blank" class="btn btn-default btn-block navbar-menu-li non-backbone-link" data-path="<%= value %>" href="<%= value %>"><%= key %></a></li>
+                <% end %>
+            <% end %>
+        <% end %>
     <% elsif current_user.finance_manager? %>
       <% views["finance_manager"]["links"]["cog"].each do |item| %>
         <% item.select do |key, value| %>
@@ -76,6 +89,16 @@
           <li><a class="navbar-menu-li line-break-links text-center" data-path="<%= value %>" href='#<%= value %>/params={"view":"admin"}'><%= raw key %></a></li>
         <% end %>
       <% end %>
+    <% end %>
+  </ul>
+
+  <ul id="navbar-menu-navigation-auditor">
+    <% if current_user.auditor? %>
+        <% views["auditor"]["links"]["primary_navbar"].each do |item| %>
+            <% item.select do |key, value| %>
+                <li><a class="navbar-menu-li line-break-links text-center" data-path="<%= value %>" href='#<%= value %>/params={"view":"auditor"}'><%= raw key %></a></li>
+            <% end %>
+        <% end %>
     <% end %>
   </ul>
 

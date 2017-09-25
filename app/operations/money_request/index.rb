@@ -2,7 +2,7 @@ class MoneyRequest::Index < MoneyRequest::Base
   attr_accessor :money_requests, :role_id
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin]
+    [:employee, :manager, :finance_manager, :admin, :auditor]
   end
 
   def init
@@ -23,15 +23,15 @@ class MoneyRequest::Index < MoneyRequest::Base
 
   def process
     case self.role_id
-      when UserRole.id_for(:admin)
+      when UserRole.id_for(:admin), UserRole.id_for(:auditor)
         user_ids = User::Team::Index.(user, params).pluck(:id)
-        if self.user.company_admin?
+        if self.user.company_admin? || user.auditor?
           self.money_requests = MoneyRequest.not_open.with_user(user_ids)
         elsif user.policy_admin?
           policy_ids = user.admin_policies.pluck(:id)
           self.money_requests = MoneyRequest.not_open.with_user(user_ids).with_policy(policy_ids)
         end
-        unless user.admin?
+        unless user.admin? || user.auditor?
           messages[:error] << 'User is not an admin'
           return false
         end

@@ -31,7 +31,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
   attr_accessor :policy, :distance_config, :time_config, :per_diem_config, :company
 
   def authorized_user_types
-    [:company_admin, :policy_admin]
+    [:company_admin, :policy_admin, :auditor]
   end
 
   def pre_validate

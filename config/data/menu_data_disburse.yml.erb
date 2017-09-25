@@ -76,6 +76,39 @@ views:
           target: '_blank'
         <% end %>
 
+  <% elsif current_user.auditor? %>
+    auditor:
+        menus:
+          navbar:
+          - name: Expenses
+            url: expenses
+            id: expenses
+          - name: ATM Withdrawals
+            url: atm_withdrawals
+            id: atm_withdrawals
+          - name: Users
+            url: users
+            id: users
+          - name: Orders
+            id: orders
+            url: orders
+          - name: Analytics
+            url: analytics
+            id: analytics
+          - name: Statements
+            url: company_statements
+            id: statements
+          cog:
+          - name: Organization Account
+            url: '#organization_account'
+          - name: 'Company Statements'
+            url: '#company_statements'
+          <% if current_company.feature_subscription.yes_bank_account and current_user.auditor? %>
+          - name: Vendor Payments
+            url: '/payments'
+            target: '_blank'
+          <% end %>
+
   <% elsif current_user.finance_manager? %>
     finance:
       menus:
