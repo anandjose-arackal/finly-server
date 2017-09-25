@@ -43,7 +43,7 @@ class Event::ESummary::Report < Event::SetNotifier
   end
 
   def mailer_body(user)
-    "Please find your Finly Summary for #{DateUtils.date_formatted(Date.today)}"
+    "Please find your Finly Summary Report"
   end
 
   def set_presenter_params(user)
