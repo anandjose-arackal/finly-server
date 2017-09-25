@@ -21,8 +21,9 @@
 
           <div id="policyListTable">
             <ul style="list-style-type: none; padding-left: 0;">
+              <% view = params[:view] %>
               <% @result.policies.each do |policy| %>
-                <li class="policy" data-navigate-to="<%= "#policies/" + policy.id.to_s + '/params={"view": "admin"}' %>">
+                <li class="policy" data-navigate-to="<%= "#policies/" + policy.id.to_s + "/params={\"view\": \"#{view}\"}" %>">
                   <div class="row no-margin">
                     <div class="col-sm-8" style="font-size: 21px;line-height: 42px;">
                       <h4><%= policy.name %></h4>
@@ -47,31 +48,33 @@
     </div>
   </div>
 
-  <div class="col-sm-4">
-    <div class="section-card">
-      <div class="row no-margin section-header">
-        <div class="col-sm-12">
-          <h4>Add New Policy</h4>
+  <% if current_user.company_admin? %>
+    <div class="col-sm-4">
+      <div class="section-card">
+        <div class="row no-margin section-header">
+          <div class="col-sm-12">
+            <h4>Add New Policy</h4>
+          </div>
         </div>
-      </div>
-      <div class="row no-margin">
-        <div class="col-sm-12 text-right" style="padding-top: 15px;">
-          <form data-turboboost id="form-add-policy"  action="<%= policies_path(view: 'admin') %>">
-            <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
+        <div class="row no-margin">
+          <div class="col-sm-12 text-right" style="padding-top: 15px;">
+            <form data-turboboost id="form-add-policy"  action="<%= policies_path(view: 'admin') %>">
+              <%= hidden_field_tag :authenticity_token, form_authenticity_token %>
 
-            <input type="text" class="form-control" name="name" placeholder="Enter name of policy">
+              <input type="text" class="form-control" name="name" placeholder="Enter name of policy">
 
-            <!--<p style="margin-top: 20px; font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policy-->
-              <!--applied to: </p>-->
-            <!--<input type="radio" name="users" value="everyone" checked> Everyone <br>-->
-            <!--<input type="radio" name="users" value=""> Invite Employees Later <br>-->
+              <!--<p style="margin-top: 20px; font-family: 'Roboto Condensed', 'Helvetica Neue', Helvetica, sans-serif;">Policy-->
+                <!--applied to: </p>-->
+              <!--<input type="radio" name="users" value="everyone" checked> Everyone <br>-->
+              <!--<input type="radio" name="users" value=""> Invite Employees Later <br>-->
 
-            <input type="submit" class="btn btn-success btn-sm" value="Create">
-          </form>    
+              <input type="submit" class="btn btn-success btn-sm" value="Create">
+            </form>
+          </div>
         </div>
       </div>
     </div>
-  </div>
+  <% end %>
 </div>   
 
 

@@ -6,7 +6,7 @@ class Integrations::Quickbooks::Base < BaseOperation
   attr_accessor :adapter
 
   def authorized_user_types
-    [:company_admin, :finance_manager]
+    [:company_admin, :finance_manager, :auditor]
   end
 
   def pre_validate

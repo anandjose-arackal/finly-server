@@ -34,10 +34,6 @@ class Report::Index < Report::Base
           policy_ids = user.admin_policies.pluck(:id)
           self.reports = Report.not_open.with_user(team_ids).with_policy(policy_ids)
         end
-        unless user.admin?
-          messages[:error] << 'User is not an admin'
-          return false
-        end
       when UserRole.id_for(:manager)
         team_ids = User::Team::Index.(user, params)&.pluck(:id)
         controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids)
