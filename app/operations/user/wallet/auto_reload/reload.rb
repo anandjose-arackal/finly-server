@@ -35,8 +35,12 @@ class User::Wallet::AutoReload::Reload < BackgroundOperation
 
     # check if the wallet has enough balance to reload the card
     unless precision_value(wallet.balance_value) >= precision_value(auto_reload_config.minimum_balance_value.to_f - card_balance_value.to_f)
-      add_message :error, "Not enough balance in the wallet to auto-reload card"
-      return
+      # update load amount value to the whatever is present in the wallet
+      self.load_amount_value = wallet.balance_value
+      if self.load_amount_value.to_f <= 0
+        add_message :error, "Not enough balance in the wallet to auto-reload card"
+        return
+      end
     end
 
   end
@@ -46,7 +50,6 @@ class User::Wallet::AutoReload::Reload < BackgroundOperation
   end
 
   def process
-    # moving this to the new structure of payment order
     payment_request = PaymentRequest.(selected_user, selected_user.wallet, Card.name, :credit, :card_auto_reload)
     payment_request.add_payment_item(PaymentRequest::PaymentItem.(selected_user, expense_card, load_amount_value))
     op = AccountManager::Payments::PaymentProcessor.(selected_user, payment_request: payment_request)

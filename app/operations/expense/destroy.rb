@@ -48,9 +48,17 @@ class Expense::Destroy < Expense::Base
 
   def process
     self.expenses.each do |expense|
-      unless expense.destroy
-        add_message :error, expense.errors.full_messages
-        return false
+      # todo - jugaad for iOS - Remove expenses from report when destroy is called if expense is in a report
+      if expense.report_id.present?
+        unless expense.update_attributes report_id: nil, expense_status_id: ExpenseStatus.unreported_id
+          add_message :error, expense.errors.full_messages
+          return false
+        end
+      else
+        unless expense.destroy
+          add_message :error, expense.errors.full_messages
+          return false
+        end
       end
     end
   end

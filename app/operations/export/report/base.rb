@@ -40,9 +40,9 @@ class Export::Report::Base < Export::Base
     preferences.each do |pref|
       case pref.export_field_id
         when ExportField.type_report_id
-          data_arr << report.id
+          data_arr << report&.id
         when ExportField.type_report_name
-          data_arr << report.name
+          data_arr << report&.name
         when ExportField.type_report_status
           data_arr << report.status.name
         when ExportField.type_employee_name
@@ -58,9 +58,9 @@ class Export::Report::Base < Export::Base
         when ExportField.type_expense_category_name
           data_arr << expense.category_name
         when ExportField.type_expense_currency
-          data_arr << expense.amount.currency.country_code
+          data_arr << expense.amount&.currency&.country_code
         when ExportField.type_expense_amount
-          data_arr << expense.amount.value
+          data_arr << expense.amount&.value
         when ExportField.type_expense_date
           data_arr << expense.date
         when ExportField.type_expense_note
