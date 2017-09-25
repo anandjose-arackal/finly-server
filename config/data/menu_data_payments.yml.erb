@@ -34,6 +34,11 @@ user:
     name: Admin
     default_url: 'orders'
   <% end %>
+  <% if current_user.auditor? %>
+  - id: auditor
+    name: Auditor
+    default_url: 'orders'
+  <% end %>
   <% if current_user.vendor_payments_creditor? %>
   - id: creditor
     name: 'Creditor'
@@ -139,6 +144,7 @@ views:
           url: beneficiaries
           id: beneficiaries
   <% end %>
+
   <% if current_user.vendor_payment_creditor? %>
     creditor:
       menus:
@@ -156,6 +162,7 @@ views:
           url: beneficiaries
           id: beneficiaries
   <% end %>
+
   <% if current_user.vendor_payment_initiator? %>
     initiator:
       menus:
