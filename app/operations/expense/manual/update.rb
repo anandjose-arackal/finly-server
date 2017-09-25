@@ -6,7 +6,7 @@
 class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :updated_expense_params
   attr_accessor :editable_attrs, :receipt, :old_receipt, :destroy_receipts
-  attr_accessor :originally_from_cash_on_hand
+  attr_accessor :original_attributes
 
   def pre_validate
     if params.blank? or user.blank?
@@ -54,7 +54,6 @@ class Expense::Manual::Update < Expense::Manual::Base
         self.receipt = user.receipts.find_by(id: params[:receipt_id])
       end
     end
-    self.originally_from_cash_on_hand = expense.from_cash_on_hand
   end
 
   def authorize
@@ -130,10 +129,6 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
     end
 
-    # handling cash on hand additions and subtractions based on whether it originally was so
-
-
-
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
     if expense.receipts.present?
       expense.receipts.update_all(to_be_transcribed: false)
@@ -159,7 +154,9 @@ class Expense::Manual::Update < Expense::Manual::Base
                            merchant_name: expense.merchant_name,
                            amount_value: expense.amount_value,
                            category_name: expense.category_name,
-                           receipt: expense.receipts.count}
+                           receipt: expense.receipts.count,
+                           from_cash_on_hand: expense.from_cash_on_hand
+                          }
   end
 
 end

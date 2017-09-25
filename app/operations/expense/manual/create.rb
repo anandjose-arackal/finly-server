@@ -91,13 +91,16 @@ class Expense::Manual::Create < Expense::Manual::Base
 
     Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: self.expense)
 
-    # check if the expense is from cash on hand, and deduct the respective amount from the COH respectively
-    debugger
-    if expense.from_cash_on_hand
-      payment_request = PaymentRequest.(user, nil, "CashOnHand", :debit, :balance_clearance_against_cash_on_hand)
-      payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, expense.amount_value))
-      op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
-    end
+    # # check if the expense is from cash on hand, and deduct the respective amount from the COH respectively
+    # if expense.from_cash_on_hand
+    #   payment_request = PaymentRequest.(user, nil, "CashOnHand", :debit, :balance_clearance_against_cash_on_hand)
+    #   payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, expense.amount_value))
+    #   op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    #   if op.success?
+    #     payment = op.payment_order.payments.first
+    #     payment.update(reference_resource: self.expense)
+    #   end
+    # end
 
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?

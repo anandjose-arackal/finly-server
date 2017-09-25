@@ -56,6 +56,7 @@ class Expense < ActiveRecord::Base
   has_one :time_expense, dependent: :destroy
   has_one :per_diem_expense, dependent: :destroy
   has_one :receipt_email
+  has_one :payment, as: :reference_resource
 
   accepts_nested_attributes_for :system_messages
   accepts_nested_attributes_for :amount
@@ -260,6 +261,7 @@ class Expense < ActiveRecord::Base
                                                                        ExpenseType.id_for(:time),
                                                                        ExpenseType.id_for(:per_diem)]) }
   scope :only_reimbursable_expenses, -> { where(reimbursable: true) }
+  scope :spent_from_cash_on_hand, -> {where from_cash_on_hand: true}
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }
@@ -282,7 +284,7 @@ class Expense < ActiveRecord::Base
   scope :untranscribed, -> { where transcribed: false }
   scope :limit_to, ->(count) { limit count }
 
-  scope :verified, -> { where expense_status_id: ExpenseStatus.verified_id }
+  scope :verified, -> { where expense_status_id: ExpenseStatus.id_for(:verified) }
   scope :unreported, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected]) }
   scope :unverified, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :submitted]) }
 
