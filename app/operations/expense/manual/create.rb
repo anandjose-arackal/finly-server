@@ -156,10 +156,6 @@ class Expense::Manual::Create < Expense::Manual::Base
     CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
   end
 
-  # def success
-  #   Expense::Manual::Create::CreatePresenter.new(expense)
-  # end
-
   class Expense::Manual::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :expense
 

@@ -150,6 +150,7 @@ class Expense < ActiveRecord::Base
   }
 
   scope :with_amount, -> { joins :amount }
+  scope :joins_amount, -> { joins :amount}
   scope :having_amount_currency, -> (amount, currency_id) { with_amount.where('amounts.value IN (?) AND amounts.currency_id IN (?)', amount, currency_id) }
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_report_id, ->(report_id) { where report_id: report_id }

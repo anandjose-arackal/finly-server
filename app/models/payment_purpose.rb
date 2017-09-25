@@ -32,7 +32,8 @@ class PaymentPurpose < ActiveRecord::Base
         :fees,
         :reissue_transfer,
         :cash_advance,
-        :balance_clearance_against_cash_on_hand
+        :balance_clearance_against_cash_on_hand,
+        :advance_against_report_unapproval
     ]
   end
 
