@@ -23,12 +23,12 @@ class AdminSummaryMailConfig < ActiveRecord::Base
     query << '('
       query << "(period_id = #{Period.id_for(:day)})"
       query << " OR "
-      query << "(period_id == #{Period.id_for(:week)} AND scheduled_day_of_week == #{day_of_week})"
+      query << "(period_id = #{Period.id_for(:week)} AND scheduled_day_of_week = '#{day_of_week}')"
       query << " OR "
-      query << "(period_id == #{Period.id_for(:month)} AND scheduled_day_of_month == #{day_of_month})"
+      query << "(period_id = #{Period.id_for(:month)} AND scheduled_day_of_month = '#{day_of_month}')"
     query << ')'
     query << " AND "
-    query << "scheduled_time == #{time_slot}"
+    query << "scheduled_time = '#{time_slot}'"
     where query.string
   end
 

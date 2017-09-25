@@ -1,6 +1,6 @@
 class CreateSummaryMailConfigurations < ActiveRecord::Migration
-  def change
-    create_table :admin_summary_mail_config do |t|
+  def up
+    create_table :admin_summary_mail_configs do |t|
       t.references :user, index: true, foreign_key: true
       t.references :period, index: true, foreign_key: true
       t.integer :scheduled_day_of_month, index: true

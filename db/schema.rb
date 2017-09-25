@@ -67,6 +67,23 @@ ActiveRecord::Schema.define(version: 20170921090738) do
   add_index "admin_summary_mail_config", ["scheduled_time"], name: "index_admin_summary_mail_config_on_scheduled_time", using: :btree
   add_index "admin_summary_mail_config", ["user_id"], name: "index_admin_summary_mail_config_on_user_id", using: :btree
 
+  create_table "admin_summary_mail_configs", force: :cascade do |t|
+    t.integer  "user_id",                limit: 4
+    t.integer  "period_id",              limit: 4
+    t.integer  "scheduled_day_of_month", limit: 4
+    t.string   "scheduled_day_of_week",  limit: 255
+    t.string   "scheduled_time",         limit: 255
+    t.string   "application",            limit: 255
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "admin_summary_mail_configs", ["period_id"], name: "index_admin_summary_mail_configs_on_period_id", using: :btree
+  add_index "admin_summary_mail_configs", ["scheduled_day_of_month"], name: "index_admin_summary_mail_configs_on_scheduled_day_of_month", using: :btree
+  add_index "admin_summary_mail_configs", ["scheduled_day_of_week"], name: "index_admin_summary_mail_configs_on_scheduled_day_of_week", using: :btree
+  add_index "admin_summary_mail_configs", ["scheduled_time"], name: "index_admin_summary_mail_configs_on_scheduled_time", using: :btree
+  add_index "admin_summary_mail_configs", ["user_id"], name: "index_admin_summary_mail_configs_on_user_id", using: :btree
+
   create_table "admin_summary_mail_configurations", force: :cascade do |t|
     t.integer  "user_id",                limit: 4
     t.integer  "period_id",              limit: 4
@@ -3140,6 +3157,8 @@ ActiveRecord::Schema.define(version: 20170921090738) do
   add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
   add_foreign_key "admin_summary_mail_config", "periods"
   add_foreign_key "admin_summary_mail_config", "users"
+  add_foreign_key "admin_summary_mail_configs", "periods"
+  add_foreign_key "admin_summary_mail_configs", "users"
   add_foreign_key "admin_summary_mail_configurations", "periods"
   add_foreign_key "admin_summary_mail_configurations", "users"
   add_foreign_key "admin_user_role_mappings", "admin_user_roles"

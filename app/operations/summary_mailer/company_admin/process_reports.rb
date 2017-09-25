@@ -34,10 +34,11 @@ class SummaryMailer::CompanyAdmin::ProcessReports < BaseOperation
       time_slot += ':30'
     end
     time_slot
+    '10:00'
   end
 
   def fetch_configurations
-    datetime = DateTime.today
+    datetime = DateTime.now
     day_of_month = datetime.day
     day_of_week = datetime.strftime("%A")
     self.time_slot = fetch_time_slot datetime
@@ -69,7 +70,7 @@ class SummaryMailer::CompanyAdmin::ProcessReports < BaseOperation
     end
     set_company_expenses_summary(summary, user, start_date, end_date, application, options)
     unless summary.blank?
-      Event::ESummary::Report.(user, user: user, application: application, start_date: start_date, end_date: end_date, summary: summary)
+      Event::ESummary::Report.(user, user: user, summary: summary)
     end
   end
 
@@ -91,7 +92,7 @@ class SummaryMailer::CompanyAdmin::ProcessReports < BaseOperation
   def set_company_funds_summary(summary, user, start_date, end_date)
     company = user.company
     account = company.itz_cash_company_account
-    transactions = account.finly_transactions
+    transactions = account.finly_transactions.with_date_range(start_date, end_date)
     transactions_summary = FinlyTransaction::Summary.(user, finly_transactions: transactions).summary
     opening_balance = account.opening_balance(start_date)
     closing_balance = account.closing_balance(end_date)
