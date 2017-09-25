@@ -108,11 +108,11 @@ class SummaryMailer::ProcessReports < BaseOperation
     }
   end
 
-  def set_company_expenses_summary(summary, user, start_date, end_date,application, options={})
+  def set_company_expenses_summary(summary, user, start_date, end_date, application, options={})
     return unless options[:user_ids].present?
     card_ids = options[:card_ids]
     if card_ids.present?
-      card_transactions = CardTransaction.with_card(card_ids).debits
+      card_transactions = CardTransaction.with_card(card_ids).with_date_range(start_date, end_date).debits
 
       atm_withdrawals = card_transactions.atm_withdrawals
       atm_count = atm_withdrawals.count
@@ -122,16 +122,27 @@ class SummaryMailer::ProcessReports < BaseOperation
       card_exp_count = card_transactions.count
       card_exp_amount = card_transactions.sum_billing_amount
 
+      balance_summary = {in_cards: 0, in_finly_money: 0, in_cash_on_hand: 0}
+      user.company.users.include_all_accounts_with_balance.each do |user|
+        user.cards.each do |card|
+          next unless card.card_program_id == CardProgram.id_for(:expense)
+          balance_summary[:in_cards] += card.card_balance_value rescue 0
+        end
+        balance_summary[:in_finly_money] += user.wallet.balance_value
+        balance_summary[:in_cash_on_hand] += user.cash_in_hand.value rescue 0
+      end
+
       summary[:accounts_summary] = {
           atm: {count: atm_count, amount: atm_amount},
-          card_expenses: {count: card_exp_count, amount: card_exp_amount}
+          card_expenses: {count: card_exp_count, amount: card_exp_amount},
+          total_amount_with_employees: balance_summary
       }
     end
 
     report_presenter = Report::Index.(user, view: 'admin')
     if report_presenter.success?
       reports = report_presenter.reports.with_status_id(ReportStatus.ids_for([:processing, :approved, :settled, :settlement_confirmed, :closed]))
-      expenses = Expense.reported.with_report_id(reports.pluck(:id))
+      expenses = Expense.reported.with_report_id(reports.pluck(:id)).with_date_range(start_date, end_date)
       manual_expenses = expenses.only_manual_expenses
       manual_expenses_count = manual_expenses.count
       manual_expenses_amount = manual_expenses.sum_amount

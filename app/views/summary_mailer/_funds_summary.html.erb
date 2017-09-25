@@ -2,15 +2,15 @@
   <tbody>
   <tr>
     <td style="padding: 15px; border: 0px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: auto;">Start
-      Date
+      Date / Time
     </td>
     <td style="padding: 15px; border: 0px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: auto;"><%= @data.summary[:start_date] %></td>
   </tr>
   <tr>
-    <td style="padding: 15px; border: 0px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 60%;">End
-      Date
+    <td style="padding: 15px; border: 0px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: auto;">End
+      Date / Time
     </td>
-    <td style="padding: 15px; border: 0px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 40%;"><%= @data.summary[:end_date] %></td>
+    <td style="padding: 15px; border: 0px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: auto;"><%= @data.summary[:end_date] %></td>
   </tr>
   </tbody>
 </table>
@@ -93,23 +93,25 @@
           Transactions
         </td>
       </tr>
+      <% if not @data.summary&.dig(:accounts_summary, :total_amount_with_employees, :in_cards).nil? and @data.summary[:d_code_enabled] %>
+          <tr>
+            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Total
+              Amount on Cards
+            </td>
+            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%; text-align: center;" colspan="2">₹<%= @data.summary&.dig(:accounts_summary, :total_amount_with_employees, :in_cards) %></td>
+          </tr>
+      <% end %>
       <tr>
         <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Total
-          Cash on Card
+          Amount on Finly Money
         </td>
-        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%; text-align: center;" colspan="2">₹<%= @data.summary&.dig(:accounts_summary, :total_cash_on_hand) %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%; text-align: center;" colspan="2">₹<%= @data.summary&.dig(:accounts_summary, :total_amount_with_employees, :in_finly_money) %></td>
       </tr>
       <tr>
         <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Total
-          Cash on Finly Money
+          Cash on Employees Hand
         </td>
-        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%; text-align: center;" colspan="2">₹<%= @data.summary&.dig(:accounts_summary, :total_cash_on_finly_money) %></td>
-      </tr>
-      <tr>
-        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Total
-          Cash on Hand
-        </td>
-        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%; text-align: center;" colspan="2">₹<%= @data.summary&.dig(:accounts_summary, :total_cash_on_card) %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%; text-align: center;" colspan="2">₹<%= @data.summary&.dig(:accounts_summary, :total_amount_with_employees, :in_cash_on_hand) %></td>
       </tr>
       </tbody>
     </table>
