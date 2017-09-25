@@ -10,8 +10,8 @@ class SummaryMailer::ProcessReports < BaseOperation
   end
 
   def init
-    # self.configurations = fetch_configurations
-    self.configurations = SummaryMailConfiguration.all
+    self.configurations = fetch_configurations
+    # self.configurations = SummaryMailConfiguration.all
   end
 
   def validate
