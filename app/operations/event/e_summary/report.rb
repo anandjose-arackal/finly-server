@@ -35,7 +35,7 @@ class Event::ESummary::Report < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    CardTransactionMailer.delay.send_mail(Event::ECard::ETransaction::Base::MailerPresenter.new(user, params))
+    SummaryMailer.delay.send_mail(Event::ESummary::Report::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)
@@ -55,7 +55,7 @@ class Event::ESummary::Report < Event::SetNotifier
   class Event::ESummary::Report::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :summary, :user, :body_val, :subject_val, :button_val, :action_name, :company
 
-    def init(user, params)
+    def init
       self.summary = params[:summary]
       self.body_val = params[:body]
       self.subject_val = params[:subject]
@@ -64,7 +64,7 @@ class Event::ESummary::Report < Event::SetNotifier
     end
 
     def validate
-      self.user.present? and self.transaction.present?
+      self.user.present?
     end
 
     def to

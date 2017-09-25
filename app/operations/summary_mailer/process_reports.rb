@@ -49,8 +49,8 @@ class SummaryMailer::ProcessReports < BaseOperation
     end_date = DateTime.now
     summary = {
         d_code_enabled: configuration.user.company.d_code_enabled?,
-        start_date: start_date,
-        end_date: end_date
+        start_date: DateUtils.datetime_formatted(start_date),
+        end_date: DateUtils.datetime_formatted(end_date)
     }
     user = configuration.user
     application = configuration.application
