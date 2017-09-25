@@ -34,6 +34,9 @@ class User::Invite::Base < BaseOperation
     if params[:admin] == '1'
       params[:pending_invite][:role_mapping_attributes] << {user_role_id: 1, purpose_id: MappingPurpose.id_for(:expense_management)}
     end
+    if params[:auditor] == '1'
+      params[:pending_invite][:role_mapping_attributes] << {user_role_id: UserRole.id_for(:auditor), purpose_id: MappingPurpose.id_for(:expense_management)}
+    end
 
     # adding a default vendor payments initiator role for all invited users
     params[:pending_invite][:role_mapping_attributes] << {user_role_id: UserRole.id_for(:initiator), purpose_id: MappingPurpose.id_for(:vendor_payments)}
