@@ -118,7 +118,8 @@ class Settlement::Report::Approved < Report::Base
   end
 
   def post_process
-
+    # marking the report as accounted for
+    report.update(accounted: true)
   end
 
   def success

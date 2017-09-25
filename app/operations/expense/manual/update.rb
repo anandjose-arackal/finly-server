@@ -73,6 +73,15 @@ class Expense::Manual::Update < Expense::Manual::Base
         return
       end
     end
+
+    # if the expense is being marked as fropm cash on hand, check if there is enough cash on hand to facilitate it
+    if updated_expense_params[:from_cash_on_hand] == '1'
+      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      unless coh_adapter.balance >= updated_expense_params[:amount_attributes][:value].to_f
+        add_message :error, "You do not have enough balance in your Cash on Hand to mark this expense against it"
+        return
+      end
+    end
   end
 
   def process
