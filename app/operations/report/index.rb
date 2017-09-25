@@ -26,7 +26,7 @@ class Report::Index < Report::Base
   def process
     case self.role_id
       when UserRole.id_for(:admin), UserRole.id_for(:auditor)
-        if self.user.company_admin?
+        if self.user.company_admin? || self.user.auditor?
           team_ids = User::Team::Index.(user, params)&.pluck(:id)
           self.reports = Report.not_open.with_user(team_ids)
         elsif user.policy_admin?

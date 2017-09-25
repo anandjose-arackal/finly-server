@@ -12,7 +12,7 @@
       <li><a href='#reports/params={"view":"admin"}' class="navbar-view-type" data-view-type="admin">Admin View</a></li>
     <% end %>
     <% if current_user.auditor? %>
-        <li><a href='#reports/params={"view":"auditor"}' class="navbar-view-type" data-view-type="admin">Auditor View</a></li>
+        <li><a href='#reports/params={"view":"auditor"}' class="navbar-view-type" data-view-type="auditor">Auditor View</a></li>
     <% end %>
     <% if current_user.finance_manager? %>
       <li><a href='#reports/params={"view":"finance_manager"}' class="navbar-view-type" data-view-type="finance_manager">Finance View</a></li>
@@ -93,7 +93,7 @@
   </ul>
 
   <ul id="navbar-menu-navigation-auditor">
-    <% if current_user.admin?%>
+    <% if current_user.auditor? %>
         <% views["auditor"]["links"]["primary_navbar"].each do |item| %>
             <% item.select do |key, value| %>
                 <li><a class="navbar-menu-li line-break-links text-center" data-path="<%= value %>" href='#<%= value %>/params={"view":"auditor"}'><%= raw key %></a></li>

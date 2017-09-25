@@ -7,7 +7,6 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
   def pre_validate
     super
-
   end
 
   def init
