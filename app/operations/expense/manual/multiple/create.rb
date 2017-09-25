@@ -49,6 +49,11 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
         current_expense_params.except!(:receipts_attributes)
       end
 
+      # if the current expense is from cash on hand, mark it as non-reimbursable by default
+      if ['1', 1].include?(current_expense_params[:from_cash_on_hand])
+        current_expense_params[:reimbursable] = false
+      end
+
       # Initializing expense out of strong params
       self.multiple_expenses[key][:expense] = user.expenses.new(current_expense_params)
 

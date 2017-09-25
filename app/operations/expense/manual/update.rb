@@ -84,6 +84,13 @@ class Expense::Manual::Update < Expense::Manual::Base
     end
   end
 
+  def pre_process
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if ['1', 1].include?(updated_expense_params[:from_cash_on_hand])
+      updated_expense_params[:reimbursable] = false
+    end
+  end
+
   def process
     # Set custom fields
     custom_fields = {custom_fields: params[:custom_fields]}
