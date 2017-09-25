@@ -1,5 +1,6 @@
 class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
-  attr_accessor :valid, :errors_by_expenses, :multiple_expenses_params, :multiple_expenses
+  attr_accessor :valid, :errors_by_expenses, :multiple_expenses_params, :multiple_expenses,
+                :total_amount_from_coh
 
   def pre_validate
     if user.blank?
@@ -48,6 +49,11 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
         current_expense_params.except!(:receipts_attributes)
       end
 
+      # if the current expense is from cash on hand, mark it as non-reimbursable by default
+      if ['1', 1].include?(current_expense_params[:from_cash_on_hand])
+        current_expense_params[:reimbursable] = false
+      end
+
       # Initializing expense out of strong params
       self.multiple_expenses[key][:expense] = user.expenses.new(current_expense_params)
 
@@ -65,12 +71,25 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
     # MISSING
     # Adding expense to reports, check validation for report editable
 
+    # calculating the total of all expenses that are marked as from cash on hand
+    self.total_amount_from_coh = 0
+    coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+
     for key, value in self.multiple_expenses
       # Setting errors for the current expense
       self.errors_by_expenses[key] = {error: []}
 
       # Adding model level validation errors
-      self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages unless value[:expense].valid?
+      if value[:expense].valid?
+        self.total_amount_from_coh += value[:expense].amount_value
+      else
+        self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages
+      end
+
+      if self.total_amount_from_coh > coh_adapter.balance
+        # add error message saying this expense cannot be from COH
+        self.errors_by_expenses[key][:error] += ["You do not have enough balance in your Cash on Hand to mark this expense against it"]
+      end
 
       valid = CustomField::Validate.(value[:expense].manual_expense)
       unless valid.success?

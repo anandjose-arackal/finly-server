@@ -2,10 +2,6 @@ class ItzCash::AccountDetails < ItzCash::Base
   attr_accessor :card
 
   def pre_validate
-    # if user.blank? && !params[:unassigned]
-    #   add_message :error, 'User not found'
-    #   return
-    # end
     if params[:card].blank?
       add_message :error, 'Card not found'
     end

@@ -64,7 +64,13 @@ class Expense::Destroy < Expense::Base
   end
 
   def post_process
-    # mail?
+    # if it's a manual expense that was marked against cash on hand and isn't part of a report, add the respective amount to cash on hand
+    if expense.from_cash_on_hand && expense.manual? && !expense.report_id.present?
+      payment_request = PaymentRequest.(user, nil, "CashOnHand", :credit, :advance_against_cash_on_hand_expense_deletion)
+      payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, expense.amount_value))
+      op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    end
+
     add_message :success, 'Expense deleted'
   end
 

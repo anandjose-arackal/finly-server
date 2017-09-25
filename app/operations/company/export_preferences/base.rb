@@ -3,7 +3,7 @@ class Company::ExportPreferences::Base < BaseOperation
   attr_accessor :company, :preference
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :auditor]
   end
 
   def pre_validate

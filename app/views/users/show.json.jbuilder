@@ -31,6 +31,7 @@ json.role do
   json.admin @result.roles[:admin]
   json.manager @result.roles[:manager]
   json.finance_manager @result.roles[:finance_manager]
+  json.auditor @result.roles[:auditor]
   json.editable do
     admin = (@result.user.company_admin? and params[:view] == 'admin')
     json.admin (admin and not @result.selected_user == @result.user)

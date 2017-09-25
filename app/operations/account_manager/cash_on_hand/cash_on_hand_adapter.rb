@@ -35,7 +35,9 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
   end
 
   def balance
-    self.account.balance_value
+    balance = self.account.balance_value
+    expenses_against_coh_total = self.account.user.expenses.unverified.spent_from_cash_on_hand.joins_amount.sum(:value)
+    (balance - expenses_against_coh_total)
   end
 
   def eligibility(source_id)

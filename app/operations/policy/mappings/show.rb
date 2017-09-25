@@ -10,7 +10,7 @@ class Policy::Mappings::Show < Policy::Base
   def pre_authorize
     return if params[:user].present? and params[:user].is_a?(::User)
     user_id = (params[:id] or params[:user_id])
-    if user.company_admin?
+    if user.company_admin? || user.auditor?
       self.updating_user = user.company.users.with_id(user_id).first rescue nil
     elsif user.policy_admin?
       if params[:user_manager_mapping].present?

@@ -33,6 +33,8 @@ class User::Role::Set < BaseOperation
           ['1', 'true'].include?(params[:user_roles][:manager].to_s)
       new_role_ids << UserRole.finance_manager_id if params[:user_roles][:finance_manager].present? and
           ['1', 'true'].include?(params[:user_roles][:finance_manager].to_s)
+      new_role_ids << UserRole.id_for(:auditor) if params[:user_roles][:auditor].present? and
+          params[:user_roles][:auditor].to_s == '1'
       # adding initiator role if it's present in the params
       new_role_ids << UserRole.id_for(:initiator) if params[:user_roles][:initiator].present? && ['1', 'true'].include?(params[:user_roles][:initiator])
     end

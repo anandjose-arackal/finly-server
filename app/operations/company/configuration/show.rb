@@ -1,7 +1,7 @@
 class Company::Configuration::Show < Company::Base
 
   def authorized_user_types
-    [:admin]
+    [:admin, :auditor]
   end
 
   class Company::Configuration::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter

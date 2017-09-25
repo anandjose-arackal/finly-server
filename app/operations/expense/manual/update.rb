@@ -6,6 +6,7 @@
 class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :updated_expense_params
   attr_accessor :editable_attrs, :receipt, :old_receipt, :destroy_receipts
+  attr_accessor :original_attributes
 
   def pre_validate
     if params.blank? or user.blank?
@@ -71,6 +72,22 @@ class Expense::Manual::Update < Expense::Manual::Base
         messages[:error] << 'Expense cannot be edited at this stage'
         return
       end
+    end
+
+    # if the expense is being marked as fropm cash on hand, check if there is enough cash on hand to facilitate it
+    if updated_expense_params[:from_cash_on_hand] == '1'
+      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      unless coh_adapter.balance >= updated_expense_params[:amount_attributes][:value].to_f
+        add_message :error, "You do not have enough balance in your Cash on Hand to mark this expense against it"
+        return
+      end
+    end
+  end
+
+  def pre_process
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if ['1', 1].include?(updated_expense_params[:from_cash_on_hand])
+      updated_expense_params[:reimbursable] = false
     end
   end
 
@@ -153,7 +170,9 @@ class Expense::Manual::Update < Expense::Manual::Base
                            merchant_name: expense.merchant_name,
                            amount_value: expense.amount_value,
                            category_name: expense.category_name,
-                           receipt: expense.receipts.count}
+                           receipt: expense.receipts.count,
+                           from_cash_on_hand: expense.from_cash_on_hand
+                          }
   end
 
 end
