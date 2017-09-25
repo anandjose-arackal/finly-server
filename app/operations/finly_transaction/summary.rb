@@ -13,7 +13,7 @@ class FinlyTransaction::Summary < BaseOperation
   end
 
   def validate
-    unless [ActiveRecord::Relation.name, ActiveRecord::AssociationRelation.name].include?(self.finly_transactions.class.name)
+    unless [ActiveRecord::Relation.name, ActiveRecord::AssociationRelation.name, ActiveRecord::Associations::CollectionProxy.name].include?(self.finly_transactions.class.name)
       add_message :error, 'Invalid params'
       return
     end

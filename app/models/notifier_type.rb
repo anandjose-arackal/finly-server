@@ -81,7 +81,7 @@ class NotifierType < ActiveRecord::Base
               configurable_push_notification: false, configurable_mailer: false},
              {key: :auto_reload_card, has_push_notification: false, has_mailer: false,
               configurable_push_notification: false, configurable_mailer: false},
-             {key: :funds_summary, has_push_notification: false, has_mailer: true,
+             {key: :admin_summary, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
              {key: :bank_payment_request_submit, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
@@ -124,7 +124,7 @@ class NotifierType < ActiveRecord::Base
   def self.seed_data
     ACTIONS.each do |item|
       unless NotifierType.find_by(name: item[:key].to_s)
-        NotifierType.create id: (NotifierType::ACTIONS.find_index(item) + 1), name: item[:key].to_s,
+        NotifierType.create name: item[:key].to_s,
                             has_push_notification: item[:has_push_notification], has_mailer: item[:has_mailer],
                             configurable_push_notification: item[:configurable_push_notification],
                             configurable_mailer: item[:configurable_mailer]

@@ -24,7 +24,7 @@ class Event::ESummary::Report < Event::SetNotifier
   end
 
   def event_id
-    NotifierType.id_for(:funds_summary)
+    NotifierType.id_for(:admin_summary)
   end
 
   def affected_users
@@ -49,9 +49,7 @@ class Event::ESummary::Report < Event::SetNotifier
   def set_presenter_params(user)
     params[:subject] = self.mailer_subject(user)
     params[:body] = self.mailer_body(user)
-    params[:button_name] = self.mailer_button_name(user)
     params[:action_name] = action_name
-    params[:summary] = self.summary(user)
   end
 
   class Event::ESummary::Report::MailerPresenter < Event::SetNotifier::MailerPresenter

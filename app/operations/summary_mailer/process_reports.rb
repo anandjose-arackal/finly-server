@@ -1,4 +1,4 @@
-class Summary::ProcessReports < BaseOperation
+class SummaryMailer::ProcessReports < BaseOperation
   attr_accessor :time_slot, :configurations
 
   def self.call
@@ -10,7 +10,8 @@ class Summary::ProcessReports < BaseOperation
   end
 
   def init
-    self.configurations = fetch_configurations
+    # self.configurations = fetch_configurations
+    self.configurations = SummaryMailConfiguration.all
   end
 
   def validate
@@ -44,11 +45,13 @@ class Summary::ProcessReports < BaseOperation
   end
 
   def process_configuration(configuration)
-    summary = {
-        d_code_enabled: user.company.d_code_enabled?
-    }
     start_date = get_start_date configuration
     end_date = DateTime.now
+    summary = {
+        d_code_enabled: configuration.user.company.d_code_enabled?,
+        start_date: start_date,
+        end_date: end_date
+    }
     user = configuration.user
     application = configuration.application
     options = {}
@@ -57,7 +60,7 @@ class Summary::ProcessReports < BaseOperation
       if user_presenter.success?
         options[:users] = user_presenter.team
         options[:user_ids] = user_presenter.team&.pluck(:id)
-        options[:cards] = Card.with_company(user.company_id).with_user(company_user_ids).expense_cards
+        options[:cards] = Card.with_company(user.company_id).with_user(options[:user_ids]).expense_cards
         options[:card_ids] = options[:cards]&.pluck(:id)
       end
     end
@@ -90,7 +93,7 @@ class Summary::ProcessReports < BaseOperation
     company = user.company
     account = company.itz_cash_company_account
     transactions = account.finly_transactions
-    transactions_summary = transactions.with_date_range(start_date, end_date)
+    transactions_summary = FinlyTransaction::Summary.(user, finly_transactions: transactions).summary
     opening_balance = account.opening_balance(start_date)
     closing_balance = account.closing_balance(end_date)
     credits = transactions.credits.sum_amounts || 0
@@ -119,7 +122,7 @@ class Summary::ProcessReports < BaseOperation
       card_exp_count = card_transactions.count
       card_exp_amount = card_transactions.sum_billing_amount
 
-      summary[:transactions_summary] = {
+      summary[:accounts_summary] = {
           atm: {count: atm_count, amount: atm_amount},
           card_expenses: {count: card_exp_count, amount: card_exp_amount}
       }

@@ -1,8 +1,182 @@
-<table style="width: 94%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
-  <% @data.summary.each do |key, value| %>
+<table style="width: 40%; margin-left: 10%; border-collapse: collapse;">
+  <tbody>
+  <tr>
+    <td style="padding: 15px; border: 0px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 60%;">Start
+      Date
+    </td>
+    <td style="padding: 15px; border: 0px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 40%;"><%= @data.summary[:start_date] %></td>
+  </tr>
+  <tr>
+    <td style="padding: 15px; border: 0px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 60%;">End
+      Date
+    </td>
+    <td style="padding: 15px; border: 0px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 40%;"><%= @data.summary[:end_date] %></td>
+  </tr>
+  </tbody>
+</table>
+<% if data.summary[:company_funds_summary].present? and data.summary[:d_code_enabled] %>
+    <table style="width: 80%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
+      <tbody>
       <tr>
-        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;"><%= key.upcase %></td>
-        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif;">&#8377;<%= value %></td>
+        <td style="padding: 15px; background: #ED4D6A; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%; text-align: center;" colspan="3">
+          <span style="color: #fff;">Company Credits Summary</span></td>
+      </tr>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%;" colspan="2">Opening
+          Balance
+        </td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%; text-align: center;">
+          <% data.summary[:company_funds_summary][:opening_balance] %></td>
+      </tr>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%;" colspan="2">Credits</td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%; text-align: center;">+
+          <% data.summary[:company_funds_summary][:credits] %></td>
+      </tr>
+      <% data.summary[:company_funds_summary][:credit_summary]&.each do |item| %>
+          <tr>
+            <td style="width: 35%;">&nbsp;</td>
+            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 35%; text-align: left;"><%= item[:name] %>
+            </td>
+            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%;text-align: center;">
+              <span style="color: #39b26a;">+<%= item[:value] %></span></td>
+          </tr>
+      <% end %>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%;" colspan="2">Debits</td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%; text-align: center;">-
+          <% data.summary[:company_funds_summary][:debits] %></td>
+      </tr>
+      <% data.summary[:company_funds_summary][:debit_summary]&.each do |item| %>
+          <tr>
+            <td style="width: 35%;">&nbsp;</td>
+            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 35%; text-align: left;"><%= item[:name] %>
+            </td>
+            <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%;text-align: center;">
+              <span style="color: #ed4d6a;">-<%= item[:value] %></span></td>
+          </tr>
+      <% end %>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%;" colspan="2">Closing
+          Balance
+        </td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 30%; text-align: center;">
+          <% data.summary[:company_funds_summary][:closing_balance] %>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <br/><br/><br/>
+<% end %>
+<% if data.summary[:accounts_summary].present? and data.summary[:d_code_enabled] %>
+    <table style="width: 80%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
+      <tbody>
+      <tr>
+        <td style="padding: 15px; background: #19AAD9; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%; text-align: center;" colspan="4">
+          <span style="color: #fff;">Accounts Summary</span></td>
+      </tr>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">ATM
+          Withdrawals
+        </td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">₹<%= data.summary&.dig(:accounts_summary, :atm, :amount) %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= data.summary&.dig(:accounts_summary, :atm, :count) %>
+          Transactions
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Card
+          Transactions
+        </td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">₹<%= data.summary&.dig(:accounts_summary, :card_expenses, :amount) %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= data.summary&.dig(:accounts_summary, :card_expenses, :count) %>
+          Transactions
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Total
+          Cash on Card
+        </td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%; text-align: center;" colspan="2">₹<%= data.summary&.dig(:accounts_summary, :total_cash_on_hand) %></td>
+      </tr>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Total
+          Cash on Finly Money
+        </td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%; text-align: center;" colspan="2">₹<%= data.summary&.dig(:accounts_summary, :total_cash_on_finly_money) %></td>
+      </tr>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Total
+          Cash on Hand
+        </td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%; text-align: center;" colspan="2">₹<%= data.summary&.dig(:accounts_summary, :total_cash_on_card) %></td>
+      </tr>
+      </tbody>
+    </table>
+    <br/><br/><br/>
+<% end %>
+<table style="width: 80%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
+  <tbody>
+  <tr>
+    <td style="padding: 15px; background: #39b26a; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%; text-align: center;" colspan="4">
+      <span style="color: #fff;">Expense Summary</span></td>
+  </tr>
+  <tr>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Total
+      Expenses
+    </td>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">₹<%= data.summary&.dig(:expenses_summary, :total, :amount) %></td>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= data.summary&.dig(:expenses_summary, :total, :count) %>
+      Expenses
+    </td>
+  </tr>
+  <% if @data.summary&.dig(:expenses_summary, :card_expenses).present? %>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Card
+          Expenses
+        </td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">₹<%= data.summary&.dig(:expenses_summary, :card_expenses, :amount) %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= data.summary&.dig(:expenses_summary, :card_expenses, :count) %>
+          Expenses
+        </td>
       </tr>
   <% end %>
-</table><br>
+  <tr>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Manual
+      Expenses
+    </td>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">₹<%= data.summary&.dig(:expenses_summary, :manual_expenses, :amount) %></td>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= data.summary&.dig(:expenses_summary, :manual_expenses, :count) %>
+      Expenses
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Distance
+      Expenses
+    </td>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">₹<%= data.summary&.dig(:expenses_summary, :distance_expenses, :amount) %></td>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= data.summary&.dig(:expenses_summary, :distance_expenses, :count) %>
+      Expenses
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Time
+      Expenses
+    </td>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">₹<%= data.summary&.dig(:expenses_summary, :time_expenses, :amount) %></td>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= data.summary&.dig(:expenses_summary, :time_expenses, :count) %>
+      Expenses
+    </td>
+  </tr>
+  <tr>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;" colspan="2">Per
+      Diem Expenses
+    </td>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">₹<%= data.summary&.dig(:expenses_summary, :per_diem_expenses, :amount) %></td>
+    <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= data.summary&.dig(:expenses_summary, :per_diem_expenses, :count) %>
+      Expenses
+    </td>
+  </tr>
+  </tbody>
+</table>
+<br/>
