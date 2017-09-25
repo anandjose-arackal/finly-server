@@ -350,6 +350,7 @@ class Expense < ActiveRecord::Base
     end
   end
 
+
   def base_amount
     unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present?
       return self.amount
