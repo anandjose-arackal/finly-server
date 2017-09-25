@@ -6,7 +6,7 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
   attr_accessor :users, :role_id
 
   def authorized_user_types
-    [:company_admin]
+    [:vendor_payments_admin]
   end
 
   def pre_validate

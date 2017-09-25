@@ -47,6 +47,9 @@ personal:
       <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
       - Vendor Payments: '/payments'
       <% end %>
+      <% if current_company.feature_subscription.cards_enabled and current_user.user_panel_subscription.disburse %>
+      - Fund Disbursement: '/disburse'
+      <% end %>
       # - My Balance: '#modal-balance'
       # - FAQ: '#faq/params={"view":"personal"}'
       # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
@@ -68,6 +71,9 @@ manager:
       - My Account: '#settings'
       <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
       - Vendor Payments: '/payments'
+      <% end %>
+      <% if current_company.feature_subscription.cards_enabled and current_user.user_panel_subscription.disburse %>
+      - Fund Disbursement: '/disburse'
       <% end %>
       # - My Balance: '#modal-balance'
       # - FAQ: '#faq/params={"view":"manager"}'
@@ -92,6 +98,9 @@ finance_manager:
       - My Account: '#settings'
       <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
       - Vendor Payments: '/payments'
+      <% end %>
+      <% if current_company.feature_subscription.cards_enabled and current_user.user_panel_subscription.disburse %>
+      - Fund Disbursement: '/disburse'
       <% end %>
 #      - Company Statements: '#company_statements/params={"view": "finance"}'
       # - My Balance: '#modal-balance'
