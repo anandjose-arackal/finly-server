@@ -44,6 +44,7 @@ json.role do
   json.finance_manager @result.roles[:finance_manager]
   json.manager @result.roles[:manager]
   json.initiator @result.roles[:initiator]
+  json.auditor @result.roles[:auditor]
   # since only admins can see this screen, they can edit the fields by default
 end
 

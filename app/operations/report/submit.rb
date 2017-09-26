@@ -87,7 +87,7 @@ class Report::Submit < Report::Base
       report.reload
       # changing the status of the expenses in the auto approved report.
       report.expenses.each do |expense|
-        expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
+        expense.update_attribute(:expense_status_id, ExpenseStatus.id_for(:verified))
       end
       return true
     end
@@ -109,8 +109,10 @@ class Report::Submit < Report::Base
                            modified_user_role_id: manager_role_id,
                            report_tracking_action_id: ReportTrackingAction.id_for(:submit),
                            report_status_id: ReportStatus.processing_id
-      report.expenses.each do |expense|
-        expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
+      unless report.approved?
+        report.expenses.each do |expense|
+          expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
+        end
       end
       return true
     end

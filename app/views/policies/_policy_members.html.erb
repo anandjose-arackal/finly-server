@@ -6,11 +6,13 @@
 
   <div class="row no-margin">
     <div class="col-sm-12">
-      <% unless @result.policy.default %>
-          <button id="btn-assign-users-to-policy" class="btn btn-primary btn-sm">Add Users to Policy</button>
-          <button id="btn-unassign-users-to-policy" class="btn btn-danger btn-sm" disabled="disabled" data-url="<%= policy_remove_users_path(load_params policy_id: @result.policy.id) %>">Remove
-            Selected Users
-          </button>
+      <% if @result.user.admin? %>
+        <% unless @result.policy.default %>
+            <button id="btn-assign-users-to-policy" class="btn btn-primary btn-sm">Add Users to Policy</button>
+            <button id="btn-unassign-users-to-policy" class="btn btn-danger btn-sm" disabled="disabled" data-url="<%= policy_remove_users_path(load_params policy_id: @result.policy.id) %>">Remove
+              Selected Users
+            </button>
+        <% end %>
       <% end %>
     </div>
   </div>
@@ -59,9 +61,11 @@
                     <p>Approves Finance To <%= default_mapping.approves_finance_to.email %></p>
                 <% end %>
               </div>
+              <% if @result.user.admin? %>
               <div class="col-sm-2 no-padding text-right">
                 <i style="cursor: pointer; font-size: 20px" class="fa fa-cog policy-member-settings" data-user-id="<%= user[:user].id %>"></i>
               </div>
+              <% end %>
             </div>
         <% end %>
       </div>

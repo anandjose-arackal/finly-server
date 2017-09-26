@@ -1,6 +1,10 @@
 class UserGroup::Update < UserGroup::Base
   attr_accessor :name, :items, :groups_items_to_destroy
 
+  def authorized_user_types
+    [:company_admin, :auditor]
+  end
+
   def pre_validate
     super
     return if has_errors?

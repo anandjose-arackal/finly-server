@@ -3,7 +3,7 @@ class BankTransfer::Users::Count < BankTransfer::Users::Base
   attr_accessor :users_count
 
   def authorized_user_types
-    [:vendor_payments_admin]
+    [:vendor_payments_admin, :auditor]
   end
 
   def pre_validate
