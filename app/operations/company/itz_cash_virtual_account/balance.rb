@@ -2,7 +2,7 @@ class Company::ItzCashVirtualAccount::Balance < BaseOperation
   attr_accessor :total_wallet_balance, :balance, :account_number, :scheduled_payment_orders_balance, :company
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :auditor]
   end
 
   def pre_validate
