@@ -70,7 +70,9 @@ ActiveRecord::Schema.define(version: 20170921090738) do
   create_table "admin_summary_mail_configs", force: :cascade do |t|
     t.integer  "user_id",                limit: 4
     t.integer  "period_id",              limit: 4
+    t.integer  "starting_day_of_month",  limit: 4
     t.integer  "scheduled_day_of_month", limit: 4
+    t.string   "starting_day_of_week",   limit: 255
     t.string   "scheduled_day_of_week",  limit: 255
     t.string   "scheduled_time",         limit: 255
     t.string   "application",            limit: 255
@@ -82,6 +84,8 @@ ActiveRecord::Schema.define(version: 20170921090738) do
   add_index "admin_summary_mail_configs", ["scheduled_day_of_month"], name: "index_admin_summary_mail_configs_on_scheduled_day_of_month", using: :btree
   add_index "admin_summary_mail_configs", ["scheduled_day_of_week"], name: "index_admin_summary_mail_configs_on_scheduled_day_of_week", using: :btree
   add_index "admin_summary_mail_configs", ["scheduled_time"], name: "index_admin_summary_mail_configs_on_scheduled_time", using: :btree
+  add_index "admin_summary_mail_configs", ["starting_day_of_month"], name: "index_admin_summary_mail_configs_on_starting_day_of_month", using: :btree
+  add_index "admin_summary_mail_configs", ["starting_day_of_week"], name: "index_admin_summary_mail_configs_on_starting_day_of_week", using: :btree
   add_index "admin_summary_mail_configs", ["user_id"], name: "index_admin_summary_mail_configs_on_user_id", using: :btree
 
   create_table "admin_summary_mail_configurations", force: :cascade do |t|

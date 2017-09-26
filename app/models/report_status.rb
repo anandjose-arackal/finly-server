@@ -9,6 +9,7 @@
 #  updated_at :datetime         not null
 #
 
+
 class ReportStatus < ActiveRecord::Base
   include Seedable
 

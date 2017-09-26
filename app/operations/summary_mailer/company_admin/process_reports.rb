@@ -80,8 +80,11 @@ class SummaryMailer::CompanyAdmin::ProcessReports < BaseOperation
     if period.day?
       from_date = DateTime.now.beginning_of_day
     elsif period.week?
-      # Get previous Sunday
-      from_date = (DateTime.now.beginning_of_day - DateTime.now.wday)
+      starting_day_of_week = Date.parse(configuration.starting_day_of_week).wday
+      from_date = Date.today
+      while from_date.wday != starting_day_of_week
+        from_date -= 1
+      end
     elsif period.month?
       # Get first of the current month
       from_date = (DateTime.now.beginning_of_day - (DateTime.now.mday - 1))
