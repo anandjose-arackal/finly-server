@@ -67,4 +67,11 @@ class Period < ActiveRecord::Base
     self.id == Period.id_for(:hour)
   end
 
+  def as_json(options= {})
+    {
+        id: self.id,
+        name: self.name
+    }
+  end
+
 end

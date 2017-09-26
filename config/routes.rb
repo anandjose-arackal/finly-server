@@ -2251,6 +2251,10 @@ Rails.application.routes.draw do
   end
 
 
+  namespace :summary do
+    resources :company_admin, only: [:create, :index, :destroy]
+  end
+
 
 
   # The priority is based upon order of creation: first created -> highest priority.

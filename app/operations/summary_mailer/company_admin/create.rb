@@ -1,4 +1,4 @@
-class SummaryMailer::CompanyAdmin::Add < SummaryMailer::CompanyAdmin::Base
+class SummaryMailer::CompanyAdmin::Create < SummaryMailer::CompanyAdmin::Base
   attr_accessor :admin_summary_mail_config
 
   def authorized_user_types
@@ -34,7 +34,7 @@ class SummaryMailer::CompanyAdmin::Add < SummaryMailer::CompanyAdmin::Base
   end
 
   def process
-
+    self.admin_summary_mail_config.save
   end
 
   protected

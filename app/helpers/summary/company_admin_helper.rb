@@ -1,0 +1,2 @@
+module Summary::CompanyAdminHelper
+end
