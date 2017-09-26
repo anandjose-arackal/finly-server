@@ -93,6 +93,11 @@ class PaymentOrder < ActiveRecord::Base
   scope :with_initiating_user_id, -> (user_id){
     where initiating_user_id: user_id
   }
+  scope :from_company_account, -> (enabled){
+    if ['1', 1].include?(enabled)
+      where initiating_account_type: ["ItzCashCompanyAccount", "YesBankCompanyAccount"]
+    end
+  }
 
   scope :vendor_payments, -> (enabled){
     if enabled == 1 || enabled == '1'

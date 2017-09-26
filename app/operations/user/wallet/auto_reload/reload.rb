@@ -50,7 +50,12 @@ class User::Wallet::AutoReload::Reload < BackgroundOperation
   end
 
   def pre_process
-    RequestStore.store[:current_app] = auto_reload_config.application
+    # determining the application for the user based on their subscriptions
+    if selected_user.expense_management_enabled?
+      RequestStore.store[:current_app] = "em"
+    elsif selected_user.disburse_enabled?
+      RequestStore.store[:current_app] = "ft"
+    end
   end
 
   def process

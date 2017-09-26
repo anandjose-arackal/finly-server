@@ -14,11 +14,11 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
     self.params_order_cards = order_cards_params
     # this is to ensure only payment orders that are processed from the disburse panel show up
     params[:with_application] = RequestStore.store[:current_app].to_s
+    # params[:from_company_account] = '1'
   end
 
   def process
     # self.payment_orders = user.company.payment_orders.with_type_id(params_order_cards[:order_type_ids])
-    # todo payment purpose filter to be implemented here
     self.payment_orders = user.company.payment_orders
   end
 
@@ -33,6 +33,7 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
     include HasScope
 
     has_scope :with_application
+    has_scope :from_company_account
 
     def init
       self.payment_orders = params[:payment_orders]
