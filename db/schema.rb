@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170921090738) do
+ActiveRecord::Schema.define(version: 20170926122434) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -378,6 +378,8 @@ ActiveRecord::Schema.define(version: 20170921090738) do
     t.string   "reloadable_type",      limit: 255
     t.integer  "threshold_balance_id", limit: 4
     t.integer  "target_balance_id",    limit: 4
+    t.integer  "source_account_id",    limit: 4
+    t.string   "source_account_type",  limit: 255
   end
 
   add_index "auto_reload_configs", ["reloadable_type", "reloadable_id"], name: "index_auto_reload_configs_on_reloadable_type_and_reloadable_id", using: :btree
@@ -1477,9 +1479,10 @@ ActiveRecord::Schema.define(version: 20170921090738) do
     t.boolean  "transcribed",                          default: false
     t.boolean  "personal",                             default: false
     t.boolean  "reimbursable",                         default: true
-    t.boolean  "synced_with_quickbooks"
+    t.boolean  "synced_with_quickbooks",               default: false
     t.string   "split_link",             limit: 255
     t.boolean  "deleted_to_split",                     default: false
+    t.boolean  "from_cash_on_hand",                    default: false
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -1876,6 +1879,32 @@ ActiveRecord::Schema.define(version: 20170921090738) do
 
   add_index "login_agreement_mappings", ["agreement_id"], name: "index_login_agreement_mappings_on_agreement_id", using: :btree
   add_index "login_agreement_mappings", ["user_id"], name: "index_login_agreement_mappings_on_user_id", using: :btree
+
+  create_table "manager_summary_mail_configs", force: :cascade do |t|
+    t.integer  "user_id",                limit: 4,   null: false
+    t.integer  "period_id",              limit: 4,   null: false
+    t.integer  "starting_day_of_month",  limit: 4
+    t.integer  "scheduled_day_of_month", limit: 4
+    t.string   "starting_day_of_week",   limit: 255
+    t.string   "scheduled_day_of_week",  limit: 255
+    t.string   "scheduled_time",         limit: 255, null: false
+    t.string   "application",            limit: 255, null: false
+    t.integer  "role_id",                limit: 4,   null: false
+    t.string   "entity_type",            limit: 255, null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "manager_summary_mail_configs", ["application"], name: "index_manager_summary_mail_configs_on_application", using: :btree
+  add_index "manager_summary_mail_configs", ["entity_type"], name: "index_manager_summary_mail_configs_on_entity_type", using: :btree
+  add_index "manager_summary_mail_configs", ["period_id"], name: "index_manager_summary_mail_configs_on_period_id", using: :btree
+  add_index "manager_summary_mail_configs", ["role_id"], name: "index_manager_summary_mail_configs_on_role_id", using: :btree
+  add_index "manager_summary_mail_configs", ["scheduled_day_of_month"], name: "index_manager_summary_mail_configs_on_scheduled_day_of_month", using: :btree
+  add_index "manager_summary_mail_configs", ["scheduled_day_of_week"], name: "index_manager_summary_mail_configs_on_scheduled_day_of_week", using: :btree
+  add_index "manager_summary_mail_configs", ["scheduled_time"], name: "index_manager_summary_mail_configs_on_scheduled_time", using: :btree
+  add_index "manager_summary_mail_configs", ["starting_day_of_month"], name: "index_manager_summary_mail_configs_on_starting_day_of_month", using: :btree
+  add_index "manager_summary_mail_configs", ["starting_day_of_week"], name: "index_manager_summary_mail_configs_on_starting_day_of_week", using: :btree
+  add_index "manager_summary_mail_configs", ["user_id"], name: "index_manager_summary_mail_configs_on_user_id", using: :btree
 
   create_table "manual_expenses", force: :cascade do |t|
     t.integer  "expense_id", limit: 4
@@ -3257,6 +3286,8 @@ ActiveRecord::Schema.define(version: 20170921090738) do
   add_foreign_key "kyc_documents", "company_kycs"
   add_foreign_key "login_agreement_mappings", "agreements"
   add_foreign_key "login_agreement_mappings", "users"
+  add_foreign_key "manager_summary_mail_configs", "periods"
+  add_foreign_key "manager_summary_mail_configs", "users"
   add_foreign_key "manual_expenses", "expenses"
   add_foreign_key "mcc_category_mappings", "categories"
   add_foreign_key "money_request_comments", "expenses"
