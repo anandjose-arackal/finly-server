@@ -125,7 +125,7 @@ auditor:
       - Organization Account: '#organization_account/params={"view":"auditor"}'
       - Company Statements: '#company_statements/params={"view": "auditor"}'
       <% if current_company.feature_subscription.cards_enabled and current_user.auditor? %>
-#      - Fund Disbursement: '/disburse'
+      - Fund Disbursement: '/disburse'
       <% end %>
       <% if current_company.feature_subscription.yes_bank_account and current_user.auditor? %>
       - Vendor Payments: '/payments'
