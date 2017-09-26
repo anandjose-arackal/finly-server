@@ -25,6 +25,9 @@ class User::Role::Set < BaseOperation
     return unless being_updated_user.present?
     self.purpose_id = MappingPurpose.id_from_application_for(RequestStore.store[:current_app])
     existing_role_ids = being_updated_user.role_mapping.with_purpose(purpose_id).map(&:user_role_id)
+    # extracting auditor roles here becuase it's purpose agnostic
+    existing_role_ids += being_updated_user.role_mapping.auditor.map(&:user_role_id)
+
     new_role_ids = params[:user_role_id]
     if new_role_ids.blank? and params[:user_roles].present?
       new_role_ids = []
@@ -59,6 +62,11 @@ class User::Role::Set < BaseOperation
     end
     UserRoleMapping.create(create) if create.present?
     being_updated_user.role_mapping.with_purpose(purpose_id).role(roles_to_remove).destroy_all if roles_to_remove.present?
+
+    # destroying auditor roles if required, because they're purpose agnostic
+    if roles_to_remove.include?(UserRole.id_for(:auditor))
+      being_updated_user.role_mapping.role(UserRole.id_for(:auditor)).destroy_all
+    end
   end
 
   def post_process
