@@ -27,15 +27,6 @@
 #  reference_id            :string(255)      not null
 #
 
-
-
-
-
-
-
-
-
-
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
