@@ -262,7 +262,7 @@ class Expense < ActiveRecord::Base
                                                                        ExpenseType.id_for(:time),
                                                                        ExpenseType.id_for(:per_diem)]) }
   scope :only_reimbursable_expenses, -> { where(reimbursable: true) }
-  scope :spent_from_cash_on_hand, -> {where from_cash_on_hand: true}
+  scope :spent_from_cash_on_hand, -> {where(from_cash_on_hand: true).where(expense_type_id: ExpenseType.id_for(:manual))}
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }
