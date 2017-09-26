@@ -2252,7 +2252,9 @@ Rails.application.routes.draw do
 
 
   namespace :summary do
-    resources :company_admin, only: [:create, :index, :destroy]
+    get 'configurations', to: 'configuration#index'
+    post 'configurations/admin', to: 'configuration#admin_create'
+    delete 'configurations/admin/:id', to: 'configuration#admin_destroy'
   end
 
 

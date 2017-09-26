@@ -1,4 +1,4 @@
-class SummaryMailer::CompanyAdmin::Index < SummaryMailer::CompanyAdmin::Base
+class SummaryMailer::Index < SummaryMailer::CompanyAdmin::Base
   attr_accessor :admin_summary_mail_configs
 
   def authorized_user_types
@@ -13,15 +13,17 @@ class SummaryMailer::CompanyAdmin::Index < SummaryMailer::CompanyAdmin::Base
   end
 
   def init
-    self.admin_summary_mail_configs = user.admin_summary_mail_configs
+    if user.company_admin?
+      self.admin_summary_mail_configs = user.admin_summary_mail_configs
+    end
   end
 
   def success
     params[:admin_summary_mail_configs] = self.admin_summary_mail_configs
-    SummaryMailer::CompanyAdmin::Index::SuccessPresenter.new(user, params, messages)
+    SummaryMailer::Index::SuccessPresenter.new(user, params, messages)
   end
 
-  class SummaryMailer::CompanyAdmin::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class SummaryMailer::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :admin_summary_mail_configs
 
     def init

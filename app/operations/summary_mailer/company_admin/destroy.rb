@@ -13,7 +13,7 @@ class SummaryMailer::CompanyAdmin::Destroy < SummaryMailer::CompanyAdmin::Base
   end
 
   def init
-    result = SummaryMailer::CompanyAdmin::Index.(user, params)
+    result = SummaryMailer::Index.(user, params)
     unless result.success?
       add_message :error, result.messages[:error]
       return
