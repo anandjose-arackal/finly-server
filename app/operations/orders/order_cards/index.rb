@@ -1,5 +1,9 @@
 class Orders::OrderCards::Index < Orders::OrderCards::Base
-  attr_accessor :payment_orders, :params_order_cards
+  attr_accessor :payment_orders, :params_order_cards, :role_id
+
+  def authorized_user_types
+    [:company_admin, :auditor, :finance_manager]
+  end
 
   def pre_validate
     super
@@ -12,14 +16,23 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
 
   def init
     self.params_order_cards = order_cards_params
+    self.role_id = params[:role_id]
+    if self.role_id.blank?
+      self.role_id = UserRole::VALUES[params[:view].to_sym]
+    end
     # this is to ensure only payment orders that are processed from the disburse panel show up
     params[:with_application] = RequestStore.store[:current_app].to_s
-    # params[:from_company_account] = '1'
   end
 
   def process
-    # self.payment_orders = user.company.payment_orders.with_type_id(params_order_cards[:order_type_ids])
-    self.payment_orders = user.company.payment_orders
+    case self.role_id
+      when UserRole.id_for(:admin)
+        self.payment_orders = user.company.payment_orders
+      when UserRole.id_for(:finance_manager)
+        self.payment_orders = user.payment_orders
+      else
+        # do nothing?
+    end
   end
 
   def success
@@ -33,7 +46,6 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
     include HasScope
 
     has_scope :with_application
-    has_scope :from_company_account
 
     def init
       self.payment_orders = params[:payment_orders]
