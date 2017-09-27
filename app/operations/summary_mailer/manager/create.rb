@@ -37,7 +37,7 @@ class SummaryMailer::Manager::Create < SummaryMailer::Manager::Base
 
   protected
   def config_strong_params
-    params.require(:manager_config).permit(:period_id, :scheduled_day_of_month,
+    params.require(:config).permit(:period_id, :scheduled_day_of_month,
                                    :scheduled_day_of_week, :scheduled_time, :entity_type)
   end
 
