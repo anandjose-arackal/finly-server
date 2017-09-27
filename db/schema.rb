@@ -1883,14 +1883,11 @@ ActiveRecord::Schema.define(version: 20170926122434) do
   create_table "manager_summary_mail_configs", force: :cascade do |t|
     t.integer  "user_id",                limit: 4,   null: false
     t.integer  "period_id",              limit: 4,   null: false
-    t.integer  "starting_day_of_month",  limit: 4
     t.integer  "scheduled_day_of_month", limit: 4
-    t.string   "starting_day_of_week",   limit: 255
     t.string   "scheduled_day_of_week",  limit: 255
     t.string   "scheduled_time",         limit: 255, null: false
-    t.string   "application",            limit: 255, null: false
-    t.integer  "role_id",                limit: 4,   null: false
     t.string   "entity_type",            limit: 255, null: false
+    t.string   "application",            limit: 255, null: false
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
   end
@@ -1898,12 +1895,9 @@ ActiveRecord::Schema.define(version: 20170926122434) do
   add_index "manager_summary_mail_configs", ["application"], name: "index_manager_summary_mail_configs_on_application", using: :btree
   add_index "manager_summary_mail_configs", ["entity_type"], name: "index_manager_summary_mail_configs_on_entity_type", using: :btree
   add_index "manager_summary_mail_configs", ["period_id"], name: "index_manager_summary_mail_configs_on_period_id", using: :btree
-  add_index "manager_summary_mail_configs", ["role_id"], name: "index_manager_summary_mail_configs_on_role_id", using: :btree
   add_index "manager_summary_mail_configs", ["scheduled_day_of_month"], name: "index_manager_summary_mail_configs_on_scheduled_day_of_month", using: :btree
   add_index "manager_summary_mail_configs", ["scheduled_day_of_week"], name: "index_manager_summary_mail_configs_on_scheduled_day_of_week", using: :btree
   add_index "manager_summary_mail_configs", ["scheduled_time"], name: "index_manager_summary_mail_configs_on_scheduled_time", using: :btree
-  add_index "manager_summary_mail_configs", ["starting_day_of_month"], name: "index_manager_summary_mail_configs_on_starting_day_of_month", using: :btree
-  add_index "manager_summary_mail_configs", ["starting_day_of_week"], name: "index_manager_summary_mail_configs_on_starting_day_of_week", using: :btree
   add_index "manager_summary_mail_configs", ["user_id"], name: "index_manager_summary_mail_configs_on_user_id", using: :btree
 
   create_table "manual_expenses", force: :cascade do |t|

@@ -1,10 +1,6 @@
 class SummaryMailer::CompanyAdmin::Destroy < SummaryMailer::CompanyAdmin::Base
   attr_accessor :config_to_destroy
 
-  def authorized_user_types
-    [:company_admin]
-  end
-
   def pre_validate
     if params&.dig(:id).blank?
       add_message :error, 'Item not found'

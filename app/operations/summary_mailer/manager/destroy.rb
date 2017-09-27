@@ -1,9 +1,5 @@
-class SummaryMailer::Manager::Destroy < SummaryMailer::CompanyAdmin::Base
+class SummaryMailer::Manager::Destroy < SummaryMailer::Manager::Base
   attr_accessor :config_to_destroy
-
-  def authorized_user_types
-    [:company_admin]
-  end
 
   def pre_validate
     if params&.dig(:id).blank?
@@ -18,7 +14,7 @@ class SummaryMailer::Manager::Destroy < SummaryMailer::CompanyAdmin::Base
       add_message :error, result.messages[:error]
       return
     end
-    self.config_to_destroy = result.admin_summary_mail_configs.find_by_id(params[:id])
+    self.config_to_destroy = result.manager_summary_mail_config.find_by_id(params[:id])
   end
 
   def validate

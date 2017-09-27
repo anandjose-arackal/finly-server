@@ -83,6 +83,8 @@ class NotifierType < ActiveRecord::Base
               configurable_push_notification: false, configurable_mailer: false},
              {key: :admin_summary, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
+             {key: :manager_summary, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true},
              {key: :bank_payment_request_submit, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
              {key: :bank_payment_request_approve, has_push_notification: true, has_mailer: true,

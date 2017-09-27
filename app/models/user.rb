@@ -102,6 +102,7 @@ class User < ActiveRecord::Base
   has_one :user_panel_subscription, dependent: :destroy
   has_one :cash_on_hand, dependent: :destroy
   has_many :admin_summary_mail_configs, dependent: :destroy
+  has_many :manager_summary_mail_configs, dependent: :destroy
 
   has_many :bank_accounts, as: :account_owner
   has_many :authentications

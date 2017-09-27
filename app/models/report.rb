@@ -43,6 +43,7 @@
 
 
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -153,7 +154,7 @@ class Report < ActiveRecord::Base
 
   scope :sort_for_personal, -> { joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
 
-  scope :awaiting_approval_for_user, ->(user_id, role_id){ where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
+  scope :awaiting_approval_of_user, ->(user_id, role_id){ where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
 
   delegate :status_name, to: :status
 

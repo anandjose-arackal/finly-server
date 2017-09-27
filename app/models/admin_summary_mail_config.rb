@@ -19,20 +19,6 @@ class AdminSummaryMailConfig < ActiveRecord::Base
   belongs_to :user
   belongs_to :period
 
-  scope :configurations_for, -> (day_of_month, day_of_week, time_slot) do
-    query = StringIO.new
-    query << '('
-    query << "(period_id = #{Period.id_for(:day)})"
-    query << " OR "
-    query << "(period_id = #{Period.id_for(:week)} AND scheduled_day_of_week = '#{day_of_week}')"
-    query << " OR "
-    query << "(period_id = #{Period.id_for(:month)} AND scheduled_day_of_month = '#{day_of_month}')"
-    query << ')'
-    query << " AND "
-    query << "scheduled_time = '#{time_slot}'"
-    where query.string
-  end
-
   DAYS_OF_MONTH = [*1..31] + [nil]
   WEEK_DAYS = [nil, 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday']
 
@@ -48,6 +34,20 @@ class AdminSummaryMailConfig < ActiveRecord::Base
   validates_presence_of :scheduled_day_of_week, if: -> { period_id == Period.id_for(:week)}
   validates :application, Application.validate_app
   validate :validate_scheduled_time
+
+  scope :configurations_for, -> (day_of_month, day_of_week, time_slot) do
+    query = StringIO.new
+    query << '('
+    query << "(period_id = #{Period.id_for(:day)})"
+    query << " OR "
+    query << "(period_id = #{Period.id_for(:week)} AND scheduled_day_of_week = '#{day_of_week}')"
+    query << " OR "
+    query << "(period_id = #{Period.id_for(:month)} AND scheduled_day_of_month = '#{day_of_month}')"
+    query << ')'
+    query << " AND "
+    query << "scheduled_time = '#{time_slot}'"
+    where query.string
+  end
 
   def validate_scheduled_time
     if scheduled_time.blank?

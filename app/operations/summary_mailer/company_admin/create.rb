@@ -1,10 +1,6 @@
 class SummaryMailer::CompanyAdmin::Create < SummaryMailer::CompanyAdmin::Base
   attr_accessor :admin_summary_mail_config
 
-  def authorized_user_types
-    [:company_admin]
-  end
-
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'
@@ -34,12 +30,14 @@ class SummaryMailer::CompanyAdmin::Create < SummaryMailer::CompanyAdmin::Base
   end
 
   def process
-    self.admin_summary_mail_config.save
+    unless self.admin_summary_mail_config.save
+      add_message :error, self.admin_summary_mail_config&.errors&.full_messages
+    end
   end
 
   protected
   def config_strong_params
-    params.require(:config).permit(:period_id, :scheduled_day_of_month,
+    params.require(:admin_config).permit(:period_id, :scheduled_day_of_month,
                                    :scheduled_day_of_week, :scheduled_time)
   end
 

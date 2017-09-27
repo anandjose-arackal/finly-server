@@ -1,9 +1,5 @@
-class SummaryMailer::Manager::Create < SummaryMailer::CompanyAdmin::Base
-  attr_accessor :admin_summary_mail_config
-
-  def authorized_user_types
-    [:company_admin]
-  end
+class SummaryMailer::Manager::Create < SummaryMailer::Manager::Base
+  attr_accessor :manager_summary_mail_config
 
   def pre_validate
     if user.blank?
@@ -19,28 +15,30 @@ class SummaryMailer::Manager::Create < SummaryMailer::CompanyAdmin::Base
   def init
     config_params = config_strong_params
     config_params[:application] = current_app
-    self.admin_summary_mail_config = user.admin_summary_mail_configs.new config_params
+    self.manager_summary_mail_config = user.manager_summary_mail_configs.new config_params
   end
 
   def validate
-    unless self.admin_summary_mail_config.present?
+    unless self.manager_summary_mail_config.present?
       add_message :error, 'Invalid configuration details'
       return
     end
-    unless self.admin_summary_mail_config.valid?
-      add_message :error, self.admin_summary_mail_config.errors.full_messages
+    unless self.manager_summary_mail_config.valid?
+      add_message :error, self.manager_summary_mail_config.errors.full_messages
       return
     end
   end
 
   def process
-    self.admin_summary_mail_config.save
+    unless self.manager_summary_mail_config.save
+      add_message :error, self.manager_summary_mail_config&.errors&.full_messages
+    end
   end
 
   protected
   def config_strong_params
-    params.require(:config).permit(:period_id, :scheduled_day_of_month,
-                                   :scheduled_day_of_week, :scheduled_time)
+    params.require(:manager_config).permit(:period_id, :scheduled_day_of_month,
+                                   :scheduled_day_of_week, :scheduled_time, :entity_type)
   end
 
 end
