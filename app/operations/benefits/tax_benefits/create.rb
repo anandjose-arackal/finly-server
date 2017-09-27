@@ -2,7 +2,7 @@
 # and pass it to the payment processor
 class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
   attr_accessor :order_data, :processed_order_data, :payment_order, :scheduled_at,
-                :payment_purpose
+                :payment_purpose, :initiating_account
 
   def pre_validate
     super
@@ -30,6 +30,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
         payment_order: self.order_data, card_program_id: card_program_id)
     self.scheduled_at = self.processed_order_data.scheduled_at
     self.payment_purpose = retrieve_payment_purpose
+    self.initiating_account = retrieve_initiating_account
   end
 
   def validate
@@ -108,6 +109,17 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
         return :reimbursement
       else
         # do nothing?
+    end
+  end
+
+  def retrieve_initiating_account
+    case params[:initiating_account_type]
+      when 1, '1'
+        return user.company.itz_cash_company_account
+      when 2, '2'
+        return user.wallet
+      else
+        # return "#{user.first_name}'s Finly Money'"
     end
   end
 

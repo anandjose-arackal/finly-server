@@ -1,7 +1,7 @@
 # Process validates the request for payment order wrt tax benefits and generates the respective output to be sent for confirmation or for creating payment order
 class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
   attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount,
-                :errors, :payment_order_valid, :scheduled_at, :company_balance
+                :errors, :payment_order_valid, :scheduled_at, :company_balance, :initiating_account
 
   def pre_validate
     super
@@ -24,6 +24,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     self.processable_amount = 0
     self.processed_order = []
     self.scheduled_at = Date.parse params[:scheduled_at] if params[:scheduled_at].present? and DateUtils.validate_date_format?(params[:scheduled_at])
+    self.initiating_account = retrieve_initiating_account
 
     if scheduled_at.present? and scheduled_at < Date.today
       self.scheduled_at = Date.today
@@ -123,12 +124,13 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     params[:errors] = self.errors
     params[:payment_order_valid] = self.payment_order_valid
     params[:scheduled_at] = self.scheduled_at
+    params[:initiating_account] = self.initiating_account
     Benefits::TaxBenefits::Process::SuccessPresenter.new(user, params, messages)
   end
 
   class Benefits::TaxBenefits::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :errors,
-                  :payment_order_valid, :scheduled_at
+                  :payment_order_valid, :scheduled_at, :initiating_account
 
     def init
       self.payment_order_data = params[:payment_order_data]
@@ -138,6 +140,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       self.errors = params[:errors]
       self.payment_order_valid = params[:payment_order_valid]
       self.scheduled_at = params[:scheduled_at]
+      self.initiating_account = params[:initiating_account]
     end
 
     def scheduled_at_formatted
@@ -148,6 +151,19 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       DateUtils.date_formatted Date.today
     end
 
+  end
+
+  private
+
+  def retrieve_initiating_account
+    case params[:initiating_account_type]
+      when 1, '1'
+        return "Company Credits (Card Transfer Pocket)"
+      when 2, '2'
+        return "#{user.first_name}'s Finly Money'"
+      else
+        # return "#{user.first_name}'s Finly Money'"
+    end
   end
 
 end
