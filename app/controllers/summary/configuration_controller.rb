@@ -17,4 +17,14 @@ class Summary::ConfigurationController < ApplicationController
     respond response: (@result&.success? ? :success : :failure)
   end
 
+  def manager_create
+    @result = SummaryMailer::Manager::Create.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def manager_destroy
+    @result = SummaryMailer::Manager::Destroy.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
 end

@@ -14,7 +14,7 @@ class SummaryMailer::Manager::Destroy < SummaryMailer::Manager::Base
       add_message :error, result.messages[:error]
       return
     end
-    self.config_to_destroy = result.manager_summary_mail_config.find_by_id(params[:id])
+    self.config_to_destroy = result.manager_summary_mail_configs.find_by_id(params[:id])
   end
 
   def validate

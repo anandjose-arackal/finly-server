@@ -47,6 +47,8 @@ class ManagerSummaryMailConfig < ActiveRecord::Base
     query << "scheduled_time = '#{time_slot}'"
     where query.string
   end
+  scope :reports, -> { where entity_type: 'report' }
+  scope :money_requests, -> { where entity_type: 'money_request' }
 
   def validate_scheduled_time
     if scheduled_time.blank?
