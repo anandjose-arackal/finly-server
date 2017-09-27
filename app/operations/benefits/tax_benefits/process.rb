@@ -1,7 +1,8 @@
 # Process validates the request for payment order wrt tax benefits and generates the respective output to be sent for confirmation or for creating payment order
 class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
   attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount,
-                :errors, :payment_order_valid, :scheduled_at, :company_balance, :initiating_account
+                :errors, :payment_order_valid, :scheduled_at, :company_balance, :initiating_account,
+                :initiating_account_name
 
   def pre_validate
     super
@@ -24,7 +25,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     self.processable_amount = 0
     self.processed_order = []
     self.scheduled_at = Date.parse params[:scheduled_at] if params[:scheduled_at].present? and DateUtils.validate_date_format?(params[:scheduled_at])
-    self.initiating_account = retrieve_initiating_account
+    self.initiating_account_name = retrieve_initiating_account_name
 
     if scheduled_at.present? and scheduled_at < Date.today
       self.scheduled_at = Date.today
@@ -57,7 +58,8 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       self.requested_amount += (item[:amount].to_d rescue 0)
     end
 
-    if self.requested_amount > company_balance
+    initiating_account_adapter = retrieve_initiating_account_adapter
+    if self.requested_amount > initiating_account_adapter.balance
       self.errors << 'Insufficient funds to initiate the transfer'
       self.payment_order_valid = false
     end
@@ -124,7 +126,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     params[:errors] = self.errors
     params[:payment_order_valid] = self.payment_order_valid
     params[:scheduled_at] = self.scheduled_at
-    params[:initiating_account] = self.initiating_account
+    params[:initiating_account] = self.initiating_account_name
     Benefits::TaxBenefits::Process::SuccessPresenter.new(user, params, messages)
   end
 
@@ -155,12 +157,23 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
 
   private
 
-  def retrieve_initiating_account
+  def retrieve_initiating_account_name
     case params[:initiating_account_type]
       when 1, '1'
         return "Company Credits (Card Transfer Pocket)"
       when 2, '2'
         return "#{user.first_name}'s Finly Money'"
+      else
+        # return "#{user.first_name}'s Finly Money'"
+    end
+  end
+
+  def retrieve_initiating_account_adapter
+    case params[:initiating_account_type]
+      when 1, '1'
+        return AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter.new(user.company.itz_cash_company_account)
+      when 2, '2'
+        return AccountManager::Wallet::WalletAdapter.new(user.wallet)
       else
         # return "#{user.first_name}'s Finly Money'"
     end

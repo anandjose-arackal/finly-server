@@ -27,7 +27,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
   def init
     self.order_data = params[:payment_order]
     self.processed_order_data = Benefits::TaxBenefits::Process.(config, user, scheduled_at: params[:scheduled_at],
-        payment_order: self.order_data, card_program_id: card_program_id)
+        payment_order: self.order_data, card_program_id: card_program_id, initiating_account_type: params[:initiating_account_type])
     self.scheduled_at = self.processed_order_data.scheduled_at
     self.payment_purpose = retrieve_payment_purpose
     self.initiating_account = retrieve_initiating_account
@@ -58,7 +58,7 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
 
   def process
     initiating_user = user
-
+    
     payment_request = PaymentRequest.(initiating_user, initiating_account, Card.name, :credit, payment_purpose, {scheduled_at: self.scheduled_at, background: true})
     self.processed_order_data.processed_order.each do |item|
 
