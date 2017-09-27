@@ -65,7 +65,6 @@ class User::Role::Set < BaseOperation
     if roles_to_remove.present?
       being_updated_user.role_mapping.with_purpose(purpose_id).role(roles_to_remove).each do |role_mapping|
         role_mapping.destroy
-        debugger
       end
     end
   end
