@@ -1,7 +1,6 @@
 json.roles do
-  json.admin @result.user.company_admin?
-  json.finance_manager @result.user.finance_manager?
-  json.manager @result.user.manager?
+  json.admin_summary @result.user.company_admin?
+  json.manager_summary (@result.user.finance_manager? or @result.user.manager?)
 end
 json.admin_summary do
   json.array! @result.admin_summary_mail_configs, :id, :period,
