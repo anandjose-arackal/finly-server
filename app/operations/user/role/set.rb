@@ -24,7 +24,11 @@ class User::Role::Set < BaseOperation
     self.being_updated_user = user.company.users.with_id(id).first rescue nil
     return unless being_updated_user.present?
     self.purpose_id = MappingPurpose.id_from_application_for(RequestStore.store[:current_app])
-    existing_role_ids = being_updated_user.role_mapping.with_purpose(purpose_id).map(&:user_role_id)
+    if funds_transfer?
+      existing_role_ids = being_updated_user.role_mapping.with_purpose(purpose_id).only_admin_and_finance.map(&:user_role_id)
+    else
+      existing_role_ids = being_updated_user.role_mapping.with_purpose(purpose_id).map(&:user_role_id)
+    end
     new_role_ids = params[:user_role_id]
     if new_role_ids.blank? and params[:user_roles].present?
       new_role_ids = []
@@ -58,7 +62,12 @@ class User::Role::Set < BaseOperation
                  purpose_id: purpose_id}
     end
     UserRoleMapping.create(create) if create.present?
-    being_updated_user.role_mapping.with_purpose(purpose_id).role(roles_to_remove).destroy_all if roles_to_remove.present?
+    if roles_to_remove.present?
+      being_updated_user.role_mapping.with_purpose(purpose_id).role(roles_to_remove).each do |role_mapping|
+        role_mapping.destroy
+        debugger
+      end
+    end
   end
 
   def post_process
