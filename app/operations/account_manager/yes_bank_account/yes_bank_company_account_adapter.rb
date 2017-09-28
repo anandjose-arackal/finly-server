@@ -8,28 +8,31 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
 
   def credit(payment, options = {})
     # this will add money to this company's balance
-    opening_balance = balance
+    opening_balance = self.account.balance_value
+    opening_balance_for_ft = balance
     if self.account.balance.update(value: opening_balance + payment.amount_value)
       closing_balance = balance
-      store_transaction payment, :credit, :success, opening_balance, closing_balance, account.company_id
+      store_transaction payment, :credit, :success, opening_balance_for_ft, closing_balance, account.company_id
       return true
     end
     self.errors = self.account.errors.full_messages
     closing_balance = balance
-    store_transaction payment, :credit, :failure, opening_balance, closing_balance, account.company_id, error: self.errors
+    store_transaction payment, :credit, :failure, opening_balance_for_ft, closing_balance, account.company_id, error: self.errors
     false
   end
 
   def debit(payment, options = {})
     # this will debit money from the company balance
-    opening_balance = balance
+    opening_balance = self.account.balance_value
+    opening_balance_for_ft = balance
     if self.account.balance.update(value: opening_balance - payment.amount_value)
       closing_balance = balance
-      store_transaction payment, :debit, :success, opening_balance, closing_balance, account.company_id
+      store_transaction payment, :debit, :success, opening_balance_for_ft, closing_balance, account.company_id
       return true
     end
+    self.errors = self.account.errors.full_messages
     closing_balance = balance
-    store_transaction payment, :debit, :failure, opening_balance, closing_balance, account.company_id, error: self.errors
+    store_transaction payment, :debit, :failure, opening_balance_for_ft, closing_balance, account.company_id, error: self.errors
     false
   end
 
