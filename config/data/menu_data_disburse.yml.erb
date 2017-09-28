@@ -89,7 +89,7 @@ views:
           target: '_blank'
         - name: 'Company Statements'
           url: '#company_statements'
-        <% if current_company.feature_subscription.yes_bank_account and current_user.company_admin? %>
+        <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
         - name: Vendor Payments
           url: '/payments'
           target: '_blank'
@@ -171,7 +171,7 @@ views:
             url: '#organization_account'
           - name: 'Company Statements'
             url: '#company_statements'
-          <% if current_company.feature_subscription.yes_bank_account and current_user.auditor? %>
+          <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
           - name: Vendor Payments
             url: '/payments'
             target: '_blank'
