@@ -1,4 +1,4 @@
-class Event::ESummary::Report < Event::SetNotifier
+class Event::ESummary::Manager < Event::SetNotifier
   attr_accessor :users
 
   def pre_validate
@@ -13,7 +13,7 @@ class Event::ESummary::Report < Event::SetNotifier
   end
 
   def action_name
-    'Pending Reports'
+    'Pending Reports and Money Requests'
   end
 
   def init
@@ -25,7 +25,7 @@ class Event::ESummary::Report < Event::SetNotifier
   end
 
   def event_id
-    NotifierType.id_for(:admin_summary)
+    NotifierType.id_for(:manager_summary)
   end
 
   def affected_users
@@ -36,15 +36,15 @@ class Event::ESummary::Report < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    SummaryMailer.delay.send_mail(Event::ESummary::Report::MailerPresenter.new(user, params))
+    SummaryMailer.delay.send_manager_mail(Event::ESummary::Manager::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)
-    "Finly Summary for #{DateUtils.date_formatted(Date.today)}"
+    'Pending Reports and Money Requests'
   end
 
   def mailer_body(user)
-    "Please find your Finly Summary Report"
+    'Here are the Reports and Money Requests which are awaiting your approval'
   end
 
   def set_presenter_params(user)
@@ -53,7 +53,7 @@ class Event::ESummary::Report < Event::SetNotifier
     params[:action_name] = action_name
   end
 
-  class Event::ESummary::Report::MailerPresenter < Event::SetNotifier::MailerPresenter
+  class Event::ESummary::Manager::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :summary, :user, :body_val, :subject_val, :button_val, :action_name, :company
 
     def init

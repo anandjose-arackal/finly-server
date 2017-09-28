@@ -35,7 +35,7 @@ class Event::ESummary::Report < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? and params[:body].present?
-    SummaryMailer.delay.send_mail(Event::ESummary::Report::MailerPresenter.new(user, params))
+    SummaryMailer.delay.send_admin_mail(Event::ESummary::Report::MailerPresenter.new(user, params))
   end
 
   def mailer_subject(user)

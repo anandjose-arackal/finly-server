@@ -34,7 +34,6 @@ class SummaryMailer::CompanyAdmin::ProcessReports < BaseOperation
       time_slot += ':30'
     end
     time_slot
-    '10:00'
   end
 
   def fetch_configurations
