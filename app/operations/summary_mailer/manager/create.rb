@@ -35,6 +35,12 @@ class SummaryMailer::Manager::Create < SummaryMailer::Manager::Base
     end
   end
 
+  def post_process
+    # if user.manager_summary_mail_configs.present? and
+    #
+    # end
+  end
+
   protected
   def config_strong_params
     params.require(:config).permit(:period_id, :scheduled_day_of_month,

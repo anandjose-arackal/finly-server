@@ -1,2 +1,0 @@
-module Summary::ConfigurationHelper
-end
