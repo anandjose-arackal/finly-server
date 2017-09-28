@@ -2,7 +2,7 @@
 class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
   attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount,
                 :errors, :payment_order_valid, :scheduled_at, :company_balance, :initiating_account,
-                :initiating_account_name
+                :initiating_account_name, :initiating_account_type_id
 
   def pre_validate
     super
@@ -26,6 +26,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     self.processed_order = []
     self.scheduled_at = Date.parse params[:scheduled_at] if params[:scheduled_at].present? and DateUtils.validate_date_format?(params[:scheduled_at])
     self.initiating_account_name = retrieve_initiating_account_name
+    self.initiating_account_type_id = params[:initiating_account_type]
 
     if scheduled_at.present? and scheduled_at < Date.today
       self.scheduled_at = Date.today
@@ -127,12 +128,13 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     params[:payment_order_valid] = self.payment_order_valid
     params[:scheduled_at] = self.scheduled_at
     params[:initiating_account] = self.initiating_account_name
+    params[:initiating_account_type_id] = self.initiating_account_type_id
     Benefits::TaxBenefits::Process::SuccessPresenter.new(user, params, messages)
   end
 
   class Benefits::TaxBenefits::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :errors,
-                  :payment_order_valid, :scheduled_at, :initiating_account
+                  :payment_order_valid, :scheduled_at, :initiating_account, :initiating_account_type_id
 
     def init
       self.payment_order_data = params[:payment_order_data]
@@ -143,6 +145,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
       self.payment_order_valid = params[:payment_order_valid]
       self.scheduled_at = params[:scheduled_at]
       self.initiating_account = params[:initiating_account]
+      self.initiating_account_type_id = params[:initiating_account_type_id]
     end
 
     def scheduled_at_formatted
