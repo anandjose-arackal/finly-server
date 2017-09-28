@@ -114,6 +114,8 @@ class PaymentOrder < ActiveRecord::Base
     where('processed_at >= ? AND processed_at <= ?', date_from, date_to)
   }
 
+  scope :from_disburse, -> {where application: ["fd", "ft"]}
+  scope :from_vendor_payments, -> {where application: "vp"}
 
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
   delegate :amount_requested_value, to: :amount_requested
