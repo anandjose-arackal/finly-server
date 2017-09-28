@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170922120218) do
+ActiveRecord::Schema.define(version: 20170923091913) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -49,6 +49,62 @@ ActiveRecord::Schema.define(version: 20170922120218) do
   end
 
   add_index "admin_review_workflows", ["name"], name: "index_admin_review_workflows_on_name", using: :btree
+
+  create_table "admin_summary_mail_config", force: :cascade do |t|
+    t.integer  "user_id",                limit: 4
+    t.integer  "period_id",              limit: 4
+    t.integer  "scheduled_day_of_month", limit: 4
+    t.string   "scheduled_day_of_week",  limit: 255
+    t.string   "scheduled_time",         limit: 255
+    t.string   "application",            limit: 255
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "admin_summary_mail_config", ["period_id"], name: "index_admin_summary_mail_config_on_period_id", using: :btree
+  add_index "admin_summary_mail_config", ["scheduled_day_of_month"], name: "index_admin_summary_mail_config_on_scheduled_day_of_month", using: :btree
+  add_index "admin_summary_mail_config", ["scheduled_day_of_week"], name: "index_admin_summary_mail_config_on_scheduled_day_of_week", using: :btree
+  add_index "admin_summary_mail_config", ["scheduled_time"], name: "index_admin_summary_mail_config_on_scheduled_time", using: :btree
+  add_index "admin_summary_mail_config", ["user_id"], name: "index_admin_summary_mail_config_on_user_id", using: :btree
+
+  create_table "admin_summary_mail_configs", force: :cascade do |t|
+    t.integer  "user_id",                limit: 4
+    t.integer  "period_id",              limit: 4
+    t.integer  "starting_day_of_month",  limit: 4
+    t.integer  "scheduled_day_of_month", limit: 4
+    t.string   "starting_day_of_week",   limit: 255
+    t.string   "scheduled_day_of_week",  limit: 255
+    t.string   "scheduled_time",         limit: 255
+    t.string   "application",            limit: 255
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "admin_summary_mail_configs", ["period_id"], name: "index_admin_summary_mail_configs_on_period_id", using: :btree
+  add_index "admin_summary_mail_configs", ["scheduled_day_of_month"], name: "index_admin_summary_mail_configs_on_scheduled_day_of_month", using: :btree
+  add_index "admin_summary_mail_configs", ["scheduled_day_of_week"], name: "index_admin_summary_mail_configs_on_scheduled_day_of_week", using: :btree
+  add_index "admin_summary_mail_configs", ["scheduled_time"], name: "index_admin_summary_mail_configs_on_scheduled_time", using: :btree
+  add_index "admin_summary_mail_configs", ["starting_day_of_month"], name: "index_admin_summary_mail_configs_on_starting_day_of_month", using: :btree
+  add_index "admin_summary_mail_configs", ["starting_day_of_week"], name: "index_admin_summary_mail_configs_on_starting_day_of_week", using: :btree
+  add_index "admin_summary_mail_configs", ["user_id"], name: "index_admin_summary_mail_configs_on_user_id", using: :btree
+
+  create_table "admin_summary_mail_configurations", force: :cascade do |t|
+    t.integer  "user_id",                limit: 4
+    t.integer  "period_id",              limit: 4
+    t.integer  "scheduled_day_of_month", limit: 4
+    t.string   "scheduled_day_of_week",  limit: 255
+    t.string   "scheduled_time",         limit: 255
+    t.boolean  "personal"
+    t.string   "application",            limit: 255
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "admin_summary_mail_configurations", ["period_id"], name: "index_admin_summary_mail_configurations_on_period_id", using: :btree
+  add_index "admin_summary_mail_configurations", ["scheduled_day_of_month"], name: "index_summary_mail_configurations_on_scheduled_day_of_month", using: :btree
+  add_index "admin_summary_mail_configurations", ["scheduled_day_of_week"], name: "index_summary_mail_configurations_on_scheduled_day_of_week", using: :btree
+  add_index "admin_summary_mail_configurations", ["scheduled_time"], name: "index_summary_mail_configurations_on_scheduled_time", using: :btree
+  add_index "admin_summary_mail_configurations", ["user_id"], name: "index_admin_summary_mail_configurations_on_user_id", using: :btree
 
   create_table "admin_user_role_mappings", force: :cascade do |t|
     t.integer  "admin_user_id",      limit: 4
@@ -322,6 +378,8 @@ ActiveRecord::Schema.define(version: 20170922120218) do
     t.string   "reloadable_type",      limit: 255
     t.integer  "threshold_balance_id", limit: 4
     t.integer  "target_balance_id",    limit: 4
+    t.integer  "source_account_id",    limit: 4
+    t.string   "source_account_type",  limit: 255
   end
 
   add_index "auto_reload_configs", ["reloadable_type", "reloadable_id"], name: "index_auto_reload_configs_on_reloadable_type_and_reloadable_id", using: :btree
@@ -3104,6 +3162,12 @@ ActiveRecord::Schema.define(version: 20170922120218) do
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
 
   add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
+  add_foreign_key "admin_summary_mail_config", "periods"
+  add_foreign_key "admin_summary_mail_config", "users"
+  add_foreign_key "admin_summary_mail_configs", "periods"
+  add_foreign_key "admin_summary_mail_configs", "users"
+  add_foreign_key "admin_summary_mail_configurations", "periods"
+  add_foreign_key "admin_summary_mail_configurations", "users"
   add_foreign_key "admin_user_role_mappings", "admin_user_roles"
   add_foreign_key "admin_user_role_mappings", "admin_users"
   add_foreign_key "agreements", "agreement_types"
