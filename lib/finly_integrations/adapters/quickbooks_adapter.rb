@@ -227,7 +227,7 @@ module FinlyIntegrations
       end
 
       def quickbooks_department_mapper(department)
-        fi_department = QuickbooksFinlyIntegrationsTag.new
+        fi_department = QuickbooksFinlyIntegrationsDepartment.new
         fi_department.name = department.name
         fi_department.active = department.active?
         fi_department.quickbooks_id = department.id
