@@ -68,7 +68,7 @@ class Report::Retract < Report::Base
     report.submitted_amount&.destroy
 
     if prev_status.approved?
-      Settlement::Report::Unapproved.(user, report: report)
+      op = Settlement::Report::Unapproved.(user, report: report)
     end
 
     # Invalidate All existing Email Authorizations

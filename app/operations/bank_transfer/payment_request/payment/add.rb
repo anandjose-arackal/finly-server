@@ -26,10 +26,6 @@ class BankTransfer::PaymentRequest::Payment::Add < BankTransfer::PaymentRequest:
 
   def init
     super
-    id = params[:id] || params[:bank_payment_request_id]
-    self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
-    # self.bank_payment_request = BankPaymentRequest.find_by(id: id)
-    self.payment_order = bank_payment_request.payment_order
     self.payments_data = []
     params[:bank_accounts].each do |bank_account|
       id = bank_account[:id]

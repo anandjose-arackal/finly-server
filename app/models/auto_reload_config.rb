@@ -21,12 +21,14 @@ class AutoReloadConfig < ActiveRecord::Base
   belongs_to :minimum_balance, class_name: 'Amount'
   belongs_to :threshold_balance, class_name: "Amount"
   belongs_to :target_balance, class_name: "Amount"
+  belongs_to :source_account, polymorphic: true
 
   accepts_nested_attributes_for :minimum_balance
   accepts_nested_attributes_for :threshold_balance
   accepts_nested_attributes_for :target_balance
 
   # validate :minimum_balance_presence
+  validate :source_account_presence
 
   def minimum_balance_value
     if self.minimum_balance
@@ -52,12 +54,31 @@ class AutoReloadConfig < ActiveRecord::Base
     end
   end
 
+  def source_account_type_id
+    case self.source_account_type
+      when "UserWallet"
+        return 2
+      when "ItzCashCompanyAccount"
+        return 1
+      else
+        # do nothing?
+    end
+  end
+
   private
 
   def minimum_balance_presence
     if self.enabled
       unless minimum_balance.present?
         errors.add(:minimum_balance, "cannot be blank")
+      end
+    end
+  end
+
+  def source_account_presence
+    if self.enabled
+      if source_account.blank?
+        errors.add("Source account cannot be blank")
       end
     end
   end

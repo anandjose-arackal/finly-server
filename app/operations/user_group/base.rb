@@ -2,7 +2,7 @@ class UserGroup::Base < BaseOperation
   attr_accessor :user_group
 
   def authorized_user_types
-    :company_admin
+    [:company_admin, :auditor]
   end
 
   def pre_validate
