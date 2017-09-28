@@ -18,7 +18,7 @@ company:
     <% if current_company.feature_subscription.reimbursement_card_enabled && current_user.user_panel_subscription.disburse %>
     reimbursement_card: true
     <% end %>
-    <% if current_company.feature_subscription.expense_management_enabled && current_user.user_panel_subscription.expense_managements %>
+    <% if current_company.feature_subscription.expense_management_enabled && current_user.user_panel_subscription.expense_management %>
     expense_management: true
     <% end %>
     <% if current_company.feature_subscription.yes_bank_account && current_user.user_panel_subscription.yes_bank_account_transfer %>
