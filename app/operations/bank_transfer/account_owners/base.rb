@@ -1,4 +1,4 @@
-class BankTransfer::Vendor::Base < BaseOperation
+class BankTransfer::AccountOwners::Base < BaseOperation
 
   attr_accessor :company, :vendor
 
@@ -14,11 +14,11 @@ class BankTransfer::Vendor::Base < BaseOperation
 
   def success
     params[:vendor] = vendor
-    BankTransfer::Vendor::Base::VendorPresenter.new(user, params, messages)
+    BankTransfer::AccountOwners::Base::AccountOwnersPresenter.new(user, params, messages)
 
   end
 
-  class BankTransfer::Vendor::Base::VendorPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::AccountOwners::Base::AccountOwnersPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :vendor
 

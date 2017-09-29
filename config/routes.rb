@@ -2225,7 +2225,7 @@ Rails.application.routes.draw do
     end
 
     get 'vendors/count', to: 'vendors#count'
-    resources :vendors
+    resources :account_owners
 
     get 'bank_accounts/count', to: 'bank_accounts#count'
     resources :bank_accounts

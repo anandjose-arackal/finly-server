@@ -1,6 +1,6 @@
 # This operation will fetch all the
 
-class BankTransfer::Vendor::Transfers::Show < BankTransfer::Vendor::Base
+class BankTransfer::AccountOwners::Transfers::Show < BankTransfer::AccountOwners::Base
 
   attr_accessor :vendor, :receiving_transactions, :bank_accounts
 
@@ -19,10 +19,10 @@ class BankTransfer::Vendor::Transfers::Show < BankTransfer::Vendor::Base
     params[:receiving_transactions] = receiving_transactions
     params[:bank_accounts] = bank_accounts
     params[:vendor] = vendor
-    BankTransfer::Vendor::Transfers::Show::VendorPresenter.new(user, params)
+    BankTransfer::AccountOwners::Transfers::Show::AccountOwnersPresenter.new(user, params)
   end
 
-  class BankTransfer::Vendor::Transfers::Show::VendorPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::AccountOwners::Transfers::Show::AccountOwnersPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :receiving_transactions, :bank_accounts, :vendor
 
