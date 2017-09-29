@@ -10,6 +10,7 @@
 #  email         :string(255)
 #  mobile_number :string(255)
 #  authorized    :boolean
+#  description   :string(255)
 #
 
 class YesBankVendor < ActiveRecord::Base

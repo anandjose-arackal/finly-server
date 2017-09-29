@@ -906,6 +906,15 @@
 #                                                         PUT    /bank_transfer/bank_payment_requests/:id(.:format)                                         bank_transfer/bank_payment_requests#update
 #                                                         DELETE /bank_transfer/bank_payment_requests/:id(.:format)                                         bank_transfer/bank_payment_requests#destroy
 #                             bank_transfer_vendors_count GET    /bank_transfer/vendors/count(.:format)                                                     bank_transfer/vendors#count
+#                            bank_transfer_account_owners GET    /bank_transfer/account_owners(.:format)                                                    bank_transfer/account_owners#index
+#                                                         POST   /bank_transfer/account_owners(.:format)                                                    bank_transfer/account_owners#create
+#                         new_bank_transfer_account_owner GET    /bank_transfer/account_owners/new(.:format)                                                bank_transfer/account_owners#new
+#                        edit_bank_transfer_account_owner GET    /bank_transfer/account_owners/:id/edit(.:format)                                           bank_transfer/account_owners#edit
+#                             bank_transfer_account_owner GET    /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#show
+#                                                         PATCH  /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#update
+#                                                         PUT    /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#update
+#                                                         DELETE /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#destroy
+#                     bank_transfer_vendor_show_transfers GET    /bank_transfer/vendors/:vendor_id/show_transfers(.:format)                                 bank_transfer/vendors#show_transfers
 #                                   bank_transfer_vendors GET    /bank_transfer/vendors(.:format)                                                           bank_transfer/vendors#index
 #                                                         POST   /bank_transfer/vendors(.:format)                                                           bank_transfer/vendors#create
 #                                new_bank_transfer_vendor GET    /bank_transfer/vendors/new(.:format)                                                       bank_transfer/vendors#new
@@ -944,6 +953,7 @@
 #                                                         DELETE /bank_transfer/users/:id(.:format)                                                         bank_transfer/users#destroy
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                             bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                       bank_transfer/vendor_payment_wallets#transfer_options
+#                            bank_transfer_show_transfers GET    /bank_transfer/show_transfers(.:format)                                                    bank_transfer/users#show_transfers
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)            admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)             admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                           admin_users/funds_load_requests#index
@@ -2227,6 +2237,10 @@ Rails.application.routes.draw do
     get 'vendors/count', to: 'vendors#count'
     resources :account_owners
 
+    resources :vendors do
+      get 'show_transfers', to: 'vendors#show_transfers'
+    end
+
     get 'bank_accounts/count', to: 'bank_accounts#count'
     resources :bank_accounts
 
@@ -2238,6 +2252,7 @@ Rails.application.routes.draw do
     resources :users
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
+    get 'show_transfers', to: 'users#show_transfers'
   end
 
 

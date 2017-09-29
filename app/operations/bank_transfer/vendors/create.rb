@@ -1,4 +1,4 @@
-class BankTransfer::AccountOwners::Create < BankTransfer::AccountOwners::Base
+class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
 
   attr_accessor :vendor_parameters, :vendor
 
