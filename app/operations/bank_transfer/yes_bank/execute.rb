@@ -34,6 +34,14 @@ class BankTransfer::YesBank::Execute < BankTransfer::YesBank::Base
 
   end
 
+  def post_process
+    # add condition here that if the payment order has been successfully executed,
+    # mark the respective bank payment request also as credited
+    if payment_order.completed?
+      payment_order.bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+    end
+  end
+
   def success
     params[:payment_order] = self.payment_order
     Benefits::TaxBenefits::Execute::SuccessPresenter.new(user, params, messages)
