@@ -80,7 +80,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
       payment = payment_order.payments.find_by(id: id)
       parameters[:payments_attributes] << {
           id: account_details[:id],
-          note: p[:payments_attributes][:note],
+          note: account_details[:note],
           amount_attributes: {
               id: payment.amount.id,
               value: account_details[:amount]
