@@ -10,7 +10,7 @@ class Orders::OrderCards::Base < BaseOperation
   # end
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :auditor]
   end
 
   def pre_validate
