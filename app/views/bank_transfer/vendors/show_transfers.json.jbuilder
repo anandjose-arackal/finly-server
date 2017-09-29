@@ -18,7 +18,11 @@ json.transactions do
     json.amount payment.amount.value
     json.date payment.date
     json.payment_order_id payment.payment_order_id
-    json.payment
+    json.payment_mode payment.payment_mode
+    json.account_number payment.receiving_account.account_number
+    json.ifsc payment.receiving_account.ifsc
+    json.initiating_user_name payment.initiating_user&.name
+    json.payment_status payment.payment_status_name
   end
 end
 

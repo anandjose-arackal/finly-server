@@ -17,7 +17,7 @@ class YesBankVendor < ActiveRecord::Base
   belongs_to :company
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
-  has_many :receiving_payments, as: :receiving_user
+  has_many :receiving_payments, as: :receiving_user, class_name: "Payment"
 
   accepts_nested_attributes_for :bank_accounts
 

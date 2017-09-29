@@ -20,4 +20,9 @@ class BankTransfer::UsersController < ApplicationController
     respond
   end
 
+  def show_transfers
+    @result = BankTransfer::Users::Transfers::Show.(current_user, params)
+    respond
+  end
+
 end
