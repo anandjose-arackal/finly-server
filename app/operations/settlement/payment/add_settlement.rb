@@ -128,9 +128,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
         id = payment_params[:receiving_account_id]
         self.receiving_account = self.reimbursement_bank_account = to_user.bank_accounts.find_by(id: id)
       else
-        # add error message and return I suppose
-        add_message :error, "Please choose a reimbursement method before proceesing"
-        return
+        # do nothing?
     end
     self.note = payment_params[:note]
   end
