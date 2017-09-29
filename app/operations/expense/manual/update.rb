@@ -87,7 +87,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     from_cash_on_hand = StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand)) || expense.from_cash_on_hand
     reimbursable = StringUtils.to_bool(updated_expense_params&.dig(:reimbursable)) || expense.reimbursable
     if from_cash_on_hand and reimbursable
-      add_message :error, 'Expense cannot be Reimbursable and from Cash on Hand'
+      add_message :error, 'Expense cannot be Reimbursable and Paid from Cash on Hand'
       return
     end
   end
