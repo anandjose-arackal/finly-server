@@ -173,7 +173,12 @@ class Payment < ActiveRecord::Base
   scope :with_reference_id, -> (ref_id) { where reference_id: ref_id }
 
   scope :filter_search, -> (term) {
-    #todo - need to think about this
+    bank_account_ids = BankAccount.where("account_number like ? OR name like ? OR ifsc like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = YesBankVendor.where("name like ? OR email like ? OR mobile_number like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    user_ids = User.where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+
+    where("(receiving_account_type = 'BankAccount' AND receiving_account_id IN (?)) OR (receiving_user_type = 'YesBankVendor' AND receiving_user_id IN (?))
+            OR (receiving_user_type = 'User' AND receiving_user_id IN (?))", bank_account_ids, vendor_ids, user_ids)
   }
 
   scope :filter_user_id, -> (user_id) {
