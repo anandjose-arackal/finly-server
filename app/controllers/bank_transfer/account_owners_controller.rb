@@ -12,5 +12,9 @@ class BankTransfer::AccountOwnersController < ApplicationController
     render json: @result.as_json
   end
 
+  def show
+    @result = BankTransfer::AccountOwners::Show.(current_user, params)
+    respond
+  end
 
 end
