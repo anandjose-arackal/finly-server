@@ -26,7 +26,10 @@ json.currencies do
     json.country_code currency.country_code
   end
 end
-
+json.cash_on_hand do
+  json.value @result.cash_on_hand
+  json.currency Currency.first
+end
 json.categories do
   json.array!(@result.categories) do |category|
     json.extract! category, :id, :name
