@@ -138,7 +138,7 @@ class BankPaymentRequest < ActiveRecord::Base
       return self.payment_order.payment_order_status&.name
     elsif [BankPaymentRequestStatus.id_for(:approved)].include?(self.status_id)
       # todo - can change this to pending credit
-      return "approved"
+      return "pending_credit"
     end
     self.status&.name&.to_s
   end
