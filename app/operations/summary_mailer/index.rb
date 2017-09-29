@@ -1,9 +1,9 @@
 class SummaryMailer::Index < SummaryMailer::CompanyAdmin::Base
   attr_accessor :admin_summary_mail_configs, :manager_summary_mail_configs, :manager_report_summary_mail_configs, :manager_money_request_summary_mail_configs
 
-  def authorized_user_types
-    [:company_admin]
-  end
+  # def authorized_user_types
+  #   [:company_admin]
+  # end
 
   def pre_validate
     if user.blank?
