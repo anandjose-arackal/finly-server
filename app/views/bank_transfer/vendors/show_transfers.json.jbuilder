@@ -1,4 +1,4 @@
-json.vendor do
+json.account_owner do
   json.extract! @result.vendor, :id, :name, :email, :mobile_number, :authorized, :description
   json.created_at @result.vendor.created_at.strftime "%b %d %yy"
 end
