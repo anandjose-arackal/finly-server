@@ -5,7 +5,7 @@ class Admin::Companies::Base < Admin::Base
   end
 
   def company_params
-    params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code], configuration_attributes: [:logo],
+    params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code], configuration_attributes: [:logo, :registered_mobile_number],
                                     company_kyc_attributes: [:company_type_id, :customer_type_id],
                                     feature_subscription_attributes: [
                                       :ocr_enabled,
@@ -34,9 +34,17 @@ class Admin::Companies::Base < Admin::Base
       self.company = params[:company]
     end
 
-    def company_balance
-      op = Admin::Companies::Balance.(user, {company: company})
-      op&.success? ? op.balance : nil
+    def itz_cash_company_balance
+      # op = Admin::Companies::ItzCashBalance.(user, {company: company})
+      # op&.success? ? op.balance : nil
+      itz_cash_adapter = AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter.new(company.itz_cash_company_account)
+      return itz_cash_adapter.balance
+    end
+
+    def yes_bank_company_balance
+      # calling the adapter for balance
+      yes_bank_adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(company.yes_bank_company_account)
+      return yes_bank_adapter.balance
     end
   end
 

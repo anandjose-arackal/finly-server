@@ -157,7 +157,7 @@ class User::Balances::Show < User::Base
     self.balances[:cash_on_hand] << {
         name: "Cash On Hand",
         type: "cash",
-        balance: self.wallet_info[:itz_cash][:balance]
+        balance: self.cash_on_hand_info[:itz_cash][:balance]
     }
   end
 

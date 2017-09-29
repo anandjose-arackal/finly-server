@@ -21,6 +21,10 @@ class BankTransfer::PaymentRequest::Beneficiary::Remove < BankTransfer::PaymentR
   def post_process
     add_message :success, "Payment successfully removed"
 
+    # update the amount requested for this particular payment order
+    amount_requested = self.payment_order.request_total
+    payment_order.amount_requested.update(value: amount_requested)
+
     # add a comment for this removal
     if bank_payment_request.retracted? || bank_payment_request.rejected?
       # adding comments for all the beneficiaries added and removed in the comments

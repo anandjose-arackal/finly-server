@@ -109,6 +109,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         elsif bank_payment_request.open? && bank_payment_request.owner_id == user.id
           actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:destroy] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
+        elsif bank_payment_request.scheduled?
+          # if the payment request is scheduled, give the option to cancel it here
+          actions[:cancel] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_payment_order_path(bank_payment_request.payment_order)}
         elsif bank_payment_request.approved?
           actions[:credit] = true
           balance = retrieve_balance(:vendor_payment_wallet, user)
@@ -139,9 +142,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                   type: 7
               }
           }
-        elsif bank_payment_request.scheduled?
-          # if the payment request is scheduled, give the option to cancel it here
-          actions[:cancel] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_payment_order_path(bank_payment_request.payment_order)}
         end
       elsif (manager_view?) && bank_payment_request.processing?
         if bank_payment_request.controlling_user_id == user.id

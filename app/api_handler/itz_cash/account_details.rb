@@ -2,10 +2,6 @@ class ItzCash::AccountDetails < ItzCash::Base
   attr_accessor :card
 
   def pre_validate
-    # if user.blank? && !params[:unassigned]
-    #   add_message :error, 'User not found'
-    #   return
-    # end
     if params[:card].blank?
       add_message :error, 'Card not found'
     end
@@ -119,6 +115,15 @@ class ItzCash::AccountDetails < ItzCash::Base
     end
     if status == :upgraded and card.user.individual_kyc.kyc_status_id != KycStatus.id_for(:completed)
       card.user.individual_kyc.update(kyc_status_id: KycStatus.id_for(:completed), review_position: nil)
+    end
+
+    assign_request = card.card_assign_requests.with_card_owner_id(card.user_id)&.first
+    if assign_request.present? and CardAssignRequestStatus.ids_for([:processing, :approved, :rejected, :cancelled]).include? assign_request.status_id
+      if [:upgraded].include? status
+        assign_request.update(review_position: nil, status_id: CardAssignRequestStatus.id_for(:assigned_and_upgraded), assigned_by_resource: nil, assigned_on: DateTime.now)
+      elsif [:assigned, :upgrade_requested].include? status
+        assign_request.update(review_position: nil, status_id: CardAssignRequestStatus.id_for(:assigned), assigned_by_resource: nil, assigned_on: DateTime.now)
+      end
     end
   end
 

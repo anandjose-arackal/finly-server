@@ -22,6 +22,7 @@ class ItzCashCompanyAccount < ActiveRecord::Base
   has_many :receiving_payments, as: :receiving_account
   has_many :receiving_payment_trails, as: :receiving_account
   has_many :finly_transactions, as: :finly_account
+  has_many :auto_reload_configs, as: :source_account
 
   accepts_nested_attributes_for :balance
   accepts_nested_attributes_for :wallet_balance
@@ -32,6 +33,6 @@ class ItzCashCompanyAccount < ActiveRecord::Base
   end
 
   def blocked_amount_for_pending_payments
-    PaymentOrder.with_company_id(self.company_id).scheduled.joins(:amount_requested).sum(:value)
+    PaymentOrder.with_company_id(self.company_id).with_initiating_account_type("ItzCashCompanyAccount").scheduled.joins(:amount_requested).sum(:value)
   end
 end

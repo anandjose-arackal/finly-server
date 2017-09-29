@@ -25,11 +25,13 @@ json.payments do
     json.amount payment.amount_value
     json.status payment.payment_status_name
     json.id payment.id
+    json.note payment.note
     json.account_id payment.receiving_account.id
     json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
     json.system_messages do
       json.array! (payment.system_messages)
     end
+    json.bank_reference_number payment.reference_resource&.bank_reference_number
   end
 end
 

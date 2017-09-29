@@ -14,8 +14,8 @@ class Policy::Index < Policy::Base
   end
 
   def process
-    if admin_view?
-      if user.company_admin?
+    if admin_view? || auditor_view?
+      if user.company_admin? || user.auditor?
         self.policies = user&.company.policies
       else
         self.policies = user&.admin_policies

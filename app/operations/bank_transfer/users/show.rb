@@ -55,7 +55,8 @@ class BankTransfer::Users::Show < BankTransfer::Users::Base
       self.roles = {admin: selected_user.vendor_payment_admin?,
                     finance_manager: selected_user.vendor_payment_finance?,
                     manager: selected_user.vendor_payment_manager?,
-                    initiator: selected_user.vendor_payment_initiator?
+                    initiator: selected_user.vendor_payment_initiator?,
+                    auditor: selected_user.auditor?
                     }
       self.managers = selected_user.company.users.only_vendor_payment_reviewers
       self.finance_managers = selected_user.company.users.only_vendor_payment_creditors

@@ -2,7 +2,7 @@ class Expense::Index < Expense::Base
   attr_accessor :role_id, :expenses, :expense_filters
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin]
+    [:employee, :manager, :finance_manager, :admin, :auditor]
   end
 
   def pre_validate

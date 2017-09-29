@@ -6,7 +6,7 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
   attr_accessor :users, :role_id
 
   def authorized_user_types
-    [:company_admin]
+    [:vendor_payments_admin, :auditor]
   end
 
   def pre_validate
@@ -39,7 +39,7 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
 
   def process
     case role_id
-      when UserRole.id_for(:admin)
+      when UserRole.id_for(:admin), UserRole.id_for(:auditor)
         self.users = user.company.users
       else
         self.users = []

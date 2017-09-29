@@ -1,6 +1,10 @@
 class UserTeam::BatchUpdate::Base < UserTeam::Base
   attr_accessor :users
 
+  def authorized_user_types
+    [:company_admin]
+  end
+
   def init
     super
     return if user_team.blank?

@@ -26,10 +26,6 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
 
   def init
     super
-    id = params[:id] || params[:bank_payment_request_id]
-    self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
-    # self.bank_payment_request = BankPaymentRequest.find_by(id: id)
-    self.payment_order = bank_payment_request.payment_order
     self.payments_data = []
     params[:bank_accounts].each do |bank_account|
       id = bank_account[:id]
@@ -80,6 +76,10 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
 
   def post_process
     add_message :success, "Beneficiaries added!"
+
+    # update the amount requested for this particular payment order
+    amount_requested = self.payment_order.request_total
+    payment_order.amount_requested&.update(value: amount_requested)
 
     if bank_payment_request.retracted? || bank_payment_request.rejected?
       # adding comments for all the beneficiaries removed in the comments

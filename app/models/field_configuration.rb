@@ -51,7 +51,7 @@ class FieldConfiguration < ActiveRecord::Base
   scope :enabled, -> { where enabled: true }
   scope :disabled, -> { where enabled: false }
 
-  default_scope { unscope(where: :is_deleted) }
+  default_scope { unscope(:where) }
 
   def validate_config
     case field_type_id

@@ -137,7 +137,7 @@ class BankPaymentRequest < ActiveRecord::Base
     if [BankPaymentRequestStatus.id_for(:credited), BankPaymentRequestStatus.id_for(:approved)].include?(self.status_id)
       return self.payment_order.payment_order_status&.name
     end
-    self.status.name&.to_s
+    self.status&.name&.to_s
   end
 
   def beneficiary_type

@@ -41,7 +41,7 @@ class Company::Balances::SetBalances < BaseOperation
     neft_transfer_total =  neft_balance_op.transactions.manual_fund_credits.with_date(params[:date]).joins(:transaction_amount).sum(:value) rescue 0
 
     self.company_admin = company.users.only_admins.first
-    current_company_balance = Company::VirtualAccount::Balance.(company_admin).balance rescue 0
+    current_company_balance = Company::ItzCashVirtualAccount::Balance.(company_admin).balance rescue 0
     company_withdrawal_to_card = 0
     company_withdrawal_to_wallet = 0
     company_load_from_card = 0

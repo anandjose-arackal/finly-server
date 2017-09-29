@@ -19,9 +19,10 @@
 #  transcribed            :boolean          default(FALSE)
 #  personal               :boolean          default(FALSE)
 #  reimbursable           :boolean          default(TRUE)
-#  synced_with_quickbooks :boolean
+#  synced_with_quickbooks :boolean          default(FALSE)
 #  split_link             :string(255)
 #  deleted_to_split       :boolean          default(FALSE)
+#  from_cash_on_hand      :boolean          default(FALSE)
 #
 
 
@@ -55,6 +56,7 @@ class Expense < ActiveRecord::Base
   has_one :time_expense, dependent: :destroy
   has_one :per_diem_expense, dependent: :destroy
   has_one :receipt_email
+  has_one :payment, as: :reference_resource
 
   accepts_nested_attributes_for :system_messages
   accepts_nested_attributes_for :amount
@@ -101,7 +103,7 @@ class Expense < ActiveRecord::Base
     end
   end
 
-  default_scope { order('expenses.date DESC') }
+  default_scope { order('expenses.created_at DESC') }
 
   scope :with_id, -> (ids) { where id: ids }
 
@@ -112,7 +114,7 @@ class Expense < ActiveRecord::Base
     where personal: true
   }
 
-  scope :non_cancelled, -> {
+  scope :non_cancelled  , -> {
     ids = pluck(:id)
     card_expenses = CardExpense.with_expense_id(ids)
     cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
@@ -148,6 +150,7 @@ class Expense < ActiveRecord::Base
   }
 
   scope :with_amount, -> { joins :amount }
+  scope :joins_amount, -> { joins :amount}
   scope :having_amount_currency, -> (amount, currency_id) { with_amount.where('amounts.value IN (?) AND amounts.currency_id IN (?)', amount, currency_id) }
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_report_id, ->(report_id) { where report_id: report_id }
@@ -259,6 +262,7 @@ class Expense < ActiveRecord::Base
                                                                        ExpenseType.id_for(:time),
                                                                        ExpenseType.id_for(:per_diem)]) }
   scope :only_reimbursable_expenses, -> { where(reimbursable: true) }
+  scope :spent_from_cash_on_hand, -> {where(from_cash_on_hand: true).where(expense_type_id: ExpenseType.id_for(:manual))}
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }
@@ -281,7 +285,7 @@ class Expense < ActiveRecord::Base
   scope :untranscribed, -> { where transcribed: false }
   scope :limit_to, ->(count) { limit count }
 
-  scope :verified, -> { where expense_status_id: ExpenseStatus.verified_id }
+  scope :verified, -> { where expense_status_id: ExpenseStatus.id_for(:verified) }
   scope :unreported, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected]) }
   scope :unverified, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :submitted]) }
 
@@ -346,6 +350,7 @@ class Expense < ActiveRecord::Base
     end
   end
 
+
   def base_amount
     unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present?
       return self.amount
@@ -362,6 +367,7 @@ class Expense < ActiveRecord::Base
     return nil unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present? and report_id.present?
     converted_amount = amount_value
     original_amount = original_amount_value
+    return nil unless converted_amount.present? and converted_amount > 0 and original_amount.present? and original_amount > 0
     precision_value converted_amount/original_amount
   end
 
