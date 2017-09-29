@@ -22,7 +22,7 @@ class BankTransfer::Vendor::Index < BankTransfer::Vendor::Base
 
     def init
       self.vendors = params[:vendors]
-      self.paginated_vendors = vendors.paginate(page: params[:page], per_page: 10)
+      self.paginated_vendors = vendors.paginate(page: params[:page], per_page: params[:per_page] || 30)
     end
   end
 end

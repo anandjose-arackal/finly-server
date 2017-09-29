@@ -1,14 +1,10 @@
 json.array!(@result.paginated_vendors) do |vendor|
-  json.id vendor.id
-  json.name vendor.name
-  json.email vendor.email
-  json.mobile_number vendor.mobile_number
+  json.extract! vendor, :id, :name, :email, :mobile_number, :description
+
   json.bank_accounts do
     json.array!(vendor.bank_accounts) do |bank_account|
-      json.account_number bank_account.account_number
-      json.ifsc bank_account.ifsc
-      json.id bank_account.id
-      json.name bank_account.name
+      json.extract! bank_account, :id, :ifsc, :name, :account_number
+      json.default bank_account.default_account
     end
   end
 end

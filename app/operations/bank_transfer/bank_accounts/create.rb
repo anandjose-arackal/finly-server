@@ -1,6 +1,6 @@
 class BankTransfer::BankAccounts::Create < BankTransfer::BankAccounts::Base
 
-  attr_accessor :bank_account, :account_params, :owner
+  attr_accessor :bank_account, :account_params, :owner, :set_default_account
 
   def pre_validate
     super()
@@ -22,7 +22,9 @@ class BankTransfer::BankAccounts::Create < BankTransfer::BankAccounts::Base
   end
 
   def pre_process
-
+    if account_params[:default_account] == '1'
+      self.set_default_account = true
+    end
   end
 
   def validate
@@ -33,6 +35,13 @@ class BankTransfer::BankAccounts::Create < BankTransfer::BankAccounts::Base
 
   def process
     self.bank_account = self.owner.bank_accounts.build(account_params)
+
+    if bank_account.valid?
+      if set_default_account
+        owner.bank_accounts.update_all(default_account: false)
+      end
+    end
+
     unless bank_account.save
       add_message :error, bank_account.errors.full_messages
     end
