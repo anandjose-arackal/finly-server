@@ -13,6 +13,7 @@ json.actions @result.actions
 json.bank_accounts do
   json.array!(@result.selected_user.bank_accounts) do |bank_account|
     json.id bank_account.id
+    json.default bank_account.default_account
     json.account do
       json.account_number bank_account.account_number
       json.ifsc bank_account.ifsc

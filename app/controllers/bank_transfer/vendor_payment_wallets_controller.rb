@@ -19,5 +19,4 @@ class BankTransfer::VendorPaymentWalletsController < ApplicationController
     @result = BankTransfer::VendorPaymentWallet::TransferOptions.(current_user, params)
     respond
   end
-
 end

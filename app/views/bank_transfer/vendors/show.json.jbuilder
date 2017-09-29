@@ -1,5 +1,5 @@
 json.vendor do
-  json.extract! @result.vendor, :id, :name, :email, :mobile_number, :authorized
+  json.extract! @result.vendor, :id, :name, :email, :mobile_number, :authorized, :description
   json.created_at @result.vendor.created_at.strftime "%b %d %yy"
 end
 json.id @result.vendor.id
@@ -9,6 +9,7 @@ json.bank_accounts do
     json.ifsc bank_account.ifsc
     json.id bank_account.id
     json.name bank_account.name
+    json.default bank_account.default_account
   end
 end
 json.transactions do
