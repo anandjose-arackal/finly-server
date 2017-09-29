@@ -2234,7 +2234,7 @@ Rails.application.routes.draw do
       patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficairy
     end
 
-    get 'vendors/count', to: 'vendors#count'
+    get 'account_owners/count', to: 'account_owners#count'
     resources :account_owners
 
     resources :vendors do

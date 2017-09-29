@@ -22,7 +22,7 @@ class BankTransfer::AccountOwners::Index < BankTransfer::AccountOwners::Base
     # todo - based on the type, send vendors or employees
     case self.beneficiary_type
       when 1, '1'
-        self.account_owners = company.users
+        self.account_owners = company.users.with_bank_accounts
       when 2, '2'
         self.account_owners = company.yes_bank_vendors
       else
