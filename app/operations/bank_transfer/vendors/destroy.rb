@@ -5,14 +5,20 @@ class BankTransfer::Vendors::Destroy < BankTransfer::Vendors::Base
     self.vendor = YesBankVendor.find_by(id: id)
   end
 
+  def validate
+    if self.vendor.blank?
+      add_message :error, "Vendor not found"
+    end
+  end
+
   def process
-    unless self.vendor.destroy
+    unless self.vendor.update(is_deleted: true)
       add_message :error, self.vendor.errors.full_messages
     end
   end
 
   def post_process
-    add_message :error, "Vendor successfully destroyed"
+    add_message :success, "Vendor successfully destroyed"
   end
 
 end

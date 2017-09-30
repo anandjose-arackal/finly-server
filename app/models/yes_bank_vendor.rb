@@ -11,6 +11,7 @@
 #  mobile_number :string(255)
 #  authorized    :boolean
 #  description   :string(255)
+#  is_deleted    :boolean          default(FALSE)
 #
 
 class YesBankVendor < ActiveRecord::Base
@@ -22,4 +23,5 @@ class YesBankVendor < ActiveRecord::Base
   accepts_nested_attributes_for :bank_accounts
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
+  scope :non_deleted, -> { where is_deleted: [false, nil]}
 end
