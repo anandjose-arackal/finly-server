@@ -23,10 +23,11 @@ json.per_diem_config do
     end
   end
 end
-json.cash_on_hand do
-  json.value @result.cash_on_hand
-  json.currency Currency.first
+custom_fields_config = @result.custom_fields_config
+if custom_fields_config.nil?
+  custom_fields_config = {}
 end
+custom_fields_config[:cash_on_hand] = {value: @result.cash_on_hand, currency: Currency.first}
 json.custom_fields_config @result.custom_fields_config
 json.currencies do
   json.array!(@result.currencies) do |currency|
