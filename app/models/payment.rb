@@ -92,6 +92,7 @@ class Payment < ActiveRecord::Base
                                                              PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly),
                                                              PaymentPurpose.id_for(:atm_withdrawal)] }
   scope :with_amount, -> { joins :amount }
+  scope :joins_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }

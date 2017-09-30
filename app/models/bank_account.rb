@@ -44,7 +44,7 @@ class BankAccount < ActiveRecord::Base
   scope :with_id, -> (id) {where id: id}
   scope :only_vendors, -> {where account_owner_type: "YesBankVendor"}
   scope :only_users, -> {where account_owner_type: "User"}
-  scope :default_accounts, -> { where default_account: true}
+  scope :default_accounts, -> { where(default_account: true).non_deleted}
   scope :non_deleted, -> {where is_deleted: [nil, false]}
   scope :with_owner_id, -> (owner_id) {
     where account_owner_id: owner_id

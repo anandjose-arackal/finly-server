@@ -33,7 +33,7 @@ class BankTransfer::BankAccounts::Destroy < BankTransfer::BankAccounts::Base
   def post_process
     # checking if the account owner has any default accounts, if not set one of them
     unless self.account_owner.bank_accounts.default_accounts.present?
-      self.account_owner.bank_accounts.first.update(default_account: true)
+      self.account_owner.bank_accounts.non_deleted.first.update(default_account: true)
     end
 
     add_message :success, "Bank account deleted"
