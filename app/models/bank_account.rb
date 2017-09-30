@@ -19,10 +19,11 @@
 #  company_id         :integer
 #  reimbursable       :boolean
 #  default_account    :boolean          default(FALSE)
+#  is_deleted         :boolean          default(FALSE)
 #
 
 class BankAccount < ActiveRecord::Base
-  include SoftDeletable
+  # include SoftDeletable
 
   belongs_to :account_owner, polymorphic: true
 
@@ -43,6 +44,8 @@ class BankAccount < ActiveRecord::Base
   scope :with_id, -> (id) {where id: id}
   scope :only_vendors, -> {where account_owner_type: "YesBankVendor"}
   scope :only_users, -> {where account_owner_type: "User"}
+  scope :default_accounts, -> { where default_account: true}
+  scope :non_deleted, -> {where is_deleted: [nil, false]}
   scope :with_owner_id, -> (owner_id) {
     where account_owner_id: owner_id
   }

@@ -3,6 +3,9 @@ json.account_owner do
   if @result.account_owner.is_a?(YesBankVendor)
     json.authorized @result.account_owner.authorized
     json.description @result.account_owner.description
+    json.editable_details true
+  else
+    json.editable_details false
   end
   json.created_at @result.account_owner.created_at.strftime "%b %d %yy"
 end

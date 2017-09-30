@@ -23,7 +23,7 @@ class BankTransfer::AccountOwners::Show < BankTransfer::AccountOwners::Base
   end
 
   def process
-    self.bank_accounts = account_owner.bank_accounts
+    self.bank_accounts = account_owner.bank_accounts.non_deleted
     self.receiving_transactions = account_owner.receiving_payments.with_receiving_account_type("BankAccount")
   end
 

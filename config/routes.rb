@@ -231,6 +231,7 @@
 #                      mobile_v0_configuration_categories GET    /mobile/v0/configuration/categories(.:format)                                              mobile/v0/configuration/category#index
 #                    mobile_v0_configuration_gcm_register POST   /mobile/v0/configuration/gcm/register(.:format)                                            mobile/v0/configuration/gcm#create
 #                  mobile_v0_configuration_gcm_unregister POST   /mobile/v0/configuration/gcm/unregister(.:format)                                          mobile/v0/configuration/gcm#delete
+#                       mobile_v0_available_expense_types GET    /mobile/v0/available_expense_types(.:format)                                               mobile/v0/expenses#available_expense_types
 #                                          mobile_v1_auth POST   /mobile/v1/auth(.:format)                                                                  mobile/v1/token#create
 #                        mobile_v1_configuration_category GET    /mobile/v1/configuration/category(.:format)                                                mobile/v1/configuration#category
 #                                      mobile_v1_expenses GET    /mobile/v1/expenses(.:format)                                                              mobile/v1/expenses#index
@@ -313,6 +314,7 @@
 #                                        mobile_v1_lookup POST   /mobile/v1/lookup(.:format)                                                                mobile/v1/users#lookup
 #                         mobile_v1_send_verification_otp POST   /mobile/v1/send_verification_otp(.:format)                                                 mobile/v1/users#send_verification_otp
 #                               mobile_v1_verify_user_otp POST   /mobile/v1/verify_user_otp(.:format)                                                       mobile/v1/users#verify_user_otp
+#                       mobile_v2_available_expense_types GET    /mobile/v2/available_expense_types(.:format)                                               mobile/v2/expenses#available_expense_types
 #                                          chrome_v1_auth POST   /chrome/v1/auth(.:format)                                                                  chrome/v1/token#create
 #                                                         DELETE /chrome/v1/auth(.:format)                                                                  chrome/v1/token#destroy
 #                        chrome_v1_expenses_configuration POST   /chrome/v1/expenses/configuration(.:format)                                                chrome/v1/expenses#configuration
@@ -905,7 +907,7 @@
 #                                                         PATCH  /bank_transfer/bank_payment_requests/:id(.:format)                                         bank_transfer/bank_payment_requests#update
 #                                                         PUT    /bank_transfer/bank_payment_requests/:id(.:format)                                         bank_transfer/bank_payment_requests#update
 #                                                         DELETE /bank_transfer/bank_payment_requests/:id(.:format)                                         bank_transfer/bank_payment_requests#destroy
-#                             bank_transfer_vendors_count GET    /bank_transfer/vendors/count(.:format)                                                     bank_transfer/vendors#count
+#                      bank_transfer_account_owners_count GET    /bank_transfer/account_owners/count(.:format)                                              bank_transfer/account_owners#count
 #                            bank_transfer_account_owners GET    /bank_transfer/account_owners(.:format)                                                    bank_transfer/account_owners#index
 #                                                         POST   /bank_transfer/account_owners(.:format)                                                    bank_transfer/account_owners#create
 #                         new_bank_transfer_account_owner GET    /bank_transfer/account_owners/new(.:format)                                                bank_transfer/account_owners#new
