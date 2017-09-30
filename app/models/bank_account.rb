@@ -22,6 +22,8 @@
 #
 
 class BankAccount < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :account_owner, polymorphic: true
 
   has_many :receiving_payments, as: :receiving_account

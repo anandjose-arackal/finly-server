@@ -19,7 +19,12 @@ class BankTransfer::VendorsController < ApplicationController
   end
 
   def destroy
-
+    @result = BankTransfer::Vendors::Destroy.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def show_transfers

@@ -25,6 +25,12 @@ class BankTransfer::BankAccountsController < ApplicationController
   end
 
   def destroy
+    @result = BankTransfer::BankAccounts::Destroy.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def update
