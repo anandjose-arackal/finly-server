@@ -324,7 +324,6 @@ ActiveRecord::Schema.define(version: 20170930145457) do
     t.integer  "target_balance_id",    limit: 4
     t.integer  "source_account_id",    limit: 4
     t.string   "source_account_type",  limit: 255
-    t.string   "application",          limit: 255
   end
 
   add_index "auto_reload_configs", ["reloadable_type", "reloadable_id"], name: "index_auto_reload_configs_on_reloadable_type_and_reloadable_id", using: :btree
@@ -2408,18 +2407,6 @@ ActiveRecord::Schema.define(version: 20170930145457) do
   add_index "quickbooks_configurations", ["quickbooks_payment_type_id"], name: "index_quickbooks_configurations_on_quickbooks_payment_type_id", using: :btree
   add_index "quickbooks_configurations", ["user_id"], name: "index_quickbooks_configurations_on_user_id", using: :btree
 
-  create_table "quickbooks_departments", force: :cascade do |t|
-    t.string   "name",                   limit: 255
-    t.integer  "quickbooks_id",          limit: 4
-    t.boolean  "active"
-    t.integer  "company_id",             limit: 4
-    t.text     "additional_information", limit: 65535
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
-  end
-
-  add_index "quickbooks_departments", ["company_id"], name: "index_quickbooks_departments_on_company_id", using: :btree
-
   create_table "quickbooks_finly_integrations_users", force: :cascade do |t|
     t.string   "email",                             limit: 255
     t.string   "name",                              limit: 255
@@ -3251,7 +3238,6 @@ ActiveRecord::Schema.define(version: 20170930145457) do
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "quickbooks_configurations", "quickbooks_payment_types"
   add_foreign_key "quickbooks_configurations", "users"
-  add_foreign_key "quickbooks_departments", "companies"
   add_foreign_key "quickbooks_finly_integrations_users", "companies"
   add_foreign_key "quickbooks_finly_integrations_users", "users"
   add_foreign_key "quickbooks_payment_types", "companies"
