@@ -12,11 +12,11 @@ class BankTransfer::BankAccounts::Index < BankTransfer::BankAccounts::Base
 
   def process
     if user.vendor_payments_initiator? || user.vendor_payments_admin?
-      self.bank_accounts = company.bank_accounts
+      self.bank_accounts = company.bank_accounts.non_deleted
     else
       account_ids = company.bank_accounts.only_vendors.pluck(:id)
       account_ids += company.bank_accounts.only_users.with_owner_id(user.id).pluck(:id)
-      self.bank_accounts = BankAccount.with_id(account_ids)
+      self.bank_accounts = BankAccount.with_id(account_ids).non_deleted
     end
   end
 

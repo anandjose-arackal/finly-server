@@ -8,7 +8,17 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
   end
 
   def pre_process
-
+    # setting the first account as default if none of them are marked as default
+    # todo - temporary fix, will be taken in the front end later
+    default = false
+    self.vendor_parameters[:bank_accounts_attributes].each do |param|
+      if [true].include?(StringUtils.to_bool param[:default_account])
+        default = true
+      end
+    end
+    unless default
+      vendor_parameters[:bank_accounts_attributes].first[:default_account] = '1'
+    end
   end
 
   def process
