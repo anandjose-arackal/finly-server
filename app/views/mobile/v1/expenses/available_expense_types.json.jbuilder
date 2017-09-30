@@ -23,10 +23,6 @@ json.per_diem_config do
     end
   end
 end
-json.cash_on_hand do
-  json.value @result.cash_on_hand
-  json.currency Currency.first
-end
 json.custom_fields_config @result.custom_fields_config
 json.currencies do
   json.array!(@result.currencies) do |currency|
