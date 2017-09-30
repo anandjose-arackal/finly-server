@@ -1674,6 +1674,7 @@ Rails.application.routes.draw do
         post 'gcm/register', to: 'gcm#create'
         post 'gcm/unregister', to: 'gcm#delete'
       end
+      get 'available_expense_types', to: 'expenses#available_expense_types'
     end
 
     namespace :v1 do
