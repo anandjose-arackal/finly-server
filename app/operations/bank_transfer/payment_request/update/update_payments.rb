@@ -26,10 +26,6 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
   end
 
   def pre_process
-    self.requested_total = 0
-    params[:bank_payment_request][:payments_attributes].each do |details|
-      self.requested_total += details[:amount]&.to_f
-    end
     self.payment_order.payments.each do |payment|
       self.original_values << {
           name: payment.receiving_account.name,
@@ -66,6 +62,9 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
       end
     end
 
+    # updating the requested total amount for the payment order
+    self.requested_total = self.payment_order.payments.joins_amount.sum(:value)
+    self.payment_order.amount_requested.update(value: self.requested_total)
     add_message :success, "Payment Details edited!"
   end
 
@@ -73,13 +72,14 @@ class BankTransfer::PaymentRequest::Update::UpdatePayments < BankTransfer::Payme
 
   def payment_order_params
     parameters = {payments_attributes: []}
-    p = params.require(:bank_payment_request).permit(payments_attributes: [:amount, :id])
+    p = params.require(:bank_payment_request).permit(payments_attributes: [:amount, :id, :note])
 
     p[:payments_attributes].each do |account_details|
       id = account_details[:id]
       payment = payment_order.payments.find_by(id: id)
       parameters[:payments_attributes] << {
           id: account_details[:id],
+          note: account_details[:note],
           amount_attributes: {
               id: payment.amount.id,
               value: account_details[:amount]

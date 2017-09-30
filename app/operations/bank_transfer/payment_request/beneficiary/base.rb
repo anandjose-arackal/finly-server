@@ -1,4 +1,4 @@
-class BankTransfer::PaymentRequest::Payment::Base < BankTransfer::PaymentRequest::Base
+class BankTransfer::PaymentRequest::Beneficiary::Base < BankTransfer::PaymentRequest::Base
 
   attr_accessor :bank_payment_request, :payment_order
 

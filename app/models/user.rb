@@ -50,6 +50,8 @@
 
 
 
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -348,6 +350,7 @@ class User < ActiveRecord::Base
   scope :only_employees, -> { where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :approved_reports_total]) }
+  scope :with_bank_accounts, -> { joins(:bank_accounts) }
 
   scope :filter_disburse, -> (enabled) {
     if enabled == '1' || enabled == 1

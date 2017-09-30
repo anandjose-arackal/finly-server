@@ -1,4 +1,4 @@
-class BankTransfer::Vendor::Count < BankTransfer::Vendor::Base
+class BankTransfer::Vendors::Count < BankTransfer::Vendors::Base
 
   attr_accessor :vendors_count
 
