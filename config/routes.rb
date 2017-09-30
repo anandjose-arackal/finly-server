@@ -1684,6 +1684,7 @@ Rails.application.routes.draw do
         post 'gcm/register', to: 'gcm#create'
         post 'gcm/unregister', to: 'gcm#delete'
       end
+      get 'available_expense_types', to: 'expenses#available_expense_types'
     end
 
     namespace :v1 do
@@ -1729,6 +1730,10 @@ Rails.application.routes.draw do
       post 'lookup', to: 'users#lookup'
       post 'send_verification_otp', to: 'users#send_verification_otp'
       post 'verify_user_otp', to: 'users#verify_user_otp'
+    end
+
+    namespace :v2 do
+      get 'available_expense_types', to: 'expenses#available_expense_types'
     end
   end
 
