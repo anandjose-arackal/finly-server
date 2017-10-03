@@ -14,7 +14,7 @@ class Integrations::Quickbooks::Authentication::Create < BaseOperation
   end
 
   def process
-    # adding this authentication for all finance managers and admins in the company so that anyone can sync reports with quickbooks
+    # adding this authentication for all finance managers, auditors and admins in the company so that anyone can sync reports with quickbooks
     finance_managers = user.company.users.only_finance_managers
     finance_managers.each do |fm|
       auth_obj = fm.authentications.with_provider(auth[:provider]).first
@@ -31,6 +31,15 @@ class Integrations::Quickbooks::Authentication::Create < BaseOperation
         auth_obj.update(uid: auth[:uid], token: auth[:credentials][:token], secret: auth[:credentials][:secret], expires_at: 180.days.from_now)
       else
         admin.authentications.build(provider: auth[:provider], uid: auth[:uid], token: auth[:credentials][:token], secret: auth[:credentials][:secret], expires_at: 180.days.from_now).save
+      end
+    end
+    auditors = user.company.users.only_auditors
+    auditors.each do |auditor|
+      auth_obj = auditor.authentications.with_provider(auth[:provider]).first
+      if auth_obj.present?
+        auth_obj.update(uid: auth[:uid], token: auth[:credentials][:token], secret: auth[:credentials][:secret], expires_at: 180.days.from_now)
+      else
+        auditor.authentications.build(provider: auth[:provider], uid: auth[:uid], token: auth[:credentials][:token], secret: auth[:credentials][:secret], expires_at: 180.days.from_now).save
       end
     end
   end
