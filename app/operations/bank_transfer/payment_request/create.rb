@@ -159,6 +159,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               value: order_details[:amount],
               currency_id: Currency.first.id
           },
+          note: order_details[:note],
           date: DateUtils.local_date,
       }
     end
