@@ -54,7 +54,7 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
   end
 
   def process
-    # now iterating through each payment order and performing the respective transfer
+    # now iterating through each payments in the order and performing the respective transfer
     succeeded_transactions = false
     failed_transactions = false
     processed_amount = 0

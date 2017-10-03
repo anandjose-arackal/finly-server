@@ -13,4 +13,9 @@ class BankTransfer::PaymentsController < ApplicationController
   def show
 
   end
+
+  def retry
+    @result = BankTransfer::Payments::Retry.(params[:payment_id])
+    respond
+  end
 end

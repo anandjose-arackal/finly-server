@@ -83,6 +83,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def retry
+    @result = BankTransfer::PaymentRequest::Retry.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type)

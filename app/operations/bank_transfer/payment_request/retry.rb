@@ -4,4 +4,8 @@
 class BankTransfer::PaymentRequest::Retry < BankTransfer::PaymentRequest::Base
 
 
+  def initialize
+
+  end
+
 end
