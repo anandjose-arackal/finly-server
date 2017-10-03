@@ -79,6 +79,13 @@ class BankPaymentRequest < ActiveRecord::Base
     end
   }
 
+  scope :filter_date, -> (date_from, date_to) {
+    date_from = "1990-01-01" if date_from.blank?
+    date_to = DateUtils.local_date_time if date_to.blank?
+    date_from = date_from.to_time if date_from.present?
+    date_to = date_to.to_time if date_to.present?
+    joins(:payment_order).where('payment_orders.processed_at >= ? AND processed_at <= ?', date_from, date_to)
+  }
 
   attr_accessor :cache_users
 
