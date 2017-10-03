@@ -329,6 +329,10 @@ class Payment < ActiveRecord::Base
     self.payment_purpose_id == PaymentPurpose.id_for(:cash_advance)
   end
 
+  def retriable?
+    self.failed?
+  end
+
   private
 
   def initiating_account_presence
