@@ -8,6 +8,10 @@ class AccountManager::Payments::RetryPayment < AccountManager::Base
     self.payment = payment
   end
 
+  def self.call(payment)
+    self.new(payment).run
+  end
+
   def validate
     unless payment.failed?
       add_message :error, "Only failed payments can be retried"
@@ -27,7 +31,7 @@ class AccountManager::Payments::RetryPayment < AccountManager::Base
 
   def process
     # calling payment executor so that the payment can be successfully executed using the respective adapters
-    op = AccountManager::Payments::PaymentExecutor.(self.payment)
+    op = AccountManager::Payments::PaymentExecutor.(self.payment, bank_transfer_type: payment.payment_mode)
     if op.success?
       if self.payment_order.payments.pluck(:payment_status_id).uniq == [PaymentStatus.id_for(:completed)]
         self.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
