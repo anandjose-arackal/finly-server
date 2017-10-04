@@ -35,6 +35,13 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     # BankPaymentRequestMailer.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params)).deliver_now
   end
 
+  def send_sms(user)
+    return if user.blank? || user.mobile_number.blank?
+    message = sms_message
+    # now trigger the API used for sending SMSes
+    Sms::Send.(user, message: message)
+  end
+
   def mailer_subject(user)
 
   end
@@ -44,6 +51,10 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
   end
 
   def mailer_button_name
+
+  end
+
+  def sms_message
 
   end
 
@@ -63,10 +74,11 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
   class Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter < Event::SetNotifier::MailerPresenter
 
     attr_accessor :bank_payment_request, :action_name, :subject_val, :body_val,
-                  :event_id, :company, :view_role_id, :view_url
+                  :event_id, :company, :view_role_id, :view_url, :payment
 
     def init
       self.bank_payment_request = params[:bank_payment_request]
+      self.payment = params[:payment]
       self.action_name = params[:action_name]
       self.subject_val = params[:subject]
       self.body_val = params[:body]
@@ -77,7 +89,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     end
 
     def validate
-      self.user.present? && self.bank_payment_request.present?
+      self.user.present? && (self.bank_payment_request.present? || self.payment.present?)
     end
 
     def recipient
@@ -93,6 +105,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     end
 
     def generate_view_url
+      return if self.bank_payment_request.blank?
       view = ""
       case view_role_id
         when 4, '4' # i.e. initiator
