@@ -38,7 +38,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     require 'bank_transfer/payment_request/review/associated_users'
 
     attr_accessor :bank_payment_request, :payment_order, :actions, :bank_wallet_balance,
-                  :manager, :finance_manager, :associated_users
+                  :manager, :finance_manager, :associated_users, :payments_verified, :payments_unverified
 
     def init
       self.bank_payment_request = params[:payment_request]
@@ -52,6 +52,17 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         self.finance_manager = associated_users.include?(finance_manager) ? finance_manager : nil
       end
       self.actions = retrieve_actions
+
+      self.payments_unverified = []
+      self.payments_verified = []
+      # separating the verified and unverified payments
+      self.payment_order.payments.each do |payment|
+        if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
+          self.payments_verified << payment
+        else
+          self.payments_unverified << payment
+        end
+      end
     end
 
     def retrieve_actions

@@ -68,9 +68,9 @@ views:
         - name: Users
           url: users
           id: users
-        - name: Vendors
-          url: vendors
-          id: 'vendors'
+#        - name: Vendors
+#          url: vendors
+#          id: 'vendors'
         - name: Beneficiaries
           url: beneficiaries
           id: beneficiaries
@@ -115,6 +115,8 @@ views:
 #          url: statements
 #          id: statements
         cog:
+        - name: Load Company Balance
+          url: '#load-company-balance'
         <% if current_user.company.expense_management_enabled? %>
 #        - name: Expense Management
 #          url: '/'
@@ -137,9 +139,9 @@ views:
         - name: Payment Orders
           url: orders
           id: orders
-        - name: Vendors
-          url: vendors
-          id: 'vendors'
+#        - name: Vendors
+#          url: vendors
+#          id: 'vendors'
         - name: Beneficiaries
           url: beneficiaries
           id: beneficiaries
@@ -155,12 +157,15 @@ views:
         - name: Payment Orders
           url: orders
           id: orders
-        - name: Vendors
-          url: vendors
-          id: 'vendors'
+#        - name: Vendors
+#          url: vendors
+#          id: 'vendors'
         - name: Beneficiaries
           url: beneficiaries
           id: beneficiaries
+        cog:
+        - name: Load Company Balance
+          url: '#load-company-balance'
   <% end %>
 
   <% if current_user.vendor_payment_initiator? %>
@@ -173,9 +178,9 @@ views:
         - name: Payment Orders
           url: orders
           id: orders
-        - name: Vendors
-          url: vendors
-          id: 'vendors'
+#        - name: Vendors
+#          url: vendors
+#          id: 'vendors'
         - name: Beneficiaries
           url: beneficiaries
           id: beneficiaries

@@ -1,6 +1,6 @@
 # This operation will fetch all the
 
-class BankTransfer::Vendor::Transfers::Show < BankTransfer::Vendor::Base
+class BankTransfer::Vendors::Transfers::Show < BankTransfer::Vendors::Base
 
   attr_accessor :vendor, :receiving_transactions, :bank_accounts
 
@@ -12,23 +12,25 @@ class BankTransfer::Vendor::Transfers::Show < BankTransfer::Vendor::Base
 
   def process
     self.bank_accounts = vendor.bank_accounts
-    self.receiving_transactions = Payment.with_receiving_account_type("YesBankVendor").with_receiving_account_id(bank_accounts.pluck(:id))
+    self.receiving_transactions = vendor.receiving_payments
   end
 
   def success
     params[:receiving_transactions] = receiving_transactions
     params[:bank_accounts] = bank_accounts
+    params[:vendor] = vendor
+    BankTransfer::Vendors::Transfers::Show::AccountOwnersPresenter.new(user, params)
   end
 
-  class BankTransfer::Vendor::Transfers::Show::VendorPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::Vendors::Transfers::Show::AccountOwnersPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :receiving_transactions
+    attr_accessor :receiving_transactions, :bank_accounts, :vendor
 
     def init
       self.receiving_transactions = params[:receiving_transactions]
       self.bank_accounts = params[:bank_accounts]
+      self.vendor = params[:vendor]
     end
 
   end
-
 end

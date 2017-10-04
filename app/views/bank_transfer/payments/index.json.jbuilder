@@ -7,4 +7,5 @@ json.array!(@result.paginated_payments) do |payment|
   json.processed_date payment.payment_order&.processed_at&.strftime("%Y-%m-%d")
   json.status payment.payment_status&.name.humanize
   json.initiating_user payment.initiating_user&.name
+  json.bank_reference_number payment.reference_resource&.bank_reference_number
 end

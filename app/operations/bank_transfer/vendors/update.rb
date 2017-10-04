@@ -1,4 +1,4 @@
-class BankTransfer::Vendor::Update < BankTransfer::Vendor::Base
+class BankTransfer::Vendors::Update < BankTransfer::Vendors::Base
 
   attr_accessor :vendor, :vendor_parameters
 

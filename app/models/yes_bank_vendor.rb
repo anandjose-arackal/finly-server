@@ -10,15 +10,18 @@
 #  email         :string(255)
 #  mobile_number :string(255)
 #  authorized    :boolean
+#  description   :string(255)
+#  is_deleted    :boolean          default(FALSE)
 #
 
 class YesBankVendor < ActiveRecord::Base
   belongs_to :company
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
-  has_many :receiving_payments, as: :receiving_user
+  has_many :receiving_payments, as: :receiving_user, class_name: "Payment"
 
   accepts_nested_attributes_for :bank_accounts
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
+  scope :non_deleted, -> { where is_deleted: [false, nil]}
 end

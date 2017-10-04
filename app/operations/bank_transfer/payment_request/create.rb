@@ -166,7 +166,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   end
 
   def retrieve_bank_account(order_details)
-    ba = BankAccount.find_by(account_number: order_details[:bank_account_number],
+    ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number],
                              company_id: self.company_id)
     vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
 

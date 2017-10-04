@@ -18,7 +18,7 @@ class Company::AddBalance < Company::Base
   end
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :auditor]
   end
 
   def init
