@@ -11,6 +11,7 @@
 #
 
 class YesBankCompanyAccount < ActiveRecord::Base
+  include Accountable
   belongs_to :company
   belongs_to :balance, class_name: "Amount"
   belongs_to :wallet_balance, class_name: "Amount"

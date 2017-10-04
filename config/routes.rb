@@ -2274,6 +2274,14 @@ Rails.application.routes.draw do
   end
 
 
+  namespace :summary do
+    get 'configurations', to: 'configuration#index'
+    post 'configurations/admin', to: 'configuration#admin_create'
+    delete 'configurations/admin/:id', to: 'configuration#admin_destroy'
+    post 'configurations/manager', to: 'configuration#manager_create'
+    delete 'configurations/manager/:id', to: 'configuration#manager_destroy'
+  end
+
 
 
   # The priority is based upon order of creation: first created -> highest priority.

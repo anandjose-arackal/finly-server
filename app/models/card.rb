@@ -26,8 +26,8 @@
 #  card_processor_status    :string(255)
 #
 
-
 class Card < ActiveRecord::Base
+  include Accountable
   include SoftDeletable
 
   belongs_to :card_type
@@ -61,6 +61,7 @@ class Card < ActiveRecord::Base
 
   scope :with_id, -> (id) { where id: id }
   scope :with_user, -> (user_id) { where user_id: user_id }
+  scope :with_company, -> (company_id) { where company_id: company_id }
   scope :unassigned, -> { where user_id: nil }
   scope :active, -> { where active: true }
   scope :expense_cards, -> { where card_program_id: CardProgram.id_for(:expense) }
