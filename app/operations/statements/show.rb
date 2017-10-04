@@ -20,7 +20,12 @@ class Statements::Show < Statements::Base
     account_type = params[:account_type]&.to_sym
     case statement_type
       when :company
-        self.account = user.company.itz_cash_company_account
+        case account_type
+          when :card_transfer_credits
+            self.account = user.company.itz_cash_company_account
+          when :bank_transfer_credits
+            self.account = user.company.yes_bank_company_account
+        end
       when :user
         user_presenter = User::Show.(user, params)
         unless user_presenter.success?
@@ -33,8 +38,10 @@ class Statements::Show < Statements::Base
             self.account = sel_user.cards.expense_cards.first
           when :reimbursement_card
             self.account = sel_user.cards.reimbursement_cards.first
-          when :finly_money
+          when :finly_money_card_transfer
             self.account = sel_user.wallet
+          when :finly_money_bank_transfer
+            self.account = sel_user.bank_wallet
           when :cash_on_hand
             self.account = sel_user.cash_on_hand
         end
