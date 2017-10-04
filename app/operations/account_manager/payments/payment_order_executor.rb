@@ -1,5 +1,5 @@
 class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
-  attr_accessor :payment_order, :options
+  attr_accessor :payment_order, :options, :retry_attempt
 
   def self.call(payment_order, options = {})
     payment_order_id = payment_order
@@ -53,13 +53,24 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:in_progress))
   end
 
+  def init
+    self.retry_attempt = options[:retry]
+  end
+
   def process
     # now iterating through each payments in the order and performing the respective transfer
     succeeded_transactions = false
     failed_transactions = false
     processed_amount = 0
     error_messages = []
-    payment_order.payments.each do |payment|
+
+    # now scope the payments to just the failed ones if it's a retry, otherwise, execute normally
+    if self.retry_attempt
+      payments = self.payment_order.payments.failed
+    else
+      payments = self.payment_order.payments
+    end
+    payments.each do |payment|
       op = AccountManager::Payments::PaymentExecutor.(payment, options)
       if op.success? && ((payment.payment_status_id == PaymentStatus.id_for(:completed)) || (payment.payment_status_id == PaymentStatus.id_for(:processing)))
         processed_amount += payment.amount_value

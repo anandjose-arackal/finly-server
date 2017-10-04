@@ -66,6 +66,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     # if the user has enough balance for the transaction themselves, the request will get auto approved
     # and credited to the respective bank accounts
     # this should now create a BankPaymentRequest and save it in the DB
+    debugger
     self.bank_payment_request = BankPaymentRequest.new(request_params)
     unless bank_payment_request.save
       add_message :error, bank_payment_request.errors.full_messages
