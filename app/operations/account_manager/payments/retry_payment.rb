@@ -1,6 +1,6 @@
 # will retry a single payment synchronously when requested
 
-class AccountManager::Payments::Retry < AccountManager::Base
+class AccountManager::Payments::RetryPayment < AccountManager::Base
 
   attr_accessor :payment
 
