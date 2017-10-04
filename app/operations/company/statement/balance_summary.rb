@@ -5,7 +5,7 @@ class Company::Statement::BalanceSummary < Company::Statement::Base
   attr_accessor :items
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :auditor]
   end
 
   def pre_validate

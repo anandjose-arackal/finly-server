@@ -79,6 +79,13 @@ class BankPaymentRequest < ActiveRecord::Base
     end
   }
 
+  scope :filter_date, -> (date_from, date_to) {
+    date_from = "1990-01-01" if date_from.blank?
+    date_to = DateUtils.local_date_time if date_to.blank?
+    date_from = date_from.to_time if date_from.present?
+    date_to = date_to.to_time if date_to.present?
+    joins(:payment_order).where('payment_orders.processed_at >= ? AND processed_at <= ?', date_from, date_to)
+  }
 
   attr_accessor :cache_users
 
@@ -134,8 +141,11 @@ class BankPaymentRequest < ActiveRecord::Base
         return "processing"
       end
     end
-    if [BankPaymentRequestStatus.id_for(:credited), BankPaymentRequestStatus.id_for(:approved)].include?(self.status_id)
+    if [BankPaymentRequestStatus.id_for(:credited)].include?(self.status_id)
       return self.payment_order.payment_order_status&.name
+    elsif [BankPaymentRequestStatus.id_for(:approved)].include?(self.status_id)
+      # todo - can change this to pending credit
+      return "pending_credit"
     end
     self.status&.name&.to_s
   end

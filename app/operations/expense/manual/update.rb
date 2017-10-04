@@ -75,19 +75,22 @@ class Expense::Manual::Update < Expense::Manual::Base
     end
 
     # if the expense is being marked as fropm cash on hand, check if there is enough cash on hand to facilitate it
-    if updated_expense_params[:from_cash_on_hand] == '1'
+    if StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand)) or (updated_expense_params&.dig(:from_cash_on_hand).nil? and expense.from_cash_on_hand)
       coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
-      unless coh_adapter.balance >= updated_expense_params[:amount_attributes][:value].to_f
-        add_message :error, "You do not have enough balance in your Cash on Hand to mark this expense against it"
+      amount_val = (updated_expense_params&.dig(:amount_attributes,:value)&.to_f || expense.amount&.value)
+      unless coh_adapter.balance >= amount_val
+        add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
         return
       end
     end
-  end
 
-  def pre_process
-    # if the expense is from cash on hand, mark it as non-reimbursable by default
-    if ['1', 1].include?(updated_expense_params[:from_cash_on_hand])
-      updated_expense_params[:reimbursable] = false
+    from_cash_on_hand = StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
+    from_cash_on_hand = from_cash_on_hand.nil? ? expense.from_cash_on_hand : from_cash_on_hand
+    reimbursable = StringUtils.to_bool(updated_expense_params&.dig(:reimbursable))
+    reimbursable = reimbursable.nil? ?  expense.reimbursable : reimbursable
+    if from_cash_on_hand and reimbursable
+      add_message :error, 'Expense cannot be Reimbursable and Paid from Cash on Hand'
+      return
     end
   end
 

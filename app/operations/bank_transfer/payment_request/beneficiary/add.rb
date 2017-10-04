@@ -12,7 +12,7 @@
 #   .
 # ]
 
-class BankTransfer::PaymentRequest::Payment::Add < BankTransfer::PaymentRequest::Base
+class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequest::Beneficiary::Base
 
   attr_accessor :payments_data, :amount, :bank_payment_request, :payment_order,
                 :error_messages
@@ -38,7 +38,7 @@ class BankTransfer::PaymentRequest::Payment::Add < BankTransfer::PaymentRequest:
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_type_id: PaymentType.id_for(:credit),
           payment_purpose_id: PaymentPurpose.id_for(:vendor_payments),
-          payment_mode: bank_payment_request.payment_order.payments.first.payment_mode,
+          payment_mode: bank_payment_request.payment_order.payment_mode,
           amount_attributes: {
               value: bank_account[:amount],
               currency_id: 1
@@ -92,6 +92,5 @@ class BankTransfer::PaymentRequest::Payment::Add < BankTransfer::PaymentRequest:
       end
     end
   end
-
 
 end
