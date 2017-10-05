@@ -9,7 +9,8 @@
 
 class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   include MathUtil
-  attr_accessor :money_requests, :payment_param, :role, :money_request_amounts
+  attr_accessor :money_requests, :payment_param, :role, :money_request_amounts,
+                :payment, :payment_purpose, :initiating_account, :receiving_account
 
   def authorized_user_types
     [:finance_manager, :admin]
@@ -31,36 +32,30 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def init
+
+    # extracting the user to whom the money request belongs
     id = (params[:id] or params[:to_user_id])
     team = User::Team::Index.(user, params)
     self.to_user = team.with_id(id).first rescue nil if team.present?
-    if params[:money_request_ids].is_a?(Array)
-      money_request_id = (params[:money_request_id] or params[:money_request_ids])
-    else
-      money_request_id = params[:money_request_id]&.split(',') || params[:money_request_ids]&.split(',')
-    end
 
-    if money_request_id.present?
-      self.money_requests = to_user.money_requests.with_id(money_request_id) if to_user.present?
-    end
     self.payment_param = payment_params
     if user.admin? and admin_view?
       self.role = UserRole.id_for(:admin)
     else
       self.role = UserRole.id_for(:finance_manager)
     end
+
     self.amount = payment_param[:amount]
     self.note = payment_param[:note]
     self.currency_id = payment_param[:currency_id] || Currency.first.id
 
-    # keeping track of the individual money requests and the respective amounts being credited to them
-    self.money_request_amounts = {}
-    params[:money_requests]&.each do |money_request|
-      self.money_request_amounts[money_request[:id]] = money_request[:processed_amount]
-    end
-    params.delete(:money_requests)
+    # setting the initiating account based on what is sent from the front end
+    self.initiating_account = retrieve_initiating_account(payment_param[:initiating_account_type])
+    self.receiving_account = retrieve_receiving_account(payment_param[:receiving_account_type])
+    self.payment_purpose = [1, '1'].include?(payment_param[:receiving_account_type]) ? :cash_advance : :advance_outside_finly
 
-    init_payment_request(:credit, :advance_outside_finly, amount)
+    # this is creating the payment request for crediting money to the bank account, if at all they choose to
+    init_payment_request(:credit, payment_purpose, {amount: amount, initiating_account: self.initiating_account, receiving_account: self.receiving_account})
   end
 
   def authorize
@@ -74,39 +69,26 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       # above method already adds the respective error message, so just returning
       return false
     end
-
-    # validations specific to a particular validation in the money request
-    if money_requests.present?
-
-      total_amount = 0
-      money_requests.each do |request|
-        total_amount += request.total_amount
-      end
-      if payment_param[:amount].to_f > total_amount
-        add_message :error, 'You cannot credit more than the total of the money requests'
-      end
-
-      date = Date.parse(payment_params[:date])
-      # validating date of money request against payment date
-      if date < money_requests.order(submitted_at: :asc).first.updated_at.to_date
-        add_message :error, 'Payment date cannot be before money request date'
-      end
-    end
   end
 
   def process
     # now calling the payment processor with the payment request parameter so that it handles the payment for us
-    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
+    # if it's a bank transfer, it will first be executed, and then the user's cash on hand will be added
+    # else it directly adds to the user's cash on hand and returns
+    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_param[:payment_mode]&.upcase})
     if op.success?
-      payment = op.payments.first
-      # if there are associated money requests, mark them as credited
-      if money_requests.present?
-        ids = money_requests.pluck(:id)
-        total_amount = MoneyRequestItem.with_money_request(ids).with_amount.sum(:value)
-        to_user.balance_sheet.subtract_pending_advance(total_amount)
-        money_requests.each do |money_request|
-          MoneyRequest::MarkAsCredited.(user, {payment: payment, money_request: money_request, role_id: role, amount_processed: self.money_request_amounts["#{money_request.id}"]})
-        end
+      self.payment = op.payments.first
+      bank_transaction = payment.reference_resource
+      # only if the bank transaction has been completed, will the cash on hand be added to the user's account
+      # if the payment was done through a bank transfer, create a payment request for crediting the user's cash on hand
+      if payment_purpose == :advance && bank_transaction&.completed?
+        init_payment_request(:credit, :advance, {amount: amount, initiating_account: nil, receiving_account: user.cash_on_hand})
+        # now payment request will have the new details of money to be added - so add it to the cash on hand
+        op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
+
+        payment = op.payments.first
+        # setting the reference resource for the cash on hand payment as the bank transfer payment
+        payment.update(reference_resource: self.payment)
       end
       return true
     end
@@ -130,6 +112,33 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
         balance_history.update_attributes(cash_on_hand_balance_attributes: {value: cash_on_hand_value, id: balance_history.cash_on_hand_balance.id},
                                           cash_on_hand_load_attributes: {value: cash_on_hand_load, id: balance_history.cash_on_hand_load.id})
       end
+    end
+  end
+
+  private
+
+  def retrieve_initiating_account(account_type)
+    case account_type
+      when 1, '1' # i.e. finly money
+        return user.bank_wallet
+      when 2, '2' # i.e. company credits
+        return user.company.yes_bank_company_account
+      when 3, '3' # i.e. outside Finly
+        return nil
+      else
+        # do nothing?
+    end
+  end
+
+  def retrieve_receiving_account(account_type)
+    case account_type
+      when 1, '1' # i.e. user's bank account
+        id = payment_param[:receiving_account_id]
+        return to_user.bank_accounts.find_by(id: id)
+      when 2, '2' # i.e. outside of Finly
+        return to_user.cash_on_hand
+      else
+        # do nothing?
     end
   end
 

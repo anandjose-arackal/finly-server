@@ -51,7 +51,7 @@ class User::Show < User::Base
     def init
       self.selected_user = params[:selected_user]
       self.roles = {admin: self.selected_user.company_admin?, manager: self.selected_user.manager?,
-                    finance_manager: self.selected_user.finance_manager?}
+                    finance_manager: self.selected_user.finance_manager?, auditor: self.selected_user.auditor?}
       self.team_mapping = self.selected_user.team_mapping
       # self.mapping = [Policy::Mappings::Show.(user, user: selected_user, policy: nil).map]
       self.policies = selected_user.policies
@@ -116,6 +116,7 @@ class User::Show < User::Base
               end
             end
           end
+
           assign_request_data = nil
           unless card.assigned?
             assign_request = card.card_assign_requests.with_card_owner_id(selected_user.id)&.first
@@ -217,12 +218,21 @@ class User::Show < User::Base
         actions[:update_subscriptions] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
       end
 
+      # checking if the user has associated bank accounts, and sending the flag accordingly'
+      # also, if the user's cash on hand has been credited with any payments pending confirmation
+      actions[:bank_transfer_enabled] = selected_user.bank_transfer_enabled?
+      actions[:pending_cash_on_hand_credits] = {
+          present: self.selected_user.cash_on_hand_credits_awaiting_confirmation?,
+          message: "Some money has been added to your cash on hand. They will reflect once the payment is confirmed"
+      }
+      #####################################################################################
+
       actions
     end
 
     def load_transfer_options(balances)
       credit_actions = {initiating_accounts: [], receiving_accounts: []}
-      debit_actions={receiving_accounts: [], initiating_accounts: []}
+      debit_actions = {receiving_accounts: [], initiating_accounts: []}
 
       from_user_transferable_cards = user.cards.with_non_personal_fund_transfer
       to_user_creditable_cards = selected_user.cards.creditable_cards

@@ -23,6 +23,7 @@
 #  card_status_id           :integer          not null
 #  is_deleted               :boolean          default(FALSE)
 #  hotlisted                :boolean          default(FALSE)
+#  card_processor_status    :string(255)
 #
 
 
@@ -91,6 +92,8 @@ class Card < ActiveRecord::Base
   delegate :card_balance_value, to: :card_balance
   delegate :card_program_name, to: :card_program
   delegate :itz_cash_card_program_name, to: :itz_cash_card_program
+  delegate :manager_view_balance, to: :card_program
+
 
   validates :proxy, uniqueness: true, format: {with: /\A[S]\d{11}\z/}, length: {is: 12}
   validates :ending_number, presence: true
@@ -124,12 +127,24 @@ class Card < ActiveRecord::Base
     self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
 
     # building card restriction
-    self.build_card_restriction(channel_atm: true, channel_ecom_pos: true, card_limits_attributes: [{period_id: 1, limit_type_id: ChannelType.id_for(:ecom_pos)},
+    self.build_card_restriction(channel_atm: true,
+                                channel_ecom_pos: true,
+                                card_limits_attributes: [{period_id: 1, limit_type_id: ChannelType.id_for(:ecom_pos)},
                                                                                                     {period_id: 2, limit_type_id: ChannelType.id_for(:ecom_pos)},
                                                                                                     {period_id: 3, limit_type_id: ChannelType.id_for(:ecom_pos)},
                                                                                                     {period_id: 1, limit_type_id: ChannelType.id_for(:atm)},
                                                                                                     {period_id: 2, limit_type_id: ChannelType.id_for(:atm)},
                                                                                                     {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
+
+    reload
+    if card_balance_id.nil? and card_balance.nil?
+      balance_amount = Amount.create(value: 0, currency_id: Currency.id_for(:INR))
+      self.update(card_balance: balance_amount)
+    end
+    if card_eligibility_id.nil? and card_eligibility.nil?
+      eligibility_amount = Amount.create(value: 0, currency_id: Currency.id_for(:INR))
+      self.update(card_eligibility: eligibility_amount)
+    end
   end
 
 
@@ -157,14 +172,14 @@ class Card < ActiveRecord::Base
     if card_balance.blank?
       ItzCash::AccountDetails.(user, card: self)
     end
-    self.card_balance.value
+    (self.card_balance&.value || 0)
   end
 
   def available_card_eligibility
     if card_eligibility.blank?
       ItzCash::AccountDetails.(user, card: self)
     end
-    self.card_eligibility.value
+    (self.card_eligibility&.value || 0)
   end
 
   def serial_id

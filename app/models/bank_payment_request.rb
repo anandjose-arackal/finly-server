@@ -17,9 +17,13 @@
 #  controlling_for_user_id      :integer
 #  controlling_for_user_role_id :integer
 #  require_approval             :boolean
+#  is_deleted                   :boolean
+#  beneficiary_type_id          :integer
 #
 
 class BankPaymentRequest < ActiveRecord::Base
+
+  include SoftDeletable
 
   belongs_to :status, class_name: "BankPaymentRequestStatus"
   belongs_to :payment_order, dependent: :destroy
@@ -43,12 +47,45 @@ class BankPaymentRequest < ActiveRecord::Base
 
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
   delegate :requested_amount_value, to: :requested_amount
+  delegate :scheduled?, to: :payment_order
 
   scope :non_owner, -> (user_id) { where.not owner_id: user_id }
   scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
   scope :with_user, -> (user_id) { where owner_id: user_id}
   scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
   scope :with_id, -> (id) { where id: id }
+  scope :filter_status_id, -> (status_id) {
+    case status_id
+      when 1, '1' # i.e. open
+        where status_id: BankPaymentRequestStatus.id_for(:open)
+      when 2, '2' # i.e. processing
+        where status_id: BankPaymentRequestStatus.id_for(:processing)
+      when 3, '3' # i.e. retracted
+        where status_id: BankPaymentRequestStatus.id_for(:retracted)
+      when 4, '4' # i.e. rejected
+        where status_id: BankPaymentRequestStatus.id_for(:rejected)
+      when 5, '5' # i.e. approved
+        where status_id: BankPaymentRequestStatus.id_for(:approved)
+      when 6, '6' # i.e. credited
+        where status_id: BankPaymentRequestStatus.id_for(:credited)
+      when 7, '7' # i.e. failed
+        joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:failed))
+      when 8, '8' # i.e. scheduled
+        joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
+      when 9, '9' # i.e. pending
+        joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
+      else
+        # do nothing?
+    end
+  }
+
+  scope :filter_date, -> (date_from, date_to) {
+    date_from = "1990-01-01" if date_from.blank?
+    date_to = DateUtils.local_date_time if date_to.blank?
+    date_from = date_from.to_time if date_from.present?
+    date_to = date_to.to_time if date_to.present?
+    joins(:payment_order).where('payment_orders.processed_at >= ? AND processed_at <= ?', date_from, date_to)
+  }
 
   attr_accessor :cache_users
 
@@ -80,6 +117,10 @@ class BankPaymentRequest < ActiveRecord::Base
     processing?
   end
 
+  def credit_pending?
+    approved? && !credited?
+  end
+
   def user
     self.owner
   end
@@ -96,16 +137,36 @@ class BankPaymentRequest < ActiveRecord::Base
     if self.status_id == BankPaymentRequestStatus.id_for(:processing)
       if user_id == self.controlling_user_id
         return "awaiting_approval"
-      # elsif user_id == self.owner_id
-      #   return "submitted"
       else
         return "processing"
       end
     end
     if [BankPaymentRequestStatus.id_for(:credited)].include?(self.status_id)
       return self.payment_order.payment_order_status&.name
+    elsif [BankPaymentRequestStatus.id_for(:approved)].include?(self.status_id)
+      # todo - can change this to pending credit
+      return "pending_credit"
     end
-    self.status.name&.to_s
+    self.status&.name&.to_s
+  end
+
+  def beneficiary_type
+    case self.payment_order.payments.first&.receiving_user&.class&.name
+      when "User"
+        return 1 # i.e. 1 is users
+      when "YesBankVendor"
+        return 2 # i.e. 2 is vendors
+      else
+        return 2 # i.e. it's vendors by default
+    end
+  end
+
+  def total_amount
+    self.requested_amount.value
+  end
+
+  def payment_mode
+    self.payment_order.payment_mode
   end
 
   private

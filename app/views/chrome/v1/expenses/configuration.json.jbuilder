@@ -14,3 +14,7 @@ json.currencies do
     json.country currency.country
   end
 end
+
+json.balances do
+  json.cash_on_hand @result.cash_on_hand
+end

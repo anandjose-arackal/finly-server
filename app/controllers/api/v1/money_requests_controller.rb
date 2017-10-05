@@ -65,6 +65,11 @@ class Api::V1::MoneyRequestsController < Api::V1::BaseApiController
     end
   end
 
+  def credit_cash
+    @result = MoneyRequest::Cash::Credit.(current_user, params)
+    respond
+  end
+
   def destroy
     @result = MoneyRequest::Destroy.(current_user, params)
     @result.config[:mobile_api] = true

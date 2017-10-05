@@ -52,16 +52,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -193,6 +183,7 @@ class User < ActiveRecord::Base
   # scope :only_vendor_payment_creditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments)) }
   scope :only_admins, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.user_role_id = ?', MappingPurpose.id_for(:expense_management)) }
   scope :only_vendor_payment_admins, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments)) }
+  scope :only_auditors, -> { with_roles.where('user_role_mapping.user_role_id = ?', UserRole.id_for(:auditor)) }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }
@@ -360,6 +351,7 @@ class User < ActiveRecord::Base
   scope :only_employees, -> { where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :approved_reports_total]) }
+  scope :with_bank_accounts, -> { joins(:bank_accounts) }
 
   scope :filter_disburse, -> (enabled) {
     if enabled == '1' || enabled == 1
@@ -393,15 +385,6 @@ class User < ActiveRecord::Base
     joins(:cards).select('users.*').where('proxy like ?', "%#{term}%")
   }
 
-  # scope :filter_team, -> (team_ids) do
-  #   group_ids = UserTeamGroupItemMapping.with_user_team(team_ids).pluck(:user_group_item_id)
-  #   filter_group group_ids
-  # end
-  #
-  # scope :filter_group, -> (group_ids) do
-  #   group_user_ids = UserGroupItemMapping.with_group_item(group_ids).pluck(:user_id).uniq
-  #   with_id group_user_ids
-  # end
 
   before_save :strip_whitespace
 
@@ -467,8 +450,15 @@ class User < ActiveRecord::Base
   end
 
   # todo - temporarily disabling policy admin screen for the admin? role
-  def admin?
-    company_admin?
+  def admin?(application = "em")
+    case application
+      when "em"
+        company_admin?
+      when "vp"
+        vendor_payment_admin?
+      else
+        company_admin?
+    end
   end
 
   def finance_manager?
@@ -488,7 +478,7 @@ class User < ActiveRecord::Base
 
   def auditor?
     mapping = role_mapping
-    mapping.expense_management.auditor.present?
+    mapping.auditor.present?
   end
 
   def vendor_payment_manager?
@@ -520,6 +510,20 @@ class User < ActiveRecord::Base
 
   alias_method :vendor_payments_initiator?, :vendor_payment_initiator?
 
+
+  def expense_management_enabled?
+    self.user_panel_subscription.expense_management
+  end
+
+  def disburse_enabled?
+    self.user_panel_subscription.disburse
+  end
+
+  def vendor_payments_enabled?
+    self.user_panel_subscription.yes_bank_account_transfer
+  end
+
+  alias_method :vendor_payment_enabled?, :vendor_payments_enabled?
 
   def has_role?(role_id)
     return false unless role_id.present?
@@ -705,6 +709,21 @@ class User < ActiveRecord::Base
 
   def payment_initiator?
     self.role_mapping.vendor_payments.employee.present?
+  end
+
+  def bank_transfer_enabled?
+    (self.vendor_payments_enabled? && self.bank_accounts.present?)
+  end
+
+  # method that determines whether a particular user has
+  # cash on hand payments that are pending confirmation
+  # from the bank - eg. NEFT transfers
+  def cash_on_hand_credits_awaiting_confirmation?
+    self.receiving_payments.cash_advance.processing.present?
+  end
+
+  def reimbursements_awaiting_confirmation?
+
   end
 
   private

@@ -123,6 +123,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
         currency_id: Currency.first.id
     }
     p[:description] = params[:description]
+    p[:beneficiary_type_id] = retrieve_beneficiary_type
     p[:payment_order_attributes] = {}
     p[:payment_order_attributes][:initiating_user] = user
     p[:payment_order_attributes][:payment_order_status_id] = PaymentOrderStatus.id_for(:pending_approval)
@@ -165,17 +166,32 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   end
 
   def retrieve_bank_account(order_details)
-    ba = BankAccount.find_by(account_number: order_details[:bank_account_number],
+    ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number],
                              company_id: self.company_id)
     vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
 
     self.unauthorized_vendors_presence = false
     if ba.nil?
-      ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc], account_owner: vendor, company_id: self.company_id)
+      ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc],
+                              account_owner: vendor, company_id: self.company_id, default_account: true)
+      
       # setting unauthorized vendors as true so that after creation, the approval flow is mandated
       self.unauthorized_vendors_presence = true
     end
     return ba
+  end
+
+  def retrieve_beneficiary_type
+    bank_account = retrieve_bank_account processed_order_data.first
+    return if bank_account.blank?
+    case bank_account&.account_owner&.class&.name
+      when "YesBankVendor"
+        return 2
+      when "User"
+        return 1
+      else
+        # do nothing?
+    end
   end
 
 end

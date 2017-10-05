@@ -34,6 +34,7 @@ class BankTransfer::PaymentRequest::Review::Retract < BankTransfer::PaymentReque
     bank_payment_request.comments.create user_id: user.id,
                                          action_id: BankPaymentRequestCommentAction.id_for(:retract)
 
+    Event::EBankPaymentRequest::Retract.(user, bank_payment_request: bank_payment_request)
     add_message :success, "Payment Order retracted successfully"
   end
 

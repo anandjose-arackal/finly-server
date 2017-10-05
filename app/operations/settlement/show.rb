@@ -102,7 +102,11 @@ class Settlement::Show < Settlement::Base
   end
 
   def load_payments
-    self.payments = self.selected_user.payments.non_settlement.with_details
+    ids = self.selected_user.payments.successful.non_settlement.pluck(:id)
+    ids += self.selected_user.payments.reimbursement.pluck(:id) # because we have to show reimbursements irrespectvei of whether they have been confirmed or not
+    ids = ids.uniq
+    self.payments = Payment.where(id: ids).with_details
+    # self.payments = self.selected_user.payments.successful.non_settlement.with_details
   end
 
   def load_money_requests

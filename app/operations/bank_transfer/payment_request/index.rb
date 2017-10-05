@@ -1,13 +1,12 @@
 # this operation should return the list of payment requests that a particular user
 # has access to from the index screen - based on the approval flow logic
-# essentially, payment orders that one owns, and payment orders that
+# essentially, payment orders that one owns, and payment orders that one has access to
 class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
   attr_accessor :role_id, :payment_requests
 
   def pre_validate
     super
-
   end
 
   def init
@@ -27,14 +26,10 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
   def process
     case self.role_id
-      when UserRole.id_for(:admin)
-        if self.user.company_admin?
+      when UserRole.id_for(:admin), UserRole.id_for(:auditor)
+        if self.user.vendor_payments_admin? || self.user.auditor?
           team_ids = user.company.users.pluck(:id)
           self.payment_requests = BankPaymentRequest.not_open.with_user(team_ids)
-        end
-        unless user.admin?
-          messages[:error] << 'User is not an admin'
-          return false
         end
       when UserRole.id_for(:manager)
         team_ids = User::Team::Index.(user, role_id: UserRole.id_for(:manager))&.pluck(:id)
@@ -66,8 +61,12 @@ class BankTransfer::PaymentRequest::Index < BankTransfer::PaymentRequest::Base
 
     attr_accessor :payment_requests
 
+    has_scope :filter_status_id
+    has_scope :filter_date, using: [:from, :to], type: :hash
+
     def init
       self.payment_requests = params[:payment_requests]
+      self.payment_requests = apply_scopes(payment_requests)
     end
   end
 

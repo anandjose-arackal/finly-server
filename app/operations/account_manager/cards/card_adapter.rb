@@ -75,7 +75,7 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
 
   def balance
     op = ItzCash::AccountDetails.(account.user, card: account)
-    op.balance
+    op.balance rescue 0
   end
 
   def creditable_accounts
@@ -89,5 +89,10 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
   def eligibility(payment)
     # checks if the particular card can be credited with so and so amount
     true
+  end
+
+  def credit_eligibility
+    op = ItzCash::AccountDetails.(account.user, card: account)
+    op.available_card_eligibility rescue 0
   end
 end

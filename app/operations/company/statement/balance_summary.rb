@@ -5,7 +5,7 @@ class Company::Statement::BalanceSummary < Company::Statement::Base
   attr_accessor :items
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :auditor]
   end
 
   def pre_validate
@@ -28,7 +28,7 @@ class Company::Statement::BalanceSummary < Company::Statement::Base
   end
 
   def process
-    result = Company::VirtualAccount::Balance.(user)
+    result = Company::ItzCashVirtualAccount::Balance.(user)
     items[:current_company_balance] = result.balance rescue 0
 
     # calculating money with employees in various forms

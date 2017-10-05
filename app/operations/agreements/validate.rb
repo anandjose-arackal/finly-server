@@ -34,14 +34,6 @@ class Agreements::Validate < Agreements::Base
         self.agreed = false
       end
     end
-    # if active_agreements_id.present?
-    #   active_agreements_id.each do |agreement_id|
-    #     user_agreement = CompanyAgreementTrack.with_user(user.id).with_agreement(agreement_id)
-    #     unless user_agreement.present?
-    #       self.agreed = false
-    #     end
-    #   end
-    # end
 
     self.kyc_required = user.company.kyc_required?
   end

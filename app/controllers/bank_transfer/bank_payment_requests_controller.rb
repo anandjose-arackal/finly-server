@@ -73,6 +73,16 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     render json: @result.as_json
   end
 
+  def add_beneficiary
+    @result = BankTransfer::PaymentRequest::Beneficiary::Add.(current_user, params)
+    respond
+  end
+
+  def remove_beneficiary
+    @result = BankTransfer::PaymentRequest::Beneficiary::Remove.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type)

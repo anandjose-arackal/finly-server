@@ -38,6 +38,19 @@ class Settlement::Report::Unapproved < Report::Base
     unless report.update_attributes(accounted: false)
       messages[:error] = report.errors.full_messages
     end
+
+    ######## Cash on Hand Addition ###############
+    cash_on_hand_deduction = self.report.expenses.spent_from_cash_on_hand.joins_amount.sum(:value)
+    if cash_on_hand_deduction.present? && cash_on_hand_deduction > 0
+      payment_request = PaymentRequest.(self.report.user, nil, "CashOnHand", :credit, :advance_against_report_unapproval)
+      payment_request.add_payment_item(PaymentRequest::PaymentItem.(self.report.user, self.report.user.cash_on_hand, cash_on_hand_deduction))
+      op = AccountManager::Payments::PaymentProcessor.(self.report.user, payment_request: payment_request)
+      if op.success?
+        payment = op.payment_order.payments.first
+        payment.update(reference_resource: self.report)
+      end
+    end
+    ######### end of cash on hand addition ########
   end
 
   def post_process

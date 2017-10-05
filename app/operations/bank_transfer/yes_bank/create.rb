@@ -27,48 +27,17 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
     self.bank_transfer_type = payment_order.bank_transfer_type
     ################################################################
 
-    # op = BankTransfer::YesBank::Process.(user, scheduled_at: params[:scheduled_at],
-    #     payment_order: self.order_data)
-    # self.processed_order_data = op.payment_order_data
-    #
-    # # setting the initiating account based on the type of user creating the
-    # # request as well as the option chosen by the admin
-    # self.initiating_account = retrieve_initiating_account
-    # ##########################################################
-    #
-    # #### setting the bank transfer type from the front end ####
-    # params[:bank_transfer_type] = params[:transfer_type].upcase
-    # ###########################################################
-    #
-    # self.scheduled_at = op.scheduled_at
-    # # below variable will contain the payment_request that holds data about initiating accounts and
-    # # receiving accounts
-    #
-    # self.payment_request = build_payment_request(processed_order_data, params[:bank_transfer_type], scheduled_at, initiating_account)
   end
 
   def validate
 
-    # if scheduled_at && scheduled_at < Date.today
-    #   add_message :error, 'Scheduled Date cannot be less than the current date'
-    #   return
-    # end
-    #
-    # if self.processed_order_data.blank? && payment_order.blank?
-    #   add_message :error, 'Error loading configuration. Please try again'
-    #   return
-    # end
-    #
-    # unless self.payment_request.valid? || payment_order.blank?
-    #   add_message :error, 'Please fix the issues before confirming the request'
-    # end
   end
 
   def pre_process
-    # updating the state of the payment request, because if it gets here, the status is credited,
+    # updating the state of the payment request, because if it gets here, the status is approved,
     # irrespective of if whether the actual payments succeeded or not
     if self.bank_payment_request.present?
-      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:approved))
     end
 
     # also set the payment order's status id as either scheduled or as pending
@@ -88,9 +57,12 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
     unless op.success?
 
       add_message :error, op.messages[:error]
-      # op.payment_order.payments.each do |payment|
-      #   payment.receiving_account.destroy # just the bogus bank account
-      # end
+      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
+      payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
+      payment_order.payments.each do |payment|
+        payment.system_messages.create(content: op.messages[:error].to_sentence,
+                                       system_message_type_id: SystemMessageType.id_for(:error))
+      end
       return
     end
     self.payment_order = op.payment_order

@@ -44,8 +44,8 @@ class User::Team::Index < User::Team::Base
 
   def authorize
     case role_id
-      when UserRole.admin_id
-        unless user.admin? || user.vendor_payments_admin?
+      when UserRole.admin_id, UserRole.id_for(:auditor)
+        unless user.admin? || user.vendor_payments_admin? || user.auditor?
           messages[:error] << 'User is not an Admin'
           raise_unauthorized_exception
         end
@@ -89,7 +89,7 @@ class User::Team::Index < User::Team::Base
     manager_association = nil
     approves_to_association = nil
     case role_id
-      when UserRole.admin_id
+      when UserRole.admin_id, UserRole.id_for(:auditor)
         self.response = admin_team
         return
       when UserRole.finance_manager_id
@@ -141,7 +141,7 @@ class User::Team::Index < User::Team::Base
   private
   def admin_team
     clear_messages
-    if user.company_admin?
+    if user.company_admin? || user.auditor?
       return user.company.users
     elsif user.policy_admin?
       users = user.company.users

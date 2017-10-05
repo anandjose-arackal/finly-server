@@ -2,11 +2,19 @@ class BankTransfer::PaymentRequest::Base < BaseOperation
 
   attr_accessor :initiating_account
 
+  def authorized_user_types
+    [:vendor_payments_admin, :vendor_payments_reviewer, :vendor_payments_creditor, :vendor_payments_initiator, :auditor]
+  end
+
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
       return
     end
+  end
+
+  def init
+    super
   end
 
   def retrieve_initiating_account

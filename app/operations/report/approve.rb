@@ -64,7 +64,7 @@ class Report::Approve < Report::Base
     if auto_approve or manager.blank?
       status = ReportStatus.approved_id
       # if the report has no reimbursable expenses, mark it as closed because there are no reimbursements
-      if report.expenses.only_reimbursable_expenses.count == 0 && report.only_card_expenses?
+      if report.expenses.only_reimbursable_expenses.count == 0 && (report.only_card_expenses? || report.only_cash_on_hand_expenses?)
         status = ReportStatus.closed_id
       end
     end
@@ -122,7 +122,13 @@ class Report::Approve < Report::Base
       email_authorization = nil
 
       # set the reimbursement amount of the report
-      unless report.processing?
+      if report.processing?
+        email_auth_invalidate_presenter = EmailAuthorization::Invalidate.(user, authorizable: report)
+        email_authorization_presenter = EmailAuthorization::Create.(user, {authorizable: report})
+        if email_authorization_presenter.success?
+          email_authorization = email_authorization_presenter.email_authorization
+        end
+      else
         Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
         report.reload
 
@@ -133,12 +139,6 @@ class Report::Approve < Report::Base
         # unless email_auth_invalidate_presenter.success?
 
         # end
-      else
-        email_auth_invalidate_presenter = EmailAuthorization::Invalidate.(user, authorizable: report)
-        email_authorization_presenter = EmailAuthorization::Create.(user, {authorizable: report})
-        if email_authorization_presenter.success?
-          email_authorization = email_authorization_presenter.email_authorization
-        end
       end
       # if report is closed, add the relevant comment
       if report.closed?

@@ -36,6 +36,7 @@ class BankTransaction < ActiveRecord::Base
   accepts_nested_attributes_for :amount
 
   delegate :amount_value, to: :amount
+  delegate :completed?, :processing?, :failed?, to: :transfer_status
 
   scope :processing_transactions, -> {where transfer_status_id: BankTransferStatus.id_for(:processing)}
 

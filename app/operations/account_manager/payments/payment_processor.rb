@@ -90,8 +90,30 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         if result.success?
           add_message :success, 'Payment processed successfully'
         else
+          # overriding this for testing
+          # payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+          # payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:completed))
           add_message :error, result.messages[:error]
         end
+      end
+    end
+  end
+
+  def post_process
+    # here check if the payment order has associated bank payment requests and accordingly send notification
+    if payment_order.bank_payment_request.present?
+      # now check if all the payments in this order are either successes or failures.
+      # i.e. none processing or awaiting credit confirmation
+      completed = true
+      bank_payment_request = payment_order.bank_payment_request
+      payment_order.payments.each do |payment|
+        unless [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)].include?(payment.payment_status_id)
+          completed = false
+        end
+      end
+      if completed
+        # this will trigger the mailer and notification that a particular credit has been successfully completed
+        Event::EBankPaymentRequest::CreditConfirm.(bank_payment_request.owner, bank_payment_request: bank_payment_request)
       end
     end
   end
@@ -171,6 +193,5 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     end
     p
   end
-
 end
 

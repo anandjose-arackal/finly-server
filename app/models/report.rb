@@ -43,6 +43,7 @@
 
 
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -351,6 +352,10 @@ class Report < ActiveRecord::Base
 
   def only_card_expenses?
     self.expenses.count == self.expenses.only_card_expenses.count
+  end
+
+  def only_cash_on_hand_expenses?
+    self.expenses.count == self.expenses.spent_from_cash_on_hand.count
   end
 
   def synced_with_quickbooks?

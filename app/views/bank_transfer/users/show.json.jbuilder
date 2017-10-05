@@ -1,7 +1,10 @@
 json.user do
-  json.extract! @result.selected_user, :email, :name, :mobile_number,
-              :address_1, :address_2
-  json.gender @result.selected_user.gender_name
+  json.email @result.selected_user.email
+  json.name @result.selected_user.name
+  json.mobile_number @result.selected_user.mobile_number
+  json.address_1 @result.selected_user.profile&.address_1
+  json.address_2 @result.selected_user.profile&.address_2
+  json.gender @result.selected_user.profile&.gender
 end
 
 json.actions @result.actions
@@ -9,6 +12,8 @@ json.actions @result.actions
 
 json.bank_accounts do
   json.array!(@result.selected_user.bank_accounts) do |bank_account|
+    json.id bank_account.id
+    json.default bank_account.default_account
     json.account do
       json.account_number bank_account.account_number
       json.ifsc bank_account.ifsc
@@ -41,6 +46,7 @@ json.role do
   json.finance_manager @result.roles[:finance_manager]
   json.manager @result.roles[:manager]
   json.initiator @result.roles[:initiator]
+  json.auditor @result.roles[:auditor]
   # since only admins can see this screen, they can edit the fields by default
 end
 

@@ -6,6 +6,7 @@
 class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :updated_expense_params
   attr_accessor :editable_attrs, :receipt, :old_receipt, :destroy_receipts
+  attr_accessor :original_attributes
 
   def pre_validate
     if params.blank? or user.blank?
@@ -71,6 +72,25 @@ class Expense::Manual::Update < Expense::Manual::Base
         messages[:error] << 'Expense cannot be edited at this stage'
         return
       end
+    end
+
+    # if the expense is being marked as fropm cash on hand, check if there is enough cash on hand to facilitate it
+    if StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand)) or (updated_expense_params&.dig(:from_cash_on_hand).nil? and expense.from_cash_on_hand)
+      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      amount_val = (updated_expense_params&.dig(:amount_attributes,:value)&.to_f || expense.amount&.value)
+      unless coh_adapter.balance >= amount_val
+        add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
+        return
+      end
+    end
+
+    from_cash_on_hand = StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
+    from_cash_on_hand = from_cash_on_hand.nil? ? expense.from_cash_on_hand : from_cash_on_hand
+    reimbursable = StringUtils.to_bool(updated_expense_params&.dig(:reimbursable))
+    reimbursable = reimbursable.nil? ?  expense.reimbursable : reimbursable
+    if from_cash_on_hand and reimbursable
+      add_message :error, 'Expense cannot be Reimbursable and Paid from Cash on Hand'
+      return
     end
   end
 
@@ -153,7 +173,9 @@ class Expense::Manual::Update < Expense::Manual::Base
                            merchant_name: expense.merchant_name,
                            amount_value: expense.amount_value,
                            category_name: expense.category_name,
-                           receipt: expense.receipts.count}
+                           receipt: expense.receipts.count,
+                           from_cash_on_hand: expense.from_cash_on_hand
+                          }
   end
 
 end

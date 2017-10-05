@@ -3,7 +3,7 @@ class Export::Report::WithReceipts < Export::Report::Base
   attr_accessor :reports, :preferences, :result, :report_names, :default_column_names, :custom_field_column_names, :files
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin]
+    [:employee, :manager, :finance_manager, :admin, :auditor]
   end
 
   def init

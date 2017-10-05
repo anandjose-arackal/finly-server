@@ -3,7 +3,7 @@
 
 class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentRequest::Review::Base
 
-  attr_accessor :initiating_account, :initiating_account_adapter
+  attr_accessor :initiating_account, :initiating_account_adapter, :view_role
 
   def pre_validate
     super
@@ -21,6 +21,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     super
     self.initiating_account = retrieve_initiating_account
     self.initiating_account_adapter = retrieve_initiating_account_adapter
+    self.view_role = UserRole.id_for(params[:view].to_sym)
   end
 
   def validate
@@ -33,11 +34,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   end
 
   def pre_process
-    # setting the status as pending because it will be processed immediately - for both payments and payment orders
-    payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
-    payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
-
-    # updating the initiating account for the payment order and paymets
+    # updating the initiating account for the payment order and payments
     payment_order.update(initiating_account_type: initiating_account.class.name)
     payment_order.payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
   end
@@ -47,18 +44,34 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
     # now pass to the Create operation
     op = BankTransfer::YesBank::Create.(user, bank_payment_request: bank_payment_request)
-    unless op.success?
+    if op.success?
+      # update the bank_payment_request to credited
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+      # create a trail to show that the BPR was credited
+      bank_payment_request.bank_payment_request_trails.create action_user: user,
+                                                              action_user_role_id: self.view_role,
+                                                              action_id: BankPaymentRequestTrailAction.id_for(:credit),
+                                                              modified_user_id: nil,
+                                                              modified_user_role_id: nil
+    else
       add_message :error, op.messages[:error]
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:failed))
       return
     end
-
-    # update the bank_payment_request to credited
-    bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
   end
 
   def post_process
     bank_payment_request.comments.create user_id: user.id,
                                          action_id: BankPaymentRequestCommentAction.id_for(:credit)
+
+    Event::EBankPaymentRequest::Credit.(user, bank_payment_request: bank_payment_request)
+
+    # # since credit has been initiated for all these vendors, make them authorized (if they're users, they're authorized by default)
+    # self.payment_order.payments.each do |payment|
+    #   if payment.receiving_account.is_a?(BankAccount) && payment.receiving_account.account_owner.is_a?(YesBankVendor)
+    #     payment.receiving_account.account_owner.update(authorized: true)
+    #   end
+    # end
 
     add_message :success, "Payment Order credit initiated!"
   end

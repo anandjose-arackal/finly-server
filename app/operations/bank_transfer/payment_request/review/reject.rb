@@ -1,8 +1,10 @@
 class BankTransfer::PaymentRequest::Review::Reject < BankTransfer::PaymentRequest::Review::Base
 
+  attr_accessor :rejection_note
+
   def init
     super
-
+    self.rejection_note = params[:note]
   end
 
   def validate
@@ -35,7 +37,10 @@ class BankTransfer::PaymentRequest::Review::Reject < BankTransfer::PaymentReques
   def post_process
     # add comments
     bank_payment_request.comments.create user_id: user.id,
-                                         action_id: BankPaymentRequestCommentAction.id_for(:reject)
+                                         action_id: BankPaymentRequestCommentAction.id_for(:reject),
+                                         note: rejection_note
+
+    Event::EBankPaymentRequest::Reject.(user, bank_payment_request: bank_payment_request)
 
     add_message :success, "Payment Request successfully rejected"
   end

@@ -17,9 +17,14 @@
 #  account_owner_id   :integer
 #  account_owner_type :string(255)
 #  company_id         :integer
+#  reimbursable       :boolean
+#  default_account    :boolean          default(FALSE)
+#  is_deleted         :boolean          default(FALSE)
 #
 
 class BankAccount < ActiveRecord::Base
+  # include SoftDeletable
+
   belongs_to :account_owner, polymorphic: true
 
   has_many :receiving_payments, as: :receiving_account
@@ -27,6 +32,7 @@ class BankAccount < ActiveRecord::Base
 
   validates :account_number, presence: true
   validates :ifsc, presence: true
+  validates :name, presence: true
 
   accepts_nested_attributes_for :account_owner
 
@@ -38,6 +44,8 @@ class BankAccount < ActiveRecord::Base
   scope :with_id, -> (id) {where id: id}
   scope :only_vendors, -> {where account_owner_type: "YesBankVendor"}
   scope :only_users, -> {where account_owner_type: "User"}
+  scope :default_accounts, -> { where(default_account: true).non_deleted}
+  scope :non_deleted, -> {where is_deleted: [nil, false]}
   scope :with_owner_id, -> (owner_id) {
     where account_owner_id: owner_id
   }

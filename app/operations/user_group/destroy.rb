@@ -1,5 +1,9 @@
 class UserGroup::Destroy < UserGroup::Base
 
+  def authorized_user_types
+    [:company_admin]
+  end
+
   def process
     self.user_group.user_group_items.each do |item|
       item.destroy
