@@ -380,6 +380,7 @@ ActiveRecord::Schema.define(version: 20170930214116) do
     t.integer  "target_balance_id",    limit: 4
     t.integer  "source_account_id",    limit: 4
     t.string   "source_account_type",  limit: 255
+    t.string   "application",          limit: 255
   end
 
   add_index "auto_reload_configs", ["reloadable_type", "reloadable_id"], name: "index_auto_reload_configs_on_reloadable_type_and_reloadable_id", using: :btree
