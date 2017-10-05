@@ -9,7 +9,7 @@ module Accountable
 
     # todo Jugaad to access historical data
     from = (date - 1.day)
-    case self.account.class.name
+    case self.class.name
       when Card.name
         self.user.user_balance_histories.with_date(from)&.first&.card_balance&.value || 0
       when ItzCashCompanyAccount.name
@@ -18,6 +18,8 @@ module Accountable
         self.user.user_balance_histories.with_date(from)&.first&.finly_money_balance&.value || 0
       when CashOnHand.name
         self.user.user_balance_histories.with_date(from)&.first&.cash_on_hand_balance&.value || 0
+      when YesBankCompanyAccount.name
+        0
     end
   end
 
@@ -30,7 +32,7 @@ module Accountable
 
     # todo Jugaad to access historical data
     to = date
-    case self.account.class.name
+    case self.class.name
       when Card.name
         self.user.user_balance_histories.with_date(to)&.first&.card_balance&.value || 0
       when ItzCashCompanyAccount.name
@@ -39,6 +41,8 @@ module Accountable
         self.user.user_balance_histories.with_date(to)&.first&.finly_money_balance&.value || 0
       when CashOnHand.name
         self.user.user_balance_histories.with_date(to)&.first&.cash_on_hand_balance&.value || 0
+      when YesBankCompanyAccount.name
+        0
     end
   end
 
