@@ -68,8 +68,6 @@ class FinlyTransaction::Summary < BaseOperation
           if credits.present?
             summary[:credits] << {name: "Received as Payroll", amount: credits}
           end
-        when PaymentPurpose.id_for(:vendor_payment)
-
         when PaymentPurpose.id_for(:corporate_balance_load)
           if credits.present?
             summary[:credits] << {name: "Added to Company Credits", amount: credits}
