@@ -144,7 +144,6 @@ class BankPaymentRequest < ActiveRecord::Base
     if [BankPaymentRequestStatus.id_for(:credited)].include?(self.status_id)
       return self.payment_order.payment_order_status&.name
     elsif [BankPaymentRequestStatus.id_for(:approved)].include?(self.status_id)
-      # todo - can change this to pending credit
       return "pending_credit"
     end
     self.status&.name&.to_s
@@ -167,6 +166,10 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def payment_mode
     self.payment_order.payment_mode
+  end
+
+  def retriable?
+    self.payment_order.partially_completed? || self.payment_order.failed?
   end
 
   private

@@ -19,7 +19,8 @@
 # }
 class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :bank_accounts, :account_ids, :amounts, :response_presenter, :parsed_data
+  attr_accessor :bank_accounts, :account_ids, :amounts, :response_presenter, :parsed_data,
+                :notes
 
   def pre_validate
     if user.blank? || params.blank?
@@ -34,6 +35,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
   def init
     self.account_ids = retrieve_data(:account_id)
     self.amounts = retrieve_data(:amount)
+    self.notes = retrieve_data(:note)
   end
 
   def process
@@ -69,7 +71,8 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           name: bank_account.account_owner.name,
           bank_account_number: bank_account.account_number,
           ifsc: bank_account.ifsc,
-          amount: amounts[index]
+          amount: amounts[index],
+          note: self.notes[index]
       }
     end
     data

@@ -2,7 +2,7 @@
 # request object out of it
 class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
   attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount,
-                :errors, :payment_order_valid, :scheduled_at
+                :errors, :payment_order_valid, :scheduled_at, :description
 
   def pre_validate
     super
@@ -25,6 +25,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     self.processable_amount = 0
     self.processed_order = []
     self.scheduled_at = Date.parse params[:scheduled_at] if params[:scheduled_at].present? and DateUtils.validate_date_format?(params[:scheduled_at])
+    self.description = params[:description]
 
     if scheduled_at.present? and scheduled_at < Date.today
       self.scheduled_at = Date.today
@@ -80,6 +81,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       ifsc = item[:ifsc] || item["ifsc"]
       name = item[:name] || item["name"]
       amount = item[:amount]&.to_f || item["amount"]&.to_f
+      note = item[:note]&.to_s || item["note"]&.to_s
 
       valid = true
       messages = []
@@ -126,7 +128,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       self.payment_order_valid = false unless valid
 
-      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, amount: amount, valid: valid, messages: messages}
+      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, amount: amount, note: note, valid: valid, messages: messages}
     end
   end
 
@@ -138,12 +140,13 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     params[:errors] = self.errors
     params[:payment_order_valid] = self.payment_order_valid
     params[:scheduled_at] = self.scheduled_at
+    params[:description] = self.description
     BankTransfer::PaymentRequest::Process::SuccessPresenter.new(user, params, messages)
   end
 
   class BankTransfer::PaymentRequest::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :errors,
-                  :payment_order_valid, :scheduled_at
+                  :payment_order_valid, :scheduled_at, :description
 
     def init
       self.payment_order_data = params[:payment_order_data]
@@ -153,6 +156,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.errors = params[:errors]
       self.payment_order_valid = params[:payment_order_valid]
       self.scheduled_at = params[:scheduled_at]
+      self.description = params[:description]
     end
 
     def scheduled_at_formatted
