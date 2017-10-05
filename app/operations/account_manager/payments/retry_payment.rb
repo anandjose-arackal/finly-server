@@ -33,7 +33,7 @@ class AccountManager::Payments::RetryPayment < AccountManager::Base
     # calling payment executor so that the payment can be successfully executed using the respective adapters
     op = AccountManager::Payments::PaymentExecutor.(self.payment, bank_transfer_type: payment.payment_mode)
     if op.success?
-      if self.payment_order.payments.pluck(:payment_status_id).uniq == [PaymentStatus.id_for(:completed)]
+      if self.payment_order.payments.pluck(:payment_status_id).uniq == [PaymentStatus.id_for(:completed)] || self.payment_order.payments.pluck(:payment_status_id).uniq == [PaymentStatus.id_for(:processing)]
         self.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
       elsif self.payment_order.payments.pluck(:payment_status_id).uniq == [PaymentStatus.id_for(:failed)]
         self.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
