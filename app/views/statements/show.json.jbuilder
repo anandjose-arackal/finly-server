@@ -6,15 +6,12 @@ json.debits_count AmountUtils.format(@result.debits_count, placeholder: '-')
 json.credit_amount AmountUtils.format(@result.credit_amount, placeholder: '-')
 json.debit_amount AmountUtils.format(@result.debit_amount, placeholder: '-')
 json.summary do
+  summary = @result.summary
   json.credits do
-    json.array! @result.summary[:credits] do |item|
-      "#{item[:name]}: <b>#{item[:amount]}</b>"
-    end
+    json.array! summary[:credits].map{|item| "#{item[:name]}: <b>#{item[:amount]}</b>"}
   end
   json.debits do
-    json.array! @result.summary[:debits] do |item|
-      "#{item[:name]}: <b>#{item[:amount]}</b>"
-    end
+    json.array! summary[:debits].map{|item| "#{item[:name]}: <b>#{item[:amount]}</b>"}
   end
 end
 json.finly_transactions do
