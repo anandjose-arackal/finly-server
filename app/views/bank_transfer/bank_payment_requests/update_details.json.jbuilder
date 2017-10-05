@@ -5,11 +5,13 @@ json.payment do
       json.amount item[:amount]
       json.ifsc item[:ifsc]
       json.name item[:name]
+      json.note item[:note]
       json.valid item[:valid]
       json.messages item[:messages]
     end
   end
   json.errors @result.errors
+  json.description @result.description
   json.payment_order_valid @result.payment_order_valid
   json.requested_amount @result.requested_amount
   json.processable_amount @result.processable_amount

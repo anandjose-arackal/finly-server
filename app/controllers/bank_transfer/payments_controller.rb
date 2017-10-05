@@ -1,5 +1,7 @@
 class BankTransfer::PaymentsController < ApplicationController
 
+  before_action {finly_authorize! :web}
+
   def index
     @result = BankTransfer::Payments::Index.(current_user, params)
     respond
@@ -12,5 +14,10 @@ class BankTransfer::PaymentsController < ApplicationController
 
   def show
 
+  end
+
+  def retry
+    @result = BankTransfer::Payments::Retry.(current_user, params)
+    respond
   end
 end

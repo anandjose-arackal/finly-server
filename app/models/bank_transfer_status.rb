@@ -16,4 +16,12 @@ class BankTransferStatus < ActiveRecord::Base
     [:completed, :processing, :failed]
   end
 
+  def completed?
+    self.id == BankTransferStatus.id_for(:completed)
+  end
+
+  def processing?
+    self.id == BankTransferStatus.id_for(:processing)
+  end
+
 end
