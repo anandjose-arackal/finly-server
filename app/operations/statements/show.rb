@@ -174,7 +174,12 @@ class Statements::Show < Statements::Base
         when PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:personal_expense), PaymentPurpose.id_for(:card_transaction)
           merchant = finly_transaction&.associated_transaction&.merchant_name
         when PaymentPurpose.id_for(:vendor_payment)
-          merchant = 'Vendor Payment'
+          merchant = finly_transaction.payment&.receiving_user&.name
+          if merchant.present?
+            merchant = "Sent to #{merchant}"
+          else
+            merchant =  'Vendor Payment'
+          end
         when PaymentPurpose.id_for(:corporate_balance_load)
           merchant = 'Corporate Balance Load'
         when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:balance_clearance),
