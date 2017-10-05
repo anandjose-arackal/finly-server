@@ -18,6 +18,8 @@ module Accountable
         self.user.user_balance_histories.with_date(from)&.first&.finly_money_balance&.value || 0
       when CashOnHand.name
         self.user.user_balance_histories.with_date(from)&.first&.cash_on_hand_balance&.value || 0
+      when YesBankCompanyAccount.name
+        0
     end
   end
 
@@ -39,6 +41,8 @@ module Accountable
         self.user.user_balance_histories.with_date(to)&.first&.finly_money_balance&.value || 0
       when CashOnHand.name
         self.user.user_balance_histories.with_date(to)&.first&.cash_on_hand_balance&.value || 0
+      when YesBankCompanyAccount.name
+        0
     end
   end
 
