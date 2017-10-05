@@ -95,6 +95,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   end
 
   def create_system_message_for_processing(payment)
+    payment.system_messages.destroy_all
     payment.system_messages.create(system_message_type_id: SystemMessageType.id_for(:info),
                                   content: "Payment processed. Awaiting credit confirmation")
   end
