@@ -176,9 +176,13 @@ class Statements::Show < Statements::Base
         when PaymentPurpose.id_for(:vendor_payment)
           merchant = finly_transaction.payment&.receiving_user&.name
           if merchant.present?
-            merchant = "Sent to #{merchant}"
+            if finly_transaction.credit?
+              merchant = "Reversal for #{merchant}'s Payment"
+            elsif finly_transaction.debit?
+              merchant = "Sent to #{merchant}"
+            end
           else
-            merchant =  'Vendor Payment'
+            merchant = 'Vendor Payment'
           end
         when PaymentPurpose.id_for(:corporate_balance_load)
           merchant = 'Corporate Balance Load'

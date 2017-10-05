@@ -101,6 +101,13 @@ class FinlyTransaction::Summary < BaseOperation
           if debits.present?
             summary[:debits] << "Reversed Personal Expenses: <b>₹#{debits}</b>"
           end
+        when PaymentPurpose.id_for(:vendor_payment)
+          if credits.present?
+            summary[:credits] << "Reversal from Vendor Payment: <b>₹#{credits}</b>"
+          end
+          if debits.present?
+            summary[:debits] << "Sent as Vendor Payment: <b>₹#{debits}</b>"
+          end
       end
     end
     self.summary
