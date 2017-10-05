@@ -69,6 +69,8 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
 
   def process
 
+    card = nil
+
     if payment_order_data.is_a?(Hash)
       arr = []
       self.payment_order_data.map {|k, v| arr << v }
@@ -76,12 +78,17 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
     end
 
     self.payment_order_data.each do |item|
-      user_email_mob = item[:user]
+      user_email_mob_card = item[:user]
       # converting mobile number to a string
-      if user_email_mob.is_a?(Float)
-        user_email_mob = user_email_mob&.to_i&.to_s
+      if user_email_mob_card.is_a?(Float)
+        user_email_mob_card = user_email_mob_card&.to_i&.to_s
       end
-      user = self.user.company.users.find_for_database_authentication(username: user_email_mob)
+      user = self.user.company.users.find_for_database_authentication(username: user_email_mob_card)
+      if user.blank?
+        # i.e. if they have entered a card serial number instead of a user email or mobile
+        card = self.user.company.cards.with_card_program(card_program_id).find_by(proxy: user_email_mob_card)
+        user = card&.user
+      end
       amount = item[:amount].to_d rescue nil
 
       valid = true
@@ -99,8 +106,9 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
         messages << 'Invalid amount'
       end
 
-      # Check if user has a Meal Card
-      card = user.cards.with_card_program(card_program_id).first rescue nil
+      # Check if user has a card with the respective card program
+
+      card = user&.cards.with_card_program(card_program_id).first rescue nil
       if user.present? and card.blank?
         valid = false
         program_name = CardProgram.with_id(card_program_id).first.name.humanize rescue nil
@@ -115,7 +123,7 @@ class Benefits::TaxBenefits::Process < Benefits::TaxBenefits::Base
 
       self.payment_order_valid = false unless valid
 
-      self.processed_order << {user: {identifier: user_email_mob, user_details: user}, card: card, amount: amount, valid: valid, messages: messages}
+      self.processed_order << {user: {identifier: user_email_mob_card, user_details: user}, card: card, amount: amount, valid: valid, messages: messages}
     end
   end
 
