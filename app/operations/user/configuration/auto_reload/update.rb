@@ -49,7 +49,11 @@ class User::Configuration::AutoReload::Update < BaseOperation
     end
     # removing the receiving account type attribute from front end
     update_params.delete(:source_account_type)
+
+    update_params[:application] = RequestStore.store[:current_app]
   end
+
+
 
   def process
     unless reload_config.update(update_params)

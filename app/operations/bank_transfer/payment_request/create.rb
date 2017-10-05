@@ -172,7 +172,9 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
     self.unauthorized_vendors_presence = false
     if ba.nil?
-      ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc], account_owner: vendor, company_id: self.company_id)
+      ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc],
+                              account_owner: vendor, company_id: self.company_id, default_account: true)
+      
       # setting unauthorized vendors as true so that after creation, the approval flow is mandated
       self.unauthorized_vendors_presence = true
     end

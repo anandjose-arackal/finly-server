@@ -2,7 +2,7 @@
 # If the order is scheduled, it schedules the payment_order,
 # or else it calls the Benefits::TaxBenefits::Execute in background to execute the payment order
 class Benefits::TaxBenefits::Update < Benefits::TaxBenefits::Base
-  attr_accessor :response_presenter
+  attr_accessor :response_presenter, :initiating_account
 
   def pre_validate
     super
@@ -17,11 +17,16 @@ class Benefits::TaxBenefits::Update < Benefits::TaxBenefits::Base
     end
   end
 
+  def init
+    super
+    self.initiating_account = params[:initiating_account_type]
+  end
+
   def process
     order_data = params[:payment_order]
     scheduled_at = params[:scheduled_at]
     self.response_presenter = Benefits::TaxBenefits::Process.(config, user, scheduled_at: scheduled_at,
-        payment_order: order_data, card_program_id: card_program_id)
+        payment_order: order_data, card_program_id: card_program_id, initiating_account_type: self.initiating_account)
     unless self.response_presenter.success?
       add_message :error, self.response_presenter.messages[:error]
     end
