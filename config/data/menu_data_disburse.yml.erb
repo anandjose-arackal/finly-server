@@ -42,20 +42,16 @@ user:
   <% if current_user.auditor? %>
   - name: Auditor
     id: auditor
-  - name: Personal
-    id: personal
   <% end %>
   <% if current_user.admin? %>
   - name: Admin
     id: admin
-  - name: Personal
-    id: personal
   <% elsif current_user.finance_manager? %>
   - name: Finance Manager
     id: finance_manager
+  <% end %>
   - name: Personal
     id: personal
-  <% end %>
 
 views:
   <% if current_user.admin? %>
