@@ -2,7 +2,7 @@
 
 class AccountManager::Payments::RetryPayment < AccountManager::Base
 
-  attr_accessor :payment
+  attr_accessor :payment, :payment_order
 
   def initialize(payment)
     self.payment = payment
