@@ -1,5 +1,5 @@
 class BankTransfer::Payments::Count < BankTransfer::Payments::Base
-  attr_accessor :payment_order_ids, :payments_count
+  attr_accessor :payment_ids, :payments_count
 
   def init
     params[:with_application] = RequestStore.store[:current_app].to_s
@@ -7,13 +7,13 @@ class BankTransfer::Payments::Count < BankTransfer::Payments::Base
   end
 
   def process
-    op = BankTransfer::YesBank::Index.(current_user, params)
+    op = BankTransfer::Payments::Index.(current_user, params)
     if op.success?
-      self.payment_order_ids = op.payment_orders.pluck(:id)
+      self.payments_count = op.payments.count
     else
       add_message :error, op.messages[:error]
     end
-    self.payments_count = Payment.with_payment_order_id(payment_order_ids).count
+    # self.payments_count = Payment.with_payment_order_id(payment_order_ids).count
   end
 
   def success

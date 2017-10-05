@@ -8,7 +8,7 @@ module Constants
   OTP_RESEND_INTERVAL = 60
 
   # todo - needs to be edited once we get the account details.
-  ITZCASH_EMAIL_ID = 'veekshith.rai@finly.io'
+  ITZCASH_EMAIL_ID = ['veekshith.rai@finly.io', 'vivek.a@finly.io']
 
   PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io']

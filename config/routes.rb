@@ -231,6 +231,7 @@
 #                      mobile_v0_configuration_categories GET    /mobile/v0/configuration/categories(.:format)                                              mobile/v0/configuration/category#index
 #                    mobile_v0_configuration_gcm_register POST   /mobile/v0/configuration/gcm/register(.:format)                                            mobile/v0/configuration/gcm#create
 #                  mobile_v0_configuration_gcm_unregister POST   /mobile/v0/configuration/gcm/unregister(.:format)                                          mobile/v0/configuration/gcm#delete
+#                       mobile_v0_available_expense_types GET    /mobile/v0/available_expense_types(.:format)                                               mobile/v0/expenses#available_expense_types
 #                                          mobile_v1_auth POST   /mobile/v1/auth(.:format)                                                                  mobile/v1/token#create
 #                        mobile_v1_configuration_category GET    /mobile/v1/configuration/category(.:format)                                                mobile/v1/configuration#category
 #                                      mobile_v1_expenses GET    /mobile/v1/expenses(.:format)                                                              mobile/v1/expenses#index
@@ -313,6 +314,7 @@
 #                                        mobile_v1_lookup POST   /mobile/v1/lookup(.:format)                                                                mobile/v1/users#lookup
 #                         mobile_v1_send_verification_otp POST   /mobile/v1/send_verification_otp(.:format)                                                 mobile/v1/users#send_verification_otp
 #                               mobile_v1_verify_user_otp POST   /mobile/v1/verify_user_otp(.:format)                                                       mobile/v1/users#verify_user_otp
+#                       mobile_v2_available_expense_types GET    /mobile/v2/available_expense_types(.:format)                                               mobile/v2/expenses#available_expense_types
 #                                          chrome_v1_auth POST   /chrome/v1/auth(.:format)                                                                  chrome/v1/token#create
 #                                                         DELETE /chrome/v1/auth(.:format)                                                                  chrome/v1/token#destroy
 #                        chrome_v1_expenses_configuration POST   /chrome/v1/expenses/configuration(.:format)                                                chrome/v1/expenses#configuration
@@ -905,7 +907,16 @@
 #                                                         PATCH  /bank_transfer/bank_payment_requests/:id(.:format)                                         bank_transfer/bank_payment_requests#update
 #                                                         PUT    /bank_transfer/bank_payment_requests/:id(.:format)                                         bank_transfer/bank_payment_requests#update
 #                                                         DELETE /bank_transfer/bank_payment_requests/:id(.:format)                                         bank_transfer/bank_payment_requests#destroy
-#                             bank_transfer_vendors_count GET    /bank_transfer/vendors/count(.:format)                                                     bank_transfer/vendors#count
+#                      bank_transfer_account_owners_count GET    /bank_transfer/account_owners/count(.:format)                                              bank_transfer/account_owners#count
+#                            bank_transfer_account_owners GET    /bank_transfer/account_owners(.:format)                                                    bank_transfer/account_owners#index
+#                                                         POST   /bank_transfer/account_owners(.:format)                                                    bank_transfer/account_owners#create
+#                         new_bank_transfer_account_owner GET    /bank_transfer/account_owners/new(.:format)                                                bank_transfer/account_owners#new
+#                        edit_bank_transfer_account_owner GET    /bank_transfer/account_owners/:id/edit(.:format)                                           bank_transfer/account_owners#edit
+#                             bank_transfer_account_owner GET    /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#show
+#                                                         PATCH  /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#update
+#                                                         PUT    /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#update
+#                                                         DELETE /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#destroy
+#                     bank_transfer_vendor_show_transfers GET    /bank_transfer/vendors/:vendor_id/show_transfers(.:format)                                 bank_transfer/vendors#show_transfers
 #                                   bank_transfer_vendors GET    /bank_transfer/vendors(.:format)                                                           bank_transfer/vendors#index
 #                                                         POST   /bank_transfer/vendors(.:format)                                                           bank_transfer/vendors#create
 #                                new_bank_transfer_vendor GET    /bank_transfer/vendors/new(.:format)                                                       bank_transfer/vendors#new
@@ -934,6 +945,7 @@
 #                                                         DELETE /bank_transfer/payments/:id(.:format)                                                      bank_transfer/payments#destroy
 #                               bank_transfer_users_count GET    /bank_transfer/users/count(.:format)                                                       bank_transfer/users#count
 #                            bank_transfer_users_managers GET    /bank_transfer/users/managers(.:format)                                                    bank_transfer/users#get_managers
+#                       bank_transfer_user_show_transfers GET    /bank_transfer/users/:user_id/show_transfers(.:format)                                     bank_transfer/users#show_transfers
 #                                     bank_transfer_users GET    /bank_transfer/users(.:format)                                                             bank_transfer/users#index
 #                                                         POST   /bank_transfer/users(.:format)                                                             bank_transfer/users#create
 #                                  new_bank_transfer_user GET    /bank_transfer/users/new(.:format)                                                         bank_transfer/users#new
@@ -1674,6 +1686,7 @@ Rails.application.routes.draw do
         post 'gcm/register', to: 'gcm#create'
         post 'gcm/unregister', to: 'gcm#delete'
       end
+      get 'available_expense_types', to: 'expenses#available_expense_types'
     end
 
     namespace :v1 do
@@ -1719,6 +1732,10 @@ Rails.application.routes.draw do
       post 'lookup', to: 'users#lookup'
       post 'send_verification_otp', to: 'users#send_verification_otp'
       post 'verify_user_otp', to: 'users#verify_user_otp'
+    end
+
+    namespace :v2 do
+      get 'available_expense_types', to: 'expenses#available_expense_types'
     end
   end
 
@@ -2224,8 +2241,12 @@ Rails.application.routes.draw do
       patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficairy
     end
 
-    get 'vendors/count', to: 'vendors#count'
-    resources :vendors
+    get 'account_owners/count', to: 'account_owners#count'
+    resources :account_owners
+
+    resources :vendors do
+      get 'show_transfers', to: 'vendors#show_transfers'
+    end
 
     get 'bank_accounts/count', to: 'bank_accounts#count'
     resources :bank_accounts
@@ -2235,7 +2256,9 @@ Rails.application.routes.draw do
 
     get 'users/count', to: 'users#count'
     get 'users/managers', to: 'users#get_managers'
-    resources :users
+    resources :users do
+      get 'show_transfers', to: 'users#show_transfers'
+    end
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
   end

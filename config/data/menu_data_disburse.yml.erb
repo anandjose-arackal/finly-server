@@ -6,20 +6,23 @@ company:
     url: <%= current_company.configuration.logo.url(:thumb)%>
   <% end %>
   features:
-    <% if current_company.feature_subscription.expense_card_enabled %>
+    <% if current_company.feature_subscription.expense_card_enabled && current_user.user_panel_subscription.disburse %>
     expense_card: true
     <% end %>
-    <% if current_company.feature_subscription.meal_card_enabled %>
+    <% if current_company.feature_subscription.meal_card_enabled && current_user.user_panel_subscription.disburse %>
     meal_card: true
     <% end %>
-    <% if current_company.feature_subscription.medical_card_enabled %>
+    <% if current_company.feature_subscription.medical_card_enabled && current_user.user_panel_subscription.disburse %>
     medical_card: true
     <% end %>
-    <% if current_company.feature_subscription.reimbursement_card_enabled %>
+    <% if current_company.feature_subscription.reimbursement_card_enabled && current_user.user_panel_subscription.disburse %>
     reimbursement_card: true
     <% end %>
-    <% if current_company.feature_subscription.expense_management_enabled %>
+    <% if current_company.feature_subscription.expense_management_enabled && current_user.user_panel_subscription.expense_management %>
     expense_management: true
+    <% end %>
+    <% if current_company.feature_subscription.yes_bank_account && current_user.user_panel_subscription.yes_bank_account_transfer %>
+    vendor_payments: true
     <% end %>
 
 
@@ -35,6 +38,21 @@ user:
   <% if current_user.finance_manager? %>
   - finance_manager
   <% end %>
+  switchable_roles:
+  <% if current_user.auditor? %>
+  - name: Auditor
+    id: auditor
+  <% end %>
+  <% if current_user.admin? %>
+  - name: Admin
+    id: admin
+  <% elsif current_user.finance_manager? %>
+  - name: Finance Manager
+    id: finance_manager
+  <% end %>
+  - name: Personal
+    id: personal
+
 views:
   <% if current_user.admin? %>
     admin:
@@ -70,44 +88,11 @@ views:
           target: '_blank'
         - name: 'Company Statements'
           url: '#company_statements'
-        <% if current_company.feature_subscription.yes_bank_account and current_user.company_admin? %>
-        - name: Vendor Payments
-          url: '/payments'
-          target: '_blank'
+        <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
+#        - name: Vendor Payments
+#          url: '/payments'
+#          target: '_blank'
         <% end %>
-
-  <% elsif current_user.auditor? %>
-    auditor:
-        menus:
-          navbar:
-          - name: Expenses
-            url: expenses
-            id: expenses
-          - name: ATM Withdrawals
-            url: atm_withdrawals
-            id: atm_withdrawals
-          - name: Users
-            url: users
-            id: users
-          - name: Orders
-            id: orders
-            url: orders
-          - name: Analytics
-            url: analytics
-            id: analytics
-          - name: Statements
-            url: company_statements
-            id: statements
-          cog:
-          - name: Organization Account
-            url: '#organization_account'
-          - name: 'Company Statements'
-            url: '#company_statements'
-          <% if current_company.feature_subscription.yes_bank_account and current_user.auditor? %>
-          - name: Vendor Payments
-            url: '/payments'
-            target: '_blank'
-          <% end %>
 
   <% elsif current_user.finance_manager? %>
     finance:
@@ -119,6 +104,9 @@ views:
         - name: ATM Withdrawals
           url: atm_withdrawals
           id: atm_withdrawals
+        - name: Orders
+          id: orders
+          url: orders
         - name: Users
           url: users
           id: users
@@ -158,3 +146,35 @@ views:
             - name: Statements
               url: personal/statements
               id: personal_statements
+
+    auditor:
+        menus:
+          navbar:
+          - name: Expenses
+            url: expenses
+            id: expenses
+          - name: ATM Withdrawals
+            url: atm_withdrawals
+            id: atm_withdrawals
+          - name: Users
+            url: users
+            id: users
+          - name: Orders
+            id: orders
+            url: orders
+          - name: Analytics
+            url: analytics
+            id: analytics
+          - name: Statements
+            url: company_statements
+            id: statements
+          cog:
+          - name: Organization Account
+            url: '#organization_account'
+          - name: 'Company Statements'
+            url: '#company_statements'
+          <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
+#          - name: Vendor Payments
+#            url: '/payments'
+#            target: '_blank'
+          <% end %>

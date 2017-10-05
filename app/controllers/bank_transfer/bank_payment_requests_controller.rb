@@ -74,12 +74,12 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def add_beneficiary
-    @result = BankTransfer::PaymentRequest::Payment::Add.(current_user, params)
+    @result = BankTransfer::PaymentRequest::Beneficiary::Add.(current_user, params)
     respond
   end
 
   def remove_beneficiary
-    @result = BankTransfer::PaymentRequest::Payment::Remove.(current_user, params)
+    @result = BankTransfer::PaymentRequest::Beneficiary::Remove.(current_user, params)
     respond
   end
 
