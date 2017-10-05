@@ -24,4 +24,5 @@ class YesBankVendor < ActiveRecord::Base
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> { where is_deleted: [false, nil]}
+  scope :authorized, -> { where authorized: true}
 end
