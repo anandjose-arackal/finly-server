@@ -114,6 +114,13 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       if completed
         # this will trigger the mailer and notification that a particular credit has been successfully completed
         Event::EBankPaymentRequest::CreditConfirm.(bank_payment_request.owner, bank_payment_request: bank_payment_request)
+
+        # also trigger emails for individual payments
+        payment_order.payments.each do |payment|
+          if payment.completed?
+            op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment)
+          end
+        end
       end
     end
   end

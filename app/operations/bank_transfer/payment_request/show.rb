@@ -142,6 +142,14 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                   type: 7
               }
           }
+        elsif bank_payment_request.credited?
+          # further check if the payment order has anu failed payments
+          if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?
+            actions[:retry] = {
+                method: "patch",
+                url: Rails.application.routes.url_helpers.bank_transfer_payment_retry_path(self.bank_payment_request)
+            }
+          end
         end
       elsif (manager_view?) && bank_payment_request.processing?
         if bank_payment_request.controlling_user_id == user.id
@@ -279,6 +287,14 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           end
         elsif associated_users.include?(user)
           actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+        elsif self.bank_payment_request.credited? && self.bank_payment_request.payment_order.initiating_user_id == user.id
+          # further check if the payment order has anu failed payments
+          if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?
+            actions[:retry] = {
+                method: "patch",
+                url: Rails.application.routes.url_helpers.bank_transfer_payment_retry_path(self.bank_payment_request)
+            }
+          end
         end
       elsif initiator_view?
         if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
@@ -334,6 +350,14 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                   method: "patch"
               }
           }
+        elsif self.bank_payment_request.credited? && self.bank_payment_request.payment_order.initiating_user_id == user.id
+          # further check if the payment order has anu failed payments
+          if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?
+            actions[:retry] = {
+                method: "patch",
+                url: Rails.application.routes.url_helpers.bank_transfer_payment_retry_path(self.bank_payment_request)
+            }
+          end
         end
       end
       actions

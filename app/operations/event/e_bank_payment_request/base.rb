@@ -7,12 +7,12 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
       add_message :error, 'User not found'
       return
     end
-    if params.blank? or params[:bank_payment_request].blank?
-      add_message :error, 'Report not found'
+    if params.blank? or (params[:bank_payment_request].blank? && params[:payment].blank?)
+      add_message :error, 'Payment Order not found'
       return
     end
     unless params[:bank_payment_request].is_a?(::BankPaymentRequest)
-      add_message :error, 'Error loading report'
+      add_message :error, 'Error loading Payment Order'
     end
   end
 
@@ -30,9 +30,16 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
-    BankPaymentRequestMailer.delay.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params))
+    # BankPaymentRequestMailer.delay.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params))
     # todo - temporary, for testing. Will be moved to delay before production
-    # BankPaymentRequestMailer.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params)).deliver_now
+    BankPaymentRequestMailer.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params)).deliver_now
+  end
+
+  def send_sms(user)
+    return if user.blank? || user.mobile_number.blank?
+    message = sms_message
+    # now trigger the API used for sending SMSes
+    op = Sms::Send.(user, {message: message, mobile_number: user.mobile_number})
   end
 
   def mailer_subject(user)
@@ -47,6 +54,10 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
 
   end
 
+  def sms_message
+
+  end
+
   def bank_payment_request_view_role(user)
 
   end
@@ -57,16 +68,16 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     params[:event_id] = event_id
     params[:action_name] = action_name
     params[:role_id] = bank_payment_request_view_role user
-
   end
 
   class Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter < Event::SetNotifier::MailerPresenter
 
     attr_accessor :bank_payment_request, :action_name, :subject_val, :body_val,
-                  :event_id, :company, :view_role_id, :view_url
+                  :event_id, :company, :view_role_id, :view_url, :payment
 
     def init
       self.bank_payment_request = params[:bank_payment_request]
+      self.payment = params[:payment]
       self.action_name = params[:action_name]
       self.subject_val = params[:subject]
       self.body_val = params[:body]
@@ -77,7 +88,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     end
 
     def validate
-      self.user.present? && self.bank_payment_request.present?
+      self.user.present? && (self.bank_payment_request.present?)
     end
 
     def recipient
@@ -93,6 +104,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     end
 
     def generate_view_url
+      return if self.bank_payment_request.blank?
       view = ""
       case view_role_id
         when 4, '4' # i.e. initiator
