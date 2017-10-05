@@ -30,7 +30,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   end
 
-  def validates
+  def validate
     # confirm that the bank transaction is, in fact in processing state
     unless bank_transaction.processing?
       add_message :error, "This transaction is not in processing state"
@@ -44,8 +44,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     }
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?
-      # if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-      if true
+      if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+      # if true
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))

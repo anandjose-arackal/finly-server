@@ -37,7 +37,7 @@ class Event::EBankPaymentRequest::EPayment::Base < Event::EBankPaymentRequest::B
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
-    PaymentMailer.delay.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params))
+    PaymentMailer.delay.send_mail(Event::EBankPaymentRequest::EPayment::Base::PaymentMailerPresenter.new(user, params))
     # todo - temporary, for testing. Will be moved to delay before production
     # PaymentMailer.send_mail(Event::EBankPaymentRequest::EPayment::Base::PaymentMailerPresenter.new(user, params)).deliver_now
   end
