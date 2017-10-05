@@ -1,9 +1,23 @@
 # this will send an SMS and a mailer to the users who are at the receiving end of this payment
 # ideally triggered at the time of payment credit
 
-class Event::EBankPaymentRequest::EPayment::CreditConfirm < Event::EBankPaymentRequest::Base
+class Event::EBankPaymentRequest::EPayment::CreditConfirm < Event::EBankPaymentRequest::EPayment::Base
 
   attr_accessor :payment, :receiving_user
+
+  def pre_validate
+    unless user.present?
+      add_message :error, 'User not found'
+      return
+    end
+    if params.blank? or params[:payment].blank?
+      add_message :error, 'Payment not found'
+      return
+    end
+    unless params[:payment].is_a?(::Payment)
+      add_message :error, 'Error loading Payment'
+    end
+  end
 
   def action_name
     "Payment Received"
@@ -12,6 +26,12 @@ class Event::EBankPaymentRequest::EPayment::CreditConfirm < Event::EBankPaymentR
   def init
     self.payment = params[:payment]
     self.receiving_user = payment.receiving_user
+  end
+
+  def validate
+    if payment.blank?
+      add_message :error, "Payment not found"
+    end
   end
 
   def affected_users
@@ -32,7 +52,9 @@ class Event::EBankPaymentRequest::EPayment::CreditConfirm < Event::EBankPaymentR
   end
 
   def sms_message
-    "You have received a credit of ₹#{payment.amount_value} via #{payment.payment_mode} from #{receiving_user.company.name} in your bank account: #{payment.receiving_account.account_number}. The transaction number for your reference is: #{payment.reference_resource.bank_reference_number}"
+    "You have received a amount of Rs. #{payment.amount_value} via #{payment.payment_mode} from #{receiving_user.company.name} in your bank account: #{payment.receiving_account.account_number}. The transaction number for your reference is: #{payment.reference_resource.bank_reference_number}. "
   end
+
+
 
 end

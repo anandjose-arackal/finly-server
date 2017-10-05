@@ -287,7 +287,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           end
         elsif associated_users.include?(user)
           actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
-        elsif self.bank_payment_request.credited? && self.bank_payment_request.initiating_user_id == user.id
+        elsif self.bank_payment_request.credited? && self.bank_payment_request.payment_order.initiating_user_id == user.id
           # further check if the payment order has anu failed payments
           if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?
             actions[:retry] = {
@@ -350,7 +350,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                   method: "patch"
               }
           }
-        elsif self.bank_payment_request.credited? && self.bank_payment_request.initiating_user_id == user.id
+        elsif self.bank_payment_request.credited? && self.bank_payment_request.payment_order.initiating_user_id == user.id
           # further check if the payment order has anu failed payments
           if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?
             actions[:retry] = {

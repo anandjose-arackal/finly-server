@@ -7,12 +7,12 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
       add_message :error, 'User not found'
       return
     end
-    if params.blank? or params[:bank_payment_request].blank?
-      add_message :error, 'Report not found'
+    if params.blank? or (params[:bank_payment_request].blank? && params[:payment].blank?)
+      add_message :error, 'Payment Order not found'
       return
     end
     unless params[:bank_payment_request].is_a?(::BankPaymentRequest)
-      add_message :error, 'Error loading report'
+      add_message :error, 'Error loading Payment Order'
     end
   end
 
@@ -30,16 +30,16 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     return if user.blank?
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
-    BankPaymentRequestMailer.delay.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params))
+    # BankPaymentRequestMailer.delay.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params))
     # todo - temporary, for testing. Will be moved to delay before production
-    # BankPaymentRequestMailer.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params)).deliver_now
+    BankPaymentRequestMailer.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params)).deliver_now
   end
 
   def send_sms(user)
     return if user.blank? || user.mobile_number.blank?
     message = sms_message
     # now trigger the API used for sending SMSes
-    Sms::Send.(user, message: message)
+    op = Sms::Send.(user, {message: message, mobile_number: user.mobile_number})
   end
 
   def mailer_subject(user)
@@ -68,7 +68,6 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     params[:event_id] = event_id
     params[:action_name] = action_name
     params[:role_id] = bank_payment_request_view_role user
-
   end
 
   class Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter < Event::SetNotifier::MailerPresenter
@@ -89,7 +88,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     end
 
     def validate
-      self.user.present? && (self.bank_payment_request.present? || self.payment.present?)
+      self.user.present? && (self.bank_payment_request.present?)
     end
 
     def recipient

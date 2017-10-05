@@ -44,8 +44,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     }
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?
-      if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-      # if true
+      # if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+      if true
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
@@ -54,6 +54,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
+        # destroying previous messages first, before adding the failure message
+        poayment.system_messages.destroy_all
+        # adding message regarding payment refund
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
@@ -81,6 +84,11 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         # this will trigger the mailer and notification that a particular credit has been successfully completed
         Event::EBankPaymentRequest::CreditConfirm.(bank_payment_request.owner, bank_payment_request: bank_payment_request)
       end
+    end
+
+    # trigger event for sending mailer to the receiver of the payment
+    if payment.completed?
+      op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment)
     end
   end
 

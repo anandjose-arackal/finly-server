@@ -66,8 +66,10 @@ class Event::SetNotifier < Event::Base
       users.each do |user|
         next if user.blank?# or not user.is_a?(User)
         user_event_configuration = load_configuration(user)
-        if allow_push_notification(user, user_event_configuration)
-          send_push_notification(user)
+        if user.is_a?(User)
+          if allow_push_notification(user, user_event_configuration)
+            send_push_notification(user)
+          end
         end
       end
     end
@@ -76,7 +78,7 @@ class Event::SetNotifier < Event::Base
     users = notification_affected_users
     if users.present?
       users.each do |user|
-        next if user.blank? # or not user.is_a?(User)
+        next if user.blank? || !user.is_a?(User) # or not user.is_a?(User)
         set_notification(user)
       end
     end
