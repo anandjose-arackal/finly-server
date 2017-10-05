@@ -52,7 +52,7 @@ class Event::EBankPaymentRequest::EPayment::CreditConfirm < Event::EBankPaymentR
   end
 
   def sms_message
-    "You have received a amount of Rs. #{payment.amount_value} via #{payment.payment_mode} from #{receiving_user.company.name} in your bank account: #{payment.receiving_account.account_number}. The transaction number for your reference is: #{payment.reference_resource.bank_reference_number}. "
+    "You have received a amount of Rs. #{payment.amount_value} via #{payment.payment_mode} from #{receiving_user.company.name} in your bank account: #{payment.receiving_account.account_number}. The transaction number for your reference is: #{payment.reference_resource.bank_reference_number}."
   end
 
 
