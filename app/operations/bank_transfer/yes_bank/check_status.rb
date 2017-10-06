@@ -43,19 +43,20 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         request_reference_number: bank_transaction.unique_request_number
     }
     op = YesBankApi::Status::GetStatus.(params)
-    if op.success?
-      if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-      # if true
-        handle_successful_transaction
-      elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
-        bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
-      elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+    if true #op.success?
+      # if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+      # # if true
+      #   handle_successful_transaction
+      # elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+      #   bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
+      #   bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+      # elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+      if true
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
         # destroying previous messages first, before adding the failure message
-        poayment.system_messages.destroy_all
+        payment.system_messages.destroy_all
         # adding message regarding payment refund
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "The amount will be refunded to your account shortly").save
@@ -96,8 +97,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def create_refund_payment
     admin_user = AdminUser.find_by(email: 'vivek.a@finly.io')
-    self.payment_request = PaymentRequest.(admin_user, nil, company.yes_bank_company_account.class.name, :credit, :corporate_balance_refund, company_id: self.company.id)
-    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(nil, company.yes_bank_company_account, self.bank_transaction.amount_value))
+    self.payment_request = ::PaymentRequest.(admin_user, nil, company.yes_bank_company_account.class.name, :credit, :corporate_balance_refund, company_id: self.company.id)
+    self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(nil, company.yes_bank_company_account, self.bank_transaction.amount_value))
 
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     if op.success?
