@@ -68,8 +68,6 @@ class FinlyTransaction::Summary < BaseOperation
           if credits.present?
             summary[:credits] << {name: "Received as Payroll", amount: credits}
           end
-        when PaymentPurpose.id_for(:vendor_payment)
-
         when PaymentPurpose.id_for(:corporate_balance_load)
           if credits.present?
             summary[:credits] << {name: "Added to Company Credits", amount: credits}
@@ -92,21 +90,21 @@ class FinlyTransaction::Summary < BaseOperation
             # Not possible?
           end
           if debits.present?
-            summary[:debits] << "Fees: <b>₹#{debits}</b>"
+            summary[:debits] << {name: "Fees", amount: debits}
           end
         when PaymentPurpose.id_for(:personal_expense)
           if credits.present?
-            summary[:credits] << "Added from Personal Expenses: <b>₹#{credits}</b>"
+            summary[:credits] << {name: "Added from Personal Expenses", amount: credits}
           end
           if debits.present?
-            summary[:debits] << "Reversed Personal Expenses: <b>₹#{debits}</b>"
+            summary[:debits] << {name: "Reversed Personal Expenses", amount: debits}
           end
         when PaymentPurpose.id_for(:vendor_payment)
           if credits.present?
-            summary[:credits] << "Reversal from Vendor Payment: <b>₹#{credits}</b>"
+            summary[:credits] <<{name: "Reversal from Vendor Payments", amount: credits}
           end
           if debits.present?
-            summary[:debits] << "Sent as Vendor Payment: <b>₹#{debits}</b>"
+            summary[:debits] << {name: "Sent as Vendor Payment", amount: debits}
           end
       end
     end
