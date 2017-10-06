@@ -43,15 +43,14 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         request_reference_number: bank_transaction.unique_request_number
     }
     op = YesBankApi::Status::GetStatus.(params)
-    if true #op.success?
-      # if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-      # # if true
-      #   handle_successful_transaction
-      # elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-      #   bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
-      #   bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
-      # elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
-      if true
+    if op.success?
+      if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+      # if true
+        handle_successful_transaction
+      elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+        bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
+        bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+      elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
