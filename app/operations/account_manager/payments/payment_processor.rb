@@ -36,6 +36,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     # setting the company id based on whether it's a user or an AdminUser
     if user.is_a?(User)
       self.company_id = user.company_id
+      self.company = user.company
     else
       self.company_id = payment_request.company_id
       self.company = Company.find_by(id: self.company_id)
