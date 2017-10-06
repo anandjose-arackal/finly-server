@@ -16,6 +16,7 @@ module FinlyIntegrations
         @access_token = OAuth::AccessToken.new(QB_OAUTH_CONSUMER, auth_obj.token, auth_obj.secret)
         @company_id = auth_obj.uid
         @finly_company_id = auth_obj.user.company_id
+        @finly_company = auth_obj.user.company
         @finly_user_id = auth_obj.user_id
         @quickbooks_config = QuickbooksConfiguration.where(user_id: auth_obj.user_id).first
         service = Quickbooks::Service::CompanyInfo.new
@@ -59,6 +60,8 @@ module FinlyIntegrations
           line_item.description = "#{expense.merchant_name} - #{expense.note}"
           line_item.amount = expense.amount.send(:INR).to_f
           line_item.detail_type = CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category.quickbooks_category_type][0]
+
+          # deciding whether it's an account item or a purchase item
           line_item.send(CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category.quickbooks_category_type][1]) do |detail|
             if category.quickbooks_category.quickbooks_category_type == QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0]
               detail.account_id = category.quickbooks_category.quickbooks_id
@@ -66,6 +69,11 @@ module FinlyIntegrations
               detail.item_id = category.quickbooks_category.quickbooks_id
             end
           end
+
+          # this method will map the custom fields in an expense to the respective
+          # attribute in Quickbooks, if necessary
+          add_custom_fields(line_item, expense, @finly_company.field_configurations)
+
           finly_purchase.line_items << line_item
         end
         purchase_service = Quickbooks::Service::Purchase.new
@@ -234,7 +242,6 @@ module FinlyIntegrations
         fi_department.company_id = @finly_company_id
         fi_department.quickbooks_integration_type = QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
         fi_department.quickbooks_updated_at = department.meta_data.last_updated_time
-        fi_department.tag_sub_type = QuickbooksFinlyIntegrationsTag::QUICKBOOKS_TAG_SUB_TYPES.last
         save_additional_information(fi_department, department)
         fi_department
       end
@@ -267,6 +274,23 @@ module FinlyIntegrations
         batch.each do |obj|
           fi_obj = obj_mapper.call(obj)
           container << fi_obj if fi_obj.valid?
+        end
+      end
+
+      def add_custom_fields(line_item, expense, field_configs)
+        return if line_item.blank? || expense.blank?
+        field_configs.each do |field_config|
+          next unless field_config.external_reference.present? && field_config.external_reference_type.include?("Quickbooks")
+          case field_config.external_reference_type
+            when "Department"
+              # add logic to include the department in the respective custom field
+              # first check the type of custom field it is
+              case field_config.field_type_id
+                when FieldType.id_for(:text)
+              end
+            else
+
+          end
         end
       end
     end
