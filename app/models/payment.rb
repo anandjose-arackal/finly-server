@@ -29,13 +29,6 @@
 
 
 
-
-
-
-
-
-
-
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -90,6 +83,7 @@ class Payment < ActiveRecord::Base
                                                              PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly),
                                                              PaymentPurpose.id_for(:atm_withdrawal)] }
   scope :with_amount, -> { joins :amount }
+  scope :joins_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
@@ -172,7 +166,12 @@ class Payment < ActiveRecord::Base
   scope :with_reference_id, -> (ref_id) { where reference_id: ref_id }
 
   scope :filter_search, -> (term) {
-    #todo - need to think about this
+    bank_account_ids = BankAccount.where("account_number like ? OR name like ? OR ifsc like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = YesBankVendor.where("name like ? OR email like ? OR mobile_number like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    user_ids = User.where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+
+    where("(receiving_account_type = 'BankAccount' AND receiving_account_id IN (?)) OR (receiving_user_type = 'YesBankVendor' AND receiving_user_id IN (?))
+            OR (receiving_user_type = 'User' AND receiving_user_id IN (?))", bank_account_ids, vendor_ids, user_ids)
   }
 
   scope :filter_user_id, -> (user_id) {
@@ -319,6 +318,10 @@ class Payment < ActiveRecord::Base
 
   def cash_on_hand_credit?
     self.payment_purpose_id == PaymentPurpose.id_for(:cash_advance)
+  end
+
+  def retriable?
+    self.failed?
   end
 
   private

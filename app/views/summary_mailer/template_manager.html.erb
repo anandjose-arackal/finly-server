@@ -1,0 +1,19 @@
+<% content_for :body do %>
+    <head>
+      <title>Finly Summary</title>
+    </head>
+    <body style="background-color: #f3f3f3; margin: 0px;height: auto;">
+    <div style="height: 80px; width: 100%; margin: auto; background-color: #2980b9; color: white; display: table;">
+      <p style="font-size: 22px; display: table-cell; vertical-align: middle; padding-left: 3%;"><%=@data.action_name%></p>
+    </div>
+    <div style="margin: auto; height: auto; width: 100%; background-color: white;">
+
+      <!--<p style="font-size: 18px; padding-top: 3%; margin-top: 0px; margin-left: 3%;"><span style="color: #2980b9;">'sreeram.nr</span> Expenses to 2016-06-02' rejected</p>-->
+      <p style="font-size: 17px; margin-left: 3%; text-align: left"><%=@data.body_val.html_safe%></p>
+      <br><br>
+      <%= render 'manager_summary' %>
+    </div>
+    </body>
+<% end %>
+
+<%= render 'application_mailer/template' %>

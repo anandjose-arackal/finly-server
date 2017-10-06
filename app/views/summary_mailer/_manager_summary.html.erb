@@ -1,0 +1,62 @@
+<% if @data.summary[:roles][:manager] %>
+    <table style="width: 80%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
+      <tbody>
+      <tr>
+        <td style="padding: 15px; background: #ED4D6A; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%; text-align: center;" colspan="3">
+          <span style="color: #fff;">Manager Pending Actions</span></td>
+      </tr>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;">Reports</td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= @data.summary[:manager_reports][:count] %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">
+          <div style="text-align: center;">
+            <a style="height: auto; width: auto; background-color: #3adb76; color: white; border: none;
+                font-size: 12px; padding: 10px 8px; border-radius: 2px; text-decoration: none;" href="">View</a></div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;">Money
+          Requests
+        </td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= @data.summary[:manager_money_requests][:count] %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">
+          <div style="text-align: center;">
+            <a style="height: auto; width: auto; background-color: #3adb76; color: white; border: none;
+                font-size: 12px; padding: 10px 8px; border-radius: 2px; text-decoration: none;" href="">View</a></div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <br/><br/><br/>
+<% end %>
+<% if @data.summary[:roles][:finance_manager] %>
+    <table style="width: 80%; margin: auto; border: 1px solid #dcdcdc; border-collapse: collapse;">
+      <tbody>
+      <tr>
+        <td style="padding: 15px; background: #19AAD9; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 70%; text-align: center;" colspan="3">
+          <span style="color: #fff;">Finance Manager Pending Actions</span></td>
+      </tr>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;">Reports</td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= @data.summary[:finance_reports][:count] %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">
+          <div style="text-align: center;">
+            <a style="height: auto; width: auto; background-color: #3adb76; color: white; border: none;
+                font-size: 12px; padding: 10px 8px; border-radius: 2px; text-decoration: none;" href="">View</a></div>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 50%;">Money
+          Requests
+        </td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;"><%= @data.summary[:finance_money_requests][:count] %></td>
+        <td style="padding: 15px; border: 1px solid #dcdcdc; font-family: Helvetica, Arial, sans-serif; width: 25%; text-align: center;">
+          <div style="text-align: center;">
+            <a style="height: auto; width: auto; background-color: #3adb76; color: white; border: none;
+                font-size: 12px; padding: 10px 8px; border-radius: 2px; text-decoration: none;" href="">View</a></div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+    <br/>
+<% end %>

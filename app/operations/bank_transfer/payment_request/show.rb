@@ -38,7 +38,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     require 'bank_transfer/payment_request/review/associated_users'
 
     attr_accessor :bank_payment_request, :payment_order, :actions, :bank_wallet_balance,
-                  :manager, :finance_manager, :associated_users
+                  :manager, :finance_manager, :associated_users, :payments_verified, :payments_unverified
 
     def init
       self.bank_payment_request = params[:payment_request]
@@ -52,6 +52,17 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         self.finance_manager = associated_users.include?(finance_manager) ? finance_manager : nil
       end
       self.actions = retrieve_actions
+
+      self.payments_unverified = []
+      self.payments_verified = []
+      # separating the verified and unverified payments
+      self.payment_order.payments.each do |payment|
+        if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
+          self.payments_verified << payment
+        else
+          self.payments_unverified << payment
+        end
+      end
     end
 
     def retrieve_actions
@@ -98,6 +109,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         elsif bank_payment_request.open? && bank_payment_request.owner_id == user.id
           actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:destroy] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_path(bank_payment_request)}
+        elsif bank_payment_request.scheduled?
+          # if the payment request is scheduled, give the option to cancel it here
+          actions[:cancel] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_payment_order_path(bank_payment_request.payment_order)}
         elsif bank_payment_request.approved?
           actions[:credit] = true
           balance = retrieve_balance(:vendor_payment_wallet, user)
@@ -128,9 +142,14 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                   type: 7
               }
           }
-        elsif bank_payment_request.scheduled?
-          # if the payment request is scheduled, give the option to cancel it here
-          actions[:cancel] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_payment_order_path(bank_payment_request.payment_order)}
+        elsif bank_payment_request.credited?
+          # further check if the payment order has anu failed payments
+          if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?
+            actions[:retry] = {
+                method: "patch",
+                url: Rails.application.routes.url_helpers.bank_transfer_payment_retry_path(self.bank_payment_request)
+            }
+          end
         end
       elsif (manager_view?) && bank_payment_request.processing?
         if bank_payment_request.controlling_user_id == user.id
@@ -268,6 +287,14 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           end
         elsif associated_users.include?(user)
           actions[:unapprove] = {method: "patch", type: 5, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+        elsif self.bank_payment_request.credited? && self.bank_payment_request.payment_order.initiating_user_id == user.id
+          # further check if the payment order has anu failed payments
+          if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?
+            actions[:retry] = {
+                method: "patch",
+                url: Rails.application.routes.url_helpers.bank_transfer_payment_retry_path(self.bank_payment_request)
+            }
+          end
         end
       elsif initiator_view?
         if (bank_payment_request.open? || bank_payment_request.rejected? || bank_payment_request.retracted?) && (bank_payment_request.owner_id == user.id)
@@ -323,6 +350,14 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                   method: "patch"
               }
           }
+        elsif self.bank_payment_request.credited? && self.bank_payment_request.payment_order.initiating_user_id == user.id
+          # further check if the payment order has anu failed payments
+          if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?
+            actions[:retry] = {
+                method: "patch",
+                url: Rails.application.routes.url_helpers.bank_transfer_payment_retry_path(self.bank_payment_request)
+            }
+          end
         end
       end
       actions

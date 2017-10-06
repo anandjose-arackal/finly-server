@@ -94,6 +94,16 @@ class PaymentOrder < ActiveRecord::Base
     where initiating_user_id: user_id
   }
 
+  scope :with_initiating_or_receiving_user, -> (user_id) {
+    where('initiating_user_id = ? OR receiving_user_id = ?', user_id, user_id)
+  }
+
+  scope :from_company_account, -> (enabled){
+    if ['1', 1].include?(enabled)
+      where initiating_account_type: ["ItzCashCompanyAccount", "YesBankCompanyAccount"]
+    end
+  }
+
   scope :vendor_payments, -> (enabled){
     if enabled == 1 || enabled == '1'
       where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
@@ -114,6 +124,8 @@ class PaymentOrder < ActiveRecord::Base
     where('processed_at >= ? AND processed_at <= ?', date_from, date_to)
   }
 
+  scope :from_disburse, -> {where application: ["fd", "ft"]}
+  scope :from_vendor_payments, -> {where application: "vp"}
 
   delegate :cancelled?, :completed?, :failed?, :pending?, :in_progress?, :scheduled?, :partially_completed?, to: :payment_order_status
   delegate :amount_requested_value, to: :amount_requested
@@ -155,6 +167,20 @@ class PaymentOrder < ActiveRecord::Base
   # for convenience, just picks this up from the individual payments
   def initiating_account
     self.payments.first.initiating_account
+  end
+
+  def initiating_account_name
+    initiating_account = self.initiating_account
+    case initiating_account.class.name
+      when "ItzCashCompanyAccount"
+        return "Company Credits (Card Transfer Pocket)"
+      when "UserWallet"
+        return "#{initiating_account.user.first_name}'s Finly Money (Card Transfer Pocket)"
+      when "VendorPaymentWallet"
+        return "#{initiating_account.user.first_name}'s Finly Money (Bank Transfer Pocket)"
+      else
+        return ""
+    end
   end
 
   # again, for convenience, and only applies to bank transfer poyments

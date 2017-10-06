@@ -50,6 +50,8 @@
 
 
 
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -99,6 +101,8 @@ class User < ActiveRecord::Base
   has_one :itz_cash_dmt_sender
   has_one :user_panel_subscription, dependent: :destroy
   has_one :cash_on_hand, dependent: :destroy
+  has_many :admin_summary_mail_configs, dependent: :destroy
+  has_many :manager_summary_mail_configs, dependent: :destroy
 
   has_many :bank_accounts, as: :account_owner
   has_many :authentications
@@ -181,11 +185,13 @@ class User < ActiveRecord::Base
   # scope :only_vendor_payment_creditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.finance_manager_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments)) }
   scope :only_admins, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.user_role_id = ?', MappingPurpose.id_for(:expense_management)) }
   scope :only_vendor_payment_admins, -> { with_roles.joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true).where('user_role_mappings.user_role_id = ?', UserRole.admin_id).where('user_role_mappings.purpose_id = ?', MappingPurpose.id_for(:vendor_payments)) }
+  scope :only_auditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.id_for(:auditor)) }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
   scope :invited_by, ->(id) { where invited_by_id: id }
   scope :with_vendor_payments_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
   scope :with_expense_management_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
+  scope :include_all_accounts_with_balance, -> { includes(cards: [:card_balance], wallet: [:balance], cash_on_hand: [:balance], bank_wallet: [:balance]) }
 
   # Users having cards assigned with the given program
   scope :with_cards_having_card_program, ->(id) do
@@ -348,6 +354,7 @@ class User < ActiveRecord::Base
   scope :only_employees, -> { where('user_role_mappings.user_role_id = ?', UserRole.employee_id).uniq }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :with_balance_sheet, -> { includes(:balance_sheet => [:cash_in_hand, :approved_reports_total]) }
+  scope :with_bank_accounts, -> { joins(:bank_accounts) }
 
   scope :filter_disburse, -> (enabled) {
     if enabled == '1' || enabled == 1

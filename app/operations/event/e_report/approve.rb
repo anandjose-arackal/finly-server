@@ -15,7 +15,7 @@ class Event::EReport::Approve < Event::EReport::Base
   end
 
   def action_name
-    "Report Approved"
+    'Report Approved'
   end
 
   def init

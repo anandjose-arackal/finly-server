@@ -29,4 +29,6 @@ json.payment do
   json.processable_amount @result.processable_amount
   json.scheduled_at @result.scheduled_at_formatted
   json.created_at @result.created_at_formatted
+  json.initiating_account @result.initiating_account
+  json.initiating_account_type_id @result.initiating_account_type_id
 end

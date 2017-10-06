@@ -19,4 +19,9 @@ class AutocompleteController < ApplicationController
     @result = Autocomplete::Cards.(current_user, params)
     respond
   end
+
+  def beneficiaries
+    @result = Autocomplete::Beneficiaries.(urrent_user, params)
+    respond
+  end
 end

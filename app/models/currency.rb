@@ -19,6 +19,15 @@ class Currency < ActiveRecord::Base
     1
   end
 
+  def as_json(options={})
+      {
+          id: self.id,
+          country: self.country,
+          country_code: self.country_code,
+          symbol: self.symbol
+      }
+  end
+
   CURRENCIES = [
       {
           country: "India Rupee",

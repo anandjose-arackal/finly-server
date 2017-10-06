@@ -15,6 +15,7 @@ if @result.success?
       json.name data[:category][:name]
     end
     json.reimbursable data[:reimbursable]
+    json.from_cash_on_hand data[:from_cash_on_hand]
     json.amount do
       json.value data[:amount]&.dig(:value)
       json.currency do

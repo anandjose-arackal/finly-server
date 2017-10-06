@@ -30,7 +30,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   end
 
-  def validates
+  def validate
     # confirm that the bank transaction is, in fact in processing state
     unless bank_transaction.processing?
       add_message :error, "This transaction is not in processing state"
@@ -54,6 +54,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
+        # destroying previous messages first, before adding the failure message
+        payment.system_messages.destroy_all
+        # adding message regarding payment refund
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
@@ -82,14 +85,19 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         Event::EBankPaymentRequest::CreditConfirm.(bank_payment_request.owner, bank_payment_request: bank_payment_request)
       end
     end
+
+    # trigger event for sending mailer to the receiver of the payment
+    if payment.completed?
+      op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment)
+    end
   end
 
   private
 
   def create_refund_payment
     admin_user = AdminUser.find_by(email: 'vivek.a@finly.io')
-    self.payment_request = PaymentRequest.(admin_user, nil, company.yes_bank_company_account.class.name, :credit, :corporate_balance_refund, company_id: self.company.id)
-    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(nil, company.yes_bank_company_account, self.bank_transaction.amount_value))
+    self.payment_request = ::PaymentRequest.(admin_user, nil, company.yes_bank_company_account.class.name, :credit, :corporate_balance_refund, company_id: self.company.id)
+    self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(nil, company.yes_bank_company_account, self.bank_transaction.amount_value))
 
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     if op.success?

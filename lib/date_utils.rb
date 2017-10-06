@@ -63,4 +63,8 @@ class DateUtils
     date.strftime('%d %b %Y')
   end
 
+  def self.wday_for(day)
+
+  end
+
 end

@@ -1,9 +1,7 @@
 class BankTransfer::VendorsController < ApplicationController
 
-  before_action {finly_authorize! :web}
-
   def create
-    @result = BankTransfer::Vendor::Create.(current_user, params)
+    @result = BankTransfer::Vendors::Create.(current_user, params)
     if @result.success?
       respond response: :success
     else
@@ -12,7 +10,7 @@ class BankTransfer::VendorsController < ApplicationController
   end
 
   def update
-    @result = BankTransfer::Vendor::Update.(current_user, params)
+    @result = BankTransfer::Vendors::Update.(current_user, params)
     if @result.success?
       respond response: :success
     else
@@ -20,18 +18,17 @@ class BankTransfer::VendorsController < ApplicationController
     end
   end
 
-  def index
-    @result = BankTransfer::Vendor::Index.(current_user, params)
-    respond
+  def destroy
+    @result = BankTransfer::Vendors::Destroy.(current_user, params)
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
-  def count
-    @result = BankTransfer::Vendor::Count.(current_user, params)
-    render json: @result.as_json
-  end
-
-  def show
-    @result = BankTransfer::Vendor::Transfers::Show.(current_user, params)
+  def show_transfers
+    @result = BankTransfer::Vendors::Transfers::Show.(current_user, params)
     respond
   end
 

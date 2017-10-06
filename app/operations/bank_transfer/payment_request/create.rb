@@ -159,6 +159,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               value: order_details[:amount],
               currency_id: Currency.first.id
           },
+          note: order_details[:note],
           date: DateUtils.local_date,
       }
     end
@@ -166,13 +167,15 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   end
 
   def retrieve_bank_account(order_details)
-    ba = BankAccount.find_by(account_number: order_details[:bank_account_number],
+    ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number],
                              company_id: self.company_id)
     vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
 
     self.unauthorized_vendors_presence = false
     if ba.nil?
-      ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc], account_owner: vendor, company_id: self.company_id)
+      ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc],
+                              account_owner: vendor, company_id: self.company_id, default_account: true)
+      
       # setting unauthorized vendors as true so that after creation, the approval flow is mandated
       self.unauthorized_vendors_presence = true
     end
