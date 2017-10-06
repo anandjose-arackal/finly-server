@@ -52,7 +52,7 @@ class FinlyTransaction < ActiveRecord::Base
   scope :with_date_range, -> (start_date, end_date) { where('finly_transactions.date >= ? AND finly_transactions.date <= ?', start_date, end_date) }
   scope :before_date, -> (date) { where('finly_transactions.date < ?', date) }
   scope :sum_amounts, -> { joins(:amount).sum(:value) }
-  scope :success, -> { where status_id: TransactionStatus.id_for(:success) }
+  scope :successsuccess, -> { where status_id: TransactionStatus.id_for(:success) }
   scope :with_reference_id, -> (ref_id) { where transaction_reference_id: ref_id }
   scope :through_finly_dashboard, -> { where payment_purpose_id: PaymentPurpose.ids_for([:advance_outside_finly,
                                                                                :reimbursement_outside_finly, :advance,
@@ -63,7 +63,7 @@ class FinlyTransaction < ActiveRecord::Base
   scope :joins_amounts, -> { joins :amount }
   scope :group_by_purpose, -> { group :payment_purpose_id }
   scope :purpose_wise_amount, -> { joins_amounts.group_by_purpose.sum('amounts.value') }
-  scope :sort_date_asc, -> { unscope(:order).order(date: :asc) }
+  scope :sort_date_asc, -> { unscope(:order).order(id: :asc) }
   scope :limit_to_one, -> { limit 1 }
 
   before_create do
