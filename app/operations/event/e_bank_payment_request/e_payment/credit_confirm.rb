@@ -47,7 +47,7 @@ class Event::EBankPaymentRequest::EPayment::CreditConfirm < Event::EBankPaymentR
   end
 
   def mailer_body(user)
-    "You have received a credit of ₹#{payment.amount_value} via #{payment.payment_mode} from #{receiving_user.company.name} in your bank account: #{payment.receiving_account.account_number}. <br/><br/>
+    "You have received a credit of ₹#{payment.amount_value} via #{payment.payment_mode} from #{receiving_user.company.name} in your bank account: #{payment.receiving_account.account_number.last(4)}. <br/><br/>
     The transaction number for your reference is: #{payment.reference_resource.bank_reference_number}"
   end
 

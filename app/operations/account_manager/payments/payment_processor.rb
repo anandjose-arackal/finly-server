@@ -21,12 +21,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   end
 
   def init
-    # setting the company id based on whether it's a user or an AdminUser
-    if user.is_a?(User)
-      self.company_id = user.company_id
-    else
-      self.company_id = payment_request.company_id
-    end
 
     # create the payment order object and associated payments, if the payment request is present
     self.payment_request = params[:payment_request]
@@ -37,6 +31,15 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.options = {}
       self.options[:bank_transfer_type] = params[:bank_transfer_type]
       self.background = payment_request.background
+    end
+
+    # setting the company id based on whether it's a user or an AdminUser
+    if user.is_a?(User)
+      self.company_id = user.company_id
+      self.company = user.company
+    else
+      self.company_id = payment_request.company_id
+      self.company = Company.find_by(id: self.company_id)
     end
 
     # in case there is not payment request, use the payment order that is passed
