@@ -24,4 +24,7 @@ json.array! @result.payment_orders.each do |item|
   end
   json.amount_processed item.amount_processed
   json.amount_requested item.amount_requested
+  json.initiating_account item.initiating_account_name
+  json.initiating_user item.initiating_user.name
+  json.payment_purpose item.payment_purpose.name.humanize
 end

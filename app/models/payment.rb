@@ -29,15 +29,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -327,6 +318,10 @@ class Payment < ActiveRecord::Base
 
   def cash_on_hand_credit?
     self.payment_purpose_id == PaymentPurpose.id_for(:cash_advance)
+  end
+
+  def retriable?
+    self.failed?
   end
 
   private

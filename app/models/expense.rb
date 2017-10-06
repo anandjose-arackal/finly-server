@@ -31,6 +31,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -288,7 +289,11 @@ class Expense < ActiveRecord::Base
 
   scope :verified, -> { where expense_status_id: ExpenseStatus.id_for(:verified) }
   scope :unreported, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected]) }
+  scope :reported, -> { where expense_status_id: ExpenseStatus.ids_for([:submitted, :verified]) }
   scope :unverified, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :submitted]) }
+
+  scope :joins_amount, -> { joins(:amount) }
+  scope :sum_amount, -> { joins_amount.sum(:value) }
 
   scope :joins_card_expenses, -> { only_card_expenses.joins(:card_expense) }
   scope :pluck_card_transaction_id, -> { joins_card_expenses.pluck('card_expense.card_transaction_id') }

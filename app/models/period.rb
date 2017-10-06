@@ -43,4 +43,35 @@ class Period < ActiveRecord::Base
     end
   end
 
+  def day?
+    self.id == Period.id_for(:day)
+  end
+
+  def week?
+    self.id == Period.id_for(:week)
+  end
+
+  def month?
+    self.id == Period.id_for(:month)
+  end
+
+  def quarter?
+    self.id == Period.id_for(:quarter)
+  end
+
+  def year?
+    self.id == Period.id_for(:year)
+  end
+
+  def hour?
+    self.id == Period.id_for(:hour)
+  end
+
+  def as_json(options= {})
+    {
+        id: self.id,
+        name: self.name
+    }
+  end
+
 end

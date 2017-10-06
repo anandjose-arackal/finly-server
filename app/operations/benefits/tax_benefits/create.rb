@@ -2,7 +2,7 @@
 # and pass it to the payment processor
 class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
   attr_accessor :order_data, :processed_order_data, :payment_order, :scheduled_at,
-                :payment_purpose
+                :payment_purpose, :initiating_account
 
   def pre_validate
     super
@@ -27,9 +27,10 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
   def init
     self.order_data = params[:payment_order]
     self.processed_order_data = Benefits::TaxBenefits::Process.(config, user, scheduled_at: params[:scheduled_at],
-        payment_order: self.order_data, card_program_id: card_program_id)
+        payment_order: self.order_data, card_program_id: card_program_id, initiating_account_type: params[:initiating_account_type])
     self.scheduled_at = self.processed_order_data.scheduled_at
     self.payment_purpose = retrieve_payment_purpose
+    self.initiating_account = retrieve_initiating_account
   end
 
   def validate
@@ -56,11 +57,8 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
   end
 
   def process
-
     initiating_user = user
-    # todo update this to dynamically pick an initiating_account
-    initiating_account = user.company.itz_cash_company_account
-
+    
     payment_request = PaymentRequest.(initiating_user, initiating_account, Card.name, :credit, payment_purpose, {scheduled_at: self.scheduled_at, background: true})
     self.processed_order_data.processed_order.each do |item|
 
@@ -108,6 +106,17 @@ class Benefits::TaxBenefits::Create < Benefits::TaxBenefits::Base
         return :reimbursement
       else
         # do nothing?
+    end
+  end
+
+  def retrieve_initiating_account
+    case params[:initiating_account_type]
+      when 1, '1'
+        return user.company.itz_cash_company_account
+      when 2, '2'
+        return user.wallet
+      else
+        # return "#{user.first_name}'s Finly Money'"
     end
   end
 

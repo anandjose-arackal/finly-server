@@ -898,7 +898,8 @@
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)             bank_transfer/bank_payment_requests#review
 #               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)             bank_transfer/bank_payment_requests#credit
 #      bank_transfer_bank_payment_request_add_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/add_beneficiary(.:format)    bank_transfer/bank_payment_requests#add_beneficiary
-#   bank_transfer_bank_payment_request_remove_beneficairy PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_beneficiary(.:format) bank_transfer/bank_payment_requests#remove_beneficiary
+#   bank_transfer_bank_payment_request_remove_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_beneficiary(.:format) bank_transfer/bank_payment_requests#remove_beneficiary
+#                bank_transfer_bank_payment_request_retry PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/retry(.:format)              bank_transfer/bank_payment_requests#retry
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                             bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                             bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                                         bank_transfer/bank_payment_requests#new
@@ -935,6 +936,7 @@
 #                                                         PUT    /bank_transfer/bank_accounts/:id(.:format)                                                 bank_transfer/bank_accounts#update
 #                                                         DELETE /bank_transfer/bank_accounts/:id(.:format)                                                 bank_transfer/bank_accounts#destroy
 #                            bank_transfer_payments_count GET    /bank_transfer/payments/count(.:format)                                                    bank_transfer/payments#count
+#                             bank_transfer_payment_retry PATCH  /bank_transfer/payments/:payment_id/retry(.:format)                                        bank_transfer/payments#retry
 #                                  bank_transfer_payments GET    /bank_transfer/payments(.:format)                                                          bank_transfer/payments#index
 #                                                         POST   /bank_transfer/payments(.:format)                                                          bank_transfer/payments#create
 #                               new_bank_transfer_payment GET    /bank_transfer/payments/new(.:format)                                                      bank_transfer/payments#new
@@ -2238,7 +2240,8 @@ Rails.application.routes.draw do
       patch 'review', to: 'bank_payment_requests#review', as: :review
       patch 'credit', to: 'bank_payment_requests#credit', as: :credit
       patch 'add_beneficiary', to: 'bank_payment_requests#add_beneficiary', as: :add_beneficiary
-      patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficairy
+      patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficiary
+      patch 'retry', to: 'bank_payment_requests#retry', as: :retry
     end
 
     get 'account_owners/count', to: 'account_owners#count'
@@ -2252,7 +2255,9 @@ Rails.application.routes.draw do
     resources :bank_accounts
 
     get 'payments/count', to: 'payments#count'
-    resources :payments
+    resources :payments do
+      patch 'retry', to: 'payments#retry', as: :retry
+    end
 
     get 'users/count', to: 'users#count'
     get 'users/managers', to: 'users#get_managers'
@@ -2273,6 +2278,14 @@ Rails.application.routes.draw do
     end
   end
 
+
+  namespace :summary do
+    get 'configurations', to: 'configuration#index'
+    post 'configurations/admin', to: 'configuration#admin_create'
+    delete 'configurations/admin/:id', to: 'configuration#admin_destroy'
+    post 'configurations/manager', to: 'configuration#manager_create'
+    delete 'configurations/manager/:id', to: 'configuration#manager_destroy'
+  end
 
 
 

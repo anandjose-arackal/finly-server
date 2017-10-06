@@ -65,6 +65,7 @@ class Receipt::ReceiptEmails::Show < BaseOperation
                 name: expense.category.name
             },
             reimbursable: expense.reimbursable,
+            from_cash_on_hand: expense.from_cash_on_hand,
             amount: {
                 value: expense.amount.value,
                 currency: {
