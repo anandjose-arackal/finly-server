@@ -48,10 +48,11 @@ class Report::Update < Report::Base
   end
 
   def process
-    # return unless update_param.present?
+    original_policy_id = report.policy_id
     if report.update_attributes(update_param)
-      if params[:custom_fields].present?
-        CustomField::SetFields.(report, FieldParentType.id_for(:report), custom_fields: params[:custom_fields], save: true)
+      updated_policy_id = report.policy_id
+      if params[:custom_fields].present? or original_policy_id != updated_policy_id
+        CustomField::SetFields.(report, FieldParentType.id_for(:report), custom_fields: params[:custom_fields], save: true, reset_fields: true)
       end
     else
       messages[:error] = report.errors.full_messages
