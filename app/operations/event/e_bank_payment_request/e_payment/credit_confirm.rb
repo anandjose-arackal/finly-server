@@ -5,6 +5,10 @@ class Event::EBankPaymentRequest::EPayment::CreditConfirm < Event::EBankPaymentR
 
   attr_accessor :payment, :receiving_user
 
+  def event_id
+    NotifierType.id_for(:bank_payment_request_credit_confirm)
+  end
+
   def pre_validate
     unless user.present?
       add_message :error, 'User not found'
