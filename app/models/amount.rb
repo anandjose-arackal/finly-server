@@ -197,6 +197,8 @@ class Amount < ActiveRecord::Base
     end
   end
 
+  default_scope { unscope(:where) }
+
   # method that returns the amount value
   def amount_value
     self.precision_value
