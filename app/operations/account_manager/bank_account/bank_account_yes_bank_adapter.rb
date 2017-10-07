@@ -69,6 +69,13 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     []
   end
 
+  def on_completion(options)
+    payment = options[:payment]
+    if payment.completed?
+      op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: payment)
+    end
+  end
+
   private
 
   def create_bank_transaction(payment, transfer_request)
