@@ -22,10 +22,6 @@ class Expense::Manual::Create < Expense::Manual::Base
     if amount_value.present? and amount_value <= 0
       add_message :error, 'Amount cannot be less than or equal to 0'
     end
-    date = params[:expense][:date]
-    if date.blank?
-      add_message :error, "Date cannot be blank"
-    end
   end
 
   def init
@@ -56,13 +52,7 @@ class Expense::Manual::Create < Expense::Manual::Base
 
     # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
     if ['1', 1].include?(expense_params[:from_cash_on_hand])
-      raw_amount = expense_params[:amount_attributes][:value].to_f
-      # check if the expense is today, and if the currency is not INR
-      if (Date.parse(expense_params[:date]) != DateUtils.local_date) && !(['1', 1].include?(expense_params[:amount_attributes][:currency_id]))
-        add_message :error, "Expenses that are not in INR, and spent from cash on hand can only be added the next day"
-        return
-      end
-      amount = CurrencyConversionUtils.converted_amount(expense_params[:date], raw_amount)
+      amount = expense_params[:amount_attributes][:value].to_f
       unless user.cash_on_hand.balance_value > amount
         add_message :error, "You do not have enough balance in your Cash On Hand to mark this expense against it"
         return

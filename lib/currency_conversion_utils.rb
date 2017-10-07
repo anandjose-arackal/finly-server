@@ -6,7 +6,7 @@ class CurrencyConversionUtils
     date = Date.parse(date) unless date.is_a?(Date)
     rate = CurrencyConversionRate.find_by(date: date)
     if rate.nil?
-      
+
     end
     converted_amount = CurrencyConversionRate.find_by(date: date) * amount
   end
