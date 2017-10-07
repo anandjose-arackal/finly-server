@@ -72,7 +72,7 @@ class Event::EReport::Base < Event::SetNotifier
 
   def allow_mailer(user, configuration)
     val = super(user, configuration)
-    val and (user.manager_summary_mail_config.reports.blank? or report.user == user)
+    val and (user.manager_summary_mail_configs.reports.blank? or report.user == user)
   end
 
   def process
