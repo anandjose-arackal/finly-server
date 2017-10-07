@@ -56,7 +56,6 @@ class Event::EReport::Base < Event::SetNotifier
   end
 
   def report_view_role(user)
-
   end
 
   def set_presenter_params(user)
@@ -68,6 +67,46 @@ class Event::EReport::Base < Event::SetNotifier
     params[:role_id] = report_view_role(user)
     if params[:email_authorization]
       params[:action_url_token] = get_token(user)
+    end
+  end
+
+  def allow_mailer(user, configuration)
+    val = super(user, configuration)
+    val and (user.manager_summary_mail_configs.reports.blank? or report.user == user)
+  end
+
+  def process
+    # sending mailers
+    users = mailer_affected_users
+    if users.present?
+      users.each do |user|
+        next if user.blank? # or not user.is_a?(User)
+        user_event_configuration = load_configuration(user)
+        if allow_mailer(user, user_event_configuration) && user.email.present?
+          send_mailer(user)
+        end
+      end
+    end
+
+    # sending push notifications
+    users = push_notification_affected_users
+    if users.present?
+      users.each do |user|
+        next if user.blank?# or not user.is_a?(User)
+        user_event_configuration = load_configuration(user)
+        if allow_push_notification(user, user_event_configuration)
+          send_push_notification(user)
+        end
+      end
+    end
+
+    # sending notifications
+    users = notification_affected_users
+    if users.present?
+      users.each do |user|
+        next if user.blank? # or not user.is_a?(User)
+        set_notification(user)
+      end
     end
   end
 

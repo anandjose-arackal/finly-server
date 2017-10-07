@@ -62,6 +62,11 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
     params[:role_id] = money_request_view_role(user)
   end
 
+  def allow_mailer(user, configuration)
+    val = super(user, configuration)
+    val and (user.manager_summary_mail_config.money_requests.blank? or report.user == user)
+  end
+
   class Event::EMoneyRequest::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
     attr_accessor :money_request, :user, :body_val, :subject_val, :button_val, :event_id,
                   :action_name, :comment_body, :role_id, :view_url, :company
