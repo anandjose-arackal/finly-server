@@ -27,7 +27,7 @@ class User::Balances::Show < User::Base
     case current_app
       when 'em'
         # Adding expense management balances in this section if it's enabled for that user
-        if selected_user.company.cards_enabled? && selected_user.expense_management_enabled?
+        if selected_user.company.d_code_enabled? && selected_user.expense_management_enabled?
           set_itz_cash_balances
         end
         if selected_user.cards.present?
