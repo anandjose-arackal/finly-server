@@ -10,11 +10,12 @@
 
 
 
+
 class ExpenseType < ActiveRecord::Base
 
   validates :name, presence: true
 
-  VALUES = {manual: 1, card: 2, distance: 3, time: 4, per_diem: 5}
+  VALUES = {manual: 1, card: 2, distance: 3, time: 4, per_diem: 5, cash: 1}
 
 
   def self.id_for(type)

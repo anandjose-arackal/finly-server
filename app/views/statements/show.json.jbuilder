@@ -5,7 +5,15 @@ json.credits_count AmountUtils.format(@result.credits_count, placeholder: '-')
 json.debits_count AmountUtils.format(@result.debits_count, placeholder: '-')
 json.credit_amount AmountUtils.format(@result.credit_amount, placeholder: '-')
 json.debit_amount AmountUtils.format(@result.debit_amount, placeholder: '-')
-json.summary @result.summary
+json.summary do
+  summary = @result.summary
+  json.credits do
+    json.array! summary[:credits].map{|item| "#{item[:name]}: <b>#{item[:amount]}</b>"}
+  end
+  json.debits do
+    json.array! summary[:debits].map{|item| "#{item[:name]}: <b>#{item[:amount]}</b>"}
+  end
+end
 json.finly_transactions do
   json.array! @result.account_transactions do |finly_transaction|
     json.reference_id finly_transaction.transaction_reference_id
@@ -29,5 +37,6 @@ json.finly_transactions do
         json.array! finly_transaction.system_messages
       end
     end
+    json.note finly_transaction.payment&.note
   end
 end

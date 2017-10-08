@@ -69,6 +69,13 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     []
   end
 
+  def on_completion(options)
+    payment = options[:payment]
+    if payment.completed?
+      op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: payment)
+    end
+  end
+
   private
 
   def create_bank_transaction(payment, transfer_request)
@@ -95,6 +102,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   end
 
   def create_system_message_for_processing(payment)
+    payment.system_messages.destroy_all
     payment.system_messages.create(system_message_type_id: SystemMessageType.id_for(:info),
                                   content: "Payment processed. Awaiting credit confirmation")
   end

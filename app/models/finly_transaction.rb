@@ -50,6 +50,7 @@ class FinlyTransaction < ActiveRecord::Base
   scope :debits, -> { where transaction_type_id: TransactionType.id_for(:debit) }
   scope :with_date, -> (date) { where(date: date) }
   scope :with_date_range, -> (start_date, end_date) { where('finly_transactions.date >= ? AND finly_transactions.date <= ?', start_date, end_date) }
+  scope :before_date, -> (date) { where('finly_transactions.date < ?', date) }
   scope :sum_amounts, -> { joins(:amount).sum(:value) }
   scope :success, -> { where status_id: TransactionStatus.id_for(:success) }
   scope :with_reference_id, -> (ref_id) { where transaction_reference_id: ref_id }
@@ -63,6 +64,7 @@ class FinlyTransaction < ActiveRecord::Base
   scope :group_by_purpose, -> { group :payment_purpose_id }
   scope :purpose_wise_amount, -> { joins_amounts.group_by_purpose.sum('amounts.value') }
   scope :sort_date_asc, -> { unscope(:order).order(date: :asc) }
+  scope :limit_to_one, -> { limit 1 }
 
   before_create do
     ref_id = payment&.reference_id
@@ -72,7 +74,7 @@ class FinlyTransaction < ActiveRecord::Base
     self.transaction_reference_id = ref_id
   end
 
-  default_scope { order(date: :desc).order(id: :desc) }
+  default_scope { order(id: :desc) }
 
   delegate :credit?, :debit?, to: :transaction_type
 

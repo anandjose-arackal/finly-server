@@ -5,7 +5,6 @@ class Expense::Manual::Create < Expense::Manual::Base
   attr_accessor :expense_params, :receipt
 
   # only employees can create expenses
-
   def authorized_user_types
     [:employee]
   end
@@ -50,6 +49,22 @@ class Expense::Manual::Create < Expense::Manual::Base
         add_message :error, 'Expense cannot be added to the report in this state'
       end
     end
+
+    # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
+    if ['1', 1].include?(expense_params[:from_cash_on_hand])
+      amount = expense_params[:amount_attributes][:value].to_f
+      unless user.cash_on_hand.balance_value > amount
+        add_message :error, "You do not have enough balance in your Cash On Hand to mark this expense against it"
+        return
+      end
+    end
+  end
+
+  def pre_process
+    # if the expense is from cash on hand, mark it as non-reimbursable by default
+    if ['1', 1].include?(expense_params[:from_cash_on_hand])
+      expense_params[:reimbursable] = false
+    end
   end
 
   def process
@@ -75,6 +90,17 @@ class Expense::Manual::Create < Expense::Manual::Base
     end
 
     Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: self.expense)
+
+    # # check if the expense is from cash on hand, and deduct the respective amount from the COH respectively
+    # if expense.from_cash_on_hand
+    #   payment_request = PaymentRequest.(user, nil, "CashOnHand", :debit, :balance_clearance_against_cash_on_hand)
+    #   payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, expense.amount_value))
+    #   op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    #   if op.success?
+    #     payment = op.payment_order.payments.first
+    #     payment.update(reference_resource: self.expense)
+    #   end
+    # end
 
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?
@@ -129,10 +155,6 @@ class Expense::Manual::Create < Expense::Manual::Base
     custom_fields[:save] = save
     CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
   end
-
-  # def success
-  #   Expense::Manual::Create::CreatePresenter.new(expense)
-  # end
 
   class Expense::Manual::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :expense

@@ -21,6 +21,7 @@
 #  link                 :text(65535)
 #  view_role_id         :integer
 #  message              :text(65535)
+#  application          :string(255)
 #
 
 class Notification < ActiveRecord::Base
@@ -37,6 +38,7 @@ class Notification < ActiveRecord::Base
   scope :expense, -> {where(notification_type_id: NotificationType.id_for(:expense))}
   scope :settlement, -> {where(notification_type_id: NotificationType.id_for(:settlement))}
   scope :advance_request, -> {where(notification_type_id: NotificationType.id_for(:advance_request))}
+  scope :with_application, -> (application) {where application: application&.to_s}
 
   accepts_nested_attributes_for :amount
 
@@ -66,6 +68,8 @@ class Notification < ActiveRecord::Base
         object = "Finly Money"
       when "Payment"
         object = "Cash"
+      when "PaymentOrder", "Payment Order"
+        object = "Payment Order"
       else
         # do nothing
     end
@@ -212,6 +216,12 @@ class Notification < ActiveRecord::Base
       when NotificationActionType.id_for(:notify_quickbooks_sync_partial_success)
         content = "Syncing with Quickbooks was partially successful - refer to reports list to see what all were successful"
         return content
+      when NotificationActionType.id_for(:notify_credit_confirmation)
+        bank_payment_request = BankPaymentRequest.unscoped.find_by(id: self.object_id)
+        content = "Credit for one of your payments in Payment Order: #{bank_payment_request.name} was successful!"
+        return content
+      when NotificationActionType.id_for(:notify_credit_failure)
+        # todo
       else
         action = ""
     end
@@ -260,6 +270,23 @@ class Notification < ActiveRecord::Base
         if action_type_id == NotificationActionType.id_for(:notify_awaiting_approval)
           object_name += " and is awaiting your further approval"
         end
+      when "PaymentOrder", "Payment Order"
+        if action_type_id == NotificationActionType.id_for(:notify_credit)
+          object = " against your payment order"
+        else
+          object = " payment order"
+        end
+        bpr = BankPaymentRequest.unscoped.find_by(id: self.object_id)
+        object_name = " : \"#{bpr.name}\""
+        if action_type_id == NotificationActionType.id_for(:notify_auto_approve)
+          object_name += " has been auto approved"
+        end
+        if action_type_id == NotificationActionType.id_for(:notify_awaiting_approval)
+          object_name += " and is awaiting your further approval"
+        end
+      when "PaymentOrderItem"
+        # this is when an individual payment order item is rejected - will hold its details
+         # todo - add logic to handle this
       when "Expense"
         object = " an expense"
         e = Expense.unscoped.find_by(id: self.object_id)
@@ -297,18 +324,36 @@ class Notification < ActiveRecord::Base
 
     # base = Constants::BASE_URL
     view = ""
-    case view_role_id
-      when 3
-        view = "\"manager\""
-      when 2
-        view = "\"finance_manager\""
-      when 1
-        view = "\"admin\""
-      else
-        view = "\"personal\""
+
+    # now depending on the object type, the URL will be loaded
+    if self.object_type == "PaymentOrder" || self.object_type == "Payment Order"
+      case view_role_id
+        when 3
+          view = "\"reviewer\""
+        when 2
+          view = "\"creditor\""
+        when 1
+          view = "\"admin\""
+        else
+          view = "\"initiator\""
+      end
+      suffix = "/params={\"view\":#{view},\"ref\":1,\"n_id\":#{self.id}"
+      path = ""
+    else
+      case view_role_id
+        when 3
+          view = "\"manager\""
+        when 2
+          view = "\"finance_manager\""
+        when 1
+          view = "\"admin\""
+        else
+          view = "\"personal\""
+      end
+      suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id}"
+      path = ""
     end
-    suffix = "/params={\"view\":" + view + ",\"preview\":true,\"ref\":1,\"n_id\":#{self.id}"
-    path = ""
+
     case self.path_object_type
       when "Report"
         path_object = Report.unscoped.find_by(id: self.path_object_id)
@@ -344,6 +389,13 @@ class Notification < ActiveRecord::Base
           # do nothing
         else
           path = "employees"
+        end
+      when "PaymentOrder", "Payment Order"
+        path_object = BankPaymentRequest.unscoped.find_by(id: self.path_object_id)
+        if path_object.blank?
+          path = "orders"
+        else
+          path = "orders/#{self.path_object_id}"
         end
       else
         # do nothing

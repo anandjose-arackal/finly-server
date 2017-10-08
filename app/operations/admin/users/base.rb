@@ -4,7 +4,8 @@ class Admin::Users::Base < Admin::Base
   class Admin::Users::Base::UserPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :created_user, :selected_user, :cards, :policies, :mapping,
                   :managers, :finance_managers, :wallet, :user_panel_subscription,
-                  :itz_cash_card_programs
+                  :itz_cash_card_programs, :reviewers, :creditors,
+                  :mapping_em, :mapping_vp
 
     def init
       self.created_user = params[:created_user]
@@ -20,8 +21,22 @@ class Admin::Users::Base < Admin::Base
         self.mapping << op.map
       end
 
+      # extracting the mapping separately
+      self.mapping_em = []
+      self.mapping_vp = []
+      self.policies.each do |policy|
+        op = Admin::Policy::Mappings::Show.(user, user: selected_user, policy: policy, purpose_id: MappingPurpose.id_for(:expense_management))
+        self.mapping_em << op.map
+      end
+      self.policies.default.each do |policy|
+        op = Admin::Policy::Mappings::Show.(user, user: selected_user, policy: policy, purpose_id: MappingPurpose.id_for(:vendor_payments))
+        self.mapping_vp << op.map
+      end
+
       self.managers = selected_user.company.users.signed_up.with_roles.only_managers
       self.finance_managers = selected_user.company.users.signed_up.with_roles.only_finance_managers
+      self.reviewers = selected_user.company.users.signed_up.with_roles.only_vendor_payment_reviewers
+      self.creditors = selected_user.company.users.signed_up.with_roles.only_vendor_payment_creditors
       self.itz_cash_card_programs = ItzCashCardProgram.all
     end
 
@@ -39,7 +54,7 @@ class Admin::Users::Base < Admin::Base
             status: {id: card.card_status.id, name: card.card_status.name}
         }
         unless card.assigned?
-          assign_request = card.card_assign_requests.with_card_owner_id(selected_user.id)
+          assign_request = card.card_assign_requests.with_card_owner_id(selected_user.id).first
           if assign_request.present?
             data[:assign_request] = {
                 id: assign_request.id,
@@ -56,7 +71,7 @@ class Admin::Users::Base < Admin::Base
 
     def individual_kyc_data
       data = {}
-      if selected_user.individual_kyc.kyc_status_id > 1
+      if selected_user.individual_kyc.present? && selected_user.individual_kyc.kyc_status_id > 1
         data[:id_proof] = {
           url: selected_user.individual_kyc.id_proof.url,
           file_type: selected_user.individual_kyc.id_proof.content_type

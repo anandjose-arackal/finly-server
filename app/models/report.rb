@@ -28,9 +28,12 @@
 #  reimbursable_expenses_total_id     :integer
 #  card_expenses_total_id             :integer
 #  non_reimbursable_expenses_total_id :integer
-#  synced_with_quickbooks             :boolean
 #  sync_status_id                     :integer
 #
+
+
+
+
 
 
 
@@ -152,6 +155,8 @@ class Report < ActiveRecord::Base
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
   scope :sort_for_personal, -> { joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
+
+  scope :awaiting_approval_of_user, ->(user_id, role_id){ where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
 
   delegate :status_name, to: :status
 
@@ -351,6 +356,10 @@ class Report < ActiveRecord::Base
 
   def only_card_expenses?
     self.expenses.count == self.expenses.only_card_expenses.count
+  end
+
+  def only_cash_on_hand_expenses?
+    self.expenses.count == self.expenses.spent_from_cash_on_hand.count
   end
 
   def synced_with_quickbooks?

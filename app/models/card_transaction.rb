@@ -69,7 +69,10 @@ class CardTransaction < ActiveRecord::Base
   scope :credits, -> { where transaction_type: 'Credit' }
   scope :on_date, -> (date) { where('DATE(transaction_timestamp) = ?', date) }
   scope :with_date_range, -> (start_date, end_date) { where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_date, end_date) }
+  scope :joins_transaction_amount, -> { joins(:transaction_amount) }
   scope :joins_billing_amount, -> { joins(:billing_amount) }
+  scope :sum_transaction_amount, -> { joins_transaction_amount.sum(:value) }
+  scope :sum_billing_amount, -> { joins_billing_amount.sum(:value) }
   scope :successful, -> {where.not success: false}
   scope :failed, -> {where success: false}
 
@@ -145,7 +148,7 @@ class CardTransaction < ActiveRecord::Base
   end
 
   def refund?
-    if self.merchant_name.include?('Refund') || self.merchant_name.include?('refund')
+    if CardTransaction.refunds.include?(self)
       if self.transaction_type == 'Credit'
         return true
       end

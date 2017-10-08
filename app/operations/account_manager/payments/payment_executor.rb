@@ -63,7 +63,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         end
       else
         unless receiving_account_adapter.balance >= payment.amount_value
-          add_message :error, "This source account does not have enough balance for this transaction"
+          add_message :error, "The source account does not have enough balance for this transaction"
           payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                         content: "Not enough funds in #{payment.receiving_account_type.to_s} to initiate the transfer").save
           return
@@ -103,6 +103,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
        # Debit failed
       add_message :error, debit_adapter.errors
       payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+      payment.system_messages.destroy_all
       debit_adapter.errors.each do |content|
         payment.system_messages.build(content: content,
                                       system_message_type_id: SystemMessageType.id_for(:error)).save
@@ -115,6 +116,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       # Credit failed
         add_message :error, credit_adapter.errors
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+        payment.system_messages.destroy_all
         credit_adapter.errors.each do |content|
           payment.system_messages.build(content: content,
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
@@ -124,11 +126,22 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       return
     end
 
+    # on success, execute whatever callbacks that need to be processed on success of this transaction
+    # essentially calling the on_completion account
+    if self.payment.completed?
+      debit_adapter.on_completion(payment: self.payment)
+      credit_adapter.on_completion(payment: self.payment)
+    end
+
     # todo - probably should be moved to the adapter itself
+    # i.e. if the payment was not modified in any way during the execution, update it here.
     if payment.in_progress?
-      # i.e. if the payment was not modified in any way during the execution, update it here.
       payment.update(payment_status_id: PaymentStatus.id_for(:completed))
     end
+
+  end
+
+  def post_process
 
   end
 

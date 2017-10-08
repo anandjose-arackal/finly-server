@@ -23,6 +23,10 @@ class Event::SetNotifier < Event::Base
     affected_users
   end
 
+  def sms_affected_users
+
+  end
+
   def send_push_notification(user)
 
   end
@@ -42,10 +46,16 @@ class Event::SetNotifier < Event::Base
     users = mailer_affected_users
     if users.present?
       users.each do |user|
-        next if user.blank? #or not user.is_a?(User)
+        next if user.blank? # or not user.is_a?(User)
         user_event_configuration = load_configuration(user)
-        if allow_mailer(user, user_event_configuration) && user.email.present?
-          send_mailer(user)
+        if user.is_a?(User)
+          if allow_mailer(user, user_event_configuration) && user.email.present?
+            send_mailer(user)
+          end
+        else
+          if user.email.present?
+            send_mailer(user)
+          end
         end
       end
     end
@@ -56,8 +66,10 @@ class Event::SetNotifier < Event::Base
       users.each do |user|
         next if user.blank?# or not user.is_a?(User)
         user_event_configuration = load_configuration(user)
-        if allow_push_notification(user, user_event_configuration)
-          send_push_notification(user)
+        if user.is_a?(User)
+          if allow_push_notification(user, user_event_configuration)
+            send_push_notification(user)
+          end
         end
       end
     end
@@ -66,8 +78,17 @@ class Event::SetNotifier < Event::Base
     users = notification_affected_users
     if users.present?
       users.each do |user|
-        next if user.blank? #or not user.is_a?(User)
+        next if user.blank? || !user.is_a?(User) # or not user.is_a?(User)
         set_notification(user)
+      end
+    end
+
+    # sending SMS messages
+    users = sms_affected_users
+    if users.present?
+      users.each do |user|
+        next if user.blank?
+        send_sms(user)
       end
     end
   end
@@ -101,7 +122,7 @@ class Event::SetNotifier < Event::Base
   end
 
   def load_configuration(user)
-    return nil if user.blank?
+    return nil if user.blank? || !user.is_a?(User)
     user.notifier_type_configurations.with_event(event_id).first rescue nil
   end
 

@@ -18,6 +18,7 @@ class Mobile::V1::Kyc::UserController < ApplicationController
     @result = KycProcess::User::Update.(current_user, formatted_request)
     unless @result&.success?
       respond response: :failure
+      return
     end
     @result = KycProcess::User::Submit.(current_user, formatted_request)
     respond response: @result&.success? ? :success : :failure

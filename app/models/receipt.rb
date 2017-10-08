@@ -48,6 +48,7 @@ class Receipt < ActiveRecord::Base
   scope :with_user_id, -> (user_ids) { where user_id: user_ids }
   scope :with_id, ->(id) { where id: id }
   scope :without_parent, -> { where(parent_id: nil) }
+  scope :with_parent, -> { where.not(parent_id: nil) }
   scope :with_expense_id, -> (expense_ids) { where(parent_type: 'Expense').where(parent_id: expense_ids) }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     unless date_from.blank? && date_to.blank?
@@ -109,6 +110,44 @@ class Receipt < ActiveRecord::Base
       type = "image"
     end
     type
+  end
+
+  def image_extension
+    case image_content_type
+      when 'image/jpg', 'image/jpeg'
+        return 'jpg'
+      when 'image/png'
+        return 'png'
+      when 'image/gif'
+        return 'gif'
+      when 'application/pdf'
+        return 'pdf'
+      when 'application/rtf'
+        return 'rtf'
+      else
+        nil
+    end
+  end
+
+  def export_image_file_name
+    file_name = "#{user_id}#{id}.#{image_extension}"
+    if parent.present?
+      if parent.is_a?(Expense)
+        expense = parent
+        if expense.manual? or expense.card?
+          file_name = "#{expense.user_id}#{id}_#{expense.merchant_name}.#{image_extension}"
+        elsif expense.distance?
+          file_name = "#{expense.user_id}#{id}_distance_expense.#{image_extension}"
+        elsif expense.time?
+          file_name = "#{expense.user_id}#{id}_time_expense.#{image_extension}"
+        elsif expense.per_diem?
+          file_name = "#{expense.user_id}#{id}_per_diem_expense.#{image_extension}"
+        end
+      elsif parent.is_a?(Report)
+        file_name = "#{user_id}#{id}_#{parent.name}"
+      end
+    end
+    file_name
   end
 
 end

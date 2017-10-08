@@ -4,6 +4,8 @@ class YesBankApi::Base < BaseHandler
                 :auth_password, :template, :config_path, :application_id,
                 :customer_id
 
+  ILLEGAL_CHARACTERS = ['%', ',' "/", '\\', '(', ')', '@', '&']
+
   def env_key
     'yes_bank'
   end

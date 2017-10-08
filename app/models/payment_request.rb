@@ -61,9 +61,9 @@ class PaymentRequest < NonPersistentModel
 
   def retrieve_payment_order_status
     if self.scheduled_at.present? && self.scheduled_at > DateUtils.local_date
-      return PaymentOrderStatus.id_for(:scheduled)
+      PaymentOrderStatus.id_for(:scheduled)
     else
-      return PaymentOrderStatus.id_for(:pending)
+      PaymentOrderStatus.id_for(:pending)
     end
   end
 
@@ -118,7 +118,8 @@ class PaymentRequest < NonPersistentModel
                   :receiving_account_id, :receiving_account_type,
                   :amount,
                   :payment_request,
-                  :reference_resource
+                  :reference_resource,
+                  :note
 
     delegate :initiating_resource,:initiating_resource_id,:initiating_resource_type,
              :initiating_account, :initiating_account_id, :initiating_account_type, :scheduled_at,
@@ -140,7 +141,8 @@ class PaymentRequest < NonPersistentModel
                    receiving_resource: receiving_resource,
                    receiving_account: receiving_account,
                    amount: amount,
-                   reference_resource: options[:reference_resource]
+                   reference_resource: options[:reference_resource],
+                   note: options[:note]
                })
     end
 

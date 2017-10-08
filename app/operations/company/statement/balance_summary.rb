@@ -5,11 +5,11 @@ class Company::Statement::BalanceSummary < Company::Statement::Base
   attr_accessor :items
 
   def authorized_user_types
-    [:company_admin]
+    [:company_admin, :auditor]
   end
 
   def pre_validate
-    if user.blank? or params.blank?
+    if user.blank?
       add_message :error, "Invalid parameters"
     end
   end
@@ -28,7 +28,7 @@ class Company::Statement::BalanceSummary < Company::Statement::Base
   end
 
   def process
-    result = Company::VirtualAccount::Balance.(user)
+    result = Company::ItzCashVirtualAccount::Balance.(user)
     items[:current_company_balance] = result.balance rescue 0
 
     # calculating money with employees in various forms
@@ -37,8 +37,11 @@ class Company::Statement::BalanceSummary < Company::Statement::Base
     items[:total_amount_with_employees][:in_finly_money] = 0
     items[:total_amount_with_employees][:in_cash_on_hand] = 0
     items[:total_amount_with_employees][:total] = 0
-    company.users.each do |user|
-      items[:total_amount_with_employees][:in_cards] += user.cards.first.card_balance_value rescue 0
+    company.users.include_all_accounts_with_balance.each do |user|
+      user.cards.each do |card|
+        next unless card.card_program_id == CardProgram.id_for(:expense)
+        items[:total_amount_with_employees][:in_cards] += card.card_balance_value rescue 0
+      end
       items[:total_amount_with_employees][:in_finly_money] += user.wallet.balance_value
       items[:total_amount_with_employees][:in_cash_on_hand] += user.cash_in_hand.value rescue 0
     end

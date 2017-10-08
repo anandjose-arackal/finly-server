@@ -2,13 +2,14 @@ class MoneyRequest::Index < MoneyRequest::Base
   attr_accessor :money_requests, :role_id
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin]
+    [:employee, :manager, :finance_manager, :admin, :auditor]
   end
 
   def init
     self.role_id = params[:role_id]
     if self.role_id.blank? and params[:view].present?
       self.role_id = UserRole::VALUES[params[:view].to_sym]
+      params[:role_id] = self.role_id
     end
   end
 
@@ -22,27 +23,29 @@ class MoneyRequest::Index < MoneyRequest::Base
 
   def process
     case self.role_id
-      when UserRole.id_for(:admin)
-        if self.user.company_admin?
-          self.money_requests = MoneyRequest.not_open.with_user(user.company.users.pluck(:id))
+      when UserRole.id_for(:admin), UserRole.id_for(:auditor)
+        user_ids = User::Team::Index.(user, params).pluck(:id)
+        if self.user.company_admin? || user.auditor?
+          self.money_requests = MoneyRequest.not_open.with_user(user_ids)
         elsif user.policy_admin?
-          user_ids = User::Team::Index.(user, role_id: UserRole.admin_id).pluck(:id)
           policy_ids = user.admin_policies.pluck(:id)
           self.money_requests = MoneyRequest.not_open.with_user(user_ids).with_policy(policy_ids)
         end
-        unless user.admin?
+        unless user.admin? || user.auditor?
           messages[:error] << 'User is not an admin'
           return false
         end
       when UserRole.id_for(:manager)
-        controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager))
+        team_ids = User::Team::Index.(user, params)&.pluck(:id)
+        controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager)).with_user(team_ids)
         interacted_money_requests_query= user.manager_money_requests
         sql = MoneyRequest.connection.unprepared_statement {
           "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
         }
         self.money_requests = MoneyRequest.from(sql)
       when UserRole.id_for(:finance_manager)
-        controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:finance_manager))
+        team_ids = User::Team::Index.(user, params)&.pluck(:id)
+        controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:finance_manager)).with_user(team_ids)
         interacted_money_requests_query = user.finance_money_requests
         sql = MoneyRequest.connection.unprepared_statement {
           "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"

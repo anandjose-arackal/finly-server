@@ -27,7 +27,8 @@ class Integrations::Quickbooks::InitiateReportsSync < Integrations::Quickbooks::
 
   def init
     user_ids = user.company.users.pluck(:id)
-    self.reports = Report.with_user(user_ids).where(id: params[:report_ids])
+    ids = params[:report_ids] || params[:report_id]
+    self.reports = Report.with_user(user_ids).where(id: ids)
   end
 
   def validate
@@ -38,7 +39,7 @@ class Integrations::Quickbooks::InitiateReportsSync < Integrations::Quickbooks::
 
     invalid_reports = []
     reports.each do |report|
-      unless [ReportSyncStatus.id_for(:not_synced), ReportSyncStatus.id_for(:partially_synced)].include?(report.sync_status_id)
+      unless [ReportSyncStatus.id_for(:not_synced), ReportSyncStatus.id_for(:partially_synced), nil].include?(report.sync_status_id)
         invalid_reports << report
       end
     end

@@ -11,7 +11,7 @@ class UserTeam::Show < UserTeam::Base
     def init
       self.user_team = params[:user_team]
       self.user_groups = self.user.company.user_groups
-      self.users = UserGroup::Users.(user, filter_group_items: self.user_team.user_group_items.pluck(:id).uniq)&.selected_users
+      self.users = UserGroup::Users.(user, filter_group_items: self.user_team.user_group_items.pluck(:id).uniq, view: params[:view])&.selected_users
     end
 
     def selected_group_items

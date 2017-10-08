@@ -10,6 +10,7 @@
 #
 
 class VendorPaymentWallet < ActiveRecord::Base
+  include Accountable
   belongs_to :user
   belongs_to :balance, class_name: "Amount"
 
@@ -55,8 +56,9 @@ class VendorPaymentWallet < ActiveRecord::Base
   end
 
   def blocked_amount_for_pending_payments
-    initiating_user = self.user
-    PaymentOrder.with_company_id(initiating_user.company_id).with_initiating_account_type("VendorPaymentWallet").with_initiating_user_id(initiating_user.id).scheduled.joins(:amount_requested).sum(:value)
+    initiating_account = self.user.bank_wallet
+    Payment.scheduled.with_initiating_account_type("VendorPaymentWallet").with_initiating_account_id(initiating_account.id).joins(:amount).sum(:value)
+    # PaymentOrder.with_company_id(initiating_user.company_id).with_initiating_account_type("VendorPaymentWallet").with_initiating_user_id(initiating_user.id).scheduled.joins(:amount_requested).sum(:value)
   end
 
 end

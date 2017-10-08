@@ -48,6 +48,11 @@ class MoneyRequestController < ApplicationController
     respond render: :show
   end
 
+  def credit_cash
+    @result = MoneyRequest::Cash::Credit.(current_user, params)
+    respond
+  end
+
   def destroy
     @result = MoneyRequest::Destroy.(current_user, params)
     respond response: :success

@@ -59,7 +59,11 @@ class Oauth::TokenController < Doorkeeper::TokensController
   end
 
   def set_scope
-    params[:scope] = self.auth_scope&.to_s
+    scopes = self.auth_scope
+    unless scopes&.is_a?(Array)
+      scopes = [scopes]
+    end
+    params[:scope] = scopes&.join(' ')
   end
 
   def auth_scope
@@ -74,10 +78,10 @@ class Oauth::TokenController < Doorkeeper::TokensController
   def current_user(doorkeeper_token)
     if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
-      if scopes.include?('admin')
-        @current_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
-      elsif scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome')or scopes.include?('api')
+      if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome') or scopes.include?('api') or scopes.include?('admin_bypass')
         @current_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
+      elsif scopes.include?('admin')
+        @current_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
       end
     end
   end

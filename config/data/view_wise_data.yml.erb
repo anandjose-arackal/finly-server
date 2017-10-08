@@ -2,6 +2,7 @@ admin:
   links:
     primary_navbar:
       # - Company Expenses: expenses
+      - <span class="superscript">Company</span><br>Export: export
       - <span class="superscript">Company</span><br>Analytics: analytics
       - <span class="superscript">Company</span><br>Settlements: settlements
       - <span class="superscript">Company</span><br>Employees: employees
@@ -14,15 +15,15 @@ admin:
       - Company Statements: '#company_statements/params={"view": "admin"}'
       <% if current_company.d_code_enabled? %>
       - Load Company Balance: '/transfers/register'
+      <% end %>
       <% if current_company.feature_subscription.cards_enabled and current_user.company_admin? %>
       - Fund Disbursement: '/disburse'
       <% end %>
-      <% if current_company.feature_subscription.yes_bank_account and current_user.company_admin? %>
+      <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
       - Vendor Payments: '/payments'
       <% end %>
       <% unless current_company.kyc_completed? %>
       - Verify KYC: '/#documents'
-      <% end %>
       <% end %>
       # - Policies: '/policies'
       - My Account: '#settings'
@@ -34,6 +35,7 @@ admin:
 personal:
   links:
     primary_navbar:
+      - Export: export
       - Analytics: analytics
       - Settlements: settlements
       - Money Requests: requests
@@ -42,8 +44,11 @@ personal:
       - Expenses: expenses
     cog:
       - My Account: '#settings'
-      <% if current_company.feature_subscription.yes_bank_account and current_user.company_admin? %>
+      <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
       - Vendor Payments: '/payments'
+      <% end %>
+      <% if current_company.feature_subscription.cards_enabled and current_user.user_panel_subscription.disburse %>
+      - Fund Disbursement: '/disburse'
       <% end %>
       # - My Balance: '#modal-balance'
       # - FAQ: '#faq/params={"view":"personal"}'
@@ -56,6 +61,7 @@ manager:
 #      - Team Analytics: analytics
       # - Team Expenses: expenses
       # - Team Analytics: analytics
+      - <span class="superscript">Team</span><br>Export: export
       - <span class="superscript">Team</span><br>Members: employees
       - <span class="superscript">Team</span><br>Money Requests: requests
       - <span class="superscript">Team</span><br>Reports: reports
@@ -63,6 +69,12 @@ manager:
 
     cog:
       - My Account: '#settings'
+      <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
+      - Vendor Payments: '/payments'
+      <% end %>
+      <% if current_company.feature_subscription.cards_enabled and current_user.user_panel_subscription.disburse %>
+      - Fund Disbursement: '/disburse'
+      <% end %>
       # - My Balance: '#modal-balance'
       # - FAQ: '#faq/params={"view":"manager"}'
       # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
@@ -74,6 +86,7 @@ finance_manager:
 #      - <span class="superscript">Team</span><br>Analytics: analytics
       # - Company Expenses: expenses
       # - Analytics: analytics
+      - <span class="superscript">Team</span><br>Export: export
       - <span class="superscript">Team</span><br>Settlements: settlements
       - <span class="superscript">Team</span><br>Members: employees
       - <span class="superscript">Team</span><br>Money Requests: requests
@@ -83,10 +96,43 @@ finance_manager:
 
     cog:
       - My Account: '#settings'
-      <% if current_company.feature_subscription.yes_bank_account and current_user.finance_manager? %>
+      <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
       - Vendor Payments: '/payments'
       <% end %>
+      <% if current_company.feature_subscription.cards_enabled and current_user.user_panel_subscription.disburse %>
+      - Fund Disbursement: '/disburse'
+      <% end %>
+#      - Company Statements: '#company_statements/params={"view": "finance"}'
       # - My Balance: '#modal-balance'
       # - FAQ: '#faq/params={"view":"finance"}'
       # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'
-      # - Logout: '/users/sign_out'  
+      # - Logout: '/users/sign_out'
+
+
+auditor:
+  links:
+    primary_navbar:
+      # - Company Expenses: expenses
+      - <span class="superscript">Company</span><br>Export: export
+      - <span class="superscript">Company</span><br>Analytics: analytics
+      - <span class="superscript">Company</span><br>Settlements: settlements
+      - <span class="superscript">Company</span><br>Employees: employees
+      - <span class="superscript">Company</span><br>Money Requests: requests
+      - <span class="superscript">Company</span><br>Reports: reports
+      - <span class="superscript">Company</span><br>Expenses: expenses
+
+    cog:
+      - Organization Account: '#organization_account/params={"view":"auditor"}'
+      - Company Statements: '#company_statements/params={"view": "auditor"}'
+      <% if current_company.feature_subscription.cards_enabled and current_user.user_panel_subscription.disburse %>
+      - Fund Disbursement: '/disburse'
+      <% end %>
+      <% if current_company.feature_subscription.yes_bank_account and current_user.user_panel_subscription.yes_bank_account_transfer %>
+      - Vendor Payments: '/payments'
+      <% end %>
+      # - Policies: '/policies'
+      - My Account: '#settings'
+      # - Expense Policies: '/policies?view=admin'
+      # - My Balance: '#modal-balance'
+      # - FAQ: '#faq/params={"view":"admin"}'
+      # - Download the App: 'https://play.google.com/store/apps/details?id=io.finly.finlyapp'

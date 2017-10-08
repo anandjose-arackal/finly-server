@@ -22,6 +22,10 @@ class User::Show < User::Base
           self.balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true,
               target_user_card: true, current_user_card: true, current_user_wallet: true, virtual_account: true,
               target_user_cash_in_hand: true, view: params[:view]).balances
+        else
+          self.balances = User::Balance.(self.user, target_user: selected_user, target_user_wallet: true,
+              current_user_card: true, current_user_wallet: true, virtual_account: true,
+              target_user_cash_in_hand: true, view: params[:view]).balances
         end
       else
         messages[:error] = operation.messages[:error]
@@ -47,7 +51,7 @@ class User::Show < User::Base
     def init
       self.selected_user = params[:selected_user]
       self.roles = {admin: self.selected_user.company_admin?, manager: self.selected_user.manager?,
-                    finance_manager: self.selected_user.finance_manager?}
+                    finance_manager: self.selected_user.finance_manager?, auditor: self.selected_user.auditor?}
       self.team_mapping = self.selected_user.team_mapping
       # self.mapping = [Policy::Mappings::Show.(user, user: selected_user, policy: nil).map]
       self.policies = selected_user.policies
@@ -69,6 +73,7 @@ class User::Show < User::Base
       personal = (selected_user == user)
       if balances.present?
         selected_user.cards.each do |card|
+          ItzCash::AccountDetails.(card.user, card: card)
           actions = {}
           # Card Actions
           assigned = card.assigned?
@@ -78,7 +83,10 @@ class User::Show < User::Base
           balance = show_balance ? balances[:target_user][:card][card.id][:balance] : nil
           eligibility = show_eligibility ? balances[:target_user][:card][card.id][:eligibility] : nil
           disabled_by = card.disabled_by_role.name rescue nil
-          active = card.active
+          active = card.active?
+          locked = card.locked?
+          temporary_block = card.temporary_block?
+          suspend_status = card.suspend_status
           name = "#{card.card_program.name} Card"
           # ending_number = card.ending_number
           proxy = card.proxy
@@ -90,24 +98,25 @@ class User::Show < User::Base
             card_params[:user_id] = selected_user.id
             card_params[:card_id] = id
             card_params[:action_type] = nil
-            if card.active
+            if card.active?
               card_params[:status_type] = User::PrepaidCard::Base::STATUS[:block]
               actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
-            else
+            elsif card.temporary_block?
               card_params[:status_type] = User::PrepaidCard::Base::STATUS[:unblock]
               actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
             end
           elsif personal
-            if card.active
+            if card.active?
               card_params = {status_type: User::PrepaidCard::Base::STATUS[:block], user_id: selected_user.id}
               actions[:deactivate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
-            else
+            elsif card.temporary_block?
               if card.disabled_by_role_id == UserRole.id_for(:employee) or user.company_admin?
                 card_params = {status_type: User::PrepaidCard::Base::STATUS[:unblock], user_id: selected_user.id}
                 actions[:activate_card] = Rails.application.routes.url_helpers.update_card_status_path(card_params)
               end
             end
           end
+
           assign_request_data = nil
           unless card.assigned?
             assign_request = card.card_assign_requests.with_card_owner_id(selected_user.id)&.first
@@ -116,7 +125,7 @@ class User::Show < User::Base
                   id: assign_request.id,
                   status: {
                       id: assign_request.status.id,
-                      name: assign_request.status.name
+                      name: StringUtils.titleize(assign_request.status.name)
                   },
                   admin_note: assign_request.admin_note
               }
@@ -134,22 +143,29 @@ class User::Show < User::Base
                   show_balance: show_balance,
                   show_eligibility: show_eligibility,
                   # ending_number: ending_number,
+                  active: active,
                   proxy: proxy,
                   configurable_restrictions: configurable_restrictions,
                   balance: balance,
                   eligibility: eligibility,
                   disabled_by: disabled_by,
-                  active: active,
                   name: name,
                   id: id,
                   status: {
                       id: card.card_status.id,
-                      name: card.card_status.name
+                      name: StringUtils.titleize(card.card_status.name)
+                  },
+                  suspend_status: {
+                      active: active,
+                      temporary_block: temporary_block,
+                      locked: locked,
+                      name: suspend_status
                   },
                   assign_request: assign_request_data
               },
               actions: actions,
-              card_restriction: card.card_restriction}
+              card_restriction: card.card_restriction
+          }
         end
       end
       self.auto_submit_config = self.selected_user.auto_submit_config
@@ -202,12 +218,21 @@ class User::Show < User::Base
         actions[:update_subscriptions] = Rails.application.routes.url_helpers.user_path(id: self.selected_user.id)
       end
 
+      # checking if the user has associated bank accounts, and sending the flag accordingly'
+      # also, if the user's cash on hand has been credited with any payments pending confirmation
+      actions[:bank_transfer_enabled] = selected_user.bank_transfer_enabled?
+      actions[:pending_cash_on_hand_credits] = {
+          present: self.selected_user.cash_on_hand_credits_awaiting_confirmation?,
+          message: "Some money has been added to your cash on hand. They will reflect once the payment is confirmed"
+      }
+      #####################################################################################
+
       actions
     end
 
     def load_transfer_options(balances)
       credit_actions = {initiating_accounts: [], receiving_accounts: []}
-      debit_actions={receiving_accounts: [], initiating_accounts: []}
+      debit_actions = {receiving_accounts: [], initiating_accounts: []}
 
       from_user_transferable_cards = user.cards.with_non_personal_fund_transfer
       to_user_creditable_cards = selected_user.cards.creditable_cards

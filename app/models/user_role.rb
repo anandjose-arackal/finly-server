@@ -10,6 +10,7 @@
 
 
 
+
 class UserRole < ActiveRecord::Base
   has_many :users, through: :user_role_mappings
 
@@ -19,7 +20,8 @@ class UserRole < ActiveRecord::Base
   scope :employee, -> { where(id: UserRole.id_for(:employee)) }
   scope :auditor, -> { where(id: UserRole.id_for(:auditor)) }
 
-  VALUES = {admin: 1, finance_manager: 2, manager: 3, employee: 4, auditor: 5}
+  VALUES = {admin: 1, finance_manager: 2, manager: 3, employee: 4, auditor: 5,
+            creditor: 2, reviewer: 3, initiator: 4}
 
   self.class.instance_eval do
     VALUES.each do |key, value|

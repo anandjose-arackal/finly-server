@@ -23,7 +23,11 @@
 #  updated_at                   :datetime         not null
 #  is_deleted                   :boolean          default(FALSE), not null
 #  submitted_amount_id          :integer
+#  processed_amount_id          :integer
 #
+
+
+
 
 
 
@@ -55,7 +59,10 @@ class MoneyRequest < ActiveRecord::Base
 
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, class_name: "Amount"
+  belongs_to :processed_amount, class_name: "Amount"
+
   accepts_nested_attributes_for :submitted_amount
+  accepts_nested_attributes_for :processed_amount
   delegate :submitted_amount_value, to: :submitted_amount
 
   scope :with_id, ->(id) { where id: id }
@@ -77,6 +84,9 @@ class MoneyRequest < ActiveRecord::Base
   scope :without_payment, -> { where payment_id: nil }
   scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
   scope :with_controlling_user_id, -> (user_id) { where controlling_user_id: user_id }
+  scope :with_items, -> { joins(:items) }
+
+  scope :awaiting_approval_of_user, ->(user_id, role_id){ where(status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
 
   # scoping by payment type - cash or card
   scope :via_cash_only, -> {where payment_mode_id: PaymentMode.id_for(:cash)}

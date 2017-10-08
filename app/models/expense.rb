@@ -2,24 +2,32 @@
 #
 # Table name: expenses
 #
-#  id                   :integer          not null, primary key
-#  amount_id            :integer
-#  expense_status_id    :integer
-#  note                 :text(65535)
-#  date                 :date
-#  user_id              :integer
-#  expense_type_id      :integer
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  manager_memo         :text(65535)
-#  rejecting_manager_id :integer
-#  report_id            :integer
-#  category_id          :integer
-#  is_deleted           :boolean          default(FALSE), not null
-#  transcribed          :boolean          default(FALSE)
-#  personal             :boolean          default(FALSE)
-#  reimbursable         :boolean          default(TRUE)
+#  id                     :integer          not null, primary key
+#  amount_id              :integer
+#  expense_status_id      :integer
+#  note                   :text(65535)
+#  date                   :date
+#  user_id                :integer
+#  expense_type_id        :integer
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  manager_memo           :text(65535)
+#  rejecting_manager_id   :integer
+#  report_id              :integer
+#  category_id            :integer
+#  is_deleted             :boolean          default(FALSE), not null
+#  transcribed            :boolean          default(FALSE)
+#  personal               :boolean          default(FALSE)
+#  reimbursable           :boolean          default(TRUE)
+#  synced_with_quickbooks :boolean          default(FALSE)
+#  split_link             :string(255)
+#  deleted_to_split       :boolean          default(FALSE)
+#  from_cash_on_hand      :boolean          default(FALSE)
 #
+
+
+
+
 
 
 
@@ -50,6 +58,7 @@ class Expense < ActiveRecord::Base
   has_one :time_expense, dependent: :destroy
   has_one :per_diem_expense, dependent: :destroy
   has_one :receipt_email
+  has_one :payment, as: :reference_resource
 
   accepts_nested_attributes_for :system_messages
   accepts_nested_attributes_for :amount
@@ -83,7 +92,7 @@ class Expense < ActiveRecord::Base
   before_destroy do
     errors.add(:expense, "associated with a report can't be destroyed.") if self.report_id
 
-    self.receipts.update_all(parent_id: nil, parent_type: nil) if self.receipts.present?
+    self.receipts.update_all(to_be_transcribed: false, parent_id: nil, parent_type: nil) if self.receipts.present?
   end
 
   before_save do
@@ -107,7 +116,7 @@ class Expense < ActiveRecord::Base
     where personal: true
   }
 
-  scope :non_cancelled, -> {
+  scope :non_cancelled  , -> {
     ids = pluck(:id)
     card_expenses = CardExpense.with_expense_id(ids)
     cancelled_expense_ids = card_expenses.where('cancelled IS true').pluck(:expense_id)
@@ -143,6 +152,7 @@ class Expense < ActiveRecord::Base
   }
 
   scope :with_amount, -> { joins :amount }
+  scope :joins_amount, -> { joins :amount}
   scope :having_amount_currency, -> (amount, currency_id) { with_amount.where('amounts.value IN (?) AND amounts.currency_id IN (?)', amount, currency_id) }
   scope :with_report, ->(report_id) { where report_id: report_id }
   scope :with_report_id, ->(report_id) { where report_id: report_id }
@@ -254,6 +264,7 @@ class Expense < ActiveRecord::Base
                                                                        ExpenseType.id_for(:time),
                                                                        ExpenseType.id_for(:per_diem)]) }
   scope :only_reimbursable_expenses, -> { where(reimbursable: true) }
+  scope :spent_from_cash_on_hand, -> {where(from_cash_on_hand: true).where(expense_type_id: ExpenseType.id_for(:manual))}
 
   scope :with_id, ->(ids) { where id: ids }
   scope :with_date, ->(dates) { where date: dates }
@@ -276,9 +287,13 @@ class Expense < ActiveRecord::Base
   scope :untranscribed, -> { where transcribed: false }
   scope :limit_to, ->(count) { limit count }
 
-  scope :verified, -> { where expense_status_id: ExpenseStatus.verified_id }
+  scope :verified, -> { where expense_status_id: ExpenseStatus.id_for(:verified) }
   scope :unreported, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected]) }
+  scope :reported, -> { where expense_status_id: ExpenseStatus.ids_for([:submitted, :verified]) }
   scope :unverified, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :submitted]) }
+
+  scope :joins_amount, -> { joins(:amount) }
+  scope :sum_amount, -> { joins_amount.sum(:value) }
 
   scope :joins_card_expenses, -> { only_card_expenses.joins(:card_expense) }
   scope :pluck_card_transaction_id, -> { joins_card_expenses.pluck('card_expense.card_transaction_id') }
@@ -299,8 +314,10 @@ class Expense < ActiveRecord::Base
     end
     where expense_status_id: filter_status
   }
-  scope :not_synced_with_quickbooks, -> {where synced_with_quickbooks: [false, nil]}
-  scope :synced_with_quickbooks, -> {where synced_with_quickbooks: true}
+  scope :not_synced_with_quickbooks, -> { where synced_with_quickbooks: [false, nil] }
+  scope :synced_with_quickbooks, -> { where synced_with_quickbooks: true }
+  scope :with_split_link, -> (split_link) { where split_link: split_link }
+  scope :filter_split_link, -> (split_link) { where split_link: split_link }
 
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount
@@ -339,6 +356,7 @@ class Expense < ActiveRecord::Base
     end
   end
 
+
   def base_amount
     unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present?
       return self.amount
@@ -355,6 +373,7 @@ class Expense < ActiveRecord::Base
     return nil unless expense_type_id == ExpenseType.id_for(:manual) and self.amount.present? and report_id.present?
     converted_amount = amount_value
     original_amount = original_amount_value
+    return nil unless converted_amount.present? and converted_amount > 0 and original_amount.present? and original_amount > 0
     precision_value converted_amount/original_amount
   end
 
@@ -472,6 +491,14 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def maps_distance_value
+    if self.distance_expense?
+      return self.distance_expense.maps_distance_value
+    else
+      return nil
+    end
+  end
+
   def distance_rate_value
     if self.distance_expense?
       if self.report_id.present?
@@ -543,6 +570,10 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def custom_fields
+    self.sub_expense&.custom_fields
+  end
+
   def custom_field_names
     case self.expense_type_id
       when ExpenseType.id_for(:manual)
@@ -554,7 +585,7 @@ class Expense < ActiveRecord::Base
       when ExpenseType.id_for(:per_diem)
         return self.per_diem_expense.custom_field_names
       when ExpenseType.id_for(:card)
-        return []
+        return self.card_expense.custom_fields
       else
         return []
     end
@@ -571,7 +602,7 @@ class Expense < ActiveRecord::Base
       when ExpenseType.id_for(:per_diem)
         return self.per_diem_expense.custom_field_values
       when ExpenseType.id_for(:card)
-        return []
+        return self.card_expense.custom_fields
       else
         return []
     end
@@ -588,7 +619,7 @@ class Expense < ActiveRecord::Base
       when ExpenseType.id_for(:per_diem)
         return self.per_diem_expense.custom_field_value_by_name(name)
       when ExpenseType.id_for(:card)
-        return []
+        return self.card_expense.custom_fields
       else
         return []
     end
@@ -751,6 +782,15 @@ class Expense < ActiveRecord::Base
       when ExpenseStatus.id_for(:verified)
         'Verified'
     end
+  end
+
+  def is_split?
+    self.split_link.present?
+  end
+
+  def split_count
+    return 1 if self.split_link.blank?
+    Expense.with_split_link(self.split_link).count
   end
 
   private

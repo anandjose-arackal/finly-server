@@ -15,7 +15,7 @@ class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
 
   def send_push_notification(user)
     last_track = self.money_request.tracks.last
-    return unless user.id == last_track.modified_user.id
+    return unless user.id == last_track.modified_user&.id
     message = "#{self.money_request.user.name} retracted the Money Request: #{self.money_request.name}"
     view = UserRole.name_for(last_track.modified_user_role_id)
     GcmMessenger.push user, money_request_id: self.money_request.id, message: message, event_id: event_id, view: view
@@ -32,7 +32,8 @@ class Event::EMoneyRequest::Retract < Event::EMoneyRequest::Base
                                              path_object_type: "Money Request",
                                              read: false,
                                              timestamp: DateUtils.local_date_time,
-                                             view_role_id: roles.first)
+                                             view_role_id: roles.first,
+                                             application: RequestStore.store[:current_app])
     notification.save
   end
 

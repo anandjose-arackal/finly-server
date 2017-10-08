@@ -162,6 +162,11 @@ group :development, :test do
   gem 'capistrano-sidekiq', '0.10.0'
   gem 'hirb', '0.7.3'
   gem 'meta_request'
+  gem 'rack-mini-profiler'
+  gem 'flamegraph'
+  gem 'stackprof' # ruby 2.1+ only
+  gem 'memory_profiler'
+
   # gem 'better_errors'
   # gem 'binding_of_caller'
 

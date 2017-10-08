@@ -6,6 +6,7 @@ expense:
   note: <%= params[:note] %>
   reimbursable: <%= params[:reimbursable] %>
   category_id: <%= params[:category_id] %>
+  from_cash_on_hand: <%= params[:from_cash_on_hand] %>
   <% type = yaml_formatter.value_for_placeholder params[:type] %>
   <% if type == '1' or type == 1 %>
   manual_expense_attributes:
@@ -18,6 +19,11 @@ expense:
     <% if params[:distance].present? %>
     distance_attributes:
       value: <%= params[:distance] %>
+      physical_unit_id: <%= PhysicalUnit.kilometre_id %>
+    <% end %>
+    <% if params[:maps_distance].present? %>
+    maps_distance_attributes:
+      value: <%= params[:maps_distance] %>
       physical_unit_id: <%= PhysicalUnit.kilometre_id %>
     <% end %>
     <% if params[:locations].present? and params[:locations].is_a?(Array) %>
@@ -37,6 +43,10 @@ expense:
       value: <%= params[:time] %>
       physical_unit_id: <%= PhysicalUnit.hour_id %>
     <% end %>
+  <% elsif type == '5' or type == 5 %>
+  per_diem_expense_attributes:
+    per_diem_id: <%= params[:per_diem_id] %>
+    quantity: <%= params[:quantity] %>
   <% end %>
   <% if params[:amount].present? %>
   amount_attributes:

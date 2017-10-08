@@ -34,15 +34,15 @@ class Export::Report::Base < Export::Base
   end
 
 
-  def retrieve_data(preferences, report, expense, custom_field_names)
+  def retrieve_data(preferences, report, expense, custom_fields_data)
     data_arr = []
     user = report&.user || expense.user
     preferences.each do |pref|
       case pref.export_field_id
         when ExportField.type_report_id
-          data_arr << report.id
+          data_arr << report&.id
         when ExportField.type_report_name
-          data_arr << report.name
+          data_arr << report&.name
         when ExportField.type_report_status
           data_arr << report.status.name
         when ExportField.type_employee_name
@@ -58,9 +58,9 @@ class Export::Report::Base < Export::Base
         when ExportField.type_expense_category_name
           data_arr << expense.category_name
         when ExportField.type_expense_currency
-          data_arr << expense.amount.currency.country_code
+          data_arr << expense.amount&.currency&.country_code
         when ExportField.type_expense_amount
-          data_arr << expense.amount.value
+          data_arr << expense.amount&.value
         when ExportField.type_expense_date
           data_arr << expense.date
         when ExportField.type_expense_note
@@ -72,20 +72,17 @@ class Export::Report::Base < Export::Base
       end
     end
     # now adding the custom field values for the respective expense
-    data_arr += retrieve_custom_field_data(custom_field_names, expense)
+    data_arr += retrieve_custom_field_data(custom_fields_data, expense)
     data_arr
   end
 
-  def retrieve_custom_field_data(custom_field_names, expense)
+  def retrieve_custom_field_data(custom_fields_data, expense)
+    configuration_ids = custom_fields_data[:configuration_ids]
+    expense_custom_fields_data = custom_fields_data[:values][expense.id]
     values = []
-    field_names = expense.custom_field_names
-    custom_field_names.each do |column|
-      if field_names.include?(column)
-        values << expense.custom_field_value_by_name(column)
-      else
-        values << ''
+      configuration_ids.each do |id|
+        values << expense_custom_fields_data[id]
       end
-    end
     values
   end
 
@@ -101,6 +98,31 @@ class Export::Report::Base < Export::Base
       end
     end
     field_names.uniq! || []
+  end
+
+  def generate_custom_field_data(reports)
+    # now extract the custom fields from each expense that is a part of all the report
+    configuration_ids = []
+    headers = []
+    values = {}
+    reports.each do |report|
+      report.expenses.each do |expense|
+        # this gets all the custom field names from all different types of expenses
+        values[expense.id] = {}
+        cf = expense.custom_fields
+        cf&.each do |custom_field|
+          unless configuration_ids.include?(custom_field.field_configuration_id)
+            configuration_ids << custom_field.field_configuration_id
+            headers << custom_field.field_configuration.field_name
+          end
+          values[expense.id][custom_field.field_configuration_id] = custom_field.string_value
+        end
+      end
+    end
+    # headers: contains the header labels,
+    # configuration_ids: contains the field_configuration ids which correlate with the position of headers
+    # values: hash[expense_id][field_configuration_id] which contains string values
+    {headers: headers, configuration_ids: configuration_ids, values: values}
   end
 
 end

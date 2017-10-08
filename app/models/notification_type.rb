@@ -10,7 +10,15 @@
 
 class NotificationType < ActiveRecord::Base
 
-  VALUES = {user: 1, report: 2, payment: 3, card: 4, expense: 5, settlement: 6, money_request: 7, wallet: 8}
+  VALUES = {user: 1, report: 2, payment: 3, card: 4, expense: 5, settlement: 6, money_request: 7, wallet: 8, bank_payment_request: 9}
+
+  def self.seed_data
+    VALUES.each do |name, id|
+      unless NotificationType.find_by(name: name)
+        NotificationType.create(id: id, name: name)
+      end
+    end
+  end
 
   self.class.instance_eval do
     VALUES.each do |key, value|

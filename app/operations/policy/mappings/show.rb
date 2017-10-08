@@ -1,5 +1,5 @@
 class Policy::Mappings::Show < Policy::Base
-  attr_accessor :policy, :updating_user, :map
+  attr_accessor :policy, :updating_user, :map, :purpose_id
 
   def pre_validate
     if user.blank? or (params[:user_id].blank? and params[:id].blank? and params[:user].blank?)
@@ -10,7 +10,7 @@ class Policy::Mappings::Show < Policy::Base
   def pre_authorize
     return if params[:user].present? and params[:user].is_a?(::User)
     user_id = (params[:id] or params[:user_id])
-    if user.company_admin?
+    if user.company_admin? || user.auditor?
       self.updating_user = user.company.users.with_id(user_id).first rescue nil
     elsif user.policy_admin?
       if params[:user_manager_mapping].present?
@@ -47,15 +47,20 @@ class Policy::Mappings::Show < Policy::Base
     end
   end
 
+  def pre_process
+    self.purpose_id = params[:purpose_id] || MappingPurpose.id_from_application_for(RequestStore.store[:current_app])
+  end
+
   def process
     policy_id = self.policy.present? ? self.policy.id : nil
-    company_default_mapping = updating_user.team_mapping.policy(policy_id)
-    default_mapping = company_default_mapping.default
-    conditional_manager = company_default_mapping.non_default.manager
-    conditional_finance_manager = company_default_mapping.non_default.finance_manager
-    conditional_approves_to = company_default_mapping.non_default.approves_to
-    conditional_approves_finance_to = company_default_mapping.non_default.approves_finance_to
-    self.map = {company_default: self.policy.nil?, policy: self.policy, default: default_mapping,
+    company_default_mapping = updating_user.team_mapping.policy(policy_id).send(:with_purpose, purpose_id)
+    default_mapping = company_default_mapping.default.send(:with_purpose, purpose_id)
+    conditional_manager = company_default_mapping.non_default.manager.send(:with_purpose, purpose_id)
+    conditional_finance_manager = company_default_mapping.non_default.finance_manager.send(:with_purpose, purpose_id)
+    conditional_approves_to = company_default_mapping.non_default.approves_to.send(:with_purpose, purpose_id)
+    conditional_approves_finance_to = company_default_mapping.non_default.approves_finance_to.send(:with_purpose, purpose_id)
+    self.map = {purpose_id: self.purpose_id,
+                company_default: self.policy.nil?, policy: self.policy, default: default_mapping,
                 conditional_manager: conditional_manager,
                 conditional_finance_manager: conditional_finance_manager,
                 conditional_approves_to: conditional_approves_to,

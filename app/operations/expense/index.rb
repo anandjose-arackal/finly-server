@@ -2,7 +2,7 @@ class Expense::Index < Expense::Base
   attr_accessor :role_id, :expenses, :expense_filters
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin]
+    [:employee, :manager, :finance_manager, :admin, :auditor]
   end
 
   def pre_validate
@@ -32,12 +32,12 @@ class Expense::Index < Expense::Base
 
   def pre_process
     # removing all 'filter_*' because we don't want them applied on the user index screen
-    params.each do |key, value|
-      if key.to_s.include?("filter_")
-        expense_filters << {key => value}
-        params.delete(key)
-      end
-    end
+    # params.each do |key, value|
+    #   if key.to_s.include?("filter_")
+    #     expense_filters << {key => value}
+    #     params.delete(key)
+    #   end
+    # end
   end
 
   def process
@@ -93,6 +93,7 @@ class Expense::Index < Expense::Base
     has_scope :filter_expense_cancelled # shows only cancelled expenses
     has_scope :filter_expense_personal # shows only personal expenses
     has_scope :filter_report_status_id, type: :array # shows only personal expenses
+    has_scope :filter_split_link
 
     def init
       ScopeUtils.fix_for_scoping(params, :filter_report_status_id, :array)
@@ -106,7 +107,7 @@ class Expense::Index < Expense::Base
         end
         ############################################################################
 
-        if params[:view] == 'personal' or params[:view].nil?
+        if (params[:view] == 'personal' or params[:view].nil?) and params[:filter_split_link].blank?
           self.paginated_expenses = self.expenses&.unreported_and_rejected.paginate(page: params[:page], per_page: 30)
         else
           self.paginated_expenses = expenses.paginate(page: params[:page], per_page: 30)

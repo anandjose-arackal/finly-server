@@ -8,7 +8,7 @@ module Constants
   OTP_RESEND_INTERVAL = 60
 
   # todo - needs to be edited once we get the account details.
-  ITZCASH_EMAIL_ID = 'veekshith.rai@finly.io'
+  ITZCASH_EMAIL_ID = ['veekshith.rai@finly.io', 'vivek.a@finly.io']
 
   PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io']
@@ -76,25 +76,39 @@ module Constants
     # url = "http://192.168.81.157:3000/#"
     url = "http://localhost/#"
     authorizer_url = "http://localhost/authorizer#"
+    vendor_payments_url = "http://localhost/payments#"
+    assets_url = "localhost"
   elsif Rails.env.staging?
     url = "http://staging.finly.io/#"
     authorizer_url = "http://staging.finly.io/authorizer#"
+    vendor_payments_url = "http://staging.finly.io/payments#"
+    assets_url = "https://www.staging.finly.io"
   elsif Rails.env.itzcash_uat?
     url = "http://demo.finly.io/#"
     authorizer_url = "http://demo.finly.io/authorizer#"
+    vendor_payments_url = "http://demo.finly.io/payments#"
+    assets_url = "https://www.demo.finly.io"
   elsif Rails.env.local_vm?
     url = "http://192.168.56.101/#"
     authorizer_url = "http://192.168.56.101/authorizer#"
+    vendor_payments_url = "http://192.168.56.101/payments#"
+    assets_url = ""
   elsif Rails.env.production?
     url = "https://www.finly.io/#"
     authorizer_url = "https://www.finly.io/authorizer#"
+    vendor_payments_url = "http://www.finly.io/payments#"
+    assets_url = "https://www.finly.io"
   else
     url = ""
     authorizer_url = ""
+    vendor_payments_url = ""
+    assets_url = ""
   end
 
   BASE_URL = url
   BASE_URL_AUTHORIZER = authorizer_url
+  BASE_URL_VP = vendor_payments_url
+  BASE_ASSETS_URL = assets_url
 
   DEFAULT_PASSWORD = "lqskmclkmsal1k"
 
@@ -218,6 +232,40 @@ module Constants
                    307 => 'Card is already activated',
                    3100 => 'Transaction is already confirmed'}
   end
+
+  # YSE CARD STATUS
+  # Active
+  # Locked
+  # Blocked
+  # Hot Listed
+  # Hot Listed for Damage
+  # Closed
+  # Blocked for Damage
+  # Blocked - Card Stolen
+  # Kept Aside
+  # Dispatched
+  # Generated
+  # Generated - Pin Mailer Pending
+  # Pin Mailer Printed
+  # Pin Mailer Printed - Embossing pending
+  # Embossed
+  CARD_PROCESSOR_STATUS = {
+      active: 'Active',
+      locked: 'Locked',
+      blocked: 'Blocked',
+      hotlisted: 'Hot Listed',
+      hotlisted_for_damage: 'Hot Listed for Damage',
+      closed: 'Closed',
+      blocked_for_damage: 'Blocked for Damage',
+      blocked_card_stolen: 'Blocked - Card Stolen',
+      kept_aside: 'Kept Aside',
+      dispatched: 'Dispatched',
+      generated: 'Generated',
+      generated_pin_mailer_pending: 'Generated - Pin Mailer Pending',
+      pin_mailer_printed: 'Pin Mailer Printed',
+      pin_mailer_printed_embossing_pending: 'Pin Mailer Printed - Embossing pending',
+      embossed: 'Embossed'
+  }
 
   class Constants::YesBank
     PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN-PROCESS","IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]

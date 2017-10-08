@@ -1,5 +1,5 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :category_name, :category_id, :expense_type_id,
-                                    :transcribed, :reimbursable, :report_status
+                                    :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand
 
 if @result.expense.report.present?
   json.report_id @result.expense.report_id
@@ -7,6 +7,7 @@ end
 
 json.distance do
   json.value @result.expense.distance_value
+  json.maps_distance_value @result.expense.maps_distance_value
   json.rate_value @result.expense.distance_rate_value
 end
 
@@ -36,7 +37,7 @@ json.converted @result.expense.converted?
 json.conversion_rate @result.expense.conversion_rate
 
 if @result.expense.card_expense?
-  json.original_merchant_name @result.expense.card_expense.card_transaction.merchant_name
+  json.original_merchant_name @result.expense.card_expense&.card_transaction&.merchant_name
 end
 
 # flag to show whether a particular expense has been converted or not
@@ -118,3 +119,6 @@ json.currencies do
     json.id currency.id
   end
 end
+
+json.is_split @result.expense.is_split?
+json.split_count @result.expense.split_count

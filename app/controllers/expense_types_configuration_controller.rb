@@ -1,6 +1,6 @@
 class ExpenseTypesConfigurationController < ApplicationController
 
-  before_action -> { finly_authorize! :web}
+  before_action -> { finly_authorize! :web }
 
   def show
     @result = ExpenseTypes::Show.(current_user, params)
@@ -43,6 +43,15 @@ class ExpenseTypesConfigurationController < ApplicationController
   def menu_data_payments
     @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/menu_data_payments.yml.erb", {current_company: current_company, current_user: current_user})
     render json: @views.as_json
+  end
+
+  def groups_teams
+    @result = UserGroup::Index.(current_user, params)
+    if @result&.success?
+      @groups = @result.user_groups
+      @teams = UserTeam::Index.(current_user, params)&.user_teams
+    end
+    respond
   end
 
 end

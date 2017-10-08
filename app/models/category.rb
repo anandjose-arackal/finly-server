@@ -14,7 +14,6 @@
 
 
 
-
 class Category < ActiveRecord::Base
   belongs_to :company
 
@@ -22,6 +21,8 @@ class Category < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :name, presence: true, uniqueness: {scope: :company_id}
+
+  default_scope { order(name: :asc) }
 
   # returns the name of the category
   def category_name

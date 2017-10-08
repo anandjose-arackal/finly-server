@@ -16,10 +16,13 @@
 #  default_value_id     :integer
 #  default_value_type   :string(255)
 #  is_deleted           :boolean          default(FALSE), not null
+#  global               :boolean          default(TRUE)
 #
 
 class FieldConfiguration < ActiveRecord::Base
   include SoftDeletable
+
+  # Global - When expense is split, used to determine if the custom field should appear in the split or in the root
 
   belongs_to :field_type
   belongs_to :company
@@ -33,7 +36,6 @@ class FieldConfiguration < ActiveRecord::Base
   validates :field_name, presence: true
   validates :enabled, presence: true
   validates :field_type_id, presence: true
-  # validates :mandatory, presence: true
   validates :company_id, presence: true
   validates :field_parent_type_id, presence: true
   validates :configurable_id, presence: true
@@ -45,9 +47,11 @@ class FieldConfiguration < ActiveRecord::Base
   accepts_nested_attributes_for :custom_fields
 
   scope :with_id, -> (id) { where id: id }
-  scope :with_parent_type, ->(type_id) {where field_parent_type_id: type_id}
+  scope :with_parent_type, ->(type_id) { where field_parent_type_id: type_id }
   scope :enabled, -> { where enabled: true }
   scope :disabled, -> { where enabled: false }
+
+  default_scope { unscope(:where) }
 
   def validate_config
     case field_type_id
@@ -67,7 +71,7 @@ class FieldConfiguration < ActiveRecord::Base
 
     # IMP CONDITION - Report and Money Request Field Configurations are always defined inside a policy while Expense Field Configuration are always defined inside Company
     if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(self.field_parent_type_id) and configurable_type != 'Policy'
-        self.errors.add :invalid, 'config. Custom Fields for Reports and Money Requests can only be configured at policy level'
+      self.errors.add :invalid, 'config. Custom Fields for Reports and Money Requests can only be configured at policy level'
     end
     # # Policy custom fields can only be added for expenses as policy is not captured at the time of expense
     # if field_parent_type_id == FieldParentType.id_for(:expense) and configurable_type == 'Policy'
@@ -146,18 +150,22 @@ class FieldConfiguration < ActiveRecord::Base
     self.default_value.save if self.default_value.present?
   end
 
+  # Global - When expense is split, used to determine if the custom field should appear in the split or in the root
   def as_json(options = {})
     options = []
     if field_type_id == FieldType.id_for(:drop_down)
       options = drop_down_items
     end
-    {id: id,
-     label: field_name,
-     field_type: {id: field_type.id,
-                  name: field_type.name},
-     mandatory: mandatory,
-     value: self.default_value,
-     options: options}
+    {
+        id: id,
+        label: field_name,
+        field_type: {id: field_type.id,
+                     name: field_type.name},
+        mandatory: mandatory,
+        global: self.global,
+        value: self.default_value,
+        options: options
+    }
   end
 
 end

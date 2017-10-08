@@ -1,11 +1,12 @@
 class User::AvailableExpenseTypes::Show < User::Base
 
   attr_accessor :distance_config, :time_config, :per_diem_config,
-                :policy, :report, :company, :custom_fields_config
+                :policy, :report, :company, :custom_fields_config,
+                :cash_on_hand
 
   class User::AvailableExpenseTypes::Show::ExpenseTypesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :custom_fields_config, :currencies
+    attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :custom_fields_config, :currencies, :cash_on_hand
 
     def init
       self.distance_config = params[:distance_config]
@@ -13,6 +14,7 @@ class User::AvailableExpenseTypes::Show < User::Base
       self.per_diem_config = params[:per_diem_config]
       self.categories = params[:categories]
       self.custom_fields_config = params[:custom_fields_config]
+      self.cash_on_hand = params[:cash_on_hand]
       self.currencies = Currency.all
     end
 
@@ -32,6 +34,7 @@ class User::AvailableExpenseTypes::Show < User::Base
     self.company = user.company
     self.report = user.reports.find_by(id: params[:report_id])
     self.policy = report.policy if report.present?
+    self.cash_on_hand = AccountManager::CashOnHand::CashOnHandAdapter.new(self.user.cash_on_hand).balance
   end
 
   def validate
@@ -85,6 +88,9 @@ class User::AvailableExpenseTypes::Show < User::Base
         else
           per_diem_config[:per_diems] = []
           user.per_diems_list.each do |per_diem|
+            if user.enforce_policy_enabled? && per_diem.configurable.default
+              next
+            end
             per_diem_config[:per_diems] << {name: "#{per_diem.configurable.name} - #{per_diem.name}",
                                             id: per_diem.id,
                                             rate: per_diem.rate_value
@@ -98,9 +104,10 @@ class User::AvailableExpenseTypes::Show < User::Base
   end
 
   def load_custom_fields_config
-    configurations = user.company.field_configurations
+    configurations = user.company.field_configurations.exclude_deleted
     self.custom_fields_config = {}
     self.custom_fields_config[:manual_expense] = configurations.with_parent_type(FieldParentType.id_for(:manual_expense))
+    self.custom_fields_config[:card_expense] = configurations.with_parent_type(FieldParentType.id_for(:card_expense))
     self.custom_fields_config[:distance_expense] = configurations.with_parent_type(FieldParentType.id_for(:distance_expense)) if distance_config[:enabled]
     self.custom_fields_config[:time_expense] = configurations.with_parent_type(FieldParentType.id_for(:time_expense)) if time_config[:enabled]
     self.custom_fields_config[:per_diem_expense] = configurations.with_parent_type(FieldParentType.id_for(:per_diem_expense)) if per_diem_config[:enabled]
@@ -112,6 +119,7 @@ class User::AvailableExpenseTypes::Show < User::Base
     params[:per_diem_config] = per_diem_config
     params[:custom_fields_config] = self.custom_fields_config
     params[:categories] = self.user.company.categories.active
+    params[:cash_on_hand] = self.cash_on_hand
     User::AvailableExpenseTypes::Show::ExpenseTypesPresenter.new(user, params, messages)
   end
 end

@@ -28,6 +28,7 @@ if @result.type.include?('payments')
     json.payment_type payment_type_s
     json.total_amount payment.total_amount
     json.payment_purpose payment.payment_purpose.name.humanize
+    json.payment_id payment.id
   end
 elsif @result.type.include?('reports')
   json.array!(@result.reports) do |report|

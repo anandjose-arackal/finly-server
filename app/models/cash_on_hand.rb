@@ -10,6 +10,7 @@
 #
 
 class CashOnHand < ActiveRecord::Base
+  include Accountable
   belongs_to :user
   belongs_to :balance, class_name: "Amount"
 

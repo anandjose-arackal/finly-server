@@ -5,6 +5,10 @@ class User::CreateWoPassword < Admin::Users::Create
     params[:user][:password] = rand(36**8).to_s(36)
   end
 
+  def user_model
+    User
+  end
+
   def configure_disburse
     # from disburse panel subscribing users to only disburse
     new_user_params[:user_panel_subscription_attributes] = {

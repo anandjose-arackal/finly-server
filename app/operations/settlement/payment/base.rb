@@ -1,10 +1,12 @@
 class Settlement::Payment::Base < Settlement::Base
-  attr_accessor :payment, :payment_request, :amount, :currency_id
+  attr_accessor :payment, :payment_request, :amount, :currency_id, :note
 
-  def init_payment_request(payment_type, payment_purpose)
-    # Add Company Balance for the particular company
-    self.payment_request = PaymentRequest.(user, nil, to_user.cash_on_hand.class.name, payment_type, payment_purpose)
-    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, to_user.cash_on_hand, amount))
+  def init_payment_request(payment_type, payment_purpose, options = {})
+    initiating_account = options[:initiating_account]
+    amount = options[:amount]
+    receiving_account = options[:receiving_account] || to_user.cash_on_hand
+    self.payment_request = PaymentRequest.(user, initiating_account, (receiving_account&.class&.name), payment_type, payment_purpose)
+    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, receiving_account, amount, note: self.note))
   end
 
   class Settlement::Payment::Base::Presenter < Settlement::Base::BasePresenter::SuccessPresenter
@@ -23,8 +25,9 @@ class Settlement::Payment::Base < Settlement::Base
   end
 
   def payment_params
-    params.require(:payment).permit(:from_cash_in_hand, :from_outside_finly, :amount, :note, :date,
+    params.require(:payment).permit(:from_cash_in_hand, :from_outside_finly, :from_bank_transfer, :amount, :note, :date,
                                     :currency_id, :total, :initiating_account_id, :initiating_account_type,
+                                    :receiving_account_type, :receiving_account_id, :payment_mode,
                                     from_reimbursement_card: [:id, :amount], reimbursement_bank_account: [:amount])
   end
 

@@ -20,7 +20,12 @@ class Statements::Show < Statements::Base
     account_type = params[:account_type]&.to_sym
     case statement_type
       when :company
-        self.account = user.company.itz_cash_company_account
+        case account_type
+          when :card_transfer_credits
+            self.account = user.company.itz_cash_company_account
+          when :bank_transfer_credits
+            self.account = user.company.yes_bank_company_account
+        end
       when :user
         user_presenter = User::Show.(user, params)
         unless user_presenter.success?
@@ -33,8 +38,10 @@ class Statements::Show < Statements::Base
             self.account = sel_user.cards.expense_cards.first
           when :reimbursement_card
             self.account = sel_user.cards.reimbursement_cards.first
-          when :finly_money
+          when :finly_money_card_transfer
             self.account = sel_user.wallet
+          when :finly_money_bank_transfer
+            self.account = sel_user.bank_wallet
           when :cash_on_hand
             self.account = sel_user.cash_on_hand
         end
@@ -116,41 +123,14 @@ class Statements::Show < Statements::Base
 
     def opening_balance
       return nil unless can_view_balance?
-      balance = self.scoped_finly_transactions.last&.opening_balance&.value
-      return balance unless balance.nil?
-
-      # todo Jugaad to access historical data
-      from = (params&.dig(:with_date_range)&.dig(:from) - 1.day)
-      case self.account.class.name
-        when Card.name
-          self.account.user.user_balance_histories.with_date(from)&.first&.card_balance&.value || 0
-        when ItzCashCompanyAccount.name
-          self.account.company.company_balance_histories.with_date(from)&.first&.company_balance&.value || 0
-        when UserWallet.name
-          self.account.user.user_balance_histories.with_date(from)&.first&.finly_money_balance&.value || 0
-        when CashOnHand.name
-          self.account.user.user_balance_histories.with_date(from)&.first&.cash_on_hand_balance&.value || 0
-      end
-      # self.account.user.user_balance_histories.with_date(from)&.first.card_balance.value.to_s
+      date = params&.dig(:with_date_range)&.dig(:from)
+      account.opening_balance(date)
     end
 
     def closing_balance
       return nil unless can_view_balance?
-      balance = self.scoped_finly_transactions.first&.closing_balance&.value
-      return balance unless balance.nil?
-
-      # todo Jugaad to access historical data
-      to = params&.dig(:with_date_range)&.dig(:to)
-      case self.account.class.name
-        when Card.name
-          self.account.user.user_balance_histories.with_date(to)&.first&.card_balance&.value || 0
-        when ItzCashCompanyAccount.name
-          self.account.company.company_balance_histories.with_date(to)&.first&.company_balance&.value || 0
-        when UserWallet.name
-          self.account.user.user_balance_histories.with_date(to)&.first&.finly_money_balance&.value || 0
-        when CashOnHand.name
-          self.account.user.user_balance_histories.with_date(to)&.first&.cash_on_hand_balance&.value || 0
-      end
+      date = params&.dig(:with_date_range)&.dig(:to)
+      account.closing_balance(date)
     end
 
     def credit_amount
@@ -194,7 +174,16 @@ class Statements::Show < Statements::Base
         when PaymentPurpose.id_for(:atm_withdrawal), PaymentPurpose.id_for(:personal_expense), PaymentPurpose.id_for(:card_transaction)
           merchant = finly_transaction&.associated_transaction&.merchant_name
         when PaymentPurpose.id_for(:vendor_payment)
-          merchant = 'Vendor Payment'
+          merchant = finly_transaction.payment&.receiving_user&.name
+          if merchant.present?
+            if finly_transaction.credit?
+              merchant = "Reversal for #{merchant}'s Payment"
+            elsif finly_transaction.debit?
+              merchant = "Sent to #{merchant}"
+            end
+          else
+            merchant = 'Vendor Payment'
+          end
         when PaymentPurpose.id_for(:corporate_balance_load)
           merchant = 'Corporate Balance Load'
         when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:balance_clearance),
@@ -223,90 +212,7 @@ class Statements::Show < Statements::Base
     end
 
     def summary
-      credit_summary = self.scoped_finly_transactions.success.credits.purpose_wise_amount
-      debit_summary = self.scoped_finly_transactions.success.debits.purpose_wise_amount
-      summary = {credits: [], debits: []}
-      PaymentPurpose.all.each do |payment_purpose|
-        credits = credit_summary[payment_purpose.id]
-        debits = debit_summary[payment_purpose.id]
-        case payment_purpose.id
-          when PaymentPurpose.id_for(:atm_withdrawal)
-            if debits.present?
-              summary[:debits] << "ATM Withdrawals: <b>₹#{debits}</b>"
-            end
-          when PaymentPurpose.id_for(:card_transaction)
-            if credits.present?
-              summary[:credits] << "Received via Cashback / Refunds / Reversals: <b>₹#{credits}</b>"
-            end
-            if debits.present?
-              summary[:debits] << "Spent using Finly Card: <b>₹#{debits}</b>"
-            end
-          when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:advance)
-            if credits.present?
-              summary[:credits] << "Received as Advance: <b>₹#{credits}</b>"
-            end
-            if debits.present?
-              summary[:debits] << "Sent as Advance: <b>₹#{debits}</b>"
-            end
-          when PaymentPurpose.id_for(:reimbursement_outside_finly)
-            if credits.present?
-              summary[:credits] << "Received as Reimbursement (Outside Finly ): <b>₹#{credits}</b>"
-            end
-            if debits.present?
-              summary[:debits] << "Sent Reimbursement (Outside Finly ): <b>₹#{debits}</b>"
-            end
-          when PaymentPurpose.id_for(:reimbursement)
-            if credits.present?
-              summary[:credits] << "Received as Reimbursement: <b>₹#{credits}</b>"
-            end
-          when PaymentPurpose.id_for(:medical_benefit)
-            if credits.present?
-              summary[:credits] << "Received for Medical Benefits: <b>₹#{credits}</b>"
-            end
-          when PaymentPurpose.id_for(:meal_benefit)
-            if credits.present?
-              summary[:credits] << "Received for Meal Benefits: <b>₹#{credits}</b>"
-            end
-          when PaymentPurpose.id_for(:payroll)
-            if credits.present?
-              summary[:credits] << "Received as Payroll: <b>₹#{credits}</b>"
-            end
-          when PaymentPurpose.id_for(:vendor_payment)
-
-          when PaymentPurpose.id_for(:corporate_balance_load)
-            if credits.present?
-              summary[:credits] << "Added to Company Credits: <b>₹#{credits}</b>"
-            end
-            if debits.present?
-              # Prolly not possible
-            end
-          when PaymentPurpose.id_for(:balance_clearance_outside_finly), PaymentPurpose.id_for(:balance_clearance)
-            if credits.present?
-              summary[:credits] << "Retracted back to your account: <b>₹#{credits}</b>"
-            end
-            if debits.present?
-              summary[:debits] << "Retracted from your account: <b>₹#{debits}</b>"
-            end
-          when PaymentPurpose.id_for(:corporate_balance_refund)
-
-          when PaymentPurpose.id_for(:fees)
-            if credits.present?
-              # summary[:credits] << "Added from Personal Expenses: <b>₹#{credits}</b>"
-              # Not possible?
-            end
-            if debits.present?
-              summary[:debits] << "Fees: <b>₹#{debits}</b>"
-            end
-          when PaymentPurpose.id_for(:personal_expense)
-            if credits.present?
-              summary[:credits] << "Added from Personal Expenses: <b>₹#{credits}</b>"
-            end
-            if debits.present?
-              summary[:debits] << "Reversed Personal Expenses: <b>₹#{debits}</b>"
-            end
-        end
-      end
-      summary
+      FinlyTransaction::Summary.(user, finly_transactions: self.scoped_finly_transactions).summary
     end
 
     def can_view_transactions?

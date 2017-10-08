@@ -24,6 +24,11 @@ class Admin::Users::Team::Mappings::Set < User::Team::Mappings::Set
     self.mappings = updating_user.team_mapping
     self.updating_policy_config = params[:user_policy_config]
     self.updating_mapping = params[:user_manager_mapping]
+    # setting the purpose as expense management till the vendor payments
+    # mappings are implemented in admin panel
+    self.purpose_id = MappingPurpose.id_for(:expense_management)
+    ###################################################################
+    params[:purpose_id] = self.purpose_id
     load_updating_records
     load_updating_policy_config
   end

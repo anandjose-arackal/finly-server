@@ -17,19 +17,19 @@ class BaseOperation
 
   # Applications
   def admin_panel?
-    current_app == :ap
+    current_app == :ap || current_app == 'ap'
   end
 
   def vendor_payments?
-    current_app == :vp
+    current_app == :vp || current_app == 'vp'
   end
 
   def expense_management?
-    current_app == :em
+    current_app == :em || current_app == 'em'
   end
 
   def funds_transfer?
-    current_app == :ft
+    current_app == :ft || current_app == 'ft'
   end
 
   # Can be called as BaseOperations.(user, params) instead of BaseOperations.call(user, params)
@@ -43,36 +43,36 @@ class BaseOperation
     return failure if has_errors?
     authorize_user authorized_user_types
     return failure if has_errors?
-    pre_validate
+    execute_function :pre_validate
     return failure if has_errors?
-    pre_authorize
+    execute_function :pre_authorize
     return failure if has_errors?
-    init
+    execute_function :init
     return failure if has_errors?
-    authorize
+    execute_function :authorize
     return failure if has_errors?
-    validate
+    execute_function :validate
     return failure if has_errors?
-    subscribe
+    execute_function :subscribe
     return failure if has_errors?
     if expense_management?
-      configure_expense_management
+      execute_function :configure_expense_management
       return failure if has_errors?
     elsif funds_transfer?
-      configure_disburse
+      execute_function :configure_disburse
       return failure if has_errors?
     elsif vendor_payments?
-      configure_vendor_payment
+      execute_function :configure_vendor_payment
       return failure if has_errors?
     end
-    pre_process
+    execute_function :pre_process
     return failure if has_errors?
-    process
+    execute_function :process
     return failure if has_errors?
     self.process_complete = true
-    post_process
+    execute_function :post_process
     return failure if has_errors?
-    retrieve
+    execute_function :retrieve
   end
 
   def user_model
@@ -114,6 +114,17 @@ class BaseOperation
         raise_unauthorized_exception
       end
     end
+  end
+
+
+  #   {
+  #       pre_validate: {
+  #           before: Personalizer::Process.new([:expense, :create], :pre_validate, params),
+  #           after: Personalizer::Process.new([:expense, :create], :pre_validate, params)
+  #       }
+  #   }
+  def personalizer
+    {}
   end
 
   # Define the authorized user types for the action
@@ -188,7 +199,7 @@ class BaseOperation
   end
 
   def has_errors?
-    self.messages[:error].present? or self.messages[:failure].present?
+    self.messages.present? and (self.messages[:error].present? or self.messages[:failure].present?)
   end
 
   def processing?
@@ -253,11 +264,11 @@ class BaseOperation
     end
 
     def manager_view?
-      is_view?(:manager)
+      is_view?(:manager) or is_view?(:reviewer)
     end
 
     def finance_view?
-      is_view?(:finance) or is_view?(:finance_manager)
+      is_view?(:finance) or is_view?(:finance_manager) or is_view?(:creditor)
     end
 
     def auditor_view?
@@ -265,7 +276,11 @@ class BaseOperation
     end
 
     def personal_view?
-      is_view?(:employee) or is_view?(:personal) or params[:view].blank?
+      is_view?(:employee) or is_view?(:personal) or is_view?(:initiator) or params[:view].blank?
+    end
+
+    def initiator_view?
+      is_view?(:initiator)
     end
 
     def is_view?(type)
@@ -278,6 +293,34 @@ class BaseOperation
 
     def failure?
       false
+    end
+
+    def current_app
+      RequestStore.store[:current_app]
+    end
+
+    def current_devise
+      RequestStore.store[:current_devise]
+    end
+
+    def current_user
+      RequestStore.store[:current_user]
+    end
+
+    def authorized_scopes
+      RequestStore.store[:authorized_scopes]
+    end
+
+    def current_company
+      RequestStore.store[:current_company]
+    end
+
+    def current_request
+      RequestStore.store[:request]
+    end
+
+    def request_params
+      RequestStore.store[:params]
     end
 
     class BaseOperation::BasePresenter::SuccessPresenter < BaseOperation::BasePresenter
@@ -318,7 +361,11 @@ class BaseOperation
       user_types.each do |user_type|
         if (user_type == :employee and user.employee?) or (user_type == :manager and user.manager?) or
             (user_type == :finance_manager and user.finance_manager?) or(user_type == :policy_admin and user.policy_admin?) or
-            (user_type == :company_admin and user.company_admin?) or (user_type == :admin and user.admin?) or (user_type == :superadmin and user.superadmin?)
+            (user_type == :company_admin and user.company_admin?) or (user_type == :admin and user.admin?) or (user_type == :superadmin and user.superadmin?) or
+            (user_type == :auditor and user.auditor?) or
+            (user_type == :vendor_payments_admin && user.vendor_payments_admin?) or (user_type == :reviewer && user.vendor_payments_reviewer?) or (user_type == :creditor && user.vendor_payments_creditor?) or
+            (user_type == :vendor_payments_admin && user.vendor_payments_admin?) or (user_type == :vendor_payments_reviewer && user.vendor_payments_reviewer?) or (user_type == :vendor_payments_creditor && user.vendor_payments_creditor?) or
+            (user_type == :vendor_payments_initiator && user.vendor_payments_initiator?)
           return
         end
       end
@@ -345,11 +392,11 @@ class BaseOperation
   end
 
   def manager_view?
-    is_view?(:manager)
+    is_view?(:manager) or is_view?(:reviewer)
   end
 
   def finance_view?
-    is_view?(:finance) or is_view? :finance_manager
+    is_view?(:finance) or is_view? :finance_manager or is_view?(:creditor)
   end
 
   def auditor_view?
@@ -357,7 +404,11 @@ class BaseOperation
   end
 
   def personal_view?
-    is_view?(:employee) or is_view?(:personal) or params[:view].blank?
+    is_view?(:employee) or is_view?(:personal) or is_view?(:initiator) or params[:view].blank?
+  end
+
+  def initiator_view?
+    is_view?(:initiator)
   end
 
   def is_view?(type)
@@ -366,6 +417,41 @@ class BaseOperation
 
   def clear_messages
     self.messages = {error: [], failure: [], success: [], message: [], notice: []}
+  end
+
+  # Used for executing custom functions. All functions defined in personalizer would be executed here
+  def execute_function(function)
+    return unless function.present?
+
+    personalizer_config = personalizer
+    if personalizer_config.nil?
+      personalizer_config = {}
+    end
+
+    # Run personalizer if present
+    before_operation = personalizer_config&.dig(function, :before)
+    before_operation&.run
+
+    if before_operation&.has_errors?
+      add_message :error, before_operation.messages[:error]
+      return
+    end
+
+    result = self.send function
+    if has_errors?
+      return
+    end
+    # Run personalizer if present
+    after_operation = personalizer_config&.dig(function, :after)
+    after_operation&.run
+
+    if after_operation&.has_errors?
+      add_message :error, after_operation.messages[:error]
+      return
+    end
+
+    # Return the result provided by the function
+    result
   end
 
 end

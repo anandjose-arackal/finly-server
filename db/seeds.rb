@@ -272,8 +272,8 @@ if User.count == 0
   a = User.create(company: Company.first, first_name: "Demo", last_name: "Admin", email: "admin@demo.com",
                   password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                   mothers_maiden_name: Faker::Name.first_name,
-                  role_mapping_attributes: [{user_role_id: UserRole.admin_id},
-                                            {user_role_id: UserRole.employee_id}],
+                  role_mapping_attributes: [{purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.admin_id},
+                                            {purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.employee_id}],
                   profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                        address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
                   user_panel_subscription_attributes: {disburse: true, expense_management: true})
@@ -283,8 +283,8 @@ if User.count == 0
     fm << User.create(company: Company.first, first_name: "Demo", last_name: "FinanceManager#{pos}", email: "finance#{pos}@demo.com",
                       password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                       mothers_maiden_name: Faker::Name.first_name,
-                      role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id},
-                                                {user_role_id: UserRole.employee_id}],
+                      role_mapping_attributes: [{purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.finance_manager_id},
+                                                {purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.employee_id}],
                       profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                            address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
                       user_panel_subscription_attributes: {disburse: true, expense_management: true})
@@ -295,8 +295,8 @@ if User.count == 0
     m << User.create(company: Company.first, first_name: "Demo", last_name: "Manager#{pos}", email: "manager#{pos}@demo.com",
                      password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                      mothers_maiden_name: Faker::Name.first_name,
-                     role_mapping_attributes: [{user_role_id: 3},
-                                               {user_role_id: UserRole.employee_id}],
+                     role_mapping_attributes: [{purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: 3},
+                                               {purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.employee_id}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
                      user_panel_subscription_attributes: {disburse: true, expense_management: true})
@@ -308,7 +308,7 @@ if User.count == 0
   v << User.create(company: Company.first, first_name: "Demo", last_name: "Manager", email: "manager4@demo.com",
                    password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
-                   role_mapping_attributes: [{user_role_id: UserRole.manager_id}, {user_role_id: UserRole.employee_id}],
+                   role_mapping_attributes: [{purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.manager_id}, {purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.employee_id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
                    user_panel_subscription_attributes: {disburse: true, expense_management: true})
@@ -316,7 +316,7 @@ if User.count == 0
   v << User.create(company: Company.first, first_name: "Demo", last_name: "Finance", email: "finance4@demo.com",
                    password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
-                   role_mapping_attributes: [{user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
+                   role_mapping_attributes: [{purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.finance_manager_id}, {purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.employee_id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
                    user_panel_subscription_attributes: {disburse: true, expense_management: true})
@@ -329,7 +329,7 @@ if User.count == 0
   u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "employee0@demo.com",
                    password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                    mothers_maiden_name: Faker::Name.first_name,
-                   role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
+                   role_mapping_attributes: [{purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.employee_id}],
                    team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0], policy_id: Company.first.policies.default.first.id}],
                    profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                         address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
@@ -339,7 +339,7 @@ if User.count == 0
     u << User.create(company: Company.first, first_name: Faker::Name.first_name, last_name: Faker::Name.last_name, email: "#{Faker::Internet.user_name}@demo.com",
                      password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
                      mothers_maiden_name: Faker::Name.first_name,
-                     role_mapping_attributes: [{user_role_id: UserRole.employee_id}],
+                     role_mapping_attributes: [{purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.employee_id}],
                      team_mapping_attributes: [{default: true, manager: m[0], finance_manager: fm[0], policy_id: Company.first.policies.default.first.id}],
                      profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                           address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
@@ -351,8 +351,8 @@ if User.count == 0
   User.create(company: Company.first, first_name: "Demo", last_name: "King", email: "king@demo.com",
               password: "demo1234", password_confirmation: "demo1234", company_id: c.id, mobile_number: random_mobile_number,
               mothers_maiden_name: Faker::Name.first_name,
-              role_mapping_attributes: [{user_role_id: UserRole.admin_id}, {user_role_id: UserRole.manager_id},
-                                        {user_role_id: UserRole.finance_manager_id}, {user_role_id: UserRole.employee_id}],
+              role_mapping_attributes: [{purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.admin_id}, {purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.manager_id},
+                                        {purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.finance_manager_id}, {purpose_id: MappingPurpose.id_for(:expense_management), user_role_id: UserRole.employee_id}],
               profile_attributes: {date_of_birth: Faker::Date.backward(365), gender: 'm', address_1: 'Dummy Address',
                                    address_2: 'Dummy Address Line 2', city: Faker::Address.city, state: State.first, pin_code: "123456"},
               user_panel_subscription_attributes: {disburse: true, expense_management: true})
@@ -389,7 +389,7 @@ end
 if Policy.non_default.count == 0
   a = User.first
   p = Policy::Create.(a, {name: 'Bangalore team'})
-  p = Policy.find_by(name: "Bangalore team")
+  p = Policy.find_by(name: 'Bangalore team')
   p.configuration.update_attribute(:require_category, true) if p.present?
   Policy::Users::AddUser.(a, {view: 'admin', policy_id: p.id, user_id: "#{u[0].id}"})
   # PolicyUserService.new(p).add_user(u[0], false)
@@ -565,6 +565,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Employee ID',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:report)})
@@ -572,6 +573,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Name',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:report)})
@@ -580,6 +582,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Location',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:money_request)})
@@ -587,6 +590,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Policy',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Project Name',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:money_request)})
@@ -595,6 +599,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Location',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:manual_expense)})
@@ -602,6 +607,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Duration of Meeting',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:manual_expense)})
@@ -610,6 +616,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Reason',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:distance_expense)})
@@ -617,6 +624,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Name',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:distance_expense)})
@@ -625,6 +633,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Reason',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:time_expense)})
@@ -632,6 +641,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Name',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:time_expense)})
@@ -639,6 +649,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Reason',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:per_diem_expense)})
@@ -646,6 +657,7 @@ if FieldConfiguration.count == 0
   CustomField::Configuration::Create.(User.first, field_configuration: {configurable_type: 'Company',
                                                                         configurable_id: 1, company_id: 1,
                                                                         field_name: 'Client Name',
+                                                                        global: true,
                                                                         field_type_id: FieldType.id_for(:text),
                                                                         mandatory: false,
                                                                         field_parent_type_id: FieldParentType.id_for(:per_diem_expense)})

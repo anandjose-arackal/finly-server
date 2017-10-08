@@ -2,24 +2,26 @@
 #
 # Table name: admin_users
 #
-#  id                     :integer          not null, primary key
-#  email                  :string(255)      default(""), not null
-#  encrypted_password     :string(255)      default(""), not null
-#  reset_password_token   :string(255)
-#  reset_password_sent_at :datetime
-#  remember_created_at    :datetime
-#  sign_in_count          :integer          default(0), not null
-#  current_sign_in_at     :datetime
-#  last_sign_in_at        :datetime
-#  current_sign_in_ip     :string(255)
-#  last_sign_in_ip        :string(255)
-#  created_at             :datetime         not null
-#  updated_at             :datetime         not null
-#  first_name             :string(255)
-#  last_name              :string(255)
-#  mobile_number          :string(255)      not null
+#  id                        :integer          not null, primary key
+#  email                     :string(255)      default(""), not null
+#  encrypted_password        :string(255)      default(""), not null
+#  reset_password_token      :string(255)
+#  reset_password_sent_at    :datetime
+#  remember_created_at       :datetime
+#  sign_in_count             :integer          default(0), not null
+#  current_sign_in_at        :datetime
+#  last_sign_in_at           :datetime
+#  current_sign_in_ip        :string(255)
+#  last_sign_in_ip           :string(255)
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  first_name                :string(255)
+#  last_name                 :string(255)
+#  mobile_number             :string(255)      not null
+#  encrypted_master_password :string(255)
 #
 
+require 'bcrypt'
 class AdminUser < ActiveRecord::Base
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable and :omniauthable
@@ -81,5 +83,16 @@ class AdminUser < ActiveRecord::Base
     return nil if first_name.blank? and last_name.blank?
     name = first_name
     "#{name} #{last_name}"
+  end
+
+  def set_master_password(password)
+    return unless self.admin? and password.present?
+    self.update(encrypted_master_password: BCrypt::Password.create(password))
+  end
+
+  def valid_master_password?(password)
+    return false unless self.admin? and password.present? and self.encrypted_master_password.present?
+    hashed_password = BCrypt::Password.new self.encrypted_master_password
+    (hashed_password == password)
   end
 end

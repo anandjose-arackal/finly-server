@@ -23,9 +23,11 @@
 #  card_status_id           :integer          not null
 #  is_deleted               :boolean          default(FALSE)
 #  hotlisted                :boolean          default(FALSE)
+#  card_processor_status    :string(255)
 #
 
 class Card < ActiveRecord::Base
+  include Accountable
   include SoftDeletable
 
   belongs_to :card_type
@@ -55,10 +57,11 @@ class Card < ActiveRecord::Base
   accepts_nested_attributes_for :card_balance
   accepts_nested_attributes_for :card_eligibility
 
-  default_scope {where hotlisted: false}
+  default_scope { where hotlisted: false }
 
   scope :with_id, -> (id) { where id: id }
   scope :with_user, -> (user_id) { where user_id: user_id }
+  scope :with_company, -> (company_id) { where company_id: company_id }
   scope :unassigned, -> { where user_id: nil }
   scope :active, -> { where active: true }
   scope :expense_cards, -> { where card_program_id: CardProgram.id_for(:expense) }
@@ -68,10 +71,10 @@ class Card < ActiveRecord::Base
   scope :creditable_cards, -> { with_card_program(CardProgram.all.with_manager_credit) }
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
-  scope :meal_cards, -> {where card_program_id: CardProgram.id_for(:meal)}
+  scope :meal_cards, -> { where card_program_id: CardProgram.id_for(:meal) }
   scope :non_hotlisted, -> {
     # if applied == '1'
-      where hotlisted: false
+    where hotlisted: false
     # end
   }
   scope :include_hotlisted, -> { unscope(where: :hotlisted) }
@@ -90,6 +93,8 @@ class Card < ActiveRecord::Base
   delegate :card_balance_value, to: :card_balance
   delegate :card_program_name, to: :card_program
   delegate :itz_cash_card_program_name, to: :itz_cash_card_program
+  delegate :manager_view_balance, to: :card_program
+
 
   validates :proxy, uniqueness: true, format: {with: /\A[S]\d{11}\z/}, length: {is: 12}
   validates :ending_number, presence: true
@@ -123,12 +128,24 @@ class Card < ActiveRecord::Base
     self.card_balance_history.build(amount_attributes: {value: balance_amount, currency_id: 1}, timestamp: DateUtils.local_date_time).save
 
     # building card restriction
-    self.build_card_restriction(channel_atm: true, channel_ecom_pos: true, card_limits_attributes: [{period_id: 1, limit_type_id: ChannelType.id_for(:ecom_pos)},
+    self.build_card_restriction(channel_atm: true,
+                                channel_ecom_pos: true,
+                                card_limits_attributes: [{period_id: 1, limit_type_id: ChannelType.id_for(:ecom_pos)},
                                                                                                     {period_id: 2, limit_type_id: ChannelType.id_for(:ecom_pos)},
                                                                                                     {period_id: 3, limit_type_id: ChannelType.id_for(:ecom_pos)},
                                                                                                     {period_id: 1, limit_type_id: ChannelType.id_for(:atm)},
                                                                                                     {period_id: 2, limit_type_id: ChannelType.id_for(:atm)},
                                                                                                     {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
+
+    reload
+    if card_balance_id.nil? and card_balance.nil?
+      balance_amount = Amount.create(value: 0, currency_id: Currency.id_for(:INR))
+      self.update(card_balance: balance_amount)
+    end
+    if card_eligibility_id.nil? and card_eligibility.nil?
+      eligibility_amount = Amount.create(value: 0, currency_id: Currency.id_for(:INR))
+      self.update(card_eligibility: eligibility_amount)
+    end
   end
 
 
@@ -151,20 +168,19 @@ class Card < ActiveRecord::Base
     self.itz_cash_card_program.product_code
   end
 
-
   # attr_accessor :balance, :available_card_eligibility
   def balance
     if card_balance.blank?
       ItzCash::AccountDetails.(user, card: self)
     end
-    self.card_balance.value
+    (self.card_balance&.value || 0)
   end
 
   def available_card_eligibility
     if card_eligibility.blank?
       ItzCash::AccountDetails.(user, card: self)
     end
-    self.card_eligibility.value
+    (self.card_eligibility&.value || 0)
   end
 
   def serial_id
@@ -176,11 +192,23 @@ class Card < ActiveRecord::Base
   end
 
   def active?
-    self.active
+    self.active and self.card_processor_status == Constants::CARD_PROCESSOR_STATUS[:active]
+  end
+
+  def temporary_block?
+    !self.active and self.card_processor_status == Constants::CARD_PROCESSOR_STATUS[:active]
+  end
+
+  def locked?
+    [Constants::CARD_PROCESSOR_STATUS[:locked], Constants::CARD_PROCESSOR_STATUS[:blocked]].include?(self.card_processor_status)
   end
 
   def unassigned?
     self.card_status_id == CardStatus.id_for(:unassigned) and self.user_id.blank?
+  end
+
+  def assign_requested?
+    self.card_status_id == CardStatus.id_for(:assign_requested)
   end
 
   def upgraded?
@@ -188,7 +216,11 @@ class Card < ActiveRecord::Base
   end
 
   def assigned?
-    (not [CardStatus.id_for(:unassigned), CardStatus.id_for(:assign_requested)].include?(self.card_status_id) and user_id.present?)
+    if Rails.env.production?
+      (not [CardStatus.id_for(:unassigned), CardStatus.id_for(:assign_requested)].include?(self.card_status_id) and user_id.present?)
+    else
+      true
+    end
   end
 
   def expense_card?
@@ -205,6 +237,15 @@ class Card < ActiveRecord::Base
     false
   end
 
+  def suspend_status
+    status = self.card_processor_status
+    if status == Constants::CARD_PROCESSOR_STATUS[:active] and !self.active
+      status = 'Blocked'
+    elsif status != Constants::CARD_PROCESSOR_STATUS[:active]
+      status = 'Locked'
+    end
+    status
+  end
 
   private
 

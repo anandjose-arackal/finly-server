@@ -19,6 +19,8 @@
 
 
 class BudgetRule < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :category
   belongs_to :amount, dependent: :destroy
   belongs_to :period
@@ -31,6 +33,8 @@ class BudgetRule < ActiveRecord::Base
   delegate :type, to: :rule_type
   delegate :amount_value, to: :amount
   delegate :category_name, to: :category
+
+  default_scope { unscope(:where)}
 
   validates :period_id, presence: true
   validates :policy_id, presence: true

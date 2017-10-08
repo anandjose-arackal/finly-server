@@ -1,8 +1,8 @@
 class ChangeOrderOfReportStatus < ActiveRecord::Migration
   def change
     if ReportStatus.count > 0
-      processing = ReportStatus.with_name(name: 'Processing').first rescue nil
-      retracted = ReportStatus.with_name(name: 'Retracted').first rescue nil
+      processing = ReportStatus.with_name('Processing').first rescue nil
+      retracted = ReportStatus.with_name('Retracted').first rescue nil
 
       if processing&.order == 2
         processing.update(order: 3)

@@ -1,6 +1,10 @@
 class UserGroup::Index < UserGroup::Base
   attr_accessor :user_groups
 
+  def authorized_user_types
+    [:admin, :manager, :finance_manager, :auditor]
+  end
+
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'

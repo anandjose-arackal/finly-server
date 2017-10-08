@@ -49,6 +49,8 @@ class Payment < ActiveRecord::Base
   has_many :money_request_tracks
   has_many :finly_transactions
 
+  has_one :payment, as: :reference_resource
+
   belongs_to :payment_order
   belongs_to :payment_status
   belongs_to :payment_purpose
@@ -60,34 +62,43 @@ class Payment < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :payment_order
+  accepts_nested_attributes_for :receiving_account
+
   delegate :amount_value, to: :amount
 
   default_scope { order date: :desc, created_at: :desc }
 
-  scope :atm_withdrawals, -> { where payment_type_id: PaymentType.id_for(:atm_withdrawal) }
-  scope :advance, -> { where payment_type_id: PaymentType.id_for(:add_cash_on_hand) }
-  scope :cash_on_hand_additions, -> { where payment_type_id: PaymentType.id_for(:add_cash_on_hand) }
-  scope :reimbursement, -> { where payment_type_id: PaymentType.id_for(:reimbursement) }
-  scope :debt_clearance, -> { where payment_type_id: PaymentType.id_for(:deduct_cash_on_hand) }
-  scope :cash_on_hand_deductions, -> { where payment_type_id: PaymentType.id_for(:deduct_cash_on_hand) }
-  scope :settlement, -> { where payment_type_id: PaymentType.id_for(:settlement) }
+  scope :atm_withdrawals, -> { where payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal) }
+  scope :advance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:advance_outside_finly)] }
+  scope :cash_on_hand_additions, -> { where payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:cash_advance)] }
+  scope :reimbursement, -> { where payment_purpose_id: [PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)] }
+  scope :debt_clearance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:balance_clearance), PaymentPurpose.id_for(:balance_clearance_outside_finly)] }
+  scope :cash_on_hand_deductions, -> { where payment_purpose_id: [PaymentPurpose.id_for(:balance_clearance_outside_finly)] }
+  scope :settlement, -> { where payment_purpose_id: PaymentType.id_for(:settlement) }
   scope :involving_user, ->(user_id) { where('receiving_user_id = ? OR initiating_user_id = ?', user_id, user_id) }
   scope :involving_account, ->(account) { where('(initiating_account_id = ? AND initiating_account_type = ?) OR (receiving_account_id = ? and receiving_account_type = ?)', account.id, account.class.name, account.id, account.class.name) }
   scope :received_by_user, ->(user_id) { where receiving_user_id: user_id }
   scope :initiated_by_user, ->(user_id) { where initiating_user_id: user_id }
-  scope :transferred_cash_to_user, -> { where payment_type: [PaymentType.id_for(:add_cash_on_hand),
-                                                             PaymentType.id_for(:reimbursement),
-                                                             PaymentType.id_for(:settlement),
-                                                             PaymentType.id_for(:atm_withdrawal)] }
+  scope :transferred_cash_to_user, -> { where payment_type: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:cash_advance),
+                                                             PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly),
+                                                             PaymentPurpose.id_for(:atm_withdrawal)] }
   scope :with_amount, -> { joins :amount }
+  scope :joins_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
+  scope :scheduled, -> {where payment_status_id: PaymentStatus.id_for(:scheduled)}
   scope :with_receiving_account_type, -> (receiving_account_type){
     where receiving_account_type: receiving_account_type
   }
   scope :with_receiving_account_id, -> (ids) {
     where receiving_account_id: ids
+  }
+  scope :with_initiating_account_type, -> (initiating_account_type){
+    where initiating_account_type: initiating_account_type
+  }
+  scope :with_initiating_account_id, -> (ids) {
+    where initiating_account_id: ids
   }
 
   # Personal are card transactions from own wallet to own card
@@ -129,6 +140,10 @@ class Payment < ActiveRecord::Base
   scope :debit_from_card_to_virtual_account, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::VIRTUAL_ACCOUNT, receiving_account_type: Payment::AccountType::CARD }
   scope :debit_from_card_to_wallet, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::WALLET, receiving_account_type: Payment::AccountType::CARD }
   scope :debit_from_card_to_card, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::CARD, receiving_account_type: Payment::AccountType::CARD }
+  scope :cash_on_hand_credits, -> {where(receiving_account_type: "CashOnHand")}
+  scope :cash_advance, -> { where payment_purpose_id: PaymentPurpose.id_for(:cash_advance) }
+  scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
+  scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
 
   scope :transfer_to_card, -> { where('(payment_type_id = ? AND receiving_account_type = ?) OR (payment_type_id = ? AND initiating_account_type = ?)',
                                       PaymentType.id_for(:credit), Payment::AccountType::CARD, PaymentType.id_for(:debit), Payment::AccountType::CARD) }
@@ -151,7 +166,12 @@ class Payment < ActiveRecord::Base
   scope :with_reference_id, -> (ref_id) { where reference_id: ref_id }
 
   scope :filter_search, -> (term) {
-    #todo - need to think about this
+    bank_account_ids = BankAccount.where("account_number like ? OR name like ? OR ifsc like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = YesBankVendor.where("name like ? OR email like ? OR mobile_number like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    user_ids = User.where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+
+    where("(receiving_account_type = 'BankAccount' AND receiving_account_id IN (?)) OR (receiving_user_type = 'YesBankVendor' AND receiving_user_id IN (?))
+            OR (receiving_user_type = 'User' AND receiving_user_id IN (?))", bank_account_ids, vendor_ids, user_ids)
   }
 
   scope :filter_user_id, -> (user_id) {
@@ -192,11 +212,11 @@ class Payment < ActiveRecord::Base
   end
 
   def initiating_account_type_name
-    name = "#{initiating_user&.name&.to_s}'s "
+    name = "#{initiating_user&.first_name&.to_s}'s "
 
     case self.initiating_account_type
       when "Company", "ItzCashCompanyAccount"
-        name = "Company Credits"
+        name = "Company Credits (Card Transfer Pocket)"
       when "CashOnHand"
         name += "Cash on Hand"
       when "Card"
@@ -205,21 +225,25 @@ class Payment < ActiveRecord::Base
       when "UserWallet"
         name += "Finly Money"
       when "YesBankCompanyAccount"
-        name = "Company Credits"
+        name = "Company Credits (Bank Transfer Pocket)"
       when "VendorPaymentWallet"
-        name += "Finly Credits"
+        name += "Finly Money (Bank Transfer Pocket)"
+      when "BankAccount"
+        name += "Bank Account (Number: #{self.initiating_account.account_number})"
       else
         name = ""
     end
     name
   end
 
+  alias_method :initiating_account_name, :initiating_account_type_name
+
   def receiving_account_type_name
-    name = "#{receiving_user&.name.to_s}'s "
+    name = "#{receiving_user&.first_name.to_s}'s "
 
     case self.receiving_account_type
       when "Company", "ItzCashCompanyAccount"
-        name = "Company Credits"
+        name = "Company Credits (Card Transfer Pocket)"
       when "CashOnHand"
         name += "Cash on Hand"
       when "Card"
@@ -228,14 +252,18 @@ class Payment < ActiveRecord::Base
       when "UserWallet"
         name += "Finly Money"
       when "YesBankCompanyAccount"
-        name = "Company Credits"
+        name = "Company Credits (Bank Transfer Pocket)"
       when "VendorPaymentWallet"
-        name += "Finly Credits"
+        name += "Finly Money (Bank Transfer Pocket)"
+      when "BankAccount"
+        name += "Bank Account (Number: #{self.receiving_account.account_number})"
       else
         name = ""
     end
     name
   end
+
+  alias_method :receiving_account_name, :receiving_account_type_name
 
   def credit?
     self.payment_type_id == PaymentType.id_for(:credit)
@@ -275,12 +303,25 @@ class Payment < ActiveRecord::Base
     end
   end
 
+  # only used in the show action of the payment request
   def payment_status_name
     if self.payment_status_id == PaymentStatus.id_for(:processing)
       return "Processed. Awaiting credit confirmation"
+    elsif self.payment_order&.bank_payment_request&.status&.name == 'approved'
+      return "Approved"
+    elsif ['open', 'retracted', 'rejected'].include?(self.payment_order&.bank_payment_request&.status&.name)
+      return self.payment_order&.bank_payment_request&.status&.name&.humanize
     else
       self.payment_status.name.humanize
     end
+  end
+
+  def cash_on_hand_credit?
+    self.payment_purpose_id == PaymentPurpose.id_for(:cash_advance)
+  end
+
+  def retriable?
+    self.failed?
   end
 
   private
@@ -288,7 +329,8 @@ class Payment < ActiveRecord::Base
   def initiating_account_presence
     unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly, :balance_clearance_outside_finly,
                                    :personal_expense, :atm_withdrawal, :card_transaction, :advance, :corporate_balance_load,
-                                   :corporate_balance_refund]).include?(self.payment_purpose_id)
+                                   :corporate_balance_refund, :cash_advance, :balance_clearance_against_cash_on_hand,
+                                   :advance_against_report_unapproval]).include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")
       end

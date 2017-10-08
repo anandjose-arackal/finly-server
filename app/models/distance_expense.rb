@@ -2,12 +2,13 @@
 #
 # Table name: distance_expenses
 #
-#  id          :integer          not null, primary key
-#  expense_id  :integer
-#  is_deleted  :boolean          default(FALSE)
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  distance_id :integer
+#  id               :integer          not null, primary key
+#  expense_id       :integer
+#  is_deleted       :boolean          default(FALSE)
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  distance_id      :integer
+#  maps_distance_id :integer
 #
 
 class DistanceExpense < ActiveRecord::Base
@@ -15,16 +16,22 @@ class DistanceExpense < ActiveRecord::Base
 
   belongs_to :expense
   belongs_to :distance
+  belongs_to :maps_distance, class_name: 'Distance'
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :locations, as: :locatable, dependent: :destroy
 
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :locations
   accepts_nested_attributes_for :distance
+  accepts_nested_attributes_for :maps_distance, allow_destroy: true
 
   validates :distance, presence: true
 
-  delegate :distance_value, to: :distance
+  delegate :distance_value, to: :distance, allow_nil: true
+
+  def maps_distance_value
+    maps_distance&.value
+  end
 
   # returns an array of all the associated custom field's names
   def custom_field_names

@@ -1,10 +1,11 @@
 # params = {receiving_account: :virtual_account/wallet,initiating_account: wallet/card, initiating_user_id: 1, password: 'password' }
 class User::Wallet::Debit < User::Wallet::Base
 
-  attr_accessor :payment_request, :payment
+  attr_accessor :payment_request, :payment, :note
 
   def init
     super
+    self.note = params[:note]
   end
 
   def validate_sufficient_funds
@@ -14,7 +15,7 @@ class User::Wallet::Debit < User::Wallet::Base
   def process
     # create the payment request object and pass it to the payment processor for the actual credit
     self.payment_request = PaymentRequest.(initiating_user, initiating_account, receiving_account.class.name, :debit, :balance_clearance)
-    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, self.amount))
+    self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(receiving_user, receiving_account, self.amount, note: self.note))
 
     # calling the payment processor to complete the transfer using adapters
     op = AccountManager::Payments::PaymentProcessor.(initiating_user, {payment_request: payment_request})

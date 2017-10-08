@@ -14,7 +14,12 @@ json.per_diem_config do
     json.array! @result.per_diem_config[:per_diems].each do |per_diem|
       json.name per_diem[:name]
       json.id per_diem[:id]
-      json.rate per_diem[:rate]
+      json.rate do
+        json.value per_diem[:rate]
+        json.currency do
+          json.extract! Currency.first, :id, :country, :country_code, :symbol
+        end
+      end
     end
   end
 end
@@ -24,9 +29,13 @@ json.currencies do
     json.id currency.id
     json.symbol currency.symbol
     json.country_code currency.country_code
+    json.country currency.country
   end
 end
-
+json.cash_on_hand do
+  json.value @result.cash_on_hand
+  json.currency Currency.first
+end
 json.categories do
   json.array!(@result.categories) do |category|
     json.extract! category, :id, :name
