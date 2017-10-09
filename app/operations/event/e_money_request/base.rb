@@ -64,7 +64,7 @@ class Event::EMoneyRequest::Base < Event::SetNotifier
 
   def allow_mailer(user, configuration)
     val = super(user, configuration)
-    val and (user.manager_summary_mail_configs.money_requests.blank? or report.user == user)
+    val and (user.manager_summary_mail_configs.money_requests.blank? or money_request.user == user)
   end
 
   class Event::EMoneyRequest::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
