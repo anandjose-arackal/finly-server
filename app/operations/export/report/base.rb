@@ -67,6 +67,34 @@ class Export::Report::Base < Export::Base
           data_arr << expense.note
         when ExportField.type_expense_status
           data_arr << expense.expense_status&.name&.humanize
+        when ExportField.id_for(:employee_email)
+          data_arr << expense.user.email
+        when ExportField.id_for(:employee_mobile_number)
+          data_arr << expense.user.mobile_number
+        when ExportField.id_for(:distance_expense_source)
+          if expense.distance_expense?
+            data_arr << expense.distance_expense.locations&.first&.name
+          else
+            data_arr << ''
+          end
+        when ExportField.id_for(:distance_expense_destination)
+          if expense.distance_expense?
+            data_arr << expense.distance_expense.locations&.last&.name
+          else
+            data_arr << ''
+          end
+        when ExportField.id_for(:distance_in_km)
+          if expense.distance_expense?
+            data_arr << expense.distance_expense.distance_value
+          else
+            data_arr << ''
+          end
+        when ExportField.id_for(:maps_distance_in_km)
+          if expense.distance_expense?
+            data_arr << expense.distance_expense.maps_distance_value
+          else
+            data_arr << ''
+          end
         else
           data_arr << ''
       end
