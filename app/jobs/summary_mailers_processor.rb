@@ -1,4 +1,4 @@
-class SummaryMailers < ActiveJob::Base
+class SummaryMailersProcessor < ActiveJob::Base
 
   def perform
     SummaryMailer::Manager::ProcessReports.new.run
