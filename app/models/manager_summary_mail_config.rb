@@ -43,7 +43,7 @@ class ManagerSummaryMailConfig < ActiveRecord::Base
     query << ')'
     query << " AND "
     query << "scheduled_time = '#{time_slot}'"
-    where query.string
+    where(query.string).group(:user_id)
   end
   scope :reports, -> { where entity_type: 'report' }
   scope :money_requests, -> { where entity_type: 'money_request' }
