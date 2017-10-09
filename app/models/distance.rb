@@ -27,4 +27,6 @@ class Distance < ActiveRecord::Base
     self.value
   end
 
+  alias_method :maps_distance_value, :distance_value
+
 end

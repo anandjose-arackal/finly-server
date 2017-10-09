@@ -16,15 +16,14 @@ class ExportField < ActiveRecord::Base
 
   scope :with_id, ->(id) { where id: id }
 
-
   VALUES = {
       1 => "Employee Name",
-      2 => "Employee ID",
-      3 => "Payroll ID",
-      4 => "Report ID",
+      2 => "Employee Id",
+      3 => "Payroll Id",
+      4 => "Report Id",
       5 => "Report name",
       6 => "Report Status",
-      7 => "Expense ID",
+      7 => "Expense Id",
       8 => "Expense Merchant",
       9 => "Expense Currency",
       10 => "Expense Amount",
@@ -32,8 +31,22 @@ class ExportField < ActiveRecord::Base
       12 => "Expense Category Name",
       13 => "Custom Field",
       14 => "Expense Note",
-      15 => "Expense Status"
+      15 => "Expense Status",
+      16 => "Employee Email",
+      17 => "Employee Mobile Number",
+      18 => "Distance Expense Source",
+      19 => "Distance Expense Destination",
+      20 => "Distance In Km",
+      21 => "Maps Distance in Km"
   }
+
+  def self.id_for(name_in_sym)
+    VALUES.each do |key, value|
+      if value.underscore.gsub(' ', '_').to_sym == name_in_sym
+        return key
+      end
+    end
+  end
 
   def self.seed_data
     VALUES.each do |key, value|
