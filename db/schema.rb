@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171006143843) do
+ActiveRecord::Schema.define(version: 20171007075408) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -536,10 +536,11 @@ ActiveRecord::Schema.define(version: 20171006143843) do
     t.integer  "amount_id",            limit: 4
     t.integer  "period_id",            limit: 4
     t.integer  "policy_id",            limit: 4
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
     t.integer  "rule_type_id",         limit: 4
     t.boolean  "include_reimbursable",           default: true
+    t.boolean  "is_deleted",                     default: false
   end
 
   add_index "budget_rules", ["amount_id"], name: "index_budget_rules_on_amount_id", using: :btree
@@ -1405,11 +1406,12 @@ ActiveRecord::Schema.define(version: 20171006143843) do
     t.integer  "greater_than_amount_id", limit: 4
     t.integer  "category_id",            limit: 4
     t.integer  "days_after",             limit: 4
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
     t.integer  "rule_type_id",           limit: 4
     t.integer  "expense_rule_type_id",   limit: 4
     t.integer  "policy_id",              limit: 4
+    t.boolean  "is_deleted",                       default: false
   end
 
   add_index "expense_rules", ["category_id"], name: "index_expense_rules_on_category_id", using: :btree

@@ -73,10 +73,10 @@ class Report::Violation < Report::Base
       end
 
       unless no_policy
-        policy.expense_rules.each do |rule|
+        policy.expense_rules.non_deleted.each do |rule|
           check_expense_rule rule, expense
         end
-        policy.budget_rules.each do |rule|
+        policy.budget_rules.non_deleted.each do |rule|
           check_budget rule, expense
         end
       end

@@ -16,6 +16,8 @@
 
 
 class ExpenseRule < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :greater_than_amount, class_name: "Amount", dependent: :destroy
   belongs_to :category
 
@@ -30,6 +32,7 @@ class ExpenseRule < ActiveRecord::Base
   delegate :type, to: :rule_type
   delegate :category_name, to: :category
 
+  default_scope { unscope(:where)}
 
   validates :policy_id, presence: true
   validates :rule_type_id, presence: true
