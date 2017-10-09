@@ -24,5 +24,4 @@ Crono.perform(UpdateConvertedAmountValues).every 1.day, at: {hour: 05, min: 40}
 # Crono.perform(AdminPanelVerifierMailer).every 1.hour
 Crono.perform(BankTransferStatusChecker).every 1.hour
 Crono.perform(BackupImages).every 1.day, at: {hour: 01, min: 00}
-Crono.perform(SummaryMailersAdminsProcessor).every 1.minute
-Crono.perform(SummaryMailersManagersProcessor).every 1.minute
+Crono.perform(SummaryMailersProcessor).every 1.minute
