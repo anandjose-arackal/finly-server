@@ -31,7 +31,7 @@ class Event::EBankPaymentRequest::Base < Event::SetNotifier
     set_presenter_params(user)
     return unless params[:subject].present? && params[:body].present?
     BankPaymentRequestMailer.delay.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params))
-    # todo - temporary, for testing. Will be moved to delay before production
+    # # todo - temporary, for testing. Will be moved to delay before production
     # BankPaymentRequestMailer.send_mail(Event::EBankPaymentRequest::Base::PaymentRequestMailerPresenter.new(user, params)).deliver_now
   end
 
