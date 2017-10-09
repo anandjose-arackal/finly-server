@@ -20,7 +20,7 @@
         </div>
         <div class="row no-margin">
           <% warning_rules_count = 0 %>
-          <% @result.policy.expense_rules.each do |rule| %>
+          <% @result.policy.expense_rules.non_deleted.each do |rule| %>
             <% if rule.rule_type_id == 1 %>
               <% warning_rules_count += 1 %>
               <!-- deleting a particular rule or warning -->
@@ -89,7 +89,7 @@
         </div>
         <div class="row no-margin">
           <% blocking_rules_count = 0 %>
-          <% @result.policy.expense_rules.each do |rule| %>
+          <% @result.policy.expense_rules.non_deleted.each do |rule| %>
             <% if rule.rule_type_id == 2 %>
               <% blocking_rules_count += 1 %>
               <!-- deleting a particular rule or warning -->

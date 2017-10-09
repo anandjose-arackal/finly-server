@@ -5,6 +5,9 @@ class RequestFormatter::ApiParser::ChromeParser::V1::Expenses::Parse < RequestFo
     if params&.dig(:expense, :reimbursable)&.to_s.present?
       map[:expense][:reimbursable] = StringUtils.to_bool params[:expense][:reimbursable]&.to_s
     end
+    if params&.dig(:expense, :from_cash_on_hand)&.to_s.present?
+      map[:expense][:from_cash_on_hand] = StringUtils.to_bool params[:expense][:from_cash_on_hand]&.to_s
+    end
     # Load receipt seperately has yaml cannot handle images
     if params[:receipt].present?
       formatted_params = RequestFormatter::ReceiptsParser::Parse.(user, params).formatted_request

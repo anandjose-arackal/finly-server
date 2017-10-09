@@ -23,6 +23,10 @@ class Event::EBankPaymentRequest::EPayment::Base < Event::EBankPaymentRequest::B
       self.payment.receiving_user.email
     end
 
+    def to
+      recipient
+    end
+
     def subject
       self.subject_val
     end
