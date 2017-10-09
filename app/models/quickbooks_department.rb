@@ -16,5 +16,5 @@ class QuickbooksDepartment < ActiveRecord::Base
 
   belongs_to :company
 
-  
+  scope :with_name, -> (name) {where name: name}
 end

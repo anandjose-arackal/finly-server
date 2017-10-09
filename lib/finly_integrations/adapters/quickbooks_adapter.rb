@@ -287,6 +287,15 @@ module FinlyIntegrations
               # first check the type of custom field it is
               case field_config.field_type_id
                 when FieldType.id_for(:text)
+                  # loop through all the QuickbooksDepartments for an exact text match and add it to
+                  # the line item using the id of the respective department
+                  department_value = expense.custom_fields.with_field_configuration_ids(field_config.id).first
+                  department = @finly_company.quickbooks_departments.with_name(department_value)
+                  if department.present?
+                    line_item.department_id = department.id
+                  end
+                when FieldType.id_for(:drop_down)
+
               end
             else
 
