@@ -1,4 +1,4 @@
-# Once approved, this operation will take the payment order and perform a credit for it
+ # Once approved, this operation will take the payment order and perform a credit for it
 # the initiating account can be changed at this stage as well
 
 class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentRequest::Review::Base
@@ -65,13 +65,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
                                          action_id: BankPaymentRequestCommentAction.id_for(:credit)
 
     Event::EBankPaymentRequest::Credit.(user, bank_payment_request: bank_payment_request)
-
-    # # since credit has been initiated for all these vendors, make them authorized (if they're users, they're authorized by default)
-    # self.payment_order.payments.each do |payment|
-    #   if payment.receiving_account.is_a?(BankAccount) && payment.receiving_account.account_owner.is_a?(YesBankVendor)
-    #     payment.receiving_account.account_owner.update(authorized: true)
-    #   end
-    # end
 
     add_message :success, "Payment Order credit initiated!"
   end
