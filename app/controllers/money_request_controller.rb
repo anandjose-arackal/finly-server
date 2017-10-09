@@ -19,6 +19,7 @@ class MoneyRequestController < ApplicationController
 
   # params[:type] = types given below
   def update
+    params[:amount] = "5"
     # fail
     if params[:action_type].blank?
       respond_failure 'Invalid update type'
