@@ -7,7 +7,7 @@ class Expense::Exports::Base < ::Export::Report::Base
 
   def init
     expense_presenter = Expense::Index.(user, params)
-    self.expenses = expense_presenter.expenses
+    self.expenses = expense_presenter.expenses.includes_export
     if self.params[:expense_id].present?
       expense_id = params[:expense_id]
       unless expense_id.is_a?(Array)
@@ -38,8 +38,9 @@ class Expense::Exports::Base < ::Export::Report::Base
     field_names = []
     self.expenses&.each do |expense|
       # this gets all the custom field names from all different types of expenses
-      if expense.custom_field_names.present?
-        field_names += expense.custom_field_names
+      custom_field_names = expense.custom_field_names
+      if custom_field_names.present?
+        field_names += custom_field_names
       end
     end
     field_names.uniq! || []

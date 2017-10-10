@@ -166,7 +166,7 @@ group :development, :test do
   gem 'flamegraph'
   gem 'stackprof' # ruby 2.1+ only
   gem 'memory_profiler'
-
+  gem 'active_record_query_trace'
   # gem 'better_errors'
   # gem 'binding_of_caller'
 
