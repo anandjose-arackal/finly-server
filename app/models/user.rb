@@ -52,6 +52,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -393,8 +394,11 @@ class User < ActiveRecord::Base
 
   after_create do
     default_policy_id = self.company.default_policy.id
-    if self.team_mapping.count == 0
+    # if the user us added to either one system and not the other, create a default mapping for him or her in both
+    if self.team_mapping.expense_management.count == 0
       self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: MappingPurpose.id_for(:expense_management)).save
+    end
+    if self.team_mapping.vendor_payments.count == 0
       self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: MappingPurpose.id_for(:vendor_payments)).save
     end
     self.policy_user_mappings.build(policy_id: default_policy_id).save

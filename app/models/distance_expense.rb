@@ -28,6 +28,7 @@ class DistanceExpense < ActiveRecord::Base
   validates :distance, presence: true
 
   delegate :distance_value, to: :distance, allow_nil: true
+  delegate :maps_distance_value, to: :distance, allow_nil: true
 
   def maps_distance_value
     maps_distance&.value
