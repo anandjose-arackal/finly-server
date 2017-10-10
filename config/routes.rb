@@ -857,6 +857,7 @@
 #                              quickbooks_sync_categories POST   /quickbooks/sync_categories(.:format)                                                      quickbooks#sync_categories
 #                           quickbooks_sync_payment_types POST   /quickbooks/sync_payment_types(.:format)                                                   quickbooks#sync_payment_types
 #                                quickbooks_update_config PATCH  /quickbooks/update_config(.:format)                                                        quickbooks#update
+#                                              sync_users PATCH  /quickbooks/sync_users(.:format)                                                           quickbooks#sync_users
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                                               quickbooks#show
 #                                                     tos GET    /tos(.:format)                                                                             static_pages#tos
 #                                                 privacy GET    /privacy(.:format)                                                                         static_pages#privacy
@@ -2211,6 +2212,7 @@ Rails.application.routes.draw do
   post 'quickbooks/sync_categories', to: 'quickbooks#sync_categories', as: :quickbooks_sync_categories
   post 'quickbooks/sync_payment_types', to: 'quickbooks#sync_payment_types', as: :quickbooks_sync_payment_types
   patch 'quickbooks/update_config', to: 'quickbooks#update', as: :quickbooks_update_config
+  patch 'quickbooks/sync_users', to: 'quickbooks#sync_users', as: :sync_users
   get 'quickbooks/config', to: 'quickbooks#show', as: :quickbooks_config
 
   get 'tos', to: 'static_pages#tos'

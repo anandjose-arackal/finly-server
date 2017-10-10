@@ -23,6 +23,11 @@ class QuickbooksController < ApplicationController
     respond
   end
 
+  def sync_users
+    @result = Integrations::Quickbooks::SyncUsers.(current_company, params, current_user)
+    respond
+  end
+
   # action that updates the configuration for the quickbooks sync
   def update
     @result = Integrations::Quickbooks::Configuration::Update.(current_company, params, current_user)

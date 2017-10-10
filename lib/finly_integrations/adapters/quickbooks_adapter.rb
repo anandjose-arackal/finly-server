@@ -72,7 +72,8 @@ module FinlyIntegrations
 
           # this method will map the custom fields in an expense to the respective
           # attribute in Quickbooks, if necessary
-          add_custom_fields(line_item, expense, @finly_company.field_configurations)
+          add_department_details(finly_purchase, expense, @finly_company.field_configurations)
+          add_payee_details(finly_purchase, expense)
 
           finly_purchase.line_items << line_item
         end
@@ -162,6 +163,7 @@ module FinlyIntegrations
         fi_user = QuickbooksFinlyIntegrationsUser.find_or_initialize_by(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, quickbooks_id: user.id, quickbooks_user_type: QuickbooksFinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.first)
         fi_user.email = user.primary_email_address.address if user.primary_email_address.present?
         fi_user.name = user.display_name
+        fi_user.quickbooks_id = user.id
         fi_user.company_id = @finly_company_id
         fi_user.mobile_number = user.primary_phone.free_form_number if user.primary_phone.present?
         fi_user.quickbooks_updated_at = user.meta_data.last_updated_time
@@ -171,7 +173,7 @@ module FinlyIntegrations
       end
 
       def quickbooks_vendor_mapper(user)
-        fi_user = QuickbooksFinlyIntegrationsUser.find_or_initialize_by(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, quickbooks_id: user.id, quickbooks_user_type: FinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.last)
+        fi_user = QuickbooksFinlyIntegrationsUser.find_or_initialize_by(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, quickbooks_id: user.id, quickbooks_user_type: QuickbooksFinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.last)
         fi_user.email = user.primary_email_address.address if user.primary_email_address.present?
         fi_user.name = user.display_name
         fi_user.company_id = @finly_company_id
@@ -277,8 +279,9 @@ module FinlyIntegrations
         end
       end
 
-      def add_custom_fields(line_item, expense, field_configs)
-        return if line_item.blank? || expense.blank?
+      def add_department_details(purchase_item, expense, field_configs)
+        return if purchase_item.blank? || expense.blank?
+        return if purchase_item.department_id.present? # i.e. if the department has already been chosen
         field_configs.each do |field_config|
           next unless field_config.external_reference.present? && field_config.external_reference_type.include?("Quickbooks")
           case field_config.external_reference_type
@@ -289,17 +292,28 @@ module FinlyIntegrations
                 when FieldType.id_for(:text)
                   # loop through all the QuickbooksDepartments for an exact text match and add it to
                   # the line item using the id of the respective department
-                  department_value = expense.custom_fields.with_field_configuration_ids(field_config.id).first
-                  department = @finly_company.quickbooks_departments.with_name(department_value)
-                  if department.present?
-                    line_item.department_id = department.id
-                  end
+                  department_value = expense.custom_fields.with_field_configuration_ids(field_config.id).first&.value&.value
                 when FieldType.id_for(:drop_down)
-
+                  # find the department from the drop down items
+                  department_value = expense.custom_fields.with_field_configuration_ids(field_config.id).first&.value&.value
+                else
+                  department_value = nil
+              end
+              department = @finly_company.quickbooks_departments.with_name(department_value)
+              if department.present?
+                purchase_item.department_id = department.id
+                next
               end
             else
-
+              # do nothing?
           end
+        end
+      end
+
+      def add_payee_details(purchase_item, expense)
+        if expense.user.quickbooks_user.present?
+          qb_user = expense.user.quickbooks_user
+          purchase_item.entity_id = qb_user.id
         end
       end
     end
