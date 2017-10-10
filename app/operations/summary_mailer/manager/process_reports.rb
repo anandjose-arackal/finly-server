@@ -10,8 +10,8 @@ class SummaryMailer::Manager::ProcessReports < BaseOperation
   end
 
   def init
-    # self.configurations = fetch_configurations
-    self.configurations = ManagerSummaryMailConfig.all
+    self.configurations = fetch_configurations
+    # self.configurations = ManagerSummaryMailConfig.all
   end
 
   def validate
@@ -41,7 +41,7 @@ class SummaryMailer::Manager::ProcessReports < BaseOperation
     day_of_month = datetime.day
     day_of_week = datetime.strftime("%A")
     self.time_slot = fetch_time_slot datetime
-    ManagerSummaryMailConfig.configurations_for day_of_month, day_of_week, self.time_slot
+    ManagerSummaryMailConfig.configurations_for(day_of_month, day_of_week, self.time_slot).group_by_user
   end
 
   def process_configuration(configuration)

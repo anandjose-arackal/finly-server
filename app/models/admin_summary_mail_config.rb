@@ -48,6 +48,7 @@ class AdminSummaryMailConfig < ActiveRecord::Base
     query << "scheduled_time = '#{time_slot}'"
     where query.string
   end
+  scope :group_by_user, -> { group(:user_id) }
 
   def validate_scheduled_time
     if scheduled_time.blank?

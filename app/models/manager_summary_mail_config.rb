@@ -25,9 +25,9 @@ class ManagerSummaryMailConfig < ActiveRecord::Base
   validates :user_id, presence: true
   validates :period_id, presence: true, :inclusion => {:in => [Period.id_for(:day), Period.id_for(:week), Period.id_for(:month)]}
   validates :scheduled_day_of_month, :inclusion => {:in => DAYS_OF_MONTH}
-  validates_presence_of :scheduled_day_of_month, if: -> { period_id == Period.id_for(:month)}
+  validates_presence_of :scheduled_day_of_month, if: -> { period_id == Period.id_for(:month) }
   validates :scheduled_day_of_week, :inclusion => {:in => WEEK_DAYS}
-  validates_presence_of :scheduled_day_of_week, if: -> { period_id == Period.id_for(:week)}
+  validates_presence_of :scheduled_day_of_week, if: -> { period_id == Period.id_for(:week) }
   validates :entity_type, presence: true, :inclusion => {:in => ['report', 'money_request']}
   validates :application, Application.validate_app
   validate :validate_scheduled_time
@@ -43,8 +43,9 @@ class ManagerSummaryMailConfig < ActiveRecord::Base
     query << ')'
     query << " AND "
     query << "scheduled_time = '#{time_slot}'"
-    where query.string
+    where(query.string)
   end
+  scope :group_by_user, -> { group(:user_id) }
   scope :reports, -> { where entity_type: 'report' }
   scope :money_requests, -> { where entity_type: 'money_request' }
 
