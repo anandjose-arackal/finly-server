@@ -3,7 +3,6 @@
 # along with all the custom fields
 
 class Export::Expense::AsSpreadsheet < Export::Expense::Base
-
   attr_accessor :expenses, :preferences, :result, :default_column_names, :custom_field_column_names,
                 :headers
 
@@ -13,7 +12,7 @@ class Export::Expense::AsSpreadsheet < Export::Expense::Base
 
   def init
     expense_ids = params[:expense_ids]
-    self.expenses = ::Expense.with_id(expense_ids).reorder(created_at: :desc)
+    self.expenses = ::Expense.with_id(expense_ids).reorder(created_at: :desc).includes_export
     self.default_column_names = user.company.export_preferences.pluck(:name)
     self.custom_field_column_names = extract_custom_field_names(expenses)
     self.preferences = user.company.export_preferences
