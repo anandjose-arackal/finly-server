@@ -320,10 +320,10 @@ class Expense < ActiveRecord::Base
   scope :filter_split_link, -> (split_link) { where split_link: split_link }
   scope :includes_export, -> { includes(:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
                                              :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
-                                             {card_expense: [custom_fields: [:field_configuration, :value]]},
-                                             {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration, :value]]},
-                                             {time_expense: [custom_fields: [:field_configuration, :value]]},
-                                             {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration, :value]]},
+                                             {card_expense: [custom_fields: [:field_configuration]]},
+                                             {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},
+                                             {time_expense: [custom_fields: [:field_configuration]]},
+                                             {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
                                              {amount: [:currency]}, :expense_status) }
 
   delegate :category_name, to: :category
