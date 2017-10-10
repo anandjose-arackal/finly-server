@@ -968,6 +968,11 @@
 #                                                         PATCH  /admin/admin_users/funds_load_requests/:id(.:format)                                       admin_users/funds_load_requests#update
 #                                                         PUT    /admin/admin_users/funds_load_requests/:id(.:format)                                       admin_users/funds_load_requests#update
 #                                                         DELETE /admin/admin_users/funds_load_requests/:id(.:format)                                       admin_users/funds_load_requests#destroy
+#                                  summary_configurations GET    /summary/configurations(.:format)                                                          summary/configuration#index
+#                            summary_configurations_admin POST   /summary/configurations/admin(.:format)                                                    summary/configuration#admin_create
+#                                                 summary DELETE /summary/configurations/admin/:id(.:format)                                                summary/configuration#admin_destroy
+#                          summary_configurations_manager POST   /summary/configurations/manager(.:format)                                                  summary/configuration#manager_create
+#                                                         DELETE /summary/configurations/manager/:id(.:format)                                              summary/configuration#manager_destroy
 #
 
 #                               crono_web        /crono                                                      Crono::Web
