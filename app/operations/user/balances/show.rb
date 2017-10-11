@@ -15,7 +15,7 @@ class User::Balances::Show < User::Base
     else
       self.selected_user = user
     end
-    self.balances = {company_credits: [], finly_money: [], cards: []}
+    self.balances = {company_credits: [], finly_money: [], cards: [], cash_on_hand: []}
     retrieve_balances
   end
 
