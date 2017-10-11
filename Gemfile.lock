@@ -56,6 +56,7 @@ GEM
       erubis (~> 2.7.0)
       rails-dom-testing (~> 1.0, >= 1.0.5)
       rails-html-sanitizer (~> 1.0, >= 1.0.2)
+    active_record_query_trace (1.5.4)
     activejob (4.2.7.1)
       activesupport (= 4.2.7.1)
       globalid (>= 0.3.0)
@@ -272,7 +273,7 @@ GEM
     multi_json (1.12.1)
     multi_xml (0.6.0)
     multipart-post (2.0.0)
-    mysql2 (0.4.5)
+    mysql2 (0.4.9)
     net-scp (1.2.1)
       net-ssh (>= 2.6.5)
     net-ssh (4.1.0)
@@ -446,6 +447,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  active_record_query_trace
   activeadmin (= 1.1.0)!
   activemodel-associations (= 0.2.0)
   animate-rails (= 1.0.10)
@@ -496,7 +498,7 @@ DEPENDENCIES
   memory_profiler
   meta_request
   mocha (= 1.2.1)
-  mysql2 (= 0.4.5)
+  mysql2 (= 0.4.9)
   nokogiri (= 1.6.8)
   oj (~> 2.18.1)
   omniauth
