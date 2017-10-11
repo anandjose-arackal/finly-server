@@ -2166,7 +2166,7 @@ Rails.application.routes.draw do
 
   # Disburse
   post 'disburse/users' => 'disburse/users#create'
-  post 'disburse/users/import', to: 'disburse#import'
+  post 'disburse/users/import', to: 'disburse/users#import'
 
   get 'features_subscribed' => 'expense_types_configuration#features_subscribed'
   resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]

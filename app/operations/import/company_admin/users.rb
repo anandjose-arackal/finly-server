@@ -12,6 +12,7 @@ class Import::CompanyAdmin::Users < Import::Base
   end
 
   def init
+    super
     self.file = params[:file]
     self.result_hash = {}
     if file.present?
@@ -121,7 +122,7 @@ class Import::CompanyAdmin::Users < Import::Base
     end
 
     # adding a default initiator role for users in vendor payments
-    role_mapping_attributes << {user_role_id: UserRole.id_for(:vendor_payments), purpose_id: MappingPurpose.id_for(:vendor_payments)}
+    role_mapping_attributes << {user_role_id: UserRole.id_for(:initiator), purpose_id: MappingPurpose.id_for(:vendor_payments)}
 
     manager = finance_manager = approves_to = approves_finance_to = nil
     # creating team mapping attributes

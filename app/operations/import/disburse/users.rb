@@ -13,13 +13,13 @@ class Import::Disburse::Users < Import::Base
   end
 
   def init
+    super
     self.file = params[:file]
     self.result_hash = {}
     if file.present?
       self.sheet = open_spreadsheet(file)
       self.header = sheet.row(1)
     end
-    self.company_id = user.company_id
   end
 
   def authorize
@@ -50,13 +50,13 @@ class Import::Disburse::Users < Import::Base
       unique = mobile_number_valid?(row[import_fields[:mobile_number]])
 
       if unique == true
+        self.invitee = User.new(params)
+        self.invitee.skip_confirmation_notification!
+        invitee.update_attribute(:default_password, true)
+        invitee.update_attribute(:verified, true)
         if type == 'email'
-          self.invitee = User.new(params)
-          self.invitee.skip_confirmation_notification!
           self.invitee.save
         elsif type == 'mobile'
-          self.invitee = User.new(params)
-          u.skip_confirmation_notification!
           u.save
           u.update_attribute(:email, "")
           u.update_attribute(:mobile_only_invite, true)
@@ -125,7 +125,7 @@ class Import::Disburse::Users < Import::Base
     end
 
     # adding a default initiator role for users in vendor payments
-    role_mapping_attributes << {user_role_id: UserRole.id_for(:vendor_payments), purpose_id: MappingPurpose.id_for(:vendor_payments)}
+    role_mapping_attributes << {user_role_id: UserRole.id_for(:initiator), purpose_id: MappingPurpose.id_for(:vendor_payments)}
 
     manager = finance_manager = approves_to = approves_finance_to = nil
     # creating team mapping attributes
