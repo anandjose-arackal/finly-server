@@ -51,16 +51,18 @@ class Import::Disburse::Users < Import::Base
 
       if unique == true
         if type == 'email'
-          self.invitee = user.company.users.invite!(params)
+          self.invitee = User.new(params)
+          self.invitee.skip_confirmation_notification!
+          self.invitee.save
         elsif type == 'mobile'
-          self.invitee = user.company.users.invite!(params, user) do |u|
-            u.skip_invitation
-            u.update_attribute(:email, "")
-            u.update_attribute(:mobile_only_invite, true)
-            # send welcome message to invitee
-            # CustomMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
-            Sms::UserInvite.(user)
-          end
+          self.invitee = User.new(params)
+          u.skip_confirmation_notification!
+          u.save
+          u.update_attribute(:email, "")
+          u.update_attribute(:mobile_only_invite, true)
+          # send welcome message to invitee
+          # CustomMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
+          Sms::UserInvite.(user)
         end
       end
 

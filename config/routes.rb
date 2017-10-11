@@ -780,6 +780,7 @@
 #                                                     kyc GET    /kyc/users/:id(.:format)                                                                   kyc/user#show
 #                                                         PATCH  /kyc/users/:id(.:format)                                                                   kyc/user#update
 #                                          disburse_users POST   /disburse/users(.:format)                                                                  disburse/users#create
+#                                   disburse_users_import POST   /disburse/users/import(.:format)                                                           disburse#import
 #                                     features_subscribed GET    /features_subscribed(.:format)                                                             expense_types_configuration#features_subscribed
 #                                                  groups GET    /groups(.:format)                                                                          user_groups#index
 #                                                         POST   /groups(.:format)                                                                          user_groups#create
@@ -2165,6 +2166,7 @@ Rails.application.routes.draw do
 
   # Disburse
   post 'disburse/users' => 'disburse/users#create'
+  post 'disburse/users/import', to: 'disburse#import'
 
   get 'features_subscribed' => 'expense_types_configuration#features_subscribed'
   resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]
