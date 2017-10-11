@@ -1,4 +1,4 @@
-class Import::CompanyAdmin::Users < Import::Superadmin::Users
+class Import::CompanyAdmin::Users < Import::Base
   attr_accessor :file_url
 
   def authorized_user_types
@@ -178,6 +178,15 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
                                                approves_finance_to: approves_finance_to,
                                                policy_id: company.policies.first.id,
                                                purpose_id: MappingPurpose.id_for(:expense_management)
+                                              },
+                                              {
+                                               default: true,
+                                               manager: nil,
+                                               finance_manager: nil,
+                                               approves_to: nil,
+                                               approves_finance_to: nil,
+                                               policy_id: company.policies.first.id,
+                                               purpose_id: MappingPurpose.id_for(:vendor_payments)
                                               }],
                     error_messages: errors
                   }
