@@ -1913,9 +1913,9 @@ Rails.application.routes.draw do
   resources :card_restrictions
 
   get 'companies/notify', to: 'companies#notify'
+  get 'companies/load_options', to: 'companies#load_options', as: :load_options
   resources :companies do
     post 'add_balance', to: 'companies#add_balance', as: :add_balance
-    get 'load_options', to: 'companies#load_options', as: :load_options
   end
 
   # get 'organization_account' => 'organization_account#show'
