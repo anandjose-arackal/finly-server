@@ -35,6 +35,10 @@ class Benefits::TaxBenefits::Execute < BackgroundOperation
 
   end
 
+  def post_process
+
+  end
+
   def success
     params[:payment_order] = self.payment_order
     Benefits::TaxBenefits::Execute::SuccessPresenter.new(user, params, messages)

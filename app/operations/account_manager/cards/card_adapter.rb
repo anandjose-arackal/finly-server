@@ -23,11 +23,20 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     opening_balance = balance
     op = ItzCash::Credit.(account.user, {card: account, amount: payment.amount_value})
     unless op.success?
-      self.errors = op.messages[:error]
-      closing_balance = balance
-      store_transaction payment, :credit, :failure, opening_balance, closing_balance, account.user.company_id, op.messages
-      return false
+      # retry no. 1
+      op = ItzCash::Credit.(account.user, {card: account, amount: payment.amount_value})
+      unless op.success?
+        # retry no. 2
+        op = ItzCash::Credit.(account.user, {card: account, amount: payment.amount_value})
+        unless op.success?
+          self.errors = op.messages[:error]
+          closing_balance = balance
+          store_transaction payment, :credit, :failure, opening_balance, closing_balance, account.user.company_id, op.messages
+          return false
+        end
+      end
     end
+
     closing_balance = balance
     store_transaction payment, :credit, :success, opening_balance, closing_balance, account.user.company_id
 
@@ -57,10 +66,18 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     # operation that debits a particular card
     op = ItzCash::Debit.(account.user, {card: account, amount: payment.amount_value})
     unless op.success?
-      self.errors = op.messages[:error]
-      closing_balance = balance
-      store_transaction payment, :debit, :failure, opening_balance, closing_balance, account.user.company_id, op.messages
-      return false
+      # retry no. 1
+      op = ItzCash::Debit.(account.user, {card: account, amount: payment.amount_value})
+      unless op.success?
+        # retry no. 2
+        op = ItzCash::Debit.(account.user, {card: account, amount: payment.amount_value})
+        unless op.success?
+          self.errors = op.messages[:error]
+          closing_balance = balance
+          store_transaction payment, :debit, :failure, opening_balance, closing_balance, account.user.company_id, op.messages
+          return false
+        end
+      end
     end
     closing_balance = balance
     store_transaction payment, :debit, :success, opening_balance, closing_balance, account.user.company_id

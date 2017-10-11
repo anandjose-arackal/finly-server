@@ -117,4 +117,6 @@ class AccountManager::BaseAdapter
     end
   end
 
+
+
 end
