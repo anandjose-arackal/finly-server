@@ -52,17 +52,14 @@ class Import::Disburse::Users < Import::Base
       if unique == true
         self.invitee = User.new(params)
         self.invitee.skip_confirmation_notification!
-        invitee.update_attribute(:default_password, true)
-        invitee.update_attribute(:verified, true)
+        invitee.default_password = true
+        invitee.verified = true
         if type == 'email'
           self.invitee.save
         elsif type == 'mobile'
-          u.save
-          u.update_attribute(:email, "")
-          u.update_attribute(:mobile_only_invite, true)
-          # send welcome message to invitee
-          # CustomMessage::Create.(user, {mobile_number: [params[:mobile_number]]})
-          Sms::UserInvite.(user)
+          invitee.save
+          invitee.update_attribute(:email, "")
+          invitee.update_attribute(:mobile_only_invite, true)
         end
       end
 
@@ -189,7 +186,17 @@ class Import::Disburse::Users < Import::Base
                                                approves_finance_to: approves_finance_to,
                                                policy_id: company.policies.first.id,
                                                purpose_id: MappingPurpose.id_for(:expense_management)
-                                              }],
+                                              },
+                                              {
+                                                  default: true,
+                                                  manager: nil,
+                                                  finance_manager: nil,
+                                                  approves_to: nil,
+                                                  approves_finance_to: nil,
+                                                  policy_id: company.policies.first.id,
+                                                  purpose_id: MappingPurpose.id_for(:vendor_payments)
+                                              }
+                                              ],
                     company_id: self.company_id,
                     profile_attributes: {
                           date_of_birth: "01-01-2000",

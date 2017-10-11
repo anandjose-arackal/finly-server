@@ -20,4 +20,9 @@ class CompaniesController < ApplicationController
     @result = Company::AddBalance.(current_user, params)
     respond
   end
+
+  def load_options
+    @result = Company::LoadOptions.(current_user, params)
+    respond
+  end
 end
