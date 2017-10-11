@@ -49,7 +49,7 @@ gem 'annotate', '2.7.1'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.2.7.1'
 # Use mysql as the database for Active Record
-gem 'mysql2', '0.4.5'
+gem 'mysql2', '0.4.9'
 
 #Bundles for pagination
 gem 'will_paginate', '3.1.5'
@@ -166,7 +166,7 @@ group :development, :test do
   gem 'flamegraph'
   gem 'stackprof' # ruby 2.1+ only
   gem 'memory_profiler'
-
+  gem 'active_record_query_trace'
   # gem 'better_errors'
   # gem 'binding_of_caller'
 

@@ -158,6 +158,14 @@ class Report < ActiveRecord::Base
 
   scope :awaiting_approval_of_user, ->(user_id, role_id){ where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
 
+  scope :includes_export, -> { includes({expenses:[:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
+                                               :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
+                                               {card_expense: [custom_fields: [:field_configuration]]},
+                                               {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},
+                                               {time_expense: [custom_fields: [:field_configuration]]},
+                                               {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
+                                               {amount: [:currency]}, :expense_status]}, :status, policy: [distance_expense_config: [:rate]]) }
+
   delegate :status_name, to: :status
 
   delegate :submitted_amount_value, to: :submitted_amount
