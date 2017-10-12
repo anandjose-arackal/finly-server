@@ -38,7 +38,7 @@ class Statements::AsSpreadsheet < Statements::Base
           finly_transaction.closing_balance&.value,
           finly_transaction.status.name.humanize,
           finly_transaction.transaction_reference_id,
-          nil
+          finly_transaction.payment&.note
       ]
     end
   end
