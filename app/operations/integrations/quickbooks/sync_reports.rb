@@ -1,7 +1,7 @@
 class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBase
 
   attr_accessor :reports, :temp_errors, :qb_reports, :date_type, :quickbooks_configuration, :company,
-                :sync_status, :department_split
+                :sync_status, :department_split, :department_field_configuration, :quickbooks_departments
 
   def init
     super()
@@ -12,6 +12,8 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
     self.qb_reports = []
     self.department_split = {}
     self.date_type = quickbooks_configuration.transaction_date_field
+    retrieve_field_configurations
+    self.quickbooks_departments = company.quickbooks_departments
   end
 
   def self.call_async(user_id, params)
@@ -60,11 +62,8 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
       reimbursable_qb_report = non_reimbursable_qb_report = nil
       if reimbursable_expenses.present?
         self.department_split = generate_department_split(reimbursable_expenses)
-        reimbursable_qb_report = QuickbooksReportConfig.new(user, true, reimbursable_expenses)
-        if date_type == 1
-          reimbursable_qb_report.date = reimbursable_expenses.reorder(date: :asc).first&.date
-        elsif date_type == 2
-          reimbursable_qb_report.date = reimbursable_expenses.reorder(date: :desc).first&.date
+        self.department_split.each do |key, value|
+          qb_report = QuickbooksReportConfig.new()
         end
       end
       # adding reimbursable reports to the qb_report array
@@ -164,8 +163,35 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
 
   private
 
-  # this method
+  # this method will take a bunch of expenses and split them according to quickbooks department
   def generate_department_split(expenses)
+    expenses.each do |expense|
+      department_value = expense.custom_fields.with_field_configuration_ids(self.department_field_configuration.id).first&.value&.value
+      department = company.quickbooks_departments.with_name(department_value).first
+      if department.present?
+        if self.department_split[department.id].is_a?(Array)
+          self.department_split[department.id] << expense
+        else
+          self.department_split[department.id] = []
+          self.department_split[department.id] << expense
+        end
+      else
+        if self.department_split[nil].is_a?(Array)
+          self.department_split[nil] << expense
+        else
+          self.department_split[nil] = []
+          self.department_split[nil] << expense
+        end
+      end
+    end
+  end
 
+  def retrieve_department_field_configuration
+    company.field_configurations.each do |config|
+      if config.external_reference.present? && config.external_reference_type.include?("QuickbooksDepartment")
+        self.department_field_configuration = config
+        return
+      end
+    end
   end
 end
