@@ -2,7 +2,8 @@
 
 class QuickbooksReportConfig
 
-  attr_accessor :reimbursable, :expenses, :report, :account_id, :user, :date
+  attr_accessor :reimbursable, :expenses, :report, :account_id, :user, :date,
+                :quickbooks_department_id, :payee_id
 
   def initialize(user, reimbursable, expenses)
     self.user = user

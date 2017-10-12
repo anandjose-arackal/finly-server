@@ -1,7 +1,7 @@
 class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBase
 
   attr_accessor :reports, :temp_errors, :qb_reports, :date_type, :quickbooks_configuration, :company,
-                :sync_status
+                :sync_status, :department_split
 
   def init
     super()
@@ -10,6 +10,7 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
     user_ids = user.company.users.pluck(:id)
     self.reports = Report.with_user(user_ids).where(id: params[:report_ids])
     self.qb_reports = []
+    self.department_split = {}
     self.date_type = quickbooks_configuration.transaction_date_field
   end
 
@@ -48,7 +49,8 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
 
 
   def pre_process
-    # splitting the reports into two sections for syncing with quickbooks online
+    # splitting the reports into two sections (reimbursable and non-reimbursable) for syncing with quickbooks online
+    # further, the reports will be split according to the respective departments that they're a part of
     reports.each do |report|
       # if the report is already synced, skip to the next one
       if report.synced_with_quickbooks?
@@ -57,6 +59,7 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
       reimbursable_expenses = report.expenses.reimbursable
       reimbursable_qb_report = non_reimbursable_qb_report = nil
       if reimbursable_expenses.present?
+        self.department_split = generate_department_split(reimbursable_expenses)
         reimbursable_qb_report = QuickbooksReportConfig.new(user, true, reimbursable_expenses)
         if date_type == 1
           reimbursable_qb_report.date = reimbursable_expenses.reorder(date: :asc).first&.date
@@ -156,5 +159,13 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
                                        timestamp: DateUtils.local_date_time,
                                        view_role_id: view_role,
                                        message: messages[:error].to_sentence)
+  end
+
+
+  private
+
+  # this method
+  def generate_department_split(expenses)
+
   end
 end
