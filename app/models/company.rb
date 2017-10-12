@@ -178,7 +178,7 @@ class Company < ActiveRecord::Base
   end
 
   def bank_reimbursement_enabled?
-    vendor_payments_enabled?
+    self.feature_subscription.bank_account_reimbursement || vendor_payments_enabled?
   end
 
   def gift_card_enabled?

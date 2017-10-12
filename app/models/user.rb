@@ -53,6 +53,8 @@
 
 
 
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -719,7 +721,7 @@ class User < ActiveRecord::Base
   end
 
   def bank_transfer_enabled?
-    (self.vendor_payments_enabled? && self.bank_accounts.present?)
+    (self.vendor_payments_enabled? && self.bank_accounts.present?) || (self.company.bank_reimbursement_enabled?)
   end
 
   # method that determines whether a particular user has

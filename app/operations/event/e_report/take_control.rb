@@ -49,7 +49,7 @@ class Event::EReport::TakeControl < Event::EReport::Base
     if user.id == report.controlling_user_id
       "You have taken control of the report: #{self.report.name}"
     else
-      "#{self.report.controlling_user.name} has has taken control of the report: #{self.report.name}"
+      "#{self.report.controlling_user.name} has taken control of the report: #{self.report.name}"
     end
   end
 
@@ -57,7 +57,7 @@ class Event::EReport::TakeControl < Event::EReport::Base
     if user.id == report.controlling_user_id
       "You have taken control of the report.<br/><br/>Report: \"#{self.report.name}\""
     else
-      "#{self.report.controlling_user.name} has has taken control of the report which was awaiting your review.<br/><br/>Report: \"#{self.report.name}\""
+      "#{self.report.controlling_user.name} has taken control of the report which was awaiting your review.<br/><br/>Report: \"#{self.report.name}\""
     end
   end
 

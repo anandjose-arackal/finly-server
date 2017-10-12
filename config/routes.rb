@@ -519,6 +519,7 @@
 #                                                         DELETE /card_restrictions/:id(.:format)                                                           card_restrictions#destroy
 #                                        companies_notify GET    /companies/notify(.:format)                                                                companies#notify
 #                                     company_add_balance POST   /companies/:company_id/add_balance(.:format)                                               companies#add_balance
+#                                    company_load_options GET    /companies/:company_id/load_options(.:format)                                              companies#load_options
 #                                               companies GET    /companies(.:format)                                                                       companies#index
 #                                                         POST   /companies(.:format)                                                                       companies#create
 #                                             new_company GET    /companies/new(.:format)                                                                   companies#new
@@ -780,6 +781,7 @@
 #                                                     kyc GET    /kyc/users/:id(.:format)                                                                   kyc/user#show
 #                                                         PATCH  /kyc/users/:id(.:format)                                                                   kyc/user#update
 #                                          disburse_users POST   /disburse/users(.:format)                                                                  disburse/users#create
+#                                   disburse_users_import POST   /disburse/users/import(.:format)                                                           disburse/users#import
 #                                     features_subscribed GET    /features_subscribed(.:format)                                                             expense_types_configuration#features_subscribed
 #                                                  groups GET    /groups(.:format)                                                                          user_groups#index
 #                                                         POST   /groups(.:format)                                                                          user_groups#create
@@ -968,6 +970,11 @@
 #                                                         PATCH  /admin/admin_users/funds_load_requests/:id(.:format)                                       admin_users/funds_load_requests#update
 #                                                         PUT    /admin/admin_users/funds_load_requests/:id(.:format)                                       admin_users/funds_load_requests#update
 #                                                         DELETE /admin/admin_users/funds_load_requests/:id(.:format)                                       admin_users/funds_load_requests#destroy
+#                                  summary_configurations GET    /summary/configurations(.:format)                                                          summary/configuration#index
+#                            summary_configurations_admin POST   /summary/configurations/admin(.:format)                                                    summary/configuration#admin_create
+#                                                 summary DELETE /summary/configurations/admin/:id(.:format)                                                summary/configuration#admin_destroy
+#                          summary_configurations_manager POST   /summary/configurations/manager(.:format)                                                  summary/configuration#manager_create
+#                                                         DELETE /summary/configurations/manager/:id(.:format)                                              summary/configuration#manager_destroy
 #
 
 #                               crono_web        /crono                                                      Crono::Web
@@ -1906,6 +1913,7 @@ Rails.application.routes.draw do
   resources :card_restrictions
 
   get 'companies/notify', to: 'companies#notify'
+  get 'companies/load_options', to: 'companies#load_options', as: :load_options
   resources :companies do
     post 'add_balance', to: 'companies#add_balance', as: :add_balance
   end
@@ -2160,6 +2168,7 @@ Rails.application.routes.draw do
 
   # Disburse
   post 'disburse/users' => 'disburse/users#create'
+  post 'disburse/users/import', to: 'disburse/users#import'
 
   get 'features_subscribed' => 'expense_types_configuration#features_subscribed'
   resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]
