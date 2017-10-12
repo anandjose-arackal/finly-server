@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171010150748) do
+ActiveRecord::Schema.define(version: 20171012115431) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2499,6 +2499,20 @@ ActiveRecord::Schema.define(version: 20171010150748) do
   end
 
   add_index "quickbooks_payment_types", ["company_id"], name: "index_quickbooks_payment_types_on_company_id", using: :btree
+
+  create_table "quickbooks_reference_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "quickbooks_references", force: :cascade do |t|
+    t.string   "name",              limit: 255
+    t.integer  "company_id",        limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.integer  "reference_type_id", limit: 4
+  end
 
   create_table "receipt_email_attachments", force: :cascade do |t|
     t.integer  "receipt_email_id",                 limit: 4

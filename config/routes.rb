@@ -518,8 +518,8 @@
 #                                                         PUT    /card_restrictions/:id(.:format)                                                           card_restrictions#update
 #                                                         DELETE /card_restrictions/:id(.:format)                                                           card_restrictions#destroy
 #                                        companies_notify GET    /companies/notify(.:format)                                                                companies#notify
+#                                            load_options GET    /companies/load_options(.:format)                                                          companies#load_options
 #                                     company_add_balance POST   /companies/:company_id/add_balance(.:format)                                               companies#add_balance
-#                                    company_load_options GET    /companies/:company_id/load_options(.:format)                                              companies#load_options
 #                                               companies GET    /companies(.:format)                                                                       companies#index
 #                                                         POST   /companies(.:format)                                                                       companies#create
 #                                             new_company GET    /companies/new(.:format)                                                                   companies#new

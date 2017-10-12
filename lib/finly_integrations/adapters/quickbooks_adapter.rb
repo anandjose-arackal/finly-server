@@ -72,8 +72,8 @@ module FinlyIntegrations
 
           # this method will map the custom fields in an expense to the respective
           # attribute in Quickbooks, if necessary
-          add_department_details(finly_purchase, expense, @finly_company.field_configurations)
-          add_payee_details(finly_purchase, expense)
+          finly_purchase.department_id = qb_report.quickbooks_department_id
+          finly_purchase.payee_id = qb_report.user.quickbooks_user&.id
 
           finly_purchase.line_items << line_item
         end

@@ -34,6 +34,7 @@ class FieldConfiguration < ActiveRecord::Base
   has_many :drop_down_items, class_name: 'FieldDropDownItem'
   has_many :custom_fields
   belongs_to :default_value, polymorphic: true
+  belongs_to :external_reference, polymorphic: true
 
   validates :field_name, presence: true
   validates :enabled, presence: true

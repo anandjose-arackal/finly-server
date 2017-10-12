@@ -8,7 +8,7 @@ class QuickbooksReportConfig
   def initialize(user, reimbursable, expenses, options = {})
     self.user = user
     self.reimbursable = reimbursable
-    self.expenses = expenses
+    self.expenses = retrieve_expenses(expenses)
     self.report = expenses.first.report
     self.quickbooks_department_id = options[:department_id]
     self.payee_id = user.quickbooks_user&.id
@@ -22,5 +22,14 @@ class QuickbooksReportConfig
     else
       return qb.non_reimbursable_account&.quickbooks_id
     end
+  end
+
+  # making the expenses object an ActiveRecord::Relation so that scopes and shit can be used
+  def retrieve_expenses(expenses)
+    ids = []
+    expenses.each do |expense|
+      ids << expense.id
+    end
+    Expense.where(id: ids)
   end
 end

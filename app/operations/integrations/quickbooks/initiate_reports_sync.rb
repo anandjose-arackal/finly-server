@@ -65,7 +65,8 @@ class Integrations::Quickbooks::InitiateReportsSync < Integrations::Quickbooks::
   end
 
   def process
-    Integrations::Quickbooks::SyncReports.call_async(user.id, report_ids: reports.pluck(:id))
+    # Integrations::Quickbooks::SyncReports.call_async(user.id, report_ids: reports.pluck(:id))
+    Integrations::Quickbooks::SyncReports.(user.id, report_ids: reports.pluck(:id))
   end
 
   def post_process
