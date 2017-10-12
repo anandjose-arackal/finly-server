@@ -262,13 +262,25 @@ class Admin::Users::Import < Admin::Base
                     password: generated_password,
                     password_confirmation: generated_password,
                     role_mapping_attributes: role_mapping_attributes,
-                    team_mapping_attributes: [{default: true, manager: manager,
+                    team_mapping_attributes: [
+                                              {
+                                               default: true, manager: manager,
                                                finance_manager: finance_manager,
                                                approves_to: approves_to,
                                                approves_finance_to: approves_finance_to,
                                                policy_id: (company.policies.default.first.id rescue nil),
                                                purpose_id: MappingPurpose.id_for(:expense_management)
-                                              }],
+                                              },
+                                              {
+                                                default: true,
+                                                manager: nil,
+                                                finance_manager: nil,
+                                                approves_to: nil,
+                                                approves_finance_to: nil,
+                                                policy_id: company.policies.first.id,
+                                                purpose_id: MappingPurpose.id_for(:vendor_payments)
+                                              }
+                                              ],
                     profile_attributes: {address_1: row[import_fields[:address_1]],
                                          address_2: row[import_fields[:address_2]],
                                          pin_code: pin_code,

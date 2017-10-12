@@ -178,6 +178,10 @@ class Company < ActiveRecord::Base
     self.feature_subscription.expense_management_enabled
   end
 
+  def bank_reimbursement_enabled?
+    self.feature_subscription.bank_account_reimbursement || vendor_payments_enabled?
+  end
+
   def gift_card_enabled?
     self.feature_subscription.gift_card_enabled
   end

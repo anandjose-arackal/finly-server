@@ -84,4 +84,18 @@ class Report::Create < Report::Base
     add_message :success, 'Report created'
   end
 
+  # def success
+  #   params[:report] = self.report
+  #   Report::Create::SuccessPresenter.new(user, params, messages)
+  # end
+  #
+  # class Report::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  #   attr_accessor :report
+  #
+  #   def init
+  #     self.report = params[:report]
+  #   end
+  #
+  # end
+
 end

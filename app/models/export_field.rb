@@ -35,10 +35,9 @@ class ExportField < ActiveRecord::Base
       15 => "Expense Status",
       16 => "Employee Email",
       17 => "Employee Mobile Number",
-      18 => "Distance Expense Source",
-      19 => "Distance Expense Destination",
       20 => "Distance In Km",
-      21 => "Maps Distance in Km"
+      21 => "Maps Distance in Km",
+      22 => "Distance Expense Locations"
   }
 
   def self.id_for(name_in_sym)

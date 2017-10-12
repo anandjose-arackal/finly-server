@@ -45,7 +45,8 @@ class Report::Expenses::Add < Report::Base
       # Split if IDS are sent as one comma delimited string
       ids= ids.split(',')
       self.expenses = user.expenses.with_id(ids)
-      end
+    end
+    self.expenses = self.expenses&.includes_export
   end
 
   def authorize
@@ -80,11 +81,12 @@ class Report::Expenses::Add < Report::Base
   end
 
   def process
+    expenses.update_all(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager_id: nil)
     expenses.each do |expense|
-      calculate_amounts # method that calculates the amount for all distance, time and Per Diem expenses
-      unless expense.update_attributes(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager: nil)
-        messages[:error] = expense.errors.full_messages
-      end
+      calculate_amounts(expense) # method that calculates the amount for all distance, time and Per Diem expenses
+      # unless expense.update_attributes(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager: nil)
+      #   messages[:error] = expense.errors.full_messages
+      # end
     end
   end
 
@@ -102,21 +104,21 @@ class Report::Expenses::Add < Report::Base
 
   private
 
-  def calculate_amounts
-    expenses.each do |expense|
-      if expense.card_expense? || expense.manual_expense?
-        next
+  def calculate_amounts(expense)
+    # expenses.each do |expense|
+    if expense.card_expense? || expense.manual_expense?
+      return
+    else
+      amount = expense.amount
+      if amount.nil?
+        amount_params = {value: expense.calculate_amount_value(report.policy), currency_id: Currency.first.id}
+        amount = Amount.create(amount_params)
       else
-        amount = expense.amount
-        if amount.nil?
-          amount_params = {value: expense.calculate_amount_value(report.policy), currency_id: Currency.first.id}
-          amount = Amount.create(amount_params)
-        else
-          amount.update(value: expense.calculate_amount_value(report.policy))
-        end
-        expense.update_attributes(amount_id: amount.id)
-        expense.update_other_currencies unless expense.date == DateUtils.local_date
+        amount.update(value: expense.calculate_amount_value(report.policy))
       end
+      expense.update_attributes(amount_id: amount.id)
+      expense.update_other_currencies unless expense.date == DateUtils.local_date
     end
+    # end
   end
 end

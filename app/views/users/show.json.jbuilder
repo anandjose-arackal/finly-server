@@ -1,4 +1,5 @@
 json.company_card_enabled @result.user.company.itz_cash_property.d_code.present? rescue false
+json.bank_account_reimbursement @result.user.company.bank_reimbursement_enabled?
 json.user do
   json.id @result.selected_user.id
   json.name @result.selected_user.name
