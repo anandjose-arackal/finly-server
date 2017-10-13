@@ -88,6 +88,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def within_timeframe
+    @result = BankTransfer::Configuration::TransferTimings.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type)

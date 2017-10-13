@@ -1,0 +1,1 @@
+json.allowed @result.allowed
