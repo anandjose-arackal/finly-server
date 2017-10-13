@@ -64,7 +64,6 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
       if reimbursable_expenses.present?
         self.department_split = generate_department_split(reimbursable_expenses)
         self.department_split.each do |key, value|
-
           department = QuickbooksDepartment.find_by(id: key)
           qb_report = QuickbooksReportConfig.new(report.user, true, value, {department_id: department&.quickbooks_id})
           if date_type == 1

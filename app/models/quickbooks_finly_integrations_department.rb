@@ -8,7 +8,7 @@ class QuickbooksFinlyIntegrationsDepartment
       # add logic to save the new department into the DB
 
       company = Company.find_by(id: self.company_id)
-      qb_department = QuickbooksDepartment.find_by(quickbooks_id: self.quickbooks_id) || QuickbooksDepartment.find_by(name: self.name)
+      qb_department = QuickbooksDepartment.find_by(quickbooks_id: self.quickbooks_id, company_id: company.id) || QuickbooksDepartment.find_by(name: self.name, company_id: company.id)
       if qb_department.blank?
         qb_department = company.quickbooks_departments.build(
                                               name: self.name,
