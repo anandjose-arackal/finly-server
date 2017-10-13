@@ -73,7 +73,7 @@ module FinlyIntegrations
           # this method will map the custom fields in an expense to the respective
           # attribute in Quickbooks, if necessary
           finly_purchase.department_id = qb_report.quickbooks_department_id
-          finly_purchase.payee_id = qb_report.user.quickbooks_user&.id
+          # finly_purchase.entity_id = qb_report.user.quickbooks_user&.id
 
           finly_purchase.line_items << line_item
         end
@@ -279,43 +279,6 @@ module FinlyIntegrations
         end
       end
 
-      def add_department_details(purchase_item, expense, field_configs)
-        return if purchase_item.blank? || expense.blank?
-        return if purchase_item.department_id.present? # i.e. if the department has already been chosen
-        field_configs.each do |field_config|
-          next unless field_config.external_reference.present? && field_config.external_reference_type.include?("Quickbooks")
-          case field_config.external_reference_type
-            when "Department"
-              # add logic to include the department in the respective custom field
-              # first check the type of custom field it is
-              case field_config.field_type_id
-                when FieldType.id_for(:text)
-                  # loop through all the QuickbooksDepartments for an exact text match and add it to
-                  # the line item using the id of the respective department
-                  department_value = expense.custom_fields.with_field_configuration_ids(field_config.id).first&.value&.value
-                when FieldType.id_for(:drop_down)
-                  # find the department from the drop down items
-                  department_value = expense.custom_fields.with_field_configuration_ids(field_config.id).first&.value&.value
-                else
-                  department_value = nil
-              end
-              department = @finly_company.quickbooks_departments.with_name(department_value)
-              if department.present?
-                purchase_item.department_id = department.id
-                next
-              end
-            else
-              # do nothing?
-          end
-        end
-      end
-
-      def add_payee_details(purchase_item, expense)
-        if expense.user.quickbooks_user.present?
-          qb_user = expense.user.quickbooks_user
-          purchase_item.entity_id = qb_user.id
-        end
-      end
     end
   end
 end
