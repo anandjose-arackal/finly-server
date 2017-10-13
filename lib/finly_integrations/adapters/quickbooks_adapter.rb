@@ -70,13 +70,14 @@ module FinlyIntegrations
             end
           end
 
-          # this method will map the custom fields in an expense to the respective
-          # attribute in Quickbooks, if necessary
-          finly_purchase.department_id = qb_report.quickbooks_department_id
-          # finly_purchase.entity_id = qb_report.user.quickbooks_user&.id
 
           finly_purchase.line_items << line_item
         end
+        # mapping the department and payee details (called entity) from the qb_report
+        # to sync it in quickbooks
+        finly_purchase.department_id = qb_report.quickbooks_department_id
+        finly_purchase.entity_id = qb_report.user.quickbooks_user&.quickbooks_id
+
         purchase_service = Quickbooks::Service::Purchase.new
         begin
           initialize_service(purchase_service)
@@ -160,14 +161,23 @@ module FinlyIntegrations
       private
 
       def quickbooks_employee_mapper(user)
-        fi_user = QuickbooksFinlyIntegrationsUser.find_or_initialize_by(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, quickbooks_id: user.id, quickbooks_user_type: QuickbooksFinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.first)
-        fi_user.email = user.primary_email_address.address if user.primary_email_address.present?
-        fi_user.name = user.display_name
-        fi_user.quickbooks_id = user.id
-        fi_user.company_id = @finly_company_id
-        fi_user.mobile_number = user.primary_phone.free_form_number if user.primary_phone.present?
-        fi_user.quickbooks_updated_at = user.meta_data.last_updated_time
-        fi_user.active = user.active?
+        # fi_user = QuickbooksFinlyIntegrationsUser.find_or_initialize_by(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, quickbooks_id: user.id, quickbooks_user_type: QuickbooksFinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.first)
+        fi_user = QuickbooksFinlyIntegrationsUser.new({
+                              email: (user.primary_email_address.address if user.primary_email_address.present?),
+                              name: user.display_name,
+                              quickbooks_id: user.id,
+                              company_id: @finly_company_id,
+                              mobile_number: (user.primary_phone.free_form_number if user.primary_phone.present?),
+                              quickbooks_updated_at: user.meta_data.last_updated_time,
+                              active: user.active?
+                                                      })
+        # fi_user.email = user.primary_email_address.address if user.primary_email_address.present?
+        # fi_user.name = user.display_name
+        # fi_user.quickbooks_id = user.id
+        # fi_user.company_id = @finly_company_id
+        # fi_user.mobile_number = user.primary_phone.free_form_number if user.primary_phone.present?
+        # fi_user.quickbooks_updated_at = user.meta_data.last_updated_time
+        # fi_user.active = user.active?
         save_additional_information(fi_user, user)
         fi_user
       end

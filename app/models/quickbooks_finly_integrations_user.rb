@@ -19,7 +19,6 @@
 #
 
 class QuickbooksFinlyIntegrationsUser < ActiveRecord::Base
-  include QuickbooksFinlyIntegratable
   QUICKBOOKS_USER_TYPES = ['Employee', 'Vendor']
 
   validates :email, presence: true
@@ -40,10 +39,12 @@ class QuickbooksFinlyIntegrationsUser < ActiveRecord::Base
           qb_user = finly_user.quickbooks_user
           qb_user.destroy
           self.user = finly_user
+          self.company = finly_user.company
           super
         else
           # now create the corresponding quickbooks_integrations_user from this data
           self.user = finly_user
+          self.company = finly_user.company
           super
         end
       end

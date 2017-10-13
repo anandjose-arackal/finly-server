@@ -82,7 +82,7 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
         self.department_split = generate_department_split(non_reimbursable_expenses)
         self.department_split.each do |key, value|
           department = QuickbooksDepartment.find_by(id: key)
-          qb_report = QuickbooksReportConfig.new(report.user, false, value, {department_id: department.quickbooks_id})
+          qb_report = QuickbooksReportConfig.new(report.user, false, value, {department_id: department&.quickbooks_id})
           if date_type == 1
             qb_report.date = non_reimbursable_expenses.reorder(date: :asc).first&.date
           elsif date_type == 2
@@ -146,7 +146,8 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
                                          object_type: "Report",
                                          read: false,
                                          timestamp: DateUtils.local_date_time,
-                                         view_role_id: view_role)
+                                         view_role_id: view_role,
+                                         application: RequestStore.store[:current_app])
       when 2
         # partially synced
         user.notifications.create(notification_type_id: NotificationType.id_for(:report),
@@ -156,7 +157,8 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
                                   object_type: "Report",
                                   read: false,
                                   timestamp: DateUtils.local_date_time,
-                                  view_role_id: view_role)
+                                  view_role_id: view_role,
+                                  application: RequestStore.store[:current_app])
     end
   end
 
@@ -171,6 +173,7 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
                                        read: false,
                                        timestamp: DateUtils.local_date_time,
                                        view_role_id: view_role,
+                                       application: RequestStore.store[:current_app],
                                        message: messages[:error].to_sentence)
   end
 
