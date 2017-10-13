@@ -2,7 +2,7 @@ require "#{Rails.root}/app/operations/expense/manual/create"
 class Mobile::V0::ExpensesController < Mobile::V1::BaseApiController
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :mobile}
+  before_action -> { finly_authorize! :mobile }
 
 
   def create
@@ -12,7 +12,12 @@ class Mobile::V0::ExpensesController < Mobile::V1::BaseApiController
       when '1', 1
         @result = Expense::Manual::Create.(current_user, param)
       when '3', 3
-        @result = Expense::ExDistance::Create.(current_user, param)
+        case params&.dig(:expense, :distance_expense_attributes, :type_id)
+          when '1', 1, nil
+            @result = Expense::ExDistance::Create.(current_user, param)
+          when '2', 2
+            @result = Expense::ExDistance::Odometer::ExCreate.(current_user, param)
+        end
       when '4', 4
         @result = Expense::ExTime::Create.(current_user, param)
       when '5', 5

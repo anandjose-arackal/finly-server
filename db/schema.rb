@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171010150748) do
+ActiveRecord::Schema.define(version: 20171012070628) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1308,13 +1308,30 @@ ActiveRecord::Schema.define(version: 20171010150748) do
     t.integer  "policy_id",           limit: 4, null: false
   end
 
+  create_table "distance_expense_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "distance_expense_types", ["name"], name: "index_distance_expense_types_on_name", using: :btree
+
   create_table "distance_expenses", force: :cascade do |t|
-    t.integer  "expense_id",       limit: 4
-    t.boolean  "is_deleted",                 default: false
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
-    t.integer  "distance_id",      limit: 4
-    t.integer  "maps_distance_id", limit: 4
+    t.integer  "expense_id",                        limit: 4
+    t.boolean  "is_deleted",                                                 default: false
+    t.datetime "created_at",                                                                 null: false
+    t.datetime "updated_at",                                                                 null: false
+    t.integer  "distance_id",                       limit: 4
+    t.integer  "maps_distance_id",                  limit: 4
+    t.integer  "type_id",                           limit: 4
+    t.decimal  "odometer_reading_one",                        precision: 10
+    t.decimal  "odometer_reading_two",                        precision: 10
+    t.integer  "odometer_reading_receipt_one_id",   limit: 4
+    t.integer  "odometer_reading_receipt_two_id",   limit: 4
+    t.decimal  "odometer_reading_start",                      precision: 10
+    t.decimal  "odometer_reading_end",                        precision: 10
+    t.integer  "odometer_reading_receipt_start_id", limit: 4
+    t.integer  "odometer_reading_receipt_end_id",   limit: 4
   end
 
   add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
@@ -1536,22 +1553,20 @@ ActiveRecord::Schema.define(version: 20171010150748) do
   end
 
   create_table "field_configurations", force: :cascade do |t|
-    t.boolean  "enabled",                             default: true,  null: false
-    t.integer  "field_type_id",           limit: 4,                   null: false
-    t.boolean  "mandatory",                           default: false, null: false
-    t.integer  "company_id",              limit: 4,                   null: false
-    t.integer  "field_parent_type_id",    limit: 4,                   null: false
-    t.integer  "configurable_id",         limit: 4,                   null: false
-    t.string   "configurable_type",       limit: 255,                 null: false
-    t.datetime "created_at",                                          null: false
-    t.datetime "updated_at",                                          null: false
-    t.string   "field_name",              limit: 255,                 null: false
-    t.integer  "default_value_id",        limit: 4
-    t.string   "default_value_type",      limit: 255
-    t.boolean  "is_deleted",                          default: false, null: false
-    t.boolean  "global",                              default: true
-    t.string   "external_reference_type", limit: 255
-    t.integer  "external_reference_id",   limit: 4
+    t.boolean  "enabled",                          default: true,  null: false
+    t.integer  "field_type_id",        limit: 4,                   null: false
+    t.boolean  "mandatory",                        default: false, null: false
+    t.integer  "company_id",           limit: 4,                   null: false
+    t.integer  "field_parent_type_id", limit: 4,                   null: false
+    t.integer  "configurable_id",      limit: 4,                   null: false
+    t.string   "configurable_type",    limit: 255,                 null: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+    t.string   "field_name",           limit: 255,                 null: false
+    t.integer  "default_value_id",     limit: 4
+    t.string   "default_value_type",   limit: 255
+    t.boolean  "is_deleted",                       default: false, null: false
+    t.boolean  "global",                           default: true
   end
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
@@ -2455,18 +2470,6 @@ ActiveRecord::Schema.define(version: 20171010150748) do
   add_index "quickbooks_configurations", ["quickbooks_payment_type_id"], name: "index_quickbooks_configurations_on_quickbooks_payment_type_id", using: :btree
   add_index "quickbooks_configurations", ["user_id"], name: "index_quickbooks_configurations_on_user_id", using: :btree
 
-  create_table "quickbooks_departments", force: :cascade do |t|
-    t.string   "name",                   limit: 255
-    t.integer  "quickbooks_id",          limit: 4
-    t.boolean  "active"
-    t.integer  "company_id",             limit: 4
-    t.text     "additional_information", limit: 65535
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
-  end
-
-  add_index "quickbooks_departments", ["company_id"], name: "index_quickbooks_departments_on_company_id", using: :btree
-
   create_table "quickbooks_finly_integrations_users", force: :cascade do |t|
     t.string   "email",                             limit: 255
     t.string   "name",                              limit: 255
@@ -3302,7 +3305,6 @@ ActiveRecord::Schema.define(version: 20171010150748) do
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "quickbooks_configurations", "quickbooks_payment_types"
   add_foreign_key "quickbooks_configurations", "users"
-  add_foreign_key "quickbooks_departments", "companies"
   add_foreign_key "quickbooks_finly_integrations_users", "companies"
   add_foreign_key "quickbooks_finly_integrations_users", "users"
   add_foreign_key "quickbooks_payment_types", "companies"

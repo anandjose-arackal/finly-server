@@ -25,7 +25,8 @@ class DistanceExpense < ActiveRecord::Base
   accepts_nested_attributes_for :distance
   accepts_nested_attributes_for :maps_distance, allow_destroy: true
 
-  validates :distance, presence: true
+  # validates :distance, presence: true
+  validate :distance_presence
 
   delegate :distance_value, to: :distance, allow_nil: true
   delegate :maps_distance_value, to: :distance, allow_nil: true
@@ -65,6 +66,13 @@ class DistanceExpense < ActiveRecord::Base
       if cf.field_configuration.field_name.casecmp(name) == 0
         return cf&.value&.value
       end
+    end
+  end
+
+  protected
+  def distance_presence
+    if self.distance.blank? and type_id != DistanceExpenseType.id_for(:odometer)
+      self.errors.add :distance, 'value cannot be blank'
     end
   end
 end
