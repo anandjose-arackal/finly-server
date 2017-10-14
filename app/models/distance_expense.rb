@@ -2,13 +2,22 @@
 #
 # Table name: distance_expenses
 #
-#  id               :integer          not null, primary key
-#  expense_id       :integer
-#  is_deleted       :boolean          default(FALSE)
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  distance_id      :integer
-#  maps_distance_id :integer
+#  id                                :integer          not null, primary key
+#  expense_id                        :integer
+#  is_deleted                        :boolean          default(FALSE)
+#  created_at                        :datetime         not null
+#  updated_at                        :datetime         not null
+#  distance_id                       :integer
+#  maps_distance_id                  :integer
+#  type_id                           :integer
+#  odometer_reading_one              :decimal(10, )
+#  odometer_reading_two              :decimal(10, )
+#  odometer_reading_receipt_one_id   :integer
+#  odometer_reading_receipt_two_id   :integer
+#  odometer_reading_start            :decimal(10, )
+#  odometer_reading_end              :decimal(10, )
+#  odometer_reading_receipt_start_id :integer
+#  odometer_reading_receipt_end_id   :integer
 #
 
 class DistanceExpense < ActiveRecord::Base
@@ -71,8 +80,12 @@ class DistanceExpense < ActiveRecord::Base
 
   protected
   def distance_presence
-    if self.distance.blank? and type_id != DistanceExpenseType.id_for(:odometer)
+    if self.distance_value.blank? and type_id != DistanceExpenseType.id_for(:odometer)
       self.errors.add :distance, 'value cannot be blank'
     end
+    if self.distance_value.present? and self.distance_value <= 0
+      self.errors.add :distance, 'value has to be greater than 0'
+    end
   end
+
 end

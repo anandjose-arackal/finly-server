@@ -7,12 +7,11 @@ class Mobile::V0::ExpensesController < Mobile::V1::BaseApiController
 
   def create
     param = RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse.(current_user, params).formatted_request
-
     case params[:type]
       when '1', 1
         @result = Expense::Manual::Create.(current_user, param)
       when '3', 3
-        case params&.dig(:expense, :distance_expense_attributes, :type_id)
+        case params&.dig(:distance_type)
           when '1', 1, nil
             @result = Expense::ExDistance::Create.(current_user, param)
           when '2', 2

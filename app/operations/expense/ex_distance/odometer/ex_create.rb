@@ -27,12 +27,23 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
   end
 
   def init
+    if self.params[:expense][:distance_expense_attributes].present?
+      self.params[:expense][:distance_expense_attributes][:type_id] = DistanceExpenseType.id_for(:odometer)
+    end
+    if self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_start).present? and
+        self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_end).present?
+      start_val = self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_start)
+      end_val = self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_end)
+      self.params[:expense][:distance_expense_attributes][:distance_attributes] = {
+          value: (end_val - start_val),
+          physical_unit_id: PhysicalUnit.kilometre_id
+      }
+    end
+
     super
+
     return if has_errors?
     self.receipt = nil
-    if self.expense_params[:distance_attributes].present?
-      self.expense_params[:distance_attributes][:type_id] = DistanceExpenseType.id_for(:odometer)
-    end
     receipt_start_id = params&.dig(:expense, :receipt_start_id)
     receipt_end_id = params&.dig(:expense, :receipt_end_id)
     if receipt_start_id.present?
@@ -71,9 +82,11 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
 
   def distance_expense_params
     params.require(:expense).permit(:note, :category_id, :date,
-                                    :expense_type_id, :expense_status_id, :report_id,
-                                    :reimbursable, :odometer_reading_start, :odometer_reading_end,
-                                    :odometer_reading_receipt_start_id, :odometer_reading_receipt_end_id)
+                                    :expense_type_id, :expense_status_id,
+                                    :report_id, :reimbursable,
+                                    distance_expense_attributes: [:odometer_reading_start, :odometer_reading_end,
+                                                                  :odometer_reading_receipt_start_id, :odometer_reading_receipt_end_id,
+                                                                  distance_attributes: [:value, :physical_unit_id]])
   end
 
 end
