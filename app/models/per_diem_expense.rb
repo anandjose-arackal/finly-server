@@ -65,6 +65,10 @@ class PerDiemExpense < ActiveRecord::Base
     end
   end
 
+  def incomplete?
+    false
+  end
+
   private
 
   def valid_quantity

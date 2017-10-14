@@ -78,10 +78,19 @@ class DistanceExpense < ActiveRecord::Base
     end
   end
 
+  def incomplete?
+    self.distance_value.blank?
+  end
+
   protected
   def distance_presence
     if self.distance_value.blank? and type_id != DistanceExpenseType.id_for(:odometer)
       self.errors.add :distance, 'value cannot be blank'
+      return
+    end
+    if type_id != DistanceExpenseType.id_for(:odometer) and odometer_reading_start.blank?
+      self.errors.add :start, 'reading cannot be blank'
+      return
     end
     if self.distance_value.present? and self.distance_value <= 0
       self.errors.add :distance, 'value has to be greater than 0'

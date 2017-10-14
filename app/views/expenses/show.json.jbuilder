@@ -1,14 +1,19 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :category_name, :category_id, :expense_type_id,
-                                    :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand
+              :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand
 
 if @result.expense.report.present?
   json.report_id @result.expense.report_id
 end
 
 json.distance do
+  json.type @result.expense.distance_expense&.type
   json.value @result.expense.distance_value
   json.maps_distance_value @result.expense.maps_distance_value
   json.rate_value @result.expense.distance_rate_value
+  json.odometer_reading_start @result.expense.distance_expense&.odometer_reading_start
+  json.odometer_reading_end @result.expense.distance_expense&.odometer_reading_end
+  json.odometer_reading_receipt_start @result.expense.distance_expense&.odometer_reading_receipt_start_id
+  json.odometer_reading_receipt_end @result.expense.distance_expense&.odometer_reading_receipt_end_id
 end
 
 json.time do

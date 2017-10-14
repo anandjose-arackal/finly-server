@@ -801,6 +801,10 @@ class Expense < ActiveRecord::Base
     Expense.with_split_link(self.split_link).count
   end
 
+  def incomplete?
+    self.sub_expense&.incomplete?
+  end
+
   private
 
   # cannot add an expense with future date

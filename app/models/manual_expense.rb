@@ -65,4 +65,8 @@ class ManualExpense < ActiveRecord::Base
     end
   end
 
+  def incomplete?
+    false
+  end
+
 end

@@ -44,21 +44,21 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
 
     return if has_errors?
     self.receipt = nil
-    receipt_start_id = params&.dig(:expense, :receipt_start_id)
-    receipt_end_id = params&.dig(:expense, :receipt_end_id)
+    receipt_start_id = params&.dig(:expense, :distance_expense_attributes, :odometer_reading_receipt_start_id)
+    receipt_end_id = params&.dig(:expense, :distance_expense_attributes, :odometer_reading_receipt_end_id)
     if receipt_start_id.present?
-      self.receipt_start = user.receipts.without_parent.with_id(id: receipt_start_id)
+      self.receipt_start = user.receipts.without_parent.find_by_id(receipt_start_id)
     end
     if receipt_end_id.present?
-      self.receipt_end = user.receipts.without_parent.with_id(id: receipt_end_id)
+      self.receipt_end = user.receipts.without_parent.find_by_id(receipt_end_id)
     end
   end
 
   def validate
     super
     return if has_errors?
-    receipt_start_id = params&.dig(:expense, :receipt_start_id)
-    receipt_end_id = params&.dig(:expense, :receipt_end_id)
+    receipt_start_id = params&.dig(:expense, :distance_expense_attributes, :odometer_reading_receipt_start_id)
+    receipt_end_id = params&.dig(:expense, :distance_expense_attributes, :odometer_reading_receipt_end_id)
     if receipt_start_id.present? and self.receipt_start.blank?
       add_message :error, 'Start Reading receipt not found'
       return
