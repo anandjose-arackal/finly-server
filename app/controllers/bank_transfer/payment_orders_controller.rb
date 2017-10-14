@@ -25,6 +25,7 @@ class BankTransfer::PaymentOrdersController < ApplicationController
     @result = BankTransfer::Users::Balance.(current_user, params)
     respond
   end
+
   #
   # def update_details
   #   @result = BankTransfer::YesBank::Update.(current_user, params)

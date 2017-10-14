@@ -903,6 +903,7 @@
 #      bank_transfer_bank_payment_request_add_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/add_beneficiary(.:format)    bank_transfer/bank_payment_requests#add_beneficiary
 #   bank_transfer_bank_payment_request_remove_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_beneficiary(.:format) bank_transfer/bank_payment_requests#remove_beneficiary
 #                bank_transfer_bank_payment_request_retry PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/retry(.:format)              bank_transfer/bank_payment_requests#retry
+#     bank_transfer_bank_payment_request_within_timeframe GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/within_timeframe(.:format)   bank_transfer/bank_payment_requests#within_timeframe
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                             bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                             bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                                         bank_transfer/bank_payment_requests#new
@@ -2253,6 +2254,7 @@ Rails.application.routes.draw do
       patch 'add_beneficiary', to: 'bank_payment_requests#add_beneficiary', as: :add_beneficiary
       patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficiary
       patch 'retry', to: 'bank_payment_requests#retry', as: :retry
+      get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
     end
 
     get 'account_owners/count', to: 'account_owners#count'
