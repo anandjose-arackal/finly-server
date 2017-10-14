@@ -84,7 +84,7 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
     params.require(:expense).permit(:note, :category_id, :date,
                                     :expense_type_id, :expense_status_id,
                                     :report_id, :reimbursable,
-                                    distance_expense_attributes: [:odometer_reading_start, :odometer_reading_end,
+                                    distance_expense_attributes: [:type_id, :odometer_reading_start, :odometer_reading_end,
                                                                   :odometer_reading_receipt_start_id, :odometer_reading_receipt_end_id,
                                                                   distance_attributes: [:value, :physical_unit_id]])
   end
