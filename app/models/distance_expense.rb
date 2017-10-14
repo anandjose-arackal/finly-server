@@ -28,6 +28,7 @@ class DistanceExpense < ActiveRecord::Base
   belongs_to :maps_distance, class_name: 'Distance'
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :locations, as: :locatable, dependent: :destroy
+  belongs_to :type, class_name: 'DistanceExpenseType'
 
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :locations
