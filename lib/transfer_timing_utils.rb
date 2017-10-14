@@ -45,8 +45,8 @@ class TransferTimingUtils
   end
 
   def self.next_valid_date(original_time, payment_mode)
-    return original_time if within_timeframe? payment_mode
-    return original_time if payment_mode == "IMPS"
+    return original_time.to_date if within_timeframe? payment_mode
+    return original_time.to_date if payment_mode == "IMPS"
     case payment_mode.upcase
       when "NEFT", "RTGS"
         date = original_time.to_date
