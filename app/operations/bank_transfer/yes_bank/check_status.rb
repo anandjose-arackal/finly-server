@@ -51,6 +51,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
+      # elsif true
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
@@ -61,6 +62,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
                                       content: "The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
         create_refund_payment
+        # nulling reimbursements that might have happened through this
+        nullify_reimbursed_reports
       else
         # do nothing?
       end
@@ -127,6 +130,13 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     receiving_account = receiving_user.cash_on_hand
     self.payment_request = ::PaymentRequest.(payment.initiating_user, nil, (receiving_account&.class&.name), :credit, :advance)
     self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(receiving_user, receiving_account, amount, note: self.payment.note))
+  end
+
+  def nullify_reimbursed_reports
+    reports = payment.reimbursed_reports
+    reports.each do |report|
+      report.update(report_status_id: ReportStatus.id_for(:approved), reimbursement_id: nil)
+    end
   end
 
 end
