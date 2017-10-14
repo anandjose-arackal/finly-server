@@ -7,11 +7,12 @@ class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration
 
   class BankTransfer::Configuration::TransferTimings::TimingsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :timings, :allowed
+    attr_accessor :timings, :allowed, :next_valid_date
 
     def init
       self.allowed = params[:allowed]
       self.timings = params[:timings]
+      self.next_valid_date = params[:next_date]
     end
 
   end
@@ -38,6 +39,7 @@ class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration
 
   def success
     params[:allowed] = TransferTimingUtils.within_timeframe?(payment_order.payment_mode)
+    params[:next_date] = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_order.payment_mode)
     BankTransfer::Configuration::TransferTimings::TimingsPresenter.new(user, params, messages)
   end
 

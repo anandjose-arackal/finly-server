@@ -7,7 +7,7 @@ class TransferTimingUtils
       when "NEFT", "RTGS"
         return false if (DateUtils.local_date.sunday? || DateUtils.local_date.saturday?)
         return false if bank_holidays.include?(DateUtils.local_date.strftime("%d-%m-%Y"))
-        return daily_time_range(payment_mode).cover?(DateUtils.local_date_time)
+        return daily_time_range(payment_mode).cover?(DateUtils.local_date_time) # i.e. if the timestamp
       else
         return false
     end
@@ -42,6 +42,26 @@ class TransferTimingUtils
         end_time = DateTime.new(Date.today.year, Date.today.month, Date.today.day, 16, 10, 0, "IST")
     end
     (start_time..end_time)
+  end
+
+  def self.next_valid_date(original_time, payment_mode)
+    return original_time if within_timeframe? payment_mode
+    return original_time if payment_mode == "IMPS"
+    case payment_mode.upcase
+      when "NEFT", "RTGS"
+        date = original_time.to_date
+        next_date = date.sunday + 1.day # i.e. the next monday of that week
+        loop do
+          if bank_holidays.include?(next_date.strftime("%d-%m-%Y"))
+            next_date = next_date + 1.day
+          else
+            return next_date
+          end
+        end
+      else
+        # do nothing? maybe just return the original date
+        return original_time.to_date
+    end
   end
 
 end
