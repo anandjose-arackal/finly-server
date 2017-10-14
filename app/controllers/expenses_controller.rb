@@ -11,7 +11,12 @@ class ExpensesController < ApplicationController
           @result = Expense::Manual::Create.(current_user, params)
         end
       when '3'
-        @result = Expense::ExDistance::Create.(current_user, params)
+        case params[:distance_type]
+          when 1, '1', nil
+            @result = Expense::ExDistance::Create.(current_user, params)
+          when 2,'2'
+            @result = Expense::ExDistance::Odometer::ExCreate.(current_user, params)
+        end
       when '4'
         @result = Expense::ExTime::Create.(current_user, params)
       when '5'
