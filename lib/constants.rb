@@ -31,7 +31,7 @@ module Constants
   end
 
   if Rails.env.production?
-    ITZ_CASH_KYC_CARBON_COPY_EMAIL = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'anushrut.khare@finly.io', 'sales@finly.io']
+    ITZ_CASH_KYC_CARBON_COPY_EMAIL = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'anushrut.khare@finly.io', 'sales@finly.io', 'kartik.k@finly.io']
   else
     ITZ_CASH_KYC_CARBON_COPY_EMAIL = []
   end
