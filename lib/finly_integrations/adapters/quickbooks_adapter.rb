@@ -169,15 +169,9 @@ module FinlyIntegrations
                               company_id: @finly_company_id,
                               mobile_number: (user.primary_phone.free_form_number if user.primary_phone.present?),
                               quickbooks_updated_at: user.meta_data.last_updated_time,
-                              active: user.active?
+                              active: user.active?,
+                              quickbooks_user_type: "Employee"
                                                       })
-        # fi_user.email = user.primary_email_address.address if user.primary_email_address.present?
-        # fi_user.name = user.display_name
-        # fi_user.quickbooks_id = user.id
-        # fi_user.company_id = @finly_company_id
-        # fi_user.mobile_number = user.primary_phone.free_form_number if user.primary_phone.present?
-        # fi_user.quickbooks_updated_at = user.meta_data.last_updated_time
-        # fi_user.active = user.active?
         save_additional_information(fi_user, user)
         fi_user
       end
