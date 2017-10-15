@@ -33,7 +33,9 @@ class QuickbooksFinlyIntegrationsUser < ActiveRecord::Base
     if self.valid?
       finly_user = nil
       finly_user = User.find_by(email: self.email, company_id: self.company_id) unless self.email.blank?
-      finly_user = User.find_by(mobile_number: self.mobile_number, company_id: self.company_id) unless self.mobile_number.blank?
+      if finly_user.blank?
+        finly_user = User.find_by(mobile_number: self.mobile_number, company_id: self.company_id) unless self.mobile_number.blank?
+      end
       if finly_user
         if finly_user.quickbooks_user.present?
           qb_user = finly_user.quickbooks_user
