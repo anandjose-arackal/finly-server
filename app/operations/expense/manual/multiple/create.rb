@@ -81,7 +81,9 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
 
       # Adding model level validation errors
       if value[:expense].valid?
-        self.total_amount_from_coh += value[:expense].amount_value
+        if value[:expense].from_cash_on_hand
+          self.total_amount_from_coh += value[:expense].amount_value
+        end
       else
         self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages
       end
