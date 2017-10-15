@@ -1,5 +1,5 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :category_name, :category_id, :expense_type_id,
-                                    :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand
+                                    :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks
 
 if @result.expense.report.present?
   json.report_id @result.expense.report_id

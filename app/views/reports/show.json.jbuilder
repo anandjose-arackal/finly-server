@@ -82,6 +82,7 @@ json.expense_sections sorted_expenses do |category|
     json.date expense.date.strftime('%d %b %y')
     json.reimbursable expense.reimbursable
     json.from_cash_on_hand expense.from_cash_on_hand
+    json.synced_with_quickbooks expense.synced_with_quickbooks
     json.violations do
       items = @result.violations[expense.id]
       json.blocking_present (items[:expense_blocking].present? or items[:budget_blocking].present? or items['expense_blocking'].present? or items['budget_blocking'].present?)
