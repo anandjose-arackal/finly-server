@@ -120,7 +120,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     end
     # now mark the respective bank transaction and payment as completed
     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
-    self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+    self.payment.update(payment_status_id: PaymentStatus.id_for(:completed), note: "Payment credit confirmed")
     self.payment.system_messages.destroy_all # deleting the previous system messages
   end
 
@@ -133,6 +133,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   end
 
   def nullify_reimbursed_reports
+    # setting their status as approved, and disassociating the reimbursement payment with these reports
     reports = payment.reimbursed_reports
     reports.each do |report|
       report.update(report_status_id: ReportStatus.id_for(:approved), reimbursement_id: nil)
