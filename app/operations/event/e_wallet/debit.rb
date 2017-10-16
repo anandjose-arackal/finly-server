@@ -19,7 +19,7 @@ class Event::EWallet::Debit < Event::EWallet::Base
   def send_push_notification(user)
     return unless user.id == payment.receiving_user_id
     message = "An amount of ₹#{self.payment.amount.value} has been debited from your #{receiving_account_s}"
-    GcmMessenger.push user, report_id: self.report.id, message: message, event_id: event_id
+    GcmMessenger.push user, message: message, event_id: event_id
   end
 
   def set_notification(user)
