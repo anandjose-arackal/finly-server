@@ -16,6 +16,7 @@ module FinlyIntegrations
         @access_token = OAuth::AccessToken.new(QB_OAUTH_CONSUMER, auth_obj.token, auth_obj.secret)
         @company_id = auth_obj.uid
         @finly_company_id = auth_obj.user.company_id
+        @finly_company = auth_obj.user.company
         @finly_user_id = auth_obj.user_id
         @quickbooks_config = QuickbooksConfiguration.where(user_id: auth_obj.user_id).first
         service = Quickbooks::Service::CompanyInfo.new
@@ -59,6 +60,8 @@ module FinlyIntegrations
           line_item.description = "#{expense.merchant_name} - #{expense.note}"
           line_item.amount = expense.amount.send(:INR).to_f
           line_item.detail_type = CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category.quickbooks_category_type][0]
+
+          # deciding whether it's an account item or a purchase item
           line_item.send(CATEGORY_LINE_ITEMS_MAPPER[category.quickbooks_category.quickbooks_category_type][1]) do |detail|
             if category.quickbooks_category.quickbooks_category_type == QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES[0]
               detail.account_id = category.quickbooks_category.quickbooks_id
@@ -66,8 +69,15 @@ module FinlyIntegrations
               detail.item_id = category.quickbooks_category.quickbooks_id
             end
           end
+
+
           finly_purchase.line_items << line_item
         end
+        # mapping the department and payee details (called entity) from the qb_report
+        # to sync it in quickbooks
+        finly_purchase.department_id = qb_report.quickbooks_department_id
+        finly_purchase.entity_id = qb_report.user.quickbooks_user&.quickbooks_id
+
         purchase_service = Quickbooks::Service::Purchase.new
         begin
           initialize_service(purchase_service)
@@ -151,19 +161,23 @@ module FinlyIntegrations
       private
 
       def quickbooks_employee_mapper(user)
-        fi_user = QuickbooksFinlyIntegrationsUser.find_or_initialize_by(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, quickbooks_id: user.id, quickbooks_user_type: QuickbooksFinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.first)
-        fi_user.email = user.primary_email_address.address if user.primary_email_address.present?
-        fi_user.name = user.display_name
-        fi_user.company_id = @finly_company_id
-        fi_user.mobile_number = user.primary_phone.free_form_number if user.primary_phone.present?
-        fi_user.quickbooks_updated_at = user.meta_data.last_updated_time
-        fi_user.active = user.active?
+        # fi_user = QuickbooksFinlyIntegrationsUser.find_or_initialize_by(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, quickbooks_id: user.id, quickbooks_user_type: QuickbooksFinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.first)
+        fi_user = QuickbooksFinlyIntegrationsUser.new({
+                              email: (user.primary_email_address.address if user.primary_email_address.present?),
+                              name: user.display_name,
+                              quickbooks_id: user.id,
+                              company_id: @finly_company_id,
+                              mobile_number: (user.primary_phone.free_form_number if user.primary_phone.present?),
+                              quickbooks_updated_at: user.meta_data.last_updated_time,
+                              active: user.active?,
+                              quickbooks_user_type: "Employee"
+                                                      })
         save_additional_information(fi_user, user)
         fi_user
       end
 
       def quickbooks_vendor_mapper(user)
-        fi_user = QuickbooksFinlyIntegrationsUser.find_or_initialize_by(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, quickbooks_id: user.id, quickbooks_user_type: FinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.last)
+        fi_user = QuickbooksFinlyIntegrationsUser.find_or_initialize_by(quickbooks_integration_type: QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first, quickbooks_id: user.id, quickbooks_user_type: QuickbooksFinlyIntegrationsUser::QUICKBOOKS_USER_TYPES.last)
         fi_user.email = user.primary_email_address.address if user.primary_email_address.present?
         fi_user.name = user.display_name
         fi_user.company_id = @finly_company_id
@@ -227,14 +241,13 @@ module FinlyIntegrations
       end
 
       def quickbooks_department_mapper(department)
-        fi_department = QuickbooksFinlyIntegrationsTag.new
+        fi_department = QuickbooksFinlyIntegrationsDepartment.new
         fi_department.name = department.name
         fi_department.active = department.active?
         fi_department.quickbooks_id = department.id
         fi_department.company_id = @finly_company_id
         fi_department.quickbooks_integration_type = QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
         fi_department.quickbooks_updated_at = department.meta_data.last_updated_time
-        fi_department.tag_sub_type = QuickbooksFinlyIntegrationsTag::QUICKBOOKS_TAG_SUB_TYPES.last
         save_additional_information(fi_department, department)
         fi_department
       end
@@ -269,6 +282,7 @@ module FinlyIntegrations
           container << fi_obj if fi_obj.valid?
         end
       end
+
     end
   end
 end

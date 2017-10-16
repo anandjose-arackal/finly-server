@@ -518,6 +518,7 @@
 #                                                         PUT    /card_restrictions/:id(.:format)                                                           card_restrictions#update
 #                                                         DELETE /card_restrictions/:id(.:format)                                                           card_restrictions#destroy
 #                                        companies_notify GET    /companies/notify(.:format)                                                                companies#notify
+#                                            load_options GET    /companies/load_options(.:format)                                                          companies#load_options
 #                                     company_add_balance POST   /companies/:company_id/add_balance(.:format)                                               companies#add_balance
 #                                               companies GET    /companies(.:format)                                                                       companies#index
 #                                                         POST   /companies(.:format)                                                                       companies#create
@@ -780,6 +781,7 @@
 #                                                     kyc GET    /kyc/users/:id(.:format)                                                                   kyc/user#show
 #                                                         PATCH  /kyc/users/:id(.:format)                                                                   kyc/user#update
 #                                          disburse_users POST   /disburse/users(.:format)                                                                  disburse/users#create
+#                                   disburse_users_import POST   /disburse/users/import(.:format)                                                           disburse/users#import
 #                                     features_subscribed GET    /features_subscribed(.:format)                                                             expense_types_configuration#features_subscribed
 #                                                  groups GET    /groups(.:format)                                                                          user_groups#index
 #                                                         POST   /groups(.:format)                                                                          user_groups#create
@@ -857,6 +859,7 @@
 #                              quickbooks_sync_categories POST   /quickbooks/sync_categories(.:format)                                                      quickbooks#sync_categories
 #                           quickbooks_sync_payment_types POST   /quickbooks/sync_payment_types(.:format)                                                   quickbooks#sync_payment_types
 #                                quickbooks_update_config PATCH  /quickbooks/update_config(.:format)                                                        quickbooks#update
+#                                              sync_users PATCH  /quickbooks/sync_users(.:format)                                                           quickbooks#sync_users
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                                               quickbooks#show
 #                                                     tos GET    /tos(.:format)                                                                             static_pages#tos
 #                                                 privacy GET    /privacy(.:format)                                                                         static_pages#privacy
@@ -900,6 +903,7 @@
 #      bank_transfer_bank_payment_request_add_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/add_beneficiary(.:format)    bank_transfer/bank_payment_requests#add_beneficiary
 #   bank_transfer_bank_payment_request_remove_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_beneficiary(.:format) bank_transfer/bank_payment_requests#remove_beneficiary
 #                bank_transfer_bank_payment_request_retry PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/retry(.:format)              bank_transfer/bank_payment_requests#retry
+#     bank_transfer_bank_payment_request_within_timeframe GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/within_timeframe(.:format)   bank_transfer/bank_payment_requests#within_timeframe
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                             bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                             bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                                         bank_transfer/bank_payment_requests#new
@@ -968,6 +972,11 @@
 #                                                         PATCH  /admin/admin_users/funds_load_requests/:id(.:format)                                       admin_users/funds_load_requests#update
 #                                                         PUT    /admin/admin_users/funds_load_requests/:id(.:format)                                       admin_users/funds_load_requests#update
 #                                                         DELETE /admin/admin_users/funds_load_requests/:id(.:format)                                       admin_users/funds_load_requests#destroy
+#                                  summary_configurations GET    /summary/configurations(.:format)                                                          summary/configuration#index
+#                            summary_configurations_admin POST   /summary/configurations/admin(.:format)                                                    summary/configuration#admin_create
+#                                                 summary DELETE /summary/configurations/admin/:id(.:format)                                                summary/configuration#admin_destroy
+#                          summary_configurations_manager POST   /summary/configurations/manager(.:format)                                                  summary/configuration#manager_create
+#                                                         DELETE /summary/configurations/manager/:id(.:format)                                              summary/configuration#manager_destroy
 #
 
 #                               crono_web        /crono                                                      Crono::Web
@@ -1906,6 +1915,7 @@ Rails.application.routes.draw do
   resources :card_restrictions
 
   get 'companies/notify', to: 'companies#notify'
+  get 'companies/load_options', to: 'companies#load_options', as: :load_options
   resources :companies do
     post 'add_balance', to: 'companies#add_balance', as: :add_balance
   end
@@ -2160,6 +2170,7 @@ Rails.application.routes.draw do
 
   # Disburse
   post 'disburse/users' => 'disburse/users#create'
+  post 'disburse/users/import', to: 'disburse/users#import'
 
   get 'features_subscribed' => 'expense_types_configuration#features_subscribed'
   resources :groups, controller: 'user_groups', only: [:create, :index, :update, :destroy]
@@ -2206,6 +2217,7 @@ Rails.application.routes.draw do
   post 'quickbooks/sync_categories', to: 'quickbooks#sync_categories', as: :quickbooks_sync_categories
   post 'quickbooks/sync_payment_types', to: 'quickbooks#sync_payment_types', as: :quickbooks_sync_payment_types
   patch 'quickbooks/update_config', to: 'quickbooks#update', as: :quickbooks_update_config
+  patch 'quickbooks/sync_users', to: 'quickbooks#sync_users', as: :sync_users
   get 'quickbooks/config', to: 'quickbooks#show', as: :quickbooks_config
 
   get 'tos', to: 'static_pages#tos'
@@ -2242,6 +2254,7 @@ Rails.application.routes.draw do
       patch 'add_beneficiary', to: 'bank_payment_requests#add_beneficiary', as: :add_beneficiary
       patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficiary
       patch 'retry', to: 'bank_payment_requests#retry', as: :retry
+      get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
     end
 
     get 'account_owners/count', to: 'account_owners#count'

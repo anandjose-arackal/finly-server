@@ -19,7 +19,6 @@
 #
 
 class QuickbooksFinlyIntegrationsUser < ActiveRecord::Base
-  include QuickbooksFinlyIntegratable
   QUICKBOOKS_USER_TYPES = ['Employee', 'Vendor']
 
   validates :email, presence: true
@@ -32,19 +31,24 @@ class QuickbooksFinlyIntegrationsUser < ActiveRecord::Base
   # adds the relevant details to the User model and saves it in the db
   def save
     if self.valid?
-      begin
-        finly_user = User.find_by(email: self.email) || User.find_by(mobile_number: self.mobile_number)
-        if finly_user
-          finly_user.tap do |user|
-            user.quickbooks_id = self.quickbooks_id
-            user.quickbooks_integration_type = self.quickbooks_integration_type
-            user.quickbooks_updated_at = self.quickbooks_updated_at
-            user.quickbooks_additional_information = self.quickbooks_additional_information
-          end
-          finly_user.save
+      finly_user = nil
+      finly_user = User.find_by(email: self.email, company_id: self.company_id) unless self.email.blank?
+      if finly_user.blank?
+        finly_user = User.find_by(mobile_number: self.mobile_number, company_id: self.company_id) unless self.mobile_number.blank?
+      end
+      if finly_user
+        if finly_user.quickbooks_user.present?
+          qb_user = finly_user.quickbooks_user
+          qb_user.destroy
+          self.user = finly_user
+          self.company = finly_user.company
+          super
+        else
+          # now create the corresponding quickbooks_integrations_user from this data
+          self.user = finly_user
+          self.company = finly_user.company
+          super
         end
-      rescue ActiveRecord::RecordNotUnique
-        # retry
       end
     else
       return false

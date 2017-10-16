@@ -46,6 +46,7 @@ class Company < ActiveRecord::Base
   has_many :individual_kycs
   has_many :yes_bank_vendors
   has_many :bank_accounts
+  has_many :quickbooks_departments
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -178,7 +179,7 @@ class Company < ActiveRecord::Base
   end
 
   def bank_reimbursement_enabled?
-    vendor_payments_enabled?
+    self.feature_subscription.bank_account_reimbursement || vendor_payments_enabled?
   end
 
   def gift_card_enabled?

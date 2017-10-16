@@ -10,11 +10,11 @@ module Constants
   # todo - needs to be edited once we get the account details.
   ITZCASH_EMAIL_ID = ['veekshith.rai@finly.io', 'vivek.a@finly.io']
 
-  PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io']
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
-  RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io']
+  RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io']
 
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finly.io', 'admin@finlytest.io']
 
@@ -31,7 +31,7 @@ module Constants
   end
 
   if Rails.env.production?
-    ITZ_CASH_KYC_CARBON_COPY_EMAIL = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'anushrut.khare@finly.io', 'sales@finly.io']
+    ITZ_CASH_KYC_CARBON_COPY_EMAIL = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'anushrut.khare@finly.io', 'sales@finly.io', 'kartik.k@finly.io']
   else
     ITZ_CASH_KYC_CARBON_COPY_EMAIL = []
   end

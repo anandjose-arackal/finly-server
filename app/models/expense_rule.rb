@@ -11,6 +11,7 @@
 #  rule_type_id           :integer
 #  expense_rule_type_id   :integer
 #  policy_id              :integer
+#  is_deleted             :boolean          default(FALSE)
 #
 
 

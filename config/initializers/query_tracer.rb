@@ -1,3 +1,3 @@
 if ['test', 'development'].include? Rails.env
-  ActiveRecordQueryTrace.enabled = true
+  ActiveRecordQueryTrace.enabled = false
 end

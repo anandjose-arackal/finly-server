@@ -2,21 +2,23 @@
 #
 # Table name: field_configurations
 #
-#  id                   :integer          not null, primary key
-#  enabled              :boolean          default(TRUE), not null
-#  field_type_id        :integer          not null
-#  mandatory            :boolean          default(FALSE), not null
-#  company_id           :integer          not null
-#  field_parent_type_id :integer          not null
-#  configurable_id      :integer          not null
-#  configurable_type    :string(255)      not null
-#  created_at           :datetime         not null
-#  updated_at           :datetime         not null
-#  field_name           :string(255)      not null
-#  default_value_id     :integer
-#  default_value_type   :string(255)
-#  is_deleted           :boolean          default(FALSE), not null
-#  global               :boolean          default(TRUE)
+#  id                      :integer          not null, primary key
+#  enabled                 :boolean          default(TRUE), not null
+#  field_type_id           :integer          not null
+#  mandatory               :boolean          default(FALSE), not null
+#  company_id              :integer          not null
+#  field_parent_type_id    :integer          not null
+#  configurable_id         :integer          not null
+#  configurable_type       :string(255)      not null
+#  created_at              :datetime         not null
+#  updated_at              :datetime         not null
+#  field_name              :string(255)      not null
+#  default_value_id        :integer
+#  default_value_type      :string(255)
+#  is_deleted              :boolean          default(FALSE), not null
+#  global                  :boolean          default(TRUE)
+#  external_reference_type :string(255)
+#  external_reference_id   :integer
 #
 
 class FieldConfiguration < ActiveRecord::Base
@@ -32,6 +34,7 @@ class FieldConfiguration < ActiveRecord::Base
   has_many :drop_down_items, class_name: 'FieldDropDownItem'
   has_many :custom_fields
   belongs_to :default_value, polymorphic: true
+  belongs_to :external_reference, polymorphic: true
 
   validates :field_name, presence: true
   validates :enabled, presence: true

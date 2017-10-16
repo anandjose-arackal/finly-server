@@ -42,7 +42,7 @@ class BalanceMsgQueuePoller
       end
 
       # if the balance history wasn't created also log it in the log file
-      if @result.failure? || @result.balance_history.nil?
+      if @result&.failure? || @result.balance_history.nil?
         error_logger.error("Following history entry : #{message.body} couldn't be created because the operation failed due to the following errors: #{@result.messages[:error]}")
       end
 
