@@ -16,7 +16,7 @@
 
 class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
 
-  attr_accessor :receipt_start, :receipt_end
+  attr_accessor :receipt_start, :receipt_end, :old_receipt_start, :old_receipt_end
 
   def pre_validate
     if params.blank? or user.blank?
@@ -33,6 +33,16 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
     id = (params[:expense_id] or params[:id])
     self.expense = Expense::Index.(user, params)&.expenses&.find_by(id: id)
 
+    if self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_start).present? and
+        self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_end).present?
+      start_val = self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_start)
+      end_val = self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_end)
+      self.params[:expense][:distance_expense_attributes][:distance_attributes] = {
+          value: (end_val - start_val),
+          physical_unit_id: PhysicalUnit.kilometre_id
+      }
+    end
+
     # saving previous expense attributes before updation
     define_editable_attributes if expense
 
@@ -46,77 +56,36 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
       if self.updated_expense_params&.dig(:distance_expense_attributes, :distance_attributes).present? and expense.distance_expense.distance_id.present?
         self.updated_expense_params[:distance_expense_attributes][:distance_attributes][:id] = expense.distance_expense.distance.id
       end
-      receipt_start_id = updated_expense_params(:distance_expense_attributes, :odometer_reading_receipt_start_id)
-      receipt_end_id = updated_expense_params(:distance_expense_attributes, :odometer_reading_receipt_end_id)
-      if receipt_start_id.present?
 
-      end
-      if receipt_end_id.present?
-
-      end
-    end
-  end
-
-  def authorize
-    unless expense
-      raise_unauthorized_exception
-    end
-    # i.e. if an employee is editing an expense
-    if personal_view? and expense.user_id != user.id
-      raise_unauthorized_exception
+      init_receipts
     end
   end
 
   def validate
-    if expense.report_id and personal_view?
-      unless expense.report.editable?
-        messages[:error] << 'Expense cannot be edited at this stage'
-        return
-      end
+    super
+    return if has_errors?
+    receipt_start_id = updated_expense_params(:distance_expense_attributes, :odometer_reading_receipt_start_id)
+    receipt_end_id = updated_expense_params(:distance_expense_attributes, :odometer_reading_receipt_end_id)
+    if receipt_start_id.present? and self.receipt_start.blank?
+      add_message :error, 'Start Reading Receipt not found'
+      return
     end
-    if receipt
-      unless receipt.user_id == user.id
-        add_message :error, "You do not own this receipt"
-      end
+    if receipt_end_id.present? and self.receipt_end.blank?
+      add_message :error, 'End Reading Receipt not found'
+      return
     end
   end
 
   def process
-    # Set custom fields
-    custom_fields = {custom_fields: params[:custom_fields]}
-    custom_fields[:save] = false
-    set_fields = CustomField::SetFields.(self.expense.distance_expense, FieldParentType.id_for(:distance_expense), custom_fields)
-    unless set_fields.success?
-      add_message :error, set_fields.messages[:error]
-      return
+    super
+    return if has_errors?
+    if self.receipt_start.present? and self.receipt_start != self.old_receipt_start
+      self.old_receipt_start.update(parent: nil)
+      self.receipt_start.update(parent: self.expense)
     end
-    # valid = CustomField::Validate.(self.expense.distance_expense)
-    # unless valid.success?
-    #   add_message :error, valid.messages[:error]
-    #   return
-    # end
-
-    if expense.update(updated_expense_params)
-      expense.distance_expense.locations.with_id(locations_marked_for_destruction).destroy_all if self.locations_marked_for_destruction.present?
-      if self.destroy_receipts
-        expense.receipts.each do |receipt|
-          if receipt
-            receipt.parent = nil
-            receipt.save
-          end
-        end
-      end
-      if receipt
-        receipt.parent = expense
-        if receipt.save
-          if old_receipt.present?
-            old_receipt.parent = nil
-            old_receipt.save
-          end
-        end
-      end
-    else
-      add_message :error, self.expense.errors.full_messages
+    if self.receipt_end.present? and self.receipt_end != self.old_receipt_end
+      self.old_receipt_end.update(parent: nil)
+      self.receipt_end.update(parent: self.expense)
     end
   end
 
@@ -156,6 +125,34 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
                                     distance_expense_attributes: [:type_id, :odometer_reading_start, :odometer_reading_end,
                                                                   :odometer_reading_receipt_start_id, :odometer_reading_receipt_end_id,
                                                                   distance_attributes: [:value, :physical_unit_id]])
+  end
+
+  def init_receipts
+    self.receipt = nil
+    self.old_receipt_start = self.expense.distance_expense.odometer_reading_receipt_start
+    self.old_receipt_end = self.expense.distance_expense.odometer_reading_receipt_end
+    receipt_start_id = updated_expense_params(:distance_expense_attributes, :odometer_reading_receipt_start_id)
+    receipt_end_id = updated_expense_params(:distance_expense_attributes, :odometer_reading_receipt_end_id)
+    if receipt_start_id.present?
+      self.receipt_start = user.receipts.without_parent.find_by_id(receipt_start_id)
+      if self.receipt_start.blank?
+        if receipt_start_id == expense.distance_expense&.odometer_reading_receipt_start_id
+          self.receipt_start = expense.distance_expense&.odometer_reading_receipt_start
+        elsif receipt_start_id == expense.distance_expense&.odometer_reading_receipt_end_id
+          self.receipt_start = expense.distance_expense&.odometer_reading_receipt_end
+        end
+      end
+    end
+    if receipt_end_id.present?
+      self.receipt_end = user.receipts.without_parent.find_by_id(receipt_end_id)
+      if self.receipt_end.blank?
+        if receipt_end_id == expense.distance_expense&.odometer_reading_receipt_start_id
+          self.receipt_end = expense.distance_expense&.odometer_reading_receipt_start
+        elsif receipt_end_id == expense.distance_expense&.odometer_reading_receipt_end_id
+          self.receipt_end = expense.distance_expense&.odometer_reading_receipt_end
+        end
+      end
+    end
   end
 
 end

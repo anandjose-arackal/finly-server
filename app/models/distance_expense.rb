@@ -29,6 +29,8 @@ class DistanceExpense < ActiveRecord::Base
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :locations, as: :locatable, dependent: :destroy
   belongs_to :type, class_name: 'DistanceExpenseType'
+  belongs_to :odometer_reading_receipt_start, class_name: 'Receipt'
+  belongs_to :odometer_reading_receipt_end, class_name: 'Receipt'
 
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :locations

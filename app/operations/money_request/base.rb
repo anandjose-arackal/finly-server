@@ -102,6 +102,8 @@ class MoneyRequest::Base < BaseOperation
         end
       end
 
+      debugger
+
       # Load credit actions
       if actions[:approve_and_credit]
 
