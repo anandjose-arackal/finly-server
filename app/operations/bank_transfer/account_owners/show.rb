@@ -24,7 +24,7 @@ class BankTransfer::AccountOwners::Show < BankTransfer::AccountOwners::Base
 
   def process
     self.bank_accounts = account_owner.bank_accounts.non_deleted
-    self.receiving_transactions = account_owner.receiving_payments.with_receiving_account_type("BankAccount")
+    self.receiving_transactions = account_owner.receiving_payments.with_receiving_account_type("BankAccount").successful_and_failed_only
   end
 
   def success

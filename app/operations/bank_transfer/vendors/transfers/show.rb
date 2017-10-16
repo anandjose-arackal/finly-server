@@ -12,7 +12,7 @@ class BankTransfer::Vendors::Transfers::Show < BankTransfer::Vendors::Base
 
   def process
     self.bank_accounts = vendor.bank_accounts
-    self.receiving_transactions = vendor.receiving_payments
+    self.receiving_transactions = vendor.receiving_payments.successful_and_failed_only
   end
 
   def success
