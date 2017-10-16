@@ -144,6 +144,7 @@ class Payment < ActiveRecord::Base
   scope :cash_advance, -> { where payment_purpose_id: PaymentPurpose.id_for(:cash_advance) }
   scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
   scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
+  scope :successful_and_failed_only, -> {where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)]}
 
   scope :transfer_to_card, -> { where('(payment_type_id = ? AND receiving_account_type = ?) OR (payment_type_id = ? AND initiating_account_type = ?)',
                                       PaymentType.id_for(:credit), Payment::AccountType::CARD, PaymentType.id_for(:debit), Payment::AccountType::CARD) }

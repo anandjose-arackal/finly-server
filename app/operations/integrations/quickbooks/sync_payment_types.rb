@@ -12,11 +12,20 @@ class Integrations::Quickbooks::SyncPaymentTypes < Integrations::Quickbooks::Bas
     categories.each do |category|
       additional_information = JSON.parse(category.quickbooks_additional_information)
       if FinlyIntegrationsConstants::CATEGORY_PAYMENT_TYPES.include? additional_information['account_type']
-        cat = QuickbooksPaymentType.create(quickbooks_integration_type: category.quickbooks_integration_type,
-                                           quickbooks_id: category.quickbooks_id,
-                                           name: category.name,
-                                           company_id: category.company_id,
-                                           quickbooks_additional_information: category.quickbooks_additional_information)
+        cat = QuickbooksPaymentType.find_by(quickbooks_id: category.quickbooks_id)
+        if cat.blank?
+          cat = QuickbooksPaymentType.create(quickbooks_integration_type: category.quickbooks_integration_type,
+                                             quickbooks_id: category.quickbooks_id,
+                                             name: category.name,
+                                             company_id: category.company_id,
+                                             quickbooks_additional_information: category.quickbooks_additional_information)
+        else
+          cat.update(quickbooks_integration_type: category.quickbooks_integration_type,
+              quickbooks_id: category.quickbooks_id,
+              name: category.name,
+              company_id: category.company_id,
+              quickbooks_additional_information: category.quickbooks_additional_information)
+        end
       end
     end
   end

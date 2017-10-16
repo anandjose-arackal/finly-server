@@ -12,7 +12,7 @@ class BankTransfer::Users::Transfers::Show < BankTransfer::Users::Base
 
   def process
     self.bank_accounts = employee.bank_accounts
-    self.receiving_transactions = employee.receiving_payments.with_receiving_account_type("BankAccount")
+    self.receiving_transactions = employee.receiving_payments.with_receiving_account_type("BankAccount").successful_and_failed_only
   end
 
   def success
