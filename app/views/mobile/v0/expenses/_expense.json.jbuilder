@@ -6,19 +6,31 @@ if expense.distance_expense?
   json.distance_type expense.distance_expense&.type_id
   json.odometer_reading_start expense.distance_expense&.odometer_reading_start
   json.odometer_reading_end expense.distance_expense&.odometer_reading_end
-  json.odometer_reading_receipt_start do
-    start_receipt = expense.distance_expense&.odometer_reading_receipt_start
-    json.original start_receipt&.image(:original)
-    json.large start_receipt&.image(:large)
-    json.normal start_receipt&.image(:normal)
-    json.thumb start_receipt&.image(:thumb)
+  start_receipt = expense.distance_expense&.odometer_reading_receipt_start
+  if start_receipt.present?
+    json.odometer_reading_receipt_start do
+      json.extract! start_receipt, :id, :user_id, :note, :created_at
+      json.image_url do
+        json.file_format start_receipt.file_format
+        json.original start_receipt&.image(:original)
+        json.large start_receipt&.image(:large)
+        json.normal start_receipt&.image(:normal)
+        json.thumb start_receipt&.image(:thumb)
+      end
+    end
   end
-  json.odometer_reading_receipt_end do
-    end_receipt = expense.distance_expense&.odometer_reading_receipt_end
-    json.original end_receipt&.image(:original)
-    json.large end_receipt&.image(:large)
-    json.normal end_receipt&.image(:normal)
-    json.thumb end_receipt&.image(:thumb)
+  end_receipt = expense.distance_expense&.odometer_reading_receipt_end
+  if end_receipt.present?
+    json.odometer_reading_receipt_end do
+      json.extract! end_receipt, :id, :user_id, :note, :created_at
+      json.image_url do
+        json.file_format end_receipt.file_format
+        json.original end_receipt&.image(:original)
+        json.large end_receipt&.image(:large)
+        json.normal end_receipt&.image(:normal)
+        json.thumb end_receipt&.image(:thumb)
+      end
+    end
   end
 end
 json.user do

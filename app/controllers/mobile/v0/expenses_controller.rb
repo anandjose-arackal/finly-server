@@ -59,7 +59,12 @@ class Mobile::V0::ExpensesController < Mobile::V1::BaseApiController
       when '2', 2
         @result = Expense::ExCard::Update.(current_user, param)
       when '3', 3
-        @result = Expense::ExDistance::Update.(current_user, param)
+        case params&.dig(:distance_type)
+          when '1', 1, nil
+            @result = Expense::ExDistance::Update.(current_user, param)
+          when '2', 2
+            @result = Expense::ExDistance::Odometer::ExUpdate.(current_user, param)
+        end
       when '4', 4
         @result = Expense::ExTime::Update.(current_user, param)
       when '5', 5
