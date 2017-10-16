@@ -36,16 +36,19 @@ class Policy::Users::RemoveUser < Policy::Base
       raise_unauthorized_exception
       return false
     end
-    removed_users.each do |removed_user|
-      if removed_user.policy_admin?(policy) and policy.admins.count <= 1
-        raise_unauthorized_exception
-        return false
-      end
-    end
+
   end
 
   def validate
     super()
+
+    removed_users.each do |removed_user|
+      if removed_user.policy_admin?(policy) and policy.admins.count <= 1
+        add_message :error, "You cannot remove the only policy admin from the policy"
+        return false
+      end
+    end
+
     removed_users.each do |removed_user|
       messages = []
       conflicts = false
