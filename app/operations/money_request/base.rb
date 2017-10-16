@@ -83,7 +83,7 @@ class MoneyRequest::Base < BaseOperation
         elsif self.money_request.processing? and self.money_request.controlling_user?(user)
           if self.money_request.payment_mode_card?
             actions[:approve_and_credit] = true
-            actions[:approve_and_forward_to] = true
+            actions[:approve_and_forward_to] = Rails.application.routes.url_helpers.money_request_path(id: money_request.id, view: params[:view])
           else
             actions[:approve] = true
           end
