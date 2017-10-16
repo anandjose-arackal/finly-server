@@ -6,8 +6,20 @@ if expense.distance_expense?
   json.distance_type expense.distance_expense&.type_id
   json.odometer_reading_start expense.distance_expense&.odometer_reading_start
   json.odometer_reading_end expense.distance_expense&.odometer_reading_end
-  json.odometer_reading_receipt_start expense.distance_expense&.odometer_reading_receipt_start
-  json.odometer_reading_receipt_end expense.distance_expense&.odometer_reading_receipt_end
+  json.odometer_reading_receipt_start do
+    start_receipt = expense.distance_expense&.odometer_reading_receipt_start
+    json.original start_receipt&.image(:original)
+    json.large start_receipt&.image(:large)
+    json.normal start_receipt&.image(:normal)
+    json.thumb start_receipt&.image(:thumb)
+  end
+  json.odometer_reading_receipt_end do
+    end_receipt = expense.distance_expense&.odometer_reading_receipt_end
+    json.original end_receipt&.image(:original)
+    json.large end_receipt&.image(:large)
+    json.normal end_receipt&.image(:normal)
+    json.thumb end_receipt&.image(:thumb)
+  end
 end
 json.user do
   json.id expense.user.id
