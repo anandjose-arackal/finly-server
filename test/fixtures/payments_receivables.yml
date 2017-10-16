@@ -1,0 +1,15 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  customer_id: 
+  amount_id: 
+  purpose: MyText
+  expire_by: 2017-10-16
+  company_id: 
+
+two:
+  customer_id: 
+  amount_id: 
+  purpose: MyText
+  expire_by: 2017-10-16
+  company_id: 
