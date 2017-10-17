@@ -83,6 +83,7 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
         if self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes, :value).blank?
           # self.updated_expense_params[:distance_expense_attributes][:maps_distance_attributes][:_destroy] = true
           self.destroy_maps_distance = true
+          self.updated_expense_params[:distance_expense_attributes]&.delete(:maps_distance_attributes)
         end
       end
       if not self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).nil? and not
