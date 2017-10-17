@@ -17,7 +17,7 @@
 class Expense::ExDistance::Update < Expense::ExDistance::Base
 
   attr_accessor :updated_expense_params, :locations_marked_for_destruction
-  attr_accessor :editable_attrs, :receipt, :old_receipt, :destroy_receipts
+  attr_accessor :editable_attrs, :receipt, :old_receipt, :destroy_receipts, :destroy_maps_distance
 
   def pre_validate
     if params.blank? or user.blank?
@@ -81,7 +81,8 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       if not self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).nil? and expense.distance_expense.maps_distance_id.present?
         self.updated_expense_params[:distance_expense_attributes][:maps_distance_attributes][:id] = expense.distance_expense.maps_distance_id
         if self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes, :value).blank?
-          self.updated_expense_params[:distance_expense_attributes][:maps_distance_attributes][:_destroy] = true
+          # self.updated_expense_params[:distance_expense_attributes][:maps_distance_attributes][:_destroy] = true
+          self.destroy_maps_distance = true
         end
       end
       if not self.updated_expense_params&.dig(:distance_expense_attributes, :maps_distance_attributes).nil? and not
@@ -137,6 +138,10 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
     #   add_message :error, valid.messages[:error]
     #   return
     # end
+
+    if self.destroy_maps_distance
+      expense&.distance_expense&.maps_distance&.destroy
+    end
 
     if expense.update(updated_expense_params)
       expense.distance_expense.locations.with_id(locations_marked_for_destruction).destroy_all if self.locations_marked_for_destruction.present?
