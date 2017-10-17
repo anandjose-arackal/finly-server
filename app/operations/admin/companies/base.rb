@@ -20,7 +20,8 @@ class Admin::Companies::Base < Admin::Base
                                       :itz_cash_d_code_enabled,
                                       :hard_copy_receipt,
                                       :yes_bank_account,
-                                      :bank_account_reimbursement
+                                      :bank_account_reimbursement,
+                                      :payroll_card_enabled
                                     ])
   end
 

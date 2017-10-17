@@ -210,6 +210,10 @@ class Company < ActiveRecord::Base
     self.feature_subscription.reimbursement_card_enabled
   end
 
+  def payroll_card_enabled?
+    self.feature_subscription.payroll_card_enabled
+  end
+
   def hard_copy_receipt_enabled?
     self.feature_subscription.hard_copy_receipt
   end
