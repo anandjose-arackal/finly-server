@@ -53,6 +53,8 @@ class AccountManager::Payments::RetryPayment < AccountManager::Base
   def post_process
     # clearing the system messages for this particular payment
     self.payment.system_messages.destroy_all
+    # update processed amount for this payment order
+    self.payment_order.update_processed_amount
     add_message :success, "Payment retry successfully executed"
   end
   
