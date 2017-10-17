@@ -35,7 +35,7 @@ class Expense::ExDistance::Odometer::ExCreate < Expense::ExDistance::Create
       start_val = self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_start)
       end_val = self.params&.dig(:expense, :distance_expense_attributes, :odometer_reading_end)
       self.params[:expense][:distance_expense_attributes][:distance_attributes] = {
-          value: (end_val - start_val),
+          value: (end_val.to_f - start_val.to_f),
           physical_unit_id: PhysicalUnit.kilometre_id
       }
     end
