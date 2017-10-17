@@ -962,6 +962,14 @@
 #                                                         DELETE /bank_transfer/users/:id(.:format)                                                         bank_transfer/users#destroy
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                             bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                       bank_transfer/vendor_payment_wallets#transfer_options
+#                           invoicing_payment_receivables GET    /invoicing/payment_receivables(.:format)                                                   invoicing/payment_receivables#index
+#                                                         POST   /invoicing/payment_receivables(.:format)                                                   invoicing/payment_receivables#create
+#                        new_invoicing_payment_receivable GET    /invoicing/payment_receivables/new(.:format)                                               invoicing/payment_receivables#new
+#                       edit_invoicing_payment_receivable GET    /invoicing/payment_receivables/:id/edit(.:format)                                          invoicing/payment_receivables#edit
+#                            invoicing_payment_receivable GET    /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#show
+#                                                         PATCH  /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
+#                                                         PUT    /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
+#                                                         DELETE /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#destroy
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)            admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)             admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                           admin_users/funds_load_requests#index
@@ -2279,6 +2287,13 @@ Rails.application.routes.draw do
     end
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
+  end
+
+
+  namespace :invoicing do
+
+    resources :payment_receivables
+    
   end
 
 

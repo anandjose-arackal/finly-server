@@ -1,3 +1,18 @@
+# == Schema Information
+#
+# Table name: payments_receivables
+#
+#  id                 :integer          not null, primary key
+#  customer_id        :integer
+#  amount_id          :integer
+#  purpose            :text(65535)
+#  expire_by          :date
+#  company_id         :integer
+#  initiating_user_id :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#
+
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:

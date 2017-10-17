@@ -21,6 +21,7 @@ class Invoicing::PaymentReceivable::Index < Invoicing::PaymentReceivable::Base
   end
 
   def success
-
+    params[:receivables] = PaymentsReceivable.all
+    Invoicing::PaymentReceivable::Index::ReceivablesPresenter.new(user, params, messages)
   end
 end
