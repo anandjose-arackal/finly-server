@@ -17,14 +17,14 @@ class Distance < ActiveRecord::Base
 
   before_save {
     self.physical_unit_id = PhysicalUnit.kilometre_id if self.physical_unit_id.nil?
-    if self.value.nil?
+    if self.value.blank?
       self.value = 0
     end
   }
 
   before_validation {
     self.physical_unit_id = PhysicalUnit.kilometre_id if self.physical_unit_id.nil?
-    if self.value.nil?
+    if self.value.blank?
       self.value = 0
     end
   }
