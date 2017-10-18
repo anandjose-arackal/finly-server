@@ -172,7 +172,7 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
     end
     if receipt_end_id == 'nil' or
         (updated_expense_params&.dig(:distance_expense_attributes)&.has_key?(:odometer_reading_receipt_end_id) and
-            receipt_end_id.blank?) or (receipt_end_id.present? and self.receipt_end != self.receipt_end)
+            receipt_end_id.blank?) or (receipt_end_id.present? and self.receipt_end != self.old_receipt_end)
       self.remove_receipt_end = true
     end
   end
