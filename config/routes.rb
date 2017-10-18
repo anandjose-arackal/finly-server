@@ -744,6 +744,7 @@
 #                                         menu_data_cards GET    /menu_data_cards(.:format)                                                                 expense_types_configuration#menu_data_cards
 #                                      menu_data_disburse GET    /menu_data_disburse(.:format)                                                              expense_types_configuration#menu_data_disburse
 #                                      menu_data_payments GET    /menu_data_payments(.:format)                                                              expense_types_configuration#menu_data_payments
+#                                       menu_data_collect GET    /menu_data_collect(.:format)                                                               expense_types_configuration#menu_data_collect
 #                                            cards_orders GET    /cards/orders(.:format)                                                                    orders/order_cards#index
 #                                                         GET    /cards/orders/:id(.:format)                                                                orders/order_cards#show
 #                                                         DELETE /cards/orders/:id(.:format)                                                                orders/order_cards#destroy
@@ -2120,6 +2121,7 @@ Rails.application.routes.draw do
   get 'menu_data_cards' => 'expense_types_configuration#menu_data_cards'
   get 'menu_data_disburse' => 'expense_types_configuration#menu_data_disburse'
   get 'menu_data_payments' => 'expense_types_configuration#menu_data_payments'
+  get 'menu_data_collect' => 'expense_types_configuration#menu_data_collect'
 
   # Orders
   get 'cards/orders' => 'orders/order_cards#index'

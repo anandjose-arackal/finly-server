@@ -21,6 +21,9 @@ company:
     <% if current_company.feature_subscription.expense_management_enabled && current_user.user_panel_subscription.expense_management %>
     expense_management: true
     <% end %>
+    <% if current_company.feature_subscription.invoicing_system && current_user.user_panel_subscription.invoicing_system %>
+    invoicing: true
+    <% end %>
 
 
 user:
@@ -54,8 +57,8 @@ views:
           id: virtual_accounts
         cog:
         - name: Organization Account
-          url: '#orgranization_account'
-          id: 'orgranization_account'
+          url: '#organization_account'
+          id: 'organization_account'
 
     auditor:
       menus:
@@ -74,8 +77,8 @@ views:
           id: virtual_accounts
         cog:
         - name: Organization Account
-          url: '#orgranization_account'
-          id: 'orgranization_account'
+          url: '#organization_account'
+          id: 'organization_account'
 
     initiator:
       menus:
