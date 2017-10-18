@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: payments_receivables
+# Table name: payment_receivables
 #
 #  id                 :integer          not null, primary key
 #  customer_id        :integer
@@ -13,7 +13,7 @@
 #  updated_at         :datetime         not null
 #
 
-class PaymentsReceivable < ActiveRecord::Base
+class PaymentReceivable < ActiveRecord::Base
   belongs_to :customer
   belongs_to :amount
   belongs_to :company
