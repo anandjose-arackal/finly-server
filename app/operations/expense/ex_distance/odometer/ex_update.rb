@@ -148,9 +148,9 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
     if receipt_start_id.present?
       self.receipt_start = user.receipts.without_parent.find_by_id(receipt_start_id)
       if self.receipt_start.blank?
-        if receipt_start_id == expense.distance_expense&.odometer_reading_receipt_start_id
+        if receipt_start_id&.to_i == expense.distance_expense&.odometer_reading_receipt_start_id
           self.receipt_start = expense.distance_expense&.odometer_reading_receipt_start
-        elsif receipt_start_id == expense.distance_expense&.odometer_reading_receipt_end_id
+        elsif receipt_start_id&.to_i == expense.distance_expense&.odometer_reading_receipt_end_id
           self.receipt_start = expense.distance_expense&.odometer_reading_receipt_end
         end
       end
@@ -158,21 +158,21 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
     if receipt_end_id.present?
       self.receipt_end = user.receipts.without_parent.find_by_id(receipt_end_id)
       if self.receipt_end.blank?
-        if receipt_end_id == expense.distance_expense&.odometer_reading_receipt_start_id
+        if receipt_end_id&.to_i == expense.distance_expense&.odometer_reading_receipt_start_id
           self.receipt_end = expense.distance_expense&.odometer_reading_receipt_start
-        elsif receipt_end_id == expense.distance_expense&.odometer_reading_receipt_end_id
+        elsif receipt_end_id&.to_i == expense.distance_expense&.odometer_reading_receipt_end_id
           self.receipt_end = expense.distance_expense&.odometer_reading_receipt_end
         end
       end
     end
     if receipt_start_id == 'nil' or
         (updated_expense_params&.dig(:distance_expense_attributes)&.has_key?(:odometer_reading_receipt_start_id) and
-            receipt_start_id.nil?) or (receipt_start_id.present? and self.receipt_start != self.old_receipt_start)
+            receipt_start_id.blank?) or (receipt_start_id.present? and self.receipt_start != self.old_receipt_start)
       self.remove_receipt_start = true
     end
     if receipt_end_id == 'nil' or
         (updated_expense_params&.dig(:distance_expense_attributes)&.has_key?(:odometer_reading_receipt_end_id) and
-            receipt_end_id.nil?) or (receipt_end_id.present? and self.receipt_end != self.receipt_end)
+            receipt_end_id.blank?) or (receipt_end_id.present? and self.receipt_end != self.receipt_end)
       self.remove_receipt_end = true
     end
   end
