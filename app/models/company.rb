@@ -29,6 +29,7 @@ class Company < ActiveRecord::Base
   has_many :company_transactions
   has_many :per_diems, as: :configurable
   has_many :company_balance_histories
+  has_many :all_field_configurations, class_name: 'FieldConfiguration'
   has_many :field_configurations, as: :configurable
   has_many :bank_transactions
   has_one :feature_subscription, as: :subscribable

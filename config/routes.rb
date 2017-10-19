@@ -2069,6 +2069,8 @@ Rails.application.routes.draw do
   resources :statements
   get 'statements/:id/export', to: 'statements#export'
 
+  resources :custom_fields
+
   # get 'settlements/summary' => 'settlements#summary'
 
   root 'home#index'

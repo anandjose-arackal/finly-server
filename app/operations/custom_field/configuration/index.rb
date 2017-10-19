@@ -25,30 +25,31 @@ class CustomField::Configuration::Index < CustomField::Configuration::Base
   end
 
   def init
-    self.for_company = (params[:company] or params[:for_company])
-    self.for_policy = (params[:policy] or params[:for_policy])
-    self.policy_id = (params[:policy_id] or params[:id])
-    if for_policy and self.policy_id
-      self.policy = Policy::Index.(user, params).policies.with_id(self.policy_id).first rescue nil
-    end
+    # self.for_company = (params[:company] or params[:for_company])
+    # self.for_policy = (params[:policy] or params[:for_policy])
+    # self.policy_id = (params[:policy_id] or params[:id])
+    # if for_policy and self.policy_id
+    #   self.policy = Policy::Index.(user, params).policies.with_id(self.policy_id).first rescue nil
+    # end
   end
 
   def validate
-    unless for_company or for_policy
-      add_message :error, 'Configuration not loaded correctly. PLease try again'
-      return
-    end
-    if for_policy and self.policy.blank?
-      add_message :error, 'Policy not found'
-    end
+    # unless for_company or for_policy
+    #   add_message :error, 'Configuration not loaded correctly. PLease try again'
+    #   return
+    # end
+    # if for_policy and self.policy.blank?
+    #   add_message :error, 'Policy not found'
+    # end
   end
 
   def process
-    if for_company
-      self.field_configurations = self.user.company.field_configurations
-    elsif for_policy
-      self.field_configurations = self.policy.field_configurations
-    end
+    # if for_company
+    #   self.field_configurations = self.user.company.field_configurations
+    # elsif for_policy
+    #   self.field_configurations = self.policy.field_configurations
+    # end
+    self.field_configurations = self.user.company.all_field_configurations.exclude_deleted
   end
 
   def success

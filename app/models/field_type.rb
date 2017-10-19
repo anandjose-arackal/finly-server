@@ -20,4 +20,11 @@ class FieldType < ActiveRecord::Base
     TYPES.key(id)
   end
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end
