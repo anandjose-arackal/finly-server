@@ -2071,7 +2071,7 @@ Rails.application.routes.draw do
 
   post 'custom_fields/:field_configuration_id/drop_down_items', to: 'custom_fields#dropdownitem_create'
   delete 'custom_fields/:field_configuration_id/drop_down_items/:drop_down_item_id', to: 'custom_fields#dropdownitem_destroy'
-  resources :custom_fields
+  resources :custom_fields, only: [:create, :index, :show, :update, :destroy]
 
   # get 'settlements/summary' => 'settlements#summary'
 

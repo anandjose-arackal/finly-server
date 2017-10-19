@@ -12,6 +12,11 @@ class CustomFieldsController < ApplicationController
     respond
   end
 
+  def show
+    @result = CustomField::Configuration::Show.(current_user, params)
+    respond
+  end
+
   def update
     @result = CustomField::Configuration::Update.(current_user, params)
     respond response: @result&.success? ? :success : :failure

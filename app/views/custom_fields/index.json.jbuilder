@@ -1,17 +1,17 @@
-json.array! @result.field_configurations do |config|
-  json.extract! config, :id, :field_name, :enabled, :mandatory,
+json.array! @result.field_configurations do |field_configuration|
+  json.extract! field_configuration, :id, :field_name, :enabled, :mandatory,
                 :global, :field_type, :field_parent_type
-  if config.drop_down?
+  if field_configuration.drop_down?
     json.drop_down_items do
-      json.array! config.drop_down_items.exclude_deleted
+      json.array! field_configuration.drop_down_items.exclude_deleted
     end
   end
   json.configurable do
-    json.type config.configurable_type
-    if config.configurable&.class&.name == 'Policy'
+    json.type field_configuration.configurable_type
+    if field_configuration.configurable&.class&.name == 'Policy'
       json.policy do
-        json.id config.configurable.id
-        json.name config.configurable.name
+        json.id field_configuration.configurable.id
+        json.name field_configuration.configurable.name
       end
     end
   end
