@@ -23,11 +23,13 @@ class CustomFieldsController < ApplicationController
   end
 
   def dropdownitem_create
-
+    @result = CustomField::Configuration::DropDownItem::Add.(current_user, params)
+    respond response: @result&.success? ? :success : :failure
   end
 
   def dropdownitem_destroy
-
+    @result = CustomField::Configuration::DropDownItem::Remove.(current_user, params)
+    respond response: @result&.success? ? :success : :failure
   end
 
 end

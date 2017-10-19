@@ -53,6 +53,8 @@ class FieldConfiguration < ActiveRecord::Base
   scope :enabled, -> { where enabled: true }
   scope :disabled, -> { where enabled: false }
 
+  delegate :drop_down?, :text?, to: :field_type
+
   default_scope { unscope(:where) }
 
   def validate_config
