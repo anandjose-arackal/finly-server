@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171020072928) do
+ActiveRecord::Schema.define(version: 20171020113439) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3183,10 +3183,13 @@ ActiveRecord::Schema.define(version: 20171020072928) do
     t.text     "description",    limit: 65535
     t.integer  "parent_id",      limit: 4
     t.string   "parent_type",    limit: 255
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
     t.date     "expires_by"
     t.integer  "purpose_id",     limit: 4
+    t.boolean  "company_id"
+    t.boolean  "active",                       default: true
+    t.boolean  "is_deleted",                   default: false
   end
 
   create_table "whitelisted_ip_types", force: :cascade do |t|

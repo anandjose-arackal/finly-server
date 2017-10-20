@@ -9,4 +9,15 @@
 #
 
 class VirtualAccountPurpose < ActiveRecord::Base
+  include Seedable
+
+  # cash_on_hand_reversal - when employees return their cash advance through a bank transfer
+  # payment_receivable - when the account is used for a single incoming payment
+  # invoice - when the account is used for paying an invoice
+  # virtual_bank_account - just plain vanilla bank account
+
+  def self.values
+    [:cash_on_hand_reversal, :payment_receivable, :invoice, :virtual_bank_account]
+  end
+
 end

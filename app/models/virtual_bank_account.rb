@@ -11,9 +11,26 @@
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
 #  expires_by     :date
+#  purpose_id     :integer
+#  company_id     :boolean
+#  active         :boolean          default(TRUE)
+#  is_deleted     :boolean          default(FALSE)
 #
 
+# parent here will be either the payment receivable, or user, or whatever
 class VirtualBankAccount < ActiveRecord::Base
-
+  include SoftDeletable
+  
   belongs_to :parent, polymorphic: true
+  belongs_to :purpose, class_name: "VirtualAccountPurpose"
+  belongs_to :company
+
+  def deactivate
+    self.update(active: false)
+  end
+
+  def reactivate
+    self.update(active: true)
+  end
+
 end
