@@ -72,14 +72,19 @@ class Admin::Users::Base < Admin::Base
     def individual_kyc_data
       data = {}
       if selected_user.individual_kyc.present? && selected_user.individual_kyc.kyc_status_id > 1
+        kyc_file_1_url = selected_user.individual_kyc.kyc_file_1.present? ? selected_user.individual_kyc.kyc_file_1&.url : selected_user.individual_kyc.id_proof.url
+        kyc_file_1_file_type = selected_user.individual_kyc.kyc_file_1.present? ? selected_user.individual_kyc.kyc_file_1&.url : selected_user.individual_kyc.id_proof.url
         data[:id_proof] = {
-            url: (selected_user.individual_kyc.kyc_file_1&.url || selected_user.individual_kyc.id_proof.url),
-            file_type: (selected_user.individual_kyc.kyc_file_1&.content_type || selected_user.individual_kyc.id_proof.content_type)
+            url: kyc_file_1_url,
+            file_type: kyc_file_1_file_type
         }
 
+
+        kyc_file_2_url = (selected_user.individual_kyc.kyc_file_2.present? ? selected_user.individual_kyc.kyc_file_2&.url : selected_user.individual_kyc.address_proof.url)
+        kyc_file_2_file_type = (selected_user.individual_kyc.kyc_file_2.present? ? selected_user.individual_kyc.kyc_file_2&.content_type : selected_user.individual_kyc.address_proof.content_type)
         data[:address_proof] = {
-            url: (selected_user.individual_kyc.kyc_file_2&.url || selected_user.individual_kyc.address_proof.url),
-            file_type: (selected_user.individual_kyc.kyc_file_2&.content_type || selected_user.individual_kyc.address_proof.content_type)
+            url: kyc_file_2_url,
+            file_type: kyc_file_2_file_type
         }
       end
       data
