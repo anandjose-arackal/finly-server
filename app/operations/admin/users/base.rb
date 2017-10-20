@@ -73,14 +73,13 @@ class Admin::Users::Base < Admin::Base
       data = {}
       if selected_user.individual_kyc.present? && selected_user.individual_kyc.kyc_status_id > 1
         data[:id_proof] = {
-          url: selected_user.individual_kyc.id_proof.url,
-          file_type: selected_user.individual_kyc.id_proof.content_type
+            url: (selected_user.individual_kyc.kyc_file_1&.url || selected_user.individual_kyc.id_proof.url),
+            file_type: (selected_user.individual_kyc.kyc_file_1&.content_type || selected_user.individual_kyc.id_proof.content_type)
         }
 
-
         data[:address_proof] = {
-          url: selected_user.individual_kyc.address_proof.url,
-          file_type: selected_user.individual_kyc.address_proof.content_type
+            url: (selected_user.individual_kyc.kyc_file_2&.url || selected_user.individual_kyc.address_proof.url),
+            file_type: (selected_user.individual_kyc.kyc_file_2&.content_type || selected_user.individual_kyc.address_proof.content_type)
         }
       end
       data
