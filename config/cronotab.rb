@@ -24,53 +24,8 @@ Crono.perform(UpdateConvertedAmountValues).every 1.day, at: {hour: 05, min: 40}
 # Crono.perform(AdminPanelVerifierMailer).every 1.hour
 Crono.perform(BankTransferStatusChecker).every 1.hour
 Crono.perform(BackupImages).every 1.day, at: {hour: 01, min: 00}
-
 # Summary mailer checks performed every 30minutes
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 00, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 00, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 1, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 1, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 2, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 2, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 3, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 3, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 4, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 4, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 5, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 5, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 6, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 6, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 7, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 7, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 8, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 8, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 9, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 9, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 10, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 10, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 11, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 11, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 12, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 12, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 13, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 13, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 14, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 14, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 15, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 15, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 16, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 16, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 17, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 17, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 18, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 18, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 19, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 19, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 20, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 20, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 21, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 21, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 22, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 22, min: 30}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 23, min: 00}
-Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: 23, min: 30}
+24.times do |num|
+  Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: num, min: 00}
+  Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: num, min: 30}
+end
