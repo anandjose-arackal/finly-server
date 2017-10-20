@@ -3,5 +3,13 @@
 
 class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Base
 
+  attr_accessor :account_params
+
+  def init
+
+  end
+
+  private
+
 
 end

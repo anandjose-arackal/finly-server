@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171018111323) do
+ActiveRecord::Schema.define(version: 20171020072928) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3171,6 +3171,12 @@ ActiveRecord::Schema.define(version: 20171018111323) do
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
   add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
 
+  create_table "virtual_account_purposes", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "virtual_bank_accounts", force: :cascade do |t|
     t.string   "account_number", limit: 255
     t.string   "ifsc",           limit: 255
@@ -3179,6 +3185,8 @@ ActiveRecord::Schema.define(version: 20171018111323) do
     t.string   "parent_type",    limit: 255
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+    t.date     "expires_by"
+    t.integer  "purpose_id",     limit: 4
   end
 
   create_table "whitelisted_ip_types", force: :cascade do |t|

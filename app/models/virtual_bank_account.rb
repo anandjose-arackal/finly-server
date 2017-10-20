@@ -10,6 +10,7 @@
 #  parent_type    :string(255)
 #  created_at     :datetime         not null
 #  updated_at     :datetime         not null
+#  expires_by     :date
 #
 
 class VirtualBankAccount < ActiveRecord::Base

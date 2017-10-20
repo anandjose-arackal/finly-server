@@ -173,6 +173,8 @@ class ApplicationController < ActionController::Base
           return :vp
         when 'em', :em
           return :em
+        when 'fc', :fc
+          return :fc
       end
     end
     # todo Referrer is jugaad as disburse is using expense management endpoints.
@@ -186,6 +188,8 @@ class ApplicationController < ActionController::Base
         return :vp
       elsif path.starts_with?('/disburse')
         return :ft
+      elsif path.starts_with?('/collect')
+        return :fc
       end
     end
     :em

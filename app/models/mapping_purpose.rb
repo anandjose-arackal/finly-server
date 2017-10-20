@@ -13,7 +13,7 @@ class MappingPurpose < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:expense_management, :vendor_payments]
+    [:expense_management, :vendor_payments, :invoicing]
   end
 
   def self.id_from_application_for(application)
