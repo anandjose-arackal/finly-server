@@ -32,6 +32,9 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
     end
     self.default_value = params[:field_configuration][:default_value] if config_params.present? and params&.dig(:field_configuration, :default_value).present?
     self.config_params[:global] = !!config_params[:global]
+    if config_params[:field_type_id]&.to_i == FieldType.id_for(:text) and config_params&.has_key?(:drop_down_items_attributes)
+      config_params.delete(:drop_down_items_attributes)
+    end
   end
 
   def authorize

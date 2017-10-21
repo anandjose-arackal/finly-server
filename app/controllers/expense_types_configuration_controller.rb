@@ -54,4 +54,14 @@ class ExpenseTypesConfigurationController < ApplicationController
     respond
   end
 
+  def filters
+    @result = UserGroup::Index.(current_user, params)
+    if @result&.success?
+      @groups = @result.user_groups
+      @teams = UserTeam::Index.(current_user, params)&.user_teams
+    end
+    # @custom_fields =
+    respond
+  end
+
 end
