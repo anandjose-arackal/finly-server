@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171020113439) do
+ActiveRecord::Schema.define(version: 20171020133530) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3175,6 +3175,26 @@ ActiveRecord::Schema.define(version: 20171020113439) do
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "virtual_account_transactions", force: :cascade do |t|
+    t.string   "beneficiary_account_number", limit: 255
+    t.string   "beneficiary_account_ifsc",   limit: 255
+    t.string   "transfer_type",              limit: 255
+    t.string   "beneficiary_full_name",      limit: 255
+    t.string   "transfer_id",                limit: 255
+    t.string   "transfer_timestamp",         limit: 255
+    t.string   "transfer_currency",          limit: 255
+    t.string   "transfer_amount",            limit: 255
+    t.string   "remitter_account_no",        limit: 255
+    t.string   "remitter_account_ifsc",      limit: 255
+    t.string   "remitter_account_type",      limit: 255
+    t.string   "remitter_full_name",         limit: 255
+    t.string   "remitter_address",           limit: 255
+    t.string   "note",                       limit: 255
+    t.string   "credited_at",                limit: 255
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
   end
 
   create_table "virtual_bank_accounts", force: :cascade do |t|
