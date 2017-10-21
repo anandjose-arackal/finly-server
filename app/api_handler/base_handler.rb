@@ -8,7 +8,7 @@ class BaseHandler
   def initialize(user, params={})
     self.timeout = false
     self.user = user
-    self.params = (params or {})
+    self.params = (ActionController::Parameters.new(params) or {})
     clear_messages
   end
 
@@ -41,8 +41,11 @@ class BaseHandler
 
   end
 
+  def header_params
+
+  end
+
   def http_request_type
-    # :get, :post, :patch, :delete, :put
     :post
   end
 
@@ -106,6 +109,7 @@ class BaseHandler
     p = self.path
     query_param = self.query_params
     body_param = self.post_params
+    header_param = self.header_params
     return unless p.present? and not has_errors?
     begin
       puts "Posting Path : #{p}"
@@ -125,6 +129,11 @@ class BaseHandler
           self.response = self.connection.post do |req|
             req.url p
             req.params = query_param if query_param.present?
+            if header_param.present? and header_param.is_a?(Hash)
+              header_param.each do |k, v|
+                req[k] = v
+              end
+            end
             req.body = body_param if body_param.present?
           end
         when :patch
