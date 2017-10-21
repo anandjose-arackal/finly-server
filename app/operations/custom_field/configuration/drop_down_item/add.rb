@@ -1,5 +1,5 @@
 class CustomField::Configuration::DropDownItem::Add < CustomField::Configuration::Base
-  attr_accessor :field_configuration, :drop_down_item
+  attr_accessor :field_configuration, :drop_down_items, :items, :drop_down_items
 
   def pre_validate
     if user.blank?
@@ -14,8 +14,8 @@ class CustomField::Configuration::DropDownItem::Add < CustomField::Configuration
       add_message :error, 'Field configuration not found'
       return
     end
-    if params[:name].blank?
-      add_message :error, 'DropDown label cannot be empty'
+    if params[:items].blank?
+      add_message :error, 'Nothing to add'
       return
     end
   end
@@ -23,6 +23,16 @@ class CustomField::Configuration::DropDownItem::Add < CustomField::Configuration
   def init
     id = params[:field_configuration_id]
     self.field_configuration = CustomField::Configuration::Index.(user, params).field_configurations.with_id(id).first rescue nil
+    self.items = params[:items]
+    self.items = self.items&.reject { |item| item[:name].blank? }
+    if items.blank?
+      add_message :error, 'Nothing to add'
+      return
+    end
+    self.drop_down_items = []
+    self.items.each do |item|
+      self.drop_down_items << self.field_configuration.drop_down_items.build(name: item[:name])
+    end
   end
 
   def validate
@@ -34,17 +44,21 @@ class CustomField::Configuration::DropDownItem::Add < CustomField::Configuration
       add_message :error, 'DropDown Item can only be added to DropDown Custom Fields'
       return
     end
+    if self.drop_down_items.blank?
+      add_message :error, 'Nothing to add'
+      return
+    end
+    self.drop_down_items.each do |item|
+      unless item.valid?
+        add_message :error, item.errors.full_messages
+        return
+      end
+    end
   end
 
   def process
-    self.drop_down_item = self.field_configuration.drop_down_items.build name: params[:name]
-    unless self.drop_down_item.valid?
-      add_message :error, self.drop_down_item.errors.full_messages
-      return
-    end
-    unless self.drop_down_item.save
-      add_message :error, self.drop_down_item.errors.full_messages
-      return
+    self.drop_down_items.each do |item|
+      item.save
     end
   end
 

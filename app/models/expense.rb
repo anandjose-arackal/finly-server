@@ -26,7 +26,6 @@
 #
 
 
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -145,6 +144,12 @@ class Expense < ActiveRecord::Base
     end
 
   }
+
+  scope :filter_field_configuration, ->(config_id) do
+    configs = CustomField.with_field_configuration_ids(config_id).includes_parent.expenses
+    expense_ids = configs.map { |item| item.parent&.expense_id }
+    with_id(expense_ids)
+  end
 
   scope :with_amount, -> { joins :amount }
   scope :joins_amount, -> { joins :amount }

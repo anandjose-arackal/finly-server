@@ -28,6 +28,8 @@ class CustomField < ActiveRecord::Base
   validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText']}
 
   scope :with_field_configuration_ids, ->(ids) { where field_configuration_id: ids }
+  scope :includes_parent, -> { includes :parent }
+  scope :expenses, -> { where parent_type: ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense']}
 
   def set_value(value, save = true)
     if value.blank?

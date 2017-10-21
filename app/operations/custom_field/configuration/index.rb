@@ -2,15 +2,15 @@ class CustomField::Configuration::Index < CustomField::Configuration::Base
   attr_accessor :field_configurations, :policy_id, :for_company, :for_policy, :policy
 
   def authorized_user_types
-    # Policy Admin authorization
-    if user.present? and not user.company_admin? and user.policy_admin?
-      unless params.present? and (params[:policy].present? or params[:for_policy].present?) and (params[:id].present? or params[:policy_id].present?)
-        # Unauthorized policy admin
-        return [:company_admin]
-      end
-      # Authorized policy admin
-      return nil
-    end
+    # # Policy Admin authorization
+    # if user.present? and not user.company_admin? and user.policy_admin?
+    #   unless params.present? and (params[:policy].present? or params[:for_policy].present?) and (params[:id].present? or params[:policy_id].present?)
+    #     # Unauthorized policy admin
+    #     return [:company_admin]
+    #   end
+    #   # Authorized policy admin
+    #   return nil
+    # end
     [:company_admin]
   end
 
@@ -60,8 +60,11 @@ class CustomField::Configuration::Index < CustomField::Configuration::Base
   class CustomField::Configuration::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :field_configurations
 
+    has_scope :filter_field_type_id
+
     def init
       self.field_configurations = params[:field_configurations]
+      self.field_configurations = apply_scopes(self.field_configurations, params)
     end
 
   end
