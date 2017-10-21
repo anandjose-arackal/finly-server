@@ -1,0 +1,1 @@
+json.array! @policies.policies, :id, :name
