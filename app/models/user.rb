@@ -55,6 +55,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -108,6 +109,8 @@ class User < ActiveRecord::Base
 
   has_many :admin_summary_mail_configs, dependent: :destroy
   has_many :manager_summary_mail_configs, dependent: :destroy
+  has_many :payment_receivables, foreign_key: :initiating_user_id
+
 
   has_many :bank_accounts, as: :account_owner
   has_many :authentications

@@ -20,4 +20,5 @@ class PaymentReceivable < ActiveRecord::Base
   belongs_to :initiating_user, class_name: "User"
 
   accepts_nested_attributes_for :amount
+  accepts_nested_attributes_for :customer
 end
