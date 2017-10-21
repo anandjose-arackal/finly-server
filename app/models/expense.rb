@@ -151,6 +151,13 @@ class Expense < ActiveRecord::Base
     with_id(expense_ids)
   end
 
+  scope :filter_custom_drop_down_selection, ->(drop_down_item_id) do
+    drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
+    configs = CustomField.with_drop_down_selection(drop_down_selection_ids).includes_parent.expenses
+    expense_ids = configs.map { |item| item.parent&.expense_id }
+    with_id(expense_ids)
+  end
+
   scope :with_amount, -> { joins :amount }
   scope :joins_amount, -> { joins :amount }
   scope :having_amount_currency, -> (amount, currency_id) { with_amount.where('amounts.value IN (?) AND amounts.currency_id IN (?)', amount, currency_id) }

@@ -11,5 +11,5 @@ json.teams do
   json.array! @teams, :id, :name
 end
 json.custom_fields do
-  json.array! @field_configurations, :field_name, :id, :field_type
+  json.array! @field_configurations, :field_name, :id, :field_type, :drop_down_items
 end
