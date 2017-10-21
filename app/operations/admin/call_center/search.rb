@@ -20,6 +20,9 @@ class Admin::CallCenter::Search < Admin::Base
   def process
     self.user = User.find_by(mobile_number: term) || User.find_by(email: term)
     if user.blank?
+      self.user = Card.with_proxy(term)&.first&.user
+    end
+    if user.blank?
       add_message :error, "User not found"
     end
   end
