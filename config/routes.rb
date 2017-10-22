@@ -1575,6 +1575,10 @@ Rails.application.routes.draw do
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
 
+  ######### FINLY COLLECT START ###########
+    post 'collect/notify', to: 'finly_collect#notify'
+  ######### FINLY COLLECT END ###########
+
   ######### GEMS SPECIFIC START ###########
 
   mount Crono::Web, at: '/crono'

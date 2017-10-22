@@ -1318,13 +1318,30 @@ ActiveRecord::Schema.define(version: 20171020133530) do
     t.integer  "policy_id",           limit: 4, null: false
   end
 
+  create_table "distance_expense_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "distance_expense_types", ["name"], name: "index_distance_expense_types_on_name", using: :btree
+
   create_table "distance_expenses", force: :cascade do |t|
-    t.integer  "expense_id",       limit: 4
-    t.boolean  "is_deleted",                 default: false
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
-    t.integer  "distance_id",      limit: 4
-    t.integer  "maps_distance_id", limit: 4
+    t.integer  "expense_id",                        limit: 4
+    t.boolean  "is_deleted",                                                           default: false
+    t.datetime "created_at",                                                                           null: false
+    t.datetime "updated_at",                                                                           null: false
+    t.integer  "distance_id",                       limit: 4
+    t.integer  "maps_distance_id",                  limit: 4
+    t.integer  "type_id",                           limit: 4
+    t.decimal  "odometer_reading_one",                        precision: 10
+    t.decimal  "odometer_reading_two",                        precision: 10
+    t.integer  "odometer_reading_receipt_one_id",   limit: 4
+    t.integer  "odometer_reading_receipt_two_id",   limit: 4
+    t.decimal  "odometer_reading_start",                      precision: 10, scale: 2
+    t.decimal  "odometer_reading_end",                        precision: 10, scale: 2
+    t.integer  "odometer_reading_receipt_start_id", limit: 4
+    t.integer  "odometer_reading_receipt_end_id",   limit: 4
   end
 
   add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
@@ -1508,7 +1525,6 @@ ActiveRecord::Schema.define(version: 20171020133530) do
     t.boolean  "itz_cash_d_code_enabled",                default: false
     t.boolean  "yes_bank_account"
     t.boolean  "bank_account_reimbursement"
-    t.boolean  "payroll_card_enabled",                   default: false
     t.boolean  "invoicing_system",                       default: false
   end
 
@@ -1591,10 +1607,11 @@ ActiveRecord::Schema.define(version: 20171020133530) do
   end
 
   create_table "field_drop_down_items", force: :cascade do |t|
-    t.string   "name",                   limit: 255, null: false
-    t.integer  "field_configuration_id", limit: 4,   null: false
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.string   "name",                   limit: 255,                 null: false
+    t.integer  "field_configuration_id", limit: 4,                   null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.boolean  "is_deleted",                         default: false
   end
 
   add_index "field_drop_down_items", ["field_configuration_id"], name: "index_field_drop_down_items_on_field_configuration_id", using: :btree
@@ -3203,11 +3220,11 @@ ActiveRecord::Schema.define(version: 20171020133530) do
     t.text     "description",    limit: 65535
     t.integer  "parent_id",      limit: 4
     t.string   "parent_type",    limit: 255
+    t.integer  "company_id",     limit: 4
     t.datetime "created_at",                                   null: false
     t.datetime "updated_at",                                   null: false
     t.date     "expires_by"
     t.integer  "purpose_id",     limit: 4
-    t.boolean  "company_id"
     t.boolean  "active",                       default: true
     t.boolean  "is_deleted",                   default: false
   end
