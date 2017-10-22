@@ -137,8 +137,8 @@ gem 'devise', '4.2.0'
 gem 'devise_invitable', '1.7.0'
 gem 'doorkeeper', '4.2.6'
 
-gem 'faraday', '0.10.0'
-gem 'faraday_middleware', '0.11.0.1'
+gem 'faraday', '0.13.1'
+gem 'faraday_middleware', '0.12.2'
 # gem for xml parsing
 gem 'liquid'
 

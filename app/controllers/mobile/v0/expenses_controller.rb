@@ -2,17 +2,21 @@ require "#{Rails.root}/app/operations/expense/manual/create"
 class Mobile::V0::ExpensesController < Mobile::V1::BaseApiController
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :mobile}
+  before_action -> { finly_authorize! :mobile }
 
 
   def create
     param = RequestFormatter::ApiParser::MobileParser::V1::Expenses::Parse.(current_user, params).formatted_request
-
     case params[:type]
       when '1', 1
         @result = Expense::Manual::Create.(current_user, param)
       when '3', 3
-        @result = Expense::ExDistance::Create.(current_user, param)
+        case params&.dig(:distance_type)
+          when '1', 1, nil
+            @result = Expense::ExDistance::Create.(current_user, param)
+          when '2', 2
+            @result = Expense::ExDistance::Odometer::ExCreate.(current_user, param)
+        end
       when '4', 4
         @result = Expense::ExTime::Create.(current_user, param)
       when '5', 5
@@ -55,7 +59,12 @@ class Mobile::V0::ExpensesController < Mobile::V1::BaseApiController
       when '2', 2
         @result = Expense::ExCard::Update.(current_user, param)
       when '3', 3
-        @result = Expense::ExDistance::Update.(current_user, param)
+        case params&.dig(:distance_type)
+          when '1', 1, nil
+            @result = Expense::ExDistance::Update.(current_user, param)
+          when '2', 2
+            @result = Expense::ExDistance::Odometer::ExUpdate.(current_user, param)
+        end
       when '4', 4
         @result = Expense::ExTime::Update.(current_user, param)
       when '5', 5

@@ -59,4 +59,9 @@ class TimeExpense < ActiveRecord::Base
       end
     end
   end
+
+  def incomplete?
+    false
+  end
+
 end

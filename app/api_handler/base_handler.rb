@@ -122,6 +122,11 @@ class BaseHandler
           # self.response = self.connection.post p, body_param
           self.response = self.connection.get do |req|
             req.url p
+            if header_param.present? and header_param.is_a?(Hash)
+              header_param.each do |k, v|
+                req[k] = v
+              end
+            end
             req.params = query_param if query_param.present?
           end
         when :post
@@ -142,6 +147,11 @@ class BaseHandler
             req.url p
             req.params = query_param if query_param.present?
             req.body = body_param if body_param.present?
+            if header_param.present? and header_param.is_a?(Hash)
+              header_param.each do |k, v|
+                req[k] = v
+              end
+            end
           end
         when :put
           # self.response = self.connection.post p, body_param
@@ -149,12 +159,22 @@ class BaseHandler
             req.url p
             req.params = query_param if query_param.present?
             req.body = body_param if body_param.present?
+            if header_param.present? and header_param.is_a?(Hash)
+              header_param.each do |k, v|
+                req[k] = v
+              end
+            end
           end
         when :delete
           # self.response = self.connection.post p, body_param
           self.response = self.connection.delete do |req|
             req.url p
             req.params = query_param if query_param.present?
+            if header_param.present? and header_param.is_a?(Hash)
+              header_param.each do |k, v|
+                req[k] = v
+              end
+            end
           end
         else
           add_message :error, 'Invalid Request Type'

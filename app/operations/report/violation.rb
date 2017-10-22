@@ -67,6 +67,7 @@ class Report::Violation < Report::Base
       check_compatible_expenses(expense)
       check_non_base_currency(expense)
       check_custom_fields(expense)
+      check_distance_expense(expense)
       # i.e. if the expense does not have a possible currency computation skip rule checking because the amount isn't clear
       if expense.amount&.currency_id != base_currency_id && expense.date == DateUtils.local_date
         next
@@ -295,8 +296,8 @@ class Report::Violation < Report::Base
   end
 
   def check_non_base_currency(expense)
-    if expense.date == DateUtils.local_date
-      if expense&.amount.currency_id == base_currency_id
+    if expense.date == DateUtils.local_date and expense&.amount.present?
+      if expense&.amount&.currency_id == base_currency_id
         return
       else
         self.warning_messages[expense.id]['expense_blocking'] << {type: 'non_base_currency', message: "Expenses that are reported in a different currency from #{base_currency_code} can only be submitted the next day"}
@@ -311,6 +312,14 @@ class Report::Violation < Report::Base
       valid.messages[:error]&.each do |message|
         self.warning_messages[expense.id]['expense_blocking'] << {type: 'custom_fields', message: message}
       end
+    end
+  end
+
+  def check_distance_expense(expense)
+    return unless expense.distance_expense?
+    distance_expense = expense.distance_expense
+    unless distance_expense&.distance.present? and distance_expense&.distance&.value > 0
+      self.warning_messages[expense.id]['expense_blocking'] << {type: 'distance_expense', message: 'Distance cannot be blank'}
     end
   end
 

@@ -39,6 +39,9 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
   def init
     self.expense_params = distance_expense_params
     self.expense_params[:expense_type_id] = ExpenseType.distance_expense_id
+    if self.expense_params[:distance_attributes].present?
+      self.expense_params[:distance_attributes][:type_id] = DistanceExpenseType.id_for(:distance)
+    end
     if params[:receipt_id].present?
       self.receipt = user.receipts.with_id(params[:receipt_id]).first rescue nil
     end

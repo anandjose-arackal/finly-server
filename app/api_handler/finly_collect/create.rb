@@ -7,7 +7,7 @@
                    :allowed_transaction_count,
                    :current_account, :savings_account,
                    :neft, :imps, :rtgs, :upi, :date_after,
-                   :date_before, :date_on)
+                   :date_before, :date_on)&.to_s
   end
 
 end
