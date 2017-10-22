@@ -46,6 +46,10 @@ class AccountManager::BaseAdapter
 
   end
 
+  def on_completion(options)
+
+  end
+
   def creditable_account?(account_type)
     if account_type.present? and not account_type.is_a?(String)
       account_type = account_type&.class.name
@@ -112,5 +116,7 @@ class AccountManager::BaseAdapter
       end
     end
   end
+
+
 
 end

@@ -13,7 +13,10 @@ class Export::Report::AsXml < Export::Report::Base
   def init
     report_presenter = ::Report::Index.(user, params)
     id = (params[:report_id] or params[:report_ids]).split(',') rescue nil
-    self.reports = report_presenter.reports.with_id(id) rescue nil
+    self.reports = report_presenter&.reports.includes_export
+    if id.present?
+      self.reports = self.reports&.with_id(id)
+    end
     self.default_column_names = user.company.export_preferences.pluck(:name)
     self.custom_field_column_names = extract_custom_field_names(reports)
     self.preferences = user.company.export_preferences

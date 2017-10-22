@@ -102,6 +102,13 @@ class User::Team::Review::PendingApprovers < User::Team::Base
     return if approving_users.present? and approving_users.include?(user)
     self.pos += 1
     self.approvers = [] if self.approvers.blank?
+    # check if this user is already present - if not, only then add him/her
+    self.approvers.each do |approver|
+      if approver[:approver].id == user.id
+        # no need to add the user anymore because they're already in the list
+        return
+      end
+    end
     self.approvers << {approver: user, role_id: role_id, pos: self.pos, reviewer: reviewer}
     if approving_users.blank?
       approving_users = []
@@ -114,6 +121,7 @@ class User::Team::Review::PendingApprovers < User::Team::Base
 
     def init
       self.approvers = params[:approvers]
+
     end
 
     def approver_with_id(id)

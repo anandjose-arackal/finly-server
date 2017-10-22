@@ -24,3 +24,8 @@ Crono.perform(UpdateConvertedAmountValues).every 1.day, at: {hour: 05, min: 40}
 # Crono.perform(AdminPanelVerifierMailer).every 1.hour
 Crono.perform(BankTransferStatusChecker).every 1.hour
 Crono.perform(BackupImages).every 1.day, at: {hour: 01, min: 00}
+# Summary mailer checks performed every 30minutes
+24.times do |num|
+  Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: num, min: 00}
+  Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: num, min: 30}
+end

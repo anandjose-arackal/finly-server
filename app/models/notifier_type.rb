@@ -59,9 +59,9 @@ class NotifierType < ActiveRecord::Base
               configurable_push_notification: false, configurable_mailer: true},
              {key: :settlement_settled, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
-             {key: :wallet_credit, has_push_notification: false, has_mailer: true,
+             {key: :wallet_credit, has_push_notification: true, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
-             {key: :wallet_debit, has_push_notification: false, has_mailer: true,
+             {key: :wallet_debit, has_push_notification: true, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: true},
              {key: :money_request_submit, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
@@ -107,6 +107,8 @@ class NotifierType < ActiveRecord::Base
               configurable_push_notification: true, configurable_mailer: true},
             ]
 
+  scope :with_name, ->(name) {where name: name}
+
   self.class.instance_eval do
     ACTIONS.each do |item|
       define_method "#{item[:key]}_id" do
@@ -116,11 +118,7 @@ class NotifierType < ActiveRecord::Base
   end
 
   def self.id_for(sym)
-    ACTIONS.each do |action|
-      if action[:key] == sym
-        return (ACTIONS.find_index(action) + 1)
-      end
-    end
+    NotifierType.with_name(sym)&.first&.id
   end
 
   def self.seed_data

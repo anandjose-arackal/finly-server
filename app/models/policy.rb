@@ -17,6 +17,7 @@
 
 
 
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -72,11 +73,11 @@ class Policy < ActiveRecord::Base
   end
 
   def expense_rules_count
-    self.expense_rules.count
+    self.expense_rules.non_deleted.count
   end
 
   def budget_rules_count
-    self.budget_rules.count
+    self.budget_rules.non_deleted.count
   end
 
   def rules_count

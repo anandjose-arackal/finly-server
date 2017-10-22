@@ -126,11 +126,22 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       return
     end
 
+    # on success, execute whatever callbacks that need to be processed on success of this transaction
+    # essentially calling the on_completion account
+    if self.payment.completed?
+      debit_adapter.on_completion(payment: self.payment)
+      credit_adapter.on_completion(payment: self.payment)
+    end
+
     # todo - probably should be moved to the adapter itself
+    # i.e. if the payment was not modified in any way during the execution, update it here.
     if payment.in_progress?
-      # i.e. if the payment was not modified in any way during the execution, update it here.
       payment.update(payment_status_id: PaymentStatus.id_for(:completed))
     end
+
+  end
+
+  def post_process
 
   end
 

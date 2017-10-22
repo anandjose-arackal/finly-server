@@ -19,6 +19,7 @@
 #  hard_copy_receipt          :boolean          default(FALSE)
 #  itz_cash_d_code_enabled    :boolean          default(FALSE)
 #  yes_bank_account           :boolean
+#  bank_account_reimbursement :boolean
 #
 
 class FeatureSubscription < ActiveRecord::Base

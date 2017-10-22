@@ -31,7 +31,7 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
     return if self.money_request.blank?
     self.to_user = money_request.user
     return if to_user.blank? or money_request.blank?
-    self.amount = money_request.total_amount
+    self.amount = params[:amount]&.to_f || money_request.total_amount
   end
 
   def validate
@@ -79,7 +79,7 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
         receiving_account_id = to_user.cards.with_card_program(CardProgram.id_for(:expense)).first.id
       end
 
-      result = User::Wallet::Credit.(user, initiating_account_type: initiating_account_type, initiating_account_id: initiating_account_id,
+      result = User::Wallet::Credit.(user, initiating_account_type: initiating_account_type, initiating_account_id: initiating_account_id, money_request: money_request,
           receiving_account_type: receiving_account_type, receiving_account_id: receiving_account_id, receiving_user: to_user, amount: self.amount, password: params[:password])
 
       if result.failure?
@@ -96,6 +96,10 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
       update_attributes[:controlling_user_role_id] = nil
       update_attributes[:controlling_for_user_role_id] = nil
       update_attributes[:payment] = result.payment
+      update_attributes[:processed_amount_attributes] = {
+          value: self.amount,
+          currency_id: Currency.first.id
+      }
 
       money_request.update_attributes update_attributes
 

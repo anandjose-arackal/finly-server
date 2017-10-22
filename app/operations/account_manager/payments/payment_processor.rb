@@ -21,12 +21,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   end
 
   def init
-    # setting the company id based on whether it's a user or an AdminUser
-    if user.is_a?(User)
-      self.company_id = user.company_id
-    else
-      self.company_id = payment_request.company_id
-    end
 
     # create the payment order object and associated payments, if the payment request is present
     self.payment_request = params[:payment_request]
@@ -37,6 +31,15 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.options = {}
       self.options[:bank_transfer_type] = params[:bank_transfer_type]
       self.background = payment_request.background
+    end
+
+    # setting the company id based on whether it's a user or an AdminUser
+    if user.is_a?(User)
+      self.company_id = user.company_id
+      self.company = user.company
+    else
+      self.company_id = payment_request.company_id
+      self.company = Company.find_by(id: self.company_id)
     end
 
     # in case there is not payment request, use the payment order that is passed
@@ -100,29 +103,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
   end
 
   def post_process
-    # here check if the payment order has associated bank payment requests and accordingly send notification
-    if payment_order.bank_payment_request.present?
-      # now check if all the payments in this order are either successes or failures.
-      # i.e. none processing or awaiting credit confirmation
-      completed = true
-      bank_payment_request = payment_order.bank_payment_request
-      payment_order.payments.each do |payment|
-        unless [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)].include?(payment.payment_status_id)
-          completed = false
-        end
-      end
-      if completed
-        # this will trigger the mailer and notification that a particular credit has been successfully completed
-        Event::EBankPaymentRequest::CreditConfirm.(bank_payment_request.owner, bank_payment_request: bank_payment_request)
 
-        # also trigger emails for individual payments
-        payment_order.payments.each do |payment|
-          if payment.completed?
-            op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment)
-          end
-        end
-      end
-    end
   end
 
 

@@ -1,5 +1,14 @@
 class Import::Base < BaseOperation
 
+  attr_accessor :file, :result_hash, :header, :import_fields, :sheet, :invitee,
+                :company, :company_id
+
+  def init
+    self.company = user.company
+    self.company_id = user.company_id
+  end
+
+
   def create_response_csv
     file_name = "public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
     CSV.open(file_name, 'wb') do |csv|

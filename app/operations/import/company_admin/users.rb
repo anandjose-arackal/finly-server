@@ -1,4 +1,4 @@
-class Import::CompanyAdmin::Users < Import::Superadmin::Users
+class Import::CompanyAdmin::Users < Import::Base
   attr_accessor :file_url
 
   def authorized_user_types
@@ -12,6 +12,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
   end
 
   def init
+    super
     self.file = params[:file]
     self.result_hash = {}
     if file.present?
@@ -121,7 +122,7 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
     end
 
     # adding a default initiator role for users in vendor payments
-    role_mapping_attributes << {user_role_id: UserRole.id_for(:vendor_payments), purpose_id: MappingPurpose.id_for(:vendor_payments)}
+    role_mapping_attributes << {user_role_id: UserRole.id_for(:initiator), purpose_id: MappingPurpose.id_for(:vendor_payments)}
 
     manager = finance_manager = approves_to = approves_finance_to = nil
     # creating team mapping attributes
@@ -178,6 +179,15 @@ class Import::CompanyAdmin::Users < Import::Superadmin::Users
                                                approves_finance_to: approves_finance_to,
                                                policy_id: company.policies.first.id,
                                                purpose_id: MappingPurpose.id_for(:expense_management)
+                                              },
+                                              {
+                                               default: true,
+                                               manager: nil,
+                                               finance_manager: nil,
+                                               approves_to: nil,
+                                               approves_finance_to: nil,
+                                               policy_id: company.policies.first.id,
+                                               purpose_id: MappingPurpose.id_for(:vendor_payments)
                                               }],
                     error_messages: errors
                   }

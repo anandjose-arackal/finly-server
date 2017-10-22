@@ -33,7 +33,7 @@ class DistanceExpenseConfig < ActiveRecord::Base
 
   def rate_value
     if self.enabled
-      return self.rate.send(self.policy.base_currency.country_code)
+      return self.rate.INR#send(self.policy.base_currency.country_code)
     else
       return nil
     end

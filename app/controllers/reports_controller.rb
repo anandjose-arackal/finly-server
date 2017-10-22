@@ -5,7 +5,7 @@ class ReportsController < ApplicationController
 
   def create
     @result = Report::Create.(current_user, params)
-    respond render: :show
+    respond
   end
 
   def index

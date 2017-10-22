@@ -24,10 +24,12 @@ class Company::AddBalance < Company::Base
   def init
     self.transaction_details = param
     self.transaction_details[:amount_attributes][:currency_id] = Currency.first.id rescue nil
-    if expense_management?
-      self.transaction_details[:bank_type_id] = CompanyFundsLoadRequestType.id_for(:itzcash)
-    elsif vendor_payments?
-      self.transaction_details[:bank_type_id] = CompanyFundsLoadRequestType.id_for(:yesbank)
+    if transaction_details[:bank_type_id].blank?
+      if expense_management?
+        self.transaction_details[:bank_type_id] = CompanyFundsLoadRequestType.id_for(:itzcash)
+      elsif vendor_payments?
+        self.transaction_details[:bank_type_id] = CompanyFundsLoadRequestType.id_for(:yesbank)
+      end
     end
   end
 
@@ -62,7 +64,8 @@ class Company::AddBalance < Company::Base
   end
 
   private
+
   def param
-    params.permit(:reference_id, :date, :remark, :amount_attributes => [:value, :currency_id])
+    params.permit(:reference_id, :date, :remark, :bank_type_id, :amount_attributes => [:value, :currency_id])
   end
 end

@@ -27,15 +27,19 @@ class User::Balances::Show < User::Base
     case current_app
       when 'em'
         # Adding expense management balances in this section if it's enabled for that user
-        if selected_user.company.expense_management_enabled? && selected_user.expense_management_enabled?
+        if selected_user.company.d_code_enabled? && selected_user.expense_management_enabled?
           set_itz_cash_balances
         end
         if selected_user.cards.present?
           set_card_balances
         end
         # adding vendor payment balances in this section if it is enabled for that selected_user
-        if selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?
+        if (selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?) || selected_user.company.bank_reimbursement_enabled?
           set_yes_bank_balances
+        end
+        # showing cash on hand balances based on whether they have expense management enabled
+        if selected_user.company.expense_management_enabled? && selected_user.expense_management_enabled?
+          set_cash_on_hand_balances
         end
       when 'vp'
         if selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?
@@ -45,6 +49,9 @@ class User::Balances::Show < User::Base
         # Adding expense management balances in this section if it's enabled for that user
         if selected_user.company.cards_enabled? && selected_user.disburse_enabled?
           set_itz_cash_balances
+        end
+        if selected_user.cards.present?
+          set_card_balances
         end
       else
         # do nothing?
@@ -141,6 +148,7 @@ class User::Balances::Show < User::Base
 
   def set_itz_cash_balances
     if selected_user.admin?
+      self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
       self.balances[:company_credits] << {
           name: "Card Transfer Credits",
           type: "card",
@@ -148,27 +156,24 @@ class User::Balances::Show < User::Base
       }
     end
     # adding finly money
+    self.balances[:finly_money] = [] if self.balances[:finly_money].blank?
     self.balances[:finly_money] << {
         name: "Card Transfer Pocket",
         type: "card",
         balance: self.wallet_info[:itz_cash][:balance]
     }
-    # adding cash on hand
-    self.balances[:cash_on_hand] << {
-        name: "Cash On Hand",
-        type: "cash",
-        balance: self.cash_on_hand_info[:itz_cash][:balance]
-    }
   end
 
   def set_yes_bank_balances
-    if selected_user.vendor_payments_admin?
+    if selected_user.vendor_payments_admin? || (selected_user.company.bank_reimbursement_enabled? || selected_user.admin?)
+      self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
       self.balances[:company_credits] << {
           name: "Bank Transfer Credits",
           type: "bank",
           balance: self.company_credits_info[:yes_bank][:balance]
       }
     end
+    self.balances[:finly_money] = [] if self.balances[:finly_money].blank?
     self.balances[:finly_money] << {
         name: "Bank Transfer Pocket",
         type: "bank",
@@ -192,6 +197,16 @@ class User::Balances::Show < User::Base
         }
       end
     end
+  end
+
+  def set_cash_on_hand_balances
+    # adding cash on hand
+    self.balances[:cash_on_hand] = [] if self.balances[:cash_on_hand].blank?
+    self.balances[:cash_on_hand] << {
+        name: "Cash On Hand",
+        type: "cash",
+        balance: self.cash_on_hand_info[:itz_cash][:balance]
+    }
   end
 
   def set_actions

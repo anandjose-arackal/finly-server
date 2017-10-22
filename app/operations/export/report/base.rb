@@ -36,7 +36,7 @@ class Export::Report::Base < Export::Base
 
   def retrieve_data(preferences, report, expense, custom_fields_data)
     data_arr = []
-    user = report&.user || expense.user
+    user = expense.user
     preferences.each do |pref|
       case pref.export_field_id
         when ExportField.type_report_id
@@ -67,6 +67,28 @@ class Export::Report::Base < Export::Base
           data_arr << expense.note
         when ExportField.type_expense_status
           data_arr << expense.expense_status&.name&.humanize
+        when ExportField.id_for(:employee_email)
+          data_arr << expense.user.email
+        when ExportField.id_for(:employee_mobile_number)
+          data_arr << expense.user.mobile_number
+        when ExportField.id_for(:distance_expense_locations)
+          if expense.distance_expense?
+            data_arr << expense.distance_expense&.locations&.pluck(:name).join(', ')
+          else
+            data_arr << ''
+          end
+        when ExportField.id_for(:distance_in_km)
+          if expense.distance_expense?
+            data_arr << expense.distance_expense.distance_value
+          else
+            data_arr << ''
+          end
+        when ExportField.id_for(:maps_distance_in_km)
+          if expense.distance_expense?
+            data_arr << expense.distance_expense.maps_distance_value
+          else
+            data_arr << ''
+          end
         else
           data_arr << ''
       end

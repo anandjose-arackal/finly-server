@@ -37,7 +37,7 @@ class User::Wallet::Credit < User::Wallet::Base
 
   def post_process
     add_message :success, "Payment was successful"
-    Event::EWallet::Credit.(self.user, payment: self.payment)
+    Event::EWallet::Credit.(self.user, payment: self.payment, money_request: params[:money_request])
   end
 
   class User::Wallet::Credit::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter

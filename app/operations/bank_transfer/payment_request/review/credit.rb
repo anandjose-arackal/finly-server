@@ -1,4 +1,4 @@
-# Once approved, this operation will take the payment order and perform a credit for it
+ # Once approved, this operation will take the payment order and perform a credit for it
 # the initiating account can be changed at this stage as well
 
 class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentRequest::Review::Base
@@ -37,6 +37,13 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     # updating the initiating account for the payment order and payments
     payment_order.update(initiating_account_type: initiating_account.class.name)
     payment_order.payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
+
+    # check if the payment order can be executed at this moment, otherwise schedule it for the next working day
+    unless TransferTimingUtils.within_timeframe?(payment_order.payment_mode)
+      # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
+      next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_order.payment_mode)
+      payment_order.update(scheduled_at: next_date)
+    end
   end
 
 
@@ -65,13 +72,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
                                          action_id: BankPaymentRequestCommentAction.id_for(:credit)
 
     Event::EBankPaymentRequest::Credit.(user, bank_payment_request: bank_payment_request)
-
-    # # since credit has been initiated for all these vendors, make them authorized (if they're users, they're authorized by default)
-    # self.payment_order.payments.each do |payment|
-    #   if payment.receiving_account.is_a?(BankAccount) && payment.receiving_account.account_owner.is_a?(YesBankVendor)
-    #     payment.receiving_account.account_owner.update(authorized: true)
-    #   end
-    # end
 
     add_message :success, "Payment Order credit initiated!"
   end

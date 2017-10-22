@@ -52,6 +52,9 @@
 
 
 
+
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -101,6 +104,8 @@ class User < ActiveRecord::Base
   has_one :itz_cash_dmt_sender
   has_one :user_panel_subscription, dependent: :destroy
   has_one :cash_on_hand, dependent: :destroy
+  has_one :quickbooks_user, class_name: "QuickbooksFinlyIntegrationsUser"
+
   has_many :admin_summary_mail_configs, dependent: :destroy
   has_many :manager_summary_mail_configs, dependent: :destroy
 
@@ -152,6 +157,7 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :cards
   accepts_nested_attributes_for :itz_cash_dmt_sender
   accepts_nested_attributes_for :user_panel_subscription
+  accepts_nested_attributes_for :quickbooks_user
   # accepts_nested_attributes_for :feature_access
 
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
@@ -393,8 +399,11 @@ class User < ActiveRecord::Base
 
   after_create do
     default_policy_id = self.company.default_policy.id
-    if self.team_mapping.count == 0
+    # if the user us added to either one system and not the other, create a default mapping for him or her in both
+    if self.team_mapping.expense_management.count == 0
       self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: MappingPurpose.id_for(:expense_management)).save
+    end
+    if self.team_mapping.vendor_payments.count == 0
       self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: MappingPurpose.id_for(:vendor_payments)).save
     end
     self.policy_user_mappings.build(policy_id: default_policy_id).save
@@ -715,7 +724,7 @@ class User < ActiveRecord::Base
   end
 
   def bank_transfer_enabled?
-    (self.vendor_payments_enabled? && self.bank_accounts.present?)
+    (self.vendor_payments_enabled? && self.bank_accounts.present?) || (self.company.bank_reimbursement_enabled?)
   end
 
   # method that determines whether a particular user has
