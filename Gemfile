@@ -20,7 +20,7 @@ gem 'rollbar'
 gem 'oj', '~> 2.18.1'
 
 # gem for admin panel
-gem 'activeadmin', '1.1.0', git: 'https://github.com/activeadmin/activeadmin.git'
+# gem 'activeadmin', '1.1.0', git: 'https://github.com/activeadmin/activeadmin.git'
 
 # puma web server
 gem 'figaro', '1.1.1'
@@ -152,7 +152,7 @@ gem 'awesome_print', '1.7.0'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', '9.0.6'
-  gem 'capistrano', '3.7.2'
+  gem 'capistrano', '3.9.1'
   gem 'capistrano3-puma', '1.2.1'
   gem 'capistrano-rails', '1.2.2', require: false
   gem 'capistrano-bundler', '1.2.0', require: false

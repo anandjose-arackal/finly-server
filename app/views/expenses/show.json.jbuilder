@@ -13,8 +13,8 @@ json.distance do
     json.rate_value @result.expense.distance_rate_value
     json.odometer_reading_start @result.expense.distance_expense&.odometer_reading_start
     json.odometer_reading_end @result.expense.distance_expense&.odometer_reading_end
-    json.odometer_reading_receipt_start @result.expense.distance_expense&.odometer_reading_receipt_start_id
-    json.odometer_reading_receipt_end @result.expense.distance_expense&.odometer_reading_receipt_end_id
+    json.odometer_reading_receipt_start @result.start_receipt
+    json.odometer_reading_receipt_end @result.end_receipt
   end
 end
 
