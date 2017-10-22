@@ -36,6 +36,7 @@ class FinlyCollect::Base < BaseHandler
     if expect_receivable?
       params[:receivable] = self.parsed_response[:receivable]
     end
+    FinlyCollect::Base::Success.new(user, params, messages)
   end
 
   class FinlyCollect::Base::Success < BaseOperation::BasePresenter::SuccessPresenter
