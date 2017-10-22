@@ -8,6 +8,14 @@ class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :editable_attrs, :receipt, :old_receipt, :destroy_receipts
   attr_accessor :original_attributes
 
+  def personalizer
+    {
+        pre_validate: {
+            before: Personalizer::Process.new([:expense, :manual_update], :pre_validate, params)
+        }
+    }
+  end
+
   def pre_validate
     if params.blank? or user.blank?
       messages[:error] << 'Parameters or user not found'
