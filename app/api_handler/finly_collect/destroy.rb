@@ -9,6 +9,10 @@ class FinlyCollect::Destroy < FinlyCollect::Base
     end
   end
 
+  def expect_receivable?
+    false
+  end
+
   def http_request_type
     :delete
   end
