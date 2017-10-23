@@ -1,6 +1,14 @@
 class MoneyRequest::ApproveAndForward < MoneyRequest::Approve
   attr_accessor :forward_to_user
 
+  def personalizer
+    {
+        post_process: {
+            before: Personalizer::Process.new([:money_request, :approve_and_forward], :post_process, self)
+        }
+    }
+  end
+
   def init
     super
     return if money_request.blank?

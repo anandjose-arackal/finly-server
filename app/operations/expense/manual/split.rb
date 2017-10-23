@@ -4,7 +4,7 @@ class Expense::Manual::Split < Expense::Manual::Base
   def personalizer
     {
         init: {
-            before: Personalizer::Process.new([:expense, :manual_split], :init, params)
+            before: Personalizer::Process.new([:expense, :manual_split], :init, self)
         }
     }
   end
