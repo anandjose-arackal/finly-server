@@ -7,7 +7,7 @@ class Expense::Manual::Create < Expense::Manual::Base
   def personalizer
     {
         pre_validate: {
-            before: Personalizer::Process.new([:expense, :manual_create], :pre_validate, params)
+            before: Personalizer::Process.new([:expense, :manual_create], :pre_validate, self)
         }
     }
   end
