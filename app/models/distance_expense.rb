@@ -2,13 +2,22 @@
 #
 # Table name: distance_expenses
 #
-#  id               :integer          not null, primary key
-#  expense_id       :integer
-#  is_deleted       :boolean          default(FALSE)
-#  created_at       :datetime         not null
-#  updated_at       :datetime         not null
-#  distance_id      :integer
-#  maps_distance_id :integer
+#  id                                :integer          not null, primary key
+#  expense_id                        :integer
+#  is_deleted                        :boolean          default(FALSE)
+#  created_at                        :datetime         not null
+#  updated_at                        :datetime         not null
+#  distance_id                       :integer
+#  maps_distance_id                  :integer
+#  type_id                           :integer
+#  odometer_reading_one              :decimal(10, )
+#  odometer_reading_two              :decimal(10, )
+#  odometer_reading_receipt_one_id   :integer
+#  odometer_reading_receipt_two_id   :integer
+#  odometer_reading_start            :decimal(10, 2)
+#  odometer_reading_end              :decimal(10, 2)
+#  odometer_reading_receipt_start_id :integer
+#  odometer_reading_receipt_end_id   :integer
 #
 
 class DistanceExpense < ActiveRecord::Base
@@ -19,13 +28,17 @@ class DistanceExpense < ActiveRecord::Base
   belongs_to :maps_distance, class_name: 'Distance'
   has_many :custom_fields, as: :parent, dependent: :destroy
   has_many :locations, as: :locatable, dependent: :destroy
+  belongs_to :type, class_name: 'DistanceExpenseType'
+  belongs_to :odometer_reading_receipt_start, class_name: 'Receipt'
+  belongs_to :odometer_reading_receipt_end, class_name: 'Receipt'
 
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :locations
   accepts_nested_attributes_for :distance
   accepts_nested_attributes_for :maps_distance, allow_destroy: true
 
-  validates :distance, presence: true
+  # validates :distance, presence: true
+  validate :distance_presence
 
   delegate :distance_value, to: :distance, allow_nil: true
   delegate :maps_distance_value, to: :distance, allow_nil: true
@@ -67,4 +80,24 @@ class DistanceExpense < ActiveRecord::Base
       end
     end
   end
+
+  def incomplete?
+    self.distance_value.blank?
+  end
+
+  protected
+  def distance_presence
+    if self.distance_value.blank? and type_id != DistanceExpenseType.id_for(:odometer)
+      self.errors.add :distance, 'value cannot be blank'
+      return
+    end
+    if type_id == DistanceExpenseType.id_for(:odometer) and odometer_reading_start.blank?
+      self.errors.add :start, 'reading cannot be blank'
+      return
+    end
+    if self.distance_value.present? and self.distance_value <= 0
+      self.errors.add :distance, 'value has to be greater than 0'
+    end
+  end
+
 end

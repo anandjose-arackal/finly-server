@@ -14,6 +14,7 @@
 
 
 
+
 class ManualExpense < ActiveRecord::Base
   include SoftDeletable
 
@@ -63,6 +64,10 @@ class ManualExpense < ActiveRecord::Base
         return cf&.value&.value
       end
     end
+  end
+
+  def incomplete?
+    false
   end
 
 end

@@ -10,11 +10,15 @@
 #
 
 class FieldDropDownItem < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :field_configuration
 
   validates :name, presence: true
 
   scope :with_id, -> (id){ where id: id }
+
+  default_scope { unscope(:where) }
 
   def as_json(options={})
     {id: id, name: name}
