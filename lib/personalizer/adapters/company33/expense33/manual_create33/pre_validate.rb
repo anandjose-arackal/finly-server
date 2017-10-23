@@ -3,7 +3,7 @@ class Personalizer::Adapters::Company33::Expense33::ManualCreate33::PreValidate 
   if Rails.env.production?
     TYPE_OF_EXPENSE = '54'
     MODE_OF_PAYMENT = '55'
-    UNIT = '56'
+    UNIT = '64'
     CATEGORY = '57'
     EMPLOYEE_FIELD = '58'
     KIRANA = '59'
@@ -22,26 +22,26 @@ class Personalizer::Adapters::Company33::Expense33::ManualCreate33::PreValidate 
     CATEGORY_KIRANA = '72'
     CATEGORY_VEGETABLES = '73'
   else
-    TYPE_OF_EXPENSE = '62'
-    MODE_OF_PAYMENT = '63'
+    TYPE_OF_EXPENSE = '54'
+    MODE_OF_PAYMENT = '55'
     UNIT = '64'
-    EMPLOYEE_FIELD = '65'
-    KIRANA = '66'
-    VEGETABLES = '67'
-    CATEGORY = '68'
-    UNIT_PRICE = '69'
-    QUANTITY = '70'
+    CATEGORY = '57'
+    EMPLOYEE_FIELD = '58'
+    KIRANA = '59'
+    VEGETABLES = '60'
+    UNIT_PRICE = '61'
+    QUANTITY = '62'
 
-    TYPE_OF_EXPENSE_DAILY_CASH = '69'
-    TYPE_OF_EXPENSE_MONTHLY_EXPENSE = '70'
-    TYPE_OF_EXPENSE_EMPLOYEE_EXPENSE = '71'
+    TYPE_OF_EXPENSE_DAILY_CASH = '62'
+    TYPE_OF_EXPENSE_MONTHLY_EXPENSE = '63'
+    TYPE_OF_EXPENSE_EMPLOYEE_EXPENSE = '64'
 
-    MODE_OF_PAYMENT_CASH = '72'
-    MODE_OF_PAYMENT_CREDIT = '73'
-    MODE_OF_PAYMENT_BANK = '74'
+    MODE_OF_PAYMENT_CASH = '65'
+    MODE_OF_PAYMENT_CREDIT = '66'
+    MODE_OF_PAYMENT_BANK = '67'
 
-    CATEGORY_KIRANA = '218'
-    CATEGORY_VEGETABLES = '219'
+    CATEGORY_KIRANA = '72'
+    CATEGORY_VEGETABLES = '73'
   end
 
 
@@ -61,8 +61,12 @@ class Personalizer::Adapters::Company33::Expense33::ManualCreate33::PreValidate 
   def init_category
     global_custom_fields = (params&.dig(:custom_fields) or params&.dig(:expense, :custom_fields) or {})
     category = global_custom_fields[CATEGORY]
-
-    company_category = current_user.company.categories.with_name(category)&.first
+    if category.blank?
+      add_message :error, 'Category cannot be blank'
+      return
+    end
+    category_name = FieldDropDownItem.find_by_id(category)&.name
+    company_category = current_user.company.categories.with_name(category_name)&.first
     if company_category.present?
       params[:expense][:category_id] = company_category.id
     end
@@ -148,6 +152,8 @@ class Personalizer::Adapters::Company33::Expense33::ManualCreate33::PreValidate 
       add_message :error, 'Employee has not been selected for an Employee Expense'
       return
     end
+    employee = FieldDropDownItem.find_by_id(global_custom_fields[EMPLOYEE_FIELD])&.name
+    params[:expense][:manual_expense_attributes][:merchant] = "Employee Exp: #{employee}"
   end
 
   def process
