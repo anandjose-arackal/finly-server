@@ -105,9 +105,14 @@ class Expense::ExDistance::Odometer::ExUpdate < Expense::ExDistance::Update
     Report::Expenses::UpdateComment.(self.user, updated_expense: self.expense, updated_attributes: editable_attrs)
 
     # if the expense has an associated amount, update the amount
-    if expense.amount.present? && expense.report.present?
-      amount = expense.amount
-      amount.update(value: expense.calculate_amount_value(expense.report.policy))
+    if expense.report.present?
+      if expense.amount.present?
+        amount = expense.amount
+        amount.update(value: expense.calculate_amount_value(expense.report.policy))
+      else
+        expense.amount = Amount.create(value: expense.calculate_amount_value(expense.report.policy), currency_id: Currency.id_for(:INR))
+        expense.save
+      end
     end
 
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
