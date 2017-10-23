@@ -31,6 +31,7 @@ class Analytics::Charts < BaseOperation
   has_scope :filter_status_id
   has_scope :filter_date, using: [:from, :to], type: :hash
   has_scope :filter_expense_type_id, type: :array
+  has_scope :filter_custom_drop_down_selection, type: :array
 
   attr_accessor :team_users, :user_ids, :field, :charts, :expenses, :role
 

@@ -57,7 +57,7 @@ class FieldConfiguration < ActiveRecord::Base
 
   delegate :drop_down?, :text?, to: :field_type
 
-  default_scope { unscope(:where) }
+  default_scope { unscope(:where).order(created_at: :desc) }
 
   def validate_config
     case field_type_id

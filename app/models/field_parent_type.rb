@@ -33,7 +33,7 @@ class FieldParentType < ActiveRecord::Base
   def as_json(options={})
     {
         id: id,
-        name: name
+        name: name&.humanize
     }
   end
 
