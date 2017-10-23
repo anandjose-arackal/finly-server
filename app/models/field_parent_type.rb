@@ -31,9 +31,13 @@ class FieldParentType < ActiveRecord::Base
   end
 
   def as_json(options={})
+    n = name&.humanize
+    if name == 'manual_expense'
+      n = 'Cash Expense'
+    end
     {
         id: id,
-        name: name
+        name: n
     }
   end
 
