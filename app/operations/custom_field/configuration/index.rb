@@ -49,7 +49,7 @@ class CustomField::Configuration::Index < CustomField::Configuration::Base
     # elsif for_policy
     #   self.field_configurations = self.policy.field_configurations
     # end
-    self.field_configurations = self.user.company.all_field_configurations.exclude_deleted
+    self.field_configurations = self.user.company.all_field_configurations.exclude_deleted.order_created_at_desc
   end
 
   def success
