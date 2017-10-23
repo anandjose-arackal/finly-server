@@ -62,7 +62,7 @@ class Personalizer::Adapters::Company33::Expense33::ManualSplit33::Init < Person
     global_custom_fields = (params&.dig(:custom_fields) or params&.dig(:expense, :custom_fields) or {})
     category = global_custom_fields[CATEGORY]
 
-    company_category = user.company.categories.with_name(category)&.first
+    company_category = current_user.company.categories.with_name(category)&.first
 
     params&.dig(:splits).each do |key, value|
       # kirana = value.dig(:custom_fields, KIRANA)
