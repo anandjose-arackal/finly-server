@@ -30,4 +30,11 @@ class FieldParentType < ActiveRecord::Base
      FieldParentType.id_for(:per_diem_expense)]
   end
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end

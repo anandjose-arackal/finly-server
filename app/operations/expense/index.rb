@@ -94,9 +94,11 @@ class Expense::Index < Expense::Base
     has_scope :filter_expense_personal # shows only personal expenses
     has_scope :filter_report_status_id, type: :array # shows only personal expenses
     has_scope :filter_split_link
+    has_scope :filter_custom_drop_down_selection, type: :array
 
     def init
       ScopeUtils.fix_for_scoping(params, :filter_report_status_id, :array)
+      ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)
       self.expenses = params[:expenses]
       if expenses.present?
         self.expenses = apply_scopes(expenses, params)

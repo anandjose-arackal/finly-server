@@ -83,6 +83,33 @@ class Expense::Base < BaseOperation
       end
       false
     end
+
+    def start_receipt
+      receipt = expense.distance_expense&.odometer_reading_receipt_start
+      return nil unless receipt.present?
+      {
+          id: receipt.id,
+          image: {
+              file_type: receipt.file_format,
+              original: receipt.image.url,
+              thumb: receipt.image.url(:thumb)
+          }
+      }
+    end
+
+    def end_receipt
+      receipt = expense.distance_expense&.odometer_reading_receipt_end
+      return nil unless receipt.present?
+      {
+          id: receipt.id,
+          image: {
+              file_type: receipt.file_format,
+              original: receipt.image.url,
+              thumb: receipt.image.url(:thumb)
+          }
+      }
+    end
+
   end
 
 
