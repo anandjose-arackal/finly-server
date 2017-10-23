@@ -61,8 +61,13 @@ class Personalizer::Adapters::Company33::Expense33::ManualSplit33::Init < Person
   def init_category
     global_custom_fields = (params&.dig(:custom_fields) or params&.dig(:expense, :custom_fields) or {})
     category = global_custom_fields[CATEGORY]
+    if category.blank?
+      add_message :error, 'Category cannot be blank'
+      return
+    end
+    category_name = FieldDropDownItem.find_by_id(category)&.name
+    company_category = current_user.company.categories.with_name(category_name)&.first
 
-    company_category = current_user.company.categories.with_name(category)&.first
 
     params&.dig(:splits).each do |key, value|
       # kirana = value.dig(:custom_fields, KIRANA)
@@ -75,7 +80,6 @@ class Personalizer::Adapters::Company33::Expense33::ManualSplit33::Init < Person
       #   add_message :error, "Split #{key}: Vegetables cannot be blank"
       #   return
       # end
-
       if company_category.present?
         value[:category_id] = company_category&.id
       end
@@ -170,6 +174,8 @@ class Personalizer::Adapters::Company33::Expense33::ManualSplit33::Init < Person
       add_message :error, 'Employee has not been selected for an Employee Expense'
       return
     end
+    employee = FieldDropDownItem.find_by_id(global_custom_fields[EMPLOYEE_FIELD])&.name
+    params[:expense][:manual_expense_attributes][:merchant] = "Employee Exp: #{employee}"
   end
 
   def process

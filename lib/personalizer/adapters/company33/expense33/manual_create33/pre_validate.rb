@@ -61,8 +61,12 @@ class Personalizer::Adapters::Company33::Expense33::ManualCreate33::PreValidate 
   def init_category
     global_custom_fields = (params&.dig(:custom_fields) or params&.dig(:expense, :custom_fields) or {})
     category = global_custom_fields[CATEGORY]
-
-    company_category = current_user.company.categories.with_name(category)&.first
+    if category.blank?
+      add_message :error, 'Category cannot be blank'
+      return
+    end
+    category_name = FieldDropDownItem.find_by_id(category)&.name
+    company_category = current_user.company.categories.with_name(category_name)&.first
     if company_category.present?
       params[:expense][:category_id] = company_category.id
     end
@@ -148,6 +152,8 @@ class Personalizer::Adapters::Company33::Expense33::ManualCreate33::PreValidate 
       add_message :error, 'Employee has not been selected for an Employee Expense'
       return
     end
+    employee = FieldDropDownItem.find_by_id(global_custom_fields[EMPLOYEE_FIELD])&.name
+    params[:expense][:manual_expense_attributes][:merchant] = "Employee Exp: #{employee}"
   end
 
   def process
