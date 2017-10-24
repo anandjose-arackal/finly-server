@@ -25,7 +25,7 @@ class Autocomplete::Merchant < BaseOperation
 
   def post_process
     if response.empty?
-      self.response = ['No matches']
+      self.response = []
     end
   end
 

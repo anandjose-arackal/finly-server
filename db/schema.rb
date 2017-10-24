@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171012115431) do
+ActiveRecord::Schema.define(version: 20171017125338) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1291,6 +1291,16 @@ ActiveRecord::Schema.define(version: 20171012115431) do
   add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
+  create_table "customers", force: :cascade do |t|
+    t.string   "name",          limit: 255
+    t.string   "email",         limit: 255
+    t.string   "mobile_number", limit: 255
+    t.text     "description",   limit: 65535
+    t.integer  "company_id",    limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
   create_table "desktop_users", force: :cascade do |t|
     t.string   "email",      limit: 255, null: false
     t.string   "country",    limit: 255, null: false
@@ -1498,6 +1508,7 @@ ActiveRecord::Schema.define(version: 20171012115431) do
     t.boolean  "itz_cash_d_code_enabled",                default: false
     t.boolean  "yes_bank_account"
     t.boolean  "bank_account_reimbursement"
+    t.boolean  "payroll_card_enabled",                   default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -2302,6 +2313,22 @@ ActiveRecord::Schema.define(version: 20171012115431) do
   add_index "payments", ["initiating_user_id"], name: "index_payments_on_initiating_user_id", using: :btree
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
+
+  create_table "payments_receivables", force: :cascade do |t|
+    t.integer  "customer_id",        limit: 4
+    t.integer  "amount_id",          limit: 4
+    t.text     "purpose",            limit: 65535
+    t.date     "expire_by"
+    t.integer  "company_id",         limit: 4
+    t.integer  "initiating_user_id", limit: 4
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+  end
+
+  add_index "payments_receivables", ["amount_id"], name: "index_payments_receivables_on_amount_id", using: :btree
+  add_index "payments_receivables", ["company_id"], name: "index_payments_receivables_on_company_id", using: :btree
+  add_index "payments_receivables", ["customer_id"], name: "index_payments_receivables_on_customer_id", using: :btree
+  add_index "payments_receivables", ["initiating_user_id"], name: "index_payments_receivables_on_initiating_user_id", using: :btree
 
   create_table "per_diem_expense_configs", force: :cascade do |t|
     t.boolean  "enabled"
@@ -3142,6 +3169,16 @@ ActiveRecord::Schema.define(version: 20171012115431) do
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
   add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
 
+  create_table "virtual_bank_accounts", force: :cascade do |t|
+    t.string   "account_number", limit: 255
+    t.string   "ifsc",           limit: 255
+    t.text     "description",    limit: 65535
+    t.integer  "parent_id",      limit: 4
+    t.string   "parent_type",    limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+  end
+
   create_table "whitelisted_ip_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -3308,6 +3345,9 @@ ActiveRecord::Schema.define(version: 20171012115431) do
   add_foreign_key "payment_orders", "payment_order_statuses"
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "payment_types"
+  add_foreign_key "payments_receivables", "amounts"
+  add_foreign_key "payments_receivables", "companies"
+  add_foreign_key "payments_receivables", "customers"
   add_foreign_key "per_diem_expenses", "expenses"
   add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"

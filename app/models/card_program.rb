@@ -31,7 +31,7 @@ class CardProgram < ActiveRecord::Base
   scope :with_manager_view_transactions, -> { where manager_view_transactions: true }
   scope :expense, -> {where id: PROGRAMS[:expense]}
 
-  PROGRAMS = {expense: 1, reimbursement: 2, meal: 3, medical: 4}
+  PROGRAMS = {expense: 1, reimbursement: 2, meal: 3, medical: 4, payroll: 5}
 
   PROGRAM_DETAILS = {expense: {id: PROGRAMS[:expense],
                                name: 'Expense',
@@ -88,7 +88,21 @@ class CardProgram < ActiveRecord::Base
                             manager_view_balance: false,
                             manager_view_eligibility: false,
                             manager_view_transactions: false,
-                            non_personal_fund_transfer: false}
+                            non_personal_fund_transfer: false},
+                     payroll: {id: PROGRAMS[:payroll],
+                               name: 'Payroll',
+                               create_expense: false,
+                               receive_reimbursement: true,
+                               personal_wallet_fund_transfer: false,
+                               spend_restrictions: false,
+                               end_date_restrictions: true,
+                               manager_credit: true,
+                               manager_debit: false,
+                               manager_blockable: false,
+                               manager_view_balance: false,
+                               manager_view_eligibility: true,
+                               manager_view_transactions: false,
+                               non_personal_fund_transfer: false}
   }
 
   def self.id_for(program)
