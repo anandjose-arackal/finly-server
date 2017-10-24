@@ -1,0 +1,1 @@
+json.id @result.virtual_bank_account&.id

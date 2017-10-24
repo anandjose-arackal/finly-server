@@ -1,4 +1,4 @@
-  class FinlyCollect::Create < FinlyCollect::Base
+class FinlyCollect::Create < FinlyCollect::Base
 
   def post_params
     params&.permit(:account_number,

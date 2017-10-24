@@ -12,7 +12,7 @@
 #  updated_at         :datetime         not null
 #  expires_by         :date
 #  purpose_id         :integer
-#  company_id         :boolean
+#  company_id         :integer
 #  active             :boolean          default(TRUE)
 #  is_deleted         :boolean          default(FALSE)
 #  initiating_user_id :integer

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171024121829) do
+ActiveRecord::Schema.define(version: 20171024124353) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3221,7 +3221,7 @@ ActiveRecord::Schema.define(version: 20171024121829) do
     t.datetime "updated_at",                                       null: false
     t.date     "expires_by"
     t.integer  "purpose_id",         limit: 4
-    t.boolean  "company_id"
+    t.integer  "company_id",         limit: 4
     t.boolean  "active",                           default: true
     t.boolean  "is_deleted",                       default: false
     t.integer  "initiating_user_id", limit: 4
