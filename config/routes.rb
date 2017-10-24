@@ -2304,6 +2304,7 @@ Rails.application.routes.draw do
   namespace :invoicing do
 
     resources :payment_receivables
+    resources :virtual_bank_accounts
     
   end
 

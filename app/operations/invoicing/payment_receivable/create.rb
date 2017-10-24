@@ -20,7 +20,8 @@ class Invoicing::PaymentReceivable::Create < Invoicing::PaymentReceivable::Base
   end
 
   def process
-    self.payment_receivable = company.payments_receivable.build(payment_receivable_params)
+    debugger
+    self.payment_receivable = company.payment_receivables.build(payment_receivable_params)
     if self.payment_receivable.save
       # now create a virtual bank account for this receivable and attach it to the current object
       op = Invoicing::VirtualBankAccount::Create.(user, {parent: self.payment_receivable,
