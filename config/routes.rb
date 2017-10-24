@@ -5,6 +5,7 @@
 #                       qukickbooks_configurations_update GET    /qukickbooks_configurations/update(.:format)                                               qukickbooks_configurations#update
 #                         qukickbooks_configurations_show GET    /qukickbooks_configurations/show(.:format)                                                 qukickbooks_configurations#show
 #                                           accept_invite GET    /users/invitation/accept(.:format)                                                         pending_invites#edit
+#                                          collect_notify POST   /collect/notify(.:format)                                                                  finly_collect#notify
 #                                               crono_web        /crono                                                                                     Crono::Web
 #                                  new_admin_user_session GET    /admin_users/sign_in(.:format)                                                             admin_users/sessions#new
 #                                      admin_user_session POST   /admin_users/sign_in(.:format)                                                             admin_users/sessions#create
@@ -690,6 +691,7 @@
 #                         expense_type_configuration_show GET    /expense_type_configurations(.:format)                                                     expense_types_configuration#show
 #                       expense_type_configuration_update PATCH  /expense_type_configurations(.:format)                                                     expense_types_configuration#update
 #                                            groups_teams GET    /groups_teams(.:format)                                                                    expense_types_configuration#groups_teams
+#                                         expense_filters GET    /expense_filters(.:format)                                                                 expense_types_configuration#expense_filters
 #                                               per_diems GET    /per_diems(.:format)                                                                       per_diems#index
 #                                                         POST   /per_diems(.:format)                                                                       per_diems#create
 #                                            new_per_diem GET    /per_diems/new(.:format)                                                                   per_diems#new
@@ -723,6 +725,14 @@
 #                                                         PUT    /statements/:id(.:format)                                                                  statements#update
 #                                                         DELETE /statements/:id(.:format)                                                                  statements#destroy
 #                                                         GET    /statements/:id/export(.:format)                                                           statements#export
+#                                                         POST   /custom_fields/:field_configuration_id/drop_down_items(.:format)                           custom_fields#dropdownitem_create
+#                                                         DELETE /custom_fields/:field_configuration_id/drop_down_items/:drop_down_item_id(.:format)        custom_fields#dropdownitem_destroy
+#                                           custom_fields GET    /custom_fields(.:format)                                                                   custom_fields#index
+#                                                         POST   /custom_fields(.:format)                                                                   custom_fields#create
+#                                            custom_field GET    /custom_fields/:id(.:format)                                                               custom_fields#show
+#                                                         PATCH  /custom_fields/:id(.:format)                                                               custom_fields#update
+#                                                         PUT    /custom_fields/:id(.:format)                                                               custom_fields#update
+#                                                         DELETE /custom_fields/:id(.:format)                                                               custom_fields#destroy
 #                                                    root GET    /                                                                                          home#index
 #                                                 welcome GET    /welcome(.:format)                                                                         home#welcome
 #                                                   about GET    /about(.:format)                                                                           home#about
@@ -971,6 +981,14 @@
 #                                                         PATCH  /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
 #                                                         PUT    /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
 #                                                         DELETE /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#destroy
+#                         invoicing_virtual_bank_accounts GET    /invoicing/virtual_bank_accounts(.:format)                                                 invoicing/virtual_bank_accounts#index
+#                                                         POST   /invoicing/virtual_bank_accounts(.:format)                                                 invoicing/virtual_bank_accounts#create
+#                      new_invoicing_virtual_bank_account GET    /invoicing/virtual_bank_accounts/new(.:format)                                             invoicing/virtual_bank_accounts#new
+#                     edit_invoicing_virtual_bank_account GET    /invoicing/virtual_bank_accounts/:id/edit(.:format)                                        invoicing/virtual_bank_accounts#edit
+#                          invoicing_virtual_bank_account GET    /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#show
+#                                                         PATCH  /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#update
+#                                                         PUT    /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#update
+#                                                         DELETE /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#destroy
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)            admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)             admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                           admin_users/funds_load_requests#index

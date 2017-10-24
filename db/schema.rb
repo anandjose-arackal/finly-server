@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171020133530) do
+ActiveRecord::Schema.define(version: 20171024121829) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1334,10 +1334,6 @@ ActiveRecord::Schema.define(version: 20171020133530) do
     t.integer  "distance_id",                       limit: 4
     t.integer  "maps_distance_id",                  limit: 4
     t.integer  "type_id",                           limit: 4
-    t.decimal  "odometer_reading_one",                        precision: 10
-    t.decimal  "odometer_reading_two",                        precision: 10
-    t.integer  "odometer_reading_receipt_one_id",   limit: 4
-    t.integer  "odometer_reading_receipt_two_id",   limit: 4
     t.decimal  "odometer_reading_start",                      precision: 10, scale: 2
     t.decimal  "odometer_reading_end",                        precision: 10, scale: 2
     t.integer  "odometer_reading_receipt_start_id", limit: 4
@@ -1525,6 +1521,7 @@ ActiveRecord::Schema.define(version: 20171020133530) do
     t.boolean  "itz_cash_d_code_enabled",                default: false
     t.boolean  "yes_bank_account"
     t.boolean  "bank_account_reimbursement"
+    t.boolean  "payroll_card_enabled",                   default: false
     t.boolean  "invoicing_system",                       default: false
   end
 
@@ -3215,18 +3212,19 @@ ActiveRecord::Schema.define(version: 20171020133530) do
   end
 
   create_table "virtual_bank_accounts", force: :cascade do |t|
-    t.string   "account_number", limit: 255
-    t.string   "ifsc",           limit: 255
-    t.text     "description",    limit: 65535
-    t.integer  "parent_id",      limit: 4
-    t.string   "parent_type",    limit: 255
-    t.integer  "company_id",     limit: 4
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
+    t.string   "account_number",     limit: 255
+    t.string   "ifsc",               limit: 255
+    t.text     "description",        limit: 65535
+    t.integer  "parent_id",          limit: 4
+    t.string   "parent_type",        limit: 255
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
     t.date     "expires_by"
-    t.integer  "purpose_id",     limit: 4
-    t.boolean  "active",                       default: true
-    t.boolean  "is_deleted",                   default: false
+    t.integer  "purpose_id",         limit: 4
+    t.boolean  "company_id"
+    t.boolean  "active",                           default: true
+    t.boolean  "is_deleted",                       default: false
+    t.integer  "initiating_user_id", limit: 4
   end
 
   create_table "whitelisted_ip_types", force: :cascade do |t|

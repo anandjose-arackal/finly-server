@@ -10,10 +10,6 @@
 #  distance_id                       :integer
 #  maps_distance_id                  :integer
 #  type_id                           :integer
-#  odometer_reading_one              :decimal(10, )
-#  odometer_reading_two              :decimal(10, )
-#  odometer_reading_receipt_one_id   :integer
-#  odometer_reading_receipt_two_id   :integer
 #  odometer_reading_start            :decimal(10, 2)
 #  odometer_reading_end              :decimal(10, 2)
 #  odometer_reading_receipt_start_id :integer
