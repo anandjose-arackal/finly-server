@@ -41,5 +41,6 @@ class Invoicing::VirtualBankAccount::Index < Invoicing::VirtualBankAccount::Base
 
   def success
     params[:virtual_bank_accounts] = self.virtual_accounts
+    Invoicing::VirtualBankAccount::Index::AccountsPresenter.new(user, params, messages)
   end
 end

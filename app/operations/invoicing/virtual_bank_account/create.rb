@@ -42,7 +42,8 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
                                                   ifsc: "YESB009989",
                                                   company_id: company.id,
                                                   purpose_id: self.purpose_id,
-                                                  parent: self.parent)
+                                                  parent: self.parent,
+                                                  initiating_user: user)
   end
 
   def success
