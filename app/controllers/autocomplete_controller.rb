@@ -2,7 +2,6 @@ class AutocompleteController < ApplicationController
   before_action -> { finly_authorize! :web}
   def merchant
     merchants = Autocomplete::Merchant.(current_user, params)
-
     respond_to do |format|
       format.json {render json: merchants.as_json }
     end
