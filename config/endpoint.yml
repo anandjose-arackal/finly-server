@@ -39,9 +39,9 @@ default: &default
     base: 'https://uatsky.yesbank.in:444'
     path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
   finly_collect:
-#      base: 'https://collect-staging.finly.io'
-      base: 'http://localhost:3002/'
-      path: 'receivables'
+#   base: 'https://collect-staging.finly.io'
+    base: 'http://localhost:3002/'
+    path: 'receivables'
 
 
 staging:

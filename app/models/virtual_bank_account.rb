@@ -35,8 +35,4 @@ class VirtualBankAccount < ActiveRecord::Base
     self.update(active: true)
   end
 
-  def payments_received
-    Payment.where()
-  end
-
 end
