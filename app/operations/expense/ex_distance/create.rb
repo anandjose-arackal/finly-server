@@ -117,11 +117,13 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       end
       expense.update_attributes(amount_id: amount.id)
 
-      # calculate the equivalent amount in all currencies in the amounts table
-      if expense.date == DateUtils.local_date
-        expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
-      else
-        expense.update_other_currencies
+      if expense.amount.present?
+        # calculate the equivalent amount in all currencies in the amounts table
+        if expense.date == DateUtils.local_date
+          expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+        else
+          expense.update_other_currencies
+        end
       end
     end
 

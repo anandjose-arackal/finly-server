@@ -1,5 +1,13 @@
 class MoneyRequest::Submit < MoneyRequest::Base
 
+  def personalizer
+    {
+        post_process: {
+            before: Personalizer::Process.new([:money_request, :submit], :post_process, self)
+        }
+    }
+  end
+
   def authorized_user_types
     [:employee]
   end

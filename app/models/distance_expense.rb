@@ -87,7 +87,7 @@ class DistanceExpense < ActiveRecord::Base
       self.errors.add :distance, 'value cannot be blank'
       return
     end
-    if type_id != DistanceExpenseType.id_for(:odometer) and odometer_reading_start.blank?
+    if type_id == DistanceExpenseType.id_for(:odometer) and odometer_reading_start.blank?
       self.errors.add :start, 'reading cannot be blank'
       return
     end

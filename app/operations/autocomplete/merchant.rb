@@ -11,6 +11,7 @@ class Autocomplete::Merchant < BaseOperation
   def init
     self.query = params[:filter_search] || params[:query]
     self.query.strip! if self.query.is_a?(String)
+    # self.response = []
   end
 
   def process
@@ -25,8 +26,12 @@ class Autocomplete::Merchant < BaseOperation
 
   def post_process
     if response.empty?
-      self.response = ['No matches']
+      self.response = []
     end
+  end
+
+  def success
+    self.response
   end
 
 end
