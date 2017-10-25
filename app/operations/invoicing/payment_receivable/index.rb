@@ -1,19 +1,21 @@
 class Invoicing::PaymentReceivable::Index < Invoicing::PaymentReceivable::Base
 
-  attr_accessor :receivables
+  attr_accessor :receivables, :role_id
 
   class Invoicing::PaymentReceivable::Index::ReceivablesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :receivables, :role_id
+    attr_accessor :receivables
 
     def init
       self.receivables = params[:receivables]
     end
-
   end
 
   def init
-
+    self.role_id = UserRole::VALUES[params[:view].to_sym]
+    if self.role_id.blank?
+      self.role_id = UserRole.id_for(:initiator)
+    end
   end
 
   def process
