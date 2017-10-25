@@ -36,7 +36,7 @@ class Agreements::Validate < Agreements::Base
     end
 
     # overriding the agreements screen for this company if it already has a d-code
-    if self.company.d_code.present?
+    if self.user.company.d_code.present?
       self.agreed = true
     end
 
