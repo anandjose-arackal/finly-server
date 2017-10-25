@@ -10,6 +10,11 @@ class Invoicing::VirtualBankAccountsController < ApplicationController
     respond
   end
 
+  def show
+    @result = Invoicing::VirtualBankAccount::Show.(current_user, params)
+    respond
+  end
+
   def destroy
     @result = Invoicing::VirtualBankAccount::Destroy.(current_user, params)
     respond
