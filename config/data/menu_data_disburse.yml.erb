@@ -49,9 +49,11 @@ user:
   <% elsif current_user.finance_manager? %>
   - name: Finance Manager
     id: finance_manager
-  <% end %>
+  <% else %>
   - name: Personal
     id: personal
+  <% end %>
+
 
 views:
   <% if current_user.admin? %>

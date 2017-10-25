@@ -26,7 +26,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
     return if has_errors?
     from_cash_in_hand = params[:payment][:from_cash_in_hand].to_f rescue 0
     from_outside_finly = params[:payment][:from_outside_finly].to_f rescue 0
-    from_reimbursement_card = params[:payment][:from_reimburesement_card][:amount] rescue 0
+    from_reimbursement_card = params[:payment][:from_reimbursement_card][:amount] rescue 0
     if from_cash_in_hand < 0
       add_message :error, 'Deduct Cash in Hand amount cannot be less than 0'
       return
@@ -317,7 +317,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
           payment.system_messages.create(content: "Reimbursement processed. Awaiting credit confirmation",
                                          system_message_type_id: SystemMessageType.id_for(:error)
                                         )
-          payment.update(note: "Reimbursemet processed. Awaiting credit confirmation")
+          payment.update(note: "Reimbursement processed. Awaiting credit confirmation")
         end
         return
       else

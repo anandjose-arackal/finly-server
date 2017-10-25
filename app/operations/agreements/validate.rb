@@ -35,6 +35,11 @@ class Agreements::Validate < Agreements::Base
       end
     end
 
+    # overriding the agreements screen for this company if it already has a d-code
+    if self.user.company.d_code.present?
+      self.agreed = true
+    end
+
     self.kyc_required = user.company.kyc_required?
   end
 
