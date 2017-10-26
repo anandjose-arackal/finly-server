@@ -24,6 +24,12 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
   end
 
   def init
+    if params&.dig(:field_configuration, :global).present?
+      params[:field_configuration][:global] = StringUtils.to_bool params&.dig(:field_configuration, :global)
+    end
+    if params&.dig(:field_configuration, :mandatory).present?
+      params[:field_configuration][:mandatory] = StringUtils.to_bool params&.dig(:field_configuration, :mandatory)
+    end
     self.config_params = config_strong_params
     config_params[:company_id] = self.user.company_id
     if config_params[:configurable_type]&.downcase == 'company'

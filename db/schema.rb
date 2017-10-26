@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171017125338) do
+ActiveRecord::Schema.define(version: 20171019083212) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1291,16 +1291,6 @@ ActiveRecord::Schema.define(version: 20171017125338) do
   add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
-  create_table "customers", force: :cascade do |t|
-    t.string   "name",          limit: 255
-    t.string   "email",         limit: 255
-    t.string   "mobile_number", limit: 255
-    t.text     "description",   limit: 65535
-    t.integer  "company_id",    limit: 4
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-  end
-
   create_table "desktop_users", force: :cascade do |t|
     t.string   "email",      limit: 255, null: false
     t.string   "country",    limit: 255, null: false
@@ -1318,13 +1308,26 @@ ActiveRecord::Schema.define(version: 20171017125338) do
     t.integer  "policy_id",           limit: 4, null: false
   end
 
+  create_table "distance_expense_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "distance_expense_types", ["name"], name: "index_distance_expense_types_on_name", using: :btree
+
   create_table "distance_expenses", force: :cascade do |t|
-    t.integer  "expense_id",       limit: 4
-    t.boolean  "is_deleted",                 default: false
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
-    t.integer  "distance_id",      limit: 4
-    t.integer  "maps_distance_id", limit: 4
+    t.integer  "expense_id",                        limit: 4
+    t.boolean  "is_deleted",                                                           default: false
+    t.datetime "created_at",                                                                           null: false
+    t.datetime "updated_at",                                                                           null: false
+    t.integer  "distance_id",                       limit: 4
+    t.integer  "maps_distance_id",                  limit: 4
+    t.integer  "type_id",                           limit: 4
+    t.decimal  "odometer_reading_start",                      precision: 10, scale: 2
+    t.decimal  "odometer_reading_end",                        precision: 10, scale: 2
+    t.integer  "odometer_reading_receipt_start_id", limit: 4
+    t.integer  "odometer_reading_receipt_end_id",   limit: 4
   end
 
   add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
@@ -1590,10 +1593,11 @@ ActiveRecord::Schema.define(version: 20171017125338) do
   end
 
   create_table "field_drop_down_items", force: :cascade do |t|
-    t.string   "name",                   limit: 255, null: false
-    t.integer  "field_configuration_id", limit: 4,   null: false
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.string   "name",                   limit: 255,                 null: false
+    t.integer  "field_configuration_id", limit: 4,                   null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.boolean  "is_deleted",                         default: false
   end
 
   add_index "field_drop_down_items", ["field_configuration_id"], name: "index_field_drop_down_items_on_field_configuration_id", using: :btree
@@ -2313,22 +2317,6 @@ ActiveRecord::Schema.define(version: 20171017125338) do
   add_index "payments", ["initiating_user_id"], name: "index_payments_on_initiating_user_id", using: :btree
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
-
-  create_table "payments_receivables", force: :cascade do |t|
-    t.integer  "customer_id",        limit: 4
-    t.integer  "amount_id",          limit: 4
-    t.text     "purpose",            limit: 65535
-    t.date     "expire_by"
-    t.integer  "company_id",         limit: 4
-    t.integer  "initiating_user_id", limit: 4
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-  end
-
-  add_index "payments_receivables", ["amount_id"], name: "index_payments_receivables_on_amount_id", using: :btree
-  add_index "payments_receivables", ["company_id"], name: "index_payments_receivables_on_company_id", using: :btree
-  add_index "payments_receivables", ["customer_id"], name: "index_payments_receivables_on_customer_id", using: :btree
-  add_index "payments_receivables", ["initiating_user_id"], name: "index_payments_receivables_on_initiating_user_id", using: :btree
 
   create_table "per_diem_expense_configs", force: :cascade do |t|
     t.boolean  "enabled"
@@ -3169,16 +3157,6 @@ ActiveRecord::Schema.define(version: 20171017125338) do
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
   add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
 
-  create_table "virtual_bank_accounts", force: :cascade do |t|
-    t.string   "account_number", limit: 255
-    t.string   "ifsc",           limit: 255
-    t.text     "description",    limit: 65535
-    t.integer  "parent_id",      limit: 4
-    t.string   "parent_type",    limit: 255
-    t.datetime "created_at",                   null: false
-    t.datetime "updated_at",                   null: false
-  end
-
   create_table "whitelisted_ip_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -3345,9 +3323,6 @@ ActiveRecord::Schema.define(version: 20171017125338) do
   add_foreign_key "payment_orders", "payment_order_statuses"
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "payment_types"
-  add_foreign_key "payments_receivables", "amounts"
-  add_foreign_key "payments_receivables", "companies"
-  add_foreign_key "payments_receivables", "customers"
   add_foreign_key "per_diem_expenses", "expenses"
   add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"
