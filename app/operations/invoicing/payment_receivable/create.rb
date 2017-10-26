@@ -12,7 +12,9 @@ class Invoicing::PaymentReceivable::Create < Invoicing::PaymentReceivable::Base
   end
 
   def validate
-
+    if Date.parse(payment_receivable_params[:expire_by]) < DateUtils.local_date
+      add_message :error, "Expiry date cannot be the in the past"
+    end
   end
 
   def pre_process
