@@ -32,6 +32,6 @@ class Invoicing::VirtualBankAccountsController < ApplicationController
 
   def show_payments
     @result = Invoicing::VirtualBankAccount::Payments::Show.(current_user, params)
-    responda
+    respond
   end
 end

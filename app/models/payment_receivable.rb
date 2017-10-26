@@ -27,4 +27,6 @@ class PaymentReceivable < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :customer
+
+  delegate :amount_value, to: :amount, allow_nil: true
 end

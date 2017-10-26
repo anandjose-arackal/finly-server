@@ -3,13 +3,12 @@
 
 class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Base
 
-  attr_accessor :account_params, :purpose_id, :bank_account, :parent, :expire_by
+  attr_accessor :account_params, :purpose_id, :bank_account, :parent, :expire_by, :exact_transaction_amount
 
   def init
     self.company = user.company
     self.purpose_id = params[:purpose_id] || ::VirtualAccountPurpose.id_for(:virtual_bank_account)
     self.parent = params[:parent]
-    self.expire_by = params[:expire_by]
   end
 
   def validate
@@ -37,13 +36,13 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
 
   def process
     # call the operation to generate a bank account number from the dedicated server
-    op = FinlyCollect::Create.({date_before: self.expire_by})
-    debugger
+
+    op = FinlyCollect::Create.(params)
     if op.success?
       bank_account_number = op.account_number
       # temporarily using a generator for this
       self.bank_account = ::VirtualBankAccount.create(account_number: bank_account_number,
-                                                    ifsc: Constants::YES_BANK_RECEIVING_IFSC,
+                                                    ifsc: Constants::YesBank::YES_BANK_RECEIVING_IFSC,
                                                     company_id: company.id,
                                                     purpose_id: self.purpose_id,
                                                     parent: self.parent,

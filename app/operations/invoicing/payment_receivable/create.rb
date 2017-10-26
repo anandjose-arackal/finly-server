@@ -19,6 +19,7 @@ class Invoicing::PaymentReceivable::Create < Invoicing::PaymentReceivable::Base
 
   def pre_process
     self.payment_receivable_params[:payment_receivable_status_id] = PaymentReceivableStatus.id_for(:active)
+    self.payment_receivable_params[:initiating_user_id] = user.id
   end
 
   def process
@@ -26,7 +27,9 @@ class Invoicing::PaymentReceivable::Create < Invoicing::PaymentReceivable::Base
     if self.payment_receivable.save
       # now create a virtual bank account for this receivable and attach it to the current object
       op = Invoicing::VirtualBankAccount::Create.(user, {parent: self.payment_receivable,
-                                                         purpose_id: VirtualAccountPurpose.id_for(:payment_receivable)})
+                                                         purpose_id: VirtualAccountPurpose.id_for(:payment_receivable),
+                                                         exact_transaction_amount: self.payment_receivable.amount_value,
+                                                         date_before: self.payment_receivable.expire_by})
     else
       add_message :error, payment_receivable.errors.full_messages
       return
