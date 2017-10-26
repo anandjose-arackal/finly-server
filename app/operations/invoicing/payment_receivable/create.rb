@@ -18,7 +18,7 @@ class Invoicing::PaymentReceivable::Create < Invoicing::PaymentReceivable::Base
   end
 
   def pre_process
-
+    self.payment_receivable_params[:payment_receivable_status_id] = PaymentReceivableStatus.id_for(:active)
   end
 
   def process

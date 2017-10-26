@@ -23,6 +23,8 @@ class PaymentReceivable < ActiveRecord::Base
   belongs_to :initiating_user, class_name: "User"
   belongs_to :payment_receivable_status
 
+  has_one :virtual_bank_account, as: :parent
+
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :customer
 end

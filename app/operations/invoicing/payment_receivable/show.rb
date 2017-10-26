@@ -19,6 +19,7 @@ class Invoicing::PaymentReceivable::Show < Invoicing::PaymentReceivable::Base
 
   def success
     params[:payment_receivable] = self.payment_receivable
+    params[:virtual_bank_account] = self.payment_receivable.virtual_bank_account
     Invoicing::PaymentReceivable::Base::ReceivablePresenter.new(user, params, messages)
   end
 

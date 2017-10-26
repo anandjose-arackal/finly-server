@@ -28,6 +28,7 @@ class Invoicing::PaymentReceivablesController < ApplicationController
   end
 
   def show
-
+    @result = Invoicing::PaymentReceivable::Show.(current_user, params)
+    respond
   end
 end
