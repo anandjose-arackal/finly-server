@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171024121829) do
+ActiveRecord::Schema.define(version: 20171026102805) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2268,6 +2268,18 @@ ActiveRecord::Schema.define(version: 20171024121829) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "payment_receivable_transaction_trails", force: :cascade do |t|
+    t.integer  "transaction_id",              limit: 4
+    t.boolean  "find_payment_receivable"
+    t.boolean  "creating_payment"
+    t.boolean  "update_company_balance"
+    t.boolean  "payment_receivable_updation"
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "payment_receivable_transaction_trails", ["transaction_id"], name: "index_payment_receivable_transaction_trails_on_transaction_id", using: :btree
+
   create_table "payment_receivables", force: :cascade do |t|
     t.integer  "customer_id",        limit: 4
     t.integer  "amount_id",          limit: 4
@@ -2277,6 +2289,7 @@ ActiveRecord::Schema.define(version: 20171024121829) do
     t.integer  "initiating_user_id", limit: 4
     t.datetime "created_at",                       null: false
     t.datetime "updated_at",                       null: false
+    t.string   "email",              limit: 255
   end
 
   add_index "payment_receivables", ["amount_id"], name: "index_payment_receivables_on_amount_id", using: :btree
