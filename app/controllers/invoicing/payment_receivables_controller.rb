@@ -18,4 +18,8 @@ class Invoicing::PaymentReceivablesController < ApplicationController
   def show_transfers
 
   end
+
+  def show
+
+  end
 end
