@@ -2050,6 +2050,7 @@ Rails.application.routes.draw do
   get 'expense_type_configurations', to: 'expense_types_configuration#show', as: :expense_type_configuration_show
   patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update
   get 'groups_teams', to: 'expense_types_configuration#groups_teams'
+  get 'expense_filters', to: 'expense_types_configuration#expense_filters'
 
   resources :per_diems
 
@@ -2070,6 +2071,10 @@ Rails.application.routes.draw do
   get 'export/:id/statements(.:format)', to: 'export#statement', as: :export_statement
   resources :statements
   get 'statements/:id/export', to: 'statements#export'
+
+  post 'custom_fields/:field_configuration_id/drop_down_items', to: 'custom_fields#dropdownitem_create'
+  delete 'custom_fields/:field_configuration_id/drop_down_items/:drop_down_item_id', to: 'custom_fields#dropdownitem_destroy'
+  resources :custom_fields, only: [:create, :index, :show, :update, :destroy]
 
   # get 'settlements/summary' => 'settlements#summary'
 

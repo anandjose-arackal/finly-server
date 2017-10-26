@@ -1,15 +1,17 @@
 class Personalizer::Process < BaseOperation
-  attr_accessor :params, :path, :function, :company, :class_object, :show_errors
+  attr_accessor :params, :path, :function, :company, :class_object, :show_errors, :op_instance
   # Show errors is used to show failure only if a personalization exists and the personalization is throwing an error. Else success presenter is returned
 
-  def self.call(path, function, params)
-    self.new(path, function, params).run
+  def self.call(path, function, instance)
+    self.new(path, function, instance).run
   end
 
-  def initialize(path, function, params)
+  def initialize(path, function, instance)
     self.path = path
     self.function = function
-    self.params = params
+    self.op_instance = instance
+    self.params = instance.params if instance&.respond_to? :params
+    self.user = instance.user if instance&.respond_to? :user
   end
 
   def pre_validate
@@ -53,7 +55,7 @@ class Personalizer::Process < BaseOperation
     class_name += "::#{function.to_s.camelize}"
 
     # Execute class
-    self.class_object = (Object.const_get(class_name).new(self.params) rescue nil)
+    self.class_object = (Object.const_get(class_name).new(self.op_instance, self.user, self.params) rescue nil)
   end
 
   def validate

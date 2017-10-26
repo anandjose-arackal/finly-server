@@ -4,7 +4,7 @@ class Expense::Manual::Split < Expense::Manual::Base
   def personalizer
     {
         init: {
-            before: Personalizer::Process.new([:expense, :manual_split], :init, params)
+            before: Personalizer::Process.new([:expense, :manual_split], :init, self)
         }
     }
   end
@@ -126,9 +126,12 @@ class Expense::Manual::Split < Expense::Manual::Base
       expense_item_params[:note] = split[:note]
       expense_item_params[:category_id] = split[:category_id]
       expense_item_params[:amount_attributes] = split[:amount_attributes] if split[:amount_attributes].present?
-      expense_custom_fields = base_custom_fields
+      expense_custom_fields = base_custom_fields.deep_dup
       if split[:custom_fields].present?
         expense_custom_fields.merge! split[:custom_fields]
+        # split[:custom_fields]&.each do |key, value|
+        #   expense_custom_fields[key] = value
+        # end
       end
       if expense_item_params.present?
         expense_item_params = (expense_item_params.permit! rescue expense_item_params)

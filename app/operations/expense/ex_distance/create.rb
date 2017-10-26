@@ -39,6 +39,9 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
   def init
     self.expense_params = distance_expense_params
     self.expense_params[:expense_type_id] = ExpenseType.distance_expense_id
+    if self.expense_params[:distance_attributes].present?
+      self.expense_params[:distance_attributes][:type_id] = DistanceExpenseType.id_for(:distance)
+    end
     if params[:receipt_id].present?
       self.receipt = user.receipts.with_id(params[:receipt_id]).first rescue nil
     end
@@ -114,11 +117,13 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
       end
       expense.update_attributes(amount_id: amount.id)
 
-      # calculate the equivalent amount in all currencies in the amounts table
-      if expense.date == DateUtils.local_date
-        expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
-      else
-        expense.update_other_currencies
+      if expense.amount.present?
+        # calculate the equivalent amount in all currencies in the amounts table
+        if expense.date == DateUtils.local_date
+          expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+        else
+          expense.update_other_currencies
+        end
       end
     end
 

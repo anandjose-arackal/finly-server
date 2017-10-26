@@ -20,4 +20,19 @@ class FieldType < ActiveRecord::Base
     TYPES.key(id)
   end
 
+  def drop_down?
+    self.id == FieldType.id_for(:drop_down)
+  end
+
+  def text?
+    self.id == FieldType.id_for(:text)
+  end
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end

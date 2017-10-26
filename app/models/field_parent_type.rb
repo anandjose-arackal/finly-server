@@ -30,4 +30,15 @@ class FieldParentType < ActiveRecord::Base
      FieldParentType.id_for(:per_diem_expense)]
   end
 
+  def as_json(options={})
+    n = name&.humanize
+    if name == 'manual_expense'
+      n = 'Cash Expense'
+    end
+    {
+        id: id,
+        name: n
+    }
+  end
+
 end
