@@ -10,6 +10,7 @@
 #Gemfile.lock
 /config/database.yml
 /.byebug_history
+config/finly_collect.yml
 
 # Ignore all logfiles and tempfiles.
 /log/*
