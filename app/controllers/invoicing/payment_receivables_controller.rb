@@ -7,12 +7,20 @@ class Invoicing::PaymentReceivablesController < ApplicationController
 
   def create
     @result = Invoicing::PaymentReceivable::Create.(current_user, params)
-    respond
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure
+    end
   end
 
   def destroy
     @result = Invoicing::PaymentReceivable::Destroy.(current_user, params)
-    respond
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure
+    end
   end
 
   def show_transfers

@@ -25,4 +25,5 @@ class Invoicing::VirtualBankAccount::Transactions::Show < Invoicing::VirtualBank
     params[:transactions] = self.transactions
     Invoicing::VirtualBankAccount::Transactions::Show::TransactionsPresenter.new(user, params, messages)
   end
+
 end
