@@ -29,4 +29,8 @@ class Invoicing::VirtualBankAccountsController < ApplicationController
     @result = Invoicing::VirtualBankAccount::Reactivate.(current_user, params)
     respond
   end
+
+  def show_payments
+
+  end
 end
