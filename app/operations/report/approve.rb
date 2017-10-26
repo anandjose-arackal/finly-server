@@ -129,7 +129,7 @@ class Report::Approve < Report::Base
           email_authorization = email_authorization_presenter.email_authorization
         end
       else
-        Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
+        op = Settlement::Report::Approved.(user, report: report, auto_approve: auto_approve)
         report.reload
 
         report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:verified))
