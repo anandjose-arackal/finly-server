@@ -24,6 +24,10 @@ class FinlyCollect::Base < BaseHandler
     end
   end
 
+  def load_custom_connection(faraday)
+    faraday&.basic_auth(CONFIG['username'], CONFIG['password'])
+  end
+
   def expect_receivable?
     true
   end
