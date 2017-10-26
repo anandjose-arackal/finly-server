@@ -981,6 +981,7 @@
 #                                                         PATCH  /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
 #                                                         PUT    /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
 #                                                         DELETE /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#destroy
+#            invoicing_virtual_bank_account_show_payments GET    /invoicing/virtual_bank_accounts/:virtual_bank_account_id/show_payments(.:format)          invoicing/virtual_bank_accounts#show_payments
 #                         invoicing_virtual_bank_accounts GET    /invoicing/virtual_bank_accounts(.:format)                                                 invoicing/virtual_bank_accounts#index
 #                                                         POST   /invoicing/virtual_bank_accounts(.:format)                                                 invoicing/virtual_bank_accounts#create
 #                      new_invoicing_virtual_bank_account GET    /invoicing/virtual_bank_accounts/new(.:format)                                             invoicing/virtual_bank_accounts#new
@@ -2322,7 +2323,9 @@ Rails.application.routes.draw do
   namespace :invoicing do
 
     resources :payment_receivables
-    resources :virtual_bank_accounts
+    resources :virtual_bank_accounts do
+      get 'show_payments', to: 'virtual_bank_accounts#show_payments', as: :show_payments
+    end
     
   end
 

@@ -2,7 +2,7 @@ class Invoicing::VirtualBankAccount::Payments::Show < Invoicing::VirtualBankAcco
 
   attr_accessor :payments, :virtual_bank_account
 
-  class Invoicing::VirtualBankAccount::Transactions::Show::TransactionsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class Invoicing::VirtualBankAccount::Payments::Show::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :payments
 
@@ -23,7 +23,7 @@ class Invoicing::VirtualBankAccount::Payments::Show < Invoicing::VirtualBankAcco
 
   def success
     params[:payments] = self.payments
-    Invoicing::VirtualBankAccount::Payments::Show::TransactionsPresenter.new(user, params, messages)
+    Invoicing::VirtualBankAccount::Payments::Show::PaymentsPresenter.new(user, params, messages)
   end
 
 end
