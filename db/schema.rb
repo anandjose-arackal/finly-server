@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171026102805) do
+ActiveRecord::Schema.define(version: 20171026120004) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2268,6 +2268,12 @@ ActiveRecord::Schema.define(version: 20171026102805) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "payment_receivable_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "payment_receivable_transaction_trails", force: :cascade do |t|
     t.integer  "transaction_id",              limit: 4
     t.boolean  "find_payment_receivable"
@@ -2281,21 +2287,23 @@ ActiveRecord::Schema.define(version: 20171026102805) do
   add_index "payment_receivable_transaction_trails", ["transaction_id"], name: "index_payment_receivable_transaction_trails_on_transaction_id", using: :btree
 
   create_table "payment_receivables", force: :cascade do |t|
-    t.integer  "customer_id",        limit: 4
-    t.integer  "amount_id",          limit: 4
-    t.text     "purpose",            limit: 65535
+    t.integer  "customer_id",                  limit: 4
+    t.integer  "amount_id",                    limit: 4
+    t.text     "purpose",                      limit: 65535
     t.date     "expire_by"
-    t.integer  "company_id",         limit: 4
-    t.integer  "initiating_user_id", limit: 4
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-    t.string   "email",              limit: 255
+    t.integer  "company_id",                   limit: 4
+    t.integer  "initiating_user_id",           limit: 4
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+    t.string   "email",                        limit: 255
+    t.integer  "payment_receivable_status_id", limit: 4
   end
 
   add_index "payment_receivables", ["amount_id"], name: "index_payment_receivables_on_amount_id", using: :btree
   add_index "payment_receivables", ["company_id"], name: "index_payment_receivables_on_company_id", using: :btree
   add_index "payment_receivables", ["customer_id"], name: "index_payment_receivables_on_customer_id", using: :btree
   add_index "payment_receivables", ["initiating_user_id"], name: "index_payment_receivables_on_initiating_user_id", using: :btree
+  add_index "payment_receivables", ["payment_receivable_status_id"], name: "index_payment_receivables_on_payment_receivable_status_id", using: :btree
 
   create_table "payment_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -3407,6 +3415,7 @@ ActiveRecord::Schema.define(version: 20171026102805) do
   add_foreign_key "payment_receivables", "amounts"
   add_foreign_key "payment_receivables", "companies"
   add_foreign_key "payment_receivables", "customers"
+  add_foreign_key "payment_receivables", "payment_receivable_statuses"
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "payment_types"
   add_foreign_key "per_diem_expenses", "expenses"
