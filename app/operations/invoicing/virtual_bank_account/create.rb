@@ -3,12 +3,13 @@
 
 class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Base
 
-  attr_accessor :account_params, :purpose_id, :bank_account, :parent
+  attr_accessor :account_params, :purpose_id, :bank_account, :parent, :expire_by
 
   def init
     self.company = user.company
     self.purpose_id = params[:purpose_id] || ::VirtualAccountPurpose.id_for(:virtual_bank_account)
     self.parent = params[:parent]
+    self.expire_by = params[:expire_by]
   end
 
   def validate
@@ -36,14 +37,20 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
 
   def process
     # call the operation to generate a bank account number from the dedicated server
-    # todo - <insert operation call here)
-    # temporarily using a generator for this
-    self.bank_account = ::VirtualBankAccount.create(account_number: generate_random_bank_account,
-                                                  ifsc: "YESB009989",
-                                                  company_id: company.id,
-                                                  purpose_id: self.purpose_id,
-                                                  parent: self.parent,
-                                                  initiating_user: user)
+    op = FinlyCollect::Create.({date_before: self.expire_by})
+    debugger
+    if op.success?
+      bank_account_number = op.account_number
+      # temporarily using a generator for this
+      self.bank_account = ::VirtualBankAccount.create(account_number: bank_account_number,
+                                                    ifsc: Constants::YES_BANK_RECEIVING_IFSC,
+                                                    company_id: company.id,
+                                                    purpose_id: self.purpose_id,
+                                                    parent: self.parent,
+                                                    initiating_user: user)
+    else
+      add_message :error, "Could not generate virtual account number, please try again later"
+    end
   end
 
   def success

@@ -14,6 +14,7 @@ class FinlyCollect::Base < BaseHandler
   end
 
   def parse
+    debugger
     self.parsed_response = JSON.parse(self.response&.body).with_indifferent_access rescue nil
     unless self.parsed_response&.dig(:success)
       message = self.parsed_response&.dig(:messages, :error)
