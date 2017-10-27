@@ -1,4 +1,5 @@
-class Collect::Base < BaseOperation
+class Collect::Base < BackgroundOperation
+
 
   
 end

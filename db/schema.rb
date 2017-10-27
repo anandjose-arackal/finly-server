@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171026120004) do
+ActiveRecord::Schema.define(version: 20171026153444) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -823,6 +823,19 @@ ActiveRecord::Schema.define(version: 20171026120004) do
     t.string   "city_code",  limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "collect_transaction_purposes", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "collect_transaction_virtual_account_mappings", force: :cascade do |t|
+    t.integer  "virtual_account_id",     limit: 4
+    t.integer  "transaction_purpose_id", limit: 4
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
   end
 
   create_table "companies", force: :cascade do |t|
