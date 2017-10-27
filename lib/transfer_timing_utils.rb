@@ -5,7 +5,7 @@ class TransferTimingUtils
       when "IMPS"
         return true
       when "NEFT", "RTGS"
-        return false if (DateUtils.local_date.sunday? || DateUtils.local_date.saturday?)
+        return false if (DateUtils.local_date.sunday?)
         return false if bank_holidays.include?(DateUtils.local_date.strftime("%d-%m-%Y"))
         return daily_time_range(payment_mode).cover?(DateUtils.local_date_time) # i.e. if the timestamp
       else

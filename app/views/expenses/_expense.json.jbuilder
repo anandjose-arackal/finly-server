@@ -8,6 +8,7 @@ if expense.note
     json.note expense.note
   end
 end
+json.incomplete expense.incomplete?
 
 json.receipts expense.receipts do |receipt|
   json.id receipt.id

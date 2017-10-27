@@ -1,4 +1,4 @@
-class User::Team::Mappings::Set < User::Team::Mappings::Base
+ class User::Team::Mappings::Set < User::Team::Mappings::Base
   attr_accessor :updating_mapping, :policy, :updating_records, :records_marked_for_destroy,
                 :updating_policy_config, :updating_policy_records
 

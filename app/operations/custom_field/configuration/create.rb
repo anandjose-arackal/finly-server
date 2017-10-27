@@ -24,15 +24,28 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
   end
 
   def init
-    params[:field_configuration][:company_id] = self.user.company_id
+    if params&.dig(:field_configuration, :global).present?
+      params[:field_configuration][:global] = StringUtils.to_bool params&.dig(:field_configuration, :global)
+    end
+    if params&.dig(:field_configuration, :mandatory).present?
+      params[:field_configuration][:mandatory] = StringUtils.to_bool params&.dig(:field_configuration, :mandatory)
+    end
     self.config_params = config_strong_params
-    self.default_value = params[:field_configuration][:default_value] if config_params.present? and params[:field_configuration][:default_value].present?
+    config_params[:company_id] = self.user.company_id
+    if config_params[:configurable_type]&.downcase == 'company'
+      config_params[:configurable_type] = 'Company'
+      config_params[:configurable_id] = self.user.company_id
+    end
+    self.default_value = params[:field_configuration][:default_value] if config_params.present? and params&.dig(:field_configuration, :default_value).present?
     self.config_params[:global] = !!config_params[:global]
+    if config_params[:field_type_id]&.to_i == FieldType.id_for(:text) and config_params&.has_key?(:drop_down_items_attributes)
+      config_params.delete(:drop_down_items_attributes)
+    end
   end
 
   def authorize
     if not user.company_admin? and user.policy_admin?
-      policy_id = params[:field_configuration][:configurable_id]
+      policy_id = config_params[:configurable_id]
       policies_presenter = Policy::Index.(user, view: 'admin')
       unless policies_presenter.policies.with_id(policy_id).present?
         raise_unauthorized_exception
@@ -49,8 +62,7 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
   def process
     self.field_configuration = FieldConfiguration.new config_params
     self.field_configuration.set_default_value default_value if default_value.present?
-    if self.field_configuration.save
-    else
+    unless self.field_configuration.save
       add_message :error, field_configuration.errors.full_messages
     end
   end
@@ -64,7 +76,7 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
     params.require(:field_configuration).permit(:field_name, :enabled, :field_type_id,
                                                 :mandatory, :field_parent_type_id,
                                                 :configurable, :configurable_id,
-                                                :configurable_type, :company_id, :global,
+                                                :configurable_type, :global,
                                                 drop_down_items_attributes: [:name])
   end
 

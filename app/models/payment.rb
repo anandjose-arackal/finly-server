@@ -29,6 +29,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -144,6 +145,8 @@ class Payment < ActiveRecord::Base
   scope :cash_advance, -> { where payment_purpose_id: PaymentPurpose.id_for(:cash_advance) }
   scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
   scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
+  scope :successful_and_failed_only, -> {where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)]}
+  scope :completed, -> {where payment_status_id: PaymentStatus.id_for(:completed)}
 
   scope :transfer_to_card, -> { where('(payment_type_id = ? AND receiving_account_type = ?) OR (payment_type_id = ? AND initiating_account_type = ?)',
                                       PaymentType.id_for(:credit), Payment::AccountType::CARD, PaymentType.id_for(:debit), Payment::AccountType::CARD) }
@@ -329,7 +332,7 @@ class Payment < ActiveRecord::Base
   def initiating_account_presence
     unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly, :balance_clearance_outside_finly,
                                    :personal_expense, :atm_withdrawal, :card_transaction, :advance, :corporate_balance_load,
-                                   :corporate_balance_refund, :cash_advance, :balance_clearance_against_cash_on_hand,
+                                   :corporate_balance_refund, :cash_advance, :balance_clearance_against_cash_on_hand, :settlement_against_cash_on_hand,
                                    :advance_against_report_unapproval]).include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")

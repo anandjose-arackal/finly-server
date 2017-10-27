@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171012115431) do
+ActiveRecord::Schema.define(version: 20171019083212) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1308,13 +1308,26 @@ ActiveRecord::Schema.define(version: 20171012115431) do
     t.integer  "policy_id",           limit: 4, null: false
   end
 
+  create_table "distance_expense_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "distance_expense_types", ["name"], name: "index_distance_expense_types_on_name", using: :btree
+
   create_table "distance_expenses", force: :cascade do |t|
-    t.integer  "expense_id",       limit: 4
-    t.boolean  "is_deleted",                 default: false
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
-    t.integer  "distance_id",      limit: 4
-    t.integer  "maps_distance_id", limit: 4
+    t.integer  "expense_id",                        limit: 4
+    t.boolean  "is_deleted",                                                           default: false
+    t.datetime "created_at",                                                                           null: false
+    t.datetime "updated_at",                                                                           null: false
+    t.integer  "distance_id",                       limit: 4
+    t.integer  "maps_distance_id",                  limit: 4
+    t.integer  "type_id",                           limit: 4
+    t.decimal  "odometer_reading_start",                      precision: 10, scale: 2
+    t.decimal  "odometer_reading_end",                        precision: 10, scale: 2
+    t.integer  "odometer_reading_receipt_start_id", limit: 4
+    t.integer  "odometer_reading_receipt_end_id",   limit: 4
   end
 
   add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
@@ -1498,6 +1511,7 @@ ActiveRecord::Schema.define(version: 20171012115431) do
     t.boolean  "itz_cash_d_code_enabled",                default: false
     t.boolean  "yes_bank_account"
     t.boolean  "bank_account_reimbursement"
+    t.boolean  "payroll_card_enabled",                   default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -1579,10 +1593,11 @@ ActiveRecord::Schema.define(version: 20171012115431) do
   end
 
   create_table "field_drop_down_items", force: :cascade do |t|
-    t.string   "name",                   limit: 255, null: false
-    t.integer  "field_configuration_id", limit: 4,   null: false
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
+    t.string   "name",                   limit: 255,                 null: false
+    t.integer  "field_configuration_id", limit: 4,                   null: false
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.boolean  "is_deleted",                         default: false
   end
 
   add_index "field_drop_down_items", ["field_configuration_id"], name: "index_field_drop_down_items_on_field_configuration_id", using: :btree

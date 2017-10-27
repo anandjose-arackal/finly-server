@@ -120,7 +120,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     end
     # now mark the respective bank transaction and payment as completed
     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
-    self.payment.update(payment_status_id: PaymentStatus.id_for(:completed), note: "Payment credit confirmed")
+    self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+    if self.payment.note.blank? || payment.note == 'Reimbursement processed. Awaiting credit confirmation'
+      self.payment.update(note: "Payment credit confirmed")
+    end
     self.payment.system_messages.destroy_all # deleting the previous system messages
   end
 

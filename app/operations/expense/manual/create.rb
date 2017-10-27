@@ -4,6 +4,14 @@
 class Expense::Manual::Create < Expense::Manual::Base
   attr_accessor :expense_params, :receipt
 
+  def personalizer
+    {
+        pre_validate: {
+            before: Personalizer::Process.new([:expense, :manual_create], :pre_validate, self)
+        }
+    }
+  end
+
   # only employees can create expenses
   def authorized_user_types
     [:employee]

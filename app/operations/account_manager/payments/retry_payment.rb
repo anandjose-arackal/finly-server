@@ -12,6 +12,10 @@ class AccountManager::Payments::RetryPayment < AccountManager::Base
     self.new(payment).run
   end
 
+  def init
+    self.payment_order = payment.payment_order
+  end
+
   def validate
     unless payment.failed?
       add_message :error, "Only failed payments can be retried"
@@ -47,6 +51,10 @@ class AccountManager::Payments::RetryPayment < AccountManager::Base
   end
 
   def post_process
+    # clearing the system messages for this particular payment
+    self.payment.system_messages.destroy_all
+    # update processed amount for this payment order
+    self.payment_order.update_processed_amount
     add_message :success, "Payment retry successfully executed"
   end
   

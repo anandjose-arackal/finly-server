@@ -39,19 +39,21 @@ user:
   - finance_manager
   <% end %>
   switchable_roles:
-  <% if current_user.auditor? %>
-  - name: Auditor
-    id: auditor
-  <% end %>
   <% if current_user.admin? %>
   - name: Admin
     id: admin
   <% elsif current_user.finance_manager? %>
   - name: Finance Manager
     id: finance_manager
+  <% else %>
+  <% if current_user.auditor? %>
+  - name: Auditor
+    id: auditor
   <% end %>
   - name: Personal
     id: personal
+  <% end %>
+
 
 views:
   <% if current_user.admin? %>

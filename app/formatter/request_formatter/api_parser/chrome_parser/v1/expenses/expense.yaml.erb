@@ -20,7 +20,7 @@ expense:
     sender: "<%= params[:receipt_email][:sender] %>"
     subject: "<%= YamlUtils.escape_string params[:receipt_email][:subject] %>"
     <% if params[:receipt_email][:timestamp].present? %>
-    sent_at: <%= DateTime.parse(params[:receipt_email][:timestamp]) %>
+    sent_at: <%= params[:receipt_email][:timestamp] %>
     <% end %>
     <% if params[:receipt_email][:attachments].present? %>
     receipt_email_attachments_attributes:

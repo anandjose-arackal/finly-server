@@ -72,6 +72,7 @@ class Card < ActiveRecord::Base
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
   scope :meal_cards, -> { where card_program_id: CardProgram.id_for(:meal) }
+  scope :payroll_cards, -> { where card_program_id: CardProgram.id_for(:payroll)}
   scope :non_hotlisted, -> {
     # if applied == '1'
     where hotlisted: false
@@ -81,6 +82,7 @@ class Card < ActiveRecord::Base
 
   scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
   scope :reimbursement_cards_only, -> { where card_program_id: CardProgram.id_for(:reimbursement) }
+  scope :with_proxy, -> (proxy) { where proxy: proxy }
 
   scope :filter_search, -> (term) {
     if term.present?
@@ -131,11 +133,11 @@ class Card < ActiveRecord::Base
     self.build_card_restriction(channel_atm: true,
                                 channel_ecom_pos: true,
                                 card_limits_attributes: [{period_id: 1, limit_type_id: ChannelType.id_for(:ecom_pos)},
-                                                                                                    {period_id: 2, limit_type_id: ChannelType.id_for(:ecom_pos)},
-                                                                                                    {period_id: 3, limit_type_id: ChannelType.id_for(:ecom_pos)},
-                                                                                                    {period_id: 1, limit_type_id: ChannelType.id_for(:atm)},
-                                                                                                    {period_id: 2, limit_type_id: ChannelType.id_for(:atm)},
-                                                                                                    {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
+                                                         {period_id: 2, limit_type_id: ChannelType.id_for(:ecom_pos)},
+                                                         {period_id: 3, limit_type_id: ChannelType.id_for(:ecom_pos)},
+                                                         {period_id: 1, limit_type_id: ChannelType.id_for(:atm)},
+                                                         {period_id: 2, limit_type_id: ChannelType.id_for(:atm)},
+                                                         {period_id: 3, limit_type_id: ChannelType.id_for(:atm)}]).save
 
     reload
     if card_balance_id.nil? and card_balance.nil?
