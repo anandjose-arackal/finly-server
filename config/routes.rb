@@ -973,7 +973,7 @@
 #                                                         DELETE /bank_transfer/users/:id(.:format)                                                         bank_transfer/users#destroy
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                             bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                       bank_transfer/vendor_payment_wallets#transfer_options
-#                                     public_bank_account GET    /account/:account_number(.:format)                                                         public_links#virtual_bank_account_show
+#                                     public_bank_account GET    /account/:account_number(.:format)                                                         invoicing/public_links#virtual_bank_account_show
 #                           invoicing_payment_receivables GET    /invoicing/payment_receivables(.:format)                                                   invoicing/payment_receivables#index
 #                                                         POST   /invoicing/payment_receivables(.:format)                                                   invoicing/payment_receivables#create
 #                        new_invoicing_payment_receivable GET    /invoicing/payment_receivables/new(.:format)                                               invoicing/payment_receivables#new

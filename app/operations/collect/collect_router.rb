@@ -25,11 +25,13 @@ class Collect::CollectRouter < BaseOperation
       # trigger the respective background operation that will execute the payment
       case self.purpose_id
         when VirtualAccountPurpose.id_for(:virtual_bank_account)
-          Invoicing::VirtualBankAccount::Accept.call_async(virtual_account_transaction_id: self.virtual_account_transaction.id)
+          Collect::VirtualBankAccount::Accept.call_async(self.virtual_account_transaction.id)
         when VirtualAccountPurpose.id_for(:payment_receivable)
-          Invoicing::PaymentReceivable::Accept.call_async(virtual_account_transaction_id: self.virtual_account_transaction.id)
+          Collect::PaymentReceivable::Accept.call_async(self.virtual_account_transaction.id)
         when VirtualAccountPurpose.id_for(:invoice)
-          Invoicing::Invoice::Accept.call_async(virtual_account_transaction_id: self.virtual_account_transaction.id)
+          Collect::Invoice::Accept.call_async(self.virtual_account_transaction.id)
+        when VirtualAccountPurpose.id_for(:corporate_balance_reload)
+          Collect::CorporateBalanceReload::BalanceReload.call_async(self.virtual_account_transaction.id)
         else
           # do nothing?
       end

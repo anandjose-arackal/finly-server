@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171026153444) do
+ActiveRecord::Schema.define(version: 20171027162816) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3219,6 +3219,14 @@ ActiveRecord::Schema.define(version: 20171026153444) do
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
   add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
 
+  create_table "virtual_account_collect_trails", force: :cascade do |t|
+    t.boolean  "found_virtual_account"
+    t.boolean  "update_company_balance"
+    t.boolean  "create_payment"
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "virtual_account_purposes", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -3243,6 +3251,7 @@ ActiveRecord::Schema.define(version: 20171026153444) do
     t.string   "credited_at",                limit: 255
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
+    t.integer  "virtual_account_id",         limit: 4
   end
 
   create_table "virtual_bank_accounts", force: :cascade do |t|

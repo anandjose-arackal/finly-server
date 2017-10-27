@@ -17,5 +17,10 @@ class Collect::Base < BackgroundOperation
     self.options = options
   end
 
+  def init_payment_request(purpose, company)
+    # todo - initiating resource to be finished
+    payment_request = PaymentRequest.(initiating_user, initiating_account, company.yes_bank_company_account, :credit, :virtual_account_credit)
+  end
+
   
 end

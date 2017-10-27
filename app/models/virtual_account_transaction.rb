@@ -20,12 +20,15 @@
 #  credited_at                :string(255)
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
+#  virtual_account_id         :integer
 #
 
 class VirtualAccountTransaction < ActiveRecord::Base
 
   has_one :payment, as: :reference_resource
+  belongs_to :virtual_bank_account
 
   validates :transfer_id, uniqueness: true
+
 
 end
