@@ -27,6 +27,8 @@ class VirtualBankAccount < ActiveRecord::Base
   belongs_to :company
   belongs_to :initiating_user, class_name: "User"
 
+  validates :purpose, presence: true
+
   def deactivate
     self.update(active: false)
   end

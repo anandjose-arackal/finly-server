@@ -10,4 +10,5 @@
 #
 
 class CollectTransactionVirtualAccountMapping < ActiveRecord::Base
+
 end

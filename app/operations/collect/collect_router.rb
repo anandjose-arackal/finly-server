@@ -9,22 +9,36 @@ class Collect::CollectRouter < BaseOperation
     self.virtual_account_transaction_params = transaction_params
     self.virtual_account = VirtualBankAccount.find_by(account_number: virtual_account_transaction_params[:beneficiary_account_number])
     unless self.virtual_account.blank?
-      self.purpose_id = CollectTransactionVirtualAccountMapping.find_by(virtual_account_id: self.virtual_account.id)
+      self.purpose_id = virtual_account.purpose.id
     end
   end
 
   def validate
-
+    if self.virtual_account.blank?
+      add_message :error, "Virtual Account not found"
+    end
   end
 
   def process
     self.virtual_account_transaction = VirtualAccountTransaction.new(self.virtual_account_transaction_params)
     if self.virtual_account_transaction.save
       # trigger the respective background operation that will execute the payment
-
+      case self.purpose_id
+        when VirtualAccountPurpose.id_for(:virtual_bank_account)
+          Invoicing::VirtualBankAccount::Accept.call_async(virtual_account_transaction_id: self.virtual_account_transaction.id)
+        when VirtualAccountPurpose.id_for(:payment_receivable)
+          Invoicing::PaymentReceivable::Accept.call_async(virtual_account_transaction_id: self.virtual_account_transaction.id)
+        when VirtualAccountPurpose.id_for(:invoice)
+          Invoicing::Invoice::Accept.call_async(virtual_account_transaction_id: self.virtual_account_transaction.id)
+        else
+          # do nothing?
+      end
     end
   end
 
+  def post_process
+
+  end
 
   private
 
