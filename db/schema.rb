@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171019083212) do
+ActiveRecord::Schema.define(version: 20171026144925) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2677,6 +2677,32 @@ ActiveRecord::Schema.define(version: 20171019083212) do
   add_index "report_comments", ["report_comment_action_id"], name: "index_report_comments_on_report_comment_action_id", using: :btree
   add_index "report_comments", ["report_id"], name: "index_report_comments_on_report_id", using: :btree
   add_index "report_comments", ["user_id"], name: "index_report_comments_on_user_id", using: :btree
+
+  create_table "report_processor_group_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "report_processor_group_statuses", ["name"], name: "index_report_processor_group_statuses_on_name", using: :btree
+
+  create_table "report_processor_groups", force: :cascade do |t|
+    t.integer  "status_id",                 limit: 4,                 null: false
+    t.boolean  "is_deleted",                          default: false
+    t.boolean  "payment_file_generated",              default: false
+    t.datetime "payment_file_generated_at"
+    t.datetime "completed_at"
+    t.integer  "total_amount_id",           limit: 4,                 null: false
+    t.integer  "processed_amount_id",       limit: 4
+    t.integer  "created_by_user_id",        limit: 4
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
+  end
+
+  add_index "report_processor_groups", ["created_by_user_id"], name: "index_report_processor_groups_on_created_by_user_id", using: :btree
+  add_index "report_processor_groups", ["processed_amount_id"], name: "index_report_processor_groups_on_processed_amount_id", using: :btree
+  add_index "report_processor_groups", ["status_id"], name: "index_report_processor_groups_on_status_id", using: :btree
+  add_index "report_processor_groups", ["total_amount_id"], name: "index_report_processor_groups_on_total_amount_id", using: :btree
 
   create_table "report_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false

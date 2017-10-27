@@ -2052,6 +2052,8 @@ Rails.application.routes.draw do
   get 'groups_teams', to: 'expense_types_configuration#groups_teams'
   get 'expense_filters', to: 'expense_types_configuration#expense_filters'
 
+  get 'settlements/reports/pending', to: 'settlement/report#pending_index'
+
   resources :per_diems
 
   resources :card_transactions do

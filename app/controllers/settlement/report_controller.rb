@@ -1,7 +1,10 @@
 class Settlement::ReportController < ApplicationController
 
-  def pending_index
+  before_action -> { finly_authorize! :web }
 
+  def pending_index
+    @result = Settlement::SReport::Pending::Index.(current_user, params)
+    respond
   end
 
   def create_processing

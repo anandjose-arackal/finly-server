@@ -1,4 +1,4 @@
-class Settlement::Report::Index < Settlement::Report::Base
+class Settlement::SReport::Pending::Index < Settlement::SReport::Pending::Base
   attr_accessor :reports
 
   def authorized_user_types
@@ -20,5 +20,19 @@ class Settlement::Report::Index < Settlement::Report::Base
     end
     self.reports = reports_presenter.reports.approved
   end
+
+  def success
+    params[:reports] = self.reports
+    Settlement::SReport::Pending::Index::SuccessPresenter.new(user, params, messages)
+  end
+
+  class Settlement::SReport::Pending::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :reports
+
+    def init
+      self.reports = params[:reports]
+    end
+  end
+
 
 end
