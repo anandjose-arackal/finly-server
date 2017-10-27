@@ -525,6 +525,11 @@ class User < ActiveRecord::Base
 
   alias_method :vendor_payments_initiator?, :vendor_payment_initiator?
 
+  def collect_admin?
+    self.role_mapping.invoicing.admin.present?
+  end
+
+  alias_method :invoicing_admin?, :collect_admin?
 
   def expense_management_enabled?
     self.user_panel_subscription.expense_management

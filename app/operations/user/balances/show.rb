@@ -53,6 +53,8 @@ class User::Balances::Show < User::Base
         if selected_user.cards.present?
           set_card_balances
         end
+      when 'fc'
+
       else
         # do nothing?
     end
@@ -179,6 +181,17 @@ class User::Balances::Show < User::Base
         type: "bank",
         balance: self.wallet_info[:yes_bank][:balance]
     }
+  end
+
+  def set_collect_balances
+    if selected_user.collect_admin?
+      self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
+      self.balances[:company_credits] << {
+          name: "Finly Collect Credits",
+          type: "bank",
+          balance: self.company_credits_info[:yes_bank][:balance]
+      }
+    end
   end
 
   def set_card_balances
