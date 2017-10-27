@@ -32,21 +32,6 @@
 #
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -103,7 +88,7 @@ class Report < ActiveRecord::Base
   scope :with_reimbursable_expenses_total, -> { joins :reimbursable_expenses_total }
   scope :with_non_reimbursable_expenses_total, -> { joins :non_reimbursable_expenses_total }
   scope :with_card_expenses_total, -> { joins :card_expenses_total }
-  scope :with_status_id, ->(id) {where report_status_id: id}
+  scope :with_status_id, ->(id) { where report_status_id: id }
   scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }
@@ -122,7 +107,7 @@ class Report < ActiveRecord::Base
   scope :pending_settlement, -> { where(report_status_id: ReportStatus.approved_id).where(accounted: false) }
   scope :with_controlling_user_id, ->(user_id) { where controlling_user_id: user_id }
 
-  scope :unsubmitted, -> { where(report_status_id: [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:retracted)] ) }
+  scope :unsubmitted, -> { where(report_status_id: [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:retracted)]) }
 
   scope :with_approved_at_range, -> (start_time, end_time) { where('approved_at >= ? and approved_at <= ?', start_time, end_time) }
 
@@ -155,17 +140,19 @@ class Report < ActiveRecord::Base
   end
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
-  scope :sort_for_personal, -> { joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
+  scope :sort_for_personal, -> { joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC') }
 
-  scope :awaiting_approval_of_user, ->(user_id, role_id){ where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
+  scope :awaiting_approval_of_user, ->(user_id, role_id) { where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
 
-  scope :includes_export, -> { includes({expenses:[:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
-                                               :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
-                                               {card_expense: [custom_fields: [:field_configuration]]},
-                                               {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},
-                                               {time_expense: [custom_fields: [:field_configuration]]},
-                                               {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
-                                               {amount: [:currency]}, :expense_status]}, :status, policy: [distance_expense_config: [:rate]]) }
+  scope :includes_export, -> { includes({expenses: [:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
+                                                    :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
+                                                    {card_expense: [custom_fields: [:field_configuration]]},
+                                                    {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},
+                                                    {time_expense: [custom_fields: [:field_configuration]]},
+                                                    {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
+                                                    {amount: [:currency]}, :expense_status]}, :status, policy: [distance_expense_config: [:rate]]) }
+
+  scope :includes_user, -> { includes :user }
 
   delegate :status_name, to: :status
 
