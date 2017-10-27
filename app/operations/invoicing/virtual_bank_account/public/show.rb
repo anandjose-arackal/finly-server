@@ -3,7 +3,7 @@ class Invoicing::VirtualBankAccount::Public::Show < Invoicing::VirtualBankAccoun
   attr_accessor :virtual_bank_account
 
   def init
-    acc_number = params[:virtual_account_number]
+    acc_number = params[:account_number]
     self.virtual_bank_account = ::VirtualBankAccount.find_by(account_number: acc_number)
   end
 
