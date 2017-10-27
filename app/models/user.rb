@@ -545,6 +545,10 @@ class User < ActiveRecord::Base
 
   alias_method :vendor_payment_enabled?, :vendor_payments_enabled?
 
+  def invoicing_system_enabled?
+    self.user_panel_subscription.invoicing_system
+  end
+
   def has_role?(role_id)
     return false unless role_id.present?
     mapping = role_mapping
