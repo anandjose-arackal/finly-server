@@ -203,7 +203,7 @@ class User::Balances::Show < User::Base
     # adding cash on hand
     self.balances[:cash_on_hand] = [] if self.balances[:cash_on_hand].blank?
     self.balances[:cash_on_hand] << {
-        name: "Cash On Hand",
+        name: "Available Cash On Hand",
         type: "cash",
         balance: self.cash_on_hand_info[:itz_cash][:balance]
     }
