@@ -6,7 +6,7 @@ class Invoicing::VirtualBankAccount::Base < BaseOperation
 
     def init
       self.virtual_bank_account = params[:virtual_bank_account]
-      self.company = user.company
+      self.company = virtual_bank_account.company
     end
 
   end

@@ -4,7 +4,7 @@ class Invoicing::VirtualBankAccount::Public::Show < Invoicing::VirtualBankAccoun
 
   def init
     acc_number = params[:virtual_account_number]
-    self.virtual_bank_account = VirtualBankAccount.find_by(account_number: acc_number)
+    self.virtual_bank_account = ::VirtualBankAccount.find_by(account_number: acc_number)
   end
 
   def process

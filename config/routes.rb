@@ -2321,7 +2321,7 @@ Rails.application.routes.draw do
   end
 
 
-  get 'account/:account_number', to: 'public_links#virtual_bank_account_show', as: :public_bank_account
+  get 'account/:account_number', to: 'invoicing/public_links#virtual_bank_account_show', as: :public_bank_account
 
   namespace :invoicing do
 
