@@ -34,6 +34,7 @@ class Policy::Create < Policy::Base
     cloned_policy.name = params[:name]
     cloned_policy.description = ''
     cloned_policy.default = false
+    cloned_policy.application = current_app
     if cloned_policy.save
       self.policy = cloned_policy
       return true

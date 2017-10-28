@@ -7,6 +7,7 @@
 #  field_configuration_id :integer          not null
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  is_deleted             :boolean          default(FALSE)
 #
 
 class FieldDropDownItem < ActiveRecord::Base
