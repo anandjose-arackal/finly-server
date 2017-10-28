@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027162816) do
+ActiveRecord::Schema.define(version: 20171028071936) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2310,6 +2310,7 @@ ActiveRecord::Schema.define(version: 20171027162816) do
     t.datetime "updated_at",                                 null: false
     t.string   "email",                        limit: 255
     t.integer  "payment_receivable_status_id", limit: 4
+    t.integer  "payment_id",                   limit: 4
   end
 
   add_index "payment_receivables", ["amount_id"], name: "index_payment_receivables_on_amount_id", using: :btree

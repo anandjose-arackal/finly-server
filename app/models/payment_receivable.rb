@@ -13,6 +13,7 @@
 #  updated_at                   :datetime         not null
 #  email                        :string(255)
 #  payment_receivable_status_id :integer
+#  payment_id                   :integer
 #
 
 class PaymentReceivable < ActiveRecord::Base
@@ -24,6 +25,7 @@ class PaymentReceivable < ActiveRecord::Base
   belongs_to :payment_receivable_status
 
   has_one :virtual_bank_account, as: :parent, dependent: :destroy
+  has_one :payment
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :customer

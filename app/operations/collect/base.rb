@@ -1,6 +1,6 @@
 class Collect::Base < BackgroundOperation
 
-  attr_accessor :virtual_account_transaction, :options
+  attr_accessor :virtual_account_transaction, :options, :virtual_account
 
   def self.call(virtual_account_transaction, options = {})
     self.new(virtual_account_transaction, options).run
@@ -19,7 +19,11 @@ class Collect::Base < BackgroundOperation
 
   def init_payment_request(purpose, company)
     # todo - initiating resource to be finished
-    payment_request = PaymentRequest.(initiating_user, initiating_account, company.yes_bank_company_account, :credit, :virtual_account_credit)
+    initiating_account = self.virtual_account
+    initiating_user = nil
+    payment_request = PaymentRequest.(initiating_user, initiating_account, company.yes_bank_company_account.class.name, :credit, :virtual_account_credit)
+    payment_request.add_payment_item(PaymentRequest::PaymentItem.(nil, company.yes_bank_company_account, self.virtual_account_transaction.transfer_amount))
+    payment_request
   end
 
   
