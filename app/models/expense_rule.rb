@@ -79,7 +79,7 @@ class ExpenseRule < ActiveRecord::Base
   # todo - look for a more elegant way to do this. Shitty code.
   # make sure no rule has all attributes the same
   def no_duplicates
-    self.policy.expense_rules.each do |rule|
+    self.policy.expense_rules.exclude_deleted.each do |rule|
       if not rule.id == self.id and rule.amount_value == self.amount_value and rule.category_id == self.category_id and rule.days_after == self.days_after and rule.expense_rule_type_id == self.expense_rule_type_id and rule.rule_type_id == self.rule_type_id
         errors.add(:rule, 'already exists. Please try again.')
       end
