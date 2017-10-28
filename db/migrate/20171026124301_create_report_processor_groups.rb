@@ -15,6 +15,8 @@ class CreateReportProcessorGroups < ActiveRecord::Migration
       t.integer :total_amount_id, references: 'Amount', null: false, foreign_key: true, index: true
       t.integer :processed_amount_id, references: 'Amount', foreign_key: true, index: true
       t.integer :created_by_user_id, references: 'User', index: true, foreign_key: true
+      t.string :transfer_account_type
+      t.string :transfer_account_mode
 
       t.timestamps null: false
     end
