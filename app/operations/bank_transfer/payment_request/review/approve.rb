@@ -8,7 +8,6 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
 
   def init
     super
-
   end
 
   def validate
