@@ -92,4 +92,14 @@ class Mobile::V2::ExpensesController < ApplicationController
     end
   end
 
+  def destroy
+    @result = Expense::Destroy.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond render: 'mobile/v0/shared/success'
+    else
+      respond render: 'mobile/v0/shared/failure'
+    end
+  end
+
 end

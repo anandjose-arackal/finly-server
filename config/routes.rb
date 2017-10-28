@@ -1747,6 +1747,7 @@ Rails.application.routes.draw do
 
     namespace :v2 do
       get 'available_expense_types', to: 'expenses#available_expense_types'
+      resources :expenses, only: [:index, :show, :create, :update, :destroy]
     end
   end
 
