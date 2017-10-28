@@ -1,27 +1,26 @@
-class Personalizer::Adapters::Company2::ExportTemplates2::Tally < Personalizer::Adapters::ExportBase
+class Integrations::Tally::Vouchers < Integrations::Tally::Base
   attr_accessor :expenses
 
-  has_scope :filter_date, using: [:from, :to], type: :hash
-
   def pre_validate
-
+    unless user.present?
+      add_message :error, 'User not found'
+      return
+    end
   end
 
   def process
-    users_presenter = User::Index.(user, params)
-    unless users_presenter&.success?
-      add_message :error, users_presenter.messages[:error]
+    reports_presenter = Report::Index.(user, params)
+    unless reports_presenter&.success?
+      add_message :error, reports_presenter.messages[:error]
       return
     end
-    users = users_presenter.team
-    user_ids = users.pluck(:id)
-    reports = apply_scopes Report.with_user_id(user_ids).processed
+    reports = reports_presenter.reports
     report_ids = reports.pluck(:id)
     self.expenses = Expense.with_report_id(report_ids)
   end
 
   def success
-    current_class_path = self.method(:success).source_location.first.gsub('/tally.rb', '')
+    current_class_path = self.method(:success).source_location.first.gsub('/vouchers.rb', '')
     template = "#{current_class_path}/tally.xml"
     Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses}}}, messages)
   end

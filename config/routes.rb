@@ -2225,6 +2225,11 @@ Rails.application.routes.draw do
   patch 'quickbooks/sync_users', to: 'quickbooks#sync_users', as: :sync_users
   get 'quickbooks/config', to: 'quickbooks#show', as: :quickbooks_config
 
+  namespace :integration do
+    get 'tally/vouchers', to: 'tally#vouchers'
+  end
+
+
   get 'tos', to: 'static_pages#tos'
   get 'privacy', to: 'static_pages#privacy'
   get 'prepaid_card_agreement', to: 'static_pages#prepaid_card_agreement'
