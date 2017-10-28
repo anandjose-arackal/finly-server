@@ -29,6 +29,11 @@ class VirtualBankAccount < ActiveRecord::Base
 
   validates :purpose, presence: true
 
+  scope :cash_on_hand_returns, -> { where purpose_id: VirtualAccountPurpose.id_for(:cash_on_hand_return) }
+  scope :payment_receivables, -> { where purpose_id: VirtualAccountPurpose.id_for(:payment_receivable) }
+  scope :virtual_bank_accounts, -> { where purpose_id: VirtualAccountPurpose.id_for(:virtual_bank_account) }
+  scope :invoices, -> { where purpose_id: VirtualAccountPurpose.id_for(:invoice) }
+
   def deactivate
     self.update(active: false)
   end

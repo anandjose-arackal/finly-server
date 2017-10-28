@@ -18,7 +18,7 @@ class VirtualAccountPurpose < ActiveRecord::Base
   # corporate balance reload - when a company wants to reload their yes bank account
 
   def self.values
-    [:cash_on_hand_reversal, :payment_receivable, :invoice, :virtual_bank_account, :corporate_account_reload]
+    [:cash_on_hand_return, :payment_receivable, :invoice, :virtual_bank_account, :corporate_account_reload]
   end
 
 end
