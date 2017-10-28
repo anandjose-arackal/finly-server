@@ -7,8 +7,7 @@ class Personalizer::Adapters::Company2::ExportTemplates2::Config
             name: 'Tally',
             description: 'Tally exportable format. Exports expenses',
             formats: [
-                {name: 'Export as Excel', extension: 'xls'},
-                {name: 'Export as CSV', extension: 'csv'}
+                {name: 'Export as XML', extension: 'xml'},
             ]
             # formats: [:xls, :csv]
         }
