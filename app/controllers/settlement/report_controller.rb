@@ -7,6 +7,11 @@ class Settlement::ReportController < ApplicationController
     respond
   end
 
+  def init_processing
+    @result = Settlement::SReport::Processing::Init.(current_user, params)
+    respond
+  end
+
   def create_processing
 
   end

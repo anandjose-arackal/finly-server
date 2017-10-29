@@ -1,5 +1,17 @@
 class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::Base
-  attr_accessor :payment_mode, :reports, :user_reports
+  attr_accessor :payment_mode, :reports, :user_reports, :expenses_total, :reimbursement_total, :user_count
+
+  class Settlement::SReport::Processing::Init::Success < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :details,:expenses_total, :reimbursement_total, :user_count
+
+    def init
+      self.details = params[:details]
+      self.expenses_total = params[:expenses_total]
+      self.reimbursement_total = params[:reimbursement_total]
+      self.user_count = params[:user_count]
+    end
+
+  end
 
   def authorized_user_types
     [:admin, :finance_manager]
@@ -41,8 +53,12 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
     end
   end
 
-  def process
-
+  def success
+    params[:details] = self.user_reports
+    params[:expenses_total] = self.expenses_total
+    params[:reimbursement_total] = self.reimbursement_total
+    params[:user_count] = self.user_count
+    Settlement::SReport::Processing::Init::Success.new(user, params, messages)
   end
 
   protected
@@ -57,11 +73,17 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
     expenses_totals = self.reports.group_user.expenses_total
     reimbursable_totals = self.reports.group_user.expenses_reimbursable_total
     self.user_reports = []
+    self.reimbursement_total = 0
+    self.expenses_total = 0
+    self.user_count = 0
     expenses_totals.each do |user, total|
+      self.user_count += 1
+      self.reimbursement_total += (reimbursable_totals[user] || 0)
+      self.expenses_total += total
       user_reports << {
           user: user,
-          reports_total: total,
-          reimbursable_total: reimbursable_totals[user],
+          expenses_total: total,
+          reimbursement_total: reimbursable_totals[user],
           reports: self.reports.with_user_id(user.id),
           has_errors: false
       }
