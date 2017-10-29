@@ -32,6 +32,7 @@
 #
 
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -106,6 +107,12 @@ class Report < ActiveRecord::Base
   scope :without_payment, -> { where reimbursement_id: nil }
   scope :pending_settlement, -> { where(report_status_id: ReportStatus.approved_id).where(accounted: false) }
   scope :with_controlling_user_id, ->(user_id) { where controlling_user_id: user_id }
+  scope :expenses_total, -> { joins(expenses: :amount).sum(:value) }
+  scope :expenses_reimbursable_total, -> { joins(expenses: :amount).where('expenses.reimbursable = true').sum('amounts.value') }
+  scope :group_user_id, -> { group :user_id }
+  scope :group_user, -> { group :user }
+  scope :joins_user, -> { joins  :user }
+  scope :include_reimbursable_user_accounts, -> { includes user: [:bank_accounts, :reimbursement_cards] }
 
   scope :unsubmitted, -> { where(report_status_id: [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:retracted)]) }
 

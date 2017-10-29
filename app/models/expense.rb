@@ -332,6 +332,8 @@ class Expense < ActiveRecord::Base
                                         {time_expense: [custom_fields: [:field_configuration]]},
                                         {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
                                         {amount: [:currency]}, :expense_status) }
+  scope :includes_amount, -> { includes :amount }
+  scope :sum_amounts, -> { includes_amount.sum('amounts.value') }
 
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount

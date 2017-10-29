@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171026144925) do
+ActiveRecord::Schema.define(version: 20171027180834) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2678,6 +2678,20 @@ ActiveRecord::Schema.define(version: 20171026144925) do
   add_index "report_comments", ["report_id"], name: "index_report_comments_on_report_id", using: :btree
   add_index "report_comments", ["user_id"], name: "index_report_comments_on_user_id", using: :btree
 
+  create_table "report_processor_group_mappings", force: :cascade do |t|
+    t.integer  "processor_group_id", limit: 4,   null: false
+    t.integer  "user_id",            limit: 4,   null: false
+    t.integer  "account_id",         limit: 4,   null: false
+    t.string   "account_type",       limit: 255, null: false
+    t.integer  "amount_id",          limit: 4,   null: false
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "report_processor_group_mappings", ["amount_id"], name: "index_report_processor_group_mappings_on_amount_id", using: :btree
+  add_index "report_processor_group_mappings", ["processor_group_id"], name: "index_report_processor_group_mappings_on_processor_group_id", using: :btree
+  add_index "report_processor_group_mappings", ["user_id"], name: "index_report_processor_group_mappings_on_user_id", using: :btree
+
   create_table "report_processor_group_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -3369,6 +3383,8 @@ ActiveRecord::Schema.define(version: 20171026144925) do
   add_foreign_key "report_comments", "report_comment_actions"
   add_foreign_key "report_comments", "reports"
   add_foreign_key "report_comments", "users"
+  add_foreign_key "report_processor_group_mappings", "amounts"
+  add_foreign_key "report_processor_group_mappings", "users"
   add_foreign_key "report_tracks", "report_statuses"
   add_foreign_key "report_tracks", "report_tracking_actions"
   add_foreign_key "report_tracks", "reports"

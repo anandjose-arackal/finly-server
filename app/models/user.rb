@@ -49,12 +49,6 @@
 #
 
 
-
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -112,6 +106,12 @@ class User < ActiveRecord::Base
   has_many :bank_accounts, as: :account_owner
   has_many :authentications
   has_many :cards, dependent: :destroy
+  has_many :payroll_cards, -> { where(card_program_id: CardProgram.id_for(:payroll)) }, class_name: 'Card'
+  has_many :reimbursement_cards, -> { where(card_program_id: CardProgram.id_for(:reimbursement)) }, class_name: 'Card'
+  has_many :reimbursement_payroll_cards, -> { where(card_program_id: [CardProgram.id_for(:reimbursement), CardProgram.id_for(:payroll)]) }, class_name: 'Card'
+  has_many :meal_cards, -> { where(card_program_id: CardProgram.id_for(:meal)) }, class_name: 'Card'
+  has_many :medical_cards, -> { where(card_program_id: CardProgram.id_for(:medical)) }, class_name: 'Card'
+  has_many :expense_cards, -> { where(card_program_id: CardProgram.id_for(:expense)) }, class_name: 'Card'
   has_many :card_transactions, dependent: :destroy
   has_many :money_requests
   has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
@@ -252,7 +252,7 @@ class User < ActiveRecord::Base
   # scope :filter_search, -> (term) { where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_search, ->(term) do
     ids = self.where("first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ? or mobile_number like ?",
-                      "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+                     "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
     ids += self.joins(:cards).where('proxy like ?', "%#{term}%")
     ids.uniq!
     self.where(id: ids)
@@ -497,7 +497,7 @@ class User < ActiveRecord::Base
     self.role_mapping.vendor_payments.manager.present?
   end
 
-  alias_method :vendor_payments_manager? , :vendor_payment_manager?
+  alias_method :vendor_payments_manager?, :vendor_payment_manager?
 
   alias_method :vendor_payment_reviewer?, :vendor_payment_manager?
   alias_method :vendor_payments_reviewer?, :vendor_payment_manager?
@@ -514,7 +514,7 @@ class User < ActiveRecord::Base
     self.role_mapping.vendor_payments.admin.present?
   end
 
-  alias_method :vendor_payments_admin? , :vendor_payment_admin?
+  alias_method :vendor_payments_admin?, :vendor_payment_admin?
 
   def vendor_payment_initiator?
     self.role_mapping.vendor_payments.initiator.present?
