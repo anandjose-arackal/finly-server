@@ -2,6 +2,7 @@ json.array! @result.reports do |report|
 
   json.extract! report, :id, :name
   json.user do
+    json.id report.user_id
     json.name report.user.name
     json.email report.user.email
     json.mobile_number report.user.mobile_number

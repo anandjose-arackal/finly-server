@@ -13,7 +13,8 @@ class Settlement::ReportController < ApplicationController
   end
 
   def create_processing
-
+    @result = Settlement::SReport::Processing::Create.(current_user, params)
+    respond
   end
 
   def processing_index

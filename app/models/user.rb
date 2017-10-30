@@ -49,6 +49,7 @@
 #
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -198,6 +199,7 @@ class User < ActiveRecord::Base
   scope :with_vendor_payments_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
   scope :with_expense_management_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
   scope :include_all_accounts_with_balance, -> { includes(cards: [:card_balance], wallet: [:balance], cash_on_hand: [:balance], bank_wallet: [:balance]) }
+  scope :include_reimbursable_accounts, -> { includes :bank_accounts, :reimbursement_cards }
 
   # Users having cards assigned with the given program
   scope :with_cards_having_card_program, ->(id) do

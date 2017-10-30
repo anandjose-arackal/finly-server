@@ -48,6 +48,7 @@ class Company < ActiveRecord::Base
   has_many :yes_bank_vendors
   has_many :bank_accounts
   has_many :quickbooks_departments
+  has_many :report_processor_groups
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property

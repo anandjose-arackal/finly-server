@@ -7,10 +7,15 @@
 #  is_deleted                :boolean          default(FALSE)
 #  payment_file_generated    :boolean          default(FALSE)
 #  payment_file_generated_at :datetime         default(NULL)
+#  scheduled_at              :date
 #  completed_at              :datetime
 #  total_amount_id           :integer          not null
 #  processed_amount_id       :integer
 #  created_by_user_id        :integer
+#  source_account_id         :integer
+#  source_account_type       :string(255)
+#  payment_mode              :string(255)
+#  company_id                :integer
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #

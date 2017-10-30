@@ -29,7 +29,10 @@
 #  card_expenses_total_id             :integer
 #  non_reimbursable_expenses_total_id :integer
 #  sync_status_id                     :integer
+#  report_processor_group_mapping_id  :integer
 #
+
+
 
 
 
@@ -58,6 +61,7 @@ class Report < ActiveRecord::Base
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
   belongs_to :sync_status, class_name: "ReportSyncStatus"
+  belongs_to :report_processor_group_mapping
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 

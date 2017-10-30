@@ -11,12 +11,15 @@ class CreateReportProcessorGroups < ActiveRecord::Migration
       t.boolean :is_deleted, default: false
       t.boolean :payment_file_generated, default: false
       t.datetime :payment_file_generated_at, default: false
+      t.date :scheduled_at, index: true
       t.datetime :completed_at
       t.integer :total_amount_id, references: 'Amount', null: false, foreign_key: true, index: true
       t.integer :processed_amount_id, references: 'Amount', foreign_key: true, index: true
       t.integer :created_by_user_id, references: 'User', index: true, foreign_key: true
-      t.string :transfer_account_type
-      t.string :transfer_account_mode
+      t.integer :source_account_id, index: true
+      t.string :source_account_type, index: true
+      t.string :payment_mode
+      t.references :company, index: true, foreign_key: true, null: false
 
       t.timestamps null: false
     end

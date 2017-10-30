@@ -1,5 +1,5 @@
 class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::Base
-  attr_accessor :payment_mode, :reports, :user_reports, :expenses_total, :reimbursement_total, :user_count
+  attr_accessor :payment_type, :reports, :user_reports, :expenses_total, :reimbursement_total, :user_count
 
   class Settlement::SReport::Processing::Init::Success < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :details,:expenses_total, :reimbursement_total, :user_count
@@ -26,17 +26,17 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
       add_message :error, 'Report not found'
       return
     end
-    if params&.dig(:payment_mode).blank?
-      add_message :error, 'Payment Mode not found'
+    if params&.dig(:payment_type).blank?
+      add_message :error, 'Payment Type not found'
       return
     end
   end
 
   def init
-    self.payment_mode = params[:payment_mode]
+    self.payment_type = params[:payment_type]
     init_reports
     return if has_errors?
-    case self.payment_mode
+    case self.payment_type
       when 'bank_transfer'
         init_bank_transfer
       when 'reimbursement_card'
@@ -69,7 +69,7 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
       add_message :error, message
       return
     end
-    self.reports = reports_presenter.reports.include_reimbursable_user_accounts
+    self.reports = reports_presenter.reports.approved.include_reimbursable_user_accounts
     expenses_totals = self.reports.group_user.expenses_total
     reimbursable_totals = self.reports.group_user.expenses_reimbursable_total
     self.user_reports = []
@@ -98,7 +98,6 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
       if bank_accounts.blank?
         details[:has_error] = true
         details[:errors] = 'User has not added a bank account'
-        return
       end
     end
   end

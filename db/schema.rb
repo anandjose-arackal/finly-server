@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171027180834) do
+ActiveRecord::Schema.define(version: 20171030154048) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2679,13 +2679,13 @@ ActiveRecord::Schema.define(version: 20171027180834) do
   add_index "report_comments", ["user_id"], name: "index_report_comments_on_user_id", using: :btree
 
   create_table "report_processor_group_mappings", force: :cascade do |t|
-    t.integer  "processor_group_id", limit: 4,   null: false
-    t.integer  "user_id",            limit: 4,   null: false
-    t.integer  "account_id",         limit: 4,   null: false
-    t.string   "account_type",       limit: 255, null: false
-    t.integer  "amount_id",          limit: 4,   null: false
-    t.datetime "created_at",                     null: false
-    t.datetime "updated_at",                     null: false
+    t.integer  "processor_group_id",         limit: 4,   null: false
+    t.integer  "user_id",                    limit: 4,   null: false
+    t.integer  "processor_accountable_id",   limit: 4,   null: false
+    t.string   "processor_accountable_type", limit: 255, null: false
+    t.integer  "amount_id",                  limit: 4,   null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
   end
 
   add_index "report_processor_group_mappings", ["amount_id"], name: "index_report_processor_group_mappings_on_amount_id", using: :btree
@@ -2701,20 +2701,29 @@ ActiveRecord::Schema.define(version: 20171027180834) do
   add_index "report_processor_group_statuses", ["name"], name: "index_report_processor_group_statuses_on_name", using: :btree
 
   create_table "report_processor_groups", force: :cascade do |t|
-    t.integer  "status_id",                 limit: 4,                 null: false
-    t.boolean  "is_deleted",                          default: false
-    t.boolean  "payment_file_generated",              default: false
+    t.integer  "status_id",                 limit: 4,                   null: false
+    t.boolean  "is_deleted",                            default: false
+    t.boolean  "payment_file_generated",                default: false
     t.datetime "payment_file_generated_at"
+    t.date     "scheduled_at"
     t.datetime "completed_at"
-    t.integer  "total_amount_id",           limit: 4,                 null: false
+    t.integer  "total_amount_id",           limit: 4,                   null: false
     t.integer  "processed_amount_id",       limit: 4
     t.integer  "created_by_user_id",        limit: 4
-    t.datetime "created_at",                                          null: false
-    t.datetime "updated_at",                                          null: false
+    t.integer  "source_account_id",         limit: 4
+    t.string   "source_account_type",       limit: 255
+    t.string   "payment_mode",              limit: 255
+    t.integer  "company_id",                limit: 4,                   null: false
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
   end
 
+  add_index "report_processor_groups", ["company_id"], name: "index_report_processor_groups_on_company_id", using: :btree
   add_index "report_processor_groups", ["created_by_user_id"], name: "index_report_processor_groups_on_created_by_user_id", using: :btree
   add_index "report_processor_groups", ["processed_amount_id"], name: "index_report_processor_groups_on_processed_amount_id", using: :btree
+  add_index "report_processor_groups", ["scheduled_at"], name: "index_report_processor_groups_on_scheduled_at", using: :btree
+  add_index "report_processor_groups", ["source_account_id"], name: "index_report_processor_groups_on_source_account_id", using: :btree
+  add_index "report_processor_groups", ["source_account_type"], name: "index_report_processor_groups_on_source_account_type", using: :btree
   add_index "report_processor_groups", ["status_id"], name: "index_report_processor_groups_on_status_id", using: :btree
   add_index "report_processor_groups", ["total_amount_id"], name: "index_report_processor_groups_on_total_amount_id", using: :btree
 
@@ -2786,6 +2795,7 @@ ActiveRecord::Schema.define(version: 20171027180834) do
     t.integer  "card_expenses_total_id",             limit: 4
     t.integer  "non_reimbursable_expenses_total_id", limit: 4
     t.integer  "sync_status_id",                     limit: 4
+    t.integer  "report_processor_group_mapping_id",  limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -2794,6 +2804,7 @@ ActiveRecord::Schema.define(version: 20171027180834) do
   add_index "reports", ["controlling_user_role_id"], name: "index_reports_on_controlling_user_role_id", using: :btree
   add_index "reports", ["name"], name: "index_reports_on_name", using: :btree
   add_index "reports", ["policy_id"], name: "index_reports_on_policy_id", using: :btree
+  add_index "reports", ["report_processor_group_mapping_id"], name: "index_reports_on_report_processor_group_mapping_id", using: :btree
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree
 
@@ -3385,10 +3396,12 @@ ActiveRecord::Schema.define(version: 20171027180834) do
   add_foreign_key "report_comments", "users"
   add_foreign_key "report_processor_group_mappings", "amounts"
   add_foreign_key "report_processor_group_mappings", "users"
+  add_foreign_key "report_processor_groups", "companies"
   add_foreign_key "report_tracks", "report_statuses"
   add_foreign_key "report_tracks", "report_tracking_actions"
   add_foreign_key "report_tracks", "reports"
   add_foreign_key "reports", "policies"
+  add_foreign_key "reports", "report_processor_group_mappings"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
   add_foreign_key "time_expenses", "expenses"

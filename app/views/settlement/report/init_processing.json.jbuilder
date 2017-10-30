@@ -5,6 +5,7 @@ json.details do
   json.array! @result.details do |detail|
     json.user do
       user = detail[:user]
+      json.id user.id
       json.name user.name
       json.email user.email
       json.mobile_number user.mobile_number
@@ -16,6 +17,7 @@ json.details do
     json.reports_count reports.size
     json.reports do
       json.array! reports do |report|
+        json.id report.id
         json.name report.name
         final_approver = report.final_approver
         json.auto_approved final_approver.blank?
