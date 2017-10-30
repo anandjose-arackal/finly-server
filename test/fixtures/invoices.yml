@@ -1,0 +1,44 @@
+# == Schema Information
+#
+# Table name: invoices
+#
+#  id               :integer          not null, primary key
+#  address_id       :integer
+#  date             :date
+#  due_date         :date
+#  invoice_number   :string(255)
+#  SGST             :decimal(10, )
+#  CGST             :decimal(10, )
+#  IGST             :decimal(10, )
+#  tax_type_id      :integer
+#  discount         :decimal(10, )
+#  discount_type_id :integer
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  address_id: 
+  date: 2017-10-30
+  due_date: 2017-10-30
+  invoice_number: MyString
+  SGST: 9.99
+  CGST: 9.99
+  IGST: 9.99
+  tax_type_id: 1
+  discount: 9.99
+  discount_type_id: 1
+
+two:
+  address_id: 
+  date: 2017-10-30
+  due_date: 2017-10-30
+  invoice_number: MyString
+  SGST: 9.99
+  CGST: 9.99
+  IGST: 9.99
+  tax_type_id: 1
+  discount: 9.99
+  discount_type_id: 1

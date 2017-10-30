@@ -52,6 +52,7 @@ class Payment < ActiveRecord::Base
   has_many :finly_transactions
 
   has_one :payment, as: :reference_resource
+  has_one :invoice
 
   belongs_to :payment_order
   belongs_to :payment_status
@@ -65,6 +66,7 @@ class Payment < ActiveRecord::Base
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :receiving_account
+  accepts_nested_attributes_for :invoice
 
   delegate :amount_value, to: :amount
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171030055325) do
+ActiveRecord::Schema.define(version: 20171030150835) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -27,6 +27,20 @@ ActiveRecord::Schema.define(version: 20171030055325) do
   add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
   add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
+
+  create_table "addresses", force: :cascade do |t|
+    t.text     "line_1",     limit: 65535
+    t.text     "line_2",     limit: 65535
+    t.text     "line_3",     limit: 65535
+    t.string   "city",       limit: 255
+    t.integer  "state_id",   limit: 4
+    t.string   "name",       limit: 255
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+    t.string   "pin_code",   limit: 255
+  end
+
+  add_index "addresses", ["state_id"], name: "index_addresses_on_state_id", using: :btree
 
   create_table "admin_review_workflow_levels", force: :cascade do |t|
     t.integer  "admin_review_workflow_id", limit: 4,                 null: false
@@ -1767,6 +1781,25 @@ ActiveRecord::Schema.define(version: 20171030055325) do
   add_index "individual_kycs", ["company_id"], name: "index_individual_kycs_on_company_id", using: :btree
   add_index "individual_kycs", ["user_id"], name: "index_individual_kycs_on_user_id", using: :btree
 
+  create_table "invoices", force: :cascade do |t|
+    t.integer  "address_id",       limit: 4
+    t.date     "date"
+    t.date     "due_date"
+    t.string   "invoice_number",   limit: 255
+    t.decimal  "SGST",                         precision: 10
+    t.decimal  "CGST",                         precision: 10
+    t.decimal  "IGST",                         precision: 10
+    t.integer  "tax_type_id",      limit: 4
+    t.decimal  "discount",                     precision: 10
+    t.integer  "discount_type_id", limit: 4
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+  end
+
+  add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
+  add_index "invoices", ["discount_type_id"], name: "index_invoices_on_discount_type_id", using: :btree
+  add_index "invoices", ["tax_type_id"], name: "index_invoices_on_tax_type_id", using: :btree
+
   create_table "itz_cash_card_programs", force: :cascade do |t|
     t.string   "product_code", limit: 255
     t.string   "charge_code",  limit: 255
@@ -2593,6 +2626,12 @@ ActiveRecord::Schema.define(version: 20171030055325) do
     t.integer  "reference_type_id", limit: 4
   end
 
+  create_table "rate_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "receipt_email_attachments", force: :cascade do |t|
     t.integer  "receipt_email_id",                 limit: 4
     t.string   "original_attachment_file_name",    limit: 255
@@ -3314,6 +3353,7 @@ ActiveRecord::Schema.define(version: 20171030055325) do
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
 
+  add_foreign_key "addresses", "states"
   add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
   add_foreign_key "admin_summary_mail_configs", "periods"
   add_foreign_key "admin_summary_mail_configs", "users"
@@ -3401,6 +3441,7 @@ ActiveRecord::Schema.define(version: 20171030055325) do
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
+  add_foreign_key "invoices", "addresses"
   add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
   add_foreign_key "itz_cash_dmt_senders", "users"
