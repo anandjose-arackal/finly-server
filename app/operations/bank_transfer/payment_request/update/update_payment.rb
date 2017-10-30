@@ -20,7 +20,9 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
 
   def payment_attributes
     # todo - add attributes here for invoice and attachment
-    params.require(:payment).permit(invoice_attributes: [])
+    params.require(:payment).permit(:SGST, :CGST, :IGST, :tax_type_id, :discount, :date,
+                                    :discount_type_id, :due_date, :invoice_number,
+                                    invoice_attributes: [], address_attributes: [])
   end
 
 end
