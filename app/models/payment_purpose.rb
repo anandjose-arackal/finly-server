@@ -34,6 +34,8 @@ class PaymentPurpose < ActiveRecord::Base
         :cash_advance,
         :balance_clearance_against_cash_on_hand,
         :advance_against_report_unapproval,
+        :settlement_against_cash_on_hand,
+        :advance_against_report_unapproval,
         :cash_on_hand_reversal,
         :virtual_account_credit,
         :payment_link_credit,

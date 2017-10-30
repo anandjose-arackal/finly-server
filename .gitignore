@@ -9,6 +9,7 @@
 /.bundle
 #Gemfile.lock
 /config/database.yml
+/config/finly_collect.yml
 /.byebug_history
 config/finly_collect.yml
 
