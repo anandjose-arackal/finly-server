@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171030150835) do
+ActiveRecord::Schema.define(version: 20171030154926) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1781,19 +1781,32 @@ ActiveRecord::Schema.define(version: 20171030150835) do
   add_index "individual_kycs", ["company_id"], name: "index_individual_kycs_on_company_id", using: :btree
   add_index "individual_kycs", ["user_id"], name: "index_individual_kycs_on_user_id", using: :btree
 
+  create_table "invoice_attachments", force: :cascade do |t|
+    t.string   "attached_file_file_name",    limit: 255
+    t.string   "attached_file_content_type", limit: 255
+    t.integer  "attached_file_file_size",    limit: 4
+    t.datetime "attached_file_updated_at"
+    t.integer  "invoice_id",                 limit: 4
+    t.text     "description",                limit: 65535
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+  end
+
+  add_index "invoice_attachments", ["invoice_id"], name: "index_invoice_attachments_on_invoice_id", using: :btree
+
   create_table "invoices", force: :cascade do |t|
     t.integer  "address_id",       limit: 4
     t.date     "date"
     t.date     "due_date"
     t.string   "invoice_number",   limit: 255
-    t.decimal  "SGST",                         precision: 10
-    t.decimal  "CGST",                         precision: 10
-    t.decimal  "IGST",                         precision: 10
+    t.decimal  "SGST",                         precision: 64, scale: 12
+    t.decimal  "CGST",                         precision: 64, scale: 12
+    t.decimal  "IGST",                         precision: 64, scale: 12
     t.integer  "tax_type_id",      limit: 4
-    t.decimal  "discount",                     precision: 10
+    t.decimal  "discount",                     precision: 64, scale: 12
     t.integer  "discount_type_id", limit: 4
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -3441,6 +3454,7 @@ ActiveRecord::Schema.define(version: 20171030150835) do
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
+  add_foreign_key "invoice_attachments", "invoices"
   add_foreign_key "invoices", "addresses"
   add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
