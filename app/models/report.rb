@@ -160,6 +160,7 @@ class Report < ActiveRecord::Base
                                                     {amount: [:currency]}, :expense_status]}, :status, policy: [distance_expense_config: [:rate]]) }
 
   scope :includes_user, -> { includes :user }
+  scope :includes_tracks, -> { includes :tracks }
 
   delegate :status_name, to: :status
 
