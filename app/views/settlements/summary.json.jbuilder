@@ -1,5 +1,3 @@
-json.company_card_enabled @result.user.company.d_code_enabled?
-json.data do
-  json.merge! @result.balances
-  json.actions @result.actions
-end
+json.users_summary @result.users_summary
+json.money_requests_summary @result.money_requests_summary
+json.reports_summary @result.reports_summary
