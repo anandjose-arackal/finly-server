@@ -2044,6 +2044,7 @@ Rails.application.routes.draw do
   end
 
   get 'settlements/summary' => 'settlements#summary'
+  get 'settlements/overview' => 'settlements#overview'
   resources :settlements
   post 'settlements/:id/add_payment' => 'settlements#add_payment', as: :settlement_add_payment
 
