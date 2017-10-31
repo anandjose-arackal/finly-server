@@ -15,7 +15,7 @@
 class ReportProcessorGroupMapping < ActiveRecord::Base
 
   belongs_to :user
-  belongs_to :amount
+  belongs_to :amount, dependent: :destroy
   belongs_to :processor_group, class_name: 'ReportProcessorGroup'
   belongs_to :processor_accountable, polymorphic: true
 
@@ -25,5 +25,9 @@ class ReportProcessorGroupMapping < ActiveRecord::Base
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :reports
+
+  before_destroy do
+    self.reports.update_all(report_processor_group_mapping_id: nil)
+  end
 
 end

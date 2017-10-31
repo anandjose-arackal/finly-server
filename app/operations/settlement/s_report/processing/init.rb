@@ -14,7 +14,7 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
   end
 
   def authorized_user_types
-    [:admin, :finance_manager, :auditor]
+    [:admin, :finance_manager]
   end
 
   def pre_validate

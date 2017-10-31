@@ -18,7 +18,8 @@ class Settlement::ReportController < ApplicationController
   end
 
   def processing_index
-
+    @result = Settlement::SReport::Processing::Index.(current_user, params)
+    respond
   end
 
   def completed_index

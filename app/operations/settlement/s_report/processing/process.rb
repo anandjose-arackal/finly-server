@@ -1,6 +1,10 @@
 class Settlement::SReport::Processing::Process < BackgroundOperation
   attr_accessor :report_processor_group
 
+  def authorized_user_types
+    [:admin, :finance_manager]
+  end
+
   def pre_validate
     unless params&.dig(:report_processor_group_id).present?
       add_message :error, 'Batch not found'

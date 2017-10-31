@@ -18,6 +18,10 @@
 class Settlement::SReport::Processing::Create < Settlement::SReport::Processing::Base
   attr_accessor :processor_params, :report_processor_group, :scheduled
 
+  def authorized_user_types
+    [:admin, :finance_manager]
+  end
+
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'

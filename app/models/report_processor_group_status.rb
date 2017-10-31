@@ -15,4 +15,32 @@ class ReportProcessorGroupStatus < ActiveRecord::Base
     [:pending, :scheduled, :processing, :partially_completed, :completed, :failed, :cancelled]
   end
 
+  def pending?
+    self.id == ReportProcessorGroupStatus.id_for(:pending)
+  end
+
+  def scheduled?
+    self.id == ReportProcessorGroupStatus.id_for(:scheduled)
+  end
+
+  def processing?
+    self.id == ReportProcessorGroupStatus.id_for(:processing)
+  end
+
+  def partially_completed?
+    self.id == ReportProcessorGroupStatus.id_for(:partially_completed)
+  end
+
+  def completed?
+    self.id == ReportProcessorGroupStatus.id_for(:completed)
+  end
+
+  def failed?
+    self.id == ReportProcessorGroupStatus.id_for(:failed)
+  end
+
+  def cancelled?
+    self.id == ReportProcessorGroupStatus.id_for(:cancelled)
+  end
+
 end

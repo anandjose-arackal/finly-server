@@ -1,10 +1,6 @@
 class Settlement::SReport::Pending::Index < Settlement::SReport::Pending::Base
   attr_accessor :reports
 
-  def authorized_user_types
-    [:admin, :manager, :finance_manager, :auditor]
-  end
-
   def pre_validate
     if user.blank?
       add_message :error, 'User not found'

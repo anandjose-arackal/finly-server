@@ -22,10 +22,10 @@
 
 class ReportProcessorGroup < ActiveRecord::Base
 
-  has_many :mappings, class_name: 'ReportProcessorGroupMapping', foreign_key: :processor_group_id
+  has_many :mappings, class_name: 'ReportProcessorGroupMapping', foreign_key: :processor_group_id, dependent: :destroy
   has_many :users, through: :mappings
-  belongs_to :total_amount, class_name: 'Amount'
-  belongs_to :processed_amount, class_name: 'Amount'
+  belongs_to :total_amount, class_name: 'Amount', dependent: :destroy
+  belongs_to :processed_amount, class_name: 'Amount', dependent: :destroy
   belongs_to :created_by_user, class_name: 'User'
   belongs_to :status, class_name: 'ReportProcessorGroupStatus'
   belongs_to :source_account, polymorphic: true
@@ -37,6 +37,8 @@ class ReportProcessorGroup < ActiveRecord::Base
   accepts_nested_attributes_for :mappings
   accepts_nested_attributes_for :total_amount
   accepts_nested_attributes_for :processed_amount
+
+  scope :created_bby_user, -> (user_id) { where created_by_user_id: user_id }
 
   delegate :scheduled?, :processing?, :processing?, :partially_completed?, :completed?, :failed?, :cancelled?, to: :status
 
