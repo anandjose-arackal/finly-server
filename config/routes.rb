@@ -2056,6 +2056,7 @@ Rails.application.routes.draw do
   get 'settlements/reports/pending', to: 'settlement/report#pending_index'
   post 'settlements/reports/processing/init', to: 'settlement/report#init_processing'
   post 'settlements/reports/processing/create', to: 'settlement/report#create_processing'
+  get 'settlements/reports/completed/index', to: 'settlement/report#completed_index'
 
   resources :per_diems
 

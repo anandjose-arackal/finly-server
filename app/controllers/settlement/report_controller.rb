@@ -23,7 +23,8 @@ class Settlement::ReportController < ApplicationController
   end
 
   def completed_index
-
+    @result = Settlement::SReport::Completed::Index.(current_user, params)
+    respond
   end
 
 end

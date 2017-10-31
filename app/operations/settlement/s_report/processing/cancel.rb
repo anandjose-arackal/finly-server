@@ -37,7 +37,7 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
   end
 
   def process
-    
+    self.report_group_processor.destroy
   end
 
 end
