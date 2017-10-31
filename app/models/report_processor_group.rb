@@ -38,4 +38,6 @@ class ReportProcessorGroup < ActiveRecord::Base
   accepts_nested_attributes_for :total_amount
   accepts_nested_attributes_for :processed_amount
 
+  delegate :scheduled?, :processing?, :processing?, :partially_completed?, :completed?, :failed?, :cancelled?, to: :status
+
 end

@@ -51,12 +51,16 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
       add_message :error, self.report_processor_group.errors.full_messages
       return
     end
+    validate_balance
   end
 
   def process
     self.report_processor_group.save
-    unless scheduled
+  end
 
+  def post_process
+    unless scheduled
+      Settlement::SReport::Processing::Process.call_async(user, params)
     end
   end
 
@@ -178,6 +182,15 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     end
 
     self.report_processor_group.total_amount = Amount.new(value: total, currency_id: currency_id)
+  end
+
+  def validate_balance
+    total_amount = self.report_processor_group.total_amount.value
+    unless total_amount.present? and total_amount > 0
+      add_message :error, 'Error loading configuration'
+      return
+    end
+
   end
 
 end
