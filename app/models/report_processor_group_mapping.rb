@@ -18,10 +18,12 @@ class ReportProcessorGroupMapping < ActiveRecord::Base
   belongs_to :amount, dependent: :destroy
   belongs_to :processor_group, class_name: 'ReportProcessorGroup'
   belongs_to :processor_accountable, polymorphic: true
+  belongs_to :status, class_name: 'ReportProcessorGroupStatus'
 
   has_many :reports
 
   validates :user_id, presence: true
+  validates :status_id, presence: true
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :reports
