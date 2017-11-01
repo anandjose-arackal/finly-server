@@ -17,7 +17,8 @@ class PoliciesController < ApplicationController
   end
 
   def index
-    @policies = Policy::Index.(current_user, view: params[:view])
+    @result = Policy::Index.(current_user, view: params[:view])
+    respond
   end
 
   def show
