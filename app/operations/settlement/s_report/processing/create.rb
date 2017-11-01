@@ -92,7 +92,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
           when 'finly_money'
             self.report_processor_group.source_account = user.user_wallet
         end
-      when 'outside_finly'
+      when 'outside_finly', 'payment_file'
         # Nothing to do here as receiving account is nil
       else
         add_message :error, 'Invalid Source Account Type'
@@ -130,7 +130,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
       processor_accountable = nil
 
       case params&.dig(:payment_type)
-        when 'bank_transfer'
+        when 'bank_transfer', 'payment_file'
           unless processor_accountable_type == BankAccount.name
             add_message :error, 'Funds can only be transferred to Bank Account in this mode'
             return

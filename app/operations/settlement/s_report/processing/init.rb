@@ -41,6 +41,8 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
         init_bank_transfer
       when 'reimbursement_card'
         init_reimbursement_card
+      when 'payment_file'
+        init_payment_file
       when 'outside_finly'
         init_outside_finly
     end
@@ -111,6 +113,18 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
         details[:has_error] = true
         details[:errors] = 'User has not been assigned a Reimbursement Card'
         return
+      end
+    end
+  end
+
+  def init_payment_file
+    self.user_reports.each do |details|
+      user = details[:user]
+      bank_accounts = user.bank_accounts
+      details[:bank_accounts] = bank_accounts
+      if bank_accounts.blank?
+        details[:has_error] = true
+        details[:errors] = 'User has not added a bank account'
       end
     end
   end
