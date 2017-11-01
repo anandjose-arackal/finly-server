@@ -18,6 +18,7 @@ class CreateReportProcessorGroups < ActiveRecord::Migration
       t.integer :created_by_user_id, references: 'User', index: true, foreign_key: true
       t.integer :source_account_id, index: true
       t.string :source_account_type, index: true
+      t.string :payment_type
       t.string :payment_mode
       t.references :company, index: true, foreign_key: true, null: false
 

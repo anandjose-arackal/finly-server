@@ -8,6 +8,9 @@
 #  processor_accountable_id   :integer          not null
 #  processor_accountable_type :string(255)      not null
 #  amount_id                  :integer          not null
+#  completed_at               :datetime
+#  status_id                  :integer          not null
+#  payment_id                 :integer
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #

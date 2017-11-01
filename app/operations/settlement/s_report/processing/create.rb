@@ -37,6 +37,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     self.report_processor_group = current_company.report_processor_groups.new({
                                                                                   created_by_user: user,
                                                                                   scheduled_at: params[:scheduled_at],
+                                                                                  payment_type: params[:payment_type],
                                                                                   payment_mode: params[:payment_mode]
                                                                               })
     if params[:scheduled_at].present? and Date.parse(params[:scheduled_at]) > Date.today
@@ -64,7 +65,8 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
 
   def post_process
     unless scheduled
-      Settlement::SReport::Processing::Process.call_async(user, params)
+      params[:report_processor_group_id] = self.report_processor_group.id
+      Settlement::SReport::Processing::Process.(user, params)
     end
   end
 
@@ -174,14 +176,16 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
         add_message :error, 'Amount has to be greater than or equal to 0'
         return
       end
-
-      self.report_processor_group.mappings.build({user: user,
-                                                  processor_accountable: processor_accountable,
-                                                  reports: reports,
-                                                  amount_attributes: {
-                                                      value: config&.dig(:amount, :value),
-                                                      currency_id: config&.dig(:amount, :currency_id)
-                                                  }
+      mapping_status = ReportProcessorGroupStatus.id_for(:pending)
+      self.report_processor_group.mappings.build({
+                                                     user: user,
+                                                     processor_accountable: processor_accountable,
+                                                     reports: reports,
+                                                     amount_attributes: {
+                                                         value: config&.dig(:amount, :value),
+                                                         currency_id: config&.dig(:amount, :currency_id)
+                                                     },
+                                                     status_id: mapping_status
                                                  })
     end
 

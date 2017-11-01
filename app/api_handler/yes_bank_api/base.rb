@@ -61,12 +61,14 @@ class YesBankApi::Base < BaseHandler
     # adding the ssl options here for the request
     # verify certificate only in production
     verify = Rails.env.production? ? true : false
-    # since we're using the default keystore, no need to import Yes Bank's certificates as they're signed
-    ssl_options = {
-        client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
-        client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
-        verify: verify
-    }
+    if verify
+      # since we're using the default keystore, no need to import Yes Bank's certificates as they're signed
+      ssl_options = {
+          client_cert: OpenSSL::X509::Certificate.new(File.read(ENV['HOME'] + '/certificates/finly.crt')),
+          client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
+          verify: verify
+      }
+    end
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|
       # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params

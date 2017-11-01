@@ -14,7 +14,7 @@ class Settlement::ReportController < ApplicationController
 
   def create_processing
     @result = Settlement::SReport::Processing::Create.(current_user, params)
-    respond
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def processing_index

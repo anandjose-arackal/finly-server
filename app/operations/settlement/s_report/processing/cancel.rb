@@ -37,7 +37,13 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
   end
 
   def process
-    self.report_group_processor.destroy
+    if report_group_processor.partially_completed?
+      pending_mappings = self.report_group_processor.mappings.pending
+      pending_mappings.each { |mapping| mapping.destroy }
+      self.report_group_processor.update(status_id: ReportProcessorGroupStatus.id_for(:completed))
+    else
+      self.report_group_processor.destroy
+    end
   end
 
 end

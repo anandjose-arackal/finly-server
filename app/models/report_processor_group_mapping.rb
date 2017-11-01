@@ -8,6 +8,9 @@
 #  processor_accountable_id   :integer          not null
 #  processor_accountable_type :string(255)      not null
 #  amount_id                  :integer          not null
+#  completed_at               :datetime
+#  status_id                  :integer          not null
+#  payment_id                 :integer
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #
@@ -19,14 +22,20 @@ class ReportProcessorGroupMapping < ActiveRecord::Base
   belongs_to :processor_group, class_name: 'ReportProcessorGroup'
   belongs_to :processor_accountable, polymorphic: true
   belongs_to :status, class_name: 'ReportProcessorGroupStatus'
+  belongs_to :payment
 
   has_many :reports
+  has_many :system_messages, as: :messagable
 
   validates :user_id, presence: true
   validates :status_id, presence: true
 
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :reports
+  accepts_nested_attributes_for :system_messages
+
+  scope :pending, -> { where status_id: ReportProcessorGroupStatus.id_for(:pending) }
+  scope :not_completed, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:completed) }
 
   before_destroy do
     self.reports.update_all(report_processor_group_mapping_id: nil)

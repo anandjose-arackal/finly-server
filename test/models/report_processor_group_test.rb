@@ -14,8 +14,9 @@
 #  created_by_user_id        :integer
 #  source_account_id         :integer
 #  source_account_type       :string(255)
+#  payment_type              :string(255)
 #  payment_mode              :string(255)
-#  company_id                :integer
+#  company_id                :integer          not null
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #

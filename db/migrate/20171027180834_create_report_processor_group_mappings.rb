@@ -8,6 +8,7 @@ class CreateReportProcessorGroupMappings < ActiveRecord::Migration
       t.references :amount, index: true, foreign_key: true, null: false
       t.datetime :completed_at
       t.integer :status_id, references: 'ReportProcessorGroupStatus', index: true, foreign_key: true, null: false
+      t.references :payment, index: true, foreign_key: true
 
       t.timestamps null: false
     end

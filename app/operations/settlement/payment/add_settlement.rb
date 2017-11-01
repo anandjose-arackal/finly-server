@@ -302,12 +302,9 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
 
     ### if the reimbursement is through the bank account ####################
     if self.reimbursement_type_id == REIMBURSEMENT_TYPE[:reimbursement_bank_account] and reimbursement_amount.present?
-      payment_request = PaymentRequest.(user,
-                                        initiating_account,
-                                        receiving_account.class.name,
-                                        :credit,
-                                        :reimbursement,
-                                        {bank_transfer_type: self.transfer_mode, payment_mode: self.transfer_mode}
+      payment_request = PaymentRequest.(
+          user, initiating_account, receiving_account.class.name, :credit, :reimbursement,
+              {bank_transfer_type: self.transfer_mode, payment_mode: self.transfer_mode}
       )
       payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, receiving_account, reimbursement_amount))
       op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: self.transfer_mode})
@@ -316,7 +313,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
         if payment.reload.processing?
           payment.system_messages.create(content: "Reimbursement processed. Awaiting credit confirmation",
                                          system_message_type_id: SystemMessageType.id_for(:error)
-                                        )
+          )
           payment.update(note: "Reimbursement processed. Awaiting credit confirmation")
         end
         return

@@ -2684,12 +2684,17 @@ ActiveRecord::Schema.define(version: 20171030154048) do
     t.integer  "processor_accountable_id",   limit: 4,   null: false
     t.string   "processor_accountable_type", limit: 255, null: false
     t.integer  "amount_id",                  limit: 4,   null: false
+    t.datetime "completed_at"
+    t.integer  "status_id",                  limit: 4,   null: false
+    t.integer  "payment_id",                 limit: 4
     t.datetime "created_at",                             null: false
     t.datetime "updated_at",                             null: false
   end
 
   add_index "report_processor_group_mappings", ["amount_id"], name: "index_report_processor_group_mappings_on_amount_id", using: :btree
+  add_index "report_processor_group_mappings", ["payment_id"], name: "index_report_processor_group_mappings_on_payment_id", using: :btree
   add_index "report_processor_group_mappings", ["processor_group_id"], name: "index_report_processor_group_mappings_on_processor_group_id", using: :btree
+  add_index "report_processor_group_mappings", ["status_id"], name: "index_report_processor_group_mappings_on_status_id", using: :btree
   add_index "report_processor_group_mappings", ["user_id"], name: "index_report_processor_group_mappings_on_user_id", using: :btree
 
   create_table "report_processor_group_statuses", force: :cascade do |t|
@@ -2712,6 +2717,7 @@ ActiveRecord::Schema.define(version: 20171030154048) do
     t.integer  "created_by_user_id",        limit: 4
     t.integer  "source_account_id",         limit: 4
     t.string   "source_account_type",       limit: 255
+    t.string   "payment_type",              limit: 255
     t.string   "payment_mode",              limit: 255
     t.integer  "company_id",                limit: 4,                   null: false
     t.datetime "created_at",                                            null: false
@@ -3395,6 +3401,7 @@ ActiveRecord::Schema.define(version: 20171030154048) do
   add_foreign_key "report_comments", "reports"
   add_foreign_key "report_comments", "users"
   add_foreign_key "report_processor_group_mappings", "amounts"
+  add_foreign_key "report_processor_group_mappings", "payments"
   add_foreign_key "report_processor_group_mappings", "users"
   add_foreign_key "report_processor_groups", "companies"
   add_foreign_key "report_tracks", "report_statuses"
