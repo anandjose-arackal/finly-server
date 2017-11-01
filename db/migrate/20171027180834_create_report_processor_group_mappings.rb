@@ -7,6 +7,7 @@ class CreateReportProcessorGroupMappings < ActiveRecord::Migration
       t.string :processor_accountable_type, null: false
       t.references :amount, index: true, foreign_key: true, null: false
       t.datetime :completed_at
+      t.boolean :marked_as_completed, default: false
       t.integer :status_id, references: 'ReportProcessorGroupStatus', index: true, foreign_key: true, null: false
       t.references :payment, index: true, foreign_key: true
 
