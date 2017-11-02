@@ -9,27 +9,37 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
   end
 
   def credit(payment, options)
+    success = false
     opening_balance = balance
-    if self.account.credit_funds(payment.amount_value)
-      closing_balance = balance
+    balance_amount = self.account.balance
+    balance_amount.with_lock do
+      balance_amount.value += payment.amount_value
+      success = balance_amount.save
+    end
+    closing_balance = balance
+    if success
       store_transaction payment, :credit, :success, opening_balance, closing_balance, account.user.company_id
       return true
     end
     self.errors = account.errors.full_messages
-    closing_balance = balance
     store_transaction payment, :credit, :failure, opening_balance, closing_balance, account.user.company_id, error: self.errors
     false
   end
 
   def debit(payment, options)
+    success = false
     opening_balance = balance
-    if self.account.debit_funds(payment.amount_value)
-      closing_balance = balance
+    balance_amount = self.account.balance
+    balance_amount.with_lock do
+      balance_amount.value -= payment.amount_value
+      success = balance_amount.save
+    end
+    closing_balance = balance
+    if success
       store_transaction payment, :debit, :success, opening_balance, closing_balance, account.user.company_id
       return true
     end
     self.errors = account.errors.full_messages
-    closing_balance = balance
     store_transaction payment, :debit, :failure, opening_balance, closing_balance, account.user.company_id, error: self.errors
     false
   end
