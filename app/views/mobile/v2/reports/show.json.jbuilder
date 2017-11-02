@@ -1,4 +1,4 @@
-json.partial! '/api/v2/reports/report', report: @result.report
+json.partial! '/mobile/v2/reports/report', report: @result.report
 manager_name = ''
 manager_name = @result.manager.name if @result.manager.present?
 finance_manager_name = ''
@@ -21,7 +21,7 @@ json.sections @result.expenses_category_sorted do |item|
   json.name item[:section_name]
   json.total item[:section_total]
   json.expenses item[:expenses] do |expense_item|
-    json.partial! '/api/v2/expenses/expense', expense: expense_item
+    json.partial! '/mobile/v2/expenses/expense', expense: expense_item
   end
 end
 json.comments @result.comments do |comment|
