@@ -55,6 +55,7 @@ class PoliciesController < ApplicationController
     @result = Policy::Show.(current_user, params)
     respond_to do |format|
       format.html { render partial: 'policy_members' }
+      format.json { render partial: 'policy_members' }
     end
   end
 
