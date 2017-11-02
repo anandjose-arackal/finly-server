@@ -95,4 +95,25 @@ class BankAccount < ActiveRecord::Base
   after_create do
     self.update(company_id: self.account_owner.company_id)
   end
+
+  #  account_number     :string(255)
+  #  ifsc               :string(255)
+  #  name               :string(255)
+  #  account_owner_id   :integer
+  #  account_owner_type :string(255)
+  #  company_id         :integer
+  #  reimbursable       :boolean
+  #  default_account    :boolean          default(FALSE)
+  #  is_deleted         :boolean          default(FALSE)
+
+  def as_json(options={})
+    {
+        account_number: account_number,
+        ifsc: ifsc,
+        name: name,
+        account_owner: account_owner,
+        default_account: default_account
+    }
+  end
+
 end
