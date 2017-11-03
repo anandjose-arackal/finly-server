@@ -72,6 +72,17 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     end
   end
 
+  def pre_process
+    # also set the payment order's status id as either scheduled or as pending
+    if payment_order.scheduled_at.present? && payment_order.scheduled_at > DateUtils.local_date
+      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
+      payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:scheduled))
+    else
+      payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
+      payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
+    end
+  end
+
   def process
     # now the actual execution of the payment order, based on whether it's
     # synchronous or a background operation

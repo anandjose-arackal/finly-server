@@ -11,7 +11,7 @@ class BankTransfer::PaymentRequest::Review::Retract < BankTransfer::PaymentReque
     end
 
     unless bank_payment_request.can_retract?
-      add_message :error, "Report cannot be retracted in this state"
+      add_message :error, "Payment Order cannot be retracted in this state"
       return
     end
   end
