@@ -63,7 +63,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
       end
       unless payment.amount.value > 0
         valid = false
-        error_messages << "Amount has for #{payment.receiving_user.name} cannot be less than or equal to 0"
+        error_messages << "Amount has for #{payment.receiving_account.name} cannot be less than or equal to 0"
       end
     end
     unless valid
