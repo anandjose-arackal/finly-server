@@ -27,7 +27,8 @@ json.payments do
     json.name payment.receiving_account.account_owner.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
-    json.amount payment.amount_value
+    json.gross_amount payment.gross_amount
+    json.net_amount payment.amount_value
     json.status payment.payment_status_name
     json.id payment.id
     json.note payment.note
@@ -38,6 +39,12 @@ json.payments do
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
     json.retriable payment.retriable?
+
+    if payment.invoice.present?
+      json.invoice do
+
+      end
+    end
   end
 end
 

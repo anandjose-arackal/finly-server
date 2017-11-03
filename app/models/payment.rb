@@ -32,6 +32,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -216,6 +217,12 @@ class Payment < ActiveRecord::Base
 
   before_create do
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)
+  end
+
+  before_save do
+    # recalculating the amount or net amount for this particular
+    # payment from the details inside the invoice
+
   end
 
   def initiating_account_type_name

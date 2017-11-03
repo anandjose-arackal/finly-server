@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171030154926) do
+ActiveRecord::Schema.define(version: 20171103164814) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1795,18 +1795,25 @@ ActiveRecord::Schema.define(version: 20171030154926) do
   add_index "invoice_attachments", ["invoice_id"], name: "index_invoice_attachments_on_invoice_id", using: :btree
 
   create_table "invoices", force: :cascade do |t|
-    t.integer  "address_id",       limit: 4
+    t.integer  "address_id",         limit: 4
     t.date     "date"
     t.date     "due_date"
-    t.string   "invoice_number",   limit: 255
-    t.decimal  "SGST",                         precision: 64, scale: 12
-    t.decimal  "CGST",                         precision: 64, scale: 12
-    t.decimal  "IGST",                         precision: 64, scale: 12
-    t.integer  "tax_type_id",      limit: 4
-    t.decimal  "discount",                     precision: 64, scale: 12
-    t.integer  "discount_type_id", limit: 4
-    t.datetime "created_at",                                             null: false
-    t.datetime "updated_at",                                             null: false
+    t.string   "invoice_number",     limit: 255
+    t.decimal  "SGST",                           precision: 64, scale: 12
+    t.decimal  "CGST",                           precision: 64, scale: 12
+    t.decimal  "IGST",                           precision: 64, scale: 12
+    t.integer  "tax_type_id",        limit: 4
+    t.decimal  "discount",                       precision: 64, scale: 12
+    t.integer  "discount_type_id",   limit: 4
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+    t.integer  "gross_amount_id",    limit: 4
+    t.integer  "net_amount_id",      limit: 4
+    t.boolean  "inclusive_of_taxes"
+    t.integer  "amount_id",          limit: 4
+    t.decimal  "TDS",                            precision: 64, scale: 12
+    t.integer  "tds_type_id",        limit: 4
+    t.integer  "gst_type_id",        limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -3028,11 +3035,12 @@ ActiveRecord::Schema.define(version: 20171030154926) do
   add_index "user_group_items", ["user_group_id"], name: "index_user_group_items_on_user_group_id", using: :btree
 
   create_table "user_groups", force: :cascade do |t|
-    t.string   "name",       limit: 255,                 null: false
-    t.integer  "company_id", limit: 4,                   null: false
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
-    t.boolean  "is_deleted",             default: false
+    t.string   "name",        limit: 255,                 null: false
+    t.integer  "company_id",  limit: 4,                   null: false
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.boolean  "is_deleted",              default: false
+    t.string   "application", limit: 255
   end
 
   add_index "user_groups", ["company_id"], name: "index_user_groups_on_company_id", using: :btree
@@ -3149,10 +3157,11 @@ ActiveRecord::Schema.define(version: 20171030154926) do
   add_index "user_team_group_item_mappings", ["user_team_id"], name: "index_user_team_group_item_mappings_on_user_team_id", using: :btree
 
   create_table "user_teams", force: :cascade do |t|
-    t.integer  "company_id", limit: 4,   null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.string   "name",       limit: 255, null: false
+    t.integer  "company_id",  limit: 4,   null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.string   "name",        limit: 255, null: false
+    t.string   "application", limit: 255
   end
 
   add_index "user_teams", ["company_id"], name: "index_user_teams_on_company_id", using: :btree

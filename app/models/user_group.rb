@@ -2,12 +2,13 @@
 #
 # Table name: user_groups
 #
-#  id         :integer          not null, primary key
-#  name       :string(255)      not null
-#  company_id :integer          not null
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
-#  is_deleted :boolean          default(FALSE)
+#  id          :integer          not null, primary key
+#  name        :string(255)      not null
+#  company_id  :integer          not null
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  is_deleted  :boolean          default(FALSE)
+#  application :string(255)
 #
 
 class UserGroup < ActiveRecord::Base
@@ -21,4 +22,5 @@ class UserGroup < ActiveRecord::Base
   validates :name, uniqueness: {scope: :company_id, :case_sensitive => false}
 
   scope :include_items, -> { includes(:user_group_items) }
+  scope :with_application, -> (application) { where application: application }
 end
