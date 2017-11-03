@@ -18,11 +18,21 @@ class YesBankVendor < ActiveRecord::Base
   belongs_to :company
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
-  has_many :receiving_payments, as: :receiving_user, class_name: "Payment"
+  has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
 
   accepts_nested_attributes_for :bank_accounts
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> { where is_deleted: [false, nil]}
   scope :authorized, -> { where authorized: true}
+
+  def as_json(options={})
+    {
+        name: name,
+        email: email,
+        mobile_number: mobile_number,
+        description: description
+    }
+  end
+
 end

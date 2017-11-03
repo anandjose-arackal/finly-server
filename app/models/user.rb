@@ -103,7 +103,7 @@ class User < ActiveRecord::Base
   has_many :admin_summary_mail_configs, dependent: :destroy
   has_many :manager_summary_mail_configs, dependent: :destroy
 
-  has_many :bank_accounts, as: :account_owner
+  has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :authentications
   has_many :cards, dependent: :destroy
   has_many :payroll_cards, -> { where(card_program_id: CardProgram.id_for(:payroll)) }, class_name: 'Card'
@@ -598,9 +598,15 @@ class User < ActiveRecord::Base
   alias_method :finance?, :finance_manager?
 
   def as_json(options = {})
-    json = super(options)
-    json[:name] = self.name
-    json
+    # json = super(options)
+    # json[:name] = self.name
+    # json
+    {
+        id: id,
+        name: name,
+        email: email,
+        mobile_number: mobile_number
+    }
   end
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate
