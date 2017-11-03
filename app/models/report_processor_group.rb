@@ -40,6 +40,21 @@ class ReportProcessorGroup < ActiveRecord::Base
   accepts_nested_attributes_for :processed_amount
 
   scope :created_bby_user, -> (user_id) { where created_by_user_id: user_id }
+  scope :include_for_show, -> {
+    includes(
+        {mappings:
+             [:user,
+              {amount: [:currency]},
+              :status,
+              :payment,
+              :reports,
+              :system_messages]
+        },
+        {total_amount: [:currency]},
+        {processed_amount: [:currency]},
+        :status,
+        :created_by_user)
+  }
 
   delegate :scheduled?, :processing?, :processing?, :partially_completed?, :completed?, :failed?, :cancelled?, to: :status
 

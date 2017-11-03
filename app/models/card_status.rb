@@ -16,4 +16,11 @@ class CardStatus < ActiveRecord::Base
     [:unassigned, :assign_requested, :assigned, :upgrade_requested, :upgraded, :expired, :hotlisted]
   end
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end

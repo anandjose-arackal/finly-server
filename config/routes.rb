@@ -2054,8 +2054,9 @@ Rails.application.routes.draw do
   get 'expense_filters', to: 'expense_types_configuration#expense_filters'
 
   get 'settlements/reports/pending', to: 'settlement/report#pending_index'
-  post 'settlements/reports/processing/init', to: 'settlement/report#init_processing'
-  post 'settlements/reports/processing/create', to: 'settlement/report#create_processing'
+  get 'settlements/reports/processing', to: 'settlement/report#processing_index'
+  post 'settlements/reports/processing/init', to: 'settlement/report#processing_init'
+  post 'settlements/reports/processing/create', to: 'settlement/report#processing_create'
   get 'settlements/reports/completed', to: 'settlement/report#completed_index'
 
   resources :per_diems

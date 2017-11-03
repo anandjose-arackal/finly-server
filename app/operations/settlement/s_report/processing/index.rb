@@ -2,10 +2,11 @@ class Settlement::SReport::Processing::Index < Settlement::SReport::Processing::
   attr_accessor :report_processor_groups
 
   class Settlement::SReport::Processing::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :report_processor_groups
+    attr_accessor :report_processor_groups, :report_processor_groups_show
 
     def init
       self.report_processor_groups = params[:report_processor_groups]
+      self.report_processor_groups_show = self.report_processor_groups&.include_for_show
     end
 
   end

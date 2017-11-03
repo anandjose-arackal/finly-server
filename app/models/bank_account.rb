@@ -98,9 +98,11 @@ class BankAccount < ActiveRecord::Base
 
   def as_json(options={})
     {
+        id: id,
         account_number: account_number,
         ifsc: ifsc,
         name: name,
+        account_owner_type: account_owner_type,
         account_owner: account_owner,
         default_account: default_account
     }

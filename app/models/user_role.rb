@@ -40,4 +40,11 @@ class UserRole < ActiveRecord::Base
     VALUES.key(role_id)
   end
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end

@@ -43,4 +43,11 @@ class ReportProcessorGroupStatus < ActiveRecord::Base
     self.id == ReportProcessorGroupStatus.id_for(:cancelled)
   end
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end

@@ -72,7 +72,7 @@ class Card < ActiveRecord::Base
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
   scope :meal_cards, -> { where card_program_id: CardProgram.id_for(:meal) }
-  scope :payroll_cards, -> { where card_program_id: CardProgram.id_for(:payroll)}
+  scope :payroll_cards, -> { where card_program_id: CardProgram.id_for(:payroll) }
   scope :non_hotlisted, -> {
     # if applied == '1'
     where hotlisted: false
@@ -247,6 +247,26 @@ class Card < ActiveRecord::Base
       status = 'Locked'
     end
     status
+  end
+
+  def as_json(options={})
+    {
+        user: user,
+        proxy: proxy,
+        description: description,
+        active: active,
+        hotlisted: hotlisted,
+        locked: locked?,
+        card_status: card_status,
+        card_balance: card_balance,
+        card_program: card_program,
+        card_eligibility: card_eligibility,
+        disabled: {
+            disabled_by_user: disabled_by_user,
+            disabled_by_role: disabled_by_role,
+            disable_note: disable_note
+        }
+    }
   end
 
   private

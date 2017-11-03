@@ -7,12 +7,12 @@ class Settlement::ReportController < ApplicationController
     respond
   end
 
-  def init_processing
+  def processing_init
     @result = Settlement::SReport::Processing::Init.(current_user, params)
     respond
   end
 
-  def create_processing
+  def processing_create
     @result = Settlement::SReport::Processing::Create.(current_user, params)
     respond response: (@result&.success? ? :success : :failure)
   end
