@@ -33,7 +33,7 @@ class Expense::Destroy < Expense::Base
     end
 
     self.expenses.each do |expense|
-      if expense.expense_type_id == ExpenseType.card_expense_id
+      if expense.expense_type_id == ExpenseType.card_expense_id && expense.report_id.present?
         add_message :error, 'Card expenses cannot be deleted'
       end
 

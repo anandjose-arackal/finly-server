@@ -3,8 +3,6 @@ class PoliciesController < ApplicationController
 
   before_action -> { finly_authorize! :web}
 
-
-
   def create
     @result = Policy::Create.(current_user, params)
     respond
