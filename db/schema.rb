@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171104085638) do
+ActiveRecord::Schema.define(version: 20171104124131) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1795,26 +1795,31 @@ ActiveRecord::Schema.define(version: 20171104085638) do
   add_index "invoice_attachments", ["invoice_id"], name: "index_invoice_attachments_on_invoice_id", using: :btree
 
   create_table "invoices", force: :cascade do |t|
-    t.integer  "address_id",         limit: 4
+    t.integer  "address_id",           limit: 4
     t.date     "date"
     t.date     "due_date"
-    t.string   "invoice_number",     limit: 255
-    t.decimal  "SGST",                           precision: 64, scale: 12
-    t.decimal  "CGST",                           precision: 64, scale: 12
-    t.decimal  "IGST",                           precision: 64, scale: 12
-    t.integer  "tax_type_id",        limit: 4
-    t.decimal  "discount",                       precision: 64, scale: 12
-    t.integer  "discount_type_id",   limit: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
-    t.integer  "gross_amount_id",    limit: 4
-    t.integer  "net_amount_id",      limit: 4
+    t.string   "invoice_number",       limit: 255
+    t.decimal  "SGST",                             precision: 64, scale: 12
+    t.decimal  "CGST",                             precision: 64, scale: 12
+    t.decimal  "IGST",                             precision: 64, scale: 12
+    t.integer  "tax_type_id",          limit: 4
+    t.decimal  "discount",                         precision: 64, scale: 12
+    t.integer  "discount_type_id",     limit: 4
+    t.datetime "created_at",                                                 null: false
+    t.datetime "updated_at",                                                 null: false
+    t.integer  "gross_amount_id",      limit: 4
+    t.integer  "net_amount_id",        limit: 4
     t.boolean  "inclusive_of_taxes"
-    t.integer  "amount_id",          limit: 4
-    t.decimal  "TDS",                            precision: 64, scale: 12
-    t.integer  "tds_type_id",        limit: 4
-    t.integer  "gst_type_id",        limit: 4
-    t.integer  "payment_id",         limit: 4
+    t.integer  "amount_id",            limit: 4
+    t.decimal  "TDS",                              precision: 64, scale: 12
+    t.integer  "tds_type_id",          limit: 4
+    t.integer  "gst_type_id",          limit: 4
+    t.integer  "payment_id",           limit: 4
+    t.integer  "discounted_amount_id", limit: 4
+    t.integer  "sgst_amount_id",       limit: 4
+    t.integer  "csgt_amount_id",       limit: 4
+    t.integer  "igst_amount_id",       limit: 4
+    t.integer  "tds_amount_id",        limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree

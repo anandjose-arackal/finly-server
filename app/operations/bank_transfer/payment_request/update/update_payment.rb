@@ -1,6 +1,7 @@
 class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::PaymentRequest::Update::Base
 
-  attr_accessor :payment, :payment_request, :payment_params
+  attr_accessor :payment, :payment_request, :payment_params, :amount, :gross_amount, :net_amount,
+                :invoice
 
   def init
     super
@@ -27,7 +28,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     unless self.payment.update(payment_params)
       add_message :error, self.payment.errors.full_messages
     end
-    calculate_tax_and_discounts
+    # calculate_tax_and_discounts
   end
 
   def post_process
@@ -40,19 +41,90 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     # todo - add attributes here for invoice and attachment
     params.require(:payment).permit(invoice_attributes: [:SGST, :CGST, :IGST, :gst_type_id, :TDS, :tds_type_id,
                                                          :tax_type_id, :discount, :date, :discount_type_id, :due_date,
-                                                         :invoice_number, :inclusive_of_taxes, amount_attributes: [:value, :currency_id]],
-                                    invoice_attachment_attributes: [:attached_file, :description]
+                                                         :invoice_number, :inclusive_of_taxes,
+                                                         amount_attributes: [:value, :currency_id],
+                                                         gross_amount_attributes: [:value, :currency_id],
+                                                         net_amount_attributes: [:value, :currency_id]],
+                                    invoice_attachment_attributes: [:attached_file, :description],
+                                    amount_attributes: [:value, :currency_id]
                                     )
   end
 
   def calculate_tax_and_discounts
-    invoice = payment.invoice
-    amount = invoice.amount&.value
-    if invoice.inclusive_of_taxes
+    self.invoice = payment.invoice
+    self.amount = self.invoice.amount&.value
+    if self.invoice.inclusive_of_taxes
       # calculate the other amounts retrospectively
+      calculate_discount
+      calculate_inclusive_taxes
+      calculate_tds
+
     else
       # calculate proactively
+      calculate_discount
+      calculate_exclusive_taxes
+      calculate_tds
     end
+  end
+
+  def calculate_discount
+    if invoice.discount.present?
+      self.gross_amount = 0
+    else
+      self.gross_amount = amount
+      return
+    end
+    case invoice.discount_type_id
+      when 1, '1'
+        self.gross_amount = amount - (invoice.discount*amount)/100
+      when 2, '2'
+        self.gross_amount = amount - invoice.discount
+      else
+        # do nothing?
+    end
+  end
+
+  def calculate_exclusive_taxes
+    # because the starting point is the gross amount
+    amount = self.gross_amount
+    case invoice.gst_type_id
+      when '1', 1
+        case invoice.tax_type_id
+          # 1 - percentage
+          when '1', 1
+            self.net_amount = amount - ((invoice.SGST)*amount)/100 - ((invoice.CGST)*amount)/100
+            return
+          # 2 - absolute
+          when '2', 2
+            self.net_amount = amount - invoice.SGST - invoice.CGST
+            return
+          else
+            # do nothing?
+        end
+      when 2, '2'
+        case invoice.tax_type_id
+          # 1 - percentage
+          when '1', 1
+            self.net_amount = amount - ((invoice.IGST)*amount)/100
+            return
+          # 2 - absolute
+          when '2', 2
+            self.net_amount = amount - invoice.IGST
+            return
+          else
+            # do nothing?
+        end
+      else
+        # do nothing?
+    end
+  end
+
+  def calculate_inclusive_taxes
+
+  end
+
+  def calculate_tds
+
   end
 
 end
