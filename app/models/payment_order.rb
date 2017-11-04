@@ -25,6 +25,7 @@
 #
 
 class PaymentOrder < ActiveRecord::Base
+  include PostOperationExecution
 
   CONFIG = {
       meal_card: {

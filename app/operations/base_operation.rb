@@ -38,40 +38,40 @@ class BaseOperation
   def run
     clear_messages
     validate_user_model
-    return failure if has_errors?
+    return execute_failure if has_errors?
     authorize_subscriptions
-    return failure if has_errors?
+    return execute_failure if has_errors?
     authorize_user authorized_user_types
-    return failure if has_errors?
+    return execute_failure if has_errors?
     execute_function :pre_validate
-    return failure if has_errors?
+    return execute_failure if has_errors?
     execute_function :pre_authorize
-    return failure if has_errors?
+    return execute_failure if has_errors?
     execute_function :init
-    return failure if has_errors?
+    return execute_failure if has_errors?
     execute_function :authorize
-    return failure if has_errors?
+    return execute_failure if has_errors?
     execute_function :validate
-    return failure if has_errors?
+    return execute_failure if has_errors?
     execute_function :subscribe
-    return failure if has_errors?
+    return execute_failure if has_errors?
     if expense_management?
       execute_function :configure_expense_management
-      return failure if has_errors?
+      return execute_failure if has_errors?
     elsif funds_transfer?
       execute_function :configure_disburse
-      return failure if has_errors?
+      return execute_failure if has_errors?
     elsif vendor_payments?
       execute_function :configure_vendor_payment
-      return failure if has_errors?
+      return execute_failure if has_errors?
     end
     execute_function :pre_process
-    return failure if has_errors?
+    return execute_failure if has_errors?
     execute_function :process
-    return failure if has_errors?
+    return execute_failure if has_errors?
     self.process_complete = true
     execute_function :post_process
-    return failure if has_errors?
+    return execute_failure if has_errors?
     execute_function :retrieve
   end
 
@@ -175,6 +175,10 @@ class BaseOperation
 
   end
 
+  def execute_post_operations(success)
+
+  end
+
   def configure_expense_management
 
   end
@@ -192,9 +196,9 @@ class BaseOperation
     if self.response.present?
       response
     elsif success?
-      success
+      execute_success
     else
-      failure
+      execute_failure
     end
   end
 
@@ -346,8 +350,18 @@ class BaseOperation
   end
 
   protected
+  def execute_success
+    execute_post_operations(true)
+    success
+  end
+
   def success
     BaseOperation::BasePresenter::SuccessPresenter.new(self.user, self.params, self.messages)
+  end
+
+  def execute_failure
+    execute_post_operations(false)
+    failure
   end
 
   def failure

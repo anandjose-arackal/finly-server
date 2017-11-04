@@ -154,6 +154,8 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         value: payment_request.request_total,
         currency_id: payment_request.currency_id
     }
+    p[:on_completion_event] = payment_request.on_completion_event
+    p[:on_completion_params] = payment_request.on_completion_params
     p[:payments_attributes] = []
     payment_request.payment_items.each do |pi|
       p[:payments_attributes] << {
@@ -176,7 +178,9 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
           },
           date: pi.date,
           reference_resource: pi.reference_resource,
-          note: pi.note
+          note: pi.note,
+          on_completion_event: pi.on_completion_event,
+          on_completion_params: pi.on_completion_params
       }
     end
     p

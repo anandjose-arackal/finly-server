@@ -31,6 +31,7 @@
 
 
 class Payment < ActiveRecord::Base
+  include PostOperationExecution
 
   class Payment::AccountType
     VIRTUAL_ACCOUNT = 'Company'

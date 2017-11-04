@@ -16,7 +16,8 @@ class PaymentRequest < NonPersistentModel
                 :payment_items,
                 :payment_type_id,
                 :currency_id,
-                :bank_transfer_type
+                :bank_transfer_type,
+                :on_completion_event, :on_completion_params
 
   belongs_to :company
   belongs_to :initiating_resource, polymorphic: true
@@ -44,7 +45,9 @@ class PaymentRequest < NonPersistentModel
                  currency_id: options[:currency_id],
                  background: !!options[:background],
                  bank_transfer_type: options[:bank_transfer_type],
-                 company_id: options[:company_id]
+                 company_id: options[:company_id],
+                 on_completion_event: options[:on_completion_event],
+                 on_completion_params: options[:on_completion_params]
              })
   end
 
@@ -119,7 +122,8 @@ class PaymentRequest < NonPersistentModel
                   :amount,
                   :payment_request,
                   :reference_resource,
-                  :note
+                  :note,
+                  :on_completion_event, :on_completion_params
 
     delegate :initiating_resource,:initiating_resource_id,:initiating_resource_type,
              :initiating_account, :initiating_account_id, :initiating_account_type, :scheduled_at,
@@ -142,7 +146,9 @@ class PaymentRequest < NonPersistentModel
                    receiving_account: receiving_account,
                    amount: amount,
                    reference_resource: options[:reference_resource],
-                   note: options[:note]
+                   note: options[:note],
+                   on_completion_event: options[:on_completion_event],
+                   on_completion_params: options[:on_completion_params]
                })
     end
 
