@@ -33,6 +33,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -336,6 +337,11 @@ class Payment < ActiveRecord::Base
 
   def retriable?
     self.failed?
+  end
+
+  def gross_amount
+    return self.amount.value unless self.invoice.present?
+    self.invoice.gross_amount&.value # the idea is that gross amount should be present if the invoice exists
   end
 
   private

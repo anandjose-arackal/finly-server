@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171103164814) do
+ActiveRecord::Schema.define(version: 20171104085638) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1814,6 +1814,7 @@ ActiveRecord::Schema.define(version: 20171103164814) do
     t.decimal  "TDS",                            precision: 64, scale: 12
     t.integer  "tds_type_id",        limit: 4
     t.integer  "gst_type_id",        limit: 4
+    t.integer  "payment_id",         limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree

@@ -27,6 +27,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     unless self.payment.update(payment_params)
       add_message :error, self.payment.errors.full_messages
     end
+    calculate_tax_and_discounts
   end
 
   def post_process
@@ -37,10 +38,21 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
 
   def payment_attributes
     # todo - add attributes here for invoice and attachment
-    params.require(:payment).permit(invoice_attributes: [:SGST, :CGST, :IGST, :tax_type_id, :discount, :date,
-                                                         :discount_type_id, :due_date, :invoice_number],
-                                    address_attributes: [],
+    params.require(:payment).permit(invoice_attributes: [:SGST, :CGST, :IGST, :gst_type_id, :TDS, :tds_type_id,
+                                                         :tax_type_id, :discount, :date, :discount_type_id, :due_date,
+                                                         :invoice_number, :inclusive_of_taxes, amount_attributes: [:value, :currency_id]],
+                                    invoice_attachment_attributes: [:attached_file, :description]
                                     )
+  end
+
+  def calculate_tax_and_discounts
+    invoice = payment.invoice
+    amount = invoice.amount&.value
+    if invoice.inclusive_of_taxes
+      # calculate the other amounts retrospectively
+    else
+      # calculate proactively
+    end
   end
 
 end

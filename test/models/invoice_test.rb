@@ -22,6 +22,7 @@
 #  TDS                :decimal(64, 12)
 #  tds_type_id        :integer
 #  gst_type_id        :integer
+#  payment_id         :integer
 #
 
 require 'test_helper'
