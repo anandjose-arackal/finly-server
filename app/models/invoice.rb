@@ -41,6 +41,8 @@ class Invoice < ActiveRecord::Base
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments
   accepts_nested_attributes_for :amount
+  accepts_nested_attributes_for :gross_amount
+  accepts_nested_attributes_for :net_amount
 
   validates :gross_amount, presence: true
   validates :net_amount, presence: true
