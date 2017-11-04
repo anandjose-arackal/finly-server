@@ -40,9 +40,28 @@ json.payments do
     json.bank_reference_number payment.reference_resource&.bank_reference_number
     json.retriable payment.retriable?
 
+    invoice = payment.invoice
     if payment.invoice.present?
       json.invoice do
-
+        json.sgst invoice.SGST
+        json.cgst invoice.CGST
+        json.igst invoice.IGST
+        json.tds invoice.TDS
+        json.gst_type_id invoice.gst_type_id
+        json.tax_type_id invoice.tax_type_id
+        json.tds_type_id invoice.tds_type_id
+        json.discount invoice.discount
+        json.date invoice.date
+        json.discount_type_id invoice.discount_type_id
+        json.due_date invoice.due_date
+        json.invoice_number invoice.invoice_number
+        json.inclusive_of_taxes invoice.inclusive_of_taxes
+        json.invoice_attachment do
+          json.url invoice.invoice_attachments.first.attached_file.url
+          json.thumb invoice.invoice_attachments.first.attached_file.url(:thumb)
+        end
+        json.net_amount invoice.net_amount&.value
+        json.gross_amount invoice.gross_amount&.value
       end
     end
   end
