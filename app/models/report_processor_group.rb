@@ -40,7 +40,7 @@ class ReportProcessorGroup < ActiveRecord::Base
   accepts_nested_attributes_for :total_amount
   accepts_nested_attributes_for :processed_amount
 
-  scope :created_bby_user, -> (user_id) { where created_by_user_id: user_id }
+  scope :created_by_user, -> (user_id) { where created_by_user_id: user_id }
   scope :include_for_show, -> {
     includes(
         {mappings:

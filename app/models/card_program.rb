@@ -122,4 +122,11 @@ class CardProgram < ActiveRecord::Base
     self.name
   end
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end

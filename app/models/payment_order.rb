@@ -137,6 +137,14 @@ class PaymentOrder < ActiveRecord::Base
 
   # method for total of all the payments in this particular payment order
   def request_total
+    # in case the payment order is not yet created
+    if self.id.blank?
+      total = 0
+      self.payments.each do |payment|
+        total += payment.amount.value
+      end
+      return total
+    end
     self.payments.joins(:amount).sum(:value)
   end
 

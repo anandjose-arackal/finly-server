@@ -40,6 +40,7 @@ module Seedable
       end
       # todo handle destroying data if it should not exist in database
     end
+
     alias_method :sync_data, :seed_data
 
   end
@@ -50,5 +51,6 @@ module Seedable
         name: name
     }
   end
+
 
 end

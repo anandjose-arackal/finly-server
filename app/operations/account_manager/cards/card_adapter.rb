@@ -103,9 +103,8 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     [Card, UserWallet, ItzCashCompanyAccount]
   end
 
-  def eligibility(payment)
-    # checks if the particular card can be credited with so and so amount
-    true
+  def eligibility(amount)
+    credit_eligibility >= amount
   end
 
   def credit_eligibility

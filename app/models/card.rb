@@ -251,6 +251,7 @@ class Card < ActiveRecord::Base
 
   def as_json(options={})
     {
+        id: id,
         user: user,
         proxy: proxy,
         description: description,

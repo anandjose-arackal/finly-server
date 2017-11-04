@@ -67,8 +67,11 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
         receiving_account_adapter = retrieve_adapter payment.receiving_account
         unless receiving_account_adapter.eligibility(payment.amount_value)
           valid = false
-          payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value}",
-                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+          # If the object exists, i.e only validator is not being called
+          if payment.id.present?
+            payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value}",
+                                          system_message_type_id: SystemMessageType.id_for(:error)).save
+          end
         end
       end
       unless valid
@@ -82,8 +85,11 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
         receiving_account_adapter = retrieve_adapter payment.receiving_account
         unless receiving_account_adapter.balance >= payment.amount_value
           valid = false
-          payment.system_messages.build(content: "#{receiving_account_adapter.name} has insufficient balance",
-                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+          # If the object exists, i.e only validator is not being called
+          if payment.id.present?
+            payment.system_messages.build(content: "#{receiving_account_adapter.name} has insufficient balance",
+                                          system_message_type_id: SystemMessageType.id_for(:error)).save
+          end
         end
       end
       unless valid

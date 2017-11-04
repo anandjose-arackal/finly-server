@@ -57,16 +57,16 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
       add_message :error, self.report_processor_group.errors.full_messages
       return
     end
-    validate_balance
+    validator = AccountManager::Payments::PaymentValidator.(self.report_processor_group.payment_order)
+    unless validator.success?
+      add_message :error, validator.messages[:error]
+      return
+    end
   end
 
   def process
-    op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
-    unless op.success?
-      add_message :error, (op&.messages[:error] || 'Unknown Error')
-      return
-    end
     self.report_processor_group.save
+    AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
   end
 
   protected
@@ -194,8 +194,12 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
   def set_payment_request
     return unless ['bank_transfer', 'reimbursement_card'].include?(params&.dig(:payment_type))
     receiving_account_class = params&.dig(:payment_type) == 'bank_transfer' ? BankAccount.name : Card.name
-    self.payment_request = ::PaymentRequest.(user, self.report_processor_group.source_account, receiving_account_class, :credit, :reimbursement,
-        background: true, scheduled_at: self.report_processor_group.scheduled_at)
+    post_operation = 'Settlement::SReport::Processing::PostOperation'
+    post_operation_payload = {report_id: 1}
+    self.payment_request = ::PaymentRequest.(user, self.report_processor_group.source_account,
+        receiving_account_class, :credit, :reimbursement,
+        background: true, scheduled_at: self.report_processor_group.scheduled_at,
+        post_operation: post_operation, post_operation_payload: post_operation_payload)
     self.report_processor_group.payment_order = self.payment_request.payment_order
     self.report_processor_group.mappings.each do |mapping|
       payment_item = PaymentRequest::PaymentItem.(mapping.user, mapping.processor_accountable, mapping.amount.value)
