@@ -25,8 +25,6 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     # create the payment order object and associated payments, if the payment request is present
     self.payment_request = params[:payment_request]
     if payment_request.present?
-      self.payment_order_params = retrieve_payment_order_params
-
       self.company = Company.find_by(id: company_id)
       self.options = {}
       self.options[:bank_transfer_type] = params[:bank_transfer_type]
@@ -54,8 +52,8 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     end
 
     # building the payment order if it wasn't already passed from the payment request
-    if payment_order.blank?
-      self.payment_order = company.payment_orders.build(payment_order_params)
+    if payment_order.blank? and payment_request.present?
+      self.payment_order = payment_request.build_payment_order
     end
 
     unless payment_order.valid?
@@ -137,53 +135,5 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     end
   end
 
-  private
-
-  def retrieve_payment_order_params
-    p = {}
-    p[:payment_purpose_id] = payment_request.payment_purpose_id
-    p[:payment_order_status_id] = payment_request.retrieve_payment_order_status
-    p[:initiating_user_id] = payment_request.initiating_resource_id
-    p[:company_id] = self.company_id # assuming there will be a user executing this particular operation
-    p[:scheduled_at] = payment_request.scheduled_at
-    p[:initiating_account_type] = payment_request.initiating_account_type
-    p[:receiving_account_type] = payment_request.receiving_account_type
-    p[:currency_id] = payment_request.currency_id
-    p[:application] = RequestStore.store[:current_app]
-    p[:amount_requested_attributes] = {
-        value: payment_request.request_total,
-        currency_id: payment_request.currency_id
-    }
-    p[:on_completion_event] = payment_request.on_completion_event
-    p[:on_completion_params] = payment_request.on_completion_params
-    p[:payments_attributes] = []
-    payment_request.payment_items.each do |pi|
-      p[:payments_attributes] << {
-          payment_type_id: pi.payment_type_id,
-          application: RequestStore.store[:current_app],
-          receiving_user_id: pi.receiving_resource_id,
-          receiving_user_type: pi.receiving_resource_type,
-          initiating_user_id: pi.initiating_resource_id,
-          initiating_user_type: pi.initiating_resource_type,
-          initiating_account_id: pi.initiating_account_id,
-          initiating_account_type: pi.initiating_account_type,
-          receiving_account_type: pi.receiving_account_type,
-          receiving_account_id: pi.receiving_account_id,
-          payment_status_id: pi.payment_status_id,
-          payment_purpose_id: pi.payment_purpose_id,
-          payment_mode: payment_request.bank_transfer_type,
-          amount_attributes: {
-              value: pi.amount,
-              currency_id: pi.currency_id
-          },
-          date: pi.date,
-          reference_resource: pi.reference_resource,
-          note: pi.note,
-          on_completion_event: pi.on_completion_event,
-          on_completion_params: pi.on_completion_params
-      }
-    end
-    p
-  end
 end
 

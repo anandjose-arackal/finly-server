@@ -28,8 +28,6 @@
 #
 
 
-
-
 class Payment < ActiveRecord::Base
   include PostOperationExecution
 
@@ -89,14 +87,14 @@ class Payment < ActiveRecord::Base
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
   scope :with_details, -> { includes :amount, :initiating_user, :receiving_user, :payment_type }
-  scope :scheduled, -> {where payment_status_id: PaymentStatus.id_for(:scheduled)}
-  scope :with_receiving_account_type, -> (receiving_account_type){
+  scope :scheduled, -> { where payment_status_id: PaymentStatus.id_for(:scheduled) }
+  scope :with_receiving_account_type, -> (receiving_account_type) {
     where receiving_account_type: receiving_account_type
   }
   scope :with_receiving_account_id, -> (ids) {
     where receiving_account_id: ids
   }
-  scope :with_initiating_account_type, -> (initiating_account_type){
+  scope :with_initiating_account_type, -> (initiating_account_type) {
     where initiating_account_type: initiating_account_type
   }
   scope :with_initiating_account_id, -> (ids) {
@@ -142,12 +140,12 @@ class Payment < ActiveRecord::Base
   scope :debit_from_card_to_virtual_account, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::VIRTUAL_ACCOUNT, receiving_account_type: Payment::AccountType::CARD }
   scope :debit_from_card_to_wallet, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::WALLET, receiving_account_type: Payment::AccountType::CARD }
   scope :debit_from_card_to_card, -> { where payment_type_id: PaymentType.id_for(:debit), initiating_account_type: Payment::AccountType::CARD, receiving_account_type: Payment::AccountType::CARD }
-  scope :cash_on_hand_credits, -> {where(receiving_account_type: "CashOnHand")}
+  scope :cash_on_hand_credits, -> { where(receiving_account_type: "CashOnHand") }
   scope :cash_advance, -> { where payment_purpose_id: PaymentPurpose.id_for(:cash_advance) }
   scope :successful, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
   scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
-  scope :successful_and_failed_only, -> {where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)]}
-  scope :completed, -> {where payment_status_id: PaymentStatus.id_for(:completed)}
+  scope :successful_and_failed_only, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)] }
+  scope :completed, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
 
   scope :transfer_to_card, -> { where('(payment_type_id = ? AND receiving_account_type = ?) OR (payment_type_id = ? AND initiating_account_type = ?)',
                                       PaymentType.id_for(:credit), Payment::AccountType::CARD, PaymentType.id_for(:debit), Payment::AccountType::CARD) }
@@ -184,7 +182,7 @@ class Payment < ActiveRecord::Base
     end
   }
 
-  scope :filter_vendor_payments, -> (enabled){
+  scope :filter_vendor_payments, -> (enabled) {
     if ['1', 1].include?(enabled)
       where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
     end
@@ -199,6 +197,8 @@ class Payment < ActiveRecord::Base
     payments = arel_table
     where(payments[type_val].gteq(date_from).and(payments[type_val].lteq(date_to)))
   }
+
+  scope :pending, -> { where payment_status_id: [PaymentStatus.id_for(:pending), PaymentStatus.id_for(:scheduled)] }
 
   # validates :amount_id, presence: true
   validates :date, presence: true

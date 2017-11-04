@@ -16,7 +16,7 @@
 #     }
 # }
 class Settlement::SReport::Processing::Create < Settlement::SReport::Processing::Base
-  attr_accessor :processor_params, :report_processor_group, :scheduled
+  attr_accessor :processor_params, :report_processor_group, :scheduled, :payment_request
 
   def authorized_user_types
     [:admin, :finance_manager]
@@ -49,6 +49,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     end
     set_source_account
     set_receiving_accounts
+    set_payment_request
   end
 
   def validate
@@ -60,14 +61,12 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
   end
 
   def process
-    self.report_processor_group.save
-  end
-
-  def post_process
-    unless scheduled
-      params[:report_processor_group_id] = self.report_processor_group.id
-      Settlement::SReport::Processing::Process.(user, params)
+    op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    unless op.success?
+      add_message :error, (op&.messages[:error] || 'Unknown Error')
+      return
     end
+    self.report_processor_group.save
   end
 
   protected
@@ -190,6 +189,19 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     end
 
     self.report_processor_group.total_amount = Amount.new(value: total, currency_id: currency_id)
+  end
+
+  def set_payment_request
+    return unless ['bank_transfer', 'reimbursement_card'].include?(params&.dig(:payment_type))
+    receiving_account_class = params&.dig(:payment_type) == 'bank_transfer' ? BankAccount.name : Card.name
+    self.payment_request = ::PaymentRequest.(user, self.report_processor_group.source_account, receiving_account_class, :credit, :reimbursement,
+        background: true, scheduled_at: self.report_processor_group.scheduled_at)
+    self.report_processor_group.payment_order = self.payment_request.payment_order
+    self.report_processor_group.mappings.each do |mapping|
+      payment_item = PaymentRequest::PaymentItem.(mapping.user, mapping.processor_accountable, mapping.amount.value)
+      self.payment_request.add_payment_item(payment_item)
+      mapping.payment = payment_item.payment
+    end
   end
 
   def validate_balance

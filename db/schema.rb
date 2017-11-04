@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171030154048) do
+ActiveRecord::Schema.define(version: 20171104050835) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2243,6 +2243,8 @@ ActiveRecord::Schema.define(version: 20171030154048) do
     t.integer  "payment_purpose_id",        limit: 4,     null: false
     t.integer  "currency_id",               limit: 4,     null: false
     t.string   "application",               limit: 255
+    t.text     "post_operation",            limit: 65535
+    t.text     "post_operation_payload",    limit: 65535
   end
 
   add_index "payment_orders", ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id", using: :btree
@@ -2311,6 +2313,8 @@ ActiveRecord::Schema.define(version: 20171030154048) do
     t.string   "application",             limit: 255
     t.string   "payment_mode",            limit: 255
     t.string   "reference_id",            limit: 255,   null: false
+    t.text     "post_operation",          limit: 65535
+    t.text     "post_operation_payload",  limit: 65535
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -2724,10 +2728,14 @@ ActiveRecord::Schema.define(version: 20171030154048) do
     t.integer  "company_id",                limit: 4,                   null: false
     t.datetime "created_at",                                            null: false
     t.datetime "updated_at",                                            null: false
+    t.integer  "payment_order_id_id",       limit: 4
+    t.integer  "payment_order_id",          limit: 4
   end
 
   add_index "report_processor_groups", ["company_id"], name: "index_report_processor_groups_on_company_id", using: :btree
   add_index "report_processor_groups", ["created_by_user_id"], name: "index_report_processor_groups_on_created_by_user_id", using: :btree
+  add_index "report_processor_groups", ["payment_order_id"], name: "index_report_processor_groups_on_payment_order_id", using: :btree
+  add_index "report_processor_groups", ["payment_order_id_id"], name: "index_report_processor_groups_on_payment_order_id_id", using: :btree
   add_index "report_processor_groups", ["processed_amount_id"], name: "index_report_processor_groups_on_processed_amount_id", using: :btree
   add_index "report_processor_groups", ["scheduled_at"], name: "index_report_processor_groups_on_scheduled_at", using: :btree
   add_index "report_processor_groups", ["source_account_id"], name: "index_report_processor_groups_on_source_account_id", using: :btree
@@ -3406,6 +3414,7 @@ ActiveRecord::Schema.define(version: 20171030154048) do
   add_foreign_key "report_processor_group_mappings", "payments"
   add_foreign_key "report_processor_group_mappings", "users"
   add_foreign_key "report_processor_groups", "companies"
+  add_foreign_key "report_processor_groups", "payment_orders"
   add_foreign_key "report_tracks", "report_statuses"
   add_foreign_key "report_tracks", "report_tracking_actions"
   add_foreign_key "report_tracks", "reports"

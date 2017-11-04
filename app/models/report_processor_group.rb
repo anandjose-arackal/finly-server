@@ -31,6 +31,7 @@ class ReportProcessorGroup < ActiveRecord::Base
   belongs_to :status, class_name: 'ReportProcessorGroupStatus'
   belongs_to :source_account, polymorphic: true
   belongs_to :company
+  belongs_to :payment_order
 
   validates :created_by_user_id, presence: true
   validates :status_id, presence: true
@@ -57,5 +58,14 @@ class ReportProcessorGroup < ActiveRecord::Base
   }
 
   delegate :scheduled?, :processing?, :processing?, :partially_completed?, :completed?, :failed?, :cancelled?, to: :status
+
+  before_destroy do
+    if payment_order.present?
+      if [PaymentOrderStatus.id_for(:scheduled)].include? payment_order.payment_order_status_id
+        payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:cancelled))
+        payment_order.payments.pending.update_all(payment_status_id: PaymentStatus.id_for(:cancelled))
+      end
+    end
+  end
 
 end
