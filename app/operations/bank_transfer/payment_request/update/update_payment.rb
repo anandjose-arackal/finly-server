@@ -1,7 +1,7 @@
 class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::PaymentRequest::Update::Base
 
   attr_accessor :payment, :payment_request, :payment_params, :amount, :gross_amount, :net_amount,
-                :invoice
+                :invoice, :cgst_amount, :sgst_amount, :igst_amount, :discount_amount, :tds_amount
 
   def init
     super
@@ -58,13 +58,54 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       calculate_discount
       calculate_inclusive_taxes
       calculate_tds
-
     else
       # calculate proactively
       calculate_discount
       calculate_exclusive_taxes
       calculate_tds
     end
+    self.invoice.update(
+       amount_attributes: {
+           value: self.amount,
+           currency_id: 1,
+           id: self.invoice.amount&.id
+       },
+       net_amount_attributes: {
+           value: self.net_amount,
+           currency_id: 1,
+           id: self.invoice.net_amount&.id
+       },
+       gross_amount_attributes: {
+           value: self.gross_amount,
+           currency_id: 1,
+           id: self.invoice.gross_amount&.id
+       },
+       discount_amount_attributes: {
+           value: self.discount_amount,
+           currency_id: 1,
+           id: self.invoice.gross_amount&.id
+       },
+       tds_amount_attributes: {
+           value: self.tds_amount,
+           currency_id: 1,
+           id: self.invoice.gross_amount&.id
+       },
+       cgst_amount_attributes: {
+           value: self.cgst_amount,
+           currency_id: 1,
+           id: self.invoice.gross_amount&.id
+       },
+       sgst_amount_attributes: {
+           value: self.sgst_amount,
+           currency_id: 1,
+           id: self.invoice.gross_amount&.id
+       },
+       igst_amount_attributes: {
+           value: self.igst_amount,
+           currency_id: 1,
+           id: self.invoice.gross_amount&.id
+       }
+    )
   end
 
   def calculate_discount
