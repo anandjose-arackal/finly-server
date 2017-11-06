@@ -2227,6 +2227,7 @@ Rails.application.routes.draw do
 
   namespace :integration do
     get 'tally/vouchers', to: 'tally#vouchers'
+    post 'tally/configuration', to: 'tally#set_configuration'
   end
 
 

@@ -6,6 +6,10 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
       add_message :error, 'User not found'
       return
     end
+    unless current_company.tally_configuration.present? and current_company.tally_configuration.active
+      add_message :error, 'Tally integration has not been configured for your company'
+      return
+    end
   end
 
   def process
@@ -22,7 +26,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
   def success
     current_class_path = self.method(:success).source_location.first.gsub('/vouchers.rb', '')
     template = "#{current_class_path}/tally.xml"
-    Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses}}}, messages)
+    Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses, company_name: current_company.tally_configuration.company_name}}}, messages)
   end
 
   # class Personalizer::Adapters::Company2::ExportTemplates2::Tally::Presenter < Exporter
