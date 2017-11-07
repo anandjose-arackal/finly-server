@@ -140,6 +140,13 @@ class PaymentOrder < ActiveRecord::Base
     self.payments.joins(:amount).sum(:value)
   end
 
+  def payment_mode
+    if super.blank?
+      return self.payments.first&.payment_mode
+    end
+    super
+  end
+
   def payment_type
     self.payments.first&.payment_type&.name&.humanize
   end
