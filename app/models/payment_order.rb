@@ -22,6 +22,7 @@
 #  payment_purpose_id        :integer          not null
 #  currency_id               :integer          not null
 #  application               :string(255)
+#  payment_mode              :string(255)
 #
 
 class PaymentOrder < ActiveRecord::Base
@@ -140,7 +141,7 @@ class PaymentOrder < ActiveRecord::Base
   end
 
   def payment_mode
-    self.payments.first&.payment_mode
+    self.payment_mode || self.payments.first&.payment_mode
   end
 
   def payment_type
