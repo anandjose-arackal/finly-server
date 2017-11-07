@@ -21,7 +21,7 @@ class ReceiptEmailAttachment < ActiveRecord::Base
   IMAGE_CONTENT_TYPES = ['image/jpg', 'image/jpeg', 'image/png', 'image/gif'].freeze
   MSWORD_CONTENT_TYPES = ['application/rtf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'].freeze
 
-  has_many :system_messages, as: :messagable
+  has_many :system_messages, as: :messagable, dependent: :destroy
 
   belongs_to :receipt_email
   has_attached_file :original_attachment

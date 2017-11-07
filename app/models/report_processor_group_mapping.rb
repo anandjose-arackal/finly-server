@@ -26,7 +26,7 @@ class ReportProcessorGroupMapping < ActiveRecord::Base
   belongs_to :payment
 
   has_many :reports
-  has_many :system_messages, as: :messagable
+  has_many :system_messages, as: :messagable, dependent: :destroy
 
   validates :user_id, presence: true
   validates :status_id, presence: true

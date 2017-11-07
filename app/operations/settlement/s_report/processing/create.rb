@@ -34,8 +34,10 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
   end
 
   def init
+    role_id = admin_view? ? UserRole.id_for(:admin) : UserRole.id_for(:finance_manager)
     self.report_processor_group = current_company.report_processor_groups.new({
                                                                                   created_by_user: user,
+                                                                                  created_by_user_role_id: role_id,
                                                                                   scheduled_at: params[:scheduled_at],
                                                                                   payment_type: params[:payment_type],
                                                                                   payment_mode: params[:payment_mode]

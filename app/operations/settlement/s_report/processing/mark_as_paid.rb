@@ -17,8 +17,8 @@ class Settlement::SReport::Processing::MarkAsPaid < Settlement::SReport::Process
 
   def init
     groups_presenter = Settlement::SReport::Processing::Index.(user, params)
-    unless report_group_processors_presenter.success?
-      add_message :error, report_group_processors_presenter.messages[:error]
+    unless groups_presenter.success?
+      add_message :error, groups_presenter.messages[:error]
       return
     end
     self.report_group_processor = groups_presenter.report_processor_groups.find_by_id(params[:report_processor_group_id])

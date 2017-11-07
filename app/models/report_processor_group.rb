@@ -45,6 +45,7 @@ class ReportProcessorGroup < ActiveRecord::Base
 
   scope :created_by_user, -> (user_id) { where created_by_user_id: user_id }
   scope :with_payment_order_id, -> (payment_order_id) { where payment_order_id: payment_order_id }
+  scope :include_mapping_reports, -> { includes({mappings: [:reports, :system_messages]}) }
   scope :include_for_show, -> {
     includes(
         {mappings:
