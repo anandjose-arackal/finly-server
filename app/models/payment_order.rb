@@ -140,7 +140,7 @@ class PaymentOrder < ActiveRecord::Base
   end
 
   def payment_mode
-    self.payments.first.payment_mode
+    self.payments.first&.payment_mode
   end
 
   def payment_type
