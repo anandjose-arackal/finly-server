@@ -66,7 +66,9 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
 
   def process
     self.report_processor_group.save
-    AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    if self.report_processor_group.process_via_finly?
+      AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    end
   end
 
   protected
@@ -192,29 +194,19 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
   end
 
   def set_payment_request
-    return unless ['bank_transfer', 'reimbursement_card'].include?(params&.dig(:payment_type))
+    return unless self.report_processor_group.process_via_finly?
     receiving_account_class = params&.dig(:payment_type) == 'bank_transfer' ? BankAccount.name : Card.name
     post_operation = 'Settlement::SReport::Processing::PostOperation'
-    post_operation_payload = {report_id: 1}
     self.payment_request = ::PaymentRequest.(user, self.report_processor_group.source_account,
         receiving_account_class, :credit, :reimbursement,
         background: true, scheduled_at: self.report_processor_group.scheduled_at,
-        post_operation: post_operation, post_operation_payload: post_operation_payload)
+        post_operation: post_operation)
     self.report_processor_group.payment_order = self.payment_request.payment_order
     self.report_processor_group.mappings.each do |mapping|
       payment_item = PaymentRequest::PaymentItem.(mapping.user, mapping.processor_accountable, mapping.amount.value)
       self.payment_request.add_payment_item(payment_item)
       mapping.payment = payment_item.payment
     end
-  end
-
-  def validate_balance
-    total_amount = self.report_processor_group.total_amount.value
-    unless total_amount.present? and total_amount > 0
-      add_message :error, 'Error loading configuration'
-      return
-    end
-
   end
 
 end

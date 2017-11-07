@@ -68,4 +68,12 @@ class ReportProcessorGroup < ActiveRecord::Base
     end
   end
 
+  def process_outside_finly?
+    !process_via_finly?
+  end
+
+  def process_via_finly?
+    ['bank_transfer', 'reimbursement_card'].include?(payment_type)
+  end
+
 end
