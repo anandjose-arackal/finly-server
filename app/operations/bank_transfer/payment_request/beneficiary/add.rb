@@ -30,8 +30,9 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
     params[:bank_accounts].each do |bank_account|
       id = bank_account[:id]
       account = user.company.bank_accounts.find_by(id: id)
+      initiating_account = bank_payment_request.payment_order.initiating_account || user.bank_wallet
       self.payments_data << {
-          initiating_account: bank_payment_request.payment_order.initiating_account,
+          initiating_account: initiating_account,
           receiving_account: account,
           receiving_user: account.account_owner,
           initiating_user: user,

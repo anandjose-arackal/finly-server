@@ -50,9 +50,9 @@ class TransferTimingUtils
     case payment_mode.upcase
       when "NEFT", "RTGS"
         date = original_time.to_date
-        next_date = date.sunday + 1.day # i.e. the next monday of that week
+        next_date = date + 1.day # i.e. the next day
         loop do
-          if bank_holidays.include?(next_date.strftime("%d-%m-%Y"))
+          if bank_holidays.include?(next_date.strftime("%d-%m-%Y")) || next_date.sunday?
             next_date = next_date + 1.day
           else
             return next_date

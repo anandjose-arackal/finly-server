@@ -49,6 +49,7 @@ class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::Paymen
         }
       end
     end
+    p[:payment_mode] = params[:bank_payment_request][:bank_transfer_type]
     p.permit!
   end
 

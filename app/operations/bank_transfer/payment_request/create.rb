@@ -132,6 +132,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
         value: self.requested_amount,
         currency_id: Currency.first.id
     }
+    p[:payment_order_attributes][:payment_mode] = params[:bank_transfer_type]
     p[:payment_order_attributes][:initiating_account_type] = initiating_account.class.name
     p[:payment_order_attributes][:receiving_account_type] = BankAccount.name
     p[:payment_order_attributes][:payment_purpose_id] = PaymentPurpose.id_for(:vendor_payment)

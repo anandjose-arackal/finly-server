@@ -22,6 +22,7 @@
 #  payment_purpose_id        :integer          not null
 #  currency_id               :integer          not null
 #  application               :string(255)
+#  payment_mode              :string(255)
 #
 
 class PaymentOrder < ActiveRecord::Base
@@ -140,11 +141,14 @@ class PaymentOrder < ActiveRecord::Base
   end
 
   def payment_mode
-    self.payments.first.payment_mode
+    if super.blank?
+      return self.payments.first&.payment_mode
+    end
+    super
   end
 
   def payment_type
-    self.payments.first.payment_type.name.humanize
+    self.payments.first&.payment_type&.name&.humanize
   end
 
   def credit?
@@ -166,7 +170,7 @@ class PaymentOrder < ActiveRecord::Base
 
   # for convenience, just picks this up from the individual payments
   def initiating_account
-    self.payments.first.initiating_account
+    self.payments.first&.initiating_account
   end
 
   def initiating_account_name

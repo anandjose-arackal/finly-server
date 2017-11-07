@@ -30,10 +30,6 @@
 
 
 
-
-
-
-
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
