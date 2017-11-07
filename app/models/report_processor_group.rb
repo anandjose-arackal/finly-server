@@ -14,11 +14,14 @@
 #  created_by_user_id        :integer
 #  source_account_id         :integer
 #  source_account_type       :string(255)
+#  marked_as_completed       :boolean          default(FALSE)
 #  payment_type              :string(255)
 #  payment_mode              :string(255)
 #  company_id                :integer          not null
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  payment_order_id_id       :integer
+#  payment_order_id          :integer
 #
 
 class ReportProcessorGroup < ActiveRecord::Base
@@ -41,6 +44,7 @@ class ReportProcessorGroup < ActiveRecord::Base
   accepts_nested_attributes_for :processed_amount
 
   scope :created_by_user, -> (user_id) { where created_by_user_id: user_id }
+  scope :with_payment_order_id, -> (payment_order_id) { where payment_order_id: payment_order_id }
   scope :include_for_show, -> {
     includes(
         {mappings:

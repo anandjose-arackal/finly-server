@@ -197,10 +197,11 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     return unless self.report_processor_group.process_via_finly?
     receiving_account_class = params&.dig(:payment_type) == 'bank_transfer' ? BankAccount.name : Card.name
     post_operation = 'Settlement::SReport::Processing::PostOperation'
+    post_operation_payload = {}
     self.payment_request = ::PaymentRequest.(user, self.report_processor_group.source_account,
         receiving_account_class, :credit, :reimbursement,
         background: true, scheduled_at: self.report_processor_group.scheduled_at,
-        post_operation: post_operation)
+        post_operation: post_operation, post_operation_payload: post_operation_payload)
     self.report_processor_group.payment_order = self.payment_request.payment_order
     self.report_processor_group.mappings.each do |mapping|
       payment_item = PaymentRequest::PaymentItem.(mapping.user, mapping.processor_accountable, mapping.amount.value)

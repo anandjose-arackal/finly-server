@@ -22,6 +22,8 @@
 #  payment_purpose_id        :integer          not null
 #  currency_id               :integer          not null
 #  application               :string(255)
+#  post_operation            :text(65535)
+#  post_operation_payload    :text(65535)
 #
 
 require 'test_helper'

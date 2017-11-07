@@ -9,6 +9,7 @@
 #  processor_accountable_type :string(255)      not null
 #  amount_id                  :integer          not null
 #  completed_at               :datetime
+#  marked_as_completed        :boolean          default(FALSE)
 #  status_id                  :integer          not null
 #  payment_id                 :integer
 #  created_at                 :datetime         not null
