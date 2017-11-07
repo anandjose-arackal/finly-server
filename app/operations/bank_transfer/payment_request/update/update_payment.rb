@@ -29,7 +29,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     unless self.payment.update(payment_params)
       add_message :error, self.payment.errors.full_messages
     end
-    # calculate_tax_and_discounts
+    calculate_tax_and_discounts
   end
 
   def post_process
@@ -40,7 +40,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
 
   def payment_attributes
     # todo - add attributes here for invoice and attachment
-    params.require(:payment).permit(invoice_attributes: [:tax_rate, :gst_type_id, :TDS, :tds_type_id,
+    params.require(:payment).permit(invoice_attributes: [:tax_rate, :gst_type_id, :tds, :tds_type_id,
                                                          :tax_type_id, :discount, :date, :discount_type_id, :due_date,
                                                          :invoice_number, :inclusive_of_taxes,
                                                          amount_attributes: [:value, :currency_id]],
@@ -107,7 +107,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     end
     case invoice.discount_type_id
       when 1, '1'
-        self.discount_amount = (invoice.discount*amount)/100
+        self.discount_amount = (invoice.discount*self.invoice_amount)/100
       when 2, '2'
         self.discount_amount = invoice.discount
       else
@@ -123,7 +123,8 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
         self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax_rate), self.invoice.tax_type_id)
       when 2, '2'
         # i.e SGST + CGST
-        self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, 2*(self.invoice.tax_rate), self.invoice.tax_type_id)
+        rate = (self.invoice.tax_rate.blank?) ? 0 : self.invoice.tax_rate
+        self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, rate, self.invoice.tax_type_id)
       else
         # do nothing?
     end

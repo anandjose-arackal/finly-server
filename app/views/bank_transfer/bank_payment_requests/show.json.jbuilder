@@ -43,10 +43,8 @@ json.payments do
     invoice = payment.invoice
     if payment.invoice.present?
       json.invoice do
-        json.sgst invoice.SGST
-        json.cgst invoice.CGST
-        json.igst invoice.IGST
-        json.tds invoice.TDS
+        json.tax_amount invoice.tax_amount_value
+        json.tds_amount invoice.tds_amount_value
         json.gst_type_id invoice.gst_type_id
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
@@ -87,10 +85,8 @@ json.payments_verified do
     invoice = payment.invoice
     if payment.invoice.present?
       json.invoice do
-        json.sgst invoice.SGST
-        json.cgst invoice.CGST
-        json.igst invoice.IGST
-        json.tds invoice.TDS
+        json.tax_amount invoice.tax_amount_value
+        json.tds_amount invoice.tds_amount_value
         json.gst_type_id invoice.gst_type_id
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id

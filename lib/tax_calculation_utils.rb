@@ -6,6 +6,9 @@ class TaxCalculationUtils
     if amount == 0 || tax == 0
       return amount
     end
+    if amount.blank? || tax.blank?
+      return amount
+    end
     case type
       when 1, '1'
         amount = amount + (amount*tax)/100
@@ -23,6 +26,9 @@ class TaxCalculationUtils
     if amount == 0 || tax == 0
       return amount
     end
+    if amount.blank? || tax.blank?
+      return amount
+    end
     case type
       when 1, '1'
         amount = (amount * 100) / (100 + tax)
@@ -38,6 +44,9 @@ class TaxCalculationUtils
   # this is always a deduction, so nothing much to do here
   def self.tds_amount(amount = 0, tax = 0, type = 1)
     if amount == 0 || tax == 0
+      return amount
+    end
+    if amount.blank? || tax.blank?
       return amount
     end
     case type
