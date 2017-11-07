@@ -11,7 +11,7 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
     # checking if a particular bank account already exists, if it does, just mark that respective vendor
     # as authorized and add the bank account to their existing list
     self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
-      ba = BankAccount.find_by(account_number: account_params[:account_number])
+      ba = current_company.bank_accounts.find_by(account_number: account_params[:account_number])
       if ba.present?
         self.vendor = ba.account_owner
         # removing this particular bank account from the list of bank accounts being created

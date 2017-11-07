@@ -3,10 +3,11 @@ class AccountManagerUtils
   ACCOUNTS = [
       {class: Card, name: 'Card', code: 'CRD'},
       {class: UserWallet, name: 'Finly Money', code: 'FMY'},
+      {class: VendorPaymentWallet, name: 'Finly Money ( Bank Transfer )', code: 'FMB'},
       {class: ItzCashCompanyAccount, name: 'Company Credits', code: 'ITA'},
       {class: YesBankCompanyAccount, name: 'Bank Transfer Credits', code: 'YBA'},
       {class: CashOnHand, name: 'Cash on Hand', code: 'COH'},
-      {class: BankAccount, name: 'Bank Account', code: 'BAC'},
+      {class: BankAccount, name: 'Bank Account', code: 'BAC'}
   ]
 
   def self.available_accounts(options = {})
