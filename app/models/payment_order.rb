@@ -140,12 +140,8 @@ class PaymentOrder < ActiveRecord::Base
     self.payments.joins(:amount).sum(:value)
   end
 
-  def payment_mode
-    self.payment_mode || self.payments.first&.payment_mode
-  end
-
   def payment_type
-    self.payments.first.payment_type.name.humanize
+    self.payments.first&.payment_type&.name&.humanize
   end
 
   def credit?
@@ -167,7 +163,7 @@ class PaymentOrder < ActiveRecord::Base
 
   # for convenience, just picks this up from the individual payments
   def initiating_account
-    self.payments.first.initiating_account
+    self.payments.first&.initiating_account
   end
 
   def initiating_account_name

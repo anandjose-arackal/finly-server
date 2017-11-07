@@ -6,7 +6,7 @@ json.summary do
   end
   json.retriable @result.bank_payment_request.retriable?
   json.bank_transfer_type @result.payment_order.payment_mode&.upcase
-  json.payment_type @result.payment_order.payment_type.humanize
+  json.payment_type @result.payment_order.payment_type&.humanize
   json.scheduled_at @result.payment_order.scheduled_at&.strftime "%d %b %Y"
   json.processed_at @result.payment_order.processed_at&.strftime "%d %b %Y"
   json.amount_requested @result.payment_order.amount_requested&.value
