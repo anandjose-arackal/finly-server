@@ -7,9 +7,6 @@
 #  date                 :date
 #  due_date             :date
 #  invoice_number       :string(255)
-#  SGST                 :decimal(64, 12)
-#  CGST                 :decimal(64, 12)
-#  IGST                 :decimal(64, 12)
 #  tax_type_id          :integer
 #  discount             :decimal(64, 12)
 #  discount_type_id     :integer
@@ -28,9 +25,11 @@
 #  csgt_amount_id       :integer
 #  igst_amount_id       :integer
 #  tds_amount_id        :integer
+#  tax_amount_id        :integer
+#  tax_rate             :decimal(64, 12)
 #
 
-# gst_type_id: 1 - IGST
+#  gst_type_id: 1 - IGST
 #              2 - CGST + SGST
 
 class Invoice < ActiveRecord::Base
@@ -39,10 +38,8 @@ class Invoice < ActiveRecord::Base
   belongs_to :gross_amount, class_name: "Amount"
   belongs_to :net_amount, class_name: "Amount"
   belongs_to :discounted_amount, class_name: "Amount"
-  belongs_to :sgst_amount, class_name: "Amount"
-  belongs_to :cgst_amount, class_name: "Amount"
-  belongs_to :igst_amount, class_name: "Amount"
   belongs_to :tds_amount, class_name: "Amount"
+  belongs_to :tax_amount, class_name: "Amount"
 
   belongs_to :payment
 
@@ -54,7 +51,11 @@ class Invoice < ActiveRecord::Base
   accepts_nested_attributes_for :gross_amount
   accepts_nested_attributes_for :net_amount
 
-  validates :gross_amount, presence: true
-  validates :net_amount, presence: true
+  # validates :gross_amount, presence: true
+  # validates :net_amount, presence: true
   validates :amount, presence: true
+
+  private
+
+
 end

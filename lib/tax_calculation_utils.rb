@@ -2,14 +2,14 @@
 class TaxCalculationUtils
 
   # type - will be 1 for rate, and 2 for absolute amounts
-  def exclusive_tax_amount(amount = 0, tax = 0, type = 1)
+  def self.exclusive_tax_amount(amount = 0, tax = 0, type = 1)
     if amount == 0 || tax == 0
       return amount
     end
     case type
       when 1, '1'
         amount = amount + (amount*tax)/100
-      when 2, 2
+      when 2, '2'
         amount = amount + tax
       else
         # default is assumed as rate
@@ -18,31 +18,32 @@ class TaxCalculationUtils
     amount
   end
 
-  def inclusive_tax_amount(amount = 0, tax = 0, type = 1)
+  # this returns the gross amount of the
+  def self.inclusive_tax_amount(amount = 0, tax = 0, type = 1)
     if amount == 0 || tax == 0
       return amount
     end
     case type
       when 1, '1'
-        amount = amount - (amount*tax)/100
-      when 2, 2
+        amount = (amount * 100) / (100 + tax)
+      when 2, '2'
         amount = amount - tax
       else
         # default is assumed as rate
-        amount = amount - (amount*tax)/100
+        amount = (amount * 100) / (100 + tax)
     end
     amount
   end
 
   # this is always a deduction, so nothing much to do here
-  def tds_amount(amount = 0, tax = 0, type = 1)
+  def self.tds_amount(amount = 0, tax = 0, type = 1)
     if amount == 0 || tax == 0
       return amount
     end
     case type
       when 1, '1'
         amount = amount - (amount*tax)/100
-      when 2, 2
+      when 2, '2'
         amount = amount - tax
       else
         # default is assumed as rate

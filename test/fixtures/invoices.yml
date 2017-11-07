@@ -7,9 +7,6 @@
 #  date                 :date
 #  due_date             :date
 #  invoice_number       :string(255)
-#  SGST                 :decimal(64, 12)
-#  CGST                 :decimal(64, 12)
-#  IGST                 :decimal(64, 12)
 #  tax_type_id          :integer
 #  discount             :decimal(64, 12)
 #  discount_type_id     :integer
@@ -28,6 +25,8 @@
 #  csgt_amount_id       :integer
 #  igst_amount_id       :integer
 #  tds_amount_id        :integer
+#  tax_amount_id        :integer
+#  tax_rate             :decimal(64, 12)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
