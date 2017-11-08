@@ -36,11 +36,12 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     false
   end
 
-  def balance
+  def balance(options = {})
     # can either be an operation or a specific call with
     # a model call
+    payment_order = options[:payment_order]
     balance = self.account.balance_value
-    blocked_amount_for_payments = account.blocked_amount_for_pending_payments
+    blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
     return (balance - blocked_amount_for_payments)
   end
 

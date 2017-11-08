@@ -70,6 +70,8 @@ class Payment < ActiveRecord::Base
 
   default_scope { order date: :desc, created_at: :desc }
 
+  scope :with_id, -> (id) { where id: id }
+  scope :without_id, -> (id) { where id: id }
   scope :atm_withdrawals, -> { where payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal) }
   scope :advance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:advance_outside_finly)] }
   scope :cash_on_hand_additions, -> { where payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:cash_advance)] }
