@@ -86,7 +86,8 @@ class Expense::Manual::Update < Expense::Manual::Base
     if StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand)) or (updated_expense_params&.dig(:from_cash_on_hand).nil? and expense.from_cash_on_hand)
       coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
       amount_val = (updated_expense_params&.dig(:amount_attributes,:value)&.to_f || expense.amount&.value)
-      unless coh_adapter.balance >= amount_val
+      balance = coh_adapter.balance + expense.amount_value
+      unless balance >= amount_val
         add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
         return
       end
