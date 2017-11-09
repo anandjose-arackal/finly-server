@@ -27,7 +27,7 @@ class AccountManager::OutsideFinly::OutsideFinlyAdapter < AccountManager::BaseAd
     return true
   end
 
-  def balance
+  def balance(options = {})
     # no such thing as balance for this, so returning an insanely high number
     # so that balance checks pass
     return 999999999999999999
