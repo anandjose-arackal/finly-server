@@ -20,6 +20,10 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
       add_message :error, "Payment Order not passed"
       return
     end
+    unless payment_order.valid?
+      add_message :error, payment_order.errors.full_messages
+      return
+    end
     # this validation is irrespective of the source and destination of the payment
     # i.e. checking for consistency of initiating and receiving account types etc.
     unless validate_account_consistency(payment_order)

@@ -18,7 +18,7 @@ class PaymentRequest < NonPersistentModel
                 :currency_id,
                 :bank_transfer_type,
                 :payment_order,
-                :post_operation, :post_operation_payload
+                :post_operation_actions
 
   belongs_to :company
   belongs_to :initiating_resource, polymorphic: true
@@ -46,9 +46,7 @@ class PaymentRequest < NonPersistentModel
                  currency_id: options[:currency_id],
                  background: !!options[:background],
                  bank_transfer_type: options[:bank_transfer_type],
-                 company_id: options[:company_id],
-                 post_operation: options[:post_operation],
-                 post_operation_payload: options[:post_operation_payload]
+                 company_id: options[:company_id]
              })
   end
 
@@ -61,7 +59,12 @@ class PaymentRequest < NonPersistentModel
     self.payment_order_status_id ||= retrieve_payment_order_status
     self.payment_items ||= []
     self.background ||= false
-    build_payment_order
+    self.post_operation_actions = []
+  end
+
+  def add_post_operation_action(operation, payload)
+    self.post_operation_actions = [] if self.post_operation_actions.nil?
+    self.post_operation_actions << {operation: operation, payload: payload}
   end
 
   def retrieve_payment_order_status
@@ -87,7 +90,9 @@ class PaymentRequest < NonPersistentModel
     end
     if payment_item.class.name == 'PaymentRequest::PaymentItem'
       payment_item.payment_request = self
-      payment_item.build_payment(payment_order)
+      if payment_order.present?
+        payment_item.build_payment(payment_order)
+      end
       self.payment_items << payment_item
     else
       return false
@@ -120,10 +125,17 @@ class PaymentRequest < NonPersistentModel
   end
 
   def build_payment_order
-    return self.payment_order if self.payment_order.present?
-    self.payment_order = current_company.payment_orders.build payment_order_params
+    unless self.payment_order.present?
+      self.payment_order = current_company.payment_orders.build payment_order_params
+    end
+    self.payment_order
     self.payment_items.each do |item|
       item.build_payment(self.payment_order)
+    end
+    self.payment_order.post_operation_actions&.destroy_all
+    post_operation_actions&.each do |action_params|
+      action_params[:post_operatable] = self.payment_order
+      self.payment_order.post_operation_actions.build action_params
     end
     self.payment_order
   end
@@ -146,9 +158,7 @@ class PaymentRequest < NonPersistentModel
         amount_requested_attributes: {
             value: request_total,
             currency_id: currency_id
-        },
-        post_operation: post_operation,
-        post_operation_payload: post_operation_payload
+        }
     }
   end
 
@@ -159,10 +169,10 @@ class PaymentRequest < NonPersistentModel
                   :payment_request,
                   :reference_resource,
                   :note,
-                  :post_operation, :post_operation_payload,
+                  :post_operation_actions,
                   :payment
 
-    delegate :initiating_resource,:initiating_resource_id,:initiating_resource_type,
+    delegate :initiating_resource, :initiating_resource_id, :initiating_resource_type,
              :initiating_account, :initiating_account_id, :initiating_account_type, :scheduled_at,
              :payment_type_id, :currency_id, :payment_purpose_id, to: :payment_request, allow_nil: true
 
@@ -183,14 +193,17 @@ class PaymentRequest < NonPersistentModel
                    receiving_account: receiving_account,
                    amount: amount,
                    reference_resource: options[:reference_resource],
-                   note: options[:note],
-                   post_operation: options[:post_operation],
-                   post_operation_payload: options[:post_operation_payload]
+                   note: options[:note]
                })
     end
 
     def post_initialize(attributes={})
+      self.post_operation_actions = []
+    end
 
+    def add_post_operation_action(operation, payload)
+      self.post_operation_actions = [] if self.post_operation_actions.nil?
+      self.post_operation_actions << {operation: operation, payload: payload}
     end
 
     def payment_status_id
@@ -217,8 +230,15 @@ class PaymentRequest < NonPersistentModel
     end
 
     def build_payment(payment_order)
-      return self.payment if self.payment.present?
-      self.payment = payment_order.payments.build payment_params
+      unless self.payment.present?
+        self.payment = payment_order.payments.build payment_params
+      end
+      self.payment.post_operation_actions&.destroy_all
+      post_operation_actions&.each do |action_params|
+        action_params[:self.payment] = self.payment_order
+        self.payment.post_operation_actions.build action_params
+      end
+      self.payment
     end
 
     def payment_params
@@ -242,9 +262,7 @@ class PaymentRequest < NonPersistentModel
           },
           date: date,
           reference_resource: reference_resource,
-          note: note,
-          post_operation: post_operation,
-          post_operation_payload: post_operation_payload
+          note: note
       }
     end
 

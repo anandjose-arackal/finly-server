@@ -12,16 +12,16 @@
 #  total_amount_id           :integer          not null
 #  processed_amount_id       :integer
 #  created_by_user_id        :integer
+#  created_by_user_role_id   :integer
 #  source_account_id         :integer
 #  source_account_type       :string(255)
 #  marked_as_completed       :boolean          default(FALSE)
 #  payment_type              :string(255)
 #  payment_mode              :string(255)
 #  company_id                :integer          not null
+#  payment_order_id          :integer
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
-#  payment_order_id_id       :integer
-#  payment_order_id          :integer
 #
 
 class ReportProcessorGroup < ActiveRecord::Base

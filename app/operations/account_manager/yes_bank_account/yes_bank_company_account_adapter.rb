@@ -37,6 +37,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
   end
 
   def balance
+    return 1000
     # can either be an operation or a specific call with
     # a model call
     balance = self.account.balance_value

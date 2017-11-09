@@ -37,7 +37,7 @@ class Settlement::SReport::Processing::MarkAsPaid < Settlement::SReport::Process
   end
 
   def process
-    Settlement::SReport::Processing::PostOperation.(self.report_group_processor, marked_as_completed: true, true)
+    Settlement::SReport::Processing::PostOperation.(self.report_group_processor, {marked_as_completed: true}, true)
   end
 
 end

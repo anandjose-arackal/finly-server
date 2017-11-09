@@ -11,4 +11,8 @@ class FinlyPostOperation < BaseOperation
     super(nil, params)
   end
 
+  def self.is_finly_post_operation?
+    true
+  end
+
 end

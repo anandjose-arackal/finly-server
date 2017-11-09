@@ -3,6 +3,8 @@ module PostOperationExecution
 
   included do
     has_many :post_operation_actions, as: :post_operatable
+
+    accepts_nested_attributes_for :post_operation_actions
   end
 
   def execute_post_operation(success, options={})

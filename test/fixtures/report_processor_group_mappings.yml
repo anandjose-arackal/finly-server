@@ -5,8 +5,8 @@
 #  id                         :integer          not null, primary key
 #  processor_group_id         :integer          not null
 #  user_id                    :integer          not null
-#  processor_accountable_id   :integer          not null
-#  processor_accountable_type :string(255)      not null
+#  processor_accountable_id   :integer
+#  processor_accountable_type :string(255)
 #  amount_id                  :integer          not null
 #  completed_at               :datetime
 #  marked_as_completed        :boolean          default(FALSE)

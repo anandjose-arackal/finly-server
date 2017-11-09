@@ -60,6 +60,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
       return
     end
     if self.report_processor_group.payment_order.present?
+
       validator = AccountManager::Payments::PaymentValidator.(self.report_processor_group.payment_order)
       unless validator.success?
         add_message :error, validator.messages[:error]
@@ -203,9 +204,9 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     post_operation_payload = {}
     self.payment_request = ::PaymentRequest.(user, self.report_processor_group.source_account,
         receiving_account_class, :credit, :reimbursement,
-        background: true, scheduled_at: self.report_processor_group.scheduled_at,
-        post_operation: post_operation, post_operation_payload: post_operation_payload)
-    self.report_processor_group.payment_order = self.payment_request.payment_order
+        background: true, scheduled_at: self.report_processor_group.scheduled_at)
+    self.payment_request.add_post_operation_action(post_operation, post_operation_payload)
+    self.report_processor_group.payment_order = self.payment_request.build_payment_order
     self.report_processor_group.mappings.each do |mapping|
       payment_item = PaymentRequest::PaymentItem.(mapping.user, mapping.processor_accountable, mapping.amount.value)
       self.payment_request.add_payment_item(payment_item)
