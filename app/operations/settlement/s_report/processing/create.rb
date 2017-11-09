@@ -59,10 +59,12 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
       add_message :error, self.report_processor_group.errors.full_messages
       return
     end
-    validator = AccountManager::Payments::PaymentValidator.(self.report_processor_group.payment_order)
-    unless validator.success?
-      add_message :error, validator.messages[:error]
-      return
+    if self.report_processor_group.payment_order.present?
+      validator = AccountManager::Payments::PaymentValidator.(self.report_processor_group.payment_order)
+      unless validator.success?
+        add_message :error, validator.messages[:error]
+        return
+      end
     end
   end
 
@@ -191,7 +193,6 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
                                                      status_id: mapping_status
                                                  })
     end
-
     self.report_processor_group.total_amount = Amount.new(value: total, currency_id: currency_id)
   end
 

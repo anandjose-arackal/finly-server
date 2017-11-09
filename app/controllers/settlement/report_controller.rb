@@ -17,6 +17,16 @@ class Settlement::ReportController < ApplicationController
     respond response: (@result&.success? ? :success : :failure)
   end
 
+  def processing_cancel
+    @result = Settlement::SReport::Processing::Cancel.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def processing_mark_paid
+    @result = Settlement::SReport::Processing::MarkAsPaid.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
   def processing_index
     @result = Settlement::SReport::Processing::Index.(current_user, params)
     respond

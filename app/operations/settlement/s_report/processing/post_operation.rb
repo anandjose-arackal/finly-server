@@ -9,8 +9,16 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
   end
 
   def init
-    self.payment_order = object
-    self.report_processor_group = ReportProcessorGroup.with_payment_order_id(self.payment_order.id)&.first&.include_mapping_reports
+    case object.class.name
+      when PaymentOrder.name
+        self.payment_order = object
+        self.report_processor_group = ReportProcessorGroup.with_payment_order_id(self.payment_order.id)&.first&.include_mapping_reports
+      when ReportProcessorGroup
+        self.report_processor_group = object
+      else
+        add_message :error, 'Error loading configuration'
+        return
+    end
   end
 
   def validate
@@ -35,7 +43,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
           self.report_processor_group.mappings.each do |mapping|
             if mapping.payment.completed?
               has_success = true
-              mapping.update(status_id: group_completed_status)
+              mapping.update(status_id: group_completed_status, completed_at: DateTime.now, marked_as_completed: !!params&.dig(:marked_as_completed))
               mapping.reports.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
                                          controlling_for_user_id: nil, controlling_for_user_role_id: nil,
                                          status_id: report_status_settled, reimbursement: mapping.payment)
@@ -55,9 +63,9 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
       end
     end
     if has_success and has_failure
-      self.report_processor_group.update(status_id: group_partially_complete_status)
+      self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now, marked_as_completed: !!params&.dig(:marked_as_completed))
     elsif has_success
-      self.report_processor_group.update(status_id: group_completed_status)
+      self.report_processor_group.update(status_id: group_completed_status, completed_at: DateTime.now, marked_as_completed: !!params&.dig(:marked_as_completed))
     elsif has_failure
       self.report_processor_group.update(status_id: group_failed_status)
     end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171106063439) do
+ActiveRecord::Schema.define(version: 20171108144908) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1533,9 +1533,9 @@ ActiveRecord::Schema.define(version: 20171106063439) do
     t.boolean  "hard_copy_receipt",                      default: false
     t.boolean  "itz_cash_d_code_enabled",                default: false
     t.boolean  "yes_bank_account"
+    t.boolean  "invoicing_system",                       default: false
     t.boolean  "bank_account_reimbursement"
     t.boolean  "payroll_card_enabled",                   default: false
-    t.boolean  "invoicing_system",                       default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -2479,6 +2479,19 @@ ActiveRecord::Schema.define(version: 20171106063439) do
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
   add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
 
+  create_table "post_operation_actions", force: :cascade do |t|
+    t.string   "operation",            limit: 255,   null: false
+    t.text     "payload",              limit: 65535
+    t.integer  "post_operatable_id",   limit: 4,     null: false
+    t.string   "post_operatable_type", limit: 255,   null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "post_operation_actions", ["operation"], name: "index_post_operation_actions_on_operation", using: :btree
+  add_index "post_operation_actions", ["post_operatable_id"], name: "index_post_operation_actions_on_post_operatable_id", using: :btree
+  add_index "post_operation_actions", ["post_operatable_type"], name: "index_post_operation_actions_on_post_operatable_type", using: :btree
+
   create_table "preview_registrations", force: :cascade do |t|
     t.string   "email",              limit: 255
     t.text     "company",            limit: 65535
@@ -2747,8 +2760,8 @@ ActiveRecord::Schema.define(version: 20171106063439) do
   create_table "report_processor_group_mappings", force: :cascade do |t|
     t.integer  "processor_group_id",         limit: 4,                   null: false
     t.integer  "user_id",                    limit: 4,                   null: false
-    t.integer  "processor_accountable_id",   limit: 4,                   null: false
-    t.string   "processor_accountable_type", limit: 255,                 null: false
+    t.integer  "processor_accountable_id",   limit: 4
+    t.string   "processor_accountable_type", limit: 255
     t.integer  "amount_id",                  limit: 4,                   null: false
     t.datetime "completed_at"
     t.boolean  "marked_as_completed",                    default: false
@@ -2782,22 +2795,22 @@ ActiveRecord::Schema.define(version: 20171106063439) do
     t.integer  "total_amount_id",           limit: 4,                   null: false
     t.integer  "processed_amount_id",       limit: 4
     t.integer  "created_by_user_id",        limit: 4
+    t.integer  "created_by_user_role_id",   limit: 4
     t.integer  "source_account_id",         limit: 4
     t.string   "source_account_type",       limit: 255
     t.boolean  "marked_as_completed",                   default: false
     t.string   "payment_type",              limit: 255
     t.string   "payment_mode",              limit: 255
     t.integer  "company_id",                limit: 4,                   null: false
+    t.integer  "payment_order_id",          limit: 4
     t.datetime "created_at",                                            null: false
     t.datetime "updated_at",                                            null: false
-    t.integer  "payment_order_id_id",       limit: 4
-    t.integer  "payment_order_id",          limit: 4
   end
 
   add_index "report_processor_groups", ["company_id"], name: "index_report_processor_groups_on_company_id", using: :btree
   add_index "report_processor_groups", ["created_by_user_id"], name: "index_report_processor_groups_on_created_by_user_id", using: :btree
+  add_index "report_processor_groups", ["created_by_user_role_id"], name: "index_report_processor_groups_on_created_by_user_role_id", using: :btree
   add_index "report_processor_groups", ["payment_order_id"], name: "index_report_processor_groups_on_payment_order_id", using: :btree
-  add_index "report_processor_groups", ["payment_order_id_id"], name: "index_report_processor_groups_on_payment_order_id_id", using: :btree
   add_index "report_processor_groups", ["processed_amount_id"], name: "index_report_processor_groups_on_processed_amount_id", using: :btree
   add_index "report_processor_groups", ["scheduled_at"], name: "index_report_processor_groups_on_scheduled_at", using: :btree
   add_index "report_processor_groups", ["source_account_id"], name: "index_report_processor_groups_on_source_account_id", using: :btree

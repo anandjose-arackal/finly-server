@@ -1,4 +1,5 @@
 class Settlement::SReport::Processing::MarkAsPaid < Settlement::SReport::Processing::Base
+  attr_accessor :report_group_processor
 
   def authorized_user_types
     [:admin, :finance_manager]
@@ -36,10 +37,7 @@ class Settlement::SReport::Processing::MarkAsPaid < Settlement::SReport::Process
   end
 
   def process
-    pending_mappings = self.report_group_processor.mappings.pending
-    completed_status = ReportProcessorGroupStatus.id_for(:completed)
-    pending_mappings.update_all(status_id: completed_status, completed_at: DateTime.now, marked_as_completed: true)
-    self.report_group_processor.update(status_id: completed_status, completed_at: DateTime.now, marked_as_completed: true)
+    Settlement::SReport::Processing::PostOperation.(self.report_group_processor, marked_as_completed: true, true)
   end
 
 end

@@ -18,6 +18,7 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
   def pre_validate
     if payment_order.blank?
       add_message :error, "Payment Order not passed"
+      return
     end
     # this validation is irrespective of the source and destination of the payment
     # i.e. checking for consistency of initiating and receiving account types etc.

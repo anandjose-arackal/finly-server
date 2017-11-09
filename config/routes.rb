@@ -2053,11 +2053,19 @@ Rails.application.routes.draw do
   get 'groups_teams', to: 'expense_types_configuration#groups_teams'
   get 'expense_filters', to: 'expense_types_configuration#expense_filters'
 
-  get 'settlements/reports/pending', to: 'settlement/report#pending_index'
-  get 'settlements/reports/processing', to: 'settlement/report#processing_index'
-  post 'settlements/reports/processing/init', to: 'settlement/report#processing_init'
-  post 'settlements/reports/processing/create', to: 'settlement/report#processing_create'
-  get 'settlements/reports/completed', to: 'settlement/report#completed_index'
+  scope :settlements do
+    scope :reports do
+      get 'pending', to: 'settlement/report#pending_index'
+      scope :processing do
+        get '/', to: 'settlement/report#processing_index'
+        post 'init', to: 'settlement/report#processing_init'
+        post 'create', to: 'settlement/report#processing_create'
+        post 'cancel', to: 'settlement/report#processing_cancel'
+        post 'mark_as_paid', to: 'settlement/report#processing_mark_paid'
+      end
+      get 'completed', to: 'settlement/report#completed_index'
+    end
+  end
 
   resources :per_diems
 

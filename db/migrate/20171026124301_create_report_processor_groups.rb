@@ -23,6 +23,7 @@ class CreateReportProcessorGroups < ActiveRecord::Migration
       t.string :payment_type
       t.string :payment_mode
       t.references :company, index: true, foreign_key: true, null: false
+      t.references :payment_order, index: true, foreign_key: true
 
       t.timestamps null: false
     end

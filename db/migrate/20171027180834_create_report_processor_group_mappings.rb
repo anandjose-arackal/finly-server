@@ -3,8 +3,8 @@ class CreateReportProcessorGroupMappings < ActiveRecord::Migration
     create_table :report_processor_group_mappings do |t|
       t.integer :processor_group_id, references: 'ReportProcessorGroupMapping', index: true, foreign_key: true, null: false
       t.references :user, index: true, foreign_key: true, null: false
-      t.integer :processor_accountable_id, null: false
-      t.string :processor_accountable_type, null: false
+      t.integer :processor_accountable_id
+      t.string :processor_accountable_type
       t.references :amount, index: true, foreign_key: true, null: false
       t.datetime :completed_at
       t.boolean :marked_as_completed, default: false

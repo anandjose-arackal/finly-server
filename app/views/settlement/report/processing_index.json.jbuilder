@@ -1,5 +1,5 @@
 json.array! @result.report_processor_groups_show do |group|
-
+  json.id group.id
   json.created_by_user group.created_by_user
   json.status group.status
   json.scheduled_at group.scheduled_at

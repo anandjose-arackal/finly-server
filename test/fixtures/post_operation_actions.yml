@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  operation: MyString
+  payload: MyText
+  post_operatable_id: 1
+  post_operatable_type: MyString
+
+two:
+  operation: MyString
+  payload: MyText
+  post_operatable_id: 1
+  post_operatable_type: MyString
