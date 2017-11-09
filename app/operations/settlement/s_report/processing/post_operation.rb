@@ -1,5 +1,5 @@
 class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
-  attr_accessor :payment_order
+  attr_accessor :payment_order, :report_processor_group
 
   def pre_validate
     if object.blank?
@@ -12,7 +12,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     case object.class.name
       when PaymentOrder.name
         self.payment_order = object
-        self.report_processor_group = ReportProcessorGroup.with_payment_order_id(self.payment_order.id)&.first&.include_mapping_reports
+        self.report_processor_group = ReportProcessorGroup.with_payment_order_id(self.payment_order.id)&.include_mapping_reports.first
       when ReportProcessorGroup
         self.report_processor_group = object
       else
