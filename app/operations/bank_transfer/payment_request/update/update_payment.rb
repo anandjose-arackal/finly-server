@@ -26,6 +26,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def process
+    debugger
     unless self.payment.update(payment_params)
       add_message :error, self.payment.errors.full_messages
     end
@@ -33,6 +34,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def post_process
+    debugger
     add_message :success, "Payment updated"
   end
 
@@ -40,7 +42,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
 
   def payment_attributes
     # todo - add attributes here for invoice and attachment
-    params.require(:payment).permit(invoice_attributes: [:tax_rate, :gst_type_id, :tds, :tds_type_id,
+    params.require(:payment).permit(invoice_attributes: [:tax, :gst_type_id, :tds, :tds_type_id,
                                                          :tax_type_id, :discount, :date, :discount_type_id, :due_date,
                                                          :invoice_number, :inclusive_of_taxes,
                                                          amount_attributes: [:value, :currency_id]],
@@ -113,6 +115,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       else
         # do nothing?
     end
+    debugger
     self.gross_amount = self.invoice_amount - self.discount_amount
   end
 
@@ -120,14 +123,15 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     case self.invoice.gst_type_id
       when 1, '1'
         # i.e. IGST
-        self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax_rate), self.invoice.tax_type_id)
+        self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax), self.invoice.tax_type_id)
       when 2, '2'
         # i.e SGST + CGST
-        rate = (self.invoice.tax_rate.blank?) ? 0 : self.invoice.tax_rate
+        rate = (self.invoice.tax.blank?) ? 0 : self.invoice.tax
         self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, rate, self.invoice.tax_type_id)
       else
         # do nothing?
     end
+    debugger
     self.tax_amount = self.net_amount - self.gross_amount
   end
 
@@ -135,10 +139,10 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     case self.invoice.gst_type_id
       when 1, '1'
         # i.e. IGST
-        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.net_amount, (self.invoice.tax_rate), self.invoice.tax_type_id)
+        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.net_amount, (self.invoice.tax), self.invoice.tax_type_id)
       when 2, '2'
         # i.e SGST + CGST
-        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.net_amount, 2*(self.invoice.tax_rate), self.invoice.tax_type_id)
+        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.net_amount, 2*(self.invoice.tax), self.invoice.tax_type_id)
       else
         # do nothing?
     end

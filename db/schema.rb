@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171107145110) do
+ActiveRecord::Schema.define(version: 20171109095120) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1818,7 +1818,7 @@ ActiveRecord::Schema.define(version: 20171107145110) do
     t.integer  "igst_amount_id",     limit: 4
     t.integer  "tds_amount_id",      limit: 4
     t.integer  "tax_amount_id",      limit: 4
-    t.decimal  "tax_rate",                       precision: 64, scale: 12
+    t.decimal  "tax",                            precision: 64, scale: 12
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree

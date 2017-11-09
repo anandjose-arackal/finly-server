@@ -26,7 +26,7 @@
 #  igst_amount_id     :integer
 #  tds_amount_id      :integer
 #  tax_amount_id      :integer
-#  tax_rate           :decimal(64, 12)
+#  tax                :decimal(64, 12)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
