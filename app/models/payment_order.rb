@@ -81,6 +81,11 @@ class PaymentOrder < ActiveRecord::Base
   scope :with_purpose_id, -> (id) { where payment_purpose_id: id }
   scope :without_purpose_id, -> (id) { where.not payment_purpose_id: id }
   scope :with_id, -> (id) { where id: id }
+  scope :without_id, -> (id) {
+    if id.present?
+      where.not(id: id)
+    end
+  }
   scope :with_status, ->(status_id) { where payment_order_status_id: status_id }
   scope :scheduled, -> { with_status(PaymentOrderStatus.id_for(:scheduled)) }
   scope :scheduled_on_or_before, -> (date) { where('scheduled_at <= ?', date).where(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled)) }
