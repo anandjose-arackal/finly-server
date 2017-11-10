@@ -143,6 +143,13 @@ json.cards do
         json.mcc_restriction_type card_restriction.mcc_restriction_type
         json.mcc_group_name card_restriction.mcc_group_name rescue nil
 
+        json.mcc_groups do
+          json.array!(MccGroup.all) do |group|
+            json.name group.name
+            json.id group.id
+          end
+        end
+
         json.limits do
           json.atm_limits do
             json.array! card_limits.atm_limits.each do |limit|

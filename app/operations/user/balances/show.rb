@@ -190,7 +190,7 @@ class User::Balances::Show < User::Base
         self.balances[:cards] << {
             name: "#{card.card_program.name.humanize}",
             balance: balance,
-            eligibility: self.card_info[card.id][:eligibility],
+            eligibility: self.card_info&.dig(card.id, :eligibility),
             active: card.active,
             disabler: disabler,
             disabler_role: disabler_role
@@ -203,7 +203,7 @@ class User::Balances::Show < User::Base
     # adding cash on hand
     self.balances[:cash_on_hand] = [] if self.balances[:cash_on_hand].blank?
     self.balances[:cash_on_hand] << {
-        name: "Cash On Hand",
+        name: "Available Cash On Hand",
         type: "cash",
         balance: self.cash_on_hand_info[:itz_cash][:balance]
     }
@@ -238,7 +238,7 @@ class User::Balances::Show < User::Base
               id: card.id,
               name: "#{selected_user.name}'s Expense Card",
               balance: self.card_info[card.id][:balance],
-              eligibility: self.card_info[card.id][:eligibility],
+              eligibility: self.card_info&.dig(card.id, :eligibility),
               active: card.active,
               disabler: disabler,
               disabler_role: disabler_role

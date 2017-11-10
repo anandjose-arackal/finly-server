@@ -54,8 +54,10 @@ class Company::AddBalance < Company::Base
   end
 
   def post_process
-    # triggerring mailer so that itzCash is notified
-    transaction_details[:company] = self.user.company.name
+    # triggering mailer
+    # so that itzCash is notified
+    transaction_details[:company_name] = self.user.company.name
+    transaction_details[:company] = self.user.company
     CompanyMailer.delay.balance_update(transaction_details)
   end
 

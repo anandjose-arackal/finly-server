@@ -26,4 +26,24 @@ class BankPaymentRequestTrail < ActiveRecord::Base
   scope :finance_manager_role, -> { where('modified_user_role_id = ?', "#{UserRole.id_for(:finance_manager)}") }
   scope :involving_user, -> (user_id) { where('modified_user_id = ? OR action_user_id = ?', user_id, user_id) }
   scope :created_before, -> (created_before) {where 'created_at < ?', created_before}
+
+  def submit_action?
+    self.action_id == BankPaymentRequestTrailAction.id_for(:submit)
+  end
+
+  def approve_action?
+    self.action_id == BankPaymentRequestTrailAction.id_for(:approve)
+  end
+
+  def credit_action?
+    self.action_id == BankPaymentRequestTrailAction.id_for(:credit)
+  end
+
+  def retract_action?
+    self.action_id == BankPaymentRequestTrailAction.id_for(:retract)
+  end
+
+  def unapprove_action?
+    self.action_id == BankPaymentRequestTrailAction.id_for(:unapprove)
+  end
 end

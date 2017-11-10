@@ -54,11 +54,11 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
     # checking if total order amount is less than the company balance amount
     if payment_order.credit?
       order_total = payment_order.request_total
-      unless source_account_adapter.balance
+      unless source_account_adapter.balance(payment_order: payment_order)
         add_message :error, "Error retrieving the source account's balance. Try again later"
         return
       end
-      if order_total > source_account_adapter.balance
+      if order_total > source_account_adapter.balance(payment_order: payment_order)
         add_message :error, "You do not have enough balance in #{source_account_name} to make this transfer"
         return
       end

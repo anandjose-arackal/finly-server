@@ -22,6 +22,7 @@
 #  invoicing_system           :boolean          default(FALSE)
 #  bank_account_reimbursement :boolean
 #  payroll_card_enabled       :boolean          default(FALSE)
+#  invoicing_system           :boolean          default(FALSE)
 #
 
 require 'test_helper'

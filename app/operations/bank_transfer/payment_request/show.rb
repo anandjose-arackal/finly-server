@@ -222,8 +222,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           # if the payment request is scheduled, give the option to cancel it here
           actions[:cancel] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_payment_order_path(bank_payment_request.payment_order)}
         end
-      elsif finance_view? && bank_payment_request.processing?
-        if bank_payment_request.controlling_user_id == user.id
+      elsif finance_view?
+        if bank_payment_request.controlling_user_id == user.id && bank_payment_request.processing?
           actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:summary_editable] = true
           actions[:payments_editable] = true
@@ -328,6 +328,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         elsif bank_payment_request.processing? && bank_payment_request.owner_id == user.id
           actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         elsif bank_payment_request.approved? && bank_payment_request.owner_id == user.id
+          actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           balance = retrieve_balance(:vendor_payment_wallet, user)
           credit_enabled = false
           admin = false

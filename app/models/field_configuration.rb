@@ -80,19 +80,6 @@ class FieldConfiguration < ActiveRecord::Base
     if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(self.field_parent_type_id) and configurable_type != 'Policy'
       self.errors.add :invalid, 'config. Custom Fields for Reports and Money Requests can only be configured at policy level'
     end
-    # # Policy custom fields can only be added for expenses as policy is not captured at the time of expense
-    # if field_parent_type_id == FieldParentType.id_for(:expense) and configurable_type == 'Policy'
-    #   add_message :error, 'Custom expense field cannot be added at a policy level'
-    #   return
-    # end
-    # if default_value.present?
-    #   result = CustomField::Configuration::ValidateFieldValue.(value: default_value, config: self)
-    #   unless result.success?
-    #     result.messages[:error].each do |error|
-    #       self.errors.add :error, ": #{error}"
-    #     end
-    #   end
-    # end
   end
 
   def set_default_value(value)
@@ -161,7 +148,7 @@ class FieldConfiguration < ActiveRecord::Base
   def as_json(options = {})
     options = []
     if field_type_id == FieldType.id_for(:drop_down)
-      options = drop_down_items
+      options = drop_down_items.exclude_deleted
     end
     {
         id: id,

@@ -155,6 +155,7 @@ class PaymentRequest < NonPersistentModel
         receiving_account_type: receiving_account_type,
         currency_id: currency_id,
         application: RequestStore.store[:current_app],
+        payment_mode: bank_transfer_type,
         amount_requested_attributes: {
             value: request_total,
             currency_id: currency_id

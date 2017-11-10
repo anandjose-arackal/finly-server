@@ -1,6 +1,12 @@
 class Admin::Cards::AssignRequests::Export::AsXls < Admin::Cards::AssignRequests::Base
   attr_accessor :headers, :contents
 
+  def pre_validate
+    if user.blank?
+      add_message :error, 'User not found'
+    end
+  end
+
   def init
     if !!params&.dig(:download_all)
       assign_requests_presenter = Admin::Cards::AssignRequests::Index.(user, params)

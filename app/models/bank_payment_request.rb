@@ -19,6 +19,7 @@
 #  require_approval             :boolean
 #  is_deleted                   :boolean
 #  beneficiary_type_id          :integer
+#  policy_id                    :integer
 #
 
 class BankPaymentRequest < ActiveRecord::Base
@@ -106,7 +107,7 @@ class BankPaymentRequest < ActiveRecord::Base
   end
 
   def can_retract?
-    processing?
+    processing? || auto_approved?
   end
 
   def can_credit?
@@ -119,6 +120,13 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def credit_pending?
     approved? && !credited?
+  end
+
+  def auto_approved?
+    # extracting the last tracks and checking if it was a submit action combined
+    # with the next action user being blank
+    trail = self.bank_payment_request_trails.last
+    trail.submit_action? && trail.modified_user.blank?
   end
 
   def user

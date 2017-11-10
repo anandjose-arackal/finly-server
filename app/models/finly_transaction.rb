@@ -49,7 +49,11 @@ class FinlyTransaction < ActiveRecord::Base
   scope :credits, -> { where transaction_type_id: TransactionType.id_for(:credit) }
   scope :debits, -> { where transaction_type_id: TransactionType.id_for(:debit) }
   scope :with_date, -> (date) { where(date: date) }
-  scope :with_date_range, -> (start_date, end_date) { where('finly_transactions.date >= ? AND finly_transactions.date <= ?', start_date, end_date) }
+  scope :with_date_range, -> (start_date, end_date) do
+    start_date = start_date.beginning_of_day rescue start_date
+    end_date = end_date.end_of_day rescue end_date
+    where('finly_transactions.date >= ? AND finly_transactions.date <= ?', start_date, end_date)
+  end
   scope :before_date, -> (date) { where('finly_transactions.date < ?', date) }
   scope :sum_amounts, -> { joins(:amount).sum(:value) }
   scope :success, -> { where status_id: TransactionStatus.id_for(:success) }
