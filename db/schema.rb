@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171109164031) do
+ActiveRecord::Schema.define(version: 20171110111635) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -27,20 +27,6 @@ ActiveRecord::Schema.define(version: 20171109164031) do
   add_index "active_admin_comments", ["author_type", "author_id"], name: "index_active_admin_comments_on_author_type_and_author_id", using: :btree
   add_index "active_admin_comments", ["namespace"], name: "index_active_admin_comments_on_namespace", using: :btree
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
-
-  create_table "addresses", force: :cascade do |t|
-    t.text     "line_1",     limit: 65535
-    t.text     "line_2",     limit: 65535
-    t.text     "line_3",     limit: 65535
-    t.string   "city",       limit: 255
-    t.integer  "state_id",   limit: 4
-    t.string   "name",       limit: 255
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-    t.string   "pin_code",   limit: 255
-  end
-
-  add_index "addresses", ["state_id"], name: "index_addresses_on_state_id", using: :btree
 
   create_table "admin_review_workflow_levels", force: :cascade do |t|
     t.integer  "admin_review_workflow_id", limit: 4,                 null: false
@@ -512,7 +498,6 @@ ActiveRecord::Schema.define(version: 20171109164031) do
     t.boolean  "require_approval"
     t.boolean  "is_deleted"
     t.integer  "beneficiary_type_id",          limit: 4
-    t.integer  "policy_id",                    limit: 4
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
@@ -1549,9 +1534,9 @@ ActiveRecord::Schema.define(version: 20171109164031) do
     t.boolean  "hard_copy_receipt",                      default: false
     t.boolean  "itz_cash_d_code_enabled",                default: false
     t.boolean  "yes_bank_account"
+    t.boolean  "invoicing_system",                       default: false
     t.boolean  "bank_account_reimbursement"
     t.boolean  "payroll_card_enabled",                   default: false
-    t.boolean  "invoicing_system",                       default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -1781,50 +1766,6 @@ ActiveRecord::Schema.define(version: 20171109164031) do
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
   add_index "individual_kycs", ["company_id"], name: "index_individual_kycs_on_company_id", using: :btree
   add_index "individual_kycs", ["user_id"], name: "index_individual_kycs_on_user_id", using: :btree
-
-  create_table "invoice_attachments", force: :cascade do |t|
-    t.string   "attached_file_file_name",    limit: 255
-    t.string   "attached_file_content_type", limit: 255
-    t.integer  "attached_file_file_size",    limit: 4
-    t.datetime "attached_file_updated_at"
-    t.integer  "invoice_id",                 limit: 4
-    t.text     "description",                limit: 65535
-    t.datetime "created_at",                               null: false
-    t.datetime "updated_at",                               null: false
-  end
-
-  add_index "invoice_attachments", ["invoice_id"], name: "index_invoice_attachments_on_invoice_id", using: :btree
-
-  create_table "invoices", force: :cascade do |t|
-    t.integer  "address_id",         limit: 4
-    t.date     "date"
-    t.date     "due_date"
-    t.string   "invoice_number",     limit: 255
-    t.integer  "tax_type_id",        limit: 4
-    t.decimal  "discount",                       precision: 64, scale: 12
-    t.integer  "discount_type_id",   limit: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
-    t.integer  "gross_amount_id",    limit: 4
-    t.integer  "net_amount_id",      limit: 4
-    t.boolean  "inclusive_of_taxes"
-    t.integer  "amount_id",          limit: 4
-    t.decimal  "tds",                            precision: 64, scale: 12
-    t.integer  "tds_type_id",        limit: 4
-    t.integer  "gst_type_id",        limit: 4
-    t.integer  "payment_id",         limit: 4
-    t.integer  "discount_amount_id", limit: 4
-    t.integer  "sgst_amount_id",     limit: 4
-    t.integer  "csgt_amount_id",     limit: 4
-    t.integer  "igst_amount_id",     limit: 4
-    t.integer  "tds_amount_id",      limit: 4
-    t.integer  "tax_amount_id",      limit: 4
-    t.decimal  "tax",                            precision: 64, scale: 12
-  end
-
-  add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
-  add_index "invoices", ["discount_type_id"], name: "index_invoices_on_discount_type_id", using: :btree
-  add_index "invoices", ["tax_type_id"], name: "index_invoices_on_tax_type_id", using: :btree
 
   create_table "itz_cash_card_programs", force: :cascade do |t|
     t.string   "product_code", limit: 255
@@ -2327,6 +2268,8 @@ ActiveRecord::Schema.define(version: 20171109164031) do
     t.integer  "payment_purpose_id",        limit: 4,     null: false
     t.integer  "currency_id",               limit: 4,     null: false
     t.string   "application",               limit: 255
+    t.text     "post_operation",            limit: 65535
+    t.text     "post_operation_payload",    limit: 65535
     t.string   "payment_mode",              limit: 255
   end
 
@@ -2434,6 +2377,8 @@ ActiveRecord::Schema.define(version: 20171109164031) do
     t.string   "application",             limit: 255
     t.string   "payment_mode",            limit: 255
     t.string   "reference_id",            limit: 255,   null: false
+    t.text     "post_operation",          limit: 65535
+    t.text     "post_operation_payload",  limit: 65535
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -2502,7 +2447,6 @@ ActiveRecord::Schema.define(version: 20171109164031) do
     t.boolean  "is_deleted",                     default: false, null: false
     t.text     "description",      limit: 65535
     t.integer  "base_currency_id", limit: 4,     default: 1
-    t.string   "application",      limit: 255
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
@@ -2536,6 +2480,19 @@ ActiveRecord::Schema.define(version: 20171109164031) do
 
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
   add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
+
+  create_table "post_operation_actions", force: :cascade do |t|
+    t.string   "operation",            limit: 255,   null: false
+    t.text     "payload",              limit: 65535
+    t.integer  "post_operatable_id",   limit: 4,     null: false
+    t.string   "post_operatable_type", limit: 255,   null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "post_operation_actions", ["operation"], name: "index_post_operation_actions_on_operation", using: :btree
+  add_index "post_operation_actions", ["post_operatable_id"], name: "index_post_operation_actions_on_post_operatable_id", using: :btree
+  add_index "post_operation_actions", ["post_operatable_type"], name: "index_post_operation_actions_on_post_operatable_type", using: :btree
 
   create_table "preview_registrations", force: :cascade do |t|
     t.string   "email",              limit: 255
@@ -2651,12 +2608,6 @@ ActiveRecord::Schema.define(version: 20171109164031) do
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
     t.integer  "reference_type_id", limit: 4
-  end
-
-  create_table "rate_types", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
   end
 
   create_table "receipt_email_attachments", force: :cascade do |t|
@@ -2808,6 +2759,67 @@ ActiveRecord::Schema.define(version: 20171109164031) do
   add_index "report_comments", ["report_id"], name: "index_report_comments_on_report_id", using: :btree
   add_index "report_comments", ["user_id"], name: "index_report_comments_on_user_id", using: :btree
 
+  create_table "report_processor_group_mappings", force: :cascade do |t|
+    t.integer  "processor_group_id",         limit: 4,                   null: false
+    t.integer  "user_id",                    limit: 4,                   null: false
+    t.integer  "processor_accountable_id",   limit: 4
+    t.string   "processor_accountable_type", limit: 255
+    t.integer  "amount_id",                  limit: 4,                   null: false
+    t.datetime "completed_at"
+    t.boolean  "marked_as_completed",                    default: false
+    t.integer  "status_id",                  limit: 4,                   null: false
+    t.integer  "payment_id",                 limit: 4
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+  end
+
+  add_index "report_processor_group_mappings", ["amount_id"], name: "index_report_processor_group_mappings_on_amount_id", using: :btree
+  add_index "report_processor_group_mappings", ["payment_id"], name: "index_report_processor_group_mappings_on_payment_id", using: :btree
+  add_index "report_processor_group_mappings", ["processor_group_id"], name: "index_report_processor_group_mappings_on_processor_group_id", using: :btree
+  add_index "report_processor_group_mappings", ["status_id"], name: "index_report_processor_group_mappings_on_status_id", using: :btree
+  add_index "report_processor_group_mappings", ["user_id"], name: "index_report_processor_group_mappings_on_user_id", using: :btree
+
+  create_table "report_processor_group_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "report_processor_group_statuses", ["name"], name: "index_report_processor_group_statuses_on_name", using: :btree
+
+  create_table "report_processor_groups", force: :cascade do |t|
+    t.integer  "status_id",                 limit: 4,                   null: false
+    t.boolean  "is_deleted",                            default: false
+    t.boolean  "payment_file_generated",                default: false
+    t.datetime "payment_file_generated_at"
+    t.date     "scheduled_at"
+    t.datetime "completed_at"
+    t.integer  "total_amount_id",           limit: 4,                   null: false
+    t.integer  "processed_amount_id",       limit: 4
+    t.integer  "created_by_user_id",        limit: 4
+    t.integer  "created_by_user_role_id",   limit: 4
+    t.integer  "source_account_id",         limit: 4
+    t.string   "source_account_type",       limit: 255
+    t.boolean  "marked_as_completed",                   default: false
+    t.string   "payment_type",              limit: 255
+    t.string   "payment_mode",              limit: 255
+    t.integer  "company_id",                limit: 4,                   null: false
+    t.integer  "payment_order_id",          limit: 4
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+  end
+
+  add_index "report_processor_groups", ["company_id"], name: "index_report_processor_groups_on_company_id", using: :btree
+  add_index "report_processor_groups", ["created_by_user_id"], name: "index_report_processor_groups_on_created_by_user_id", using: :btree
+  add_index "report_processor_groups", ["created_by_user_role_id"], name: "index_report_processor_groups_on_created_by_user_role_id", using: :btree
+  add_index "report_processor_groups", ["payment_order_id"], name: "index_report_processor_groups_on_payment_order_id", using: :btree
+  add_index "report_processor_groups", ["processed_amount_id"], name: "index_report_processor_groups_on_processed_amount_id", using: :btree
+  add_index "report_processor_groups", ["scheduled_at"], name: "index_report_processor_groups_on_scheduled_at", using: :btree
+  add_index "report_processor_groups", ["source_account_id"], name: "index_report_processor_groups_on_source_account_id", using: :btree
+  add_index "report_processor_groups", ["source_account_type"], name: "index_report_processor_groups_on_source_account_type", using: :btree
+  add_index "report_processor_groups", ["status_id"], name: "index_report_processor_groups_on_status_id", using: :btree
+  add_index "report_processor_groups", ["total_amount_id"], name: "index_report_processor_groups_on_total_amount_id", using: :btree
+
   create_table "report_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.integer  "order",      limit: 4
@@ -2876,6 +2888,7 @@ ActiveRecord::Schema.define(version: 20171109164031) do
     t.integer  "card_expenses_total_id",             limit: 4
     t.integer  "non_reimbursable_expenses_total_id", limit: 4
     t.integer  "sync_status_id",                     limit: 4
+    t.integer  "report_processor_group_mapping_id",  limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -2884,6 +2897,7 @@ ActiveRecord::Schema.define(version: 20171109164031) do
   add_index "reports", ["controlling_user_role_id"], name: "index_reports_on_controlling_user_role_id", using: :btree
   add_index "reports", ["name"], name: "index_reports_on_name", using: :btree
   add_index "reports", ["policy_id"], name: "index_reports_on_policy_id", using: :btree
+  add_index "reports", ["report_processor_group_mapping_id"], name: "index_reports_on_report_processor_group_mapping_id", using: :btree
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree
 
@@ -2927,6 +2941,16 @@ ActiveRecord::Schema.define(version: 20171109164031) do
   end
 
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
+
+  create_table "tally_configurations", force: :cascade do |t|
+    t.integer  "company_id",   limit: 4,   null: false
+    t.string   "company_name", limit: 255
+    t.boolean  "active"
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "tally_configurations", ["company_id"], name: "index_tally_configurations_on_company_id", using: :btree
 
   create_table "time_expense_configs", force: :cascade do |t|
     t.datetime "created_at",                    null: false
@@ -3042,12 +3066,11 @@ ActiveRecord::Schema.define(version: 20171109164031) do
   add_index "user_group_items", ["user_group_id"], name: "index_user_group_items_on_user_group_id", using: :btree
 
   create_table "user_groups", force: :cascade do |t|
-    t.string   "name",        limit: 255,                 null: false
-    t.integer  "company_id",  limit: 4,                   null: false
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-    t.boolean  "is_deleted",              default: false
-    t.string   "application", limit: 255
+    t.string   "name",       limit: 255,                 null: false
+    t.integer  "company_id", limit: 4,                   null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.boolean  "is_deleted",             default: false
   end
 
   add_index "user_groups", ["company_id"], name: "index_user_groups_on_company_id", using: :btree
@@ -3164,11 +3187,10 @@ ActiveRecord::Schema.define(version: 20171109164031) do
   add_index "user_team_group_item_mappings", ["user_team_id"], name: "index_user_team_group_item_mappings_on_user_team_id", using: :btree
 
   create_table "user_teams", force: :cascade do |t|
-    t.integer  "company_id",  limit: 4,   null: false
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-    t.string   "name",        limit: 255, null: false
-    t.string   "application", limit: 255
+    t.integer  "company_id", limit: 4,   null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "name",       limit: 255, null: false
   end
 
   add_index "user_teams", ["company_id"], name: "index_user_teams_on_company_id", using: :btree
@@ -3382,7 +3404,6 @@ ActiveRecord::Schema.define(version: 20171109164031) do
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
 
-  add_foreign_key "addresses", "states"
   add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
   add_foreign_key "admin_summary_mail_configs", "periods"
   add_foreign_key "admin_summary_mail_configs", "users"
@@ -3470,8 +3491,6 @@ ActiveRecord::Schema.define(version: 20171109164031) do
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
-  add_foreign_key "invoice_attachments", "invoices"
-  add_foreign_key "invoices", "addresses"
   add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
   add_foreign_key "itz_cash_dmt_senders", "users"
@@ -3534,12 +3553,19 @@ ActiveRecord::Schema.define(version: 20171109164031) do
   add_foreign_key "report_comments", "report_comment_actions"
   add_foreign_key "report_comments", "reports"
   add_foreign_key "report_comments", "users"
+  add_foreign_key "report_processor_group_mappings", "amounts"
+  add_foreign_key "report_processor_group_mappings", "payments"
+  add_foreign_key "report_processor_group_mappings", "users"
+  add_foreign_key "report_processor_groups", "companies"
+  add_foreign_key "report_processor_groups", "payment_orders"
   add_foreign_key "report_tracks", "report_statuses"
   add_foreign_key "report_tracks", "report_tracking_actions"
   add_foreign_key "report_tracks", "reports"
   add_foreign_key "reports", "policies"
+  add_foreign_key "reports", "report_processor_group_mappings"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
+  add_foreign_key "tally_configurations", "companies"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"
   add_foreign_key "transcribed_expenses", "amounts"
