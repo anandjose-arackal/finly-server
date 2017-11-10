@@ -61,7 +61,9 @@ class Expense::Manual::Create < Expense::Manual::Base
     # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
     if ['1', 1].include?(expense_params[:from_cash_on_hand])
       amount = expense_params[:amount_attributes][:value].to_f
-      unless user.cash_on_hand.balance_value > amount
+      cash_on_hand_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      balance = cash_on_hand_adapter.balance
+      unless balance > amount
         add_message :error, "You do not have enough balance in your Cash On Hand to mark this expense against it"
         return
       end

@@ -190,7 +190,7 @@ class User::Balances::Show < User::Base
         self.balances[:cards] << {
             name: "#{card.card_program.name.humanize}",
             balance: balance,
-            eligibility: self.card_info[card.id][:eligibility],
+            eligibility: self.card_info&.dig(card.id, :eligibility),
             active: card.active,
             disabler: disabler,
             disabler_role: disabler_role
@@ -238,7 +238,7 @@ class User::Balances::Show < User::Base
               id: card.id,
               name: "#{selected_user.name}'s Expense Card",
               balance: self.card_info[card.id][:balance],
-              eligibility: self.card_info[card.id][:eligibility],
+              eligibility: self.card_info&.dig(card.id, :eligibility),
               active: card.active,
               disabler: disabler,
               disabler_role: disabler_role

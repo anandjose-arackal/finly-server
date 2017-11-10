@@ -1,5 +1,5 @@
 <% content_for :body do %>
-    <h3><%= "#{@company}" %> has loaded money into their company account. The details are as follows: </h3>
+    <h3><%= "#{@company_name}" %> has loaded money into their company account. The details are as follows: </h3>
 
     <h4>Amount: <%= @amount %></h4>
     <br/>
@@ -9,6 +9,19 @@
     <br/>
     <h4>Remarks: <%= @remarks %></h4>
     <br/>
+
+    <% case @bank_type_id %>
+      <% when CompanyFundsLoadRequestType.id_for(:itzcash), CompanyFundsLoadRequestType.id_for(:itzcash).to_s %>
+        <h4>D-Code: <%= @company.d_code %></h4>
+        <br/>
+      <% when CompanyFundsLoadRequestType.id_for(:yesbank), CompanyFundsLoadRequestType.id_for(:yesbank).to_s %>
+
+      <% else %>
+    <% end %>
+
+    <h4>Bank Type: <%= @company.bank_type %> Bank</h4>
+    <br/>
+
 <% end %>
 
 <%= render 'application_mailer/template' %>
