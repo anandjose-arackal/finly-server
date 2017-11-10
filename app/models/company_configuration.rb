@@ -15,6 +15,7 @@
 #  other_expense_types         :boolean          default(FALSE)
 #  encrypted_easy_login_params :text(65535)
 #  registered_mobile_number    :string(255)
+#  bank_type                   :string(255)
 #
 
 class CompanyConfiguration < ActiveRecord::Base
@@ -25,6 +26,7 @@ class CompanyConfiguration < ActiveRecord::Base
   validates_attachment_content_type :logo, :content_type => ["image/jpg", "image/jpeg", "image/png", "image/gif"]
 
   validates :company_id, presence: true, uniqueness: true
+
 
 
 end
