@@ -27,6 +27,7 @@
 #  tds_amount_id      :integer
 #  tax_amount_id      :integer
 #  tax                :decimal(64, 12)
+#  category_id        :integer
 #
 
 require 'test_helper'

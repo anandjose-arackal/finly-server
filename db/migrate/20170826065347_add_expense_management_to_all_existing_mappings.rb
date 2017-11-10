@@ -1,6 +1,6 @@
 class AddExpenseManagementToAllExistingMappings < ActiveRecord::Migration
   def change
-    MappingPurpose.seed_data
-    UserManagerMapping.update_all(purpose_id: MappingPurpose.id_for(:expense_management))
+    Purpose.seed_data
+    UserManagerMapping.update_all(purpose_id: Purpose.id_for(:expense_management))
   end
 end
