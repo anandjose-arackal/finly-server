@@ -1,0 +1,20 @@
+# == Schema Information
+#
+# Table name: payment_file_configurations
+#
+#  id         :integer          not null, primary key
+#  format     :string(255)
+#  company_id :integer          not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  format: MyString
+  company_id: 
+
+two:
+  format: MyString
+  company_id: 
