@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171110115022) do
+ActiveRecord::Schema.define(version: 20171110111635) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2217,15 +2217,6 @@ ActiveRecord::Schema.define(version: 20171110115022) do
     t.datetime "updated_at",             null: false
   end
 
-  create_table "payment_file_configurations", force: :cascade do |t|
-    t.string   "format",     limit: 255
-    t.integer  "company_id", limit: 4,   null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "payment_file_configurations", ["company_id"], name: "index_payment_file_configurations_on_company_id", using: :btree
-
   create_table "payment_modes", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -3532,7 +3523,6 @@ ActiveRecord::Schema.define(version: 20171110115022) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
-  add_foreign_key "payment_file_configurations", "companies"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
   add_foreign_key "payment_receivables", "amounts"
