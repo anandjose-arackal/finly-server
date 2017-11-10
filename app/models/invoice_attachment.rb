@@ -14,6 +14,8 @@
 #
 
 class InvoiceAttachment < ActiveRecord::Base
+  include Attachable
+
   belongs_to :invoice
 
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}

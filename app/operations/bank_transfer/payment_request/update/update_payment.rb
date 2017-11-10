@@ -26,7 +26,6 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def process
-    debugger
     unless self.payment.update(payment_params)
       add_message :error, self.payment.errors.full_messages
     end
@@ -34,19 +33,17 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def post_process
-    debugger
     add_message :success, "Payment updated"
   end
 
   private
 
   def payment_attributes
-    # todo - add attributes here for invoice and attachment
-    params.require(:payment).permit(invoice_attributes: [:tax, :gst_type_id, :tds, :tds_type_id,
+    params.require(:payment).permit(invoice_attributes: [:tax, :gst_type_id, :tds, :tds_type_id, :category_id,
                                                          :tax_type_id, :discount, :date, :discount_type_id, :due_date,
                                                          :invoice_number, :inclusive_of_taxes,
-                                                         amount_attributes: [:value, :currency_id]],
-                                    invoice_attachment_attributes: [:attached_file, :description],
+                                                         amount_attributes: [:value, :currency_id],
+                                                         invoice_attachments_attributes: [:attached_file, :description]],
                                     amount_attributes: [:value, :currency_id]
                                     )
   end
@@ -115,7 +112,6 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       else
         # do nothing?
     end
-    debugger
     self.gross_amount = self.invoice_amount - self.discount_amount
   end
 
@@ -131,7 +127,6 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       else
         # do nothing?
     end
-    debugger
     self.tax_amount = self.net_amount - self.gross_amount
   end
 
