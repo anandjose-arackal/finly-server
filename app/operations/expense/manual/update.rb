@@ -82,10 +82,11 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
     end
 
-    # if the expense is being marked as fropm cash on hand, check if there is enough cash on hand to facilitate it
+
+    # if the expense is being marked as from cash on hand, check if there is enough cash on hand to facilitate it
     if StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand)) or (updated_expense_params&.dig(:from_cash_on_hand).nil? and expense.from_cash_on_hand)
       coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
-      amount_val = (updated_expense_params&.dig(:amount_attributes,:value)&.to_f || expense.amount&.value)
+      amount_val = (updated_expense_params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
       balance = coh_adapter.balance
       # if the expense is continuing to be from COH, and only the amount is changing
       if expense.from_cash_on_hand && StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
@@ -103,7 +104,6 @@ class Expense::Manual::Update < Expense::Manual::Base
       elsif expense.from_cash_on_hand && !StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
         # nothing to do here ¯\_(ツ)_/¯
       end
-
     end
 
     from_cash_on_hand = StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
