@@ -30,6 +30,13 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       add_message :error, self.payment.errors.full_messages
     end
     calculate_tax_and_discounts
+    if payment.invoice.present?
+      custom_fields = {custom_fields: (payment_params[:custom_fields] or payment_params[:invoice_attributes][:custom_fields])}
+      custom_fields[:user] = user
+      custom_fields[:reset_fields] = true
+      custom_fields[:save] = false
+      CustomField::SetFields.(self.payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
+    end
   end
 
   def post_process
