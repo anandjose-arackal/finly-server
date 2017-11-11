@@ -9,7 +9,7 @@
 #     ]
 # }
 class PaymentFiles::Formats::BaseFormat < BaseOperation
-  attr_accessor :payment_file_data
+  attr_accessor :payment_file_data, :config, :options
 
   def pre_validate
     if params&.dig(:payment_file).nil?
@@ -20,6 +20,8 @@ class PaymentFiles::Formats::BaseFormat < BaseOperation
 
   def init
     self.payment_file_data = params[:payment_file]
+    self.config = user.company.payment_file_configuration
+    self.options = self.config&.options
   end
 
   def validate

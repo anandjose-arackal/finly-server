@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171110111635) do
+ActiveRecord::Schema.define(version: 20171110115022) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -940,6 +940,7 @@ ActiveRecord::Schema.define(version: 20171110111635) do
     t.boolean  "other_expense_types",                       default: false
     t.text     "encrypted_easy_login_params", limit: 65535
     t.string   "registered_mobile_number",    limit: 255
+    t.string   "bank_type",                   limit: 255
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -2217,6 +2218,16 @@ ActiveRecord::Schema.define(version: 20171110111635) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "payment_file_configurations", force: :cascade do |t|
+    t.string   "format",     limit: 255
+    t.integer  "company_id", limit: 4,     null: false
+    t.text     "options",    limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "payment_file_configurations", ["company_id"], name: "index_payment_file_configurations_on_company_id", using: :btree
+
   create_table "payment_modes", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -2269,6 +2280,7 @@ ActiveRecord::Schema.define(version: 20171110111635) do
     t.string   "application",               limit: 255
     t.text     "post_operation",            limit: 65535
     t.text     "post_operation_payload",    limit: 65535
+    t.string   "payment_mode",              limit: 255
   end
 
   add_index "payment_orders", ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id", using: :btree
@@ -3523,6 +3535,7 @@ ActiveRecord::Schema.define(version: 20171110111635) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "payment_file_configurations", "companies"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
   add_foreign_key "payment_receivables", "amounts"

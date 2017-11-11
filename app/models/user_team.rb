@@ -2,12 +2,11 @@
 #
 # Table name: user_teams
 #
-#  id          :integer          not null, primary key
-#  company_id  :integer          not null
-#  created_at  :datetime         not null
-#  updated_at  :datetime         not null
-#  name        :string(255)      not null
-#  application :string(255)
+#  id         :integer          not null, primary key
+#  company_id :integer          not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  name       :string(255)      not null
 #
 
 class UserTeam < ActiveRecord::Base

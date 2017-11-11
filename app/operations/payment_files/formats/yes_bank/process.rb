@@ -9,12 +9,18 @@ class PaymentFiles::Formats::YesBank::Process < PaymentFiles::Formats::BaseForma
     end
   end
 
-  def process
+  def init
+    super
+    return if has_errors?
 
   end
 
-  class PaymentFiles::Formats::YesBank::Process::Exporter < Exporter
-
+  def process
+    template = "#{File.expand_path(File.dirname(__FILE__))}/template.xls.erb"
+    customer_code = user.company.payment_file_configuration&.options&.dig(:customer_code)
+    total_amount = ''
+    contents = []
+    Exporter::Spreadsheet.new(user, {template: template, contents: contents, data: {customer_code: customer_code, total: total_amount}})
   end
 
 end

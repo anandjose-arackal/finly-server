@@ -12,7 +12,6 @@
 #  is_deleted       :boolean          default(FALSE), not null
 #  description      :text(65535)
 #  base_currency_id :integer          default(1)
-#  application      :string(255)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
