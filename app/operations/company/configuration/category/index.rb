@@ -5,7 +5,6 @@ class Company::Configuration::Category::Index < Company::Configuration::Category
   end
 
   def process
-    debugger
     self.categories = current_company.categories.with_purpose(Purpose.id_from_application_for(RequestStore.store[:current_app]))
   end
 
