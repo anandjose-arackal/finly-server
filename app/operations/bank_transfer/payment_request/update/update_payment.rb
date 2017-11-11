@@ -15,6 +15,19 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     if self.payment.blank?
       add_message :error, "Payment not found"
     end
+    # validate custom fields
+    if payment.invoice.present?
+      set_fields = set_custom_fields(false)
+      unless set_fields.success?
+        add_message :error, set_fields.messages[:error]
+        return
+      end
+      valid = CustomField::Validate.(self.payment.invoice)
+      unless valid.success?
+        add_message :error, valid.messages[:error]
+        return
+      end
+    end
   end
 
   def pre_process
@@ -31,11 +44,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     end
     calculate_tax_and_discounts
     if payment.invoice.present?
-      custom_fields = {custom_fields: (payment_params[:custom_fields] or payment_params[:invoice_attributes][:custom_fields])}
-      custom_fields[:user] = user
-      custom_fields[:reset_fields] = true
-      custom_fields[:save] = false
-      CustomField::SetFields.(self.payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
+      set_custom_fields(true)
     end
   end
 
@@ -53,6 +62,14 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
                                                          invoice_attachments_attributes: [:attached_file, :description]],
                                     amount_attributes: [:value, :currency_id]
                                     )
+  end
+
+  def set_custom_fields(save)
+    custom_fields = {custom_fields: (payment_params[:custom_fields] or payment_params[:invoice_attributes][:custom_fields])}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(self.payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
 
   def calculate_tax_and_discounts
