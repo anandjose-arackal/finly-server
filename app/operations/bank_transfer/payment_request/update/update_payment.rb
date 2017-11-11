@@ -49,13 +49,15 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def post_process
+    self.payment_order.update_requested_amount
     add_message :success, "Payment updated"
   end
 
   private
 
   def payment_attributes
-    params.require(:payment).permit(invoice_attributes: [:tax, :gst_type_id, :tds, :tds_type_id, :category_id,
+    params.require(:payment).permit(:note,
+                                    invoice_attributes: [:tax, :gst_type_id, :tds, :tds_type_id, :category_id,
                                                          :tax_type_id, :discount, :date, :discount_type_id, :due_date,
                                                          :invoice_number, :inclusive_of_taxes,
                                                          amount_attributes: [:value, :currency_id],
@@ -140,13 +142,14 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def calculate_exclusive_taxes
+    debugger
     case self.invoice.gst_type_id
       when 1, '1'
         # i.e. IGST
         self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax), self.invoice.tax_type_id)
       when 2, '2'
         # i.e SGST + CGST
-        rate = (self.invoice.tax.blank?) ? 0 : self.invoice.tax
+        rate = (self.invoice.tax.blank?) ? 0 : 2*self.invoice.tax
         self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, rate, self.invoice.tax_type_id)
       else
         # do nothing?

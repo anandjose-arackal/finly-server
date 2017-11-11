@@ -190,7 +190,6 @@ json.payments_unverified do
     else
       json.raw_amount payment.amount_value
     end
-
   end
 end
 
