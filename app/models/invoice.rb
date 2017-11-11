@@ -28,6 +28,7 @@
 #  tax_amount_id      :integer
 #  tax                :decimal(64, 12)
 #  category_id        :integer
+#  original_amount_id :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -41,6 +42,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :tds_amount, class_name: "Amount"
   belongs_to :tax_amount, class_name: "Amount"
   belongs_to :discount_amount, class_name: "Amount"
+  belongs_to :original_amount, class_name: "Amount"
 
   belongs_to :payment
 
@@ -55,6 +57,7 @@ class Invoice < ActiveRecord::Base
   accepts_nested_attributes_for :discount_amount
   accepts_nested_attributes_for :tds_amount
   accepts_nested_attributes_for :tax_amount
+  accepts_nested_attributes_for :original_amount
   accepts_nested_attributes_for :custom_fields
 
   delegate :tax_amount_value, to: :tax_amount

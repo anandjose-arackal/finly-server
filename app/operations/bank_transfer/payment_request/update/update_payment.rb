@@ -1,8 +1,8 @@
 class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::PaymentRequest::Update::Base
 
   attr_accessor :payment, :payment_request, :payment_params, :invoice_amount, :payment_amount,
-                :gross_amount, :net_amount, :invoice, :cgst_amount, :sgst_amount, :igst_amount,
-                :discount_amount, :tds_amount, :tax_amount
+                :gross_amount, :net_amount, :invoice,
+                :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount
 
   def init
     super
@@ -27,6 +27,11 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
         add_message :error, valid.messages[:error]
         return
       end
+    end
+    
+    # validate that the amount is being passed
+    unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present?
+      add_message :error, "Sub Total cannot be blank"
     end
   end
 
@@ -64,7 +69,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
                                     invoice_attributes: [:tax, :gst_type_id, :tds, :tds_type_id, :category_id,
                                                          :tax_type_id, :discount, :date, :discount_type_id, :due_date,
                                                          :invoice_number, :inclusive_of_taxes,
-                                                         amount_attributes: [:value, :currency_id],
+                                                         original_amount_attributes: [:value, :currency_id],
                                                          invoice_attachments_attributes: [:attached_file, :description]],
                                     amount_attributes: [:value, :currency_id]
                                     )
@@ -81,16 +86,19 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   def calculate_tax_and_discounts
     self.invoice = payment.invoice
     if self.invoice.inclusive_of_taxes # calculate the other amounts retrospectively
-      self.net_amount = self.invoice.amount&.value
+      self.after_tax_amount = self.invoice.original_amount&.value
       # first calculate the gross amount from the
       calculate_inclusive_taxes
-      calculate_discount
       calculate_tds
+      calculate_discount_inclusive
+      self.net_amount = self.after_tax_amount - self.tds_amount
+      # calculate_tds
     else # calculate proactively
-      self.invoice_amount = self.invoice.amount&.value
-      calculate_discount
+      self.invoice_amount = self.invoice.original_amount&.value
+      calculate_discount_exclusive
       calculate_exclusive_taxes
       calculate_tds
+      self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
     end
     # update the invoice with the respective calculated amounts
     self.invoice.update(
@@ -129,12 +137,13 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     self.payment.amount&.update(value: self.net_amount)
   end
 
-  def calculate_discount
+  def calculate_discount_exclusive
     if self.invoice.discount.blank?
       self.discount_amount = 0
       self.gross_amount = self.invoice_amount
       return
     end
+
     case invoice.discount_type_id
       when 1, '1'
         self.discount_amount = (invoice.discount*self.invoice_amount)/100
@@ -144,6 +153,24 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
         # do nothing?
     end
     self.gross_amount = self.invoice_amount - self.discount_amount
+  end
+
+  def calculate_discount_inclusive
+    if self.invoice.discount.blank?
+      self.discount_amount = 0
+      self.invoice_amount = self.gross_amount
+      return
+    end
+
+    case invoice.discount_type_id
+      when 1, '1'
+        self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
+      when 2, '2'
+        self.invoice_amount = self.gross_amount - invoice.discount
+      else
+        # do nothing?
+    end
+    self.discount_amount = self.invoice_amount - self.gross_amount
   end
 
   def calculate_exclusive_taxes
@@ -168,27 +195,28 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
 
   def calculate_inclusive_taxes
     if self.invoice.tax.blank?
-      self.net_amount = self.gross_amount
+      self.after_tax_amount = self.gross_amount
       self.tax_amount = 0
       return
     end
+
     case self.invoice.gst_type_id
       when 1, '1'
         # i.e. IGST
-        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.net_amount, (self.invoice.tax), self.invoice.tax_type_id)
+        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax), self.invoice.tax_type_id)
       when 2, '2'
         # i.e SGST + CGST
-        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.net_amount, 2*(self.invoice.tax), self.invoice.tax_type_id)
+        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, 2*(self.invoice.tax), self.invoice.tax_type_id)
       else
         # do nothing?
     end
-    self.tax_amount = self.gross_amount - self.net_amount
+    self.tax_amount = self.after_tax_amount - self.gross_amount
+
   end
 
   def calculate_tds
-    original_amount = self.net_amount
-    self.net_amount = TaxCalculationUtils.tds_amount(self.net_amount, self.invoice.tds, self.invoice.tds_type_id)
-    self.tds_amount = original_amount - self.net_amount
+    new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, self.invoice.tds, self.invoice.tds_type_id)
+    self.tds_amount = self.gross_amount - new_gross_amount
   end
 
 end

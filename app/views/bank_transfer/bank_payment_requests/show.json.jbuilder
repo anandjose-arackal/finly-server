@@ -45,6 +45,7 @@ json.payments do
     if payment.invoice.present?
       json.raw_amount invoice&.amount&.value
       json.invoice do
+        json.original_amount invoice.original_amount&.value
         json.tax_amount invoice.tax_amount&.value
         json.tds_amount invoice.tds_amount&.value
         json.tax invoice.tax
@@ -69,7 +70,7 @@ json.payments do
           json.array! invoice.custom_fields
         end
         json.category_id invoice.category_id
-        json.custom_field_config do
+        json.custom_fields_config do
           json.array!(@result.custom_field_config)
         end
       end
@@ -102,6 +103,7 @@ json.payments_verified do
     if payment.invoice.present?
       json.raw_amount invoice&.amount&.value
       json.invoice do
+        json.original_amount invoice.original_amount&.value
         json.tax_amount invoice.tax_amount&.value
         json.tds_amount invoice.tds_amount&.value
         json.tax invoice.tax
@@ -126,7 +128,7 @@ json.payments_verified do
           json.array! invoice.custom_fields
         end
         json.category_id invoice.category_id
-        json.custom_field_config do
+        json.custom_fields_config do
           json.array!(@result.custom_field_config)
         end
       end
@@ -159,6 +161,7 @@ json.payments_unverified do
     if payment.invoice.present?
       json.raw_amount invoice&.amount&.value
       json.invoice do
+        json.original_amount invoice.original_amount&.value
         json.tax_amount invoice.tax_amount&.value
         json.tds_amount invoice.tds_amount&.value
         json.tax invoice.tax
@@ -183,7 +186,7 @@ json.payments_unverified do
           json.array! invoice.custom_fields
         end
         json.category_id invoice.category_id
-        json.custom_field_config do
+        json.custom_fields_config do
           json.array!(@result.custom_field_config)
         end
       end
