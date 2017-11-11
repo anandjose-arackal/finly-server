@@ -69,7 +69,9 @@ json.payments do
           json.array! invoice.custom_fields
         end
 
-        json.custom_field_config @result.custom_field_config
+        json.custom_field_config do
+          json.array!(@result.custom_field_config)
+        end
       end
     else
       json.raw_amount payment.amount_value
@@ -124,7 +126,9 @@ json.payments_verified do
           json.array! invoice.custom_fields
         end
 
-        json.custom_field_config @result.custom_field_config
+        json.custom_field_config do
+          json.array!(@result.custom_field_config)
+        end
       end
     else
       json.raw_amount payment.amount_value
@@ -179,7 +183,9 @@ json.payments_unverified do
           json.array! invoice.custom_fields
         end
 
-        json.custom_field_config @result.custom_field_config
+        json.custom_field_config do
+          json.array!(@result.custom_field_config)
+        end
       end
     else
       json.raw_amount payment.amount_value

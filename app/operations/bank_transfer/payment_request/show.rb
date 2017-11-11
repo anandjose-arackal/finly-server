@@ -69,9 +69,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
     def custom_field_configurations
       configurations = user.company.field_configurations.exclude_deleted
-      config = {}
-      config[:invoice] = configurations.with_parent_type(FieldParentType.id_for(:invoice))
-      config
+      configurations.with_parent_type(FieldParentType.id_for(:invoice))
     end
 
     def retrieve_actions
