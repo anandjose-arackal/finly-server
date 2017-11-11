@@ -133,6 +133,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     if self.invoice.discount.blank?
       self.discount_amount = 0
       self.gross_amount = self.invoice_amount
+      return
     end
     case invoice.discount_type_id
       when 1, '1'
@@ -146,6 +147,11 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def calculate_exclusive_taxes
+    if self.invoice.tax.blank?
+      self.net_amount = self.gross_amount
+      self.tax_amount = 0
+      return
+    end
     case self.invoice.gst_type_id
       when 1, '1'
         # i.e. IGST
@@ -161,6 +167,11 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def calculate_inclusive_taxes
+    if self.invoice.tax.blank?
+      self.net_amount = self.gross_amount
+      self.tax_amount = 0
+      return
+    end
     case self.invoice.gst_type_id
       when 1, '1'
         # i.e. IGST
