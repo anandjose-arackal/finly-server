@@ -68,7 +68,7 @@ json.payments do
         json.custom_fields do
           json.array! invoice.custom_fields
         end
-
+        json.category_id invoice.category_id
         json.custom_field_config do
           json.array!(@result.custom_field_config)
         end
