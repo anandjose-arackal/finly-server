@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171110115022) do
+ActiveRecord::Schema.define(version: 20171111095059) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2770,17 +2770,18 @@ ActiveRecord::Schema.define(version: 20171110115022) do
   add_index "report_comments", ["user_id"], name: "index_report_comments_on_user_id", using: :btree
 
   create_table "report_processor_group_mappings", force: :cascade do |t|
-    t.integer  "processor_group_id",         limit: 4,                   null: false
-    t.integer  "user_id",                    limit: 4,                   null: false
+    t.integer  "processor_group_id",         limit: 4,                     null: false
+    t.integer  "user_id",                    limit: 4,                     null: false
     t.integer  "processor_accountable_id",   limit: 4
     t.string   "processor_accountable_type", limit: 255
-    t.integer  "amount_id",                  limit: 4,                   null: false
+    t.integer  "amount_id",                  limit: 4,                     null: false
     t.datetime "completed_at"
-    t.boolean  "marked_as_completed",                    default: false
-    t.integer  "status_id",                  limit: 4,                   null: false
+    t.boolean  "marked_as_completed",                      default: false
+    t.integer  "status_id",                  limit: 4,                     null: false
     t.integer  "payment_id",                 limit: 4
-    t.datetime "created_at",                                             null: false
-    t.datetime "updated_at",                                             null: false
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+    t.text     "note",                       limit: 65535
   end
 
   add_index "report_processor_group_mappings", ["amount_id"], name: "index_report_processor_group_mappings_on_amount_id", using: :btree

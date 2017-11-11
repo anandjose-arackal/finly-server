@@ -31,6 +31,10 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
       add_message :error, 'Invalid Payment Type'
       return
     end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
   end
 
   def init
@@ -40,7 +44,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
                                                                                   created_by_user_role_id: role_id,
                                                                                   scheduled_at: params[:scheduled_at],
                                                                                   payment_type: params[:payment_type],
-                                                                                  payment_mode: params[:payment_mode]
+                                                                                  payment_mode: params[:payment_mode],
                                                                               })
     if params[:scheduled_at].present? and Date.parse(params[:scheduled_at]) > Date.today
       self.report_processor_group.status_id = ReportProcessorGroupStatus.id_for(:scheduled)
@@ -191,7 +195,8 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
                                                          value: config&.dig(:amount, :value),
                                                          currency_id: config&.dig(:amount, :currency_id)
                                                      },
-                                                     status_id: mapping_status
+                                                     status_id: mapping_status,
+                                                     note: config[:note]
                                                  })
     end
     self.report_processor_group.total_amount = Amount.new(value: total, currency_id: currency_id)
@@ -208,7 +213,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     self.payment_request.add_post_operation_action(post_operation, post_operation_payload)
     self.report_processor_group.payment_order = self.payment_request.build_payment_order
     self.report_processor_group.mappings.each do |mapping|
-      payment_item = PaymentRequest::PaymentItem.(mapping.user, mapping.processor_accountable, mapping.amount.value)
+      payment_item = PaymentRequest::PaymentItem.(mapping.user, mapping.processor_accountable, mapping.amount.value, note: mapping.note)
       self.payment_request.add_payment_item(payment_item)
       mapping.payment = payment_item.payment
     end
