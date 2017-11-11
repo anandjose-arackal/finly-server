@@ -15,6 +15,7 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
   end
 
   def process
+    debugger
     if self.category.present?
       self.category.active = true
     else
