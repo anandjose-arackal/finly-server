@@ -36,6 +36,10 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     if self.payment.invoice.present? && self.payment_params[:invoice_attributes].present?
       self.payment_params[:invoice_attributes][:id] = self.payment.invoice.id
     end
+
+    if self.payment.invoice&.invoice_attachments.present? && self.payment_params&.dig(:invoice_attributes, :invoice_attachments_attributes)
+      self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:id] = self.payment.invoice.invoice_attachments.first&.id
+    end
   end
 
   def process
@@ -142,7 +146,6 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def calculate_exclusive_taxes
-    debugger
     case self.invoice.gst_type_id
       when 1, '1'
         # i.e. IGST
