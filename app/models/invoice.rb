@@ -45,6 +45,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :payment
 
   has_many :invoice_attachments
+  has_many :custom_fields, as: :parent, dependent: :destroy
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments
@@ -54,6 +55,7 @@ class Invoice < ActiveRecord::Base
   accepts_nested_attributes_for :discount_amount
   accepts_nested_attributes_for :tds_amount
   accepts_nested_attributes_for :tax_amount
+  accepts_nested_attributes_for :custom_fields
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount
@@ -65,6 +67,15 @@ class Invoice < ActiveRecord::Base
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true
   validates :amount, presence: true
+
+  def policy
+    self.payment&.payment_order&.bank_payment_request&.policy
+  end
+
+  # the 'user' will default to the initiating user of the payment
+  def user
+    self.payment.initiating_user
+  end
 
   private
 

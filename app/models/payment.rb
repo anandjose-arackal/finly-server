@@ -343,9 +343,9 @@ class Payment < ActiveRecord::Base
     self.failed?
   end
 
-  def gross_amount
+  def invoice_amount
     return self.amount.value unless self.invoice.present?
-    self.invoice.gross_amount&.value # the idea is that gross amount should be present if the invoice exists
+    self.invoice.amount&.value # in this case return the actual invoice amount
   end
 
   private
