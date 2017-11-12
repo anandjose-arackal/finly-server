@@ -46,7 +46,7 @@ class PaymentFiles::SetConfiguration < PaymentFiles::Base
 
   protected
   def strong_params
-    params.require(:payment_file_configuration).permit(:format, :options)
+    params.require(:payment_file_configuration).permit(:file_format, :options)
   end
 
 end

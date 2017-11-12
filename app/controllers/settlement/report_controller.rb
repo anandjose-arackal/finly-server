@@ -32,6 +32,11 @@ class Settlement::ReportController < ApplicationController
     respond
   end
 
+  def processing_payment_file
+    @result = Settlement::SReport::Processing::GeneratePaymentFile.(current_user, params)
+    respond
+  end
+
   def completed_index
     @result = Settlement::SReport::Completed::Index.(current_user, params)
     respond

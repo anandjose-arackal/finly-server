@@ -14,4 +14,11 @@ class PaymentFiles::Config
     ]
   end
 
+  def self.adapter_for(key)
+    self.available_adapters.each do |adapter|
+      return adapter[:operation] if adapter[:key] == key
+    end
+    nil
+  end
+
 end

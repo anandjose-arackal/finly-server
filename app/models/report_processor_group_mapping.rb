@@ -37,6 +37,7 @@ class ReportProcessorGroupMapping < ActiveRecord::Base
 
   scope :pending, -> { where status_id: ReportProcessorGroupStatus.id_for(:pending) }
   scope :not_completed, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:completed) }
+  scope :include_for_payment_file, -> { includes :user, :amount, :processor_accountable }
 
   before_destroy do
     self.reports.update_all(report_processor_group_mapping_id: nil)

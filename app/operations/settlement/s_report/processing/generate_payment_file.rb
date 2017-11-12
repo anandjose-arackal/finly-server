@@ -22,15 +22,27 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
       add_message :error, groups_presenter.messages[:error]
       return
     end
-    self.report_group_processor = groups_presenter.report_processor_groups.find_by_id(params[:report_processor_group_id])
+    id = params[:report_processor_group_id] or params[:id]
+    self.report_group_processor = groups_presenter.report_processor_groups.find_by_id(id)
   end
 
   def validate
-
+    unless self.report_group_processor.present?
+      add_message :error, 'Batch not found'
+      return
+    end
+    unless ReportProcessorGroupStatus.ids_for([:pending, :scheduled, :processing, :partially_completed]).include?(self.report_processor_group.status_id)
+      add_message :error, 'Payment file cannot be generated at this stage'
+      return
+    end
   end
 
   def process
-
+    # Format as required by PaymentFiles::Generate
+    payment_params = []
+    self.report_processor_group.mappings.include&.each do |mapping|
+      payment_params << mapping.user
+    end
   end
 
 end

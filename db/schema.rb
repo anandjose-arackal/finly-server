@@ -2219,11 +2219,11 @@ ActiveRecord::Schema.define(version: 20171111095059) do
   end
 
   create_table "payment_file_configurations", force: :cascade do |t|
-    t.string   "format",     limit: 255
-    t.integer  "company_id", limit: 4,     null: false
-    t.text     "options",    limit: 65535
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.string   "file_format", limit: 255
+    t.integer  "company_id",  limit: 4,     null: false
+    t.text     "options",     limit: 65535
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
   end
 
   add_index "payment_file_configurations", ["company_id"], name: "index_payment_file_configurations_on_company_id", using: :btree
