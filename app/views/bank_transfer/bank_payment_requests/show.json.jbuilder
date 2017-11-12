@@ -31,8 +31,8 @@ json.payments do
     json.name payment.receiving_account.account_owner.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
-    json.invoice_amount payment.invoice_amount
-    json.net_amount payment.amount_value
+    json.invoice_amount precision_value payment.invoice_amount
+    json.net_amount precision_value payment.amount_value
     json.status payment.payment_status_name
     json.id payment.id
     json.note payment.note
@@ -89,8 +89,8 @@ json.payments_verified do
     json.name payment.receiving_account.account_owner.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
-    json.net_amount payment.amount_value
-    json.invoice_amount payment.invoice_amount
+    json.net_amount precision_value payment.amount_value
+    json.invoice_amount precision_value payment.invoice_amount
     json.status payment.payment_status_name
     json.id payment.id
     json.note payment.note
@@ -147,8 +147,9 @@ json.payments_unverified do
     json.name payment.receiving_account.account_owner.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
-    json.amount payment.amount_value
-    json.invoice_amount payment.invoice_amount
+    json.amount precision_value payment.amount_value
+    json.net_amount precision_value payment.net_amount&.value
+    json.invoice_amount precision_value payment.invoice_amount
     json.status payment.payment_status_name
     json.id payment.id
     json.note payment.note
