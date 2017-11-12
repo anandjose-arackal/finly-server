@@ -1,3 +1,7 @@
+def precision_value(float_n)
+  float_n.to_d.round(2) rescue 0
+end
+
 
 json.summary do
   json.order_status do
@@ -43,18 +47,18 @@ json.payments do
     invoice = payment.invoice
 
     if payment.invoice.present?
-      json.raw_amount invoice&.amount&.value
+      json.raw_amount precision_value invoice&.amount&.value
       json.invoice do
-        json.original_amount invoice.original_amount&.value
-        json.tax_amount invoice.tax_amount&.value
-        json.tds_amount invoice.tds_amount&.value
-        json.tax invoice.tax
-        json.tds invoice.tds
+        json.original_amount precision_value invoice.original_amount&.value
+        json.tax_amount precision_value invoice.tax_amount&.value
+        json.tds_amount precision_value invoice.tds_amount&.value
+        json.tax precision_value invoice.tax
+        json.tds precision_value invoice.tds
         json.gst_type_id invoice.gst_type_id
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
-        json.discount_amount invoice.discount_amount&.value
-        json.discount invoice.discount
+        json.discount_amount precision_value invoice.discount_amount&.value
+        json.discount precision_value invoice.discount
         json.date invoice.date
         json.discount_type_id invoice.discount_type_id
         json.due_date invoice.due_date
@@ -64,8 +68,8 @@ json.payments do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
         end
-        json.net_amount invoice.net_amount&.value
-        json.gross_amount invoice.gross_amount&.value
+        json.net_amount precision_value invoice.net_amount&.value
+        json.gross_amount precision_value invoice.gross_amount&.value
         json.custom_fields do
           json.array! invoice.custom_fields
         end
@@ -75,7 +79,7 @@ json.payments do
         end
       end
     else
-      json.raw_amount payment.amount_value
+      json.raw_amount precision_value payment.amount_value
     end
   end
 end
@@ -101,18 +105,18 @@ json.payments_verified do
     invoice = payment.invoice
 
     if payment.invoice.present?
-      json.raw_amount invoice&.amount&.value
+      json.raw_amount precision_value invoice&.amount&.value
       json.invoice do
-        json.original_amount invoice.original_amount&.value
-        json.tax_amount invoice.tax_amount&.value
-        json.tds_amount invoice.tds_amount&.value
-        json.tax invoice.tax
-        json.tds invoice.tds
+        json.original_amount precision_value invoice.original_amount&.value
+        json.tax_amount precision_value invoice.tax_amount&.value
+        json.tds_amount precision_value invoice.tds_amount&.value
+        json.tax precision_value invoice.tax
+        json.tds precision_value invoice.tds
         json.gst_type_id invoice.gst_type_id
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
-        json.discount_amount invoice.discount_amount&.value
-        json.discount invoice.discount
+        json.discount_amount precision_value invoice.discount_amount&.value
+        json.discount precision_value invoice.discount
         json.date invoice.date
         json.discount_type_id invoice.discount_type_id
         json.due_date invoice.due_date
@@ -122,8 +126,8 @@ json.payments_verified do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
         end
-        json.net_amount invoice.net_amount&.value
-        json.gross_amount invoice.gross_amount&.value
+        json.net_amount precision_value invoice.net_amount&.value
+        json.gross_amount precision_value invoice.gross_amount&.value
         json.custom_fields do
           json.array! invoice.custom_fields
         end
@@ -133,7 +137,7 @@ json.payments_verified do
         end
       end
     else
-      json.raw_amount payment.amount_value
+      json.raw_amount precision_value payment.amount_value
     end
   end
 end
@@ -159,18 +163,18 @@ json.payments_unverified do
     invoice = payment.invoice
 
     if payment.invoice.present?
-      json.raw_amount invoice&.amount&.value
+      json.raw_amount precision_value invoice&.amount&.value
       json.invoice do
-        json.original_amount invoice.original_amount&.value
-        json.tax_amount invoice.tax_amount&.value
-        json.tds_amount invoice.tds_amount&.value
-        json.tax invoice.tax
-        json.tds invoice.tds
+        json.original_amount precision_value invoice.original_amount&.value
+        json.tax_amount precision_value invoice.tax_amount&.value
+        json.tds_amount precision_value invoice.tds_amount&.value
+        json.tax precision_value invoice.tax
+        json.tds precision_value invoice.tds
         json.gst_type_id invoice.gst_type_id
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
-        json.discount_amount invoice.discount_amount&.value
-        json.discount invoice.discount
+        json.discount_amount precision_value invoice.discount_amount&.value
+        json.discount precision_value invoice.discount
         json.date invoice.date
         json.discount_type_id invoice.discount_type_id
         json.due_date invoice.due_date
@@ -180,8 +184,8 @@ json.payments_unverified do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
         end
-        json.net_amount invoice.net_amount&.value
-        json.gross_amount invoice.gross_amount&.value
+        json.net_amount precision_value invoice.net_amount&.value
+        json.gross_amount precision_value invoice.gross_amount&.value
         json.custom_fields do
           json.array! invoice.custom_fields
         end
@@ -191,7 +195,7 @@ json.payments_unverified do
         end
       end
     else
-      json.raw_amount payment.amount_value
+      json.raw_amount precision_value payment.amount_value
     end
   end
 end

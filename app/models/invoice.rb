@@ -69,7 +69,7 @@ class Invoice < ActiveRecord::Base
 
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true
-  validates :amount, presence: true
+  # validates :amount, presence: true
 
   def policy
     self.payment&.payment_order&.bank_payment_request&.policy

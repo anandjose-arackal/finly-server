@@ -6,7 +6,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
 
   def init
     super
-    id = params[:payment_id] || params[:payment][:id] # todo - temporary till the front end fixes it
+    id = params[:payment_id] || params[:payment][:id]
     self.payment = self.payment_order.payments.find_by(id: id)
     self.payment_params = payment_attributes
   end
@@ -28,7 +28,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
         return
       end
     end
-    
+
     # validate that the amount is being passed
     unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present?
       add_message :error, "Sub Total cannot be blank"
@@ -92,6 +92,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       calculate_tds
       calculate_discount_inclusive
       self.net_amount = self.after_tax_amount - self.tds_amount
+      self.invoice_amount = self.gross_amount + self.discount_amount
       # calculate_tds
     else # calculate proactively
       self.invoice_amount = self.invoice.original_amount&.value
@@ -99,6 +100,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       calculate_exclusive_taxes
       calculate_tds
       self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
+      self.invoice_amount = invoice.original_amount&.value
     end
     # update the invoice with the respective calculated amounts
     self.invoice.update(
