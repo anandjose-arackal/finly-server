@@ -8,6 +8,10 @@ json.summary do
     json.name @result.bank_payment_request.status_name(current_user.id)&.humanize
     json.identifier @result.bank_payment_request.status_name(current_user.id)
   end
+  json.policy do
+    json.id @result.bank_payment_request.policy&.id
+    json.name @result.bank_payment_request.policy&.name
+  end
   json.retriable @result.bank_payment_request.retriable?
   json.bank_transfer_type @result.payment_order.payment_mode&.upcase
   json.payment_type @result.payment_order.payment_type&.humanize
