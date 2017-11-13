@@ -6,7 +6,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   attr_accessor :order_data, :payment_request, :payment_order, :scheduled_at,
                 :processed_order_data, :initiating_account, :request_params,
                 :company_id, :bank_payment_request, :requested_amount,
-                :unauthorized_vendors_presence
+                :unauthorized_vendors_presence, :invoice_parameters
 
   def pre_validate
     super
@@ -47,6 +47,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     # below variable will contain the payment_request that holds data about initiating accounts and
     # receiving accounts
     self.request_params = payment_request_params
+    self.invoice_parameters = invoice_params
   end
 
   def validate
@@ -166,6 +167,10 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       }
     end
     p
+  end
+
+  def invoice_params
+    
   end
 
   def retrieve_bank_account(order_details)
