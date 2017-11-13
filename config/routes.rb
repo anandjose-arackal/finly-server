@@ -2052,8 +2052,8 @@ Rails.application.routes.draw do
     patch 'accept', to: 'pending_invites#accept', as: :accept
   end
 
+  get 'settlements/:id/summary' => 'settlements#user_summary'
   get 'settlements/summary' => 'settlements#summary'
-  get 'settlements/overview' => 'settlements#overview'
   resources :settlements
   post 'settlements/:id/add_payment' => 'settlements#add_payment', as: :settlement_add_payment
 
@@ -2092,7 +2092,7 @@ Rails.application.routes.draw do
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 
-  get 'statements/:id/summary' => 'statements#summary'
+  get 'statements/summary' => 'statements#summary'
   get 'export/:id/statements(.:format)', to: 'export#statement', as: :export_statement
   resources :statements
   get 'statements/:id/export', to: 'statements#export'

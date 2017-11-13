@@ -30,12 +30,12 @@ class SettlementsController < ApplicationController
     respond
   end
 
-  def summary
-    @result = Settlement::Summary.(current_user, params)
+  def user_summary
+    @result = Settlement::UserSummary.(current_user, params)
     respond
   end
 
-  def overview
+  def summary
     @result = Settlement::Summary.(current_user, params)
     respond
   end
