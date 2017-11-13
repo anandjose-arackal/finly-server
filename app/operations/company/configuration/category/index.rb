@@ -5,7 +5,7 @@ class Company::Configuration::Category::Index < Company::Configuration::Category
   end
 
   def process
-    self.categories = current_company.categories.with_purpose(Purpose.id_from_application_for(RequestStore.store[:current_app]))
+    self.categories = current_company.categories.active.with_purpose(Purpose.id_from_application_for(RequestStore.store[:current_app]))
   end
 
   def success
