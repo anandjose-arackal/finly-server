@@ -16,7 +16,7 @@ class BankTransfer::PaymentRequest::ParseFile < BankTransfer::PaymentRequest::Ba
   def init
     self.file = params[:file]
     self.parsed_data = ImportUtil.load_spreadsheet(file, [:name, :bank_account_number, :ifsc, :amount,
-                                                                :inclusive_of_taxes, :gst_type_id, :tax_type_id, :tax, :discount_type,
+                                                                :inclusive_of_taxes, :gst_type_id, :tax_type_id, :tax, :discount_type_id,
                                                                 :discount, :tds_type_id, :tds, :invoice_number, :invoice_date, :due_date], {skip_empty_lines: true})
   end
 

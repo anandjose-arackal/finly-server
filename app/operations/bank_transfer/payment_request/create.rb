@@ -71,7 +71,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     unless bank_payment_request.save
       add_message :error, bank_payment_request.errors.full_messages
     end
-
+    # create the invoice along with the payment in this case
+    # todo - operation to call the Invoice creation
   end
 
   def post_process
@@ -170,7 +171,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   end
 
   def invoice_params
-    
+
   end
 
   def retrieve_bank_account(order_details)

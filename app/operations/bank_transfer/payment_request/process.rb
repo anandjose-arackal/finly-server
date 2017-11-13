@@ -139,7 +139,11 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       self.payment_order_valid = false unless self.valid
 
-      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, amount: amount, note: note, valid: self.valid, messages: self.error_messages}
+      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, amount: amount, note: note,
+                               gst_type_id: gst_type_id, tax_type_id: tax_type_id, tax: tax, tds_type_id: tds_type_id,
+                               discount_type_id: discount_type_id, discount: discount,
+                               invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date,
+                               valid: self.valid, messages: self.error_messages}
     end
   end
 
@@ -183,9 +187,12 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
   private
 
   def validate_rate(rate, rate_type_id, amount)
+    if rate.blank?
+      return true
+    end
     case rate_type_id
       when 1, '1'
-        if rate >= 100
+        if rate.to_f >= 100
           return false
         end
       when 2, '2'
@@ -197,7 +204,14 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
   end
 
   def validate_date(date)
-
+    if date.blank?
+      return true
+    end
+    date_obj = Date.parse(date) rescue nil
+    if date_obj.blank?
+      return false
+    end
+    true
   end
 
   def validate_amount
