@@ -48,7 +48,7 @@ class Policy::Mappings::Show < Policy::Base
   end
 
   def pre_process
-    self.purpose_id = params[:purpose_id] || MappingPurpose.id_from_application_for(RequestStore.store[:current_app])
+    self.purpose_id = params[:purpose_id] || Purpose.id_from_application_for(RequestStore.store[:current_app])
   end
 
   def process

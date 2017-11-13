@@ -690,6 +690,7 @@
 #                         expense_type_configuration_show GET    /expense_type_configurations(.:format)                                                     expense_types_configuration#show
 #                       expense_type_configuration_update PATCH  /expense_type_configurations(.:format)                                                     expense_types_configuration#update
 #                                            groups_teams GET    /groups_teams(.:format)                                                                    expense_types_configuration#groups_teams
+#                                         expense_filters GET    /expense_filters(.:format)                                                                 expense_types_configuration#expense_filters
 #                                               per_diems GET    /per_diems(.:format)                                                                       per_diems#index
 #                                                         POST   /per_diems(.:format)                                                                       per_diems#create
 #                                            new_per_diem GET    /per_diems/new(.:format)                                                                   per_diems#new
@@ -723,6 +724,14 @@
 #                                                         PUT    /statements/:id(.:format)                                                                  statements#update
 #                                                         DELETE /statements/:id(.:format)                                                                  statements#destroy
 #                                                         GET    /statements/:id/export(.:format)                                                           statements#export
+#                                                         POST   /custom_fields/:field_configuration_id/drop_down_items(.:format)                           custom_fields#dropdownitem_create
+#                                                         DELETE /custom_fields/:field_configuration_id/drop_down_items/:drop_down_item_id(.:format)        custom_fields#dropdownitem_destroy
+#                                           custom_fields GET    /custom_fields(.:format)                                                                   custom_fields#index
+#                                                         POST   /custom_fields(.:format)                                                                   custom_fields#create
+#                                            custom_field GET    /custom_fields/:id(.:format)                                                               custom_fields#show
+#                                                         PATCH  /custom_fields/:id(.:format)                                                               custom_fields#update
+#                                                         PUT    /custom_fields/:id(.:format)                                                               custom_fields#update
+#                                                         DELETE /custom_fields/:id(.:format)                                                               custom_fields#destroy
 #                                                    root GET    /                                                                                          home#index
 #                                                 welcome GET    /welcome(.:format)                                                                         home#welcome
 #                                                   about GET    /about(.:format)                                                                           home#about
@@ -904,6 +913,7 @@
 #   bank_transfer_bank_payment_request_remove_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_beneficiary(.:format) bank_transfer/bank_payment_requests#remove_beneficiary
 #                bank_transfer_bank_payment_request_retry PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/retry(.:format)              bank_transfer/bank_payment_requests#retry
 #     bank_transfer_bank_payment_request_within_timeframe GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/within_timeframe(.:format)   bank_transfer/bank_payment_requests#within_timeframe
+#       bank_transfer_bank_payment_request_update_payment PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/update_payment(.:format)     bank_transfer/bank_payment_requests#update_payment
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                             bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                             bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                                         bank_transfer/bank_payment_requests#new
@@ -2260,6 +2270,7 @@ Rails.application.routes.draw do
       patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficiary
       patch 'retry', to: 'bank_payment_requests#retry', as: :retry
       get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
+      patch 'update_payment', to: 'bank_payment_requests#update_payment'
     end
 
     get 'account_owners/count', to: 'account_owners#count'

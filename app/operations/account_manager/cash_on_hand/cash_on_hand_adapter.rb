@@ -10,13 +10,13 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
 
   def credit(payment, options)
     success = false
-    opening_balance = balance
+    opening_balance = database_balance
     balance_amount = self.account.balance
     balance_amount.with_lock do
       balance_amount.value += payment.amount_value
       success = balance_amount.save
     end
-    closing_balance = balance
+    closing_balance = database_balance
     if success
       store_transaction payment, :credit, :success, opening_balance, closing_balance, account.user.company_id
       return true
@@ -28,13 +28,13 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
 
   def debit(payment, options)
     success = false
-    opening_balance = balance
+    opening_balance = database_balance
     balance_amount = self.account.balance
     balance_amount.with_lock do
       balance_amount.value -= payment.amount_value
       success = balance_amount.save
     end
-    closing_balance = balance
+    closing_balance = database_balance
     if success
       store_transaction payment, :debit, :success, opening_balance, closing_balance, account.user.company_id
       return true
@@ -44,10 +44,14 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
     false
   end
 
-  def balance
+  def balance(options = {})
     balance = self.account.balance_value
     expenses_against_coh_total = self.account.user.expenses.unverified.spent_from_cash_on_hand.joins_amount.sum(:value)
     (balance - expenses_against_coh_total)
+  end
+
+  def database_balance
+    self.account.balance_value
   end
 
   def eligibility(source_id)

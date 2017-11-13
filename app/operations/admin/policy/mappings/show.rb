@@ -4,7 +4,7 @@ class Admin::Policy::Mappings::Show <  Policy::Mappings::Show
   end
 
   def init
-    params[:purpose_id] = params[:purpose_id] || MappingPurpose.id_for(:expense_management)
+    params[:purpose_id] = params[:purpose_id] || Purpose.id_for(:expense_management)
     super
   end
 end

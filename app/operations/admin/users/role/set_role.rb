@@ -21,7 +21,7 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
     return unless being_updated_user.present?
 
     ###### setting the expense management roles first ############
-    self.em_purpose_id = MappingPurpose.id_for(:expense_management)
+    self.em_purpose_id = Purpose.id_for(:expense_management)
 
     existing_role_ids = being_updated_user.role_mapping.expense_management.map(&:user_role_id)
     new_role_ids = em_role_params[:user_role_id]
@@ -47,7 +47,7 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
 
 
     ###### setting the vendor payment roles ######################
-    self.vp_purpose_id = MappingPurpose.id_for(:vendor_payments)
+    self.vp_purpose_id = Purpose.id_for(:vendor_payments)
 
     existing_role_ids = being_updated_user.role_mapping.vendor_payments.map(&:user_role_id)
     new_role_ids = vp_role_params[:user_role_id]

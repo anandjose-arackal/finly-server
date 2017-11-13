@@ -55,6 +55,8 @@ class Company < ActiveRecord::Base
   accepts_nested_attributes_for :auto_sync_configs
   accepts_nested_attributes_for :company_kyc
 
+  delegate :bank_type, to: :configuration
+
   after_create :init_config_present
 
   validates :name, presence: true
@@ -151,6 +153,14 @@ class Company < ActiveRecord::Base
   def d_code
     return nil if itz_cash_property.blank?
     itz_cash_property.d_code
+  end
+
+  def hdfc?
+    self.configuration.bank_type.upcase == "HDFC"
+  end
+
+  def rbl?
+    self.configuration.bank_type.upcase == "RBL"
   end
 
   def easy_account_no
@@ -283,6 +293,12 @@ class Company < ActiveRecord::Base
 
   def yes_bank_account_number
     self.yes_bank_company_account.account_number
+  end
+
+  def all_policies
+    policy_ids = self.policies.default.pluck(:id)
+    policy_ids += self.policies.with_application(RequestStore[:current_app]).pluck(:id)
+    Policy.with_id(policy_ids)
   end
 
   private

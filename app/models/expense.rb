@@ -26,6 +26,8 @@
 #
 
 
+
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -274,6 +276,11 @@ class Expense < ActiveRecord::Base
   scope :spent_from_cash_on_hand, -> { where(from_cash_on_hand: true).where(expense_type_id: ExpenseType.id_for(:manual)) }
 
   scope :with_id, ->(ids) { where id: ids }
+  scope :without_id, -> (id) {
+    if id.present?
+      where.not(id: id)
+    end
+  }
   scope :with_date, ->(dates) { where date: dates }
   scope :with_date_range, -> (start_date, end_date) { where('date >= ? AND date <= ?', start_date, end_date) }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }

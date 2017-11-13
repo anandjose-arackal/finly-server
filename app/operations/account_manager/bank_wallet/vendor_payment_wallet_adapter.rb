@@ -48,9 +48,10 @@ class AccountManager::BankWallet::VendorPaymentWalletAdapter < AccountManager::B
     true
   end
 
-  def balance
+  def balance(options = {})
+    payment_order = options[:payment_order]
     balance = self.account.balance_value
-    blocked_amount = self.account.blocked_amount_for_pending_payments
+    blocked_amount = self.account.blocked_amount_for_pending_payments(payment_order&.id)
     return (balance - blocked_amount)
   end
 

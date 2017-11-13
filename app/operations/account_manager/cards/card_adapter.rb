@@ -90,7 +90,7 @@ class AccountManager::Cards::CardAdapter < AccountManager::BaseAdapter
     true
   end
 
-  def balance
+  def balance(options = {})
     op = ItzCash::AccountDetails.(account.user, card: account)
     op.balance rescue 0
   end

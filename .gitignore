@@ -9,6 +9,7 @@
 /.bundle
 #Gemfile.lock
 /config/database.yml
+/config/finly_collect.yml
 /.byebug_history
 
 # Ignore all logfiles and tempfiles.
@@ -22,6 +23,7 @@
 /public/system/individual_kycs/*
 /public/system/payment_order_attachments/*
 /public/system/agreements/*
+/public/system/invoice_attachments/*
 /public/system/kyc_documents/*
 public/system/payment_order_attachments/attached_files/*
 /public/common/files/temp_files/*

@@ -38,7 +38,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     require 'bank_transfer/payment_request/review/associated_users'
 
     attr_accessor :bank_payment_request, :payment_order, :actions, :bank_wallet_balance,
-                  :manager, :finance_manager, :associated_users, :payments_verified, :payments_unverified
+                  :manager, :finance_manager, :associated_users, :payments_verified, :payments_unverified,
+                  :custom_field_config
 
     def init
       self.bank_payment_request = params[:payment_request]
@@ -63,6 +64,12 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           self.payments_unverified << payment
         end
       end
+      self.custom_field_config = custom_field_configurations
+    end
+
+    def custom_field_configurations
+      configurations = user.company.field_configurations.exclude_deleted
+      configurations.with_parent_type(FieldParentType.id_for(:invoice))
     end
 
     def retrieve_actions
@@ -222,8 +229,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           # if the payment request is scheduled, give the option to cancel it here
           actions[:cancel] = {method: "delete", type: 2, url: Rails.application.routes.url_helpers.bank_transfer_payment_order_path(bank_payment_request.payment_order)}
         end
-      elsif finance_view? && bank_payment_request.processing?
-        if bank_payment_request.controlling_user_id == user.id
+      elsif finance_view?
+        if bank_payment_request.controlling_user_id == user.id && bank_payment_request.processing?
           actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:summary_editable] = true
           actions[:payments_editable] = true
@@ -328,6 +335,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         elsif bank_payment_request.processing? && bank_payment_request.owner_id == user.id
           actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         elsif bank_payment_request.approved? && bank_payment_request.owner_id == user.id
+          actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           balance = retrieve_balance(:vendor_payment_wallet, user)
           credit_enabled = false
           admin = false

@@ -86,7 +86,7 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
     true
   end
 
-  def balance
+  def balance(options = {})
     self.account.balance_value
   end
 

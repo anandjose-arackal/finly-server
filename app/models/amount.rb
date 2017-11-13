@@ -251,6 +251,12 @@ class Amount < ActiveRecord::Base
   alias_method :amount_processed_value, :amount_value
   alias_method :requested_amount_value, :amount_value
 
+  alias_method :gross_amount_value, :amount_value
+  alias_method :net_amount_value, :amount_value
+  alias_method :tds_amount_value, :amount_value
+  alias_method :tax_amount_value, :amount_value
+  alias_method :discount_amount_value, :amount_value
+
   scope :with_id, -> (id) { where id: id }
 
   before_save do

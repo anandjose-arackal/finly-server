@@ -2,7 +2,7 @@ class DuplicateExistingMappingsInVendorPaymentsToNewFormat < ActiveRecord::Migra
   def change
     # creating one default team mapping for all users ion vendor payment system
     User.all.each do |user|
-      user.team_mapping.build(default: true, policy: user.company.policies.default.first, purpose_id: MappingPurpose.id_for(:vendor_payments)).save
+      user.team_mapping.build(default: true, policy: user.company.policies.default.first, purpose_id: Purpose.id_for(:vendor_payments)).save
     end
   end
 end

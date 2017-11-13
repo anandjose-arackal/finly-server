@@ -30,6 +30,9 @@
 
 
 
+
+
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -51,6 +54,7 @@ class Payment < ActiveRecord::Base
   has_many :finly_transactions
 
   has_one :payment, as: :reference_resource
+  has_one :invoice
 
   belongs_to :payment_order
   belongs_to :payment_status
@@ -64,11 +68,18 @@ class Payment < ActiveRecord::Base
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :receiving_account
+  accepts_nested_attributes_for :invoice
 
   delegate :amount_value, to: :amount
 
   default_scope { order date: :desc, created_at: :desc }
 
+  scope :with_id, -> (id) { where id: id }
+  scope :without_id, -> (id) {
+    if id.present?
+      where.not(id: id)
+    end
+  }
   scope :atm_withdrawals, -> { where payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal) }
   scope :advance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:advance_outside_finly)] }
   scope :cash_on_hand_additions, -> { where payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:cash_advance)] }
@@ -214,6 +225,12 @@ class Payment < ActiveRecord::Base
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)
   end
 
+  before_save do
+    # recalculating the amount or net amount for this particular
+    # payment from the details inside the invoice
+
+  end
+
   def initiating_account_type_name
     name = "#{initiating_user&.first_name&.to_s}'s "
 
@@ -327,12 +344,17 @@ class Payment < ActiveRecord::Base
     self.failed?
   end
 
+  def invoice_amount
+    return self.amount.value unless self.invoice.present?
+    self.invoice.amount&.value # in this case return the actual invoice amount
+  end
+
   private
 
   def initiating_account_presence
     unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly, :balance_clearance_outside_finly,
                                    :personal_expense, :atm_withdrawal, :card_transaction, :advance, :corporate_balance_load,
-                                   :corporate_balance_refund, :cash_advance, :balance_clearance_against_cash_on_hand,
+                                   :corporate_balance_refund, :cash_advance, :balance_clearance_against_cash_on_hand, :settlement_against_cash_on_hand,
                                    :advance_against_report_unapproval]).include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")

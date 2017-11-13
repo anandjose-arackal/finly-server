@@ -46,27 +46,10 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       return
     end
 
-    # op = AccountManager::Balance::Check.(current_user.company.yes_bank_company_account, params)
-    # company_balance = op.balance rescue 0
-    #
     payment_order_data.each do |item|
       self.requested_amount += (item[:amount].to_d rescue 0)
     end
 
-    # case params[:initiating_account_type]
-    #   when '1', 1
-    #     if self.requested_amount > company_balance
-    #       self.errors << 'Insufficient funds to initiate the transfer'
-    #       self.payment_order_valid = false
-    #       return
-    #     end
-    #   when '2', 2
-    #     if self.requested_amount > user.bank_wallet.balance_value
-    #       self.errors << 'Insufficient funds to initiate the transfer'
-    #       self.payment_order_valid = false
-    #       return
-    #     end
-    # end
   end
 
   def process
@@ -86,14 +69,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       valid = true
       messages = []
 
-      # # if the user is not an admin or creditor, they can't credit to unauthorized vendors
-      # unless user.vendor_payments_admin? || user.vendor_payments_creditor?
-      #   ba = BankAccount.find_by(account_number: bank_account_no, ifsc: ifsc)
-      #   if ba.nil?
-      #     messages << "You cannot credit to unaithorized bank accounts. Please request the admin or creditor to add this bank account"
-      #     valid = false
-      #   end
-      # end
 
       # Check if bank account number is present
       if bank_account_no.blank?

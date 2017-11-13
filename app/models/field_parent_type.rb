@@ -17,7 +17,8 @@ class FieldParentType < ActiveRecord::Base
       time_expense: 4,
       distance_expense: 5,
       per_diem_expense: 6,
-      card_expense: 7
+      card_expense: 7,
+      invoice: 8
   }
 
   def self.id_for(sym)

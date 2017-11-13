@@ -12,7 +12,9 @@
 #  is_deleted       :boolean          default(FALSE), not null
 #  description      :text(65535)
 #  base_currency_id :integer          default(1)
+#  application      :string(255)
 #
+
 
 
 
@@ -48,6 +50,7 @@ class Policy < ActiveRecord::Base
   scope :without_id, ->(id) { where.not id: id }
   scope :not_deleted, -> { where is_deleted: false }
   scope :find_from_id, -> (id) { find_by(id: id) }
+  scope :with_application, -> (application) { where application: application }
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
@@ -110,8 +113,6 @@ class Policy < ActiveRecord::Base
     self.build_distance_expense_config(enabled: false).save
     self.build_time_expense_config(enabled: false).save
     self.build_per_diem_expense_config(enabled: false).save
-
-    # todo - change this to mirror the company configuration at this current time
   end
 
 end
