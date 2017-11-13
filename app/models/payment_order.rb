@@ -197,6 +197,11 @@ class PaymentOrder < ActiveRecord::Base
     self.amount_processed&.update(value: new_amount)
   end
 
+  def update_requested_amount
+    new_amount = self.payments.joins(:amount).sum(:value)
+    self.amount_requested&.update(value: new_amount)
+  end
+
   # again, for convenience, and only applies to bank transfer poyments
   def bank_transfer_type
     self.payments.first.payment_mode

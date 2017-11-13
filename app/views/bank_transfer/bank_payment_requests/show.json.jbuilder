@@ -1,8 +1,16 @@
+def precision_value(float_n)
+  float_n.to_d.round(2) rescue 0
+end
+
 
 json.summary do
   json.order_status do
     json.name @result.bank_payment_request.status_name(current_user.id)&.humanize
     json.identifier @result.bank_payment_request.status_name(current_user.id)
+  end
+  json.policy do
+    json.id @result.bank_payment_request.policy&.id
+    json.name @result.bank_payment_request.policy&.name
   end
   json.retriable @result.bank_payment_request.retriable?
   json.bank_transfer_type @result.payment_order.payment_mode&.upcase
@@ -27,7 +35,8 @@ json.payments do
     json.name payment.receiving_account.account_owner.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
-    json.amount payment.amount_value
+    json.invoice_amount precision_value payment.invoice_amount
+    json.net_amount precision_value payment.amount_value
     json.status payment.payment_status_name
     json.id payment.id
     json.note payment.note
@@ -38,6 +47,44 @@ json.payments do
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
     json.retriable payment.retriable?
+
+    invoice = payment.invoice
+
+    if payment.invoice.present?
+      json.raw_amount precision_value invoice&.amount&.value
+      json.invoice do
+        json.original_amount precision_value invoice.original_amount&.value
+        json.tax_amount precision_value invoice.tax_amount&.value
+        json.tds_amount precision_value invoice.tds_amount&.value
+        json.tax precision_value invoice.tax
+        json.tds precision_value invoice.tds
+        json.gst_type_id invoice.gst_type_id
+        json.tax_type_id invoice.tax_type_id
+        json.tds_type_id invoice.tds_type_id
+        json.discount_amount precision_value invoice.discount_amount&.value
+        json.discount precision_value invoice.discount
+        json.date invoice.date
+        json.discount_type_id invoice.discount_type_id
+        json.due_date invoice.due_date
+        json.invoice_number invoice.invoice_number
+        json.inclusive_of_taxes invoice.inclusive_of_taxes
+        json.invoice_attachment do
+          json.url invoice.invoice_attachments.first&.attached_file&.url
+          json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
+        end
+        json.net_amount precision_value invoice.net_amount&.value
+        json.gross_amount precision_value invoice.gross_amount&.value
+        json.custom_fields do
+          json.array! invoice.custom_fields
+        end
+        json.category_id invoice.category_id
+        json.custom_fields_config do
+          json.array!(@result.custom_field_config)
+        end
+      end
+    else
+      json.raw_amount precision_value payment.amount_value
+    end
   end
 end
 
@@ -46,7 +93,8 @@ json.payments_verified do
     json.name payment.receiving_account.account_owner.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
-    json.amount payment.amount_value
+    json.net_amount precision_value payment.amount_value
+    json.invoice_amount precision_value payment.invoice_amount
     json.status payment.payment_status_name
     json.id payment.id
     json.note payment.note
@@ -57,6 +105,44 @@ json.payments_verified do
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
     json.retriable payment.retriable?
+
+    invoice = payment.invoice
+
+    if payment.invoice.present?
+      json.raw_amount precision_value invoice&.amount&.value
+      json.invoice do
+        json.original_amount precision_value invoice.original_amount&.value
+        json.tax_amount precision_value invoice.tax_amount&.value
+        json.tds_amount precision_value invoice.tds_amount&.value
+        json.tax precision_value invoice.tax
+        json.tds precision_value invoice.tds
+        json.gst_type_id invoice.gst_type_id
+        json.tax_type_id invoice.tax_type_id
+        json.tds_type_id invoice.tds_type_id
+        json.discount_amount precision_value invoice.discount_amount&.value
+        json.discount precision_value invoice.discount
+        json.date invoice.date
+        json.discount_type_id invoice.discount_type_id
+        json.due_date invoice.due_date
+        json.invoice_number invoice.invoice_number
+        json.inclusive_of_taxes invoice.inclusive_of_taxes
+        json.invoice_attachment do
+          json.url invoice.invoice_attachments.first&.attached_file&.url
+          json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
+        end
+        json.net_amount precision_value invoice.net_amount&.value
+        json.gross_amount precision_value invoice.gross_amount&.value
+        json.custom_fields do
+          json.array! invoice.custom_fields
+        end
+        json.category_id invoice.category_id
+        json.custom_fields_config do
+          json.array!(@result.custom_field_config)
+        end
+      end
+    else
+      json.raw_amount precision_value payment.amount_value
+    end
   end
 end
 
@@ -65,7 +151,9 @@ json.payments_unverified do
     json.name payment.receiving_account.account_owner.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
-    json.amount payment.amount_value
+    json.amount precision_value payment.amount_value
+    json.net_amount precision_value payment.net_amount&.value
+    json.invoice_amount precision_value payment.invoice_amount
     json.status payment.payment_status_name
     json.id payment.id
     json.note payment.note
@@ -76,6 +164,44 @@ json.payments_unverified do
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
     json.retriable payment.retriable?
+
+    invoice = payment.invoice
+
+    if payment.invoice.present?
+      json.raw_amount precision_value invoice&.amount&.value
+      json.invoice do
+        json.original_amount precision_value invoice.original_amount&.value
+        json.tax_amount precision_value invoice.tax_amount&.value
+        json.tds_amount precision_value invoice.tds_amount&.value
+        json.tax precision_value invoice.tax
+        json.tds precision_value invoice.tds
+        json.gst_type_id invoice.gst_type_id
+        json.tax_type_id invoice.tax_type_id
+        json.tds_type_id invoice.tds_type_id
+        json.discount_amount precision_value invoice.discount_amount&.value
+        json.discount precision_value invoice.discount
+        json.date invoice.date
+        json.discount_type_id invoice.discount_type_id
+        json.due_date invoice.due_date
+        json.invoice_number invoice.invoice_number
+        json.inclusive_of_taxes invoice.inclusive_of_taxes
+        json.invoice_attachment do
+          json.url invoice.invoice_attachments.first&.attached_file&.url
+          json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
+        end
+        json.net_amount precision_value invoice.net_amount&.value
+        json.gross_amount precision_value invoice.gross_amount&.value
+        json.custom_fields do
+          json.array! invoice.custom_fields
+        end
+        json.category_id invoice.category_id
+        json.custom_fields_config do
+          json.array!(@result.custom_field_config)
+        end
+      end
+    else
+      json.raw_amount precision_value payment.amount_value
+    end
   end
 end
 

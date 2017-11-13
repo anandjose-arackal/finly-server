@@ -1,5 +1,5 @@
 class UserTeam::Create < UserTeam::Base
-  attr_accessor :user_team_configuration
+  attr_accessor :user_team_configuration, :application
 
   def authorized_user_types
     [:company_admin]
@@ -16,7 +16,8 @@ class UserTeam::Create < UserTeam::Base
   end
 
   def init
-    self.user_team_configuration = {name: params[:name], user_team_group_item_mappings_attributes: []}
+    self.application = RequestStore.store[:current_app]&.to_s
+    self.user_team_configuration = {name: params[:name], application: self.application, user_team_group_item_mappings_attributes: []}
     item_ids = []
     params[:user_team_items]&.each do |id|
       next if item_ids.include?(id)

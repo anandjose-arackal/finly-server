@@ -15,7 +15,8 @@ class PoliciesController < ApplicationController
   end
 
   def index
-    @policies = Policy::Index.(current_user, view: params[:view])
+    @result = Policy::Index.(current_user, view: params[:view])
+    respond
   end
 
   def show
@@ -52,6 +53,7 @@ class PoliciesController < ApplicationController
     @result = Policy::Show.(current_user, params)
     respond_to do |format|
       format.html { render partial: 'policy_members' }
+      format.json { }
     end
   end
 
@@ -70,6 +72,7 @@ class PoliciesController < ApplicationController
     @result = Policy::InvitableUsers.(current_user, params)
     respond_to do |format|
       format.html { render partial: 'users' }
+      format.json { }
     end
   end
 

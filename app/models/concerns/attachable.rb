@@ -18,7 +18,9 @@ module Attachable
       }
     else
       {
-
+          :thumb => ["500x500>", :png],
+          :normal => ["1080x1080>", :png],
+          :large => ["2160x2160>", :png]
       }
     end
   end

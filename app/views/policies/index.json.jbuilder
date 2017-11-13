@@ -1,1 +1,1 @@
-json.array! @policies.policies, :id, :name
+json.array! @result.policies, :id, :name

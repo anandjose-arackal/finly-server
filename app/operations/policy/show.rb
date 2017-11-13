@@ -74,7 +74,7 @@ class Policy::Show < Policy::Base
       caft = conditional_mapping.approves_finance_to
       conditional_approves_finance_to = caft.first if caft.present?
 
-      users << {user: user, admin: admin, default_mapping: default_mapping, conditional_manager: conditional_manager,
+      users << {user: user, admin: admin, default_mapping: default_mapping, default: default_mapping, conditional_manager: conditional_manager,
                 conditional_finance: conditional_finance, conditional_approves_to: conditional_approves_to,
                 conditional_approves_finance_to: conditional_approves_finance_to}
     end
