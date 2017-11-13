@@ -42,7 +42,6 @@ default: &default
     base: 'http://localhost:3002/'
     path: 'receivables'
 
-
 staging:
   <<: *default
   finly_collect:
