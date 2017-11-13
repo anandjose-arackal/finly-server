@@ -2,6 +2,9 @@ class MoneyRequest::Submit < MoneyRequest::Base
 
   def personalizer
     {
+        pre_process: {
+            before: Personalizer::Process.new([:money_request, :submit], :pre_process, self)
+        },
         post_process: {
             before: Personalizer::Process.new([:money_request, :submit], :post_process, self)
         }
