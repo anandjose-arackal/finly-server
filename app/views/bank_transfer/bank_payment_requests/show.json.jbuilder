@@ -1,7 +1,3 @@
-def precision_value(float_n)
-  float_n.to_d.round(2) rescue 0
-end
-
 
 json.summary do
   json.order_status do
@@ -84,6 +80,7 @@ json.payments do
       end
     else
       json.raw_amount precision_value payment.amount_value
+      json.original_amount precision_value payment.amount_value
     end
   end
 end
@@ -142,6 +139,7 @@ json.payments_verified do
       end
     else
       json.raw_amount precision_value payment.amount_value
+      json.original_amount precision_value payment.amount_value
     end
   end
 end
@@ -201,6 +199,7 @@ json.payments_unverified do
       end
     else
       json.raw_amount precision_value payment.amount_value
+      json.original_amount precision_value payment.amount_value
     end
   end
 end

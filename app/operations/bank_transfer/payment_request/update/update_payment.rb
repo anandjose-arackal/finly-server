@@ -33,6 +33,13 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present?
       add_message :error, "Sub Total cannot be blank"
     end
+
+    # if the amount is inclusive of taxes, the tax cannot be blank
+    if StringUtils.to_bool(payment_params&.dig(:invoice_attributes, :inclusive_of_taxes))
+      if payment_params&.dig(:invoice_attributes, :tax).blank?
+        add_message :error, "When sub total is inclusive of taxes, tax rate cannot be blank"
+      end
+    end
   end
 
   def pre_process
