@@ -9,6 +9,7 @@
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #  yes_bank_account_transfer :boolean
+#  invoicing_system          :boolean          default(FALSE)
 #
 
 require 'test_helper'
