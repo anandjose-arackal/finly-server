@@ -124,6 +124,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     }
     p[:description] = params[:description]
     p[:beneficiary_type_id] = retrieve_beneficiary_type
+    p[:policy_id] = current_company.default_policy.id
     p[:payment_order_attributes] = {}
     p[:payment_order_attributes][:initiating_user] = user
     p[:payment_order_attributes][:payment_order_status_id] = PaymentOrderStatus.id_for(:pending_approval)
