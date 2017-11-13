@@ -65,6 +65,16 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       name = item[:name] || item["name"]
       amount = item[:amount]&.to_f || item["amount"]&.to_f
       note = item[:note]&.to_s || item["note"]&.to_s
+      gst_type_id = item[:gst_type_id]
+      tax_type_id = item[:tax_type_id]
+      discount_type_id = item[:discount_type_id]
+      tds_type_id = item[:tds_type_id]
+      discount = item[:discount]
+      tds = item[:tds]
+      tax = item[:tax]
+      invoice_number = item[:invoice_number]
+      invoice_date = item[:invoice_date]
+      due_date = item[:due_date]
 
       valid = true
       messages = []
@@ -96,6 +106,21 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       # todo - if there's any user specific configuration for this particular user,
       # add it here
+
+      # adding all invoice specific validations here for the payment
+      unless validate_date invoice_date
+        valid = false
+        messages << "Invalid invoice date"
+      end
+
+      unless validate_date due_date
+        valid = false
+        messages << "Invalid due date"
+      end
+
+      unless validate_rate tax
+
+      end
 
       if valid
         self.processable_amount += amount
@@ -141,6 +166,20 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     def created_at_formatted
       DateUtils.date_formatted Date.today
     end
+
+  end
+
+  private
+
+  def validate_rate(rate)
+
+  end
+
+  def validate_date(date)
+
+  end
+
+  def validate_amount
 
   end
 
