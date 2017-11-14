@@ -43,15 +43,15 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     self.parsed_data = parse_order_information
     params[:payment_order] = self.parsed_data
     self.response_presenter = BankTransfer::PaymentRequest::Process.(user, params)
+    unless self.response_presenter&.success?
+      add_message :error, (self.response_presenter&.messages[:error] || "Unknown failure")
+    end
   end
 
   def success
     response_presenter
   end
 
-  def failure
-    response_presenter || nil
-  end
 
   private
 
