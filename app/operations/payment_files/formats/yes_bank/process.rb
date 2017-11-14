@@ -11,8 +11,9 @@ class PaymentFiles::Formats::YesBank::Process < PaymentFiles::Formats::BaseForma
 
   def validate
     super
-    unless self.options&.dig(:customer_code).present?
-      add_message :error, 'Customer Code is not configured for YesBank Payment File'
+    result = PaymentFiles::Formats::YesBank::ValidateConfig.(user, {options: self.options, config: self.config})
+    unless result.success?
+      add_message :error, result.messages[:error]
       return
     end
   end
