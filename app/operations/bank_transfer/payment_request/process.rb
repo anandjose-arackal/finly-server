@@ -196,7 +196,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           return false
         end
       when 2, '2'
-        return false
+        return true
       else
         # do nothing?
     end
