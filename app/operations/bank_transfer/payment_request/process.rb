@@ -2,7 +2,7 @@
 # request object out of it
 class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
   attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount,
-                :errors, :payment_order_valid, :scheduled_at, :description
+                :errors, :payment_order_valid, :scheduled_at, :description, :valid, :error_messages
 
   def pre_validate
     super
@@ -63,47 +63,88 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
       name = item[:name] || item["name"]
-      amount = item[:amount]&.to_f || item["amount"]&.to_f
+      amount = item[:original_amount]&.to_f || item["original_amount"]&.to_f
       note = item[:note]&.to_s || item["note"]&.to_s
+      gst_type_id = item[:gst_type_id]
+      tax_type_id = item[:tax_type_id]
+      discount_type_id = item[:discount_type_id]
+      tds_type_id = item[:tds_type_id]
+      discount = item[:discount]
+      tds = item[:tds]
+      tax = item[:tax]
+      invoice_number = item[:invoice_number]
+      invoice_date = item[:invoice_date]
+      due_date = item[:due_date]
+      inclusive_of_taxes = item[:inclusive_of_taxes]
 
-      valid = true
-      messages = []
+      self.valid = true
+      self.error_messages = []
 
 
       # Check if bank account number is present
       if bank_account_no.blank?
-        valid = false
-        messages << 'Bank account not found'
+        self.valid = false
+        self.error_messages << 'Bank account not found'
       end
 
       # Check if the amount is present
       if amount.blank? || !amount.is_a?(Numeric)
-        valid = false
-        messages << 'Invalid amount'
+        self.valid = false
+        self.error_messages << 'Invalid amount'
       end
 
       # check if name is present
       if name.blank?
-        valid = false
-        messages << 'Name cannot be blank'
+        self.valid = false
+        self.error_messages << 'Name cannot be blank'
       end
 
       # check if the ifsc is present
       if ifsc.blank?
-        valid = false
-        messages << 'IFSC cannot be blank'
+        self.valid = false
+        self.error_messages << 'IFSC cannot be blank'
       end
 
       # todo - if there's any user specific configuration for this particular user,
       # add it here
 
-      if valid
+      # adding all invoice specific validations here for the payment
+      unless validate_date invoice_date
+        self.valid = false
+        self.error_messages << "Invalid invoice date"
+      end
+
+      unless validate_date due_date
+        self.valid = false
+        self.error_messages << "Invalid due date"
+      end
+
+      unless validate_rate tax, tax_type_id, amount
+        self.valid = false
+        self.error_messages << "Invalid tax entered"
+      end
+
+      unless validate_rate tds, tds_type_id, amount
+        self.valid = false
+        self.error_messages << "Invalid TDS entered"
+      end
+
+      unless validate_rate discount, discount_type_id, amount
+        self.valid = false
+        self.error_messages << "Invalid discount entered"
+      end
+
+      if self.valid
         self.processable_amount += amount
       end
 
-      self.payment_order_valid = false unless valid
+      self.payment_order_valid = false unless self.valid
 
-      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, amount: amount, note: note, valid: valid, messages: messages}
+      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
+                               gst_type_id: gst_type_id, tax_type_id: tax_type_id, tax: tax, tds_type_id: tds_type_id,
+                               discount_type_id: discount_type_id, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
+                               invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date,
+                               valid: self.valid, messages: self.error_messages}
     end
   end
 
@@ -141,6 +182,40 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     def created_at_formatted
       DateUtils.date_formatted Date.today
     end
+
+  end
+
+  private
+
+  def validate_rate(rate, rate_type_id, amount)
+    if rate.blank?
+      return true
+    end
+    case rate_type_id
+      when 1, '1'
+        if rate.to_f >= 100
+          return false
+        end
+      when 2, '2'
+        return true
+      else
+        # do nothing?
+    end
+    true
+  end
+
+  def validate_date(date)
+    if date.blank?
+      return true
+    end
+    date_obj = Date.parse(date) rescue nil
+    if date_obj.blank?
+      return false
+    end
+    true
+  end
+
+  def validate_amount
 
   end
 

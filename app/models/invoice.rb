@@ -82,5 +82,12 @@ class Invoice < ActiveRecord::Base
 
   private
 
+  def tax_rate_validation
+
+  end
+
+  def tds_rate_validation
+
+  end
 
 end

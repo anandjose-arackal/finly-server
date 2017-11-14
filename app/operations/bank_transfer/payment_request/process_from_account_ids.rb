@@ -71,8 +71,9 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           name: bank_account.account_owner.name,
           bank_account_number: bank_account.account_number,
           ifsc: bank_account.ifsc,
-          amount: amounts[index],
-          note: self.notes[index]
+          original_amount: amounts[index],
+          note: self.notes[index],
+
       }
     end
     data
