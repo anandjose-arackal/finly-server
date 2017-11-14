@@ -47,7 +47,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     end
 
     payment_order_data.each do |item|
-      self.requested_amount += (item[:amount].to_d rescue 0)
+      self.requested_amount += (item[:original_amount].to_d rescue 0)
     end
 
   end
