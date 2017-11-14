@@ -2072,7 +2072,7 @@ Rails.application.routes.draw do
         post 'create', to: 'settlement/report#processing_create'
         post 'cancel', to: 'settlement/report#processing_cancel'
         post 'mark_as_paid', to: 'settlement/report#processing_mark_paid'
-        get ':id/payment_file', to: 'settlement/report#processing_payment_file'
+        get 'payment_file', to: 'settlement/report#processing_payment_file'
       end
       get 'completed', to: 'settlement/report#completed_index'
     end

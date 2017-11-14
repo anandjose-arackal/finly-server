@@ -23,10 +23,12 @@ class Settlement::SReport::Pending::Index < Settlement::SReport::Pending::Base
   end
 
   class Settlement::SReport::Pending::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :reports
+    attr_accessor :reports, :paginated_reports
 
     def init
       self.reports = params[:reports]
+      page_size = params[:page_size] || 30
+      self.paginated_reports = self.reports.paginate(page: params[:page], per_page: page_size)
     end
   end
 

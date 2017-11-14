@@ -1,5 +1,5 @@
 class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport::Processing::Base
-  attr_accessor :report_processor_group
+  attr_accessor :report_processor_groups, :group_mappings
 
   def authorized_user_types
     [:company_admin, :finance_manager]
@@ -23,16 +23,20 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
       return
     end
     id = (params[:report_processor_group_id] or params[:id])
-    self.report_processor_group = groups_presenter.report_processor_groups.find_by_id(id)
+    self.report_processor_groups = groups_presenter.report_processor_groups.with_id(id)
+    if self.report_processor_groups.present?
+      ids = self.report_processor_groups.pluck(:id)
+      self.group_mappings = ReportProcessorGroupMapping.with_processor_group_id(ids)
+    end
   end
 
   def validate
-    unless self.report_processor_group.present?
+    unless self.group_mappings.present?
       add_message :error, 'Batch not found'
       return
     end
-    unless ReportProcessorGroupStatus.ids_for([:pending, :scheduled, :processing, :partially_completed]).include?(self.report_processor_group.status_id)
-      add_message :error, 'Payment file cannot be generated at this stage'
+    unless (self.report_processor_groups.pluck_status_id - ReportProcessorGroupStatus.ids_for([:pending, :scheduled, :processing, :partially_completed])).blank?
+      add_message :error, 'Payment file cannot be generated for the selected batches'
       return
     end
   end
@@ -40,7 +44,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
   def process
     # Format as required by PaymentFiles::Generate
     payment_params = []
-    self.report_processor_group.mappings.include_for_payment_file&.each do |mapping|
+    self.group_mappings.include_for_payment_file&.each do |mapping|
       payment_params << {email: mapping.user.email, mobile_number: mapping.user.mobile_number, amount: mapping.amount, bank_account: mapping.processor_accountable}
     end
     self.response = PaymentFiles::Formats::YesBank::Process.(user, payment_params)

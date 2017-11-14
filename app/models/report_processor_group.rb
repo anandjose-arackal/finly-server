@@ -43,6 +43,7 @@ class ReportProcessorGroup < ActiveRecord::Base
   accepts_nested_attributes_for :total_amount
   accepts_nested_attributes_for :processed_amount
 
+  scope :with_id, -> (id){ where id: id }
   scope :created_by_user, -> (user_id) { where created_by_user_id: user_id }
   scope :with_payment_order_id, -> (payment_order_id) { where payment_order_id: payment_order_id }
   scope :include_mapping_reports, -> { includes({mappings: [:reports, :system_messages]}) }
@@ -61,6 +62,7 @@ class ReportProcessorGroup < ActiveRecord::Base
         :status,
         :created_by_user)
   }
+  scope :pluck_status_id, -> { pluck :status_id }
 
   delegate :scheduled?, :processing?, :processing?, :partially_completed?, :completed?, :failed?, :cancelled?, to: :status
 
