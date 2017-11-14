@@ -2066,8 +2066,10 @@ Rails.application.routes.draw do
   scope :settlements do
     scope :reports do
       get 'pending', to: 'settlement/report#pending_index'
+      get 'pending/count', to: 'settlement/report#pending_count'
       scope :processing do
         get '/', to: 'settlement/report#processing_index'
+        get 'count', to: 'settlement/report#processing_count'
         post 'init', to: 'settlement/report#processing_init'
         post 'create', to: 'settlement/report#processing_create'
         post 'cancel', to: 'settlement/report#processing_cancel'
@@ -2075,6 +2077,7 @@ Rails.application.routes.draw do
         get 'payment_file', to: 'settlement/report#processing_payment_file'
       end
       get 'completed', to: 'settlement/report#completed_index'
+      get 'completed/count', to: 'settlement/report#completed_count'
     end
   end
 

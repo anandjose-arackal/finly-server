@@ -1,0 +1,1 @@
+json.processing_count @result.report_processor_groups.count

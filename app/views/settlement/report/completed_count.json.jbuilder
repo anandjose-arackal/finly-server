@@ -1,0 +1,1 @@
+json.completed_count @result.reports.count

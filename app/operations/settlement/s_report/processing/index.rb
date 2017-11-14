@@ -2,11 +2,12 @@ class Settlement::SReport::Processing::Index < Settlement::SReport::Processing::
   attr_accessor :report_processor_groups
 
   class Settlement::SReport::Processing::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :report_processor_groups, :report_processor_groups_show
+    attr_accessor :report_processor_groups, :paginated_report_processor_groups
 
     def init
       self.report_processor_groups = params[:report_processor_groups]
-      self.report_processor_groups_show = self.report_processor_groups&.include_for_show
+      per_page = params[:per_page] || 30
+      self.paginated_report_processor_groups = self.report_processor_groups&.include_for_show.paginate(page: params[:page], per_page: per_page)
     end
 
   end

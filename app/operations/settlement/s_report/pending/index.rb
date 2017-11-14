@@ -27,9 +27,10 @@ class Settlement::SReport::Pending::Index < Settlement::SReport::Pending::Base
 
     def init
       self.reports = params[:reports]
-      page_size = params[:page_size] || 30
-      self.paginated_reports = self.reports.paginate(page: params[:page], per_page: page_size)
+      per_page = params[:per_page] || 30
+      self.paginated_reports = self.reports.paginate(page: params[:page], per_page: per_page)
     end
+
   end
 
 

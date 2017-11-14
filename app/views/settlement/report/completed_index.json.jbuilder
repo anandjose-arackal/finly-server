@@ -1,4 +1,4 @@
-json.array! @result.reports do |report|
+json.array! @result.paginated_reports do |report|
 
   json.extract! report, :id, :name
   json.user do

@@ -7,6 +7,11 @@ class Settlement::ReportController < ApplicationController
     respond
   end
 
+  def pending_count
+    @result = Settlement::SReport::Pending::Index.(current_user, params)
+    respond
+  end
+
   def processing_init
     @result = Settlement::SReport::Processing::Init.(current_user, params)
     respond
@@ -32,12 +37,22 @@ class Settlement::ReportController < ApplicationController
     respond
   end
 
+  def processing_count
+    @result = Settlement::SReport::Processing::Index.(current_user, params)
+    respond
+  end
+
   def processing_payment_file
     @result = Settlement::SReport::Processing::GeneratePaymentFile.(current_user, params)
     respond
   end
 
   def completed_index
+    @result = Settlement::SReport::Completed::Index.(current_user, params)
+    respond
+  end
+
+  def completed_count
     @result = Settlement::SReport::Completed::Index.(current_user, params)
     respond
   end
