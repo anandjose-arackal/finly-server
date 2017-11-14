@@ -131,7 +131,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       unless validate_rate discount, discount_type_id, amount
         self.valid = false
-        self.error_messages << "Invalid discount amount"
+        self.error_messages << "Invalid discount entered"
       end
 
       if self.valid
