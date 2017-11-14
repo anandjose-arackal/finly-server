@@ -286,7 +286,6 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       self.gross_amount = self.invoice_amount
       return
     end
-
     case invoice.discount_type_id
       when 1, '1'
         self.discount_amount = (invoice.discount*self.invoice_amount)/100
