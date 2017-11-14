@@ -13,6 +13,7 @@ class UserGroup::Index < UserGroup::Base
 
   def init
     self.user_groups = user.company.user_groups.include_items
+    params[:with_application] = RequestStore.store[:current_app]&.to_s
   end
 
   def validate
@@ -27,8 +28,11 @@ class UserGroup::Index < UserGroup::Base
   class UserGroup::Index::SuccessPresent < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :user_groups
 
+    has_scope :with_application
+
     def init
       self.user_groups = params[:user_groups]
+      self.user_groups = apply_scopes(user_groups)
     end
 
   end

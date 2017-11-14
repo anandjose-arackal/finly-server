@@ -62,10 +62,10 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
         valid = false
         error_messages << payment.errors.full_messages.to_sentence
       end
-      unless payment.amount.value > 0
-        valid = false
-        error_messages << "Amount has for #{payment.receiving_account.name} cannot be less than or equal to 0"
-      end
+      # unless payment.amount.value > 0
+      #   valid = false
+      #   error_messages << "Amount has for #{payment.receiving_account.name} cannot be less than or equal to 0"
+      # end
     end
     unless valid
       add_message :error, error_messages.to_sentence

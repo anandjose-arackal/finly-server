@@ -1,5 +1,5 @@
 class UserGroup::Create < UserGroup::Base
-  attr_accessor :name, :items
+  attr_accessor :name, :items, :application
 
   def authorized_user_types
     :company_admin
@@ -27,6 +27,7 @@ class UserGroup::Create < UserGroup::Base
       self.items = [self.items]
     end
     self.items = items.reject { |c| c.blank? }
+    self.application = RequestStore.store[:current_app]
   end
 
   def validate
@@ -45,7 +46,8 @@ class UserGroup::Create < UserGroup::Base
 
   def process
     param = {
-        name: self.name
+        name: self.name,
+        application: self.application
     }
     if self.items.present?
       param[:user_group_items_attributes] = []

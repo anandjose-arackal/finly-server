@@ -10,7 +10,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
       add_message :error, 'User not found'
       return
     end
-    if params&.dig(:report_processor_group_id).blank?
+    if params&.dig(:report_processor_group_id).blank? and params&.dig(:id).blank?
       add_message :error, 'Order not found'
       return
     end
@@ -22,12 +22,12 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
       add_message :error, groups_presenter.messages[:error]
       return
     end
-    id = params[:report_processor_group_id] or params[:id]
-    self.report_group_processor = groups_presenter.report_processor_groups.find_by_id(id)
+    id = (params[:report_processor_group_id] or params[:id])
+    self.report_processor_group = groups_presenter.report_processor_groups.find_by_id(id)
   end
 
   def validate
-    unless self.report_group_processor.present?
+    unless self.report_processor_group.present?
       add_message :error, 'Batch not found'
       return
     end
@@ -40,9 +40,10 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
   def process
     # Format as required by PaymentFiles::Generate
     payment_params = []
-    self.report_processor_group.mappings.include&.each do |mapping|
-      payment_params << mapping.user
+    self.report_processor_group.mappings.include_for_payment_file&.each do |mapping|
+      payment_params << {email: mapping.user.email, mobile_number: mapping.user.mobile_number, amount: mapping.amount, bank_account: mapping.processor_accountable}
     end
+    self.response = PaymentFiles::Formats::YesBank::Process.(user, payment_params)
   end
 
 end

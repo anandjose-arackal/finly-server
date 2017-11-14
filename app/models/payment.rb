@@ -25,8 +25,6 @@
 #  application             :string(255)
 #  payment_mode            :string(255)
 #  reference_id            :string(255)      not null
-#  post_operation          :text(65535)
-#  post_operation_payload  :text(65535)
 #
 
 
@@ -55,6 +53,7 @@ class Payment < ActiveRecord::Base
   has_many :finly_transactions
 
   has_one :payment, as: :reference_resource
+  has_one :invoice
 
   belongs_to :payment_order
   belongs_to :payment_status
@@ -68,6 +67,7 @@ class Payment < ActiveRecord::Base
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :payment_order
   accepts_nested_attributes_for :receiving_account
+  accepts_nested_attributes_for :invoice
 
   delegate :amount_value, to: :amount
 
@@ -226,6 +226,12 @@ class Payment < ActiveRecord::Base
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)
   end
 
+  before_save do
+    # recalculating the amount or net amount for this particular
+    # payment from the details inside the invoice
+
+  end
+
   def initiating_account_type_name
     name = "#{initiating_user&.first_name&.to_s}'s "
 
@@ -337,6 +343,11 @@ class Payment < ActiveRecord::Base
 
   def retriable?
     self.failed?
+  end
+
+  def invoice_amount
+    return self.amount.value unless self.invoice.present?
+    self.invoice.amount&.value # in this case return the actual invoice amount
   end
 
   private

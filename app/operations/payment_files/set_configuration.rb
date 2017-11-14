@@ -21,9 +21,10 @@ class PaymentFiles::SetConfiguration < PaymentFiles::Base
     return if self.update_params.blank?
     self.payment_file_configuration = user.company.payment_file_configuration
     if payment_file_configuration.nil?
-      self.payment_file_configuration = user.company.build_payment_file_configuration
+      self.payment_file_configuration = user.company.build_payment_file_configuration(self.update_params)
+    else
+      self.payment_file_configuration.assign_attributes(self.update_params)
     end
-    self.payment_file_configuration.assign_attributes(self.update_params)
   end
 
   def validate
@@ -46,7 +47,9 @@ class PaymentFiles::SetConfiguration < PaymentFiles::Base
 
   protected
   def strong_params
-    params.require(:payment_file_configuration).permit(:file_format, :options)
+    p = params.require(:payment_file_configuration).permit(:file_format)
+    p[:options] = params&.dig(:payment_file_configuration, :options)
+    p.permit!
   end
 
 end

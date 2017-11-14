@@ -54,6 +54,6 @@ class BankTransfer::PaymentRequest::Update::UpdateSummary < BankTransfer::Paymen
   end
 
   def request_params
-    params.require(:bank_payment_request).permit(:description)
+    params.require(:bank_payment_request).permit(:description, :policy_id)
   end
 end

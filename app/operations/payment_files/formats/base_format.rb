@@ -2,9 +2,10 @@
 # {
 #     payment_file: [
 #         {
-#             user: '<user>',
-#             amount: 150,
-#             currency_id: 1
+#             email: 'email@id.com',
+#             mobile_number: '9989989898',
+#             bank_account: '<bank_account>',
+#             amount: <amount class>,
 #         }
 #     ]
 # }
@@ -30,16 +31,12 @@ class PaymentFiles::Formats::BaseFormat < BaseOperation
       return
     end
     self.payment_file_data.each do |data|
-      unless data[:user].present? and data[:user].class.name == User.name
-        add_message :error, 'Invalid Data: User not found'
+      unless data[:bank_account].present? and data[:bank_account].class.name == BankAccount.name
+        add_message :error, 'Invalid Data: Bank Account not found'
         return
       end
-      unless data[:amount].present? and data[:amount]&.to_d > 0
+      unless data[:amount].present? and data[:amount].class.name == Amount.name
         add_message :error, 'Invalid Data: Amount not valid'
-        return
-      end
-      unless data[:currency_id].present?
-        add_message :error, 'Invalid Data: Currency not valid'
         return
       end
     end

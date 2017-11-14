@@ -14,7 +14,7 @@ class PaymentFileConfiguration < ActiveRecord::Base
   belongs_to :company
 
   validates :company_id, presence: true
-  validates :format, inclusion: {in: PaymentFiles::Config.available_keys}
+  validates :file_format, inclusion: {in: [nil, "custom", "yes_bank"]}
 
   serialize :options
 

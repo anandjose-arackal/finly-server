@@ -22,9 +22,9 @@ class CategoriesController < ApplicationController
   end
 
   def index
-    @categories = current_company.categories.active rescue []
+    @result = Company::Configuration::Category::Index.(current_user, params)
     respond_to do |format|
-      format.json {render json: @categories.as_json(:only => [:id, :name])}
+      format.json {render json: @result.categories.as_json(:only => [:id, :name])}
     end
   end
 end

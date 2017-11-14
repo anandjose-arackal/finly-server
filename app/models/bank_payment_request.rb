@@ -33,6 +33,7 @@ class BankPaymentRequest < ActiveRecord::Base
   belongs_to :controlling_user_role, class_name: "UserRole"
   belongs_to :controlling_for_user, class_name: "User"
   belongs_to :controlling_for_user_role, class_name: "UserRole"
+  belongs_to :policy
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails

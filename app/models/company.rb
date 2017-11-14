@@ -297,6 +297,12 @@ class Company < ActiveRecord::Base
     self.yes_bank_company_account.account_number
   end
 
+  def all_policies
+    policy_ids = self.policies.default.pluck(:id)
+    policy_ids += self.policies.with_application(RequestStore[:current_app]).pluck(:id)
+    Policy.with_id(policy_ids)
+  end
+
   private
 
   def init_config_present

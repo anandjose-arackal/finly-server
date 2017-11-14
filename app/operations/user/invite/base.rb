@@ -24,22 +24,22 @@ class User::Invite::Base < BaseOperation
   end
 
   def create_invite_params
-    params[:pending_invite][:role_mapping_attributes] = [{user_role_id: 4, purpose_id: MappingPurpose.id_for(:expense_management)}]
+    params[:pending_invite][:role_mapping_attributes] = [{user_role_id: 4, purpose_id: Purpose.id_for(:expense_management)}]
     if params[:manager] == '1'
-      params[:pending_invite][:role_mapping_attributes] << {user_role_id: 3, purpose_id: MappingPurpose.id_for(:expense_management)}
+      params[:pending_invite][:role_mapping_attributes] << {user_role_id: 3, purpose_id: Purpose.id_for(:expense_management)}
     end
     if params[:finance_manager] == '1'
-      params[:pending_invite][:role_mapping_attributes] << {user_role_id: 2, purpose_id: MappingPurpose.id_for(:expense_management)}
+      params[:pending_invite][:role_mapping_attributes] << {user_role_id: 2, purpose_id: Purpose.id_for(:expense_management)}
     end
     if params[:admin] == '1'
-      params[:pending_invite][:role_mapping_attributes] << {user_role_id: 1, purpose_id: MappingPurpose.id_for(:expense_management)}
+      params[:pending_invite][:role_mapping_attributes] << {user_role_id: 1, purpose_id: Purpose.id_for(:expense_management)}
     end
     if params[:auditor] == '1'
-      params[:pending_invite][:role_mapping_attributes] << {user_role_id: UserRole.id_for(:auditor), purpose_id: MappingPurpose.id_for(:expense_management)}
+      params[:pending_invite][:role_mapping_attributes] << {user_role_id: UserRole.id_for(:auditor), purpose_id: Purpose.id_for(:expense_management)}
     end
 
     # adding a default vendor payments initiator role for all invited users
-    params[:pending_invite][:role_mapping_attributes] << {user_role_id: UserRole.id_for(:initiator), purpose_id: MappingPurpose.id_for(:vendor_payments)}
+    params[:pending_invite][:role_mapping_attributes] << {user_role_id: UserRole.id_for(:initiator), purpose_id: Purpose.id_for(:vendor_payments)}
     #########################################################################
 
     params[:pending_invite][:team_mapping_attributes][:default] = true

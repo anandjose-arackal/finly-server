@@ -21,4 +21,5 @@ class UserGroup < ActiveRecord::Base
   validates :name, uniqueness: {scope: :company_id, :case_sensitive => false}
 
   scope :include_items, -> { includes(:user_group_items) }
+  scope :with_application, -> (application) { where application: application }
 end
