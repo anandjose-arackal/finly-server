@@ -16,6 +16,7 @@ json.payment do
       json.invoice_number item[:invoice_number]
       json.invoice_date item[:invoice_date]
       json.due_date item[:due_date]
+      json.inclusive_of_taxes item[:inclusive_of_taxes]
       json.valid item[:valid]
       json.messages item[:messages]
     end
