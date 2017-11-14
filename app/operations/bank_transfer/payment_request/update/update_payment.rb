@@ -49,8 +49,24 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       self.payment_params[:invoice_attributes][:id] = self.payment.invoice.id
     end
 
-    if self.payment.invoice&.invoice_attachments.present? && self.payment_params&.dig(:invoice_attributes, :invoice_attachments_attributes)
-      self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:id] = self.payment.invoice.invoice_attachments.first&.id
+    if self.payment_params&.dig(:invoice_attributes, :invoice_attachments_attributes)
+      # only if the actual attached file is present, do you even make it save
+      if self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:attached_file].present?
+        if self.payment.invoice&.invoice_attachments.present?
+          self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:id] = self.payment.invoice.invoice_attachments.first&.id
+        end
+        self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first.delete(:remove_file)
+      elsif self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:remove_file] == '1'
+        self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:_destroy] = true
+        self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first[:id] = self.payment.invoice.invoice_attachments.first&.id
+        self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first.delete(:remove_file)
+      else
+        if self.payment.invoice&.invoice_attachments.present?
+          self.payment_params[:invoice_attributes][:invoice_attachments_attributes].first.delete(:remove_file)
+        else
+          self.payment_params[:invoice_attributes].delete(:invoice_attachments_attributes)
+        end
+      end
     end
   end
 
@@ -77,7 +93,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
                                                          :tax_type_id, :discount, :date, :discount_type_id, :due_date,
                                                          :invoice_number, :inclusive_of_taxes,
                                                          original_amount_attributes: [:value, :currency_id],
-                                                         invoice_attachments_attributes: [:attached_file, :description]],
+                                                         invoice_attachments_attributes: [:attached_file, :description, :remove_file]],
                                     amount_attributes: [:value, :currency_id]
                                     )
   end

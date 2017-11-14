@@ -48,8 +48,8 @@ json.payments do
 
     if payment.invoice.present?
       json.raw_amount precision_value invoice&.amount&.value
+      json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
-        json.original_amount precision_value invoice.original_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
@@ -107,8 +107,8 @@ json.payments_verified do
 
     if payment.invoice.present?
       json.raw_amount precision_value invoice&.amount&.value
+      json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
-        json.original_amount precision_value invoice.original_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
@@ -150,7 +150,7 @@ json.payments_unverified do
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.amount precision_value payment.amount_value
-    json.net_amount precision_value payment.net_amount&.value
+    json.net_amount precision_value payment.amount_value
     json.invoice_amount precision_value payment.invoice_amount
     json.status payment.payment_status_name
     json.id payment.id
@@ -167,8 +167,8 @@ json.payments_unverified do
 
     if payment.invoice.present?
       json.raw_amount precision_value invoice&.amount&.value
+      json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
-        json.original_amount precision_value invoice.original_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
