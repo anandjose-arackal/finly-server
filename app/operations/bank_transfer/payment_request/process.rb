@@ -63,7 +63,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
       name = item[:name] || item["name"]
-      amount = item[:amount]&.to_f || item["amount"]&.to_f
+      amount = item[:original_amount]&.to_f || item["original_amount"]&.to_f
       note = item[:note]&.to_s || item["note"]&.to_s
       gst_type_id = item[:gst_type_id]
       tax_type_id = item[:tax_type_id]
@@ -139,7 +139,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       self.payment_order_valid = false unless self.valid
 
-      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, amount: amount, note: note,
+      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
                                gst_type_id: gst_type_id, tax_type_id: tax_type_id, tax: tax, tds_type_id: tds_type_id,
                                discount_type_id: discount_type_id, discount: discount,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date,
