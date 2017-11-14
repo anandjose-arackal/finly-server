@@ -13,8 +13,8 @@ json.summary do
   json.payment_type @result.payment_order.payment_type&.humanize
   json.scheduled_at @result.payment_order.scheduled_at&.strftime "%d %b %Y"
   json.processed_at @result.payment_order.processed_at&.strftime "%d %b %Y"
-  json.amount_requested @result.payment_order.amount_requested&.value
-  json.amount_processed @result.payment_order.amount_processed&.value
+  json.amount_requested precision_value @result.payment_order.amount_requested&.value
+  json.amount_processed precision_value @result.payment_order.amount_processed&.value
   json.description @result.bank_payment_request.description
   json.note @result.payment_order.note
   json.initiating_user @result.bank_payment_request.owner.name
@@ -150,7 +150,7 @@ json.payments_unverified do
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.amount precision_value payment.amount_value
-    json.net_amount precision_value payment.net_amount&.value
+    json.net_amount precision_value payment.amount_value
     json.invoice_amount precision_value payment.invoice_amount
     json.status payment.payment_status_name
     json.id payment.id
