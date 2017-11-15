@@ -29,7 +29,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   def process_account_ids
     @result = BankTransfer::PaymentRequest::ProcessFromAccountIds.(current_user, params)
     if @result&.success?
-      render 'process_file'
+      render 'process_account_ids'
     else
       respond response: :failure, message: @result.messages[:error]
     end

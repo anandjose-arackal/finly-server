@@ -29,4 +29,5 @@ json.payment do
   json.scheduled_at @result.scheduled_at_formatted
   json.created_at @result.created_at_formatted
   json.policy_id @result.policy_id
+  json.beneficiary_editable true
 end

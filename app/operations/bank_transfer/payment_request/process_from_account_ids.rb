@@ -37,9 +37,9 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
 
   def init
     self.account_ids = retrieve_data(:account_id)
-    self.amounts = retrieve_data(:amount)
+    self.amounts = retrieve_data(:original_amount)
     self.notes = retrieve_data(:note)
-    [:tax_type_ids, :tds_type_ids, :gst_type_ids, :discount_type_ids, :discounts, :taxes, :tdses, :invoice_dates, :invoice_numbers, :due_dates].each do |attr|
+    [:tax_type_id, :tds_type_id, :gst_type_id, :discount_type_id, :discount, :tax, :tds, :invoice_date, :invoice_number, :due_date].each do |attr|
       self.class.send(:attr_accessor, attr)
       instance_variable_set("@#{attr}", retrieve_data(attr))
     end
@@ -80,16 +80,16 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           ifsc: bank_account.ifsc,
           original_amount: amounts[index],
           note: self.notes[index],
-          gst_type_id: self.gst_type_ids[index],
-          tax_type_id: self.tax_type_ids[index],
-          discount_type_id: self.discount_type_ids[index],
-          tds_type_id: self.tds_type_ids[index],
-          tax: self.taxes[index],
-          tds: self.tdses[index],
-          discount: self.discounts[index],
-          invoice_number: self.invoice_numbers[index],
-          invoice_date: self.invoice_dates[index],
-          due_date: self.due_dates[index]
+          gst_type_id: self.gst_type_id[index],
+          tax_type_id: self.tax_type_id[index],
+          discount_type_id: self.discount_type_id[index],
+          tds_type_id: self.tds_type_id[index],
+          tax: self.tax[index],
+          tds: self.tds[index],
+          discount: self.discount[index],
+          invoice_number: self.invoice_number[index],
+          invoice_date: self.invoice_date[index],
+          due_date: self.due_date[index]
       }
     end
     data
