@@ -21,21 +21,28 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
 
   attr_accessor :bank_accounts, :account_ids, :amounts, :response_presenter, :parsed_data,
                 :notes
+                # :tax_type_ids, :tds_type_ids, :gst_type_ids, :discount_type_ids,
+                # :discounts, :taxes, :tdses, :invoice_numbers, :invoice_dates, :due_dates
+
 
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters"
       return
     end
-    if params[:orders].blank? || params[:account_owner_type].blank?
+    if params[:payment_order].blank? || params[:account_owner_type].blank?
       add_message :error, "No bank account selected"
     end
   end
 
   def init
     self.account_ids = retrieve_data(:account_id)
-    self.amounts = retrieve_data(:amount)
+    self.amounts = retrieve_data(:original_amount)
     self.notes = retrieve_data(:note)
+    [:tax_type_id, :tds_type_id, :gst_type_id, :discount_type_id, :discount, :tax, :tds, :invoice_date, :invoice_number, :due_date].each do |attr|
+      self.class.send(:attr_accessor, attr)
+      instance_variable_set("@#{attr}", retrieve_data(attr))
+    end
   end
 
   def process
@@ -57,7 +64,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
 
   def retrieve_data(key)
     data = []
-    params[:orders].each do |order|
+    params[:payment_order].each do |k, order|
       data << order[key.to_sym]
     end
     data
@@ -73,7 +80,16 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           ifsc: bank_account.ifsc,
           original_amount: amounts[index],
           note: self.notes[index],
-
+          gst_type_id: self.gst_type_id[index],
+          tax_type_id: self.tax_type_id[index],
+          discount_type_id: self.discount_type_id[index],
+          tds_type_id: self.tds_type_id[index],
+          tax: self.tax[index],
+          tds: self.tds[index],
+          discount: self.discount[index],
+          invoice_number: self.invoice_number[index],
+          invoice_date: self.invoice_date[index],
+          due_date: self.due_date[index]
       }
     end
     data

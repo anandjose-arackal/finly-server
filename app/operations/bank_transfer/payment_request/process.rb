@@ -1,7 +1,7 @@
 # this extracts the payment data from the parsed excel file and creates the payment
 # request object out of it
 class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
-  attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount,
+  attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :policy_id,
                 :errors, :payment_order_valid, :scheduled_at, :description, :valid, :error_messages
 
   def pre_validate
@@ -26,6 +26,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     self.processed_order = []
     self.scheduled_at = Date.parse params[:scheduled_at] if params[:scheduled_at].present? and DateUtils.validate_date_format?(params[:scheduled_at])
     self.description = params[:description]
+    self.policy_id = params[:policy_id]
 
     if scheduled_at.present? and scheduled_at < Date.today
       self.scheduled_at = Date.today
@@ -157,12 +158,13 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     params[:payment_order_valid] = self.payment_order_valid
     params[:scheduled_at] = self.scheduled_at
     params[:description] = self.description
+    params[:policy_id] = self.policy_id
     BankTransfer::PaymentRequest::Process::SuccessPresenter.new(user, params, messages)
   end
 
   class BankTransfer::PaymentRequest::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :errors,
-                  :payment_order_valid, :scheduled_at, :description
+                  :payment_order_valid, :scheduled_at, :description, :policy_id
 
     def init
       self.payment_order_data = params[:payment_order_data]
@@ -173,6 +175,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.payment_order_valid = params[:payment_order_valid]
       self.scheduled_at = params[:scheduled_at]
       self.description = params[:description]
+      self.policy_id = params[:policy_id]
     end
 
     def scheduled_at_formatted
