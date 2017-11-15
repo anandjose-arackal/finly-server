@@ -30,7 +30,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
       add_message :error, "Invalid parameters"
       return
     end
-    if params[:orders].blank? || params[:account_owner_type].blank?
+    if params[:payment_order].blank? || params[:account_owner_type].blank?
       add_message :error, "No bank account selected"
     end
   end
@@ -64,7 +64,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
 
   def retrieve_data(key)
     data = []
-    params[:orders].each do |order|
+    params[:payment_order].each do |k, order|
       data << order[key.to_sym]
     end
     data
