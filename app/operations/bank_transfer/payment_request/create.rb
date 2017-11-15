@@ -9,7 +9,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
                 :unauthorized_vendors_presence, :invoice_parameters,
                 :invoice_amount, :payment_amount, :payment,
                 :gross_amount, :net_amount, :invoice,
-                :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount
+                :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
+                :policy_id
 
   def pre_validate
     super
@@ -47,6 +48,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
     self.scheduled_at = op.scheduled_at
     self.company_id = user.company_id
+    self.policy_id = params[:policy_id]
     # below variable will contain the payment_request that holds data about initiating accounts and
     # receiving accounts
     self.request_params = payment_request_params
@@ -130,7 +132,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     }
     p[:description] = params[:description]
     p[:beneficiary_type_id] = retrieve_beneficiary_type
-    p[:policy_id] = current_company.default_policy.id
+    p[:policy_id] = self.policy_id
     p[:payment_order_attributes] = {}
     p[:payment_order_attributes][:initiating_user] = user
     p[:payment_order_attributes][:payment_order_status_id] = PaymentOrderStatus.id_for(:pending_approval)

@@ -21,6 +21,9 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
 
   attr_accessor :bank_accounts, :account_ids, :amounts, :response_presenter, :parsed_data,
                 :notes
+                # :tax_type_ids, :tds_type_ids, :gst_type_ids, :discount_type_ids,
+                # :discounts, :taxes, :tdses, :invoice_numbers, :invoice_dates, :due_dates
+
 
   def pre_validate
     if user.blank? || params.blank?
@@ -36,6 +39,10 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     self.account_ids = retrieve_data(:account_id)
     self.amounts = retrieve_data(:amount)
     self.notes = retrieve_data(:note)
+    [:tax_type_ids, :tds_type_ids, :gst_type_ids, :discount_type_ids, :discounts, :taxes, :tdses, :invoice_dates, :invoice_numbers, :due_dates].each do |attr|
+      self.class.send(:attr_accessor, attr)
+      instance_variable_set("@#{attr}", retrieve_data(attr))
+    end
   end
 
   def process
@@ -73,7 +80,16 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           ifsc: bank_account.ifsc,
           original_amount: amounts[index],
           note: self.notes[index],
-
+          gst_type_id: self.gst_type_ids[index],
+          tax_type_id: self.tax_type_ids[index],
+          discount_type_id: self.discount_type_ids[index],
+          tds_type_id: self.tds_type_ids[index],
+          tax: self.taxes[index],
+          tds: self.tdses[index],
+          discount: self.discounts[index],
+          invoice_number: self.invoice_numbers[index],
+          invoice_date: self.invoice_dates[index],
+          due_date: self.due_dates[index]
       }
     end
     data
