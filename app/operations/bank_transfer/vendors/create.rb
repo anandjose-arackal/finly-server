@@ -34,6 +34,7 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
         vendor_parameters[:bank_accounts_attributes]&.first[:default_account] = '1'
       end
     end
+
   end
 
   def process
