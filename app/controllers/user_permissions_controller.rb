@@ -15,4 +15,9 @@ class UserPermissionsController < ApplicationController
       respond response: :failure, message: @result.messages[:error]
     end
   end
+
+  def check_permissions
+    @result = User::Permission::CheckPermissions.(current_user, params)
+    respond
+  end
 end
