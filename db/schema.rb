@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171115154211) do
+ActiveRecord::Schema.define(version: 20171116081041) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1799,6 +1799,12 @@ ActiveRecord::Schema.define(version: 20171115154211) do
     t.decimal  "tax",                            precision: 64, scale: 12
     t.integer  "category_id",        limit: 4
     t.integer  "original_amount_id", limit: 4
+    t.integer  "advance_amount_id",  limit: 4
+    t.integer  "advance_type_id",    limit: 4
+    t.decimal  "advance",                        precision: 20, scale: 10
+    t.integer  "freight_amount_id",  limit: 4
+    t.integer  "freight_type_id",    limit: 4
+    t.decimal  "freight",                        precision: 20, scale: 10
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -3038,6 +3044,17 @@ ActiveRecord::Schema.define(version: 20171115154211) do
 
   add_index "user_panel_subscriptions", ["user_id"], name: "index_user_panel_subscriptions_on_user_id", using: :btree
 
+  create_table "user_permissions", force: :cascade do |t|
+    t.integer  "user_id",              limit: 4
+    t.integer  "company_id",           limit: 4
+    t.boolean  "create_beneficiaries"
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "user_permissions", ["company_id"], name: "index_user_permissions_on_company_id", using: :btree
+  add_index "user_permissions", ["user_id"], name: "index_user_permissions_on_user_id", using: :btree
+
   create_table "user_profiles", force: :cascade do |t|
     t.integer  "user_id",             limit: 4
     t.string   "avatar_file_name",    limit: 255
@@ -3455,6 +3472,8 @@ ActiveRecord::Schema.define(version: 20171115154211) do
   add_foreign_key "user_manager_mappings", "policies"
   add_foreign_key "user_manager_mappings", "users"
   add_foreign_key "user_panel_subscriptions", "users"
+  add_foreign_key "user_permissions", "companies"
+  add_foreign_key "user_permissions", "users"
   add_foreign_key "user_profiles", "states"
   add_foreign_key "user_profiles", "users"
   add_foreign_key "user_role_mappings", "user_roles"
