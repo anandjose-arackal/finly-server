@@ -83,10 +83,6 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
   protected
 
   def set_source_account
-    unless ['company_credits', 'finly_money'].include?(params[:source_account_type])
-      add_message :error, 'Invalid Source Account Type'
-      return
-    end
     case params&.dig(:payment_type)
       when 'bank_transfer'
         case params[:source_account_type]
@@ -94,6 +90,9 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
             self.report_processor_group.source_account = current_company.yes_bank_company_account
           when 'finly_money'
             self.report_processor_group.source_account = user.bank_wallet
+          else
+            add_message :error, 'Invalid Source Account Type'
+            return
         end
       when 'reimbursement_card'
         case params[:source_account_type]
@@ -101,6 +100,9 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
             self.report_processor_group.source_account = current_company.itz_cash_company_account
           when 'finly_money'
             self.report_processor_group.source_account = user.user_wallet
+          else
+            add_message :error, 'Invalid Source Account Type'
+            return
         end
       when 'outside_finly', 'payment_file'
         # Nothing to do here as receiving account is nil
@@ -152,7 +154,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
           end
         when 'reimbursement_card'
           unless processor_accountable_type == Card.name
-            add_message :error, 'Funds can only be transferred to Bank Account in this mode'
+            add_message :error, 'Funds can only be transferred to Reimbursement Card in this mode'
             return
           end
           processor_accountable = user.reimbursement_cards.find_by_id(processor_accountable_id)

@@ -841,19 +841,6 @@ ActiveRecord::Schema.define(version: 20171111190652) do
     t.datetime "updated_at",             null: false
   end
 
-  create_table "collect_transaction_purposes", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "collect_transaction_virtual_account_mappings", force: :cascade do |t|
-    t.integer  "virtual_account_id",     limit: 4
-    t.integer  "transaction_purpose_id", limit: 4
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-  end
-
   create_table "companies", force: :cascade do |t|
     t.string   "name",             limit: 255
     t.datetime "created_at",                                  null: false
@@ -1321,16 +1308,6 @@ ActiveRecord::Schema.define(version: 20171111190652) do
   add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
-  create_table "customers", force: :cascade do |t|
-    t.string   "name",          limit: 255
-    t.string   "email",         limit: 255
-    t.string   "mobile_number", limit: 255
-    t.text     "description",   limit: 65535
-    t.integer  "company_id",    limit: 4
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
-  end
-
   create_table "desktop_users", force: :cascade do |t|
     t.string   "email",      limit: 255, null: false
     t.string   "country",    limit: 255, null: false
@@ -1550,7 +1527,6 @@ ActiveRecord::Schema.define(version: 20171111190652) do
     t.boolean  "hard_copy_receipt",                      default: false
     t.boolean  "itz_cash_d_code_enabled",                default: false
     t.boolean  "yes_bank_account"
-    t.boolean  "invoicing_system",                       default: false
     t.boolean  "bank_account_reimbursement"
     t.boolean  "payroll_card_enabled",                   default: false
   end
@@ -2334,9 +2310,9 @@ ActiveRecord::Schema.define(version: 20171111190652) do
     t.integer  "payment_purpose_id",        limit: 4,     null: false
     t.integer  "currency_id",               limit: 4,     null: false
     t.string   "application",               limit: 255
+    t.string   "payment_mode",              limit: 255
     t.text     "post_operation",            limit: 65535
     t.text     "post_operation_payload",    limit: 65535
-    t.string   "payment_mode",              limit: 255
   end
 
   add_index "payment_orders", ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id", using: :btree
@@ -2350,44 +2326,6 @@ ActiveRecord::Schema.define(version: 20171111190652) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
-
-  create_table "payment_receivable_statuses", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "payment_receivable_transaction_trails", force: :cascade do |t|
-    t.integer  "transaction_id",              limit: 4
-    t.boolean  "find_payment_receivable"
-    t.boolean  "creating_payment"
-    t.boolean  "update_company_balance"
-    t.boolean  "payment_receivable_updation"
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-  end
-
-  add_index "payment_receivable_transaction_trails", ["transaction_id"], name: "index_payment_receivable_transaction_trails_on_transaction_id", using: :btree
-
-  create_table "payment_receivables", force: :cascade do |t|
-    t.integer  "customer_id",                  limit: 4
-    t.integer  "amount_id",                    limit: 4
-    t.text     "purpose",                      limit: 65535
-    t.date     "expire_by"
-    t.integer  "company_id",                   limit: 4
-    t.integer  "initiating_user_id",           limit: 4
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
-    t.string   "email",                        limit: 255
-    t.integer  "payment_receivable_status_id", limit: 4
-    t.integer  "payment_id",                   limit: 4
-  end
-
-  add_index "payment_receivables", ["amount_id"], name: "index_payment_receivables_on_amount_id", using: :btree
-  add_index "payment_receivables", ["company_id"], name: "index_payment_receivables_on_company_id", using: :btree
-  add_index "payment_receivables", ["customer_id"], name: "index_payment_receivables_on_customer_id", using: :btree
-  add_index "payment_receivables", ["initiating_user_id"], name: "index_payment_receivables_on_initiating_user_id", using: :btree
-  add_index "payment_receivables", ["payment_receivable_status_id"], name: "index_payment_receivables_on_payment_receivable_status_id", using: :btree
 
   create_table "payment_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -3022,16 +2960,6 @@ ActiveRecord::Schema.define(version: 20171111190652) do
 
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
 
-  create_table "tally_configurations", force: :cascade do |t|
-    t.integer  "company_id",   limit: 4,   null: false
-    t.string   "company_name", limit: 255
-    t.boolean  "active"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-  end
-
-  add_index "tally_configurations", ["company_id"], name: "index_tally_configurations_on_company_id", using: :btree
-
   create_table "time_expense_configs", force: :cascade do |t|
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
@@ -3194,10 +3122,9 @@ ActiveRecord::Schema.define(version: 20171111190652) do
     t.integer  "user_id",                   limit: 4
     t.boolean  "disburse"
     t.boolean  "expense_management"
-    t.datetime "created_at",                                          null: false
-    t.datetime "updated_at",                                          null: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
     t.boolean  "yes_bank_account_transfer"
-    t.boolean  "invoicing_system",                    default: false
   end
 
   add_index "user_panel_subscriptions", ["user_id"], name: "index_user_panel_subscriptions_on_user_id", using: :btree
@@ -3394,57 +3321,6 @@ ActiveRecord::Schema.define(version: 20171111190652) do
   add_index "versions", ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id", using: :btree
   add_index "versions", ["transaction_id"], name: "index_versions_on_transaction_id", using: :btree
 
-  create_table "virtual_account_collect_trails", force: :cascade do |t|
-    t.boolean  "found_virtual_account"
-    t.boolean  "update_company_balance"
-    t.boolean  "create_payment"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "virtual_account_purposes", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "virtual_account_transactions", force: :cascade do |t|
-    t.string   "beneficiary_account_number", limit: 255
-    t.string   "beneficiary_account_ifsc",   limit: 255
-    t.string   "transfer_type",              limit: 255
-    t.string   "beneficiary_full_name",      limit: 255
-    t.string   "transfer_id",                limit: 255
-    t.string   "transfer_timestamp",         limit: 255
-    t.string   "transfer_currency",          limit: 255
-    t.string   "transfer_amount",            limit: 255
-    t.string   "remitter_account_no",        limit: 255
-    t.string   "remitter_account_ifsc",      limit: 255
-    t.string   "remitter_account_type",      limit: 255
-    t.string   "remitter_full_name",         limit: 255
-    t.string   "remitter_address",           limit: 255
-    t.string   "note",                       limit: 255
-    t.string   "credited_at",                limit: 255
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
-    t.integer  "virtual_account_id",         limit: 4
-  end
-
-  create_table "virtual_bank_accounts", force: :cascade do |t|
-    t.string   "account_number",     limit: 255
-    t.string   "ifsc",               limit: 255
-    t.text     "description",        limit: 65535
-    t.integer  "parent_id",          limit: 4
-    t.string   "parent_type",        limit: 255
-    t.integer  "company_id",         limit: 4
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
-    t.date     "expires_by"
-    t.integer  "purpose_id",         limit: 4
-    t.boolean  "active",                           default: true
-    t.boolean  "is_deleted",                       default: false
-    t.integer  "initiating_user_id", limit: 4
-  end
-
   create_table "whitelisted_ip_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -3613,10 +3489,6 @@ ActiveRecord::Schema.define(version: 20171111190652) do
   add_foreign_key "payment_file_configurations", "companies"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
-  add_foreign_key "payment_receivables", "amounts"
-  add_foreign_key "payment_receivables", "companies"
-  add_foreign_key "payment_receivables", "customers"
-  add_foreign_key "payment_receivables", "payment_receivable_statuses"
   add_foreign_key "payments", "amounts"
   add_foreign_key "payments", "payment_types"
   add_foreign_key "per_diem_expenses", "expenses"
@@ -3651,7 +3523,6 @@ ActiveRecord::Schema.define(version: 20171111190652) do
   add_foreign_key "reports", "report_processor_group_mappings"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
-  add_foreign_key "tally_configurations", "companies"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"
   add_foreign_key "transcribed_expenses", "amounts"

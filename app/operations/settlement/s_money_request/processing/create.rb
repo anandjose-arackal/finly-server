@@ -142,7 +142,7 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
           end
         when 'reimbursement_card'
           unless processor_accountable_type == Card.name
-            add_message :error, 'Funds can only be transferred to Bank Account in this mode'
+            add_message :error, 'Funds can only be transferred to Reimbursement Card in this mode'
             return
           end
           processor_accountable = user.reimbursement_cards.find_by_id(processor_accountable_id)
