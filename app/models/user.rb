@@ -57,6 +57,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -107,6 +108,7 @@ class User < ActiveRecord::Base
   has_one :user_panel_subscription, dependent: :destroy
   has_one :cash_on_hand, dependent: :destroy
   has_one :quickbooks_user, class_name: "QuickbooksFinlyIntegrationsUser"
+  has_one :permission, class_name: "UserPermission"
 
   has_many :admin_summary_mail_configs, dependent: :destroy
   has_many :manager_summary_mail_configs, dependent: :destroy
