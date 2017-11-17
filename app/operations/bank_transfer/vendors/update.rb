@@ -25,22 +25,22 @@ class BankTransfer::Vendors::Update < BankTransfer::Vendors::Base
     end
 
     # checking for attachments and adding the id
-    if self.vendor_parameters&.dig(:vendor_attachment_attributes)
+    if self.vendor_parameters&.dig(:vendor_attachments_attributes)
       # only if the actual attached file is present, do you even make it save
-      if self.vendor_parameters[:vendor_attachment_attributes].first[:attached_file].present?
+      if self.vendor_parameters[:vendor_attachments_attributes].first[:attached_file].present?
         if self.vendor.vendor_attachments.present?
-          self.vendor_parameters[:vendor_attachment_attributes].first[:id] = self.vendor.vendor_attachments.first&.id
+          self.vendor_parameters[:vendor_attachments_attributes].first[:id] = self.vendor.vendor_attachments.first&.id
         end
-        self.vendor_parameters[:vendor_attachment_attributes].first.delete(:remove_file)
-      elsif self.payment_params[:vendor_attachment_attributes].first[:remove_file] == '1'
-        self.vendor_parameters[:vendor_attachment_attributes].first[:_destroy] = true
-        self.vendor_parameters[:vendor_attachment_attributes].first[:id] = self.vendor.vendor_attachments.first&.id
-        self.vendor_parameters[:vendor_attachment_attributes].first.delete(:remove_file)
+        self.vendor_parameters[:vendor_attachments_attributes].first.delete(:remove_file)
+      elsif self.vendor_parameters[:vendor_attachments_attributes].first[:remove_file] == '1'
+        self.vendor_parameters[:vendor_attachments_attributes].first[:_destroy] = true
+        self.vendor_parameters[:vendor_attachments_attributes].first[:id] = self.vendor.vendor_attachments.first&.id
+        self.vendor_parameters[:vendor_attachments_attributes].first.delete(:remove_file)
       else
-        if self.payment.invoice&.invoice_attachments.present?
-          self.vendor_parameters[:vendor_attachment_attributes].first.delete(:remove_file)
+        if self.vendor.vendor_attachments.present?
+          self.vendor_parameters[:vendor_attachments_attributes].first.delete(:remove_file)
         else
-          self.vendor_parameters.delete(:vendor_attachment_attributes)
+          self.vendor_parameters.delete(:vendor_attachments_attributes)
         end
       end
     end
