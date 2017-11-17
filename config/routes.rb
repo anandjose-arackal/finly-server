@@ -493,6 +493,15 @@
 #                                                         PATCH  /policies/:id(.:format)                                                                    policies#update
 #                                                         PUT    /policies/:id(.:format)                                                                    policies#update
 #                                                         DELETE /policies/:id(.:format)                                                                    policies#destroy
+#                       user_permission_check_permissions POST   /user_permissions/:user_permission_id/check_permissions(.:format)                          user_permissions#check_permissions
+#                                        user_permissions GET    /user_permissions(.:format)                                                                user_permissions#index
+#                                                         POST   /user_permissions(.:format)                                                                user_permissions#create
+#                                     new_user_permission GET    /user_permissions/new(.:format)                                                            user_permissions#new
+#                                    edit_user_permission GET    /user_permissions/:id/edit(.:format)                                                       user_permissions#edit
+#                                         user_permission GET    /user_permissions/:id(.:format)                                                            user_permissions#show
+#                                                         PATCH  /user_permissions/:id(.:format)                                                            user_permissions#update
+#                                                         PUT    /user_permissions/:id(.:format)                                                            user_permissions#update
+#                                                         DELETE /user_permissions/:id(.:format)                                                            user_permissions#destroy
 #                                              categories GET    /categories(.:format)                                                                      categories#index
 #                                                         POST   /categories(.:format)                                                                      categories#create
 #                                            new_category GET    /categories/new(.:format)                                                                  categories#new
@@ -1916,6 +1925,10 @@ Rails.application.routes.draw do
     post 'add_rule', to: 'rules#create', as: :add_rule
     delete 'remove_rule', to: 'rules#destroy', as: :remove_rule
     get 'description', to: 'policies#show_description'
+  end
+
+  resources :user_permissions do
+    post 'check_permissions', to: 'user_permissions#check_permissions', as: :check_permissions
   end
 
   resources :categories

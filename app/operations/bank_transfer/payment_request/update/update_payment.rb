@@ -95,7 +95,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
                                                          original_amount_attributes: [:value, :currency_id],
                                                          invoice_attachments_attributes: [:attached_file, :description, :remove_file]],
                                     amount_attributes: [:value, :currency_id]
-                                    )
+    )
   end
 
   def set_custom_fields(save)
@@ -127,36 +127,36 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     end
     # update the invoice with the respective calculated amounts
     self.invoice.update(
-       amount_attributes: {
-           value: self.invoice_amount,
-           currency_id: 1,
-           id: self.invoice.amount&.id
-       },
-       net_amount_attributes: {
-           value: self.net_amount,
-           currency_id: 1,
-           id: self.invoice.net_amount&.id
-       },
-       gross_amount_attributes: {
-           value: self.gross_amount,
-           currency_id: 1,
-           id: self.invoice.gross_amount&.id
-       },
-       discount_amount_attributes: {
-           value: self.discount_amount,
-           currency_id: 1,
-           id: self.invoice.discount_amount&.id
-       },
-       tds_amount_attributes: {
-           value: self.tds_amount,
-           currency_id: 1,
-           id: self.invoice.tds_amount&.id
-       },
-       tax_amount_attributes: {
-           value: self.tax_amount,
-           currency_id: 1,
-           id: self.invoice.tax_amount&.id
-       }
+        amount_attributes: {
+            value: self.invoice_amount,
+            currency_id: 1,
+            id: self.invoice.amount&.id
+        },
+        net_amount_attributes: {
+            value: self.net_amount,
+            currency_id: 1,
+            id: self.invoice.net_amount&.id
+        },
+        gross_amount_attributes: {
+            value: self.gross_amount,
+            currency_id: 1,
+            id: self.invoice.gross_amount&.id
+        },
+        discount_amount_attributes: {
+            value: self.discount_amount,
+            currency_id: 1,
+            id: self.invoice.discount_amount&.id
+        },
+        tds_amount_attributes: {
+            value: self.tds_amount,
+            currency_id: 1,
+            id: self.invoice.tds_amount&.id
+        },
+        tax_amount_attributes: {
+            value: self.tax_amount,
+            currency_id: 1,
+            id: self.invoice.tax_amount&.id
+        }
     )
     # also update the payment with all the respective amounts
     self.payment.amount&.update(value: self.net_amount)
