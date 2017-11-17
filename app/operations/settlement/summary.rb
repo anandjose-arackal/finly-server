@@ -45,7 +45,7 @@ class Settlement::Summary < Settlement::Base
       add_message :error, reports_presenter.messages[:error]
       return
     end
-    reports = reports_presenter.reports.approved
+    reports = reports_presenter.reports.approved.not_settled
     self.reports_summary = {
         count: reports.count,
         expenses_total: Amount.new(value: reports.expenses_total, currency_id: self.currency_id),
