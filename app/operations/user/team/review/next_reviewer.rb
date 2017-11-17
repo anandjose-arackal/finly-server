@@ -5,12 +5,12 @@
 class User::Team::Review::NextReviewer < BaseOperation
   attr_accessor :obj, :next_approver, :role_id
 
-  def self.call(obj)
-    self.new(obj).run
+  def self.call(obj, params = {})
+    self.new(obj, params).run
   end
 
-  def initialize(obj)
-    super(nil, nil)
+  def initialize(obj, params = {})
+    super(nil, params)
     self.obj = obj
   end
 
@@ -61,10 +61,10 @@ class User::Team::Review::NextReviewer < BaseOperation
 
   private
   def next_reviewer(sym, obj)
-    user = (obj.controlling_for_user or obj.controlling_user or obj.user)
-    role = (obj.controlling_for_user_role_id or obj.controlling_user_role_id)
+    user = params[:controlling_user] || (obj.controlling_for_user or obj.controlling_user or obj.user)
+    role = params[:controlling_user_role_id] || (obj.controlling_for_user_role_id or obj.controlling_user_role_id)
     role = ::UserRole.id_for(:employee) if role.blank? and obj.controlling_user == obj.user
-    arg_hash={}
+    arg_hash = {}
     arg_hash[sym] = obj
     if role.blank?
       add_message :error, 'Error loading configuration'

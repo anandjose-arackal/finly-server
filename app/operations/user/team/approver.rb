@@ -17,8 +17,10 @@ class User::Team::Approver < User::Team::Base
 
   def init
     init_values
-    self.purpose_id = Purpose.id_from_application_for(RequestStore.store[:current_app])
+    # self.purpose_id = Purpose.id_from_application_for(RequestStore.store[:current_app])
+    self.purpose_id = 2
   end
+
 
   def authorize
     unless mappings.present?
