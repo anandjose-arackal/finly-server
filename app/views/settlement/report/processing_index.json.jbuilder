@@ -9,6 +9,7 @@ json.array! @result.paginated_report_processor_groups do |group|
   json.source_account_type group.source_account_type
   json.payment_type group.payment_type
   json.payment_mode group.payment_mode
+  json.actions @result.actions_for(group)
   json.items do
     json.array! group.mappings do |item|
       json.user item.user
@@ -29,7 +30,6 @@ json.array! @result.paginated_report_processor_groups do |group|
           json.total_amount do
             json.partial! 'shared/amount', amount: Amount.new(value: report.total_amount, currency: currency)
           end
-
         end
       end
       json.system_messages do

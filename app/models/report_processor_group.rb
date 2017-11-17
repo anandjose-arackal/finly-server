@@ -64,7 +64,7 @@ class ReportProcessorGroup < ActiveRecord::Base
   }
   scope :pluck_status_id, -> { pluck :status_id }
 
-  delegate :scheduled?, :processing?, :processing?, :partially_completed?, :completed?, :failed?, :cancelled?, to: :status
+  delegate :scheduled?, :pending?, :processing?, :partially_completed?, :completed?, :failed?, :cancelled?, to: :status
 
   before_destroy do
     if payment_order.present?
@@ -76,11 +76,27 @@ class ReportProcessorGroup < ActiveRecord::Base
   end
 
   def process_outside_finly?
-    !process_via_finly?
+    outside_finly? || payment_file?
   end
 
   def process_via_finly?
-    ['bank_transfer', 'reimbursement_card'].include?(payment_type)
+    bank_transfer? || reimbursement_card?
+  end
+
+  def bank_transfer?
+    payment_type == 'bank_transfer'
+  end
+
+  def reimbursement_card?
+    payment_type == 'reimbursement_card'
+  end
+
+  def outside_finly?
+    payment_type == 'outside_finly'
+  end
+
+  def payment_file?
+    payment_type == 'payment_file'
   end
 
 end
