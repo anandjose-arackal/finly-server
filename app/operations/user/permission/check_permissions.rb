@@ -30,6 +30,7 @@ class User::Permission::CheckPermissions < User::Permission::Base
 
   def success
     params[:permissions] = self.result_hash
+    params[:selected_user] = self.selected_user
     User::Permission::CheckPermissions::PermissionPresenter.new(user, params, messages)
   end
 end

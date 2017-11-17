@@ -32,7 +32,7 @@ class BankTransfer::Vendors::Base < BaseOperation
   def vendor_attributes
     params.require(:vendor).permit(:name, :email, :mobile_number, :authorized, :description,
                                    bank_accounts_attributes: [:account_number, :ifsc, :name, :default_account, :address_1, :address_2, :address_3, :pin_code, :country],
-                                   vendor_attachments_attributes: [:attached_file])
+                                   vendor_attachments_attributes: [:attached_file, :remove_file])
   end
 end
 
