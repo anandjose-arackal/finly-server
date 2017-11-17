@@ -63,6 +63,9 @@ class ReportProcessorGroup < ActiveRecord::Base
         :created_by_user)
   }
   scope :pluck_status_id, -> { pluck :status_id }
+  scope :not_completed, -> { where status_id: ReportProcessorGroupStatus.ids_for([:pending, :scheduled,
+                                                                                  :processing, :partially_completed,
+                                                                                  :failed]) }
 
   delegate :scheduled?, :pending?, :processing?, :partially_completed?, :completed?, :failed?, :cancelled?, to: :status
 

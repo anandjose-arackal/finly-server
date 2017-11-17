@@ -1,1 +1,1 @@
-json.completed_count @result.reports.count
+json.count @result.reports.count

@@ -167,6 +167,8 @@ class Report < ActiveRecord::Base
 
   scope :includes_user, -> { includes :user }
   scope :includes_tracks, -> { includes :tracks }
+  scope :not_settled, -> { where report_processor_group_mapping_id: nil }
+  scope :with_processor_group_mapping, -> (id) { where report_processor_group_mapping_id: id }
 
   delegate :status_name, to: :status
 

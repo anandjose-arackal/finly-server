@@ -37,12 +37,14 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
   end
 
   def process
+    pending_mappings = self.report_group_processor.mappings.pending
+    pending_mappings_id = pending_mappings.pluck(:id)
+    Report.with_processor_group_mapping(pending_mappings_id).update_all(report_processor_group_mapping_id: nil)
+    pending_mappings.update_all(status_id: ReportProcessorGroupStatus.id_for(:cancelled))
     if report_group_processor.partially_completed?
-      pending_mappings = self.report_group_processor.mappings.pending
-      pending_mappings.each { |mapping| mapping.destroy }
       self.report_group_processor.update(status_id: ReportProcessorGroupStatus.id_for(:completed))
     else
-      self.report_group_processor.destroy
+      self.report_group_processor.update(status_id: ReportProcessorGroupStatus.id_for(:cancelled))
     end
   end
 

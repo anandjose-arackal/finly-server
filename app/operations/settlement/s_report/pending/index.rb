@@ -14,7 +14,7 @@ class Settlement::SReport::Pending::Index < Settlement::SReport::Pending::Base
       add_message :error, reports_presenter.messages[:error]
       return
     end
-    self.reports = reports_presenter.reports.approved
+    self.reports = reports_presenter.reports.approved.not_settled
   end
 
   def success

@@ -1,1 +1,1 @@
-json.pending_reports @result.reports.count
+json.count @result.reports.count
