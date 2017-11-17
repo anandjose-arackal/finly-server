@@ -2,7 +2,7 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
   attr_accessor :payment_type, :reports, :user_reports, :expenses_total, :reimbursement_total, :user_count
 
   class Settlement::SReport::Processing::Init::Success < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :details,:expenses_total, :reimbursement_total, :user_count
+    attr_accessor :details, :expenses_total, :reimbursement_total, :user_count
 
     def init
       self.details = params[:details]
@@ -30,10 +30,12 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
       add_message :error, 'Payment Type not found'
       return
     end
-    result = PaymentFiles::IsConfigured.(user, params)
-    unless result.success?
-      add_message :error, result.messages[:error]
-      return
+    if params[:payment_type] == 'payment_file'
+      result = PaymentFiles::IsConfigured.(user, params)
+      unless result.success?
+        add_message :error, result.messages[:error]
+        return
+      end
     end
   end
 
