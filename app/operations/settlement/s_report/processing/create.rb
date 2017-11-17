@@ -104,7 +104,13 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
             add_message :error, 'Invalid Source Account Type'
             return
         end
-      when 'outside_finly', 'payment_file'
+      when 'payment_file'
+        result = PaymentFiles::IsConfigured.(user, params)
+        unless result.success?
+          add_message :error, result.messages[:error]
+          return
+        end
+      when 'outside_finly'
         # Nothing to do here as receiving account is nil
       else
         add_message :error, 'Invalid Source Account Type'

@@ -15,7 +15,7 @@ class PaymentFiles::Formats::YesBank::ValidateConfig < BaseOperation
 
   def validate
     unless config.present? and options&.dig(:customer_code).present?
-      add_message :error, 'System has not been configured correctly for this file format'
+      add_message :error, 'Payment File has not been configured correctly in the system'
       return
     end
   end

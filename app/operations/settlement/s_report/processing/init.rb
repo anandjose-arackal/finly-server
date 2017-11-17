@@ -30,6 +30,11 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
       add_message :error, 'Payment Type not found'
       return
     end
+    result = PaymentFiles::IsConfigured.(user, params)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
   end
 
   def init
