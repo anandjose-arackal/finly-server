@@ -33,3 +33,10 @@ json.transactions do
     json.payment_status payment.payment_status_name
   end
 end
+if @result.account_owner.is_a?(YesBankVendor)
+  json.attachment do
+    json.url @result.account_owner.vendor_attachments.first&.attached_file&.url
+    json.thumb @result.account_owner.vendor_attachments.first&.attached_file&.url(:thumb)
+    json.file_type @result.account_owner.vendor_attachments.first&.attached_file_content_type
+  end
+end

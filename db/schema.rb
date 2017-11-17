@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171116110600) do
+ActiveRecord::Schema.define(version: 20171117081836) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3221,12 +3221,12 @@ ActiveRecord::Schema.define(version: 20171116110600) do
     t.integer  "attached_file_file_size",    limit: 4
     t.datetime "attached_file_updated_at"
     t.text     "description",                limit: 65535
-    t.integer  "vendor_id",                  limit: 4
+    t.integer  "yes_bank_vendor_id",         limit: 4
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
   end
 
-  add_index "vendor_attachments", ["vendor_id"], name: "index_vendor_attachments_on_vendor_id", using: :btree
+  add_index "vendor_attachments", ["yes_bank_vendor_id"], name: "index_vendor_attachments_on_yes_bank_vendor_id", using: :btree
 
   create_table "vendor_payment_wallets", force: :cascade do |t|
     t.integer  "balance_id", limit: 4

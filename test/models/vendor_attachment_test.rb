@@ -8,7 +8,7 @@
 #  attached_file_file_size    :integer
 #  attached_file_updated_at   :datetime
 #  description                :text(65535)
-#  vendor_id                  :integer
+#  yes_bank_vendor_id         :integer
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #

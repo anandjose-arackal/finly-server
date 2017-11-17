@@ -35,6 +35,10 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
       end
     end
 
+    # if the receipt is being uploaded, delete the 'remove_file' key
+    if vendor_parameters&.dig(:vendor_attachments_attributes).present?
+      vendor_parameters[:vendor_attachments_attributes].first&.delete(:remove_file)
+    end
   end
 
   def process
