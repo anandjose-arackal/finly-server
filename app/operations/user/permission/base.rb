@@ -3,8 +3,7 @@ class User::Permission::Base < User::Base
   attr_accessor :permission, :selected_user
 
   def init
-    id = params[:id] || params[:selected_user_id]
-    self.selected_user = User::Team.(user, params).team.find_by(id: id) rescue nil
+    self.selected_user = user
     self.permission = selected_user&.permission
   end
 

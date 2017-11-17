@@ -12,24 +12,13 @@ class User::Permission::Show < User::Permission::Base
   end
 
   def init
-    super
-    self.permission_keys = params[:permissible_actions]
-    self.result_hash = {}
-  end
-
-  def validate
-    non_existent_keys = self.permission_keys - UserPermission.column_names
-    self.permission_keys = self.permission_keys - non_existent_keys
-  end
-
-  def process
-    self.permission_keys.each do |key|
-      self.result_hash[key] = self.permission.send(key)
-    end
+    id = params[:id] || params[:selected_user_id]
+    self.selected_user = User::Index.(user, params).team.find_by(id: id) rescue nil
+    self.permission = selected_user&.permission
   end
 
   def success
-    params[:permissions] = self.result_hash
+    params[:permissions] = self.permission
     User::Permission::Show::PermissionPresenter.new(user, params, messages)
   end
 end
