@@ -19,6 +19,7 @@ class User::Permission::Show < User::Permission::Base
 
   def success
     params[:permissions] = self.permission
+    params[:selected_user] = self.selected_user
     User::Permission::Show::PermissionPresenter.new(user, params, messages)
   end
 end
