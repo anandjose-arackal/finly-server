@@ -60,6 +60,9 @@ json.payments do
         json.tds_type_id invoice.tds_type_id
         json.discount_amount precision_value invoice.discount_amount&.value
         json.discount precision_value invoice.discount
+        json.advance_type_id invoice.advance_type_id
+        json.advance invoice.advance
+        json.freight_amount invoice.freight_amount&.value
         json.date invoice.date
         json.discount_type_id invoice.discount_type_id
         json.due_date invoice.due_date

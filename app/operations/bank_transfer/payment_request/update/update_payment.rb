@@ -100,7 +100,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     params.require(:payment).permit(:note,
                                     invoice_attributes: [:tax, :gst_type_id, :tds, :tds_type_id, :category_id,
                                                          :tax_type_id, :discount, :date, :discount_type_id, :due_date,
-                                                         :invoice_number, :inclusive_of_taxes, :advance,
+                                                         :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id,
                                                          original_amount_attributes: [:value, :currency_id],
                                                          freight_amount_attributes: [:value, :currency_id],
                                                          invoice_attachments_attributes: [:attached_file, :description, :remove_file]],

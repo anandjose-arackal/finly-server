@@ -69,6 +69,7 @@ class Invoice < ActiveRecord::Base
   accepts_nested_attributes_for :original_amount
   accepts_nested_attributes_for :freight_amount
   accepts_nested_attributes_for :custom_fields
+  accepts_nested_attributes_for :advance_amount
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount
