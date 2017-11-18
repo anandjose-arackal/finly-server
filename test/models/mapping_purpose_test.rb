@@ -10,7 +10,7 @@
 
 require 'test_helper'
 
-class MappingPurposeTest < ActiveSupport::TestCase
+class PurposeTest < ActiveSupport::TestCase
   # test "the truth" do
   #   assert true
   # end
