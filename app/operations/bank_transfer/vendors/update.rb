@@ -2,6 +2,14 @@ class BankTransfer::Vendors::Update < BankTransfer::Vendors::Base
 
   attr_accessor :vendor, :vendor_parameters
 
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:vendors, :update], :validate, self)
+        }
+    }
+  end
+
   def init
     id = params[:id] || params[:yes_bank_vendor_id]
     self.vendor_parameters = vendor_attributes

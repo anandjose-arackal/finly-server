@@ -2,13 +2,13 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
 
   attr_accessor :vendor_parameters, :vendor
 
-  # def personalizer
-  #   {
-  #       validate: {
-  #           after: Personalizer::Process.new([:vendors, :create], :validate, self)
-  #       }
-  #   }
-  # end
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:vendors, :create], :validate, self)
+        }
+    }
+  end
 
   def init
     super()

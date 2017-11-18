@@ -7,9 +7,8 @@ class Personalizer::Adapters::Company49::Vendors49::Create49::Validate < Persona
   end
 
   def validate
-    if self.vendor_params[:vendor_attachment_attributes].blank?
-      add_message :error, "All vendors must be created with a compulsory image of a cancelled cheque leaf"
-      return
+    if self.vendor_params[:vendor_attachments_attributes]&.first&.dig(:attached_file).blank?
+      add_message :error, "All vendors must have a compulsory image of a cancelled cheque leaf"
     end
   end
 end
