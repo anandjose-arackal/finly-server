@@ -66,6 +66,7 @@ class ReportProcessorGroup < ActiveRecord::Base
   scope :not_completed, -> { where status_id: ReportProcessorGroupStatus.ids_for([:pending, :scheduled,
                                                                                   :processing, :partially_completed,
                                                                                   :failed]) }
+  scope :completed, -> { where status_id: ReportProcessorGroupStatus.id_for(:completed) }
 
   delegate :scheduled?, :pending?, :processing?, :partially_completed?, :completed?, :failed?, :cancelled?, to: :status
 

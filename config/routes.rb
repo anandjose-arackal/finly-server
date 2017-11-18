@@ -2078,6 +2078,8 @@ Rails.application.routes.draw do
       end
       get 'completed', to: 'settlement/report#completed_index'
       get 'completed/count', to: 'settlement/report#completed_count'
+      get 'completed/batch', to: 'settlement/report#completed_batch_index'
+      get 'completed/batch/count', to: 'settlement/report#completed_batch_count'
     end
   end
 

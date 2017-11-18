@@ -57,4 +57,14 @@ class Settlement::ReportController < ApplicationController
     respond
   end
 
+  def completed_batch_index
+    @result = Settlement::SReport::Completed::BatchIndex.(current_user, params)
+    respond
+  end
+
+  def completed_batch_count
+    @result = Settlement::SReport::Completed::BatchIndex.(current_user, params)
+    respond
+  end
+
 end
