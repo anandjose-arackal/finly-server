@@ -19,7 +19,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     # validate custom fields
     if payment.invoice.present?
       set_fields = set_custom_fields(false)
-      unless set_fields.success?
+      unless set_fields&.success?
         add_message :error, set_fields.messages[:error]
         return
       end
@@ -77,15 +77,20 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
         end
       end
     end
+
+    # todo - temporary
+    self.payment_params[:invoice_attributes][:freight_amount_attributes][:currency_id] = 1
+    ##################
   end
 
   def process
-    unless self.payment.update(payment_params)
+    payment.assign_attributes(payment_params)
+    set_custom_fields(false) # this should hopefully add the attributes to the model
+    unless self.payment.save
       add_message :error, self.payment.errors.full_messages
     end
     if payment.invoice.present?
       calculate_tax_and_discounts
-      set_custom_fields(true)
     end
   end
 
@@ -109,7 +114,11 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def set_custom_fields(save)
-    custom_fields = {custom_fields: (payment_params[:custom_fields] or payment_params[:invoice_attributes][:custom_fields])}
+    fields = params[:custom_fields]
+    if fields.blank?
+      return
+    end
+    custom_fields = {custom_fields: fields}
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
@@ -247,7 +256,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       return
     end
     original_net_amount = self.net_amount
-    self.advance_amount = (self.invoice.advance*self.original_amount)/100
+    self.advance_amount = (self.invoice.advance*self.net_amount)/100
     self.net_amount = original_net_amount - self.advance_amount
   end
 
