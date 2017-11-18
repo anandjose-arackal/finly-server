@@ -142,6 +142,7 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   protected
+
   def validate_custom_fields
     if self.expense.valid?
       set_fields = set_custom_fields false

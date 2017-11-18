@@ -4,6 +4,9 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
   attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :policy_id,
                 :errors, :payment_order_valid, :scheduled_at, :description, :valid, :error_messages
 
+  # the object that will hold the details of the custom fields because the object hasn't been created
+  attr_accessor :ghost_invoice
+
   def pre_validate
     super
     return if has_errors?
@@ -135,6 +138,20 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.error_messages << "Invalid discount entered"
       end
 
+      # adding the custom fields for the particular invoice, using a ghost invoice
+      self.ghost_invoice = Invoice.new
+      custom_fields = params[:invoice][:custom_fields]
+      custom_fields[:user] = user
+      custom_fields[:reset_fields] = true
+      custom_fields[:save] = false
+      CustomField::SetFields.(self.ghost_invoice, FieldParentType.id_for(:invoice), custom_fields)
+
+      op = CustomField::Validate.(self.ghost_invoice)
+      unless op.success?
+        self.error_messages << op.messages[:error]
+        self.valid = false
+      end
+
       if self.valid
         self.processable_amount += amount
       end
@@ -144,7 +161,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
                                gst_type_id: gst_type_id, tax_type_id: tax_type_id, tax: tax, tds_type_id: tds_type_id, tds: tds,
                                discount_type_id: discount_type_id, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
-                               invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date,
+                               invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: self.ghost_invoice.custom_fields,
                                valid: self.valid, messages: self.error_messages}
     end
   end
@@ -164,7 +181,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
   class BankTransfer::PaymentRequest::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :errors,
-                  :payment_order_valid, :scheduled_at, :description, :policy_id
+                  :payment_order_valid, :scheduled_at, :description, :policy_id, :custom_fields_config
 
     def init
       self.payment_order_data = params[:payment_order_data]
@@ -176,6 +193,9 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.scheduled_at = params[:scheduled_at]
       self.description = params[:description]
       self.policy_id = params[:policy_id]
+      self.custom_fields_config = {
+          invoice: user.company.field_configurations.exclude_deleted.with_parent_type(FieldParentType.id_for(:invoice))
+      }
     end
 
     def scheduled_at_formatted

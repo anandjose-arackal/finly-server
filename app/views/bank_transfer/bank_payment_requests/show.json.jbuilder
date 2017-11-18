@@ -76,9 +76,6 @@ json.payments do
         end
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
-        json.custom_fields_config do
-          json.array!(@result.custom_field_config)
-        end
       end
     else
       json.raw_amount precision_value payment.amount_value
@@ -136,9 +133,6 @@ json.payments_verified do
         end
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
-        json.custom_fields_config do
-          json.array!(@result.custom_field_config)
-        end
       end
     else
       json.raw_amount precision_value payment.amount_value
@@ -197,9 +191,6 @@ json.payments_unverified do
         end
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
-        json.custom_fields_config do
-          json.array!(@result.custom_field_config)
-        end
       end
     else
       json.raw_amount precision_value payment.amount_value
