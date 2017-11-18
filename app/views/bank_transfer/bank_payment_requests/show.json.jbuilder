@@ -23,6 +23,7 @@ json.summary do
   creditor = (@result.finance_manager.name rescue '--')
   json.crediting_user creditor
   json.beneficiary_type @result.bank_payment_request.beneficiary_type
+  json.approvers @result.approvers
 end
 
 
@@ -74,6 +75,7 @@ json.payments do
           json.array! invoice.custom_fields
         end
         json.category_id invoice.category_id
+        json.category_name invoice.category&.name
         json.custom_fields_config do
           json.array!(@result.custom_field_config)
         end
@@ -133,6 +135,7 @@ json.payments_verified do
           json.array! invoice.custom_fields
         end
         json.category_id invoice.category_id
+        json.category_name invoice.category&.name
         json.custom_fields_config do
           json.array!(@result.custom_field_config)
         end
@@ -193,6 +196,7 @@ json.payments_unverified do
           json.array! invoice.custom_fields
         end
         json.category_id invoice.category_id
+        json.category_name invoice.category&.name
         json.custom_fields_config do
           json.array!(@result.custom_field_config)
         end

@@ -51,6 +51,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :original_amount, class_name: "Amount"
   belongs_to :advance_amount, class_name: "Amount"
   belongs_to :freight_amount, class_name: "Amount"
+  belongs_to :category
 
   belongs_to :payment
 

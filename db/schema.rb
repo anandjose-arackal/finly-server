@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171117081836) do
+ActiveRecord::Schema.define(version: 20171117174450) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1529,6 +1529,7 @@ ActiveRecord::Schema.define(version: 20171117081836) do
     t.boolean  "yes_bank_account"
     t.boolean  "bank_account_reimbursement"
     t.boolean  "payroll_card_enabled",                   default: false
+    t.boolean  "yes_bank_api_enabled"
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
