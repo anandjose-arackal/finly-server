@@ -68,6 +68,7 @@ json.payments do
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
+        json.freight_amount invoice.freight_amount&.value
         # adding the respective rates
         json.tax_rate precision_value ((invoice.tax_amount.value rescue 0)/(invoice.gross_amount.value)*100)
         json.tds_rate precision_value ((invoice.tds_amount.value rescue 0)/(invoice.gross_amount.value)*100)
@@ -131,6 +132,7 @@ json.payments_verified do
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
+        json.freight_amount invoice.freight_amount&.value
         # adding the respective rates
         json.tax_rate precision_value ((invoice.tax_amount.value rescue 0)/(invoice.gross_amount.value)*100)
         json.tds_rate precision_value ((invoice.tds_amount.value rescue 0)/(invoice.gross_amount.value)*100)
@@ -195,6 +197,7 @@ json.payments_unverified do
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
+        json.freight_amount invoice.freight_amount&.value
         # adding the respective rates
         json.tax_rate precision_value ((invoice.tax_amount.value rescue 0)/(invoice.gross_amount.value)*100)
         json.tds_rate precision_value ((invoice.tds_amount.value rescue 0)/(invoice.gross_amount.value)*100)
