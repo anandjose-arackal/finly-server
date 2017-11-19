@@ -162,7 +162,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
                                gst_type_id: gst_type_id, tax_type_id: tax_type_id, tax: tax, tds_type_id: tds_type_id, tds: tds,
                                discount_type_id: discount_type_id, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
-                               invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: self.ghost_invoice.custom_fields,
+                               invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
                                valid: self.valid, messages: self.error_messages}
     end
   end
