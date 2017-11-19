@@ -73,7 +73,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
       self.approvers.first[:title] = "This payment order will be auto approved as there is no reviewer assigned"
     else
       self.approvers.first[:title] = "This payment order has been submitted by #{bank_payment_request.name}"
-      self.approvers[:timestamp] = bank_payment_request.submitted_at
+      self.approvers.first[:timestamp] = bank_payment_request.submitted_at
     end
     while self.reviewer.present?
       self.approvers << {

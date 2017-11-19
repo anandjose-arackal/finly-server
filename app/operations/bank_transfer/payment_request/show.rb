@@ -65,7 +65,12 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
         end
       end
       self.custom_field_config = custom_field_configurations
-      self.approvers = BankTransfer::PaymentRequest::Approvers.(bank_payment_request: self.bank_payment_request).approvers rescue []
+      op = BankTransfer::PaymentRequest::Approvers.(bank_payment_request: self.bank_payment_request)
+      if op.success?
+        self.approvers = op.approvers
+      else
+        self.approvers = []
+      end
     end
 
     def custom_field_configurations
