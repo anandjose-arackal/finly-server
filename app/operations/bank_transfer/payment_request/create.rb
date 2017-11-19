@@ -73,6 +73,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     # and credited to the respective bank accounts
     # this should now create a BankPaymentRequest and save it in the DB
     self.bank_payment_request = BankPaymentRequest.new(request_params)
+    validate_custom_fields(processed_order_data)
+    return if has_errors?
     unless bank_payment_request.save
       add_message :error, bank_payment_request.errors.full_messages
     end
@@ -120,6 +122,31 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   end
 
   private
+
+  def validate_custom_fields(order_data)
+    if self.bank_payment_request.valid?
+      self.bank_payment_request.payment_order.payments.each_with_index do |payment, index|
+        set_fields = set_custom_fields payment, self.processed_order_data[index], false
+        unless set_fields.success?
+          add_message :error, set_fields.messages[:error]
+          return
+        end
+        valid = CustomField::Validate.(self.bank_payment_request)
+        unless valid.success?
+          add_message :error, valid.messages[:error]
+          return
+        end
+      end
+    end
+  end
+
+  def set_custom_fields(payment, data, save)
+    custom_fields = {custom_fields: data[:custom_fields]}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
+  end
 
   def payment_request_params
     p = {}
@@ -184,6 +211,10 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               tds: order_details[:tds],
               original_amount_attributes: {
                   value: order_details[:original_amount],
+                  currency_id: 1
+              },
+              freight_amount_attributes: {
+                  value: 0,
                   currency_id: 1
               }
           }

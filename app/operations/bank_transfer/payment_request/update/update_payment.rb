@@ -2,7 +2,8 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
 
   attr_accessor :payment, :payment_request, :payment_params, :invoice_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
-                :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount
+                :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
+                :advance, :advance_amount
 
   def init
     super
@@ -18,7 +19,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     # validate custom fields
     if payment.invoice.present?
       set_fields = set_custom_fields(false)
-      unless set_fields.success?
+      unless set_fields&.success?
         add_message :error, set_fields.messages[:error]
         return
       end
@@ -43,10 +44,18 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def pre_process
-    # adding the invoice id so that it gets updated anf not created again
+    # adding the invoice id so that it gets updated and not created again
     # if it already exists in the database
     if self.payment.invoice.present? && self.payment_params[:invoice_attributes].present?
       self.payment_params[:invoice_attributes][:id] = self.payment.invoice.id
+    end
+
+    # adding id for original_amount and freight_amount so that new copies aren't created every time
+    if payment_params&.dig(:invoice_attributes, :original_amount_attributes).present?
+      payment_params[:invoice_attributes][:original_amount_attributes][:id] = self.payment&.invoice&.original_amount&.id
+    end
+    if payment_params&.dig(:invoice_attributes, :freight_amount_attributes).present?
+      payment_params[:invoice_attributes][:freight_amount_attributes][:id] = self.payment&.invoice&.freight_amount&.id
     end
 
     if self.payment_params&.dig(:invoice_attributes, :invoice_attachments_attributes)
@@ -68,15 +77,20 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
         end
       end
     end
+
+    # todo - temporary
+    self.payment_params[:invoice_attributes][:freight_amount_attributes][:currency_id] = 1
+    ##################
   end
 
   def process
-    unless self.payment.update(payment_params)
+    payment.assign_attributes(payment_params)
+    set_custom_fields(false) # this should hopefully add the attributes to the model
+    unless self.payment.save
       add_message :error, self.payment.errors.full_messages
     end
-    calculate_tax_and_discounts
     if payment.invoice.present?
-      set_custom_fields(true)
+      calculate_tax_and_discounts
     end
   end
 
@@ -91,15 +105,20 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     params.require(:payment).permit(:note,
                                     invoice_attributes: [:tax, :gst_type_id, :tds, :tds_type_id, :category_id,
                                                          :tax_type_id, :discount, :date, :discount_type_id, :due_date,
-                                                         :invoice_number, :inclusive_of_taxes,
+                                                         :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id,
                                                          original_amount_attributes: [:value, :currency_id],
+                                                         freight_amount_attributes: [:value, :currency_id],
                                                          invoice_attachments_attributes: [:attached_file, :description, :remove_file]],
                                     amount_attributes: [:value, :currency_id]
     )
   end
 
   def set_custom_fields(save)
-    custom_fields = {custom_fields: (payment_params[:custom_fields] or payment_params[:invoice_attributes][:custom_fields])}
+    fields = params[:custom_fields]
+    if fields.blank?
+      return
+    end
+    custom_fields = {custom_fields: fields}
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
@@ -116,7 +135,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       calculate_discount_inclusive
       self.net_amount = self.after_tax_amount - self.tds_amount
       self.invoice_amount = self.gross_amount + self.discount_amount
-      # calculate_tds
+      calculate_advance_paid
     else # calculate proactively
       self.invoice_amount = self.invoice.original_amount&.value
       calculate_discount_exclusive
@@ -124,6 +143,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       calculate_tds
       self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
       self.invoice_amount = invoice.original_amount&.value
+      calculate_advance_paid
     end
     # update the invoice with the respective calculated amounts
     self.invoice.update(
@@ -156,6 +176,11 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
             value: self.tax_amount,
             currency_id: 1,
             id: self.invoice.tax_amount&.id
+        },
+        advance_amount_attributes: {
+            value: self.advance_amount,
+            currency_id: 1,
+            id: self.invoice.advance_amount&.id
         }
     )
     # also update the payment with all the respective amounts
@@ -175,7 +200,8 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       when 2, '2'
         self.discount_amount = invoice.discount
       else
-        # do nothing?
+        # defaults back to rate
+        self.discount_amount = (invoice.discount*self.invoice_amount)/100
     end
     self.gross_amount = self.invoice_amount - self.discount_amount
   end
@@ -186,14 +212,14 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       self.invoice_amount = self.gross_amount
       return
     end
-
     case invoice.discount_type_id
       when 1, '1'
         self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
       when 2, '2'
         self.invoice_amount = self.gross_amount - invoice.discount
       else
-        # do nothing?
+        # defaults back to rate
+        self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
     end
     self.discount_amount = self.invoice_amount - self.gross_amount
   end
@@ -204,17 +230,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       self.tax_amount = 0
       return
     end
-    case self.invoice.gst_type_id
-      when 1, '1'
-        # i.e. IGST
-        self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax), self.invoice.tax_type_id)
-      when 2, '2'
-        # i.e SGST + CGST
-        rate = (self.invoice.tax.blank?) ? 0 : 2*self.invoice.tax
-        self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, rate, self.invoice.tax_type_id)
-      else
-        # do nothing?
-    end
+    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax), self.invoice.tax_type_id)
     self.tax_amount = self.net_amount - self.gross_amount
   end
 
@@ -224,24 +240,32 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       self.tax_amount = 0
       return
     end
-
-    case self.invoice.gst_type_id
-      when 1, '1'
-        # i.e. IGST
-        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax), self.invoice.tax_type_id)
-      when 2, '2'
-        # i.e SGST + CGST
-        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, 2*(self.invoice.tax), self.invoice.tax_type_id)
-      else
-        # do nothing?
-    end
+    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax), self.invoice.tax_type_id)
     self.tax_amount = self.after_tax_amount - self.gross_amount
-
   end
 
   def calculate_tds
     new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, self.invoice.tds, self.invoice.tds_type_id)
     self.tds_amount = self.gross_amount - new_gross_amount
+  end
+
+  def calculate_advance_paid
+    if self.invoice.advance.blank?
+      # no change in net amount
+      self.advance_amount = 0
+      return
+    end
+    original_net_amount = self.net_amount
+    case invoice.discount_type_id
+      when 1, '1'
+        self.advance_amount = (self.invoice.advance*self.net_amount)/100
+      when 2, '2'
+        self.advance_amount = self.invoice.advance
+      else
+        # defaults back to rate
+        self.advance_amount = (self.invoice.advance*self.net_amount)/100
+    end
+    self.net_amount = original_net_amount - self.advance_amount
   end
 
 end

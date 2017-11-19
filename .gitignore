@@ -26,7 +26,7 @@
 /public/system/invoice_attachments/*
 /public/system/kyc_documents/*
 public/system/payment_order_attachments/attached_files/*
-public/system/vendor_attachments/attached_files/*
+public/system/vendor_attachments/*
 /public/common/files/temp_files/*
 /sample_atm_transactions.txt
 /junk_expenses.rb

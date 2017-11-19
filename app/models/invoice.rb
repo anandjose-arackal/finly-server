@@ -51,6 +51,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :original_amount, class_name: "Amount"
   belongs_to :advance_amount, class_name: "Amount"
   belongs_to :freight_amount, class_name: "Amount"
+  belongs_to :category
 
   belongs_to :payment
 
@@ -68,6 +69,7 @@ class Invoice < ActiveRecord::Base
   accepts_nested_attributes_for :original_amount
   accepts_nested_attributes_for :freight_amount
   accepts_nested_attributes_for :custom_fields
+  accepts_nested_attributes_for :advance_amount
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount

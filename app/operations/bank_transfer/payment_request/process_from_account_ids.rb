@@ -21,8 +21,6 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
 
   attr_accessor :bank_accounts, :account_ids, :amounts, :response_presenter, :parsed_data,
                 :notes
-                # :tax_type_ids, :tds_type_ids, :gst_type_ids, :discount_type_ids,
-                # :discounts, :taxes, :tdses, :invoice_numbers, :invoice_dates, :due_dates
 
 
   def pre_validate
@@ -39,7 +37,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     self.account_ids = retrieve_data(:account_id)
     self.amounts = retrieve_data(:original_amount)
     self.notes = retrieve_data(:note)
-    [:tax_type_id, :tds_type_id, :gst_type_id, :discount_type_id, :discount, :tax, :tds, :invoice_date, :invoice_number, :due_date].each do |attr|
+    [:tax_type_id, :tds_type_id, :gst_type_id, :discount_type_id, :discount, :tax, :tds, :invoice_date, :invoice_number, :due_date, :custom_fields].each do |attr|
       self.class.send(:attr_accessor, attr)
       instance_variable_set("@#{attr}", retrieve_data(attr))
     end
@@ -89,7 +87,8 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           discount: self.discount[index],
           invoice_number: self.invoice_number[index],
           invoice_date: self.invoice_date[index],
-          due_date: self.due_date[index]
+          due_date: self.due_date[index],
+          custom_fields: self.custom_fields[index]
       }
     end
     data
