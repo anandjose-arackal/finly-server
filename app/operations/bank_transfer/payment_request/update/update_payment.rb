@@ -178,7 +178,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
             id: self.invoice.tax_amount&.id
         },
         advance_amount_attributes: {
-            value: self.advance,
+            value: self.advance_amount,
             currency_id: 1,
             id: self.invoice.advance_amount&.id
         }
