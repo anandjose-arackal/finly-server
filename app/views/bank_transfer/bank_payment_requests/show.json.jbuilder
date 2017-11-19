@@ -51,6 +51,8 @@ json.payments do
       json.raw_amount precision_value invoice&.amount&.value
       json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
+        json.advance invoice.advance
+        json.advance_amount invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
@@ -118,6 +120,8 @@ json.payments_verified do
       json.raw_amount precision_value invoice&.amount&.value
       json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
+        json.advance invoice.advance
+        json.advance_amount invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
@@ -183,6 +187,8 @@ json.payments_unverified do
       json.raw_amount precision_value invoice&.amount&.value
       json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
+        json.advance invoice.advance
+        json.advance_amount invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax

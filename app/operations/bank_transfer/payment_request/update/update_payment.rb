@@ -256,7 +256,15 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       return
     end
     original_net_amount = self.net_amount
-    self.advance_amount = (self.invoice.advance*self.net_amount)/100
+    case invoice.discount_type_id
+      when 1, '1'
+        self.advance_amount = (self.invoice.advance*self.net_amount)/100
+      when 2, '2'
+        self.advance_amount = self.invoice.advance
+      else
+        # defaults back to rate
+        self.advance_amount = (self.invoice.advance*self.net_amount)/100
+    end
     self.net_amount = original_net_amount - self.advance_amount
   end
 
