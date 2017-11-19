@@ -140,7 +140,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       # adding the custom fields for the particular invoice, using a ghost invoice
       self.ghost_invoice = Invoice.new
-      custom_fields = item[:custom_fields] || {}
+      custom_fields = {custom_fields: item[:custom_fields]} || {}
       custom_fields[:user] = user
       custom_fields[:reset_fields] = true
       custom_fields[:save] = false
@@ -157,6 +157,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       end
 
       self.payment_order_valid = false unless self.valid
+
 
       self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
                                gst_type_id: gst_type_id, tax_type_id: tax_type_id, tax: tax, tds_type_id: tds_type_id, tds: tds,
