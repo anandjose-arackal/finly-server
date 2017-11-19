@@ -71,6 +71,9 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
     if self.reviewer.blank?
       self.approvers.first[:auto_approve] = true
       self.approvers.first[:title] = "This payment order will be auto approved as there is no reviewer assigned"
+    else
+      self.approvers.first[:title] = "This payment order has been submitted by #{bank_payment_request.name}"
+      self.approvers[:timestamp] = bank_payment_request.submitted_at
     end
     while self.reviewer.present?
       self.approvers << {
@@ -86,7 +89,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
               name: UserRole.name_for(self.reviewer_role)
           },
           title: associated_users.include?(self.reviewer) ? "#{self.reviewer.name} has approved the payment order" : "",
-          approved_at: (bank_payment_request.verified? ? bank_payment_request.approved_at : nil)
+          timestamp: (bank_payment_request.verified? ? bank_payment_request.approved_at : nil)
       }
       op = User::Team::Review::NextReviewer.(bank_payment_request, controlling_user: self.reviewer, controlling_user_role_id: self.reviewer_role)
       self.reviewer = op.user

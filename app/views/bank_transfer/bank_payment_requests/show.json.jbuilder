@@ -68,6 +68,12 @@ json.payments do
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
+        # adding the respective rates
+        json.tax_rate precision_value ((invoice.tax_amount.value rescue 0)/(invoice.gross_amount.value)*100)
+        json.tds_rate precision_value ((invoice.tds_amount.value rescue 0)/(invoice.gross_amount.value)*100)
+        json.discount_rate precision_value ((invoice.discount_amount.value rescue 0)/(invoice.amount.value)*100)
+        json.advance_rate precision_value ((invoice.advance_amount.value rescue 0)/(invoice.net_amount.value)*100)
+        #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
@@ -125,6 +131,12 @@ json.payments_verified do
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
+        # adding the respective rates
+        json.tax_rate precision_value ((invoice.tax_amount.value rescue 0)/(invoice.gross_amount.value)*100)
+        json.tds_rate precision_value ((invoice.tds_amount.value rescue 0)/(invoice.gross_amount.value)*100)
+        json.discount_rate precision_value ((invoice.discount_amount.value rescue 0)/(invoice.amount.value)*100)
+        json.advance_rate precision_value ((invoice.advance_amount.value rescue 0)/(invoice.net_amount.value)*100)
+        #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
@@ -183,6 +195,12 @@ json.payments_unverified do
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
+        # adding the respective rates
+        json.tax_rate precision_value ((invoice.tax_amount.value rescue 0)/(invoice.gross_amount.value)*100)
+        json.tds_rate precision_value ((invoice.tds_amount.value rescue 0)/(invoice.gross_amount.value)*100)
+        json.discount_rate precision_value ((invoice.discount_amount.value rescue 0)/(invoice.amount.value)*100)
+        json.advance_rate precision_value ((invoice.advance_amount.value rescue 0)/(invoice.net_amount.value)*100)
+        #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
