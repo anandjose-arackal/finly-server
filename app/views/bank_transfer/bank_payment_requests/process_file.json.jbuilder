@@ -20,7 +20,6 @@ json.payment do
       json.valid item[:valid]
       json.messages item[:messages]
       json.custom_fields_config @result.custom_fields_config
-      json.custom_fields item[:custom_fields]
     end
   end
   json.errors @result.errors
