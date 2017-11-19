@@ -9,7 +9,7 @@ class Personalizer::Adapters::Company49::Vendors49::Update49::Validate < Persona
   def validate
     # if they try to remove the attachment, ensure they cannot
     if self.vendor_params[:vendor_attachments_attributes]&.first&.dig(:remove_file) == '1' && self.vendor_params[:vendor_attachments_attributes]&.first&.dig(:attached_file).blank?
-      add_message :error, "All vendors must have a compulsory image of a cancelled cheque leaf"
+      add_message :error, "All vendors must have a compulsory attachment"
     end
   end
 end
