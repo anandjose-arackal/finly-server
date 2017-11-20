@@ -1,1 +1,1 @@
-json.count @result.report_processor_groups.count
+json.count @result.money_request_processors.count

@@ -1,33 +1,30 @@
-json.array! @result.paginated_report_processor_groups do |group|
-  json.id group.id
-  json.created_by_user group.created_by_user
-  json.status group.status
-  json.scheduled_at group.scheduled_at
-  json.completed_at group.completed_at
-  json.total_amount group.total_amount
-  json.processed_amount group.processed_amount
-  json.source_account_type group.source_account_type
-  json.payment_type group.payment_type
-  json.payment_mode group.payment_mode
+json.array! @result.paginated_money_request_processors do |processor|
+  json.id processor.id
+  json.created_by_user processor.created_by_user
+  json.status processor.status
+  json.scheduled_at processor.scheduled_at
+  json.completed_at processor.completed_at
+  json.total_amount processor.total_amount
+  json.processed_amount processor.processed_amount
+  json.source_account_type processor.source_account_type
+  json.payment_type processor.payment_type
+  json.payment_mode processor.payment_mode
   json.items do
-    json.array! group.mappings do |item|
+    json.array! processor.mappings do |item|
       json.user item.user
       json.amount item.amount
       json.completed_at item.completed_at
       json.status item.status
       json.payment item.payment
-      json.reports do
-        json.array! item.reports do |report|
+      json.money_requests do
+        json.array! item.money_requests do |money_request|
 
-          json.extract! report, :id, :name
-          json.user report.user
-          json.final_approver report.final_approver
+          json.extract! money_request, :id, :name
+          json.user money_request.user
+          json.final_approver money_request.final_approver
           currency = Currency.first
-          json.reimbursable_amount do
-            json.partial! 'shared/amount', amount: Amount.new(value: report.total_amount([:reimbursable]), currency: currency)
-          end
           json.total_amount do
-            json.partial! 'shared/amount', amount: Amount.new(value: report.total_amount, currency: currency)
+            json.partial! 'shared/amount', amount: Amount.new(value: money_request.total_amount, currency: currency)
           end
         end
       end

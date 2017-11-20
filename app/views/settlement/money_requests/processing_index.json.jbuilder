@@ -17,8 +17,8 @@ json.array! @result.paginated_money_request_processors do |processor|
       json.completed_at item.completed_at
       json.status item.status
       json.payment item.payment
-      json.reports do
-        json.array! item.reports do |money_request|
+      json.money_requests do
+        json.array! item.money_requests do |money_request|
 
           json.extract! money_request, :id, :name
           json.user money_request.user

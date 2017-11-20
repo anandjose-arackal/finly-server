@@ -1,1 +1,1 @@
-json.count @result.reports.count
+json.count @result.money_requests.count

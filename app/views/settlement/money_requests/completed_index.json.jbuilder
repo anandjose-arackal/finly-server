@@ -1,14 +1,14 @@
-json.array! @result.paginated_reports do |report|
+json.array! @result.paginated_money_requests do |money_request|
 
-  json.extract! report, :id, :name
+  json.extract! money_request, :id, :name
   json.user do
-    json.id report.user_id
-    json.name report.user.name
-    json.email report.user.email
-    json.mobile_number report.user.mobile_number
+    json.id money_request.user_id
+    json.name money_request.user.name
+    json.email money_request.user.email
+    json.mobile_number money_request.user.mobile_number
   end
   json.final_approver do
-    final_approver = report.final_approver
+    final_approver = money_request.final_approver
     if final_approver.present?
       json.name final_approver.name
       json.email final_approver.email
@@ -16,8 +16,8 @@ json.array! @result.paginated_reports do |report|
     end
   end
   json.payment do
-    mapping = report.report_processor_group_mapping
-    processor_group = mapping&.processor_group
+    mapping = money_request.money_request_processor_mapping
+    processor_group = mapping&.processor
     processed_by = processor_group&.created_by_user
 
     json.completed_at mapping&.completed_at
@@ -37,11 +37,8 @@ json.array! @result.paginated_reports do |report|
   end
 
   currency = Currency.first
-  json.reimbursable_amount do
-    json.partial! 'shared/amount', amount: Amount.new(value: report.total_amount([:reimbursable]), currency: currency)
-  end
   json.total_amount do
-    json.partial! 'shared/amount', amount: Amount.new(value: report.total_amount, currency: currency)
+    json.partial! 'shared/amount', amount: Amount.new(value: money_request.total_amount, currency: currency)
   end
 
 end
