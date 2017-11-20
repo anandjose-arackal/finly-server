@@ -19,7 +19,6 @@
 #  hard_copy_receipt          :boolean          default(FALSE)
 #  itz_cash_d_code_enabled    :boolean          default(FALSE)
 #  yes_bank_account           :boolean
-#  invoicing_system           :boolean          default(FALSE)
 #  bank_account_reimbursement :boolean
 #  payroll_card_enabled       :boolean          default(FALSE)
 #

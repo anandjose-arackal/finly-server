@@ -1,5 +1,5 @@
 class Settlement::SMoneyRequest::Completed::Index < Settlement::SMoneyRequest::Completed::Base
-  attr_accessor :money_requests
+  attr_accessor :reports
 
   def pre_validate
     if user.blank?
@@ -9,24 +9,26 @@ class Settlement::SMoneyRequest::Completed::Index < Settlement::SMoneyRequest::C
   end
 
   def init
-    money_requests_presenter = Report::Index.(user, params)
-    unless money_requests_presenter.success?
-      add_message :error, money_requests_presenter.messages[:error]
+    reports_presenter = Report::Index.(user, params)
+    unless reports_presenter.success?
+      add_message :error, reports_presenter.messages[:error]
       return
     end
-    self.money_requests = money_requests_presenter.money_requests.credited
+    self.reports = reports_presenter.reports.completed
   end
 
   def success
-    params[:money_requests] = self.money_requests
+    params[:reports] = self.reports
     Settlement::SMoneyRequest::Pending::Index::SuccessPresenter.new(user, params, messages)
   end
 
   class Settlement::SMoneyRequest::Pending::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :money_requests
+    attr_accessor :reports, :paginated_reports
 
     def init
-      self.money_requests = params[:money_requests]
+      self.reports = params[:reports]
+      per_page = params[:per_page] || 30
+      self.paginated_reports = self.reports.paginate(page: params[:page], per_page: per_page)
     end
   end
 

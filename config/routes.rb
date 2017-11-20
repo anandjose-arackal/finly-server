@@ -2081,6 +2081,23 @@ Rails.application.routes.draw do
       get 'completed/batch', to: 'settlement/report#completed_batch_index'
       get 'completed/batch/count', to: 'settlement/report#completed_batch_count'
     end
+    scope :money_requests do
+      get 'pending', to: 'settlement/money_requests#pending_index'
+      get 'pending/count', to: 'settlement/money_requests#pending_count'
+      scope :processing do
+        get '/', to: 'settlement/money_requests#processing_index'
+        get 'count', to: 'settlement/money_requests#processing_count'
+        post 'init', to: 'settlement/money_requests#processing_init'
+        post 'create', to: 'settlement/money_requests#processing_create'
+        post 'cancel', to: 'settlement/money_requests#processing_cancel'
+        post 'mark_as_paid', to: 'settlement/money_requests#processing_mark_paid'
+        get 'payment_file', to: 'settlement/money_requests#processing_payment_file'
+      end
+      get 'completed', to: 'settlement/money_requests#completed_index'
+      get 'completed/count', to: 'settlement/money_requests#completed_count'
+      get 'completed/batch', to: 'settlement/money_requests#completed_batch_index'
+      get 'completed/batch/count', to: 'settlement/money_requests#completed_batch_count'
+    end
   end
 
   resources :per_diems

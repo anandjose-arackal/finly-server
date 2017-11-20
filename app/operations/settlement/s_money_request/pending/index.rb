@@ -9,12 +9,12 @@ class Settlement::SMoneyRequest::Pending::Index < Settlement::SMoneyRequest::Pen
   end
 
   def init
-    money_request_presenter = MoneyRequest::Index.(user, params)
-    unless money_request_presenter.success?
-      add_message :error, money_request_presenter.messages[:error]
+    money_requests_presenter = ::MoneyRequest::Index.(user, params)
+    unless money_requests_presenter.success?
+      add_message :error, money_requests_presenter.messages[:error]
       return
     end
-    self.money_requests = money_request_presenter.money_requests.approved
+    self.money_requests = money_requests_presenter.money_requests.approved.not_settled
   end
 
   def success
@@ -23,11 +23,14 @@ class Settlement::SMoneyRequest::Pending::Index < Settlement::SMoneyRequest::Pen
   end
 
   class Settlement::SMoneyRequest::Pending::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :money_requests
+    attr_accessor :money_requests, :paginated_money_requests
 
     def init
       self.money_requests = params[:money_requests]
+      per_page = params[:per_page] || 30
+      self.paginated_money_requests = self.money_requests.paginate(page: params[:page], per_page: per_page)
     end
+
   end
 
 

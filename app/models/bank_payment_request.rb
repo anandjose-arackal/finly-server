@@ -19,6 +19,7 @@
 #  require_approval             :boolean
 #  is_deleted                   :boolean
 #  beneficiary_type_id          :integer
+#  policy_id                    :integer
 #
 
 class BankPaymentRequest < ActiveRecord::Base

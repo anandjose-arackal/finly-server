@@ -16,7 +16,7 @@
 #     }
 # }
 class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest::Processing::Base
-  attr_accessor :processor_params, :report_processor_group, :scheduled
+  attr_accessor :processor_params, :report_processor_group, :scheduled, :payment_request
 
   def authorized_user_types
     [:admin, :finance_manager]
@@ -31,14 +31,20 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
       add_message :error, 'Invalid Payment Type'
       return
     end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
   end
 
   def init
+    role_id = admin_view? ? UserRole.id_for(:admin) : UserRole.id_for(:finance_manager)
     self.report_processor_group = current_company.report_processor_groups.new({
                                                                                   created_by_user: user,
+                                                                                  created_by_user_role_id: role_id,
                                                                                   scheduled_at: params[:scheduled_at],
                                                                                   payment_type: params[:payment_type],
-                                                                                  payment_mode: params[:payment_mode]
+                                                                                  payment_mode: params[:payment_mode],
                                                                               })
     if params[:scheduled_at].present? and Date.parse(params[:scheduled_at]) > Date.today
       self.report_processor_group.status_id = ReportProcessorGroupStatus.id_for(:scheduled)
@@ -49,6 +55,7 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
     end
     set_source_account
     set_receiving_accounts
+    set_payment_request
   end
 
   def validate
@@ -56,27 +63,26 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
       add_message :error, self.report_processor_group.errors.full_messages
       return
     end
-    validate_balance
+    if self.report_processor_group.payment_order.present?
+
+      validator = AccountManager::Payments::PaymentValidator.(self.report_processor_group.payment_order)
+      unless validator.success?
+        add_message :error, validator.messages[:error]
+        return
+      end
+    end
   end
 
   def process
     self.report_processor_group.save
-  end
-
-  def post_process
-    unless scheduled
-      params[:report_processor_group_id] = self.report_processor_group.id
-      Settlement::SMoneyRequest::Processing::Process.(user, params)
+    if self.report_processor_group.process_via_finly?
+      AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
     end
   end
 
   protected
 
   def set_source_account
-    unless ['company_credits', 'finly_money'].include?(params[:source_account_type])
-      add_message :error, 'Invalid Source Account Type'
-      return
-    end
     case params&.dig(:payment_type)
       when 'bank_transfer'
         case params[:source_account_type]
@@ -84,6 +90,9 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
             self.report_processor_group.source_account = current_company.yes_bank_company_account
           when 'finly_money'
             self.report_processor_group.source_account = user.bank_wallet
+          else
+            add_message :error, 'Invalid Source Account Type'
+            return
         end
       when 'reimbursement_card'
         case params[:source_account_type]
@@ -91,6 +100,15 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
             self.report_processor_group.source_account = current_company.itz_cash_company_account
           when 'finly_money'
             self.report_processor_group.source_account = user.user_wallet
+          else
+            add_message :error, 'Invalid Source Account Type'
+            return
+        end
+      when 'payment_file'
+        result = PaymentFiles::IsConfigured.(user, params)
+        unless result.success?
+          add_message :error, result.messages[:error]
+          return
         end
       when 'outside_finly'
         # Nothing to do here as receiving account is nil
@@ -130,7 +148,7 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
       processor_accountable = nil
 
       case params&.dig(:payment_type)
-        when 'bank_transfer'
+        when 'bank_transfer', 'payment_file'
           unless processor_accountable_type == BankAccount.name
             add_message :error, 'Funds can only be transferred to Bank Account in this mode'
             return
@@ -185,20 +203,28 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
                                                          value: config&.dig(:amount, :value),
                                                          currency_id: config&.dig(:amount, :currency_id)
                                                      },
-                                                     status_id: mapping_status
+                                                     status_id: mapping_status,
+                                                     note: config[:note]
                                                  })
     end
-
     self.report_processor_group.total_amount = Amount.new(value: total, currency_id: currency_id)
   end
 
-  def validate_balance
-    total_amount = self.report_processor_group.total_amount.value
-    unless total_amount.present? and total_amount > 0
-      add_message :error, 'Error loading configuration'
-      return
+  def set_payment_request
+    return unless self.report_processor_group.process_via_finly?
+    receiving_account_class = params&.dig(:payment_type) == 'bank_transfer' ? BankAccount.name : Card.name
+    post_operation = 'Settlement::SMoneyRequest::Processing::PostOperation'
+    post_operation_payload = {}
+    self.payment_request = ::PaymentRequest.(user, self.report_processor_group.source_account,
+        receiving_account_class, :credit, :reimbursement,
+        background: true, scheduled_at: self.report_processor_group.scheduled_at)
+    self.payment_request.add_post_operation_action(post_operation, post_operation_payload)
+    self.report_processor_group.payment_order = self.payment_request.build_payment_order
+    self.report_processor_group.mappings.each do |mapping|
+      payment_item = PaymentRequest::PaymentItem.(mapping.user, mapping.processor_accountable, mapping.amount.value, note: mapping.note)
+      self.payment_request.add_payment_item(payment_item)
+      mapping.payment = payment_item.payment
     end
-
   end
 
 end

@@ -32,11 +32,6 @@
 #  report_processor_group_mapping_id  :integer
 #
 
-
-
-
-
-
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
