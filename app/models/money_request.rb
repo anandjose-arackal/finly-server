@@ -24,7 +24,9 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #  submitted_amount_id          :integer
 #  processed_amount_id          :integer
+#  auto_approve                 :boolean
 #
+
 
 
 
@@ -169,7 +171,7 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def can_retract?
-    processing?
+    processing? or (approved? and auto_approve)
   end
 
   def can_destroy?
