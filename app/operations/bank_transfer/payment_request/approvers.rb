@@ -50,10 +50,9 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
     self.reviewer_role = UserRole.id_for(:employee)
     # first generate the owner's entry in the approvers hash
     self.approvers << {
-        approved: true, # because the owner has always approved it already
         controlling_user: bank_payment_request.can_submit?,
-        rejected: false,
-        approver: {
+        action_id: nil,
+        action_user: {
             name: bank_payment_request.owner.name,
             email: bank_payment_request.owner.email,
             mobile_number: bank_payment_request.owner.mobile_number
