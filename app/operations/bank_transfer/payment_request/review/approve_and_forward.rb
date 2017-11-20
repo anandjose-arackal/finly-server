@@ -27,7 +27,7 @@ class BankTransfer::PaymentRequest::Review::ApproveAndForward < BankTransfer::Pa
                                                       action_user_role_id: current_user_role,
                                                       modified_user: forwarded_to_user,
                                                       modified_user_role_id: UserRole.id_for(:admin),
-                                                      action_id: BankPaymentRequestTrailAction.id_for(:approved_and_forwarded)
+                                                      action_id: BankPaymentRequestTrailAction.id_for(:approve_and_forward)
     end
     add_message :error, bank_payment_request.errors.full_messages
   end
