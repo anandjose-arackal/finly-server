@@ -52,6 +52,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
     self.approvers << {
         controlling_user: bank_payment_request.can_submit?,
         action_id: nil,
+        owner: true,
         action_user: {
             name: bank_payment_request.owner.name,
             email: bank_payment_request.owner.email,
