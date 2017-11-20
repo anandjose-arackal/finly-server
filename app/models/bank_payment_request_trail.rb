@@ -47,4 +47,8 @@ class BankPaymentRequestTrail < ActiveRecord::Base
   def unapprove_action?
     self.action_id == BankPaymentRequestTrailAction.id_for(:unapprove)
   end
+
+  def reject_action?
+    self.action_id == BankPaymentRequestTrailAction.id_for(:reject)
+  end
 end

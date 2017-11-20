@@ -51,21 +51,50 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
     self.reviewer = bank_payment_request.owner
     self.reviewer_role = UserRole.id_for(:employee)
     # first generate the owner's entry in the approvers hash
-    self.approvers << {
-        approved: true, # because the owner has always approved it already
-        controlling_user: bank_payment_request.can_submit?,
-        approver: {
-            name: bank_payment_request.owner.name,
-            email: bank_payment_request.owner.email,
-            mobile_number: bank_payment_request.owner.mobile_number
-        },
-        role: {
-            id: UserRole.id_for(:employee),
-            name: UserRole.name_for(UserRole.id_for(:employee))
-        },
-    }
-    # associated_users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request)
+    # self.approvers << {
+    #     approved: true, # because the owner has always approved it already
+    #     controlling_user: bank_payment_request.can_submit?,
+    #     rejected: false,
+    #     approver: {
+    #         name: bank_payment_request.owner.name,
+    #         email: bank_payment_request.owner.email,
+    #         mobile_number: bank_payment_request.owner.mobile_number
+    #     },
+    #     role: {
+    #         id: UserRole.id_for(:employee),
+    #         name: UserRole.name_for(UserRole.id_for(:employee))
+    #     },
+    # }
+    # # associated_users = BankTransfer::PaymentRequest::Review::AssociatedUsers.(self.user, bank_payment_request: self.bank_payment_request)
     previous_approvers = bank_payment_request.bank_payment_request_trails.with_action(BankPaymentRequestTrailAction.id_for(:approve)).pluck(:action_user_id)
+
+    # now extract all the users from the track
+    self.bank_payment_request.bank_payment_request_trails.each do |trail|
+      rejected = trail.reject_action?
+      approved = trail.approve_action? || trail.submit_action?
+      self.approvers << {
+          approved: approved,
+          rejected: rejected,
+          action_id: trail.action_id,
+          controlling_user: (trail.action_user_id == bank_payment_request.controlling_user_id),
+          approver: {
+              name: trail.action_user.name,
+              email: trail.action_user.email,
+              mobile_number: trail.action_user.mobile_number,
+          },
+          rejecter: {
+              name: trail.action_user.name,
+              email: trail.action_user.email,
+              mobile_number: trail.action_user.mobile_number,
+          },
+          role: {
+              id: trail.action_user_role_id,
+              name: UserRole.name_for(trail.action_user_role_id)
+          }
+      }
+      self.reviewer = trail.action_user
+      self.reviewer_role = trail.action_user_role_id
+    end
 
     op = User::Team::Review::NextReviewer.(bank_payment_request, controlling_user: self.reviewer, controlling_user_role_id: self.reviewer_role)
     self.reviewer = op.user
@@ -82,6 +111,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
       self.approvers << {
           approved: approved,
           controlling_user: (self.reviewer.id == bank_payment_request.controlling_user_id),
+          rejected: false,
           approver: {
               name: self.reviewer.name,
               email: self.reviewer.email,
