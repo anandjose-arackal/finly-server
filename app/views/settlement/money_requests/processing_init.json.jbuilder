@@ -9,7 +9,7 @@ json.details do
       json.email user.email
       json.mobile_number user.mobile_number
     end
-    json.total detail[:total]
+    json.requests_total detail[:total]
     money_requests = detail[:money_requests]
     json.money_requests_count money_requests.size
     json.money_requests do

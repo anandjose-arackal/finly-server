@@ -1,5 +1,5 @@
 class Settlement::SMoneyRequest::Processing::Index < Settlement::SMoneyRequest::Processing::Base
-  attr_accessor :report_processor_groups
+  attr_accessor :money_request_processors
 
   def pre_validate
     if user.blank?
@@ -9,24 +9,24 @@ class Settlement::SMoneyRequest::Processing::Index < Settlement::SMoneyRequest::
   end
 
   def init
-    self.report_processor_groups = current_company.report_processor_groups.not_completed
+    self.money_request_processors = current_company.money_request_processors.not_completed
     if finance_view?
-      self.report_processor_groups = self.report_processor_groups.created_by_user(user.id)
+      self.money_request_processors = self.money_request_processors.created_by_user(user.id)
     end
   end
 
   def success
-    params[:report_processor_groups] = self.report_processor_groups
+    params[:money_request_processors] = self.money_request_processors
     Settlement::SMoneyRequest::Processing::Index::SuccessPresenter.new(user, params, messages)
   end
 
   class Settlement::SMoneyRequest::Processing::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :report_processor_groups, :paginated_report_processor_groups
+    attr_accessor :money_request_processors, :paginated_money_request_processors
 
     def init
-      self.report_processor_groups = params[:report_processor_groups]
+      self.money_request_processors = params[:money_request_processors]
       per_page = params[:per_page] || 30
-      self.paginated_report_processor_groups = self.report_processor_groups&.include_for_show.paginate(page: params[:page], per_page: per_page)
+      self.paginated_money_request_processors = self.money_request_processors&.include_for_show.paginate(page: params[:page], per_page: per_page)
     end
 
     def actions_for(processor_group)

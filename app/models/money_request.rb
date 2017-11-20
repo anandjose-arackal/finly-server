@@ -2,29 +2,31 @@
 #
 # Table name: money_requests
 #
-#  id                           :integer          not null, primary key
-#  name                         :string(255)
-#  user_id                      :integer          not null
-#  policy_id                    :integer          not null
-#  payment_mode_id              :integer          not null
-#  payment_id                   :integer
-#  required_by_date             :date
-#  status_id                    :integer          not null
-#  controlling_user_id          :integer
-#  controlling_user_role_id     :integer
-#  controlling_for_user_id      :integer
-#  controlling_for_user_role_id :integer
-#  loaded_by                    :integer
-#  loaded_at                    :datetime
-#  submitted_at                 :datetime
-#  memo                         :string(255)
-#  accounted                    :boolean          default(FALSE), not null
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
-#  is_deleted                   :boolean          default(FALSE), not null
-#  submitted_amount_id          :integer
-#  processed_amount_id          :integer
+#  id                                 :integer          not null, primary key
+#  name                               :string(255)
+#  user_id                            :integer          not null
+#  policy_id                          :integer          not null
+#  payment_mode_id                    :integer          not null
+#  payment_id                         :integer
+#  required_by_date                   :date
+#  status_id                          :integer          not null
+#  controlling_user_id                :integer
+#  controlling_user_role_id           :integer
+#  controlling_for_user_id            :integer
+#  controlling_for_user_role_id       :integer
+#  loaded_by                          :integer
+#  loaded_at                          :datetime
+#  submitted_at                       :datetime
+#  memo                               :string(255)
+#  accounted                          :boolean          default(FALSE), not null
+#  created_at                         :datetime         not null
+#  updated_at                         :datetime         not null
+#  is_deleted                         :boolean          default(FALSE), not null
+#  submitted_amount_id                :integer
+#  processed_amount_id                :integer
+#  money_request_processor_mapping_id :integer
 #
+
 
 
 class MoneyRequest < ActiveRecord::Base
@@ -116,6 +118,7 @@ class MoneyRequest < ActiveRecord::Base
   scope :settlement_viewable, -> { where status_id: [MoneyRequestStatus.id_for(:approved), MoneyRequestStatus.id_for(:credited)] }
   scope :sort_for_personal, -> { joins(:status).reorder('money_request_statuses.order ASC, money_requests.submitted_at DESC, money_requests.created_at DESC')}
   scope :not_settled, -> { where money_request_processor_mapping_id: nil }
+  scope :with_processor_mapping, -> (id) { where money_request_processor_mapping_id: id }
 
   accepts_nested_attributes_for :custom_fields
 

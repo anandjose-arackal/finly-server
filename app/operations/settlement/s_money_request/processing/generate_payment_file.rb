@@ -1,5 +1,5 @@
 class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::SMoneyRequest::Processing::Base
-  attr_accessor :report_processor_groups, :group_mappings
+  attr_accessor :money_request_processors, :group_mappings
 
   def authorized_user_types
     [:company_admin, :finance_manager]
@@ -10,7 +10,7 @@ class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::S
       add_message :error, 'User not found'
       return
     end
-    if params&.dig(:report_processor_group_id).blank? and params&.dig(:id).blank?
+    if params&.dig(:money_request_processor_id).blank? and params&.dig(:id).blank?
       add_message :error, 'Order not found'
       return
     end
@@ -22,11 +22,11 @@ class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::S
       add_message :error, groups_presenter.messages[:error]
       return
     end
-    id = (params[:report_processor_group_id] or params[:id])
-    self.report_processor_groups = groups_presenter.report_processor_groups.with_id(id)
-    if self.report_processor_groups.present?
-      ids = self.report_processor_groups.pluck(:id)
-      self.group_mappings = ReportProcessorGroupMapping.with_processor_group_id(ids)
+    id = (params[:money_request_processor_id] or params[:id])
+    self.money_request_processors = groups_presenter.money_request_processors.with_id(id)
+    if self.money_request_processors.present?
+      ids = self.money_request_processors.pluck(:id)
+      self.group_mappings = MoneyRequestProcessorMapping.with_processor_group_id(ids)
     end
   end
 
@@ -35,7 +35,7 @@ class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::S
       add_message :error, 'Batch not found'
       return
     end
-    unless (self.report_processor_groups.pluck_status_id - ReportProcessorGroupStatus.ids_for([:pending, :scheduled, :processing, :partially_completed])).blank?
+    unless (self.money_request_processors.pluck_status_id - MoneyRequestProcessorStatus.ids_for([:pending, :scheduled, :processing, :partially_completed])).blank?
       add_message :error, 'Payment file cannot be generated for the selected batches'
       return
     end
