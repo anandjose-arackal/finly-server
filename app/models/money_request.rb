@@ -78,6 +78,10 @@ class MoneyRequest < ActiveRecord::Base
   scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
   scope :with_controlling_user_id, -> (user_id) { where controlling_user_id: user_id }
   scope :with_items, -> { joins(:items) }
+  scope :include_user_accounts, -> { includes user: [:bank_accounts, :expense_cards] }
+  scope :group_user_id, -> { group :user_id }
+  scope :group_user, -> { group :user }
+  scope :sum_total, -> { joins(items: :amount).sum(:value) }
 
   scope :awaiting_approval_of_user, ->(user_id, role_id){ where(status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
 
