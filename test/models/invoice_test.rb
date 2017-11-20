@@ -29,6 +29,12 @@
 #  tax                :decimal(64, 12)
 #  category_id        :integer
 #  original_amount_id :integer
+#  advance_amount_id  :integer
+#  advance_type_id    :integer
+#  advance            :decimal(20, 10)
+#  freight_amount_id  :integer
+#  freight_type_id    :integer
+#  freight            :decimal(20, 10)
 #
 
 require 'test_helper'

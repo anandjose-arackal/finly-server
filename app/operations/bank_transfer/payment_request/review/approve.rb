@@ -39,7 +39,7 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
                                    controlling_user_role_id: next_reviewer_role_id
       bank_payment_request.bank_payment_request_trails.create action_user: user,
                                                               action_user_role_id: current_user_role,
-                                                              action_id: BankPaymentRequestTrailAction.id_for(:submit),
+                                                              action_id: BankPaymentRequestTrailAction.id_for(:approve),
                                                               modified_user_id: next_reviewer&.id,
                                                               modified_user_role_id: next_reviewer_role_id
       return true

@@ -29,6 +29,12 @@
 #  tax                :decimal(64, 12)
 #  category_id        :integer
 #  original_amount_id :integer
+#  advance_amount_id  :integer
+#  advance_type_id    :integer
+#  advance            :decimal(20, 10)
+#  freight_amount_id  :integer
+#  freight_type_id    :integer
+#  freight            :decimal(20, 10)
 #
 
 #  gst_type_id: 1 - IGST
@@ -43,6 +49,9 @@ class Invoice < ActiveRecord::Base
   belongs_to :tax_amount, class_name: "Amount"
   belongs_to :discount_amount, class_name: "Amount"
   belongs_to :original_amount, class_name: "Amount"
+  belongs_to :advance_amount, class_name: "Amount"
+  belongs_to :freight_amount, class_name: "Amount"
+  belongs_to :category
 
   belongs_to :payment
 
@@ -50,7 +59,7 @@ class Invoice < ActiveRecord::Base
   has_many :custom_fields, as: :parent, dependent: :destroy
 
   accepts_nested_attributes_for :address
-  accepts_nested_attributes_for :invoice_attachments
+  accepts_nested_attributes_for :invoice_attachments, allow_destroy: true
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :gross_amount
   accepts_nested_attributes_for :net_amount
@@ -58,7 +67,9 @@ class Invoice < ActiveRecord::Base
   accepts_nested_attributes_for :tds_amount
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :original_amount
+  accepts_nested_attributes_for :freight_amount
   accepts_nested_attributes_for :custom_fields
+  accepts_nested_attributes_for :advance_amount
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount
@@ -82,5 +93,12 @@ class Invoice < ActiveRecord::Base
 
   private
 
+  def tax_rate_validation
+
+  end
+
+  def tds_rate_validation
+
+  end
 
 end
