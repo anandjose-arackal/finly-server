@@ -97,12 +97,12 @@ class CustomField < ActiveRecord::Base
       when FieldType.id_for(:multiselect)
         # here self.value should ideally be an object of FieldMultiselectSelection
         if self.value.blank?
-          self.value = FieldMultiselectSelection.new(field_multiselect_selection_items_attributes: []).save
+          self.value = FieldMultiselectSelection.new(field_multiselect_selection_items_attributes: [])
         end
         # now set the individual values that are passed as the new values of the multi select
         self.value.field_multiselect_selection_items.destroy_all # destroy the existing ones and create the new ones, I guess?
         value.each do |val|
-          item = self.value.field_multiselect_selection_items.build(value: val).save
+          item = self.value.field_multiselect_selection_items.build(value: val)
         end
       else
         # do nothing?

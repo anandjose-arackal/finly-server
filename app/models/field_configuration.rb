@@ -32,6 +32,7 @@ class FieldConfiguration < ActiveRecord::Base
   # Applicable for User, Policy, Company
   belongs_to :configurable, polymorphic: true
   has_many :drop_down_items, class_name: 'FieldDropDownItem'
+  has_many :multiselect_items, class_name: "FieldMultiselectItem"
   has_many :custom_fields
   belongs_to :default_value, polymorphic: true
   belongs_to :external_reference, polymorphic: true
@@ -48,6 +49,7 @@ class FieldConfiguration < ActiveRecord::Base
 
   accepts_nested_attributes_for :drop_down_items
   accepts_nested_attributes_for :custom_fields
+  accepts_nested_attributes_for :multiselect_items
 
   scope :with_id, -> (id) { where id: id }
   scope :with_parent_type, ->(type_id) { where field_parent_type_id: type_id }
@@ -149,6 +151,8 @@ class FieldConfiguration < ActiveRecord::Base
     options = []
     if field_type_id == FieldType.id_for(:drop_down)
       options = drop_down_items.exclude_deleted
+    elsif field_type_id == FieldType.id_for(:multiselect)
+      options = multiselect_items
     end
     {
         id: id,
