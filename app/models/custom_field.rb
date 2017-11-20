@@ -94,6 +94,18 @@ class CustomField < ActiveRecord::Base
         self.value.value.value = value
         # value.value is Amount, so setting Amounts currency_id becomes value(CustomField.value).value(FieldAmount.value).currency_id(Amount.currency_id)
         self.value.value.currency_id = 1
+      when FieldType.id_for(:multiselect)
+        # here self.value should ideally be an object of FieldMultiselectSelection
+        if self.value.blank?
+          self.value = FieldMultiselectSelection.new(field_multiselect_selection_items_attributes: []).save
+        end
+        # now set the individual values that are passed as the new values of the multi select
+        self.value.field_multiselect_selection_items.destroy_all # destroy the existing ones and create the new ones, I guess?
+        value.each do |val|
+          item = self.value.field_multiselect_selection_items.build(value: val).save
+        end
+      else
+        # do nothing?
     end
     self.value.save if self.value.present? and save
   end
@@ -118,7 +130,21 @@ class CustomField < ActiveRecord::Base
                          name: field_configuration.field_type.name},
             mandatory: field_configuration.mandatory,
             options: options}
-    json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
+    case self.field_configuration.field_type_id
+      when FieldType.id_for(:multiselect)
+        ids = []
+        names = []
+        self.value.field_multiselect_selection_items.each do |item|
+          ids << item.id
+          names << item.value.name
+        end
+        json["#{field_configuration.field_type.name.to_sym}_field_value"] = {
+            ids: ids,
+            names: names
+        }
+      else
+        json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
+    end
     json
   end
 

@@ -67,7 +67,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
     self.reviewer = op.user
     self.reviewer_role = op.role_id
 
-
+    # checking if the particular payment order can be auto approved
     if self.reviewer.blank?
       self.approvers.first[:auto_approve] = true
       self.approvers.first[:title] = "This payment order will be auto approved as there is no reviewer assigned"

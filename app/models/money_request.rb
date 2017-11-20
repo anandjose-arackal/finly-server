@@ -24,6 +24,7 @@
 #  is_deleted                   :boolean          default(FALSE), not null
 #  submitted_amount_id          :integer
 #  processed_amount_id          :integer
+#  auto_approve                 :boolean
 #
 
 
