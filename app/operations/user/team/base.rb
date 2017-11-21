@@ -72,7 +72,7 @@ class User::Team::Base < BaseOperation
   def load_payment_request
     self.payment_request = params[:payment_request]
     # use the default company policy for retrieving the reviewers
-    self.policy_id = payment_request.owner.company.policies.default.first
+    self.policy_id = self.payment_request.policy_id
     self.currency_id = 1
     self.amount_value = payment_request.requested_amount_value
   end

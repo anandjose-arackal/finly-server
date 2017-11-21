@@ -5,12 +5,12 @@
 class User::Team::Review::NextReviewer < BaseOperation
   attr_accessor :obj, :next_approver, :role_id
 
-  def self.call(obj)
-    self.new(obj).run
+  def self.call(obj, params = {})
+    self.new(obj, params).run
   end
 
-  def initialize(obj)
-    super(nil, nil)
+  def initialize(obj, params = {})
+    super(nil, params)
     self.obj = obj
   end
 
@@ -61,13 +61,13 @@ class User::Team::Review::NextReviewer < BaseOperation
 
   private
   def next_reviewer(sym, obj)
-    user = (obj.controlling_for_user or obj.controlling_user or obj.user)
-    role = (obj.controlling_for_user_role_id or obj.controlling_user_role_id)
+    user = params[:controlling_user] || (obj.controlling_for_user or obj.controlling_user or obj.user)
+    role = params[:controlling_user_role_id] || (obj.controlling_for_user_role_id or obj.controlling_user_role_id)
     role = ::UserRole.id_for(:employee) if role.blank? and obj.controlling_user == obj.user
-    arg_hash={}
+    arg_hash = {}
     arg_hash[sym] = obj
     if role.blank?
-      add_message :error, 'Error loading the report configuration'
+      add_message :error, 'Error loading configuration'
       return
     end
     if obj.user.id == user.id
@@ -89,7 +89,7 @@ class User::Team::Review::NextReviewer < BaseOperation
       end
     end
     arg_hash[:type] = :manager
-    if user.manager? and role == UserRole.id_for(:manager)
+    if (user.manager? || user.vendor_payments_reviewer?) and role == UserRole.id_for(:manager)
       arg_hash[:type] = :approves_to
       manager = User::Team::Approver.(user, arg_hash)
       if manager.nil?
@@ -108,7 +108,7 @@ class User::Team::Review::NextReviewer < BaseOperation
       end
     end
     arg_hash[:type] = :finance_manager
-    if user.finance_manager? and role == UserRole.id_for(:finance_manager)
+    if (user.finance_manager? || user.vendor_payments_creditor?) and role == UserRole.id_for(:finance_manager)
       arg_hash[:type] = :approves_finance_to
       self.response = User::Team::Approver.(user, arg_hash)
       if self.response.present?

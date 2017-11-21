@@ -82,13 +82,27 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
     end
 
-    # if the expense is being marked as fropm cash on hand, check if there is enough cash on hand to facilitate it
+
+    # if the expense is being marked as from cash on hand, check if there is enough cash on hand to facilitate it
     if StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand)) or (updated_expense_params&.dig(:from_cash_on_hand).nil? and expense.from_cash_on_hand)
       coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
-      amount_val = (updated_expense_params&.dig(:amount_attributes,:value)&.to_f || expense.amount&.value)
-      unless coh_adapter.balance >= amount_val
-        add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
-        return
+      amount_val = (updated_expense_params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
+      balance = coh_adapter.balance
+      # if the expense is continuing to be from COH, and only the amount is changing
+      if expense.from_cash_on_hand && StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
+        difference = updated_expense_params&.dig(:amount_attributes, :value)&.to_f - expense.amount_value
+        unless difference <= balance
+          add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
+          return
+        end
+      # i.e. if the expense was not originally from COH, and it's currently being made into one
+      elsif !expense.from_cash_on_hand && StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
+        unless balance >= amount_val
+          add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
+          return
+        end
+      elsif expense.from_cash_on_hand && !StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
+        # nothing to do here ¯\_(ツ)_/¯
       end
     end
 
@@ -111,11 +125,6 @@ class Expense::Manual::Update < Expense::Manual::Base
       add_message :error, set_fields.messages[:error]
       return
     end
-    # valid = CustomField::Validate.(self.expense.manual_expense)
-    # unless valid.success?
-    #   add_message :error, valid.messages[:error]
-    #   return
-    # end
     if expense.update(updated_expense_params)
       if self.destroy_receipts
         expense.receipts.each do |receipt|

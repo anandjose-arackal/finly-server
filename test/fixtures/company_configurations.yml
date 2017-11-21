@@ -15,6 +15,7 @@
 #  other_expense_types         :boolean          default(FALSE)
 #  encrypted_easy_login_params :text(65535)
 #  registered_mobile_number    :string(255)
+#  bank_type                   :string(255)
 #
 
 

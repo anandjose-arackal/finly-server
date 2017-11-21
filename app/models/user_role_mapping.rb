@@ -15,11 +15,12 @@
 
 
 
+
 class UserRoleMapping < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :user_role
-  belongs_to :purpose, class_name: "MappingPurpose"
+  belongs_to :purpose, class_name: "Purpose"
 
   scope :role, ->(role_id) { where user_role_id: role_id }
   scope :admin, -> { where(user_role_id: UserRole.id_for(:admin)) }
@@ -30,8 +31,8 @@ class UserRoleMapping < ActiveRecord::Base
   scope :employee, -> { where(user_role_id: UserRole.id_for(:employee)) }
   scope :without_employee, -> {where.not(user_role_id: UserRole.id_for(:employee))}
   scope :only_admin_and_finance, -> {where(user_role_id: [UserRole.id_for(:admin), UserRole.id_for(:finance_manager)])}
-  scope :vendor_payments, -> { where purpose_id: MappingPurpose.id_for(:vendor_payments)}
-  scope :expense_management, -> { where purpose_id: MappingPurpose.id_for(:expense_management)}
+  scope :vendor_payments, -> { where purpose_id: Purpose.id_for(:vendor_payments)}
+  scope :expense_management, -> { where purpose_id: Purpose.id_for(:expense_management)}
   scope :with_purpose, -> (purpose_id) { where purpose_id: purpose_id}
 
   before_destroy do

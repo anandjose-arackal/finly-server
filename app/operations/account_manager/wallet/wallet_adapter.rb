@@ -10,6 +10,7 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
 
   def credit(payment, options)
     super
+
     # Since this function debits ItzCashCompanyAccount, create 2 transactions, one for company account and other for wallet
     company_balance = nil
     company_adapter = nil
@@ -23,15 +24,20 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
       company_balance = company_adapter.balance
     end
 
+    success = false
     opening_balance = balance
+    balance_amount = self.account.balance
+    balance_amount.with_lock do
+      balance_amount.value += payment.amount_value
+      success = balance_amount.save
+    end
+    closing_balance = balance
     # credit a particular wallet with the respective amount
-    unless self.account.add_funds(payment.amount_value)
+    unless success
       self.errors = account.errors.full_messages
-      closing_balance = balance
       store_transaction payment, :credit, :failure, opening_balance, closing_balance, account.user.company_id, error: self.errors
       return false
     end
-    closing_balance = balance
     store_transaction payment, :credit, :success, opening_balance, closing_balance, account.user.company_id
 
     if company_adapter.present?
@@ -43,6 +49,7 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
 
   def debit(payment, options)
     super
+
     # Since this function debits ItzCashCompanyAccount, create 2 transactions, one for company account and other for wallet
     company_balance = nil
     company_adapter = nil
@@ -56,15 +63,20 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
       company_balance = company_adapter.balance
     end
 
+    success = false
     opening_balance = balance
+    balance_amount = self.account.balance
+    balance_amount.with_lock do
+      balance_amount.value -= payment.amount_value
+      success = balance_amount.save
+    end
+    closing_balance = balance
     # debit a particular wallet with the respective amount
-    unless self.account.subtract_funds(payment.amount_value)
+    unless success
       self.errors = account.errors.full_messages
-      closing_balance = balance
       store_transaction payment, :debit, :failure, opening_balance, closing_balance, account.user.company_id, error: self.errors
       return false
     end
-    closing_balance = balance
     store_transaction payment, :debit, :success, opening_balance, closing_balance, account.user.company_id
 
     if company_adapter.present?
@@ -74,7 +86,7 @@ class AccountManager::Wallet::WalletAdapter < AccountManager::BaseAdapter
     true
   end
 
-  def balance
+  def balance(options = {})
     self.account.balance_value
   end
 
