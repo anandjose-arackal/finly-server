@@ -37,7 +37,11 @@ class Settlement::SReport::Processing::MarkAsPaid < Settlement::SReport::Process
   end
 
   def process
-    Settlement::SReport::Processing::PostOperation.(self.report_group_processor, {marked_as_completed: true}, true)
+    result = Settlement::SReport::Processing::PostOperation.(self.report_group_processor, {marked_as_completed: true}, true)
+    unless result.success?
+      add_message :error, result.messages[:error]
+      return
+    end
   end
 
 end
