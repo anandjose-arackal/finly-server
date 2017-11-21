@@ -158,6 +158,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       self.payment_order_valid = false unless self.valid
 
+      debugger
 
       self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
                                gst_type_id: gst_type_id, tax_type_id: tax_type_id, tax: tax, tds_type_id: tds_type_id, tds: tds,
@@ -194,9 +195,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.scheduled_at = params[:scheduled_at]
       self.description = params[:description]
       self.policy_id = params[:policy_id]
-      self.custom_fields_config = {
-          invoice: user.company.field_configurations.exclude_deleted.with_parent_type(FieldParentType.id_for(:invoice))
-      }
     end
 
     def scheduled_at_formatted

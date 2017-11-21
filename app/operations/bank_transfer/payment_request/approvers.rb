@@ -48,7 +48,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
     # run a loop till the next_reviewer is the current user
     self.reviewer = bank_payment_request.owner
     self.reviewer_role = UserRole.id_for(:employee)
-    # first generate the owner's entry in the approvers hash
+    # first generate the owner's entry in the approvers hash - submitted entry
     self.approvers << {
         controlling_user: bank_payment_request.can_submit?,
         action_id: nil,
@@ -63,12 +63,12 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
             name: UserRole.name_for(UserRole.id_for(:employee))
         },
     }
+
     op = User::Team::Review::NextReviewer.(bank_payment_request, controlling_user: self.reviewer, controlling_user_role_id: self.reviewer_role)
-    self.reviewer = op.user
-    self.reviewer_role = op.role_id
+    first_reviewer = op.user
 
     # checking if the particular payment order can be auto approved
-    if self.reviewer.blank?
+    if first_reviewer.blank?
       self.approvers.first[:auto_approve] = true
       self.approvers.first[:title] = "This payment order will be auto approved as there is no reviewer assigned"
     else

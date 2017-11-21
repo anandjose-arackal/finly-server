@@ -136,7 +136,7 @@ class CustomField < ActiveRecord::Base
       when FieldType.id_for(:multiselect)
         ids = []
         names = []
-        self.value.field_multiselect_selection_items.each do |item|
+        self.value&.field_multiselect_selection_items&.each do |item|
           ids << item.id
           names << item.value.name
         end

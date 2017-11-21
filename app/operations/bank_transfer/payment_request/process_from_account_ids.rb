@@ -48,6 +48,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     self.parsed_data = parse_order_information
     params[:payment_order] = self.parsed_data
     self.response_presenter = BankTransfer::PaymentRequest::Process.(user, params)
+    debugger
     unless self.response_presenter&.success?
       add_message :error, (self.response_presenter&.messages[:error] || "Unknown failure")
     end
