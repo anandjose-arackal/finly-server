@@ -123,6 +123,8 @@ class CustomField < ActiveRecord::Base
     options = []
     if field_configuration.field_type_id == FieldType.id_for(:drop_down)
       options = field_configuration.drop_down_items
+    elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)
+      options = field_configuration.multiselect_items
     end
     json = {id: field_configuration.id,
             label: field_configuration.field_name,
