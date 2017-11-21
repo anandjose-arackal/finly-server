@@ -25,7 +25,7 @@ class CustomField < ActiveRecord::Base
 
   validates :field_configuration_id, presence: true
   validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice']}
-  validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText']}
+  validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiselectSelection']}
 
   scope :with_field_configuration_ids, ->(ids) { where field_configuration_id: ids }
   scope :includes_parent, -> { includes :parent }
@@ -102,7 +102,7 @@ class CustomField < ActiveRecord::Base
         # now set the individual values that are passed as the new values of the multi select
         self.value.field_multiselect_selection_items.destroy_all # destroy the existing ones and create the new ones, I guess?
         value.each do |val|
-          item = self.value.field_multiselect_selection_items.build(value: val)
+          item = self.value.field_multiselect_selection_items.build(value_id: val)
         end
       else
         # do nothing?
@@ -137,7 +137,7 @@ class CustomField < ActiveRecord::Base
         ids = []
         names = []
         self.value&.field_multiselect_selection_items&.each do |item|
-          ids << item.id
+          ids << item.value_id
           names << item.value.name
         end
         json["#{field_configuration.field_type.name.to_sym}_field_value"] = {

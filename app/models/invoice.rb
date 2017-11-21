@@ -140,6 +140,6 @@ class Invoice < ActiveRecord::Base
   end
 
   private
-  
+
 
 end

@@ -44,7 +44,7 @@ class FieldConfiguration < ActiveRecord::Base
   validates :field_parent_type_id, presence: true
   validates :configurable_id, presence: true
   validates :configurable_type, presence: true, :inclusion => {:in => ['Policy', 'Company']} #, 'User']}
-  validates :default_value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText']}
+  validates :default_value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiSelectSelection']}
   validate :validate_config
 
   accepts_nested_attributes_for :drop_down_items
@@ -67,6 +67,10 @@ class FieldConfiguration < ActiveRecord::Base
       when FieldType.id_for(:drop_down)
         if drop_down_items.blank?
           self.errors.add(:drop_down, 'cannot be empty')
+        end
+      when FieldType.id_for(:multiselect)
+        if multiselect_items.blank?
+          self.errors.add(:multiselect, 'items cannot be empty')
         end
     end
     if default_value.present? and not default_value.valid?
