@@ -76,7 +76,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
       self.approvers.first[:timestamp] = bank_payment_request.submitted_at
     end
 
-    # now extract all the users from the track
+    # now extract all the users from the track, EXCEPT the controlling_user and his/her role
     self.bank_payment_request.bank_payment_request_trails.trails_for_approval_chain.each do |trail|
       self.approvers << {
           action_id: trail.action_id,

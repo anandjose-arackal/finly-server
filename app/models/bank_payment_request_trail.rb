@@ -27,7 +27,7 @@ class BankPaymentRequestTrail < ActiveRecord::Base
   scope :involving_user, -> (user_id) { where('modified_user_id = ? OR action_user_id = ?', user_id, user_id) }
   scope :created_before, -> (created_before) {where 'created_at < ?', created_before}
   scope :with_action, -> (action_id) { where action_id: action_id}
-  scope :trails_for_approval_chain, -> {
+  scope :trails_for_approval_chain, -> (bank_payment_request_id) {
     # this scope should essentially just return the approvers and the take control / approve and forward actions
     # first find the latest submit action trail
     latest_submit_trail = self.where(action_id: BankPaymentRequestTrailAction.ids_for([:submit])).reorder(created_at: :desc).first&.id
@@ -37,7 +37,9 @@ class BankPaymentRequestTrail < ActiveRecord::Base
     else
       ids = []
     end
-    where(id: ids)
+    bpr = BankPaymentRequest.find_by(id: bank_payment_request_id)
+    controlling_user_action_ids = where(action_user_id: bpr.controlling_user_id, action_user_role_id: bpr.controlling_user_role_id)
+    where(id: ids).where.not(id: controlling_user_action_ids)
   }
 
   default_scope { order('created_at ASC') }

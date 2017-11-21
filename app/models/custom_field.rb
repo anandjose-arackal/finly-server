@@ -116,6 +116,8 @@ class CustomField < ActiveRecord::Base
         return self.value&.value
       when FieldType.id_for(:drop_down)
         return self.value&.value&.name
+      else
+        # do nothing?
     end
   end
 
