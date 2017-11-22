@@ -31,6 +31,7 @@ json.array! @result.paginated_report_processor_groups do |group|
           json.total_amount do
             json.partial! 'shared/amount', amount: Amount.new(value: report.total_amount, currency: currency)
           end
+
         end
       end
       json.system_messages do

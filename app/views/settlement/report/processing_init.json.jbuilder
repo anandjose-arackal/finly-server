@@ -17,8 +17,9 @@ json.details do
     json.reports_count reports.size
     json.reports do
       json.array! reports do |report|
-        json.id report.id
-        json.name report.name
+        json.extract! report, :id, :name, :policy, :date_as_string
+        json.submitted_on DateUtils.date_formatted(report.submitted_at)
+        json.approved_on DateUtils.date_formatted(report.approved_at)
         final_approver = report.final_approver
         json.auto_approved final_approver.blank?
         json.final_approver do
