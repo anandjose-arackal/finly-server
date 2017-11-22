@@ -11,8 +11,11 @@ json.array! @result.paginated_report_processor_groups do |group|
   json.payment_type group.payment_type
   json.payment_mode group.payment_mode
   json.actions @result.actions_for(group)
+  user_count = 0
+  report_count = 0
   json.items do
     json.array! group.mappings do |item|
+      user_count += 1
       json.user item.user
       json.amount item.amount
       json.completed_at DateUtils.date_formatted item.completed_at
@@ -21,6 +24,7 @@ json.array! @result.paginated_report_processor_groups do |group|
       json.reports do
         json.array! item.reports do |report|
 
+          report_count += 1
           json.extract! report, :id, :name, :policy, :date_as_string
           json.submitted_on DateUtils.date_formatted(report.submitted_at)
           json.approved_on DateUtils.date_formatted(report.approved_at)
@@ -40,5 +44,7 @@ json.array! @result.paginated_report_processor_groups do |group|
       end
     end
   end
+  json.user_count user_count
+  json.report_count report_count
 
 end
