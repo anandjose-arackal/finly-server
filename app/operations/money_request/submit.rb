@@ -75,7 +75,7 @@ class MoneyRequest::Submit < MoneyRequest::Base
       if money_request.submitted_amount
         submitted_amount_attributes[:id] = money_request.submitted_amount_id
       end
-      money_request.update(submitted_amount_attributes)
+      money_request.update(submitted_amount_attributes: submitted_amount_attributes)
       money_request.reload
       return
     end
