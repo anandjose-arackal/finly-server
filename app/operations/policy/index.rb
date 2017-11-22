@@ -16,16 +16,28 @@ class Policy::Index < Policy::Base
   def process
     if admin_view? || auditor_view?
       if user.company_admin? || user.auditor?
-        ids = user&.company.policies.default.pluck(:id)
+        if user&.enforce_policy_enabled?
+          ids = []
+        else
+          ids = user&.policies.default.pluck(:id)
+        end
         ids += user&.company.policies.with_application(current_app).pluck(:id)
         self.policies = Policy.with_id(ids)
       else
-        ids = user&.company.policies.default.pluck(:id)
+        if user&.enforce_policy_enabled?
+          ids = []
+        else
+          ids = user&.policies.default.pluck(:id)
+        end
         ids += user&.admin_policies.with_application(current_app).pluck(:id)
         self.policies = Policy.with_id(ids)
       end
     else
-      ids = user&.policies.default.pluck(:id)
+      if user&.enforce_policy_enabled?
+        ids = []
+      else
+        ids = user&.policies.default.pluck(:id)
+      end
       ids += user&.policies.with_application(current_app).pluck(:id)
       self.policies = Policy.with_id(ids)
     end

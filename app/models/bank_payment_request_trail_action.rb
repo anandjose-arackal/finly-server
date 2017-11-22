@@ -13,6 +13,6 @@ class BankPaymentRequestTrailAction < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:submit, :approve, :unapprove, :retract, :reject, :credit]
+    [:submit, :approve, :unapprove, :retract, :reject, :credit, :take_control, :approve_and_forward]
   end
 end
