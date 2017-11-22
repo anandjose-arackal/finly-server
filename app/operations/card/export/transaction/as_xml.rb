@@ -17,7 +17,7 @@ class Card::Export::Transaction::AsXml < Card::Export::Transaction::Base
     
     case view
     when 'manager', 'finance_manager'
-      user_ids = User::Team::Index.(f, view: view).pluck(:id)
+      user_ids = User::Team::Index.(user, view: view).pluck(:id)
     when 'admin'
       user_ids = user.company.users.pluck(:id)
     end
