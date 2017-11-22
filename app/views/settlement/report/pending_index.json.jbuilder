@@ -1,6 +1,8 @@
 json.array! @result.paginated_reports do |report|
 
-  json.extract! report, :id, :name
+  json.extract! report, :id, :name, :policy, :date_as_string
+  json.submitted_on DateUtils.date_formatted(report.submitted_at)
+  json.approved_on DateUtils.date_formatted(report.approved_at)
   json.user report.user
   json.final_approver report.final_approver
   currency = Currency.first
