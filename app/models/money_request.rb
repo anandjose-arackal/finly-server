@@ -36,6 +36,7 @@
 
 
 
+
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 
@@ -170,7 +171,7 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def can_retract?
-    processing?
+    processing? or (approved? and auto_approve)
   end
 
   def can_destroy?
