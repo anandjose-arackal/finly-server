@@ -20,12 +20,24 @@ class FieldType < ActiveRecord::Base
     TYPES.key(id)
   end
 
+  def self.seed_data
+    TYPES.each do |name, id|
+      unless FieldType.find_by(name: name.to_s)
+        FieldType.create(id: id, name: name)
+      end
+    end
+  end
+
   def drop_down?
     self.id == FieldType.id_for(:drop_down)
   end
 
   def text?
     self.id == FieldType.id_for(:text)
+  end
+
+  def multiselect?
+    self.id == FieldType.id_for(:multiselect)
   end
 
   def as_json(options={})
