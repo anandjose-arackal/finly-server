@@ -2,8 +2,9 @@ json.array! @result.paginated_report_processor_groups do |group|
   json.id group.id
   json.created_by_user group.created_by_user
   json.status group.status
-  json.scheduled_at group.scheduled_at
-  json.completed_at group.completed_at
+  json.created_on DateUtils.date_formatted group.created_at
+  json.scheduled_on DateUtils.date_formatted group.scheduled_at
+  json.completed_on DateUtils.date_formatted group.completed_at
   json.total_amount group.total_amount
   json.processed_amount group.processed_amount
   json.source_account_type group.source_account_type
@@ -14,7 +15,7 @@ json.array! @result.paginated_report_processor_groups do |group|
     json.array! group.mappings do |item|
       json.user item.user
       json.amount item.amount
-      json.completed_at item.completed_at
+      json.completed_at DateUtils.date_formatted item.completed_at
       json.status item.status
       json.payment item.payment
       json.reports do
