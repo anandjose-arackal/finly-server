@@ -16,7 +16,7 @@ class Policy::Index < Policy::Base
   def process
     if admin_view? || auditor_view?
       if user.company_admin? || user.auditor?
-        if user.enforce_policy_enabled?
+        if user&.enforce_policy_enabled?
           ids = []
         else
           ids = user&.policies.default.pluck(:id)
@@ -24,7 +24,7 @@ class Policy::Index < Policy::Base
         ids += user&.company.policies.with_application(current_app).pluck(:id)
         self.policies = Policy.with_id(ids)
       else
-        if user.enforce_policy_enabled?
+        if user&.enforce_policy_enabled?
           ids = []
         else
           ids = user&.policies.default.pluck(:id)
@@ -33,7 +33,7 @@ class Policy::Index < Policy::Base
         self.policies = Policy.with_id(ids)
       end
     else
-      if user.enforce_policy_enabled?
+      if user&.enforce_policy_enabled?
         ids = []
       else
         ids = user&.policies.default.pluck(:id)
