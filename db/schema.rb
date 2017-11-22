@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171117174450) do
+ActiveRecord::Schema.define(version: 20171120125325) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2089,6 +2089,7 @@ ActiveRecord::Schema.define(version: 20171117174450) do
     t.boolean  "is_deleted",                                             default: false, null: false
     t.integer  "submitted_amount_id",          limit: 4
     t.integer  "processed_amount_id",          limit: 4
+    t.boolean  "auto_approve"
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
