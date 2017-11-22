@@ -124,7 +124,7 @@ class Admin::Users::Import < Admin::Base
   private
 
   def create_response_csv
-    file_name = "#{Rails.root}/public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    file_name = "common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
     CSV.open(file_name, 'wb') do |csv|
       self.header << 'Result'
       csv << header
