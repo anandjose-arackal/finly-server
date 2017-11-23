@@ -141,7 +141,7 @@ class User::Balances::Show < User::Base
     }
     self.cash_on_hand_info = {
         itz_cash: {
-            balance: cash_on_hand_adapter.balance
+            balance: cash_on_hand_adapter.balance(display_balance: true)
         }
     }
   end

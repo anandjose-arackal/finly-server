@@ -37,6 +37,7 @@ class Settlement::Report::Unapproved < Report::Base
     report.card_expenses_total.update(value: 0) if report.card_expenses_total.present?
     unless report.update_attributes(accounted: false)
       messages[:error] = report.errors.full_messages
+      return
     end
 
     ######## Cash on Hand Addition ###############

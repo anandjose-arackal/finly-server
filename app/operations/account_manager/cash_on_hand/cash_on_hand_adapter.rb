@@ -46,8 +46,12 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
 
   def balance(options = {})
     balance = self.account.balance_value
-    expenses_against_coh_total = self.account.user.expenses.unverified.spent_from_cash_on_hand.joins_amount.sum(:value)
-    (balance - expenses_against_coh_total)
+    if options[:display_balance]
+      expenses_against_coh_total = self.account.user.expenses.unverified.spent_from_cash_on_hand.joins_amount.sum(:value)
+      (balance - expenses_against_coh_total)
+    else
+      balance
+    end
   end
 
   def database_balance
