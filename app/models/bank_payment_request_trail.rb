@@ -40,10 +40,10 @@ class BankPaymentRequestTrail < ActiveRecord::Base
     else
       ids = []
     end
-    # bpr = BankPaymentRequest.find_by(id: bank_payment_request_id)
-    # controlling_user_action_ids = where(action_user_id: bpr.controlling_user_id, action_user_role_id: bpr.controlling_user_role_id)
-    # where(id: ids).where.not(id: controlling_user_action_ids)
     where(id: ids)
+  }
+  scope :with_action_user_and_role, -> (user_id, role_id, action_id) {
+    where(action_user_id: user_id, action_user_role_id: role_id, action_id: action_id)
   }
 
   default_scope { order('created_at ASC') }
