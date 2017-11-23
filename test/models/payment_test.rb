@@ -25,6 +25,8 @@
 #  application             :string(255)
 #  payment_mode            :string(255)
 #  reference_id            :string(255)      not null
+#  post_operation          :text(65535)
+#  post_operation_payload  :text(65535)
 #
 
 

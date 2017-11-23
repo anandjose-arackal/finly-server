@@ -29,6 +29,7 @@
 #  card_expenses_total_id             :integer
 #  non_reimbursable_expenses_total_id :integer
 #  sync_status_id                     :integer
+#  report_processor_group_mapping_id  :integer
 #
 
 
