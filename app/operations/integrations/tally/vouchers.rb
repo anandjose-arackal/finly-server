@@ -1,5 +1,5 @@
 class Integrations::Tally::Vouchers < Integrations::Tally::Base
-  attr_accessor :expenses
+  attr_accessor :expenses, :reports
 
   def pre_validate
     unless user.present?
@@ -18,15 +18,16 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
       add_message :error, reports_presenter.messages[:error]
       return
     end
-    reports = reports_presenter.reports
+    self.reports = reports_presenter.reports
     report_ids = reports.pluck(:id)
     self.expenses = Expense.with_report_id(report_ids)
-  end
-
-  def success
     current_class_path = self.method(:success).source_location.first.gsub('/vouchers.rb', '')
     template = "#{current_class_path}/tally.xml"
-    Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses, company_name: current_company.tally_configuration.company_name}}}, messages)
+    self.response = Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses, company_name: current_company.tally_configuration.company_name}}}, messages)
+  end
+
+  def post_process
+    # self.reports.
   end
 
   # class Personalizer::Adapters::Company2::ExportTemplates2::Tally::Presenter < Exporter
