@@ -34,7 +34,7 @@ class User::AvailableExpenseTypes::Show < User::Base
     self.company = user.company
     self.report = user.reports.find_by(id: params[:report_id])
     self.policy = report.policy if report.present?
-    self.cash_on_hand = AccountManager::CashOnHand::CashOnHandAdapter.new(self.user.cash_on_hand).balance
+    self.cash_on_hand = AccountManager::CashOnHand::CashOnHandAdapter.new(self.user.cash_on_hand).balance(display_balance: true)
   end
 
   def validate
