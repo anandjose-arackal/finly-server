@@ -2311,6 +2311,8 @@ Rails.application.routes.draw do
       patch 'update_payment', to: 'bank_payment_requests#update_payment'
     end
 
+    get 'transfer_timings', to: 'bank_payment_requests#within_timeframe'
+
     get 'account_owners/count', to: 'account_owners#count'
     resources :account_owners
 
