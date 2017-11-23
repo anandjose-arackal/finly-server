@@ -61,7 +61,9 @@ class Expense::Manual::Create < Expense::Manual::Base
     # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
     if ['1', 1].include?(expense_params[:from_cash_on_hand])
       amount = expense_params[:amount_attributes][:value].to_f
-      unless user.cash_on_hand.balance_value > amount
+      cash_on_hand_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      balance = cash_on_hand_adapter.balance
+      unless balance > amount
         add_message :error, "You do not have enough balance in your Cash On Hand to mark this expense against it"
         return
       end
@@ -99,17 +101,6 @@ class Expense::Manual::Create < Expense::Manual::Base
 
     Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: self.expense)
 
-    # # check if the expense is from cash on hand, and deduct the respective amount from the COH respectively
-    # if expense.from_cash_on_hand
-    #   payment_request = PaymentRequest.(user, nil, "CashOnHand", :debit, :balance_clearance_against_cash_on_hand)
-    #   payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, expense.amount_value))
-    #   op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
-    #   if op.success?
-    #     payment = op.payment_order.payments.first
-    #     payment.update(reference_resource: self.expense)
-    #   end
-    # end
-
     # add comment in report if expense is added within report
     if self.expense.report_id.present? and self.expense.report.retracted?
       comment = self.expense.report.comments.build report: self.expense.report, user: user,
@@ -140,6 +131,7 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   protected
+
   def validate_custom_fields
     if self.expense.valid?
       set_fields = set_custom_fields false

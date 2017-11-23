@@ -3,12 +3,22 @@ class CompanyMailer < ApplicationMailer
   helper Admin::CompanyMailHelper
 
   def balance_update(transaction_details)
+    @bank_type_id = transaction_details[:bank_type_id]
     @amount = transaction_details[:amount_attributes][:value] rescue nil
     @reference_id = transaction_details[:reference_id]
     @date = transaction_details[:date]
     @remarks = transaction_details[:remark]
+    @company_name = transaction_details[:company_name]
     @company = transaction_details[:company]
-    mail to: Constants::ITZCASH_EMAIL_ID, subject: "Transaction Details for Company: #{transaction_details[:company]}"
+    case @bank_type_id
+      when CompanyFundsLoadRequestType.id_for(:itzcash)
+        notifier_emails = Constants::ITZCASH_EMAIL_ID
+      when CompanyFundsLoadRequestType.id_for(:yes_bank)
+        notifier_emails = Constants::YESBANK_EMAIL_ID
+      else
+        notifier_emails = Constants::YESBANK_EMAIL_ID
+    end
+    mail to: notifier_emails, subject: "Transaction Details for Company: #{transaction_details[:company_name]}"
   end
 
   # mailer that is sent to ItzCash when all documents have been confirmed as sent from the user

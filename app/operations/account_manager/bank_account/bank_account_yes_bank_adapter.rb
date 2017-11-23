@@ -55,7 +55,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     # nothing to do here ¯\_(ツ)_/¯
   end
 
-  def balance
+  def balance(options = {})
     # doesn't make sense here because it's outside finly
     # nothing to do here ¯\_(ツ)_/¯
   end

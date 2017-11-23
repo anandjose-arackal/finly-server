@@ -30,7 +30,7 @@ class MoneyRequest::Retract < MoneyRequest::Base
   end
 
   def validate
-    unless self.money_request.processing?
+    unless self.money_request.can_retract?
       messages[:error] << 'Card Load Requests can only be retracted when in processing state'
     end
   end
@@ -60,7 +60,7 @@ class MoneyRequest::Retract < MoneyRequest::Base
     money_request.comments.create user: user, comment_action_id: MoneyRequestCommentAction.id_for(:retract)
 
     # destroying the submitted amount field
-    money_request.submitted_amount.destroy
+    money_request.submitted_amount&.destroy
     Event::EMoneyRequest::Retract.(self.user, money_request: self.money_request)
   end
 

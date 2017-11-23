@@ -19,10 +19,10 @@ class Admin::Users::Create < Admin::Users::Base
     # creating a default initiator role for vendor payments, because as of now the admin panel
     # only has ability to create roles for Expense Management
     new_user_params[:role_mapping_attributes].each do |mapping|
-      mapping[:purpose_id] = MappingPurpose.id_for(:expense_management)
+      mapping[:purpose_id] = Purpose.id_for(:expense_management)
     end
     new_user_params[:role_mapping_attributes] << {
-        purpose_id: MappingPurpose.id_for(:vendor_payments),
+        purpose_id: Purpose.id_for(:vendor_payments),
         user_role_id: UserRole.id_for(:initiator)
     }
     new_user_params.permit!

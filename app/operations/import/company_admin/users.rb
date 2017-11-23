@@ -110,19 +110,19 @@ class Import::CompanyAdmin::Users < Import::Base
     end
 
     # creating role mapping attributes
-    role_mapping_attributes = [{user_role_id: UserRole.employee_id, purpose_id: MappingPurpose.id_for(:expense_management)}]
+    role_mapping_attributes = [{user_role_id: UserRole.employee_id, purpose_id: Purpose.id_for(:expense_management)}]
     if row[import_fields[:manager_role]] and row[import_fields[:manager_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.manager_id, purpose_id: MappingPurpose.id_for(:expense_management)}
+      role_mapping_attributes << {user_role_id: UserRole.manager_id, purpose_id: Purpose.id_for(:expense_management)}
     end
     if row[import_fields[:finance_manager_role]] and row[import_fields[:finance_manager_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.finance_manager_id, purpose_id: MappingPurpose.id_for(:expense_management)}
+      role_mapping_attributes << {user_role_id: UserRole.finance_manager_id, purpose_id: Purpose.id_for(:expense_management)}
     end
     if row[import_fields[:admin_role]] and row[import_fields[:admin_role]].downcase == "y"
-      role_mapping_attributes << {user_role_id: UserRole.admin_id, purpose_id: MappingPurpose.id_for(:expense_management)}
+      role_mapping_attributes << {user_role_id: UserRole.admin_id, purpose_id: Purpose.id_for(:expense_management)}
     end
 
     # adding a default initiator role for users in vendor payments
-    role_mapping_attributes << {user_role_id: UserRole.id_for(:initiator), purpose_id: MappingPurpose.id_for(:vendor_payments)}
+    role_mapping_attributes << {user_role_id: UserRole.id_for(:initiator), purpose_id: Purpose.id_for(:vendor_payments)}
 
     manager = finance_manager = approves_to = approves_finance_to = nil
     # creating team mapping attributes
@@ -178,7 +178,7 @@ class Import::CompanyAdmin::Users < Import::Base
                                                approves_to: approves_to,
                                                approves_finance_to: approves_finance_to,
                                                policy_id: company.policies.first.id,
-                                               purpose_id: MappingPurpose.id_for(:expense_management)
+                                               purpose_id: Purpose.id_for(:expense_management)
                                               },
                                               {
                                                default: true,
@@ -187,7 +187,7 @@ class Import::CompanyAdmin::Users < Import::Base
                                                approves_to: nil,
                                                approves_finance_to: nil,
                                                policy_id: company.policies.first.id,
-                                               purpose_id: MappingPurpose.id_for(:vendor_payments)
+                                               purpose_id: Purpose.id_for(:vendor_payments)
                                               }],
                     error_messages: errors
                   }

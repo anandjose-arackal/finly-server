@@ -19,6 +19,7 @@ json.currency_symbol @result.report.base_currency_symbol
 json.currency_country_code @result.report.base_currency_code
 json.synced_with_quickbooks !!@result.report.synced_with_quickbooks?
 json.show_sync_button (@result.report.processed? && is_admin_view)
+json.controlling_user @result.report.controlling_user&.name
 
 policy_id = nil
 policy_name = nil

@@ -34,6 +34,7 @@ class BankPaymentRequest < ActiveRecord::Base
   belongs_to :controlling_user_role, class_name: "UserRole"
   belongs_to :controlling_for_user, class_name: "User"
   belongs_to :controlling_for_user_role, class_name: "UserRole"
+  belongs_to :policy
 
   has_many :comments, class_name: "BankPaymentRequestComment"
   has_many :bank_payment_request_trails
@@ -107,7 +108,7 @@ class BankPaymentRequest < ActiveRecord::Base
   end
 
   def can_retract?
-    processing?
+    processing? || auto_approved?
   end
 
   def can_credit?
@@ -120,6 +121,13 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def credit_pending?
     approved? && !credited?
+  end
+
+  def auto_approved?
+    # extracting the last tracks and checking if it was a submit action combined
+    # with the next action user being blank
+    trail = self.bank_payment_request_trails.last
+    trail.submit_action? && trail.modified_user.blank?
   end
 
   def user
@@ -171,6 +179,10 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def retriable?
     self.payment_order.partially_completed? || self.payment_order.failed?
+  end
+
+  def verified?
+    [BankPaymentRequestStatus.ids_for([:approved, :credited])].include?(self.status_id)
   end
 
   private

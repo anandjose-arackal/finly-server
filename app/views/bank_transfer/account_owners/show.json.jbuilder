@@ -3,7 +3,7 @@ json.account_owner do
   if @result.account_owner.is_a?(YesBankVendor)
     json.authorized @result.account_owner.authorized
     json.description @result.account_owner.description
-    json.editable_details true
+    json.editable_details @result.user.permission.create_beneficiaries
   else
     json.editable_details false
   end
@@ -25,12 +25,18 @@ json.transactions do
     json.reference_id payment.reference_resource&.bank_reference_number
     json.amount payment.amount.value
     json.date payment.date
-    json.bank_payment_request_id payment.payment_order.bank_payment_request&.id
-    json.payment_mode payment.payment_mode.upcase
-    json.account_number payment.receiving_account.account_number
-    json.ifsc payment.receiving_account.ifsc
+    json.bank_payment_request_id payment.payment_order&.bank_payment_request&.id
+    json.payment_mode payment.payment_mode&.upcase
+    json.account_number payment.receiving_account&.account_number
+    json.ifsc payment.receiving_account&.ifsc
     json.initiating_user_name payment.initiating_user&.name
     json.payment_status payment.payment_status_name
   end
 end
-
+if @result.account_owner.is_a?(YesBankVendor)
+  json.attachment do
+    json.url @result.account_owner.vendor_attachments.first&.attached_file&.url
+    json.thumb @result.account_owner.vendor_attachments.first&.attached_file&.url(:thumb)
+    json.file_type @result.account_owner.vendor_attachments.first&.attached_file_content_type
+  end
+end

@@ -23,7 +23,7 @@ class User::Role::Set < BaseOperation
     id = (params[:id] or params[:user_id])
     self.being_updated_user = user.company.users.with_id(id).first rescue nil
     return unless being_updated_user.present?
-    self.purpose_id = MappingPurpose.id_from_application_for(RequestStore.store[:current_app])
+    self.purpose_id = Purpose.id_from_application_for(RequestStore.store[:current_app])
 
     if funds_transfer?
       existing_role_ids = being_updated_user.role_mapping.with_purpose(purpose_id).only_admin_and_finance.map(&:user_role_id)

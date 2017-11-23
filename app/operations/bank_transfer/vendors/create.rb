@@ -2,6 +2,14 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
 
   attr_accessor :vendor_parameters, :vendor
 
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:vendors, :create], :validate, self)
+        }
+    }
+  end
+
   def init
     super()
     self.vendor_parameters = vendor_attributes
@@ -11,7 +19,7 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
     # checking if a particular bank account already exists, if it does, just mark that respective vendor
     # as authorized and add the bank account to their existing list
     self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
-      ba = BankAccount.find_by(account_number: account_params[:account_number])
+      ba = current_company.bank_accounts.find_by(account_number: account_params[:account_number])
       if ba.present?
         self.vendor = ba.account_owner
         # removing this particular bank account from the list of bank accounts being created
@@ -33,6 +41,11 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
       if vendor_parameters[:bank_accounts_attributes]&.first.present?
         vendor_parameters[:bank_accounts_attributes]&.first[:default_account] = '1'
       end
+    end
+
+    # if the receipt is being uploaded, delete the 'remove_file' key
+    if vendor_parameters&.dig(:vendor_attachments_attributes).present?
+      vendor_parameters[:vendor_attachments_attributes].first&.delete(:remove_file)
     end
   end
 
