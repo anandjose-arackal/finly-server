@@ -62,7 +62,7 @@ class Expense::Manual::Create < Expense::Manual::Base
     if ['1', 1].include?(expense_params[:from_cash_on_hand])
       amount = expense_params[:amount_attributes][:value].to_f
       cash_on_hand_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
-      balance = cash_on_hand_adapter.balance
+      balance = cash_on_hand_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
       unless balance > amount
         add_message :error, "You do not have enough balance in your Cash On Hand to mark this expense against it"
         return
