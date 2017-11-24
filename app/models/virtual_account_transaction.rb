@@ -30,5 +30,4 @@ class VirtualAccountTransaction < ActiveRecord::Base
 
   validates :transfer_id, uniqueness: true
 
-
 end

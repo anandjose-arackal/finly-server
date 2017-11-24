@@ -6,8 +6,11 @@ class Invoicing::VirtualBankAccount::Payments::Show < Invoicing::VirtualBankAcco
 
     attr_accessor :payments
 
+    has_scope :filter_date, using: [:from, :to], type: :hash
+
     def init
-      self.payments = [1,2,3,6,5,6,5,6]
+      self.payments = params[:payments]
+      self.payments = apply_scopes(self.payments, params)
     end
   end
 
@@ -18,7 +21,7 @@ class Invoicing::VirtualBankAccount::Payments::Show < Invoicing::VirtualBankAcco
   end
 
   def process
-    self.payments = Payment.with_initiating_account_id(self.virtual_bank_account.id)
+    self.payments = Payment.with_initiating_account(self.virtual_bank_account)
   end
 
   def success

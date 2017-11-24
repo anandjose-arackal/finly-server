@@ -8,14 +8,15 @@
 #  description        :text(65535)
 #  parent_id          :integer
 #  parent_type        :string(255)
+#  company_id         :integer
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  expires_by         :date
 #  purpose_id         :integer
-#  company_id         :integer
 #  active             :boolean          default(TRUE)
 #  is_deleted         :boolean          default(FALSE)
 #  initiating_user_id :integer
+#  name               :string(255)
 #
 
 # parent here will be either the payment receivable, or user, or whatever

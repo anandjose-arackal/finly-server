@@ -1,13 +1,13 @@
 json.transactions do
   json.array!(@result.payments) do |payment|
     json.source_account do
-      json.name "Brijesh Yadav"
-      json.ifsc "IFSC872598345"
-      json.account_number "5612549684621"
+      virtual_trans = payment.reference_resource
+      json.name virtual_trans&.remitter_full_name
+      json.ifsc virtual_trans&.remitter_account_ifsc
+      json.account_number virtual_trans&.remitter_account_no
     end
-
-    json.amount "5468.132"
-    json.note "THis is a note. READ IT!"
-    json.date "27-10-2017"
+    json.amount payment.amount_value
+    json.note payment.note
+    json.date payment.date
   end
 end

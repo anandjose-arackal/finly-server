@@ -33,6 +33,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -111,6 +112,10 @@ class Payment < ActiveRecord::Base
   }
   scope :with_initiating_account_id, -> (ids) {
     where initiating_account_id: ids
+  }
+
+  scope :with_initiating_account, -> (initiating_account) {
+    where initiating_account: initiating_account
   }
 
   # Personal are card transactions from own wallet to own card

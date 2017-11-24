@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171121075947) do
+ActiveRecord::Schema.define(version: 20171124095741) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3395,6 +3395,7 @@ ActiveRecord::Schema.define(version: 20171121075947) do
     t.boolean  "active",                           default: true
     t.boolean  "is_deleted",                       default: false
     t.integer  "initiating_user_id", limit: 4
+    t.string   "name",               limit: 255
   end
 
   create_table "whitelisted_ip_types", force: :cascade do |t|
