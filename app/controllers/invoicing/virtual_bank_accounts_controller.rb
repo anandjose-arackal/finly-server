@@ -12,7 +12,11 @@ class Invoicing::VirtualBankAccountsController < ApplicationController
 
   def update
     @result = Invoicing::VirtualBankAccount::Update.(current_user, params)
-    respond
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def show

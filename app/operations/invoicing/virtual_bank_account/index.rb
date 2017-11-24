@@ -13,7 +13,7 @@ class Invoicing::VirtualBankAccount::Index < Invoicing::VirtualBankAccount::Base
 
 
   def init
-    self.role_id = UserRole::VALUES[params[:view].to_sym]
+    self.role_id = UserRole::VALUES[params[:view]&.to_sym]
     if self.role_id.blank?
       self.role_id = UserRole.id_for(:personal)
     end
@@ -31,7 +31,8 @@ class Invoicing::VirtualBankAccount::Index < Invoicing::VirtualBankAccount::Base
       when UserRole.id_for(:reviewer), UserRole.id_for(:initiator)
         self.virtual_accounts = self.user.virtual_bank_accounts
       else
-        self.virtual_accounts = self.user.virtual_bank_accounts
+        # self.virtual_accounts = self.user.virtual_bank_accounts
+        self.virtual_accounts = self.company.virtual_bank_accounts
     end
   end
 

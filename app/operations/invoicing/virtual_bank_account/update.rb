@@ -21,7 +21,7 @@ class Invoicing::VirtualBankAccount::Update < Invoicing::VirtualBankAccount::Bas
   private
 
   def virtual_bank_account_params
-    params.require(:virtual_bank_account).permit(:expires_by, :description)
+    params.require(:virtual_bank_account).permit(:expires_by, :description, :name)
   end
 
 end

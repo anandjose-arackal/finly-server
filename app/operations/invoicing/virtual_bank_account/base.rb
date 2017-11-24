@@ -15,7 +15,8 @@ class Invoicing::VirtualBankAccount::Base < BaseOperation
 
   def init
     id = params[:id] || params[:virtual_bank_account_id]
-    self.virtual_bank_account = Invoicing::VirtualBankAccount::Index.(user, params).virtual_bank_accounts.find_by(id: id) rescue nil
+    op = Invoicing::VirtualBankAccount::Index.(user, params)
+    self.virtual_bank_account = op.virtual_bank_accounts.find_by(id: id)
   end
 
 end
