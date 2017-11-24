@@ -31,7 +31,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
     report_ids = reports.pluck(:id)
     self.expenses = Expense.with_report_id(report_ids)
     current_class_path = self.method(:success).source_location.first.gsub('/vouchers.rb', '')
-    template = "#{current_class_path}/tally.xml"
+    template = "#{current_class_path}/vouchers.xml"
     self.response = Exporter.new(user, {xml: {template: template, local_variables: {expenses: expenses, company_name: current_company.tally_configuration.company_name}}}, messages)
   end
 
