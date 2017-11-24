@@ -19,4 +19,6 @@ json.array!(@result.paginated_reports) do |report|
   json.date report.created_at.strftime("%d %b")
   json.currency_symbol report.base_currency_symbol
   json.sync_status_id report.sync_status_id
+  json.sync_status report.sync_status
+  json.sync_type report.sync_type
 end

@@ -36,7 +36,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
   end
 
   def post_process
-    # self.reports.
+    self.reports.update_all(sync_status_id: ReportSyncStatus.id_for(:exported), sync_type_id: ReportSyncType.id_for(:tally_export))
   end
 
   def success
