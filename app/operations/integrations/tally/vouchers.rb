@@ -30,6 +30,10 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
     # self.reports.
   end
 
+  def success
+    self.response
+  end
+
   # class Personalizer::Adapters::Company2::ExportTemplates2::Tally::Presenter < Exporter
   #
   #   def render(controller)
