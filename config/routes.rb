@@ -2249,6 +2249,7 @@ Rails.application.routes.draw do
   get 'quickbooks/config', to: 'quickbooks#show', as: :quickbooks_config
 
   namespace :integration do
+    get 'tally/check', to: 'tally#check'
     get 'tally/vouchers', to: 'tally#vouchers'
     post 'tally/configuration', to: 'tally#set_configuration'
   end

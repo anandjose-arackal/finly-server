@@ -13,4 +13,9 @@ class Integration::TallyController < ApplicationController
     respond
   end
 
+  def check
+    @result = Integrations::Tally::ValidateConfiguration.(current_user, params)
+    respond
+  end
+
 end
