@@ -22,7 +22,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
       add_message :error, reports_presenter.messages[:error]
       return
     end
-    self.reports = reports_presenter.reports
+    self.reports = reports_presenter.reports.processed
     unless params[:filtered]
       id = params[:id] || params[:report_id]
       id = id.split(',')
