@@ -19,12 +19,16 @@ class BankTransfer::PaymentRequest::Review::ApproveUnapproveBlock < BankTransfer
   end
 
   def process
-    action_user_ids = self.trails.pluck(:action_user_id).uniq!
+    action_user_ids = self.trails.pluck(:action_user_id).uniq
     id_ranges = []
     action_user_ids.each do |user_id|
       [UserRole.id_for(:manager), UserRole.id_for(:finance), UserRole.id_for(:admin)].each do |role|
         approve_action = self.trails.where.not(id: id_ranges).with_action_user_and_role(user_id, role, approve_id).reorder(created_at: :asc).first
-        unapprove_action = self.trails.where.not(id: id_ranges).with_action_user_and_role(user_id, role, unapprove_id).reorder(created_at: :asc).last
+        if approve_action.blank?
+          unapprove_action = nil
+        else
+          unapprove_action = self.trails.where.not(id: id_ranges).with_action_user_and_role(user_id, role, unapprove_id).reorder(created_at: :asc).last
+        end
         if approve_action.present? && unapprove_action.present?
           id_ranges += (approve_action.id..unapprove_action.id).to_a
         end
