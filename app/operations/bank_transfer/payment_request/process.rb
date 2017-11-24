@@ -1,8 +1,11 @@
 # this extracts the payment data from the parsed excel file and creates the payment
 # request object out of it
 class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
-  attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount,
-                :errors, :payment_order_valid, :scheduled_at, :description
+  attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :policy_id,
+                :errors, :payment_order_valid, :scheduled_at, :description, :valid, :error_messages
+
+  # the object that will hold the details of the custom fields because the object hasn't been created
+  attr_accessor :ghost_invoice
 
   def pre_validate
     super
@@ -26,6 +29,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     self.processed_order = []
     self.scheduled_at = Date.parse params[:scheduled_at] if params[:scheduled_at].present? and DateUtils.validate_date_format?(params[:scheduled_at])
     self.description = params[:description]
+    self.policy_id = params[:policy_id]
 
     if scheduled_at.present? and scheduled_at < Date.today
       self.scheduled_at = Date.today
@@ -46,27 +50,10 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       return
     end
 
-    # op = AccountManager::Balance::Check.(current_user.company.yes_bank_company_account, params)
-    # company_balance = op.balance rescue 0
-    #
     payment_order_data.each do |item|
-      self.requested_amount += (item[:amount].to_d rescue 0)
+      self.requested_amount += (item[:original_amount].to_d rescue 0)
     end
 
-    # case params[:initiating_account_type]
-    #   when '1', 1
-    #     if self.requested_amount > company_balance
-    #       self.errors << 'Insufficient funds to initiate the transfer'
-    #       self.payment_order_valid = false
-    #       return
-    #     end
-    #   when '2', 2
-    #     if self.requested_amount > user.bank_wallet.balance_value
-    #       self.errors << 'Insufficient funds to initiate the transfer'
-    #       self.payment_order_valid = false
-    #       return
-    #     end
-    # end
   end
 
   def process
@@ -80,55 +67,102 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
       name = item[:name] || item["name"]
-      amount = item[:amount]&.to_f || item["amount"]&.to_f
+      amount = item[:original_amount]&.to_f || item["original_amount"]&.to_f
       note = item[:note]&.to_s || item["note"]&.to_s
+      gst_type_id = item[:gst_type_id]
+      tax_type_id = item[:tax_type_id]
+      discount_type_id = item[:discount_type_id]
+      tds_type_id = item[:tds_type_id]
+      discount = item[:discount]
+      tds = item[:tds]
+      tax = item[:tax]
+      invoice_number = item[:invoice_number]
+      invoice_date = item[:invoice_date]
+      due_date = item[:due_date]
+      inclusive_of_taxes = item[:inclusive_of_taxes]
 
-      valid = true
-      messages = []
+      self.valid = true
+      self.error_messages = []
 
-      # # if the user is not an admin or creditor, they can't credit to unauthorized vendors
-      # unless user.vendor_payments_admin? || user.vendor_payments_creditor?
-      #   ba = BankAccount.find_by(account_number: bank_account_no, ifsc: ifsc)
-      #   if ba.nil?
-      #     messages << "You cannot credit to unaithorized bank accounts. Please request the admin or creditor to add this bank account"
-      #     valid = false
-      #   end
-      # end
 
       # Check if bank account number is present
       if bank_account_no.blank?
-        valid = false
-        messages << 'Bank account not found'
+        self.valid = false
+        self.error_messages << 'Bank account not found'
       end
 
       # Check if the amount is present
       if amount.blank? || !amount.is_a?(Numeric)
-        valid = false
-        messages << 'Invalid amount'
+        self.valid = false
+        self.error_messages << 'Invalid amount'
       end
 
       # check if name is present
       if name.blank?
-        valid = false
-        messages << 'Name cannot be blank'
+        self.valid = false
+        self.error_messages << 'Name cannot be blank'
       end
 
       # check if the ifsc is present
       if ifsc.blank?
-        valid = false
-        messages << 'IFSC cannot be blank'
+        self.valid = false
+        self.error_messages << 'IFSC cannot be blank'
       end
 
       # todo - if there's any user specific configuration for this particular user,
       # add it here
 
-      if valid
+      # adding all invoice specific validations here for the payment
+      unless validate_date invoice_date
+        self.valid = false
+        self.error_messages << "Invalid invoice date"
+      end
+
+      unless validate_date due_date
+        self.valid = false
+        self.error_messages << "Invalid due date"
+      end
+
+      unless validate_rate tax, tax_type_id, amount
+        self.valid = false
+        self.error_messages << "Invalid tax entered"
+      end
+
+      unless validate_rate tds, tds_type_id, amount
+        self.valid = false
+        self.error_messages << "Invalid TDS entered"
+      end
+
+      unless validate_rate discount, discount_type_id, amount
+        self.valid = false
+        self.error_messages << "Invalid discount entered"
+      end
+
+      # adding the custom fields for the particular invoice, using a ghost invoice
+      self.ghost_invoice = Invoice.new
+      custom_fields = {custom_fields: item[:custom_fields]} || {}
+      custom_fields[:user] = user
+      custom_fields[:reset_fields] = true
+      custom_fields[:save] = false
+      CustomField::SetFields.(self.ghost_invoice, FieldParentType.id_for(:invoice), custom_fields)
+
+      op = CustomField::Validate.(self.ghost_invoice)
+      unless op.success?
+        self.error_messages << op.messages[:error]
+        self.valid = false
+      end
+
+      if self.valid
         self.processable_amount += amount
       end
 
-      self.payment_order_valid = false unless valid
+      self.payment_order_valid = false unless self.valid
 
-      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, amount: amount, note: note, valid: valid, messages: messages}
+      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
+                               gst_type_id: gst_type_id, tax_type_id: tax_type_id, tax: tax, tds_type_id: tds_type_id, tds: tds,
+                               discount_type_id: discount_type_id, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
+                               invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
+                               valid: self.valid, messages: self.error_messages}
     end
   end
 
@@ -141,12 +175,13 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     params[:payment_order_valid] = self.payment_order_valid
     params[:scheduled_at] = self.scheduled_at
     params[:description] = self.description
+    params[:policy_id] = self.policy_id
     BankTransfer::PaymentRequest::Process::SuccessPresenter.new(user, params, messages)
   end
 
   class BankTransfer::PaymentRequest::Process::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :errors,
-                  :payment_order_valid, :scheduled_at, :description
+                  :payment_order_valid, :scheduled_at, :description, :policy_id, :custom_fields_config
 
     def init
       self.payment_order_data = params[:payment_order_data]
@@ -157,6 +192,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.payment_order_valid = params[:payment_order_valid]
       self.scheduled_at = params[:scheduled_at]
       self.description = params[:description]
+      self.policy_id = params[:policy_id]
     end
 
     def scheduled_at_formatted
@@ -166,6 +202,40 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     def created_at_formatted
       DateUtils.date_formatted Date.today
     end
+
+  end
+
+  private
+
+  def validate_rate(rate, rate_type_id, amount)
+    if rate.blank?
+      return true
+    end
+    case rate_type_id
+      when 1, '1'
+        if rate.to_f >= 100
+          return false
+        end
+      when 2, '2'
+        return true
+      else
+        # do nothing?
+    end
+    true
+  end
+
+  def validate_date(date)
+    if date.blank?
+      return true
+    end
+    date_obj = Date.parse(date) rescue nil
+    if date_obj.blank?
+      return false
+    end
+    true
+  end
+
+  def validate_amount
 
   end
 

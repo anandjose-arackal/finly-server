@@ -6,7 +6,7 @@ class DuplicateExistingRolesInVendorPaymentsToNewFormat < ActiveRecord::Migratio
       if user.role_mapping.vendor_payments.empty?
         role_mappings.each do |role_map|
           new_role_map = role_map.dup
-          new_role_map.purpose_id = MappingPurpose.id_for(:vendor_payments)
+          new_role_map.purpose_id = Purpose.id_for(:vendor_payments)
           new_role_map.save
         end
       end

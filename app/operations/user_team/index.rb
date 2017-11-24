@@ -14,6 +14,7 @@ class UserTeam::Index < UserTeam::Base
 
   def init
     self.user_teams = user.company.user_teams
+    params[:with_application] = RequestStore.store[:current_app]&.to_s
   end
 
   def validate
@@ -28,8 +29,11 @@ class UserTeam::Index < UserTeam::Base
   class UserTeam::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :user_teams, :user_groups
 
+    has_scope :with_application
+
     def init
       self.user_teams = params[:user_teams]
+      self.user_teams = apply_scopes(user_teams)
     end
 
     def teams_mapping

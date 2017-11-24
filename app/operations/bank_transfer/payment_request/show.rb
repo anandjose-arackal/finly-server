@@ -38,7 +38,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
     require 'bank_transfer/payment_request/review/associated_users'
 
     attr_accessor :bank_payment_request, :payment_order, :actions, :bank_wallet_balance,
-                  :manager, :finance_manager, :associated_users, :payments_verified, :payments_unverified
+                  :manager, :finance_manager, :associated_users, :payments_verified, :payments_unverified,
+                  :custom_field_config, :approvers
 
     def init
       self.bank_payment_request = params[:payment_request]
@@ -63,6 +64,18 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           self.payments_unverified << payment
         end
       end
+      self.custom_field_config = custom_field_configurations
+      op = BankTransfer::PaymentRequest::Approvers.(bank_payment_request: self.bank_payment_request)
+      if op.success?
+        self.approvers = op.approvers
+      else
+        self.approvers = []
+      end
+    end
+
+    def custom_field_configurations
+      configurations = user.company.field_configurations.exclude_deleted
+      configurations.with_parent_type(FieldParentType.id_for(:invoice))
     end
 
     def retrieve_actions

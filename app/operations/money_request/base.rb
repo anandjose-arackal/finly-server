@@ -97,7 +97,7 @@ class MoneyRequest::Base < BaseOperation
           actions[:delete] = true
           actions[:editable] = true
           actions[:submit] = true
-        elsif self.money_request.processing?
+        elsif self.money_request.can_retract?
           actions[:retract] = true
         end
       end

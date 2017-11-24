@@ -494,6 +494,15 @@
 #                                                         PATCH  /policies/:id(.:format)                                                                    policies#update
 #                                                         PUT    /policies/:id(.:format)                                                                    policies#update
 #                                                         DELETE /policies/:id(.:format)                                                                    policies#destroy
+#                       user_permission_check_permissions POST   /user_permissions/:user_permission_id/check_permissions(.:format)                          user_permissions#check_permissions
+#                                        user_permissions GET    /user_permissions(.:format)                                                                user_permissions#index
+#                                                         POST   /user_permissions(.:format)                                                                user_permissions#create
+#                                     new_user_permission GET    /user_permissions/new(.:format)                                                            user_permissions#new
+#                                    edit_user_permission GET    /user_permissions/:id/edit(.:format)                                                       user_permissions#edit
+#                                         user_permission GET    /user_permissions/:id(.:format)                                                            user_permissions#show
+#                                                         PATCH  /user_permissions/:id(.:format)                                                            user_permissions#update
+#                                                         PUT    /user_permissions/:id(.:format)                                                            user_permissions#update
+#                                                         DELETE /user_permissions/:id(.:format)                                                            user_permissions#destroy
 #                                              categories GET    /categories(.:format)                                                                      categories#index
 #                                                         POST   /categories(.:format)                                                                      categories#create
 #                                            new_category GET    /categories/new(.:format)                                                                  categories#new
@@ -915,6 +924,7 @@
 #   bank_transfer_bank_payment_request_remove_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_beneficiary(.:format) bank_transfer/bank_payment_requests#remove_beneficiary
 #                bank_transfer_bank_payment_request_retry PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/retry(.:format)              bank_transfer/bank_payment_requests#retry
 #     bank_transfer_bank_payment_request_within_timeframe GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/within_timeframe(.:format)   bank_transfer/bank_payment_requests#within_timeframe
+#       bank_transfer_bank_payment_request_update_payment PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/update_payment(.:format)     bank_transfer/bank_payment_requests#update_payment
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                             bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                             bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                                         bank_transfer/bank_payment_requests#new
@@ -1941,6 +1951,10 @@ Rails.application.routes.draw do
     get 'description', to: 'policies#show_description'
   end
 
+  resources :user_permissions do
+    post 'check_permissions', to: 'user_permissions#check_permissions', as: :check_permissions
+  end
+
   resources :categories
 
   resources :export_preferences
@@ -2294,6 +2308,7 @@ Rails.application.routes.draw do
       patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficiary
       patch 'retry', to: 'bank_payment_requests#retry', as: :retry
       get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
+      patch 'update_payment', to: 'bank_payment_requests#update_payment'
     end
 
     get 'account_owners/count', to: 'account_owners#count'

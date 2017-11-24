@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: mapping_purposes
+# Table name: purposes
 #
 #  id         :integer          not null, primary key
 #  name       :string(255)
@@ -8,7 +8,7 @@
 #  updated_at :datetime         not null
 #
 
-class MappingPurpose < ActiveRecord::Base
+class Purpose < ActiveRecord::Base
 
   include Seedable
 
@@ -19,9 +19,9 @@ class MappingPurpose < ActiveRecord::Base
   def self.id_from_application_for(application)
     case application
       when :vp, 'vp'
-        return MappingPurpose.id_for(:vendor_payments)
+        return Purpose.id_for(:vendor_payments)
       when 'em', :em, :ft, 'ft'
-        return MappingPurpose.id_for(:expense_management)
+        return Purpose.id_for(:expense_management)
       else
         # do nothing?
     end

@@ -1,5 +1,6 @@
 class Personalizer::Process < BaseOperation
   attr_accessor :params, :path, :function, :company, :class_object, :show_errors, :op_instance
+
   # Show errors is used to show failure only if a personalization exists and the personalization is throwing an error. Else success presenter is returned
 
   def self.call(path, function, instance)

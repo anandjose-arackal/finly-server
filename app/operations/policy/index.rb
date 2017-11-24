@@ -16,12 +16,30 @@ class Policy::Index < Policy::Base
   def process
     if admin_view? || auditor_view?
       if user.company_admin? || user.auditor?
-        self.policies = user&.company.policies
+        if user&.enforce_policy_enabled?
+          ids = []
+        else
+          ids = user&.policies.default.pluck(:id)
+        end
+        ids += user&.company.policies.with_application(current_app).pluck(:id)
+        self.policies = Policy.with_id(ids)
       else
-        self.policies = user&.admin_policies
+        if user&.enforce_policy_enabled?
+          ids = []
+        else
+          ids = user&.policies.default.pluck(:id)
+        end
+        ids += user&.admin_policies.with_application(current_app).pluck(:id)
+        self.policies = Policy.with_id(ids)
       end
     else
-      self.policies = user&.policies
+      if user&.enforce_policy_enabled?
+        ids = []
+      else
+        ids = user&.policies.default.pluck(:id)
+      end
+      ids += user&.policies.with_application(current_app).pluck(:id)
+      self.policies = Policy.with_id(ids)
     end
   end
 
@@ -30,7 +48,8 @@ class Policy::Index < Policy::Base
   end
 
   def success
-    Policy::Index::IndexPresenter.new(user, {policies: policies}, messages)
+    params[:policies] = self.policies
+    Policy::Index::IndexPresenter.new(user, params, messages)
   end
 
   class Policy::Index::IndexPresenter < Policy::Base::PolicyPresenter

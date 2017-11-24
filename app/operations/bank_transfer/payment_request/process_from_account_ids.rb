@@ -22,20 +22,25 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
   attr_accessor :bank_accounts, :account_ids, :amounts, :response_presenter, :parsed_data,
                 :notes
 
+
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters"
       return
     end
-    if params[:orders].blank? || params[:account_owner_type].blank?
+    if params[:payment_order].blank? || params[:account_owner_type].blank?
       add_message :error, "No bank account selected"
     end
   end
 
   def init
     self.account_ids = retrieve_data(:account_id)
-    self.amounts = retrieve_data(:amount)
+    self.amounts = retrieve_data(:original_amount)
     self.notes = retrieve_data(:note)
+    [:tax_type_id, :tds_type_id, :gst_type_id, :discount_type_id, :discount, :tax, :tds, :invoice_date, :invoice_number, :due_date, :custom_fields].each do |attr|
+      self.class.send(:attr_accessor, attr)
+      instance_variable_set("@#{attr}", retrieve_data(attr))
+    end
   end
 
   def process
@@ -43,21 +48,21 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     self.parsed_data = parse_order_information
     params[:payment_order] = self.parsed_data
     self.response_presenter = BankTransfer::PaymentRequest::Process.(user, params)
+    unless self.response_presenter&.success?
+      add_message :error, (self.response_presenter&.messages[:error] || "Unknown failure")
+    end
   end
 
   def success
     response_presenter
   end
 
-  def failure
-    response_presenter || nil
-  end
 
   private
 
   def retrieve_data(key)
     data = []
-    params[:orders].each do |order|
+    params[:payment_order].each do |k, order|
       data << order[key.to_sym]
     end
     data
@@ -71,8 +76,19 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           name: bank_account.account_owner.name,
           bank_account_number: bank_account.account_number,
           ifsc: bank_account.ifsc,
-          amount: amounts[index],
-          note: self.notes[index]
+          original_amount: amounts[index],
+          note: self.notes[index],
+          gst_type_id: self.gst_type_id[index],
+          tax_type_id: self.tax_type_id[index],
+          discount_type_id: self.discount_type_id[index],
+          tds_type_id: self.tds_type_id[index],
+          tax: self.tax[index],
+          tds: self.tds[index],
+          discount: self.discount[index],
+          invoice_number: self.invoice_number[index],
+          invoice_date: self.invoice_date[index],
+          due_date: self.due_date[index],
+          custom_fields: self.custom_fields[index]
       }
     end
     data

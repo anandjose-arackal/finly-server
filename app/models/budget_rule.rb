@@ -20,6 +20,7 @@
 
 
 
+
 class BudgetRule < ActiveRecord::Base
   include SoftDeletable
 

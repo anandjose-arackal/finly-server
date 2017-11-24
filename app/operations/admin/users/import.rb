@@ -124,7 +124,7 @@ class Admin::Users::Import < Admin::Base
   private
 
   def create_response_csv
-    file_name = "#{Rails.root}/public/common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
+    file_name = "common/files/temp_files/#{DateUtils.local_date_time}-#{user.id}-result.csv".gsub(Regexp.union([' ', '-', ':', '+']), '')
     CSV.open(file_name, 'wb') do |csv|
       self.header << 'Result'
       csv << header
@@ -172,23 +172,23 @@ class Admin::Users::Import < Admin::Base
 
     # creating role mapping attributes
     role_mapping_attributes = [{user_role_id: UserRole.employee_id,
-                                purpose_id: MappingPurpose.id_for(:expense_management)}]
+                                purpose_id: Purpose.id_for(:expense_management)}]
     if row[import_fields[:manager_role]] and row[import_fields[:manager_role]].downcase == "y"
       role_mapping_attributes << {user_role_id: UserRole.manager_id,
-                                  purpose_id: MappingPurpose.id_for(:expense_management)}
+                                  purpose_id: Purpose.id_for(:expense_management)}
     end
     if row[import_fields[:finance_manager_role]] and row[import_fields[:finance_manager_role]].downcase == "y"
       role_mapping_attributes << {user_role_id: UserRole.finance_manager_id,
-                                  purpose_id: MappingPurpose.id_for(:expense_management)}
+                                  purpose_id: Purpose.id_for(:expense_management)}
     end
     if row[import_fields[:admin_role]] and row[import_fields[:admin_role]].downcase == "y"
       role_mapping_attributes << {user_role_id: UserRole.admin_id,
-                                  purpose_id: MappingPurpose.id_for(:expense_management)}
+                                  purpose_id: Purpose.id_for(:expense_management)}
     end
 
     # adding a default initiator role for vendor payments
     role_mapping_attributes << {user_role_id: UserRole.id_for(:initiator),
-                                purpose_id: MappingPurpose.id_for(:vendor_payments)}
+                                purpose_id: Purpose.id_for(:vendor_payments)}
 
     manager = finance_manager = approves_to = approves_finance_to = nil
     manager_email = finance_manager_email = approves_to_email = approves_finance_to_email = nil
@@ -269,7 +269,7 @@ class Admin::Users::Import < Admin::Base
                                                approves_to: approves_to,
                                                approves_finance_to: approves_finance_to,
                                                policy_id: (company.policies.default.first.id rescue nil),
-                                               purpose_id: MappingPurpose.id_for(:expense_management)
+                                               purpose_id: Purpose.id_for(:expense_management)
                                               },
                                               {
                                                 default: true,
@@ -278,7 +278,7 @@ class Admin::Users::Import < Admin::Base
                                                 approves_to: nil,
                                                 approves_finance_to: nil,
                                                 policy_id: company.policies.first.id,
-                                                purpose_id: MappingPurpose.id_for(:vendor_payments)
+                                                purpose_id: Purpose.id_for(:vendor_payments)
                                               }
                                               ],
                     profile_attributes: {address_1: row[import_fields[:address_1]],

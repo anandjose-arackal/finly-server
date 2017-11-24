@@ -9,6 +9,9 @@ end
 
 json.actions @result.actions
 
+json.permissions do
+  json.create_beneficiaries @result.selected_user.permission.create_beneficiaries
+end
 
 json.bank_accounts do
   json.array!(@result.selected_user.bank_accounts) do |bank_account|

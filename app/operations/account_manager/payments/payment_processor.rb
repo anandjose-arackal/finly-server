@@ -161,6 +161,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     p[:receiving_account_type] = payment_request.receiving_account_type
     p[:currency_id] = payment_request.currency_id
     p[:application] = RequestStore.store[:current_app]
+    p[:payment_mode] = payment_request.bank_transfer_type
     p[:amount_requested_attributes] = {
         value: payment_request.request_total,
         currency_id: payment_request.currency_id

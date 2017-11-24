@@ -26,7 +26,6 @@
 #
 
 
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -167,6 +166,7 @@ class Expense < ActiveRecord::Base
   scope :with_user, ->(user_id) { where user_id: user_id }
   scope :with_user_id, ->(user_id) { where user_id: user_id }
   scope :with_user_or_report, ->(user_id, report_id) { where 'user_id IN (?) OR report_id IN (?)', user_id, report_id }
+  scope :date_before, -> (date) { where 'date < ?', date }
   # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
   scope :filter_expense_type_id, ->(type_id) do
     type_id = [type_id] unless type_id.is_a?(Array)
@@ -275,6 +275,11 @@ class Expense < ActiveRecord::Base
   scope :spent_from_cash_on_hand, -> { where(from_cash_on_hand: true).where(expense_type_id: ExpenseType.id_for(:manual)) }
 
   scope :with_id, ->(ids) { where id: ids }
+  scope :without_id, -> (id) {
+    if id.present?
+      where.not(id: id)
+    end
+  }
   scope :with_date, ->(dates) { where date: dates }
   scope :with_date_range, -> (start_date, end_date) { where('date >= ? AND date <= ?', start_date, end_date) }
   scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }

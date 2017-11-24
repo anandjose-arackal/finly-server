@@ -33,20 +33,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable

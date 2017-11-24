@@ -34,7 +34,7 @@ class User::Balances::Show < User::Base
           set_card_balances
         end
         # adding vendor payment balances in this section if it is enabled for that selected_user
-        if (selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?) || selected_user.company.bank_reimbursement_enabled?
+        if (selected_user.company.yes_bank_api_enabled? && selected_user.vendor_payments_enabled?) || selected_user.company.bank_reimbursement_enabled?
           set_yes_bank_balances
         end
         # showing cash on hand balances based on whether they have expense management enabled
@@ -42,7 +42,7 @@ class User::Balances::Show < User::Base
           set_cash_on_hand_balances
         end
       when 'vp'
-        if selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?
+        if selected_user.company.yes_bank_api_enabled? && selected_user.vendor_payments_enabled?
           set_yes_bank_balances
         end
       when 'ft'
@@ -145,7 +145,7 @@ class User::Balances::Show < User::Base
     }
     self.cash_on_hand_info = {
         itz_cash: {
-            balance: cash_on_hand_adapter.balance
+            balance: cash_on_hand_adapter.balance(display_balance: true)
         }
     }
   end
@@ -205,7 +205,7 @@ class User::Balances::Show < User::Base
         self.balances[:cards] << {
             name: "#{card.card_program.name.humanize}",
             balance: balance,
-            eligibility: self.card_info[card.id][:eligibility],
+            eligibility: self.card_info&.dig(card.id, :eligibility),
             active: card.active,
             disabler: disabler,
             disabler_role: disabler_role
@@ -253,7 +253,7 @@ class User::Balances::Show < User::Base
               id: card.id,
               name: "#{selected_user.name}'s Expense Card",
               balance: self.card_info[card.id][:balance],
-              eligibility: self.card_info[card.id][:eligibility],
+              eligibility: self.card_info&.dig(card.id, :eligibility),
               active: card.active,
               disabler: disabler,
               disabler_role: disabler_role

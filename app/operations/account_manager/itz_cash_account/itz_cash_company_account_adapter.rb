@@ -18,7 +18,7 @@ class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountMana
     return true
   end
 
-  def balance
+  def balance(options = {})
     op = ItzCash::VirtualAccountBalance.(account.company)
     if op.success?
       balance = op.wallets.first[:balance] # original balance from ItzCash's servers

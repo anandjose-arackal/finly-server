@@ -30,8 +30,9 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
     params[:bank_accounts].each do |bank_account|
       id = bank_account[:id]
       account = user.company.bank_accounts.find_by(id: id)
+      initiating_account = bank_payment_request.payment_order.initiating_account || user.bank_wallet
       self.payments_data << {
-          initiating_account: bank_payment_request.payment_order.initiating_account,
+          initiating_account: initiating_account,
           receiving_account: account,
           receiving_user: account.account_owner,
           initiating_user: user,
@@ -43,14 +44,35 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
               value: bank_account[:amount],
               currency_id: 1
           },
-          date: (bank_payment_request.payment_order.scheduled_at || DateUtils.local_date)
+          date: (bank_payment_request.payment_order.scheduled_at || DateUtils.local_date),
+          invoice_attributes: {
+              original_amount_attributes: {
+                  value: 0,
+                  currency_id: 1
+              },
+              freight_amount_attributes: {
+                  value: 0,
+                  currency_id: 1
+              },
+              gross_amount_attributes: {
+                  value: 0,
+                  currency_id: 1
+              },
+              amount_attributes: {
+                  value: 0,
+                  currency_id: 1
+              },
+              net_amount_attributes: {
+                  value: 0,
+                  currency_id: 1
+              }
+          }
       }
     end
   end
 
   def validate
     super
-
     # checking if the payment data is valid - all or nothing
     # todo - the error messages can be customized to each payment being added later - like in multiple expense creation
     valid = true
@@ -61,10 +83,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
         valid = false
         error_messages << payment.errors.full_messages.to_sentence
       end
-      unless payment.amount.value > 0
-        valid = false
-        error_messages << "Amount has for #{payment.receiving_account.name} cannot be less than or equal to 0"
-      end
+      # adding validations for custom fields here
     end
     unless valid
       add_message :error, error_messages.to_sentence
@@ -74,6 +93,8 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
   def process
     self.payments_data.each do |data|
       payment = self.payment_order.payments.build(data)
+      # set custom field data
+      set_custom_fields(false, payment)
       payment.save
     end
   end
@@ -95,6 +116,23 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
                                             beneficiary_id: account.id).save
       end
     end
+  end
+
+  private
+
+  def set_custom_fields(save, payment)
+    fields = {}
+    current_company.field_configurations.with_parent_type(FieldParentType.id_for(:invoice)).each do |fc|
+      fields[fc.id] = ""
+    end
+    if fields.blank?
+      return
+    end
+    custom_fields = {custom_fields: fields}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
 
 end

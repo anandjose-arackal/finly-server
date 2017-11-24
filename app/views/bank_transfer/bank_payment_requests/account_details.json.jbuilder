@@ -4,4 +4,5 @@ json.array!(@result.bank_accounts) do |bank_account|
   json.name bank_account.name
   json.owner_name bank_account.account_owner.name
   json.id bank_account.id
+  json.custom_fields_config @result.custom_fields_config
 end

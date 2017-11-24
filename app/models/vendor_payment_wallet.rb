@@ -55,9 +55,10 @@ class VendorPaymentWallet < ActiveRecord::Base
     true
   end
 
-  def blocked_amount_for_pending_payments
+  def blocked_amount_for_pending_payments(excluded_payment_order_id = nil)
     initiating_account = self.user.bank_wallet
-    Payment.scheduled.with_initiating_account_type("VendorPaymentWallet").with_initiating_account_id(initiating_account.id).joins(:amount).sum(:value)
+    payment_ids = PaymentOrder.find_by(id: excluded_payment_order_id)&.payments&.pluck(:id)
+    Payment.scheduled.with_initiating_account_type("VendorPaymentWallet").with_initiating_account_id(initiating_account.id).without_id(payment_ids).joins(:amount).sum(:value)
     # PaymentOrder.with_company_id(initiating_user.company_id).with_initiating_account_type("VendorPaymentWallet").with_initiating_user_id(initiating_user.id).scheduled.joins(:amount_requested).sum(:value)
   end
 

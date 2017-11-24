@@ -22,6 +22,7 @@
 #  payment_purpose_id        :integer          not null
 #  currency_id               :integer          not null
 #  application               :string(255)
+#  payment_mode              :string(255)
 #
 
 class PaymentOrder < ActiveRecord::Base
@@ -80,6 +81,11 @@ class PaymentOrder < ActiveRecord::Base
   scope :with_purpose_id, -> (id) { where payment_purpose_id: id }
   scope :without_purpose_id, -> (id) { where.not payment_purpose_id: id }
   scope :with_id, -> (id) { where id: id }
+  scope :without_id, -> (id) {
+    if id.present?
+      where.not(id: id)
+    end
+  }
   scope :with_status, ->(status_id) { where payment_order_status_id: status_id }
   scope :scheduled, -> { with_status(PaymentOrderStatus.id_for(:scheduled)) }
   scope :scheduled_on_or_before, -> (date) { where('scheduled_at <= ?', date).where(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled)) }
@@ -140,11 +146,14 @@ class PaymentOrder < ActiveRecord::Base
   end
 
   def payment_mode
-    self.payments.first.payment_mode
+    if super.blank?
+      return self.payments.first&.payment_mode
+    end
+    super
   end
 
   def payment_type
-    self.payments.first.payment_type.name.humanize
+    self.payments.first&.payment_type&.name&.humanize
   end
 
   def credit?
@@ -166,7 +175,7 @@ class PaymentOrder < ActiveRecord::Base
 
   # for convenience, just picks this up from the individual payments
   def initiating_account
-    self.payments.first.initiating_account
+    self.payments.first&.initiating_account
   end
 
   def initiating_account_name
@@ -186,6 +195,11 @@ class PaymentOrder < ActiveRecord::Base
   def update_processed_amount
     new_amount = self.payments.completed.joins(:amount).sum(:value)
     self.amount_processed&.update(value: new_amount)
+  end
+
+  def update_requested_amount
+    new_amount = self.payments.joins(:amount).sum(:value)
+    self.amount_requested&.update(value: new_amount)
   end
 
   # again, for convenience, and only applies to bank transfer poyments

@@ -8,7 +8,13 @@ module Constants
   OTP_RESEND_INTERVAL = 60
 
   # todo - needs to be edited once we get the account details.
-  ITZCASH_EMAIL_ID = ['veekshith.rai@finly.io', 'vivek.a@finly.io']
+  if Rails.env.production?
+    ITZCASH_EMAIL_ID = ['veekshith.rai@finly.io', 'vivek.a@finly.io', 'sabhishek@itzcash.com']
+    YESBANK_EMAIL_ID = ['veekshith.rai@finly.io', 'vivek.a@finly.io']
+  else
+    ITZCASH_EMAIL_ID = ['sreeram.nr@finly.io']
+    YESBANK_EMAIL_ID = ['sreeram.nr@finly.io']
+  end
 
   PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io']

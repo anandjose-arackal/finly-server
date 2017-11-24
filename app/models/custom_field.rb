@@ -24,8 +24,8 @@ class CustomField < ActiveRecord::Base
   # validate :validate_field
 
   validates :field_configuration_id, presence: true
-  validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest']}
-  validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText']}
+  validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice']}
+  validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiselectSelection']}
 
   scope :with_field_configuration_ids, ->(ids) { where field_configuration_id: ids }
   scope :includes_parent, -> { includes :parent }
@@ -94,6 +94,18 @@ class CustomField < ActiveRecord::Base
         self.value.value.value = value
         # value.value is Amount, so setting Amounts currency_id becomes value(CustomField.value).value(FieldAmount.value).currency_id(Amount.currency_id)
         self.value.value.currency_id = 1
+      when FieldType.id_for(:multiselect)
+        # here self.value should ideally be an object of FieldMultiselectSelection
+        if self.value.blank?
+          self.value = FieldMultiselectSelection.new(field_multiselect_selection_items_attributes: [])
+        end
+        # now set the individual values that are passed as the new values of the multi select
+        self.value.field_multiselect_selection_items.destroy_all # destroy the existing ones and create the new ones, I guess?
+        value.each do |val|
+          item = self.value.field_multiselect_selection_items.build(value_id: val)
+        end
+      else
+        # do nothing?
     end
     self.value.save if self.value.present? and save
   end
@@ -104,6 +116,8 @@ class CustomField < ActiveRecord::Base
         return self.value&.value
       when FieldType.id_for(:drop_down)
         return self.value&.value&.name
+      else
+        # do nothing?
     end
   end
 
@@ -111,6 +125,8 @@ class CustomField < ActiveRecord::Base
     options = []
     if field_configuration.field_type_id == FieldType.id_for(:drop_down)
       options = field_configuration.drop_down_items
+    elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)
+      options = field_configuration.multiselect_items
     end
     json = {id: field_configuration.id,
             label: field_configuration.field_name,
@@ -118,7 +134,21 @@ class CustomField < ActiveRecord::Base
                          name: field_configuration.field_type.name},
             mandatory: field_configuration.mandatory,
             options: options}
-    json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
+    case self.field_configuration.field_type_id
+      when FieldType.id_for(:multiselect)
+        ids = []
+        names = []
+        self.value&.field_multiselect_selection_items&.each do |item|
+          ids << item.value_id
+          names << item.value.name
+        end
+        json["#{field_configuration.field_type.name.to_sym}_field_value"] = {
+            ids: ids,
+            names: names
+        }
+      else
+        json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
+    end
     json
   end
 
