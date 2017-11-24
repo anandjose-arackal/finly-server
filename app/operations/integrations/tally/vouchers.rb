@@ -10,6 +10,10 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
       add_message :error, 'Tally integration has not been configured for your company'
       return
     end
+    unless params[:id].present? and not params[:all]
+      add_message :error, 'Report not found'
+      return
+    end
   end
 
   def process
@@ -19,6 +23,10 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
       return
     end
     self.reports = reports_presenter.reports
+    unless params[:all]
+      id = params[:id] || params[:report_id]
+      self.reports = self.reports.with_id(id)
+    end
     report_ids = reports.pluck(:id)
     self.expenses = Expense.with_report_id(report_ids)
     current_class_path = self.method(:success).source_location.first.gsub('/vouchers.rb', '')
