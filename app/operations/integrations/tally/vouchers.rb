@@ -10,7 +10,7 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
       add_message :error, 'Tally integration has not been configured for your company'
       return
     end
-    unless params[:id].present? and not params[:all]
+    unless params[:id].present? and not params[:filtered]
       add_message :error, 'Report not found'
       return
     end
