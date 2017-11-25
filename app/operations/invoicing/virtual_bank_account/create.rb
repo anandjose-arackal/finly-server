@@ -10,7 +10,7 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
     self.company = user.company
     self.purpose_id = params[:purpose_id] || ::VirtualAccountPurpose.id_for(:virtual_bank_account)
     self.parent = params[:parent]
-    self.virtual_bank_account_params = virtal_account_params
+    self.virtual_bank_account_params = virtual_account_params
   end
 
   def validate
@@ -56,6 +56,10 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
     else
       add_message :error, "Could not generate virtual account number, please try again later"
     end
+  end
+
+  def post_process
+    add_message :success, "Virtual Account Created"
   end
 
   def success
