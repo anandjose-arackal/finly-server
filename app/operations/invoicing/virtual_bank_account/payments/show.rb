@@ -21,7 +21,7 @@ class Invoicing::VirtualBankAccount::Payments::Show < Invoicing::VirtualBankAcco
   end
 
   def process
-    self.payments = Payment.with_initiating_account(self.virtual_bank_account)
+    self.payments = Payment.with_initiating_account(self.virtual_bank_account).completed
   end
 
   def success

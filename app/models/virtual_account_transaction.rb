@@ -26,7 +26,7 @@
 class VirtualAccountTransaction < ActiveRecord::Base
 
   has_one :payment, as: :reference_resource
-  belongs_to :virtual_bank_account
+  belongs_to :virtual_account, class_name: "VirtualBankAccount"
 
   validates :transfer_id, uniqueness: true
 

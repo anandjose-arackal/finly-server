@@ -16,7 +16,7 @@ json.transactions do
       json.account_number virtual_trans&.remitter_account_no
     end
     json.amount payment.amount_value
-    json.note payment.note
+    json.note payment.reference_resource&.note
     json.date payment.date
   end
 end
