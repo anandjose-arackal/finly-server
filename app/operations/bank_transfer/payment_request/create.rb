@@ -10,6 +10,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
                 :invoice_amount, :payment_amount, :payment,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
+                :advance_amount,
                 :policy_id
 
   def pre_validate
