@@ -72,10 +72,10 @@ json.payments do
         json.inclusive_of_taxes invoice.inclusive_of_taxes
         json.freight_amount invoice.freight_amount&.value
         # adding the respective rates
-        json.tax_rate precision_value ((invoice.tax_amount.value rescue 0)/(invoice.gross_amount.value)*100)
-        json.tds_rate precision_value ((invoice.tds_amount.value rescue 0)/(invoice.gross_amount.value)*100)
-        json.discount_rate precision_value ((invoice.discount_amount.value rescue 0)/(invoice.amount.value)*100)
-        json.advance_rate precision_value ((invoice.advance_amount.value rescue 0)/(invoice.net_amount.value)*100)
+        json.tax_rate precision_value invoice.tax_rate
+        json.tds_rate precision_value invoice.tds_rate
+        json.discount_rate precision_value invoice.discount_rate
+        json.advance_rate precision_value invoice.advance_rate
         #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
@@ -138,10 +138,10 @@ json.payments_verified do
         json.inclusive_of_taxes invoice.inclusive_of_taxes
         json.freight_amount invoice.freight_amount&.value
         # adding the respective rates
-        json.tax_rate precision_value ((invoice.tax_amount.value rescue 0)/(invoice.gross_amount.value)*100)
-        json.tds_rate precision_value ((invoice.tds_amount.value rescue 0)/(invoice.gross_amount.value)*100)
-        json.discount_rate precision_value ((invoice.discount_amount.value rescue 0)/(invoice.amount.value)*100)
-        json.advance_rate precision_value ((invoice.advance_amount.value rescue 0)/(invoice.net_amount.value)*100)
+        json.tax_rate precision_value invoice.tax_rate
+        json.tds_rate precision_value invoice.tds_rate
+        json.discount_rate precision_value invoice.discount_rate
+        json.advance_rate precision_value invoice.advance_rate
         #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
@@ -205,10 +205,10 @@ json.payments_unverified do
         json.inclusive_of_taxes invoice.inclusive_of_taxes
         json.freight_amount invoice.freight_amount&.value
         # adding the respective rates
-        json.tax_rate precision_value ((invoice.tax_amount.value rescue 0)/(invoice.gross_amount.value)*100)
-        json.tds_rate precision_value ((invoice.tds_amount.value rescue 0)/(invoice.gross_amount.value)*100)
-        json.discount_rate precision_value ((invoice.discount_amount.value rescue 0)/(invoice.amount.value)*100)
-        json.advance_rate precision_value ((invoice.advance_amount.value rescue 0)/(invoice.net_amount.value)*100)
+        json.tax_rate precision_value invoice.tax_rate
+        json.tds_rate precision_value invoice.tds_rate
+        json.discount_rate precision_value invoice.discount_rate
+        json.advance_rate precision_value invoice.advance_rate
         #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url

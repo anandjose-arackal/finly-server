@@ -32,4 +32,15 @@ class Admin::KycProcesses::Users::Reject < Admin::KycProcesses::Users::Base
     end
   end
 
+  def post_process
+    self.individual_kycs.each do |individual_kyc|
+      if individual_kyc.admin_note.present?
+        reason = "REASON: #{individual_kyc.admin_note}"
+      else
+        reason = ""
+      end
+      op = Sms::Send.(individual_kyc.user, user: individual_kyc.user, message: "Your Finly Prepaid Card KYC has been rejected #{reason}. Pls re-upload KYC via Finly app -Finly Team")
+    end
+  end
+
 end

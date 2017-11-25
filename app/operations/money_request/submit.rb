@@ -70,6 +70,12 @@ class MoneyRequest::Submit < MoneyRequest::Base
         # self.messages[:error] << "Error auto-approving money_request. Please try again."
         return
       end
+      # update submitted amount here
+      submitted_amount_attributes = {value: money_request.total_amount, currency_id: 1}
+      if money_request.submitted_amount
+        submitted_amount_attributes[:id] = money_request.submitted_amount_id
+      end
+      money_request.update(submitted_amount_attributes: submitted_amount_attributes)
       money_request.reload
       return
     end
@@ -85,7 +91,7 @@ class MoneyRequest::Submit < MoneyRequest::Base
                                        controlling_user_role_id: manager_role_id,
                                        controlling_for_user_role_id: nil,
                                        submitted_at: submitted_at,
-                                       submitted_amount_attributes: {value: money_request.total_amount, currency_id: 1}
+                                       submitted_amount_attributes: submitted_amount_attributes
       money_request.tracks.create action_user: user,
                                   action_user_role_id: UserRole.id_for(:employee),
                                   modified_user_id: money_request.controlling_user_id,

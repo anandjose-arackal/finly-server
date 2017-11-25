@@ -20,7 +20,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     if payment.invoice.present?
       set_fields = set_custom_fields(false)
       unless set_fields&.success?
-        add_message :error, set_fields.messages[:error]
+        add_message :error, set_fields&.messages&.dig(:error)
         return
       end
       valid = CustomField::Validate.(self.payment.invoice)
