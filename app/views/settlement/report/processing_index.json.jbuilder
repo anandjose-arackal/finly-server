@@ -48,5 +48,4 @@ json.array! @result.paginated_report_processor_groups do |group|
   end
   json.user_count user_count
   json.report_count report_count
-
 end

@@ -10,7 +10,7 @@ class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::S
       add_message :error, 'User not found'
       return
     end
-    if params&.dig(:money_request_processor_group_id).blank? and params&.dig(:id).blank?
+    if params&.dig(:money_request_processor_id).blank? and params&.dig(:id).blank?
       add_message :error, 'Order not found'
       return
     end
@@ -22,11 +22,11 @@ class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::S
       add_message :error, groups_presenter.messages[:error]
       return
     end
-    id = (params[:money_request_processor_group_id] or params[:id])
+    id = (params[:money_request_processor_id] or params[:id])
     self.money_request_processors = groups_presenter.money_request_processors.with_id(id)
     if self.money_request_processors.present?
       ids = self.money_request_processors.pluck(:id)
-      self.group_mappings = MoneyRequestProcessorGroupMapping.with_processor_group_id(ids)
+      self.group_mappings = MoneyRequestProcessorMapping.with_processor_group_id(ids)
     end
   end
 
