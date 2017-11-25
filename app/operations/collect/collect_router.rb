@@ -30,7 +30,7 @@ class Collect::CollectRouter < BaseOperation
       # todo - change all the below ones to async calls after testing
       case self.purpose_id
         when VirtualAccountPurpose.id_for(:virtual_bank_account)
-          op = Collect::VirtualAccount::Accept.(self.virtual_account_transaction.id)
+          op = Collect::VirtualAccount::Accept.(user, virtual_account_transaction_id: self.virtual_account_transaction.id)
         when VirtualAccountPurpose.id_for(:payment_receivable)
           Collect::PaymentReceivable::Accept.(self.virtual_account_transaction.id)
         when VirtualAccountPurpose.id_for(:invoice)
