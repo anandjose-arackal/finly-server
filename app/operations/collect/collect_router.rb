@@ -19,6 +19,10 @@ class Collect::CollectRouter < BaseOperation
     end
   end
 
+  def pre_process
+    self.virtual_account_transaction_params[:virtual_account_id] = self.virtual_account.id
+  end
+
   def process
     self.virtual_account_transaction = VirtualAccountTransaction.new(self.virtual_account_transaction_params)
     if self.virtual_account_transaction.save
@@ -26,7 +30,7 @@ class Collect::CollectRouter < BaseOperation
       # todo - change all the below ones to async calls after testing
       case self.purpose_id
         when VirtualAccountPurpose.id_for(:virtual_bank_account)
-          Collect::VirtualBankAccount::Accept.(self.virtual_account_transaction.id)
+          op = Collect::VirtualAccount::Accept.(self.virtual_account_transaction.id)
         when VirtualAccountPurpose.id_for(:payment_receivable)
           Collect::PaymentReceivable::Accept.(self.virtual_account_transaction.id)
         when VirtualAccountPurpose.id_for(:invoice)
@@ -38,6 +42,8 @@ class Collect::CollectRouter < BaseOperation
         else
           # do nothing?
       end
+    else
+      add_message :error, virtual_account_transaction.errors.full_messages
     end
   end
 

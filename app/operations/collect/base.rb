@@ -2,7 +2,8 @@ class Collect::Base < BackgroundOperation
 
   attr_accessor :virtual_account_transaction, :options, :virtual_account
 
-  def self.call(virtual_account_transaction, options = {})
+  def self.call(virtual_account_transaction_id, options = {})
+    self.virtual_account_transaction = VirtualAccountTransaction.find_by(id: virtual_account_transaction_id)
     self.new(virtual_account_transaction, options).run
   end
 
