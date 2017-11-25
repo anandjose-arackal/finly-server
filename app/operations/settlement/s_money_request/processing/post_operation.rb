@@ -29,9 +29,9 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
   end
 
   def process
-    group_completed_status = MoneyRequestProcessorGroupStatus.id_for(:completed)
-    group_failed_status = MoneyRequestProcessorGroupStatus.id_for(:failed)
-    group_partially_complete_status = MoneyRequestProcessorGroupStatus.id_for(:partially_completed)
+    group_completed_status = MoneyRequestProcessorStatus.id_for(:completed)
+    group_failed_status = MoneyRequestProcessorStatus.id_for(:failed)
+    group_partially_complete_status = MoneyRequestProcessorStatus.id_for(:partially_completed)
     money_request_status_settled = MoneyRequestStatus.id_for(:settled)
 
     has_success = false

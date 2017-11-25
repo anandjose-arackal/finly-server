@@ -21,14 +21,14 @@ class Settlement::SMoneyRequest::Processing::Process < BackgroundOperation
       add_message :error, 'Batch not found'
       return
     end
-    unless MoneyRequestProcessorGroupStatus.ids_for([:pending, :scheduled, :failed, :partially_completed]).include?(self.money_request_processor_group.status_id)
+    unless MoneyRequestProcessorStatus.ids_for([:pending, :scheduled, :failed, :partially_completed]).include?(self.money_request_processor_group.status_id)
       add_message :error, 'This batch cannot be processed at the moment'
       return
     end
   end
 
   def pre_process
-    self.money_request_processor_group.update(status_id: MoneyRequestProcessorGroupStatus.id_for(:processing))
+    self.money_request_processor_group.update(status_id: MoneyRequestProcessorStatus.id_for(:processing))
   end
 
   def process
@@ -38,9 +38,9 @@ class Settlement::SMoneyRequest::Processing::Process < BackgroundOperation
 
     has_failure = false
     has_success = false
-    status_completed = MoneyRequestProcessorGroupStatus.id_for(:completed)
-    status_failed = MoneyRequestProcessorGroupStatus.id_for(:failed)
-    status_partially_completed = MoneyRequestProcessorGroupStatus.id_for(:partially_completed)
+    status_completed = MoneyRequestProcessorStatus.id_for(:completed)
+    status_failed = MoneyRequestProcessorStatus.id_for(:failed)
+    status_partially_completed = MoneyRequestProcessorStatus.id_for(:partially_completed)
     system_message_error = SystemMessageType.id_for(:error)
     money_request_status_settled = MoneyRequestStatus.id_for(:settled)
 

@@ -30,7 +30,7 @@ class Settlement::SMoneyRequest::Processing::Cancel < Settlement::SMoneyRequest:
       add_message :error, 'Batch not found'
       return
     end
-    unless MoneyRequestProcessorGroupStatus.ids_for([:pending, :scheduled, :failed, :partially_completed]).include?(self.money_request_group_processor.status_id)
+    unless MoneyRequestProcessorStatus.ids_for([:pending, :scheduled, :failed, :partially_completed]).include?(self.money_request_group_processor.status_id)
       add_message :error, 'Batch cannot be cancelled at this stage'
       return
     end
@@ -40,11 +40,11 @@ class Settlement::SMoneyRequest::Processing::Cancel < Settlement::SMoneyRequest:
     pending_mappings = self.money_request_group_processor.mappings.pending
     pending_mappings_id = pending_mappings.pluck(:id)
     MoneyRequest.with_processor_group_mapping(pending_mappings_id).update_all(money_request_processor_group_mapping_id: nil)
-    pending_mappings.update_all(status_id: MoneyRequestProcessorGroupStatus.id_for(:cancelled))
+    pending_mappings.update_all(status_id: MoneyRequestProcessorStatus.id_for(:cancelled))
     if money_request_group_processor.partially_completed?
-      self.money_request_group_processor.update(status_id: MoneyRequestProcessorGroupStatus.id_for(:completed))
+      self.money_request_group_processor.update(status_id: MoneyRequestProcessorStatus.id_for(:completed))
     else
-      self.money_request_group_processor.update(status_id: MoneyRequestProcessorGroupStatus.id_for(:cancelled))
+      self.money_request_group_processor.update(status_id: MoneyRequestProcessorStatus.id_for(:cancelled))
     end
   end
 

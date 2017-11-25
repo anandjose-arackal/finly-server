@@ -35,7 +35,7 @@ class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::S
       add_message :error, 'Batch not found'
       return
     end
-    unless (self.money_request_processors.pluck_status_id - MoneyRequestProcessorGroupStatus.ids_for([:pending, :scheduled, :processing, :partially_completed])).blank?
+    unless (self.money_request_processors.pluck_status_id - MoneyRequestProcessorStatus.ids_for([:pending, :scheduled, :processing, :partially_completed])).blank?
       add_message :error, 'Payment file cannot be generated for the selected batches'
       return
     end

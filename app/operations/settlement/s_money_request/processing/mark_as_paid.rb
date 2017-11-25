@@ -30,7 +30,7 @@ class Settlement::SMoneyRequest::Processing::MarkAsPaid < Settlement::SMoneyRequ
       add_message :error, 'Batch not found'
       return
     end
-    unless MoneyRequestProcessorGroupStatus.ids_for([:pending, :scheduled, :failed, :partially_completed]).include?(self.money_request_group_processor.status_id)
+    unless MoneyRequestProcessorStatus.ids_for([:pending, :scheduled, :failed, :partially_completed]).include?(self.money_request_group_processor.status_id)
       add_message :error, 'Batch cannot be Marked as Paid at this stage'
       return
     end
