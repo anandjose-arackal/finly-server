@@ -78,7 +78,7 @@ class Settlement::SMoneyRequest::Processing::Process < BackgroundOperation
       mapping.money_requests.update_all(status_id: money_request_status_settled, payment: payment)
       mapping.update(status_id: status_completed, payment: payment, completed_at: DateTime.now)
       mapping.money_requests.each do |money_request|
-        MoneyRequest::MarkAsSettled.(user, {payment: payment, money_request: money_request, role_id: role, view: params[:view]})
+        ::MoneyRequest::MarkAsSettled.(user, {payment: payment, money_request: money_request, role_id: role, view: params[:view]})
       end
 
     end
