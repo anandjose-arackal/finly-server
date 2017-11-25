@@ -14,8 +14,9 @@ json.details do
     json.money_requests_count money_requests.size
     json.money_requests do
       json.array! money_requests do |money_request|
-        json.id money_request.id
-        json.name money_request.name
+        json.extract! money_request, :id, :name, :policy, :date_as_string
+        json.submitted_on DateUtils.date_formatted(report.submitted_at)
+        json.approved_on DateUtils.date_formatted(report.approved_at)
         final_approver = money_request.final_approver
         json.auto_approved final_approver.blank?
         json.final_approver do
