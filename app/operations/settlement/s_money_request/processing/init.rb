@@ -1,12 +1,13 @@
 class Settlement::SMoneyRequest::Processing::Init < Settlement::SMoneyRequest::Processing::Base
-  attr_accessor :payment_type, :money_requests, :user_money_requests, :request_total, :user_count
+  attr_accessor :payment_type, :money_requests, :user_money_requests, :expenses_total, :reimbursement_total, :user_count
 
   class Settlement::SMoneyRequest::Processing::Init::Success < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :details, :request_total, :user_count
+    attr_accessor :details, :expenses_total, :reimbursement_total, :user_count
 
     def init
       self.details = params[:details]
-      self.request_total = params[:request_total]
+      self.expenses_total = params[:expenses_total]
+      self.reimbursement_total = params[:reimbursement_total]
       self.user_count = params[:user_count]
     end
 
@@ -22,7 +23,7 @@ class Settlement::SMoneyRequest::Processing::Init < Settlement::SMoneyRequest::P
       return
     end
     if params&.dig(:money_request_id).blank? and not params&.dig(:init_all)
-      add_message :error, 'Money Request not found'
+      add_message :error, 'MoneyRequest not found'
       return
     end
     if params&.dig(:payment_type).blank?
@@ -45,8 +46,8 @@ class Settlement::SMoneyRequest::Processing::Init < Settlement::SMoneyRequest::P
     case self.payment_type
       when 'bank_transfer', 'payment_file'
         init_bank_transfer
-      when 'expense_card'
-        init_expense_card
+      when 'reimbursement_card'
+        init_reimbursement_card
       when 'outside_finly'
         init_outside_finly
     end
@@ -54,14 +55,15 @@ class Settlement::SMoneyRequest::Processing::Init < Settlement::SMoneyRequest::P
 
   def validate
     if self.money_requests.blank?
-      add_message :error, 'Money Request not found'
+      add_message :error, 'MoneyRequest not found'
       return
     end
   end
 
   def success
     params[:details] = self.user_money_requests
-    params[:request_total] = self.request_total
+    params[:expenses_total] = self.expenses_total
+    params[:reimbursement_total] = self.reimbursement_total
     params[:user_count] = self.user_count
     Settlement::SMoneyRequest::Processing::Init::Success.new(user, params, messages)
   end
@@ -74,21 +76,25 @@ class Settlement::SMoneyRequest::Processing::Init < Settlement::SMoneyRequest::P
       add_message :error, message
       return
     end
-    self.money_requests = money_requests_presenter.money_requests.approved.include_user_accounts
+    self.money_requests = money_requests_presenter.money_requests.approved.include_reimbursable_user_accounts
     if not params&.dig(:init_all) and params&.dig(:money_request_id).present?
       self.money_requests = self.money_requests.with_id(params&.dig(:money_request_id))
     end
-    request_totals_hash = self.money_requests.group_user.sum_total
+    expenses_totals = self.money_requests.group_user.expenses_total
+    reimbursable_totals = self.money_requests.group_user.expenses_reimbursable_total
     self.user_money_requests = []
-    self.request_total = 0
+    self.reimbursement_total = 0
+    self.expenses_total = 0
     self.user_count = 0
-    request_totals_hash.each do |user, total|
+    expenses_totals.each do |user, total|
       self.user_count += 1
-      self.request_total += total
+      self.reimbursement_total += (reimbursable_totals[user] || 0)
+      self.expenses_total += total
       user_money_requests << {
           user: user,
-          total: total,
-          money_requests: self.money_requests.with_user(user.id),
+          expenses_total: total,
+          reimbursement_total: reimbursable_totals[user],
+          money_requests: self.money_requests.with_user_id(user.id),
           has_errors: false
       }
     end
@@ -106,14 +112,14 @@ class Settlement::SMoneyRequest::Processing::Init < Settlement::SMoneyRequest::P
     end
   end
 
-  def init_expense_card
+  def init_reimbursement_card
     self.user_money_requests.each do |details|
       user = details[:user]
-      cards = user.expense_cards
-      details[:expense_cards] = cards
+      cards = user.reimbursement_cards
+      details[:reimbursement_cards] = cards
       if cards.blank?
         details[:has_error] = true
-        details[:errors] = 'User has not been assigned a Expense Card'
+        details[:errors] = 'User has not been assigned a Reimbursement Card'
         return
       end
     end

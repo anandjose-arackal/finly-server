@@ -1,6 +1,6 @@
 json.array! @result.paginated_money_requests do |money_request|
 
-  json.extract! money_request, :id, :name
+  json.extract! money_request, :id, :name, :policy, :submitted_at, :required_by_date
   json.user money_request.user
   json.final_approver money_request.final_approver
   currency = Currency.first

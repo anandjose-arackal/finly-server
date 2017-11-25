@@ -16,7 +16,7 @@
 #     }
 # }
 class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest::Processing::Base
-  attr_accessor :processor_params, :money_request_processor, :scheduled, :payment_request
+  attr_accessor :processor_params, :money_request_processor_group, :scheduled, :payment_request
 
   def authorized_user_types
     [:admin, :finance_manager]
@@ -39,7 +39,7 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
 
   def init
     role_id = admin_view? ? UserRole.id_for(:admin) : UserRole.id_for(:finance_manager)
-    self.money_request_processor = current_company.money_request_processors.new({
+    self.money_request_processor_group = current_company.money_request_processors.new({
                                                                                   created_by_user: user,
                                                                                   created_by_user_role_id: role_id,
                                                                                   scheduled_at: params[:scheduled_at],
@@ -47,10 +47,10 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
                                                                                   payment_mode: params[:payment_mode],
                                                                               })
     if params[:scheduled_at].present? and Date.parse(params[:scheduled_at]) > Date.today
-      self.money_request_processor.status_id = MoneyRequestProcessorStatus.id_for(:scheduled)
+      self.money_request_processor_group.status_id = MoneyRequestProcessorGroupStatus.id_for(:scheduled)
       self.scheduled = true
     else
-      self.money_request_processor.status_id = MoneyRequestProcessorStatus.id_for(:pending)
+      self.money_request_processor_group.status_id = MoneyRequestProcessorGroupStatus.id_for(:pending)
       self.scheduled = false
     end
     set_source_account
@@ -59,13 +59,13 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
   end
 
   def validate
-    unless self.money_request_processor.valid?
-      add_message :error, self.money_request_processor.errors.full_messages
+    unless self.money_request_processor_group.valid?
+      add_message :error, self.money_request_processor_group.errors.full_messages
       return
     end
-    if self.money_request_processor.payment_order.present?
+    if self.money_request_processor_group.payment_order.present?
 
-      validator = AccountManager::Payments::PaymentValidator.(self.money_request_processor.payment_order)
+      validator = AccountManager::Payments::PaymentValidator.(self.money_request_processor_group.payment_order)
       unless validator.success?
         add_message :error, validator.messages[:error]
         return
@@ -74,8 +74,8 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
   end
 
   def process
-    self.money_request_processor.save
-    if self.money_request_processor.process_via_finly?
+    self.money_request_processor_group.save
+    if self.money_request_processor_group.process_via_finly?
       AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
     end
   end
@@ -87,19 +87,19 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
       when 'bank_transfer'
         case params[:source_account_type]
           when 'company_credits'
-            self.money_request_processor.source_account = current_company.yes_bank_company_account
+            self.money_request_processor_group.source_account = current_company.yes_bank_company_account
           when 'finly_money'
-            self.money_request_processor.source_account = user.bank_wallet
+            self.money_request_processor_group.source_account = user.bank_wallet
           else
             add_message :error, 'Invalid Source Account Type'
             return
         end
-      when 'expense_card'
+      when 'reimbursement_card'
         case params[:source_account_type]
           when 'company_credits'
-            self.money_request_processor.source_account = current_company.itz_cash_company_account
+            self.money_request_processor_group.source_account = current_company.itz_cash_company_account
           when 'finly_money'
-            self.money_request_processor.source_account = user.user_wallet
+            self.money_request_processor_group.source_account = user.user_wallet
           else
             add_message :error, 'Invalid Source Account Type'
             return
@@ -158,14 +158,14 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
             add_message :error, 'Bank Account not found'
             return
           end
-        when 'expense_card'
+        when 'reimbursement_card'
           unless processor_accountable_type == Card.name
-            add_message :error, 'Funds can only be transferred to Expense Card in this mode'
+            add_message :error, 'Funds can only be transferred to Reimbursement Card in this mode'
             return
           end
           processor_accountable = user.reimbursement_cards.find_by_id(processor_accountable_id)
           if processor_accountable.blank?
-            add_message :error, 'Expense Card not found'
+            add_message :error, 'Reimbursement Card not found'
             return
           end
         when 'outside_finly'
@@ -194,8 +194,8 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
         add_message :error, 'Amount has to be greater than or equal to 0'
         return
       end
-      mapping_status = MoneyRequestProcessorStatus.id_for(:pending)
-      self.money_request_processor.mappings.build({
+      mapping_status = MoneyRequestProcessorGroupStatus.id_for(:pending)
+      self.money_request_processor_group.mappings.build({
                                                      user: user,
                                                      processor_accountable: processor_accountable,
                                                      money_requests: money_requests,
@@ -207,20 +207,20 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
                                                      note: config[:note]
                                                  })
     end
-    self.money_request_processor.total_amount = Amount.new(value: total, currency_id: currency_id)
+    self.money_request_processor_group.total_amount = Amount.new(value: total, currency_id: currency_id)
   end
 
   def set_payment_request
-    return unless self.money_request_processor.process_via_finly?
+    return unless self.money_request_processor_group.process_via_finly?
     receiving_account_class = params&.dig(:payment_type) == 'bank_transfer' ? BankAccount.name : Card.name
     post_operation = 'Settlement::SMoneyRequest::Processing::PostOperation'
     post_operation_payload = {}
-    self.payment_request = ::PaymentRequest.(user, self.money_request_processor.source_account,
-        receiving_account_class, :credit, :advance,
-        background: true, scheduled_at: self.money_request_processor.scheduled_at)
+    self.payment_request = ::PaymentRequest.(user, self.money_request_processor_group.source_account,
+        receiving_account_class, :credit, :reimbursement,
+        background: true, scheduled_at: self.money_request_processor_group.scheduled_at)
     self.payment_request.add_post_operation_action(post_operation, post_operation_payload)
-    self.money_request_processor.payment_order = self.payment_request.build_payment_order
-    self.money_request_processor.mappings.each do |mapping|
+    self.money_request_processor_group.payment_order = self.payment_request.build_payment_order
+    self.money_request_processor_group.mappings.each do |mapping|
       payment_item = PaymentRequest::PaymentItem.(mapping.user, mapping.processor_accountable, mapping.amount.value, note: mapping.note)
       self.payment_request.add_payment_item(payment_item)
       mapping.payment = payment_item.payment
