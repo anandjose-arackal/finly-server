@@ -3,12 +3,14 @@
 
 class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Base
 
-  attr_accessor :account_params, :purpose_id, :bank_account, :parent, :expire_by, :exact_transaction_amount
+  attr_accessor :account_params, :purpose_id, :bank_account, :parent, :expire_by, :exact_transaction_amount,
+                :virtual_bank_account_params
 
   def init
     self.company = user.company
     self.purpose_id = params[:purpose_id] || ::VirtualAccountPurpose.id_for(:virtual_bank_account)
     self.parent = params[:parent]
+    self.virtual_bank_account_params = virtal_account_params
   end
 
   def validate
@@ -46,7 +48,11 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
                                                     company_id: company.id,
                                                     purpose_id: self.purpose_id,
                                                     parent: self.parent,
-                                                    initiating_user: user)
+                                                    initiating_user: user,
+                                                    description: virtual_bank_account_params[:description],
+                                                    expires_by: virtual_bank_account_params[:expires_by],
+                                                    name: virtual_bank_account_params[:name]
+                                                    )
     else
       add_message :error, "Could not generate virtual account number, please try again later"
     end
@@ -58,6 +64,10 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
   end
 
   private
+
+  def virtual_account_params
+    params.require(:virtual_bank_account).permit(:name, :expires_by, :description)
+  end
 
   def generate_random_bank_account
     "FINLY#{random_number(10)}"
