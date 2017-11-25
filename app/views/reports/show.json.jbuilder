@@ -24,7 +24,7 @@ json.controlling_user @result.report.controlling_user&.name
 policy_id = nil
 policy_name = nil
 if @result.report.policy
-  policy_id = @result.report.policy_id
+  policy_id = @result.report.ra
   policy_name = @result.report.policy.name
   json.policy @result.report.policy.name
   json.policy_id @result.report.policy_id
