@@ -83,6 +83,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       invoice_date = item[:invoice_date]
       due_date = item[:due_date]
       inclusive_of_taxes = item[:inclusive_of_taxes]
+      net_amount = item[:net_amount]
 
       self.valid = true
       self.error_messages = []
@@ -191,11 +192,14 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       self.payment_order_valid = false unless self.valid
 
+
+
       self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
                                gst_type_id: gst_type_id, tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds,
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
                                advance: advance, advance_amount: advance_amount, freight: freight,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
+                               net_amount: net_amount,
                                valid: self.valid, messages: self.error_messages}
     end
   end

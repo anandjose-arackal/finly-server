@@ -23,6 +23,7 @@ json.payment do
       json.valid item[:valid]
       json.messages item[:messages]
       json.custom_fields_config item[:custom_fields]
+      json.net_amount item[:net_amount]
     end
   end
   json.errors @result.errors

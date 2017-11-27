@@ -4,7 +4,8 @@
 class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequest::Beneficiary::Base
 
   attr_accessor :payments_data, :amount, :bank_payment_request, :payment_order,
-                :error_messages, :processed_order_data, :order_data,
+                :error_messages, :processed_order_data, :order_data, :company_id,
+                :unauthorized_vendors_presence,
                 :invoice_amount, :payment_amount, :payment,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
@@ -12,7 +13,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
 
   def pre_validate
     super
-    if params[:bank_accounts].blank?
+    if params[:payment_order].blank?
       add_message :error, "No bank accounts data passed"
     end
   end
@@ -24,13 +25,12 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
     op = BankTransfer::PaymentRequest::Process.(user, scheduled_at: params[:scheduled_at],
         payment_order: self.order_data)
     self.processed_order_data = op.payment_order_data
-    self.payments_data = retrieve_payments_data
+    retrieve_payments_data
   end
 
   def validate
     super
     # checking if the payment data is valid - all or nothing
-    # todo - the error messages can be customized to each payment being added later - like in multiple expense creation
     valid = true
     self.error_messages = []
     self.payments_data.each do |data|
@@ -52,6 +52,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
       # set custom field data
       set_custom_fields(false, payment)
       payment.save
+      debugger
     end
   end
 
@@ -62,16 +63,17 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
     amount_requested = self.payment_order.request_total
     payment_order.amount_requested&.update(value: amount_requested)
 
-    if bank_payment_request.retracted? || bank_payment_request.rejected?
-      # adding comments for all the beneficiaries removed in the comments
-      params[:bank_accounts].each do |data|
-        id = data[:id]
-        account = user.company.bank_accounts.find_by(id: id)
-        bank_payment_request.comments.build(action_id: BankPaymentRequestCommentAction.id_for(:add_beneficiary),
-                                            user_id: user.id,
-                                            beneficiary_id: account.id).save
-      end
-    end
+    # todo - get back to this
+    # if bank_payment_request.retracted? || bank_payment_request.rejected?
+    #   # adding comments for all the beneficiaries removed in the comments
+    #   params[:payment_order].each do |data|
+    #     id = data[:id]
+    #     account = user.company.bank_accounts.find_by(id: id)
+    #     bank_payment_request.comments.build(action_id: BankPaymentRequestCommentAction.id_for(:add_beneficiary),
+    #                                         user_id: user.id,
+    #                                         beneficiary_id: account.id).save
+    #   end
+    # end
   end
 
   private
@@ -101,7 +103,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
                   currency_id: 1
               },
               freight_amount_attributes: {
-                  value: order_details[:freight_amount],
+                  value: order_details[:freight],
                   currency_id: 1
               },
               invoice_number: order_details[:invoice_number],
