@@ -14,7 +14,7 @@ class Settlement::SMoneyRequest::Completed::Index < Settlement::SMoneyRequest::C
       add_message :error, money_requests_presenter.messages[:error]
       return
     end
-    self.money_requests = money_requests_presenter.money_requests.completed
+    self.money_requests = money_requests_presenter.money_requests.credited
   end
 
   def success
