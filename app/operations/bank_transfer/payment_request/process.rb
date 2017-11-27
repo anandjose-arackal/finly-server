@@ -70,11 +70,11 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       amount = item[:original_amount]&.to_f || item["original_amount"]&.to_f
       note = item[:note]&.to_s || item["note"]&.to_s
       gst_type_id = item[:gst_type_id]
-      tax_amount = item[:tax_amount]
-      discount_amount = item[:discount_amount]
-      tds_amount = item[:tds_amount]
+      tax_amount = item[:tax_amount]&.to_f
+      discount_amount = item[:discount_amount]&.to_f
+      tds_amount = item[:tds_amount]&.to_f
       discount = item[:discount]
-      advance_amount = item[:advance_amount]
+      advance_amount = item[:advance_amount]&.to_f
       advance = item[:advance]
       freight = item[:freight]
       tds = item[:tds]
@@ -83,7 +83,8 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       invoice_date = item[:invoice_date]
       due_date = item[:due_date]
       inclusive_of_taxes = item[:inclusive_of_taxes]
-      net_amount = item[:net_amount]
+
+      net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
 
       self.valid = true
       self.error_messages = []
@@ -101,30 +102,30 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.error_messages << 'Invalid amount'
       end
 
-      unless validate_amount(discount_amount)
-        self.valid = false
-        self.error_messages << 'Invalid discount amount'
-      end
-
-      unless validate_amount(tax_amount)
-        self.valid = false
-        self.error_messages << 'Invalid tax amount'
-      end
-
-      unless validate_amount(tds_amount)
-        self.valid = false
-        self.error_messages << 'Invalid TDS amount'
-      end
-
-      unless validate_amount(advance_amount)
-        self.valid = false
-        self.error_messages << 'Invalid advance amount'
-      end
-
-      unless validate_amount(freight)
-        self.valid = false
-        self.error_messages << 'Invalid freight'
-      end
+      # unless validate_amount(discount_amount)
+      #   self.valid = false
+      #   self.error_messages << 'Invalid discount amount'
+      # end
+      #
+      # unless validate_amount(tax_amount)
+      #   self.valid = false
+      #   self.error_messages << 'Invalid tax amount'
+      # end
+      #
+      # unless validate_amount(tds_amount)
+      #   self.valid = false
+      #   self.error_messages << 'Invalid TDS amount'
+      # end
+      #
+      # unless validate_amount(advance_amount)
+      #   self.valid = false
+      #   self.error_messages << 'Invalid advance amount'
+      # end
+      #
+      # unless validate_amount(freight)
+      #   self.valid = false
+      #   self.error_messages << 'Invalid freight'
+      # end
 
       # check if name is present
       if name.blank?

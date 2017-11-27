@@ -48,23 +48,6 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
     # run a loop till the next_reviewer is the current user
     self.reviewer = bank_payment_request.owner
     self.reviewer_role = UserRole.id_for(:employee)
-    # first generate the owner's entry in the approvers hash - if the payment order is in open state
-    # if self.bank_payment_request.open?
-    #   self.approvers << {
-    #       controlling_user: bank_payment_request.can_submit?,
-    #       action_id: nil,
-    #       owner: true,
-    #       action_user: {
-    #           name: bank_payment_request.owner.name,
-    #           email: bank_payment_request.owner.email,
-    #           mobile_number: bank_payment_request.owner.mobile_number
-    #       },
-    #       role: {
-    #           id: UserRole.id_for(:employee),
-    #           name: UserRole.name_for(UserRole.id_for(:employee))
-    #       },
-    #   }
-    # end
 
     op = User::Team::Review::NextReviewer.(bank_payment_request, controlling_user: self.reviewer, controlling_user_role_id: self.reviewer_role)
     first_reviewer = op.user
