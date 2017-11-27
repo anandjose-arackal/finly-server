@@ -93,21 +93,25 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
       self.reviewer_role = trail.action_user_role_id
     end
 
-    # adding the controlling user of the particular bank payment request
-    self.approvers << {
-        action_id: nil,
-        controlling_user: true,
-        owner: (bank_payment_request.controlling_user_id == bank_payment_request.owner&.id),
-        action_user: {
-            name: bank_payment_request.controlling_user&.name,
-            email: bank_payment_request.controlling_user&.email,
-            mobile_number: bank_payment_request.controlling_user&.mobile_number,
-        },
-        role: {
-            id: bank_payment_request.controlling_user_role_id,
-            name: UserRole.id_for(bank_payment_request.controlling_user_role_id)
-        }
-    }
+    # adding the controlling user of the particular bank payment request if they're present
+    if bank_payment_request.controlling_user.present?
+      self.approvers << {
+          action_id: nil,
+          controlling_user: true,
+          owner: (bank_payment_request.controlling_user_id == bank_payment_request.owner&.id),
+          action_user: {
+              name: bank_payment_request.controlling_user&.name,
+              email: bank_payment_request.controlling_user&.email,
+              mobile_number: bank_payment_request.controlling_user&.mobile_number,
+          },
+          role: {
+              id: bank_payment_request.controlling_user_role_id,
+              name: UserRole.id_for(bank_payment_request.controlling_user_role_id)
+          }
+      }
+    end
+    self.reviewer = bank_payment_request.controlling_user
+    self.reviewer_role = bank_payment_request.controlling_user_role_id
 
     # now extracting all pending approvers (assuming there's not take control action here)
     op = User::Team::Review::NextReviewer.(bank_payment_request, controlling_user: self.reviewer, controlling_user_role_id: self.reviewer_role)
