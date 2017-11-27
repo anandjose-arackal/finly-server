@@ -12,6 +12,14 @@ class ReportSyncStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:not_synced, :in_progress, :synced, :partially_synced]
+    [:not_synced, :in_progress, :synced, :partially_synced, :exported]
   end
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end
