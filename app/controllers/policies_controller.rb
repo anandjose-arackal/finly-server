@@ -111,9 +111,11 @@ class PoliciesController < ApplicationController
     @result = Policy::Users::RemoveUser.(current_user, params)
     if @result.success?
       @result.users = Policy::Show.(current_user, params).users
-    end
-    respond_to do |format|
-      format.json {}
+      respond_to do |format|
+        format.json {}
+      end
+    else
+      respond response: :failure, message: @result.messages[:error]
     end
   end
 

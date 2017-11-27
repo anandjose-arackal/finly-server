@@ -77,6 +77,8 @@ class ImportUtil
     clean_text = raw_text
     if clean_text.is_a?(Float) || clean_text.is_a?(Integer)
       clean_text = clean_text&.to_i&.to_s
+    elsif clean_text.is_a?(Date)
+      clean_text = clean_text.strftime("%d-%m-%Y")
     end
     character_array.each do |character|
       clean_text = clean_text.sub(character, '')

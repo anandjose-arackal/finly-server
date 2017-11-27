@@ -112,6 +112,9 @@ class Settlement::SReport::Approved < Report::Base
       if op.success?
         payment = op.payment_order.payments.first
         payment.update(reference_resource: self.report)
+      else
+        # add a condition here so that if this fails, we are notified or at least initimated in some way
+
       end
     end
     ######### end of cash on hand deduction ########

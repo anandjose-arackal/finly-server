@@ -101,6 +101,7 @@ class User < ActiveRecord::Base
   has_one :user_panel_subscription, dependent: :destroy
   has_one :cash_on_hand, dependent: :destroy
   has_one :quickbooks_user, class_name: "QuickbooksFinlyIntegrationsUser"
+  has_one :permission, class_name: "UserPermission"
 
   has_many :admin_summary_mail_configs, dependent: :destroy
   has_many :manager_summary_mail_configs, dependent: :destroy
@@ -150,6 +151,7 @@ class User < ActiveRecord::Base
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
+  has_one :user_permission
 
   # has_one :feature_access, as: :accessible
 
@@ -160,7 +162,6 @@ class User < ActiveRecord::Base
   accepts_nested_attributes_for :itz_cash_dmt_sender
   accepts_nested_attributes_for :user_panel_subscription
   accepts_nested_attributes_for :quickbooks_user
-  # accepts_nested_attributes_for :feature_access
 
   delegate :employee_id, :payroll_id, :city, :address_1, :address_2, :date_of_birth, :pin_code, :gender_name, :state_id, :state_name, to: :profile
   delegate :company_name, to: :company
@@ -420,6 +421,7 @@ class User < ActiveRecord::Base
     # creating the cash on hand account for this user
     self.build_cash_on_hand(balance_attributes: {value: 0, currency_id: Currency.id_for(:INR)}).save
     self.build_bank_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+    self.build_user_permission(create_beneficiaries: false, company_id: self.company_id).save
   end
 
   def strip_whitespace
@@ -600,9 +602,6 @@ class User < ActiveRecord::Base
   alias_method :finance?, :finance_manager?
 
   def as_json(options = {})
-    # json = super(options)
-    # json[:name] = self.name
-    # json
     {
         id: id,
         name: name,

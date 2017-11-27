@@ -26,7 +26,14 @@
 #  processed_amount_id                :integer
 #  money_request_processor_mapping_id :integer
 #  auto_approve                       :boolean
+#  approved_at                        :datetime
 #
+
+
+
+
+
+
 
 
 
@@ -172,7 +179,7 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def can_retract?
-    processing?
+    processing? or (approved? and auto_approve)
   end
 
   def can_destroy?

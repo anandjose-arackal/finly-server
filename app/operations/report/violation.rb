@@ -25,6 +25,14 @@ class Report::Violation < Report::Base
   include ActionView::Helpers::NumberHelper
   attr_accessor :no_policy, :warning_messages, :policy, :base_currency_code, :base_currency_id
 
+  def personalizer
+    {
+        post_process: {
+            before: Personalizer::Process.new([:report, :violation], :post_process, self)
+        }
+    }
+  end
+
   def authorized_user_types
     nil
   end

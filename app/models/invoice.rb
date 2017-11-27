@@ -49,6 +49,9 @@ class Invoice < ActiveRecord::Base
   belongs_to :tax_amount, class_name: "Amount"
   belongs_to :discount_amount, class_name: "Amount"
   belongs_to :original_amount, class_name: "Amount"
+  belongs_to :advance_amount, class_name: "Amount"
+  belongs_to :freight_amount, class_name: "Amount"
+  belongs_to :category
 
   belongs_to :payment
 
@@ -64,7 +67,9 @@ class Invoice < ActiveRecord::Base
   accepts_nested_attributes_for :tds_amount
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :original_amount
+  accepts_nested_attributes_for :freight_amount
   accepts_nested_attributes_for :custom_fields
+  accepts_nested_attributes_for :advance_amount
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount
@@ -84,6 +89,54 @@ class Invoice < ActiveRecord::Base
   # the 'user' will default to the initiating user of the payment
   def user
     self.payment.initiating_user
+  end
+
+  def tax_rate
+    return 0 if tax.blank? || gross_amount.blank?
+    case self.tax_type_id
+      when 1, '1'
+        return self.tax
+      when 2, '2'
+        return (self.tax / (self.gross_amount.value)) * 100
+      else
+        return self.tax
+    end
+  end
+
+  def advance_rate
+    return 0 if advance.blank? || net_amount.blank?
+    case self.advance_type_id
+      when 1, '1'
+        return self.advance
+      when 2, '2'
+        return (self.advance / (self.advance + self.net_amount.value)) * 100
+      else
+        return self.advance
+    end
+  end
+
+  def tds_rate
+    return 0 if tds.blank? || gross_amount.blank?
+    case self.tds_type_id
+      when 1, '1'
+        return self.tds
+      when 2, '2'
+        return (self.tds / (self.gross_amount.value)) * 100
+      else
+        return self.tds
+    end
+  end
+
+  def discount_rate
+    return 0 if discount.blank? || amount.blank?
+    case self.discount_type_id
+      when 1, '1'
+        return self.discount
+      when 2, '2'
+        return (self.discount / (self.amount.value)) * 100
+      else
+        return self.discount
+    end
   end
 
   private

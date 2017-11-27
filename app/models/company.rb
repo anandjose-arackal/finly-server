@@ -24,6 +24,7 @@ class Company < ActiveRecord::Base
   has_many :export_preferences, dependent: :destroy
   has_one :account, class_name: 'CompanyAccount'
   has_one :quickbooks_configuration
+  has_one :tally_configuration
   has_many :fund_load_requests, class_name: 'CompanyFundsLoadRequest'
   has_one :itz_cash_property
   has_many :company_transactions
@@ -242,6 +243,10 @@ class Company < ActiveRecord::Base
 
   def vendor_payments_enabled?
     self.feature_subscription.yes_bank_account
+  end
+
+  def yes_bank_api_enabled?
+    self.feature_subscription.yes_bank_api_enabled
   end
 
   def more_than_one_subscription?

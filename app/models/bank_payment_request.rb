@@ -181,6 +181,10 @@ class BankPaymentRequest < ActiveRecord::Base
     self.payment_order.partially_completed? || self.payment_order.failed?
   end
 
+  def verified?
+    [BankPaymentRequestStatus.ids_for([:approved, :credited])].include?(self.status_id)
+  end
+
   private
 
   def generate_name

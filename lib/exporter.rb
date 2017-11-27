@@ -167,7 +167,8 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       self.files = [] if self.files.blank?
       zip_buffer = Zip::OutputStream.write_buffer do |stream|
         self.files.each do |file_details|
-          raise 'Invalid data format' if not file_details.is_a?(Hash) or file_details[:name].blank? or (file_details[:path].blank? and file_details[:file_contents].blank?)
+          raise 'Invalid data format' if not file_details.is_a?(Hash) or file_details[:name].blank? or
+              (file_details[:path].blank? and file_details[:file_contents].blank?)
           stream.put_next_entry(file_details[:name])
           if file_details[:path].present?
             stream.write IO.read(file_details[:path])
@@ -200,10 +201,6 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       end
     end
 
-    def generate_xml
-
-    end
-
     def render_xml(controller)
       self.filename = 'export' if self.filename.blank?
       self.filename += '.xml' unless self.filename.include? '.xml'
@@ -211,7 +208,13 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
         raise 'XML template not found'
         return
       end
-      controller.render xml: self.filename, layout: self.template, print_media_type: true, locals: local_variables
+      controller.send_data generate_xml, filename: self.filename
+    end
+
+    def generate_xml
+      view = ActionView::Base.new(ActionController::Base.view_paths)
+      view.extend ApplicationHelper
+      view.render(file: self.template, locals: local_variables)
     end
 
   end

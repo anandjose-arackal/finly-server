@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ENVELOPE>
+   <HEADER>
+      <TALLYREQUEST>Import Data</TALLYREQUEST>
+   </HEADER>
+   <BODY>
+      <IMPORTDATA>
+         <REQUESTDESC>
+            <REPORTNAME>Vouchers</REPORTNAME>
+            <STATICVARIABLES>
+               <SVCURRENTCOMPANY><%= html_escape company_name %></SVCURRENTCOMPANY>
+            </STATICVARIABLES>
+         </REQUESTDESC>
+         <REQUESTDATA>
+            <TALLYMESSAGE xmlns:UDF="TallyUDF">
+            <% expenses.each do |expense| %>
+               <VOUCHER VCHTYPE="Payment" ACTION="Create">
+                  <VOUCHERTYPENAME>Payment</VOUCHERTYPENAME>
+                  <DATE><%= expense.date.strftime('%Y%m%d') %></DATE>
+                  <NARRATION><%= html_escape expense.merchant_name(simple: true) %></NARRATION>
+                  <EFFECTIVEDATE><%= expense.date.strftime('%Y%m%d') %></EFFECTIVEDATE>
+                  <ALLLEDGERENTRIES.LIST>
+                     <LEDGERNAME><%= html_escape expense.category.name %></LEDGERNAME>
+                     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                     <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                     <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                     <AMOUNT>-<%= expense.amount.value %></AMOUNT>
+                  </ALLLEDGERENTRIES.LIST>
+                  <ALLLEDGERENTRIES.LIST>
+                     <LEDGERNAME>Cash</LEDGERNAME>
+                     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                     <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+                     <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                     <AMOUNT><%= expense.amount.value %></AMOUNT>
+                  </ALLLEDGERENTRIES.LIST>
+               </VOUCHER>
+            <% end %>
+            </TALLYMESSAGE>
+         </REQUESTDATA>
+      </IMPORTDATA>
+   </BODY>
+</ENVELOPE>

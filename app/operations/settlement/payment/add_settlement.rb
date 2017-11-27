@@ -161,7 +161,7 @@ class Settlement::Payment::AddSettlement < Settlement::Payment::Base
 
     # validating that the money deducted from cash in hand is actually less than the cash in hand on date of settlement
     cash_on_hand_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(to_user.cash_on_hand)
-    cash_in_hand = cash_on_hand_adapter.balance
+    cash_in_hand = cash_on_hand_adapter.balance(display_balance: true)
 
     if cash_in_hand_deduction_amount.present? and precision_value(cash_in_hand_deduction_amount) > precision_value(cash_in_hand)
       add_message :error, "Deduct Cash on Hand amount is greater than the cash on hand with #{to_user.name}"

@@ -13,8 +13,8 @@ json.summary do
   json.payment_type @result.payment_order.payment_type&.humanize
   json.scheduled_at @result.payment_order.scheduled_at&.strftime "%d %b %Y"
   json.processed_at @result.payment_order.processed_at&.strftime "%d %b %Y"
-  json.amount_requested @result.payment_order.amount_requested&.value
-  json.amount_processed @result.payment_order.amount_processed&.value
+  json.amount_requested precision_value @result.payment_order.amount_requested&.value
+  json.amount_processed precision_value @result.payment_order.amount_processed&.value
   json.description @result.bank_payment_request.description
   json.note @result.payment_order.note
   json.initiating_user @result.bank_payment_request.owner.name
@@ -23,6 +23,7 @@ json.summary do
   creditor = (@result.finance_manager.name rescue '--')
   json.crediting_user creditor
   json.beneficiary_type @result.bank_payment_request.beneficiary_type
+  json.approvers @result.approvers
 end
 
 
@@ -50,6 +51,8 @@ json.payments do
       json.raw_amount precision_value invoice&.amount&.value
       json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
+        json.advance invoice.advance
+        json.advance_amount invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
@@ -59,11 +62,21 @@ json.payments do
         json.tds_type_id invoice.tds_type_id
         json.discount_amount precision_value invoice.discount_amount&.value
         json.discount precision_value invoice.discount
+        json.advance_type_id invoice.advance_type_id
+        json.advance invoice.advance
+        json.freight_amount invoice.freight_amount&.value
         json.date invoice.date
         json.discount_type_id invoice.discount_type_id
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
+        json.freight_amount invoice.freight_amount&.value
+        # adding the respective rates
+        json.tax_rate precision_value invoice.tax_rate
+        json.tds_rate precision_value invoice.tds_rate
+        json.discount_rate precision_value invoice.discount_rate
+        json.advance_rate precision_value invoice.advance_rate
+        #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
@@ -74,9 +87,7 @@ json.payments do
           json.array! invoice.custom_fields
         end
         json.category_id invoice.category_id
-        json.custom_fields_config do
-          json.array!(@result.custom_field_config)
-        end
+        json.category_name invoice.category&.name
       end
     else
       json.raw_amount precision_value payment.amount_value
@@ -109,6 +120,8 @@ json.payments_verified do
       json.raw_amount precision_value invoice&.amount&.value
       json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
+        json.advance invoice.advance
+        json.advance_amount invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
@@ -123,6 +136,13 @@ json.payments_verified do
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
+        json.freight_amount invoice.freight_amount&.value
+        # adding the respective rates
+        json.tax_rate precision_value invoice.tax_rate
+        json.tds_rate precision_value invoice.tds_rate
+        json.discount_rate precision_value invoice.discount_rate
+        json.advance_rate precision_value invoice.advance_rate
+        #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
@@ -133,9 +153,7 @@ json.payments_verified do
           json.array! invoice.custom_fields
         end
         json.category_id invoice.category_id
-        json.custom_fields_config do
-          json.array!(@result.custom_field_config)
-        end
+        json.category_name invoice.category&.name
       end
     else
       json.raw_amount precision_value payment.amount_value
@@ -169,6 +187,8 @@ json.payments_unverified do
       json.raw_amount precision_value invoice&.amount&.value
       json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
+        json.advance invoice.advance
+        json.advance_amount invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
@@ -183,6 +203,13 @@ json.payments_unverified do
         json.due_date invoice.due_date
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
+        json.freight_amount invoice.freight_amount&.value
+        # adding the respective rates
+        json.tax_rate precision_value invoice.tax_rate
+        json.tds_rate precision_value invoice.tds_rate
+        json.discount_rate precision_value invoice.discount_rate
+        json.advance_rate precision_value invoice.advance_rate
+        #############################
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
@@ -193,9 +220,7 @@ json.payments_unverified do
           json.array! invoice.custom_fields
         end
         json.category_id invoice.category_id
-        json.custom_fields_config do
-          json.array!(@result.custom_field_config)
-        end
+        json.category_name invoice.category&.name
       end
     else
       json.raw_amount precision_value payment.amount_value

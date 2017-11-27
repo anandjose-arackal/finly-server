@@ -30,10 +30,13 @@ class BankTransfer::PaymentRequest::AccountDetails < BankTransfer::PaymentReques
 
   class BankTransfer::PaymentRequest::AccountDetails::AccountsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :bank_accounts
+    attr_accessor :bank_accounts, :custom_fields_config
 
     def init
       self.bank_accounts = params[:bank_accounts]
+      self.custom_fields_config = {
+          invoice: user.company.field_configurations.exclude_deleted.with_parent_type(FieldParentType.id_for(:invoice))
+      }
     end
   end
 

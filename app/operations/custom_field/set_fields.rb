@@ -50,9 +50,11 @@ class CustomField::SetFields < CustomField::Base
         policy = item.policy
         self.field_configurations = policy.field_configurations.exclude_deleted
       else
-        if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request), FieldParentType.id_for(:invoice)].include?(parent_type_id)
+        if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(parent_type_id)
           # For reports and money requests
-          self.field_configurations = item.user.company.field_configurations
+          self.field_configurations = item.user.company.field_configurations.exclude_deleted
+        elsif [FieldParentType.id_for(:invoice)].include?(parent_type_id)
+          self.field_configurations = current_company.field_configurations.exclude_deleted
         elsif FieldParentType.expense_ids.include?(parent_type_id)
           # For expenses
           user = item.expense.user rescue nil

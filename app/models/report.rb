@@ -60,6 +60,8 @@ class Report < ActiveRecord::Base
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
   belongs_to :sync_status, class_name: "ReportSyncStatus"
   belongs_to :report_processor_group_mapping
+  belongs_to :sync_status, class_name: 'ReportSyncStatus'
+  belongs_to :sync_type, class_name: 'ReportSyncType'
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 

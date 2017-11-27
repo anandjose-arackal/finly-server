@@ -67,8 +67,9 @@ class Report::Retract < Report::Base
     # destroying the submitted amount field
     report.submitted_amount&.destroy
 
-    if prev_status.approved?
+    if prev_status.approved? || report.auto_approve
       op = Settlement::SReport::Unapproved.(user, report: report)
+      report.update(auto_approve: false)
     end
 
     # Invalidate All existing Email Authorizations

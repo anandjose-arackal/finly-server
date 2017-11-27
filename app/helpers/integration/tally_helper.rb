@@ -1,0 +1,2 @@
+module Integration::TallyHelper
+end
