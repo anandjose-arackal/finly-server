@@ -1,4 +1,4 @@
-json.array! @result.payment_requests.each do |payment_request|
+json.array! @result.paginated_requests.each do |payment_request|
   item = payment_request.payment_order
   json.id item.bank_payment_request&.id
   scheduled_at = item.scheduled_at

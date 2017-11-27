@@ -58,9 +58,6 @@
 
 
 
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -758,11 +755,5 @@ class User < ActiveRecord::Base
   end
 
   private
-
-# def valid_role
-#   if self.role_mapping.count == 0
-#     errors.add(:user, "must be assigned a role")
-#   end
-# end
 
 end

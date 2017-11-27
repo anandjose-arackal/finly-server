@@ -1790,6 +1790,8 @@ Rails.application.routes.draw do
 
     namespace :v2 do
       get 'available_expense_types', to: 'expenses#available_expense_types'
+      resources :expenses, only: [:index, :show, :create, :update, :destroy]
+      resources :reports, only: [:show]
     end
   end
 
@@ -2272,6 +2274,13 @@ Rails.application.routes.draw do
   patch 'quickbooks/update_config', to: 'quickbooks#update', as: :quickbooks_update_config
   patch 'quickbooks/sync_users', to: 'quickbooks#sync_users', as: :sync_users
   get 'quickbooks/config', to: 'quickbooks#show', as: :quickbooks_config
+
+  namespace :integration do
+    get 'tally/check', to: 'tally#check'
+    get 'tally/vouchers', to: 'tally#vouchers'
+    post 'tally/configuration', to: 'tally#set_configuration'
+  end
+
 
   get 'tos', to: 'static_pages#tos'
   get 'privacy', to: 'static_pages#privacy'

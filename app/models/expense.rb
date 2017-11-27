@@ -438,7 +438,8 @@ class Expense < ActiveRecord::Base
   end
 
 
-  def merchant_name
+  def merchant_name(options={})
+    simple = !!options&.dig(:simple)
     case self.expense_type_id
       when ExpenseType.id_for(:manual)
         # this will handle cases for deleted expenses as well.
@@ -467,9 +468,17 @@ class Expense < ActiveRecord::Base
           return "- -"
         else
           if self.distance_expense?
-            return "#{self.distance_expense.distance_value} KM @ ₹#{report.policy.distance_expense_config.rate_value} per KM"
+            if simple
+              return "#{self.distance_expense.distance_value} KM at INR#{report.policy.distance_expense_config.rate_value} per KM"
+            else
+              return "#{self.distance_expense.distance_value} KM @ ₹#{report.policy.distance_expense_config.rate_value} per KM"
+            end
           elsif self.time_expense?
-            return "#{self.time_expense.time_object_value} Hours @ ₹#{report.policy.time_expense_config.rate_value} per Hour"
+            if simple
+              return "#{self.time_expense.time_object_value} Hours @ ₹#{report.policy.time_expense_config.rate_value} per Hour"
+            else
+              return "#{self.time_expense.time_object_value} Hours at INR#{report.policy.time_expense_config.rate_value} per Hour"
+            end
           end
         end
     end
