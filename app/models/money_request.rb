@@ -47,6 +47,7 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :policy
   belongs_to :payment
+  belongs_to :money_request_processor_mapping
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
