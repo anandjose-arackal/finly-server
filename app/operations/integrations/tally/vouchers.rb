@@ -23,7 +23,9 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
       return
     end
     self.reports = reports_presenter.reports
-    unless params[:filtered]
+    if params[:filtered]
+      self.reports = self.reports.processed
+    else
       id = params[:id] || params[:report_id]
       id = id.split(',')
       self.reports = self.reports.with_id(id)
