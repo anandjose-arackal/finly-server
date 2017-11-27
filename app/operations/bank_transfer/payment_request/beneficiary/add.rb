@@ -113,7 +113,8 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
               gst_type_id: order_details[:gst_type_id],
               discount: order_details[:discount],
               tax: order_details[:tax],
-              tds: order_details[:tds]
+              tds: order_details[:tds],
+              advance: order_details[:advance]
           }
       }
     end
@@ -132,7 +133,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
       # setting unauthorized vendors as true so that after creation, the approval flow is mandated
       self.unauthorized_vendors_presence = true
     end
-    return ba
+    ba
   end
 
 
@@ -151,9 +152,9 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
     CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
 
-  def calculate_tax_and_discounts
+  def calculate_tax_and_discounts(payment)
     self.invoice = payment.invoice
-    if self.invoice.inclusive_of_taxes # calculate the other amounts retrospectively
+    if payment.invoice.inclusive_of_taxes # calculate the other amounts retrospectively
       self.after_tax_amount = self.invoice.original_amount&.value
       # first calculate the gross amount from the
       calculate_inclusive_taxes
@@ -172,41 +173,41 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
       calculate_advance_paid
     end
     # update the invoice with the respective calculated amounts
-    self.invoice.update(
+    payment.invoice.update(
         amount_attributes: {
             value: self.invoice_amount,
             currency_id: 1,
-            id: self.invoice.amount&.id
+            id: payment.invoice.amount&.id
         },
         net_amount_attributes: {
             value: self.net_amount,
             currency_id: 1,
-            id: self.invoice.net_amount&.id
+            id: payment.invoice.net_amount&.id
         },
         gross_amount_attributes: {
             value: self.gross_amount,
             currency_id: 1,
-            id: self.invoice.gross_amount&.id
+            id: payment.invoice.gross_amount&.id
         },
         discount_amount_attributes: {
             value: self.discount_amount,
             currency_id: 1,
-            id: self.invoice.discount_amount&.id
+            id: payment.invoice.discount_amount&.id
         },
         tds_amount_attributes: {
             value: self.tds_amount,
             currency_id: 1,
-            id: self.invoice.tds_amount&.id
+            id: payment.invoice.tds_amount&.id
         },
         tax_amount_attributes: {
             value: self.tax_amount,
             currency_id: 1,
-            id: self.invoice.tax_amount&.id
+            id: payment.invoice.tax_amount&.id
         },
         advance_amount_attributes: {
             value: self.advance_amount,
             currency_id: 1,
-            id: self.invoice.advance_amount&.id
+            id: payment.invoice.advance_amount&.id
         }
     )
     # also update the payment with all the respective amounts
