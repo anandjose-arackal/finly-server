@@ -26,7 +26,9 @@
 #  processed_amount_id                :integer
 #  money_request_processor_mapping_id :integer
 #  auto_approve                       :boolean
+#  approved_at                        :datetime
 #
+
 
 
 
