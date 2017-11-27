@@ -88,7 +88,7 @@ class MoneyRequest < ActiveRecord::Base
   scope :group_user, -> { group :user }
   scope :sum_total, -> { joins(items: :amount).sum(:value) }
 
-  scope :awaiting_approval_of_user, ->(user_id, role_id){ where(status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
+  scope :awaiting_approval_of_user, ->(user_id, role_id){ where(status_id: MoneyRequestStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
 
   scope :total_value, -> { joins(items: :amount).sum(:value) }
 

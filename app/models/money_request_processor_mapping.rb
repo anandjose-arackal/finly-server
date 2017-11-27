@@ -21,9 +21,9 @@ class MoneyRequestProcessorMapping < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :amount, dependent: :destroy
-  belongs_to :processor_group, class_name: 'ReportProcessorGroup'
+  belongs_to :processor, class_name: 'MoneyRequestProcessor'
   belongs_to :processor_accountable, polymorphic: true
-  belongs_to :status, class_name: 'ReportProcessorGroupStatus'
+  belongs_to :status, class_name: 'MoneyRequestProcessorStatus'
   belongs_to :payment
 
   has_many :money_requests
