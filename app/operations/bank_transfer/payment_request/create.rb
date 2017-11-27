@@ -215,7 +215,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
                   currency_id: 1
               },
               freight_amount_attributes: {
-                  value: 0,
+                  value: order_details[:freight_amount],
                   currency_id: 1
               }
           }
