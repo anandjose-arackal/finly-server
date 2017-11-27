@@ -9,7 +9,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
                 :invoice_amount, :payment_amount, :payment,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
-                :advance_amount
+                :advance_amount, :custom_fields
 
   def pre_validate
     super
@@ -39,7 +39,6 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
         valid = false
         error_messages << payment.errors.full_messages.to_sentence
       end
-      # adding validations for custom fields here
     end
     unless valid
       add_message :error, error_messages.to_sentence
@@ -47,12 +46,12 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
   end
 
   def process
-    self.payments_data.each do |data|
+    self.payments_data.each_with_index do |data, index|
       payment = self.payment_order.payments.build(data)
       # set custom field data
-      set_custom_fields(false, payment)
+      set_custom_fields(false, payment, self.custom_fields[index])
       payment.save
-      debugger
+      calculate_tax_and_discounts(payment)
     end
   end
 
@@ -80,9 +79,11 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
 
   def retrieve_payments_data
     self.payments_data = []
+    self.custom_fields = []
     self.processed_order_data.each do |order_details|
       bank_account = retrieve_bank_account order_details
       initiating_account = bank_payment_request.payment_order.initiating_account || user.bank_wallet
+      self.custom_fields << order_details[:custom_fields]
       self.payments_data << {
           initiating_account: initiating_account,
           receiving_account: bank_account,
@@ -139,19 +140,14 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
   end
 
 
-  def set_custom_fields(save, payment)
-    fields = {}
-    current_company.field_configurations.with_parent_type(FieldParentType.id_for(:invoice)).each do |fc|
-      fields[fc.id] = ""
-    end
-    if fields.blank?
-      return
-    end
+  def set_custom_fields(save, payment, data)
+    fields = data
     custom_fields = {custom_fields: fields}
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
     CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
+    data.delete(:custom_fields) # removing the custom fields because payment creation will throw an error
   end
 
   def calculate_tax_and_discounts(payment)
@@ -213,7 +209,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
         }
     )
     # also update the payment with all the respective amounts
-    self.payment.amount&.update(value: self.net_amount)
+    payment.amount&.update(value: self.net_amount)
   end
 
   def calculate_discount_exclusive
