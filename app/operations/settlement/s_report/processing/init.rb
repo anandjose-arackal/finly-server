@@ -80,21 +80,23 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
     if not params&.dig(:init_all) and params&.dig(:report_id).present?
       self.reports = self.reports.with_id(params&.dig(:report_id))
     end
-    expenses_totals = self.reports.group_user.expenses_total
-    reimbursable_totals = self.reports.group_user.expenses_reimbursable_total
+    user_ids = self.reports.pluck(:user_id).uniq
+    users_map = User.with_id(user_ids).index_by(&:id)
+    expenses_totals = self.reports.group_user_id.expenses_total
+    reimbursable_totals = self.reports.group_user_id.expenses_reimbursable_total
     self.user_reports = []
     self.reimbursement_total = 0
     self.expenses_total = 0
     self.user_count = 0
-    expenses_totals.each do |user, total|
+    user_ids.each do |user_id|
       self.user_count += 1
-      self.reimbursement_total += (reimbursable_totals[user] || 0)
-      self.expenses_total += total
+      self.reimbursement_total += (reimbursable_totals[user_id] || 0)
+      self.expenses_total += expenses_totals[user_id]
       user_reports << {
-          user: user,
-          expenses_total: total,
-          reimbursement_total: reimbursable_totals[user],
-          reports: self.reports.with_user_id(user.id),
+          user: users_map[user_id],
+          expenses_total: expenses_totals[user_id],
+          reimbursement_total: reimbursable_totals[user_id],
+          reports: self.reports.with_user_id(user_id),
           has_errors: false
       }
     end

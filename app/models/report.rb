@@ -114,12 +114,12 @@ class Report < ActiveRecord::Base
   scope :with_controlling_user_id, ->(user_id) { where controlling_user_id: user_id }
   scope :expenses_total, -> { joins(expenses: :amount).sum(:value) }
   scope :expenses_reimbursable_total, -> { joins(expenses: :amount).where('expenses.reimbursable = true').sum('amounts.value') }
-  scope :group_user_id, -> { group :user_id }
+  scope :group_user_id, -> { group 'reports.user_id' }
   scope :group_user, -> { group :user }
   scope :joins_user, -> { joins  :user }
   scope :include_reimbursable_user_accounts, -> { includes user: [:bank_accounts, :reimbursement_cards] }
 
-  scope :unsubmitted, -> { where(report_status_id: [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:retracted)]) }
+  scope :unsubmitted, -> { where(report_status_id: [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:retracted)] ) }
 
   scope :with_approved_at_range, -> (start_time, end_time) { where('approved_at >= ? and approved_at <= ?', start_time, end_time) }
 
@@ -152,17 +152,17 @@ class Report < ActiveRecord::Base
   end
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
-  scope :sort_for_personal, -> { joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC') }
+  scope :sort_for_personal, -> { joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
 
-  scope :awaiting_approval_of_user, ->(user_id, role_id) { where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
+  scope :awaiting_approval_of_user, ->(user_id, role_id){ where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
 
-  scope :includes_export, -> { includes({expenses: [:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
-                                                    :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
-                                                    {card_expense: [custom_fields: [:field_configuration]]},
-                                                    {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},
-                                                    {time_expense: [custom_fields: [:field_configuration]]},
-                                                    {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
-                                                    {amount: [:currency]}, :expense_status]}, :status, policy: [distance_expense_config: [:rate]]) }
+  scope :includes_export, -> { includes({expenses:[:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
+                                               :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
+                                               {card_expense: [custom_fields: [:field_configuration]]},
+                                               {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},
+                                               {time_expense: [custom_fields: [:field_configuration]]},
+                                               {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
+                                               {amount: [:currency]}, :expense_status]}, :status, policy: [distance_expense_config: [:rate]]) }
 
   scope :includes_user, -> { includes :user }
   scope :includes_tracks, -> { includes :tracks }
