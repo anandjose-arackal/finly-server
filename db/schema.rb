@@ -2853,6 +2853,14 @@ ActiveRecord::Schema.define(version: 20171125132127) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "report_sync_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "report_sync_types", ["name"], name: "index_report_sync_types_on_name", using: :btree
+
   create_table "report_tracking_actions", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -2908,6 +2916,7 @@ ActiveRecord::Schema.define(version: 20171125132127) do
     t.integer  "card_expenses_total_id",             limit: 4
     t.integer  "non_reimbursable_expenses_total_id", limit: 4
     t.integer  "sync_status_id",                     limit: 4
+    t.integer  "sync_type_id",                       limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -2959,6 +2968,16 @@ ActiveRecord::Schema.define(version: 20171125132127) do
   end
 
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
+
+  create_table "tally_configurations", force: :cascade do |t|
+    t.integer  "company_id",   limit: 4,   null: false
+    t.string   "company_name", limit: 255
+    t.boolean  "active"
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "tally_configurations", ["company_id"], name: "index_tally_configurations_on_company_id", using: :btree
 
   create_table "time_expense_configs", force: :cascade do |t|
     t.datetime "created_at",                    null: false
@@ -3597,6 +3616,7 @@ ActiveRecord::Schema.define(version: 20171125132127) do
   add_foreign_key "reports", "policies"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
+  add_foreign_key "tally_configurations", "companies"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"
   add_foreign_key "transcribed_expenses", "amounts"
