@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171128113608) do
+ActiveRecord::Schema.define(version: 20171128135013) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2375,7 +2375,7 @@ ActiveRecord::Schema.define(version: 20171128113608) do
   end
 
   create_table "payment_receivable_transaction_trails", force: :cascade do |t|
-    t.integer  "transaction_id",              limit: 4
+    t.integer  "account_transaction_id",      limit: 4
     t.boolean  "find_payment_receivable"
     t.boolean  "creating_payment"
     t.boolean  "update_company_balance"
@@ -2384,7 +2384,7 @@ ActiveRecord::Schema.define(version: 20171128113608) do
     t.datetime "updated_at",                            null: false
   end
 
-  add_index "payment_receivable_transaction_trails", ["transaction_id"], name: "index_payment_receivable_transaction_trails_on_transaction_id", using: :btree
+  add_index "payment_receivable_transaction_trails", ["account_transaction_id"], name: "index_payment_receivable_transaction_trails_on_transaction_id", using: :btree
 
   create_table "payment_receivables", force: :cascade do |t|
     t.integer  "customer_id",                  limit: 4
@@ -3369,8 +3369,9 @@ ActiveRecord::Schema.define(version: 20171128113608) do
     t.boolean  "found_virtual_account"
     t.boolean  "update_company_balance"
     t.boolean  "create_payment"
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.integer  "account_transaction_id", limit: 4
   end
 
   create_table "virtual_account_purposes", force: :cascade do |t|

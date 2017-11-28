@@ -8,7 +8,10 @@
 #  create_payment         :boolean
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  account_transaction_id :integer
 #
 
 class VirtualAccountCollectTrail < ActiveRecord::Base
+  belongs_to :account_transaction, class_name: "VirtualAccountTransaction"
+
 end

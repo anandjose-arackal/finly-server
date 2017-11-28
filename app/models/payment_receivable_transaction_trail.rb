@@ -3,7 +3,7 @@
 # Table name: payment_receivable_transaction_trails
 #
 #  id                          :integer          not null, primary key
-#  transaction_id              :integer
+#  account_transaction_id      :integer
 #  find_payment_receivable     :boolean
 #  creating_payment            :boolean
 #  update_company_balance      :boolean
@@ -13,7 +13,6 @@
 #
 
 class PaymentReceivableTransactionTrail < ActiveRecord::Base
-  belongs_to :virtual_account_transaction
-
+  belongs_to :account_transaction, class_name: "VirtualAccountTransaction"
 
 end

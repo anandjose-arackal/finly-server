@@ -30,6 +30,7 @@ class VirtualBankAccount < ActiveRecord::Base
   belongs_to :company
   belongs_to :initiating_user, class_name: "User"
   belongs_to :receiving_account, polymorphic: true
+  has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
 
   validates :purpose, presence: true
 

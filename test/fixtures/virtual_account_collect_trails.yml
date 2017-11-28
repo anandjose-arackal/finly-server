@@ -8,6 +8,7 @@
 #  create_payment         :boolean
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  account_transaction_id :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

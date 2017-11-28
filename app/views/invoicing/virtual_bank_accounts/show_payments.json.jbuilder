@@ -6,7 +6,6 @@
 #   json.array! clients
 # end
 
-
 json.transactions do
   json.array!(@result.payments) do |payment|
     json.source_account do
