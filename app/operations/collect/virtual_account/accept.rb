@@ -10,7 +10,7 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
     self.virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: id)
     self.virtual_account = self.virtual_account_transaction.virtual_account
     self.company = virtual_account.company
-    self.payment_request = init_payment_request(:virtual_bank_account, company)
+    self.payment_request = init_payment_request(:virtual_bank_account, virtual_account.receiving_account)
   end
 
   def validate

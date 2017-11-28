@@ -4,13 +4,14 @@
 class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Base
 
   attr_accessor :account_params, :purpose_id, :bank_account, :parent, :expire_by, :exact_transaction_amount,
-                :virtual_bank_account_params
+                :virtual_bank_account_params, :receiving_account
 
   def init
     self.company = user.company
     self.purpose_id = params[:purpose_id] || ::VirtualAccountPurpose.id_for(:virtual_bank_account)
     self.parent = params[:parent]
     self.virtual_bank_account_params = virtual_account_params
+    self.receiving_account = self.company.yes_bank_company_account # by default it will be the company virtual account, until the config to change that is built
   end
 
   def validate
@@ -51,7 +52,8 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
                                                     initiating_user: user,
                                                     description: virtual_bank_account_params[:description],
                                                     expires_by: virtual_bank_account_params[:expires_by],
-                                                    name: virtual_bank_account_params[:name]
+                                                    name: virtual_bank_account_params[:name],
+                                                    receiving_account: self.receiving_account
                                                     )
     else
       add_message :error, "Could not generate virtual account number, please try again later"
