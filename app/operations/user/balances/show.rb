@@ -54,7 +54,7 @@ class User::Balances::Show < User::Base
           set_card_balances
         end
       when 'fc'
-        if selected_user.company.invoicing_system && selected_user.invoicing_system_enabled?
+        if selected_user.company.invoicing_system_enabled? && selected_user.invoicing_system_enabled?
           set_collect_balances
         end
       else

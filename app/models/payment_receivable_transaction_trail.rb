@@ -14,4 +14,6 @@
 
 class PaymentReceivableTransactionTrail < ActiveRecord::Base
   belongs_to :virtual_account_transaction
+
+
 end
