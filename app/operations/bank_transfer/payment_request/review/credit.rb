@@ -53,9 +53,9 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     op = BankTransfer::YesBank::Create.(user, bank_payment_request: bank_payment_request)
     if op.success?
       # update the bank_payment_request to credited
-      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited))
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil)
       # create a trail to show that the BPR was credited
-      bank_payment_request.bank_payment_request_trails.create action_user: user,
+      trail = bank_payment_request.bank_payment_request_trails.create action_user: user,
                                                               action_user_role_id: self.view_role,
                                                               action_id: BankPaymentRequestTrailAction.id_for(:credit),
                                                               modified_user_id: nil,

@@ -70,7 +70,6 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
           auto_approve: true,
           title: "This payment order will be auto approved as there is no reviewer assigned"
       }
-      return
     end
 
     # now extract all the users from the track
@@ -115,6 +114,9 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
 
     # now extracting all pending approvers (assuming there's not take control action here)
     op = User::Team::Review::NextReviewer.(bank_payment_request, controlling_user: self.reviewer, controlling_user_role_id: self.reviewer_role)
+    if op.failure? # i.e. there are no more reviewers for this baby
+      return
+    end
     self.reviewer = op.user
     self.reviewer_role = op.role_id
 
