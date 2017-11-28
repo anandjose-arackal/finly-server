@@ -1,4 +1,4 @@
-# this would create a payment reque
+# this would create a payment request that can handle
 
 class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
 
@@ -21,6 +21,7 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
 
   def process
     # triggering the operation for creating the payment
+    # and marks the respective payment against
     op = AccountManager::Payments::PaymentProcessor.(self.virtual_account.initiating_user, payment_request: self.payment_request)
     if op.success?
       payment = op.payment_order&.payments.first

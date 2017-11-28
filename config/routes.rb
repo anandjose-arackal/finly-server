@@ -316,6 +316,13 @@
 #                         mobile_v1_send_verification_otp POST   /mobile/v1/send_verification_otp(.:format)                                                 mobile/v1/users#send_verification_otp
 #                               mobile_v1_verify_user_otp POST   /mobile/v1/verify_user_otp(.:format)                                                       mobile/v1/users#verify_user_otp
 #                       mobile_v2_available_expense_types GET    /mobile/v2/available_expense_types(.:format)                                               mobile/v2/expenses#available_expense_types
+#                                      mobile_v2_expenses GET    /mobile/v2/expenses(.:format)                                                              mobile/v2/expenses#index
+#                                                         POST   /mobile/v2/expenses(.:format)                                                              mobile/v2/expenses#create
+#                                       mobile_v2_expense GET    /mobile/v2/expenses/:id(.:format)                                                          mobile/v2/expenses#show
+#                                                         PATCH  /mobile/v2/expenses/:id(.:format)                                                          mobile/v2/expenses#update
+#                                                         PUT    /mobile/v2/expenses/:id(.:format)                                                          mobile/v2/expenses#update
+#                                                         DELETE /mobile/v2/expenses/:id(.:format)                                                          mobile/v2/expenses#destroy
+#                                        mobile_v2_report GET    /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#show
 #                                          chrome_v1_auth POST   /chrome/v1/auth(.:format)                                                                  chrome/v1/token#create
 #                                                         DELETE /chrome/v1/auth(.:format)                                                                  chrome/v1/token#destroy
 #                        chrome_v1_expenses_configuration POST   /chrome/v1/expenses/configuration(.:format)                                                chrome/v1/expenses#configuration
@@ -881,6 +888,9 @@
 #                                quickbooks_update_config PATCH  /quickbooks/update_config(.:format)                                                        quickbooks#update
 #                                              sync_users PATCH  /quickbooks/sync_users(.:format)                                                           quickbooks#sync_users
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                                               quickbooks#show
+#                                 integration_tally_check GET    /integration/tally/check(.:format)                                                         integration/tally#check
+#                              integration_tally_vouchers GET    /integration/tally/vouchers(.:format)                                                      integration/tally#vouchers
+#                         integration_tally_configuration POST   /integration/tally/configuration(.:format)                                                 integration/tally#set_configuration
 #                                                     tos GET    /tos(.:format)                                                                             static_pages#tos
 #                                                 privacy GET    /privacy(.:format)                                                                         static_pages#privacy
 #                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                                          static_pages#prepaid_card_agreement

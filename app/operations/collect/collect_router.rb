@@ -9,7 +9,7 @@ class Collect::CollectRouter < BaseOperation
     self.virtual_account_transaction_params = transaction_params
     self.virtual_account = VirtualBankAccount.find_by(account_number: virtual_account_transaction_params[:beneficiary_account_number])
     unless self.virtual_account.blank?
-      self.purpose_id = virtual_account.purpose.id
+      self.purpose_id = virtual_account.purpose_id
     end
   end
 
