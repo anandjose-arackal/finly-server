@@ -32,7 +32,8 @@ class Collect::CollectRouter < BaseOperation
         when VirtualAccountPurpose.id_for(:virtual_bank_account)
           op = Collect::VirtualAccount::Accept.(user, virtual_account_transaction_id: self.virtual_account_transaction.id)
         when VirtualAccountPurpose.id_for(:payment_receivable)
-          Collect::PaymentReceivable::Accept.(self.virtual_account_transaction.id)
+          op = Collect::PaymentReceivable::Accept.(self.virtual_account_transaction.id)
+        # these three below are kinda irrelevant
         when VirtualAccountPurpose.id_for(:invoice)
           Collect::Invoice::Accept.(self.virtual_account_transaction.id)
         when VirtualAccountPurpose.id_for(:corporate_balance_reload)
