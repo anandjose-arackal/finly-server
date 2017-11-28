@@ -15,6 +15,9 @@
 #
 
 class BankPaymentRequestTrail < ActiveRecord::Base
+
+  attr_accessor :excluded_id_ranges
+
   belongs_to :bank_payment_request
   belongs_to :action_user, class_name: "User"
   belongs_to :modified_user, class_name: "User"
@@ -33,14 +36,14 @@ class BankPaymentRequestTrail < ActiveRecord::Base
     latest_submit_trail = self.where(action_id: BankPaymentRequestTrailAction.ids_for([:submit])).reorder(created_at: :desc).first&.id
     # now extract all approvers that are *after* this submit action, including itself
     if latest_submit_trail.present?
-      ids = where(action_id: BankPaymentRequestTrailAction.ids_for([:approve, :take_control, :approve_and_forward, :reject, :retract])).where('id >= ?', latest_submit_trail).pluck(:id)
+      ids = where('id >= ?', latest_submit_trail).pluck(:id)
     else
       ids = []
     end
-    # bpr = BankPaymentRequest.find_by(id: bank_payment_request_id)
-    # controlling_user_action_ids = where(action_user_id: bpr.controlling_user_id, action_user_role_id: bpr.controlling_user_role_id)
-    # where(id: ids).where.not(id: controlling_user_action_ids)
     where(id: ids)
+  }
+  scope :with_action_user_and_role, -> (user_id, role_id, action_id) {
+    where(action_user_id: user_id, action_user_role_id: role_id, action_id: action_id)
   }
 
   default_scope { order('created_at ASC') }
@@ -67,5 +70,11 @@ class BankPaymentRequestTrail < ActiveRecord::Base
 
   def reject_action?
     self.action_id == BankPaymentRequestTrailAction.id_for(:reject)
+  end
+
+  private
+
+  def approve_unapprove_block(bank_payment_request_id)
+
   end
 end

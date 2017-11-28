@@ -193,16 +193,8 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       self.gross_amount = self.invoice_amount
       return
     end
-
-    case invoice.discount_type_id
-      when 1, '1'
-        self.discount_amount = (invoice.discount*self.invoice_amount)/100
-      when 2, '2'
-        self.discount_amount = invoice.discount
-      else
-        # defaults back to rate
-        self.discount_amount = (invoice.discount*self.invoice_amount)/100
-    end
+    # because the discount rate will always be known
+    self.discount_amount = (invoice.discount*self.invoice_amount)/100
     self.gross_amount = self.invoice_amount - self.discount_amount
   end
 
@@ -212,15 +204,8 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       self.invoice_amount = self.gross_amount
       return
     end
-    case invoice.discount_type_id
-      when 1, '1'
-        self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
-      when 2, '2'
-        self.invoice_amount = self.gross_amount - invoice.discount
-      else
-        # defaults back to rate
-        self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
-    end
+    # because the discount is also always shown
+    self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
     self.discount_amount = self.invoice_amount - self.gross_amount
   end
 
@@ -230,7 +215,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       self.tax_amount = 0
       return
     end
-    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax), self.invoice.tax_type_id)
+    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
     self.tax_amount = self.net_amount - self.gross_amount
   end
 
@@ -240,12 +225,12 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       self.tax_amount = 0
       return
     end
-    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax), self.invoice.tax_type_id)
+    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax))
     self.tax_amount = self.after_tax_amount - self.gross_amount
   end
 
   def calculate_tds
-    new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, self.invoice.tds, self.invoice.tds_type_id)
+    new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, self.invoice.tds)
     self.tds_amount = self.gross_amount - new_gross_amount
   end
 
@@ -256,15 +241,7 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
       return
     end
     original_net_amount = self.net_amount
-    case invoice.discount_type_id
-      when 1, '1'
-        self.advance_amount = (self.invoice.advance*self.net_amount)/100
-      when 2, '2'
-        self.advance_amount = self.invoice.advance
-      else
-        # defaults back to rate
-        self.advance_amount = (self.invoice.advance*self.net_amount)/100
-    end
+    self.advance_amount = (self.invoice.advance*self.net_amount)/100
     self.net_amount = original_net_amount - self.advance_amount
   end
 

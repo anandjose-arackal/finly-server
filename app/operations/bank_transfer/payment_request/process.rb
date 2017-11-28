@@ -70,16 +70,21 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       amount = item[:original_amount]&.to_f || item["original_amount"]&.to_f
       note = item[:note]&.to_s || item["note"]&.to_s
       gst_type_id = item[:gst_type_id]
-      tax_type_id = item[:tax_type_id]
-      discount_type_id = item[:discount_type_id]
-      tds_type_id = item[:tds_type_id]
+      tax_amount = item[:tax_amount]&.to_f
+      discount_amount = item[:discount_amount]&.to_f
+      tds_amount = item[:tds_amount]&.to_f
       discount = item[:discount]
+      advance_amount = item[:advance_amount]&.to_f
+      advance = item[:advance]
+      freight = item[:freight]
       tds = item[:tds]
       tax = item[:tax]
       invoice_number = item[:invoice_number]
       invoice_date = item[:invoice_date]
       due_date = item[:due_date]
       inclusive_of_taxes = item[:inclusive_of_taxes]
+
+      net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
 
       self.valid = true
       self.error_messages = []
@@ -92,10 +97,35 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       end
 
       # Check if the amount is present
-      if amount.blank? || !amount.is_a?(Numeric)
+      unless validate_amount(amount)
         self.valid = false
         self.error_messages << 'Invalid amount'
       end
+
+      # unless validate_amount(discount_amount)
+      #   self.valid = false
+      #   self.error_messages << 'Invalid discount amount'
+      # end
+      #
+      # unless validate_amount(tax_amount)
+      #   self.valid = false
+      #   self.error_messages << 'Invalid tax amount'
+      # end
+      #
+      # unless validate_amount(tds_amount)
+      #   self.valid = false
+      #   self.error_messages << 'Invalid TDS amount'
+      # end
+      #
+      # unless validate_amount(advance_amount)
+      #   self.valid = false
+      #   self.error_messages << 'Invalid advance amount'
+      # end
+      #
+      # unless validate_amount(freight)
+      #   self.valid = false
+      #   self.error_messages << 'Invalid freight'
+      # end
 
       # check if name is present
       if name.blank?
@@ -123,19 +153,24 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.error_messages << "Invalid due date"
       end
 
-      unless validate_rate tax, tax_type_id, amount
+      unless validate_rate tax, 1, amount
         self.valid = false
         self.error_messages << "Invalid tax entered"
       end
 
-      unless validate_rate tds, tds_type_id, amount
+      unless validate_rate tds, 1, amount
         self.valid = false
         self.error_messages << "Invalid TDS entered"
       end
 
-      unless validate_rate discount, discount_type_id, amount
+      unless validate_rate discount, 1, amount
         self.valid = false
         self.error_messages << "Invalid discount entered"
+      end
+
+      unless validate_rate advance, 1, advance
+        self.valid = false
+        self.error_messages << "Invalid advance entered"
       end
 
       # adding the custom fields for the particular invoice, using a ghost invoice
@@ -159,9 +194,11 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.payment_order_valid = false unless self.valid
 
       self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
-                               gst_type_id: gst_type_id, tax_type_id: tax_type_id, tax: tax, tds_type_id: tds_type_id, tds: tds,
-                               discount_type_id: discount_type_id, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
+                               gst_type_id: gst_type_id, tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds,
+                               discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
+                               advance: advance, advance_amount: advance_amount, freight: freight,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
+                               net_amount: net_amount,
                                valid: self.valid, messages: self.error_messages}
     end
   end
@@ -235,8 +272,11 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     true
   end
 
-  def validate_amount
-
+  def validate_amount(amount)
+    if amount.blank? || !amount&.to_f&.is_a?(Numeric) || amount&.to_f < 0
+      return false
+    end
+    true
   end
 
 end

@@ -71,4 +71,3 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
   end
 
 end
-
