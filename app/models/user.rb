@@ -197,6 +197,8 @@ class User < ActiveRecord::Base
   scope :only_auditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.id_for(:auditor)) }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
+  scope :inactive, -> { filter_state(3) }
+  scope :pending, -> { filter_state(2) }
   scope :invited_by, ->(id) { where invited_by_id: id }
   scope :with_vendor_payments_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
   scope :with_expense_management_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }

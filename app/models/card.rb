@@ -73,6 +73,7 @@ class Card < ActiveRecord::Base
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
   scope :meal_cards, -> { where card_program_id: CardProgram.id_for(:meal) }
   scope :payroll_cards, -> { where card_program_id: CardProgram.id_for(:payroll) }
+  scope :sum_balance, -> { joins(:card_balance).sum('amounts.value') }
   scope :non_hotlisted, -> {
     # if applied == '1'
     where hotlisted: false

@@ -20,6 +20,11 @@ class CashOnHand < ActiveRecord::Base
 
   accepts_nested_attributes_for :balance
 
+  scope :joins_balance, -> { joins :balance }
+  scope :having_balance_value, -> { joins_balance.where('value > 0') }
+  scope :with_user, ->(id) { where user_id: id }
+  scope :sum_balance, -> { joins_balance.sum('amounts.value') }
+
   delegate :balance_value, to: :balance
 
   def credit_funds(amount)
@@ -31,4 +36,5 @@ class CashOnHand < ActiveRecord::Base
     balance = self.balance_value
     self.balance.update(value: (balance - amount))
   end
+
 end
