@@ -1,4 +1,5 @@
 json.array!(@result.virtual_bank_accounts) do |virtual_bank_account|
+  json.name virtual_bank_account.name
   json.account_number virtual_bank_account.account_number
   json.ifsc virtual_bank_account.ifsc
   json.expires_by virtual_bank_account.expires_by&.strftime("%d %B, %Y")
@@ -9,8 +10,8 @@ json.array!(@result.virtual_bank_accounts) do |virtual_bank_account|
   end
   json.transactions do
     payments = virtual_bank_account.initiating_payments
-    json.total_count payments.count
-    json.total_amount payments.sum_amounts
+    json.number payments.count
+    json.total payments.sum_amounts
   end
   json.description virtual_bank_account.description
   json.id virtual_bank_account.id
