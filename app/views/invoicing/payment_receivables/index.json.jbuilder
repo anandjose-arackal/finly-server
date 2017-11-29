@@ -5,5 +5,5 @@ json.array!(@result.receivables) do |receivable|
   json.id receivable.id
   json.virtual_account_number receivable.virtual_bank_account&.account_number
   json.ifsc receivable.virtual_bank_account&.ifsc
-  json.status receivable.payment_receivable_status&.name
+  json.status receivable.payment_receivable_status&.name&.humanize
 end
