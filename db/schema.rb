@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171129024857) do
+ActiveRecord::Schema.define(version: 20171129183247) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3403,22 +3403,33 @@ ActiveRecord::Schema.define(version: 20171129024857) do
   end
 
   create_table "virtual_bank_accounts", force: :cascade do |t|
-    t.string   "account_number",         limit: 255
-    t.string   "ifsc",                   limit: 255
-    t.text     "description",            limit: 65535
-    t.integer  "parent_id",              limit: 4
-    t.string   "parent_type",            limit: 255
-    t.integer  "company_id",             limit: 4
-    t.datetime "created_at",                                           null: false
-    t.datetime "updated_at",                                           null: false
+    t.string   "account_number",            limit: 255
+    t.string   "ifsc",                      limit: 255
+    t.text     "description",               limit: 65535
+    t.integer  "parent_id",                 limit: 4
+    t.string   "parent_type",               limit: 255
+    t.integer  "company_id",                limit: 4
+    t.datetime "created_at",                                              null: false
+    t.datetime "updated_at",                                              null: false
     t.date     "expires_by"
-    t.integer  "purpose_id",             limit: 4
-    t.boolean  "active",                               default: true
-    t.boolean  "is_deleted",                           default: false
-    t.integer  "initiating_user_id",     limit: 4
-    t.string   "name",                   limit: 255
-    t.integer  "receiving_account_id",   limit: 4
-    t.string   "receiving_account_type", limit: 255
+    t.integer  "purpose_id",                limit: 4
+    t.boolean  "active",                                  default: true
+    t.boolean  "is_deleted",                              default: false
+    t.integer  "initiating_user_id",        limit: 4
+    t.string   "name",                      limit: 255
+    t.integer  "receiving_account_id",      limit: 4
+    t.string   "receiving_account_type",    limit: 255
+    t.integer  "maximum_amount_id",         limit: 4
+    t.integer  "minimum_amount_id",         limit: 4
+    t.integer  "allowed_transaction_count", limit: 4
+    t.boolean  "neft",                                    default: true
+    t.boolean  "imps",                                    default: true
+    t.boolean  "rtgs",                                    default: true
+    t.boolean  "current_account",                         default: true
+    t.boolean  "savings_account",                         default: true
+    t.boolean  "upi",                                     default: true
+    t.date     "date_after"
+    t.date     "date_on"
   end
 
   create_table "whitelisted_ip_types", force: :cascade do |t|
