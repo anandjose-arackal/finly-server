@@ -3,6 +3,8 @@ class Collect::PaymentReceivable::Accept < Collect::PaymentReceivable::Base
   attr_accessor :virtual_account, :company, :payment_receivable
 
   def init
+    id = params[:id] || params[:virtual_account_transaction_id]
+    self.virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: id)
     self.virtual_account = virtual_account_transaction.virtual_bank_account
     self.company = virtual_account.company
     self.payment_request = init_payment_request(:virtual_bank_account, company)
@@ -14,14 +16,14 @@ class Collect::PaymentReceivable::Accept < Collect::PaymentReceivable::Base
     op = AccountManager::Payments::PaymentProcessor.(self.virtual_account.initiating_user, payment_request: self.payment_request)
     if op.success?
       payment = op.payment_order.payments.first
+      self.payment.update(reference_resource: self.virtual_account_transaction)
       self.payment_receivable.update(payment: payment)
     end
   end
 
   def post_process
     # mark the payment receivable as paid
-
+    self.payment_receivable.update(payment_receivable_status_id: PaymentReceivableStatus.id_for(:received))
     # trigger mailers if necessary
-
   end
 end

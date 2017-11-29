@@ -44,12 +44,12 @@ class Collect::CollectRouter < BaseOperation
           when VirtualAccountPurpose.id_for(:virtual_bank_account)
             op = Collect::VirtualAccount::Accept.(user, virtual_account_transaction_id: self.virtual_account_transaction.id, trail_id: self.trail.id)
             unless op.success?
-              self.trail.update(note: op.messages[:error], update_company_balance: false, create_payment: false)
+              self.trail.update(note: op.messages[:error].to_sentence, update_company_balance: false, create_payment: false)
             end
           when VirtualAccountPurpose.id_for(:payment_receivable)
             op = Collect::PaymentReceivable::Accept.(user, virtual_account_transaction_id: self.virtual_account_transaction.id, trail_id: self.trail.id)
             unless op.success?
-              self.trail.update(note: op.messages[:error], update_company_balance: false, creating_payment: false)
+              self.trail.update(note: op.messages[:error].to_sentence, update_company_balance: false, creating_payment: false)
             end
           # these three below are kinda irrelevant
           when VirtualAccountPurpose.id_for(:invoice)

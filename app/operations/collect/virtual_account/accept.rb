@@ -7,8 +7,8 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
 
   def init
     id = params[:id] || params[:virtual_account_transaction_id]
-    self.virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: id)
     self.virtual_account = self.virtual_account_transaction.virtual_account
+    self.virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: id)
     self.trail = ::VirtualAccountCollectTrail.find_by(id: params[:trail_id])
     self.company = virtual_account.company
     self.payment_request = init_payment_request(:virtual_bank_account, virtual_account.receiving_account)
