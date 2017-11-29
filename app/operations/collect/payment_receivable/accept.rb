@@ -8,7 +8,7 @@ class Collect::PaymentReceivable::Accept < Collect::PaymentReceivable::Base
     # self.virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: id)
     self.virtual_account = virtual_account_transaction.virtual_account
     self.company = virtual_account.company
-    self.trail = ::VirtualAccountCollectTrail.find_by(id: options[:trail_id])
+    self.trail = ::PaymentReceivableTransactionTrail.find_by(id: options[:trail_id])
     self.payment_request = init_payment_request(:virtual_bank_account, self.virtual_account.receiving_account)
     self.payment_receivable = self.virtual_account.parent
   end
@@ -23,15 +23,20 @@ class Collect::PaymentReceivable::Accept < Collect::PaymentReceivable::Base
       add_message :error, "Payment already received. Please activate the payment link again to receive payments"
       return
     end
+
+    # check for the exact amount match in the payment receivable
+    unless payment_receivable.amount_value == self.virtual_account_transaction.transfer_amount.to_f
+      add_message :error, "The amount credited does not match the payment link amount"
+    end
   end
 
   def process
     # triggering the operation for creating the payment
     op = AccountManager::Payments::PaymentProcessor.(self.virtual_account.initiating_user, payment_request: self.payment_request)
     if op.success?
-      payment = op.payment_order.payments.first
+      self.payment = op.payment_order.payments.first
       self.payment.update(reference_resource: self.virtual_account_transaction)
-      self.payment_receivable.update(payment: payment)
+      # self.payment_receivable.update(payment: payment)
       self.trail.update(update_company_balance: true, creating_payment: true)
     end
   end
