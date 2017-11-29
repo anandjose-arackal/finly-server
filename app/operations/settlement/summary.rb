@@ -136,7 +136,7 @@ class Settlement::Summary < Settlement::Base
     reimbursement_cards = Card.with_user(user_ids).reimbursement_cards
     self.reimbursement_cards_summary = {
         count: reimbursement_cards.count,
-        total: Amount.new(value: reimbursement_cards.sum_balance, currency_id: self.currency_id)
+        # total: Amount.new(value: reimbursement_cards.sum_balance, currency_id: self.currency_id)
     }
   end
 
