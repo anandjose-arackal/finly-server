@@ -3,12 +3,13 @@
 class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
 
   attr_accessor :virtual_account, :company, :virtual_account_transaction,
-                :payment_request
+                :payment_request, :trail
 
   def init
     id = params[:id] || params[:virtual_account_transaction_id]
     self.virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: id)
     self.virtual_account = self.virtual_account_transaction.virtual_account
+    self.trail = ::VirtualAccountCollectTrail.find_by(id: params[:trail_id])
     self.company = virtual_account.company
     self.payment_request = init_payment_request(:virtual_bank_account, virtual_account.receiving_account)
   end
@@ -21,11 +22,13 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
 
   def process
     # triggering the operation for creating the payment
-    # and marks the respective payment against
+    # and marks the respective payment against it
     op = AccountManager::Payments::PaymentProcessor.(self.virtual_account.initiating_user, payment_request: self.payment_request)
     if op.success?
       payment = op.payment_order&.payments.first
       payment.update(reference_resource: self.virtual_account_transaction)
+      self.trail.update(create_payment: true, update_company_balance: true)
+      self.virtual_account_transaction.update(processed: true)
     end
   end
 

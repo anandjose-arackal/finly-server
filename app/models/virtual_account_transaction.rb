@@ -21,13 +21,15 @@
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  virtual_account_id         :integer
+#  processed                  :boolean
 #
 
 class VirtualAccountTransaction < ActiveRecord::Base
 
   has_one :payment, as: :reference_resource
   belongs_to :virtual_account, class_name: "VirtualBankAccount"
+  has_one :virtual_account_collect_trail
+  has_one :payment_receivable_transaction_trail
 
   validates :transfer_id, uniqueness: true
-
 end
