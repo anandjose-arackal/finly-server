@@ -2375,17 +2375,15 @@ ActiveRecord::Schema.define(version: 20171129024857) do
   end
 
   create_table "payment_receivable_transaction_trails", force: :cascade do |t|
-    t.integer  "account_transaction_id",      limit: 4
     t.boolean  "find_payment_receivable"
     t.boolean  "creating_payment"
     t.boolean  "update_company_balance"
     t.boolean  "payment_receivable_updation"
     t.datetime "created_at",                                null: false
     t.datetime "updated_at",                                null: false
+    t.integer  "account_transaction_id",      limit: 4
     t.text     "note",                        limit: 65535
   end
-
-  add_index "payment_receivable_transaction_trails", ["account_transaction_id"], name: "index_payment_receivable_transaction_trails_on_transaction_id", using: :btree
 
   create_table "payment_receivables", force: :cascade do |t|
     t.integer  "customer_id",                  limit: 4
