@@ -35,8 +35,8 @@ user:
   - id: admin
     name: Admin
     default_url: 'payment_links'
-  - id: personal
-    name: Personal
+  - id: initiator
+    name: Initiator
     default_url: 'payment_links'
 
 views:
@@ -64,12 +64,12 @@ views:
   auditor:
     menus:
       navbar:
-      - name: Dashboard
-        url: dashboard
-        id: dashboard
-      - name: Invoices
-        url: invoices
-        id: invoices
+#      - name: Dashboard
+#        url: dashboard
+#        id: dashboard
+#      - name: Invoices
+#        url: invoices
+#        id: invoices
       - name: Payment Links
         url: payment_links
         id: payment_links
@@ -84,9 +84,9 @@ views:
   initiator:
     menus:
       navbar:
-      - name: Invoices
-        url: invoices
-        id: invoices
+#      - name: Invoices
+#        url: invoices
+#        id: invoices
       - name: Payment Links
         url: payment_links
         id: payment_links

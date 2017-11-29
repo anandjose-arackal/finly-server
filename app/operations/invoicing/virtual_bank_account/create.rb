@@ -80,8 +80,9 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
   end
 
   def collect_api_params
+    date_before = self.parent&.expire_by || virtual_account_params[:expires_by]
     p = {
-        date_before: virtual_account_params[:expires_by],
+        date_before: date_before,
         exact_transaction_amount: self.parent&.amount_value
     }
     p

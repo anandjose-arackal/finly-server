@@ -7,7 +7,7 @@ class FinlyCollect::Create < FinlyCollect::Base
                    :allowed_transaction_count,
                    :current_account, :savings_account,
                    :neft, :imps, :rtgs, :upi, :date_after,
-                   :date_before, :date_on)&.to_json
+                   :date_before, :date_on)
   end
 
 end

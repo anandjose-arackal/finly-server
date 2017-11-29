@@ -18,17 +18,20 @@ class Collect::PaymentReceivable::Accept < Collect::PaymentReceivable::Base
       payment = op.payment_order.payments.first
       self.payment.update(reference_resource: self.virtual_account_transaction)
       self.payment_receivable.update(payment: payment)
+      self.trail.update(update_company_balance: true, creating_payment: true)
     end
   end
 
   def post_process
     # mark the payment receivable as paid
-    self.payment_receivable.update(payment_receivable_status_id: PaymentReceivableStatus.id_for(:received))
+    if self.payment_receivable.update(payment_receivable_status_id: PaymentReceivableStatus.id_for(:received))
+      self.trail.update(payment_receivable_updation: true)
+    end
     # trigger mailers if necessary
   end
 
   def success
-    self.trail.update(update_company_balance: true, creating_payment: true)
+
   end
 
   def failure
