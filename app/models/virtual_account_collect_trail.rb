@@ -9,6 +9,7 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  account_transaction_id :integer
+#  note                   :text(65535)
 #
 
 class VirtualAccountCollectTrail < ActiveRecord::Base

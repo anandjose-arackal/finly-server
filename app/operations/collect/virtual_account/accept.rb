@@ -18,6 +18,9 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
     if self.virtual_account.blank?
       add_message :error, "Virtual bank account number not found"
     end
+    if self.virtual_account.expires_by < DateUtils.local_date
+      add_message :error, "This virtual account has expired"
+    end
   end
 
   def process

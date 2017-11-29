@@ -9,7 +9,7 @@ class Collect::CollectRouter < BaseOperation
     self.virtual_account_transaction_params = transaction_params
     self.virtual_account = VirtualBankAccount.find_by(account_number: virtual_account_transaction_params[:beneficiary_account_number])
     if self.virtual_account.blank?
-      self.trail = VirtualAccountCollectTrail.new(found_virtual_account: false)
+      self.trail = VirtualAccountCollectTrail.new(found_virtual_account: false, note: "Virtual Account not found")
     elsif self.virtual_account.present?
       self.purpose_id = virtual_account.purpose_id
       initiate_trail
@@ -43,8 +43,14 @@ class Collect::CollectRouter < BaseOperation
         case self.purpose_id
           when VirtualAccountPurpose.id_for(:virtual_bank_account)
             op = Collect::VirtualAccount::Accept.(user, virtual_account_transaction_id: self.virtual_account_transaction.id, trail_id: self.trail.id)
+            unless op.success?
+              self.trail.update(note: op.messages[:error], update_company_balance: false, create_payment: false)
+            end
           when VirtualAccountPurpose.id_for(:payment_receivable)
             op = Collect::PaymentReceivable::Accept.(user, virtual_account_transaction_id: self.virtual_account_transaction.id, trail_id: self.trail.id)
+            unless op.success?
+              self.trail.update(note: op.messages[:error], update_company_balance: false, creating_payment: false)
+            end
           # these three below are kinda irrelevant
           when VirtualAccountPurpose.id_for(:invoice)
             Collect::Invoice::Accept.(self.virtual_account_transaction.id)
