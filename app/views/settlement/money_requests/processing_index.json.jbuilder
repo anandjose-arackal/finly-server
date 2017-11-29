@@ -21,6 +21,7 @@ json.array! @result.paginated_money_request_processors do |processor|
       json.completed_on DateUtils.datetime_formatted item.completed_at
       json.status item.status
       json.payment item.payment
+      json.note item.note
       json.money_requests do
         json.array! item.money_requests do |money_request|
 
