@@ -68,6 +68,8 @@ class ReportProcessorGroup < ActiveRecord::Base
                                                                                   :failed]) }
   scope :completed, -> { where status_id: ReportProcessorGroupStatus.id_for(:completed) }
 
+  default_scope { order created_at: :desc }
+
   delegate :scheduled?, :pending?, :processing?, :partially_completed?, :completed?, :failed?, :cancelled?, to: :status
 
   before_destroy do

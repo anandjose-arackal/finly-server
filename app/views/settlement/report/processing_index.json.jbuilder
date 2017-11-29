@@ -18,7 +18,7 @@ json.array! @result.paginated_report_processor_groups do |group|
       user_count += 1
       json.user item.user
       json.amount item.amount
-      json.completed_at DateUtils.date_formatted item.completed_at
+      json.completed_on DateUtils.date_formatted item.completed_at
       json.status item.status
       json.payment item.payment
       json.receiving_account_type item.payment&.receiving_account_type
