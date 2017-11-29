@@ -414,6 +414,10 @@ class User < ActiveRecord::Base
     if self.team_mapping.vendor_payments.count == 0
       self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: Purpose.id_for(:vendor_payments)).save
     end
+    if self.team_mapping.invoicing.count == 0
+      self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: Purpose.id_for(:invoicing)).save
+    end
+
     self.policy_user_mappings.build(policy_id: default_policy_id).save
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
@@ -536,6 +540,14 @@ class User < ActiveRecord::Base
   end
 
   alias_method :invoicing_admin?, :collect_admin?
+  alias_method :finly_collect_admin?, :collect_admin?
+
+  def collect_initiator?
+    self.role_mapping.invoicing.initiator.present?
+  end
+
+  alias_method :invoicing_initiator?, :collect_initiator?
+  alias_method :finly_collect_initiator?, :collect_initiator?
 
   def expense_management_enabled?
     self.user_panel_subscription.expense_management

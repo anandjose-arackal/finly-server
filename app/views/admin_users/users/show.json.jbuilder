@@ -103,6 +103,11 @@ json.roles_vp do
   json.initiator @result.selected_user.vendor_payments_initiator?
 end
 
+json.roles_fc do
+  json.admin @result.selected_user.finly_collect_admin?
+  json.initiator @result.selected_user.finly_collect_initiator?
+end
+
 # all mapping for this particular user
 json.mapping @result.mapping.each do |mapping|
   json.company_default mapping[:company_default]
