@@ -1,0 +1,23 @@
+# == Schema Information
+#
+# Table name: virtual_account_collect_trails
+#
+#  id                     :integer          not null, primary key
+#  found_virtual_account  :boolean
+#  update_company_balance :boolean
+#  create_payment         :boolean
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  account_transaction_id :integer
+#  note                   :text(65535)
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  found_virtual_account: false
+  update_company_balance: false
+
+two:
+  found_virtual_account: false
+  update_company_balance: false

@@ -5,7 +5,7 @@
 
 class PaymentRequest < NonPersistentModel
 
-  AVAILABLE_ACCOUNT_TYPES = [nil, ItzCashCompanyAccount.name, YesBankCompanyAccount.name, UserWallet.name, CashOnHand.name, Card.name, BankAccount.name, VendorPaymentWallet.name]
+  AVAILABLE_ACCOUNT_TYPES = [nil, ItzCashCompanyAccount.name, YesBankCompanyAccount.name, UserWallet.name, CashOnHand.name, Card.name, BankAccount.name, VendorPaymentWallet.name, VirtualBankAccount.name]
 
   attr_accessor :company_id, :scheduled_at, :background, :payment_purpose_id,
                 :payment_items,
@@ -26,7 +26,7 @@ class PaymentRequest < NonPersistentModel
 
   validate :company_id_presence
   validates :initiating_resource, presence: true
-  validates :initiating_resource_type, inclusion: {in: [User.name, AdminUser.name]}
+  validates :initiating_resource_type, inclusion: {in: [User.name, AdminUser.name, nil]}
   validates :payment_purpose_id, presence: true
   validates :initiating_account_type, inclusion: {in: AVAILABLE_ACCOUNT_TYPES}
   validates :receiving_account_type, inclusion: {in: AVAILABLE_ACCOUNT_TYPES}

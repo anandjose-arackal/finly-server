@@ -25,9 +25,10 @@
 #  application             :string(255)
 #  payment_mode            :string(255)
 #  reference_id            :string(255)      not null
-#  post_operation          :text(65535)
-#  post_operation_payload  :text(65535)
 #
+
+
+
 
 
 
@@ -96,6 +97,7 @@ class Payment < ActiveRecord::Base
                                                              PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly),
                                                              PaymentPurpose.id_for(:atm_withdrawal)] }
   scope :with_amount, -> { joins :amount }
+  scope :sum_amounts, -> { with_amount.sum(:value) }
   scope :joins_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }
   scope :made_after, ->(date) { where 'date >= ?', date }
@@ -112,6 +114,10 @@ class Payment < ActiveRecord::Base
   }
   scope :with_initiating_account_id, -> (ids) {
     where initiating_account_id: ids
+  }
+
+  scope :with_initiating_account, -> (initiating_account) {
+    where initiating_account: initiating_account
   }
 
   # Personal are card transactions from own wallet to own card
@@ -374,7 +380,7 @@ class Payment < ActiveRecord::Base
   end
 
   def initiating_user_presence
-    unless [PaymentPurpose.id_for(:vendor_payment)].include?(self.payment_purpose_id)
+    unless PaymentPurpose.ids_for([:vendor_payment, :virtual_account_credit, :payment_link_credit, :invoice_credit, :cash_on_hand_reversal]).include?(self.payment_purpose_id)
       if initiating_user_id.blank?
         errors.add(:initiating_user_id, "cannot be blank")
       end
@@ -382,7 +388,7 @@ class Payment < ActiveRecord::Base
   end
 
   def receiving_user_presence
-    unless [PaymentPurpose.id_for(:vendor_payment), PaymentPurpose.id_for(:corporate_balance_load), PaymentPurpose.id_for(:corporate_balance_refund)].include?(self.payment_purpose_id)
+    unless PaymentPurpose.ids_for([:vendor_payment, :corporate_balance_load, :corporate_balance_refund, :virtual_account_credit, :payment_link_credit, :invoice_credit, :cash_on_hand_reversal]).include?(self.payment_purpose_id)
       if receiving_user_id.blank?
         errors.add(:receiving_user_id, "cannot be blank")
       end

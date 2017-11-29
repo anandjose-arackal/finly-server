@@ -1,0 +1,19 @@
+# == Schema Information
+#
+# Table name: payment_receivable_transaction_trails
+#
+#  id                          :integer          not null, primary key
+#  account_transaction_id      :integer
+#  find_payment_receivable     :boolean
+#  creating_payment            :boolean
+#  update_company_balance      :boolean
+#  payment_receivable_updation :boolean
+#  created_at                  :datetime         not null
+#  updated_at                  :datetime         not null
+#  note                        :text(65535)
+#
+
+class PaymentReceivableTransactionTrail < ActiveRecord::Base
+  belongs_to :account_transaction, class_name: "VirtualAccountTransaction"
+
+end

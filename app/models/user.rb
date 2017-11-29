@@ -113,6 +113,8 @@ class User < ActiveRecord::Base
 
   has_many :admin_summary_mail_configs, dependent: :destroy
   has_many :manager_summary_mail_configs, dependent: :destroy
+  has_many :payment_receivables, foreign_key: :initiating_user_id
+
 
   has_many :bank_accounts, as: :account_owner
   has_many :authentications
@@ -140,6 +142,7 @@ class User < ActiveRecord::Base
   has_many :agreements, through: :login_agreement_mappings
   has_many :card_assign_requests, foreign_key: :card_owner_id
   has_many :card_upgrade_requests, foreign_key: :card_owner_id
+  has_many :virtual_bank_accounts, foreign_key: :initiating_user_id
 
   # adding associations for the user manager mapping for payment requests
   has_many :bank_payment_requests, foreign_key: :owner_id
@@ -528,6 +531,11 @@ class User < ActiveRecord::Base
 
   alias_method :vendor_payments_initiator?, :vendor_payment_initiator?
 
+  def collect_admin?
+    self.role_mapping.invoicing.admin.present?
+  end
+
+  alias_method :invoicing_admin?, :collect_admin?
 
   def expense_management_enabled?
     self.user_panel_subscription.expense_management
@@ -542,6 +550,10 @@ class User < ActiveRecord::Base
   end
 
   alias_method :vendor_payment_enabled?, :vendor_payments_enabled?
+
+  def invoicing_system_enabled?
+    self.user_panel_subscription.invoicing_system
+  end
 
   def has_role?(role_id)
     return false unless role_id.present?
@@ -745,11 +757,5 @@ class User < ActiveRecord::Base
   end
 
   private
-
-# def valid_role
-#   if self.role_mapping.count == 0
-#     errors.add(:user, "must be assigned a role")
-#   end
-# end
 
 end

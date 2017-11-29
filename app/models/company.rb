@@ -49,6 +49,9 @@ class Company < ActiveRecord::Base
   has_many :yes_bank_vendors
   has_many :bank_accounts
   has_many :quickbooks_departments
+  has_many :payment_receivables
+  has_many :virtual_bank_accounts
+  has_many :customers
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -244,6 +247,10 @@ class Company < ActiveRecord::Base
 
   def yes_bank_api_enabled?
     self.feature_subscription.yes_bank_api_enabled
+  end
+
+  def invoicing_system_enabled?
+    self.feature_subscription.invoicing_system
   end
 
   def more_than_one_subscription?
