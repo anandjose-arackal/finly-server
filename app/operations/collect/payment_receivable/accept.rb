@@ -1,14 +1,22 @@
 class Collect::PaymentReceivable::Accept < Collect::PaymentReceivable::Base
 
-  attr_accessor :virtual_account, :company, :payment_receivable
+  attr_accessor :virtual_account, :company, :payment_receivable, :payment_request,
+                :trail, :payment
 
   def init
-    id = params[:id] || params[:virtual_account_transaction_id]
-    self.virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: id)
-    self.virtual_account = virtual_account_transaction.virtual_bank_account
+    # id = params[:id] || params[:virtual_account_transaction_id]
+    # self.virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: id)
+    self.virtual_account = virtual_account_transaction.virtual_account
     self.company = virtual_account.company
-    self.payment_request = init_payment_request(:virtual_bank_account, company)
+    self.trail = ::VirtualAccountCollectTrail.find_by(id: options[:trail_id])
+    self.payment_request = init_payment_request(:virtual_bank_account, self.virtual_account.receiving_account)
     self.payment_receivable = self.virtual_account.parent
+  end
+
+  def validate
+    if self.payment_receivable.blank?
+      add_message :error, "Payment Request not found"
+    end
   end
 
   def process

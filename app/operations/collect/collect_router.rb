@@ -61,7 +61,8 @@ class Collect::CollectRouter < BaseOperation
         self.trail.save
       end
     else
-      add_message :error, virtual_account_transaction.errors.full_messages
+      # add_message :success, virtual_account_transaction.errors.full_messages
+      # nothing to do here because we're responding with success nevertheless
     end
   end
 

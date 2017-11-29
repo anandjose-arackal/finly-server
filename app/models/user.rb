@@ -142,6 +142,7 @@ class User < ActiveRecord::Base
   has_many :agreements, through: :login_agreement_mappings
   has_many :card_assign_requests, foreign_key: :card_owner_id
   has_many :card_upgrade_requests, foreign_key: :card_owner_id
+  has_many :virtual_bank_accounts, foreign_key: :initiating_user_id
 
   # adding associations for the user manager mapping for payment requests
   has_many :bank_payment_requests, foreign_key: :owner_id
