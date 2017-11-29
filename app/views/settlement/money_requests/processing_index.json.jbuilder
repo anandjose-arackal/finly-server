@@ -2,7 +2,7 @@ json.array! @result.paginated_money_request_processors do |processor|
   json.id processor.id
   json.created_by_user processor.created_by_user
   json.status processor.status
-  json.created_on DateUtils.date_formatted processor.created_at
+  json.created_at DateUtils.date_formatted processor.created_at
   json.scheduled_on DateUtils.date_formatted processor.scheduled_at
   json.completed_on DateUtils.date_formatted processor.completed_at
   json.total_amount processor.total_amount
@@ -18,7 +18,7 @@ json.array! @result.paginated_money_request_processors do |processor|
       user_count += 1
       json.user item.user
       json.amount item.amount
-      json.completed_at item.completed_at
+      json.completed_on DateUtils.datetime_formatted item.completed_at
       json.status item.status
       json.payment item.payment
       json.money_requests do

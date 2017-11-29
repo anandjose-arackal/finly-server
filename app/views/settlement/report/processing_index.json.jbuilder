@@ -2,7 +2,7 @@ json.array! @result.paginated_report_processor_groups do |group|
   json.id group.id
   json.created_by_user group.created_by_user
   json.status group.status
-  json.created_on DateUtils.date_formatted group.created_at
+  json.created_at DateUtils.date_formatted group.created_at
   json.scheduled_on DateUtils.date_formatted group.scheduled_at
   json.completed_on DateUtils.date_formatted group.completed_at
   json.total_amount group.total_amount

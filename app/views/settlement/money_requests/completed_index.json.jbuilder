@@ -20,7 +20,7 @@ json.array! @result.paginated_money_requests do |money_request|
     processor_group = mapping&.processor
     processed_by = processor_group&.created_by_user
 
-    json.completed_at DateUtils.datetime_formatted mapping&.completed_at
+    json.completed_on DateUtils.datetime_formatted mapping&.completed_at
     json.amount mapping&.amount
     json.payment_type processor_group&.payment_type
     json.payment_mode processor_group&.payment_mode
