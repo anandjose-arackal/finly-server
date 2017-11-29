@@ -14,6 +14,10 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
       add_message :error, 'Batch not found'
       return
     end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
   end
 
   def init
@@ -46,6 +50,10 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
     else
       self.report_group_processor.update(status_id: ReportProcessorGroupStatus.id_for(:cancelled))
     end
+  end
+
+  def post_process
+    add_message :success, 'Cancelled Successfully'
   end
 
 end

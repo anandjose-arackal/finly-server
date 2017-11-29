@@ -80,6 +80,10 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     end
   end
 
+  def post_process
+    add_message :success, 'Reimbursement Initiated Successfully'
+  end
+
   protected
 
   def set_source_account

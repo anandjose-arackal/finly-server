@@ -14,6 +14,10 @@ class Settlement::SReport::Processing::MarkAsPaid < Settlement::SReport::Process
       add_message :error, 'Batch not found'
       return
     end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
   end
 
   def init
@@ -42,6 +46,10 @@ class Settlement::SReport::Processing::MarkAsPaid < Settlement::SReport::Process
       add_message :error, result.messages[:error]
       return
     end
+  end
+
+  def post_process
+    add_message :success, 'Marked as Paid Successfully'
   end
 
 end

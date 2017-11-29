@@ -80,6 +80,10 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
     end
   end
 
+  def post_process
+    add_message :success, 'Money Request Payment Initiated Successfully'
+  end
+
   protected
 
   def set_source_account
