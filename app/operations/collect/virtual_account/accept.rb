@@ -32,6 +32,8 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
       payment.update(reference_resource: self.virtual_account_transaction)
       self.trail.update(create_payment: true, update_company_balance: true)
       self.virtual_account_transaction.update(processed: true)
+    else
+      add_message :error, op.messages[:error]
     end
   end
 
@@ -44,6 +46,6 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
   end
 
   def failure
-    self.trail.update(note: op.messages[:error].to_sentence, update_company_balance: false, create_payment: false)
+    self.trail.update(note: self.messages[:error].to_sentence, update_company_balance: false, create_payment: false)
   end
 end

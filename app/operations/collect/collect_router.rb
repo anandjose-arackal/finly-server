@@ -108,15 +108,4 @@ class Collect::CollectRouter < BaseOperation
     end
   end
 
-  def update_account_not_found
-    case self.purpose_id
-      when VirtualAccountPurpose.id_for(:virtual_bank_account)
-        self.trail.found_virtual_account = false
-      when VirtualAccountPurpose.id_for(:payment_receivable)
-
-      else
-        # do nothing?
-    end
-  end
-
 end
