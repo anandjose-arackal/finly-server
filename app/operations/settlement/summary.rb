@@ -118,9 +118,13 @@ class Settlement::Summary < Settlement::Base
     self.finly_money_summary = {}
     if cards_enabled
       self.finly_money_summary[:card_transfer_wallet] = Amount.new(value: UserWallet.with_user(user_ids).sum_balance, currency_id: self.currency_id)
+    else
+      self.finly_money_summary[:card_transfer_wallet] = nil
     end
     if bank_transfer_enabled
       self.finly_money_summary[:bank_transfer_wallet] = Amount.new(value: VendorPaymentWallet.with_user(user_ids).sum_balance, currency_id: self.currency_id)
+    else
+      self.finly_money_summary[:bank_transfer_wallet] = nil
     end
   end
 
