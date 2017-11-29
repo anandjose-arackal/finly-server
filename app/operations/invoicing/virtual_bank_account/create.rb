@@ -40,7 +40,7 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
   def process
     # call the operation to generate a bank account number from the dedicated server
 
-    op = FinlyCollect::Create.(collect_api_params)
+    op = FinlyCollect::Create.(user, collect_api_params)
     if op.success?
       bank_account_number = op.account_number
       # temporarily using a generator for this
