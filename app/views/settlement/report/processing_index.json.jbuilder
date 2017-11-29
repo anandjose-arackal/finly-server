@@ -43,7 +43,10 @@ json.array! @result.paginated_report_processor_groups do |group|
         end
       end
       json.system_messages do
-        json.array! item.system_messages
+        messages = []
+        messages = messages + item.system_messages if item.system_messages.present?
+        messages = messages + item.payment.system_messages if item.payment&.system_messages&.present?
+        json.array! messages
       end
     end
   end
