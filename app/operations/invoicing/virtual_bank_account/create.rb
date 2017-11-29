@@ -40,7 +40,7 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
   def process
     # call the operation to generate a bank account number from the dedicated server
 
-    op = FinlyCollect::Create.(params)
+    op = FinlyCollect::Create.(collect_api_params)
     if op.success?
       bank_account_number = op.account_number
       # temporarily using a generator for this
@@ -72,15 +72,19 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
   private
 
   def virtual_account_params
-    params.require(:virtual_bank_account).permit(:name, :expires_by, :description)
+    if params[:virtual_bank_account].present?
+      params.require(:virtual_bank_account).permit(:name, :expires_by, :description)
+    else
+      {}
+    end
   end
 
-  def generate_random_bank_account
-    "FINLY#{random_number(10)}"
-  end
-
-  def random_number(digits)
-    (0...digits).map { (48 + rand(10)).chr }.join
+  def collect_api_params
+    p = {
+        date_before: virtual_account_params[:expires_by],
+        exact_transaction_amount: self.parent&.amount_value
+    }
+    p
   end
 
 end

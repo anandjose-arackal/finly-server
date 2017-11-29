@@ -6,10 +6,10 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
                 :payment_request, :trail
 
   def init
-    id = params[:id] || params[:virtual_account_transaction_id]
+    # id = params[:id] || params[:virtual_account_transaction_id]
+    # self.virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: id)
     self.virtual_account = self.virtual_account_transaction.virtual_account
-    self.virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: id)
-    self.trail = ::VirtualAccountCollectTrail.find_by(id: params[:trail_id])
+    self.trail = ::VirtualAccountCollectTrail.find_by(id: options[:trail_id])
     self.company = virtual_account.company
     self.payment_request = init_payment_request(:virtual_bank_account, virtual_account.receiving_account)
   end
@@ -18,7 +18,7 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
     if self.virtual_account.blank?
       add_message :error, "Virtual bank account number not found"
     end
-    if self.virtual_account.expires_by < DateUtils.local_date
+    if self.virtual_account.expires_by && self.virtual_account.expires_by < DateUtils.local_date
       add_message :error, "This virtual account has expired"
     end
   end
@@ -37,5 +37,13 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
 
   def post_process
     # trigger mailers if necessary
+  end
+
+  def success
+    self.trail.update(update_company_balance: true, create_payment: true)
+  end
+
+  def failure
+    self.trail.update(note: op.messages[:error].to_sentence, update_company_balance: false, create_payment: false)
   end
 end

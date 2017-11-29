@@ -42,10 +42,7 @@ class Collect::CollectRouter < BaseOperation
         # todo - change all the below ones to async calls after testing
         case self.purpose_id
           when VirtualAccountPurpose.id_for(:virtual_bank_account)
-            op = Collect::VirtualAccount::Accept.(user, virtual_account_transaction_id: self.virtual_account_transaction.id, trail_id: self.trail.id)
-            unless op.success?
-              self.trail.update(note: op.messages[:error].to_sentence, update_company_balance: false, create_payment: false)
-            end
+            op = Collect::VirtualAccount::Accept.call_async(self.virtual_account_transaction.id, trail_id: self.trail.id)
           when VirtualAccountPurpose.id_for(:payment_receivable)
             op = Collect::PaymentReceivable::Accept.(user, virtual_account_transaction_id: self.virtual_account_transaction.id, trail_id: self.trail.id)
             unless op.success?
