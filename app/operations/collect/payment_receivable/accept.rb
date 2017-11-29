@@ -16,6 +16,12 @@ class Collect::PaymentReceivable::Accept < Collect::PaymentReceivable::Base
   def validate
     if self.payment_receivable.blank?
       add_message :error, "Payment Request not found"
+      return
+    end
+
+    if payment_receivable.received?
+      add_message :error, "Payment already received. Please activate the payment link again to receive payments"
+      return
     end
   end
 

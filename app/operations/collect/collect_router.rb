@@ -44,7 +44,7 @@ class Collect::CollectRouter < BaseOperation
           when VirtualAccountPurpose.id_for(:virtual_bank_account)
             op = Collect::VirtualAccount::Accept.call_async(self.virtual_account_transaction.id, trail_id: self.trail.id)
           when VirtualAccountPurpose.id_for(:payment_receivable)
-            op = Collect::PaymentReceivable::Accept.(self.virtual_account_transaction.id, trail_id: self.trail.id)
+            op = Collect::PaymentReceivable::Accept.call_async(self.virtual_account_transaction.id, trail_id: self.trail.id)
           # these three below are kinda irrelevant
           when VirtualAccountPurpose.id_for(:invoice)
             Collect::Invoice::Accept.(self.virtual_account_transaction.id)

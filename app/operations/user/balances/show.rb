@@ -186,14 +186,14 @@ class User::Balances::Show < User::Base
   end
 
   def set_collect_balances
-    if selected_user.collect_admin?
+    # if selected_user.collect_admin?
       self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
       self.balances[:company_credits] << {
           name: "Finly Collect Credits",
           type: "bank",
           balance: self.company_credits_info[:yes_bank][:balance]
       }
-    end
+    # end
   end
 
   def set_card_balances

@@ -31,4 +31,16 @@ class PaymentReceivable < ActiveRecord::Base
   accepts_nested_attributes_for :customer
 
   delegate :amount_value, to: :amount, allow_nil: true
+
+  def active?
+    self.payment_receivable_status_id == PaymentReceivableStatus.id_for(:active)
+  end
+
+  def inactive?
+    self.payment_receivable_status_id == PaymentReceivableStatus.id_for(:inactive)
+  end
+
+  def received?
+    self.payment_receivable_status_id == PaymentReceivableStatus.id_for(:received)
+  end
 end

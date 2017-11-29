@@ -17,9 +17,14 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
   def validate
     if self.virtual_account.blank?
       add_message :error, "Virtual bank account number not found"
+      return
     end
     if self.virtual_account.expires_by && self.virtual_account.expires_by < DateUtils.local_date
       add_message :error, "This virtual account has expired"
+      return
+    end
+    unless self.virtual_account.active
+      add_message :error, "Virtual account has been deactivated"
     end
   end
 
@@ -43,10 +48,10 @@ class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
   end
 
   def success
-
+    self.trail.update(create_payment: true, update_company_balance: true)
   end
 
   def failure
-
+    self.trail.update(note: self.messages[:error].to_sentence, update_company_balance: false, create_payment: false)
   end
 end
