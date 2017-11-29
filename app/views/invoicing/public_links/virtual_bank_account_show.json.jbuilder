@@ -11,5 +11,6 @@ if @result.virtual_bank_account.payment_link?
     json.amount @result.virtual_bank_account.parent.amount_value
     json.expire_by @result.virtual_bank_account.parent.expire_by
     json.status @result.virtual_bank_account&.parent&.payment_receivable_status&.name&.humanize
+    json.note @result.virtual_bank_account&.parent&.purpose
   end
 end
