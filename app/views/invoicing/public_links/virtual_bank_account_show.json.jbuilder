@@ -4,5 +4,12 @@ json.company do
   json.name @result.company
   json.logo @result.company.configuration.logo&.url
 end
-json.amount @result.payment_receivable.amount_value
-json.expire_by @result.payment_receivable.expires_by
+
+if @result.virtual_bank_account.payment_link?
+  json.payment_link true
+  json.payment_receivable do
+    json.amount @result.virtual_bank_account.parent.amount_value
+    json.expire_by @result.virtual_bank_account.parent.expire_by
+    json.status @result.virtual_bank_account&.parent&.payment_receivable_status&.name&.humanize
+  end
+end

@@ -47,4 +47,8 @@ class VirtualBankAccount < ActiveRecord::Base
     self.update(active: true)
   end
 
+  def payment_link?
+    self.parent_type == "PaymentReceivable"
+  end
+
 end

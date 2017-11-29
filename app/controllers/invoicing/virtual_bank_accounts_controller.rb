@@ -26,7 +26,11 @@ class Invoicing::VirtualBankAccountsController < ApplicationController
 
   def destroy
     @result = Invoicing::VirtualBankAccount::Destroy.(current_user, params)
-    respond
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def deactivate

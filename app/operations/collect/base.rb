@@ -3,8 +3,8 @@ class Collect::Base < BackgroundOperation
   attr_accessor :virtual_account_transaction, :options, :virtual_account
 
   def self.call(virtual_account_transaction_id, options = {})
-    self.virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: virtual_account_transaction_id)
-    self.new.perform(virtual_account_transaction, options)
+    virtual_account_transaction = ::VirtualAccountTransaction.find_by(id: virtual_account_transaction_id)
+    self.new.perform(virtual_account_transaction_id, options)
   end
 
   def self.call_async(virtual_account_transaction_id, options = {})

@@ -26,4 +26,12 @@ class Collect::PaymentReceivable::Accept < Collect::PaymentReceivable::Base
     self.payment_receivable.update(payment_receivable_status_id: PaymentReceivableStatus.id_for(:received))
     # trigger mailers if necessary
   end
+
+  def success
+    self.trail.update(update_company_balance: true, creating_payment: true)
+  end
+
+  def failure
+    self.trail.update(note: self.messages[:error].to_sentence, update_company_balance: false, creating_payment: false)
+  end
 end
