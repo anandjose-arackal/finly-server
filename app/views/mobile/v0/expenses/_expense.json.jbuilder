@@ -42,11 +42,11 @@ json.status do
   json.name expense.expense_status.name
 end
 
-json.converted_amount do
+json.amount do
   json.partial! 'api/v1/shared/amount', amount: expense.base_amount
 end
 
-json.amount do
+json.original_amount do
   json.partial! 'api/v1/shared/amount', amount: expense.original_amount
 end
 
