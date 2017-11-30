@@ -1614,7 +1614,6 @@ Rails.application.routes.draw do
   # adding this before the devise routes because devise overrides out custom path
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
-
   ######### FINLY COLLECT START ###########
     post 'collect/notify', to: 'finly_collect#notify'
   ######### FINLY COLLECT END ###########
