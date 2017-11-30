@@ -6,6 +6,11 @@ class Invoicing::VirtualBankAccount::Update < Invoicing::VirtualBankAccount::Bas
 
   def init
     super
+    if self.virtual_bank_account.blank?
+      number = params[:account_number]
+      op = Invoicing::VirtualBankAccount::Index.(user, params)
+      self.virtual_bank_account = op.virtual_bank_accounts.find_by(account_number: number)
+    end
     self.virtual_bank_account_params = virtual_account_params
   end
 

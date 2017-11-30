@@ -1,4 +1,8 @@
-class Api::V1::Invoices::VirtualBankAccountsController < ApplicationController
+class Api::Fc::Invoices::VirtualBankAccountsController < ApplicationController
+
+  protect_from_forgery with: :null_session
+
+  before_action -> { finly_authorize! :api }
 
   def create
     param = RequestFormatter::VirtualBankAccountParser::Parse.(current_user, params).formatted_request
@@ -20,8 +24,17 @@ class Api::V1::Invoices::VirtualBankAccountsController < ApplicationController
     end
   end
 
+  def deactivate
+    @result = Invoicing::VirtualBankAccount::Deactivate.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.success[:message]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
   def destroy
-    @result = Invoicing::VirtualBankAccount::Destroy.(current_user, param)
+    @result = Invoicing::VirtualBankAccount::Destroy.(current_user, params)
     if @result.success?
       respond response: :success, message: @result.success[:message]
     else
@@ -30,7 +43,7 @@ class Api::V1::Invoices::VirtualBankAccountsController < ApplicationController
   end
 
   def show
-    @result = Invoicing::VirtualBankAccount::Show.(current_user, param)
+    @result = Invoicing::VirtualBankAccount::Show.(current_user, params)
     respond
   end
 

@@ -38,9 +38,9 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
     self.virtual_bank_account_params[:initiating_user] = user
     self.virtual_bank_account_params[:parent] = self.parent
     self.virtual_bank_account_params[:purpose_id] = self.purpose_id
-    self.virtual_bank_account_params[:company_id] = self.company_id
+    self.virtual_bank_account_params[:company_id] = self.company&.id
     self.virtual_bank_account_params[:receiving_account] = self.receiving_account
-    self.virtual_account_params[:ifsc] = Constants::YesBank::YES_BANK_RECEIVING_IFSC
+    self.virtual_bank_account_params[:ifsc] = Constants::YesBank::YES_BANK_RECEIVING_IFSC
   end
 
   def process
