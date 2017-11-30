@@ -2,34 +2,36 @@
 #
 # Table name: virtual_bank_accounts
 #
-#  id                        :integer          not null, primary key
-#  account_number            :string(255)
-#  ifsc                      :string(255)
-#  description               :text(65535)
-#  parent_id                 :integer
-#  parent_type               :string(255)
-#  company_id                :integer
-#  created_at                :datetime         not null
-#  updated_at                :datetime         not null
-#  expires_by                :date
-#  purpose_id                :integer
-#  active                    :boolean          default(TRUE)
-#  is_deleted                :boolean          default(FALSE)
-#  initiating_user_id        :integer
-#  name                      :string(255)
-#  receiving_account_id      :integer
-#  receiving_account_type    :string(255)
-#  maximum_amount_id         :integer
-#  minimum_amount_id         :integer
-#  allowed_transaction_count :integer
-#  neft                      :boolean          default(TRUE)
-#  imps                      :boolean          default(TRUE)
-#  rtgs                      :boolean          default(TRUE)
-#  current_account           :boolean          default(TRUE)
-#  savings_account           :boolean          default(TRUE)
-#  upi                       :boolean          default(TRUE)
-#  date_after                :date
-#  date_on                   :date
+#  id                            :integer          not null, primary key
+#  account_number                :string(255)
+#  ifsc                          :string(255)
+#  description                   :text(65535)
+#  parent_id                     :integer
+#  parent_type                   :string(255)
+#  company_id                    :integer
+#  created_at                    :datetime         not null
+#  updated_at                    :datetime         not null
+#  expires_by                    :date
+#  purpose_id                    :integer
+#  active                        :boolean          default(TRUE)
+#  is_deleted                    :boolean          default(FALSE)
+#  initiating_user_id            :integer
+#  name                          :string(255)
+#  receiving_account_id          :integer
+#  receiving_account_type        :string(255)
+#  maximum_transaction_amount_id :integer
+#  minimum_transaction_amount_id :integer
+#  allowed_transaction_count     :integer
+#  neft                          :boolean          default(TRUE)
+#  imps                          :boolean          default(TRUE)
+#  rtgs                          :boolean          default(TRUE)
+#  current_account               :boolean          default(TRUE)
+#  savings_account               :boolean          default(TRUE)
+#  upi                           :boolean          default(TRUE)
+#  date_after                    :date
+#  date_on                       :date
+#  maximum_amount_id             :integer
+#  exact_transaction_amount_id   :integer
 #
 
 # parent here will be either the payment receivable, or user, or whatever
@@ -41,6 +43,10 @@ class VirtualBankAccount < ActiveRecord::Base
   belongs_to :company
   belongs_to :initiating_user, class_name: "User"
   belongs_to :receiving_account, polymorphic: true
+  belongs_to :maximum_transaction_amount, class_name: "Amount"
+  belongs_to :minimum_transaction_amount, class_name: "Amount"
+  belongs_to :maximum_amount, class_name: "Amount"
+  
   has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
 
   validates :purpose, presence: true

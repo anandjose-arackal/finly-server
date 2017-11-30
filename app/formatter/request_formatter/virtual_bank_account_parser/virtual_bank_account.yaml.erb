@@ -1,0 +1,25 @@
+virtual_bank_account:
+  account_number: <%= params[:account_number] %>
+  active: <%= params[:active] || true %>
+  maximum_amount_attributes:
+    value: <%= params[:maximum_amount] %>
+    currency_id: 1
+  maximum_transaction_amount_attributes:
+    value: <%= params[:maximum_transaction_amount] %>
+    currency_id: 1
+  minimum_amount_attributes:
+    value: <%= params[:minimum_transaction_amount] %>
+    currency_id: 1
+  exact_trasnaction_amount_attributes:
+    value: <%= params[:exact_transaction_amount] %>
+    currency_id: 1
+  current_account: <%= params[:current_account] %>
+  savings_account: <%= params[:savings_account] %>
+  neft: <%= params[:neft] %>
+  imps: <%= params[:imps] %>
+  rtgs: <%= params[:rtgs] %>
+  upi: <%= params[:upi] %>
+  date_after: <%= params[:date_after] %>
+  expires_by: <%= params[:date_before] %>
+  date_on: <%= params[:date_on] %>
+  description: <%= params[:description] %>
