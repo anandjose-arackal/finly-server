@@ -322,7 +322,19 @@
 #                                                         PATCH  /mobile/v2/expenses/:id(.:format)                                                          mobile/v2/expenses#update
 #                                                         PUT    /mobile/v2/expenses/:id(.:format)                                                          mobile/v2/expenses#update
 #                                                         DELETE /mobile/v2/expenses/:id(.:format)                                                          mobile/v2/expenses#destroy
+#                                       mobile_v2_reports POST   /mobile/v2/reports(.:format)                                                               mobile/v2/reports#create
 #                                        mobile_v2_report GET    /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#show
+#                                                         PATCH  /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#update
+#                                                         PUT    /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#update
+#                                mobile_v2_report_comment POST   /mobile/v2/reports/:report_id/comment(.:format)                                            mobile/v2/reports#comment
+#                                                         GET    /mobile/v2/reports(.:format)                                                               mobile/v2/reports#index
+#                                                         POST   /mobile/v2/reports(.:format)                                                               mobile/v2/reports#create
+#                                    new_mobile_v2_report GET    /mobile/v2/reports/new(.:format)                                                           mobile/v2/reports#new
+#                                   edit_mobile_v2_report GET    /mobile/v2/reports/:id/edit(.:format)                                                      mobile/v2/reports#edit
+#                                                         GET    /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#show
+#                                                         PATCH  /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#update
+#                                                         PUT    /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#update
+#                                                         DELETE /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#destroy
 #                                          chrome_v1_auth POST   /chrome/v1/auth(.:format)                                                                  chrome/v1/token#create
 #                                                         DELETE /chrome/v1/auth(.:format)                                                                  chrome/v1/token#destroy
 #                        chrome_v1_expenses_configuration POST   /chrome/v1/expenses/configuration(.:format)                                                chrome/v1/expenses#configuration
