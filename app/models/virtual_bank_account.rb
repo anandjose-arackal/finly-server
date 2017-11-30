@@ -46,8 +46,19 @@ class VirtualBankAccount < ActiveRecord::Base
   belongs_to :maximum_transaction_amount, class_name: "Amount"
   belongs_to :minimum_transaction_amount, class_name: "Amount"
   belongs_to :maximum_amount, class_name: "Amount"
+  belongs_to :exact_transaction_amount, class_name: "Amount"
   
   has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
+
+  accepts_nested_attributes_for :maximum_amount
+  accepts_nested_attributes_for :maximum_transaction_amount
+  accepts_nested_attributes_for :minimum_transaction_amount
+  accepts_nested_attributes_for :exact_transaction_amount
+
+  delegate :maximum_amount_value, to: :maximum_amount, allow_nil: true
+  delegate :maximum_transaction_amount_value, to: :maximum_transaction_amount, allow_nil: true
+  delegate :minimum_transaction_amount_value, to: :minimum_transaction_amount, allow_nil: true
+  delegate :exact_transaction_amount_value, to: :exact_transaction_amount, allow_nil: true
 
   validates :purpose, presence: true
 
