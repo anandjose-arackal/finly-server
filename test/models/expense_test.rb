@@ -18,7 +18,7 @@
 #  is_deleted             :boolean          default(FALSE), not null
 #  transcribed            :boolean          default(FALSE)
 #  personal               :boolean          default(FALSE)
-#  reimbursable           :boolean          default(TRUE)
+#  reimbursable           :boolean
 #  synced_with_quickbooks :boolean          default(FALSE)
 #  split_link             :string(255)
 #  deleted_to_split       :boolean          default(FALSE)
