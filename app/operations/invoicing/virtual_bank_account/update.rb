@@ -47,7 +47,7 @@ class Invoicing::VirtualBankAccount::Update < Invoicing::VirtualBankAccount::Bas
     params.require(:virtual_bank_account).permit(:expires_by, :description, :name,
                                                  :neft, :imps, :rtgs, :upi, :allowed_transaction_count,
                                                  :current_account, :savings_account,
-                                                 :date_after, :date_on,
+                                                 :active_after, :active_on,
                                                  maximum_amount_attributes: [:value, :currency_id],
                                                  minimum_transaction_amount_attributes: [:value, :currency_id],
                                                  maximum_transaction_amount_attributes: [:value, :currency_id],

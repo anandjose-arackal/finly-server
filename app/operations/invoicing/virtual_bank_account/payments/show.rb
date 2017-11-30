@@ -20,6 +20,12 @@ class Invoicing::VirtualBankAccount::Payments::Show < Invoicing::VirtualBankAcco
     self.virtual_bank_account = user.company.virtual_bank_accounts.find_by(id: id)
   end
 
+  def validate
+    if self.virtual_bank_account.blank?
+      add_message :error, "Virtual Bank Account not found"
+    end
+  end
+
   def process
     self.payments = Payment.with_initiating_account(self.virtual_bank_account).completed
   end

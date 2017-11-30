@@ -28,8 +28,8 @@
 #  current_account               :boolean          default(TRUE)
 #  savings_account               :boolean          default(TRUE)
 #  upi                           :boolean          default(TRUE)
-#  date_after                    :date
-#  date_on                       :date
+#  active_after                  :date
+#  active_on                     :date
 #  maximum_amount_id             :integer
 #  exact_transaction_amount_id   :integer
 #
