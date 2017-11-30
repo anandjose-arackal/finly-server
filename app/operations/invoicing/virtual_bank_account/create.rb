@@ -49,9 +49,13 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
     if op.success?
       bank_account_number = op.account_number
       self.virtual_bank_account_params[:account_number] = bank_account_number
-      self.bank_account = ::VirtualBankAccount.create(virtual_bank_account_params)
+      self.bank_account = ::VirtualBankAccount.new(virtual_bank_account_params)
+      unless self.bank_account.save
+        add_message :error, self.bank_account.errors.full_messages
+        return
+      end
     else
-      add_message :error, "Could not generate virtual account number, please try again later"
+      add_message :error, op.messages[:error]
     end
   end
 
@@ -68,7 +72,7 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
 
   def virtual_account_params
     if params[:virtual_bank_account].present?
-      params.require(:virtual_bank_account).permit(:expires_by, :description, :name,
+      params.require(:virtual_bank_account).permit(:expires_by, :description, :name, :account_number,
                                                    :neft, :imps, :rtgs, :upi, :allowed_transaction_count,
                                                    :current_account, :savings_account,
                                                    :active_after, :active_on,
@@ -84,6 +88,7 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
   def collect_api_params
     date_before = self.parent&.expire_by || virtual_account_params[:expires_by]
     p = {
+        account_number: virtual_account_params[:account_number],
         date_before: date_before,
         exact_transaction_amount: self.parent&.amount_value
     }

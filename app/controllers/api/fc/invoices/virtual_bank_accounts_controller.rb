@@ -8,7 +8,7 @@ class Api::Fc::Invoices::VirtualBankAccountsController < ApplicationController
     param = RequestFormatter::VirtualBankAccountParser::Parse.(current_user, params).formatted_request
     @result = Invoicing::VirtualBankAccount::Create.(current_user, param)
     if @result.success?
-      respond response: :success, message: @result.success[:message]
+      respond response: :success, message: @result.messages[:success]
     else
       respond response: :failure, message: @result.messages[:error]
     end
@@ -18,7 +18,7 @@ class Api::Fc::Invoices::VirtualBankAccountsController < ApplicationController
     param = RequestFormatter::VirtualBankAccountParser::Parse.(current_user, params).formatted_request
     @result = Invoicing::VirtualBankAccount::Update.(current_user, param)
     if @result.success?
-      respond response: :success, message: @result.success[:message]
+      respond response: :success, message: @result.messages[:success]
     else
       respond response: :failure, message: @result.messages[:error]
     end
@@ -27,7 +27,7 @@ class Api::Fc::Invoices::VirtualBankAccountsController < ApplicationController
   def deactivate
     @result = Invoicing::VirtualBankAccount::Deactivate.(current_user, params)
     if @result.success?
-      respond response: :success, message: @result.success[:message]
+      respond response: :success, message: @result.messages[:success]
     else
       respond response: :failure, message: @result.messages[:error]
     end
@@ -36,7 +36,7 @@ class Api::Fc::Invoices::VirtualBankAccountsController < ApplicationController
   def destroy
     @result = Invoicing::VirtualBankAccount::Destroy.(current_user, params)
     if @result.success?
-      respond response: :success, message: @result.success[:message]
+      respond response: :success, message: @result.messages[:success]
     else
       respond response: :failure, message: @result.messages[:error]
     end
