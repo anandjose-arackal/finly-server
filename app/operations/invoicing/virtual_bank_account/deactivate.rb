@@ -5,6 +5,11 @@ class Invoicing::VirtualBankAccount::Deactivate < Invoicing::VirtualBankAccount:
   def init
     id = params[:id] || params[:virtual_bank_account_id]
     self.virtual_bank_account = user.company.virtual_bank_accounts.find_by(id: id)
+    if self.virtual_bank_account.blank?
+      number = params[:account_number]
+      op = Invoicing::VirtualBankAccount::Index.(user, params)
+      self.virtual_bank_account = op.virtual_bank_accounts.find_by(account_number: number)
+    end
   end
 
   def validate

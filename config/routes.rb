@@ -1942,7 +1942,7 @@ Rails.application.routes.draw do
   get 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#show'
   post 'virtual_accounts', to: 'api/fc/invoices/virtual_bank_accounts#create'
   patch 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#update'
-  delete 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#destroy'
+  delete 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#deactivate'
 
   ################### Virtual Bank Accounts End ######################
 
