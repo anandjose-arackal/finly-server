@@ -1,4 +1,4 @@
-class Collect::PaymentReceivable::Base < Collect::Base
+class AccountManager::Collect::PaymentReceivable::Base < AccountManager::Collect::Base
 
   def init_payment_request(purpose, receiving_account)
     initiating_account = self.virtual_account

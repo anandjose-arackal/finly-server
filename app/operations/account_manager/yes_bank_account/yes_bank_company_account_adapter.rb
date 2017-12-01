@@ -62,6 +62,14 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     [BankAccount, VendorPaymentWallet]
   end
 
+  def accept_va_transaction?
+    true
+  end
+
+  def on_va_transaction(payment, options={})
+    credit(payment, options)
+  end
+
   private
 
   def blocked_amount_for_payments

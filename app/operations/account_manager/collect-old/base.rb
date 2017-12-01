@@ -1,4 +1,4 @@
-class Collect::Base < BackgroundOperation
+class AccountManager::Collect::Base < BackgroundOperation
 
   attr_accessor :virtual_account_transaction, :options, :virtual_account
 

@@ -1,6 +1,6 @@
 # this is the class that will route the virtual transaction object to the appropriate one based on purpose
 # it will accept the parameters of the request an=nd store them in the
-class Collect::CollectRouter < BaseOperation
+class AccountManager::Collect::CollectRouter < BaseOperation
 
   attr_accessor :virtual_account_transaction_params, :virtual_account_transaction, :purpose_id,
                 :virtual_account, :trail
@@ -9,7 +9,7 @@ class Collect::CollectRouter < BaseOperation
     self.virtual_account_transaction_params = transaction_params
     self.virtual_account = VirtualBankAccount.find_by(account_number: virtual_account_transaction_params[:beneficiary_account_number])
     if self.virtual_account.blank?
-      self.trail = VirtualAccountCollectTrail.new(found_virtual_account: false, note: "Virtual Account not found")
+      self.trail = VirtualAccountCollectTrail.new(found_virtual_account: false, note: 'Virtual Account not found')
     elsif self.virtual_account.present?
       self.purpose_id = virtual_account.purpose_id
       initiate_trail
@@ -26,39 +26,30 @@ class Collect::CollectRouter < BaseOperation
   def pre_process
     if self.virtual_account.present?
       self.virtual_account_transaction_params[:virtual_account_id] = self.virtual_account.id
-    else
-      # pretty much do nothing?
     end
+    self.virtual_account_transaction = VirtualAccountTransaction.new(self.virtual_account_transaction_params)
   end
 
   def process
-    self.virtual_account_transaction = VirtualAccountTransaction.new(self.virtual_account_transaction_params)
     if self.virtual_account_transaction.save
       if self.virtual_account.present?
-        # first update the trail object to be saved with all the details currently created
-        self.trail.account_transaction = self.virtual_account_transaction
-        self.trail.save
         # trigger the respective background operation that will execute the payment
         # todo - change all the below ones to async calls after testing
         case self.purpose_id
           when VirtualAccountPurpose.id_for(:virtual_bank_account)
-            op = Collect::VirtualAccount::Accept.call_async(self.virtual_account_transaction.id, trail_id: self.trail.id)
+            op = AccountManager::Collect::VirtualAccount::Accept.call_async(self.virtual_account_transaction.id, trail_id: self.trail.id)
           when VirtualAccountPurpose.id_for(:payment_receivable)
-            op = Collect::PaymentReceivable::Accept.call_async(self.virtual_account_transaction.id, trail_id: self.trail.id)
+            op = AccountManager::Collect::PaymentReceivable::Accept.call_async(self.virtual_account_transaction.id, trail_id: self.trail.id)
           # these three below are kinda irrelevant
           when VirtualAccountPurpose.id_for(:invoice)
-            Collect::Invoice::Accept.(self.virtual_account_transaction.id)
+            AccountManager::Collect::Invoice::Accept.(self.virtual_account_transaction.id)
           when VirtualAccountPurpose.id_for(:corporate_balance_reload)
-            Collect::CorporateBalanceReload::BalanceReload.(self.virtual_account_transaction.id)
+            AccountManager::Collect::CorporateBalanceReload::BalanceReload.(self.virtual_account_transaction.id)
           when VirtualAccountPurpose.id_for(:cash_on_hand_reversal)
-            Collect::CashOnHandReturn::Return.(self.virtual_account_transaction.id)
+            AccountManager::Collect::CashOnHandReturn::Return.(self.virtual_account_transaction.id)
           else
             # do nothing?
         end
-      else
-        # update the trail object so that it now has the details of the created transaction
-        self.trail.account_transaction = self.virtual_account_transaction
-        self.trail.save
       end
     else
       # add_message :success, virtual_account_transaction.errors.full_messages
@@ -99,7 +90,7 @@ class Collect::CollectRouter < BaseOperation
         if self.virtual_account.parent.present? && self.virtual_account.parent_type == "PaymentReceivable"
           self.trail.find_payment_receivable = true
         else
-          self.trail .find_payment_receivable = false
+          self.trail.find_payment_receivable = false
         end
       else
         # do nothing?

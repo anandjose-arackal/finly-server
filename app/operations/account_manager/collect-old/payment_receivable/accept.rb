@@ -1,4 +1,4 @@
-class Collect::PaymentReceivable::Accept < Collect::PaymentReceivable::Base
+class AccountManager::Collect::PaymentReceivable::Accept < AccountManager::Collect::PaymentReceivable::Base
 
   attr_accessor :virtual_account, :company, :payment_receivable, :payment_request,
                 :trail, :payment

@@ -37,7 +37,7 @@
 # parent here will be either the payment receivable, or user, or whatever
 class VirtualBankAccount < ActiveRecord::Base
   include SoftDeletable
-  
+
   belongs_to :parent, polymorphic: true
   belongs_to :purpose, class_name: "VirtualAccountPurpose"
   belongs_to :company
@@ -46,10 +46,12 @@ class VirtualBankAccount < ActiveRecord::Base
   belongs_to :maximum_transaction_amount, class_name: "Amount"
   belongs_to :minimum_transaction_amount, class_name: "Amount"
   belongs_to :maximum_amount, class_name: "Amount"
-  
+
   has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
 
   validates :purpose, presence: true
+  validates :receiving_account_id, presence: true
+  validates :receiving_account_type, presence: true, :inclusion => {:in => [YesBankCompanyAccount.name, VendorPaymentWallet.name, CashOnHand.name]}
 
   scope :cash_on_hand_returns, -> { where purpose_id: VirtualAccountPurpose.id_for(:cash_on_hand_return) }
   scope :payment_receivables, -> { where purpose_id: VirtualAccountPurpose.id_for(:payment_receivable) }

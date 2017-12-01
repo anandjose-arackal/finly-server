@@ -1,6 +1,6 @@
 # this would create a payment request that can handle
 
-class Collect::VirtualAccount::Accept < Collect::VirtualAccount::Base
+class AccountManager::Collect::VirtualAccount::Accept < AccountManager::Collect::VirtualAccount::Base
 
   attr_accessor :virtual_account, :company, :virtual_account_transaction,
                 :payment_request, :trail

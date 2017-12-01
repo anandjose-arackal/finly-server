@@ -1,4 +1,4 @@
-class Collect::VirtualAccount::Base < Collect::Base
+class AccountManager::Collect::VirtualAccount::Base < AccountManager::Collect::Base
 
 
   def init_payment_request(purpose, receiving_account)

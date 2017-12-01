@@ -38,7 +38,8 @@ class PaymentPurpose < ActiveRecord::Base
         :cash_on_hand_reversal,
         :virtual_account_credit,
         :payment_link_credit,
-        :invoice_credit
+        :invoice_credit,
+        :va_payment_against_cash_on_hand
     ]
   end
 
