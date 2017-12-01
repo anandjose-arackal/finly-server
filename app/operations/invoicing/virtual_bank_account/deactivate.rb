@@ -20,7 +20,14 @@ class Invoicing::VirtualBankAccount::Deactivate < Invoicing::VirtualBankAccount:
   end
 
   def process
-    unless self.virtual_bank_account.deactivate
+    if self.virtual_bank_account.deactivate
+      # deactivate the account in the collect server as well
+      op = FinlyCollect::MakeInactive.(user, account_number: virtual_bank_account.account_number)
+      unless op.success?
+        virtual_bank_account.reactivate
+        add_message :error, "Account could not be deactivated at this time. Try again later"
+      end
+    else
       add_message :error, virtual_bank_account.errors.full_messages
       return
     end
