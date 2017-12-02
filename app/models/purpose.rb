@@ -26,4 +26,15 @@ class Purpose < ActiveRecord::Base
         # do nothing?
     end
   end
+
+  def self.category_purpose_from_application(application)
+    case application
+      when :vp, 'vp'
+        return Purpose.id_for(:invoice)
+      when 'em', :em, :ft, 'ft'
+        return Purpose.id_for(:expense_management)
+      else
+        # do nothing?
+    end
+  end
 end
