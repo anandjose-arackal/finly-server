@@ -60,7 +60,6 @@ class VirtualBankAccount < ActiveRecord::Base
   delegate :minimum_transaction_amount_value, to: :minimum_transaction_amount, allow_nil: true
   delegate :exact_transaction_amount_value, to: :exact_transaction_amount, allow_nil: true
 
-  validates :application, presence: true
   validates :purpose, presence: true
   validates :receiving_account_id, presence: true
   validates :receiving_account_type, presence: true, :inclusion => {:in => [YesBankCompanyAccount.name, VendorPaymentWallet.name, CashOnHand.name]}

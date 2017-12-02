@@ -35,7 +35,9 @@ class YesBankCompanyAccount < ActiveRecord::Base
   def va_config
     {
         enabled: true,
-        purpose_id: VirtualAccountPurpose.id_for(:corporate_account_reload)
+        purpose_id: VirtualAccountPurpose.id_for(:corporate_account_reload),
+        company: company,
+        application: :em
     }
   end
 

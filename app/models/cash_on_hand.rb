@@ -35,7 +35,9 @@ class CashOnHand < ActiveRecord::Base
   def va_config
     {
         enabled: true,
-        purpose_id: VirtualAccountPurpose.id_for(:cash_on_hand_return)
+        purpose_id: VirtualAccountPurpose.id_for(:cash_on_hand_return),
+        company: user.company,
+        application: :em
     }
   end
 

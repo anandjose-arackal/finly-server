@@ -66,7 +66,9 @@ class VendorPaymentWallet < ActiveRecord::Base
   def va_config
     {
         enabled: true,
-        purpose_id: VirtualAccountPurpose.id_for(:finly_money_reload)
+        purpose_id: VirtualAccountPurpose.id_for(:finly_money_reload),
+        company: user.company,
+        application: :em
     }
   end
 

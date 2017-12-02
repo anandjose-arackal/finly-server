@@ -9,7 +9,7 @@ class Invoicing::VirtualBankAccount::Base < BaseOperation
     def init
       self.virtual_bank_account = params[:virtual_bank_account]
       self.company = virtual_bank_account.company
-      op = Invoicing::VirtualBankAccount::Payments::Show.(user, virtual_bank_account_id: self.virtual_bank_account.id)
+      op = Invoicing::VirtualBankAccount::Payments::Show.(user, virtual_bank_account: self.virtual_bank_account)
       if op.success?
         self.total_transaction_count = op.payments.count
         self.total_transaction_amount = op.payments.sum_amounts
