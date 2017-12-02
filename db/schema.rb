@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171130132026) do
+ActiveRecord::Schema.define(version: 20171202111246) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1502,7 +1502,7 @@ ActiveRecord::Schema.define(version: 20171130132026) do
     t.boolean  "is_deleted",                           default: false, null: false
     t.boolean  "transcribed",                          default: false
     t.boolean  "personal",                             default: false
-    t.boolean  "reimbursable"
+    t.boolean  "reimbursable",                         default: true
     t.boolean  "synced_with_quickbooks",               default: false
     t.string   "split_link",             limit: 255
     t.boolean  "deleted_to_split",                     default: false
@@ -2076,6 +2076,68 @@ ActiveRecord::Schema.define(version: 20171130132026) do
   add_index "money_request_items", ["category_id"], name: "index_money_request_items_on_category_id", using: :btree
   add_index "money_request_items", ["money_request_id"], name: "index_money_request_items_on_money_request_id", using: :btree
 
+  create_table "money_request_processor_mappings", force: :cascade do |t|
+    t.integer  "processor_id",               limit: 4,                     null: false
+    t.integer  "user_id",                    limit: 4,                     null: false
+    t.integer  "processor_accountable_id",   limit: 4
+    t.string   "processor_accountable_type", limit: 255
+    t.integer  "amount_id",                  limit: 4,                     null: false
+    t.datetime "completed_at"
+    t.boolean  "marked_as_completed",                      default: false
+    t.integer  "status_id",                  limit: 4,                     null: false
+    t.integer  "payment_id",                 limit: 4
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+    t.text     "note",                       limit: 65535
+  end
+
+  add_index "money_request_processor_mappings", ["amount_id"], name: "index_money_request_processor_mappings_on_amount_id", using: :btree
+  add_index "money_request_processor_mappings", ["payment_id"], name: "index_money_request_processor_mappings_on_payment_id", using: :btree
+  add_index "money_request_processor_mappings", ["processor_id"], name: "index_money_request_processor_mappings_on_processor_id", using: :btree
+  add_index "money_request_processor_mappings", ["status_id"], name: "index_money_request_processor_mappings_on_status_id", using: :btree
+  add_index "money_request_processor_mappings", ["user_id"], name: "index_money_request_processor_mappings_on_user_id", using: :btree
+
+  create_table "money_request_processor_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "money_request_processor_statuses", ["name"], name: "index_money_request_processor_statuses_on_name", using: :btree
+
+  create_table "money_request_processors", force: :cascade do |t|
+    t.integer  "status_id",                 limit: 4,                   null: false
+    t.boolean  "is_deleted",                            default: false
+    t.boolean  "payment_file_generated",                default: false
+    t.datetime "payment_file_generated_at"
+    t.date     "scheduled_at"
+    t.datetime "completed_at"
+    t.integer  "total_amount_id",           limit: 4,                   null: false
+    t.integer  "processed_amount_id",       limit: 4
+    t.integer  "created_by_user_id",        limit: 4
+    t.integer  "created_by_user_role_id",   limit: 4
+    t.integer  "source_account_id",         limit: 4
+    t.string   "source_account_type",       limit: 255
+    t.boolean  "marked_as_completed",                   default: false
+    t.string   "payment_type",              limit: 255
+    t.string   "payment_mode",              limit: 255
+    t.integer  "company_id",                limit: 4,                   null: false
+    t.integer  "payment_order_id",          limit: 4
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+  end
+
+  add_index "money_request_processors", ["company_id"], name: "index_money_request_processors_on_company_id", using: :btree
+  add_index "money_request_processors", ["created_by_user_id"], name: "index_money_request_processors_on_created_by_user_id", using: :btree
+  add_index "money_request_processors", ["created_by_user_role_id"], name: "index_money_request_processors_on_created_by_user_role_id", using: :btree
+  add_index "money_request_processors", ["payment_order_id"], name: "index_money_request_processors_on_payment_order_id", using: :btree
+  add_index "money_request_processors", ["processed_amount_id"], name: "index_money_request_processors_on_processed_amount_id", using: :btree
+  add_index "money_request_processors", ["scheduled_at"], name: "index_money_request_processors_on_scheduled_at", using: :btree
+  add_index "money_request_processors", ["source_account_id"], name: "index_money_request_processors_on_source_account_id", using: :btree
+  add_index "money_request_processors", ["source_account_type"], name: "index_money_request_processors_on_source_account_type", using: :btree
+  add_index "money_request_processors", ["status_id"], name: "index_money_request_processors_on_status_id", using: :btree
+  add_index "money_request_processors", ["total_amount_id"], name: "index_money_request_processors_on_total_amount_id", using: :btree
+
   create_table "money_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",                         null: false
@@ -2113,28 +2175,30 @@ ActiveRecord::Schema.define(version: 20171130132026) do
   add_index "money_request_tracks", ["status_id"], name: "index_money_request_tracks_on_status_id", using: :btree
 
   create_table "money_requests", force: :cascade do |t|
-    t.string   "name",                         limit: 255
-    t.integer  "user_id",                      limit: 4,                                 null: false
-    t.integer  "policy_id",                    limit: 4,                                 null: false
-    t.integer  "payment_mode_id",              limit: 4,                                 null: false
-    t.integer  "payment_id",                   limit: 4
+    t.string   "name",                               limit: 255
+    t.integer  "user_id",                            limit: 4,                                 null: false
+    t.integer  "policy_id",                          limit: 4,                                 null: false
+    t.integer  "payment_mode_id",                    limit: 4,                                 null: false
+    t.integer  "payment_id",                         limit: 4
     t.date     "required_by_date"
-    t.integer  "status_id",                    limit: 4,                                 null: false
-    t.integer  "controlling_user_id",          limit: 4
-    t.integer  "controlling_user_role_id",     limit: 4
-    t.integer  "controlling_for_user_id",      limit: 4
-    t.integer  "controlling_for_user_role_id", limit: 4
-    t.integer  "loaded_by",                    limit: 4
+    t.integer  "status_id",                          limit: 4,                                 null: false
+    t.integer  "controlling_user_id",                limit: 4
+    t.integer  "controlling_user_role_id",           limit: 4
+    t.integer  "controlling_for_user_id",            limit: 4
+    t.integer  "controlling_for_user_role_id",       limit: 4
+    t.integer  "loaded_by",                          limit: 4
     t.datetime "loaded_at"
-    t.datetime "submitted_at",                             precision: 6
-    t.string   "memo",                         limit: 255
-    t.boolean  "accounted",                                              default: false, null: false
-    t.datetime "created_at",                                                             null: false
-    t.datetime "updated_at",                                                             null: false
-    t.boolean  "is_deleted",                                             default: false, null: false
-    t.integer  "submitted_amount_id",          limit: 4
-    t.integer  "processed_amount_id",          limit: 4
+    t.datetime "submitted_at",                                   precision: 6
+    t.string   "memo",                               limit: 255
+    t.boolean  "accounted",                                                    default: false, null: false
+    t.datetime "created_at",                                                                   null: false
+    t.datetime "updated_at",                                                                   null: false
+    t.boolean  "is_deleted",                                                   default: false, null: false
+    t.integer  "submitted_amount_id",                limit: 4
+    t.integer  "processed_amount_id",                limit: 4
+    t.integer  "money_request_processor_mapping_id", limit: 4
     t.boolean  "auto_approve"
+    t.datetime "approved_at"
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -2303,6 +2367,16 @@ ActiveRecord::Schema.define(version: 20171130132026) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "payment_file_configurations", force: :cascade do |t|
+    t.string   "file_format", limit: 255
+    t.integer  "company_id",  limit: 4,     null: false
+    t.text     "options",     limit: 65535
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "payment_file_configurations", ["company_id"], name: "index_payment_file_configurations_on_company_id", using: :btree
+
   create_table "payment_modes", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -2354,6 +2428,8 @@ ActiveRecord::Schema.define(version: 20171130132026) do
     t.integer  "currency_id",               limit: 4,     null: false
     t.string   "application",               limit: 255
     t.string   "payment_mode",              limit: 255
+    t.text     "post_operation",            limit: 65535
+    t.text     "post_operation_payload",    limit: 65535
   end
 
   add_index "payment_orders", ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id", using: :btree
@@ -2440,7 +2516,7 @@ ActiveRecord::Schema.define(version: 20171130132026) do
     t.integer  "amount_id",               limit: 4,     null: false
     t.date     "date",                                  null: false
     t.integer  "payment_type_id",         limit: 4,     null: false
-    t.integer  "initiating_user_id",      limit: 4,     null: false
+    t.integer  "initiating_user_id",      limit: 4
     t.integer  "receiving_user_id",       limit: 4
     t.text     "note",                    limit: 65535
     t.datetime "created_at",                            null: false
@@ -2459,6 +2535,8 @@ ActiveRecord::Schema.define(version: 20171130132026) do
     t.string   "application",             limit: 255
     t.string   "payment_mode",            limit: 255
     t.string   "reference_id",            limit: 255,   null: false
+    t.text     "post_operation",          limit: 65535
+    t.text     "post_operation_payload",  limit: 65535
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -2561,6 +2639,19 @@ ActiveRecord::Schema.define(version: 20171130132026) do
 
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
   add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
+
+  create_table "post_operation_actions", force: :cascade do |t|
+    t.string   "operation",            limit: 255,   null: false
+    t.text     "payload",              limit: 65535
+    t.integer  "post_operatable_id",   limit: 4,     null: false
+    t.string   "post_operatable_type", limit: 255,   null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "post_operation_actions", ["operation"], name: "index_post_operation_actions_on_operation", using: :btree
+  add_index "post_operation_actions", ["post_operatable_id"], name: "index_post_operation_actions_on_post_operatable_id", using: :btree
+  add_index "post_operation_actions", ["post_operatable_type"], name: "index_post_operation_actions_on_post_operatable_type", using: :btree
 
   create_table "preview_registrations", force: :cascade do |t|
     t.string   "email",              limit: 255
@@ -2839,6 +2930,68 @@ ActiveRecord::Schema.define(version: 20171130132026) do
   add_index "report_comments", ["report_id"], name: "index_report_comments_on_report_id", using: :btree
   add_index "report_comments", ["user_id"], name: "index_report_comments_on_user_id", using: :btree
 
+  create_table "report_processor_group_mappings", force: :cascade do |t|
+    t.integer  "processor_group_id",         limit: 4,                     null: false
+    t.integer  "user_id",                    limit: 4,                     null: false
+    t.integer  "processor_accountable_id",   limit: 4
+    t.string   "processor_accountable_type", limit: 255
+    t.integer  "amount_id",                  limit: 4,                     null: false
+    t.datetime "completed_at"
+    t.boolean  "marked_as_completed",                      default: false
+    t.integer  "status_id",                  limit: 4,                     null: false
+    t.integer  "payment_id",                 limit: 4
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+    t.text     "note",                       limit: 65535
+  end
+
+  add_index "report_processor_group_mappings", ["amount_id"], name: "index_report_processor_group_mappings_on_amount_id", using: :btree
+  add_index "report_processor_group_mappings", ["payment_id"], name: "index_report_processor_group_mappings_on_payment_id", using: :btree
+  add_index "report_processor_group_mappings", ["processor_group_id"], name: "index_report_processor_group_mappings_on_processor_group_id", using: :btree
+  add_index "report_processor_group_mappings", ["status_id"], name: "index_report_processor_group_mappings_on_status_id", using: :btree
+  add_index "report_processor_group_mappings", ["user_id"], name: "index_report_processor_group_mappings_on_user_id", using: :btree
+
+  create_table "report_processor_group_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "report_processor_group_statuses", ["name"], name: "index_report_processor_group_statuses_on_name", using: :btree
+
+  create_table "report_processor_groups", force: :cascade do |t|
+    t.integer  "status_id",                 limit: 4,                   null: false
+    t.boolean  "is_deleted",                            default: false
+    t.boolean  "payment_file_generated",                default: false
+    t.datetime "payment_file_generated_at"
+    t.date     "scheduled_at"
+    t.datetime "completed_at"
+    t.integer  "total_amount_id",           limit: 4,                   null: false
+    t.integer  "processed_amount_id",       limit: 4
+    t.integer  "created_by_user_id",        limit: 4
+    t.integer  "created_by_user_role_id",   limit: 4
+    t.integer  "source_account_id",         limit: 4
+    t.string   "source_account_type",       limit: 255
+    t.boolean  "marked_as_completed",                   default: false
+    t.string   "payment_type",              limit: 255
+    t.string   "payment_mode",              limit: 255
+    t.integer  "company_id",                limit: 4,                   null: false
+    t.integer  "payment_order_id",          limit: 4
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+  end
+
+  add_index "report_processor_groups", ["company_id"], name: "index_report_processor_groups_on_company_id", using: :btree
+  add_index "report_processor_groups", ["created_by_user_id"], name: "index_report_processor_groups_on_created_by_user_id", using: :btree
+  add_index "report_processor_groups", ["created_by_user_role_id"], name: "index_report_processor_groups_on_created_by_user_role_id", using: :btree
+  add_index "report_processor_groups", ["payment_order_id"], name: "index_report_processor_groups_on_payment_order_id", using: :btree
+  add_index "report_processor_groups", ["processed_amount_id"], name: "index_report_processor_groups_on_processed_amount_id", using: :btree
+  add_index "report_processor_groups", ["scheduled_at"], name: "index_report_processor_groups_on_scheduled_at", using: :btree
+  add_index "report_processor_groups", ["source_account_id"], name: "index_report_processor_groups_on_source_account_id", using: :btree
+  add_index "report_processor_groups", ["source_account_type"], name: "index_report_processor_groups_on_source_account_type", using: :btree
+  add_index "report_processor_groups", ["status_id"], name: "index_report_processor_groups_on_status_id", using: :btree
+  add_index "report_processor_groups", ["total_amount_id"], name: "index_report_processor_groups_on_total_amount_id", using: :btree
+
   create_table "report_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.integer  "order",      limit: 4
@@ -2915,6 +3068,7 @@ ActiveRecord::Schema.define(version: 20171130132026) do
     t.integer  "card_expenses_total_id",             limit: 4
     t.integer  "non_reimbursable_expenses_total_id", limit: 4
     t.integer  "sync_status_id",                     limit: 4
+    t.integer  "report_processor_group_mapping_id",  limit: 4
     t.integer  "sync_type_id",                       limit: 4
   end
 
@@ -2924,6 +3078,7 @@ ActiveRecord::Schema.define(version: 20171130132026) do
   add_index "reports", ["controlling_user_role_id"], name: "index_reports_on_controlling_user_role_id", using: :btree
   add_index "reports", ["name"], name: "index_reports_on_name", using: :btree
   add_index "reports", ["policy_id"], name: "index_reports_on_policy_id", using: :btree
+  add_index "reports", ["report_processor_group_mapping_id"], name: "index_reports_on_report_processor_group_mapping_id", using: :btree
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree
 
@@ -2948,6 +3103,19 @@ ActiveRecord::Schema.define(version: 20171130132026) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "system_logs", force: :cascade do |t|
+    t.integer  "log_resource_id",   limit: 4,     null: false
+    t.string   "log_resource_type", limit: 255,   null: false
+    t.integer  "type_id",           limit: 4,     null: false
+    t.text     "value",             limit: 65535, null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  add_index "system_logs", ["log_resource_id"], name: "index_system_logs_on_log_resource_id", using: :btree
+  add_index "system_logs", ["log_resource_type"], name: "index_system_logs_on_log_resource_type", using: :btree
+  add_index "system_logs", ["type_id"], name: "index_system_logs_on_type_id", using: :btree
 
   create_table "system_message_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -3432,6 +3600,7 @@ ActiveRecord::Schema.define(version: 20171130132026) do
     t.date     "active_on"
     t.integer  "maximum_amount_id",             limit: 4
     t.integer  "exact_transaction_amount_id",   limit: 4
+    t.string   "application",                   limit: 255,                   null: false
   end
 
   create_table "whitelisted_ip_types", force: :cascade do |t|
@@ -3584,6 +3753,11 @@ ActiveRecord::Schema.define(version: 20171130132026) do
   add_foreign_key "money_request_items", "amounts"
   add_foreign_key "money_request_items", "categories"
   add_foreign_key "money_request_items", "money_requests"
+  add_foreign_key "money_request_processor_mappings", "amounts"
+  add_foreign_key "money_request_processor_mappings", "payments"
+  add_foreign_key "money_request_processor_mappings", "users"
+  add_foreign_key "money_request_processors", "companies"
+  add_foreign_key "money_request_processors", "payment_orders"
   add_foreign_key "money_request_tracks", "money_request_tracking_actions"
   add_foreign_key "money_request_tracks", "money_requests"
   add_foreign_key "money_request_tracks", "payments"
@@ -3599,6 +3773,7 @@ ActiveRecord::Schema.define(version: 20171130132026) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "payment_file_configurations", "companies"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
   add_foreign_key "payment_receivables", "amounts"
@@ -3627,10 +3802,16 @@ ActiveRecord::Schema.define(version: 20171130132026) do
   add_foreign_key "report_comments", "report_comment_actions"
   add_foreign_key "report_comments", "reports"
   add_foreign_key "report_comments", "users"
+  add_foreign_key "report_processor_group_mappings", "amounts"
+  add_foreign_key "report_processor_group_mappings", "payments"
+  add_foreign_key "report_processor_group_mappings", "users"
+  add_foreign_key "report_processor_groups", "companies"
+  add_foreign_key "report_processor_groups", "payment_orders"
   add_foreign_key "report_tracks", "report_statuses"
   add_foreign_key "report_tracks", "report_tracking_actions"
   add_foreign_key "report_tracks", "reports"
   add_foreign_key "reports", "policies"
+  add_foreign_key "reports", "report_processor_group_mappings"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
   add_foreign_key "tally_configurations", "companies"

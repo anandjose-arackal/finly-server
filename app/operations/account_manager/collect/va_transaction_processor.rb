@@ -13,7 +13,7 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
     self.virtual_account = self.virtual_account_transaction&.virtual_account
     self.virtual_account_transaction.log_state(:info, 'Initiated Processing')
     self.adapter = adapter_for self.virtual_account
-    self.payment = build_payment
+    build_payment
   end
 
   def validate
@@ -57,18 +57,18 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
 
   protected
   def adapter_for(virtual_account)
-    case virtual_account.receiving_account_type
+    case virtual_account&.receiving_account_type
       when YesBankCompanyAccount.name
-        return YesBankCompanyAccountAdapter.new virtual_account.receiving_account
+        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new virtual_account.receiving_account
       when VendorPaymentWallet.name
-        return VendorPaymentWalletAdapter.new virtual_account.receiving_account
+        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new virtual_account.receiving_account
       when CashOnHand.name
-        return CashOnHandAdapter.new virtual_account.receiving_account
+        return AccountManager::CashOnHand::CashOnHandAdapter.new virtual_account.receiving_account
     end
   end
 
   def build_payment
-    self.virtual_account.build_payment(
+    self.payment = self.virtual_account_transaction.build_payment(
         payment_type_id: PaymentType.id_for(:credit),
         application: self.virtual_account&.application,
         initiating_account: self.virtual_account,
@@ -80,10 +80,11 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
             value: self.virtual_account_transaction&.transfer_amount,
             currency_id: Currency.id_for(:INR)
         },
-        date: self.virtual_account_transaction&.timestamp,
+        date: self.virtual_account_transaction&.transfer_timestamp,
         reference_resource: self.virtual_account_transaction,
         note: self.virtual_account_transaction&.note
-    ).save
+    )
+    self.payment.save
   end
 
   def credit_account

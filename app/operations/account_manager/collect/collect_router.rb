@@ -1,10 +1,10 @@
 class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
 
-  attr_accessor :virtual_account_transaction
+  attr_accessor :virtual_account_transaction, :virtual_account
 
   def init
     self.virtual_account_transaction = VirtualAccountTransaction.new transaction_params
-    self.virtual_account = VirtualBankAccount.find_by(account_number: virtual_account_transaction.beneficiary_account_number)
+    self.virtual_account = ::VirtualBankAccount.find_by(account_number: virtual_account_transaction.beneficiary_account_number)
     self.virtual_account_transaction.virtual_account = self.virtual_account
   end
 
@@ -22,7 +22,7 @@ class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
   end
 
   def post_process
-    AccountManager::Collect::VATransactionProcessor.call_async(user, virtual_account_transaction_id: virtual_account_transaction.id)
+    AccountManager::Collect::VATransactionProcessor.call(user, virtual_account_transaction_id: virtual_account_transaction.id)
   end
 
   private
