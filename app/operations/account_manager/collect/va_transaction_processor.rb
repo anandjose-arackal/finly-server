@@ -13,6 +13,7 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
     self.virtual_account = self.virtual_account_transaction&.virtual_account
     self.virtual_account_transaction.log_state(:info, 'Initiated Processing')
     self.adapter = adapter_for self.virtual_account
+    self.payment = build_payment
   end
 
   def validate
@@ -38,7 +39,20 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
   end
 
   def process
+    credit_account
+    return if has_errors?
+      # case self.virtual_account.purpose_id
+      #   when VirtualAccountPurpose.id_for(:payment_receivable)
+      #     AccountManager::Collect::PaymentReceivable::Accept.call_async(self.virtual_account_transaction.id, trail_id: self.trail.id)
+      # when VirtualAccountPurpose.id_for(:invoice)
+      #   AccountManager::Collect::Invoice::Accept.(self.virtual_account_transaction.id)
+    # else
+    # do nothing?
+    # end
+  end
 
+  def post_process
+    self.virtual_account_transaction.update(processed: true)
   end
 
   protected
@@ -50,6 +64,37 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
         return VendorPaymentWalletAdapter.new virtual_account.receiving_account
       when CashOnHand.name
         return CashOnHandAdapter.new virtual_account.receiving_account
+    end
+  end
+
+  def build_payment
+    self.virtual_account.build_payment(
+        payment_type_id: PaymentType.id_for(:credit),
+        application: self.virtual_account&.application,
+        initiating_account: self.virtual_account,
+        receiving_account: self.adapter.account,
+        payment_status_id: PaymentStatus.id_for(:pending),
+        payment_purpose_id: self.virtual_account.purpose.payment_purpose_id,
+        payment_mode: self.virtual_account_transaction&.transfer_type,
+        amount_attributes: {
+            value: self.virtual_account_transaction&.transfer_amount,
+            currency_id: Currency.id_for(:INR)
+        },
+        date: self.virtual_account_transaction&.timestamp,
+        reference_resource: self.virtual_account_transaction,
+        note: self.virtual_account_transaction&.note
+    ).save
+  end
+
+  def credit_account
+    if self.adapter.on_va_transaction(self.payment)
+      self.virtual_account_transaction.log_state(:info, "#{self.adapter.account.class.name} Credited")
+      self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
+    else
+      self.virtual_account_transaction.log_state(:error, 'Payment Credit Failed')
+      add_message :error, 'Error processing payment'
+      self.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
+      return
     end
   end
 

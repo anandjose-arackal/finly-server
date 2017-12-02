@@ -21,4 +21,20 @@ class VirtualAccountPurpose < ActiveRecord::Base
     [:cash_on_hand_return, :payment_receivable, :invoice, :virtual_bank_account, :corporate_account_reload]
   end
 
+  def payment_purpose_id
+    # case name.to_sym
+    #   when :cash_on_hand_return
+    #
+    #   when :payment_receivable
+    #
+    #   when :invoice
+    #
+    #   when :virtual_bank_account
+    #
+    #   when :corporate_account_reload
+    #
+    # end
+    PaymentPurpose.id_for(name)
+  end
+
 end

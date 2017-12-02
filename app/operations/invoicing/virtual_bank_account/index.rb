@@ -28,8 +28,8 @@ class Invoicing::VirtualBankAccount::Index < Invoicing::VirtualBankAccount::Base
     case self.role_id
       when UserRole.id_for(:admin)
         self.virtual_accounts = self.company.virtual_bank_accounts
-      when UserRole.id_for(:reviewer), UserRole.id_for(:initiator)
-        self.virtual_accounts = self.user.virtual_bank_accounts
+      # when UserRole.id_for(:reviewer), UserRole.id_for(:initiator)
+      #   self.virtual_accounts = self.user.virtual_bank_accounts
       else
         # self.virtual_accounts = self.user.virtual_bank_accounts
         self.virtual_accounts = self.company.virtual_bank_accounts

@@ -1,18 +1,30 @@
 virtual_bank_account:
   account_number: <%= params[:account_number] %>
   active: <%= params[:active] || true %>
+  <% maximum_amount = yaml_formatter.value_for_placeholder params[:maximum_amount] %>
+  <% if maximum_amount.present? %>
   maximum_amount_attributes:
     value: <%= params[:maximum_amount] %>
     currency_id: 1
+  <% end %>
+  <% maximum_transaction_amount = yaml_formatter.value_for_placeholder params[:maximum_transaction_amount] %>
+  <% if maximum_transaction_amount.present? %>
   maximum_transaction_amount_attributes:
     value: <%= params[:maximum_transaction_amount] %>
     currency_id: 1
-  minimum_amount_attributes:
+  <% end %>
+  <% minimum_transaction_amount = yaml_formatter.value_for_placeholder params[:minimum_transaction_amount] %>
+  <% if minimum_transaction_amount.present? %>
+  minimum_transaction_amount_attributes:
     value: <%= params[:minimum_transaction_amount] %>
     currency_id: 1
-  exact_trasnaction_amount_attributes:
+  <% end %>
+  <% exact_transaction_amount = yaml_formatter.value_for_placeholder params[:exact_transaction_amount] %>
+  <% if exact_transaction_amount.present? %>
+  exact_transaction_amount_attributes:
     value: <%= params[:exact_transaction_amount] %>
     currency_id: 1
+  <% end %>
   current_account: <%= params[:current_account] %>
   savings_account: <%= params[:savings_account] %>
   neft: <%= params[:neft] %>

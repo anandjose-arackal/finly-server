@@ -4,9 +4,10 @@ class Api::Fm::V1::TokenController < Oauth::TokenController
 
   protected
   def pre_process
-    if block_foreign_hosts(WhitelistedIpType.id_for(:api))
-      return false
-    end
+    #todo - temporary for testing
+    # if block_foreign_hosts(WhitelistedIpType.id_for(:api))
+    #   return false
+    # end
     super
   end
 

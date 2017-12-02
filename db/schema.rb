@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171130071727) do
+ActiveRecord::Schema.define(version: 20171130132026) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1502,7 +1502,7 @@ ActiveRecord::Schema.define(version: 20171130071727) do
     t.boolean  "is_deleted",                           default: false, null: false
     t.boolean  "transcribed",                          default: false
     t.boolean  "personal",                             default: false
-    t.boolean  "reimbursable",                         default: true
+    t.boolean  "reimbursable"
     t.boolean  "synced_with_quickbooks",               default: false
     t.string   "split_link",             limit: 255
     t.boolean  "deleted_to_split",                     default: false
@@ -3428,8 +3428,8 @@ ActiveRecord::Schema.define(version: 20171130071727) do
     t.boolean  "current_account",                             default: true
     t.boolean  "savings_account",                             default: true
     t.boolean  "upi",                                         default: true
-    t.date     "date_after"
-    t.date     "date_on"
+    t.date     "active_after"
+    t.date     "active_on"
     t.integer  "maximum_amount_id",             limit: 4
     t.integer  "exact_transaction_amount_id",   limit: 4
   end

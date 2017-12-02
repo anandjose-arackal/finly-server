@@ -39,7 +39,10 @@ class PaymentPurpose < ActiveRecord::Base
         :virtual_account_credit,
         :payment_link_credit,
         :invoice_credit,
-        :va_payment_against_cash_on_hand
+        :cash_on_hand_return,
+        :payment_receivable,
+        :invoice,
+        :virtual_bank_account
     ]
   end
 

@@ -256,6 +256,11 @@ class Amount < ActiveRecord::Base
   alias_method :tds_amount_value, :amount_value
   alias_method :tax_amount_value, :amount_value
   alias_method :discount_amount_value, :amount_value
+  alias_method :maximum_amount_value, :amount_value
+  alias_method :maximum_transaction_amount_value, :amount_value
+  alias_method :minimum_transaction_amount_value, :amount_value
+  alias_method :exact_transaction_amount_value, :amount_value
+
 
   scope :with_id, -> (id) { where id: id }
 
