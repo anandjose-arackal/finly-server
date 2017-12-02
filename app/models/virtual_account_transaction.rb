@@ -35,4 +35,6 @@ class VirtualAccountTransaction < ActiveRecord::Base
 
   validates :transfer_id, uniqueness: true
 
+  scope :with_transfer_id, -> (transfer_id) { where transfer_id: transfer_id }
+
 end

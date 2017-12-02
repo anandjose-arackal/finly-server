@@ -3,14 +3,26 @@ class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
   attr_accessor :virtual_account_transaction, :virtual_account
 
   def init
-    self.virtual_account_transaction = VirtualAccountTransaction.new transaction_params
-    self.virtual_account = ::VirtualBankAccount.find_by(account_number: virtual_account_transaction.beneficiary_account_number)
-    self.virtual_account_transaction.virtual_account = self.virtual_account
+    t_params = transaction_params
+    transfer_id = t_params[:transfer_id]
+    self.virtual_account_transaction = VirtualAccountTransaction.with_transfer_id(transfer_id)&.first
+    if virtual_account_transaction.blank?
+      self.virtual_account_transaction = VirtualAccountTransaction.new transaction_params
+      self.virtual_account = ::VirtualBankAccount.find_by(account_number: virtual_account_transaction.beneficiary_account_number)
+      self.virtual_account_transaction.virtual_account = self.virtual_account
+    end
   end
 
   def validate
     unless self.virtual_account
       self.virtual_account_transaction.log_state(:error, 'Virtual Account not found')
+      add_message :error, 'Virtual Account not found'
+      return
+    end
+    if self.virtual_account_transaction.processed
+      self.virtual_account_transaction.log_state(:error, 'Transaction has already been processed')
+      add_message :error, 'Transaction has already been processed'
+      return
     end
   end
 
