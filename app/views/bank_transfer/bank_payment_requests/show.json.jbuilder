@@ -40,14 +40,9 @@ json.invoice_line_items_categories do
   end
 end
 
-json.invoice_custom_fields do
-  @result.invoice_custom_fields
-end
+json.invoice_custom_fields @result.invoice_custom_fields
 
-json.invoice_line_items_custom_fields do
-  @result.invoice_line_items_custom_fields
-end
-
+json.invoice_line_items_custom_fields @result.invoice_line_items_custom_fields
 
 json.payments do
   json.array!(@result.payment_order.payments) do |payment|
