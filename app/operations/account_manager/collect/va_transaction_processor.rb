@@ -41,18 +41,19 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
   def process
     credit_account
     return if has_errors?
-      # case self.virtual_account.purpose_id
-      #   when VirtualAccountPurpose.id_for(:payment_receivable)
-      #     AccountManager::Collect::PaymentReceivable::Accept.call_async(self.virtual_account_transaction.id, trail_id: self.trail.id)
+    case self.virtual_account.purpose_id
+      when VirtualAccountPurpose.id_for(:payment_receivable)
+        AccountManager::Collect::PaymentReceivable::Accept.call_async(self.virtual_account_transaction.id, trail_id: self.trail.id)
       # when VirtualAccountPurpose.id_for(:invoice)
       #   AccountManager::Collect::Invoice::Accept.(self.virtual_account_transaction.id)
-    # else
-    # do nothing?
-    # end
+      else
+        # do nothing?
+    end
   end
 
   def post_process
     self.virtual_account_transaction.update(processed: true)
+    self.virtual_account_transaction.log_state(:info, 'Processed')
   end
 
   protected
@@ -88,14 +89,18 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
   end
 
   def credit_account
+    if self.virtual_account_transaction.receiving_account_credited
+      self.virtual_account_transaction.log_state(:info, 'Receiving Account has already been credited')
+      return
+    end
     if self.adapter.on_va_transaction(self.payment)
       self.virtual_account_transaction.log_state(:info, "#{self.adapter.account.class.name} Credited")
+      self.virtual_account_transaction.update(receiving_account_credited: true)
       self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
     else
       self.virtual_account_transaction.log_state(:error, 'Payment Credit Failed')
       add_message :error, 'Error processing payment'
       self.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-      return
     end
   end
 

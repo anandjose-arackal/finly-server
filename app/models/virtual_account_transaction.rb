@@ -29,9 +29,6 @@ class VirtualAccountTransaction < ActiveRecord::Base
 
   has_one :payment, as: :reference_resource
   belongs_to :virtual_account, class_name: "VirtualBankAccount"
-  has_one :virtual_account_collect_trail
-  has_one :payment_receivable_transaction_trail
-  # has_one :trail, class_name: 'VirtualAccountCollectTrail'
 
   validates :transfer_id, uniqueness: true
 
