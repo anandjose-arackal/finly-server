@@ -63,4 +63,11 @@ class VendorPaymentWallet < ActiveRecord::Base
     # PaymentOrder.with_company_id(initiating_user.company_id).with_initiating_account_type("VendorPaymentWallet").with_initiating_user_id(initiating_user.id).scheduled.joins(:amount_requested).sum(:value)
   end
 
+  def va_config
+    {
+        enabled: true,
+        purpose_id: VirtualAccountPurpose.id_for(:finly_money_reload)
+    }
+  end
+
 end

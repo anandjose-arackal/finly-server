@@ -67,7 +67,7 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
   end
 
   def debitable_accounts
-    [nil]
+    [YesBankCompanyAccount]
   end
 
   def accept_va_transaction?
@@ -76,7 +76,7 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
 
   def on_va_transaction(payment, options={})
     user = self.account.user
-    payment_request = PaymentRequest.(user, self.account_class, YesBankCompanyAccount.name, :credit, :va_payment_against_cash_on_hand)
+    payment_request = PaymentRequest.(user, self.account, YesBankCompanyAccount.name, :credit, :cash_on_hand_return)
     payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, account.user.company.yes_bank_company_account, payment.amount.value))
     op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
     unless op.success?

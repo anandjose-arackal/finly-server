@@ -383,7 +383,7 @@ class Payment < ActiveRecord::Base
   def initiating_user_presence
     unless PaymentPurpose.ids_for([:vendor_payment, :virtual_account_credit, :payment_link_credit, :invoice_credit,
                                    :cash_on_hand_reversal,:virtual_account_credit,:payment_link_credit, :invoice_credit,
-                                   :cash_on_hand_return, :payment_receivable, :invoice, :virtual_bank_account]).include?(self.payment_purpose_id)
+                                   :cash_on_hand_return, :payment_receivable, :invoice, :virtual_bank_account, :finly_money_reload]).include?(self.payment_purpose_id)
       if initiating_user_id.blank?
         errors.add(:initiating_user_id, "cannot be blank")
       end
@@ -394,7 +394,7 @@ class Payment < ActiveRecord::Base
     unless PaymentPurpose.ids_for([:vendor_payment, :corporate_balance_load, :corporate_balance_refund, :virtual_account_credit,
                                    :payment_link_credit, :invoice_credit, :cash_on_hand_reversal,:virtual_account_credit,
                                    :payment_link_credit, :invoice_credit, :cash_on_hand_return,  :payment_receivable,
-                                   :invoice, :virtual_bank_account]).include?(self.payment_purpose_id)
+                                   :invoice, :virtual_bank_account, :finly_money_reload]).include?(self.payment_purpose_id)
       if receiving_user_id.blank?
         errors.add(:receiving_user_id, "cannot be blank")
       end

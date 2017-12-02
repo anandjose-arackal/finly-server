@@ -42,7 +42,8 @@ class PaymentPurpose < ActiveRecord::Base
         :cash_on_hand_return,
         :payment_receivable,
         :invoice,
-        :virtual_bank_account
+        :virtual_bank_account,
+        :finly_money_reload
     ]
   end
 

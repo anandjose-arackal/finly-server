@@ -11,22 +11,22 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
     self.purpose_id = params[:purpose_id] || ::VirtualAccountPurpose.id_for(:virtual_bank_account)
     self.parent = params[:parent]
     self.virtual_bank_account_params = virtual_account_params
-    self.receiving_account = self.company.yes_bank_company_account # by default it will be the company virtual account, until the config to change that is built
+    self.receiving_account = params[:receiving_account] || self.company.yes_bank_company_account # by default it will be the company virtual account, until the config to change that is built
   end
 
   def validate
     case self.purpose_id
-      when ::VirtualAccountPurpose.id_for(:cash_on_hand_reversal)
-        unless self.parent&.is_a?(User)
-          add_message :error, "Invalid parent type"
+      when ::VirtualAccountPurpose.id_for(:cash_on_hand_return)
+        unless self.parent&.is_a?(CashOnHand)
+          add_message :error, 'Invalid parent type'
         end
       when ::VirtualAccountPurpose.id_for(:payment_receivable)
         unless self.parent&.is_a?(PaymentReceivable)
-          add_message :error, "Invalid parent type"
+          add_message :error, 'Invalid parent type'
         end
       when ::VirtualAccountPurpose.id_for(:invoice)
         unless self.parent&.is_a(Invoice)
-          add_message :error, "Invalid parent type"
+          add_message :error, 'Invalid parent type'
         end
       else
         # in this case it's a plain old bank account creation request, so no validations?
@@ -87,13 +87,11 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
   end
 
   def collect_api_params
-    date_before = self.parent&.expire_by || virtual_account_params[:expires_by]
-    p = {
+    {
         account_number: virtual_account_params[:account_number],
-        date_before: date_before,
-        exact_transaction_amount: self.parent&.amount_value
+        date_before: virtual_account_params[:expires_by],
+        exact_transaction_amount: virtual_account_params[:exact_transaction_amount]
     }
-    p
   end
 
 end
