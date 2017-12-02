@@ -19,13 +19,13 @@ class Category::Invoicing::Index < Category::Invoicing::Base
   def init
     self.company = user.company
     self.invoice_purpose_id = Purpose.id_for(:invoicing)
-    self.invoice_line_items_purpose_id = Purpose.id_for(:invoice_line_items)
+    self.invoice_line_items_purpose_id = Purpose.id_for(:invoice_items)
   end
 
 
   def process
-    self.categories = self.company.categories.with_purpose(self.invoice_purpose_id)
-    self.invoice_line_items_categories = self.categories.with_purpose(self.invoice_line_items_purpose_id)
+    self.invoice_categories = self.company.categories.with_purpose(self.invoice_purpose_id)
+    self.invoice_line_items_categories = self.company.categories.with_purpose(self.invoice_line_items_purpose_id)
     self.invoice_custom_fields = self.company.field_configurations.with_parent_type(FieldParentType.id_for(:invoice))
     self.invoice_line_items_custom_fields = self.company.field_configurations.with_parent_type(FieldParentType.id_for(:invoice_line_item))
   end
@@ -35,6 +35,7 @@ class Category::Invoicing::Index < Category::Invoicing::Base
     params[:invoice_line_items_categories] = self.invoice_line_items_categories
     params[:invoice_custom_fields] = self.invoice_custom_fields
     params[:invoice_line_items_custom_fields] = self.invoice_line_items_custom_fields
+    Category::Invoicing::Index::CategoriesPresenter.new(user, params, messages)
   end
 
 end
