@@ -1,5 +1,5 @@
 # the library that will be used for all tax calculations
-class TaxCalculationUtils
+class InvoiceCalculationUtils
 
   # type - will be 1 for rate, and 2 for absolute amounts
   def self.exclusive_tax_amount(amount = 0, tax = 0, type = 1)

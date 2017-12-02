@@ -1,0 +1,51 @@
+# == Schema Information
+#
+# Table name: invoice_line_items
+#
+#  id                 :integer          not null, primary key
+#  invoice_id         :integer
+#  name               :string(255)
+#  quantity           :integer
+#  rate               :decimal(10, )
+#  tax                :decimal(10, )
+#  tds                :decimal(10, )
+#  discount           :decimal(10, )
+#  category_id        :integer
+#  tax_type_id        :integer
+#  tax_amount_id      :integer
+#  tds_amount_id      :integer
+#  discount_amount_id :integer
+#  amount_id          :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  invoice_id: 
+  name: MyString
+  quantity: 1
+  rate: 9.99
+  tax: 9.99
+  tds: 9.99
+  discount: 9.99
+  category_id: 
+  tax_type_id: 1
+  tax_amount_id: 1
+  tds_amount_id: 1
+  discount_amount_id: 1
+
+two:
+  invoice_id: 
+  name: MyString
+  quantity: 1
+  rate: 9.99
+  tax: 9.99
+  tds: 9.99
+  discount: 9.99
+  category_id: 
+  tax_type_id: 1
+  tax_amount_id: 1
+  tds_amount_id: 1
+  discount_amount_id: 1
