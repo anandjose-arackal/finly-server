@@ -994,6 +994,7 @@
 #                                                         DELETE /bank_transfer/payments/:id(.:format)                                                      bank_transfer/payments#destroy
 #                               bank_transfer_users_count GET    /bank_transfer/users/count(.:format)                                                       bank_transfer/users#count
 #                            bank_transfer_users_managers GET    /bank_transfer/users/managers(.:format)                                                    bank_transfer/users#get_managers
+#                          bank_transfer_users_categories GET    /bank_transfer/users/categories(.:format)                                                  bank_transfer/users#categories
 #                       bank_transfer_user_show_transfers GET    /bank_transfer/users/:user_id/show_transfers(.:format)                                     bank_transfer/users#show_transfers
 #                                     bank_transfer_users GET    /bank_transfer/users(.:format)                                                             bank_transfer/users#index
 #                                                         POST   /bank_transfer/users(.:format)                                                             bank_transfer/users#create
@@ -2361,6 +2362,8 @@ Rails.application.routes.draw do
 
     get 'users/count', to: 'users#count'
     get 'users/managers', to: 'users#get_managers'
+    get 'users/categories', to: 'users#categories'
+    
     resources :users do
       get 'show_transfers', to: 'users#show_transfers'
     end

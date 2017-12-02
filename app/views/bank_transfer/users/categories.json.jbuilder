@@ -13,13 +13,9 @@ json.invoice_line_items_categories do
 end
 
 json.invoice_custom_fields do
-  json.array!(@result.invoice_categories) do |category|
-    # todo
-  end
+  @result.invoice_custom_fields
 end
 
 json.invoice_line_items_custom_fields do
-  json.array!(@result.invoice_categories) do |category|
-    # todo
-  end
+  @result.invoice_line_items_custom_fields
 end
