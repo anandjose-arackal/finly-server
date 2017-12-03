@@ -25,7 +25,7 @@ class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
     if self.virtual_account_transaction.processed
       self.virtual_account_transaction.log_state(:error, 'Transaction has already been processed')
       add_message :error, 'Transaction has already been processed'
-      Event::EAlert::Create.(nil, message: "Transaction Details<br>#{self.virtual_account_transaction.as_json}", subject: 'Finly Collect - Account not found')
+      Event::EAlert::Create.(nil, title: 'Finly Collect - Transaction already processed',description: "#{self.virtual_account_transaction.as_json}", subject: 'Finly Collect - Transaction already processed')
       return
     end
   end
@@ -34,6 +34,7 @@ class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
     unless self.virtual_account_transaction.save
       self.virtual_account_transaction.log_state :error, self.virtual_account_transaction.errors.full_messages
       add_message :error, self.virtual_account_transaction.errors.full_messages
+      Event::EAlert::Create.(nil, title: 'Finly Collect - Transaction Save Failed',description: "#{self.virtual_account_transaction.as_json}<br><br>Errors: #{self.virtual_account_transaction.errors.full_messages.as_json}", subject: 'Finly Collect - Transaction already processed')
     end
   end
 
