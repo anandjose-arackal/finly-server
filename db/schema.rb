@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171130081235) do
+ActiveRecord::Schema.define(version: 20171202141116) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1502,7 +1502,7 @@ ActiveRecord::Schema.define(version: 20171130081235) do
     t.boolean  "is_deleted",                           default: false, null: false
     t.boolean  "transcribed",                          default: false
     t.boolean  "personal",                             default: false
-    t.boolean  "reimbursable"
+    t.boolean  "reimbursable",                         default: true
     t.boolean  "synced_with_quickbooks",               default: false
     t.string   "split_link",             limit: 255
     t.boolean  "deleted_to_split",                     default: false
@@ -2516,7 +2516,7 @@ ActiveRecord::Schema.define(version: 20171130081235) do
     t.integer  "amount_id",               limit: 4,     null: false
     t.date     "date",                                  null: false
     t.integer  "payment_type_id",         limit: 4,     null: false
-    t.integer  "initiating_user_id",      limit: 4,     null: false
+    t.integer  "initiating_user_id",      limit: 4
     t.integer  "receiving_user_id",       limit: 4
     t.text     "note",                    limit: 65535
     t.datetime "created_at",                            null: false
@@ -3104,6 +3104,19 @@ ActiveRecord::Schema.define(version: 20171130081235) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "system_logs", force: :cascade do |t|
+    t.integer  "log_resource_id",   limit: 4,     null: false
+    t.string   "log_resource_type", limit: 255,   null: false
+    t.integer  "type_id",           limit: 4,     null: false
+    t.text     "value",             limit: 65535, null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  add_index "system_logs", ["log_resource_id"], name: "index_system_logs_on_log_resource_id", using: :btree
+  add_index "system_logs", ["log_resource_type"], name: "index_system_logs_on_log_resource_type", using: :btree
+  add_index "system_logs", ["type_id"], name: "index_system_logs_on_type_id", using: :btree
+
   create_table "system_message_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -3555,6 +3568,7 @@ ActiveRecord::Schema.define(version: 20171130081235) do
     t.datetime "updated_at",                             null: false
     t.integer  "virtual_account_id",         limit: 4
     t.boolean  "processed"
+    t.boolean  "receiving_account_credited"
   end
 
   create_table "virtual_bank_accounts", force: :cascade do |t|
@@ -3583,10 +3597,11 @@ ActiveRecord::Schema.define(version: 20171130081235) do
     t.boolean  "current_account",                             default: true
     t.boolean  "savings_account",                             default: true
     t.boolean  "upi",                                         default: true
-    t.date     "date_after"
-    t.date     "date_on"
+    t.date     "active_after"
+    t.date     "active_on"
     t.integer  "maximum_amount_id",             limit: 4
     t.integer  "exact_transaction_amount_id",   limit: 4
+    t.string   "application",                   limit: 255,                   null: false
   end
 
   create_table "whitelisted_ip_types", force: :cascade do |t|

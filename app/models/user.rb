@@ -60,6 +60,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -207,6 +208,7 @@ class User < ActiveRecord::Base
   scope :with_vendor_payments_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
   scope :with_expense_management_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
   scope :include_all_accounts_with_balance, -> { includes(cards: [:card_balance], wallet: [:balance], cash_on_hand: [:balance], bank_wallet: [:balance]) }
+  scope :with_email, ->(email) { where email: email }
 
   # Users having cards assigned with the given program
   scope :with_cards_having_card_program, ->(id) do
@@ -415,6 +417,10 @@ class User < ActiveRecord::Base
     if self.team_mapping.vendor_payments.count == 0
       self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: Purpose.id_for(:vendor_payments)).save
     end
+    if self.team_mapping.invoicing.count == 0
+      self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: Purpose.id_for(:invoicing)).save
+    end
+
     self.policy_user_mappings.build(policy_id: default_policy_id).save
     self.build_balance_sheet.save if self.balance_sheet.blank?
     self.build_wallet(balance_attributes: {value: 0, currency_id: Currency.first.id}).save if self.wallet.blank?
@@ -537,6 +543,14 @@ class User < ActiveRecord::Base
   end
 
   alias_method :invoicing_admin?, :collect_admin?
+  alias_method :finly_collect_admin?, :collect_admin?
+
+  def collect_initiator?
+    self.role_mapping.invoicing.initiator.present?
+  end
+
+  alias_method :invoicing_initiator?, :collect_initiator?
+  alias_method :finly_collect_initiator?, :collect_initiator?
 
   def expense_management_enabled?
     self.user_panel_subscription.expense_management

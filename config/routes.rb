@@ -477,6 +477,10 @@
 #                   admin_users_card_assign_requests_edit GET    /admin_users/card_assign_requests/edit(.:format)                                           admin_users/card_assign_requests#edit
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                  admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                     admin_users/users#admin_menus
+#                                                         GET    /virtual_accounts/:account_number(.:format)                                                api/v1/invoices/virtual_bank_accounts#show
+#                                        virtual_accounts POST   /virtual_accounts(.:format)                                                                api/v1/invoices/virtual_bank_accounts#create
+#                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                api/v1/invoices/virtual_bank_accounts#update
+#                                                         DELETE /virtual_accounts/:account_number(.:format)                                                api/v1/invoices/virtual_bank_accounts#destroy
 #                                               junk_show GET    /junk/show(.:format)                                                                       junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                       users#menu_data
 #                              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                                               admin_users/oauth/token#create {:format=>"json"}
@@ -1717,6 +1721,7 @@ Rails.application.routes.draw do
       end
       post 'cards/balance/update', to: 'cards#update_balance'
       post 'cards/status/update', to: 'cards#update_status'
+
       namespace :configuration do
         get 'categories' => 'category#index', as: :categories
         post 'gcm/register', to: 'gcm#create'
@@ -1944,6 +1949,17 @@ Rails.application.routes.draw do
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
 
   ######### ADMIN PANEL END ###########
+
+
+  ############# Virtual Bank Accounts API Start ######################
+
+  get 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#show'
+  post 'virtual_accounts', to: 'api/fc/invoices/virtual_bank_accounts#create'
+  patch 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#update'
+  delete 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#deactivate'
+
+  ################### Virtual Bank Accounts End ######################
+
 
   get 'junk/show', to: 'junk#show'
 

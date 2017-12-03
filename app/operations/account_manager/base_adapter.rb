@@ -74,6 +74,14 @@ class AccountManager::BaseAdapter
     self.errors.blank?
   end
 
+  def accept_va_transaction?
+    false
+  end
+
+  def on_va_transaction(payment, options={})
+    self.errors = []
+  end
+
   def store_transaction(payment, type, status, opening_balance, closing_balance, company_id, system_messages = {})
     type_id = TransactionType.id_for(type)
     status_id = TransactionStatus.id_for(status)

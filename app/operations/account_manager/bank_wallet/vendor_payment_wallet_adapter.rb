@@ -67,4 +67,13 @@ class AccountManager::BankWallet::VendorPaymentWalletAdapter < AccountManager::B
     # checks if the particular wallet can be credited with so and so amount
     true
   end
+
+  def accept_va_transaction?
+    true
+  end
+
+  def on_va_transaction(payment, options={})
+    credit(payment, options)
+  end
+
 end

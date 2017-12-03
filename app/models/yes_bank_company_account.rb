@@ -28,9 +28,17 @@ class YesBankCompanyAccount < ActiveRecord::Base
   accepts_nested_attributes_for :balance
   accepts_nested_attributes_for :wallet_balance
 
-
   def blocked_amount_for_pending_payments(excluded_payment_order_id = nil)
     PaymentOrder.with_company_id(self.company_id).with_initiating_account_type("YesBankCompanyAccount").without_id(excluded_payment_order_id).scheduled.joins(:amount_requested).sum(:value)
+  end
+
+  def va_config
+    {
+        enabled: true,
+        purpose_id: VirtualAccountPurpose.id_for(:corporate_account_reload),
+        company: company,
+        application: :em
+    }
   end
 
 end

@@ -1,6 +1,31 @@
 module Accountable
   extend ActiveSupport::Concern
 
+  included do
+    has_one :virtual_bank_account, as: :parent, class_name: 'VirtualBankAccount', dependent: :destroy
+  end
+
+  def va_config
+    {
+        enabled: false,
+        purpose_id: nil,
+        options: {},
+        company: nil,
+        application: nil
+    }
+  end
+
+  def va_generate
+    config = va_config
+    enabled = config[:enabled]
+    purpose_id = config[:purpose_id]
+    company = config[:company]
+    application = config[:application]
+    if enabled and self.virtual_bank_account.blank? and purpose_id.present? and application.present? and company.present?
+      ::Invoicing::VirtualBankAccount::Create.(nil, {application: application, company: company, parent: self, purpose_id: purpose_id, receiving_account: self})
+    end
+  end
+
   def opening_balance(date)
     return 0 if date.blank?
     date = date.beginning_of_day
