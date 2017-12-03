@@ -1,0 +1,12 @@
+<% content_for :body do %>
+    <head>
+      <title>Alert</title>
+    </head>
+    <body style="background-color: #f3f3f3; margin: 0px;height: auto;">
+    <div style="margin: auto; height: 300px; width: 100%; background-color: white;">
+      <p style="font-size: 17px; margin-left: 3%; text-align: left"><%= @body.html_safe %></p>
+    </div>
+    </body>
+<% end %>
+
+<%= render 'application_mailer/template' %>
