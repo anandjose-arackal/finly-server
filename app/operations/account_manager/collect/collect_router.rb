@@ -19,11 +19,13 @@ class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
     unless self.virtual_account
       self.virtual_account_transaction.log_state(:error, 'Virtual Account not found')
       add_message :error, 'Virtual Account not found'
+      Event::EAlert::Create.(nil, title: 'Finly Collect - Account not found',description: "#{self.virtual_account_transaction.as_json}", subject: 'Finly Collect - Account not found')
       return
     end
     if self.virtual_account_transaction.processed
       self.virtual_account_transaction.log_state(:error, 'Transaction has already been processed')
       add_message :error, 'Transaction has already been processed'
+      Event::EAlert::Create.(nil, message: "Transaction Details<br>#{self.virtual_account_transaction.as_json}", subject: 'Finly Collect - Account not found')
       return
     end
   end

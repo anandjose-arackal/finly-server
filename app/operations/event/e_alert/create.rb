@@ -1,14 +1,14 @@
 class Event::EAlert::Create < Event::EAlert::Base
 
   def pre_validate
-    if params.blank? or params[:message].blank?
+    if params.blank? or (params[:title].blank? and params[:description].blank?)
       add_message :error, 'Nothing to send'
       return
     end
   end
 
   def affected_users
-    emails = %w(vivek.a@finly.io sreeram.nr@finly.io)
+    emails = %w(vivek.a@finly.io)
     User.with_email(emails)
   end
 
@@ -26,7 +26,7 @@ class Event::EAlert::Create < Event::EAlert::Base
   def send_mailer(user)
     return if user.blank?
     set_presenter_params(user)
-    return unless params[:subject].present? and params[:body].present?
+    return unless params[:subject].present? and (params[:title].present? or params[:description].present?)
     AlertMailer.delay.send_mail(Event::EAlert::Create::MailerPresenter.new(user, params))
   end
 
@@ -35,41 +35,35 @@ class Event::EAlert::Create < Event::EAlert::Base
   end
 
   def mailer_body(user)
-    params[:body]
+    params[:title]
   end
 
   def mailer_button_name(user)
   end
 
   def set_presenter_params(user)
-    params[:subject] = "Server Alert - #{params[:body]}"
-    params[:body] = params[:message]
+    params[:subject] = "Server Alert - #{params[:subject]}"
+    params[:title] = params[:title]
+    params[:description] = params[:description]
   end
 
   class Event::EAlert::Create::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor  :body_val, :subject_val, :company
+    attr_accessor  :body_title, :body_description, :subject, :company
 
     def initialize(user, params)
       self.user = user
-      self.body_val = params[:body]
-      self.subject_val = params[:subject]
+      self.body_title = params[:title]
+      self.body_description = params[:description]
+      self.subject = params[:subject]
       self.company = Company.second
     end
 
     def validate
-      self.body_val.present?
+      self.body_title.present? or self.body_description.present?
     end
 
     def to
       self.user.email
-    end
-
-    def subject
-      self.subject_val
-    end
-
-    def body
-      self.body_val
     end
 
   end
