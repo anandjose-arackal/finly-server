@@ -15,7 +15,7 @@ json.amount do
   json.partial! 'api/v1/shared/amount', amount: expense.amount
 end
 
-json.converted_amount do
+json.original_amount do
   json.partial! 'api/v1/shared/amount', amount: expense.base_amount
 end
 
