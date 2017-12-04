@@ -115,8 +115,9 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
 
     # now extracting all pending approvers (assuming there's not take control action here)
     op = User::Team::Review::NextReviewer.(bank_payment_request, controlling_user: self.reviewer, controlling_user_role_id: self.reviewer_role)
+
     self.reviewer = op.user
-    self.reviewer_role = op.role_id
+    self.reviewer_role = op.success? ? op.role_id : nil
 
     reviewer_ids = []
     while self.reviewer.present? && !reviewer_ids.include?(self.reviewer&.id)
