@@ -127,6 +127,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
 
   def calculate_tax_and_discounts
     self.payment_params = InvoiceCalculationUtils.calculate_tax_and_discounts(self.payment, self.payment_params)
+
     return
     # self.invoice = payment.invoice
     # if self.invoice.inclusive_of_taxes # calculate the other amounts retrospectively
