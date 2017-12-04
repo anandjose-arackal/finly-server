@@ -53,7 +53,11 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
       self.virtual_bank_account_params[:account_number] = bank_account_number
       self.bank_account = ::VirtualBankAccount.new(virtual_bank_account_params)
       unless self.bank_account.save
+        FinlyCollect::Destroy.(user, account_number: bank_account_number)
         add_message :error, self.bank_account.errors.full_messages
+        Event::EAlert::Create.(nil, title: 'Finly Collect Account created in collect server but failed to created in app',
+            description: "#{self.bank_account.as_json}<br><br>Errors : #{self.bank_account.errors.full_messages}",
+            subject: 'Finly Collect - Failed to create account in app')
         return
       end
     else
