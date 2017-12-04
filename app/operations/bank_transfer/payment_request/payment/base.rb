@@ -1,5 +1,7 @@
 class BankTransfer::PaymentRequest::Payment::Base < BankTransfer::PaymentRequest::Base
 
+  attr_accessor :payment_order, :payment_request
+
   def init
     id = params[:id] || params[:bank_payment_request_id]
     self.payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)

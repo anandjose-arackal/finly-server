@@ -94,7 +94,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def update_payment
-    @result = BankTransfer::PaymentRequest::Update::UpdatePayment.(current_user, params)
+    @result = BankTransfer::PaymentRequest::Payment::Update.(current_user, params)
     respond
   end
 

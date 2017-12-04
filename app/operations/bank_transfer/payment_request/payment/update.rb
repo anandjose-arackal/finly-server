@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   attr_accessor :payment, :payment_request, :payment_params, :invoice_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
-                :advance, :advance_amount
+                :advance, :advance_amount, :payment_order
 
   def init
     super
@@ -85,12 +85,12 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
 
   def process
     payment.assign_attributes(payment_params)
+    if payment.invoice.present?
+      calculate_tax_and_discounts
+    end
     set_custom_fields(false) # this should hopefully add the attributes to the model
     unless self.payment.save
       add_message :error, self.payment.errors.full_messages
-    end
-    if payment.invoice.present?
-      calculate_tax_and_discounts
     end
   end
 
@@ -126,70 +126,72 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   end
 
   def calculate_tax_and_discounts
-    self.invoice = payment.invoice
-    if self.invoice.inclusive_of_taxes # calculate the other amounts retrospectively
-      self.after_tax_amount = self.invoice.original_amount&.value
-      # first calculate the gross amount from the
-      calculate_inclusive_taxes
-      calculate_tds
-      calculate_discount_inclusive
-      self.net_amount = self.after_tax_amount - self.tds_amount
-      self.invoice_amount = self.gross_amount + self.discount_amount
-      calculate_advance_paid
-    else # calculate proactively
-      self.invoice_amount = self.invoice.original_amount&.value
-      calculate_discount_exclusive
-      calculate_exclusive_taxes
-      calculate_tds
-      self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
-      self.invoice_amount = invoice.original_amount&.value
-      calculate_advance_paid
-    end
-    # assign the respective calculated parameters to the payment params
-    self.payment_params[:invoice_attributes][:amount_attributes] = {
-        value: self.invoice_amount,
-        currency_id: 1,
-        id: self.invoice&.amount&.id
-    }
-    self.payment_params[:invoice_attributes][:net_amount_attributes] = {
-        value: self.net_amount,
-        currency_id: 1,
-        id: self.invoice&.net_amount&.id
-    }
-    self.payment_params[:invoice_attributes][:gross_amount_attributes] = {
-        value: self.gross_amount,
-        currency_id: 1,
-        id: self.invoice.gross_amount&.id
-    }
-    self.payment_params[:invoice_attributes][:discount_amount_attributes] = {
-        value: self.discount_amount,
-        currency_id: 1,
-        id: self.invoice.discount_amount&.id
-    }
-    self.payment_params[:invoice_attributes][:tds_amount_attributes] = {
-        value: self.tds_amount,
-        currency_id: 1,
-        id: self.invoice.tds_amount&.id
-    }
-    self.payment_params[:invoice_attributes][:tax_amount_attributes] = {
-        value: self.tax_amount,
-        currency_id: 1,
-        id: self.invoice.tax_amount&.id
-    }
-    self.payment_params[:invoice_attributes][:advance_amount_attributes] = {
-        value: self.advance_amount,
-        currency_id: 1,
-        id: self.invoice.advance_amount&.id
-    }
-
-    # adding the payment amount to the params
-    self.payment_params[:amount_attributes] = {
-        value: self.net_amount,
-        currency_id: 1,
-        id: self.payment.amount&.id
-    }
-    # also update the payment with all the respective amounts
-    # self.payment.amount&.update(value: self.net_amount)
+    self.payment_params = InvoiceCalculationUtils.calculate_tax_and_discounts(self.payment, self.payment_params)
+    return
+    # self.invoice = payment.invoice
+    # if self.invoice.inclusive_of_taxes # calculate the other amounts retrospectively
+    #   self.after_tax_amount = self.invoice.original_amount&.value
+    #   # first calculate the gross amount from the
+    #   calculate_inclusive_taxes
+    #   calculate_tds
+    #   calculate_discount_inclusive
+    #   self.net_amount = self.after_tax_amount - self.tds_amount
+    #   self.invoice_amount = self.gross_amount + self.discount_amount
+    #   calculate_advance_paid
+    # else # calculate proactively
+    #   self.invoice_amount = self.invoice.original_amount&.value
+    #   calculate_discount_exclusive
+    #   calculate_exclusive_taxes
+    #   calculate_tds
+    #   self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
+    #   self.invoice_amount = invoice.original_amount&.value
+    #   calculate_advance_paid
+    # end
+    # # assign the respective calculated parameters to the payment params
+    # self.payment_params[:invoice_attributes][:amount_attributes] = {
+    #     value: self.invoice_amount,
+    #     currency_id: 1,
+    #     id: self.invoice&.amount&.id
+    # }
+    # self.payment_params[:invoice_attributes][:net_amount_attributes] = {
+    #     value: self.net_amount,
+    #     currency_id: 1,
+    #     id: self.invoice&.net_amount&.id
+    # }
+    # self.payment_params[:invoice_attributes][:gross_amount_attributes] = {
+    #     value: self.gross_amount,
+    #     currency_id: 1,
+    #     id: self.invoice.gross_amount&.id
+    # }
+    # self.payment_params[:invoice_attributes][:discount_amount_attributes] = {
+    #     value: self.discount_amount,
+    #     currency_id: 1,
+    #     id: self.invoice.discount_amount&.id
+    # }
+    # self.payment_params[:invoice_attributes][:tds_amount_attributes] = {
+    #     value: self.tds_amount,
+    #     currency_id: 1,
+    #     id: self.invoice.tds_amount&.id
+    # }
+    # self.payment_params[:invoice_attributes][:tax_amount_attributes] = {
+    #     value: self.tax_amount,
+    #     currency_id: 1,
+    #     id: self.invoice.tax_amount&.id
+    # }
+    # self.payment_params[:invoice_attributes][:advance_amount_attributes] = {
+    #     value: self.advance_amount,
+    #     currency_id: 1,
+    #     id: self.invoice.advance_amount&.id
+    # }
+    #
+    # # adding the payment amount to the params
+    # self.payment_params[:amount_attributes] = {
+    #     value: self.net_amount,
+    #     currency_id: 1,
+    #     id: self.payment.amount&.id
+    # }
+    # # also update the payment with all the respective amounts
+    # # self.payment.amount&.update(value: self.net_amount)
   end
 
   def calculate_discount_exclusive
@@ -220,7 +222,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       self.tax_amount = 0
       return
     end
-    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
+    self.net_amount = InvoiceCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
     self.tax_amount = self.net_amount - self.gross_amount
   end
 
@@ -230,12 +232,12 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       self.tax_amount = 0
       return
     end
-    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax))
+    self.gross_amount = InvoiceCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax))
     self.tax_amount = self.after_tax_amount - self.gross_amount
   end
 
   def calculate_tds
-    new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, self.invoice.tds)
+    new_gross_amount = InvoiceCalculationUtils.tds_amount(self.gross_amount, self.invoice.tds)
     self.tds_amount = self.gross_amount - new_gross_amount
   end
 
