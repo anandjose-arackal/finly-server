@@ -29,7 +29,12 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   def init
     self.order_data = params[:payment_order]
     op = BankTransfer::PaymentRequest::Process.(user, scheduled_at: params[:scheduled_at],
-        payment_order: self.order_data)
+                                                payment_order: self.order_data,
+                                                policy_id: params[:policy_id])
+    unless op.success?
+      add_message :error, op.messages[:error]
+      return
+    end
     self.processed_order_data = op.payment_order_data
 
     # calculating the requested amount here
