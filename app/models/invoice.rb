@@ -55,6 +55,7 @@ class Invoice < ActiveRecord::Base
 
   belongs_to :payment
 
+  has_many :invoice_items, class_name: "InvoiceLineItem"
   has_many :invoice_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -70,6 +71,7 @@ class Invoice < ActiveRecord::Base
   accepts_nested_attributes_for :freight_amount
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :advance_amount
+  accepts_nested_attributes_for :invoice_items
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount

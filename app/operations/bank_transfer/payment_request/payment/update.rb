@@ -109,6 +109,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
                                                          original_amount_attributes: [:value, :currency_id],
                                                          freight_amount_attributes: [:value, :currency_id],
                                                          invoice_attachments_attributes: [:attached_file, :description, :remove_file]],
+                                                         invoice_items_attributes: [:quantity, :rate, :tax, :discount, :category_id, :name],
                                     amount_attributes: [:value, :currency_id]
     )
   end
@@ -126,7 +127,14 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   end
 
   def calculate_tax_and_discounts
-    self.payment_params = InvoiceCalculationUtils.calculate_tax_and_discounts(self.payment, self.payment_params)
+
+    if self.payment_params&.dig(:invoice_attributes, :invoice_items_attributes).present?
+      # if there are no invoice items, use the invoice library to calculate the amounts
+      self.payment_params = InvoiceLineItemsCalculationUtils.calculate_tax_and_discounts(self.payment, self.payment_params)
+    else
+      # if there are, in fact, invoice items, use the invoice items library
+      self.payment_params = InvoiceCalculationUtils.calculate_tax_and_discounts(self.payment, self.payment_params)
+    end
 
     return
     # self.invoice = payment.invoice
