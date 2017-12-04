@@ -6,7 +6,7 @@
 #  amount_id               :integer          not null
 #  date                    :date             not null
 #  payment_type_id         :integer          not null
-#  initiating_user_id      :integer          not null
+#  initiating_user_id      :integer
 #  receiving_user_id       :integer
 #  note                    :text(65535)
 #  created_at              :datetime         not null
@@ -25,6 +25,8 @@
 #  application             :string(255)
 #  payment_mode            :string(255)
 #  reference_id            :string(255)      not null
+#  post_operation          :text(65535)
+#  post_operation_payload  :text(65535)
 #
 
 

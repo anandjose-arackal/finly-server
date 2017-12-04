@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171202141116) do
+ActiveRecord::Schema.define(version: 20171204103047) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1502,7 +1502,7 @@ ActiveRecord::Schema.define(version: 20171202141116) do
     t.boolean  "is_deleted",                           default: false, null: false
     t.boolean  "transcribed",                          default: false
     t.boolean  "personal",                             default: false
-    t.boolean  "reimbursable",                         default: true
+    t.boolean  "reimbursable"
     t.boolean  "synced_with_quickbooks",               default: false
     t.string   "split_link",             limit: 255
     t.boolean  "deleted_to_split",                     default: false
@@ -3549,7 +3549,6 @@ ActiveRecord::Schema.define(version: 20171202141116) do
   end
 
   create_table "virtual_account_transactions", force: :cascade do |t|
-    t.string   "beneficiary_account_number", limit: 255
     t.string   "beneficiary_account_ifsc",   limit: 255
     t.string   "transfer_type",              limit: 255
     t.string   "beneficiary_full_name",      limit: 255
@@ -3569,6 +3568,7 @@ ActiveRecord::Schema.define(version: 20171202141116) do
     t.integer  "virtual_account_id",         limit: 4
     t.boolean  "processed"
     t.boolean  "receiving_account_credited"
+    t.string   "beneficiary_account_no",     limit: 255
   end
 
   create_table "virtual_bank_accounts", force: :cascade do |t|

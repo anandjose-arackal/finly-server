@@ -3,7 +3,6 @@
 # Table name: virtual_account_transactions
 #
 #  id                         :integer          not null, primary key
-#  beneficiary_account_number :string(255)
 #  beneficiary_account_ifsc   :string(255)
 #  transfer_type              :string(255)
 #  beneficiary_full_name      :string(255)
@@ -22,6 +21,8 @@
 #  updated_at                 :datetime         not null
 #  virtual_account_id         :integer
 #  processed                  :boolean
+#  receiving_account_credited :boolean
+#  beneficiary_account_no     :string(255)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
