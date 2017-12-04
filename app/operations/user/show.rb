@@ -285,7 +285,6 @@ class User::Show < User::Base
       action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name} Finly Money", balance: balance, active: true}
       credit_actions[:receiving_accounts] << action
       debit_actions[:receiving_accounts] << action
-
       # Cards
       if to_user_creditable_cards.present?
         to_user_creditable_cards.each do |card|
@@ -301,7 +300,7 @@ class User::Show < User::Base
           card_program = card.card_program
           # Verify is user is allowed to credit / debit from the card based on the card program
           if personal_transfer
-            next unless card_program.personal_wallet_fund_transfer
+            next unless card_program.personal_wallet_fund_transfer or admin_view?
             credit_actions[:receiving_accounts] << action
             debit_actions[:receiving_accounts] << action
           else
