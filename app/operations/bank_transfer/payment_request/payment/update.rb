@@ -128,9 +128,10 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
 
   def calculate_tax_and_discounts
 
-    if self.payment_params&.dig(:invoice_attributes, :invoice_items_attributes).present?
+    if self.payment.invoice.invoice_items.present?
       # if there are no invoice items, use the invoice library to calculate the amounts
       self.payment_params = InvoiceLineItemsCalculationUtils.calculate_tax_and_discounts(self.payment, self.payment_params)
+      self.payment_params = InvoiceCalculationUtils.calculate_tds_and_advance(self.payment, self.payment_params)
     else
       # if there are, in fact, invoice items, use the invoice items library
       self.payment_params = InvoiceCalculationUtils.calculate_tax_and_discounts(self.payment, self.payment_params)

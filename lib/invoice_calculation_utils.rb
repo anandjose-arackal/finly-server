@@ -79,6 +79,11 @@ class InvoiceCalculationUtils
     # also update the payment with all the respective amounts
   end
 
+  # don't go by the name - this calculates the Freight paid as well
+  def self.calculate_tds_and_advance
+
+  end
+
   def calculate_discount_exclusive
     if self.invoice.discount.blank?
       self.discount_amount = 0
