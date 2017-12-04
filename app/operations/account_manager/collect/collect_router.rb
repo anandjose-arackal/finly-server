@@ -4,7 +4,6 @@ class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
 
   def init
     t_params = transaction_params
-    debugger
     transfer_id = t_params[:transfer_id]
     self.virtual_account_transaction = VirtualAccountTransaction.with_transfer_id(transfer_id)&.first
     if virtual_account_transaction.blank?
