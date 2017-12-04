@@ -32,6 +32,7 @@
 #  active_on                     :date
 #  maximum_amount_id             :integer
 #  exact_transaction_amount_id   :integer
+#  application                   :string(255)      not null
 #
 
 require 'test_helper'

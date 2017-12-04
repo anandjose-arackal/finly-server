@@ -32,6 +32,7 @@
 #  active_on                     :date
 #  maximum_amount_id             :integer
 #  exact_transaction_amount_id   :integer
+#  application                   :string(255)      not null
 #
 
 # parent here will be either the payment receivable, or user, or whatever

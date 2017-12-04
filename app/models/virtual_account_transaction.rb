@@ -22,6 +22,7 @@
 #  updated_at                 :datetime         not null
 #  virtual_account_id         :integer
 #  processed                  :boolean
+#  receiving_account_credited :boolean
 #
 
 class VirtualAccountTransaction < ActiveRecord::Base
