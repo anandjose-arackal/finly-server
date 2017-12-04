@@ -477,10 +477,10 @@
 #                   admin_users_card_assign_requests_edit GET    /admin_users/card_assign_requests/edit(.:format)                                           admin_users/card_assign_requests#edit
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                  admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                     admin_users/users#admin_menus
-#                                                         GET    /virtual_accounts/:account_number(.:format)                                                api/v1/invoices/virtual_bank_accounts#show
-#                                        virtual_accounts POST   /virtual_accounts(.:format)                                                                api/v1/invoices/virtual_bank_accounts#create
-#                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                api/v1/invoices/virtual_bank_accounts#update
-#                                                         DELETE /virtual_accounts/:account_number(.:format)                                                api/v1/invoices/virtual_bank_accounts#destroy
+#                                                         GET    /virtual_accounts/:account_number(.:format)                                                api/fc/invoices/virtual_bank_accounts#show
+#                                        virtual_accounts POST   /virtual_accounts(.:format)                                                                api/fc/invoices/virtual_bank_accounts#create
+#                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                api/fc/invoices/virtual_bank_accounts#update
+#                                                         DELETE /virtual_accounts/:account_number(.:format)                                                api/fc/invoices/virtual_bank_accounts#deactivate
 #                                               junk_show GET    /junk/show(.:format)                                                                       junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                       users#menu_data
 #                              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                                               admin_users/oauth/token#create {:format=>"json"}

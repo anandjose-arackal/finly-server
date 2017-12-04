@@ -32,6 +32,7 @@
 #  active_on                     :date
 #  maximum_amount_id             :integer
 #  exact_transaction_amount_id   :integer
+#  application                   :string(255)      not null
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
