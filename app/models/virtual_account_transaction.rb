@@ -3,7 +3,6 @@
 # Table name: virtual_account_transactions
 #
 #  id                         :integer          not null, primary key
-#  beneficiary_account_number :string(255)
 #  beneficiary_account_ifsc   :string(255)
 #  transfer_type              :string(255)
 #  beneficiary_full_name      :string(255)
@@ -23,14 +22,17 @@
 #  virtual_account_id         :integer
 #  processed                  :boolean
 #  receiving_account_credited :boolean
+#  beneficiary_account_no     :string(255)
 #
 
 class VirtualAccountTransaction < ActiveRecord::Base
+  include SystemLoggable
 
   has_one :payment, as: :reference_resource
   belongs_to :virtual_account, class_name: "VirtualBankAccount"
-  has_one :virtual_account_collect_trail
-  has_one :payment_receivable_transaction_trail
 
   validates :transfer_id, uniqueness: true
+
+  scope :with_transfer_id, -> (transfer_id) { where transfer_id: transfer_id }
+
 end

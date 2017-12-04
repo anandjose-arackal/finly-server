@@ -31,4 +31,14 @@ class CashOnHand < ActiveRecord::Base
     balance = self.balance_value
     self.balance.update(value: (balance - amount))
   end
+
+  def va_config
+    {
+        enabled: true,
+        purpose_id: VirtualAccountPurpose.id_for(:cash_on_hand_return),
+        company: user.company,
+        application: :em
+    }
+  end
+
 end

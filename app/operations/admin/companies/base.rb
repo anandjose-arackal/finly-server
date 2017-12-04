@@ -21,7 +21,8 @@ class Admin::Companies::Base < Admin::Base
                                       :hard_copy_receipt,
                                       :yes_bank_account,
                                       :bank_account_reimbursement,
-                                      :payroll_card_enabled
+                                      :payroll_card_enabled,
+                                      :invoicing_system
                                     ])
   end
 
