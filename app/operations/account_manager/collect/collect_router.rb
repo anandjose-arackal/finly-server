@@ -4,11 +4,12 @@ class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
 
   def init
     t_params = transaction_params
+    debugger
     transfer_id = t_params[:transfer_id]
     self.virtual_account_transaction = VirtualAccountTransaction.with_transfer_id(transfer_id)&.first
     if virtual_account_transaction.blank?
       self.virtual_account_transaction = VirtualAccountTransaction.new transaction_params
-      self.virtual_account = ::VirtualBankAccount.find_by(account_number: virtual_account_transaction.beneficiary_account_number)
+      self.virtual_account = ::VirtualBankAccount.find_by(account_number: virtual_account_transaction.beneficiary_account_no)
       self.virtual_account_transaction.virtual_account = self.virtual_account
     else
       self.virtual_account = self.virtual_account_transaction.virtual_account
@@ -46,7 +47,7 @@ class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
 
   def transaction_params
     params&.permit(
-        :beneficiary_account_number,
+        :beneficiary_account_no,
         :beneficiary_account_ifsc,
         :transfer_type,
         :beneficiary_full_name,
@@ -63,5 +64,4 @@ class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
         :credited_at
     )
   end
-
 end
