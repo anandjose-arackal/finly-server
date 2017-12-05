@@ -40,7 +40,7 @@ class MoneyRequest::PrepaidCard::Credit < MoneyRequest::Base
       add_message :error, "This money request has already been credited"
       return
     end
-    if money_request.controlling_user.id != user.id
+    if money_request.controlling_user&.id != user.id
       add_message :error, 'You do not have the permission to transfer the funds'
       return
     end
