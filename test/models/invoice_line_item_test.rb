@@ -6,11 +6,11 @@
 #  invoice_id         :integer
 #  name               :string(255)
 #  quantity           :integer
-#  rate               :decimal(10, )
-#  tax                :decimal(10, )
-#  discount           :decimal(10, )
+#  rate               :decimal(20, 10)
+#  tax                :decimal(20, 10)
+#  discount           :decimal(20, 10)
 #  category_id        :integer
-#  tax_type_id        :integer
+#  gst_type_id        :integer
 #  tax_amount_id      :integer
 #  discount_amount_id :integer
 #  amount_id          :integer

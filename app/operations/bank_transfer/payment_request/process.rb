@@ -107,31 +107,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.error_messages << 'Invalid amount'
       end
 
-      # unless validate_amount(discount_amount)
-      #   self.valid = false
-      #   self.error_messages << 'Invalid discount amount'
-      # end
-      #
-      # unless validate_amount(tax_amount)
-      #   self.valid = false
-      #   self.error_messages << 'Invalid tax amount'
-      # end
-      #
-      # unless validate_amount(tds_amount)
-      #   self.valid = false
-      #   self.error_messages << 'Invalid TDS amount'
-      # end
-      #
-      # unless validate_amount(advance_amount)
-      #   self.valid = false
-      #   self.error_messages << 'Invalid advance amount'
-      # end
-      #
-      # unless validate_amount(freight)
-      #   self.valid = false
-      #   self.error_messages << 'Invalid freight'
-      # end
-
       # check if name is present
       if name.blank?
         self.valid = false
@@ -143,9 +118,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.valid = false
         self.error_messages << 'IFSC cannot be blank'
       end
-
-      # todo - if there's any user specific configuration for this particular user,
-      # add it here
 
       # adding all invoice specific validations here for the payment
       unless validate_date invoice_date
@@ -194,6 +166,16 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       if self.valid
         self.processable_amount += amount
+      end
+
+      invoice_items = []
+
+      item[:invoice_items]&.each do |invoice_item|
+        item_amount = invoice_item[:amount]
+        item_discount = invoice_item[:discount]
+        item_tax = invoice_item[:tax]
+        item_gst_type = invoice_item[:gst_type_id]
+
       end
 
       self.payment_order_valid = false unless self.valid

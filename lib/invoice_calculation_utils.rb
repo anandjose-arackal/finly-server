@@ -4,12 +4,12 @@ class InvoiceCalculationUtils
   attr_accessor :invoice_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
-                :advance, :advance_amount
+                :advance, :advance_amount, :invoice_total
 
   # don't go by the name - this calculates the Freight paid as well
-  def self.calculate_tds_and_advance(params, invoice_total, payment = nil, invoice = nil)
-    invoice = invoice || payment&.invoice
-    if invoice.blank?
+  def calculate_tds_and_advance(params, invoice_total, payment = nil, invoice = nil)
+    self.invoice = invoice || payment&.invoice
+    if self.invoice.blank?
       return
     end
     self.gross_amount = invoice_total
@@ -38,7 +38,7 @@ class InvoiceCalculationUtils
       params[:amount_attributes] = {
           value: self.net_amount,
           currency_id: 1,
-          id: self.payment.amount&.id
+          id: payment.amount&.id
       }
     end
     params
@@ -47,9 +47,9 @@ class InvoiceCalculationUtils
 
   # this method should take the invoice, payment object and the params object and
   # assign the respective calculated amounts to the params object for direct assign
-  def self.calculate_tax_and_discounts(params, payment = nil, invoice = nil)
+  def calculate_tax_and_discounts(params, payment = nil, invoice = nil)
     self.invoice = invoice || payment&.invoice
-    if invoice.blank?
+    if self.invoice.blank?
       return
     end
     if self.invoice.inclusive_of_taxes # calculate the other amounts retrospectively

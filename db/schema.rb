@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171204125209) do
+ActiveRecord::Schema.define(version: 20171205152421) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1822,24 +1822,24 @@ ActiveRecord::Schema.define(version: 20171204125209) do
     t.integer  "invoice_id",         limit: 4
     t.string   "name",               limit: 255
     t.integer  "quantity",           limit: 4
-    t.decimal  "rate",                           precision: 10
-    t.decimal  "tax",                            precision: 10
-    t.decimal  "discount",                       precision: 10
+    t.decimal  "rate",                           precision: 20, scale: 10
+    t.decimal  "tax",                            precision: 20, scale: 10
+    t.decimal  "discount",                       precision: 20, scale: 10
     t.integer  "category_id",        limit: 4
-    t.integer  "tax_type_id",        limit: 4
+    t.integer  "gst_type_id",        limit: 4
     t.integer  "tax_amount_id",      limit: 4
     t.integer  "discount_amount_id", limit: 4
     t.integer  "amount_id",          limit: 4
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
     t.integer  "net_amount_id",      limit: 4
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
   add_index "invoice_line_items", ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id", using: :btree
+  add_index "invoice_line_items", ["gst_type_id"], name: "index_invoice_line_items_on_gst_type_id", using: :btree
   add_index "invoice_line_items", ["invoice_id"], name: "index_invoice_line_items_on_invoice_id", using: :btree
   add_index "invoice_line_items", ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id", using: :btree
-  add_index "invoice_line_items", ["tax_type_id"], name: "index_invoice_line_items_on_tax_type_id", using: :btree
 
   create_table "invoices", force: :cascade do |t|
     t.integer  "address_id",         limit: 4

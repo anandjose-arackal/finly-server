@@ -106,17 +106,18 @@ json.payments do
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 
-        # adding junk items for line items
+        # invoice items
         json.invoice_items do
-          json.array!([1,2,3,4,5]) do |item|
-            json.rate item*2.3
-            json.quantity item*3
-            json.tax item*3.3
-            json.discount item*5.5
-            json.category_id item
-            json.tax_amount item*250
-            json.discount_amount item*20
-            json.amount item*450
+          json.array!(invoice.invoice_items) do |item|
+            json.rate item.rate
+            json.quantity item.quantity
+            json.tax item.tax
+            json.discount item.discount
+            json.category_id item.category_id
+            json.tax_amount item.tax_amount&.value
+            json.discount_amount item.discount_amount&.value
+            json.amount item.amount&.value
+            json.id item.id
           end
         end
       end
@@ -186,17 +187,18 @@ json.payments_verified do
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 
-        # adding junk items for line items
+        #
         json.invoice_items do
-          json.array!([1,2,3,4,5]) do |item|
-            json.rate item*2.3
-            json.quantity item*3
-            json.tax item*3.3
-            json.discount item*5.5
-            json.category_id item
-            json.tax_amount item*250
-            json.discount_amount item*20
-            json.amount item*450
+          json.array!(invoice.invoice_items) do |item|
+            json.rate item.rate
+            json.quantity item.quantity
+            json.tax item.tax
+            json.discount item.discount
+            json.category_id item.category_id
+            json.tax_amount item.tax_amount&.value
+            json.discount_amount item.discount_amount&.value
+            json.amount item.amount&.value
+            json.id item.id
           end
         end
       end
@@ -267,17 +269,17 @@ json.payments_unverified do
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 
-        # adding junk items for line items
         json.invoice_items do
-          json.array!([1,2,3,4,5]) do |item|
-            json.rate item*2.3
-            json.quantity item*3
-            json.tax item*3.3
-            json.discount item*5.5
-            json.category_id item
-            json.tax_amount item*250
-            json.discount_amount item*20
-            json.amount item*450
+          json.array!(invoice.invoice_items) do |item|
+            json.rate item.rate
+            json.quantity item.quantity
+            json.tax item.tax
+            json.discount item.discount
+            json.category_id item.category_id
+            json.tax_amount item.tax_amount&.value
+            json.discount_amount item.discount_amount&.value
+            json.amount item.amount&.value
+            json.id item.id
           end
         end
       end
