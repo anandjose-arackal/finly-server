@@ -95,7 +95,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
         # call the payment executor that runs the payments in the background
         # passing the payment id here because async operation can retrieve the object
         result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order.id, options)
-        add_message :success, "Payments have been scheduled, you can check their status from the order screen"
+        add_message :success, 'Payments have been scheduled, you can check their status from the order screen'
       else
         # Process the order synchronously
         result = AccountManager::Payments::PaymentOrderExecutor.(payment_order, options)

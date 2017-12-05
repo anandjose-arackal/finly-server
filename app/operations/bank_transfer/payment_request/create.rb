@@ -10,6 +10,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
                 :invoice_amount, :payment_amount, :payment,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
+                :advance_amount,
                 :policy_id
 
   def pre_validate
@@ -28,7 +29,12 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   def init
     self.order_data = params[:payment_order]
     op = BankTransfer::PaymentRequest::Process.(user, scheduled_at: params[:scheduled_at],
-        payment_order: self.order_data)
+                                                payment_order: self.order_data,
+                                                policy_id: params[:policy_id])
+    unless op.success?
+      add_message :error, op.messages[:error]
+      return
+    end
     self.processed_order_data = op.payment_order_data
 
     # calculating the requested amount here
@@ -209,12 +215,13 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               discount: order_details[:discount],
               tax: order_details[:tax],
               tds: order_details[:tds],
+              advance: order_details[:advance],
               original_amount_attributes: {
                   value: order_details[:original_amount],
                   currency_id: 1
               },
               freight_amount_attributes: {
-                  value: 0,
+                  value: order_details[:freight],
                   currency_id: 1
               }
           }
@@ -268,6 +275,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       self.net_amount = self.after_tax_amount - self.tds_amount
       self.invoice_amount = self.gross_amount + self.discount_amount
       # calculate_tds
+      calculate_advance_paid
     else # calculate proactively
       self.invoice_amount = self.invoice.original_amount&.value
       calculate_discount_exclusive
@@ -275,6 +283,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       calculate_tds
       self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
       self.invoice_amount = invoice.original_amount&.value
+      calculate_advance_paid
     end
     # update the invoice with the respective calculated amounts
     self.invoice.update(
@@ -319,14 +328,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       self.gross_amount = self.invoice_amount
       return
     end
-    case invoice.discount_type_id
-      when 1, '1'
-        self.discount_amount = (invoice.discount*self.invoice_amount)/100
-      when 2, '2'
-        self.discount_amount = invoice.discount
-      else
-        # do nothing?
-    end
+    self.discount_amount = (invoice.discount*self.invoice_amount)/100
     self.gross_amount = self.invoice_amount - self.discount_amount
   end
 
@@ -336,15 +338,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       self.invoice_amount = self.gross_amount
       return
     end
-
-    case invoice.discount_type_id
-      when 1, '1'
-        self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
-      when 2, '2'
-        self.invoice_amount = self.gross_amount - invoice.discount
-      else
-        # do nothing?
-    end
+    self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
     self.discount_amount = self.invoice_amount - self.gross_amount
   end
 
@@ -354,17 +348,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       self.tax_amount = 0
       return
     end
-    case self.invoice.gst_type_id
-      when 1, '1'
-        # i.e. IGST
-        self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax), self.invoice.tax_type_id)
-      when 2, '2'
-        # i.e SGST + CGST
-        rate = (self.invoice.tax.blank?) ? 0 : 2*self.invoice.tax
-        self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, rate, self.invoice.tax_type_id)
-      else
-        # do nothing?
-    end
+    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax), self.invoice.tax_type_id)
     self.tax_amount = self.net_amount - self.gross_amount
   end
 
@@ -374,24 +358,24 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       self.tax_amount = 0
       return
     end
-
-    case self.invoice.gst_type_id
-      when 1, '1'
-        # i.e. IGST
-        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax), self.invoice.tax_type_id)
-      when 2, '2'
-        # i.e SGST + CGST
-        self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, 2*(self.invoice.tax), self.invoice.tax_type_id)
-      else
-        # do nothing?
-    end
+    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax), self.invoice.tax_type_id)
     self.tax_amount = self.after_tax_amount - self.gross_amount
-
   end
 
   def calculate_tds
     new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, self.invoice.tds, self.invoice.tds_type_id)
     self.tds_amount = self.gross_amount - new_gross_amount
+  end
+
+  def calculate_advance_paid
+    if self.invoice.advance.blank?
+      # no change in net amount
+      self.advance_amount = 0
+      return
+    end
+    original_net_amount = self.net_amount
+    self.advance_amount = (self.invoice.advance*self.net_amount)/100
+    self.net_amount = original_net_amount - self.advance_amount
   end
 
 end

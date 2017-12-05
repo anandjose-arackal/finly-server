@@ -117,6 +117,9 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
             }
           end
 
+          # adding approve and reject options for admin who has taken control
+          actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
+          actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         elsif bank_payment_request.processing?
           actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         elsif bank_payment_request.open? && bank_payment_request.owner_id == user.id

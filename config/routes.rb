@@ -5,6 +5,7 @@
 #                       qukickbooks_configurations_update GET    /qukickbooks_configurations/update(.:format)                                               qukickbooks_configurations#update
 #                         qukickbooks_configurations_show GET    /qukickbooks_configurations/show(.:format)                                                 qukickbooks_configurations#show
 #                                           accept_invite GET    /users/invitation/accept(.:format)                                                         pending_invites#edit
+#                                          collect_notify POST   /collect/notify(.:format)                                                                  finly_collect#notify
 #                                               crono_web        /crono                                                                                     Crono::Web
 #                                  new_admin_user_session GET    /admin_users/sign_in(.:format)                                                             admin_users/sessions#new
 #                                      admin_user_session POST   /admin_users/sign_in(.:format)                                                             admin_users/sessions#create
@@ -315,6 +316,25 @@
 #                         mobile_v1_send_verification_otp POST   /mobile/v1/send_verification_otp(.:format)                                                 mobile/v1/users#send_verification_otp
 #                               mobile_v1_verify_user_otp POST   /mobile/v1/verify_user_otp(.:format)                                                       mobile/v1/users#verify_user_otp
 #                       mobile_v2_available_expense_types GET    /mobile/v2/available_expense_types(.:format)                                               mobile/v2/expenses#available_expense_types
+#                                      mobile_v2_expenses GET    /mobile/v2/expenses(.:format)                                                              mobile/v2/expenses#index
+#                                                         POST   /mobile/v2/expenses(.:format)                                                              mobile/v2/expenses#create
+#                                       mobile_v2_expense GET    /mobile/v2/expenses/:id(.:format)                                                          mobile/v2/expenses#show
+#                                                         PATCH  /mobile/v2/expenses/:id(.:format)                                                          mobile/v2/expenses#update
+#                                                         PUT    /mobile/v2/expenses/:id(.:format)                                                          mobile/v2/expenses#update
+#                                                         DELETE /mobile/v2/expenses/:id(.:format)                                                          mobile/v2/expenses#destroy
+#                                       mobile_v2_reports POST   /mobile/v2/reports(.:format)                                                               mobile/v2/reports#create
+#                                        mobile_v2_report GET    /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#show
+#                                                         PATCH  /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#update
+#                                                         PUT    /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#update
+#                                mobile_v2_report_comment POST   /mobile/v2/reports/:report_id/comment(.:format)                                            mobile/v2/reports#comment
+#                                                         GET    /mobile/v2/reports(.:format)                                                               mobile/v2/reports#index
+#                                                         POST   /mobile/v2/reports(.:format)                                                               mobile/v2/reports#create
+#                                    new_mobile_v2_report GET    /mobile/v2/reports/new(.:format)                                                           mobile/v2/reports#new
+#                                   edit_mobile_v2_report GET    /mobile/v2/reports/:id/edit(.:format)                                                      mobile/v2/reports#edit
+#                                                         GET    /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#show
+#                                                         PATCH  /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#update
+#                                                         PUT    /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#update
+#                                                         DELETE /mobile/v2/reports/:id(.:format)                                                           mobile/v2/reports#destroy
 #                                          chrome_v1_auth POST   /chrome/v1/auth(.:format)                                                                  chrome/v1/token#create
 #                                                         DELETE /chrome/v1/auth(.:format)                                                                  chrome/v1/token#destroy
 #                        chrome_v1_expenses_configuration POST   /chrome/v1/expenses/configuration(.:format)                                                chrome/v1/expenses#configuration
@@ -457,6 +477,10 @@
 #                   admin_users_card_assign_requests_edit GET    /admin_users/card_assign_requests/edit(.:format)                                           admin_users/card_assign_requests#edit
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                  admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                     admin_users/users#admin_menus
+#                                                         GET    /virtual_accounts/:account_number(.:format)                                                api/fc/invoices/virtual_bank_accounts#show
+#                                        virtual_accounts POST   /virtual_accounts(.:format)                                                                api/fc/invoices/virtual_bank_accounts#create
+#                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                api/fc/invoices/virtual_bank_accounts#update
+#                                                         DELETE /virtual_accounts/:account_number(.:format)                                                api/fc/invoices/virtual_bank_accounts#deactivate
 #                                               junk_show GET    /junk/show(.:format)                                                                       junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                       users#menu_data
 #                              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                                               admin_users/oauth/token#create {:format=>"json"}
@@ -762,6 +786,7 @@
 #                                         menu_data_cards GET    /menu_data_cards(.:format)                                                                 expense_types_configuration#menu_data_cards
 #                                      menu_data_disburse GET    /menu_data_disburse(.:format)                                                              expense_types_configuration#menu_data_disburse
 #                                      menu_data_payments GET    /menu_data_payments(.:format)                                                              expense_types_configuration#menu_data_payments
+#                                       menu_data_collect GET    /menu_data_collect(.:format)                                                               expense_types_configuration#menu_data_collect
 #                                            cards_orders GET    /cards/orders(.:format)                                                                    orders/order_cards#index
 #                                                         GET    /cards/orders/:id(.:format)                                                                orders/order_cards#show
 #                                                         DELETE /cards/orders/:id(.:format)                                                                orders/order_cards#destroy
@@ -879,6 +904,9 @@
 #                                quickbooks_update_config PATCH  /quickbooks/update_config(.:format)                                                        quickbooks#update
 #                                              sync_users PATCH  /quickbooks/sync_users(.:format)                                                           quickbooks#sync_users
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                                               quickbooks#show
+#                                 integration_tally_check GET    /integration/tally/check(.:format)                                                         integration/tally#check
+#                              integration_tally_vouchers GET    /integration/tally/vouchers(.:format)                                                      integration/tally#vouchers
+#                         integration_tally_configuration POST   /integration/tally/configuration(.:format)                                                 integration/tally#set_configuration
 #                                                     tos GET    /tos(.:format)                                                                             static_pages#tos
 #                                                 privacy GET    /privacy(.:format)                                                                         static_pages#privacy
 #                                  prepaid_card_agreement GET    /prepaid_card_agreement(.:format)                                                          static_pages#prepaid_card_agreement
@@ -981,6 +1009,24 @@
 #                                                         DELETE /bank_transfer/users/:id(.:format)                                                         bank_transfer/users#destroy
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                             bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                       bank_transfer/vendor_payment_wallets#transfer_options
+#                                     public_bank_account GET    /account/:account_number(.:format)                                                         invoicing/public_links#virtual_bank_account_show
+#                           invoicing_payment_receivables GET    /invoicing/payment_receivables(.:format)                                                   invoicing/payment_receivables#index
+#                                                         POST   /invoicing/payment_receivables(.:format)                                                   invoicing/payment_receivables#create
+#                        new_invoicing_payment_receivable GET    /invoicing/payment_receivables/new(.:format)                                               invoicing/payment_receivables#new
+#                       edit_invoicing_payment_receivable GET    /invoicing/payment_receivables/:id/edit(.:format)                                          invoicing/payment_receivables#edit
+#                            invoicing_payment_receivable GET    /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#show
+#                                                         PATCH  /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
+#                                                         PUT    /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
+#                                                         DELETE /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#destroy
+#            invoicing_virtual_bank_account_show_payments GET    /invoicing/virtual_bank_accounts/:virtual_bank_account_id/transactions(.:format)           invoicing/virtual_bank_accounts#show_payments
+#                         invoicing_virtual_bank_accounts GET    /invoicing/virtual_bank_accounts(.:format)                                                 invoicing/virtual_bank_accounts#index
+#                                                         POST   /invoicing/virtual_bank_accounts(.:format)                                                 invoicing/virtual_bank_accounts#create
+#                      new_invoicing_virtual_bank_account GET    /invoicing/virtual_bank_accounts/new(.:format)                                             invoicing/virtual_bank_accounts#new
+#                     edit_invoicing_virtual_bank_account GET    /invoicing/virtual_bank_accounts/:id/edit(.:format)                                        invoicing/virtual_bank_accounts#edit
+#                          invoicing_virtual_bank_account GET    /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#show
+#                                                         PATCH  /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#update
+#                                                         PUT    /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#update
+#                                                         DELETE /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#destroy
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)            admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)             admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                           admin_users/funds_load_requests#index
@@ -1584,6 +1630,9 @@ Rails.application.routes.draw do
   # adding this before the devise routes because devise overrides out custom path
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
+  ######### FINLY COLLECT START ###########
+    post 'collect/notify', to: 'finly_collect#notify'
+  ######### FINLY COLLECT END ###########
 
   ######### GEMS SPECIFIC START ###########
 
@@ -1672,6 +1721,7 @@ Rails.application.routes.draw do
       end
       post 'cards/balance/update', to: 'cards#update_balance'
       post 'cards/status/update', to: 'cards#update_status'
+
       namespace :configuration do
         get 'categories' => 'category#index', as: :categories
         post 'gcm/register', to: 'gcm#create'
@@ -1767,7 +1817,10 @@ Rails.application.routes.draw do
     namespace :v2 do
       get 'available_expense_types', to: 'expenses#available_expense_types'
       resources :expenses, only: [:index, :show, :create, :update, :destroy]
-      resources :reports, only: [:show]
+      resources :reports, only: [:create, :show, :update]
+      resources :reports do
+        post 'comment' => 'reports#comment', as: :comment
+      end
     end
   end
 
@@ -1896,6 +1949,17 @@ Rails.application.routes.draw do
   get 'admin_menus', to: 'admin_users/users#admin_menus', as: :admin_menu
 
   ######### ADMIN PANEL END ###########
+
+
+  ############# Virtual Bank Accounts API Start ######################
+
+  get 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#show'
+  post 'virtual_accounts', to: 'api/fc/invoices/virtual_bank_accounts#create'
+  patch 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#update'
+  delete 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#deactivate'
+
+  ################### Virtual Bank Accounts End ######################
+
 
   get 'junk/show', to: 'junk#show'
 
@@ -2180,6 +2244,7 @@ Rails.application.routes.draw do
   get 'menu_data_cards' => 'expense_types_configuration#menu_data_cards'
   get 'menu_data_disburse' => 'expense_types_configuration#menu_data_disburse'
   get 'menu_data_payments' => 'expense_types_configuration#menu_data_payments'
+  get 'menu_data_collect' => 'expense_types_configuration#menu_data_collect'
 
   # Orders
   get 'cards/orders' => 'orders/order_cards#index'
@@ -2357,6 +2422,18 @@ Rails.application.routes.draw do
     end
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
+  end
+
+
+  get 'account/:account_number', to: 'invoicing/public_links#virtual_bank_account_show', as: :public_bank_account
+
+  namespace :invoicing do
+
+    resources :payment_receivables
+    resources :virtual_bank_accounts do
+      get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
+    end
+    
   end
 
 

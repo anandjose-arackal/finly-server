@@ -256,6 +256,11 @@ class Amount < ActiveRecord::Base
   alias_method :tds_amount_value, :amount_value
   alias_method :tax_amount_value, :amount_value
   alias_method :discount_amount_value, :amount_value
+  alias_method :maximum_amount_value, :amount_value
+  alias_method :maximum_transaction_amount_value, :amount_value
+  alias_method :minimum_transaction_amount_value, :amount_value
+  alias_method :exact_transaction_amount_value, :amount_value
+
 
   scope :with_id, -> (id) { where id: id }
 
@@ -318,7 +323,7 @@ class Amount < ActiveRecord::Base
       # calculate the respective currency rate for the date in question
       params = {date: Date.parse(date).strftime("%Y-%m-%d")} rescue nil
       res = Currency::FetchData.(nil, params)
-      rate = CurrencyConversionRate.create(res.currency_data)
+      rate = CurrencyConversionRate.create(res.currency_data.permit!)
     end
     currencies = CurrencyConversionRate.column_names.reject { |el| ['created_at', 'updated_at', 'date', 'id'].include?(el)}
     orig_curr = self.currency.country_code
