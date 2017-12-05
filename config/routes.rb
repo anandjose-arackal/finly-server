@@ -1028,6 +1028,8 @@
 #                                                         PATCH  /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#update
 #                                                         PUT    /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#update
 #                                                         DELETE /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#destroy
+#                            invoicing_categories_invoice GET    /invoicing/categories/invoice(.:format)                                                    invoicing/categories#invoice_categories
+#                 invoicing_categories_invoice_line_items GET    /invoicing/categories/invoice_line_items(.:format)                                         invoicing/categories#invoice_items_categories
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)            admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)             admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                           admin_users/funds_load_requests#index
@@ -2391,12 +2393,13 @@ Rails.application.routes.draw do
   get 'account/:account_number', to: 'invoicing/public_links#virtual_bank_account_show', as: :public_bank_account
 
   namespace :invoicing do
-
     resources :payment_receivables
     resources :virtual_bank_accounts do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
     end
-    
+
+    get 'categories/invoice', to: 'categories#invoice_categories'
+    get 'categories/invoice_line_items', to: 'categories#invoice_items_categories'
   end
 
 
