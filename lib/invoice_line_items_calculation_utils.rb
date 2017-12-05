@@ -3,16 +3,18 @@ class InvoiceLineItemsCalculationUtils
 
   attr_accessor :invoice_item_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
-                :discount_amount, :tax_amount, :after_tax_amount
+                :discount_amount, :tax_amount, :after_tax_amount,
+                :invoice_total
 
   # this method should take the invoice, payment object and the params object and
   # assign the respective calculated amounts to the params object for direct assign
-  def self.calculate_tax_and_discounts(payment, payment_params)
-    invoice = payment.invoice
+  def self.calculate_tax_and_discounts(params, payment = nil, invoice = nil)
+    invoice = invoice || payment&.invoice
     if invoice.blank?
       return
     end
-    payment.invoice.invoice_items.each_with_index do |item, index|
+    self.invoice_total = 0
+    invoice.invoice_items.each_with_index do |item, index|
       if invoice.inclusive_of_taxes # calculate the other amounts retrospectively
         self.after_tax_amount = item.quantity * item.rate
         # first calculate the gross amount from the =
@@ -26,29 +28,38 @@ class InvoiceLineItemsCalculationUtils
         calculate_exclusive_taxes
         self.net_amount = self.gross_amount + self.tax_amount
       end
+      self.invoice_total += self.net_amount
       # assign the respective calculated parameters to the payment params
-      payment_params[:invoice_attributes][:invoice_items_attributes][index][:amount_attributes] = {
+      params[:invoice_attributes][:invoice_items_attributes][index][:amount_attributes] = {
           value: self.invoice_item_amount,
           currency_id: 1,
           id: item.amount&.id
       }
-      payment_params[:invoice_attributes][:invoice_items_attributes][index][:tax_amount_attributes] = {
+      params[:invoice_attributes][:invoice_items_attributes][index][:tax_amount_attributes] = {
           value: self.tax_amount,
           currency_id: 1,
           id: item.tax_amount&.id
       }
-      payment_params[:invoice_attributes][:invoice_items_attributes][index][:discount_amount_attributes] = {
+      params[:invoice_attributes][:invoice_items_attributes][index][:discount_amount_attributes] = {
           value: self.discount_amount,
           currency_id: 1,
           id: item.discount_amount&.id
       }
-      payment_params[:invoice_attributes][:invoice_items_attributes][index][:net_amount_attributes] = {
+      params[:invoice_attributes][:invoice_items_attributes][index][:net_amount_attributes] = {
           value: self.net_amount,
           currency_id: 1,
           id: item.net_amount&.id
       }
+      params[:invoice_attributes][:amount_attributes] = {
+          value: self.invoice_total,
+          currency_id: 1,
+          id: invoice.amount&.id
+      }
     end
-    payment_params
+
+    # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here
+    InvoiceCalculationUtils.calculate_tds_and_advance(params, self.invoice_total, payment)
+    params
   end
 
   def calculate_discount_exclusive(item)

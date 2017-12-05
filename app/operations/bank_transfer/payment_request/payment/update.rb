@@ -85,9 +85,11 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
 
   def process
     payment.assign_attributes(payment_params)
-    if payment.invoice.present?
+    if payment.invoice.present? # && payment.valid?
       calculate_tax_and_discounts
     end
+    # assign the new attributes that were calculated using the respective libraries
+    payment.assign_attributes(payment_params)
     set_custom_fields(false) # this should hopefully add the attributes to the model
     unless self.payment.save
       add_message :error, self.payment.errors.full_messages
@@ -127,11 +129,9 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   end
 
   def calculate_tax_and_discounts
-
     if self.payment.invoice.invoice_items.present?
       # if there are no invoice items, use the invoice library to calculate the amounts
       self.payment_params = InvoiceLineItemsCalculationUtils.calculate_tax_and_discounts(self.payment, self.payment_params)
-      self.payment_params = InvoiceCalculationUtils.calculate_tds_and_advance(self.payment, self.payment_params)
     else
       # if there are, in fact, invoice items, use the invoice items library
       self.payment_params = InvoiceCalculationUtils.calculate_tax_and_discounts(self.payment, self.payment_params)

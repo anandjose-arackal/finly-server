@@ -6,15 +6,53 @@ class InvoiceCalculationUtils
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
                 :advance, :advance_amount
 
-
-  # this method should take the invoice, payment object and the params object and
-  # assign the respective calculated amounts to the params object for direct assign
-  def self.calculate_tax_and_discounts(payment, payment_params)
-    invoice = payment.invoice
+  # don't go by the name - this calculates the Freight paid as well
+  def self.calculate_tds_and_advance(params, invoice_total, payment = nil, invoice = nil)
+    invoice = invoice || payment&.invoice
     if invoice.blank?
       return
     end
-    if invoice.inclusive_of_taxes # calculate the other amounts retrospectively
+    self.gross_amount = invoice_total
+    calculate_tds
+    self.net_amount = self.gross_amount - self.tds_amount
+    calculate_advance_paid
+    params[:invoice_attributes][:tds_amount_attributes] = {
+        value: self.tds_amount,
+        currency_id: 1,
+        id: self.invoice.tds_amount&.id
+    }
+    params[:invoice_attributes][:advance_amount_attributes] = {
+        value: self.advance_amount,
+        currency_id: 1,
+        id: self.invoice.advance_amount&.id
+    }
+    params[:invoice_attributes][:net_amount_attributes] = {
+        value: self.net_amount,
+        currency_id: 1,
+        id: self.invoice.net_amount&.id
+    }
+
+    # now calculating the final amount to be paid
+    # adding the payment amount to the params if the payment was passed
+    if payment.present?
+      params[:amount_attributes] = {
+          value: self.net_amount,
+          currency_id: 1,
+          id: self.payment.amount&.id
+      }
+    end
+    params
+  end
+
+
+  # this method should take the invoice, payment object and the params object and
+  # assign the respective calculated amounts to the params object for direct assign
+  def self.calculate_tax_and_discounts(params, payment = nil, invoice = nil)
+    self.invoice = invoice || payment&.invoice
+    if invoice.blank?
+      return
+    end
+    if self.invoice.inclusive_of_taxes # calculate the other amounts retrospectively
       self.after_tax_amount = self.invoice.original_amount&.value
       # first calculate the gross amount from the
       calculate_inclusive_taxes
@@ -33,56 +71,53 @@ class InvoiceCalculationUtils
       calculate_advance_paid
     end
     # assign the respective calculated parameters to the payment params
-    payment_params[:invoice_attributes][:amount_attributes] = {
+    params[:invoice_attributes][:amount_attributes] = {
         value: self.invoice_amount,
         currency_id: 1,
         id: self.invoice&.amount&.id
     }
-    payment_params[:invoice_attributes][:net_amount_attributes] = {
+    params[:invoice_attributes][:net_amount_attributes] = {
         value: self.net_amount,
         currency_id: 1,
         id: self.invoice&.net_amount&.id
     }
-    payment_params[:invoice_attributes][:gross_amount_attributes] = {
+    params[:invoice_attributes][:gross_amount_attributes] = {
         value: self.gross_amount,
         currency_id: 1,
         id: self.invoice.gross_amount&.id
     }
-    payment_params[:invoice_attributes][:discount_amount_attributes] = {
+    params[:invoice_attributes][:discount_amount_attributes] = {
         value: self.discount_amount,
         currency_id: 1,
         id: self.invoice.discount_amount&.id
     }
-    payment_params[:invoice_attributes][:tds_amount_attributes] = {
+    params[:invoice_attributes][:tds_amount_attributes] = {
         value: self.tds_amount,
         currency_id: 1,
         id: self.invoice.tds_amount&.id
     }
-    payment_params[:invoice_attributes][:tax_amount_attributes] = {
+    params[:invoice_attributes][:tax_amount_attributes] = {
         value: self.tax_amount,
         currency_id: 1,
         id: self.invoice.tax_amount&.id
     }
-    payment_params[:invoice_attributes][:advance_amount_attributes] = {
+    params[:invoice_attributes][:advance_amount_attributes] = {
         value: self.advance_amount,
         currency_id: 1,
         id: self.invoice.advance_amount&.id
     }
 
-    # adding the payment amount to the params
-    payment_params[:amount_attributes] = {
-        value: self.net_amount,
-        currency_id: 1,
-        id: self.payment.amount&.id
-    }
-    payment_params
-    # also update the payment with all the respective amounts
+    # adding the payment amount to the params if  the object is present
+    if payment.present?
+      params[:amount_attributes] = {
+          value: self.net_amount,
+          currency_id: 1,
+          id: self.payment.amount&.id
+      }
+    end
+    params
   end
 
-  # don't go by the name - this calculates the Freight paid as well
-  def self.calculate_tds_and_advance
-
-  end
 
   def calculate_discount_exclusive
     if self.invoice.discount.blank?
