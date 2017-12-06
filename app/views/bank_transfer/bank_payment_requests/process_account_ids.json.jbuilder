@@ -24,8 +24,9 @@ json.payment do
       json.messages item[:messages]
       json.custom_fields_config item[:custom_fields]
       json.net_amount item[:net_amount]
+      debugger
       json.invoice_items do
-        json.array!(item[:invoice_items]).each do |line_item|
+        json.array!(item[:invoice_items]) do |line_item|
           json.discount line_item[:discount]
           json.tax line_item[:tax]
           json.tax_amount line_item[:tax_amount]

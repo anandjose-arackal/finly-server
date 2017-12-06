@@ -68,15 +68,28 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.payment_order_data = arr
     end
 
+    debugger
+
     self.payment_order_data.each do |item|
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
       name = item[:name] || item["name"]
-      amount = item[:original_amount]&.to_f || item["original_amount"]&.to_f
       note = item[:note]&.to_s || item["note"]&.to_s
-      gst_type_id = item[:gst_type_id]
-      tax_amount = item[:tax_amount]&.to_f
-      discount_amount = item[:discount_amount]&.to_f
+
+      # deciding tax based on whether invoice items were entered or not
+      tax_amount = discount_amount = amount = 0
+      if item[:invoice_items_attributes].present?
+        item[:invoice_items_attributes].each do |line_item|
+          tax_amount += line_item[:tax_amount]&.to_f
+          discount_amount += line_item[:discount_amount]&.to_f
+          amount += line_item[:amount]&.to_f
+        end
+      else
+        tax_amount = item[:tax_amount]&.to_f
+        discount_amount = item[:discount_amount]&.to_f
+        amount += item[:original_amount]
+      end
+
       tds_amount = item[:tds_amount]&.to_f
       discount = item[:discount]
       advance_amount = item[:advance_amount]&.to_f
@@ -170,73 +183,61 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       invoice_items = []
 
+      if item&.dig(:invoice_items_attributes).present?
+        item[:invoice_items_attributes]&.each do |invoice_item|
+          item_amount = invoice_item[:amount]
+          item_discount = invoice_item[:discount]
+          item_tax = invoice_item[:tax]
+          item_gst_type = invoice_item[:gst_type_id]
+          item_rate = invoice_item[:rate]
+          item_quantity = invoice_item[:quantity]
+          item_description = invoice_item[:description]
+          item_category_id = invoice_item[:category_id]
+          item_discount_amount = invoice_item[:discount_amount]
+          item_tax_amount = invoice_item[:tax_amount]
 
-      item[:invoice_items_attributes]&.each do |invoice_item|
-        item_amount = invoice_item[:amount]
-        item_discount = invoice_item[:discount]
-        item_tax = invoice_item[:tax]
-        item_gst_type = invoice_item[:gst_type_id]
-        item_rate = invoice_item[:rate]
-        item_quantity = invoice_item[:quantity]
-        item_description = invoice_item[:description]
-        item_category_id = invoice_item[:category_id]
-        item_discount_amount = invoice_item[:discount_amount]
-        item_tax_amount = invoice_item[:tax_amount]
+          unless validate_rate item_rate, 1
+            self.error_messages << "Invoice item rate is invalid"
+            self.valid = false
+          end
 
-        unless validate_rate item_rate, 1
-          self.error_messages << "Invoice item rate is invalid"
-          self.valid = false
+          unless validate_rate item_tax, 1
+            self.error_messages << "Invoice item tax rate is invalid"
+            self.valid = false
+          end
+
+          unless validate_rate item_discount, 1
+            self.error_messages << "Invoice item discount rate is invalid"
+            self.valid = false
+          end
+
+          invoice_items << {
+            description: item_description,
+            tax: item_tax,
+            tax_amount: item_tax_amount,
+            discount: item_discount,
+            discount_amount: item_discount_amount,
+            quantity: item_quantity,
+            rate: item_rate,
+            category_id: item_category_id,
+            amount: item_amount,
+            gst_type_id: item_gst_type
+          }
         end
-
-        unless validate_rate item_tax, 1
-          self.error_messages << "Invoice item tax rate is invalid"
-          self.valid = false
-        end
-
-        unless validate_rate item_discount, 1
-          self.error_messages << "Invoice item discount rate is invalid"
-          self.valid = false
-        end
-
-        unless self.validate_amount item_tax_amount
-          self.error_messages << "Invoice item tax amount is invalid"
-          self.valid = false
-        end
-
-        unless self.validate_amount item_discount_amount
-          self.error_messages << "Invoice item discount amount is invalid"
-          self.valid = false
-        end
-
-        unless validate_amount item_amount
-          self.error_messages << "Invoice item amount is invalid"
-          self.valid = false
-        end
-
-        invoice_items << {
-          description: item_description,
-          tax: item_tax,
-          tax_amount: item_tax_amount,
-          discount: item_discount,
-          discount_amount: item_discount_amount,
-          quantity: item_quantity,
-          rate: item_rate,
-          category_id: item_category_id,
-          amount: item_amount,
-          gst_type_id: item_gst_type
-        }
       end
+      debugger
 
       self.payment_order_valid = false unless self.valid
 
       self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
-                               gst_type_id: gst_type_id, tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds,
+                               tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds,
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
                                advance: advance, advance_amount: advance_amount, freight: freight,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
                                net_amount: net_amount, invoice_items: invoice_items,
                                valid: self.valid, messages: self.error_messages}
     end
+    debugger
   end
 
   def success

@@ -20,7 +20,7 @@
 class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::PaymentRequest::Base
 
   attr_accessor :bank_accounts, :account_ids, :amounts, :response_presenter, :parsed_data,
-                :notes
+                :notes, :invoice_items
 
 
   def pre_validate
@@ -37,15 +37,17 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     self.account_ids = retrieve_data(:account_id)
     self.amounts = retrieve_data(:original_amount)
     self.notes = retrieve_data(:note)
-    [:tax_amount, :tds_amount, :gst_type_id, :discount_amount, :discount, :tax, :tds, :advance_amount, :advance, :freight, :invoice_date, :invoice_number, :due_date, :custom_fields, :invoice_items_attributes].each do |attr|
+    [:tax_amount, :tds_amount, :gst_type_id, :discount_amount, :discount, :tax, :tds, :advance_amount, :advance, :freight, :invoice_date, :invoice_number, :due_date, :custom_fields].each do |attr|
       self.class.send(:attr_accessor, attr)
       instance_variable_set("@#{attr}", retrieve_data(attr))
     end
+    retrieve_invoice_items_data
   end
 
   def process
     # this will create the data in the format we want and process it
     self.parsed_data = parse_order_information
+    debugger
     params[:payment_order] = self.parsed_data
     self.response_presenter = BankTransfer::PaymentRequest::Process.(user, params)
     unless self.response_presenter&.success?
@@ -66,6 +68,17 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
       data << order[key.to_sym]
     end
     data
+  end
+
+  def retrieve_invoice_items_data
+    self.invoice_items = []
+    params[:payment_order].each do |k, order|
+      if order&.dig(:invoice_attributes, :invoice_items_attributes).present?
+        self.invoice_items << order[:invoice_attributes][:invoice_items_attributes]
+      else
+        self.invoice_items << []
+      end
+    end
   end
 
   def parse_order_information
@@ -92,7 +105,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           invoice_date: self.invoice_date[index],
           due_date: self.due_date[index],
           custom_fields: self.custom_fields[index],
-          invoice_items_attributes: self.invoice_items_attributes[index]
+          invoice_items_attributes: self.invoice_items[index]
       }
     end
     data

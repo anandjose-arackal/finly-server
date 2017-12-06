@@ -183,6 +183,21 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     p[:payment_order_attributes][:currency_id] = Currency.first.id
     p[:payment_order_attributes][:scheduled_at] = self.scheduled_at
     processed_order_data.each do |order_details|
+      # processing the line items of this particular invoice
+      invoice_items_attributes = []
+      if order_details&.dig(:invoice_attributes, :invoice_items_attributes).present?
+        order_details[:invoice_attributes].each do |line_item|
+          invoice_items_attributes << {
+              tax: line_item[:tax],
+              discount: line_item[:discount],
+              category_id: line_item[:category_id],
+              name: line_item[:name],
+              rate: line_item[:rate],
+              quantity: line_item[:quantity]
+          }
+        end
+      end
+
       bank_account = retrieve_bank_account order_details
       p[:payment_order_attributes][:payments_attributes] << {
           payment_type_id: PaymentType.id_for(:credit),
@@ -223,7 +238,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               freight_amount_attributes: {
                   value: order_details[:freight],
                   currency_id: 1
-              }
+              },
+              invoice_items_attributes: invoice_items_attributes
           }
       }
     end
