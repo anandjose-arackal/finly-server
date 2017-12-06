@@ -50,6 +50,10 @@ json.original_amount do
   json.partial! 'api/v1/shared/amount', amount: expense.original_amount
 end
 
+json.converted_amount do
+  json.partial! 'api/v1/shared/amount', amount: expense.original_amount
+end
+
 json.converted expense.converted?
 json.conversion_rate expense.conversion_rate
 
