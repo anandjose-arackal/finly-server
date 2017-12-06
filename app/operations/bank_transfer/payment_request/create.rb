@@ -81,6 +81,11 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     self.bank_payment_request = BankPaymentRequest.new(request_params)
     validate_custom_fields(processed_order_data)
     return if has_errors?
+    if payment.invoice.present? # && payment.valid?
+      calculate_tax_and_discounts(payment_params)
+    end
+    # assign the new attributes that were calculated using the respective libraries
+    payment.assign_attributes(payment_params)
     unless bank_payment_request.save
       add_message :error, bank_payment_request.errors.full_messages
     end
@@ -280,62 +285,70 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   end
 
   def calculate_tax_and_discounts(payment)
-    self.payment = payment
-    self.invoice = payment.invoice
-    if self.invoice.inclusive_of_taxes # calculate the other amounts retrospectively
-      self.after_tax_amount = self.invoice.original_amount&.value
-      # first calculate the gross amount from the
-      calculate_inclusive_taxes
-      calculate_tds
-      calculate_discount_inclusive
-      self.net_amount = self.after_tax_amount - self.tds_amount
-      self.invoice_amount = self.gross_amount + self.discount_amount
-      # calculate_tds
-      calculate_advance_paid
-    else # calculate proactively
-      self.invoice_amount = self.invoice.original_amount&.value
-      calculate_discount_exclusive
-      calculate_exclusive_taxes
-      calculate_tds
-      self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
-      self.invoice_amount = invoice.original_amount&.value
-      calculate_advance_paid
+    if self.payment.invoice.invoice_items.present?
+      # if there are no invoice items, use the invoice library to calculate the amounts
+      self.payment_params = InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)&.permit!
+    else
+      # if there are, in fact, invoice items, use the invoice items library
+      self.payment_params = InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)&.permit!
     end
-    # update the invoice with the respective calculated amounts
-    self.invoice.update(
-        amount_attributes: {
-            value: self.invoice_amount,
-            currency_id: 1,
-            id: self.invoice.amount&.id
-        },
-        net_amount_attributes: {
-            value: self.net_amount,
-            currency_id: 1,
-            id: self.invoice.net_amount&.id
-        },
-        gross_amount_attributes: {
-            value: self.gross_amount,
-            currency_id: 1,
-            id: self.invoice.gross_amount&.id
-        },
-        discount_amount_attributes: {
-            value: self.discount_amount,
-            currency_id: 1,
-            id: self.invoice.discount_amount&.id
-        },
-        tds_amount_attributes: {
-            value: self.tds_amount,
-            currency_id: 1,
-            id: self.invoice.tds_amount&.id
-        },
-        tax_amount_attributes: {
-            value: self.tax_amount,
-            currency_id: 1,
-            id: self.invoice.tax_amount&.id
-        }
-    )
-    # also update the payment with all the respective amounts
-    self.payment.amount&.update(value: self.net_amount)
+
+    # self.payment = payment
+    # self.invoice = payment.invoice
+    # if self.invoice.inclusive_of_taxes # calculate the other amounts retrospectively
+    #   self.after_tax_amount = self.invoice.original_amount&.value
+    #   # first calculate the gross amount from the
+    #   calculate_inclusive_taxes
+    #   calculate_tds
+    #   calculate_discount_inclusive
+    #   self.net_amount = self.after_tax_amount - self.tds_amount
+    #   self.invoice_amount = self.gross_amount + self.discount_amount
+    #   # calculate_tds
+    #   calculate_advance_paid
+    # else # calculate proactively
+    #   self.invoice_amount = self.invoice.original_amount&.value
+    #   calculate_discount_exclusive
+    #   calculate_exclusive_taxes
+    #   calculate_tds
+    #   self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
+    #   self.invoice_amount = invoice.original_amount&.value
+    #   calculate_advance_paid
+    # end
+    # # update the invoice with the respective calculated amounts
+    # self.invoice.update(
+    #     amount_attributes: {
+    #         value: self.invoice_amount,
+    #         currency_id: 1,
+    #         id: self.invoice.amount&.id
+    #     },
+    #     net_amount_attributes: {
+    #         value: self.net_amount,
+    #         currency_id: 1,
+    #         id: self.invoice.net_amount&.id
+    #     },
+    #     gross_amount_attributes: {
+    #         value: self.gross_amount,
+    #         currency_id: 1,
+    #         id: self.invoice.gross_amount&.id
+    #     },
+    #     discount_amount_attributes: {
+    #         value: self.discount_amount,
+    #         currency_id: 1,
+    #         id: self.invoice.discount_amount&.id
+    #     },
+    #     tds_amount_attributes: {
+    #         value: self.tds_amount,
+    #         currency_id: 1,
+    #         id: self.invoice.tds_amount&.id
+    #     },
+    #     tax_amount_attributes: {
+    #         value: self.tax_amount,
+    #         currency_id: 1,
+    #         id: self.invoice.tax_amount&.id
+    #     }
+    # )
+    # # also update the payment with all the respective amounts
+    # self.payment.amount&.update(value: self.net_amount)
   end
 
   def calculate_discount_exclusive
