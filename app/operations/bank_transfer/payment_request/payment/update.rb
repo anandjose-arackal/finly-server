@@ -89,7 +89,6 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       calculate_tax_and_discounts
     end
     # assign the new attributes that were calculated using the respective libraries
-    debugger
     payment.assign_attributes(payment_params)
     set_custom_fields(false) # this should hopefully add the attributes to the model
     unless self.payment.save

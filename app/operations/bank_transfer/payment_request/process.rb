@@ -5,7 +5,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
                 :errors, :payment_order_valid, :scheduled_at, :description, :valid, :error_messages
 
   # the object that will hold the details of the custom fields because the object hasn't been created
-  attr_accessor :ghost_invoice
+  attr_accessor :ghost_invoice, :ghost_invoice_item
 
   def pre_validate
     super
@@ -170,12 +170,61 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       invoice_items = []
 
-      item[:invoice_items]&.each do |invoice_item|
+
+      item[:invoice_items_attributes]&.each do |invoice_item|
         item_amount = invoice_item[:amount]
         item_discount = invoice_item[:discount]
         item_tax = invoice_item[:tax]
         item_gst_type = invoice_item[:gst_type_id]
+        item_rate = invoice_item[:rate]
+        item_quantity = invoice_item[:quantity]
+        item_description = invoice_item[:description]
+        item_category_id = invoice_item[:category_id]
+        item_discount_amount = invoice_item[:discount_amount]
+        item_tax_amount = invoice_item[:tax_amount]
 
+        unless validate_rate item_rate, 1
+          self.error_messages << "Invoice item rate is invalid"
+          self.valid = false
+        end
+
+        unless validate_rate item_tax, 1
+          self.error_messages << "Invoice item tax rate is invalid"
+          self.valid = false
+        end
+
+        unless validate_rate item_discount, 1
+          self.error_messages << "Invoice item discount rate is invalid"
+          self.valid = false
+        end
+
+        unless self.validate_amount item_tax_amount
+          self.error_messages << "Invoice item tax amount is invalid"
+          self.valid = false
+        end
+
+        unless self.validate_amount item_discount_amount
+          self.error_messages << "Invoice item discount amount is invalid"
+          self.valid = false
+        end
+
+        unless validate_amount item_amount
+          self.error_messages << "Invoice item amount is invalid"
+          self.valid = false
+        end
+
+        invoice_items << {
+          description: item_description,
+          tax: item_tax,
+          tax_amount: item_tax_amount,
+          discount: item_discount,
+          discount_amount: item_discount_amount,
+          quantity: item_quantity,
+          rate: item_rate,
+          category_id: item_category_id,
+          amount: item_amount,
+          gst_type_id: item_gst_type
+        }
       end
 
       self.payment_order_valid = false unless self.valid
@@ -185,7 +234,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
                                advance: advance, advance_amount: advance_amount, freight: freight,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
-                               net_amount: net_amount,
+                               net_amount: net_amount, invoice_items: invoice_items,
                                valid: self.valid, messages: self.error_messages}
     end
   end
@@ -231,7 +280,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
   private
 
-  def validate_rate(rate, rate_type_id, amount)
+  def validate_rate(rate, rate_type_id, amount = nil)
     if rate.blank?
       return true
     end
