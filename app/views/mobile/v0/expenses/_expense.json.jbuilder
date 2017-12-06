@@ -43,7 +43,7 @@ json.status do
 end
 
 json.amount do
-  json.partial! 'api/v1/shared/amount', amount: expense.base_amount
+  json.partial! 'api/v1/shared/amount', amount: expense.original_amount
 end
 
 json.original_amount do
@@ -51,7 +51,7 @@ json.original_amount do
 end
 
 json.converted_amount do
-  json.partial! 'api/v1/shared/amount', amount: expense.original_amount
+  json.partial! 'api/v1/shared/amount', amount: expense.base_amount
 end
 
 json.converted expense.converted?
