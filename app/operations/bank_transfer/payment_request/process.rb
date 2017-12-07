@@ -107,31 +107,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.error_messages << 'Invalid amount'
       end
 
-      # unless validate_amount(discount_amount)
-      #   self.valid = false
-      #   self.error_messages << 'Invalid discount amount'
-      # end
-      #
-      # unless validate_amount(tax_amount)
-      #   self.valid = false
-      #   self.error_messages << 'Invalid tax amount'
-      # end
-      #
-      # unless validate_amount(tds_amount)
-      #   self.valid = false
-      #   self.error_messages << 'Invalid TDS amount'
-      # end
-      #
-      # unless validate_amount(advance_amount)
-      #   self.valid = false
-      #   self.error_messages << 'Invalid advance amount'
-      # end
-      #
-      # unless validate_amount(freight)
-      #   self.valid = false
-      #   self.error_messages << 'Invalid freight'
-      # end
-
       # check if name is present
       if name.blank?
         self.valid = false
