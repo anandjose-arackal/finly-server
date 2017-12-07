@@ -81,16 +81,20 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     self.bank_payment_request = BankPaymentRequest.new(request_params)
     validate_custom_fields(processed_order_data)
     return if has_errors?
-    if payment.invoice.present? # && payment.valid?
-      calculate_tax_and_discounts(payment_params)
-    end
-    # assign the new attributes that were calculated using the respective libraries
-    payment.assign_attributes(payment_params)
+    # bank_payment_request.payment_order.payments.each do |payment|
+    #   payment_params =
+    #   if payment.invoice.present? # && payment.valid?
+    #     calculate_tax_and_discounts(payment_params)
+    #   end
+    # end
+    # # assign the new attributes that were calculated using the respective libraries
+    # payment.assign_attributes(payment_params)
     unless bank_payment_request.save
       add_message :error, bank_payment_request.errors.full_messages
     end
-    self.bank_payment_request.payment_order.payments.each do |payment|
-      calculate_tax_and_discounts(payment)
+    self.bank_payment_request.payment_order.payments.each_with_index do |payment, index|
+      payment_params = request_params[:payment_order_attributes][:payments_attributes][index]
+      calculate_tax_and_discounts(payment_params, payment)
     end
   end
 
@@ -284,13 +288,15 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     end
   end
 
-  def calculate_tax_and_discounts(payment)
+  def calculate_tax_and_discounts(payment_params, payment)
     if self.payment.invoice.invoice_items.present?
       # if there are no invoice items, use the invoice library to calculate the amounts
-      self.payment_params = InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)&.permit!
+      payment_params = InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)&.permit!
+      payment.update(payment_params)
     else
       # if there are, in fact, invoice items, use the invoice items library
-      self.payment_params = InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)&.permit!
+      payment_params = InvoiceCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)&.permit!
+      payment.update(payment_params)
     end
 
     # self.payment = payment
