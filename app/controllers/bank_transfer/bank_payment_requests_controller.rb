@@ -68,6 +68,10 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def mark_as_credited
+
+  end
+
   def count
     @result = BankTransfer::PaymentRequest::Count.(current_user, params)
     render json: @result.as_json
