@@ -33,7 +33,7 @@ class UserRoleMapping < ActiveRecord::Base
   scope :only_admin_and_finance, -> {where(user_role_id: [UserRole.id_for(:admin), UserRole.id_for(:finance_manager)])}
   scope :vendor_payments, -> { where purpose_id: Purpose.id_for(:vendor_payments)}
   scope :expense_management, -> { where purpose_id: Purpose.id_for(:expense_management)}
-  scope :invoicing, -> { where purpose_id: Purpose.id_for(:invoicing)}
+  scope :invoicing, -> { where purpose_id: Purpose.id_for(:invoice)}
   scope :with_purpose, -> (purpose_id) { where purpose_id: purpose_id}
 
   before_destroy do

@@ -13,9 +13,9 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
 
   def init
 
-    self.em_role_params = params[:roles_em]
-    self.vp_role_params = params[:roles_vp]
-    self.fc_role_params = params[:roles_fc]
+    self.em_role_params = params[:roles_em] || {}
+    self.vp_role_params = params[:roles_vp] || {}
+    self.fc_role_params = params[:roles_fc] || {}
 
     id = (params[:id] or params[:user_id])
     self.being_updated_user = User.with_id(id).first rescue nil
@@ -73,7 +73,7 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
 
 
     ###### setting up the invoicing roles #########################
-    self.fc_purpose_id = Purpose.id_for(:invoicing)
+    self.fc_purpose_id = Purpose.id_for(:invoice)
 
     existing_role_ids = being_updated_user.role_mapping.invoicing.map(&:user_role_id)
     new_role_ids = fc_role_params[:user_role_id]
@@ -91,7 +91,6 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
     self.roles_to_add_fc = new_role_ids - existing_role_ids
     self.roles_to_remove_fc = existing_role_ids - new_role_ids
     ################################################################
-
   end
 
   def process
@@ -100,8 +99,10 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
     if roles_to_add_em.present? or roles_to_remove_em.present?
       create = []
       roles_to_add_em.each do |role_id|
-        create << {user_id: being_updated_user.id, user_role_id: role_id,
-                   purpose_id: em_purpose_id}
+        unless role_id.blank?
+          create << {user_id: being_updated_user.id, user_role_id: role_id,
+                     purpose_id: em_purpose_id}
+        end
       end
       UserRoleMapping.create(create) if create.present?
       being_updated_user.role_mapping.expense_management.role(roles_to_remove_em).destroy_all if roles_to_remove_em.present?
@@ -112,8 +113,10 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
     if roles_to_add_vp.present? or roles_to_remove_vp.present?
       create = []
       roles_to_add_vp.each do |role_id|
-        create << {user_id: being_updated_user.id, user_role_id: role_id,
-                   purpose_id: vp_purpose_id}
+        unless role_id.blank?
+          create << {user_id: being_updated_user.id, user_role_id: role_id,
+                    purpose_id: vp_purpose_id}
+        end
       end
       UserRoleMapping.create(create) if create.present?
       being_updated_user.role_mapping.vendor_payments.role(roles_to_remove_vp).destroy_all if roles_to_remove_vp.present?
@@ -124,11 +127,14 @@ class Admin::Users::Role::SetRole < Admin::Users::Base
     if roles_to_add_fc.present? or roles_to_remove_fc.present?
       create = []
       roles_to_add_fc.each do |role_id|
-        create << {user_id: being_updated_user.id, user_role_id: role_id,
-                   purpose_id: fc_purpose_id}
+        unless role_id.blank?
+          create << {user_id: being_updated_user.id, user_role_id: role_id,
+                     purpose_id: fc_purpose_id}
+        end
       end
-      UserRoleMapping.create(create) if create.present?
-      being_updated_user.role_mapping.invoicing.role(roles_to_remove_fc).destroy_all if roles_to_remove_fc.present?
+      # todo - waiting for frontend to add these options in the admin panel
+      # UserRoleMapping.create(create) if create.present?
+      # being_updated_user.role_mapping.invoicing.role(roles_to_remove_fc).destroy_all if roles_to_remove_fc.present?
     end
     #####################################################################
 
