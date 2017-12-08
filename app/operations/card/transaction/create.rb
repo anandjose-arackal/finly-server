@@ -164,7 +164,12 @@ class Card::Transaction::Create < BaseOperation
               end
             end
           else
-            # In this case it's a manual debit, so do nothing
+            # In this case it's a manual debit not belonging to either a manual debit ot credit triggered on Finly, so create a card transaction and a finly transaction
+            self.transaction = CardTransaction.new(params)
+            unless transaction.save
+              add_message :error, transaction.errors.full_messages
+              return false
+            end
         end
       when 'CREDIT'
         self.transaction = CardTransaction.new(params)
