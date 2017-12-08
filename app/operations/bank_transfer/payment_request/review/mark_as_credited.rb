@@ -1,5 +1,7 @@
 class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::PaymentRequest::Review::Base
 
+  attr_accessor :view_role
+
   def pre_validate
     super
     if params[:password].blank?
