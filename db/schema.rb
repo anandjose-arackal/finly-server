@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171204125209) do
+ActiveRecord::Schema.define(version: 20171207154801) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1818,29 +1818,6 @@ ActiveRecord::Schema.define(version: 20171204125209) do
 
   add_index "invoice_attachments", ["invoice_id"], name: "index_invoice_attachments_on_invoice_id", using: :btree
 
-  create_table "invoice_line_items", force: :cascade do |t|
-    t.integer  "invoice_id",         limit: 4
-    t.string   "name",               limit: 255
-    t.integer  "quantity",           limit: 4
-    t.decimal  "rate",                           precision: 10
-    t.decimal  "tax",                            precision: 10
-    t.decimal  "discount",                       precision: 10
-    t.integer  "category_id",        limit: 4
-    t.integer  "tax_type_id",        limit: 4
-    t.integer  "tax_amount_id",      limit: 4
-    t.integer  "discount_amount_id", limit: 4
-    t.integer  "amount_id",          limit: 4
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
-    t.integer  "net_amount_id",      limit: 4
-  end
-
-  add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
-  add_index "invoice_line_items", ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id", using: :btree
-  add_index "invoice_line_items", ["invoice_id"], name: "index_invoice_line_items_on_invoice_id", using: :btree
-  add_index "invoice_line_items", ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id", using: :btree
-  add_index "invoice_line_items", ["tax_type_id"], name: "index_invoice_line_items_on_tax_type_id", using: :btree
-
   create_table "invoices", force: :cascade do |t|
     t.integer  "address_id",         limit: 4
     t.date     "date"
@@ -2326,6 +2303,16 @@ ActiveRecord::Schema.define(version: 20171204125209) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "payment_file_configurations", force: :cascade do |t|
+    t.string   "file_format", limit: 255
+    t.integer  "company_id",  limit: 4,     null: false
+    t.text     "options",     limit: 65535
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "payment_file_configurations", ["company_id"], name: "index_payment_file_configurations_on_company_id", using: :btree
+
   create_table "payment_modes", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -2482,7 +2469,6 @@ ActiveRecord::Schema.define(version: 20171204125209) do
     t.string   "application",             limit: 255
     t.string   "payment_mode",            limit: 255
     t.string   "reference_id",            limit: 255,   null: false
-    t.integer  "invoice_id",              limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -3603,8 +3589,6 @@ ActiveRecord::Schema.define(version: 20171204125209) do
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
   add_foreign_key "invoice_attachments", "invoices"
-  add_foreign_key "invoice_line_items", "categories"
-  add_foreign_key "invoice_line_items", "invoices"
   add_foreign_key "invoices", "addresses"
   add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
@@ -3640,6 +3624,7 @@ ActiveRecord::Schema.define(version: 20171204125209) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "payment_file_configurations", "companies"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
   add_foreign_key "payment_receivables", "amounts"

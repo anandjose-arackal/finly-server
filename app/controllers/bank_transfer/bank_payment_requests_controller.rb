@@ -64,12 +64,12 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def credit
-    @result = BankTransfer::PaymentRequest::Review::MarkAsCredited.(current_user, params)
+    @result = BankTransfer::PaymentRequest::Review::Credit.(current_user, params)
     respond
   end
 
   def mark_as_credited
-    @result = BankTransfer::PaymentRequest::Review::Credit.(current_user, params)
+    @result = BankTransfer::PaymentRequest::Review::MarkAsCredited.(current_user, params)
     respond
   end
 
@@ -102,7 +102,6 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     @result = BankTransfer::PaymentRequest::Update::UpdatePayment.(current_user, params)
     respond
   end
-
 
 
   private
