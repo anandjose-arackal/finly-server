@@ -167,6 +167,15 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                   type: 7
               }
           }
+          # based on whether the configuration for payment file is enabled or not, add this block
+          actions[:credit_options][:mark_as_credited] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_mark_as_credited_path(bank_payment_request),
+              enabled: true,
+              messages: "You can mark this payment order as credited",
+              require_password: true,
+              method: "patch"
+          }
+          #######################################################################################
         elsif bank_payment_request.credited?
           # further check if the payment order has anu failed payments
           if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?
