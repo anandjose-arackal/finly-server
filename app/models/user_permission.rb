@@ -14,4 +14,8 @@ class UserPermission < ActiveRecord::Base
   belongs_to :user
   belongs_to :company
 
+  def create_beneficiaries
+    super || self.user.vendor_payments_admin?
+  end
+
 end
