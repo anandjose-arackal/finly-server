@@ -928,6 +928,7 @@
 #                                                         PATCH  /payments/companies/:id(.:format)                                                          companies#update
 #                                                         PUT    /payments/companies/:id(.:format)                                                          companies#update
 #                                                         DELETE /payments/companies/:id(.:format)                                                          companies#destroy
+#                                     export_payment_file GET    /export/:id/payment_file(.:format)                                                         export#statement
 #                      bank_transfer_payment_orders_count GET    /bank_transfer/payment_orders/count(.:format)                                              bank_transfer/payment_orders#count
 #                    bank_transfer_payment_orders_balance GET    /bank_transfer/payment_orders/balance(.:format)                                            bank_transfer/payment_orders#balance
 #                            bank_transfer_payment_orders GET    /bank_transfer/payment_orders(.:format)                                                    bank_transfer/payment_orders#index
@@ -2338,6 +2339,8 @@ Rails.application.routes.draw do
       post 'add_balance', to: 'companies#add_balance', as: :add_balance_payments
     end
   end
+
+  get 'export/:id/payment_file(.:format)', to: 'export#statement', as: :export_payment_file
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
     get 'payment_orders/balance', to: 'payment_orders#balance'

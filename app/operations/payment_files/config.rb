@@ -10,7 +10,8 @@ class PaymentFiles::Config
 
   def self.available_adapters
     [
-        {name: 'Yes Bank', key: :yes_bank, operation: PaymentFiles::Formats::YesBank::Process, validator: PaymentFiles::Formats::YesBank::ValidateConfig}
+        {name: 'Yes Bank', key: :yes_bank, operation: PaymentFiles::Formats::YesBank::Process, validator: PaymentFiles::Formats::YesBank::ValidateConfig},
+        {name: 'ICICI Bank', key: :icici_bank, operation: PaymentFiles::Formats::IciciBank::Process, validator: PaymentFiles::Formats::IciciBank::ValidateConfig}
     ]
   end
 

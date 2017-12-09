@@ -36,6 +36,7 @@ class Company < ActiveRecord::Base
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
+  has_one  :payment_file_configuration
 
   has_many :payment_orders
   has_many :user_groups
