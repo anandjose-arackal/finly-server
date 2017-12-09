@@ -103,6 +103,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def payment_file
+    @result = BankTransfer::PaymentRequest::GeneratePaymentFile.(current_user, params)
+    respond
+  end
+
 
   private
 

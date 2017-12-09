@@ -83,6 +83,10 @@ class ExportController < ApplicationController
     end
   end
 
+  def payment_file
+
+  end
+
   def index_template
     @result = Personalizer::ExportTemplates.(current_user)
     respond

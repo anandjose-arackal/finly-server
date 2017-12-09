@@ -1,5 +1,7 @@
 class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFormat
 
+  attr_accessor :payment_requests, :debit_account_number
+
   def pre_validate
     super
     return if has_errors?
@@ -7,11 +9,11 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
 
   def init
     super
-
+    self.payment_requests = params[:bank_payment_requests]
+    self.debit_account_number = self.options[:debit_account_number]
   end
 
   def validate
-    super
     result = PaymentFiles::Formats::YesBank::ValidateConfig.(user, {options: self.options, config: self.config})
     unless result.success?
       add_message :error, result.messages[:error]
@@ -22,6 +24,37 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
   def process
     headers = retrieve_icici_headers
     content = []
+    self.payment_requests.each do |request|
+      order = request.payment_order
+      order.payments.each do |payment|
+        content << [
+            self.debit_account_number,
+            payment.receiving_account.account_number,
+            payment.receiving_user&.name,
+            payment.amount_value,
+            "N", # todo - change this based on the payment mode - have to find out what the characters are for other payment modes
+            payment.invoice&.date&.strftime("%d-%^b-%Y"),
+            payment.receiving_account.ifsc,
+            "",
+            "",
+            payment.receiving_user.mobile_number,
+            payment.receiving_user.email,
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            "",
+            payment.note
+        ]
+      end
+    end
+    debugger
+    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: contents, template: "#{Rails.root}/app/operations/payment_files/formats/icici_bank/template.xls.erb"}}, messages)
   end
 
   def retrieve_icici_headers
