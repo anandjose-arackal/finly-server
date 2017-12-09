@@ -2352,7 +2352,7 @@ Rails.application.routes.draw do
     post 'payment_requests/account_details', to: 'bank_payment_requests#account_details'
     post 'payment_requests/process_account_ids', to: 'bank_payment_requests#process_account_ids'
     patch 'payment_requests/update_details', to: 'bank_payment_requests#update_details'
-    post 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file
+    get 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file
     resources :bank_payment_requests do
       post 'comment', to: 'bank_payment_requests#comment', as: :comment
       patch 'review', to: 'bank_payment_requests#review', as: :review
