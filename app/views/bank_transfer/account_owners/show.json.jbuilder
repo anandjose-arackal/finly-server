@@ -1,5 +1,5 @@
 json.account_owner do
-  json.extract! @result.account_owner, :id, :name, :email, :mobile_number
+  json.extract! @result.account_owner, :id, :name, :email, :mobile_number, :pan, :tin, :gst
   if @result.account_owner.is_a?(YesBankVendor)
     json.authorized @result.account_owner.authorized
     json.description @result.account_owner.description

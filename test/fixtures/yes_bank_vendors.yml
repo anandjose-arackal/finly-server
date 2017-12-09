@@ -12,6 +12,9 @@
 #  authorized    :boolean
 #  description   :string(255)
 #  is_deleted    :boolean          default(FALSE)
+#  pan           :string(255)
+#  tin           :string(255)
+#  gst           :string(255)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
