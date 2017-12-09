@@ -72,6 +72,8 @@ class BankPaymentRequestComment < ActiveRecord::Base
         comment_content += " removed a beneficiary - Name: #{self.beneficiary&.name}, Account Number: #{self.beneficiary&.account_number}"
       when BankPaymentRequestCommentAction.id_for(:payment_edit)
         comment_content += " updated #{self.edited_field} from #{self.previous_value} to #{self.new_value}, at beneficiary: #{self.beneficiary.name}"
+      when BankPaymentRequestCommentAction.id_for(:mark_as_credited)
+        comment_content += " marked the payment order as credited"
       else
         return nil
     end
