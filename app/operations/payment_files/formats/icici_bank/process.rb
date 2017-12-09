@@ -3,7 +3,6 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
   attr_accessor :payment_requests, :debit_account_number
 
   def pre_validate
-    super
     return if has_errors?
   end
 
@@ -14,7 +13,7 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
   end
 
   def validate
-    result = PaymentFiles::Formats::YesBank::ValidateConfig.(user, {options: self.options, config: self.config})
+    result = PaymentFiles::Formats::IciciBank::ValidateConfig.(user, {options: self.options, config: self.config})
     unless result.success?
       add_message :error, result.messages[:error]
       return
@@ -24,37 +23,33 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
   def process
     headers = retrieve_icici_headers
     content = []
-    self.payment_requests.each do |request|
-      order = request.payment_order
-      order.payments.each do |payment|
-        content << [
-            self.debit_account_number,
-            payment.receiving_account.account_number,
-            payment.receiving_user&.name,
-            payment.amount_value,
-            "N", # todo - change this based on the payment mode - have to find out what the characters are for other payment modes
-            payment.invoice&.date&.strftime("%d-%^b-%Y"),
-            payment.receiving_account.ifsc,
-            "",
-            "",
-            payment.receiving_user.mobile_number,
-            payment.receiving_user.email,
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            payment.note
-        ]
-      end
+    self.payment_file_data.each do |payment|
+      content << [
+          self.debit_account_number,
+          payment[:beneficiary_account_number],
+          payment[:receiving_user_name],
+          payment[:amount],
+          "N", # todo - change this based on the payment mode - have to find out what the characters are for other payment modes
+          payment[:date], # payment.invoice&.date&.strftime("%d-%^b-%Y"),
+          payment[:ifsc],
+          "",
+          "",
+          payment[:receiving_mobile_number],
+          payment[:email],
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          "",
+          payment[:note]
+      ]
     end
-    debugger
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: contents, template: "#{Rails.root}/app/operations/payment_files/formats/icici_bank/template.xls.erb"}}, messages)
+    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content, template: "#{Rails.root}/app/operations/payment_files/formats/icici_bank/template.xls.erb"}}, messages)
   end
 
   def retrieve_icici_headers

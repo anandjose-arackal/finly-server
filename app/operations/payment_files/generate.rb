@@ -30,7 +30,7 @@ class PaymentFiles::Generate < BaseOperation
   protected
 
   def load_adapter
-    file_format = current_company.payment_file_configuration&.format
+    file_format = current_company.payment_file_configuration&.file_format
     unless file_format.present?
       add_message :error, 'Payment File has not been configured for your company'
       return
