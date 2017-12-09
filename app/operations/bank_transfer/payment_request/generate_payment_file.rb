@@ -2,6 +2,14 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
 
   attr_accessor :bank_payment_requests, :payment_file_data
 
+  def pre_validate
+    super
+    if params[:bank_payment_request_ids].blank?
+      add_message :error, "Payment order ids not passed"
+      return
+    end
+  end
+
   def init
     # the input here will be either a comma separated set of values or
     ids = params[:bank_payment_request_ids]
