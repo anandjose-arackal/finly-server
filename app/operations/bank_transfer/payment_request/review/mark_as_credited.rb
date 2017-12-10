@@ -29,6 +29,12 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
       add_message :error, "Payment orders not found"
       return
     end
+    bank_payment_requests.each do |payment_request|
+      if payment_request.credited?
+        add_message :error, "Payment order with name: #{payment_request.name} is already credited"
+        return
+      end
+    end
   end
 
   def process
