@@ -2355,13 +2355,14 @@ Rails.application.routes.draw do
     patch 'payment_requests/update_details', to: 'bank_payment_requests#update_details'
     get 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file
     post 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file_post
-    patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited
+    patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited_bulk
     resources :bank_payment_requests do
       post 'comment', to: 'bank_payment_requests#comment', as: :comment
       patch 'review', to: 'bank_payment_requests#review', as: :review
       patch 'credit', to: 'bank_payment_requests#credit', as: :credit
       patch 'add_beneficiary', to: 'bank_payment_requests#add_beneficiary', as: :add_beneficiary
       patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficiary
+      patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited
       patch 'retry', to: 'bank_payment_requests#retry', as: :retry
       get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
       patch 'update_payment', to: 'bank_payment_requests#update_payment'
