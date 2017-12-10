@@ -49,7 +49,7 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
           payment[:note]
       ]
     end
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content, template: "#{Rails.root}/app/operations/payment_files/formats/icici_bank/template.xls.erb"}}, messages)
+    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
   end
 
   def retrieve_icici_headers
