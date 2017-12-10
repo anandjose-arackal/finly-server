@@ -20,6 +20,12 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
     # self.bank_payment_requests = BankPaymentRequest.where(id: ids)
   end
 
+  def validate
+    unless current_company.payment_file_configuration.present?
+      add_message :error, "Payment file has not been configured for your company yet"
+    end
+  end
+
   def process
     data = []
     bank_payment_requests.each do |request|

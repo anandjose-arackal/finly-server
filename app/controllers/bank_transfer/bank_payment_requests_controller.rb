@@ -108,7 +108,6 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
-
   private
 
   def update_handler(type)
