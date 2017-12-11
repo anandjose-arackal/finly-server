@@ -10,8 +10,8 @@ class Receipt::ReceiptEmails::Extractor::Adapter::ClearTrip < Receipt::ReceiptEm
 
   def amount_data_points
     [
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('h1:contains("Amount paid"))'),
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('h1:contains("Amount"))')
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('h1:contains("Amount paid")'),
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('h1:contains("Amount")')
     ]
   end
 
