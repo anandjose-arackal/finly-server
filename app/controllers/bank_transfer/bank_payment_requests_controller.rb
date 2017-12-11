@@ -68,6 +68,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def mark_as_credited
+    @result = BankTransfer::PaymentRequest::Review::MarkAsCredited.(current_user, params)
+    respond
+  end
+
   def count
     @result = BankTransfer::PaymentRequest::Count.(current_user, params)
     render json: @result.as_json
@@ -95,6 +100,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def update_payment
     @result = BankTransfer::PaymentRequest::Update::UpdatePayment.(current_user, params)
+    respond
+  end
+
+  def payment_file
+    @result = BankTransfer::PaymentRequest::GeneratePaymentFile.(current_user, params)
     respond
   end
 

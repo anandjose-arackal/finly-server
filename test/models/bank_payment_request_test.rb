@@ -20,6 +20,7 @@
 #  is_deleted                   :boolean
 #  beneficiary_type_id          :integer
 #  policy_id                    :integer
+#  payment_file_downloaded      :boolean          default(FALSE)
 #
 
 require 'test_helper'
