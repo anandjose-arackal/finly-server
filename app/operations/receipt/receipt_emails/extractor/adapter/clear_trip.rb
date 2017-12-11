@@ -1,4 +1,4 @@
-class Receipt::ReceiptEmails::Extractor::Adapter::GoIbibo < Receipt::ReceiptEmails::Extractor::Adapter::Base
+class Receipt::ReceiptEmails::Extractor::Adapter::ClearTrip < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
     ['no-reply@cleartrip.com']
