@@ -1,7 +1,7 @@
 class Receipt::ReceiptEmails::Extractor::Adapter::Paytm < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
-    ['alerts@paytm.com', 'no-reply@paytm.com']
+    ['alerts@paytm.com', 'no-reply@paytm.com', 'no-reply@paytm.com']
   end
 
   def merchant
@@ -10,9 +10,10 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Paytm < Receipt::ReceiptEmails
 
   def amount_data_points
     [
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('div div div div:contains("You have made a payment of', css_selector_regex: Receipt::ReceiptEmails::Extractor::Adapter::Base::REGEX_AMOUNT_WITH_RS, strip: ['Rs.', 'Rs']),
+        # Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('div div div div:contains("You have made a payment of', css_selector_regex: Receipt::ReceiptEmails::Extractor::Adapter::Base::REGEX_AMOUNT_WITH_RS, strip: ['Rs.', 'Rs']),
         Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('table tr:contains("Amount paid")'),
-        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr:contains("Total")', position: :last)
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('tr:contains("Total")', position: :last),
+        Receipt::ReceiptEmails::Extractor::Adapter::DataPoint.css_selector_mode('div:contains("Price")', position: :last)
     ]
   end
 
