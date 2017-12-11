@@ -945,12 +945,13 @@
 #           bank_transfer_payment_requests_update_details PATCH  /bank_transfer/payment_requests/update_details(.:format)                                   bank_transfer/bank_payment_requests#update_details
 #                       bank_transfer_export_payment_file GET    /bank_transfer/export/payment_file(.:format)                                               bank_transfer/bank_payment_requests#payment_file
 #                  bank_transfer_export_payment_file_post POST   /bank_transfer/export/payment_file(.:format)                                               bank_transfer/bank_payment_requests#payment_file
-#                          bank_transfer_mark_as_credited PATCH  /bank_transfer/mark_as_credited(.:format)                                                  bank_transfer/bank_payment_requests#mark_as_credited
+#                     bank_transfer_mark_as_credited_bulk PATCH  /bank_transfer/mark_as_credited(.:format)                                                  bank_transfer/bank_payment_requests#mark_as_credited
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format)            bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)             bank_transfer/bank_payment_requests#review
 #               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)             bank_transfer/bank_payment_requests#credit
 #      bank_transfer_bank_payment_request_add_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/add_beneficiary(.:format)    bank_transfer/bank_payment_requests#add_beneficiary
 #   bank_transfer_bank_payment_request_remove_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_beneficiary(.:format) bank_transfer/bank_payment_requests#remove_beneficiary
+#     bank_transfer_bank_payment_request_mark_as_credited PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/mark_as_credited(.:format)   bank_transfer/bank_payment_requests#mark_as_credited
 #                bank_transfer_bank_payment_request_retry PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/retry(.:format)              bank_transfer/bank_payment_requests#retry
 #     bank_transfer_bank_payment_request_within_timeframe GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/within_timeframe(.:format)   bank_transfer/bank_payment_requests#within_timeframe
 #       bank_transfer_bank_payment_request_update_payment PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/update_payment(.:format)     bank_transfer/bank_payment_requests#update_payment

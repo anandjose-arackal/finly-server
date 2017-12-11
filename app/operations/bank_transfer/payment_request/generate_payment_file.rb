@@ -45,4 +45,13 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
     self.response = PaymentFiles::Generate.(user, {payment_file: data})
   end
 
+  def post_process
+    # marking these payment requests as payment file downloaded
+    self.bank_payment_requests.each do |payment_request|
+      payment_request.update(payment_file_downloaded: true)
+    end
+
+    add_message :error, "Payment file successfully downloaded"
+  end
+
 end
