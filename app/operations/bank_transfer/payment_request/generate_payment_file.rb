@@ -37,7 +37,8 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
             date: payment.invoice&.date&.strftime("%d-%^b-%Y") || payment.date,
             ifsc: payment.receiving_account.ifsc,
             email: payment.receiving_user.email,
-            note: payment.note
+            note: payment.note,
+            payment_mode: payment.payment_mode
         }
       end
     end

@@ -29,7 +29,7 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
           payment[:beneficiary_account_number],
           payment[:receiving_user_name],
           payment[:amount],
-          "N", # todo - change this based on the payment mode - have to find out what the characters are for other payment modes
+          retrieve_payment_mode(payment), # todo - change this based on the payment mode - have to find out what the characters are for other payment modes
           payment[:date], # payment.invoice&.date&.strftime("%d-%^b-%Y"),
           payment[:ifsc],
           "",
@@ -54,5 +54,19 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
 
   def retrieve_icici_headers
     ["Debit Ac No", "Beneficiary Ac No", "Beneficiary Name", "Amt", "Pay Mod", "Date", "IFSC", "Payable Location", "Print Location", "Bene Mobile No.", "Bene Email ID", "Bene add1", "Bene add2", "Bene add3", "Bene add4", "Add Details 1", "Add Details 2", "Add Details 3", "Add Details 4", "Add Details 5", "Remarks"]
+  end
+
+  def retrieve_payment_mode(payment)
+    case payment[:payment_mode].upcase
+      when "NEFT"
+        return "N"
+      when "IMPS"
+        return "I"
+      when "RTGS"
+        return "R"
+      else
+        # default to "N"
+        return "N"
+    end
   end
 end
