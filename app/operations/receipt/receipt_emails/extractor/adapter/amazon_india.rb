@@ -1,7 +1,7 @@
 class Receipt::ReceiptEmails::Extractor::Adapter::AmazonIndia < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
-    ['auto-confirm@amazon.in', 'ship-confirm@amazon.in']
+    ['auto-confirm@amazon.in', 'ship-confirm@amazon.in', 'shipment-tracking@amazon.in']
   end
 
   def merchant
