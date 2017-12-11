@@ -12,6 +12,7 @@ class Receipt::ReceiptEmails::Extractor::Adapter::Loader
       Receipt::ReceiptEmails::Extractor::Adapter::GoAir,
       Receipt::ReceiptEmails::Extractor::Adapter::IndiGo,
       Receipt::ReceiptEmails::Extractor::Adapter::OyoRooms,
+      Receipt::ReceiptEmails::Extractor::Adapter::ClearTrip,
 
       # Shopping
       Receipt::ReceiptEmails::Extractor::Adapter::Flipkart,
