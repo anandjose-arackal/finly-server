@@ -34,7 +34,7 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
             beneficiary_account_number: payment.receiving_account.account_number,
             receiving_user_name: payment.receiving_user.name,
             amount: payment.amount_value,
-            date: payment.invoice&.date&.strftime("%d-%^b-%Y") || payment.date,
+            date: Date.today.strftime("%d-%^b-%Y"),
             ifsc: payment.receiving_account.ifsc,
             email: payment.receiving_user.email,
             note: payment.note,
@@ -51,7 +51,7 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
       payment_request.update(payment_file_downloaded: true)
     end
 
-    add_message :error, "Payment file successfully downloaded"
+    add_message :success, "Payment file successfully downloaded"
   end
 
 end
