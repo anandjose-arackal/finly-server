@@ -90,6 +90,8 @@ class BankPaymentRequest < ActiveRecord::Base
     joins(:payment_order).where('payment_orders.processed_at >= ? AND processed_at <= ?', date_from, date_to)
   }
 
+  scope :includes_details, -> { includes(:status, :user, :requested_amount)}
+
   attr_accessor :cache_users
 
   before_save do
