@@ -159,7 +159,7 @@ class User < ActiveRecord::Base
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
-  has_one :user_permission
+  has_one :user_permission, dependent: :destroy
 
   # has_one :feature_access, as: :accessible
 
