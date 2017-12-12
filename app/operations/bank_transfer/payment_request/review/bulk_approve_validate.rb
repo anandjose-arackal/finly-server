@@ -1,3 +1,6 @@
+# this operation will take a bunch of ids and mention whether the respective payment orders can be approved
+# it essentially checks for the state of the payment orders and return true or false
+
 class BankTransfer::PaymentRequest::Review::BulkApproveValidate < BankTransfer::PaymentRequest::Review::Base
 
   class BankTransfer::PaymentRequest::Review::BulkApprove::ApprovePresenter < BaseOperation::BasePresenter::SuccessPresenter
