@@ -1,4 +1,4 @@
-class BankTransfer::PaymentRequest::Review::MarkAllPending < BankTransfer::PaymentRequest::Review::Base
+class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::PaymentRequest::Review::Base
 
   attr_accessor :bank_payment_requests, :processing_status_id,
                 :errors_found, :validate_result
@@ -8,9 +8,9 @@ class BankTransfer::PaymentRequest::Review::MarkAllPending < BankTransfer::Payme
   end
 
   def init
-    ids = params[:ids] || params[:bank_payment_request_ids]
-    self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(ids) rescue nil
-    self.bank_payment_requests = self.bank_payment_request.includes_details
+    self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests rescue nil
+    # now extract all payment requests for which this particular user is the controlling user
+    self.bank_payment_requests = self.bank_payment_request.with_controlling_uer(user.id).includes_details
     self.processing_status_id = BankPaymentRequestStatus.id_for(:processing)
   end
 

@@ -9,10 +9,7 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
   def init
     ids = params[:ids] || params[:bank_payment_request_ids]
     self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(ids) rescue nil
-    self.bank_payment_requests = self.bank_payment_request.includes_details
-    self.processing_status_id = BankPaymentRequestStatus.id_for(:processing)
-    self.errors_found = false
-    self.validate_result = {}
+    self.bank_payment_requests = self.bank_payment_requests.includes_details
   end
 
   def validate
@@ -25,8 +22,8 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
     # update the status of all payment orders as pending
     self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
     ids = self.bank_payment_requests.pluck(:id)
-    # BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user: user)
-    BankTransfer::PaymentRequest::Review::ApproveBackground.call(ids, initiating_user: user)
+    BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user_id: user.id)
+    # op = BankTransfer::PaymentRequest::Review::ApproveBackground.call(ids, initiating_user: user)
   end
 
 

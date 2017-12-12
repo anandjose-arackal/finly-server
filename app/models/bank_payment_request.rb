@@ -90,7 +90,7 @@ class BankPaymentRequest < ActiveRecord::Base
     joins(:payment_order).where('payment_orders.processed_at >= ? AND processed_at <= ?', date_from, date_to)
   }
 
-  scope :includes_details, -> { includes(:status, :user, :requested_amount)}
+  scope :includes_details, -> { includes(:status, :owner, :requested_amount)}
 
   attr_accessor :cache_users
 
@@ -124,6 +124,10 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def credit_pending?
     approved? && !credited?
+  end
+
+  def pending?
+    self.status_id == BankPaymentRequestStatus.id_for(:pending)
   end
 
   def auto_approved?

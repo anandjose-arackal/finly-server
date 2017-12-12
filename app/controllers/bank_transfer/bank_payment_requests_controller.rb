@@ -109,17 +109,17 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def bulk_approve_validate
-    @result = BankTransfer::PaymentRequest::BulkApproveValidate.(current_user, params)
+    @result = BankTransfer::PaymentRequest::Review::BulkApproveValidate.(current_user, params)
     respond
   end
 
   def bulk_approve
-    @result = BankTransfer::PaymentRequest::BulkApprove.(current_user, params)
+    @result = BankTransfer::PaymentRequest::Review::BulkApprove.(current_user, params)
     respond
   end
 
   def mark_all_pending
-    @result = BankTransfer::PaymentRequest::MarkAllPending.(current_user, params)
+    @result = BankTransfer::PaymentRequest::Review::ApproveAllPending.(current_user, params)
     respond
   end
 

@@ -20,7 +20,7 @@ class BankTransfer::PaymentRequest::Review::BulkApproveValidate < BankTransfer::
   def init
     ids = params[:ids] || params[:bank_payment_request_ids]
     self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(ids) rescue nil
-    self.bank_payment_requests = self.bank_payment_request.includes_details
+    self.bank_payment_requests = self.bank_payment_requests.includes_details
     self.processing_status_id = BankPaymentRequestStatus.id_for(:processing)
     self.errors_found = false
     self.validate_result = []
@@ -44,11 +44,12 @@ class BankTransfer::PaymentRequest::Review::BulkApproveValidate < BankTransfer::
         self.errors_found = true
       end
       self.validate_result << {
-          user: payment_request.user,
+          user: payment_request.owner.name,
           name: payment_request.name,
           amount: payment_request.requested_amount&.value,
           errors: errors,
-          valid: (errors.empty? ? true : false)
+          valid: (errors.empty? ? true : false),
+          id: payment_request.id
       }
     end
   end

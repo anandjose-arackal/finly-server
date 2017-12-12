@@ -1,4 +1,4 @@
-class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperation
+class BankTransfer::PaymentRequest::Review:: ApproveBackground < BackgroundOperation
 
   attr_accessor :payment_requests, :options, :initiating_user
 
@@ -15,7 +15,7 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
-    self.payment_requests = BankPaymentRequest.unscoped.where(id: payment_request_ids)
+    self.payment_requests = BankPaymentRequest.where(id: payment_request_ids)
     self.options = options
     self.run
   end
@@ -36,7 +36,7 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
   end
 
   def init
-    self.initiating_user = User.find_by(id: options[:initiating_user])
+    self.initiating_user = User.find_by(id: options[:initiating_user_id])
   end
 
   def validate
@@ -50,9 +50,15 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
       unless payment_request.controlling_user_id == self.initiating_user.id
         valid = false
       end
+
       unless valid
         self.payment_requests.reject! { |pr| pr.id == payment_request.id }
       end
+    end
+
+    if self.initiating_user.blank?
+      add_message :error, "Initiating user has been returned as blank"
+      return
     end
   end
 
@@ -62,7 +68,7 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
       next_reviewer = presenter.user
       next_reviewer_role_id = presenter.role_id
       # this returns the role under which this particular user is viewing the payment request
-      current_user_role = User::Team::Review::UserRole.(user, payment_request)
+      current_user_role = User::Team::Review::UserRole.(initiating_user, payment_request)
       if next_reviewer.nil?
         payment_status = BankPaymentRequestStatus.id_for(:approved)
       else
@@ -71,13 +77,16 @@ class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperat
       if payment_request.update status_id: payment_status,
                                      controlling_user: next_reviewer,
                                      controlling_user_role_id: next_reviewer_role_id
-        payment_request.bank_payment_request_trails.create action_user: user,
+        payment_request.bank_payment_request_trails.create action_user: initiating_user,
                                                                 action_user_role_id: current_user_role,
                                                                 action_id: BankPaymentRequestTrailAction.id_for(:approve),
                                                                 modified_user_id: next_reviewer&.id,
                                                                 modified_user_role_id: next_reviewer_role_id
-        return true
       end
+
+      # generate comments for this particular action
+      payment_request.comments.create user_id: initiating_user.id,
+                                       action_id: BankPaymentRequestCommentAction.id_for(:approve)
     end
   end
 end

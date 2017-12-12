@@ -4,4 +4,5 @@ json.array!(@result.validate_result) do |result|
   json.errors result[:errors]
   json.valid result[:valid]
   json.name result[:name]
+  json.id result[:id]
 end
