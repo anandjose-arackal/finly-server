@@ -108,6 +108,21 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def bulk_approve_validate
+    @result = BankTransfer::PaymentRequest::Review::BulkApproveValidate.(current_user, params)
+    respond
+  end
+
+  def bulk_approve
+    @result = BankTransfer::PaymentRequest::Review::BulkApprove.(current_user, params)
+    respond
+  end
+
+  def mark_all_pending
+    @result = BankTransfer::PaymentRequest::Review::ApproveAllPending.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type)

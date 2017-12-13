@@ -53,6 +53,7 @@ class BankPaymentRequest < ActiveRecord::Base
   delegate :scheduled?, to: :payment_order
 
   scope :non_owner, -> (user_id) { where.not owner_id: user_id }
+  scope :with_controlling_user, -> (user_id) { where controlling_user_id: user_id }
   scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
   scope :with_user, -> (user_id) { where owner_id: user_id}
   scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
@@ -90,6 +91,8 @@ class BankPaymentRequest < ActiveRecord::Base
     joins(:payment_order).where('payment_orders.processed_at >= ? AND processed_at <= ?', date_from, date_to)
   }
 
+  scope :includes_details, -> { includes(:status, :owner, :requested_amount)}
+
   attr_accessor :cache_users
 
   before_save do
@@ -122,6 +125,10 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def credit_pending?
     approved? && !credited?
+  end
+
+  def pending?
+    self.status_id == BankPaymentRequestStatus.id_for(:pending)
   end
 
   def auto_approved?
