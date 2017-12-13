@@ -53,6 +53,7 @@ class BankPaymentRequest < ActiveRecord::Base
   delegate :scheduled?, to: :payment_order
 
   scope :non_owner, -> (user_id) { where.not owner_id: user_id }
+  scope :with_controlling_user, -> (user_id) { where controlling_user_id: user_id }
   scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
   scope :with_user, -> (user_id) { where owner_id: user_id}
   scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}

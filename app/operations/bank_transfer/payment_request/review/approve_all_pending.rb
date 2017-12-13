@@ -10,7 +10,7 @@ class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::Pa
   def init
     self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests rescue nil
     # now extract all payment requests for which this particular user is the controlling user
-    self.bank_payment_requests = self.bank_payment_request.with_controlling_uer(user.id).includes_details
+    self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id).includes_details
     self.processing_status_id = BankPaymentRequestStatus.id_for(:processing)
   end
 
@@ -25,7 +25,7 @@ class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::Pa
     self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
     ids = self.bank_payment_requests.pluck(:id)
     # BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user: user)
-    BankTransfer::PaymentRequest::Review::ApproveBackground.call(ids, initiating_user: user)
+    BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user_id: user.id)
   end
 
   def post_process
