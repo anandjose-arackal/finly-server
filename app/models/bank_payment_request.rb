@@ -96,7 +96,9 @@ class BankPaymentRequest < ActiveRecord::Base
   attr_accessor :cache_users
 
   before_save do
-    self.name = generate_name
+    if self.name.blank?
+      self.name = generate_name
+    end
   end
 
   def can_submit?
