@@ -98,6 +98,8 @@ class BankPaymentRequest < ActiveRecord::Base
     joins(:payment_order).where('payment_orders.processed_at >= ? AND processed_at <= ?', date_from, date_to)
   }
 
+  scope :processing, -> { where status_id: BankPaymentRequestStatus.id_for(:processing) }
+
   scope :includes_details, -> { includes(:status, :owner, :requested_amount)}
 
   attr_accessor :cache_users

@@ -4,7 +4,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadPending < BankTransfer:
     self.view_role = UserRole.id_for(params[:view].to_sym)
     op = BankTransfer::PaymentRequest::Index.(user, params)
     if op.success?
-      self.bank_payment_requests = op.payment_requests.with_controlling_user(user.id)
+      self.bank_payment_requests = op.payment_requests.processing.with_controlling_user(user.id)
     else
       add_message :error, op.messages[:error]
     end

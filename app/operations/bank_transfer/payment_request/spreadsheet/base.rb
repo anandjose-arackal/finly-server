@@ -1,6 +1,7 @@
 class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :view_role, :bank_payment_requests
+  attr_accessor :view_role, :bank_payment_requests,
+                :headers, :con
 
   def retrieve_headers
     ["Beneficiary Name",
@@ -30,16 +31,16 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
             payment.receiving_account.name,
             payment.receiving_account.account_number,
             payment.receiving_account.ifsc,
-            payment.payment_mode,
+            payment.payment_mode&.upcase,
             payment.initiating_user.name,
             payment.invoice&.invoice_number,
-            payment.invoice&.due_date.strftime("%d-%m-%Y"),
-            payment.invoice&.date.strftime("%d-%m-%Y"),
-            (payment.invoice&.invoice_amount&.value || 0),
+            payment.invoice&.due_date&.strftime("%d-%m-%Y"),
+            payment.invoice&.date&.strftime("%d-%m-%Y"),
+            (payment.invoice&.amount&.value || 0),
             (payment.invoice&.discount_amount&.value || 0),
             (payment.invoice&.tax_amount&.value || 0),
             (payment.invoice&.tds_amount&.value || 0),
-            (payment.invoice&.net_amount&.value || 0),
+            (payment.amount&.value || 0),
             (payment.reference_resource&.bank_reference_number),
             payment.note
         ]

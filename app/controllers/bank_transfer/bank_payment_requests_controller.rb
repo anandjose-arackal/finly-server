@@ -129,7 +129,7 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def download_selected
-    BankTransfer::PaymentRequest::Spreadsheet::DownloadSelected.(current_user, params)
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadSelected.(current_user, params)
     respond
   end
 
