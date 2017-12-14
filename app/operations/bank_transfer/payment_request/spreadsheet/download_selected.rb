@@ -1,6 +1,5 @@
 class BankTransfer::PaymentRequest::Spreadsheet::DownloadSelected < BankTransfer::PaymentRequest::Spreadsheet::Base
 
-
   def init
     ids = params[:bank_payment_request_ids]
     op = BankTransfer::PaymentRequest::Index.(user, params)
