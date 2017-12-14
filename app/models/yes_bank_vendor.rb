@@ -30,4 +30,11 @@ class YesBankVendor < ActiveRecord::Base
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> { where is_deleted: [false, nil]}
   scope :authorized, -> { where authorized: true}
+
+  scope :filter_search, -> (term) {
+    vendor_ids = where("name like ? OR email like ? OR mobile_number like ? OR description like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    bank_account_ids = BankAccount.where("account_number like ? OR ifsc like ? OR name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
+    where(id: vendor_ids)
+  }
 end

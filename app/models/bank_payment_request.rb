@@ -78,6 +78,13 @@ class BankPaymentRequest < ActiveRecord::Base
         joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
       when 9, '9' # i.e. pending
         joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
+      when '10', 10 # i.e awaiting approval from current user
+        case UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym)
+          when UserRole.id_for(:admin)
+            where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing))
+          else
+            where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing), controlling_user_role_id: UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym))
+        end
       else
         # do nothing?
     end

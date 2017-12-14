@@ -123,6 +123,16 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def download_pending
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadPending.(current_user, params)
+    respond
+  end
+
+  def download_selected
+    BankTransfer::PaymentRequest::Spreadsheet::DownloadSelected.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type)
