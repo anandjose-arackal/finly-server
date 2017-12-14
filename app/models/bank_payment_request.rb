@@ -46,7 +46,7 @@ class BankPaymentRequest < ActiveRecord::Base
   # i.e. a payment request cannot exist without a payment order
   validates :payment_order, presence: true
 
-  default_scope { order(updated_at: :desc)}
+  default_scope { order(created_at: :desc) }
 
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
   delegate :requested_amount_value, to: :requested_amount
@@ -55,9 +55,10 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :non_owner, -> (user_id) { where.not owner_id: user_id }
   scope :with_controlling_user, -> (user_id) { where controlling_user_id: user_id }
   scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
-  scope :with_user, -> (user_id) { where owner_id: user_id}
-  scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
+  scope :with_user, -> (user_id) { where owner_id: user_id }
+  scope :not_open, -> { where.not status_id: BankPaymentRequestStatus.id_for(:open) }
   scope :with_id, -> (id) { where id: id }
+  scope :approved, -> { where status_id: BankPaymentRequestStatus.id_for(:approved) }
   scope :filter_status_id, -> (status_id) {
     case status_id
       when 1, '1' # i.e. open
@@ -91,7 +92,7 @@ class BankPaymentRequest < ActiveRecord::Base
     joins(:payment_order).where('payment_orders.processed_at >= ? AND processed_at <= ?', date_from, date_to)
   }
 
-  scope :includes_details, -> { includes(:status, :owner, :requested_amount)}
+  scope :includes_details, -> { includes(:status, :owner, :requested_amount) }
 
   attr_accessor :cache_users
 

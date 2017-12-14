@@ -16,13 +16,14 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
     unless ids.is_a?(Array)
       ids = ids.split(",")
     end
-    self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(ids) rescue nil
+    self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.approved.with_id(ids) rescue nil
     # self.bank_payment_requests = BankPaymentRequest.where(id: ids)
   end
 
   def validate
     unless current_company.payment_file_configuration.present?
       add_message :error, "Payment file has not been configured for your company yet"
+      return
     end
   end
 
