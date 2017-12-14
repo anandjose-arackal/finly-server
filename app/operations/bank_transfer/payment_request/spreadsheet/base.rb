@@ -4,7 +4,9 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
                 :headers, :con
 
   def retrieve_headers
-    ["Beneficiary Name",
+    ["Payment Order ID",
+     "Payment Order Name",
+     "Beneficiary Name",
      "Beneficiary Account Number",
      "Beneficiary IFSC",
      "Payment Mode",
@@ -16,6 +18,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
      "Discount",
      "Tax",
      "TDS",
+     "Advance",
      "Net Amount",
      "Bank Reference Number",
      "Note"]
@@ -28,6 +31,8 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
       po = pr.payment_order
       po.payments.each do |payment|
         content << [
+            pr.id,
+            pr.name,
             payment.receiving_account.name,
             payment.receiving_account.account_number,
             payment.receiving_account.ifsc,
@@ -40,6 +45,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
             (payment.invoice&.discount_amount&.value || 0),
             (payment.invoice&.tax_amount&.value || 0),
             (payment.invoice&.tds_amount&.value || 0),
+            (payment.invoice&.advance_amount&.value || 0),
             (payment.amount&.value || 0),
             (payment.reference_resource&.bank_reference_number),
             payment.note
