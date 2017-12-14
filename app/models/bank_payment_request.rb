@@ -46,7 +46,7 @@ class BankPaymentRequest < ActiveRecord::Base
   # i.e. a payment request cannot exist without a payment order
   validates :payment_order, presence: true
 
-  default_scope { order(updated_at: :desc) }
+  default_scope { order(created_at: :desc) }
 
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
   delegate :requested_amount_value, to: :requested_amount
