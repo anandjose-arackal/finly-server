@@ -55,6 +55,7 @@ class BankTransfer::Users::Index < BankTransfer::Users::Base
 
     attr_accessor :users, :paginated_team
 
+    has_scope :filter_search
     has_scope :filter_state, type: :array
     has_scope :filter_role, type: :array
     has_scope :filter_vendor_payments
