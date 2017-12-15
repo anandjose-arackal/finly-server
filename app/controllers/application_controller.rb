@@ -154,10 +154,10 @@ class ApplicationController < ActionController::Base
   end
 
   def load_global_variables
-    RequestStore.store[:request] = request
-    RequestStore.store[:params] = params
-    RequestStore.store[:current_app] = current_app
-    RequestStore.store[:current_devise] = current_devise
+    RequestStoreUtil.set_current_request(request)
+    RequestStoreUtil.set_request_params params
+    RequestStoreUtil.set_current_app current_app
+    RequestStoreUtil.set_current_device current_device
   end
 
   def current_app
@@ -195,7 +195,7 @@ class ApplicationController < ActionController::Base
     :em
   end
 
-  def current_devise
+  def current_device
     path = request.path
     if path.is_a?(String)
       if path.starts_with?('/api')
@@ -241,7 +241,7 @@ class ApplicationController < ActionController::Base
   def finly_authorize!(*scopes)
     doorkeeper_authorize! *scopes
     if current_user.present?
-      RequestStore.store[:authorized_scopes] = scopes
+      RequestStoreUtil.set_authorized_scopes scopes
     end
   end
 
@@ -259,9 +259,9 @@ class ApplicationController < ActionController::Base
         @current_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
       end
     end
-    RequestStore.store[:current_user] = @current_user
+    RequestStoreUtil.set_current_user @current_user
     if @current_user.class.name == 'User'
-      RequestStore.store[:current_company] = @current_user&.company
+      RequestStoreUtil.set_current_company @current_user&.company
     end
     @current_user
   end
