@@ -9,7 +9,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
                 :invoice_amount, :payment_amount, :payment,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
-                :advance_amount, :custom_fields
+                :advance_amount, :custom_fields, :policy_id
 
   def pre_validate
     super
@@ -22,8 +22,10 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
     super
     self.company_id = self.payment_order.company_id
     self.order_data = params[:payment_order]
+    self.policy_id = self.bank_payment_request.policy_id
     op = BankTransfer::PaymentRequest::Process.(user, scheduled_at: params[:scheduled_at],
-        payment_order: self.order_data)
+                                                      payment_order: self.order_data,
+                                                      policy_id: self.policy_id)
     self.processed_order_data = op.payment_order_data
     retrieve_payments_data
   end

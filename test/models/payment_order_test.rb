@@ -25,8 +25,6 @@
 #  post_operation            :text(65535)
 #  post_operation_payload    :text(65535)
 #  payment_mode              :string(255)
-#  post_operation            :text(65535)
-#  post_operation_payload    :text(65535)
 #
 
 require 'test_helper'

@@ -154,7 +154,7 @@ class User < ActiveRecord::Base
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
-  has_one :user_permission
+  has_one :user_permission, dependent: :destroy
 
   # has_one :feature_access, as: :accessible
 
@@ -417,7 +417,7 @@ class User < ActiveRecord::Base
       self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: Purpose.id_for(:vendor_payments)).save
     end
     if self.team_mapping.invoicing.count == 0
-      self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: Purpose.id_for(:invoicing)).save
+      self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: Purpose.id_for(:invoice)).save
     end
 
     self.policy_user_mappings.build(policy_id: default_policy_id).save

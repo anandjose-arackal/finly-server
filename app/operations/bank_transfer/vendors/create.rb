@@ -50,7 +50,7 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
   end
 
   def process
-    if self.vendor.present?
+    if self.vendor.present? && vendor.is_a?(YesBankVendor)
       self.vendor_parameters[:bank_accounts_attributes].each do |account_params|
         bank_account = self.vendor.bank_accounts.build(account_params)
         unless bank_account.save

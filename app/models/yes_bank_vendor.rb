@@ -12,6 +12,9 @@
 #  authorized    :boolean
 #  description   :string(255)
 #  is_deleted    :boolean          default(FALSE)
+#  pan           :string(255)
+#  tin           :string(255)
+#  gst           :string(255)
 #
 
 class YesBankVendor < ActiveRecord::Base
@@ -37,4 +40,11 @@ class YesBankVendor < ActiveRecord::Base
     }
   end
 
+
+  scope :filter_search, -> (term) {
+    vendor_ids = where("name like ? OR email like ? OR mobile_number like ? OR description like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    bank_account_ids = BankAccount.where("account_number like ? OR ifsc like ? OR name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
+    where(id: vendor_ids)
+  }
 end

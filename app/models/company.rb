@@ -323,7 +323,7 @@ class Company < ActiveRecord::Base
     self.policies.build(default: true, name: 'Company (Default)').save unless self.policies.default.present?
     ExportPreference.build_default_preferences(self)
     Constants::DEFAULT_CATEGORIES.each do |category|
-      self.categories.create(name: category)
+      self.categories.create(name: category, purpose_id: Purpose.id_for(:expense_management))
     end
 
     self.build_configuration.save if self.configuration.blank?

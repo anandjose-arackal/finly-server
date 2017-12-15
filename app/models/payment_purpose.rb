@@ -43,7 +43,8 @@ class PaymentPurpose < ActiveRecord::Base
         :payment_receivable,
         :invoice,
         :virtual_bank_account,
-        :finly_money_reload
+        :finly_money_reload,
+        :corporate_account_reload
     ]
   end
 

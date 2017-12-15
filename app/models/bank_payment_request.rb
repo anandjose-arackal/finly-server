@@ -20,6 +20,7 @@
 #  is_deleted                   :boolean
 #  beneficiary_type_id          :integer
 #  policy_id                    :integer
+#  payment_file_downloaded      :boolean          default(FALSE)
 #
 
 class BankPaymentRequest < ActiveRecord::Base
@@ -45,17 +46,19 @@ class BankPaymentRequest < ActiveRecord::Base
   # i.e. a payment request cannot exist without a payment order
   validates :payment_order, presence: true
 
-  default_scope { order(updated_at: :desc)}
+  default_scope { order(created_at: :desc) }
 
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
   delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
   scope :non_owner, -> (user_id) { where.not owner_id: user_id }
+  scope :with_controlling_user, -> (user_id) { where controlling_user_id: user_id }
   scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
-  scope :with_user, -> (user_id) { where owner_id: user_id}
-  scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
+  scope :with_user, -> (user_id) { where owner_id: user_id }
+  scope :not_open, -> { where.not status_id: BankPaymentRequestStatus.id_for(:open) }
   scope :with_id, -> (id) { where id: id }
+  scope :approved, -> { where status_id: BankPaymentRequestStatus.id_for(:approved) }
   scope :filter_status_id, -> (status_id) {
     case status_id
       when 1, '1' # i.e. open
@@ -76,6 +79,13 @@ class BankPaymentRequest < ActiveRecord::Base
         joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
       when 9, '9' # i.e. pending
         joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
+      when '10', 10 # i.e awaiting approval from current user
+        case UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym)
+          when UserRole.id_for(:admin)
+            where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing))
+          else
+            where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing), controlling_user_role_id: UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym))
+        end
       else
         # do nothing?
     end
@@ -89,10 +99,16 @@ class BankPaymentRequest < ActiveRecord::Base
     joins(:payment_order).where('payment_orders.processed_at >= ? AND processed_at <= ?', date_from, date_to)
   }
 
+  scope :processing, -> { where status_id: BankPaymentRequestStatus.id_for(:processing) }
+
+  scope :includes_details, -> { includes(:status, :owner, :requested_amount)}
+
   attr_accessor :cache_users
 
   before_save do
-    self.name = generate_name
+    if self.name.blank?
+      self.name = generate_name
+    end
   end
 
   def can_submit?
@@ -121,6 +137,10 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def credit_pending?
     approved? && !credited?
+  end
+
+  def pending?
+    self.status_id == BankPaymentRequestStatus.id_for(:pending)
   end
 
   def auto_approved?

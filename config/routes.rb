@@ -943,11 +943,20 @@
 #          bank_transfer_payment_requests_account_details POST   /bank_transfer/payment_requests/account_details(.:format)                                  bank_transfer/bank_payment_requests#account_details
 #      bank_transfer_payment_requests_process_account_ids POST   /bank_transfer/payment_requests/process_account_ids(.:format)                              bank_transfer/bank_payment_requests#process_account_ids
 #           bank_transfer_payment_requests_update_details PATCH  /bank_transfer/payment_requests/update_details(.:format)                                   bank_transfer/bank_payment_requests#update_details
+#                       bank_transfer_export_payment_file GET    /bank_transfer/export/payment_file(.:format)                                               bank_transfer/bank_payment_requests#payment_file
+#                  bank_transfer_export_payment_file_post POST   /bank_transfer/export/payment_file(.:format)                                               bank_transfer/bank_payment_requests#payment_file
+#                     bank_transfer_mark_as_credited_bulk PATCH  /bank_transfer/mark_as_credited(.:format)                                                  bank_transfer/bank_payment_requests#mark_as_credited
+#                          bank_transfer_mark_all_pending PATCH  /bank_transfer/mark_all_pending(.:format)                                                  bank_transfer/bank_payment_requests#mark_all_pending
+#                     bank_transfer_bulk_approve_validate PATCH  /bank_transfer/bulk_approve_validate(.:format)                                             bank_transfer/bank_payment_requests#bulk_approve_validate
+#                              bank_transfer_bulk_approve PATCH  /bank_transfer/bulk_approve(.:format)                                                      bank_transfer/bank_payment_requests#bulk_approve
+#                         bank_transfer_download_selected POST   /bank_transfer/download_selected(.:format)                                                 bank_transfer/bank_payment_requests#download_selected
+#                          bank_transfer_download_pending POST   /bank_transfer/download_pending(.:format)                                                  bank_transfer/bank_payment_requests#download_pending
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format)            bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)             bank_transfer/bank_payment_requests#review
 #               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)             bank_transfer/bank_payment_requests#credit
 #      bank_transfer_bank_payment_request_add_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/add_beneficiary(.:format)    bank_transfer/bank_payment_requests#add_beneficiary
 #   bank_transfer_bank_payment_request_remove_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_beneficiary(.:format) bank_transfer/bank_payment_requests#remove_beneficiary
+#     bank_transfer_bank_payment_request_mark_as_credited PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/mark_as_credited(.:format)   bank_transfer/bank_payment_requests#mark_as_credited
 #                bank_transfer_bank_payment_request_retry PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/retry(.:format)              bank_transfer/bank_payment_requests#retry
 #     bank_transfer_bank_payment_request_within_timeframe GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/within_timeframe(.:format)   bank_transfer/bank_payment_requests#within_timeframe
 #       bank_transfer_bank_payment_request_update_payment PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/update_payment(.:format)     bank_transfer/bank_payment_requests#update_payment
@@ -2375,6 +2384,7 @@ Rails.application.routes.draw do
       post 'add_balance', to: 'companies#add_balance', as: :add_balance_payments
     end
   end
+
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
     get 'payment_orders/balance', to: 'payment_orders#balance'
@@ -2387,12 +2397,22 @@ Rails.application.routes.draw do
     post 'payment_requests/account_details', to: 'bank_payment_requests#account_details'
     post 'payment_requests/process_account_ids', to: 'bank_payment_requests#process_account_ids'
     patch 'payment_requests/update_details', to: 'bank_payment_requests#update_details'
+    get 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file
+    post 'export/payment_file(.:format)', to: 'bank_payment_requests#payment_file', as: :export_payment_file_post
+    patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited_bulk
+    patch 'mark_all_pending', to: 'bank_payment_requests#mark_all_pending', as: :mark_all_pending
+    patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
+    patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
+    post 'download_selected', to: 'bank_payment_requests#download_selected', as: :download_selected
+    post 'download_pending', to: 'bank_payment_requests#download_pending', as: :download_pending
+
     resources :bank_payment_requests do
       post 'comment', to: 'bank_payment_requests#comment', as: :comment
       patch 'review', to: 'bank_payment_requests#review', as: :review
       patch 'credit', to: 'bank_payment_requests#credit', as: :credit
       patch 'add_beneficiary', to: 'bank_payment_requests#add_beneficiary', as: :add_beneficiary
       patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficiary
+      patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited
       patch 'retry', to: 'bank_payment_requests#retry', as: :retry
       get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
       patch 'update_payment', to: 'bank_payment_requests#update_payment'

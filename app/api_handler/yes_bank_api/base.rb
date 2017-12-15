@@ -55,6 +55,7 @@ class YesBankApi::Base < BaseHandler
     end
   end
 
+
   protected
 
   def load_connection(url = base_url)

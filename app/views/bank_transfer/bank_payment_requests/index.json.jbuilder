@@ -26,4 +26,5 @@ json.array! @result.paginated_requests.each do |payment_request|
   end
   json.amount_processed item.amount_processed
   json.amount_requested item.amount_requested
+  json.payment_file_downloaded payment_request.payment_file_downloaded
 end
