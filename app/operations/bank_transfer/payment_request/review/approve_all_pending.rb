@@ -25,11 +25,11 @@ class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::Pa
     self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
     ids = self.bank_payment_requests.pluck(:id)
     # BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user: user)
-    # BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user_id: user.id)
-    BankTransfer::PaymentRequest::Review::ApproveBackground.call(ids, initiating_user_id: user.id)
+    BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user_id: user.id)
+    # BankTransfer::PaymentRequest::Review::ApproveBackground.call(ids, initiating_user_id: user.id)
   end
 
   def post_process
-    add_message :sucess, "Payment orders have been marked for approval"
+    add_message :success, 'Payment orders have been marked for approval'
   end
 end

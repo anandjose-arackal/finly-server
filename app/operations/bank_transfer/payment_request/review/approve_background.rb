@@ -6,24 +6,14 @@ class BankTransfer::PaymentRequest::Review:: ApproveBackground < BackgroundOpera
     self.new.perform(payment_request_ids, options)
   end
 
-  def self.call_async(payment_request_ids, options = {})
-    # define the operation to accordingly run the operation in the background
-    self.perform_async(payment_request_ids, options)
-  end
-
-  def perform(payment_request_ids, options)
+  def perform(payment_request_ids, options, request_store_hash = nil)
+    load_request_store request_store_hash
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
     self.payment_requests = BankPaymentRequest.where(id: payment_request_ids)
     self.options = options
     self.run
-  end
-
-  def perform_async(payment_request_ids, options)
-    # in case the object is passed directly instead of an id
-    # calls the Sidekiq::Worker method
-    super(payment_request_ids, options)
   end
 
   def initialize
