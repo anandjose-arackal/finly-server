@@ -22,8 +22,8 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
     # update the status of all payment orders as pending
     self.bank_payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
     ids = self.bank_payment_requests.pluck(:id)
-    BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user_id: user.id)
-    # op = BankTransfer::PaymentRequest::Review::ApproveBackground.call(ids, initiating_user: user)
+    # BankTransfer::PaymentRequest::Review::ApproveBackground.call_async(ids, initiating_user_id: user.id)
+    op = BankTransfer::PaymentRequest::Review::ApproveBackground.call(ids, initiating_user_id: user.id)
   end
 
 
