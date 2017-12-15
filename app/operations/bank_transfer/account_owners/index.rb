@@ -39,8 +39,11 @@ class BankTransfer::AccountOwners::Index < BankTransfer::AccountOwners::Base
 
     attr_accessor :account_owners, :paginated_account_owners
 
+    has_scope :filter_search
+
     def init
       self.account_owners = params[:account_owners]
+      self.account_owners = apply_scopes(account_owners, params)
       self.paginated_account_owners = account_owners.paginate(page: params[:page], per_page: params[:per_page] || 30)
     end
   end
