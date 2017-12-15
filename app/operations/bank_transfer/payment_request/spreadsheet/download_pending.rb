@@ -11,9 +11,9 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadPending < BankTransfer:
   end
 
   def validate
-    if self.bank_payment_requests.empty?
-      add_message :error, "No payment orders passed"
-    end
+    # if self.bank_payment_requests.empty?
+    #   add_message :error, "No payment orders passed"
+    # end
   end
 
   def process
