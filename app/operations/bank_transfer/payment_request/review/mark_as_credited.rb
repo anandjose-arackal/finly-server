@@ -30,11 +30,11 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
       return
     end
     bank_payment_requests.each do |payment_request|
-      if payment_request.credited? || payment_request.open?
-        add_message :error, "Payment order with name: #{payment_request.name} is already credited or still in open state"
-        return
+      unless payment_request.approved?
+        add_message :error, "Payment Order: #{payment_request.name} cannot be marked as Credited as it is #{payment_request.status.name.humanize}"
       end
     end
+    return if has_errors?
   end
 
   def process
