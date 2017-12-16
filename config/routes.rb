@@ -928,6 +928,7 @@
 #                                                         PATCH  /payments/companies/:id(.:format)                                                          companies#update
 #                                                         PUT    /payments/companies/:id(.:format)                                                          companies#update
 #                                                         DELETE /payments/companies/:id(.:format)                                                          companies#destroy
+#                                         request_filters GET    /payment_request_filters(.:format)                                                         bank_transfer/bank_payment_requests#filters
 #                      bank_transfer_payment_orders_count GET    /bank_transfer/payment_orders/count(.:format)                                              bank_transfer/payment_orders#count
 #                    bank_transfer_payment_orders_balance GET    /bank_transfer/payment_orders/balance(.:format)                                            bank_transfer/payment_orders#balance
 #                            bank_transfer_payment_orders GET    /bank_transfer/payment_orders(.:format)                                                    bank_transfer/payment_orders#index
@@ -2348,13 +2349,13 @@ Rails.application.routes.draw do
     end
   end
 
+  get 'payment_request_filters', to: 'bank_transfer/bank_payment_requests#filters', as: :request_filters
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
     get 'payment_orders/balance', to: 'payment_orders#balance'
     resources :payment_orders do
 
     end
-
     get 'bank_payment_requests/count', to: 'bank_payment_requests#count', as: :count
     post 'payment_requests/process_file', to: 'bank_payment_requests#process_file'
     post 'payment_requests/account_details', to: 'bank_payment_requests#account_details'

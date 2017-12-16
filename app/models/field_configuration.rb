@@ -56,6 +56,7 @@ class FieldConfiguration < ActiveRecord::Base
   scope :enabled, -> { where enabled: true }
   scope :disabled, -> { where enabled: false }
   scope :filter_field_type_id, ->(type_id) { where field_type_id: type_id }
+  scope :filter_parent_type_id, -> (type_id) { where field_parent_type_id: type_id}
   scope :order_created_at_desc, -> { order(created_at: :desc) }
 
   delegate :drop_down?, :text?, to: :field_type
