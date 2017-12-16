@@ -977,6 +977,7 @@
 #                                                         PATCH  /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#update
 #                                                         PUT    /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#update
 #                                                         DELETE /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#destroy
+#                                    bank_transfer_import POST   /bank_transfer/vendors/import(.:format)                                                    bank_transfer/vendors#import
 #                     bank_transfer_vendor_show_transfers GET    /bank_transfer/vendors/:vendor_id/show_transfers(.:format)                                 bank_transfer/vendors#show_transfers
 #                                   bank_transfer_vendors GET    /bank_transfer/vendors(.:format)                                                           bank_transfer/vendors#index
 #                                                         POST   /bank_transfer/vendors(.:format)                                                           bank_transfer/vendors#create
@@ -2383,6 +2384,7 @@ Rails.application.routes.draw do
     get 'account_owners/count', to: 'account_owners#count'
     resources :account_owners
 
+    post 'vendors/import', to: 'vendors#import', as: :import
     resources :vendors do
       get 'show_transfers', to: 'vendors#show_transfers'
     end
