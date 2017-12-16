@@ -23,6 +23,7 @@
 #  split_link             :string(255)
 #  deleted_to_split       :boolean          default(FALSE)
 #  from_cash_on_hand      :boolean          default(FALSE)
+#  cash_on_hand_blocked   :boolean
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

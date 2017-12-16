@@ -110,6 +110,10 @@ class Expense::Manual::Create < Expense::Manual::Base
       end
     end
 
+    # marking this expense as blocked against cash on hand, because it's a manual expense
+    expense.update(cash_on_hand_blocked: true)
+    ##########--------------------------############
+
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
     if expense.receipts.present?
       expense.receipts.update_all(to_be_transcribed: false)

@@ -80,6 +80,11 @@ class Report::Expenses::Remove < Report::Base
           expense.update(amount: nil)
           amount.destroy if amount
         end
+
+        # marking the expense as not blocked against cash on hand
+        unless expense.manual_expense?
+          expense.update(cash_on_hand_blocked: false)
+        end
       end
       messages[:success] << "Expenses removed."
     end
