@@ -112,9 +112,11 @@ class Statements::Team::Summary < Statements::Team::Base
             mobile_number: user.mobile_number
         }
       when :accounts_net_advance
-        return user.receiving_payments
+        return user.receiving_payments.advance.sum_amounts
       when :accounts_net_reimbursement
+        return user.receiving_payments.reimbursements.sum_amounts
       when :accounts_atm_withdrawals
+
       when :accounts_net_closing_balance
       when :expense_card_opening_balance
       when :expense_card_credits
