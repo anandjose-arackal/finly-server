@@ -117,6 +117,12 @@ class CustomField < ActiveRecord::Base
         return self.value&.value
       when FieldType.id_for(:drop_down)
         return self.value&.value&.name
+      when FieldType.id_for(:multiselect)
+        names = []
+        self.value&.field_multiselect_selection_items&.each do |item|
+          names << item.value.name
+        end
+        return names.to_sentence
       else
         # do nothing?
     end

@@ -35,6 +35,13 @@ class BankTransfer::Vendors::Import < BankTransfer::Vendors::Base
       vendor_data[:company_id] = user.company_id
       vendor_data[:authorized] = true
       retrieve_bank_accounts(vendor_data)
+
+      # if bank accounts are not entered, throw an error right away
+      if vendor_data[:bank_accounts_attributes].blank?
+        self.result_hash[index] << "No bank accounts entered"
+        next
+      end
+
       vendor = YesBankVendor.new(vendor_data)
       if vendor.save
         self.result_hash[index] << "Success!"
@@ -46,7 +53,7 @@ class BankTransfer::Vendors::Import < BankTransfer::Vendors::Base
 
   def success
     # self.response = Exporter::Spreadsheet.new(user, {headers: self.headers, content: self.result_hash})
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, content: self.result_hash}}, messages)
+    self.response = Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.result_hash}, messages)
   end
 
   private
@@ -84,12 +91,16 @@ class BankTransfer::Vendors::Import < BankTransfer::Vendors::Base
         "Description",
         "PAN",
         "GST",
+        "Bank Account Name 1",
         "Bank Account Number 1",
         "IFSC 1",
+        "Bank Account Name 2",
         "Bank Account Number 2",
         "IFSC 2",
+        "Bank Account Name 3",
         "Bank Account Number 3",
         "IFSC 3",
+        "Bank Account Name 4",
         "Bank Account Number 4",
         "IFSC 4"
     ]
