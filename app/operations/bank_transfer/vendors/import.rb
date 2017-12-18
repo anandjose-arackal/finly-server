@@ -5,6 +5,10 @@ class BankTransfer::Vendors::Import < BankTransfer::Vendors::Base
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, "Invaoid parameters"
+      return
+    end
+    if params[:file].blank?
+      add_message :error, "No file uploaded"
     end
   end
 
@@ -19,22 +23,30 @@ class BankTransfer::Vendors::Import < BankTransfer::Vendors::Base
     self.headers = retrieve_headers
   end
 
+  def validate
+    if self.vendors_data.blank?
+      add_message :error, "Empty spreadsheet uploaded"
+    end
+  end
+
   def process
     self.vendors_data.each_with_index do |vendor_data, index|
       self.result_hash << vendor_data.values
       vendor_data[:company_id] = user.company_id
-      vendor = YesBankVendor.new(vendor_data)
+      vendor_data[:authorized] = true
       retrieve_bank_accounts(vendor_data)
+      vendor = YesBankVendor.new(vendor_data)
       if vendor.save
-        self.result_hash[index] += "Success!"
+        self.result_hash[index] << "Success!"
       else
-        self.result_hash[index] += vendor.errors.full_messages.to_sentence
+        self.result_hash[index] << vendor.errors.full_messages.to_sentence
       end
     end
   end
 
   def success
-    self.response = Exporter::Spreadsheet.new(user, {headers: self.headers, content: self.result_hash})
+    # self.response = Exporter::Spreadsheet.new(user, {headers: self.headers, content: self.result_hash})
+    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, content: self.result_hash}}, messages)
   end
 
   private
@@ -42,7 +54,7 @@ class BankTransfer::Vendors::Import < BankTransfer::Vendors::Base
   def retrieve_bank_accounts(vendor_data)
     index = 1
     4.times do
-      if vendor_data.key?("bank_account_#{index}".to_sym) && vendor_data.key?("ifsc_#{index}".to_sym) && vendor_data.key?["bank_account_name_#{index}".to_sym]
+      if vendor_data["bank_account_#{index}".to_sym].present? && vendor_data["ifsc_#{index}".to_sym].present? && vendor_data["bank_account_name_#{index}".to_sym].present?
         if vendor_data[:bank_accounts_attributes].blank?
           vendor_data[:bank_accounts_attributes] = []
         end
