@@ -189,6 +189,18 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
       expense.update_other_currencies
     end
 
+    # check if this expense's amount allows for it to be marked against COH
+    # and if it is or is not, update the flag for this expense accordingly
+    if expense.amount.present? && expense.from_cash_on_hand
+      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      if coh_adapter.balance(display_balance: true) > expense.amount_value
+        expense.update(cash_on_hand_blocked: true)
+      end
+      if coh_adapter.balance(display_balance: true) < 0
+        expense.update(cash_on_hand_blocked: false)
+      end
+    end
+
     add_message :success, 'Expense updated'
   end
 
