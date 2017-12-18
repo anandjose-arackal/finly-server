@@ -143,6 +143,28 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
 
   def post_process
     self.multiple_expenses.each { |key, expense_hash| Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: expense_hash[:expense]) }
+
+    self.multiple_expenses.each do |key, expense_hash|
+      expense = expense_hash[:expense]
+      if self.expense.report_id.present? and self.expense.report.retracted?
+        comment = self.expense.report.comments.build report: self.expense.report, user: user,
+                                                     report_comment_action_id: ReportCommentAction.id_for(:expense_add), expense: expense
+        unless comment.save
+          add_message :error, comment.errors.full_messages
+        end
+      end
+
+      # marking this expense as blocked against cash on hand, because it's a manual expense
+      expense.update(cash_on_hand_blocked: true)
+      ##########--------------------------############
+
+      # calculate the equivalent amount in all currencies in the amounts table
+      if expense.date == DateUtils.local_date
+        expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
+      else
+        expense.update_other_currencies
+      end
+    end
   end
 
   def set_custom_fields_multiple(expense, current_params)

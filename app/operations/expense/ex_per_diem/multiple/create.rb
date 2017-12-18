@@ -245,6 +245,9 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
             value[:expense].update_other_currencies
           end
         end
+        # marking the expense as reconciled with cash on hand because the amount is known
+        expense.update(cash_on_hand_blocked: true)
+        ##########--------------------------############
       end
     end
 

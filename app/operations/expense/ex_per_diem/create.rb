@@ -56,6 +56,23 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
         messages[:error] << 'Expense cannot be added to the report in this state'
       end
     end
+
+    # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
+    if ['1', 1].include?(expense_params[:from_cash_on_hand])
+      expense = user.expenses.build(expense_params)
+      unless expense.valid?
+        add_message :error, expense.errors.full_messages
+        return
+      end
+      amount = expense.calculate_amount_value(self.per_diem.configurable)
+      # debugger
+      cash_on_hand_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      balance = cash_on_hand_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
+      unless balance > amount
+        add_message :error, "You do not have enough balance in your Cash On Hand to mark this expense against it"
+        return
+      end
+    end
   end
 
   def process
@@ -93,6 +110,10 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
         expense.update_other_currencies
       end
     end
+
+    # marking the expense as reconciled with cash on hand because the amount is known
+    expense.update(cash_on_hand_blocked: true)
+    ##########--------------------------############
 
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
     if expense.receipts.present?
