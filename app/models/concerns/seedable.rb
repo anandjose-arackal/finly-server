@@ -44,12 +44,11 @@ module Seedable
 
     # Checks if RequestStore contains the values. If not found, then loads RequestStore with the respective values
     def fetch_items
-      values_map = RequestStoreUtil.seedable_values self.name
-      if values_map.blank?
-        values_map =  as_hash
-        RequestStoreUtil.set_seedable_values self.name, values_map
+      # SimpleConfigUtil.seedable_for(self.name)
+      if SimpleConfig.for(:application).exists? :seedable
+        return SimpleConfig.for(:application).seedable[self.name]
       end
-      values_map
+      as_hash
     end
 
     # Generates a hash out of all the values in {name: id} format
@@ -68,6 +67,21 @@ module Seedable
         id: id,
         name: name
     }
+  end
+
+  # Load all values of all variables in SimpleConfig
+  def self.init_global_variables
+    unless Rails.env.production?
+      Rails.application.eager_load!
+    end
+    seedable_classes = ObjectSpace.each_object(Class).select { |c| c.included_modules.include?(Seedable) }
+    values = {}
+    seedable_classes.each do |seedable_class|
+      values[seedable_class.name] = seedable_class.as_hash
+    end
+    SimpleConfig.for :application do
+      set :seedable, values.with_indifferent_access
+    end
   end
 
 end

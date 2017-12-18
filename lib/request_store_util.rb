@@ -1,16 +1,5 @@
 class RequestStoreUtil
 
-  def self.seedable_values(class_name)
-    RequestStore.store[:seedable_values]&.dig(class_name)
-  end
-
-  def self.set_seedable_values(class_name, values)
-    if RequestStore.store[:seedable_values].nil?
-      RequestStore.store[:seedable_values] = {}
-    end
-    RequestStore.store[:seedable_values][class_name] = values
-  end
-
   def self.set_current_request(request)
     RequestStore.store[:request] = request
   end
