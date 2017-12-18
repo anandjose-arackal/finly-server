@@ -30,8 +30,14 @@ class StatementsController < ApplicationController
     end
   end
 
-  def team_summary
+  def user_summary
+    @result = Statements::Team::Summary.(current_user, params)
+    respond
+  end
 
+  def user_summary_export
+    @result = Statements::Team::Export.(current_user, params)
+    respond
   end
 
   # Company Statements
