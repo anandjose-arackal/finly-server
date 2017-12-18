@@ -89,7 +89,7 @@ class Report::Expenses::Add < Report::Base
         next
       end
       amount = expense.calculate_amount_value(report.policy)
-      if coh_adapter.balance >= amount
+      if coh_adapter.balance(display_balance: true) >= amount
         expense.update(cash_on_hand_blocked: true)
       end
     end

@@ -86,7 +86,7 @@ class Expense::Manual::Update < Expense::Manual::Base
     check_coh_availability_update(updated_expense_params)
 
     # ensuring a particular expense cannot be both reimbursable and from cash on hand
-    check_coh_reimbursable_exclusivity_update(expense_params)
+    check_coh_reimbursable_exclusivity_update(updated_expense_params)
   end
 
   def process

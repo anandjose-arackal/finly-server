@@ -122,6 +122,11 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
       # Adding model level validation errors
       self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages unless value[:expense].valid?
 
+      expense = value[:expense]
+      if expense.reimbursable && expense.from_cash_on_hand
+        self.errors_by_expenses[key][:error] += ["Expense cannot be both reimbursable and from cash on hand"]
+      end
+
       if personal_view? && value[:params][:report_id].present?
         report = user.reports.find_by(id: value[:params][:report_id])
         unless report.editable?
