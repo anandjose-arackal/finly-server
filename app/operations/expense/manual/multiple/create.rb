@@ -88,7 +88,7 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
         self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages
       end
 
-      if self.total_amount_from_coh > coh_adapter.balance
+      if self.total_amount_from_coh > coh_adapter.balance(display_balance: true)
         # add error message saying this expense cannot be from COH
         self.errors_by_expenses[key][:error] += ["You do not have enough balance in your Cash on Hand to mark this expense against it"]
       end

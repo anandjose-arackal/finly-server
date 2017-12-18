@@ -1,6 +1,7 @@
 class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
 
-  attr_accessor :valid, :errors_by_expenses, :multiple_expense_params, :multiple_expenses
+  attr_accessor :valid, :errors_by_expenses, :multiple_expense_params, :multiple_expenses,
+                :total_amount_from_coh
 
   def authorized_user_types
     [:employee]
@@ -114,18 +115,36 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
       return false
     end
 
+    # calculating the total of all expenses that are marked as from cash on hand
+    self.total_amount_from_coh = 0
+    coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
 
     for key, value in self.multiple_expenses
       # Setting errors for the current expense
       # self.errors_by_expenses[key] = { error: [] }
 
       # Adding model level validation errors
-      self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages unless value[:expense].valid?
+      if value[:expense].valid?
+        if value[:expense].from_cash_on_hand
+          amount = value[:expense].calculate_amount_value(value[:per_diem].configurable)
+          self.total_amount_from_coh += amount
+        end
+      else
+        self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages
+      end
+
+      if self.total_amount_from_coh > coh_adapter.balance(display_balance: true)
+        # add error message saying this expense cannot be from COH
+        self.errors_by_expenses[key][:error] += ["You do not have enough balance in your Cash on Hand to mark this expense against it"]
+      end
+
 
       expense = value[:expense]
       if expense.reimbursable && expense.from_cash_on_hand
         self.errors_by_expenses[key][:error] += ["Expense cannot be both reimbursable and from cash on hand"]
       end
+
+
 
       if personal_view? && value[:params][:report_id].present?
         report = user.reports.find_by(id: value[:params][:report_id])
@@ -189,7 +208,7 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
 
     else
       make_expenses_invalid(self.multiple_expenses)
-      add_message :failure, "Cannot create expensesxx. Please fix the errors and try again."
+      add_message :failure, "Cannot create expenses. Please fix the errors and try again."
     end
 
 
@@ -250,6 +269,7 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
             value[:expense].update_other_currencies
           end
         end
+        expense = value[:expense]
         # marking the expense as reconciled with cash on hand because the amount is known
         expense.update(cash_on_hand_blocked: true)
         ##########--------------------------############
