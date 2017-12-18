@@ -29,10 +29,6 @@ class Expense::ExTime::Create < Expense::ExTime::Base
       add_message :error, 'You have not provided any details to create an expense'
       return
     end
-    # time_value = params[:expense][:time_expense_attributes][:time_object_attributes][:value].to_d rescue nil
-    # if time_value.present? and time_value <= 0
-    #   add_message :error, 'Time cannot be less than or equal to 0'
-    # end
   end
 
   def init
@@ -65,6 +61,9 @@ class Expense::ExTime::Create < Expense::ExTime::Base
         add_message :error, "Expense cannot be added to the report in this state"
       end
     end
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_reimbursable_exclusivity_create(expense_params)
   end
 
   def process
@@ -109,6 +108,18 @@ class Expense::ExTime::Create < Expense::ExTime::Base
         expense.amount.update(expense.amount.currency.country_code.to_sym => expense.amount_value)
       else
         expense.update_other_currencies
+      end
+    end
+
+    # check if this expense's amount allows for it to be marked against COH
+    # and if it is or is not, update the flag for this expense accordingly
+    if expense.amount.present? && expense.from_cash_on_hand
+      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      if coh_adapter.balance(display_balance: true) > expense.amount_value
+        expense.update(cash_on_hand_blocked: true)
+      end
+      if coh_adapter.balance(display_balance: true) < 0
+        expense.update(cash_on_hand_blocked: false)
       end
     end
 
