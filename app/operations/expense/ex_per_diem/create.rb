@@ -57,22 +57,12 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
       end
     end
 
-    # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
-    if ['1', 1].include?(expense_params[:from_cash_on_hand])
-      expense = user.expenses.build(expense_params)
-      unless expense.valid?
-        add_message :error, expense.errors.full_messages
-        return
-      end
-      amount = expense.calculate_amount_value(self.per_diem.configurable)
-      # debugger
-      cash_on_hand_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
-      balance = cash_on_hand_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
-      unless balance > amount
-        add_message :error, "You do not have enough balance in your Cash On Hand to mark this expense against it"
-        return
-      end
-    end
+    # checking if the user has enough cash on hand balance to mark this expense against it
+    check_coh_availability_create(expense_params)
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_reimbursable_exclusivity_create(expense_params)
+
   end
 
   def process

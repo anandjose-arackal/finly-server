@@ -81,7 +81,8 @@ class Report::Expenses::Add < Report::Base
   end
 
   def pre_process
-    # mark the respective expenses that are from cash on hand as
+    # mark the respective expenses that are from cash on hand as blocked
+    # so that we can raise the rest as violations inside a report
     coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
     expenses.spent_from_cash_on_hand.each do |expense|
       if expense.cash_on_hand_blocked

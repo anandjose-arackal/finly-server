@@ -76,6 +76,10 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
         messages[:error] << "Expense cannot be added to the report in this state"
       end
     end
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_reimbursable_exclusivity_create(expense_params)
+
   end
 
   def process

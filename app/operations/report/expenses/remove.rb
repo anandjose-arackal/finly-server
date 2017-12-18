@@ -82,7 +82,7 @@ class Report::Expenses::Remove < Report::Base
         end
 
         # marking the expense as not blocked against cash on hand
-        unless expense.manual_expense?
+        unless expense.manual_expense? || expense.per_diem_expense?
           expense.update(cash_on_hand_blocked: false)
         end
       end

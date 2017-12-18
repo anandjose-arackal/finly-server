@@ -71,6 +71,9 @@ class Expense::ExTime::Update < Expense::ExTime::Base
         add_message :error, "You do not own this receipt"
       end
     end
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_reimbursable_exclusivity_update(updated_expense_params)
   end
 
   def process
