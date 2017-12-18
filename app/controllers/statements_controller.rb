@@ -30,6 +30,10 @@ class StatementsController < ApplicationController
     end
   end
 
+  def team_summary
+
+  end
+
   # Company Statements
   def company_balance_summary
     @result = ::Company::Statement::BalanceSummary.(current_user, params)

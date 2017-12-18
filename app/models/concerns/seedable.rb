@@ -7,28 +7,28 @@ module Seedable
   end
 
   class_methods do
+
     def values
       []
     end
 
-    def ids_for(keys)
-      items = self.with_name(keys)
-      if items.present?
-        return items.pluck(:id)
+    def ids_for(*keys)
+      if keys.present? and keys.first.class.name == Array.name
+        keys = keys.first
       end
-      return nil
+      ids = []
+      fetch_items.each do |key, value|
+        ids << value if keys.include? key&.to_sym
+      end
+      ids
     end
 
     def id_for(key)
-      items = self.with_name(key)
-      if items.present?
-        return items.first.id
-      end
-      return nil
+      return fetch_items[key]
     end
 
     def name_for(id)
-      self.find_by_id(id)&.name&.to_s
+      self.fetch_items.key(id)&.to_s
     end
 
     def seed_data
@@ -41,6 +41,25 @@ module Seedable
       # todo handle destroying data if it should not exist in database
     end
     alias_method :sync_data, :seed_data
+
+    # Checks if RequestStore contains the values. If not found, then loads RequestStore with the respective values
+    def fetch_items
+      values_map = RequestStoreUtil.seedable_values self.name
+      if values_map.blank?
+        values_map =  as_hash
+        RequestStoreUtil.set_seedable_values self.name, values_map
+      end
+      values_map
+    end
+
+    # Generates a hash out of all the values in {name: id} format
+    def as_hash
+      values = {}
+      self.all.each do |item|
+        values[item.name.downcase] = item.id
+      end
+      values.with_indifferent_access
+    end
 
   end
 
