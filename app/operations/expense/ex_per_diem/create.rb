@@ -56,6 +56,13 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
         messages[:error] << 'Expense cannot be added to the report in this state'
       end
     end
+
+    # checking if the user has enough cash on hand balance to mark this expense against it
+    check_coh_availability_create(expense_params)
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_reimbursable_exclusivity_create(expense_params)
+
   end
 
   def process
@@ -93,6 +100,10 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
         expense.update_other_currencies
       end
     end
+
+    # marking the expense as reconciled with cash on hand because the amount is known
+    expense.update(cash_on_hand_blocked: true)
+    ##########--------------------------############
 
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
     if expense.receipts.present?

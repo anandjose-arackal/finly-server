@@ -65,7 +65,6 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
         current_expense_params.except!(:receipts_attributes)
       end
 
-
       self.multiple_expenses[key][:expense] = user.expenses.new(current_expense_params)
 
       self.multiple_expenses[key][:params] = current_expense_params
@@ -95,6 +94,11 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
 
       # Adding model level validation errors
       self.errors_by_expenses[key][:error] += value[:expense].errors.full_messages unless value[:expense].valid?
+
+      expense = value[:expense]
+      if expense.reimbursable && expense.from_cash_on_hand
+        self.errors_by_expenses[key][:error] += ["Expense cannot be both reimbursable and from cash on hand"]
+      end
 
       if personal_view? && value[:params][:report_id].present?
         report = user.reports.find_by(id: value[:params][:report_id])
@@ -179,6 +183,19 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
             value[:expense].amount.update(value[:expense].amount.currency.country_code.to_sym => value[:expense].amount_value)
           else
             value[:expense].update_other_currencies
+          end
+        end
+
+        expense = value[:expense]
+        # check if this expense's amount allows for it to be marked against COH
+        # and if it is or is not, update the flag for this expense accordingly
+        if expense.amount.present? && expense.from_cash_on_hand
+          coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+          if coh_adapter.balance(display_balance: true) > expense.amount_value
+            expense.update(cash_on_hand_blocked: true)
+          end
+          if coh_adapter.balance(display_balance: true) < 0
+            expense.update(cash_on_hand_blocked: false)
           end
         end
       end
