@@ -34,6 +34,7 @@ class BankTransfer::Vendors::Import < BankTransfer::Vendors::Base
       self.result_hash << vendor_data.values
       vendor_data[:company_id] = user.company_id
       vendor_data[:authorized] = true
+      vendor_data[:gst_registered] = true if vendor_data[:gst].present?
       retrieve_bank_accounts(vendor_data)
 
       # if bank accounts are not entered, throw an error right away
