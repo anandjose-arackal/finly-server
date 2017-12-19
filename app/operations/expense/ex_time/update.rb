@@ -142,7 +142,7 @@ class Expense::ExTime::Update < Expense::ExTime::Base
 
     # check if this expense's amount allows for it to be marked against COH
     # and if it is or is not, update the flag for this expense accordingly
-    if expense.amount.present?
+    if expense.amount.present? && expense.from_cash_on_hand
       coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
       if coh_adapter.balance(display_balance: true) > expense.amount_value
         expense.update(cash_on_hand_blocked: true)
