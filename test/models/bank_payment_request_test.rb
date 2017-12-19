@@ -21,6 +21,7 @@
 #  beneficiary_type_id          :integer
 #  policy_id                    :integer
 #  payment_file_downloaded      :boolean          default(FALSE)
+#  auto_approved                :boolean
 #
 
 require 'test_helper'

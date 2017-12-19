@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171215165129) do
+ActiveRecord::Schema.define(version: 20171219112052) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -514,6 +514,7 @@ ActiveRecord::Schema.define(version: 20171215165129) do
     t.integer  "beneficiary_type_id",          limit: 4
     t.integer  "policy_id",                    limit: 4
     t.boolean  "payment_file_downloaded",                    default: false
+    t.boolean  "auto_approved"
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
@@ -1508,6 +1509,7 @@ ActiveRecord::Schema.define(version: 20171215165129) do
     t.string   "split_link",             limit: 255
     t.boolean  "deleted_to_split",                     default: false
     t.boolean  "from_cash_on_hand",                    default: false
+    t.boolean  "cash_on_hand_blocked"
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree

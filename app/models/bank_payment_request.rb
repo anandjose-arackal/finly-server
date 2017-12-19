@@ -21,6 +21,7 @@
 #  beneficiary_type_id          :integer
 #  policy_id                    :integer
 #  payment_file_downloaded      :boolean          default(FALSE)
+#  auto_approved                :boolean
 #
 
 class BankPaymentRequest < ActiveRecord::Base
@@ -159,7 +160,7 @@ class BankPaymentRequest < ActiveRecord::Base
     # extracting the last tracks and checking if it was a submit action combined
     # with the next action user being blank
     trail = self.bank_payment_request_trails.last
-    trail.submit_action? && trail.modified_user.blank?
+    (trail.submit_action? && trail.modified_user.blank?) || self.auto_approved
   end
 
   def user
