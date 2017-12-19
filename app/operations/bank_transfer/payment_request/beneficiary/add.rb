@@ -144,6 +144,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
 
   def set_custom_fields(save, payment, data)
     fields = data
+    return if data.blank?
     custom_fields = {custom_fields: fields}
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
