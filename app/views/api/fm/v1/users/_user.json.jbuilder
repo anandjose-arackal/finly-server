@@ -9,7 +9,7 @@ end
 json.cards do
   json.array! user.cards do |card|
     json.id card.id
-    json.serial_id card.serial_id
+    json.serial_id card.proxy
     json.active card.active
     json.ending_number card.ending_number
     json.description card.description
