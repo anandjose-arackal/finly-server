@@ -143,6 +143,18 @@ class Expense::Manual::Update < Expense::Manual::Base
       expense.receipts.update_all(to_be_transcribed: false)
     end
 
+    # check if this expense's amount allows for it to be marked against COH
+    # and if it is or is not, update the flag for this expense accordingly
+    if expense.amount.present? && expense.from_cash_on_hand
+      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      if coh_adapter.balance(display_balance: true) > expense.amount_value
+        expense.update(cash_on_hand_blocked: true)
+      end
+      if coh_adapter.balance(display_balance: true) < 0
+        expense.update(cash_on_hand_blocked: false)
+      end
+    end
+
 
     if expense.date == DateUtils.local_date
       if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id

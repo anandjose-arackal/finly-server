@@ -51,6 +51,13 @@ class Report::Create < Report::Base
     # so that we can raise the rest as violations inside a report
     coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
     policy = Policy.find_by(id: self.policy_id)
+    unless expenses.is_a?(ActiveRecord::Relation)
+      ids = []
+      expenses.each do |expense|
+        ids << expense.id
+      end
+      self.expenses = Expense.where(id: ids)
+    end
     expenses.spent_from_cash_on_hand.each do |expense|
       if expense.cash_on_hand_blocked
         next

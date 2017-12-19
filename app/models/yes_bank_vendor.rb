@@ -41,11 +41,11 @@ class YesBankVendor < ActiveRecord::Base
     where(id: vendor_ids)
   }
 
-  before_save do
-    if self.gst.blank?
-      self.gst_registered = false
-    elsif self.gst.present?
-      self.gst_registered = true
-    end
-  end
+  # before_save do
+  #   if self.gst.blank?
+  #     self.gst_registered = false
+  #   elsif self.gst.present?
+  #     self.gst_registered = true
+  #   end
+  # end
 end
