@@ -50,7 +50,6 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
   end
 
   def process
-    debugger
     if self.vendor.present? && vendor.is_a?(YesBankVendor)
       self.vendor_parameters[:bank_accounts_attributes].each do |account_params|
         bank_account = self.vendor.bank_accounts.build(account_params)
@@ -62,9 +61,7 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
       self.vendor.update(authorized: true)
     else
       self.vendor = company.yes_bank_vendors.build(vendor_parameters)
-      debugger
       unless self.vendor.save
-        debugger
         add_message :error, vendor.errors.full_messages
       end
     end
