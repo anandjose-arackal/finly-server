@@ -8,6 +8,7 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
 
   def init
     super
+    self.auto_approve = params[:auto_approve]
   end
 
   def validate
