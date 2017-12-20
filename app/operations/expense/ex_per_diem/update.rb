@@ -81,6 +81,12 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
         add_message :error, "You do not own this receipt"
       end
     end
+
+    # checking if the user has enough cash on hand balance to mark this expense against it
+    check_coh_availability_update(updated_expense_params)
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_reimbursable_exclusivity_update(updated_expense_params)
   end
 
   def process

@@ -80,6 +80,21 @@ class Report::Expenses::Add < Report::Base
     end
   end
 
+  def pre_process
+    # mark the respective expenses that are from cash on hand as blocked
+    # so that we can raise the rest as violations inside a report
+    coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+    expenses.spent_from_cash_on_hand.each do |expense|
+      if expense.cash_on_hand_blocked
+        next
+      end
+      amount = expense.calculate_amount_value(report.policy)
+      if coh_adapter.balance(display_balance: true) >= amount
+        expense.update(cash_on_hand_blocked: true)
+      end
+    end
+  end
+
   def process
     expenses.update_all(report_id: report.id, expense_status_id: ExpenseStatus.unsubmitted_id, manager_memo: nil, rejecting_manager_id: nil)
     expenses.each do |expense|

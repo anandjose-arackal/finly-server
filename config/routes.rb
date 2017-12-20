@@ -928,6 +928,7 @@
 #                                                         PATCH  /payments/companies/:id(.:format)                                                          companies#update
 #                                                         PUT    /payments/companies/:id(.:format)                                                          companies#update
 #                                                         DELETE /payments/companies/:id(.:format)                                                          companies#destroy
+#                                         request_filters GET    /payment_request_filters(.:format)                                                         bank_transfer/bank_payment_requests#filters
 #                      bank_transfer_payment_orders_count GET    /bank_transfer/payment_orders/count(.:format)                                              bank_transfer/payment_orders#count
 #                    bank_transfer_payment_orders_balance GET    /bank_transfer/payment_orders/balance(.:format)                                            bank_transfer/payment_orders#balance
 #                            bank_transfer_payment_orders GET    /bank_transfer/payment_orders(.:format)                                                    bank_transfer/payment_orders#index
@@ -977,6 +978,7 @@
 #                                                         PATCH  /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#update
 #                                                         PUT    /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#update
 #                                                         DELETE /bank_transfer/account_owners/:id(.:format)                                                bank_transfer/account_owners#destroy
+#                                    bank_transfer_import POST   /bank_transfer/vendors/import(.:format)                                                    bank_transfer/vendors#import
 #                     bank_transfer_vendor_show_transfers GET    /bank_transfer/vendors/:vendor_id/show_transfers(.:format)                                 bank_transfer/vendors#show_transfers
 #                                   bank_transfer_vendors GET    /bank_transfer/vendors(.:format)                                                           bank_transfer/vendors#index
 #                                                         POST   /bank_transfer/vendors(.:format)                                                           bank_transfer/vendors#create
@@ -2349,13 +2351,13 @@ Rails.application.routes.draw do
     end
   end
 
+  get 'payment_request_filters', to: 'bank_transfer/bank_payment_requests#filters', as: :request_filters
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
     get 'payment_orders/balance', to: 'payment_orders#balance'
     resources :payment_orders do
 
     end
-
     get 'bank_payment_requests/count', to: 'bank_payment_requests#count', as: :count
     post 'payment_requests/process_file', to: 'bank_payment_requests#process_file'
     post 'payment_requests/account_details', to: 'bank_payment_requests#account_details'
@@ -2385,6 +2387,7 @@ Rails.application.routes.draw do
     get 'account_owners/count', to: 'account_owners#count'
     resources :account_owners
 
+    post 'vendors/import', to: 'vendors#import', as: :import
     resources :vendors do
       get 'show_transfers', to: 'vendors#show_transfers'
     end

@@ -23,7 +23,9 @@
 #  split_link             :string(255)
 #  deleted_to_split       :boolean          default(FALSE)
 #  from_cash_on_hand      :boolean          default(FALSE)
+#  cash_on_hand_blocked   :boolean
 #
+
 
 
 
@@ -276,7 +278,8 @@ class Expense < ActiveRecord::Base
                                                                        ExpenseType.id_for(:time),
                                                                        ExpenseType.id_for(:per_diem)]) }
   scope :only_reimbursable_expenses, -> { where(reimbursable: true) }
-  scope :spent_from_cash_on_hand, -> { where(from_cash_on_hand: true).where(expense_type_id: ExpenseType.id_for(:manual)) }
+  scope :spent_from_cash_on_hand, -> { where(from_cash_on_hand: true) }
+  scope :blocked_against_cash_on_hand, -> { where cash_on_hand_blocked: true }
 
   scope :with_id, ->(ids) { where id: ids }
   scope :without_id, -> (id) {

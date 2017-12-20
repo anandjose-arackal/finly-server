@@ -61,6 +61,7 @@ class CustomField::Configuration::Index < CustomField::Configuration::Base
     attr_accessor :field_configurations
 
     has_scope :filter_field_type_id
+    has_scope :filter_parent_type_id
 
     def init
       self.field_configurations = params[:field_configurations]

@@ -21,6 +21,7 @@
 #  beneficiary_type_id          :integer
 #  policy_id                    :integer
 #  payment_file_downloaded      :boolean          default(FALSE)
+#  auto_approved                :boolean
 #
 
 class BankPaymentRequest < ActiveRecord::Base
@@ -103,6 +104,18 @@ class BankPaymentRequest < ActiveRecord::Base
 
   scope :includes_details, -> { includes(:status, :owner, :requested_amount)}
 
+  scope :filter_custom_drop_down_selection, -> (drop_down_item_id) {
+    drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
+    raw_po_ids = self.pluck(:payment_order_id)
+    raw_payment_ids = Payment.where(payment_order_id: raw_po_ids)
+    raw_invoice_ids = Invoice.where(payment_id: raw_payment_ids)
+    invoice_ids = CustomField.with_drop_down_selection(drop_down_selection_ids).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
+    payment_ids = Invoice.where(id: invoice_ids)
+    po_ids = Payment.where(id: payment_ids).pluck(:payment_order_id)
+    bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids)
+    where(id: bpr_ids)
+  }
+
   attr_accessor :cache_users
 
   before_save do
@@ -147,7 +160,7 @@ class BankPaymentRequest < ActiveRecord::Base
     # extracting the last tracks and checking if it was a submit action combined
     # with the next action user being blank
     trail = self.bank_payment_request_trails.last
-    trail.submit_action? && trail.modified_user.blank?
+    (trail.submit_action? && trail.modified_user.blank?) || self.auto_approved
   end
 
   def user
