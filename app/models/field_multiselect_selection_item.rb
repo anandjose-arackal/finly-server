@@ -13,4 +13,8 @@ class FieldMultiselectSelectionItem < ActiveRecord::Base
   belongs_to :field_multiselect_selection
 
   belongs_to :value, class_name: 'FieldMultiselectItem'
+
+  scope :with_value, -> (value_id) { where value_id: value_id}
+  scope :with_id, -> (id) { where id: id}
+  scope :with_field_multiselect_selection, -> (id) { where field_multiselect_selection_id: id}
 end

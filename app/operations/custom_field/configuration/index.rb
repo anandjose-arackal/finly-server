@@ -11,7 +11,6 @@ class CustomField::Configuration::Index < CustomField::Configuration::Base
     #   # Authorized policy admin
     #   return nil
     # end
-    [:company_admin]
   end
 
   def pre_validate
@@ -60,8 +59,8 @@ class CustomField::Configuration::Index < CustomField::Configuration::Base
   class CustomField::Configuration::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :field_configurations
 
-    has_scope :filter_field_type_id
-    has_scope :filter_parent_type_id
+    has_scope :filter_field_type_id, type: :array
+    has_scope :filter_parent_type_id, type: :array
 
     def init
       self.field_configurations = params[:field_configurations]
