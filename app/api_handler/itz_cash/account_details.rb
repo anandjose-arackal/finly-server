@@ -38,7 +38,7 @@ class ItzCash::AccountDetails < ItzCash::Base
     # special condition because of ItzCash's drama about reissued cards
     if card.replaced_card_id.present?
       replaced_card = Card.unscoped.find_by(id: card.replaced_card_id)
-      op = ItzCash::AccountDetails.(card.user, card: replaced_card)
+      op = ItzCash::AccountDetails.(replaced_card.user, card: replaced_card)
       if op.success?
         params[:balance] = op.balance
         params[:available_card_eligibility] = op.available_card_eligibility
