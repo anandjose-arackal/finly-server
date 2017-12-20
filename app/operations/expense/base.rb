@@ -18,7 +18,7 @@ class Expense::Base < BaseOperation
 
   def check_coh_availability_create(params = nil)
     # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
-    if ['1', 1].include?(params[:from_cash_on_hand])
+    if StringUtils.to_bool(params[:from_cash_on_hand])
       case params[:expense_type_id]
         when ExpenseType.id_for(:manual)
           amount = params[:amount_attributes][:value]&.to_f
@@ -75,7 +75,7 @@ class Expense::Base < BaseOperation
 
   # ensuring that the an expense can't be both from cash on hand AND reimbursable during creation
   def check_coh_reimbursable_exclusivity_create(params)
-    if ['1', 1].include?(params[:from_cash_on_hand]) && ['1', 1].include?(params[:reimbursable])
+    if StringUtils.to_bool(params[:from_cash_on_hand]) && StringUtils.to_bool(params[:reimbursable])
       add_message :error, "Expense spent from cash on hand cannot be reimbursable"
     end
   end
