@@ -26,7 +26,6 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
   end
 
   def process
-
     presenter = User::Team::Review::NextReviewer.(bank_payment_request)
     manager = presenter.user
     manager_role_id = presenter.role_id

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171219112052) do
+ActiveRecord::Schema.define(version: 20171219142155) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -802,6 +802,7 @@ ActiveRecord::Schema.define(version: 20171219112052) do
     t.boolean  "is_deleted",                             default: false
     t.boolean  "hotlisted",                              default: false
     t.string   "card_processor_status",    limit: 255
+    t.integer  "replaced_card_id",         limit: 4
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
