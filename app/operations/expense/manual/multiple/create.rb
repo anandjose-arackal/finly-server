@@ -146,8 +146,8 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
 
     self.multiple_expenses.each do |key, expense_hash|
       expense = expense_hash[:expense]
-      if self.expense.report_id.present? and self.expense.report.retracted?
-        comment = self.expense.report.comments.build report: self.expense.report, user: user,
+      if expense.report_id.present? and expense.report.retracted?
+        comment = expense.report.comments.build report: expense.report, user: user,
                                                      report_comment_action_id: ReportCommentAction.id_for(:expense_add), expense: expense
         unless comment.save
           add_message :error, comment.errors.full_messages
