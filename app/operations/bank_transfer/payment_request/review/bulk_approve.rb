@@ -8,6 +8,9 @@ class BankTransfer::PaymentRequest::Review::BulkApprove < BankTransfer::PaymentR
 
   def init
     ids = params[:ids] || params[:bank_payment_request_ids]
+    unless ids.is_a?(Array)
+      ids = ids.split(',')
+    end
     self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.with_id(ids) rescue nil
     self.bank_payment_requests = self.bank_payment_requests.includes_details
   end
