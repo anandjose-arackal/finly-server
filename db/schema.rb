@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171205152421) do
+ActiveRecord::Schema.define(version: 20171219142155) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -502,8 +502,8 @@ ActiveRecord::Schema.define(version: 20171205152421) do
     t.integer  "payment_order_id",             limit: 4
     t.string   "name",                         limit: 255
     t.integer  "requested_amount_id",          limit: 4
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.datetime "created_at",                                                 null: false
+    t.datetime "updated_at",                                                 null: false
     t.datetime "submitted_at"
     t.integer  "controlling_user_role_id",     limit: 4
     t.text     "description",                  limit: 65535
@@ -513,6 +513,8 @@ ActiveRecord::Schema.define(version: 20171205152421) do
     t.boolean  "is_deleted"
     t.integer  "beneficiary_type_id",          limit: 4
     t.integer  "policy_id",                    limit: 4
+    t.boolean  "payment_file_downloaded",                    default: false
+    t.boolean  "auto_approved"
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
@@ -800,6 +802,7 @@ ActiveRecord::Schema.define(version: 20171205152421) do
     t.boolean  "is_deleted",                             default: false
     t.boolean  "hotlisted",                              default: false
     t.string   "card_processor_status",    limit: 255
+    t.integer  "replaced_card_id",         limit: 4
   end
 
   add_index "cards", ["card_type_id"], name: "index_cards_on_card_type_id", using: :btree
@@ -1507,6 +1510,7 @@ ActiveRecord::Schema.define(version: 20171205152421) do
     t.string   "split_link",             limit: 255
     t.boolean  "deleted_to_split",                     default: false
     t.boolean  "from_cash_on_hand",                    default: false
+    t.boolean  "cash_on_hand_blocked"
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -2325,6 +2329,16 @@ ActiveRecord::Schema.define(version: 20171205152421) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "payment_file_configurations", force: :cascade do |t|
+    t.string   "file_format", limit: 255
+    t.integer  "company_id",  limit: 4,     null: false
+    t.text     "options",     limit: 65535
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "payment_file_configurations", ["company_id"], name: "index_payment_file_configurations_on_company_id", using: :btree
 
   create_table "payment_modes", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -3501,15 +3515,21 @@ ActiveRecord::Schema.define(version: 20171205152421) do
   add_index "yes_bank_company_accounts", ["company_id"], name: "index_yes_bank_company_accounts_on_company_id", using: :btree
 
   create_table "yes_bank_vendors", force: :cascade do |t|
-    t.string   "name",          limit: 255
-    t.integer  "company_id",    limit: 4
-    t.datetime "created_at",                                null: false
-    t.datetime "updated_at",                                null: false
-    t.string   "email",         limit: 255
-    t.string   "mobile_number", limit: 255
+    t.string   "name",           limit: 255
+    t.integer  "company_id",     limit: 4
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+    t.string   "email",          limit: 255
+    t.string   "mobile_number",  limit: 255
     t.boolean  "authorized"
-    t.string   "description",   limit: 255
-    t.boolean  "is_deleted",                default: false
+    t.string   "description",    limit: 255
+    t.boolean  "is_deleted",                 default: false
+    t.string   "pan",            limit: 255
+    t.string   "tin",            limit: 255
+    t.string   "gst",            limit: 255
+    t.boolean  "gst_registered"
+    t.string   "state",          limit: 255
+    t.string   "state_code",     limit: 255
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
@@ -3640,6 +3660,7 @@ ActiveRecord::Schema.define(version: 20171205152421) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "payment_file_configurations", "companies"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
   add_foreign_key "payment_receivables", "amounts"
