@@ -8,10 +8,15 @@ class BankTransfer::PaymentRequest::Review::ApproveAllPending < BankTransfer::Pa
   end
 
   def init
-    self.bank_payment_requests = BankTransfer::PaymentRequest::Index.(user, params).payment_requests rescue nil
-    # now extract all payment requests for which this particular user is the controlling user
-    self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id).includes_details
-    self.processing_status_id = BankPaymentRequestStatus.id_for(:processing)
+    op = BankTransfer::PaymentRequest::Index.(user, params)
+    if op.success?
+      self.bank_payment_requests = op.payment_requests
+      # now extract all payment requests for which this particular user is the controlling user
+      self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id).includes_details
+      self.processing_status_id = BankPaymentRequestStatus.id_for(:processing)
+    else
+      add_message :error, op.messages[:error]
+    end
   end
 
   def validate
