@@ -22,6 +22,7 @@
 
 
 
+
 class UserManagerMapping < ActiveRecord::Base
   include PolicyVersion
 
@@ -63,7 +64,7 @@ class UserManagerMapping < ActiveRecord::Base
   scope :with_purpose, -> (purpose_id) {where purpose_id: purpose_id}
   scope :expense_management, -> { where purpose_id: Purpose.id_for(:expense_management)}
   scope :vendor_payments, -> {where purpose_id: Purpose.id_for(:vendor_payments)}
-  scope :invoicing, -> { where purpose_id: Purpose.id_for(:invoicing) }
+  scope :invoicing, -> { where purpose_id: Purpose.id_for(:invoice) }
 
   scope :amount, ->(currency_id, value) do
     if value.blank? or currency_id.blank?

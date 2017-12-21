@@ -65,7 +65,7 @@ class ExpenseTypesConfigurationController < ApplicationController
       @groups = @result.user_groups
       @teams = UserTeam::Index.(current_user, params)&.user_teams
     end
-    field_configuration_result = CustomField::Configuration::Index.(current_user, filter_field_type_id: FieldType.id_for(:drop_down))
+    field_configuration_result = CustomField::Configuration::Index.(current_user, {filter_field_type_id: [FieldType.id_for(:drop_down)], filter_parent_type_id: FieldParentType.id_for(:expense)})
     if field_configuration_result.success?
       @field_configurations = field_configuration_result.field_configurations
     end

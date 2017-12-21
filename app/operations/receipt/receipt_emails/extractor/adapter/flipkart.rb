@@ -1,7 +1,7 @@
 class Receipt::ReceiptEmails::Extractor::Adapter::Flipkart < Receipt::ReceiptEmails::Extractor::Adapter::Base
 
   def self.senders
-    'no-reply@flipkart.com'
+    ['no-reply@flipkart.com', 'noreply@flipkart.com']
   end
 
   def merchant

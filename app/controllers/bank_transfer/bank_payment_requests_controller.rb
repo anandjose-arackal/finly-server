@@ -68,6 +68,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def mark_as_credited
+    @result = BankTransfer::PaymentRequest::Review::MarkAsCredited.(current_user, params)
+    respond
+  end
+
   def count
     @result = BankTransfer::PaymentRequest::Count.(current_user, params)
     render json: @result.as_json
@@ -95,6 +100,41 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def update_payment
     @result = BankTransfer::PaymentRequest::Payment::Update.(current_user, params)
+    respond
+  end
+
+  def payment_file
+    @result = BankTransfer::PaymentRequest::GeneratePaymentFile.(current_user, params)
+    respond
+  end
+
+  def bulk_approve_validate
+    @result = BankTransfer::PaymentRequest::Review::BulkApproveValidate.(current_user, params)
+    respond
+  end
+
+  def bulk_approve
+    @result = BankTransfer::PaymentRequest::Review::BulkApprove.(current_user, params)
+    respond
+  end
+
+  def mark_all_pending
+    @result = BankTransfer::PaymentRequest::Review::ApproveAllPending.(current_user, params)
+    respond
+  end
+
+  def download_pending
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadPending.(current_user, params)
+    respond
+  end
+
+  def download_selected
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadSelected.(current_user, params)
+    respond
+  end
+
+  def filters
+    @result = CustomField::Configuration::Index.(current_user, {filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)], filter_parent_type_id: [FieldParentType.id_for(:invoice)]})
     respond
   end
 

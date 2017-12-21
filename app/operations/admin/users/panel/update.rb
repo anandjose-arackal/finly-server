@@ -18,12 +18,12 @@ class Admin::Users::Panel::Update < Admin::Users::Base
     unless user.finly_admin?
       raise_unauthorized_exception
     end
-    if subscription_params[:yes_bank_account_transfer] == '1'
-      unless selected_user.admin? || selected_user.finance_manager?
-        add_message :error, "Vendor Payments is only available for Admins and Finance Managers as of now"
-        return
-      end
-    end
+    # if subscription_params[:yes_bank_account_transfer] == '1'
+    #   unless selected_user.admin? || selected_user.finance_manager?
+    #     add_message :error, "Vendor Payments is only available for Admins and Finance Managers as of now"
+    #     return
+    #   end
+    # end
   end
 
   def process

@@ -20,6 +20,8 @@
 #  is_deleted                   :boolean
 #  beneficiary_type_id          :integer
 #  policy_id                    :integer
+#  payment_file_downloaded      :boolean          default(FALSE)
+#  auto_approved                :boolean
 #
 
 class BankPaymentRequest < ActiveRecord::Base
@@ -45,17 +47,19 @@ class BankPaymentRequest < ActiveRecord::Base
   # i.e. a payment request cannot exist without a payment order
   validates :payment_order, presence: true
 
-  default_scope { order(updated_at: :desc)}
+  default_scope { order(created_at: :desc) }
 
   delegate :open?, :submitted?, :retracted?, :rejected?, :approved?, :credited?, :processing?, to: :status
   delegate :requested_amount_value, to: :requested_amount
   delegate :scheduled?, to: :payment_order
 
   scope :non_owner, -> (user_id) { where.not owner_id: user_id }
+  scope :with_controlling_user, -> (user_id) { where controlling_user_id: user_id }
   scope :with_controlling_user_role, -> (role_id) { where controlling_user_role_id: role_id }
-  scope :with_user, -> (user_id) { where owner_id: user_id}
-  scope :not_open, -> {where.not status_id: BankPaymentRequestStatus.id_for(:open)}
+  scope :with_user, -> (user_id) { where owner_id: user_id }
+  scope :not_open, -> { where.not status_id: BankPaymentRequestStatus.id_for(:open) }
   scope :with_id, -> (id) { where id: id }
+  scope :approved, -> { where status_id: BankPaymentRequestStatus.id_for(:approved) }
   scope :filter_status_id, -> (status_id) {
     case status_id
       when 1, '1' # i.e. open
@@ -76,6 +80,13 @@ class BankPaymentRequest < ActiveRecord::Base
         joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:scheduled))
       when 9, '9' # i.e. pending
         joins(:payment_order).where('payment_orders.payment_order_status_id = ?', PaymentOrderStatus.id_for(:pending))
+      when '10', 10 # i.e awaiting approval from current user
+        case UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym)
+          when UserRole.id_for(:admin)
+            where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing))
+          else
+            where(controlling_user_id: RequestStore.store[:current_user]&.id, status_id: BankPaymentRequestStatus.id_for(:processing), controlling_user_role_id: UserRole.id_for(RequestStore.store[:params]&.dig(:view)&.to_sym))
+        end
       else
         # do nothing?
     end
@@ -89,10 +100,30 @@ class BankPaymentRequest < ActiveRecord::Base
     joins(:payment_order).where('payment_orders.processed_at >= ? AND processed_at <= ?', date_from, date_to)
   }
 
+  scope :processing, -> { where status_id: BankPaymentRequestStatus.id_for(:processing) }
+
+  scope :includes_details, -> { includes(:status, :owner, :requested_amount)}
+
+  scope :filter_custom_drop_down_selection, -> (drop_down_item_id) {
+    drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
+    multiselect_item_ids = FieldMultiselectItem.where(id: drop_down_item_id).pluck(:id)
+    raw_po_ids = self.pluck(:payment_order_id)
+    raw_payment_ids = Payment.where(payment_order_id: raw_po_ids)
+    raw_invoice_ids = Invoice.where(payment_id: raw_payment_ids)
+    invoice_ids = CustomField.with_drop_down_selection(drop_down_selection_ids).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
+    invoice_ids += CustomField.with_multi_select_selection(multiselect_item_ids).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
+    payment_ids = Invoice.where(id: invoice_ids).pluck(:payment_id)
+    po_ids = Payment.where(id: payment_ids).pluck(:payment_order_id)
+    bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids).pluck(:id)
+    where(id: bpr_ids)
+  }
+
   attr_accessor :cache_users
 
   before_save do
-    self.name = generate_name
+    if self.name.blank?
+      self.name = generate_name
+    end
   end
 
   def can_submit?
@@ -123,11 +154,15 @@ class BankPaymentRequest < ActiveRecord::Base
     approved? && !credited?
   end
 
+  def pending?
+    self.status_id == BankPaymentRequestStatus.id_for(:pending)
+  end
+
   def auto_approved?
     # extracting the last tracks and checking if it was a submit action combined
     # with the next action user being blank
     trail = self.bank_payment_request_trails.last
-    trail.submit_action? && trail.modified_user.blank?
+    (trail.submit_action? && trail.modified_user.blank?) || self.auto_approved
   end
 
   def user

@@ -20,10 +20,11 @@ class BankTransfer::PaymentRequest::Update < BankTransfer::PaymentRequest::Base
     scheduled_at = params[:scheduled_at]
     initiating_account_type = params[:initiating_account_type]
     description = params[:description]
+    policy_id = params[:policy_id]
     self.response_presenter = BankTransfer::PaymentRequest::Process.(user, {scheduled_at: scheduled_at,
                                                                     payment_order: order_data,
                                                                     initiating_account_type: initiating_account_type,
-                                                                    description: description})
+                                                                    description: description, policy_id: policy_id})
     unless self.response_presenter.success?
       add_message :error, self.response_presenter.messages[:error]
     end

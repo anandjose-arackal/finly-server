@@ -218,8 +218,8 @@ class BaseOperation
     RequestStore.store[:current_app]
   end
 
-  def current_devise
-    RequestStore.store[:current_devise]
+  def current_device
+    RequestStore.store[:current_device]
   end
 
   def current_user
@@ -299,8 +299,8 @@ class BaseOperation
       RequestStore.store[:current_app]
     end
 
-    def current_devise
-      RequestStore.store[:current_devise]
+    def current_device
+      RequestStore.store[:current_device]
     end
 
     def current_user

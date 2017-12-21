@@ -42,6 +42,13 @@ class Policy::InvitableUsers < Policy::Base
   def process
     # filtering by manager happens manually, because the particular manager's team needs to be filtered out
     self.invitable_users = policy.company.users.signed_up.without_id(policy.users.pluck(:id)).sort_by_name
+    if expense_management?
+      self.invitable_users = self.invitable_users.filter_expense_management(true)
+    elsif funds_transfer?
+      self.invitable_users = self.invitable_users.filter_disburse(true)
+    elsif vendor_payments?
+      self.invitable_users = self.invitable_users.filter_vendor_payments(true)
+    end
     manager_id = params[:filter_manager_id]
     if manager_id.present?
       manager = policy.company.users.find_by_id(manager_id)

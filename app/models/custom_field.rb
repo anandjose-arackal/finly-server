@@ -31,6 +31,13 @@ class CustomField < ActiveRecord::Base
   scope :includes_parent, -> { includes :parent }
   scope :expenses, -> { where parent_type: ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense'] }
   scope :with_drop_down_selection, -> (drop_down_selection_id) { where value_type: 'FieldDropDownSelection', value_id: drop_down_selection_id }
+  scope :with_parent, -> (parent_id, parent_type) { where parent_id: parent_id, parent_type: parent_type}
+  scope :with_multi_select_selection, -> (multiselect_selection_id) {
+    multi_select_ids = self.where(value_type: "FieldMultiselectSelection").pluck(:value_id)
+    multi_select_ids = FieldMultiselectSelectionItem.with_value(multiselect_selection_id).with_field_multiselect_selection(multi_select_ids).pluck(:field_multiselect_selection_id)
+    ids = CustomField.where(value_id: multi_select_ids, value_type: "FieldMultiselectSelection").pluck(:id)
+    where(id: ids)
+  }
 
   def set_value(value, save = true)
     if value.blank?
@@ -116,6 +123,12 @@ class CustomField < ActiveRecord::Base
         return self.value&.value
       when FieldType.id_for(:drop_down)
         return self.value&.value&.name
+      when FieldType.id_for(:multiselect)
+        names = []
+        self.value&.field_multiselect_selection_items&.each do |item|
+          names << item.value.name
+        end
+        return names.to_sentence
       else
         # do nothing?
     end

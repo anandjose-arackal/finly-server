@@ -14,6 +14,6 @@ class BankPaymentRequestCommentAction < ActiveRecord::Base
   def self.values
     [:submit, :approve, :unapprove, :retract, :reject, :credit, :comment, :payment_edit,
      :add_attachment, :forward, :take_control, :unapprove, :auto_approve, :cancel,
-     :add_beneficiary, :remove_beneficiary]
+     :add_beneficiary, :remove_beneficiary, :mark_as_credited]
   end
 end

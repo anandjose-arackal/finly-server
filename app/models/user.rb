@@ -51,16 +51,6 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -158,7 +148,7 @@ class User < ActiveRecord::Base
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
-  has_one :user_permission
+  has_one :user_permission, dependent: :destroy
 
   # has_one :feature_access, as: :accessible
 
@@ -374,7 +364,7 @@ class User < ActiveRecord::Base
   scope :with_bank_accounts, -> { joins(:bank_accounts) }
 
   scope :filter_disburse, -> (enabled) {
-    if enabled == '1' || enabled == 1
+    if StringUtils.to_bool(enabled)
       joins(:user_panel_subscription).where('user_panel_subscriptions.disburse = ?', true)
     else
       joins(:user_panel_subscription).where('user_panel_subscriptions.disburse = ? or disburse = ?', false, nil)
@@ -382,7 +372,7 @@ class User < ActiveRecord::Base
   }
 
   scope :filter_expense_management, -> (enabled) {
-    if enabled == '1' || enabled == 1
+    if StringUtils.to_bool(enabled)
       joins(:user_panel_subscription).where('user_panel_subscriptions.expense_management = ?', true)
     else
       joins(:user_panel_subscription).where('user_panel_subscriptions.expense_management = ? or expense_management = ?', false, nil)
@@ -390,7 +380,7 @@ class User < ActiveRecord::Base
   }
 
   scope :filter_vendor_payments, -> (enabled) {
-    if enabled == '1' || enabled == 1
+    if StringUtils.to_bool(enabled)
       joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true)
     else
       joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ? or yes_bank_account_transfer = ?', false, nil)
@@ -418,7 +408,7 @@ class User < ActiveRecord::Base
       self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: Purpose.id_for(:vendor_payments)).save
     end
     if self.team_mapping.invoicing.count == 0
-      self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: Purpose.id_for(:invoicing)).save
+      self.team_mapping.build(default: true, policy_id: default_policy_id, purpose_id: Purpose.id_for(:invoice)).save
     end
 
     self.policy_user_mappings.build(policy_id: default_policy_id).save

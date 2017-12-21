@@ -7,6 +7,7 @@ json.array! @result.paginated_requests.each do |payment_request|
   end
   json.name payment_request.name
   json.scheduled_at scheduled_at
+  json.controlling_user payment_request.controlling_user&.name
   processed_date = item.processed_at
   if processed_date.present?
     processed_date = processed_date.strftime('%d %b %Y')
@@ -24,6 +25,13 @@ json.array! @result.paginated_requests.each do |payment_request|
     json.name item.payment_order_status.name.humanize
     json.identifier item.bank_payment_request&.status_name(current_user.id)
   end
-  json.amount_processed item.amount_processed
-  json.amount_requested item.amount_requested
+  json.amount_processed do
+    json.value precision_value item.amount_processed&.value
+    json.currency item.amount_processed&.currency
+  end
+  json.amount_requested do
+    json.value precision_value item.amount_requested&.value
+    json.currency item.amount_requested&.currency
+  end
+  json.payment_file_downloaded payment_request.payment_file_downloaded
 end
