@@ -1,5 +1,5 @@
 class Expense::Base < BaseOperation
-  attr_accessor :expense
+  attr_accessor :expense, :per_diem
 
   def authorized_user_types
     [:employee, :manager, :admin, :finance_manager]
@@ -15,6 +15,71 @@ class Expense::Base < BaseOperation
     id = (params[:expense_id] or params[:id])
     self.expense = Expense::Index.(user, params)&.expenses&.find_by(id: id)
   end
+
+  def check_coh_availability_create(params = nil)
+    # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
+    if StringUtils.to_bool(params[:from_cash_on_hand])
+      case params[:expense_type_id]
+        when ExpenseType.id_for(:manual)
+          amount = params[:amount_attributes][:value]&.to_f
+        when ExpenseType.id_for(:per_diem)
+          expense = user.expenses.build(params)
+          amount = expense.calculate_amount_value(self.per_diem.configurable)
+      end
+      cash_on_hand_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      balance = cash_on_hand_adapter.balance(display_balance: true) # because we need the balances after reducing the other expenses blocked amount
+      unless balance > amount
+        add_message :error, "You do not have enough balance in your Cash On Hand to mark this expense against it"
+        return
+      end
+    end
+  end
+
+  # common conditions for checking amounts against cash on hand
+  def check_coh_availability_update(params = nil)
+    # if the expense is being marked as from cash on hand, check if there is enough cash on hand to facilitate it
+    if StringUtils.to_bool(params&.dig(:from_cash_on_hand)) or (params&.dig(:from_cash_on_hand).nil? and expense.from_cash_on_hand)
+      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      amount_val = (params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
+      balance = coh_adapter.balance(display_balance: true)
+      # if the expense is continuing to be from COH, and only the amount is changing
+      if expense.from_cash_on_hand && StringUtils.to_bool(params&.dig(:from_cash_on_hand))
+        difference = params&.dig(:amount_attributes, :value)&.to_f - expense.amount_value
+        unless difference <= balance
+          add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
+          return
+        end
+        # i.e. if the expense was not originally from COH, and it's currently being made into one
+      elsif !expense.from_cash_on_hand && StringUtils.to_bool(params&.dig(:from_cash_on_hand))
+        unless balance >= amount_val
+          add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
+          return
+        end
+      elsif expense.from_cash_on_hand && !StringUtils.to_bool(params&.dig(:from_cash_on_hand))
+        # nothing to do here ¯\_(ツ)_/¯
+      end
+    end
+  end
+
+  # ensuring that the an expense can't be both from cash on hand AND reimbursable during updation
+  def check_coh_reimbursable_exclusivity_update(params)
+    # making sure that a particular expense cannot be both reimbursable and from cash on hand at the same time
+    from_cash_on_hand = StringUtils.to_bool(params&.dig(:from_cash_on_hand))
+    from_cash_on_hand = from_cash_on_hand.nil? ? expense.from_cash_on_hand : from_cash_on_hand
+    reimbursable = StringUtils.to_bool(params&.dig(:reimbursable))
+    reimbursable = reimbursable.nil? ?  expense.reimbursable : reimbursable
+    if from_cash_on_hand and reimbursable
+      add_message :error, 'Expense cannot be Reimbursable and Paid from Cash on Hand'
+    end
+  end
+
+  # ensuring that the an expense can't be both from cash on hand AND reimbursable during creation
+  def check_coh_reimbursable_exclusivity_create(params)
+    if StringUtils.to_bool(params[:from_cash_on_hand]) && StringUtils.to_bool(params[:reimbursable])
+      add_message :error, "Expense spent from cash on hand cannot be reimbursable"
+    end
+  end
+
 
   def success
     Expense::Base::Presenter.new(user, {expense: self.expense, view: params[:view]}, self.messages)

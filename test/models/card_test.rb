@@ -24,6 +24,7 @@
 #  is_deleted               :boolean          default(FALSE)
 #  hotlisted                :boolean          default(FALSE)
 #  card_processor_status    :string(255)
+#  replaced_card_id         :integer
 #
 
 

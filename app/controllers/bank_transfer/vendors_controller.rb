@@ -32,4 +32,9 @@ class BankTransfer::VendorsController < ApplicationController
     respond
   end
 
+  def import
+    @result = BankTransfer::Vendors::Import.(current_user, params)
+    respond
+  end
+
 end

@@ -54,6 +54,10 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   end
 
   def post_process
+    if self.response.status == 404
+      add_message :error, "The service is temporarily down. Please try again later"
+      return
+    end
     self.parsed_response = Hash.from_xml(response.body)
     # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
     self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")

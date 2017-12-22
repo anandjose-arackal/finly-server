@@ -9,12 +9,8 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     self.new.perform(payment_order_id, options)
   end
 
-  def self.call_async(payment_order_id, options = {})
-    # define the operation to accordingly run the operation in the background
-    self.perform_async(payment_order_id, options)
-  end
-
-  def perform(payment_order_id, options)
+  def perform(payment_order_id, options, request_store_hash=nil)
+    load_request_store request_store_hash
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
@@ -23,7 +19,7 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     self.run
   end
 
-  def perform_async(payment_order_id, options)
+  def self.perform_async(payment_order_id, options)
     # in case the object is passed directly instead of an id
     payment_order_id = payment_order_id
     if payment_order_id.present? && payment_order_id.is_a?(PaymentOrder)

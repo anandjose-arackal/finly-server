@@ -29,8 +29,8 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
           payment[:beneficiary_account_number],
           payment[:receiving_user_name],
           payment[:amount],
-          retrieve_payment_mode(payment), # todo - change this based on the payment mode - have to find out what the characters are for other payment modes
-          payment[:date], # payment.invoice&.date&.strftime("%d-%^b-%Y"),
+          retrieve_payment_mode(payment),
+          payment[:date],
           payment[:ifsc],
           "",
           "",

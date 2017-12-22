@@ -144,12 +144,15 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
 
   def set_custom_fields(save, payment, data)
     fields = data
+    return if data.blank?
     custom_fields = {custom_fields: fields}
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
     CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
-    data.delete(:custom_fields) # removing the custom fields because payment creation will throw an error
+    unless data[:custom_fields].blank?
+      data.delete(:custom_fields) # removing the custom fields because payment creation will throw an error
+    end
   end
 
   def calculate_tax_and_discounts(payment)

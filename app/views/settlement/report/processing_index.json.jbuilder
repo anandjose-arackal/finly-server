@@ -21,8 +21,8 @@ json.array! @result.paginated_report_processor_groups do |group|
       json.completed_on DateUtils.date_formatted item.completed_at
       json.status item.status
       json.payment item.payment
-      json.receiving_account_type item.payment&.receiving_account_type
-      json.receiving_account item.payment&.receiving_account
+      json.receiving_account_type item.processor_accountable_type
+      json.receiving_account item.processor_accountable
       json.note item.note
       json.reports do
         json.array! item.reports do |report|

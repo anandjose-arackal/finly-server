@@ -24,6 +24,7 @@
 #  is_deleted               :boolean          default(FALSE)
 #  hotlisted                :boolean          default(FALSE)
 #  card_processor_status    :string(255)
+#  replaced_card_id         :integer
 #
 
 class Card < ActiveRecord::Base
@@ -38,6 +39,7 @@ class Card < ActiveRecord::Base
   belongs_to :card_program
   belongs_to :itz_cash_card_program
   belongs_to :card_status
+  belongs_to :replaced_card, class_name: "Card"
   has_many :transactions, class_name: 'CardTransaction'
   has_many :initiating_payments, as: :initiating_account
   has_many :initiating_payment_trails, as: :initiating_account
@@ -151,6 +153,20 @@ class Card < ActiveRecord::Base
     end
   end
 
+  # def proxy
+  #   if self.replaced_with.present?
+  #     self.replaced_with.proxy
+  #   end
+  #   super
+  # end
+
+  def api_proxy
+    if self.replaced_card.present?
+      self.replaced_card.proxy
+    else
+      self.proxy
+    end
+  end
 
   def unblockable?
     if self.active
@@ -186,8 +202,9 @@ class Card < ActiveRecord::Base
     (self.card_eligibility&.value || 0)
   end
 
+  # always use serial_id in APIs
   def serial_id
-    self.proxy
+    api_proxy
   end
 
   def inactive?
