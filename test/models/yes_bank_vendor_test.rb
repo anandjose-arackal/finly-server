@@ -10,7 +10,7 @@
 #  email          :string(255)
 #  mobile_number  :string(255)
 #  authorized     :boolean
-#  description    :string(255)
+#  description    :text(65535)
 #  is_deleted     :boolean          default(FALSE)
 #  pan            :string(255)
 #  tin            :string(255)
