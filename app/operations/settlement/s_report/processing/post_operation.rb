@@ -33,6 +33,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     group_failed_status = ReportProcessorGroupStatus.id_for(:failed)
     group_partially_complete_status = ReportProcessorGroupStatus.id_for(:partially_completed)
     report_status_settled = ReportStatus.id_for(:settled)
+    report_tracking_status_settled = ReportTrackingAction.id_for(:settled)
 
     has_success = false
     has_failure = false
@@ -52,8 +53,8 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
               mapping.reports.each do |report|
                 report.tracks.create action_user_id: self.report_processor_group.created_by_user_id,
                                      action_user_role_id: self.report_processor_group.created_by_user_role_id,
-                                     report_tracking_action_id: report_status_settled,
-                                     report_status_id: status,
+                                     report_tracking_action_id: report_tracking_status_settled,
+                                     report_status_id: report_status_settled,
                                      payment: mapping.payment
               end
             elsif mapping.payment.failed?
