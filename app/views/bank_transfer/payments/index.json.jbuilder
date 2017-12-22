@@ -1,5 +1,6 @@
 json.array! @result.paginated_payments.each do |payment|
   json.bank_payment_request do
+    json.id payment.payment_order.bank_payment_request.id
     json.policy do
       json.id payment.payment_order.bank_payment_request.policy&.id
       json.name payment.payment_order.bank_payment_request.policy&.name
