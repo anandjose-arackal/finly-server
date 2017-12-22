@@ -44,7 +44,9 @@ class PaymentPurpose < ActiveRecord::Base
         :invoice,
         :virtual_bank_account,
         :finly_money_reload,
-        :corporate_account_reload
+        :corporate_account_reload,
+        :blocked_for_conflict_resolution,
+        :unblocked_after_conflict_resolution
     ]
   end
 
