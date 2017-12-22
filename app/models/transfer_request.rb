@@ -6,7 +6,8 @@ class TransferRequest < NonPersistentModel
   attr_accessor :beneficiary_account_number, :ifsc, :beneficiary_name, :transfer_type,
                 :transfer_currency_code, :transfer_amount, :unique_reference_number,
                 :bank_reference_number, :company_id,
-                :bank_error_message, :transaction_result
+                :bank_error_message, :transaction_result,
+                :error_code
 
   belongs_to :company
 
@@ -18,18 +19,22 @@ class TransferRequest < NonPersistentModel
   validates :transfer_amount, presence: true
   validates :transfer_type, presence: true
 
-  def self.call(beneficiary_name, beneficiary_account_number, ifsc, transfer_amount, transfer_type, transfer_currency = "INR")
+  def self.call(beneficiary_name, beneficiary_account_number, ifsc, transfer_amount, transfer_type, unique_reference_number, transfer_currency = "INR")
     self.new({
         beneficiary_account_number: beneficiary_account_number,
         beneficiary_name: beneficiary_name,
         ifsc: ifsc,
         transfer_type: transfer_type,
         transfer_amount: transfer_amount,
-        transfer_currency_code: transfer_currency
+        transfer_currency_code: transfer_currency,
+        unique_reference_number: unique_reference_number
     })
   end
 
   def generate_unique_reference
+    if self.unique_reference_number.present?
+      return
+    end
     ref = nil
     loop do
       ref = "FINLY#{transfer_type}#{beneficiary_account_number[(beneficiary_account_number.length - 5), beneficiary_account_number.length]}#{rand.to_s[2..7]}"

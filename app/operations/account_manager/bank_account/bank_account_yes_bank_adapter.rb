@@ -18,34 +18,44 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   def credit(payment, options = {})
     super
     transfer_type = options[:bank_transfer_type]
-    # this will be done by creating the respective payment request for the bank account
-    transfer_request = create_transfer_request(payment, transfer_type)
-    op = YesBankApi::Transfer::BankTransfer.(transfer_request)
+    # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
+    if payment.reference_resource&.retriable?
+      reference_number = payment.reference_resource.unique_request_number
+    else
+      reference_number = nil
+    end
+    transfer_request = create_transfer_request(payment, transfer_type, reference_number)
+    op = YesBankApi::Transfer::BankTransfer.({
+        transfer_request: transfer_request,
+        payment: payment
+    })
     # op = YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(transfer_request)
     # op.transfer_request.transaction_result = "COMPLETED"
     if op.success?
       # logic for setting whether a particular payment was successful or is processing
       if SUCCESSFUL_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-        create_bank_transaction(payment, op.transfer_request)
+        # create_bank_transaction(payment, op.transfer_request)
         store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
       elsif PROCESSING_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_system_message_for_processing(payment)
-        create_bank_transaction(payment, op.transfer_request)
+        # create_bank_transaction(payment, op.transfer_request)
         store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
-      elsif op.transfer_request.transaction_result.nil?
+      elsif op.transfer_request.transaction_result.blank?
         # i.e. there was an error processing the transaction
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         error_message = op.transfer_request.bank_error_message || "Payment could not be processed at this time"
+        # create_bank_transaction(payment, op.transfer_request)
         store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message
         return false
       end
     else
-      # i.e. there was an error processing the transaction
+      # i.e. there was an error processing the transaction - either a 401, or 404, or 500
       payment.update(payment_status_id: PaymentStatus.id_for(:failed))
       self.errors = op.transfer_request.bank_error_message || op.messages[:error] || 'Payment could not be processed at this time'
+
       store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
       return false
     end
@@ -87,6 +97,8 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         transfer_status_id = BankTransferStatus.id_for(:completed)
       when PaymentStatus.id_for(:processing)
         transfer_status_id = BankTransferStatus.id_for(:processing)
+      when PaymentStatus.id_for(:processing)
+        transfer_status_id = BankTransferStatus.id_for(:failed)
       else
         transfer_status_id = BankTransferStatus.id_for(:failed)
     end
@@ -109,8 +121,8 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
                                   content: "Payment processed. Awaiting credit confirmation")
   end
 
-  def create_transfer_request(payment, transfer_type)
-    tr = TransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type)
+  def create_transfer_request(payment, transfer_type, reference_number)
+    tr = TransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, reference_number, transfer_type)
   end
 
 end

@@ -15,6 +15,7 @@
 #  updated_at                  :datetime         not null
 #  bank_response               :string(255)
 #  refunded                    :boolean
+#  error_sub_code              :string(255)
 #
 
 class BankTransaction < ActiveRecord::Base
@@ -25,7 +26,7 @@ class BankTransaction < ActiveRecord::Base
 
   has_one :payment, as: :reference_resource
 
-  validates :bank_reference_number, presence: true
+  validates :bank_reference_number, presence: true, if: :successful?
   validates :unique_request_number, presence: true
   validates :beneficiary_bank_account_id, presence: true
   validates :transfer_status_id, presence: true
@@ -39,5 +40,15 @@ class BankTransaction < ActiveRecord::Base
   delegate :completed?, :processing?, :failed?, to: :transfer_status
 
   scope :processing_transactions, -> {where transfer_status_id: BankTransferStatus.id_for(:processing)}
+
+  def retriable?
+
+  end
+
+  private
+
+  def successful?
+    [BankTransferStatus.id_for(:completed), BankTransferStatus.id_for(:processing)].include?(self.transfer_status_id)
+  end
 
 end

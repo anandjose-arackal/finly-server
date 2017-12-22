@@ -1,12 +1,14 @@
 class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
-  attr_accessor :account_number, :transaction_result, :error_message, :transfer_request
+  attr_accessor :account_number, :transaction_result, :error_message, :transfer_request,
+                :error_code, :transfer_status_id, :company, :bank_transaction, :payment
 
   # in this context, success would imply one of these transactions
   SUCCESS_RESPONSE_CODES = ["COMPLETED", "SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
 
-  def initialize(transfer_request)
-    self.transfer_request = transfer_request
+  def initialize(params)
+    self.transfer_request = params[:transfer_request]
+    self.payment = params[:payment]
     self.params = {}
   end
 
@@ -54,16 +56,74 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   end
 
   def post_process
-    if self.response.status == 404
-      add_message :error, "The service is temporarily down. Please try again later"
-      return
+    # handle the various error cases here
+    case self.response.status
+      when 404
+        add_message :error, "The service is temporarily down. Please try again later"
+        self.transfer_status_id = BankTransferStatus.id_for(:failed)
+        return
+      when 500
+        self.parsed_response = Hash.from_xml(response.body)
+        self.error_code = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Code")&.dig("Subcode")&.dig("Value")
+        # if the transfer failed, we will see it the error message here, else it'll be nil
+        self.transfer_request.bank_error_message = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Reason")&.dig("Text")
+        case self.error_code
+          # potential failure cases
+          when "ns:E504", "ns:502", "ns:E500"
+            self.transfer_status_id = BankTransferStatus.id_for(:possible_failure)
+          # definite failure case
+          when "ns:E406", "ns:E6001", "ns:E6002", "ns:E6003", "ns:E8000", "ns:E1001", "ns:E1002", "ns:E1003", "ns:E1004", "ns:E1028", "flex:E18", "flex:E307",
+            "flex:E404", "flex:E449", "flex:E8036", "flex:E8087", "flex:E9072", "npci:E08", "npci:EM1", "npci:EM2", "npci:EM3", "npci:EM4", "npci:EM5", "npci:E307",
+            "npci:E449", "atom:E307", "atom:E404", "atom:E449", "sfms:E99", "sfms:E70", "sfms:E18", "ns:E9001", "ns:E9002"
+            self.transfer_status_id = BankTransferStatus.id_for(:failed)
+          when "ns:E429", "nsE402", "ns:E410", "ns:E403"
+            # have to trigger a mailer or something - either transaction limit reached, or not enough balance or something on those lines
+          else
+            # do nothing?
+        end
+      when 200
+        self.parsed_response = Hash.from_xml(response.body)
+        # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
+        self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
+        self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
+        if self.transfer_request.bank_reference_number.present?
+          self.transfer_status_id = BankTransferStatus.id_for(:completed)
+        end
+      else
+        # do nothing?
     end
-    self.parsed_response = Hash.from_xml(response.body)
-    # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
-    self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
-    self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
-    # if the transfer failed, we will see it the error message here, else it'll be nil
-    self.transfer_request.bank_error_message = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Reason")&.dig("Text")
+    # create the bank transaction right here
+    self.company = transfer_request.company
+    if self.payment&.reference_resource&.is_a?(BankTransaction)
+      # just update the bank transaction with the latest details
+      bank_transaction = payment.reference_resource
+      bank_transaction.update(
+                          bank_reference_number: transfer_request.bank_reference_number,
+                          transfer_status_id: self.transfer_status_id,
+                          bank_response: transfer_request.transaction_result
+      )
+      payment.retry_count += 1
+    else
+      self.bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
+                                                               transfer_type: transfer_request.transfer_type,
+                                                               bank_reference_number: transfer_request.bank_reference_number,
+                                                               beneficiary_bank_account: self.account,
+                                                               transfer_status_id: self.transfer_status_id,
+                                                               bank_response: transfer_request.transaction_result,
+                                                               amount_attributes: {
+                                                                   value: payment.amount_value,
+                                                                   currency_id: Currency.first.id
+                                                               })
+      payment.update(reference_resource: self.bank_transaction)
+    end
+
+
+    # self.parsed_response = Hash.from_xml(response.body)
+    # # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
+    # self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
+    # self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
+    # # if the transfer failed, we will see it the error message here, else it'll be nil
+    # self.transfer_request.bank_error_message = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Reason")&.dig("Text")
   end
 
   def failure?
@@ -73,28 +133,34 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   end
 
   def success
-    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(transfer_request)
+    params[:bank_transaction] = self.bank_transaction
+    params[:transfer_request] = self.transfer_request
+    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(params)
   end
 
   def failure
-    YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter.new(transfer_request)
+    params[:bank_transaction] = self.bank_transaction
+    params[:transfer_request] = self.transfer_request
+    YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter.new(params)
   end
 
   class YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :transfer_request
+    attr_accessor :transfer_request, :bank_transaction
 
-    def initialize(transfer_request)
-      self.transfer_request = transfer_request
+    def initialize(params)
+      self.transfer_request = params[:transfer_request]
+      self.bank_transaction = params[:bank_transaction]
     end
   end
 
   class YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :transfer_request
+    attr_accessor :transfer_request, :bank_transaction
 
-    def initialize(transfer_request)
-      self.transfer_request = transfer_request
+    def initialize(params)
+      self.transfer_request = params[:transfer_request]
+      self.bank_transaction = params[:bank_transaction]
     end
   end
 
