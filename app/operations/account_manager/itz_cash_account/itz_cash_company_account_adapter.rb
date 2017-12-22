@@ -29,7 +29,7 @@ class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountMana
     #   self.errors << "Could not fetch company credits. Try again later"
     #   return false
     # end
-    1000
+    100000
   end
 
   def creditable_accounts

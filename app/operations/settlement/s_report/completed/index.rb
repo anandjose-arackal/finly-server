@@ -14,7 +14,7 @@ class Settlement::SReport::Completed::Index < Settlement::SReport::Completed::Ba
       add_message :error, reports_presenter.messages[:error]
       return
     end
-    self.reports = reports_presenter.reports.completed
+    self.reports = reports_presenter.reports.completed.sort_by_updated_at
   end
 
   def success

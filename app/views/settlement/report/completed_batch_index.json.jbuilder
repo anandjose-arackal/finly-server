@@ -14,7 +14,9 @@ json.array! @result.paginated_report_processor_groups do |group|
   report_count = 0
   json.items do
     json.array! group.mappings do |item|
-      user_count += 1
+      if item.status.completed?
+        user_count += 1
+      end
       json.user item.user
       json.amount item.amount
       json.completed_on DateUtils.datetime_formatted item.completed_at
@@ -25,8 +27,9 @@ json.array! @result.paginated_report_processor_groups do |group|
       json.note item.note
       json.reports do
         json.array! item.reports do |report|
-
-          report_count += 1
+          if item.status.completed?
+            report_count += 1
+          end
           json.extract! report, :id, :name, :policy, :date_as_string
           json.submitted_on DateUtils.date_formatted(report.submitted_at)
           json.approved_on DateUtils.date_formatted(report.approved_at)

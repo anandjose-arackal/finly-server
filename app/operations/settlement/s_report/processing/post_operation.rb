@@ -65,12 +65,18 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
         end
       end
     end
+    if self.report_processor_group.processed_amount.blank?
+      processed_amount = Amount.new(currency_id: Currency.id_for(:INR))
+    else
+      processed_amount = self.report_processor_group.processed_amount
+    end
+    processed_amount.value = self.report_processor_group.payment_order&.amount_processed&.value || self.report_processor_group.total_amount.value
     if has_success and has_failure
-      self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed)
+      self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed, processed_amount: processed_amount)
     elsif has_success
-      self.report_processor_group.update(status_id: group_completed_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed)
+      self.report_processor_group.update(status_id: group_completed_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed, processed_amount: processed_amount)
     elsif has_failure
-      self.report_processor_group.update(status_id: group_failed_status)
+      self.report_processor_group.update(status_id: group_failed_status, processed_amount: processed_amount)
     end
   end
 
