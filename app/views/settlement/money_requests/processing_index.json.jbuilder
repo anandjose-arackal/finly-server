@@ -21,13 +21,16 @@ json.array! @result.paginated_money_request_processors do |processor|
       json.completed_on DateUtils.datetime_formatted item.completed_at
       json.status item.status
       json.payment item.payment
+      json.receiving_account_type item.processor_accountable_type
+      json.receiving_account item.processor_accountable
       json.note item.note
       json.money_requests do
         json.array! item.money_requests do |money_request|
 
           request_count += 1
           json.extract! money_request, :id, :name, :policy
-          json.submitted_at DateUtils.date_formatted money_request.submitted_at
+          json.submitted_on DateUtils.date_formatted money_request.submitted_at
+          json.approved_on DateUtils.date_formatted(money_request.approved_at)
           json.required_by_date DateUtils.date_formatted money_request.required_by_date
           json.approved_at DateUtils.date_formatted money_request.approved_at
           json.user money_request.user
@@ -39,7 +42,10 @@ json.array! @result.paginated_money_request_processors do |processor|
         end
       end
       json.system_messages do
-        json.array! item.system_messages
+        messages = []
+        messages = messages + item.system_messages if item.system_messages.present?
+        messages = messages + item.payment.system_messages if item.payment&.system_messages&.present?
+        json.array! messages
       end
     end
   end

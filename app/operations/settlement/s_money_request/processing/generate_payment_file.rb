@@ -26,7 +26,7 @@ class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::S
     self.money_request_processors = groups_presenter.money_request_processors.with_id(id)
     if self.money_request_processors.present?
       ids = self.money_request_processors.pluck(:id)
-      self.group_mappings = MoneyRequestProcessorMapping.with_processor_group_id(ids)
+      self.group_mappings = MoneyRequestProcessorMapping.with_processor_id(ids)
     end
   end
 
@@ -45,9 +45,19 @@ class Settlement::SMoneyRequest::Processing::GeneratePaymentFile < Settlement::S
     # Format as required by PaymentFiles::Generate
     payment_params = []
     self.group_mappings.include_for_payment_file&.each do |mapping|
-      payment_params << {email: mapping.user.email, mobile_number: mapping.user.mobile_number, amount: mapping.amount, bank_account: mapping.processor_accountable}
+      payment_params << {
+          beneficiary_account_number: mapping.processor_accountable.account_number,
+          receiving_user_name: mapping.user.name,
+          amount: mapping.amount.value,
+          payment_mode: 'NEFT',
+          date: Date.today,
+          ifsc: mapping.processor_accountable.ifsc,
+          email: mapping.user.email,
+          receiving_mobile_number: mapping.user.mobile_number,
+          note: mapping.note,
+      }
     end
-    self.response = PaymentFiles::Formats::YesBank::Process.(user, payment_params)
+    self.response = PaymentFiles::Generate.(user, payment_file: payment_params)
   end
 
 end

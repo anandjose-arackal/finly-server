@@ -43,6 +43,8 @@ class MoneyRequestProcessor < ActiveRecord::Base
   accepts_nested_attributes_for :total_amount
   accepts_nested_attributes_for :processed_amount
 
+  default_scope { order created_at: :desc }
+
   scope :with_id, -> (id){ where id: id }
   scope :created_by_user, -> (user_id) { where created_by_user_id: user_id }
   scope :with_payment_order_id, -> (payment_order_id) { where payment_order_id: payment_order_id }
