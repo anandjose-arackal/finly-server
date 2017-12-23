@@ -68,7 +68,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                 if marked_as_closed
                   comment += ' marked the report as closed'
                 else
-                  comment += " settled the report #{self.report_processor_group.payment_type.humanize}"
+                  comment += " settled the report via #{self.report_processor_group.payment_type.humanize}"
                 end
                 if mapping.note.present?
                   comment += " with a note '#{mapping.note}'"
