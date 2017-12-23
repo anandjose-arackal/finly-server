@@ -45,7 +45,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     else
       # i.e. there was an error processing the transaction
       payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-      self.errors = op.transfer_request.bank_error_message || 'Payment could not be processed at this time'
+      self.errors = op.transfer_request.bank_error_message || op.messages[:error] || 'Payment could not be processed at this time'
       store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
       return false
     end

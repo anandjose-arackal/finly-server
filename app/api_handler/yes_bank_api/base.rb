@@ -2,7 +2,7 @@ class YesBankApi::Base < BaseHandler
 
   attr_accessor :client_id, :client_secret, :auth_username,
                 :auth_password, :template, :config_path, :application_id,
-                :customer_id
+                :customer_id, :resource_not_found
 
   ILLEGAL_CHARACTERS = ['%', ',' "/", '\\', '(', ')', '@', '&']
 
@@ -52,6 +52,9 @@ class YesBankApi::Base < BaseHandler
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
+    rescue Faraday::ResourceNotFound
+      self.resource_not_found = true
+      add_message :error, "The service is temporarily down. Please try again later"
     end
   end
 

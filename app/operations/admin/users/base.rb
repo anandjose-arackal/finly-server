@@ -45,7 +45,7 @@ class Admin::Users::Base < Admin::Base
       data = []
       cards.each do |card|
         result = ItzCash::AccountDetails.(card.user, card: card)
-        data << {
+        request = {
             card: card,
             proxy: card.proxy,
             balance: (result.balance rescue 0),
@@ -56,7 +56,7 @@ class Admin::Users::Base < Admin::Base
         unless card.assigned?
           assign_request = card.card_assign_requests.with_card_owner_id(selected_user.id).first
           if assign_request.present?
-            data[:assign_request] = {
+            request[:assign_request] = {
                 id: assign_request.id,
                 status: {
                     id: assign_request.status.id,
@@ -65,6 +65,7 @@ class Admin::Users::Base < Admin::Base
             }
           end
         end
+        data << request
       end
       data
     end
