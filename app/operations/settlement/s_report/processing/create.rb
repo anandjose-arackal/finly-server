@@ -18,6 +18,15 @@
 class Settlement::SReport::Processing::Create < Settlement::SReport::Processing::Base
   attr_accessor :processor_params, :report_processor_group, :scheduled, :payment_request
 
+  class Settlement::SReport::Processing::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :report_processor_group
+
+    def init
+      self.report_processor_group = params[:report_processor_group]
+    end
+
+  end
+
   def authorized_user_types
     [:admin, :finance_manager]
   end
@@ -77,11 +86,22 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     self.report_processor_group.save
     if self.report_processor_group.process_via_finly?
       AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    elsif self.report_processor_group.mark_as_closed?
+      Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {marked_as_closed: true}, true)
     end
   end
 
   def post_process
-    add_message :success, 'Reimbursement Initiated Successfully'
+    if self.report_processor_group.mark_as_closed?
+      add_message :success, 'Reports have been marked as closed'
+    else
+      add_message :success, 'Reimbursement Initiated Successfully'
+    end
+  end
+
+  def success
+    params[:report_processor_group] = self.report_processor_group
+    Settlement::SReport::Processing::Create::SuccessPresenter.new(user, params, messages)
   end
 
   protected
@@ -116,6 +136,8 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
         end
       when 'outside_finly'
         # Nothing to do here as receiving account is nil
+      when 'mark_as_closed'
+        # Nothing to do here as receiving account is nil
       else
         add_message :error, 'Invalid Source Account Type'
         return
@@ -142,7 +164,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
     end
 
     total = 0
-    currency_id = nil
+    currency_id = Currency.id_for(:INR)
 
     users&.each do |user|
       config = params&.dig(:mappings, user.id.to_s)
@@ -174,6 +196,8 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
           end
         when 'outside_finly'
           # Nothing to do here as receiving account is nil
+        when 'mark_as_closed'
+          # Nothing to do here as receiving account is nil
       end
 
       report_ids = config[:report_ids]
@@ -188,27 +212,29 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
         return
       end
 
-      total += config&.dig(:amount, :value)&.to_d
-      currency_id = config&.dig(:amount, :currency_id)
+      if has_amounts?
+        total += config&.dig(:amount, :value)&.to_d || 0
+        currency_id = config&.dig(:amount, :currency_id)
 
-      if config&.dig(:amount, :value).blank?
-        add_message :error, 'Amount cannot be empty'
-        return
-      elsif config&.dig(:amount, :value)&.to_d <= 0
-        add_message :error, 'Amount has to be greater than or equal to 0'
-        return
+        if config&.dig(:amount, :value).blank?
+          add_message :error, 'Amount cannot be empty'
+          return
+        elsif config&.dig(:amount, :value)&.to_d <= 0
+          add_message :error, 'Amount has to be greater than or equal to 0'
+          return
+        end
       end
       mapping_status = ReportProcessorGroupStatus.id_for(:pending)
       self.report_processor_group.mappings.build({
                                                      user: user,
                                                      processor_accountable: processor_accountable,
                                                      reports: reports,
-                                                     amount_attributes: {
-                                                         value: config&.dig(:amount, :value),
-                                                         currency_id: config&.dig(:amount, :currency_id)
-                                                     },
                                                      status_id: mapping_status,
-                                                     note: config[:note]
+                                                     note: config[:note],
+                                                     amount_attributes: {
+                                                         value: (config&.dig(:amount, :value) || 0),
+                                                         currency_id: currency_id
+                                                     }
                                                  })
     end
     self.report_processor_group.total_amount = Amount.new(value: total, currency_id: currency_id)
@@ -229,6 +255,10 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
       self.payment_request.add_payment_item(payment_item)
       mapping.payment = payment_item.payment
     end
+  end
+
+  def has_amounts?
+    not self.report_processor_group.mark_as_closed?
   end
 
 end

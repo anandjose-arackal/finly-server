@@ -39,14 +39,20 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     has_failure = false
 
     marked_as_completed = !!params&.dig(:marked_as_completed)
+    marked_as_closed = !!params&.dig(:marked_as_closed)
+
+    if marked_as_closed
+      report_status_settled = ReportStatus.id_for(:closed)
+      report_tracking_status_settled = ReportTrackingAction.id_for(:closed)
+    end
 
     ReportProcessorGroupMapping.transaction do
       Report.transaction do
         ReportTrack.transaction do
           self.report_processor_group.mappings.each do |mapping|
-            if marked_as_completed or mapping.payment.completed?
+            if marked_as_completed or marked_as_closed or mapping.payment.completed?
               has_success = true
-              mapping.update(status_id: group_completed_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed)
+              mapping.update(status_id: group_completed_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
               mapping.reports.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
                                          controlling_for_user_id: nil, controlling_for_user_role_id: nil,
                                          report_status_id: report_status_settled, reimbursement_id: mapping.payment&.id)
@@ -70,11 +76,19 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     else
       processed_amount = self.report_processor_group.processed_amount
     end
-    processed_amount.value = self.report_processor_group.payment_order&.amount_processed&.value || self.report_processor_group.total_amount.value
+    if marked_as_closed
+      processed_amount = nil
+    else
+      processed_amount.value = self.report_processor_group.payment_order&.amount_processed&.value || self.report_processor_group.total_amount.value
+    end
     if has_success and has_failure
-      self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed, processed_amount: processed_amount)
+      self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
+                                         marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed,
+                                         processed_amount: processed_amount)
     elsif has_success
-      self.report_processor_group.update(status_id: group_completed_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed, processed_amount: processed_amount)
+      self.report_processor_group.update(status_id: group_completed_status, completed_at: DateTime.now,
+                                         marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed,
+                                         processed_amount: processed_amount)
     elsif has_failure
       self.report_processor_group.update(status_id: group_failed_status, processed_amount: processed_amount)
     end

@@ -13,31 +13,22 @@
 
 
 class ReportTrackingAction < ActiveRecord::Base
+  include Seedable
 
-
-  VALUES = { create: 1,
-             retract: 2,
-             submit: 3,
-             approve: 4,
-             auto_approve: 5,
-             reject: 6,
-             unapprove: 7,
-             take_control: 8,
-             settled: 9,
-             settlement_confirmed: 10,
-             closed: 11
-            }
-
-  self.class.instance_eval do
-    VALUES.each do |key, value|
-      define_method "#{key}_id" do
-        value
-      end
-    end
-  end
-
-  def self.id_for(sym)
-    VALUES[sym]
+  def self.values
+    [
+        :create,
+        :retract,
+        :submit,
+        :approve,
+        :auto_approve,
+        :reject,
+        :unapprove,
+        :take_control,
+        :settled,
+        :settlement_confirmed,
+        :closed,
+    ]
   end
 
 

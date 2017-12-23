@@ -105,4 +105,8 @@ class ReportProcessorGroup < ActiveRecord::Base
     payment_type == 'payment_file'
   end
 
+  def mark_as_closed?
+    payment_type == 'mark_as_closed'
+  end
+
 end

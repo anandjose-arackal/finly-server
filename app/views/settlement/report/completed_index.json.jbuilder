@@ -24,7 +24,7 @@ json.array! @result.paginated_reports do |report|
 
     json.completed_on DateUtils.datetime_formatted mapping&.completed_at
     json.amount mapping&.amount
-    json.payment_type processor_group&.payment_type
+    json.payment_type processor_group&.payment_type&.humanize
     json.payment_mode processor_group&.payment_mode
 
     if processed_by.present?
