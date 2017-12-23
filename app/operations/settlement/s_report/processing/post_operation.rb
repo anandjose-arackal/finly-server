@@ -34,6 +34,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     group_partially_complete_status = ReportProcessorGroupStatus.id_for(:partially_completed)
     report_status_settled = ReportStatus.id_for(:settled)
     report_tracking_status_settled = ReportTrackingAction.id_for(:settled)
+    report_comment_action = ReportCommentAction.id_for(:report_settled)
 
     has_success = false
     has_failure = false
@@ -44,6 +45,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     if marked_as_closed
       report_status_settled = ReportStatus.id_for(:closed)
       report_tracking_status_settled = ReportTrackingAction.id_for(:closed)
+      report_comment_action = ReportCommentAction.id_for(:report_closed)
     end
 
     ReportProcessorGroupMapping.transaction do
@@ -62,6 +64,21 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                                      report_tracking_action_id: report_tracking_status_settled,
                                      report_status_id: report_status_settled,
                                      payment: mapping.payment
+                comment = ''
+                if marked_as_closed
+                  comment += ' marked the report as closed'
+                else
+                  comment += " settled the report #{self.report_processor_group}"
+                end
+                if mapping.note.present?
+                  comment += " with a note '#{mapping.note}'"
+                end
+                if mapping.payment.present?
+                  comment += ". Payment ID: #{mapping.payment&.id}"
+                end
+                report.comments.build(user: self.report_processor_group.created_by_user,
+                                                report_comment_action_id: report_comment_action,
+                                                content: comment).save
               end
             elsif mapping.payment.failed?
               has_failure = true
@@ -76,11 +93,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     else
       processed_amount = self.report_processor_group.processed_amount
     end
-    if marked_as_closed
-      processed_amount = nil
-    else
-      processed_amount.value = self.report_processor_group.payment_order&.amount_processed&.value || self.report_processor_group.total_amount.value
-    end
+    processed_amount.value = self.report_processor_group.payment_order&.amount_processed&.value || self.report_processor_group.total_amount.value
     if has_success and has_failure
       self.report_processor_group.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
                                          marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed,
