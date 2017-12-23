@@ -68,7 +68,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                 if marked_as_closed
                   comment += ' marked the report as closed'
                 else
-                  comment += " settled the report #{self.report_processor_group}"
+                  comment += " settled the report #{self.report_processor_group.payment_type.humanize}"
                 end
                 if mapping.note.present?
                   comment += " with a note '#{mapping.note}'"
@@ -76,9 +76,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                 if mapping.payment.present?
                   comment += ". Payment ID: #{mapping.payment&.id}"
                 end
-                report.comments.build(user: self.report_processor_group.created_by_user,
-                                                report_comment_action_id: report_comment_action,
-                                                content: comment).save
+                report.comments.build(user: report_processor_group.created_by_user, report_comment_action_id: report_comment_action, content: comment).save
               end
             elsif mapping.payment.failed?
               has_failure = true
