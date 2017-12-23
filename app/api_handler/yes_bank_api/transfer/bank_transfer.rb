@@ -61,7 +61,6 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
       when 404
         add_message :error, "The service is temporarily down. Please try again later"
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
-        return
       when 500
         self.parsed_response = Hash.from_xml(response.body)
         self.error_code = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Code")&.dig("Subcode")&.dig("Value")
@@ -87,22 +86,27 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
         self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
         if self.transfer_request.bank_reference_number.present?
-          self.transfer_status_id = BankTransferStatus.id_for(:completed)
+          if Constants::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
+            self.transfer_status_id = BankTransferStatus.id_for(:completed)
+          elsif Constants::PROCESSING_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
+            self.transfer_status_id = BankTransferStatus.id_for(:processing)
+          end
         end
       else
         # do nothing?
     end
     # create the bank transaction right here
-    self.company = transfer_request.company
+    self.company = self.transfer_request.company
     if self.payment&.reference_resource&.is_a?(BankTransaction)
       # just update the bank transaction with the latest details
       bank_transaction = payment.reference_resource
       bank_transaction.update(
-                          bank_reference_number: transfer_request.bank_reference_number,
+                          bank_reference_number: self.transfer_request.bank_reference_number,
                           transfer_status_id: self.transfer_status_id,
-                          bank_response: transfer_request.transaction_result
+                          bank_response: self.transfer_request.transaction_result
       )
       payment.retry_count += 1
+    # otherwise create a new bank transaction
     else
       self.bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
                                                                transfer_type: transfer_request.transfer_type,
@@ -111,10 +115,10 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
                                                                transfer_status_id: self.transfer_status_id,
                                                                bank_response: transfer_request.transaction_result,
                                                                amount_attributes: {
-                                                                   value: payment.amount_value,
+                                                                   value: self.payment.amount_value,
                                                                    currency_id: Currency.first.id
                                                                })
-      payment.update(reference_resource: self.bank_transaction)
+      self.payment.update(reference_resource: self.bank_transaction)
     end
 
 
@@ -127,7 +131,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   end
 
   def failure?
-    if transfer_request.bank_error_message.present?
+    if transfer_request.bank_error_message.present? || self.messages[:error].present?
       return true
     end
   end

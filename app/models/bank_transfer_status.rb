@@ -24,4 +24,16 @@ class BankTransferStatus < ActiveRecord::Base
     self.id == BankTransferStatus.id_for(:processing)
   end
 
+  def retriable?
+    self.id == BankTransferStatus.id_for(:possible_failure)
+  end
+
+  def failed?
+    self.id == BankTransferStatus.id_for(:failed)
+  end
+
+  def possible_failure?
+    self.id == BankTransferStatus.id_for(:possible_failure)
+  end
+
 end
