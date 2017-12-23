@@ -3,7 +3,7 @@ json.requests_total @result.request_total
 json.details do
   json.array! @result.details do |detail|
     json.user detail[:user]
-    json.requests_total detail[:total]
+    json.requests_total detail[:request_total]
     money_requests = detail[:money_requests]
     json.money_requests_count money_requests.size
     json.money_requests do
@@ -19,7 +19,7 @@ json.details do
       end
     end
     json.bank_accounts detail[:bank_accounts]
-    json.reimbursement_cards detail[:reimbursement_cards]
+    json.expense_cards detail[:expense_cards]
     json.has_error detail[:has_error]
     json.errors detail[:errors]
   end
