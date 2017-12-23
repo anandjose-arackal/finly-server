@@ -18,7 +18,7 @@ class Admin::Users::Index < Admin::Users::Base
   end
 
   def init
-    self.users = User.all.unscoped
+    self.users = User.all.unscoped.includes_for_admin_panel
     self.companies = Company.all
   end
 
