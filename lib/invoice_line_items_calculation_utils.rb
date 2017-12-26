@@ -15,19 +15,11 @@ class InvoiceLineItemsCalculationUtils
     end
     self.invoice_total = 0
     invoice.invoice_items.each_with_index do |item, index|
-      if invoice.inclusive_of_taxes # calculate the other amounts retrospectively
-        self.after_tax_amount = item.quantity * item.rate
-        # first calculate the gross amount from the =
-        calculate_inclusive_taxes(item)
-        calculate_discount_inclusive(item)
-        self.invoice_item_amount = self.gross_amount + self.discount_amount
-        self.net_amount = self.after_tax_amount
-      else # calculate proactively
-        self.invoice_item_amount = item.quantity * item.rate
-        calculate_discount_exclusive(item)
-        calculate_exclusive_taxes(item)
-        self.net_amount = self.gross_amount + self.tax_amount
-      end
+      # calculate proactively
+      self.invoice_item_amount = item.quantity * item.rate
+      calculate_discount_exclusive(item)
+      calculate_exclusive_taxes(item)
+      self.net_amount = self.gross_amount + self.tax_amount
       self.invoice_total += self.net_amount
       # assign the respective calculated parameters to the payment params
       params[:invoice_attributes][:invoice_items_attributes][index][:amount_attributes] = {

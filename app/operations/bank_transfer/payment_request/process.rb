@@ -55,10 +55,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       return
     end
 
-    payment_order_data.each do |item|
-      self.requested_amount += (item[:original_amount].to_d rescue 0)
-    end
-
   end
 
   def process
@@ -104,6 +100,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       invoice_date = item[:invoice_date]
       due_date = item[:due_date]
       inclusive_of_taxes = item[:inclusive_of_taxes]
+      amount = item[:original_amount]
 
       net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
 
@@ -180,13 +177,13 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.valid = false
       end
 
-      if self.valid
-        self.processable_amount += amount
-      end
-
       invoice_items = []
 
+      invoice_net_amount = net_amount
+
       if item&.dig(:invoice_items_attributes).present?
+        invoice_net_amount = 0
+
         item[:invoice_items_attributes]&.each do |invoice_item|
           item_amount = invoice_item[:amount]
           item_discount = invoice_item[:discount]
@@ -231,7 +228,19 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
             gst_type_id: item_gst_type,
             total_amount: total_amount
           }
+
+          invoice_net_amount += total_amount
         end
+
+        # accounting for TDS, Advance and Freight in light of the new amount
+        invoice_net_amount = invoice_net_amount - tds_amount.to_f - advance_amount.to_f + freight.to_f
+      end
+
+      # adding processable amount irrespective of whether it's valid or not
+      self.requested_amount += invoice_net_amount
+
+      if self.valid
+        self.processable_amount += invoice_net_amount
       end
 
       self.payment_order_valid = false unless self.valid

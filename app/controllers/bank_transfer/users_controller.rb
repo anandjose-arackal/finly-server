@@ -26,7 +26,7 @@ class BankTransfer::UsersController < ApplicationController
   end
 
   def categories
-    @result = Category::Invoicing::Index.(current_user, params)
+    @result = Category::Invoice::Index.(current_user, params)
     respond
   end
 

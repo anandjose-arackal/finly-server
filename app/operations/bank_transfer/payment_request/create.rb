@@ -40,7 +40,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     # calculating the requested amount here
     self.requested_amount = 0
     processed_order_data.each do |details|
-      self.requested_amount += details[:original_amount]&.to_f
+      self.requested_amount += details[:total_amount].to_f
     end
 
     # setting the initiating account based on the type of user creating the
@@ -91,6 +91,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     # payment.assign_attributes(payment_params)
     unless bank_payment_request.save
       add_message :error, bank_payment_request.errors.full_messages
+      return
     end
     self.bank_payment_request.payment_order.payments.each_with_index do |payment, index|
       payment_params = request_params[:payment_order_attributes][:payments_attributes][index]

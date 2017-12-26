@@ -117,7 +117,10 @@ json.payments do
             json.tax_amount item.tax_amount&.value
             json.discount_amount item.discount_amount&.value
             json.amount item.amount&.value
+            json.category_name item.category&.name
             json.id item.id
+            json.description item.description
+            json.total_amount precision_value item.net_amount&.value
           end
         end
       end
@@ -198,7 +201,10 @@ json.payments_verified do
             json.tax_amount item.tax_amount&.value
             json.discount_amount item.discount_amount&.value
             json.amount item.amount&.value
+            json.category_name item.category&.name
             json.id item.id
+            json.description item.description
+            json.total_amount precision_value item.net_amount&.value
           end
         end
       end
@@ -276,10 +282,13 @@ json.payments_unverified do
             json.tax item.tax
             json.discount item.discount
             json.category_id item.category_id
+            json.category_name item.category&.name
             json.tax_amount item.tax_amount&.value
             json.discount_amount item.discount_amount&.value
             json.amount item.amount&.value
             json.id item.id
+            json.description item.description
+            json.total_amount precision_value item.net_amount&.value
           end
         end
       end
