@@ -1,7 +1,8 @@
 class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
   attr_accessor :account_number, :transaction_result, :error_message, :transfer_request,
-                :error_code, :transfer_status_id, :company, :bank_transaction, :payment
+                :error_code, :transfer_status_id, :company, :bank_transaction, :payment,
+                :account
 
   # in this context, success would imply one of these transactions
   SUCCESS_RESPONSE_CODES = ["COMPLETED", "SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
@@ -40,29 +41,25 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   def init
     super()
     self.account_number = YAML.load_file(config_path)[Rails.env]['account_number']
+    self.account = payment.receiving_account
     set_xml_params
   end
 
   def parse
-    self.parsed_response = Hash.from_xml(response.body)
+    # self.parsed_response = Hash.from_xml(response.body)
   end
 
-  def success?
-    ap parsed_response
-    unless SUCCESS_RESPONSE_CODES.include?(transfer_request.transaction_result)
-      false
-    end
-    true
-  end
 
   def post_process
     # handle the various error cases here
     case self.response.status
+    # case 500
       when 404
         add_message :error, "The service is temporarily down. Please try again later"
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
       when 500
         self.parsed_response = Hash.from_xml(response.body)
+        ap parsed_response
         self.error_code = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Code")&.dig("Subcode")&.dig("Value")
         # if the transfer failed, we will see it the error message here, else it'll be nil
         self.transfer_request.bank_error_message = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Reason")&.dig("Text")
@@ -82,13 +79,14 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         end
       when 200
         self.parsed_response = Hash.from_xml(response.body)
+        ap parsed_response
         # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
         self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
         self.transfer_request.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
         if self.transfer_request.bank_reference_number.present?
-          if Constants::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
+          if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(self.transfer_request.transaction_result)
             self.transfer_status_id = BankTransferStatus.id_for(:completed)
-          elsif Constants::PROCESSING_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
+          elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(self.transfer_request.transaction_result)
             self.transfer_status_id = BankTransferStatus.id_for(:processing)
           end
         end
@@ -96,16 +94,16 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         # do nothing?
     end
     # create the bank transaction right here
-    self.company = self.transfer_request.company
+    self.company = Company.find_by(id: self.transfer_request.company_id)
     if self.payment&.reference_resource&.is_a?(BankTransaction)
       # just update the bank transaction with the latest details
-      bank_transaction = payment.reference_resource
-      bank_transaction.update(
+      self.bank_transaction = payment.reference_resource
+      self.bank_transaction.update(
                           bank_reference_number: self.transfer_request.bank_reference_number,
                           transfer_status_id: self.transfer_status_id,
                           bank_response: self.transfer_request.transaction_result
       )
-      payment.retry_count += 1
+      self.payment.retry_count += 1
     # otherwise create a new bank transaction
     else
       self.bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
@@ -120,8 +118,6 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
                                                                })
       self.payment.update(reference_resource: self.bank_transaction)
     end
-
-
     # self.parsed_response = Hash.from_xml(response.body)
     # # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
     # self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")
@@ -130,10 +126,12 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
     # self.transfer_request.bank_error_message = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Reason")&.dig("Text")
   end
 
+  def success?
+    self.bank_transaction.completed? || self.bank_transaction.processing?
+  end
+
   def failure?
-    if transfer_request.bank_error_message.present? || self.messages[:error].present?
-      return true
-    end
+    self.bank_transaction.failed? || self.bank_transaction.possible_failure?
   end
 
   def success
@@ -158,7 +156,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
     end
   end
 
-  class YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class YesBankApi::Transfer::BankTransfer::TransactionFailurePresenter < BaseOperation::BasePresenter::FailurePresenter
 
     attr_accessor :transfer_request, :bank_transaction
 

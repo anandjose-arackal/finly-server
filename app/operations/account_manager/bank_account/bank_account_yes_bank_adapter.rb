@@ -30,8 +30,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         payment: payment
     })
     # bank_transaction = op.bank_transaction
-    # todo - temporary, for testing
-    bank_transaction = create_bank_transaction(payment, transfer_request)
+    bank_transaction = op.bank_transaction
     if op.success?
       if bank_transaction.completed?
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
@@ -56,34 +55,6 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         return false
       end
     end
-
-    #   # logic for setting whether a particular payment was successful or is processing
-    #   if SUCCESSFUL_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
-    #     payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-    #     # create_bank_transaction(payment, op.transfer_request)
-    #     store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
-    #   elsif PROCESSING_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
-    #     payment.update(payment_status_id: PaymentStatus.id_for(:processing))
-    #     create_system_message_for_processing(payment)
-    #     # create_bank_transaction(payment, op.transfer_request)
-    #     store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
-    #   elsif op.transfer_request.transaction_result.blank?
-    #     # i.e. there was an error processing the transaction
-    #     payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-    #     error_message = op.transfer_request.bank_error_message || "Payment could not be processed at this time"
-    #     # create_bank_transaction(payment, op.transfer_request)
-    #     store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
-    #     self.errors << error_message
-    #     return false
-    #   end
-    # else
-    #   # i.e. there was an error processing the transaction - either a 401, or 404, or 500
-    #   payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-    #   self.errors = op.transfer_request.bank_error_message || op.messages[:error] || 'Payment could not be processed at this time'
-    #
-    #   store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
-    #   return false
-    # end
     true
   end
 
@@ -148,7 +119,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   end
 
   def create_transfer_request(payment, transfer_type, reference_number)
-    tr = TransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, reference_number, transfer_type)
+    tr = TransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type, reference_number, account.company_id)
   end
 
 end

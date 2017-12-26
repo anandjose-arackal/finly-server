@@ -25,7 +25,7 @@ class BankTransferStatus < ActiveRecord::Base
   end
 
   def retriable?
-    self.id == BankTransferStatus.id_for(:possible_failure)
+    self.id == BankTransferStatus.id_for(:failed)
   end
 
   def failed?

@@ -2,7 +2,7 @@ class YesBankApi::Base < BaseHandler
 
   attr_accessor :client_id, :client_secret, :auth_username,
                 :auth_password, :template, :config_path, :application_id,
-                :customer_id, :resource_not_found
+                :customer_id, :resource_not_found, :transfer_status_id
 
   ILLEGAL_CHARACTERS = ['%', ',' "/", '\\', '(', ')', '@', '&']
 
@@ -52,9 +52,68 @@ class YesBankApi::Base < BaseHandler
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
+      self.transfer_status_id = BankTransferStatus.id_for(:failed)
+    # todo - temporary - rescue SSL error to simulate various cases
+    # rescue Faraday::SSLError
+    #   # simulating different cases
+    #   puts "WE GOT HERE EVERYBODY! LOOKS LIKE THIS IS GONNA BE A GOOD RIDE!"
+    #   # self.response.status_code = 500
+    #   self.parsed_response = {
+    #       "Envelope" => {
+    #           "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
+    #           "Body" => {
+    #               "Fault" => {
+    #                   "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
+    #                   "xmlns:flex" => "http://www.oracle.com/flexcube",
+    #                   "xmlns:npci" => "http://www.npci.org.in",
+    #                   "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
+    #                   "xmlns:ycs" => "https://uat.yalamanchili.in/",
+    #                   "xmlns:pt" => "https://www.puratech.co.in/",
+    #                   "xmlns:http" => "http://www.quantiguous.com/services",
+    #                   "xmlns:ns" => "http://www.quantiguous.com/services",
+    #                   "xmlns:atom" => "http://www.atomtech.in/imps",
+    #                   "xmlns:iib" => "http://www.ibm.com/iib",
+    #                   "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
+    #                   "Code" => {
+    #                       "Value" => "soapenv12:Sender",
+    #                       "Subcode" => {
+    #                           "Value" => "ns:E504",
+    #                           "Subcode" => {
+    #                               "Value" => "ns:E504"
+    #                           }
+    #                       }
+    #                   },
+    #                   "Reason" => {
+    #                       "Text" => "Bad Gateway"
+    #                   },
+    #                   "Detail" => {
+    #                       "ExceptionList" => {
+    #                           "RecoverableException" => {
+    #                               "File" => "/build/slot1/S900_P/src/DataFlowEngine/PluginInterface/ImbJniNode.cpp",
+    #                               "Line" => "1304",
+    #                               "Function" => "ImbJniNode::evaluate",
+    #                               "Type" => "ComIbmRouteNode",
+    #                               "Name" => "gen/fundsTransferByCustomerService2#FCMComposite_1_8.gen/transfer_Request_Response#FCMComposite_1_28.atom/invoke5#FCMComposite_1_1.atom/invoke2#FCMComposite_1_1.atom/invoke#FCMComposite_1_1",
+    #                               "Label" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?",
+    #                               "Catalog" => "BIPmsgs",
+    #                               "Severity" => "3",
+    #                               "Number" => "2230",
+    #                               "Text" => "Caught exception and rethrowing",
+    #                               "Insert" => {
+    #                                   "Type" => "14",
+    #                                   "Text" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?"
+    #                               },
+    #                           }
+    #                       }
+    #                   }
+    #               }
+    #           }
+    #       }
+    #   }
     rescue Faraday::ResourceNotFound
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
+      self.transfer_status_id = BankTransferStatus.id_for(:failed)
     end
   end
 

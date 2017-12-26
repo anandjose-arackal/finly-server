@@ -19,7 +19,7 @@ class TransferRequest < NonPersistentModel
   validates :transfer_amount, presence: true
   validates :transfer_type, presence: true
 
-  def self.call(beneficiary_name, beneficiary_account_number, ifsc, transfer_amount, transfer_type, unique_reference_number, transfer_currency = "INR")
+  def self.call(beneficiary_name, beneficiary_account_number, ifsc, transfer_amount, transfer_type, unique_reference_number, company_id, transfer_currency = "INR")
     self.new({
         beneficiary_account_number: beneficiary_account_number,
         beneficiary_name: beneficiary_name,
@@ -27,7 +27,8 @@ class TransferRequest < NonPersistentModel
         transfer_type: transfer_type,
         transfer_amount: transfer_amount,
         transfer_currency_code: transfer_currency,
-        unique_reference_number: unique_reference_number
+        unique_reference_number: unique_reference_number,
+        company_id: company_id
     })
   end
 
