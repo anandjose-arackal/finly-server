@@ -44,7 +44,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       # the difference between this and a failure is that the money is not debited back to the account till we're sure
       if bank_transaction.possible_failure?
         payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
-        create_system_message_for_processing(payment)
+        create_system_message_for_possible_failure(payment)
         store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
       elsif bank_transaction.failed?
         # i.e. there was an error processing the transaction
@@ -116,6 +116,12 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     payment.system_messages.destroy_all
     payment.system_messages.create(system_message_type_id: SystemMessageType.id_for(:info),
                                   content: "Payment processed. Awaiting credit confirmation")
+  end
+
+  def create_system_message_for_possible_failure(payment)
+    payment.system_messages.destroy_all
+    payment.system_messages.create(system_message_type_id: SystemMessageType.id_for(:info),
+                                   content: "Possible failure. Awaiting confirmation from bank")
   end
 
   def create_transfer_request(payment, transfer_type, reference_number)
