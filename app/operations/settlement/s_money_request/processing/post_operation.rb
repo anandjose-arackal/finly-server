@@ -78,14 +78,20 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
         end
       end
     end
+    if self.money_request_processor.processed_amount.blank?
+      processed_amount = Amount.new(currency_id: Currency.id_for(:INR))
+    else
+      processed_amount = self.money_request_processor.processed_amount
+    end
+    processed_amount.value = self.money_request_processor.payment_order&.amount_processed&.value || self.money_request_processor.total_amount.value
     if has_success and has_failure
       self.money_request_processor.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
-                                          marked_as_completed: marked_as_completed)
+                                          marked_as_completed: marked_as_completed, processed_amount: processed_amount)
     elsif has_success
       self.money_request_processor.update(status_id: group_completed_status, completed_at: DateTime.now,
-                                          marked_as_completed: marked_as_completed)
+                                          marked_as_completed: marked_as_completed,processed_amount: processed_amount)
     elsif has_failure
-      self.money_request_processor.update(status_id: group_failed_status)
+      self.money_request_processor.update(status_id: group_failed_status,processed_amount: processed_amount)
     end
   end
 

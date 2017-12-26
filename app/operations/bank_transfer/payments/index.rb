@@ -36,6 +36,7 @@ class BankTransfer::Payments::Index < BankTransfer::Payments::Base
     has_scope :filter_search
 
     def init
+      self.payments = params[:payments]
       self.payments = apply_scopes(params[:payments], params)
       self.paginated_payments = payments.paginate(page: params[:page], per_page: params[:per_page] || 30)
     end

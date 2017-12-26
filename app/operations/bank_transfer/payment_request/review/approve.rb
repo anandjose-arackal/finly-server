@@ -31,7 +31,6 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
     current_user_role = User::Team::Review::UserRole.(user, self.bank_payment_request)
     if next_reviewer.nil?
       payment_status = BankPaymentRequestStatus.id_for(:approved)
-      self.auto_approve = true
     else
       payment_status = BankPaymentRequestStatus.id_for(:processing)
     end
