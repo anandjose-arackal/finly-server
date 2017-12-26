@@ -87,7 +87,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       else
         tax_amount = item[:tax_amount]&.to_f
         discount_amount = item[:discount_amount]&.to_f
-        amount += item[:original_amount]
+        amount += item[:original_amount]&.to_f
       end
 
       tds_amount = item[:tds_amount]&.to_f

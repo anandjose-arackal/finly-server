@@ -202,12 +202,13 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       # processing the line items of this particular invoice
       invoice_items_attributes = []
       if order_details&.dig(:invoice_attributes, :invoice_items_attributes).present?
-        order_details[:invoice_attributes].each do |line_item|
+        debugger
+        order_details[:invoice_attributes][:invoice_items_attributes].each do |line_item|
           invoice_items_attributes << {
               tax: line_item[:tax],
               discount: line_item[:discount],
               category_id: line_item[:category_id],
-              name: line_item[:name],
+              name: line_item[:description],
               rate: line_item[:rate],
               quantity: line_item[:quantity]
           }
@@ -293,13 +294,13 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   end
 
   def calculate_tax_and_discounts(payment_params, payment)
-    if self.payment.invoice.invoice_items.present?
+    if payment.invoice.invoice_items.present?
       # if there are no invoice items, use the invoice library to calculate the amounts
-      payment_params = InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)&.permit!
+      payment_params = InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)
       payment.update(payment_params)
     else
       # if there are, in fact, invoice items, use the invoice items library
-      payment_params = InvoiceCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)&.permit!
+      payment_params = InvoiceCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)
       payment.update(payment_params)
     end
 
