@@ -68,13 +68,16 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.payment_order_data = arr
     end
 
-    debugger
-
     self.payment_order_data.each do |item|
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
-      description = item[:description] || item["description"]
+      name = item[:name] || item["name"]
       note = item[:note]&.to_s || item["note"]&.to_s
+
+      # correcting the parameters here if it's nested too deep
+      if item&.dig(:invoice_attributes, :invoice_items_attributes).present?
+        item[:invoice_items_attributes] = item[:invoice_attributes][:invoice_items_attributes]
+      end
 
       # deciding tax based on whether invoice items were entered or not
       tax_amount = discount_amount = amount = 0
@@ -121,7 +124,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       end
 
       # check if description is present
-      if description.blank?
+      if name.blank?
         self.valid = false
         self.error_messages << 'Description cannot be blank'
       end
@@ -196,6 +199,8 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           item_discount_amount = invoice_item[:discount_amount]
           item_tax_amount = invoice_item[:tax_amount]
 
+          total_amount = item_amount&.to_f - item_discount_amount&.to_f + item_tax_amount&.to_f
+
           unless validate_rate item_rate, 1
             self.error_messages << "Invoice item rate is invalid"
             self.valid = false
@@ -211,6 +216,8 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
             self.valid = false
           end
 
+          # insert custom fields here
+
           invoice_items << {
             description: item_description,
             tax: item_tax,
@@ -221,15 +228,15 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
             rate: item_rate,
             category_id: item_category_id,
             amount: item_amount,
-            gst_type_id: item_gst_type
+            gst_type_id: item_gst_type,
+            total_amount: total_amount
           }
         end
       end
-      debugger
 
       self.payment_order_valid = false unless self.valid
 
-      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, description: description, original_amount: amount, note: note,
+      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
                                tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds,
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
                                advance: advance, advance_amount: advance_amount, freight: freight,
@@ -237,7 +244,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
                                net_amount: net_amount, invoice_items: invoice_items,
                                valid: self.valid, messages: self.error_messages}
     end
-    debugger
   end
 
   def success

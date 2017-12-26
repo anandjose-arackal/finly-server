@@ -47,7 +47,6 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
   def process
     # this will create the data in the format we want and process it
     self.parsed_data = parse_order_information
-    debugger
     params[:payment_order] = self.parsed_data
     self.response_presenter = BankTransfer::PaymentRequest::Process.(user, params)
     unless self.response_presenter&.success?

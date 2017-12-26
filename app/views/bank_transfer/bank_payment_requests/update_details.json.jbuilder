@@ -20,6 +20,21 @@ json.payment do
       json.valid item[:valid]
       json.messages item[:messages]
       json.custom_fields_config item[:custom_fields]
+      json.invoice_items do
+        json.array!(item[:invoice_items]) do |line_item|
+          json.discount line_item[:discount]
+          json.tax line_item[:tax]
+          json.tax_amount line_item[:tax_amount]
+          json.discount_amount line_item[:discount_amount]
+          json.description line_item[:description]
+          json.category_id line_item[:category_id]
+          json.amount line_item[:amount]
+          json.rate line_item[:rate]
+          json.quantity line_item[:quantity]
+          json.gst_type_id line_item[:item_gst_type]
+          json.total_amount line_item[:total_amount]
+        end
+      end
     end
   end
   json.errors @result.errors
