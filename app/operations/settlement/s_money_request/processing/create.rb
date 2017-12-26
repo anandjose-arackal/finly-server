@@ -77,8 +77,8 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
     self.money_request_processor.save
     if self.money_request_processor.process_via_finly?
       AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
-    elsif self.report_processor_group.rejected?
-      Settlement::SMoneyRequest::Processing::PostOperation.(self.report_processor_group, {marked_as_closed: true}, true)
+    elsif self.money_request_processor.rejected?
+      Settlement::SMoneyRequest::Processing::PostOperation.(self.money_request_processor, {marked_as_rejected: true}, true)
     end
   end
 

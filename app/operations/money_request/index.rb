@@ -1,4 +1,4 @@
-class MoneyRequest::Index < MoneyRequest::Base
+  class MoneyRequest::Index < MoneyRequest::Base
   attr_accessor :money_requests, :role_id
 
   def authorized_user_types
