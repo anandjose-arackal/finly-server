@@ -13,7 +13,7 @@ class BankTransferStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:completed, :processing, :failed]
+    [:completed, :processing, :failed, :possible_failure]
   end
 
   def completed?
@@ -22,6 +22,18 @@ class BankTransferStatus < ActiveRecord::Base
 
   def processing?
     self.id == BankTransferStatus.id_for(:processing)
+  end
+
+  def retriable?
+    self.id == BankTransferStatus.id_for(:failed)
+  end
+
+  def failed?
+    self.id == BankTransferStatus.id_for(:failed)
+  end
+
+  def possible_failure?
+    self.id == BankTransferStatus.id_for(:possible_failure)
   end
 
 end
