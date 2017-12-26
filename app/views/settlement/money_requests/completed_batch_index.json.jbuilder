@@ -6,7 +6,7 @@ json.array! @result.paginated_money_request_processors do |processor|
   json.scheduled_on DateUtils.date_formatted processor.scheduled_at
   json.completed_on DateUtils.date_formatted processor.completed_at
   json.total_amount processor.total_amount
-  json.processed_amount processor.processed_amount
+  json.processed_amount (processor.processed_amount || group.total_amount)
   json.source_account_type processor.source_account_type
   json.payment_type processor.payment_type
   json.payment_mode processor.payment_mode
