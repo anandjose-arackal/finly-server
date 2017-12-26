@@ -37,6 +37,18 @@ json.payment do
       end
     end
   end
+  json.invoice_categories do
+    json.array!(current_company.categories.with_purpose(Purpose.id_for(:invoice))) do |category|
+      json.id category.id
+      json.name category.name
+    end
+  end
+  json.invoice_categories do
+    json.array!(current_company.categories.with_purpose(Purpose.id_for(:invoice_items))) do |category|
+      json.id category.id
+      json.name category.name
+    end
+  end
   json.errors @result.errors
   json.description @result.description
   json.payment_order_valid @result.payment_order_valid
