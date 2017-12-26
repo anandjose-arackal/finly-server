@@ -105,4 +105,8 @@ class MoneyRequestProcessor < ActiveRecord::Base
     payment_type == 'payment_file'
   end
 
+  def rejected?
+    payment_type == 'reject'
+  end
+
 end

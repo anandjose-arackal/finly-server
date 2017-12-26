@@ -40,12 +40,12 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
   def init
     role_id = admin_view? ? UserRole.id_for(:admin) : UserRole.id_for(:finance_manager)
     self.money_request_processor = current_company.money_request_processors.new({
-                                                                                  created_by_user: user,
-                                                                                  created_by_user_role_id: role_id,
-                                                                                  scheduled_at: params[:scheduled_at],
-                                                                                  payment_type: params[:payment_type],
-                                                                                  payment_mode: params[:payment_mode],
-                                                                              })
+                                                                                    created_by_user: user,
+                                                                                    created_by_user_role_id: role_id,
+                                                                                    scheduled_at: params[:scheduled_at],
+                                                                                    payment_type: params[:payment_type],
+                                                                                    payment_mode: params[:payment_mode],
+                                                                                })
     if params[:scheduled_at].present? and Date.parse(params[:scheduled_at]) > Date.today
       self.money_request_processor.status_id = MoneyRequestProcessorStatus.id_for(:scheduled)
       self.scheduled = true
@@ -77,6 +77,8 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
     self.money_request_processor.save
     if self.money_request_processor.process_via_finly?
       AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    elsif self.report_processor_group.rejected?
+      Settlement::SMoneyRequest::Processing::PostOperation.(self.report_processor_group, {marked_as_closed: true}, true)
     end
   end
 
@@ -116,6 +118,8 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
         end
       when 'outside_finly'
         # Nothing to do here as receiving account is nil
+      when 'reject'
+        # Nothing to do here as receiving account is nil
       else
         add_message :error, 'Invalid Source Account Type'
         return
@@ -142,7 +146,7 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
     end
 
     total = 0
-    currency_id = nil
+    currency_id = Currency.id_for(:INR)
 
     users&.each do |user|
       config = params&.dig(:mappings, user.id.to_s)
@@ -174,6 +178,8 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
           end
         when 'outside_finly'
           # Nothing to do here as receiving account is nil
+        when 'reject'
+          # Nothing to do here as receiving account is nil
       end
 
       money_request_ids = config[:money_request_ids]
@@ -188,28 +194,30 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
         return
       end
 
-      total += config&.dig(:amount, :value)&.to_d
-      currency_id = config&.dig(:amount, :currency_id)
+      if has_amounts?
+        total += config&.dig(:amount, :value)&.to_d
+        currency_id = config&.dig(:amount, :currency_id)
 
-      if config&.dig(:amount, :value).blank?
-        add_message :error, 'Amount cannot be empty'
-        return
-      elsif config&.dig(:amount, :value)&.to_d <= 0
-        add_message :error, 'Amount has to be greater than or equal to 0'
-        return
+        if config&.dig(:amount, :value).blank?
+          add_message :error, 'Amount cannot be empty'
+          return
+        elsif config&.dig(:amount, :value)&.to_d <= 0
+          add_message :error, 'Amount has to be greater than or equal to 0'
+          return
+        end
       end
       mapping_status = MoneyRequestProcessorStatus.id_for(:pending)
       self.money_request_processor.mappings.build({
-                                                     user: user,
-                                                     processor_accountable: processor_accountable,
-                                                     money_requests: money_requests,
-                                                     amount_attributes: {
-                                                         value: config&.dig(:amount, :value),
-                                                         currency_id: config&.dig(:amount, :currency_id)
-                                                     },
-                                                     status_id: mapping_status,
-                                                     note: config[:note]
-                                                 })
+                                                      user: user,
+                                                      processor_accountable: processor_accountable,
+                                                      money_requests: money_requests,
+                                                      amount_attributes: {
+                                                          value: (config&.dig(:amount, :value) || 0),
+                                                          currency_id: currency_id
+                                                      },
+                                                      status_id: mapping_status,
+                                                      note: config[:note]
+                                                  })
     end
     self.money_request_processor.total_amount = Amount.new(value: total, currency_id: currency_id)
   end
@@ -229,6 +237,10 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
       self.payment_request.add_payment_item(payment_item)
       mapping.payment = payment_item.payment
     end
+  end
+
+  def has_amounts?
+    not self.money_request_processor.rejected?
   end
 
 end

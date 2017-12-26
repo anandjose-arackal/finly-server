@@ -64,19 +64,7 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
                                      report_tracking_action_id: report_tracking_status_settled,
                                      report_status_id: report_status_settled,
                                      payment: mapping.payment
-                comment = ''
-                if marked_as_closed
-                  comment += ' marked the report as closed'
-                else
-                  comment += " settled the report via #{self.report_processor_group.payment_type.humanize}"
-                end
-                if mapping.note.present?
-                  comment += " with a note '#{mapping.note}'"
-                end
-                if mapping.payment.present?
-                  comment += ". Payment ID: #{mapping.payment&.id}"
-                end
-                report.comments.build(user: report_processor_group.created_by_user, report_comment_action_id: report_comment_action, content: comment).save
+                generate_comment(report, mapping, report_comment_action, marked_as_closed)
               end
             elsif mapping.payment.failed?
               has_failure = true
@@ -103,6 +91,22 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     elsif has_failure
       self.report_processor_group.update(status_id: group_failed_status, processed_amount: processed_amount)
     end
+  end
+
+  def generate_comment(report, mapping, report_comment_action, marked_as_closed)
+    comment = ''
+    if marked_as_closed
+      comment += ' marked the report as closed'
+    else
+      comment += " settled the report via #{self.report_processor_group.payment_type.humanize}"
+    end
+    if mapping.note.present?
+      comment += " with a note '#{mapping.note}'"
+    end
+    if mapping.payment.present?
+      comment += ". Payment ID: #{mapping.payment&.id}"
+    end
+    report.comments.build(user: self.report_processor_group.created_by_user, report_comment_action_id: report_comment_action, content: comment).save
   end
 
 end

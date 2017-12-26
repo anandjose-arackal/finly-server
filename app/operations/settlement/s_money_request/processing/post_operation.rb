@@ -38,12 +38,17 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
     has_failure = false
 
     marked_as_completed = !!params&.dig(:marked_as_completed)
+    rejected = self.money_request_processor.rejected?
+
+    if rejected
+
+    end
 
     MoneyRequestProcessorMapping.transaction do
       ::MoneyRequest.transaction do
         MoneyRequestTrack.transaction do
           self.money_request_processor.mappings.each do |mapping|
-            if marked_as_completed or mapping.payment.completed?
+            if rejected or marked_as_completed or mapping.payment.completed?
               has_success = true
               mapping.update(status_id: group_completed_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed)
               mapping.money_requests.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
@@ -55,6 +60,7 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
                                      money_request_tracking_action_id: money_request_status_settled,
                                      status_id: status,
                                      payment: mapping.payment
+                # generate_comment
               end
             elsif mapping.payment.failed?
               has_failure = true
