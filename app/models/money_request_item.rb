@@ -18,7 +18,7 @@ class MoneyRequestItem < ActiveRecord::Base
 
   scope :with_id, -> (id) { where id: id }
   scope :with_amount, -> { joins :amount }
-  scope :sum_amount , -> { with_amount.sum(:value) }
+  scope :sum_amount , -> { with_amount.sum(:INR) }
   scope :active_categories, -> do
 
   end
