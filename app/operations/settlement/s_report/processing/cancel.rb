@@ -45,6 +45,18 @@ class Settlement::SReport::Processing::Cancel < Settlement::SReport::Processing:
   end
 
   def process
+
+    if self.report_group_processor.process_via_finly?
+      payment_order = self.report_group_processor.payment_order
+      if payment_order.pending? or payment_order.scheduled? or payment_order.in_progress?
+        result = AccountManager::Payments::CancelPaymentOrder.(user, payment_order: payment_order)
+        unless result.success?
+          add_message :error, result.messages[:error]
+          return
+        end
+      end
+    end
+
     pending_mappings = self.report_group_processor.mappings.not_completed
     pending_mappings.update_all(status_id: ReportProcessorGroupStatus.id_for(:cancelled))
 

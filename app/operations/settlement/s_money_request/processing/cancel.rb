@@ -41,6 +41,17 @@ class Settlement::SMoneyRequest::Processing::Cancel < Settlement::SMoneyRequest:
   end
 
   def process
+    if self.money_request_processor.process_via_finly?
+      payment_order = self.money_request_processor.payment_order
+      if payment_order.pending? or payment_order.scheduled? or payment_order.in_progress?
+        result = AccountManager::Payments::CancelPaymentOrder.(user, payment_order: payment_order)
+        unless result.success?
+          add_message :error, result.messages[:error]
+          return
+        end
+      end
+    end
+
     pending_mappings = self.money_request_processor.mappings.not_completed
     pending_mappings_id = pending_mappings.pluck(:id)
     ::MoneyRequest.with_processor_mapping(pending_mappings_id).update_all(money_request_processor_mapping_id: nil)

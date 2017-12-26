@@ -105,7 +105,7 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
           when 'company_credits'
             self.money_request_processor.source_account = current_company.itz_cash_company_account
           when 'finly_money'
-            self.money_request_processor.source_account = user.user_wallet
+            self.money_request_processor.source_account = user.wallet
           else
             add_message :error, 'Invalid Source Account Type'
             return
