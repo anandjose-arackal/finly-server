@@ -73,7 +73,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
     self.payment_order_data.each do |item|
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
-      name = item[:name] || item["name"]
+      description = item[:description] || item["description"]
       note = item[:note]&.to_s || item["note"]&.to_s
 
       # deciding tax based on whether invoice items were entered or not
@@ -120,10 +120,10 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.error_messages << 'Invalid amount'
       end
 
-      # check if name is present
-      if name.blank?
+      # check if description is present
+      if description.blank?
         self.valid = false
-        self.error_messages << 'Name cannot be blank'
+        self.error_messages << 'Description cannot be blank'
       end
 
       # check if the ifsc is present
@@ -229,7 +229,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       self.payment_order_valid = false unless self.valid
 
-      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
+      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, description: description, original_amount: amount, note: note,
                                tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds,
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
                                advance: advance, advance_amount: advance_amount, freight: freight,

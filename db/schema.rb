@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171222163732) do
+ActiveRecord::Schema.define(version: 20171226090435) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1825,7 +1825,7 @@ ActiveRecord::Schema.define(version: 20171222163732) do
 
   create_table "invoice_line_items", force: :cascade do |t|
     t.integer  "invoice_id",         limit: 4
-    t.string   "name",               limit: 255
+    t.string   "description",        limit: 255
     t.integer  "quantity",           limit: 4
     t.decimal  "rate",                           precision: 20, scale: 10
     t.decimal  "tax",                            precision: 20, scale: 10
