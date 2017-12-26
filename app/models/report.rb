@@ -111,7 +111,10 @@ class Report < ActiveRecord::Base
   scope :without_payment, -> { where reimbursement_id: nil }
   scope :pending_settlement, -> { where(report_status_id: ReportStatus.approved_id).where(accounted: false) }
   scope :with_controlling_user_id, ->(user_id) { where controlling_user_id: user_id }
+
+  # todo - having issues, where amounts are not matching actual expense amounts
   scope :expenses_total, -> { joins(expenses: :amount).sum(:INR) }
+  # todo - having issues, where amounts are not matching actual reimbursements amounts
   scope :expenses_reimbursable_total, -> { joins(expenses: :amount).where('expenses.reimbursable = true').sum('amounts.INR') }
   scope :group_user_id, -> { group 'reports.user_id' }
   scope :group_user, -> { group :user }

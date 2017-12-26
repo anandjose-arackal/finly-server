@@ -32,7 +32,9 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
     group_completed_status = MoneyRequestProcessorStatus.id_for(:completed)
     group_failed_status = MoneyRequestProcessorStatus.id_for(:failed)
     group_partially_complete_status = MoneyRequestProcessorStatus.id_for(:partially_completed)
-    money_request_status_settled = MoneyRequestStatus.id_for(:credited)
+    request_status = MoneyRequestStatus.id_for(:credited)
+    request_tracking_status = MoneyRequestTrackingAction.id_for(:credited)
+    request_comment_action = MoneyRequestCommentAction.id_for(:credited)
 
     has_success = false
     has_failure = false
@@ -41,7 +43,9 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
     rejected = self.money_request_processor.rejected?
 
     if rejected
-
+      request_status = MoneyRequestStatus.id_for(:rejected)
+      request_tracking_status = MoneyRequestTrackingAction.id_for(:reject)
+      request_comment_action = MoneyRequestCommentAction.id_for(:reject)
     end
 
     MoneyRequestProcessorMapping.transaction do
@@ -50,17 +54,18 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
           self.money_request_processor.mappings.each do |mapping|
             if rejected or marked_as_completed or mapping.payment.completed?
               has_success = true
-              mapping.update(status_id: group_completed_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed)
+              mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
+                             marked_as_completed: marked_as_completed)
               mapping.money_requests.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
                                          controlling_for_user_id: nil, controlling_for_user_role_id: nil,
-                                         status_id: money_request_status_settled, payment_id: mapping.payment&.id)
+                                         status_id: request_status, payment_id: mapping.payment&.id)
               mapping.money_requests.each do |money_request|
                 money_request.tracks.create action_user_id: self.money_request_processor.created_by_user_id,
                                      action_user_role_id: self.money_request_processor.created_by_user_role_id,
-                                     money_request_tracking_action_id: money_request_status_settled,
-                                     status_id: status,
+                                     money_request_tracking_action_id: request_tracking_status,
+                                     status_id: request_status,
                                      payment: mapping.payment
-                # generate_comment
+                # generate_comment(money_request, mapping, request_comment_action, rejected)
               end
             elsif mapping.payment.failed?
               has_failure = true
@@ -71,9 +76,11 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
       end
     end
     if has_success and has_failure
-      self.money_request_processor.update(status_id: group_partially_complete_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed)
+      self.money_request_processor.update(status_id: group_partially_complete_status, completed_at: DateTime.now,
+                                          marked_as_completed: marked_as_completed)
     elsif has_success
-      self.money_request_processor.update(status_id: group_completed_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed)
+      self.money_request_processor.update(status_id: group_completed_status, completed_at: DateTime.now,
+                                          marked_as_completed: marked_as_completed)
     elsif has_failure
       self.money_request_processor.update(status_id: group_failed_status)
     end

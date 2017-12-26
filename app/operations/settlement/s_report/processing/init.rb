@@ -82,8 +82,16 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
     end
     user_ids = self.reports.pluck(:user_id).uniq
     users_map = User.with_id(user_ids).index_by(&:id)
-    expenses_totals = self.reports.group_user_id.expenses_total
-    reimbursable_totals = self.reports.group_user_id.expenses_reimbursable_total
+    expenses_totals = {} #self.reports.group_user_id.expenses_total
+    reimbursable_totals = {} #self.reports.group_user_id.expenses_reimbursable_total
+    user_ids.each do |user_id|
+      report_ids = self.reports.with_user(user_id).pluck(:id)
+      expenses = Expense.with_report_id(report_ids).sum_amount
+      reimbursements = Expense.with_report_id(report_ids).reimbursable.sum_amount
+      expenses_totals[user_id] = expenses
+      reimbursable_totals[user_id] = reimbursements
+    end
+
     self.user_reports = []
     self.reimbursement_total = 0
     self.expenses_total = 0

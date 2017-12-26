@@ -32,8 +32,8 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     group_completed_status = ReportProcessorGroupStatus.id_for(:completed)
     group_failed_status = ReportProcessorGroupStatus.id_for(:failed)
     group_partially_complete_status = ReportProcessorGroupStatus.id_for(:partially_completed)
-    report_status_settled = ReportStatus.id_for(:settled)
-    report_tracking_status_settled = ReportTrackingAction.id_for(:settled)
+    report_status = ReportStatus.id_for(:settled)
+    report_tracking_status = ReportTrackingAction.id_for(:settled)
     report_comment_action = ReportCommentAction.id_for(:report_settled)
 
     has_success = false
@@ -43,8 +43,8 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     marked_as_closed = !!params&.dig(:marked_as_closed)
 
     if marked_as_closed
-      report_status_settled = ReportStatus.id_for(:closed)
-      report_tracking_status_settled = ReportTrackingAction.id_for(:closed)
+      report_status = ReportStatus.id_for(:closed)
+      report_tracking_status = ReportTrackingAction.id_for(:closed)
       report_comment_action = ReportCommentAction.id_for(:report_closed)
     end
 
@@ -54,15 +54,16 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
           self.report_processor_group.mappings.each do |mapping|
             if marked_as_completed or marked_as_closed or mapping.payment.completed?
               has_success = true
-              mapping.update(status_id: group_completed_status, completed_at: DateTime.now, marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
+              mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
+                             marked_as_completed: marked_as_completed, marked_as_closed: marked_as_closed)
               mapping.reports.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
                                          controlling_for_user_id: nil, controlling_for_user_role_id: nil,
-                                         report_status_id: report_status_settled, reimbursement_id: mapping.payment&.id)
+                                         report_status_id: report_status, reimbursement_id: mapping.payment&.id)
               mapping.reports.each do |report|
                 report.tracks.create action_user_id: self.report_processor_group.created_by_user_id,
                                      action_user_role_id: self.report_processor_group.created_by_user_role_id,
-                                     report_tracking_action_id: report_tracking_status_settled,
-                                     report_status_id: report_status_settled,
+                                     report_tracking_action_id: report_tracking_status,
+                                     report_status_id: report_status,
                                      payment: mapping.payment
                 generate_comment(report, mapping, report_comment_action, marked_as_closed)
               end
@@ -106,7 +107,8 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
     if mapping.payment.present?
       comment += ". Payment ID: #{mapping.payment&.id}"
     end
-    report.comments.build(user: self.report_processor_group.created_by_user, report_comment_action_id: report_comment_action, content: comment).save
+    report.comments.build(user: self.report_processor_group.created_by_user,
+                          report_comment_action_id: report_comment_action, content: comment).save
   end
 
 end
