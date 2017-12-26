@@ -57,17 +57,17 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
               mapping.update(status_id: group_completed_status, completed_at: DateTime.now,
                              marked_as_completed: marked_as_completed)
               mapping.money_requests.update_all(controlling_user_id: nil, controlling_user_role_id: nil,
-                                         controlling_for_user_id: nil, controlling_for_user_role_id: nil,
-                                         status_id: request_status, payment_id: mapping.payment&.id)
+                                                controlling_for_user_id: nil, controlling_for_user_role_id: nil,
+                                                status_id: request_status, payment_id: mapping.payment&.id)
               mapping.money_requests.each do |money_request|
                 money_request.tracks.create action_user_id: self.money_request_processor.created_by_user_id,
-                                     action_user_role_id: self.money_request_processor.created_by_user_role_id,
-                                     money_request_tracking_action_id: request_tracking_status,
-                                     status_id: request_status,
-                                     payment: mapping.payment
+                                            action_user_role_id: self.money_request_processor.created_by_user_role_id,
+                                            money_request_tracking_action_id: request_tracking_status,
+                                            status_id: request_status,
+                                            payment: mapping.payment
                 # generate_comment(money_request, mapping, request_comment_action, rejected)
               end
-              if self.money_request_processor.process_outside_finly?
+              if self.money_request_processor.process_outside_finly? or self.money_request_processor.bank_transfer?
                 add_cash_on_hand(mapping)
               end
             elsif mapping.payment.failed?
@@ -90,10 +90,15 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
   end
 
   def add_cash_on_hand(mapping)
+    if mapping.bank_transfer?
+      purpose = :advance
+    else
+      purpose = :advance_outside_finly
+    end
     user = mapping.user
     amount = mapping.amount.value
-    payment_request = PaymentRequest.(user, nil, CashOnHand.name, :credit, :advance_outside_finly)
-    payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, amount))
+    payment_request = PaymentRequest.(user, nil, CashOnHand.name, :credit, purpose)
+    payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, amount, reference_resource: mapping.payment))
     AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
   end
 

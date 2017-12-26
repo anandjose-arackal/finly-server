@@ -41,7 +41,7 @@ class Settlement::SMoneyRequest::Processing::Cancel < Settlement::SMoneyRequest:
   end
 
   def process
-    pending_mappings = self.money_request_processor.mappings.pending
+    pending_mappings = self.money_request_processor.mappings.not_completed
     pending_mappings_id = pending_mappings.pluck(:id)
     ::MoneyRequest.with_processor_mapping(pending_mappings_id).update_all(money_request_processor_mapping_id: nil)
     pending_mappings.update_all(status_id: MoneyRequestProcessorStatus.id_for(:cancelled))
