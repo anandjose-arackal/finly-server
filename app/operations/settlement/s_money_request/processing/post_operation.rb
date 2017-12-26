@@ -67,6 +67,9 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
                                      payment: mapping.payment
                 # generate_comment(money_request, mapping, request_comment_action, rejected)
               end
+              if self.money_request_processor.process_outside_finly?
+                add_cash_on_hand(mapping)
+              end
             elsif mapping.payment.failed?
               has_failure = true
               mapping.update(status_id: group_failed_status)
@@ -84,6 +87,14 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
     elsif has_failure
       self.money_request_processor.update(status_id: group_failed_status)
     end
+  end
+
+  def add_cash_on_hand(mapping)
+    user = mapping.user
+    amount = mapping.amount.value
+    payment_request = PaymentRequest.(user, nil, CashOnHand.name, :credit, :advance_outside_finly)
+    payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, amount))
+    AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
   end
 
 end

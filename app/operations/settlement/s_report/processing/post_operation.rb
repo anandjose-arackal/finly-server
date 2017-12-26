@@ -96,10 +96,8 @@ class Settlement::SReport::Processing::PostOperation < FinlyPostOperation
 
   def generate_comment(report, mapping, report_comment_action, marked_as_closed)
     comment = ''
-    if marked_as_closed
-      comment += ' marked the report as closed'
-    else
-      comment += " settled the report via #{self.report_processor_group.payment_type.humanize}"
+    unless marked_as_closed
+      comment += " via #{self.report_processor_group.payment_type.humanize}"
     end
     if mapping.note.present?
       comment += " with a note '#{mapping.note}'"

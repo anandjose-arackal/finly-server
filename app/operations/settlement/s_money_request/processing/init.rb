@@ -75,11 +75,11 @@ class Settlement::SMoneyRequest::Processing::Init < Settlement::SMoneyRequest::P
       return
     end
     self.money_requests = money_requests_presenter.money_requests.approved.include_user_accounts
-    user_ids = self.money_requests.pluck(:user_id).uniq
-    users_map = User.with_id(user_ids).index_by(&:id)
     if not params&.dig(:init_all) and params&.dig(:money_request_id).present?
       self.money_requests = self.money_requests.with_id(params&.dig(:money_request_id))
     end
+    user_ids = self.money_requests.pluck(:user_id).uniq
+    users_map = User.with_id(user_ids).index_by(&:id)
     request_total_hash = {}#self.money_requests.group_user.sum_total
     user_ids.each do |user_id|
       request_ids = self.money_requests.with_user(user_id).pluck(:id)

@@ -9,9 +9,9 @@ json.details do
     json.money_requests do
       json.array! money_requests do |money_request|
         json.extract! money_request, :id, :name, :policy
-        json.submitted_at DateUtils.date_formatted money_request.submitted_at
+        json.submitted_on DateUtils.date_formatted money_request.submitted_at
         json.required_by_date DateUtils.date_formatted money_request.required_by_date
-        json.approved_at DateUtils.date_formatted money_request.approved_at
+        json.approved_on DateUtils.date_formatted money_request.approved_at
         final_approver = money_request.final_approver
         json.auto_approved final_approver.blank?
         json.final_approver final_approver
