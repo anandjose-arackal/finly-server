@@ -203,6 +203,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       # processing the line items of this particular invoice
       invoice_items_attributes = []
       if order_details&.dig(:invoice_attributes, :invoice_items_attributes).present?
+        debugger
         order_details[:invoice_attributes][:invoice_items_attributes].each do |line_item|
           invoice_items_attributes << {
               tax: line_item[:tax],
