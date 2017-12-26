@@ -22,6 +22,7 @@
 #  payment_order_id          :integer
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
+#  marked_as_closed          :boolean
 #
 
 require 'test_helper'

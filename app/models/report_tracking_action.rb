@@ -12,6 +12,7 @@
 
 
 
+
 class ReportTrackingAction < ActiveRecord::Base
   include Seedable
 

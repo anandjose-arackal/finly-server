@@ -30,7 +30,9 @@
 #  non_reimbursable_expenses_total_id :integer
 #  sync_status_id                     :integer
 #  sync_type_id                       :integer
+#  report_processor_group_mapping_id  :integer
 #
+
 
 
 class Report < ActiveRecord::Base
@@ -121,6 +123,7 @@ class Report < ActiveRecord::Base
   scope :joins_user, -> { joins  :user }
   scope :include_reimbursable_user_accounts, -> { includes user: [:bank_accounts, :reimbursement_cards] }
   scope :sort_by_updated_at, -> { unscope(:order).order(updated_at: :desc) }
+  scope :without_associated_processor, -> { where report_processor_group_mapping_id: nil }
 
   scope :unsubmitted, -> { where(report_status_id: [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:retracted)] ) }
 

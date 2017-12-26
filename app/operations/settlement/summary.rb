@@ -76,7 +76,7 @@ class Settlement::Summary < Settlement::Base
       add_message :error, reports_presenter.messages[:error]
       return
     end
-    reports = reports_presenter.reports.approved.not_settled
+    reports = reports_presenter.reports.approved.without_associated_processor
     self.reports_summary = {
         count: reports.count,
         expenses_total: Amount.new(value: reports.expenses_total, currency_id: self.currency_id),
@@ -91,7 +91,7 @@ class Settlement::Summary < Settlement::Base
       add_message :error, money_requests_presenter.messages[:error]
       return
     end
-    money_requests = money_requests_presenter.money_requests.approved
+    money_requests = money_requests_presenter.money_requests.approved.without_associated_processor
     self.money_requests_summary = {
         count: money_requests.count,
         total: Amount.new(value: money_requests.total_value, currency_id: self.currency_id),

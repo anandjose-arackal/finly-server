@@ -15,6 +15,7 @@
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  note                       :text(65535)
+#  marked_as_closed           :boolean
 #
 
 class ReportProcessorGroupMapping < ActiveRecord::Base
