@@ -22,7 +22,7 @@ Crono.perform(BankTransferProcess).every 1.day, at: {hour: 9, min: 25}
 Crono.perform(FetchCurrencyConversionRates).every 1.day, at: {hour: 05, min: 35}
 Crono.perform(UpdateConvertedAmountValues).every 1.day, at: {hour: 05, min: 40}
 # Crono.perform(AdminPanelVerifierMailer).every 1.hour
-Crono.perform(BankTransferStatusChecker).every 1.hour
+Crono.perform(BankTransferStatusChecker).every 15.minutes
 Crono.perform(BackupImages).every 1.day, at: {hour: 01, min: 00}
 # Summary mailer checks performed every 30minutes
 24.times do |num|

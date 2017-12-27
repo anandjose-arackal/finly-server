@@ -91,9 +91,10 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     # if payment order has been scheduled for execution right away, process it right now
     if payment_order.payment_order_status_id == PaymentOrderStatus.id_for(:pending)
       # if the order is not background, perform it using the regular call method in payment executor
+      # toto -  temporary
       if self.background
-        # call the payment executor that runs the payments in the background
-        # passing the payment id here because async operation can retrieve the object
+      #   # call the payment executor that runs the payments in the background
+      #   # passing the payment id here because async operation can retrieve the object
         result = AccountManager::Payments::PaymentOrderExecutor.call_async(payment_order.id, options)
         add_message :success, 'Payments have been scheduled, you can check their status from the order screen'
       else

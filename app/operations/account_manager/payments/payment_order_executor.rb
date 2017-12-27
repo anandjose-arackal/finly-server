@@ -68,7 +68,7 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     end
     payments.each do |payment|
       op = AccountManager::Payments::PaymentExecutor.(payment, options)
-      if op.success? && ((payment.payment_status_id == PaymentStatus.id_for(:completed)) || (payment.payment_status_id == PaymentStatus.id_for(:processing)))
+      if op.success? && ([PaymentStatus.id_for(:completed), PaymentStatus.id_for(:processing), PaymentStatus.id_for(:possible_failure)].include?(payment.payment_status_id))
         processed_amount += payment.amount_value
         succeeded_transactions = true
       else
