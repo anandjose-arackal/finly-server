@@ -43,7 +43,7 @@ json.payment do
       json.name category.name
     end
   end
-  json.invoice_categories do
+  json.invoice_line_items_categories do
     json.array!(current_company.categories.with_purpose(Purpose.id_for(:invoice_items))) do |category|
       json.id category.id
       json.name category.name

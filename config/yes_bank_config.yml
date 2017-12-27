@@ -21,7 +21,6 @@ production:
   client_secret: 'O2nH7eW5cS7hC3kB3nX3hY5rJ2lM1yS2rE8cU0dV3aX8lB1fY2'
   username: '8240621'
   password: 'Yesbank@123'
-
   account_number: '002267800001249'
   application_id: '8240621'
   customer_id: '8240621'
