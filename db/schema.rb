@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171222101552) do
+ActiveRecord::Schema.define(version: 20171226090435) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -535,6 +535,7 @@ ActiveRecord::Schema.define(version: 20171222101552) do
     t.datetime "updated_at",                              null: false
     t.string   "bank_response",               limit: 255
     t.boolean  "refunded"
+    t.string   "error_sub_code",              limit: 255
   end
 
   add_index "bank_transactions", ["amount_id"], name: "index_bank_transactions_on_amount_id", using: :btree
@@ -1824,7 +1825,7 @@ ActiveRecord::Schema.define(version: 20171222101552) do
 
   create_table "invoice_line_items", force: :cascade do |t|
     t.integer  "invoice_id",         limit: 4
-    t.string   "name",               limit: 255
+    t.string   "description",        limit: 255
     t.integer  "quantity",           limit: 4
     t.decimal  "rate",                           precision: 20, scale: 10
     t.decimal  "tax",                            precision: 20, scale: 10
@@ -2474,20 +2475,20 @@ ActiveRecord::Schema.define(version: 20171222101552) do
   end
 
   create_table "payments", force: :cascade do |t|
-    t.integer  "amount_id",               limit: 4,     null: false
-    t.date     "date",                                  null: false
-    t.integer  "payment_type_id",         limit: 4,     null: false
+    t.integer  "amount_id",               limit: 4,                 null: false
+    t.date     "date",                                              null: false
+    t.integer  "payment_type_id",         limit: 4,                 null: false
     t.integer  "initiating_user_id",      limit: 4
     t.integer  "receiving_user_id",       limit: 4
     t.text     "note",                    limit: 65535
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
     t.integer  "initiating_account_id",   limit: 4
     t.string   "initiating_account_type", limit: 255
     t.integer  "receiving_account_id",    limit: 4
     t.string   "receiving_account_type",  limit: 255
     t.integer  "payment_order_id",        limit: 4
-    t.integer  "payment_status_id",       limit: 4,     null: false
+    t.integer  "payment_status_id",       limit: 4,                 null: false
     t.string   "initiating_user_type",    limit: 255
     t.string   "receiving_user_type",     limit: 255
     t.integer  "payment_purpose_id",      limit: 4
@@ -2495,8 +2496,9 @@ ActiveRecord::Schema.define(version: 20171222101552) do
     t.string   "reference_resource_type", limit: 255
     t.string   "application",             limit: 255
     t.string   "payment_mode",            limit: 255
-    t.string   "reference_id",            limit: 255,   null: false
+    t.string   "reference_id",            limit: 255,               null: false
     t.integer  "invoice_id",              limit: 4
+    t.integer  "retry_count",             limit: 4,     default: 0
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree

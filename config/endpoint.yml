@@ -37,6 +37,7 @@ default: &default
     path: 'api/customer/register'
   yes_bank:
     base: 'https://uatsky.yesbank.in:444'
+#    base: 'https://uatsky.yesbank.in'
     path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
   finly_collect:
     base: 'http://localhost:3002/'
