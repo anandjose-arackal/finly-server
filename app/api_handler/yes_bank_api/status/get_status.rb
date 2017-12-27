@@ -34,7 +34,7 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
   end
 
   def post_process
-    case self.response.status_code
+    case self.response.status
       when 404
         # handle cases when the API is not up
         add_message :error, "The service is temporarily down. Please try again later"
