@@ -2047,6 +2047,7 @@ Rails.application.routes.draw do
   get 'cards/unassigned', to: 'cards#unassigned', as: :unassigned_cards
 
   resources :reports, except: [:new, :edit]
+  delete 'reports/destroy', to: 'reports#destroy'
   get 'export/report(.:format)' => 'export#report', as: :export_report
   get 'export/templates/index' => 'export#index_template'
   get 'export/templates/:template_key' => 'export#export_template'
@@ -2070,6 +2071,7 @@ Rails.application.routes.draw do
 
   patch 'money_requests/credit_cash', to: 'money_request#credit_cash', as: :credit
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
+  delete 'money_requests/destroy', to: 'money_request#destroy'
   resources :money_request do
     post 'comment' => 'money_request#comment', as: :comment
   end
