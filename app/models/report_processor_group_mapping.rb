@@ -38,6 +38,7 @@ class ReportProcessorGroupMapping < ActiveRecord::Base
   accepts_nested_attributes_for :system_messages
 
   scope :with_processor_group_id, -> (group_id){ where processor_group_id: group_id }
+  scope :with_user_id, -> (user_id) { where user_id: user_id }
   scope :pending, -> { where status_id: ReportProcessorGroupStatus.id_for(:pending) }
   scope :not_completed, -> { where.not status_id: ReportProcessorGroupStatus.id_for(:completed) }
   scope :include_for_payment_file, -> { includes :user, :amount, :processor_accountable }

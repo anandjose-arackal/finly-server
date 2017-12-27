@@ -44,7 +44,7 @@ class ReportProcessorGroup < ActiveRecord::Base
   accepts_nested_attributes_for :total_amount
   accepts_nested_attributes_for :processed_amount
 
-  scope :with_id, -> (id){ where id: id }
+  scope :with_id, -> (id) { where id: id }
   scope :created_by_user, -> (user_id) { where created_by_user_id: user_id }
   scope :with_payment_order_id, -> (payment_order_id) { where payment_order_id: payment_order_id }
   scope :include_mapping_reports, -> { includes({mappings: [:reports, :system_messages]}) }
@@ -68,6 +68,11 @@ class ReportProcessorGroup < ActiveRecord::Base
                                                                                   :processing, :partially_completed,
                                                                                   :failed]) }
   scope :completed, -> { where status_id: ReportProcessorGroupStatus.id_for(:completed) }
+  scope :filter_user_id, -> (user_id) {
+    id = pluck(:id)
+    filter_ids = ReportProcessorGroupMapping.with_processor_group_id(id).with_user_id(user_id).pluck(:processor_group_id)
+    with_id(filter_ids)
+  }
 
   default_scope { order created_at: :desc }
 

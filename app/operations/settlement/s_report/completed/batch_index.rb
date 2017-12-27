@@ -23,9 +23,12 @@ class Settlement::SReport::Completed::BatchIndex < Settlement::SReport::Complete
   class Settlement::SReport::Completed::BatchIndex::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report_processor_groups, :paginated_report_processor_groups
 
+    has_scope :filter_user_id
+
     def init
       self.report_processor_groups = params[:report_processor_groups]
       per_page = params[:per_page] || 30
+      self.report_processor_groups = apply_scopes(self.report_processor_groups, params)
       self.paginated_report_processor_groups = self.report_processor_groups&.include_for_show.paginate(page: params[:page], per_page: per_page)
     end
 
