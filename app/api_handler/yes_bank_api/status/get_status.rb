@@ -42,16 +42,17 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
       when 500
         # handle error
         self.parsed_response = Hash.from_xml(response.body)
+        ap parsed_response
         set_response_parameters
       when 200
         # handle success cases
         self.parsed_response = Hash.from_xml(response.body)
+        ap parsed_response
         set_response_parameters
       else
         # do nothing?
     end
     # self.parsed_response = Hash.from_xml(response.body)
-    ap parsed_response
     # set_response_parameters
   end
 
