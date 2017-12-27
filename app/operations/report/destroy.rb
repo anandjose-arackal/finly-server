@@ -58,4 +58,8 @@ class Report::Destroy < Report::Base
     add_message :success, 'Report deleted'
   end
 
+  def success
+    BaseOperation::BasePresenter::SuccessPresenter.new(user, params, messages)
+  end
+
 end
