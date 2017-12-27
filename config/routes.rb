@@ -2046,6 +2046,7 @@ Rails.application.routes.draw do
   patch 'cards/assign/:id/cancel', to: 'cards#cancel_assign', as: :cancel_assign_request
   get 'cards/unassigned', to: 'cards#unassigned', as: :unassigned_cards
 
+  delete 'reports/destroy', to: 'reports#destroy'
   resources :reports, except: [:new, :edit]
   get 'export/report(.:format)' => 'export#report', as: :export_report
   get 'export/templates/index' => 'export#index_template'
@@ -2069,6 +2070,7 @@ Rails.application.routes.draw do
 
 
   patch 'money_requests/credit_cash', to: 'money_request#credit_cash', as: :credit
+  delete 'money_requests/destroy', to: 'money_request#destroy'
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do
     post 'comment' => 'money_request#comment', as: :comment
