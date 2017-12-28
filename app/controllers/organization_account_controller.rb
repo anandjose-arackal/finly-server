@@ -1,7 +1,7 @@
 class OrganizationAccountController < ApplicationController
 
 
-  before_action -> { finly_authorize! :web}
+  # before_action -> { finly_authorize! :web}
 
   def policies_list
     @result = Company::Configuration::Show.(current_user, params)
@@ -31,6 +31,13 @@ class OrganizationAccountController < ApplicationController
     respond_to do |format|
       format.html {render 'organization_account/show'}
       format.json {render 'organization_account/show'}
+    end
+  end
+
+  def gst_state_codes
+    @result = GstStateCode.all
+    respond_to do |format|
+      format.json { render 'gst_state_codes' }
     end
   end
 

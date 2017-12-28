@@ -17,7 +17,7 @@
 #  gst            :string(255)
 #  gst_registered :boolean
 #  state          :string(255)
-#  state_code     :string(255)
+#  state_code_id  :integer
 #
 
 require 'test_helper'
