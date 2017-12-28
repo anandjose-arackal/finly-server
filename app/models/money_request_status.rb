@@ -13,6 +13,7 @@
 
 
 
+
 class MoneyRequestStatus < ActiveRecord::Base
   include Seedable
 
