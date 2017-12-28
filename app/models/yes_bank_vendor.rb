@@ -23,7 +23,7 @@
 
 class YesBankVendor < ActiveRecord::Base
   belongs_to :company
-  belongs_to :state_code_id, class_name: "GstStateCode"
+  belongs_to :state_code, class_name: "GstStateCode"
   belongs_to :created_by, class_name: "User"
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
