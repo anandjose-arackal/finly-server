@@ -75,20 +75,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         item[:invoice_items_attributes] = item[:invoice_attributes][:invoice_items_attributes]
       end
 
-      # deciding tax based on whether invoice items were entered or not
-      tax_amount = discount_amount = amount = 0
-      if item[:invoice_items_attributes].present?
-        item[:invoice_items_attributes].each do |line_item|
-          tax_amount += line_item[:tax_amount]&.to_f
-          discount_amount += line_item[:discount_amount]&.to_f
-          amount += line_item[:amount]&.to_f
-        end
-      else
-        tax_amount = item[:tax_amount]&.to_f
-        discount_amount = item[:discount_amount]&.to_f
-        amount += item[:original_amount]&.to_f
-      end
-
       tds_amount = item[:tds_amount]&.to_f
       discount = item[:discount]
       advance_amount = item[:advance_amount]&.to_f
@@ -100,9 +86,24 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       invoice_date = item[:invoice_date]
       due_date = item[:due_date]
       inclusive_of_taxes = item[:inclusive_of_taxes]
-      amount = item[:original_amount]
 
-      net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+      # deciding tax based on whether invoice items were entered or not
+      tax_amount = discount_amount = amount = sub_total = 0
+      if item[:invoice_items_attributes].present?
+        item[:invoice_items_attributes].each do |line_item|
+          tax_amount += line_item[:tax_amount]&.to_f
+          discount_amount += line_item[:discount_amount]&.to_f
+          sub_total += line_item[:amount]&.to_f
+          amount += sub_total - discount_amount + tax_amount
+        end
+        net_amount = amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+      else
+        tax_amount = item[:tax_amount]&.to_f
+        discount_amount = item[:discount_amount]&.to_f
+        amount += item[:original_amount]&.to_f
+        net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+      end
+
 
       self.valid = true
       self.error_messages = []
@@ -179,9 +180,12 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       invoice_items = []
 
+      debugger
+
       invoice_net_amount = net_amount
 
       if item&.dig(:invoice_items_attributes).present?
+        # i.e. if the line items are present, recalculate the net amount
         invoice_net_amount = 0
 
         item[:invoice_items_attributes]&.each do |invoice_item|
@@ -214,6 +218,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           end
 
           # insert custom fields here
+          debugger
 
           invoice_items << {
             description: item_description,
@@ -250,7 +255,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
                                advance: advance, advance_amount: advance_amount, freight: freight,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
-                               net_amount: net_amount, invoice_items: invoice_items,
+                               net_amount: invoice_net_amount, invoice_items: invoice_items,
                                valid: self.valid, messages: self.error_messages}
     end
   end

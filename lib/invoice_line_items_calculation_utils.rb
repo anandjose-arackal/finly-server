@@ -21,6 +21,7 @@ class InvoiceLineItemsCalculationUtils
       calculate_exclusive_taxes(item)
       self.net_amount = self.gross_amount + self.tax_amount
       self.invoice_total += self.net_amount
+      debugger
       # assign the respective calculated parameters to the payment params
       params[:invoice_attributes][:invoice_items_attributes][index][:amount_attributes] = {
           value: self.invoice_item_amount,

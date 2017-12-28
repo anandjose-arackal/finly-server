@@ -78,6 +78,18 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       end
     end
 
+    # add logic to remove line items if required
+    if self.payment_params&.dig(:invoice_attributes, :invoice_attachments_attributes).present?
+      self.payment_params[:invoice_attributes][:invoice_items_attributes].each do |data|
+        if StringUtils.to_bool(data[:remove_line_item])
+          data[:_delete] = true
+          data.delete(:remove_line_item)
+        else
+          data.delete(:remove_line_item)
+        end
+      end
+    end
+
     # todo - temporary
     self.payment_params[:invoice_attributes][:freight_amount_attributes][:currency_id] = 1
     ##################
@@ -85,9 +97,11 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
 
   def process
     payment.assign_attributes(payment_params)
+    debugger
     if payment.invoice.present? # && payment.valid?
       calculate_tax_and_discounts
     end
+    debugger
     # assign the new attributes that were calculated using the respective libraries
     payment.assign_attributes(payment_params)
     set_custom_fields(false) # this should hopefully add the attributes to the model
@@ -111,7 +125,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
                                                          original_amount_attributes: [:value, :currency_id],
                                                          freight_amount_attributes: [:value, :currency_id],
                                                          invoice_attachments_attributes: [:attached_file, :description, :remove_file],
-                                                         invoice_items_attributes: [:quantity, :rate, :tax, :discount, :category_id, :name]],
+                                                         invoice_items_attributes: [:quantity, :rate, :tax, :discount, :category_id, :description, :id]],
                                     amount_attributes: [:value, :currency_id]
                                    )
   end
@@ -131,6 +145,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def calculate_tax_and_discounts
     if self.payment.invoice.invoice_items.present?
       # if there are no invoice items, use the invoice library to calculate the amounts
+      debugger
       self.payment_params = InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)&.permit!
     else
       # if there are, in fact, invoice items, use the invoice items library

@@ -31,4 +31,8 @@ class InvoiceLineItem < ActiveRecord::Base
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :amount
   accepts_nested_attributes_for :net_amount
+
+  validates :description, presence: true
+  validates :quantity, presence: true
+  validates :rate, presence: true
 end

@@ -79,7 +79,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     # and credited to the respective bank accounts
     # this should now create a BankPaymentRequest and save it in the DB
     self.bank_payment_request = BankPaymentRequest.new(request_params)
-    validate_custom_fields(processed_order_data)
+    validate_custom_fields_invoice(processed_order_data)
     return if has_errors?
     # bank_payment_request.payment_order.payments.each do |payment|
     #   payment_params =
@@ -146,10 +146,10 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
   private
 
-  def validate_custom_fields(order_data)
+  def validate_custom_fields_invoice(order_data)
     if self.bank_payment_request.valid?
       self.bank_payment_request.payment_order.payments.each_with_index do |payment, index|
-        set_fields = set_custom_fields payment, self.processed_order_data[index], false
+        set_fields = set_custom_fields_invoice payment, self.processed_order_data[index], false
         unless set_fields.success?
           add_message :error, set_fields.messages[:error]
           return
@@ -163,12 +163,16 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     end
   end
 
-  def set_custom_fields(payment, data, save)
+  def set_custom_fields_invoice(payment, data, save)
     custom_fields = {custom_fields: data[:custom_fields]}
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
     CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
+  end
+
+  def set_custom_fields_invoice_items(payment, data, save)
+
   end
 
   def payment_request_params
@@ -203,8 +207,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       # processing the line items of this particular invoice
       invoice_items_attributes = []
       if order_details&.dig(:invoice_attributes, :invoice_items_attributes).present?
-        debugger
         order_details[:invoice_attributes][:invoice_items_attributes].each do |line_item|
+          debugger
           invoice_items_attributes << {
               tax: line_item[:tax],
               discount: line_item[:discount],
@@ -296,11 +300,11 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
   def calculate_tax_and_discounts(payment_params, payment)
     if payment.invoice.invoice_items.present?
-      # if there are no invoice items, use the invoice library to calculate the amounts
+      # if there are, in fact, invoice items, use the invoice items library
       payment_params = InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)
       payment.update(payment_params)
     else
-      # if there are, in fact, invoice items, use the invoice items library
+      # if there are no invoice items, use the invoice library to calculate the amounts
       payment_params = InvoiceCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)
       payment.update(payment_params)
     end
@@ -363,61 +367,61 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     # self.payment.amount&.update(value: self.net_amount)
   end
 
-  def calculate_discount_exclusive
-    if self.invoice.discount.blank?
-      self.discount_amount = 0
-      self.gross_amount = self.invoice_amount
-      return
-    end
-    self.discount_amount = (invoice.discount*self.invoice_amount)/100
-    self.gross_amount = self.invoice_amount - self.discount_amount
-  end
-
-  def calculate_discount_inclusive
-    if self.invoice.discount.blank?
-      self.discount_amount = 0
-      self.invoice_amount = self.gross_amount
-      return
-    end
-    self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
-    self.discount_amount = self.invoice_amount - self.gross_amount
-  end
-
-  def calculate_exclusive_taxes
-    if self.invoice.tax.blank?
-      self.net_amount = self.gross_amount
-      self.tax_amount = 0
-      return
-    end
-    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax), self.invoice.tax_type_id)
-    self.tax_amount = self.net_amount - self.gross_amount
-  end
-
-  def calculate_inclusive_taxes
-    if self.invoice.tax.blank?
-      self.after_tax_amount = self.gross_amount
-      self.tax_amount = 0
-      return
-    end
-    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax), self.invoice.tax_type_id)
-    self.tax_amount = self.after_tax_amount - self.gross_amount
-  end
-
-  def calculate_tds
-    new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, self.invoice.tds, self.invoice.tds_type_id)
-    self.tds_amount = self.gross_amount - new_gross_amount
-  end
-
-  def calculate_advance_paid
-    if self.invoice.advance.blank?
-      # no change in net amount
-      self.advance_amount = 0
-      return
-    end
-    original_net_amount = self.net_amount
-    self.advance_amount = (self.invoice.advance*self.net_amount)/100
-    self.net_amount = original_net_amount - self.advance_amount
-  end
+  # def calculate_discount_exclusive
+  #   if self.invoice.discount.blank?
+  #     self.discount_amount = 0
+  #     self.gross_amount = self.invoice_amount
+  #     return
+  #   end
+  #   self.discount_amount = (invoice.discount*self.invoice_amount)/100
+  #   self.gross_amount = self.invoice_amount - self.discount_amount
+  # end
+  #
+  # def calculate_discount_inclusive
+  #   if self.invoice.discount.blank?
+  #     self.discount_amount = 0
+  #     self.invoice_amount = self.gross_amount
+  #     return
+  #   end
+  #   self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
+  #   self.discount_amount = self.invoice_amount - self.gross_amount
+  # end
+  #
+  # def calculate_exclusive_taxes
+  #   if self.invoice.tax.blank?
+  #     self.net_amount = self.gross_amount
+  #     self.tax_amount = 0
+  #     return
+  #   end
+  #   self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax), self.invoice.tax_type_id)
+  #   self.tax_amount = self.net_amount - self.gross_amount
+  # end
+  #
+  # def calculate_inclusive_taxes
+  #   if self.invoice.tax.blank?
+  #     self.after_tax_amount = self.gross_amount
+  #     self.tax_amount = 0
+  #     return
+  #   end
+  #   self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax), self.invoice.tax_type_id)
+  #   self.tax_amount = self.after_tax_amount - self.gross_amount
+  # end
+  #
+  # def calculate_tds
+  #   new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, self.invoice.tds, self.invoice.tds_type_id)
+  #   self.tds_amount = self.gross_amount - new_gross_amount
+  # end
+  #
+  # def calculate_advance_paid
+  #   if self.invoice.advance.blank?
+  #     # no change in net amount
+  #     self.advance_amount = 0
+  #     return
+  #   end
+  #   original_net_amount = self.net_amount
+  #   self.advance_amount = (self.invoice.advance*self.net_amount)/100
+  #   self.net_amount = original_net_amount - self.advance_amount
+  # end
 
 end
 
