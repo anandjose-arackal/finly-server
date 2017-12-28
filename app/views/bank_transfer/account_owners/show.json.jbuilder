@@ -7,6 +7,7 @@ json.account_owner do
     json.pan @result.account_owner.pan
     json.gst @result.account_owner.gst
     json.tin @result.account_owner.tin
+    json.state_code_id @result.account_owner.state_code_id
   else
     json.editable_details false
   end
