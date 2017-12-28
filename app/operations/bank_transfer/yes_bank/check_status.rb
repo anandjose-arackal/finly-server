@@ -32,7 +32,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def validate
     # confirm that the bank transaction is, in fact in processing state
-    unless bank_transaction.processing?
+    unless bank_transaction.processing? || bank_transaction.possible_failure?
       add_message :error, "This transaction is not in processing state"
       return
     end
