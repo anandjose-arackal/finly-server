@@ -41,6 +41,8 @@ class BankTransfer::PaymentRequest::AccountDetails < BankTransfer::PaymentReques
       self.custom_fields_config = {
           invoice: user.company.field_configurations.exclude_deleted.with_parent_type(FieldParentType.id_for(:invoice))
       }
+      self.invoice_categories = params[:invoice_categories]
+      self.invoice_item_categories = params[:invoice_item_categories]
     end
   end
 

@@ -23,26 +23,37 @@ class InvoiceLineItemsCalculationUtils
       self.invoice_total += self.net_amount
       debugger
       # assign the respective calculated parameters to the payment params
-      params[:invoice_attributes][:invoice_items_attributes][index][:amount_attributes] = {
-          value: self.invoice_item_amount,
-          currency_id: 1,
-          id: item.amount&.id
-      }
-      params[:invoice_attributes][:invoice_items_attributes][index][:tax_amount_attributes] = {
-          value: self.tax_amount,
-          currency_id: 1,
-          id: item.tax_amount&.id
-      }
-      params[:invoice_attributes][:invoice_items_attributes][index][:discount_amount_attributes] = {
-          value: self.discount_amount,
-          currency_id: 1,
-          id: item.discount_amount&.id
-      }
-      params[:invoice_attributes][:invoice_items_attributes][index][:net_amount_attributes] = {
-          value: self.net_amount,
-          currency_id: 1,
-          id: item.net_amount&.id
-      }
+      # invoice line item raw amount
+      if item.amount.present?
+        item.amount.value = self.invoice_item_amount
+        item.amount.currency_id = Currency.first.id
+      else
+        item.amount = Amount.new(value: self.amount, currency_id: 1)
+      end
+
+      # invoice item tax amount
+      if item.tax_amount.present?
+        item.tax_amount.value = self.tax_amount
+        item.tax_amount.currency_id = Currency.first.id
+      else
+        item.tax_amount = Amount.new(value: self.tax_amount, currency_id: 1)
+      end
+
+      # invoice discount amount
+      if item.discount_amount.present?
+        item.discount_amount.value = self.discount_amount
+        item.discount_amount.currency_id = Currency.first.id
+      else
+        item.discount_amount = Amount.new(value: self.discount_amount, currency_id: 1)
+      end
+
+      # invoice item net amount
+      if item.net_amount.present?
+        item.net_amount.value = self.net_amount
+        item.net_amount.currency_id = Currency.first.id
+      else
+        item.net_amount = Amount.new(value: self.net_amount, currency_id: 1)
+      end
     end
     params[:invoice_attributes][:amount_attributes] = {
         value: self.invoice_total,

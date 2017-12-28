@@ -53,7 +53,8 @@ class Invoice < ActiveRecord::Base
   belongs_to :freight_amount, class_name: "Amount"
   belongs_to :category
 
-  belongs_to :payment
+  # because multiple payments can be made against one invoice
+  has_many :payments
 
   has_many :invoice_items, class_name: "InvoiceLineItem"
   has_many :invoice_attachments
