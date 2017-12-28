@@ -1,4 +1,5 @@
 class MoneyRequest::Destroy < MoneyRequest::Base
+  attr_accessor :money_requests
 
   def authorized_user_types
     [:employee]
@@ -8,25 +9,42 @@ class MoneyRequest::Destroy < MoneyRequest::Base
     if user.blank? or params.blank?
       messages[:error] << 'User or params not passed.'
     end
+    if params.blank?
+      add_message :error, 'Money Request not found'
+    end
+  end
+
+  def init
+    id = (params[:id] or params[:money_request_id])
+    self.money_requests = MoneyRequest::Index.(user, params).money_requests.with_id(id)
   end
 
   def validate
-    # check if the money_request can be destroyed at all
-    unless money_request.can_destroy?
-      messages[:error] << "Money Request can only be deleted once it's retracted or rejected"
+    unless self.money_requests.present?
+      add_message :error, 'Nothing to delete'
+      return
+    end
+    if self.money_requests.without_user(user.id).present?
+      add_message :error, "The list contains items that cannot be deleted"
+      return
+    end
+    # check if the report can be destroyed at all
+    self.money_requests.each do |money_request|
+      unless money_request.can_destroy?
+        add_message :error, "Money Request can only be deleted once it's retracted or rejected."
+        return
+      end
     end
   end
 
   def authorize
-    super
-    unless money_request.user_id == user.id
-      raise_unauthorized_exception
-    end
   end
 
   def process
-    unless money_request.destroy
-      messages[:error] = money_request.errors.full_messages
+    self.money_requests.each do |money_request|
+      unless money_request.destroy
+        messages[:error] = money_request.errors.full_messages
+      end
     end
   end
 
