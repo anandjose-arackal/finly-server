@@ -3,10 +3,11 @@ json.account_owner do
   if @result.account_owner.is_a?(YesBankVendor)
     json.authorized @result.account_owner.authorized
     json.description @result.account_owner.description
-    json.editable_details @result.user.permission.create_beneficiaries
+    json.editable_details (@result.user.permission.create_beneficiaries || @result.user.vendor_payments_admin?)
     json.pan @result.account_owner.pan
     json.gst @result.account_owner.gst
     json.tin @result.account_owner.tin
+    json.state_code_id @result.account_owner.state_code_id
   else
     json.editable_details false
   end
