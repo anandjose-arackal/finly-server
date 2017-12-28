@@ -32,9 +32,9 @@ class OrganizationAccountController < ApplicationController
   end
 
   def gst_state_codes
-    @result = GstStateCode.all
+    @codes = GstStateCode.all
     respond_to do |format|
-      format.json { render 'gst_state_codes' }
+      format.json {render 'organization_account/gst_state_codes'}
     end
   end
 
