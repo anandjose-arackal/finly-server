@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171228165340) do
+ActiveRecord::Schema.define(version: 20171228175810) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3539,6 +3539,7 @@ ActiveRecord::Schema.define(version: 20171228165340) do
     t.boolean  "gst_registered"
     t.string   "state",          limit: 255
     t.integer  "state_code_id",  limit: 4
+    t.integer  "created_by_id",  limit: 4
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
