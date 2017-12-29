@@ -196,19 +196,20 @@ class Statements::Team::Summary < Statements::Team::Base
 
   def process
     self.values = []
+    puts "COLUMNS: #{self.columns}"
     self.users.each_with_index do |user, index|
       val = {}
       self.columns.each do |key|
-        if key.class.name == Hash.name
+        if key.class.name == String.name
+          val[key] = {}
+          val[key] = self.process_column(key, user, index)
+        else
           hash_key = key.keys.first
           val[hash_key] = {}
           key.values.first.each do |sub_key|
             column_name = "#{hash_key}_#{sub_key}"
             val[hash_key][sub_key] = self.process_column(column_name, user, index)
           end
-        else
-          val[key] = {}
-          val[key] = self.process_column(key, user, index)
         end
       end
       self.values << val
