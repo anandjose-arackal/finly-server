@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171226090435) do
+ActiveRecord::Schema.define(version: 20171228175810) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1734,6 +1734,13 @@ ActiveRecord::Schema.define(version: 20171226090435) do
   add_index "finly_transactions", ["status_id"], name: "index_finly_transactions_on_status_id", using: :btree
   add_index "finly_transactions", ["transaction_reference_id"], name: "index_finly_transactions_on_transaction_reference_id", using: :btree
   add_index "finly_transactions", ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id", using: :btree
+
+  create_table "gst_state_codes", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+    t.string   "state_code", limit: 255
+  end
 
   create_table "individual_kyc_track_actions", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -3531,7 +3538,8 @@ ActiveRecord::Schema.define(version: 20171226090435) do
     t.string   "gst",            limit: 255
     t.boolean  "gst_registered"
     t.string   "state",          limit: 255
-    t.string   "state_code",     limit: 255
+    t.integer  "state_code_id",  limit: 4
+    t.integer  "created_by_id",  limit: 4
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree

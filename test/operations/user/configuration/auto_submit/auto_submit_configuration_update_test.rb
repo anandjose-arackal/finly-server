@@ -3,12 +3,12 @@ require 'test_helper'
 class AutoSubmitConfigurationUpdateTest < ActiveSupport::TestCase
 
   def setup
-    @current_user = users(:admin)
+    @curr_user = users(:admin)
     @updating_user = users(:manager)
   end
 
   test 'Current User, User ID and update params need to be passed to perform the update' do
-    result = User::Configuration::AutoSubmit::Update.(@current_user, {user:
+    result = User::Configuration::AutoSubmit::Update.(@curr_user, {user:
                                                                       {enabled: true,
                                                                        period_id: Period.id_for(:day)}, view: 'admin'})
     assert_not result.success?
@@ -23,7 +23,7 @@ class AutoSubmitConfigurationUpdateTest < ActiveSupport::TestCase
     assert exception_caught
 
 
-    result = User::Configuration::AutoSubmit::Update.(@current_user,
+    result = User::Configuration::AutoSubmit::Update.(@curr_user,
                                                       {user: {id: @updating_user.id}, view: 'admin'})
     assert_not result.success?
   end
@@ -43,7 +43,7 @@ class AutoSubmitConfigurationUpdateTest < ActiveSupport::TestCase
 
   test 'Successful update' do
     assert_not @updating_user.auto_submit_config.enabled
-    result = User::Configuration::AutoSubmit::Update.(@current_user, user: {id: @updating_user.id, enabled: true,
+    result = User::Configuration::AutoSubmit::Update.(@curr_user, user: {id: @updating_user.id, enabled: true,
                                                                             period_id: Period.id_for(:day)}, view: 'admin')
     assert result.success?
     assert @updating_user.reload.auto_submit_config.enabled

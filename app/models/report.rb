@@ -35,6 +35,7 @@
 
 
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -147,6 +148,8 @@ class Report < ActiveRecord::Base
   scope :sort_for_personal, -> { joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
 
   scope :awaiting_approval_of_user, ->(user_id, role_id){ where(report_status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
+  scope :not_destroyable, -> { where.not report_status_id: ReportStatus.ids_for([:open, :rejected, :retracted]) }
+  scope :without_user, -> (user_id) { where.not user_id: user_id }
 
   scope :includes_export, -> { includes({expenses:[:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
                                                :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
