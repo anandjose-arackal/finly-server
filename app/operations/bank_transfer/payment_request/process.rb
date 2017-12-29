@@ -87,6 +87,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       due_date = item[:due_date]
       inclusive_of_taxes = item[:inclusive_of_taxes]
       category_id = item[:category_id]
+      gst_type_id = item[:gst_type_id]
 
       # deciding tax based on whether invoice items were entered or not
       tax_amount = discount_amount = amount = sub_total = 0
@@ -251,7 +252,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.payment_order_valid = false unless self.valid
 
       self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
-                               tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds,
+                               tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds, gst_type_id: gst_type_id,
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
                                advance: advance, advance_amount: advance_amount, freight: freight, category_id: category_id,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},

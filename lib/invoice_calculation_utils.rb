@@ -68,12 +68,12 @@ class InvoiceCalculationUtils
       self.invoice_amount = self.gross_amount + self.discount_amount
       calculate_advance_paid
     else # calculate proactively
-      self.invoice_amount = invoice.original_amount&.value
+      self.invoice_amount = self.invoice.original_amount&.value
       calculate_discount_exclusive
       calculate_exclusive_taxes
       calculate_tds
       self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
-      self.invoice_amount = invoice.original_amount&.value
+      self.invoice_amount = self.invoice.original_amount&.value
       calculate_advance_paid
     end
     # assign the respective calculated parameters to the payment params
@@ -117,7 +117,7 @@ class InvoiceCalculationUtils
     if self.invoice&.advance_amount.present?
       self.invoice.advance_amount.value = self.advance_amount
     else
-      self.invoice.advance_amount = Amount.new(value: self.advance_amount, currenc_id: 1)
+      self.invoice.advance_amount = Amount.new(value: self.advance_amount, currency_id: 1)
     end
 
     # assign net amount

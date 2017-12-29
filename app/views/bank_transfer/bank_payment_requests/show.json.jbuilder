@@ -69,12 +69,12 @@ json.payments do
       json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
         json.advance invoice.advance
-        json.advance_amount invoice.advance_amount&.value
+        json.advance_amount precision_value invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
-        json.gst_type_id invoice.gst_type_id
+        json.gst_type_id invoice.gst_type
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
         json.discount_amount precision_value invoice.discount_amount&.value
@@ -157,12 +157,12 @@ json.payments_verified do
       json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
         json.advance invoice.advance
-        json.advance_amount invoice.advance_amount&.value
+        json.advance_amount precision_value invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
-        json.gst_type_id invoice.gst_type_id
+        json.gst_type_id invoice.gst_type
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
         json.discount_amount precision_value invoice.discount_amount&.value
@@ -243,12 +243,12 @@ json.payments_unverified do
       json.original_amount precision_value invoice.original_amount&.value
       json.invoice do
         json.advance invoice.advance
-        json.advance_amount invoice.advance_amount&.value
+        json.advance_amount precision_value invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
-        json.gst_type_id invoice.gst_type_id
+        json.gst_type_id invoice.gst_type
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
         json.discount_amount precision_value invoice.discount_amount&.value

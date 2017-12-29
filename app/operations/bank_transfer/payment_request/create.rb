@@ -215,7 +215,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               description: line_item[:description],
               rate: line_item[:rate],
               quantity: line_item[:quantity],
-              hsn_sac: line_item[:hsn_sac]
+              hsn_sac: line_item[:hsn_sac],
+              gst_type_id: line_item[:gst_type_id]
           }
         end
       end

@@ -142,6 +142,14 @@ class Invoice < ActiveRecord::Base
     end
   end
 
+  def gst_type
+    if self.invoice_items.empty?
+      self.gst_type_id
+    else
+      self.invoice_items.first.gst_type_id
+    end
+  end
+
   private
 
 
