@@ -46,14 +46,14 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def success
-    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(balance)
+    YesBankApi::Transfer::BankTransfer::SuccessbalancePresenter.new(balance)
   end
 
   def failure
 
   end
 
-  class YesBankApi::Transfer::BankTransfer::SuccessStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :balance
 

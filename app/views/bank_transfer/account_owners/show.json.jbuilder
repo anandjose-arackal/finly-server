@@ -8,6 +8,8 @@ json.account_owner do
     json.gst @result.account_owner.gst
     json.tin @result.account_owner.tin
     json.state_code_id @result.account_owner.state_code_id
+    json.state_code_name @result.account_owner.state_code&.full_name
+    json.created_by @result.account_owner.created_by&.name
   else
     json.editable_details false
   end

@@ -12,4 +12,8 @@
 class GstStateCode < ActiveRecord::Base
 
 
+  def full_name
+    "#{self.name} - #{self.state_code}"
+  end
+
 end
