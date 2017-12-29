@@ -288,66 +288,66 @@ class Statements::Team::Summary < Statements::Team::Base
       when :user_mobile_number
         return user.mobile_number
       when :accounts_net_advance
-        return user.receiving_payments.advance.sum_amounts
+        return format_amount user.receiving_payments.advance.sum_amounts
       when :accounts_net_reimbursement
-        return user.receiving_payments.reimbursement.sum_amounts
+        return format_amount user.receiving_payments.reimbursement.sum_amounts
       when :accounts_atm_withdrawals
-        return user.receiving_payments.atm_withdrawals.sum_amounts
+        return format_amount user.receiving_payments.atm_withdrawals.sum_amounts
       when :accounts_net_opening_balance
         card_opening_balance = dictionary(user, :expense_card, :opening_balance) || 0
-        (card_opening_balance +
+        return format_amount(card_opening_balance +
             dictionary(user, :finly_money_ctc, :opening_balance) +
             dictionary(user, :finly_money_btc, :opening_balance) +
             dictionary(user, :cash_on_hand, :opening_balance))
       when :accounts_net_closing_balance
         card_closing_balance = dictionary(user, :expense_card, :closing_balance) || 0
-        (card_closing_balance +
+        return format_amount(card_closing_balance +
             dictionary(user, :finly_money_ctc, :closing_balance) +
             dictionary(user, :finly_money_btc, :closing_balance) +
             dictionary(user, :cash_on_hand, :closing_balance))
       when :expense_card_opening_balance
-        dictionary(user, :expense_card, :opening_balance)
+        return format_amount dictionary(user, :expense_card, :opening_balance)
       when :expense_card_credits
         transactions = dictionary(user, :expense_card, :finly_transactions)
-        return transactions&.credits&.success&.sum_amounts || 0
+        return format_amount transactions&.credits&.success&.sum_amounts
       when :expense_card_debits
         transactions = dictionary(user, :expense_card, :finly_transactions)
-        return transactions&.debits&.success&.sum_amounts || 0
+        return format_amount transactions&.debits&.success&.sum_amounts
       when :expense_card_closing_balance
-        dictionary(user, :expense_card, :closing_balance)
+        return format_amount dictionary(user, :expense_card, :closing_balance)
       when :finly_money_ctc_opening_balance
-        dictionary(user, :finly_money_ctc, :opening_balance)
+        return format_amount dictionary(user, :finly_money_ctc, :opening_balance)
       when :finly_money_ctc_credits
         transactions = dictionary(user, :finly_money_ctc, :finly_transactions)
-        return transactions&.credits&.success&.sum_amounts || 0
+        return format_amount transactions&.credits&.success&.sum_amounts
       when :finly_money_ctc_debits
         transactions = dictionary(user, :finly_money_ctc, :finly_transactions)
-        return transactions&.debits&.success&.sum_amounts || 0
+        return format_amount transactions&.debits&.success&.sum_amounts
       when :finly_money_ctc_closing_balance
-        dictionary(user, :finly_money_ctc, :closing_balance)
+        return format_amount dictionary(user, :finly_money_ctc, :closing_balance)
       when :finly_money_btc_opening_balance
-        dictionary(user, :finly_money_btc, :opening_balance)
+        return format_amount dictionary(user, :finly_money_btc, :opening_balance)
       when :finly_money_btc_credits
         transactions = dictionary(user, :finly_money_btc, :finly_transactions)
-        return transactions&.credits&.success&.sum_amounts || 0
+        return format_amount transactions&.credits&.success&.sum_amounts
       when :finly_money_btc_debits
         transactions = dictionary(user, :finly_money_btc, :finly_transactions)
-        return transactions&.debits&.success&.sum_amounts || 0
+        return format_amount transactions&.debits&.success&.sum_amounts
       when :finly_money_btc_closing_balance
-        dictionary(user, :finly_money_btc, :closing_balance)
+        return format_amount dictionary(user, :finly_money_btc, :closing_balance)
       when :cash_on_hand_opening_balance
-        dictionary(user, :cash_on_hand, :opening_balance)
+        return format_amount dictionary(user, :cash_on_hand, :opening_balance)
       when :cash_on_hand_credits
         transactions = dictionary(user, :cash_on_hand, :finly_transactions)
-        return transactions&.credits&.success&.sum_amounts || 0
+        return format_amount transactions&.credits&.success&.sum_amounts
       when :cash_on_hand_debits
         transactions = dictionary(user, :cash_on_hand, :finly_transactions)
-        return transactions&.debits&.success&.sum_amounts || 0
+        return format_amount transactions&.debits&.success&.sum_amounts
       when :cash_on_hand_closing_balance
-        dictionary(user, :cash_on_hand, :closing_balance)
+        return format_amount dictionary(user, :cash_on_hand, :closing_balance)
       when :reimbursement_card_credits
         transactions = dictionary(user, :reimbursement_card, :finly_transactions)
-        return transactions&.credits&.success&.through_finly_dashboard&.sum_amounts || 0
+        return format_amount transactions&.credits&.success&.through_finly_dashboard&.sum_amounts
       when :expense_category
         expenses = dictionary user, :expenses, :object
         return expenses.group_by_category_id.sum_amount
@@ -508,6 +508,11 @@ class Statements::Team::Summary < Statements::Team::Base
             ACCOUNT_MAP[user][:expenses][:object]
         end
     end
+  end
+
+  def format_amount(value)
+    value = 0 if value.nil?
+    "₹#{value} INR"
   end
 
 end
