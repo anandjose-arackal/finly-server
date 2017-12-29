@@ -26,8 +26,9 @@
 #  payment_mode            :string(255)
 #  reference_id            :string(255)      not null
 #  invoice_id              :integer
-#  retry_count             :integer
+#  retry_count             :integer          default(0)
 #
+
 
 
 

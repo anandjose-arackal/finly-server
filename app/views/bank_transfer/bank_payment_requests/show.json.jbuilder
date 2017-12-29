@@ -121,6 +121,7 @@ json.payments do
             json.id item.id
             json.description item.description
             json.total_amount precision_value item.net_amount&.value
+            json.hsn_sac item.hsn_sac
           end
         end
       end
@@ -205,6 +206,7 @@ json.payments_verified do
             json.id item.id
             json.description item.description
             json.total_amount precision_value item.net_amount&.value
+            json.hsn_sac item.hsn_sac
           end
         end
       end
@@ -289,6 +291,7 @@ json.payments_unverified do
             json.id item.id
             json.description item.description
             json.total_amount precision_value item.net_amount&.value
+            json.hsn_sac item.hsn_sac
           end
         end
       end

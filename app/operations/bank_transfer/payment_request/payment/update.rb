@@ -78,11 +78,9 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       end
     end
 
-    debugger
     # add logic to remove line items if required
     if self.payment_params&.dig(:invoice_attributes, :invoice_items_attributes).present?
       self.payment_params[:invoice_attributes][:invoice_items_attributes].each do |data|
-        debugger
         if StringUtils.to_bool(data[:remove_line_item])
           data[:_destroy] = true
           data.delete(:remove_line_item)
@@ -99,12 +97,10 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
 
   def process
     payment.assign_attributes(payment_params)
-    debugger
     if payment.invoice.present? # && payment.valid?
       calculate_tax_and_discounts
     end
 
-    debugger
     set_custom_fields(false) # this should hopefully add the attributes to the model
     unless self.payment.save
       add_message :error, self.payment.errors.full_messages
@@ -146,11 +142,10 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def calculate_tax_and_discounts
     if self.payment.invoice.invoice_items.present?
       # if there are no invoice items, use the invoice library to calculate the amounts
-      debugger
-      self.payment_params = InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)&.permit!
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)&.permit!
     else
       # if there are, in fact, invoice items, use the invoice items library
-      self.payment_params = InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)&.permit!
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)&.permit!
     end
 
     return

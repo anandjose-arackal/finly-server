@@ -208,7 +208,6 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       invoice_items_attributes = []
       if order_details&.dig(:invoice_attributes, :invoice_items_attributes).present?
         order_details[:invoice_attributes][:invoice_items_attributes].each do |line_item|
-          debugger
           invoice_items_attributes << {
               tax: line_item[:tax],
               discount: line_item[:discount],
@@ -302,11 +301,11 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     if payment.invoice.invoice_items.present?
       # if there are, in fact, invoice items, use the invoice items library
       payment_params = InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)
-      payment.update(payment_params)
+      payment.save
     else
       # if there are no invoice items, use the invoice library to calculate the amounts
       payment_params = InvoiceCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)
-      payment.update(payment_params)
+      payment.save
     end
 
     # self.payment = payment

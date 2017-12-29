@@ -38,6 +38,7 @@ json.payment do
           json.quantity line_item[:quantity]
           json.gst_type_id line_item[:item_gst_type]
           json.total_amount line_item[:total_amount]
+          json.hsn_sac line_item[:hsn_sac]
         end
       end
     end

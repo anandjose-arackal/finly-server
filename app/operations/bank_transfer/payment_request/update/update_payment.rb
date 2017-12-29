@@ -88,7 +88,6 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
     payment.assign_attributes(payment_params)
     # now assign the calculated amounts to the params
     self.payment_params = calculate_tax_and_discounts(payment_params)
-    debugger
     # assigning the new calculated amounts
     self.payment.assign_attributes(self.payment_params)
     set_custom_fields_invoice(false) # this should hopefully add the attributes to the model
@@ -132,7 +131,6 @@ class BankTransfer::PaymentRequest::Update::UpdatePayment < BankTransfer::Paymen
   end
 
   def calculate_tax_and_discounts(payment_params)
-    debugger
     if self.payment.invoice.invoice_items.present?
       # if there are, in fact, invoice items, use the invoice items library
       payment_params = InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)

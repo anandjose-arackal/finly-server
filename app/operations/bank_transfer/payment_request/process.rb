@@ -181,8 +181,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       invoice_items = []
 
-      debugger
-
       invoice_net_amount = net_amount
 
       if item&.dig(:invoice_items_attributes).present?
@@ -200,6 +198,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           item_category_id = invoice_item[:category_id]
           item_discount_amount = invoice_item[:discount_amount]
           item_tax_amount = invoice_item[:tax_amount]
+          item_hsn_sac = invoice_item[:hsn_sac]
 
           total_amount = item_amount&.to_f - item_discount_amount&.to_f + item_tax_amount&.to_f
 
@@ -219,7 +218,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           end
 
           # insert custom fields here
-          debugger
 
           invoice_items << {
             description: item_description,
@@ -232,7 +230,8 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
             category_id: item_category_id,
             amount: item_amount,
             gst_type_id: item_gst_type,
-            total_amount: total_amount
+            total_amount: total_amount,
+            hsn_sac: item_hsn_sac
           }
 
           invoice_net_amount += total_amount

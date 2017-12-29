@@ -16,30 +16,36 @@ class InvoiceCalculationUtils
     calculate_tds
     self.net_amount = self.gross_amount - self.tds_amount
     calculate_advance_paid
-    params[:invoice_attributes][:tds_amount_attributes] = {
-        value: self.tds_amount,
-        currency_id: 1,
-        id: self.invoice.tds_amount&.id
-    }
-    params[:invoice_attributes][:advance_amount_attributes] = {
-        value: self.advance_amount,
-        currency_id: 1,
-        id: self.invoice.advance_amount&.id
-    }
-    params[:invoice_attributes][:net_amount_attributes] = {
-        value: self.net_amount,
-        currency_id: 1,
-        id: self.invoice.net_amount&.id
-    }
+
+    # assign TDS amount
+    if self.invoice&.tds_amount.present?
+      self.invoice.tds_amount.value = self.tds_amount
+    else
+      self.invoice.tds_amount = Amount.new(value: self.tds_amount, currency_id: 1)
+    end
+
+    # assign advance amount
+    if self.invoice&.advance_amount.present?
+      self.invoice.advance_amount.value = self.advance_amount
+    else
+      self.invoice.advance_amount = Amount.new(value: self.advance_amount, currency_id: 1)
+    end
+
+    # assign net amount
+    if self.invoice.net_amount.present?
+      self.invoice.net_amount.value = self.net_amount
+    else
+      self.invoice.net_amount = Amount.new(value: self.net_amount, currency_id: 1)
+    end
 
     # now calculating the final amount to be paid
-    # adding the payment amount to the params if the payment was passed
+    # assigning the final amount to the payment
     if payment.present?
-      params[:amount_attributes] = {
-          value: self.net_amount,
-          currency_id: 1,
-          id: payment.amount&.id
-      }
+      if payment.amount.present?
+        payment.amount.value = self.net_amount
+      else
+        payment.amount = Amount.new(value: self.net_amount, currency_id: 1)
+      end
     end
     params
   end
@@ -71,49 +77,64 @@ class InvoiceCalculationUtils
       calculate_advance_paid
     end
     # assign the respective calculated parameters to the payment params
-    params[:invoice_attributes][:amount_attributes] = {
-        value: self.invoice_amount,
-        currency_id: 1,
-        id: self.invoice&.amount&.id
-    }
-    params[:invoice_attributes][:net_amount_attributes] = {
-        value: self.net_amount,
-        currency_id: 1,
-        id: self.invoice&.net_amount&.id
-    }
-    params[:invoice_attributes][:gross_amount_attributes] = {
-        value: self.gross_amount,
-        currency_id: 1,
-        id: self.invoice.gross_amount&.id
-    }
-    params[:invoice_attributes][:discount_amount_attributes] = {
-        value: self.discount_amount,
-        currency_id: 1,
-        id: self.invoice.discount_amount&.id
-    }
-    params[:invoice_attributes][:tds_amount_attributes] = {
-        value: self.tds_amount,
-        currency_id: 1,
-        id: self.invoice.tds_amount&.id
-    }
-    params[:invoice_attributes][:tax_amount_attributes] = {
-        value: self.tax_amount,
-        currency_id: 1,
-        id: self.invoice.tax_amount&.id
-    }
-    params[:invoice_attributes][:advance_amount_attributes] = {
-        value: self.advance_amount,
-        currency_id: 1,
-        id: self.invoice.advance_amount&.id
-    }
+
+    # assign invoice amount
+    if self.invoice.amount.present?
+      self.invoice.amount.value = self.invoice_amount
+    else
+      self.invoice_amount = Amount.new(value: self.invoice_amount, currency_id: 1)
+    end
+
+    # assign gross amount
+    if self.invoice.gross_amount.present?
+      self.invoice.gross_amount.value = self.gross_amount
+    else
+      self.invoice.gross_amount = Amount.new(value: self.gross_amount, currency_id: 1)
+    end
+
+    # assign discount amount
+    if self.invoice.discount_amount.present?
+      self.invoice.discount_amount.value = self.discount_amount
+    else
+      self.invoice.discount_amount = Amount.new(value: self.discount_amount, currency_id: 1)
+    end
+
+    # assign tax amount
+    if self.invoice.tax_amount.present?
+      self.invoice.tax_amount.value = self.tax_amount
+    else
+      self.invoice.tax_amount = Amount.new(value: self.tax_amount, currency_id: 1)
+    end
+
+    # assign TDS amount
+    if self.invoice&.tds_amount.present?
+      self.invoice.tds_amount.value = self.tds_amount
+    else
+      self.invoice.tds_amount = Amount.new(value: self.tds_amount, currency_id: 1)
+    end
+
+    # assign advance amount
+    if self.invoice&.advance_amount.present?
+      self.invoice.advance_amount.value = self.advance_amount
+    else
+      self.invoice.advance_amount = Amount.new(value: self.advance_amount, currenc_id: 1)
+    end
+
+    # assign net amount
+    if self.invoice.net_amount.present?
+      self.invoice.net_amount.value = self.net_amount
+    else
+      self.invoice.net_amount = Amount.new(value: self.net_amount, currency_id: 1)
+    end
+
 
     # adding the payment amount to the params if  the object is present
     if payment.present?
-      params[:amount_attributes] = {
-          value: self.net_amount,
-          currency_id: 1,
-          id: self.payment.amount&.id
-      }
+      if payment.amount.present?
+        payment.amount.value = self.net_amount
+      else
+        payment.amount = Amount.new(value: self.net_amount, currency_id: 1)
+      end
     end
     params
   end

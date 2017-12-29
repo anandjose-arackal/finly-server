@@ -4,7 +4,7 @@
 #
 #  id                 :integer          not null, primary key
 #  invoice_id         :integer
-#  name               :string(255)
+#  description        :string(255)
 #  quantity           :integer
 #  rate               :decimal(20, 10)
 #  tax                :decimal(20, 10)
@@ -17,6 +17,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  net_amount_id      :integer
+#  hsn_sac            :string(255)
 #
 
 require 'test_helper'

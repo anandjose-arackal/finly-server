@@ -21,14 +21,13 @@ class InvoiceLineItemsCalculationUtils
       calculate_exclusive_taxes(item)
       self.net_amount = self.gross_amount + self.tax_amount
       self.invoice_total += self.net_amount
-      debugger
       # assign the respective calculated parameters to the payment params
       # invoice line item raw amount
       if item.amount.present?
         item.amount.value = self.invoice_item_amount
         item.amount.currency_id = Currency.first.id
       else
-        item.amount = Amount.new(value: self.amount, currency_id: 1)
+        item.amount = Amount.new(value: self.invoice_item_amount, currency_id: 1)
       end
 
       # invoice item tax amount
@@ -55,11 +54,13 @@ class InvoiceLineItemsCalculationUtils
         item.net_amount = Amount.new(value: self.net_amount, currency_id: 1)
       end
     end
-    params[:invoice_attributes][:amount_attributes] = {
-        value: self.invoice_total,
-        currency_id: 1,
-        id: invoice.amount&.id
-    }
+
+    # assign invoice amount
+    if invoice.amount.present?
+      invoice.amount.value = self.invoice_total
+    else
+      invoice.amount = Amount.new(value: self.invoice_total, currency_id: 1)
+    end
 
     # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here
     InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.invoice_total, payment)
