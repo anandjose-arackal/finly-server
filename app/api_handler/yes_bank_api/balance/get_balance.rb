@@ -46,7 +46,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def success
-    YesBankApi::Transfer::BankTransfer::SuccessbalancePresenter.new(balance)
+    YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter.new(balance)
   end
 
   def failure
