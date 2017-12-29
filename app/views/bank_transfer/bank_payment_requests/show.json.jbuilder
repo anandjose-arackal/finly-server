@@ -66,7 +66,12 @@ json.payments do
 
     if payment.invoice.present?
       json.raw_amount precision_value invoice&.amount&.value
-      json.original_amount precision_value invoice.original_amount&.value
+      # conditionally set the original amount as invoice amount is there are line items
+      if payment.invoice&.invoice_items.present?
+        json.original_amount precision_value invoice.amount&.value
+      else
+        json.original_amount precision_value invoice.original_amount&.value
+      end
       json.invoice do
         json.advance invoice.advance
         json.advance_amount precision_value invoice.advance_amount&.value
@@ -154,7 +159,12 @@ json.payments_verified do
 
     if payment.invoice.present?
       json.raw_amount precision_value invoice&.amount&.value
-      json.original_amount precision_value invoice.original_amount&.value
+      # conditionally set the original amount as invoice amount is there are line items
+      if payment.invoice&.invoice_items.present?
+        json.original_amount precision_value invoice.amount&.value
+      else
+        json.original_amount precision_value invoice.original_amount&.value
+      end
       json.invoice do
         json.advance invoice.advance
         json.advance_amount precision_value invoice.advance_amount&.value
@@ -240,7 +250,12 @@ json.payments_unverified do
 
     if payment.invoice.present?
       json.raw_amount precision_value invoice&.amount&.value
-      json.original_amount precision_value invoice.original_amount&.value
+      # conditionally set the original amount as invoice amount is there are line items
+      if payment.invoice&.invoice_items.present?
+        json.original_amount precision_value invoice.amount&.value
+      else
+        json.original_amount precision_value invoice.original_amount&.value
+      end
       json.invoice do
         json.advance invoice.advance
         json.advance_amount precision_value invoice.advance_amount&.value
