@@ -47,6 +47,9 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
     if vendor_parameters&.dig(:vendor_attachments_attributes).present?
       vendor_parameters[:vendor_attachments_attributes].first&.delete(:remove_file)
     end
+
+    # adding the created by user for this particular vendor
+    vendor_parameters[:created_by_id] = user.id
   end
 
   def process
