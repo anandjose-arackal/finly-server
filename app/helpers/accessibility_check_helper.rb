@@ -11,7 +11,7 @@ module AccessibilityCheckHelper
   end
 
   def current_user
-    @current_user
+    @curr_user || @curr_user
   end
 
   # def validate_logged_in_user
