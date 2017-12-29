@@ -116,48 +116,47 @@ class Statements::Team::Summary < Statements::Team::Base
   #     expense_unsubmitted
   # )
 
-  COLUMNS = [
-      :sl_no,
-      {user: [
+  COLUMNS = {
+      user: [
           :name,
           :email,
           :mobile_number
-      ]},
-      {accounts: [
+      ],
+      accounts: [
           :net_advance,
           :net_reimbursement,
           :atm_withdrawals,
           :net_opening_balance,
           :net_closing_balance
-      ]},
-      {expense_card: [
+      ],
+      expense_card: [
           :opening_balance,
           :credits,
           :debits,
           :closing_balance
-      ]},
-      {finly_money_ctc: [
+      ],
+      finly_money_ctc: [
           :opening_balance,
           :credits,
           :debits,
           :closing_balance
-      ]},
-      {finly_money_btc: [
+      ],
+      finly_money_btc: [
           :opening_balance,
           :credits,
           :debits,
           :closing_balance
-      ]},
-      {cash_on_hand: [
+      ],
+      cash_on_hand: [
           :opening_balance,
           :credits,
           :debits,
           :closing_balance
-      ]},
-      {reimbursement_card: [
+      ],
+      reimbursement_card: [
           :credits
-      ]},
-      {expense: [
+      ],
+      expense: [
           :category,
           :card,
           :cash,
@@ -166,8 +165,8 @@ class Statements::Team::Summary < Statements::Team::Base
           :per_diem,
           :submitted,
           :unsubmitted
-      ]}
-  ]
+      ]
+  }
 
 
   def authorized_user_types
@@ -199,17 +198,11 @@ class Statements::Team::Summary < Statements::Team::Base
     puts "COLUMNS: #{self.columns}"
     self.users.each_with_index do |user, index|
       val = {}
-      self.columns.each do |key|
-        if key.class.name == String.name
-          val[key] = {}
-          val[key] = self.process_column(key, user, index)
-        else
-          hash_key = key.keys.first
-          val[hash_key] = {}
-          key.values.first.each do |sub_key|
-            column_name = "#{hash_key}_#{sub_key}"
-            val[hash_key][sub_key] = self.process_column(column_name, user, index)
-          end
+      self.columns.each do |key, value|
+        val[key]= {}
+        value.each do |sub_key|
+          column_name = "#{key}_#{sub_key}"
+          val[key][sub_key] = self.process_column(column_name, user, index)
         end
       end
       self.values << val
@@ -224,48 +217,47 @@ class Statements::Team::Summary < Statements::Team::Base
 
   protected
   def default_columns
-    [
-        :sl_no,
-        {user: [
+    {
+        user: [
             :name,
             :email,
             :mobile_number
-        ]},
-        {accounts: [
+        ],
+        accounts: [
             :net_advance,
             :net_reimbursement,
             :atm_withdrawals,
             :net_opening_balance,
             :net_closing_balance
-        ]},
-        {expense_card: [
+        ],
+        expense_card: [
             :opening_balance,
             :credits,
             :debits,
             :closing_balance
-        ]},
-        {finly_money_ctc: [
+        ],
+        finly_money_ctc: [
             :opening_balance,
             :credits,
             :debits,
             :closing_balance
-        ]},
-        {finly_money_btc: [
+        ],
+        finly_money_btc: [
             :opening_balance,
             :credits,
             :debits,
             :closing_balance
-        ]},
-        {cash_on_hand: [
+        ],
+        cash_on_hand: [
             :opening_balance,
             :credits,
             :debits,
             :closing_balance
-        ]},
-        {reimbursement_card: [
+        ],
+        reimbursement_card: [
             :credits
-        ]},
-        {expense: [
+        ],
+        expense: [
             :category,
             :card,
             :cash,
@@ -274,8 +266,8 @@ class Statements::Team::Summary < Statements::Team::Base
             :per_diem,
             :submitted,
             :unsubmitted
-        ]}
-    ]
+        ]
+    }
   end
 
   def process_column(column_name, user, index)
@@ -297,15 +289,15 @@ class Statements::Team::Summary < Statements::Team::Base
       when :accounts_net_opening_balance
         card_opening_balance = dictionary(user, :expense_card, :opening_balance) || 0
         return format_amount(card_opening_balance +
-            dictionary(user, :finly_money_ctc, :opening_balance) +
-            dictionary(user, :finly_money_btc, :opening_balance) +
-            dictionary(user, :cash_on_hand, :opening_balance))
+                                 dictionary(user, :finly_money_ctc, :opening_balance) +
+                                 dictionary(user, :finly_money_btc, :opening_balance) +
+                                 dictionary(user, :cash_on_hand, :opening_balance))
       when :accounts_net_closing_balance
         card_closing_balance = dictionary(user, :expense_card, :closing_balance) || 0
         return format_amount(card_closing_balance +
-            dictionary(user, :finly_money_ctc, :closing_balance) +
-            dictionary(user, :finly_money_btc, :closing_balance) +
-            dictionary(user, :cash_on_hand, :closing_balance))
+                                 dictionary(user, :finly_money_ctc, :closing_balance) +
+                                 dictionary(user, :finly_money_btc, :closing_balance) +
+                                 dictionary(user, :cash_on_hand, :closing_balance))
       when :expense_card_opening_balance
         return format_amount dictionary(user, :expense_card, :opening_balance)
       when :expense_card_credits
