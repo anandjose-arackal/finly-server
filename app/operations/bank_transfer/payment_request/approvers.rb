@@ -119,8 +119,8 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
     self.reviewer = op.user
     self.reviewer_role = op.success? ? op.role_id : nil
 
-    reviewer_ids = []
-    while self.reviewer.present? && !reviewer_ids.include?(self.reviewer&.id)
+    reviewer_ids = {}
+    while self.reviewer.present? && (reviewer_ids[self.reviewer_role].blank? or !reviewer_ids[self.reviewer_role].include?(self.reviewer&.id))
       self.approvers << {
           controlling_user: (self.reviewer.id == bank_payment_request.controlling_user_id and self.reviewer_role == bank_payment_request.controlling_user_role_id),
           rejected: false,
@@ -137,8 +137,11 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
           timestamp: (bank_payment_request.verified? ? bank_payment_request.approved_at : nil)
       }
 
+      if reviewer_ids[self.reviewer_role].nil?
+        reviewer_ids[self.reviewer_role]= []
+      end
       # adding this reviewer to the list of previous reviewers
-      reviewer_ids << self.reviewer&.id
+      reviewer_ids[self.reviewer_role] << self.reviewer&.id
       op = User::Team::Review::NextReviewer.(bank_payment_request, controlling_user: self.reviewer, controlling_user_role_id: self.reviewer_role)
       self.reviewer = op.user
       self.reviewer_role = op.role_id
