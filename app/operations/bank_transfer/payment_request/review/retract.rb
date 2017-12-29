@@ -1,7 +1,7 @@
 class BankTransfer::PaymentRequest::Review::Retract < BankTransfer::PaymentRequest::Review::Base
 
   def authorized_user_types
-    [:employee]
+    [:vendor_payments_initiator]
   end
 
   def validate

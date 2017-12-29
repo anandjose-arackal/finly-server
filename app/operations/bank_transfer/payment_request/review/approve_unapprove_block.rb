@@ -37,6 +37,7 @@ class BankTransfer::PaymentRequest::Review::ApproveUnapproveBlock < BankTransfer
       if trail_h&.dig(role_id, user_id).present? and for_user_id.blank? and role_id != admin_role_id
         # trail has to be truncated as another action from the same user has taken place
         index = trail_a.find_index(trail_h&.dig(role_id, user_id))
+        next if index.nil?
         trail_a = trail_a[0, index]
         # spurious_ids << trail_a[index, trail_a.size]
       end
