@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171228175810) do
+ActiveRecord::Schema.define(version: 20171228161157) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -485,6 +485,8 @@ ActiveRecord::Schema.define(version: 20171228175810) do
     t.integer  "action_id",               limit: 4
     t.datetime "created_at",                        null: false
     t.datetime "updated_at",                        null: false
+    t.integer  "action_for_user_id",      limit: 4
+    t.integer  "action_for_user_role_id", limit: 4
   end
 
   add_index "bank_payment_request_trails", ["action_id"], name: "index_bank_payment_request_trails_on_action_id", using: :btree
@@ -1735,13 +1737,6 @@ ActiveRecord::Schema.define(version: 20171228175810) do
   add_index "finly_transactions", ["transaction_reference_id"], name: "index_finly_transactions_on_transaction_reference_id", using: :btree
   add_index "finly_transactions", ["transaction_type_id"], name: "index_finly_transactions_on_transaction_type_id", using: :btree
 
-  create_table "gst_state_codes", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.string   "state_code", limit: 255
-  end
-
   create_table "individual_kyc_track_actions", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -1829,29 +1824,6 @@ ActiveRecord::Schema.define(version: 20171228175810) do
   end
 
   add_index "invoice_attachments", ["invoice_id"], name: "index_invoice_attachments_on_invoice_id", using: :btree
-
-  create_table "invoice_line_items", force: :cascade do |t|
-    t.integer  "invoice_id",         limit: 4
-    t.string   "description",        limit: 255
-    t.integer  "quantity",           limit: 4
-    t.decimal  "rate",                           precision: 20, scale: 10
-    t.decimal  "tax",                            precision: 20, scale: 10
-    t.decimal  "discount",                       precision: 20, scale: 10
-    t.integer  "category_id",        limit: 4
-    t.integer  "gst_type_id",        limit: 4
-    t.integer  "tax_amount_id",      limit: 4
-    t.integer  "discount_amount_id", limit: 4
-    t.integer  "amount_id",          limit: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
-    t.integer  "net_amount_id",      limit: 4
-  end
-
-  add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
-  add_index "invoice_line_items", ["discount_amount_id"], name: "index_invoice_line_items_on_discount_amount_id", using: :btree
-  add_index "invoice_line_items", ["gst_type_id"], name: "index_invoice_line_items_on_gst_type_id", using: :btree
-  add_index "invoice_line_items", ["invoice_id"], name: "index_invoice_line_items_on_invoice_id", using: :btree
-  add_index "invoice_line_items", ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id", using: :btree
 
   create_table "invoices", force: :cascade do |t|
     t.integer  "address_id",         limit: 4
@@ -2504,7 +2476,6 @@ ActiveRecord::Schema.define(version: 20171228175810) do
     t.string   "application",             limit: 255
     t.string   "payment_mode",            limit: 255
     t.string   "reference_id",            limit: 255,               null: false
-    t.integer  "invoice_id",              limit: 4
     t.integer  "retry_count",             limit: 4,     default: 0
   end
 
@@ -3538,8 +3509,7 @@ ActiveRecord::Schema.define(version: 20171228175810) do
     t.string   "gst",            limit: 255
     t.boolean  "gst_registered"
     t.string   "state",          limit: 255
-    t.integer  "state_code_id",  limit: 4
-    t.integer  "created_by_id",  limit: 4
+    t.string   "state_code",     limit: 255
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
@@ -3633,8 +3603,6 @@ ActiveRecord::Schema.define(version: 20171228175810) do
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
   add_foreign_key "invoice_attachments", "invoices"
-  add_foreign_key "invoice_line_items", "categories"
-  add_foreign_key "invoice_line_items", "invoices"
   add_foreign_key "invoices", "addresses"
   add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
