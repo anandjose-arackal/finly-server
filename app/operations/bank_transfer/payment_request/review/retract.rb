@@ -20,7 +20,9 @@ class BankTransfer::PaymentRequest::Review::Retract < BankTransfer::PaymentReque
 
     if bank_payment_request.update status_id: BankPaymentRequestStatus.id_for(:retracted),
                                    controlling_user_id: user.id,
-                                   controlling_user_role_id: UserRole.id_for(:employee)
+                                   controlling_user_role_id: UserRole.id_for(:employee),
+                                   controlling_for_user_id: nil,
+                                   controlling_for_user_role_id: nil
       bank_payment_request.bank_payment_request_trails.create action_user: user,
                                                               action_user_role_id: UserRole.id_for(:employee),
                                                               action_id: BankPaymentRequestTrailAction.id_for(:retract)

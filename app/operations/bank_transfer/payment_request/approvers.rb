@@ -78,7 +78,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
     trails.each do |trail|
       self.approvers << {
           action_id: trail.action_id,
-          controlling_user: (trail.action_user_id == bank_payment_request.controlling_user_id),
+          controlling_user: false,
           action_user: {
               name: trail.action_user.name,
               email: trail.action_user.email,
@@ -110,8 +110,8 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
           }
       }
     end
-    self.reviewer = bank_payment_request.controlling_user
-    self.reviewer_role = bank_payment_request.controlling_user_role_id
+    self.reviewer = bank_payment_request.controlling_for_user || bank_payment_request.controlling_user
+    self.reviewer_role = bank_payment_request.controlling_for_user_role_id
 
     # now extracting all pending approvers (assuming there's not take control action here)
     op = User::Team::Review::NextReviewer.(bank_payment_request, controlling_user: self.reviewer, controlling_user_role_id: self.reviewer_role)
@@ -122,7 +122,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
     reviewer_ids = []
     while self.reviewer.present? && !reviewer_ids.include?(self.reviewer&.id)
       self.approvers << {
-          controlling_user: (self.reviewer.id == bank_payment_request.controlling_user_id),
+          controlling_user: (self.reviewer.id == bank_payment_request.controlling_user_id and self.reviewer_role == bank_payment_request.controlling_user_role_id),
           rejected: false,
           action_user: {
               name: self.reviewer.name,
