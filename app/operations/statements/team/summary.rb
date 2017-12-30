@@ -17,7 +17,8 @@ class Statements::Team::Summary < Statements::Team::Base
 
         span = values.count
 
-        if key&.to_s == 'expense' and values.include? :category
+        puts "VALUES: #{values}"
+        if key&.to_s == 'expense' and values.include? 'category'
           span += (self.categories.count - 1)
         end
 
