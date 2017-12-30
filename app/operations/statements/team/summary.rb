@@ -52,7 +52,7 @@ class Statements::Team::Summary < Statements::Team::Base
             value.each do |sub_key, sub_value|
               if [Hash.name, ActionController::Parameters.name].include? sub_value.class.name
                 self.categories.each do |category|
-                  user_data << (sub_value[category.id] || 0)
+                  user_data << format_amount((sub_value[category.id] || 0))
                 end
               else
                 user_data << sub_value
@@ -65,6 +65,11 @@ class Statements::Team::Summary < Statements::Team::Base
         contents << user_data
       end
       contents
+    end
+
+    def format_amount(value)
+      value = 0 if value.nil?
+      "₹#{value} INR"
     end
 
   end
@@ -334,25 +339,25 @@ class Statements::Team::Summary < Statements::Team::Base
         return expenses.group_by_category_id.sum_amount
       when :expense_card
         expenses = dictionary user, :expenses, :object
-        return expenses.only_card_expenses.sum_amount
+        return format_amount expenses.only_card_expenses.sum_amount
       when :expense_cash
         expenses = dictionary user, :expenses, :object
-        return expenses.only_manual_expenses.sum_amount
+        return format_amount expenses.only_manual_expenses.sum_amount
       when :expense_distance
         expenses = dictionary user, :expenses, :object
-        return expenses.only_distance_expenses.sum_amount
+        return format_amount expenses.only_distance_expenses.sum_amount
       when :expense_time
         expenses = dictionary user, :expenses, :object
-        return expenses.only_time_expenses.sum_amount
+        return format_amount expenses.only_time_expenses.sum_amount
       when :expense_per_diem
         expenses = dictionary user, :expenses, :object
-        return expenses.only_per_diem_expenses.sum_amount
+        return format_amount expenses.only_per_diem_expenses.sum_amount
       when :expense_submitted
         expenses = dictionary user, :expenses, :object
-        return expenses.submitted.sum_amount
+        return format_amount expenses.submitted.sum_amount
       when :expense_unsubmitted
         expenses = dictionary user, :expenses, :object
-        return expenses.admin_viewable.sum_amount
+        return format_amount expenses.admin_viewable.sum_amount
     end
   end
 
