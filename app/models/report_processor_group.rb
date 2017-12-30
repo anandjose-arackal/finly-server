@@ -1,4 +1,4 @@
-# == Schema Information
+ # == Schema Information
 #
 # Table name: report_processor_groups
 #
@@ -73,6 +73,7 @@ class ReportProcessorGroup < ActiveRecord::Base
     filter_ids = ReportProcessorGroupMapping.with_processor_group_id(id).with_user_id(user_id).pluck(:processor_group_id)
     with_id(filter_ids)
   }
+  scope :created_by_user_id, -> (user_id) { where created_by_user_id: user_id }
 
   default_scope { order created_at: :desc }
 
