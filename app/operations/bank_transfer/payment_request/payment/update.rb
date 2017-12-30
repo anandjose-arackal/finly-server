@@ -31,14 +31,16 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     end
 
     # validate that the amount is being passed # todo - uncomment it later
-    # unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present?
-    #   add_message :error, "Sub Total cannot be blank"
-    # end
+    unless payment_params&.dig(:invoice_attributes, :original_amount_attributes, :value).present?
+      add_message :error, "Sub Total cannot be blank"
+      return
+    end
 
     # if the amount is inclusive of taxes, the tax cannot be blank
     if StringUtils.to_bool(payment_params&.dig(:invoice_attributes, :inclusive_of_taxes))
-      if payment_params&.dig(:invoice_attributes, :tax).blank?
+      if payment_params&.dig(:invoice_attributes, :tax).blank? && payment_params&.dig(:invoice_attributes, :invoice_items_attributes).blank?
         add_message :error, "When sub total is inclusive of taxes, tax rate cannot be blank"
+        return
       end
     end
   end
@@ -90,14 +92,32 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
       end
     end
 
-    # todo - temporary
-    self.payment_params[:invoice_attributes][:freight_amount_attributes][:currency_id] = 1
-    ##################
+    # if nothing is passed inside invoice items attributes, assume that all are to be deleted
+    if self.payment_params&.dig(:invoice_attributes, :invoice_items_attributes).blank?
+      if self.payment&.invoice&.invoice_items.present?
+        self.payment_params[:invoice_attributes][:invoice_items_attributes] = []
+        self.payment&.invoice&.invoice_items.each do |item|
+          self.payment_params[:invoice_attributes][:invoice_items_attributes] << {
+              id: item.id,
+              _destroy: true
+          }
+        end
+      end
+    end
+
+    # if inclusive of taxes is not sent in the backend, mark it as false
+    if self.payment_params&.dig(:invoice_attributes)
+      self.payment_params[:invoice_attributes][:inclusive_of_taxes] = !!self.payment_params[:invoice_attributes][:inclusive_of_taxes]
+    end
   end
 
   def process
     payment.assign_attributes(payment_params)
-    if payment.invoice.present? # && payment.valid?
+    unless self.payment.valid?
+      add_message :error, self.payment.errors.full_messages
+      return
+    end
+    if payment.invoice.present?
       calculate_tax_and_discounts
     end
 

@@ -95,62 +95,23 @@ class Invoice < ActiveRecord::Base
   end
 
   def tax_rate
-    return 0 if tax.blank? || gross_amount.blank?
-    case self.tax_type_id
-      when 1, '1'
-        return self.tax
-      when 2, '2'
-        return (self.tax / (self.gross_amount.value)) * 100
-      else
-        return self.tax
-    end
+    self.tax
   end
 
   def advance_rate
-    # return 0 if advance.blank? || net_amount.blank?
-    # case self.advance_type_id
-    #   when 1, '1'
-    #     return self.advance
-    #   when 2, '2'
-    #     return (self.advance / (self.advance + self.net_amount.value)) * 100
-    #   else
-    #     return self.advance
-    # end
     self.advance
   end
 
   def tds_rate
-    # return 0 if tds.blank? || gross_amount.blank?
-    # case self.tds_type_id
-    #   when 1, '1'
-    #     return self.tds
-    #   when 2, '2'
-    #     return (self.tds / (self.gross_amount.value)) * 100
-    #   else
-    #     return self.tds
-    # end
     self.tds
   end
 
   def discount_rate
-    # return 0 if discount.blank? || discount_amount.blank?
-    # case self.discount_type_id
-    #   when 1, '1'
-    #     return self.discount
-    #   when 2, '2'
-    #     return (self.discount / (self.amount.value)) * 100
-    #   else
-    #     return self.discount
-    # end
     self.discount
   end
 
   def gst_type
-    if self.invoice_items.empty?
-      self.gst_type_id
-    else
-      self.invoice_items.first.gst_type_id
-    end
+    self.gst_type_id
   end
 
   private

@@ -254,6 +254,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               tax: order_details[:tax],
               tds: order_details[:tds],
               advance: order_details[:advance],
+              inclusive_of_taxes: !!order_details[:inclusive_of_taxes],
               original_amount_attributes: {
                   value: order_details[:original_amount],
                   currency_id: 1
