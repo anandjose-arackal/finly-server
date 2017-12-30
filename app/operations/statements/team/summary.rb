@@ -12,22 +12,16 @@ class Statements::Team::Summary < Statements::Team::Base
 
     def generate_header_group
       header = []
-      self.columns.each do |column|
-        if [Hash.name, ActionController::Parameters.name].include? column.class.name
-          hash_key = column.keys.first
-          name = hash_key.to_s.humanize
+      self.columns.each do |key, values|
+        name = key.to_s.humanize
 
-          hash_values = column[hash_key]
-          span = hash_values.count
+        span = values.count
 
-          if hash_key&.to_s == 'expense' and hash_values.include? :category
-            span += (self.categories.count - 1)
-          end
-
-          header << {name: name, span: span}
-        else
-          header << {name: column.to_s.humanize, span: 1}
+        if key&.to_s == 'expense' and values.include? :category
+          span += (self.categories.count - 1)
         end
+
+        header << {name: name, span: span}
       end
       header
     end
@@ -35,21 +29,15 @@ class Statements::Team::Summary < Statements::Team::Base
     def generate_header_main
       self.columns
       header = []
-      self.columns.each do |column|
-        if [Hash.name, ActionController::Parameters.name].include? column.class.name
-          hash_key = column.keys.first
-          hash_values = column[hash_key]
-          hash_values.each do |hash_value|
-            if hash_key&.to_s == 'expense' and hash_value&.to_s == 'category'
-              self.categories.each do |category|
-                header << {name: category.name, span: 1}
-              end
-            else
-              header << {name: hash_value.to_s.humanize, span: 1}
+      self.columns.each do |key, values|
+        values.each do |value|
+          if key&.to_s == 'expense' and value&.to_s == 'category'
+            self.categories.each do |category|
+              header << {name: category.name, span: 1}
             end
+          else
+            header << {name: value.to_s.humanize, span: 1}
           end
-        else
-          header << {name: column.to_s.humanize, span: 1}
         end
       end
       header
@@ -195,7 +183,6 @@ class Statements::Team::Summary < Statements::Team::Base
 
   def process
     self.values = []
-    puts "COLUMNS: #{self.columns}"
     self.users.each_with_index do |user, index|
       val = {}
       self.columns.each do |key, value|
