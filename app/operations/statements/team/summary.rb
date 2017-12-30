@@ -178,7 +178,8 @@ class Statements::Team::Summary < Statements::Team::Base
       self.columns = default_columns
     end
     self.users = User::Index.(user, params).team
-    self.users = self.users&.paginate(page: params[:page], per_page: 30)
+    per_page = params[:per_page] || 30
+    self.users = self.users&.paginate(page: params[:page], per_page: per_page)
   end
 
   def process
