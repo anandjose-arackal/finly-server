@@ -10,6 +10,7 @@
 #
 
 
+
 class ReportStatus < ActiveRecord::Base
   include Seedable
 
@@ -22,6 +23,10 @@ class ReportStatus < ActiveRecord::Base
 
   # STATES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, settled: 6, settlement_confirmed: 7, closed: 8}
   STATES = [:open, :processing, :retracted, :rejected, :approved, :settled, :settlement_confirmed, :closed]
+
+  def self.values
+    STATES
+  end
 
   def self.personal_sort_order
     [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:processing), ReportStatus.id_for(:rejected),

@@ -93,7 +93,8 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
           initiating_user: user,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_type_id: PaymentType.id_for(:credit),
-          payment_purpose_id: PaymentPurpose.id_for(:vendor_payments),
+          payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+          application: RequestStore.store[:current_app],
           payment_mode: bank_payment_request.payment_order.payment_mode,
           amount_attributes: {
               value: order_details[:original_amount],

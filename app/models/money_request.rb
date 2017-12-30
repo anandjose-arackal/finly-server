@@ -37,6 +37,7 @@
 
 
 
+
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 
@@ -88,6 +89,8 @@ class MoneyRequest < ActiveRecord::Base
   scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
   scope :with_controlling_user_id, -> (user_id) { where controlling_user_id: user_id }
   scope :with_items, -> { joins(:items) }
+  scope :not_destroyable, -> { where.not status_id: MoneyRequestStatus.ids_for([:open, :rejected, :retracted]) }
+  scope :without_user, -> (user_id) { where.not user_id: user_id }
 
   scope :awaiting_approval_of_user, ->(user_id, role_id){ where(status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
 

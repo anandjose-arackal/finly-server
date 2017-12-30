@@ -8,7 +8,7 @@ json.summary do
     json.id @result.bank_payment_request.policy&.id
     json.name @result.bank_payment_request.policy&.name
   end
-  json.retriable @result.bank_payment_request.retriable?
+  # json.retriable @result.bank_payment_request.retriable?
   json.bank_transfer_type @result.payment_order.payment_mode&.upcase
   json.payment_type @result.payment_order.payment_type&.humanize
   json.scheduled_at @result.payment_order.scheduled_at&.strftime "%d %b %Y"
@@ -43,7 +43,7 @@ json.payments do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
-    json.retriable payment.retriable?
+    # json.retriable payment.retriable?
 
     invoice = payment.invoice
 
@@ -112,7 +112,7 @@ json.payments_verified do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
-    json.retriable payment.retriable?
+    # json.retriable payment.retriable?
 
     invoice = payment.invoice
 
@@ -179,7 +179,7 @@ json.payments_unverified do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
-    json.retriable payment.retriable?
+    # json.retriable payment.retriable?
 
     invoice = payment.invoice
 

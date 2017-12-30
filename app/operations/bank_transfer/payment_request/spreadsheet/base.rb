@@ -36,7 +36,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
         payment_details = [
             pr.id,
             pr.name,
-            payment.receiving_account.name,
+            "#{payment.receiving_account.account_owner.name} - #{payment.receiving_account.name}",
             payment.receiving_account.account_number,
             payment.receiving_account.ifsc,
             payment.payment_mode&.upcase,

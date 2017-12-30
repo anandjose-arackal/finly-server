@@ -564,6 +564,7 @@
 #                      organization_account_policies_list GET    /organization_account/policies_list(.:format)                                              organization_account#policies_list
 #                         organization_account_categories GET    /organization_account/categories(.:format)                                                 organization_account#categories
 #                 organization_account_export_preferences GET    /organization_account/export_preferences(.:format)                                         organization_account#export_preferences
+#                                             state_codes GET    /state_codes(.:format)                                                                     organization_account#gst_state_codes
 #                                            add_category POST   /add_category(.:format)                                                                    organization_account#add_category
 #                                         remove_category DELETE /remove_category(.:format)                                                                 organization_account#remove_category
 #                                update_export_preference PATCH  /export/:id/update(.:format)                                                               organization_account#update_export_column
@@ -580,6 +581,7 @@
 #                                             assign_card PATCH  /cards/assign(.:format)                                                                    cards#assign
 #                                   cancel_assign_request PATCH  /cards/assign/:id/cancel(.:format)                                                         cards#cancel_assign
 #                                        unassigned_cards GET    /cards/unassigned(.:format)                                                                cards#unassigned
+#                                         reports_destroy DELETE /reports/destroy(.:format)                                                                 reports#destroy
 #                                                 reports GET    /reports(.:format)                                                                         reports#index
 #                                                         POST   /reports(.:format)                                                                         reports#create
 #                                                  report GET    /reports/:id(.:format)                                                                     reports#show
@@ -611,6 +613,7 @@
 #                                                         DELETE /reports/:id(.:format)                                                                     reports#destroy
 #                                    reports_bulk_approve POST   /reports/bulk_approve(.:format)                                                            reports#bulk_approve
 #                                                  credit PATCH  /money_requests/credit_cash(.:format)                                                      money_request#credit_cash
+#                                  money_requests_destroy DELETE /money_requests/destroy(.:format)                                                          money_request#destroy
 #                                     money_request_index GET    /money_request(.:format)                                                                   money_request#index
 #                                                         POST   /money_request(.:format)                                                                   money_request#create
 #                                           money_request GET    /money_request/:id(.:format)                                                               money_request#show
@@ -2024,7 +2027,8 @@ Rails.application.routes.draw do
   get 'organization_account/policies_list' => 'organization_account#policies_list' #todo
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
-
+  get 'state_codes', to: 'organization_account#gst_state_codes', as: :state_codes
+  
   post 'add_category', to: 'organization_account#add_category', as: :add_category
   delete 'remove_category', to: 'organization_account#remove_category', as: :remove_category
 
@@ -2046,6 +2050,7 @@ Rails.application.routes.draw do
   patch 'cards/assign/:id/cancel', to: 'cards#cancel_assign', as: :cancel_assign_request
   get 'cards/unassigned', to: 'cards#unassigned', as: :unassigned_cards
 
+  delete 'reports/destroy', to: 'reports#destroy'
   resources :reports, except: [:new, :edit]
   get 'export/report(.:format)' => 'export#report', as: :export_report
   get 'export/templates/index' => 'export#index_template'
@@ -2069,6 +2074,7 @@ Rails.application.routes.draw do
 
 
   patch 'money_requests/credit_cash', to: 'money_request#credit_cash', as: :credit
+  delete 'money_requests/destroy', to: 'money_request#destroy'
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do
     post 'comment' => 'money_request#comment', as: :comment

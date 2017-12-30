@@ -10,18 +10,21 @@
 #  email          :string(255)
 #  mobile_number  :string(255)
 #  authorized     :boolean
-#  description    :string(255)
+#  description    :text(65535)
 #  is_deleted     :boolean          default(FALSE)
 #  pan            :string(255)
 #  tin            :string(255)
 #  gst            :string(255)
 #  gst_registered :boolean
 #  state          :string(255)
-#  state_code     :string(255)
+#  state_code_id  :integer
+#  created_by_id  :integer
 #
 
 class YesBankVendor < ActiveRecord::Base
   belongs_to :company
+  belongs_to :state_code, class_name: "GstStateCode"
+  belongs_to :created_by, class_name: "User"
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: "Payment"

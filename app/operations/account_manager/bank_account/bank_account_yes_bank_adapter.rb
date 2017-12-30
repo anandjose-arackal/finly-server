@@ -18,36 +18,42 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
   def credit(payment, options = {})
     super
     transfer_type = options[:bank_transfer_type]
-    # this will be done by creating the respective payment request for the bank account
-    transfer_request = create_transfer_request(payment, transfer_type)
-    op = YesBankApi::Transfer::BankTransfer.(transfer_request)
-    # op = YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(transfer_request)
-    # op.transfer_request.transaction_result = "COMPLETED"
+    # now based on whether a respective payment has a failed bank transaction or not, decide to use the reference number
+    if payment.reference_resource&.retriable?
+      reference_number = payment.reference_resource.unique_request_number
+    else
+      reference_number = nil
+    end
+    transfer_request = create_transfer_request(payment, transfer_type, reference_number)
+    op = YesBankApi::Transfer::BankTransfer.({
+        transfer_request: transfer_request,
+        payment: payment
+    })
+    # bank_transaction = op.bank_transaction
+    bank_transaction = op.bank_transaction
     if op.success?
-      # logic for setting whether a particular payment was successful or is processing
-      if SUCCESSFUL_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
+      if bank_transaction.completed?
         payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-        create_bank_transaction(payment, op.transfer_request)
         store_transaction payment, :credit, :success, nil, nil, payment.initiating_user&.company_id
-      elsif PROCESSING_TRANSACTION_STATUSES.include?(op.transfer_request.transaction_result)
+      elsif bank_transaction.processing?
         payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         create_system_message_for_processing(payment)
-        create_bank_transaction(payment, op.transfer_request)
         store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
-      elsif op.transfer_request.transaction_result.nil?
+      end
+    else
+      # the difference between this and a failure is that the money is not debited back to the account till we're sure
+      if bank_transaction.possible_failure?
+        payment.update(payment_status_id: PaymentStatus.id_for(:possible_failure))
+        create_system_message_for_possible_failure(payment)
+        store_transaction payment, :credit, :processing, nil, nil, payment.initiating_user&.company_id
+      elsif bank_transaction.failed?
         # i.e. there was an error processing the transaction
         payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-        error_message = op.transfer_request.bank_error_message || "Payment could not be processed at this time"
+        error_message = op.transfer_request.bank_error_message || op.messages[:error] || "Payment could not be processed at this time"
         store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
         self.errors << error_message
         return false
       end
-    else
-      # i.e. there was an error processing the transaction
-      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
-      self.errors = op.transfer_request.bank_error_message || 'Payment could not be processed at this time'
-      store_transaction payment, :credit, :failure, nil, nil, payment.initiating_user&.company_id, {error: self.errors}
-      return false
     end
     true
   end
@@ -87,6 +93,8 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         transfer_status_id = BankTransferStatus.id_for(:completed)
       when PaymentStatus.id_for(:processing)
         transfer_status_id = BankTransferStatus.id_for(:processing)
+      when PaymentStatus.id_for(:processing)
+        transfer_status_id = BankTransferStatus.id_for(:failed)
       else
         transfer_status_id = BankTransferStatus.id_for(:failed)
     end
@@ -101,6 +109,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
                                              currency_id: Currency.first.id
                                          })
     payment.update(reference_resource: bank_transaction)
+    bank_transaction
   end
 
   def create_system_message_for_processing(payment)
@@ -109,8 +118,14 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
                                   content: "Payment processed. Awaiting credit confirmation")
   end
 
-  def create_transfer_request(payment, transfer_type)
-    tr = TransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type)
+  def create_system_message_for_possible_failure(payment)
+    payment.system_messages.destroy_all
+    payment.system_messages.create(system_message_type_id: SystemMessageType.id_for(:info),
+                                   content: "Possible failure. Awaiting confirmation from bank")
+  end
+
+  def create_transfer_request(payment, transfer_type, reference_number)
+    tr = TransferRequest.(account.name, account.account_number, account.ifsc, payment.amount_value, transfer_type, reference_number, account.company_id)
   end
 
 end
