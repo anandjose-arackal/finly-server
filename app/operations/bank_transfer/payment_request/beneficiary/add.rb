@@ -81,8 +81,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
   def retrieve_payments_data
     self.payments_data = []
     self.custom_fields = []
-    invoice_items_attributes = []
-    processed_order_data.each do |order_details|
+    self.processed_order_data.each do |order_details|
       # processing the line items of this particular invoice
       invoice_items_attributes = []
       if order_details&.dig(:invoice_attributes, :invoice_items_attributes).present?
@@ -99,8 +98,6 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
           }
         end
       end
-    end
-    self.processed_order_data.each do |order_details|
       bank_account = retrieve_bank_account order_details
       initiating_account = bank_payment_request.payment_order.initiating_account || user.bank_wallet
       self.custom_fields << order_details[:custom_fields]

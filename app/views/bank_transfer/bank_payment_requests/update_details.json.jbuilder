@@ -37,6 +37,7 @@ json.payment do
           json.quantity line_item[:quantity]
           json.gst_type_id line_item[:item_gst_type]
           json.total_amount line_item[:total_amount]
+          json.hsn_sac line_item[:hsn_sac]
         end
       end
     end
@@ -47,7 +48,7 @@ json.payment do
       json.name category.name
     end
   end
-  json.invoice_categories do
+  json.invoice_item_categories do
     json.array!(current_company.categories.with_purpose(Purpose.id_for(:invoice_items))) do |category|
       json.id category.id
       json.name category.name
