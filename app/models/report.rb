@@ -156,6 +156,30 @@ class Report < ActiveRecord::Base
       where(reports[:created_at].gteq(date_from).and(reports[:created_at].lteq(date_to)))
     end
   end
+  scope :filter_submitted_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      reports = arel_table
+      where(reports[:submitted_at].gteq(date_from).and(reports[:submitted_at].lteq(date_to)))
+    end
+  end
+  scope :filter_approved_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      reports = arel_table
+      where(reports[:approved_at].gteq(date_from).and(reports[:approved_at].lteq(date_to)))
+    end
+  end
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
 
   scope :sort_for_personal, -> { joins(:report_status).reorder('report_statuses.order ASC, reports.submitted_at DESC, reports.created_at DESC')}
