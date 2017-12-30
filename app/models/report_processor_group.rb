@@ -73,6 +73,7 @@ class ReportProcessorGroup < ActiveRecord::Base
     filter_ids = ReportProcessorGroupMapping.with_processor_group_id(id).with_user_id(user_id).pluck(:processor_group_id)
     with_id(filter_ids)
   }
+  # From here
   scope :created_by_user_id, -> (user_id) { where created_by_user_id: user_id }
   scope :payment_mode, -> (payment_mode) { where payment_mode: payment_mode }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
@@ -111,6 +112,7 @@ class ReportProcessorGroup < ActiveRecord::Base
       where(report_groups[:completed_at].gteq(date_from).and(report_groups[:completed_at].lteq(date_to)))
     end
   end
+  # to here
 
   default_scope { order created_at: :desc }
 
