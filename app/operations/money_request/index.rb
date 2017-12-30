@@ -1,4 +1,4 @@
-  class MoneyRequest::Index < MoneyRequest::Base
+class MoneyRequest::Index < MoneyRequest::Base
   attr_accessor :money_requests, :role_id
 
   def authorized_user_types
@@ -71,6 +71,8 @@
     has_scope :filter_status
     has_scope :filter_user_id
     has_scope :filter_date, using: [:from, :to], type: :hash
+    has_scope :filter_submitted_date, using: [:from, :to], type: :hash
+    has_scope :filter_approved_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
 
     def init
