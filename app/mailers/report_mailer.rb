@@ -6,7 +6,7 @@ class ReportMailer < ApplicationMailer
     #### variables required for the attachment pdf #########
     @result = Report::Show.(@data.user, {report_id: @data.report.id, role_id: @data.role_id})
     @report = @data.report
-    @current_user = @data.user
+    @curr_user = @data.user
     @include_comments = false
     ########################################################
     attachments["report-#{@data.report.name}.pdf"] = WickedPdf.new.pdf_from_string(

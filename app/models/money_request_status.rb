@@ -15,12 +15,17 @@
 
 
 class MoneyRequestStatus < ActiveRecord::Base
+  include Seedable
 
   VALUES = {open: 1, processing: 2, retracted: 3, rejected: 4, approved: 5, credited: 6}
 
   ORDER = {open: 1, processing: 3, retracted: 2, rejected: 4, approved: 5, credited: 6}
 
   scope :with_name, ->(name) { where name: name}
+
+  def self.values
+    VALUES.keys
+  end
 
   self.class.instance_eval do
     VALUES.each do |key, value|

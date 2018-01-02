@@ -9,6 +9,10 @@ class Personalizer::Adapters::Company49::Vendors49::Create49::Validate < Persona
   def validate
     if self.vendor_params[:vendor_attachments_attributes]&.first&.dig(:attached_file).blank?
       add_message :error, "All vendors must have a compulsory attachment"
+      return
+    end
+    if self.vendor_params[:email].blank?
+      add_message :error, "Email is mandatory for a vendor"
     end
   end
 end

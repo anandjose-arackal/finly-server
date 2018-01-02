@@ -50,6 +50,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        # destroying previous messages first, before adding the processing message
+        payment.system_messages.destroy_all
+        payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
+                                      content: "Payment processed. Awaiting credit confirmation").save
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
       # elsif true
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
@@ -99,8 +103,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def create_refund_payment
     admin_user = AdminUser.find_by(email: 'vivek.a@finly.io')
-    self.payment_request = ::PaymentRequest.(admin_user, nil, company.yes_bank_company_account.class.name, :credit, :corporate_balance_refund, company_id: self.company.id)
-    self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(nil, company.yes_bank_company_account, self.bank_transaction.amount_value))
+    original_debit_account = self.payment.initiating_account
+    self.payment_request = ::PaymentRequest.(admin_user, nil, original_debit_account.class, :credit, :corporate_balance_refund, company_id: self.company.id)
+    self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(nil, original_debit_account, self.bank_transaction.amount_value))
 
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     if op.success?

@@ -13,9 +13,6 @@ class OrganizationAccountController < ApplicationController
   def categories
     @result = Company::Configuration::Show.(current_user, params)
     respond
-    # respond_to do |format|
-    #   format.html {render partial: 'category_list'}
-    # end
   end
 
   def export_preferences
@@ -31,6 +28,13 @@ class OrganizationAccountController < ApplicationController
     respond_to do |format|
       format.html {render 'organization_account/show'}
       format.json {render 'organization_account/show'}
+    end
+  end
+
+  def gst_state_codes
+    @codes = GstStateCode.all
+    respond_to do |format|
+      format.json {render 'organization_account/gst_state_codes'}
     end
   end
 

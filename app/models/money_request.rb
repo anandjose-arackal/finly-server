@@ -96,6 +96,8 @@ class MoneyRequest < ActiveRecord::Base
   scope :group_user, -> { group :user }
   scope :sum_total, -> { joins(:items).joins({items: :amount}).sum(:value) }
   scope :without_associated_processor, -> { where money_request_processor_mapping_id: nil }
+  scope :not_destroyable, -> { where.not status_id: MoneyRequestStatus.ids_for([:open, :rejected, :retracted]) }
+  scope :without_user, -> (user_id) { where.not user_id: user_id }
 
   scope :awaiting_approval_of_user, ->(user_id, role_id){ where(status_id: MoneyRequestStatus.id_for(:processing))
                                                               .where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }

@@ -27,6 +27,8 @@
 #  reference_id            :string(255)      not null
 #  post_operation          :text(65535)
 #  post_operation_payload  :text(65535)
+#  invoice_id              :integer
+#  retry_count             :integer          default(0)
 #
 
 
@@ -247,7 +249,7 @@ class Payment < ActiveRecord::Base
   end
 
   def initiating_account_type_name
-    name = "#{initiating_user&.first_name&.to_s}'s "
+    name = "#{initiating_user&.name&.to_s}'s "
 
     case self.initiating_account_type
       when "Company", "ItzCashCompanyAccount"
@@ -274,7 +276,7 @@ class Payment < ActiveRecord::Base
   alias_method :initiating_account_name, :initiating_account_type_name
 
   def receiving_account_type_name
-    name = "#{receiving_user&.first_name.to_s}'s "
+    name = "#{receiving_user&.name.to_s}'s "
 
     case self.receiving_account_type
       when "Company", "ItzCashCompanyAccount"
