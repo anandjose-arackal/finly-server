@@ -19,9 +19,9 @@ class PaymentOrderAttachment < ActiveRecord::Base
 
   belongs_to :payment_order
 
-  CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
+  CONTENT_TYPES = {content_type: []}
 
   has_attached_file :attached_file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :attached_file, content_type: CONTENT_TYPES
-
+  
 end
