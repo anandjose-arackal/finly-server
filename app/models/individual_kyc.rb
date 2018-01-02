@@ -43,9 +43,8 @@
 #  submitted_on               :datetime
 #  upgraded_on                :datetime
 #
-
 class IndividualKyc < ActiveRecord::Base
-  include Attachable
+  include Attachable, Magick
 
   belongs_to :user
   belongs_to :kyc_status
@@ -93,6 +92,9 @@ class IndividualKyc < ActiveRecord::Base
   has_attached_file :signature, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :signature, content_type: CONTENT_TYPES
 
+  has_attached_file :combined_kyc, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :combined_kyc, content_type: CONTENT_TYPES
+
   def processing?
     KycStatus.ids_for([:processing, :submitted]).include?(self.kyc_status_id)
   end
@@ -107,6 +109,25 @@ class IndividualKyc < ActiveRecord::Base
 
   def retractable?
     [KycStatus.id_for(:submitted)].include?(kyc_status_id)
+  end
+
+  def generate_single_kyc
+    return false unless (self.aadhar_front.present? and self.aadhar_back.present? and
+        self.photo.present? and self.signature.present?)
+    view = ActionView::Base.new(ActionController::Base.view_paths)
+    view.extend ApplicationHelper
+    html_string = view.render(file: 'kyc/user/kyc_template.html.erb', locals: {kyc: self})
+
+    image_tmp_path = "#{Rails.root}/tmp/images/#{id}_combined_kyc.jpg"
+    converter = ReceiptProcessor::HTMLConverter.new
+    self.combined_kyc = converter.convert(html_string, image_tmp_path)&.first
+    self.save
+  end
+
+  def can_submit?
+    (self.kyc_file_1.present? or (self.aadhar_front.present? and self.aadhar_back.present? and
+        self.photo.present? and self.signature.present?)) and
+        self.kyc_number.present?
   end
 
 end

@@ -3,7 +3,7 @@ class KycProcess::User::Submit < KycProcess::User::Base
   def validate
     super
     return if has_errors?
-    if self.individual_kyc.type_id.blank? or self.individual_kyc.kyc_file_1.blank? or self.individual_kyc.kyc_number.blank?
+    unless self.individual_kyc.can_submit?
       add_message :error, 'Please complete your KYC Details before submitting'
       return
     end

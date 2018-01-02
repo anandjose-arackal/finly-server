@@ -1829,6 +1829,10 @@ ActiveRecord::Schema.define(version: 20180102165330) do
     t.string   "signature_content_type",     limit: 255
     t.integer  "signature_file_size",        limit: 4
     t.datetime "signature_updated_at"
+    t.string   "combined_kyc_file_name",     limit: 255
+    t.string   "combined_kyc_content_type",  limit: 255
+    t.integer  "combined_kyc_file_size",     limit: 4
+    t.datetime "combined_kyc_updated_at"
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
