@@ -92,14 +92,6 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     self.bank_payment_request = BankPaymentRequest.new(request_params)
     validate_custom_fields_invoice(processed_order_data)
     return if has_errors?
-    # bank_payment_request.payment_order.payments.each do |payment|
-    #   payment_params =
-    #   if payment.invoice.present? # && payment.valid?
-    #     calculate_tax_and_discounts(payment_params)
-    #   end
-    # end
-    # # assign the new attributes that were calculated using the respective libraries
-    # payment.assign_attributes(payment_params)
     unless bank_payment_request.save
       add_message :error, bank_payment_request.errors.full_messages
       return
@@ -123,6 +115,10 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     if authorized.include?(false) || authorized.include?(nil)
       self.bank_payment_request.update(require_approval: true)
     end
+
+    # update the requested amount for this payment order
+    self.bank_payment_request.payment_order.update_requested_amount
+
     add_message :success, "Payment Request created successfully!"
   end
 
