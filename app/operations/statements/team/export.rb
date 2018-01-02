@@ -10,7 +10,7 @@ class Statements::Team::Export < Statements::Team::Base
   end
 
   def success
-    Exporter::Spreadsheet.new(user, {template: 'statements/user_summary_export', headers: [self.result.generate_header_group, self.result.generate_header_main], contents: self.result.generate_contents}, messages)
+    Exporter::Spreadsheet.new(user, {template: 'statements/user_summary_export', headers: [self.result.generate_header_group, self.result.generate_header_main], contents: self.result.generate_contents, disable_pagination: true}, messages)
   end
 
 end
