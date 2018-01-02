@@ -80,6 +80,7 @@ json.payments do
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
+          json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -147,6 +148,7 @@ json.payments_verified do
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
+          json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -215,6 +217,7 @@ json.payments_unverified do
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
+          json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -238,6 +241,7 @@ json.attachments do
     json.thumb attachment.attached_file.url(:thumb)
     json.description attachment.description
     json.file_type attachment.file_format(attachment.attached_file)
+    json.content_type attachment.attached_file.content_type
   end
 end
 
