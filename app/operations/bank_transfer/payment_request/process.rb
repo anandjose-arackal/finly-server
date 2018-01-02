@@ -70,7 +70,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       name = item[:name] || item["name"]
       id = item[:account_id] || item["account_id"]
       owner_name = item[:owner_name]
-      amount = item[:original_amount]&.to_f || item["original_amount"]&.to_f
       note = item[:note]&.to_s || item["note"]&.to_s
 
       # correcting the parameters here if it's nested too deep
@@ -88,7 +87,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       invoice_number = item[:invoice_number]
       invoice_date = item[:invoice_date]
       due_date = item[:due_date]
-      inclusive_of_taxes = item[:inclusive_of_taxes]
+      inclusive_of_taxes = StringUtils.to_bool(item[:inclusive_of_taxes])
       category_id = item[:category_id]
       gst_type_id = item[:gst_type_id]
 
@@ -99,7 +98,11 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           tax_amount = line_item[:tax_amount]&.to_f
           discount_amount = line_item[:discount_amount]&.to_f
           sub_total = line_item[:amount]&.to_f
-          amount += sub_total - discount_amount + tax_amount
+          if inclusive_of_taxes
+            amount += sub_total
+          else
+            amount += sub_total - discount_amount + tax_amount
+          end
         end
         net_amount = amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
       else
@@ -204,7 +207,11 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           item_tax_amount = invoice_item[:tax_amount]
           item_hsn_sac = invoice_item[:hsn_sac]
 
-          total_amount = item_amount&.to_f - item_discount_amount&.to_f + item_tax_amount&.to_f
+          if inclusive_of_taxes
+            total_amount = item_amount&.to_f
+          else
+            total_amount = item_amount&.to_f - item_discount_amount&.to_f + item_tax_amount&.to_f
+          end
 
           unless validate_rate item_rate, 1
             self.error_messages << "Invoice item rate is invalid"
