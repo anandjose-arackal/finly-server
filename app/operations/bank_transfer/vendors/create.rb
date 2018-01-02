@@ -1,6 +1,6 @@
 class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
 
-  attr_accessor :vendor_parameters, :vendor
+  attr_accessor :vendor_parameters, :vendor, :account_owner_type
 
   def personalizer
     {
@@ -13,13 +13,15 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
   def init
     super()
     self.vendor_parameters = vendor_attributes
+    # setting account owner type as vendor
+
   end
 
   def validate
     # checking if a particular bank account already exists, if it does, just mark that respective vendor
     # as authorized and add the bank account to their existing list
     self.vendor_parameters[:bank_accounts_attributes].each_with_index do |account_params, index|
-      ba = current_company.bank_accounts.find_by(account_number: account_params[:account_number])
+      ba = current_company.bank_accounts.find_by(account_number: account_params[:account_number], account_owner_type: "YesBankVendor")
       if ba.present?
         self.vendor = ba.account_owner
         # removing this particular bank account from the list of bank accounts being created

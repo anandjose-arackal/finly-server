@@ -16,12 +16,14 @@ module Attachable
           large: '2160x2160>',
           normal: '1080x1080>'
       }
-    else
+    elsif is_pdf?(file.content_type)
       {
           :thumb => ["500x500>", :png],
           :normal => ["1080x1080>", :png],
           :large => ["2160x2160>", :png]
       }
+    else
+      {}
     end
   end
 

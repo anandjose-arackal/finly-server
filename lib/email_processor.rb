@@ -29,6 +29,6 @@ class EmailProcessor
       end
     end
     # receipt_email.save_receipts
-    Receipt::ReceiptEmails::ProcessEmail.(user, receipt_email_id: receipt_email.id)
+    Receipt::ReceiptEmails::ProcessEmail.call_async(user.id, receipt_email_id: receipt_email.id)
   end
 end
