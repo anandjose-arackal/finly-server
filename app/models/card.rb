@@ -80,6 +80,7 @@ class Card < ActiveRecord::Base
     where hotlisted: false
     # end
   }
+  scope :pluck_proxy, -> { pluck :proxy }
   scope :include_hotlisted, -> { unscope(where: :hotlisted) }
 
   scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
