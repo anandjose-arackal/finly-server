@@ -1,4 +1,4 @@
- # == Schema Information
+# == Schema Information
 #
 # Table name: report_processor_groups
 #
@@ -74,7 +74,16 @@ class ReportProcessorGroup < ActiveRecord::Base
     with_id(filter_ids)
   }
   # From here
-  scope :created_by_user_id, -> (user_id) { where created_by_user_id: user_id }
+  scope :filter_search, -> (search_key) {
+    if search_key.present?
+      id = pluck(:id)
+      mapping_ids = ReportProcessorGroupMapping.with_processor_group_id(id).pluck(:id)
+      filtered_mapping_id = Report.filter_mapping_id(mapping_ids).filter_search(search_key).pluck_mapping_id
+      filtered_ids = ReportProcessorGroupMapping.with_id(filtered_mapping_id).pluck_group_id
+      with_id(filtered_ids)
+    end
+  }
+  scope :filter_created_by_user_id, -> (user_id) { where created_by_user_id: user_id }
   scope :payment_mode, -> (payment_mode) { where payment_mode: payment_mode }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     # sample params: filter_date[expense, 2016-03-01, 2016-03-20]

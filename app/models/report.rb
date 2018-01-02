@@ -145,6 +145,8 @@ class Report < ActiveRecord::Base
     reports = arel_table
     where(reports[:name].matches("%#{value}%").or(reports[:id].eq(value)))
   end
+  scope :filter_mapping_id, -> (id) { where report_processor_group_mapping_id: id }
+  scope :pluck_mapping_id, -> { pluck :report_processor_group_mapping_id }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
     unless date_from.blank? && date_to.blank?
