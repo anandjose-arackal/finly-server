@@ -3,17 +3,21 @@ json.payment do
     json.array! @result.processed_order.each do |item|
       json.bank_account_number item[:bank_account_no]
       json.original_amount item[:original_amount]
+      json.id item[:id]
       json.ifsc item[:ifsc]
       json.name item[:name]
       json.owner_name item[:owner_name]
       json.note item[:note]
       json.gst_type_id item[:gst_type_id]
-      json.tax_type_id item[:tax_type_id]
+      json.tax_amount item[:tax_amount]
       json.tax item[:tax]
       json.discount item[:discount]
       json.tds item[:tds]
-      json.tds_type_id item[:tds_type_id]
-      json.discount_type_id item[:discount_type_id]
+      json.tds_amount item[:tds_amount]
+      json.discount_amount item[:discount_amount]
+      json.advance item[:advance]
+      json.advance_amount item[:advance_amount]
+      json.freight item[:freight]
       json.invoice_number item[:invoice_number]
       json.invoice_date item[:invoice_date]
       json.due_date item[:due_date]
@@ -21,6 +25,7 @@ json.payment do
       json.valid item[:valid]
       json.messages item[:messages]
       json.custom_fields_config item[:custom_fields]
+      json.net_amount item[:net_amount]
     end
   end
   json.errors @result.errors
