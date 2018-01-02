@@ -218,42 +218,7 @@ class Statements::Team::Summary < Statements::Team::Base
             :email,
             :mobile_number
         ],
-        accounts: [
-            :net_advance,
-            :net_reimbursement,
-            :atm_withdrawals,
-            :net_opening_balance,
-            :net_closing_balance
-        ],
-        expense_card: [
-            :opening_balance,
-            :credits,
-            :debits,
-            :closing_balance
-        ],
-        finly_money_ctc: [
-            :opening_balance,
-            :credits,
-            :debits,
-            :closing_balance
-        ],
-        finly_money_btc: [
-            :opening_balance,
-            :credits,
-            :debits,
-            :closing_balance
-        ],
-        cash_on_hand: [
-            :opening_balance,
-            :credits,
-            :debits,
-            :closing_balance
-        ],
-        reimbursement_card: [
-            :credits
-        ],
         expense: [
-            :category,
             :card,
             :cash,
             :distance,
