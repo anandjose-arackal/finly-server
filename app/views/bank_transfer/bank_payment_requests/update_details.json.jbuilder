@@ -5,6 +5,7 @@ json.payment do
       json.original_amount item[:original_amount]
       json.ifsc item[:ifsc]
       json.name item[:name]
+      json.owner_name item[:owner_name]
       json.note item[:note]
       json.gst_type_id item[:gst_type_id]
       json.tax_type_id item[:tax_type_id]
@@ -29,4 +30,6 @@ json.payment do
   json.processable_amount @result.processable_amount
   json.scheduled_at @result.scheduled_at_formatted
   json.created_at @result.created_at_formatted
+  json.policy_id @result.policy_id
+  json.beneficiary_editable true
 end
