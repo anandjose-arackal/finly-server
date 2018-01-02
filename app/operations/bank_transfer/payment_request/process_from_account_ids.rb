@@ -37,7 +37,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     self.account_ids = retrieve_data(:account_id)
     self.amounts = retrieve_data(:original_amount)
     self.notes = retrieve_data(:note)
-    [:tax_amount, :tds_amount, :gst_type_id, :discount_amount, :discount, :tax, :tds, :advance_amount, :advance, :freight, :invoice_date, :invoice_number, :due_date, :custom_fields].each do |attr|
+    [:tax_amount, :tds_amount, :gst_type_id, :discount_amount, :discount, :tax, :tds, :advance_amount, :advance, :freight, :invoice_date, :invoice_number, :due_date, :custom_fields, :inclusive_of_taxes].each do |attr|
       self.class.send(:attr_accessor, attr)
       instance_variable_set("@#{attr}", retrieve_data(attr))
     end
@@ -93,7 +93,8 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           invoice_number: self.invoice_number[index],
           invoice_date: self.invoice_date[index],
           due_date: self.due_date[index],
-          custom_fields: self.custom_fields[index]
+          custom_fields: self.custom_fields[index],
+          inclusive_of_taxes: self.inclusive_of_taxes[index]
       }
     end
     data
