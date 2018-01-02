@@ -4,7 +4,7 @@ class InvoiceCalculationUtils
   attr_accessor :invoice_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
-                :advance, :advance_amount, :invoice_total
+                :advance, :advance_amount, :invoice_total, :freight_amount
 
   # don't go by the name - this calculates the Freight paid as well
   def calculate_tds_and_advance(params, invoice_total, payment = nil, invoice = nil)
@@ -16,6 +16,7 @@ class InvoiceCalculationUtils
     calculate_tds
     self.net_amount = self.gross_amount - self.tds_amount
     calculate_advance_paid
+    calculate_freight_charges
 
     # assign TDS amount
     if self.invoice&.tds_amount.present?
@@ -67,6 +68,7 @@ class InvoiceCalculationUtils
       self.net_amount = self.after_tax_amount - self.tds_amount
       self.invoice_amount = self.gross_amount + self.discount_amount
       calculate_advance_paid
+      calculate_freight_charges
     else # calculate proactively
       self.invoice_amount = self.invoice.original_amount&.value
       calculate_discount_exclusive
@@ -75,6 +77,7 @@ class InvoiceCalculationUtils
       self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
       self.invoice_amount = self.invoice.original_amount&.value
       calculate_advance_paid
+      calculate_freight_charges
     end
     # assign the respective calculated parameters to the payment params
 
@@ -196,6 +199,17 @@ class InvoiceCalculationUtils
     original_net_amount = self.net_amount
     self.advance_amount = (self.invoice.advance*self.net_amount)/100
     self.net_amount = original_net_amount - self.advance_amount
+  end
+
+  def calculate_freight_charges
+    if self.invoice.freight_amount.blank?
+      # no change in net amount
+      self.freight_amount = 0
+      return
+    end
+    original_net_amount = self.net_amount
+    self.freight_amount = self.invoice.freight_amount&.value
+    self.net_amount = original_net_amount + self.freight_amount
   end
 
 end
