@@ -129,12 +129,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.error_messages << 'Invalid amount'
       end
 
-      # check if description is present
-      if name.blank?
-        self.valid = false
-        self.error_messages << 'Description cannot be blank'
-      end
-
       # check if the ifsc is present
       if ifsc.blank?
         self.valid = false
