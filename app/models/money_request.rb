@@ -30,15 +30,6 @@
 #
 
 
-
-
-
-
-
-
-
-
-
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 
@@ -99,14 +90,16 @@ class MoneyRequest < ActiveRecord::Base
   scope :not_destroyable, -> { where.not status_id: MoneyRequestStatus.ids_for([:open, :rejected, :retracted]) }
   scope :without_user, -> (user_id) { where.not user_id: user_id }
 
-  scope :awaiting_approval_of_user, ->(user_id, role_id){ where(status_id: MoneyRequestStatus.id_for(:processing))
-                                                              .where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
+  scope :awaiting_approval_of_user, ->(user_id, role_id) { where(status_id: MoneyRequestStatus.id_for(:processing))
+                                                               .where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
+  scope :filter_mapping_id, -> (id) { where money_request_processor_mapping_id: id }
+  scope :pluck_mapping_id, -> { pluck :money_request_processor_mapping_id }
 
   scope :total_value, -> { joins(items: :amount).sum(:value) }
 
   # scoping by payment type - cash or card
-  scope :via_cash_only, -> {where payment_mode_id: PaymentMode.id_for(:cash)}
-  scope :via_card_only, -> {where payment_mode_id: PaymentMode.id_for(:card)}
+  scope :via_cash_only, -> { where payment_mode_id: PaymentMode.id_for(:cash) }
+  scope :via_card_only, -> { where payment_mode_id: PaymentMode.id_for(:card) }
 
   scope :filter_status, ->(status_id) { where status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
@@ -155,7 +148,7 @@ class MoneyRequest < ActiveRecord::Base
   end
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
   scope :settlement_viewable, -> { where status_id: [MoneyRequestStatus.id_for(:approved), MoneyRequestStatus.id_for(:credited)] }
-  scope :sort_for_personal, -> { joins(:status).reorder('money_request_statuses.order ASC, money_requests.submitted_at DESC, money_requests.created_at DESC')}
+  scope :sort_for_personal, -> { joins(:status).reorder('money_request_statuses.order ASC, money_requests.submitted_at DESC, money_requests.created_at DESC') }
   scope :not_settled, -> { where money_request_processor_mapping_id: nil }
   scope :with_processor_mapping, -> (id) { where money_request_processor_mapping_id: id }
 

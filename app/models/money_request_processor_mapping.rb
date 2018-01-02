@@ -36,11 +36,13 @@ class MoneyRequestProcessorMapping < ActiveRecord::Base
   accepts_nested_attributes_for :money_requests
   accepts_nested_attributes_for :system_messages
 
-  scope :with_processor_id, -> (group_id){ where processor_id: group_id }
+  scope :with_id, -> (id) { where id: id }
+  scope :with_processor_id, -> (group_id) { where processor_id: group_id }
   scope :not_completed, -> { where.not status_id: MoneyRequestProcessorStatus.id_for(:completed) }
   scope :pending, -> { where status_id: MoneyRequestProcessorStatus.id_for(:pending) }
   scope :not_completed, -> { where.not status_id: MoneyRequestProcessorStatus.id_for(:completed) }
   scope :include_for_payment_file, -> { includes :user, :amount, :processor_accountable }
+  scope :pluck_processor_id, -> { pluck :processor_id }
 
   before_destroy do
     self.money_requests.update_all(money_request_processor_mapping_id: nil)

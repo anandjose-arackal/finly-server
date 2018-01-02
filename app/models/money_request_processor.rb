@@ -69,6 +69,55 @@ class MoneyRequestProcessor < ActiveRecord::Base
                                                                                   :processing, :partially_completed,
                                                                                   :failed]) }
   scope :completed, -> { where status_id: MoneyRequestProcessorStatus.id_for(:completed) }
+  # From here
+  scope :filter_search, -> (search_key) {
+    if search_key.present?
+      id = pluck(:id)
+      mapping_ids = MoneyRequestProcessorMapping.with_processor_id(id).pluck(:id)
+      filtered_mapping_id = MoneyRequest.filter_mapping_id(mapping_ids).filter_search(search_key).pluck_mapping_id
+      filtered_ids = MoneyRequestProcessorMapping.with_id(filtered_mapping_id).pluck_processor_id
+      with_id(filtered_ids)
+    end
+  }
+  scope :filter_created_by_user_id, -> (user_id) { where created_by_user_id: user_id }
+  scope :payment_mode, -> (payment_mode) { where payment_mode: payment_mode }
+  scope :filter_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      report_groups = arel_table
+      where(report_groups[:created_at].gteq(date_from).and(report_groups[:created_at].lteq(date_to)))
+    end
+  end
+  scope :filter_scheduled_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      report_groups = arel_table
+      where(report_groups[:scheduled_at].gteq(date_from).and(report_groups[:scheduled_at].lteq(date_to)))
+    end
+  end
+  scope :filter_completed_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      report_groups = arel_table
+      where(report_groups[:completed_at].gteq(date_from).and(report_groups[:completed_at].lteq(date_to)))
+    end
+  end
+  # to here
 
   delegate :scheduled?, :pending?, :processing?, :partially_completed?, :completed?, :failed?, :cancelled?, to: :status
 
