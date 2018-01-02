@@ -1,4 +1,3 @@
-
 json.summary do
   json.order_status do
     json.name @result.bank_payment_request.status_name(current_user.id)&.humanize
@@ -46,7 +45,8 @@ json.invoice_line_items_custom_fields @result.invoice_line_items_custom_fields
 
 json.payments do
   json.array!(@result.payment_order.payments) do |payment|
-    json.name payment.receiving_account.account_owner.name
+    json.owner_name payment.receiving_account&.account_owner&.name
+    json.name payment.receiving_account&.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.invoice_amount precision_value payment.invoice_amount
@@ -139,7 +139,8 @@ end
 
 json.payments_verified do
   json.array!(@result.payments_verified) do |payment|
-    json.name payment.receiving_account.account_owner.name
+    json.owner_name payment.receiving_account&.account_owner&.name
+    json.name payment.receiving_account&.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.net_amount precision_value payment.amount_value
@@ -229,7 +230,8 @@ end
 
 json.payments_unverified do
   json.array!(@result.payments_unverified) do |payment|
-    json.name payment.receiving_account.account_owner.name
+    json.owner_name payment.receiving_account&.account_owner&.name
+    json.name payment.receiving_account&.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.amount precision_value payment.amount_value

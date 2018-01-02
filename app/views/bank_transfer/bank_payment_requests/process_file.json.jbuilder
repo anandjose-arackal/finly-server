@@ -5,6 +5,7 @@ json.payment do
       json.original_amount item[:original_amount]
       json.ifsc item[:ifsc]
       json.name item[:name]
+      json.owner_name item[:owner_name]
       json.note item[:note]
       json.gst_type_id item[:gst_type_id]
       json.tax_amount item[:tax_amount]

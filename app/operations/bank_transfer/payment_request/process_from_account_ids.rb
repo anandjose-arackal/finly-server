@@ -85,7 +85,8 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     account_ids.each_with_index do |account_id, index|
       bank_account = BankAccount.find_by(id: account_id)
       data << {
-          name: bank_account.account_owner.name,
+          owner_name: bank_account.account_owner.name,
+          name: bank_account.name,
           bank_account_number: bank_account.account_number,
           ifsc: bank_account.ifsc,
           original_amount: amounts[index],
