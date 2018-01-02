@@ -254,6 +254,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
   def retrieve_bank_account(order_details)
     if order_details[:account_id].present?
+      id = order_details[:account_id]
       ba = BankAccount.find_by(id: id)
       return ba
     else

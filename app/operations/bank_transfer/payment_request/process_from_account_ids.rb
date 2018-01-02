@@ -75,6 +75,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
       data << {
           owner_name: bank_account.account_owner.name,
           name: bank_account.name,
+          account_id: bank_account.id,
           bank_account_number: bank_account.account_number,
           ifsc: bank_account.ifsc,
           original_amount: amounts[index],
