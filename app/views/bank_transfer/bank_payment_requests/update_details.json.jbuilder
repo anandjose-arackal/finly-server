@@ -24,6 +24,7 @@ json.payment do
       json.messages item[:messages]
       json.custom_fields_config item[:custom_fields]
       json.net_amount item[:net_amount]
+      json.category_id item[:category_id]
       json.invoice_items do
         json.array!(item[:invoice_items]) do |line_item|
           json.discount line_item[:discount]
@@ -48,7 +49,7 @@ json.payment do
       json.name category.name
     end
   end
-  json.invoice_item_categories do
+  json.invoice_line_items_categories do
     json.array!(current_company.categories.with_purpose(Purpose.id_for(:invoice_items))) do |category|
       json.id category.id
       json.name category.name

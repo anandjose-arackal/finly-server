@@ -93,9 +93,9 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       tax_amount = discount_amount = amount = sub_total = 0
       if item[:invoice_items_attributes].present?
         item[:invoice_items_attributes].each do |line_item|
-          tax_amount += line_item[:tax_amount]&.to_f
-          discount_amount += line_item[:discount_amount]&.to_f
-          sub_total += line_item[:amount]&.to_f
+          tax_amount = line_item[:tax_amount]&.to_f
+          discount_amount = line_item[:discount_amount]&.to_f
+          sub_total = line_item[:amount]&.to_f
           amount += sub_total - discount_amount + tax_amount
         end
         net_amount = amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
@@ -254,7 +254,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
                                tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds, gst_type_id: gst_type_id,
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
-                               advance: advance, advance_amount: advance_amount, freight: freight, category_id: category_id,
+                               advance: advance, advance_amount: advance_amount, freight: freight, category_id: category_id, total_amount: amount,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
                                net_amount: invoice_net_amount, invoice_items: invoice_items,
                                valid: self.valid, messages: self.error_messages}
