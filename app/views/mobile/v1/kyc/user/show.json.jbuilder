@@ -23,6 +23,30 @@ json.file_2 do
   json.original kyc&.kyc_file_2&.url
   json.thumb kyc&.kyc_file_2&.url(:thumb)
 end
+json.aadhar_front do
+  json.file_format kyc&.file_format(kyc&.aadhar_front)
+  json.file_type kyc.file_format(kyc.aadhar_front)
+  json.original kyc&.aadhar_front&.url
+  json.thumb kyc&.aadhar_front&.url(:thumb)
+end
+json.aadhar_back do
+  json.file_format kyc&.file_format(kyc&.aadhar_back)
+  json.file_type kyc.file_format(kyc.aadhar_back)
+  json.original kyc&.aadhar_back&.url
+  json.thumb kyc&.aadhar_back&.url(:thumb)
+end
+json.photo do
+  json.file_format kyc&.file_format(kyc&.photo)
+  json.file_type kyc.file_format(kyc.photo)
+  json.original kyc&.photo&.url
+  json.thumb kyc&.photo&.url(:thumb)
+end
+json.signature do
+  json.file_format kyc&.file_format(kyc&.signature)
+  json.file_type kyc.file_format(kyc.signature)
+  json.original kyc&.signature&.url
+  json.thumb kyc&.signature&.url(:thumb)
+end
 json.profile do
   user = kyc.user
   profile = user.profile

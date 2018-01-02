@@ -73,13 +73,25 @@ class IndividualKyc < ActiveRecord::Base
 
   has_attached_file :address_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :address_proof, content_type: CONTENT_TYPES
-  ## DEPRICATED END ##
 
   has_attached_file :kyc_file_1, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :kyc_file_1, content_type: CONTENT_TYPES
 
   has_attached_file :kyc_file_2, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :kyc_file_2, content_type: CONTENT_TYPES
+  ## DEPRICATED END ##
+
+  has_attached_file :aadhar_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :aadhar_front, content_type: CONTENT_TYPES
+
+  has_attached_file :aadhar_back, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :aadhar_back, content_type: CONTENT_TYPES
+
+  has_attached_file :photo, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :photo, content_type: CONTENT_TYPES
+
+  has_attached_file :signature, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :signature, content_type: CONTENT_TYPES
 
   def processing?
     KycStatus.ids_for([:processing, :submitted]).include?(self.kyc_status_id)
