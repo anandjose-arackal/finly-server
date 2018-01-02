@@ -251,6 +251,7 @@ class ApplicationController < ActionController::Base
         return RequestStore.store[:current_user]
       end
     end
+    @curr_user = nil
     if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
       if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome')or scopes.include?('api')

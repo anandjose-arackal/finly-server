@@ -38,6 +38,16 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     end
     self.processed_order_data = op.payment_order_data
 
+    # initializing the account owner type to retrieve the right bank account
+    case params[:account_owner_type]
+      when 1, '1'
+        self.account_owner_type = "User"
+      when 2, '2'
+        self.account_owner_type = "YesBankVendor"
+      else
+        self.account_owner_type = "YesBankVendor"
+    end
+
     # calculating the requested amount here
     self.requested_amount = 0
     processed_order_data.each do |details|
@@ -60,16 +70,6 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     # receiving accounts
     self.request_params = payment_request_params
     self.invoice_parameters = invoice_params
-
-    # initializing the account owner type to retrieve the right bank account
-    case params[:account_owner_type]
-      when 1, '1'
-        self.account_owner_type = "User"
-      when 2, '2'
-        self.account_owner_type = "YesBankVendor"
-      else
-        self.account_owner_type = "YesBankVendor"
-    end
   end
 
   def validate
@@ -282,17 +282,23 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   end
 
   def retrieve_bank_account(order_details)
-    ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number],
-                                         company_id: self.company_id,
-                                         account_owner_type: self.account_owner_type)
-    vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
-    ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
-    if ba.nil?
-      ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc],
-                              account_owner: vendor, company_id: self.company_id, default_account: true)
-      
+    if order_details[:account_id].present?
+      id = order_details[:account_id]
+      ba = BankAccount.find_by(id: id)
+      return ba
+    else
+      ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number],
+                                           company_id: self.company_id,
+                                           account_owner_type: self.account_owner_type)
+      vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
+      ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
+      if ba.nil?
+        ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc],
+                                account_owner: vendor, company_id: self.company_id, default_account: true)
+
+      end
+      return ba
     end
-    return ba
   end
 
   def retrieve_beneficiary_type

@@ -3,6 +3,7 @@ json.payment do
     json.array! @result.processed_order.each do |item|
       json.bank_account_number item[:bank_account_no]
       json.original_amount item[:original_amount]
+      json.id item[:id]
       json.ifsc item[:ifsc]
       json.name item[:name]
       json.owner_name item[:owner_name]
