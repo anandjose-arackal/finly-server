@@ -11,7 +11,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
                 :advance_amount,
-                :policy_id
+                :policy_id,
+                :account_owner_type
 
   def pre_validate
     super
@@ -59,6 +60,16 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     # receiving accounts
     self.request_params = payment_request_params
     self.invoice_parameters = invoice_params
+
+    # initializing the account owner type to retrieve the right bank account
+    case params[:account_owner_type]
+      when 1, '1'
+        self.account_owner_type = "User"
+      when 2, '2'
+        self.account_owner_type = "YesBankVendor"
+      else
+        self.account_owner_type = "YesBankVendor"
+    end
   end
 
   def validate
@@ -243,7 +254,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
 
   def retrieve_bank_account(order_details)
     ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number],
-                             company_id: self.company_id)
+                                         company_id: self.company_id,
+                                         account_owner_type: self.account_owner_type)
     vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
     ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
     if ba.nil?
