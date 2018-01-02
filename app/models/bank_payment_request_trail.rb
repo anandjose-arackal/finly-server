@@ -12,6 +12,8 @@
 #  action_id               :integer
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
+#  action_for_user_id      :integer
+#  action_for_user_role_id :integer
 #
 
 class BankPaymentRequestTrail < ActiveRecord::Base

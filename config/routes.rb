@@ -1012,6 +1012,7 @@
 #                                                         DELETE /bank_transfer/payments/:id(.:format)                                                      bank_transfer/payments#destroy
 #                               bank_transfer_users_count GET    /bank_transfer/users/count(.:format)                                                       bank_transfer/users#count
 #                            bank_transfer_users_managers GET    /bank_transfer/users/managers(.:format)                                                    bank_transfer/users#get_managers
+#                          bank_transfer_users_categories GET    /bank_transfer/users/categories(.:format)                                                  bank_transfer/users#categories
 #                       bank_transfer_user_show_transfers GET    /bank_transfer/users/:user_id/show_transfers(.:format)                                     bank_transfer/users#show_transfers
 #                                     bank_transfer_users GET    /bank_transfer/users(.:format)                                                             bank_transfer/users#index
 #                                                         POST   /bank_transfer/users(.:format)                                                             bank_transfer/users#create
@@ -1041,6 +1042,8 @@
 #                                                         PATCH  /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#update
 #                                                         PUT    /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#update
 #                                                         DELETE /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#destroy
+#                            invoicing_categories_invoice GET    /invoicing/categories/invoice(.:format)                                                    invoicing/categories#invoice_categories
+#                 invoicing_categories_invoice_line_items GET    /invoicing/categories/invoice_line_items(.:format)                                         invoicing/categories#invoice_items_categories
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)            admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)             admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                           admin_users/funds_load_requests#index
@@ -2406,6 +2409,8 @@ Rails.application.routes.draw do
 
     get 'users/count', to: 'users#count'
     get 'users/managers', to: 'users#get_managers'
+    get 'users/categories', to: 'users#categories'
+    
     resources :users do
       get 'show_transfers', to: 'users#show_transfers'
     end
@@ -2417,12 +2422,13 @@ Rails.application.routes.draw do
   get 'account/:account_number', to: 'invoicing/public_links#virtual_bank_account_show', as: :public_bank_account
 
   namespace :invoicing do
-
     resources :payment_receivables
     resources :virtual_bank_accounts do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
     end
-    
+
+    get 'categories/invoice', to: 'categories#invoice_categories'
+    get 'categories/invoice_line_items', to: 'categories#invoice_items_categories'
   end
 
 

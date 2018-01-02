@@ -25,17 +25,8 @@
 #  application             :string(255)
 #  payment_mode            :string(255)
 #  reference_id            :string(255)      not null
-#  invoice_id              :integer
 #  retry_count             :integer          default(0)
 #
-
-
-
-
-
-
-
-
 
 
 
@@ -62,7 +53,9 @@ class Payment < ActiveRecord::Base
   has_many :finly_transactions
 
   has_one :payment, as: :reference_resource
-  has_one :invoice
+
+  # because there needs to be a reference against which an invoice payment was made
+  belongs_to :invoice
 
   belongs_to :payment_order
   belongs_to :payment_status

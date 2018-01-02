@@ -17,8 +17,7 @@
 #  gst            :string(255)
 #  gst_registered :boolean
 #  state          :string(255)
-#  state_code_id  :integer
-#  created_by_id  :integer
+#  state_code     :string(255)
 #
 
 class YesBankVendor < ActiveRecord::Base
@@ -44,11 +43,4 @@ class YesBankVendor < ActiveRecord::Base
     where(id: vendor_ids)
   }
 
-  # before_save do
-  #   if self.gst.blank?
-  #     self.gst_registered = false
-  #   elsif self.gst.present?
-  #     self.gst_registered = true
-  #   end
-  # end
 end

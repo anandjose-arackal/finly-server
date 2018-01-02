@@ -26,8 +26,38 @@ json.payment do
       json.messages item[:messages]
       json.custom_fields_config item[:custom_fields]
       json.net_amount item[:net_amount]
+      json.category_id item[:category_id]
+      json.invoice_items do
+        json.array!(item[:invoice_items]) do |line_item|
+          json.discount line_item[:discount]
+          json.tax line_item[:tax]
+          json.tax_amount line_item[:tax_amount]
+          json.discount_amount line_item[:discount_amount]
+          json.description line_item[:description]
+          json.category_id line_item[:category_id]
+          json.amount line_item[:amount]
+          json.rate line_item[:rate]
+          json.quantity line_item[:quantity]
+          json.gst_type_id line_item[:item_gst_type]
+          json.total_amount line_item[:total_amount]
+          json.hsn_sac line_item[:hsn_sac]
+        end
+      end
     end
   end
+  json.invoice_categories do
+    json.array!(current_company.categories.with_purpose(Purpose.id_for(:invoice))) do |category|
+      json.id category.id
+      json.name category.name
+    end
+  end
+  json.invoice_line_items_categories do
+    json.array!(current_company.categories.with_purpose(Purpose.id_for(:invoice_items))) do |category|
+      json.id category.id
+      json.name category.name
+    end
+  end
+
   json.errors @result.errors
   json.description @result.description
   json.payment_order_valid @result.payment_order_valid

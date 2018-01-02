@@ -11,7 +11,7 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
     super
     # here we need all categories, not just inactive ones
     self.category = user.company.categories.with_name(category_params[:name]).first rescue nil
-    self.purpose_id = Purpose.id_from_application_for(RequestStore.store[:current_app])
+    self.purpose_id = category_params[:purpose_id] || Purpose.id_from_application_for(RequestStore.store[:current_app])
   end
 
   def process
@@ -32,6 +32,6 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
   private
 
   def category_params
-    params.require(:category).permit(:name)
+    params.require(:category).permit(:name, :purpose_id)
   end
 end
