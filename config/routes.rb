@@ -2176,6 +2176,10 @@ Rails.application.routes.draw do
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 
+  get 'statements/user_summary' => 'statements#user_summary'
+  get 'statements/user_summary/export' => 'statements#user_summary_export'
+  post 'statements/user_summary' => 'statements#user_summary'
+  post 'statements/user_summary/export' => 'statements#user_summary_export'
   get 'statements/:id/summary' => 'statements#summary'
   get 'export/:id/statements(.:format)', to: 'export#statement', as: :export_statement
   resources :statements

@@ -82,7 +82,10 @@ class Payment < ActiveRecord::Base
     end
   }
   scope :atm_withdrawals, -> { where payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal) }
-  scope :advance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:advance_outside_finly)] }
+  scope :advance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:advance),
+                                                  PaymentPurpose.id_for(:cash_advance),
+                                                  PaymentPurpose.id_for(:advance_outside_finly),
+                                                  PaymentPurpose.id_for(:advance_against_report_unapproval)] }
   scope :cash_on_hand_additions, -> { where payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:cash_advance)] }
   scope :reimbursement, -> { where payment_purpose_id: [PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)] }
   scope :debt_clearance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:balance_clearance), PaymentPurpose.id_for(:balance_clearance_outside_finly)] }
