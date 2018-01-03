@@ -251,7 +251,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       self.payment_order_valid = false unless self.valid
 
       self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note, id: id,
-                               gst_type_id: gst_type_id, tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds, gst_type_id: gst_type_id, owner_name: owner_name,
+                               tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds, gst_type_id: gst_type_id, owner_name: owner_name,
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
                                advance: advance, advance_amount: advance_amount, freight: freight, category_id: category_id, total_amount: amount,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
