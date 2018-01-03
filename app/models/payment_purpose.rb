@@ -46,7 +46,8 @@ class PaymentPurpose < ActiveRecord::Base
         :finly_money_reload,
         :corporate_account_reload,
         :blocked_for_conflict_resolution,
-        :unblocked_after_conflict_resolution
+        :unblocked_after_conflict_resolution,
+        :failed_transaction_reversal
     ]
   end
 
