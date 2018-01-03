@@ -146,6 +146,19 @@ class MoneyRequest < ActiveRecord::Base
       where(money_requests[:approved_at].gteq(date_from).and(money_requests[:approved_at].lteq(date_to)))
     end
   end
+
+  scope :filter_required_by_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      money_requests = arel_table
+      where(money_requests[:required_by_date].gteq(date_from).and(money_requests[:required_by_date].lteq(date_to)))
+    end
+  end
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
   scope :settlement_viewable, -> { where status_id: [MoneyRequestStatus.id_for(:approved), MoneyRequestStatus.id_for(:credited)] }
   scope :sort_for_personal, -> { joins(:status).reorder('money_request_statuses.order ASC, money_requests.submitted_at DESC, money_requests.created_at DESC') }

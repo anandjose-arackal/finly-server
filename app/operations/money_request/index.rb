@@ -74,6 +74,7 @@ class MoneyRequest::Index < MoneyRequest::Base
     has_scope :filter_submitted_date, using: [:from, :to], type: :hash
     has_scope :filter_approved_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
+    has_scope :filter_required_by_date
 
     def init
       self.money_requests = params[:money_requests]
