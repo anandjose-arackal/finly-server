@@ -23,10 +23,10 @@ class Settlement::SReport::Processing::Index < Settlement::SReport::Processing::
   class Settlement::SReport::Processing::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report_processor_groups, :paginated_report_processor_groups
 
-    has_scope :fitler_search
+    has_scope :filter_search
     has_scope :filter_user_id
     has_scope :filter_created_by_user_id
-    has_scope :payment_mode
+    has_scope :filter_payment_type
     has_scope :filter_date
     has_scope :filter_scheduled_date
     has_scope :filter_completed_date

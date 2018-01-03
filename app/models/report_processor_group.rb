@@ -85,6 +85,7 @@ class ReportProcessorGroup < ActiveRecord::Base
   }
   scope :filter_created_by_user_id, -> (user_id) { where created_by_user_id: user_id }
   scope :payment_mode, -> (payment_mode) { where payment_mode: payment_mode }
+  scope :filter_payment_type, -> (payment_type) { where payment_type: payment_type }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
     unless date_from.blank? && date_to.blank?

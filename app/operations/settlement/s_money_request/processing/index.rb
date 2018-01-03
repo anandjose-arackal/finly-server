@@ -23,9 +23,18 @@ class Settlement::SMoneyRequest::Processing::Index < Settlement::SMoneyRequest::
   class Settlement::SMoneyRequest::Processing::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :money_request_processors, :paginated_money_request_processors
 
+    has_scope :filter_search
+    has_scope :filter_user_id
+    has_scope :filter_created_by_user_id
+    has_scope :filter_payment_type
+    has_scope :filter_date
+    has_scope :filter_scheduled_date
+    has_scope :filter_completed_date
+
     def init
       self.money_request_processors = params[:money_request_processors]
       per_page = params[:per_page] || 30
+      self.money_request_processors = apply_scopes(self.money_request_processors, params)
       self.paginated_money_request_processors = self.money_request_processors&.include_for_show.paginate(page: params[:page], per_page: per_page)
     end
 

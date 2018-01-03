@@ -23,7 +23,13 @@ class Settlement::SReport::Completed::BatchIndex < Settlement::SReport::Complete
   class Settlement::SReport::Completed::BatchIndex::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report_processor_groups, :paginated_report_processor_groups
 
+    has_scope :filter_search
     has_scope :filter_user_id
+    has_scope :filter_created_by_user_id
+    has_scope :filter_payment_type
+    has_scope :filter_date
+    has_scope :filter_scheduled_date
+    has_scope :filter_completed_date
 
     def init
       self.report_processor_groups = params[:report_processor_groups]
