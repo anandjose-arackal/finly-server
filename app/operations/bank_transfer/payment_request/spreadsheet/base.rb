@@ -73,7 +73,11 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
     values = []
     custom_fields = payment.invoice&.custom_fields
     self.field_configurations.each do |fc|
-      values << custom_fields.with_field_configuration_ids(fc.id).first&.string_value
+      if custom_fields.present?
+        values << custom_fields.with_field_configuration_ids(fc.id).first&.string_value
+      else
+        values << ""
+      end
     end
     values
   end
