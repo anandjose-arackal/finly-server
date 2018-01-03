@@ -22,7 +22,7 @@ require 'roo'
 class Admin::Users::Import < Admin::Base
 
   attr_accessor :file, :result_hash, :header, :import_fields, :sheet, :invitee,
-                :file_url
+                :file_url, :headers, :content
 
   def authorized_user_types
 
@@ -104,12 +104,44 @@ class Admin::Users::Import < Admin::Base
   end
 
   def post_process
-    self.file_url = create_response_csv
+    # self.file_url = create_response_csv
+    self.headers = [
+        "first_name".humanize,
+        "last_name".humanize,
+        "email".humanize,
+        "mobile_number".humanize,
+        "dob".humanize,
+        "address_1".humanize,
+        "address_2".humanize,
+        "pin_code".humanize,
+        "state_id".humanize,
+        "city".humanize,
+        "gender".humanize,
+        "manager_role".humanize,
+        "finance_manager_role".humanize,
+        "admin_role".humanize,
+        "reporting_manager".humanize,
+        "reporting_finance_manager".humanize,
+        "approves_to".humanize,
+        "approves_finance_to".humanize,
+        "company_id".humanize,
+        "mothers_maiden_name".humanize,
+        "expense_management".humanize,
+        "disburse ".humanize,
+        "vendor_payments".humanize,
+
+    ]
+    self.content = []
+    (2..sheet.last_row).each do |i|
+      self.content << sheet.row(i)
+      self.content[i-2] << self.result_hash[i]
+    end
   end
 
   def success
-    params[:file_url] = file_url
-    Admin::Users::Import::FilePresenter.new(user, params, messages)
+    # params[:file_url] = file_url
+    # Admin::Users::Import::FilePresenter.new(user, params, messages)
+    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content}}, messages)
   end
 
   class Admin::Users::Import::FilePresenter < BaseOperation::BasePresenter::SuccessPresenter
