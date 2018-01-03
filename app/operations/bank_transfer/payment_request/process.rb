@@ -207,11 +207,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
             total_amount = item_amount&.to_f - item_discount_amount&.to_f + item_tax_amount&.to_f
           end
 
-          unless validate_rate item_rate, 1
-            self.error_messages << "Invoice item rate is invalid"
-            self.valid = false
-          end
-
           unless validate_rate item_tax, 1
             self.error_messages << "Invoice item tax rate is invalid"
             self.valid = false
