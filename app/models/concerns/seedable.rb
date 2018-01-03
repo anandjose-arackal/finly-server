@@ -45,9 +45,10 @@ module Seedable
     # Checks if RequestStore contains the values. If not found, then loads RequestStore with the respective values
     def fetch_items
       # SimpleConfigUtil.seedable_for(self.name)
-      # if SimpleConfig.for(:application).exists? :seedable
-      #   return SimpleConfig.for(:application).seedable[self.name]
-      # end
+      if SimpleConfig.for(:application).exists? :seedable
+        val = SimpleConfig.for(:application).seedable[self.name]
+        return val if val.present?
+      end
       as_hash
     end
 
