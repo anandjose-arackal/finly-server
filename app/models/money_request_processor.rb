@@ -82,6 +82,11 @@ class MoneyRequestProcessor < ActiveRecord::Base
   scope :filter_created_by_user_id, -> (user_id) { where created_by_user_id: user_id }
   scope :payment_mode, -> (payment_mode) { where payment_mode: payment_mode }
   scope :filter_payment_type, -> (payment_type) { where payment_type: payment_type }
+  scope :filter_user_id, -> (user_id) {
+    id = pluck(:id)
+    filter_ids = MoneyRequestProcessorMapping.with_processor_id(id).with_user_id(user_id).pluck_processor_id
+    with_id(filter_ids)
+  }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
     unless date_from.blank? && date_to.blank?
