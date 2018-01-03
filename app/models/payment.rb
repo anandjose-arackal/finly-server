@@ -35,7 +35,6 @@
 
 
 
-
 class Payment < ActiveRecord::Base
 
   class Payment::AccountType
@@ -365,7 +364,7 @@ class Payment < ActiveRecord::Base
   private
 
   def initiating_account_presence
-    unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly, :balance_clearance_outside_finly,
+    unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly, :balance_clearance_outside_finly, :failed_transaction_reversal,
                                    :personal_expense, :atm_withdrawal, :card_transaction, :advance, :corporate_balance_load,
                                    :corporate_balance_refund, :cash_advance, :balance_clearance_against_cash_on_hand, :settlement_against_cash_on_hand,
                                    :advance_against_report_unapproval]).include?(self.payment_purpose_id)
@@ -388,7 +387,7 @@ class Payment < ActiveRecord::Base
   def initiating_user_presence
     unless PaymentPurpose.ids_for([:vendor_payment, :virtual_account_credit, :payment_link_credit, :invoice_credit,
                                    :cash_on_hand_reversal,:virtual_account_credit,:payment_link_credit, :invoice_credit,
-                                   :cash_on_hand_return, :payment_receivable, :invoice,
+                                   :cash_on_hand_return, :payment_receivable, :invoice, :failed_transaction_reversal,
                                    :virtual_bank_account, :finly_money_reload, :corporate_account_reload]).include?(self.payment_purpose_id)
       if initiating_user_id.blank?
         errors.add(:initiating_user_id, "cannot be blank")
@@ -399,7 +398,7 @@ class Payment < ActiveRecord::Base
   def receiving_user_presence
     unless PaymentPurpose.ids_for([:vendor_payment, :corporate_balance_load, :corporate_balance_refund, :virtual_account_credit,
                                    :payment_link_credit, :invoice_credit, :cash_on_hand_reversal,:virtual_account_credit,
-                                   :payment_link_credit, :invoice_credit, :cash_on_hand_return,  :payment_receivable,
+                                   :payment_link_credit, :invoice_credit, :cash_on_hand_return,  :payment_receivable, :failed_transaction_reversal,
                                    :invoice, :virtual_bank_account, :finly_money_reload, :corporate_account_reload]).include?(self.payment_purpose_id)
       if receiving_user_id.blank?
         errors.add(:receiving_user_id, "cannot be blank")
