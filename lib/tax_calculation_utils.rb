@@ -1,4 +1,4 @@
-# the library that will be used for all tax calculations
+# calculates the taxes and discounts given the rates
 class TaxCalculationUtils
 
   # type - will be 1 for rate, and 2 for absolute amounts

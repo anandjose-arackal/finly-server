@@ -1,4 +1,3 @@
-
 json.summary do
   json.order_status do
     json.name @result.bank_payment_request.status_name(current_user.id)&.humanize
@@ -26,10 +25,28 @@ json.summary do
   json.approvers @result.approvers
 end
 
+json.invoice_categories do
+  json.array!(@result.invoice_categories) do |category|
+    json.id category.id
+    json.name category.name
+  end
+end
+
+json.invoice_line_items_categories do
+  json.array!(@result.invoice_line_items_categories) do |category|
+    json.id category.id
+    json.name category.name
+  end
+end
+
+json.invoice_custom_fields @result.invoice_custom_fields
+
+json.invoice_line_items_custom_fields @result.invoice_line_items_custom_fields
 
 json.payments do
   json.array!(@result.payment_order.payments) do |payment|
-    json.name payment.receiving_account.account_owner.name
+    json.owner_name payment.receiving_account&.account_owner&.name
+    json.name payment.receiving_account&.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.invoice_amount precision_value payment.invoice_amount
@@ -49,15 +66,20 @@ json.payments do
 
     if payment.invoice.present?
       json.raw_amount precision_value invoice&.amount&.value
-      json.original_amount precision_value invoice.original_amount&.value
+      # conditionally set the original amount as invoice amount is there are line items
+      if payment.invoice&.invoice_items.present?
+        json.original_amount precision_value invoice.amount&.value
+      else
+        json.original_amount precision_value invoice.original_amount&.value
+      end
       json.invoice do
         json.advance invoice.advance
-        json.advance_amount invoice.advance_amount&.value
+        json.advance_amount precision_value invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
-        json.gst_type_id invoice.gst_type_id
+        json.gst_type_id invoice.gst_type
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
         json.discount_amount precision_value invoice.discount_amount&.value
@@ -80,6 +102,7 @@ json.payments do
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
+          json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -88,6 +111,25 @@ json.payments do
         end
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
+
+        # invoice items
+        json.invoice_items do
+          json.array!(invoice.invoice_items) do |item|
+            json.rate item.rate
+            json.quantity item.quantity
+            json.tax item.tax
+            json.discount item.discount
+            json.category_id item.category_id
+            json.tax_amount precision_value item.tax_amount&.value
+            json.discount_amount precision_value item.discount_amount&.value
+            json.amount precision_value item.amount&.value
+            json.category_name item.category&.name
+            json.id item.id
+            json.description item.description
+            json.total_amount precision_value item.net_amount&.value
+            json.hsn_sac item.hsn_sac
+          end
+        end
       end
     else
       json.raw_amount precision_value payment.amount_value
@@ -98,7 +140,8 @@ end
 
 json.payments_verified do
   json.array!(@result.payments_verified) do |payment|
-    json.name payment.receiving_account.account_owner.name
+    json.owner_name payment.receiving_account&.account_owner&.name
+    json.name payment.receiving_account&.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.net_amount precision_value payment.amount_value
@@ -118,15 +161,20 @@ json.payments_verified do
 
     if payment.invoice.present?
       json.raw_amount precision_value invoice&.amount&.value
-      json.original_amount precision_value invoice.original_amount&.value
+      # conditionally set the original amount as invoice amount is there are line items
+      if payment.invoice&.invoice_items.present?
+        json.original_amount precision_value invoice.amount&.value
+      else
+        json.original_amount precision_value invoice.original_amount&.value
+      end
       json.invoice do
         json.advance invoice.advance
-        json.advance_amount invoice.advance_amount&.value
+        json.advance_amount precision_value invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
-        json.gst_type_id invoice.gst_type_id
+        json.gst_type_id invoice.gst_type
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
         json.discount_amount precision_value invoice.discount_amount&.value
@@ -146,6 +194,7 @@ json.payments_verified do
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
+          json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -154,6 +203,25 @@ json.payments_verified do
         end
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
+
+        #
+        json.invoice_items do
+          json.array!(invoice.invoice_items) do |item|
+            json.rate item.rate
+            json.quantity item.quantity
+            json.tax item.tax
+            json.discount item.discount
+            json.category_id item.category_id
+            json.tax_amount precision_value item.tax_amount&.value
+            json.discount_amount precision_value item.discount_amount&.value
+            json.amount precision_value item.amount&.value
+            json.category_name item.category&.name
+            json.id item.id
+            json.description item.description
+            json.total_amount precision_value item.net_amount&.value
+            json.hsn_sac item.hsn_sac
+          end
+        end
       end
     else
       json.raw_amount precision_value payment.amount_value
@@ -164,7 +232,8 @@ end
 
 json.payments_unverified do
   json.array!(@result.payments_unverified) do |payment|
-    json.name payment.receiving_account.account_owner.name
+    json.owner_name payment.receiving_account&.account_owner&.name
+    json.name payment.receiving_account&.name
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.amount precision_value payment.amount_value
@@ -185,15 +254,20 @@ json.payments_unverified do
 
     if payment.invoice.present?
       json.raw_amount precision_value invoice&.amount&.value
-      json.original_amount precision_value invoice.original_amount&.value
+      # conditionally set the original amount as invoice amount is there are line items
+      if payment.invoice&.invoice_items.present?
+        json.original_amount precision_value invoice.amount&.value
+      else
+        json.original_amount precision_value invoice.original_amount&.value
+      end
       json.invoice do
         json.advance invoice.advance
-        json.advance_amount invoice.advance_amount&.value
+        json.advance_amount precision_value invoice.advance_amount&.value
         json.tax_amount precision_value invoice.tax_amount&.value
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
-        json.gst_type_id invoice.gst_type_id
+        json.gst_type_id invoice.gst_type
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
         json.discount_amount precision_value invoice.discount_amount&.value
@@ -213,6 +287,7 @@ json.payments_unverified do
         json.invoice_attachment do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
+          json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -221,6 +296,24 @@ json.payments_unverified do
         end
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
+
+        json.invoice_items do
+          json.array!(invoice.invoice_items) do |item|
+            json.rate item.rate
+            json.quantity item.quantity
+            json.tax item.tax
+            json.discount item.discount
+            json.category_id item.category_id
+            json.category_name item.category&.name
+            json.tax_amount precision_value item.tax_amount&.value
+            json.discount_amount precision_value item.discount_amount&.value
+            json.amount precision_value item.amount&.value
+            json.id item.id
+            json.description item.description
+            json.total_amount precision_value item.net_amount&.value
+            json.hsn_sac item.hsn_sac
+          end
+        end
       end
     else
       json.raw_amount precision_value payment.amount_value
@@ -236,6 +329,7 @@ json.attachments do
     json.thumb attachment.attached_file.url(:thumb)
     json.description attachment.description
     json.file_type attachment.file_format(attachment.attached_file)
+    json.content_type attachment.attached_file.content_type
   end
 end
 

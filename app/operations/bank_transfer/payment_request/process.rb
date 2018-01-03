@@ -5,7 +5,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
                 :errors, :payment_order_valid, :scheduled_at, :description, :valid, :error_messages
 
   # the object that will hold the details of the custom fields because the object hasn't been created
-  attr_accessor :ghost_invoice
+  attr_accessor :ghost_invoice, :ghost_invoice_item
 
   def pre_validate
     super
@@ -55,10 +55,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       return
     end
 
-    payment_order_data.each do |item|
-      self.requested_amount += (item[:original_amount].to_d rescue 0)
-    end
-
   end
 
   def process
@@ -72,11 +68,15 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       bank_account_no = item[:bank_account_number] || item["bank_account_number"]
       ifsc = item[:ifsc] || item["ifsc"]
       name = item[:name] || item["name"]
-      amount = item[:original_amount]&.to_f || item["original_amount"]&.to_f
+      id = item[:account_id] || item["account_id"]
+      owner_name = item[:owner_name]
       note = item[:note]&.to_s || item["note"]&.to_s
-      gst_type_id = item[:gst_type_id]
-      tax_amount = item[:tax_amount]&.to_f
-      discount_amount = item[:discount_amount]&.to_f
+
+      # correcting the parameters here if it's nested too deep
+      if item&.dig(:invoice_attributes, :invoice_items_attributes).present?
+        item[:invoice_items_attributes] = item[:invoice_attributes][:invoice_items_attributes]
+      end
+
       tds_amount = item[:tds_amount]&.to_f
       discount = item[:discount]
       advance_amount = item[:advance_amount]&.to_f
@@ -87,9 +87,31 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       invoice_number = item[:invoice_number]
       invoice_date = item[:invoice_date]
       due_date = item[:due_date]
-      inclusive_of_taxes = item[:inclusive_of_taxes]
+      inclusive_of_taxes = StringUtils.to_bool(item[:inclusive_of_taxes])
+      category_id = item[:category_id]
+      gst_type_id = item[:gst_type_id]
 
-      net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+      # deciding tax based on whether invoice items were entered or not
+      tax_amount = discount_amount = amount = sub_total = 0
+      if item[:invoice_items_attributes].present?
+        item[:invoice_items_attributes].each do |line_item|
+          tax_amount = line_item[:tax_amount]&.to_f
+          discount_amount = line_item[:discount_amount]&.to_f
+          sub_total = line_item[:amount]&.to_f
+          if inclusive_of_taxes
+            amount += sub_total
+          else
+            amount += sub_total - discount_amount + tax_amount
+          end
+        end
+        net_amount = amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+      else
+        tax_amount = item[:tax_amount]&.to_f
+        discount_amount = item[:discount_amount]&.to_f
+        amount += item[:original_amount]&.to_f
+        net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+      end
+
 
       self.valid = true
       self.error_messages = []
@@ -107,20 +129,11 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.error_messages << 'Invalid amount'
       end
 
-      # check if name is present
-      if name.blank?
-        self.valid = false
-        self.error_messages << 'Name cannot be blank'
-      end
-
       # check if the ifsc is present
       if ifsc.blank?
         self.valid = false
         self.error_messages << 'IFSC cannot be blank'
       end
-
-      # todo - if there's any user specific configuration for this particular user,
-      # add it here
 
       # adding all invoice specific validations here for the payment
       unless validate_date invoice_date
@@ -167,18 +180,87 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         self.valid = false
       end
 
+      invoice_items = []
+
+      invoice_net_amount = net_amount
+
+      if item&.dig(:invoice_items_attributes).present?
+        # i.e. if the line items are present, recalculate the net amount
+        invoice_net_amount = 0
+
+        item[:invoice_items_attributes]&.each do |invoice_item|
+          item_amount = invoice_item[:amount]
+          item_discount = invoice_item[:discount]
+          item_tax = invoice_item[:tax]
+          item_gst_type = invoice_item[:gst_type_id]
+          item_rate = invoice_item[:rate]
+          item_quantity = invoice_item[:quantity]
+          item_description = invoice_item[:description]
+          item_category_id = invoice_item[:category_id]
+          item_discount_amount = invoice_item[:discount_amount]
+          item_tax_amount = invoice_item[:tax_amount]
+          item_hsn_sac = invoice_item[:hsn_sac]
+
+          if inclusive_of_taxes
+            total_amount = item_amount&.to_f
+          else
+            total_amount = item_amount&.to_f - item_discount_amount&.to_f + item_tax_amount&.to_f
+          end
+
+          unless validate_rate item_rate, 1
+            self.error_messages << "Invoice item rate is invalid"
+            self.valid = false
+          end
+
+          unless validate_rate item_tax, 1
+            self.error_messages << "Invoice item tax rate is invalid"
+            self.valid = false
+          end
+
+          unless validate_rate item_discount, 1
+            self.error_messages << "Invoice item discount rate is invalid"
+            self.valid = false
+          end
+
+          # insert custom fields here
+
+          invoice_items << {
+            description: item_description,
+            tax: item_tax,
+            tax_amount: item_tax_amount,
+            discount: item_discount,
+            discount_amount: item_discount_amount,
+            quantity: item_quantity,
+            rate: item_rate,
+            category_id: item_category_id,
+            amount: item_amount,
+            gst_type_id: item_gst_type,
+            total_amount: total_amount,
+            hsn_sac: item_hsn_sac
+          }
+
+          invoice_net_amount += total_amount
+        end
+
+        # accounting for TDS, Advance and Freight in light of the new amount
+        invoice_net_amount = invoice_net_amount - tds_amount.to_f - advance_amount.to_f + freight.to_f
+      end
+
+      # adding processable amount irrespective of whether it's valid or not
+      self.requested_amount += invoice_net_amount
+
       if self.valid
-        self.processable_amount += amount
+        self.processable_amount += invoice_net_amount
       end
 
       self.payment_order_valid = false unless self.valid
 
-      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note,
-                               gst_type_id: gst_type_id, tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds,
+      self.processed_order << {bank_account_no: bank_account_no, ifsc: ifsc, name: name, original_amount: amount, note: note, id: id,
+                               gst_type_id: gst_type_id, tax_amount: tax_amount, tax: tax, tds_amount: tds_amount, tds: tds, gst_type_id: gst_type_id, owner_name: owner_name,
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
-                               advance: advance, advance_amount: advance_amount, freight: freight,
+                               advance: advance, advance_amount: advance_amount, freight: freight, category_id: category_id, total_amount: amount,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
-                               net_amount: net_amount,
+                               net_amount: invoice_net_amount, invoice_items: invoice_items,
                                valid: self.valid, messages: self.error_messages}
     end
   end
@@ -224,7 +306,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
   private
 
-  def validate_rate(rate, rate_type_id, amount)
+  def validate_rate(rate, rate_type_id, amount = nil)
     if rate.blank?
       return true
     end

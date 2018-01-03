@@ -35,13 +35,6 @@
 
 
 
-
-
-
-
-
-
-
 class Payment < ActiveRecord::Base
   include PostOperationExecution
 
@@ -64,7 +57,9 @@ class Payment < ActiveRecord::Base
   has_many :finly_transactions
 
   has_one :payment, as: :reference_resource
-  has_one :invoice
+
+  # because there needs to be a reference against which an invoice payment was made
+  belongs_to :invoice
 
   belongs_to :payment_order
   belongs_to :payment_status

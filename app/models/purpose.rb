@@ -13,13 +13,24 @@ class Purpose < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:expense_management, :vendor_payments, :invoice]
+    [:expense_management, :vendor_payments, :invoice, :invoice_items]
   end
 
   def self.id_from_application_for(application)
     case application
       when :vp, 'vp'
         return Purpose.id_for(:vendor_payments)
+      when 'em', :em, :ft, 'ft'
+        return Purpose.id_for(:expense_management)
+      else
+        # do nothing?
+    end
+  end
+
+  def self.category_purpose_from_application(application)
+    case application
+      when :vp, 'vp'
+        return Purpose.id_for(:invoice)
       when 'em', :em, :ft, 'ft'
         return Purpose.id_for(:expense_management)
       else
