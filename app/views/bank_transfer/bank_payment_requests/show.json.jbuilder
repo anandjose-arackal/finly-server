@@ -55,6 +55,7 @@ json.payments do
     json.id payment.id
     json.note payment.note
     json.account_id payment.receiving_account.id
+    json.beneficiary_id payment.receiving_account.account_owner&.id
     json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
     json.system_messages do
       json.array! (payment.system_messages)
@@ -151,6 +152,7 @@ json.payments_verified do
     json.id payment.id
     json.note payment.note
     json.account_id payment.receiving_account.id
+    json.beneficiary_id payment.receiving_account.account_owner&.id
     json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
     json.system_messages do
       json.array! (payment.system_messages)
@@ -245,6 +247,7 @@ json.payments_unverified do
     json.id payment.id
     json.note payment.note
     json.account_id payment.receiving_account.id
+    json.beneficiary_id payment.receiving_account.account_owner&.id
     json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
     json.system_messages do
       json.array! (payment.system_messages)
