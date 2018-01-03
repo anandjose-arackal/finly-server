@@ -7,6 +7,32 @@ class KycProcess::User::Submit < KycProcess::User::Base
       add_message :error, 'Please complete your KYC Details before submitting'
       return
     end
+    validate_user_profile
+  end
+
+  def validate_user_profile
+    user_profile = self.individual_kyc.user.profile
+    unless user_profile.date_of_birth.present?
+      add_message :error, 'Date of birth cannot be blank'
+    end
+    unless user_profile.gender.present?
+      add_message :error, 'Gender has not been selected'
+    end
+    unless user_profile.address_1.present?
+      add_message :error, 'Address 1 cannot be blank'
+    end
+    unless user_profile.address_2.present?
+      add_message :error, 'Address 2 cannot be blank'
+    end
+    unless user_profile.city.present?
+      add_message :error, 'City cannot be blank'
+    end
+    unless user_profile.state_id.present?
+      add_message :error, 'State has not been selected'
+    end
+    unless user_profile.pin_code.present?
+      add_message :error, 'Pin Code cannot be blank'
+    end
   end
 
   def process
