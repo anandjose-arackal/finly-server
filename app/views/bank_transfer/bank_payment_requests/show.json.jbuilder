@@ -208,7 +208,6 @@ json.payments_verified do
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 
-        #
         json.invoice_items do
           json.array!(invoice.invoice_items) do |item|
             json.rate item.rate
