@@ -53,8 +53,10 @@ class Invoice < ActiveRecord::Base
   belongs_to :freight_amount, class_name: "Amount"
   belongs_to :category
 
-  belongs_to :payment
+  # because multiple payments can be made against one invoice
+  has_many :payments
 
+  has_many :invoice_items, class_name: "InvoiceLineItem"
   has_many :invoice_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -70,6 +72,7 @@ class Invoice < ActiveRecord::Base
   accepts_nested_attributes_for :freight_amount
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :advance_amount
+  accepts_nested_attributes_for :invoice_items, allow_destroy: true
 
   delegate :tax_amount_value, to: :tax_amount
   delegate :tds_amount_value, to: :tax_amount
@@ -92,51 +95,23 @@ class Invoice < ActiveRecord::Base
   end
 
   def tax_rate
-    return 0 if tax.blank? || gross_amount.blank?
-    case self.tax_type_id
-      when 1, '1'
-        return self.tax
-      when 2, '2'
-        return (self.tax / (self.gross_amount.value)) * 100
-      else
-        return self.tax
-    end
+    self.tax
   end
 
   def advance_rate
-    return 0 if advance.blank? || net_amount.blank?
-    case self.advance_type_id
-      when 1, '1'
-        return self.advance
-      when 2, '2'
-        return (self.advance / (self.advance + self.net_amount.value)) * 100
-      else
-        return self.advance
-    end
+    self.advance
   end
 
   def tds_rate
-    return 0 if tds.blank? || gross_amount.blank?
-    case self.tds_type_id
-      when 1, '1'
-        return self.tds
-      when 2, '2'
-        return (self.tds / (self.gross_amount.value)) * 100
-      else
-        return self.tds
-    end
+    self.tds
   end
 
   def discount_rate
-    return 0 if discount.blank? || amount.blank?
-    case self.discount_type_id
-      when 1, '1'
-        return self.discount
-      when 2, '2'
-        return (self.discount / (self.amount.value)) * 100
-      else
-        return self.discount
-    end
+    self.discount
+  end
+
+  def gst_type
+    self.gst_type_id
   end
 
   private

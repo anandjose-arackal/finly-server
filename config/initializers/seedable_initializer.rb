@@ -1,0 +1,1 @@
+Seedable.init_global_variables

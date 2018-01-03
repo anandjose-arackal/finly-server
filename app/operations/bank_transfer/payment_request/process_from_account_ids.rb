@@ -20,7 +20,7 @@
 class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::PaymentRequest::Base
 
   attr_accessor :bank_accounts, :account_ids, :amounts, :response_presenter, :parsed_data,
-                :notes
+                :notes, :invoice_items
 
 
   def pre_validate
@@ -37,10 +37,11 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     self.account_ids = retrieve_data(:account_id)
     self.amounts = retrieve_data(:original_amount)
     self.notes = retrieve_data(:note)
-    [:tax_amount, :tds_amount, :gst_type_id, :discount_amount, :discount, :tax, :tds, :advance_amount, :advance, :freight, :invoice_date, :invoice_number, :due_date, :custom_fields].each do |attr|
+    [:tax_amount, :tds_amount, :gst_type_id, :discount_amount, :discount, :tax, :tds, :advance_amount, :advance, :freight, :invoice_date, :invoice_number, :due_date, :category_id, :custom_fields, :inclusive_of_taxes].each do |attr|
       self.class.send(:attr_accessor, attr)
       instance_variable_set("@#{attr}", retrieve_data(attr))
     end
+    retrieve_invoice_items_data
   end
 
   def process
@@ -68,6 +69,17 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     data
   end
 
+  def retrieve_invoice_items_data
+    self.invoice_items = []
+    params[:payment_order].each do |k, order|
+      if order&.dig(:invoice_attributes, :invoice_items_attributes).present?
+        self.invoice_items << order[:invoice_attributes][:invoice_items_attributes]
+      else
+        self.invoice_items << []
+      end
+    end
+  end
+
   def parse_order_information
     data = []
     account_ids.each_with_index do |account_id, index|
@@ -75,6 +87,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
       data << {
           owner_name: bank_account.account_owner.name,
           name: bank_account.name,
+          account_id: bank_account.id,
           bank_account_number: bank_account.account_number,
           ifsc: bank_account.ifsc,
           original_amount: amounts[index],
@@ -92,7 +105,10 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           invoice_number: self.invoice_number[index],
           invoice_date: self.invoice_date[index],
           due_date: self.due_date[index],
-          custom_fields: self.custom_fields[index]
+          custom_fields: self.custom_fields[index],
+          category_id: self.category_id[index],
+          invoice_items_attributes: self.invoice_items[index],
+          inclusive_of_taxes: self.inclusive_of_taxes[index]
       }
     end
     data

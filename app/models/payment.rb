@@ -26,14 +26,10 @@
 #  payment_mode            :string(255)
 #  reference_id            :string(255)      not null
 #  retry_count             :integer          default(0)
+#  post_operation          :text(65535)
+#  post_operation_payload  :text(65535)
+#  invoice_id              :integer
 #
-
-
-
-
-
-
-
 
 
 
@@ -61,7 +57,9 @@ class Payment < ActiveRecord::Base
   has_many :finly_transactions
 
   has_one :payment, as: :reference_resource
-  has_one :invoice
+
+  # because there needs to be a reference against which an invoice payment was made
+  belongs_to :invoice
 
   belongs_to :payment_order
   belongs_to :payment_status
@@ -88,7 +86,10 @@ class Payment < ActiveRecord::Base
     end
   }
   scope :atm_withdrawals, -> { where payment_purpose_id: PaymentPurpose.id_for(:atm_withdrawal) }
-  scope :advance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:cash_advance), PaymentPurpose.id_for(:advance_outside_finly)] }
+  scope :advance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:advance),
+                                                  PaymentPurpose.id_for(:cash_advance),
+                                                  PaymentPurpose.id_for(:advance_outside_finly),
+                                                  PaymentPurpose.id_for(:advance_against_report_unapproval)] }
   scope :cash_on_hand_additions, -> { where payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:cash_advance)] }
   scope :reimbursement, -> { where payment_purpose_id: [PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)] }
   scope :debt_clearance, -> { where payment_purpose_id: [PaymentPurpose.id_for(:balance_clearance), PaymentPurpose.id_for(:balance_clearance_outside_finly)] }

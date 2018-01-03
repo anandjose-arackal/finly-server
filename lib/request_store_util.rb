@@ -1,6 +1,5 @@
 class RequestStoreUtil
 
-
   def self.set_current_request(request)
     RequestStore.store[:request] = request
   end

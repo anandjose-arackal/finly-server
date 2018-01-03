@@ -46,6 +46,7 @@ module Accountable
       when YesBankCompanyAccount.name
         0
     end
+    0
   end
 
   def closing_balance(date)
@@ -69,6 +70,7 @@ module Accountable
       when YesBankCompanyAccount.name
         0
     end
+    0
   end
 
 end
