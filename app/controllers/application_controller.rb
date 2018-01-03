@@ -251,19 +251,20 @@ class ApplicationController < ActionController::Base
         return RequestStore.store[:current_user]
       end
     end
+    @curr_user = nil
     if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
       scopes = doorkeeper_token[:scopes]
       if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome')or scopes.include?('api')
-        @current_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
+        @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       elsif scopes.include?('admin')
-        @current_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
+        @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
       end
     end
-    RequestStoreUtil.set_current_user @current_user
-    if @current_user.class.name == 'User'
-      RequestStoreUtil.set_current_company @current_user&.company
+    RequestStoreUtil.set_current_user @curr_user
+    if @curr_user.class.name == 'User'
+      RequestStoreUtil.set_current_company @curr_user&.company
     end
-    @current_user
+    @curr_user
   end
 
   def current_company

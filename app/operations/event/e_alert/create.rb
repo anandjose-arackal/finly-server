@@ -8,7 +8,7 @@ class Event::EAlert::Create < Event::EAlert::Base
   end
 
   def affected_users
-    emails = %w(vivek.a@finly.io)
+    emails = %w(vivek.a@finly.io sreeram.nr@finly.io)
     User.with_email(emails)
   end
 

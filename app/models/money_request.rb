@@ -2,30 +2,33 @@
 #
 # Table name: money_requests
 #
-#  id                           :integer          not null, primary key
-#  name                         :string(255)
-#  user_id                      :integer          not null
-#  policy_id                    :integer          not null
-#  payment_mode_id              :integer          not null
-#  payment_id                   :integer
-#  required_by_date             :date
-#  status_id                    :integer          not null
-#  controlling_user_id          :integer
-#  controlling_user_role_id     :integer
-#  controlling_for_user_id      :integer
-#  controlling_for_user_role_id :integer
-#  loaded_by                    :integer
-#  loaded_at                    :datetime
-#  submitted_at                 :datetime
-#  memo                         :string(255)
-#  accounted                    :boolean          default(FALSE), not null
-#  created_at                   :datetime         not null
-#  updated_at                   :datetime         not null
-#  is_deleted                   :boolean          default(FALSE), not null
-#  submitted_amount_id          :integer
-#  processed_amount_id          :integer
-#  auto_approve                 :boolean
+#  id                                 :integer          not null, primary key
+#  name                               :string(255)
+#  user_id                            :integer          not null
+#  policy_id                          :integer          not null
+#  payment_mode_id                    :integer          not null
+#  payment_id                         :integer
+#  required_by_date                   :date
+#  status_id                          :integer          not null
+#  controlling_user_id                :integer
+#  controlling_user_role_id           :integer
+#  controlling_for_user_id            :integer
+#  controlling_for_user_role_id       :integer
+#  loaded_by                          :integer
+#  loaded_at                          :datetime
+#  submitted_at                       :datetime
+#  memo                               :string(255)
+#  accounted                          :boolean          default(FALSE), not null
+#  created_at                         :datetime         not null
+#  updated_at                         :datetime         not null
+#  is_deleted                         :boolean          default(FALSE), not null
+#  submitted_amount_id                :integer
+#  processed_amount_id                :integer
+#  auto_approve                       :boolean
+#  money_request_processor_mapping_id :integer
+#  approved_at                        :datetime
 #
+
 
 
 
@@ -88,6 +91,8 @@ class MoneyRequest < ActiveRecord::Base
   scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
   scope :with_controlling_user_id, -> (user_id) { where controlling_user_id: user_id }
   scope :with_items, -> { joins(:items) }
+  scope :not_destroyable, -> { where.not status_id: MoneyRequestStatus.ids_for([:open, :rejected, :retracted]) }
+  scope :without_user, -> (user_id) { where.not user_id: user_id }
 
   scope :awaiting_approval_of_user, ->(user_id, role_id){ where(status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
 

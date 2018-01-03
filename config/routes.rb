@@ -564,6 +564,7 @@
 #                      organization_account_policies_list GET    /organization_account/policies_list(.:format)                                              organization_account#policies_list
 #                         organization_account_categories GET    /organization_account/categories(.:format)                                                 organization_account#categories
 #                 organization_account_export_preferences GET    /organization_account/export_preferences(.:format)                                         organization_account#export_preferences
+#                                             state_codes GET    /state_codes(.:format)                                                                     organization_account#gst_state_codes
 #                                            add_category POST   /add_category(.:format)                                                                    organization_account#add_category
 #                                         remove_category DELETE /remove_category(.:format)                                                                 organization_account#remove_category
 #                                update_export_preference PATCH  /export/:id/update(.:format)                                                               organization_account#update_export_column
@@ -580,6 +581,7 @@
 #                                             assign_card PATCH  /cards/assign(.:format)                                                                    cards#assign
 #                                   cancel_assign_request PATCH  /cards/assign/:id/cancel(.:format)                                                         cards#cancel_assign
 #                                        unassigned_cards GET    /cards/unassigned(.:format)                                                                cards#unassigned
+#                                         reports_destroy DELETE /reports/destroy(.:format)                                                                 reports#destroy
 #                                                 reports GET    /reports(.:format)                                                                         reports#index
 #                                                         POST   /reports(.:format)                                                                         reports#create
 #                                                  report GET    /reports/:id(.:format)                                                                     reports#show
@@ -611,6 +613,7 @@
 #                                                         DELETE /reports/:id(.:format)                                                                     reports#destroy
 #                                    reports_bulk_approve POST   /reports/bulk_approve(.:format)                                                            reports#bulk_approve
 #                                                  credit PATCH  /money_requests/credit_cash(.:format)                                                      money_request#credit_cash
+#                                  money_requests_destroy DELETE /money_requests/destroy(.:format)                                                          money_request#destroy
 #                                     money_request_index GET    /money_request(.:format)                                                                   money_request#index
 #                                                         POST   /money_request(.:format)                                                                   money_request#create
 #                                           money_request GET    /money_request/:id(.:format)                                                               money_request#show
@@ -1009,6 +1012,7 @@
 #                                                         DELETE /bank_transfer/payments/:id(.:format)                                                      bank_transfer/payments#destroy
 #                               bank_transfer_users_count GET    /bank_transfer/users/count(.:format)                                                       bank_transfer/users#count
 #                            bank_transfer_users_managers GET    /bank_transfer/users/managers(.:format)                                                    bank_transfer/users#get_managers
+#                          bank_transfer_users_categories GET    /bank_transfer/users/categories(.:format)                                                  bank_transfer/users#categories
 #                       bank_transfer_user_show_transfers GET    /bank_transfer/users/:user_id/show_transfers(.:format)                                     bank_transfer/users#show_transfers
 #                                     bank_transfer_users GET    /bank_transfer/users(.:format)                                                             bank_transfer/users#index
 #                                                         POST   /bank_transfer/users(.:format)                                                             bank_transfer/users#create
@@ -1038,6 +1042,8 @@
 #                                                         PATCH  /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#update
 #                                                         PUT    /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#update
 #                                                         DELETE /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#destroy
+#                            invoicing_categories_invoice GET    /invoicing/categories/invoice(.:format)                                                    invoicing/categories#invoice_categories
+#                 invoicing_categories_invoice_line_items GET    /invoicing/categories/invoice_line_items(.:format)                                         invoicing/categories#invoice_items_categories
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)            admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)             admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                           admin_users/funds_load_requests#index
@@ -2024,7 +2030,8 @@ Rails.application.routes.draw do
   get 'organization_account/policies_list' => 'organization_account#policies_list' #todo
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
-
+  get 'state_codes', to: 'organization_account#gst_state_codes', as: :state_codes
+  
   post 'add_category', to: 'organization_account#add_category', as: :add_category
   delete 'remove_category', to: 'organization_account#remove_category', as: :remove_category
 
@@ -2046,6 +2053,7 @@ Rails.application.routes.draw do
   patch 'cards/assign/:id/cancel', to: 'cards#cancel_assign', as: :cancel_assign_request
   get 'cards/unassigned', to: 'cards#unassigned', as: :unassigned_cards
 
+  delete 'reports/destroy', to: 'reports#destroy'
   resources :reports, except: [:new, :edit]
   get 'export/report(.:format)' => 'export#report', as: :export_report
   get 'export/templates/index' => 'export#index_template'
@@ -2069,6 +2077,7 @@ Rails.application.routes.draw do
 
 
   patch 'money_requests/credit_cash', to: 'money_request#credit_cash', as: :credit
+  delete 'money_requests/destroy', to: 'money_request#destroy'
   resources :money_request, only: [:create, :index, :show, :destroy, :update]
   resources :money_request do
     post 'comment' => 'money_request#comment', as: :comment
@@ -2167,6 +2176,10 @@ Rails.application.routes.draw do
   get 'statements/company_transactions_summary' => 'statements#company_transactions_summary'
   get 'statements/company_policies_summary' => 'statements#company_policies_summary'
 
+  get 'statements/user_summary' => 'statements#user_summary'
+  get 'statements/user_summary/export' => 'statements#user_summary_export'
+  post 'statements/user_summary' => 'statements#user_summary'
+  post 'statements/user_summary/export' => 'statements#user_summary_export'
   get 'statements/:id/summary' => 'statements#summary'
   get 'export/:id/statements(.:format)', to: 'export#statement', as: :export_statement
   resources :statements
@@ -2400,6 +2413,8 @@ Rails.application.routes.draw do
 
     get 'users/count', to: 'users#count'
     get 'users/managers', to: 'users#get_managers'
+    get 'users/categories', to: 'users#categories'
+    
     resources :users do
       get 'show_transfers', to: 'users#show_transfers'
     end
@@ -2411,12 +2426,13 @@ Rails.application.routes.draw do
   get 'account/:account_number', to: 'invoicing/public_links#virtual_bank_account_show', as: :public_bank_account
 
   namespace :invoicing do
-
     resources :payment_receivables
     resources :virtual_bank_accounts do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
     end
-    
+
+    get 'categories/invoice', to: 'categories#invoice_categories'
+    get 'categories/invoice_line_items', to: 'categories#invoice_items_categories'
   end
 
 

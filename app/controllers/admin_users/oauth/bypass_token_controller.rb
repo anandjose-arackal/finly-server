@@ -34,9 +34,9 @@ class AdminUsers::Oauth::BypassTokenController < Oauth::TokenController
         resource_owner_id = params[:for_user_id]
       end
       if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome') or scopes.include?('api') or scopes.include?('admin_bypass')
-        @current_user ||= User.find_by(id: resource_owner_id)
+        @curr_user ||= User.find_by(id: resource_owner_id)
       elsif scopes.include?('admin')
-        @current_user ||= AdminUser.find_by(id: resource_owner_id)
+        @curr_user ||= AdminUser.find_by(id: resource_owner_id)
       end
     end
   end

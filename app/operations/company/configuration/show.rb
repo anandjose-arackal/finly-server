@@ -8,7 +8,7 @@ class Company::Configuration::Show < Company::Base
 
   def init
     super
-    self.purpose_id = Purpose.id_from_application_for(RequestStore.store[:current_app])
+    self.purpose_id = params[:purpose_id] || Purpose.id_from_application_for(RequestStore.store[:current_app])
   end
 
   class Company::Configuration::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter

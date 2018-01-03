@@ -23,7 +23,9 @@ class BankTransfer::PaymentRequest::Review::Reject < BankTransfer::PaymentReques
     current_user_role = nil
     if bank_payment_request.update status_id: BankPaymentRequestStatus.id_for(:rejected),
                                    controlling_user_id: bank_payment_request.owner_id,
-                                   controlling_user_role_id: UserRole.employee_id
+                                   controlling_user_role_id: UserRole.employee_id,
+                                   controlling_for_user_id: nil,
+                                   controlling_for_user_role_id: nil
       bank_payment_request.bank_payment_request_trails.create action_user: user,
                                                               action_user_role_id: current_user_role,
                                                               action_id: BankPaymentRequestTrailAction.id_for(:reject),

@@ -31,6 +31,7 @@ gem 'haml'
 gem 'sinatra', require: nil
 
 gem 'request_store', '1.3.2'
+gem 'simpleconfig', '2.0.1'
 
 # gems for quickbooks integration
 gem 'omniauth'

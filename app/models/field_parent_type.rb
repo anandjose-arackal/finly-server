@@ -18,7 +18,8 @@ class FieldParentType < ActiveRecord::Base
       distance_expense: 5,
       per_diem_expense: 6,
       card_expense: 7,
-      invoice: 8
+      invoice: 8,
+      invoice_line_item: 9
   }
 
   def self.id_for(sym)
@@ -41,5 +42,6 @@ class FieldParentType < ActiveRecord::Base
         name: n
     }
   end
+
 
 end
