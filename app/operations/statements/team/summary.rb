@@ -231,6 +231,14 @@ class Statements::Team::Summary < Statements::Team::Base
   end
 
   def process_column(column_name, user, index)
+    date_from = params&.dig(:filter_date)&.dig(:from) || (Date.today - 30.days)
+    date_to = params&.dig(:filter_date)&.dig(:to) || Date.today
+    if date_from.class.name == String.name
+      date_from = Date.parse date_from
+    end
+    if date_to.class.name == String.name
+      date_to = Date.parse date_to
+    end
     case column_name&.to_sym
       when :sl_no
         return index
@@ -241,11 +249,11 @@ class Statements::Team::Summary < Statements::Team::Base
       when :user_mobile_number
         return user.mobile_number
       when :accounts_net_advance
-        return format_amount user.receiving_payments.advance.sum_amounts
+        return format_amount user.receiving_payments.advance.with_date_range(date_from, date_to).sum_amounts
       when :accounts_net_reimbursement
-        return format_amount user.receiving_payments.reimbursement.sum_amounts
+        return format_amount user.receiving_payments.reimbursement.with_date_range(date_from, date_to).sum_amounts
       when :accounts_atm_withdrawals
-        return format_amount user.receiving_payments.atm_withdrawals.sum_amounts
+        return format_amount user.receiving_payments.atm_withdrawals.with_date_range(date_from, date_to).sum_amounts
       when :accounts_net_opening_balance
         card_opening_balance = dictionary(user, :expense_card, :opening_balance) || 0
         return format_amount(card_opening_balance +
@@ -332,7 +340,7 @@ class Statements::Team::Summary < Statements::Team::Base
 
   def dictionary(user, account, type)
     return ACCOUNT_MAP&.dig(user)&.dig(account)&.dig(type) if ACCOUNT_MAP&.dig(user)&.dig(account)&.dig(type).present?
-    date_from = params&.dig(:filter_date)&.dig(:from) || '2017-01-01'
+    date_from = params&.dig(:filter_date)&.dig(:from) || (Date.today - 30.days)
     date_to = params&.dig(:filter_date)&.dig(:to) || Date.today
     if date_from.class.name == String.name
       date_from = Date.parse date_from
@@ -453,13 +461,14 @@ class Statements::Team::Summary < Statements::Team::Base
             return ACCOUNT_MAP[user][:cash_on_hand][:finly_transactions]
         end
       when :expenses
-        unless ACCOUNT_MAP[user][:expenses]&.dig(:object).present?
-          ACCOUNT_MAP[user][:expenses] = {object: user.expenses.with_date_range(date_from, date_to)}
-        end
-        case type
-          when :object
-            ACCOUNT_MAP[user][:expenses][:object]
-        end
+        # unless ACCOUNT_MAP[user][:expenses]&.dig(:object).present?
+        #   ACCOUNT_MAP[user][:expenses] = {object: user.expenses.with_date_range(date_from, date_to)}
+        # end
+        # case type
+        #   when :object
+        #     ACCOUNT_MAP[user][:expenses][:object]
+        # end
+        return user.expenses.with_date_range(date_from, date_to)
     end
   end
 
