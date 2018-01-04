@@ -2,14 +2,15 @@
 
 class AccountManager::Payments::RetryPayment < AccountManager::Base
 
-  attr_accessor :payment, :payment_order
+  attr_accessor :payment, :payment_order, :payment_mode
 
-  def initialize(payment)
+  def initialize(payment, options)
     self.payment = payment
+    self.payment_mode = options[:payment_mode]
   end
 
-  def self.call(payment)
-    self.new(payment).run
+  def self.call(payment, options)
+    self.new(payment, options).run
   end
 
   def init
@@ -29,11 +30,21 @@ class AccountManager::Payments::RetryPayment < AccountManager::Base
   end
 
   def pre_process
+    # clearing the system messages for this particular payment
+    self.payment.system_messages.destroy_all
     # changing the status of the payment as pending
     payment.update(payment_status_id: PaymentStatus.id_for(:pending))
   end
 
   def process
+    # first update the payment order and associated payments to reflect the new transfer mode
+    if self.payment_mode.present? # i.e. there is a change in the mode of payment
+      unless self.payment_order.update(payment_mode: self.payment_mode) && self.payment_order.payments.update_all(payment_mode: self.payment_order)
+        add_message :error, payment_order.errors.full_messages
+        return
+      end
+    end
+
     # calling payment executor so that the payment can be successfully executed using the respective adapters
     op = AccountManager::Payments::PaymentExecutor.(self.payment, bank_transfer_type: payment.payment_mode)
     if op.success?
@@ -51,10 +62,9 @@ class AccountManager::Payments::RetryPayment < AccountManager::Base
   end
 
   def post_process
-    # clearing the system messages for this particular payment
-    self.payment.system_messages.destroy_all
     # update processed amount for this payment order
     self.payment_order.update_processed_amount
+    self.payment_order.update_order_status
     add_message :success, "Payment retry successfully executed"
   end
   

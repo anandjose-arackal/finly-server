@@ -34,7 +34,7 @@ class TransferRequest < NonPersistentModel
 
   def generate_unique_reference
     if self.unique_reference_number.present?
-      return
+      return self.unique_reference_number
     end
     ref = nil
     loop do

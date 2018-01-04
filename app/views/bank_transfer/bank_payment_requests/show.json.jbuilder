@@ -61,8 +61,10 @@ json.payments do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
-    # json.retriable payment.retriable?
-
+    json.retriable do
+      json.retriable payment.retriable?
+      json.change_mode payment.payment_order.failed?
+    end
     invoice = payment.invoice
 
     if payment.invoice.present?
@@ -158,7 +160,10 @@ json.payments_verified do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
-    # json.retriable payment.retriable?
+    json.retriable do
+      json.retriable payment.retriable?
+      json.change_mode payment.payment_order.failed?
+    end
 
     invoice = payment.invoice
 
@@ -252,7 +257,10 @@ json.payments_unverified do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
-    # json.retriable payment.retriable?
+    json.retriable do
+      json.retriable payment.retriable?
+      json.change_mode payment.payment_order.failed?
+    end
 
     invoice = payment.invoice
 

@@ -135,33 +135,33 @@ class YesBankApi::Base < BaseHandler
     #   #     }
     #   # }
     #
-    #   self.parsed_response = {
-    #       "Envelope" => {
-    #           "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-    #           "Body" => {
-    #               "Fault" => {
-    #                   "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
-    #                   "xmlns:flex" => "http://www.oracle.com/flexcube",
-    #                   "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
-    #                   "xmlns:ycs" => "https://uat.yalamanchili.in/",
-    #                   "xmlns:pt" => "https://www.puratech.co.in/",
-    #                   "xmlns:http" => "http://www.quantiguous.com/services",
-    #                   "xmlns:ns" => "http://www.quantiguous.com/services",
-    #                   "xmlns:iib" => "http://www.ibm.com/iib",
-    #                   "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
-    #                   "Code" => {
-    #                       "Value" => "soapenv12:Sender",
-    #                       "Subcode" => {
-    #                           "Value" => "ns:E1001"
-    #                       }
-    #                   },
-    #                   "Reason" => {
-    #                       "Text" => "The transaction amount exceeds the maximum amount for IMPS: 200000"
-    #                   }
-    #               }
-    #           }
-    #       }
-    #   }
+    #   # self.parsed_response = {
+    #   #     "Envelope" => {
+    #   #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
+    #   #         "Body" => {
+    #   #             "Fault" => {
+    #   #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
+    #   #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
+    #   #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
+    #   #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
+    #   #                 "xmlns:pt" => "https://www.puratech.co.in/",
+    #   #                 "xmlns:http" => "http://www.quantiguous.com/services",
+    #   #                 "xmlns:ns" => "http://www.quantiguous.com/services",
+    #   #                 "xmlns:iib" => "http://www.ibm.com/iib",
+    #   #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
+    #   #                 "Code" => {
+    #   #                     "Value" => "soapenv12:Sender",
+    #   #                     "Subcode" => {
+    #   #                         "Value" => "ns:E1001"
+    #   #                     }
+    #   #                 },
+    #   #                 "Reason" => {
+    #   #                     "Text" => "The transaction amount exceeds the maximum amount for IMPS: 200000"
+    #   #                 }
+    #   #             }
+    #   #         }
+    #   #     }
+    #   # }
     rescue Faraday::ResourceNotFound
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
