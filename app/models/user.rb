@@ -395,6 +395,10 @@ class User < ActiveRecord::Base
     joins(:cards).select('users.*').where('proxy like ?', "%#{term}%")
   }
 
+  scope :includes_for_admin_panel, -> {
+    includes(:cards, :company)
+  }
+
 
   before_save :strip_whitespace
 

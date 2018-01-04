@@ -105,26 +105,27 @@ class AdminUsers::UsersController < ApplicationController
   def import
     import_op = Admin::Users::Import.new(current_user, params)
     @result = import_op.run
-    if @result.success?
-      @response = {
-          success: true,
-          file_url: @result.file_url,
-          messages: {
-              error: [],
-              failure: [],
-              success: [],
-              message: [],
-              notice: []
-          }
-      }
-      respond_to do |format|
-        format.json {
-          render json: @response.as_json
-        }
-      end
-    else
-      respond response: :failure, message: @result.messages[:error]
-    end
+    # if @result.success?
+    #   @response = {
+    #       success: true,
+    #       file_url: @result.file_url,
+    #       messages: {
+    #           error: [],
+    #           failure: [],
+    #           success: [],
+    #           message: [],
+    #           notice: []
+    #       }
+    #   }
+    #   respond_to do |format|
+    #     format.json {
+    #       render json: @response.as_json
+    #     }
+    #   end
+    # else
+    #   respond response: :failure, message: @result.messages[:error]
+    # end
+    respond
   end
 
   def update_panel
