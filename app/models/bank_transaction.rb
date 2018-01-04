@@ -42,7 +42,7 @@ class BankTransaction < ActiveRecord::Base
   scope :processing_transactions, -> {where transfer_status_id: [BankTransferStatus.id_for(:processing), BankTransferStatus.id_for(:possible_failure)]}
 
   def retriable?
-
+    self.transfer_status_id == BankTransferStatus.id_for(:failed)
   end
 
   private
