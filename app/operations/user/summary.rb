@@ -36,7 +36,9 @@ class User::Summary < User::Base
         target_user_cash_in_hand: true, view: params[:view]).balances
 
     summary[:cards] = []
+    has_cards = false
     if self.selected_user.cards.present?
+      has_cards = true
       self.selected_user.cards.each do |card|
         item = {}
         item[:id] = card.id
@@ -45,6 +47,8 @@ class User::Summary < User::Base
         item[:active] = card.active?
         item[:suspend_status] = card.suspend_status
         item[:assign_status] = StringUtils.titleize(card.card_status.name)
+        item[:atm_allowed] = card.atm_allowed?
+        item[:max_eligibility] = card.max_eligibility
         unless card.active?
           if card.temporary_block?
             disabled_by_role_name = card.disabled_by_role.name rescue nil
@@ -83,6 +87,8 @@ class User::Summary < User::Base
     summary[:actions] = load_actions balances
 
     summary[:current_user_name] = user.name
+
+    summary[:request_update_kyc] = true or (has_cards and not (user.individual_kyc.completed?))
 
     summary[:personal] = {}
     summary[:personal][:unreported_expenses] = selected_user.expenses.unreported.count

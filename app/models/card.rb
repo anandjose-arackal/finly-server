@@ -235,6 +235,14 @@ class Card < ActiveRecord::Base
     self.card_status_id == CardStatus.id_for(:upgraded)
   end
 
+  def atm_allowed?
+    upgraded? and card_restriction.channel_atm
+  end
+
+  def max_eligibility
+    upgraded? ? 50000 : 20000
+  end
+
   def assigned?
     if Rails.env.production?
       (not [CardStatus.id_for(:unassigned), CardStatus.id_for(:assign_requested)].include?(self.card_status_id) and user_id.present?)

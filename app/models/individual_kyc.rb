@@ -120,7 +120,7 @@ class IndividualKyc < ActiveRecord::Base
   end
 
   def completed?
-    KycStatus.id_for(:completed).include?(self.kyc_status_id)
+    KycStatus.id_for(:completed) == self.kyc_status_id
   end
 
   def editable?
