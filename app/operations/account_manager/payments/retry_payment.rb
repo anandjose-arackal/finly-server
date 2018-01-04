@@ -39,14 +39,13 @@ class AccountManager::Payments::RetryPayment < AccountManager::Base
   def process
     # first update the payment order and associated payments to reflect the new transfer mode
     if self.payment_mode.present? # i.e. there is a change in the mode of payment
-      unless self.payment_order.update(payment_mode: self.payment_mode) && self.payment_order.payments.update_all(payment_mode: self.payment_order)
+      unless self.payment_order.update(payment_mode: self.payment_mode) && self.payment_order.payments.update_all(payment_mode: self.payment_mode)
         add_message :error, payment_order.errors.full_messages
         return
       end
     end
-
     # calling payment executor so that the payment can be successfully executed using the respective adapters
-    op = AccountManager::Payments::PaymentExecutor.(self.payment, bank_transfer_type: payment.payment_mode)
+    op = AccountManager::Payments::PaymentExecutor.(self.payment, bank_transfer_type: payment.reload.payment_mode)
     if op.success?
       if self.payment_order.payments.pluck(:payment_status_id).uniq == [PaymentStatus.id_for(:completed)] || self.payment_order.payments.pluck(:payment_status_id).uniq == [PaymentStatus.id_for(:processing)]
         self.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))

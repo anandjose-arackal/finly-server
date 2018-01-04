@@ -134,7 +134,7 @@ class YesBankApi::Base < BaseHandler
     #   #         }
     #   #     }
     #   # }
-    #
+    #   #
     #   # self.parsed_response = {
     #   #     "Envelope" => {
     #   #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
