@@ -56,7 +56,7 @@ module Seedable
     def as_hash
       values = {}
       self.all.each do |item|
-        values[item.name] = item.id
+        values[item.name.downcase] = item.id
       end
       values.with_indifferent_access
     end
