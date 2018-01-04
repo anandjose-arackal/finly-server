@@ -74,6 +74,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
             self.transfer_status_id = BankTransferStatus.id_for(:failed)
           when "ns:E429", "nsE402", "ns:E410", "ns:E403"
             # have to trigger a mailer or something - either transaction limit reached, or not enough balance or something on those lines
+            self.transfer_status_id = BankTransferStatus.id_for(:failed)
           else
             self.transfer_status_id = BankTransferStatus.id_for(:failed)
         end
