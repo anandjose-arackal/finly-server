@@ -10,7 +10,7 @@
 
 class Transcriber::Expenses::Create < Transcriber::Expenses::Base
 
-  attr_accessor :expense_params, :receipt, :selected_user, :expense, :illegible
+  attr_accessor :expense_params, :receipt, :selected_user, :expense, :illegible, :company
 
   def pre_validate
     super()
@@ -24,6 +24,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
     self.receipt = Receipt.find_by(id: params[:receipt_id])
     self.selected_user = receipt.user if receipt
     self.illegible = params[:illegible]
+    self.company = self.selected_user.company
   end
 
   def validate
@@ -65,6 +66,7 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
       end
     else
       self.expense = selected_user.expenses.build(expense_params)
+      return unless validate_custom_fields
       if expense.save
         receipt.update(parent: expense)
       else
@@ -105,5 +107,33 @@ class Transcriber::Expenses::Create < Transcriber::Expenses::Base
       }
     end
     expense_params.permit!
+  end
+
+  def validate_custom_fields
+    if self.expense.valid?
+      set_fields = set_custom_fields false
+      unless set_fields.success?
+        add_message :error, set_fields.messages[:error]
+        return false
+      end
+      valid = CustomField::Validate.(self.expense.manual_expense)
+      unless valid.success?
+        add_message :error, valid.messages[:error]
+        return false
+      end
+      # self.expense.manual_expense.custom_fields.destroy_all
+    else
+      add_message :error, self.expense.errors.full_messages
+      return false
+    end
+    true
+  end
+
+  def set_custom_fields(save)
+    custom_fields = {custom_fields: (params[:custom_fields] or params[:expense][:custom_fields])}
+    custom_fields[:user] = selected_user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
   end
 end
