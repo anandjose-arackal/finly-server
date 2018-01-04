@@ -13,7 +13,7 @@ class Transcriber::ReceiptsController < ApplicationController
 
   def count
     @result = Transcriber::Receipts::Count.(current_user, params)
-    render json: @result.as_json
+    render json: @result.count.as_json
   end
 
 end
