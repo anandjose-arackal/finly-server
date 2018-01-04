@@ -42,26 +42,6 @@
 #  admin_note                 :text(65535)
 #  submitted_on               :datetime
 #  upgraded_on                :datetime
-#  aadhar_front_file_name     :string(255)
-#  aadhar_front_content_type  :string(255)
-#  aadhar_front_file_size     :integer
-#  aadhar_front_updated_at    :datetime
-#  aadhar_back_file_name      :string(255)
-#  aadhar_back_content_type   :string(255)
-#  aadhar_back_file_size      :integer
-#  aadhar_back_updated_at     :datetime
-#  photo_file_name            :string(255)
-#  photo_content_type         :string(255)
-#  photo_file_size            :integer
-#  photo_updated_at           :datetime
-#  signature_file_name        :string(255)
-#  signature_content_type     :string(255)
-#  signature_file_size        :integer
-#  signature_updated_at       :datetime
-#  combined_kyc_file_name     :string(255)
-#  combined_kyc_content_type  :string(255)
-#  combined_kyc_file_size     :integer
-#  combined_kyc_updated_at    :datetime
 #
 
 require 'test_helper'

@@ -387,6 +387,7 @@
 #                                                         PATCH  /transcriber/companies/:id(.:format)                                                       transcriber/companies#update
 #                                                         PUT    /transcriber/companies/:id(.:format)                                                       transcriber/companies#update
 #                                                         DELETE /transcriber/companies/:id(.:format)                                                       transcriber/companies#destroy
+#                                       transcriber_count GET    /transcriber/receipts/count(.:format)                                                      transcriber/receipts#count
 #                                    transcriber_receipts GET    /transcriber/receipts(.:format)                                                            transcriber/receipts#index
 #                                                         POST   /transcriber/receipts(.:format)                                                            transcriber/receipts#create
 #                                 new_transcriber_receipt GET    /transcriber/receipts/new(.:format)                                                        transcriber/receipts#new
@@ -749,6 +750,10 @@
 #                      statements_company_balance_summary GET    /statements/company_balance_summary(.:format)                                              statements#company_balance_summary
 #                 statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)                                         statements#company_transactions_summary
 #                     statements_company_policies_summary GET    /statements/company_policies_summary(.:format)                                             statements#company_policies_summary
+#                                 statements_user_summary GET    /statements/user_summary(.:format)                                                         statements#user_summary
+#                          statements_user_summary_export GET    /statements/user_summary/export(.:format)                                                  statements#user_summary_export
+#                                                         POST   /statements/user_summary(.:format)                                                         statements#user_summary
+#                                                         POST   /statements/user_summary/export(.:format)                                                  statements#user_summary_export
 #                                                         GET    /statements/:id/summary(.:format)                                                          statements#summary
 #                                        export_statement GET    /export/:id/statements(.:format)                                                           export#statement
 #                                              statements GET    /statements(.:format)                                                                      statements#index
@@ -1899,6 +1904,7 @@ Rails.application.routes.draw do
     get 'expenses/currencies', to: 'expenses#currencies'
     resources :expenses
     resources :companies
+    get 'receipts/count', to: 'receipts#count', as: :count
     resources :receipts
   end
 

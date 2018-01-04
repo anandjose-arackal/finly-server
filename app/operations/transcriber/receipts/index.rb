@@ -4,7 +4,7 @@ class Transcriber::Receipts::Index < Transcriber::Base
 
   class Transcriber::Receipts::Index::TranscriberPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :receipts, :categories, :companies, :users
+    attr_accessor :receipts, :categories, :companies, :users, :paginated_receipts
 
     # scopes for filters
     has_scope :filter_user
@@ -12,7 +12,13 @@ class Transcriber::Receipts::Index < Transcriber::Base
     def init
       self.receipts = params[:receipts]
       self.receipts = apply_scopes(receipts, params)
+      self.paginated_receipts = self.receipts.paginate(page: params[:page], per_page: 10)
+    end
 
+    def custom_fields_for(receipt)
+      # Get custom fields of the company for manual expense
+      configurations = receipt.user.company.field_configurations.exclude_deleted
+      custom_field = configurations.with_parent_type(FieldParentType.id_for(:manual_expense))
     end
 
   end
