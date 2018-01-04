@@ -1,4 +1,4 @@
-json.array!(@result.receipts) do |receipt|
+json.array!(@result.paginated_receipts) do |receipt|
   json.extract! receipt, :id, :user_id, :note
   # json.url receipt.image.url
   json.user_name "#{receipt.user&.name} - #{receipt.user&.company&.name}"

@@ -4,7 +4,7 @@ class Transcriber::Receipts::Index < Transcriber::Base
 
   class Transcriber::Receipts::Index::TranscriberPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :receipts, :categories, :companies, :users
+    attr_accessor :receipts, :categories, :companies, :users, :paginated_receipts
 
     # scopes for filters
     has_scope :filter_user
@@ -12,7 +12,7 @@ class Transcriber::Receipts::Index < Transcriber::Base
     def init
       self.receipts = params[:receipts]
       self.receipts = apply_scopes(receipts, params)
-
+      self.paginated_receipts = self.receipts.paginate(page: params[:page], per_page: 10)
     end
 
     def custom_fields_for(receipt)
@@ -49,10 +49,10 @@ class Transcriber::Receipts::Index < Transcriber::Base
       user_ids += company.users.pluck(:id)
     end
     if params[:filter_parent] == '1'
-      self.receipts = Receipt.untranscribed.without_parent.with_user_id(user_ids).reorder("#{self.sort_by} #{self.sort_order}").paginate(page: params[:page], per_page: 10)
+      self.receipts = Receipt.untranscribed.without_parent.with_user_id(user_ids).reorder("#{self.sort_by} #{self.sort_order}")
     elsif params[:filter_parent] == '2'
       expense_ids = Expense.transcribed.with_user_id(user_ids).pluck(:id)
-      self.receipts = Receipt.with_expense_id(expense_ids).reorder("#{self.sort_by} #{self.sort_order}").paginate(page: params[:page], per_page: 10)
+      self.receipts = Receipt.with_expense_id(expense_ids).reorder("#{self.sort_by} #{self.sort_order}")
     end
   end
 
