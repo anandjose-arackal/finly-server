@@ -207,7 +207,7 @@ class Payment < ActiveRecord::Base
   }
 
   scope :filter_vendor_payments, -> (enabled){
-    if ['1', 1].include?(enabled)
+    if StringUtils.to_bool(enabled)
       where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
     end
   }
