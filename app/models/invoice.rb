@@ -120,6 +120,14 @@ class Invoice < ActiveRecord::Base
     self.gst_type_id
   end
 
+  def line_item_discount_total
+
+  end
+
+  def line_item_tax_total
+
+  end
+
   private
 
 
