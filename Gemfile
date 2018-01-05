@@ -168,6 +168,7 @@ group :development, :test do
   gem 'stackprof' # ruby 2.1+ only
   gem 'memory_profiler'
   gem 'active_record_query_trace'
+  gem 'aws-sdk-ec2'
   # gem 'better_errors'
   # gem 'binding_of_caller'
 
