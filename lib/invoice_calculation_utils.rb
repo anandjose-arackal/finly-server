@@ -1,10 +1,13 @@
 # the library that will be used for all tax calculations
 class InvoiceCalculationUtils
 
+  include MathUtil
+
   attr_accessor :invoice_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
-                :advance, :advance_amount, :invoice_total, :freight_amount
+                :advance, :advance_amount, :invoice_total, :freight_amount,
+                :roundoff_amount, :balance_due_amount
 
   # don't go by the name - this calculates the Freight paid as well
   def calculate_tds_and_advance(params, invoice_total, payment = nil, invoice = nil)
@@ -17,6 +20,12 @@ class InvoiceCalculationUtils
     self.net_amount = self.gross_amount - self.tds_amount
     calculate_advance_paid
     calculate_freight_charges
+    self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
+    if self.roundoff_amount != 0
+      self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount)
+    else
+      self.balance_due_amount = self.net_amount
+    end
 
     # assign TDS amount
     if self.invoice&.tds_amount.present?
@@ -39,13 +48,20 @@ class InvoiceCalculationUtils
       self.invoice.net_amount = Amount.new(value: self.net_amount, currency_id: 1)
     end
 
+    # assign balance due
+    if self.invoice.balance_due.present?
+      self.invoice.balance_due.value = self.balance_due_amount
+    else
+      self.invoice.balance_due = Amount.new(value: self.balance_due_amount, currency_id: 1)
+    end
+
     # now calculating the final amount to be paid
     # assigning the final amount to the payment
     if payment.present?
       if payment.amount.present?
-        payment.amount.value = self.net_amount
+        payment.amount.value = self.balance_due_amount
       else
-        payment.amount = Amount.new(value: self.net_amount, currency_id: 1)
+        payment.amount = Amount.new(value: self.balance_due_amount, currency_id: 1)
       end
     end
     params
@@ -53,7 +69,7 @@ class InvoiceCalculationUtils
 
 
   # this method should take the invoice, payment object and the params object and
-  # assign the respective calculated amounts to the params object for direct assign
+  # assign the respective calculated amounts to the invoice object that is passed
   def calculate_tax_and_discounts(params, payment = nil, invoice = nil)
     self.invoice = invoice || payment&.invoice
     if self.invoice.blank?
@@ -79,7 +95,14 @@ class InvoiceCalculationUtils
       calculate_advance_paid
       calculate_freight_charges
     end
-    # assign the respective calculated parameters to the payment params
+    self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
+    if self.roundoff_amount != 0
+      self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount)
+    else
+      self.balance_due_amount = self.net_amount
+    end
+
+    # assign the respective calculated amounts to the payment and invoice object
 
     # assign invoice amount
     if self.invoice.amount.present?
@@ -130,13 +153,19 @@ class InvoiceCalculationUtils
       self.invoice.net_amount = Amount.new(value: self.net_amount, currency_id: 1)
     end
 
+    # assign balance due
+    if self.invoice.balance_due.present?
+      self.invoice.balance_due.value = self.balance_due_amount
+    else
+      self.invoice.balance_due = Amount.new(value: self.balance_due_amount, currency_id: 1)
+    end
 
     # adding the payment amount to the params if  the object is present
     if payment.present?
       if payment.amount.present?
-        payment.amount.value = self.net_amount
+        payment.amount.value = self.balance_due_amount
       else
-        payment.amount = Amount.new(value: self.net_amount, currency_id: 1)
+        payment.amount = Amount.new(value: self.balance_due_amount, currency_id: 1)
       end
     end
     params

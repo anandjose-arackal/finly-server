@@ -35,6 +35,8 @@
 #  freight_amount_id  :integer
 #  freight_type_id    :integer
 #  freight            :decimal(20, 10)
+#  roundoff_amount    :decimal(20, 10)
+#  balance_due_id     :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -51,6 +53,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :original_amount, class_name: "Amount"
   belongs_to :advance_amount, class_name: "Amount"
   belongs_to :freight_amount, class_name: "Amount"
+  belongs_to :balance_due, class_name: "Amount"
   belongs_to :category
 
   # because multiple payments can be made against one invoice
@@ -72,6 +75,7 @@ class Invoice < ActiveRecord::Base
   accepts_nested_attributes_for :freight_amount
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :advance_amount
+  accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
 
   delegate :tax_amount_value, to: :tax_amount

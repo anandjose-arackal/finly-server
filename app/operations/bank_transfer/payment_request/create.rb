@@ -1,7 +1,5 @@
-# when the data reaches this state, all payments will be valid and passing the respective
-# basic presence validations
-# this operation should also decide if the payment request can be processed directly from the
-# owner's Finly Credits - because if so, it can directly be passed to the payment processor
+# this operation takes the data from the front end, passes it to
+# the Process operation and formats the data for database persistence
 class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
   attr_accessor :order_data, :payment_request, :payment_order, :scheduled_at,
                 :processed_order_data, :initiating_account, :request_params,
@@ -270,6 +268,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
                   value: order_details[:freight],
                   currency_id: 1
               },
+              roundoff_amount: order_details[:roundoff_amount],
               invoice_items_attributes: invoice_items_attributes
           }
       }
