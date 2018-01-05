@@ -29,6 +29,8 @@ json.payment do
       json.category_id item[:category_id]
       json.roundoff_amount item[:roundoff_amount]
       json.balance_due item[:balance_due]
+      json.line_item_tax_total item[:item_tax_total]
+      json.line_item_discount_total item[:item_discount_total]
       json.invoice_items do
         json.array!(item[:invoice_items]) do |line_item|
           json.discount line_item[:discount]
