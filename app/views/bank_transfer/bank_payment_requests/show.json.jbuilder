@@ -96,6 +96,8 @@ json.payments do
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
         json.freight_amount invoice.freight_amount&.value
+        json.roundoff_amount invoice.roundoff_amount&.value
+        json.balance_due invoice.balance_due&.value
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate
@@ -193,6 +195,8 @@ json.payments_verified do
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
         json.freight_amount invoice.freight_amount&.value
+        json.roundoff_amount invoice.roundoff_amount&.value
+        json.balance_due invoice.balance_due&.value
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate
@@ -290,6 +294,8 @@ json.payments_unverified do
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
         json.freight_amount invoice.freight_amount&.value
+        json.roundoff_amount invoice.roundoff_amount&.value
+        json.balance_due invoice.balance_due&.value
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate
