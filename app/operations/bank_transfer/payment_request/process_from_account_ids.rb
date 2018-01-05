@@ -110,7 +110,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           category_id: self.category_id[index],
           invoice_items_attributes: self.invoice_items[index],
           inclusive_of_taxes: self.inclusive_of_taxes[index],
-          roundoff_amount: self.roundoff_amounr[index],
+          roundoff_amount: self.roundoff_amount[index],
           balance_due: self.balance_due[index]
       }
     end
