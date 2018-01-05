@@ -35,7 +35,7 @@
 #  freight_amount_id  :integer
 #  freight_type_id    :integer
 #  freight            :decimal(20, 10)
-#  roundoff_amount_id :integer
+#  roundoff_amount    :decimal(20, 10)
 #  balance_due_id     :integer
 #
 

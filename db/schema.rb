@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180105095430) do
+ActiveRecord::Schema.define(version: 20180105135041) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1889,7 +1889,7 @@ ActiveRecord::Schema.define(version: 20180105095430) do
     t.integer  "freight_amount_id",  limit: 4
     t.integer  "freight_type_id",    limit: 4
     t.decimal  "freight",                        precision: 20, scale: 10
-    t.integer  "roundoff_amount_id", limit: 4
+    t.decimal  "roundoff_amount",                precision: 20, scale: 10
     t.integer  "balance_due_id",     limit: 4
   end
 
