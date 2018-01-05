@@ -20,7 +20,7 @@ class InvoiceCalculationUtils
     self.net_amount = self.gross_amount - self.tds_amount
     calculate_advance_paid
     calculate_freight_charges
-    self.roundoff_amount = invoice.roundoff_amount&.value.to_f # even if it's nil, it gets converted to 0
+    self.roundoff_amount = self.invoice.roundoff_amount&.value.to_f # even if it's nil, it gets converted to 0
     if self.roundoff_amount != 0
       self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount)
     else
