@@ -22,5 +22,6 @@ production:
   username: '8240621'
   password: 'Yesbank@123'
   account_number: '002267800001249'
-  application_id: 'FINLY'
+#  application_id: 'FINLY'
+  application_id: '8240621'
   customer_id: '8240621'
