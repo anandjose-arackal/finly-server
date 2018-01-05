@@ -35,6 +35,8 @@
 #  freight_amount_id  :integer
 #  freight_type_id    :integer
 #  freight            :decimal(20, 10)
+#  roundoff_amount_id :integer
+#  balance_due_id     :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

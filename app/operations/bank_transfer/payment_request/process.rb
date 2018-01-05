@@ -80,6 +80,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       tds_amount = item[:tds_amount]&.to_f
       discount = item[:discount]
       advance_amount = item[:advance_amount]&.to_f
+      roundoff_amount = item[:roundoff_amount].to_f
       advance = item[:advance]
       freight = item[:freight]
       tds = item[:tds]
@@ -110,6 +111,13 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         discount_amount = item[:discount_amount]&.to_f
         amount += item[:original_amount]&.to_f
         net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+      end
+
+      # calcualate balance due with roundoff amount
+      if roundoff_amount != 0
+        balance_due = net_amount + roundoff_amount
+      else
+        balance_due = net_amount
       end
 
 
@@ -255,7 +263,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
                                advance: advance, advance_amount: advance_amount, freight: freight, category_id: category_id, total_amount: amount,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
-                               net_amount: invoice_net_amount, invoice_items: invoice_items,
+                               net_amount: invoice_net_amount, invoice_items: invoice_items, roundoff_amount: roundoff_amount, balance_due: balance_due,
                                valid: self.valid, messages: self.error_messages}
     end
   end

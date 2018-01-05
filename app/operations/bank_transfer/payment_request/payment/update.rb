@@ -141,6 +141,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
                                                          :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id,
                                                          original_amount_attributes: [:value, :currency_id],
                                                          freight_amount_attributes: [:value, :currency_id],
+                                                         roundoff_amount_attributes: [:value, :currency_id],
                                                          invoice_attachments_attributes: [:attached_file, :description, :remove_file],
                                                          invoice_items_attributes: [:quantity, :rate, :tax, :discount, :category_id, :description, :id, :remove_line_item, :hsn_sac]],
                                     amount_attributes: [:value, :currency_id]

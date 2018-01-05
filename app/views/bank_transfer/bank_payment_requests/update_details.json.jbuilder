@@ -27,6 +27,8 @@ json.payment do
       json.custom_fields_config item[:custom_fields]
       json.net_amount item[:net_amount]
       json.category_id item[:category_id]
+      json.roundoff_amount item[:roundoff_amount]
+      json.balance_due item[:balance_due]
       json.invoice_items do
         json.array!(item[:invoice_items]) do |line_item|
           json.discount line_item[:discount]
