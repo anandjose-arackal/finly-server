@@ -113,13 +113,12 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
       end
 
-      # calcualate balance due with roundoff amount
+      # calculate balance due with roundoff amount
       if roundoff_amount != 0
         balance_due = net_amount + roundoff_amount
       else
         balance_due = net_amount
       end
-
 
       self.valid = true
       self.error_messages = []

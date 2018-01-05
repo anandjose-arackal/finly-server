@@ -32,7 +32,7 @@ class InvoiceLineItemsCalculationUtils
       end
       self.invoice_total += self.net_amount
       self.total_discount += self.discount_amount
-      self.total_tax += self.total_tax
+      self.total_tax += self.tax_amount
       # assign the respective calculated parameters to the payment params
       # invoice line item raw amount
       if item.amount.present?

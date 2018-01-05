@@ -113,7 +113,6 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
 
   def process
     payment.assign_attributes(payment_params)
-    debugger
     unless self.payment.valid?
       add_message :error, self.payment.errors.full_messages
       return
