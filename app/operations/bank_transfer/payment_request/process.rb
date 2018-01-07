@@ -249,6 +249,9 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
         # accounting for TDS, Advance and Freight in light of the new amount
         invoice_net_amount = invoice_net_amount - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        # assigning discount amount, and tax amount as the sum of the individual amounts
+        discount_amount = item_discount_total
+        tax_amount = item_tax_total
       end
 
       # adding processable amount irrespective of whether it's valid or not
