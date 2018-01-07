@@ -122,7 +122,9 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     end
 
     set_custom_fields(false) # this should hopefully add the attributes to the model
-    unless self.payment.save
+    if self.payment.save
+      recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
+    else
       add_message :error, self.payment.errors.full_messages
     end
   end
@@ -169,6 +171,11 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     end
 
     return
+  end
+
+  def recalculate_totals
+    InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)
+    self.payment.save
   end
 
 end
