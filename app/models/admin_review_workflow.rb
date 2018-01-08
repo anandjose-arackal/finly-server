@@ -51,21 +51,15 @@ class AdminReviewWorkflow < ActiveRecord::Base
   def self.values
     if Rails.env.production?
       {
-          # assign_card: {
-          #     '0': [
-          #         {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
-          #         {user: 'veekshith.rai@finly.io', trigger_email: true, reviewer: true},
-          #         {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true}
-          #     ],
-          #     '1': {user: 'kalpeshg.itz@intrexindia.net', trigger_email: true, reviewer: true}
-          # },
           assign_card: {
               '0': [
                   {user: 'vivek.a@finly.io', trigger_email: true, reviewer: true},
                   {user: 'veekshith.rai@finly.io', trigger_email: true, reviewer: true},
                   {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true},
                   {user: 'abhinandanyadavg@gmail.com', trigger_email: true, reviewer: true},
-                  {user: 'kartik.k@finly.io', trigger_email: true, reviewer: true}
+                  {user: 'kartik.k@finly.io', trigger_email: true, reviewer: true},
+                  {user: 'shiva.shankar@finly.io', trigger_email: true, reviewer: true},
+                  {user: 'sreeram.nr@finly.io', trigger_email: false, reviewer: true}
               ],
               '1': [
                   {user: 'itzfinlycust@itzcash.com', trigger_email: true, reviewer: false},
@@ -90,7 +84,9 @@ class AdminReviewWorkflow < ActiveRecord::Base
                   {user: 'veekshith.rai@finly.io', trigger_email: true, reviewer: true},
                   {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true},
                   {user: 'abhinandanyadavg@gmail.com', trigger_email: true, reviewer: true},
-                  {user: 'kartik.k@finly.io', trigger_email: true, reviewer: true}
+                  {user: 'kartik.k@finly.io', trigger_email: true, reviewer: true},
+                  {user: 'shiva.shankar@finly.io', trigger_email: true, reviewer: true},
+                  {user: 'sreeram.nr@finly.io', trigger_email: false, reviewer: true}
               ],
               '1': [
                   {user: 'itzfinlycust@itzcash.com', trigger_email: true, reviewer: false},
