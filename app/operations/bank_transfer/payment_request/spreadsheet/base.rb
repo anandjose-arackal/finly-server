@@ -50,7 +50,6 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
             payment.invoice&.date&.strftime("%d-%m-%Y")
         ]
         payment_details += retrieve_custom_fields(payment)
-        # debugger
         payment_details += [
             (payment.invoice&.amount&.value || 0),
             (payment.invoice&.discount_amount&.value || 0),
