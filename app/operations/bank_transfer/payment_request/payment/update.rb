@@ -123,7 +123,9 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
 
     set_custom_fields(false) # this should hopefully add the attributes to the model
     if self.payment.save
-      recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
+      if payment.invoice.invoice_items.present?
+        recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
+      end
     else
       add_message :error, self.payment.errors.full_messages
     end
