@@ -123,9 +123,7 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
 
     set_custom_fields(false) # this should hopefully add the attributes to the model
     if self.payment.save
-      if payment.invoice.invoice_items.present?
-        recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
-      end
+      recalculate_totals # this is because assign_attributes doesn't record the fact that one of the child items is marked for destruction
     else
       add_message :error, self.payment.errors.full_messages
     end
@@ -166,17 +164,21 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def calculate_tax_and_discounts
     if self.payment.invoice.invoice_items.present?
       # if there are no invoice items, use the invoice library to calculate the amounts
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)&.permit!
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)
     else
       # if there are, in fact, invoice items, use the invoice items library
-      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)&.permit!
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)
     end
-
     return
   end
 
   def recalculate_totals
-    InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)
+    if payment.invoice.invoice_items.present?
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)
+    else
+      # if there are, in fact, invoice items, use the invoice items library
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)
+    end
     self.payment.save
   end
 
