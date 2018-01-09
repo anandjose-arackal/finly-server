@@ -24,7 +24,7 @@ class InvoiceCalculationUtils
     if self.roundoff_amount != 0
       self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount)
     else
-      self.balance_due_amount = self.net_amount
+      self.balance_due_amount = precision_value self.net_amount
     end
 
     # assign TDS amount
@@ -99,7 +99,7 @@ class InvoiceCalculationUtils
     if self.roundoff_amount != 0
       self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount)
     else
-      self.balance_due_amount = self.net_amount
+      self.balance_due_amount = precision_value self.net_amount
     end
 
     # assign the respective calculated amounts to the payment and invoice object
