@@ -13,12 +13,12 @@ class YesBankApi::Base < BaseHandler
 
   def init
     # self.config_path = Rails.root.join('config', 'yes_bank_config.yml').to_s
-    self.config_path = "~/app/current/shared/config/yes_bank_config.yml"
+    self.config_path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
     unless config_path.present?
       add_message :error, "Server error, try again later"
     end
     # checking of there's a custom configuration for a particular company - stored in a variable called configuration
-    self.configuration = YAML.load_file(config_path)[Rails.env][self.company_id.to_s] || 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
+    self.configuration = (YAML.load_file(config_path)[Rails.env][self.company_id]).present? ? self.company_id : 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
     self.client_id = YAML.load_file(config_path)[Rails.env][self.configuration]['client_id']
     self.client_secret = YAML.load_file(config_path)[Rails.env][self.configuration]['client_secret']
     self.auth_username = YAML.load_file(config_path)[Rails.env][self.configuration]['username']
