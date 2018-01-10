@@ -2,7 +2,8 @@ class YesBankApi::Base < BaseHandler
 
   attr_accessor :client_id, :client_secret, :auth_username,
                 :auth_password, :template, :config_path, :application_id,
-                :customer_id, :resource_not_found, :transfer_status_id
+                :customer_id, :resource_not_found, :transfer_status_id,
+                :configuration, :company_id
 
   ILLEGAL_CHARACTERS = ['%', ',' "/", '\\', '(', ')', '@', '&', '.']
 
@@ -11,16 +12,19 @@ class YesBankApi::Base < BaseHandler
   end
 
   def init
-    self.config_path = Rails.root.join('config', 'yes_bank_config.yml').to_s
+    # self.config_path = Rails.root.join('config', 'yes_bank_config.yml').to_s
+    self.config_path = "~/app/current/shared/config/yes_bank_config.yml"
     unless config_path.present?
       add_message :error, "Server error, try again later"
     end
-    self.client_id = YAML.load_file(config_path)[Rails.env]['client_id']
-    self.client_secret = YAML.load_file(config_path)[Rails.env]['client_secret']
-    self.auth_username = YAML.load_file(config_path)[Rails.env]['username']
-    self.auth_password = YAML.load_file(config_path)[Rails.env]['password']
-    self.application_id = YAML.load_file(config_path)[Rails.env]['application_id']
-    self.customer_id = YAML.load_file(config_path)[Rails.env]['customer_id']
+    # checking of there's a custom configuration for a particular company - stored in a variable called configuration
+    self.configuration = YAML.load_file(config_path)[Rails.env][self.company_id.to_s] || 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
+    self.client_id = YAML.load_file(config_path)[Rails.env][self.configuration]['client_id']
+    self.client_secret = YAML.load_file(config_path)[Rails.env][self.configuration]['client_secret']
+    self.auth_username = YAML.load_file(config_path)[Rails.env][self.configuration]['username']
+    self.auth_password = YAML.load_file(config_path)[Rails.env][self.configuration]['password']
+    self.application_id = YAML.load_file(config_path)[Rails.env][self.configuration]['application_id']
+    self.customer_id = YAML.load_file(config_path)[Rails.env][self.configuration]['customer_id']
     # now calling the load_connection method to initialize the connection
     super()
   end

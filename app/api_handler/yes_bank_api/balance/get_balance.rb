@@ -7,6 +7,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
 
   def initialize(params)
     self.params = params
+    self.company_id = params[:company_id]
   end
 
   def self.call(params)

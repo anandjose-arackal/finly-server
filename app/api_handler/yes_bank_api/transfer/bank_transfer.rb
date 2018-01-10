@@ -39,8 +39,9 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   end
 
   def init
+    self.company_id = self.payment.payment_order.company_id
     super()
-    self.account_number = YAML.load_file(config_path)[Rails.env]['account_number']
+    self.account_number = YAML.load_file(config_path)[Rails.env][self.configuration]['account_number']
     self.account = payment.receiving_account
     set_xml_params
   end

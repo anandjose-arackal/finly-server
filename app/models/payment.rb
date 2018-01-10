@@ -360,6 +360,10 @@ class Payment < ActiveRecord::Base
     self.invoice.amount&.value # in this case return the actual invoice amount
   end
 
+  def company_id
+    self.payment_order.company_id
+  end
+
   private
 
   def initiating_account_presence
