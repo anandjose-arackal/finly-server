@@ -87,10 +87,10 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
           completed = false
         end
       end
-      if completed
-        # this will trigger the mailer and notification that a particular credit has been successfully completed
-        Event::EBankPaymentRequest::CreditConfirm.(bank_payment_request.owner, bank_payment_request: bank_payment_request)
-      end
+      # if completed
+      #   # this will trigger the mailer and notification that a particular credit has been successfully completed
+      #   Event::EBankPaymentRequest::CreditConfirm.(bank_payment_request.owner, bank_payment_request: bank_payment_request)
+      # end
     end
 
     # trigger event for sending mailer to the receiver of the payment
