@@ -108,7 +108,7 @@ class InvoiceCalculationUtils
     if self.invoice.amount.present?
       self.invoice.amount.value = self.invoice_amount
     else
-      self.invoice_amount = Amount.new(value: self.invoice_amount, currency_id: 1)
+      self.invoice.amount = Amount.new(value: self.invoice_amount, currency_id: 1)
     end
 
     # assign gross amount
