@@ -4,7 +4,7 @@
 class YesBankApi::Status::GetStatus < YesBankApi::Base
 
   attr_accessor :request_reference_number, :request_status, :transaction_status,
-                :bank_error_message
+                :bank_error_message, :bank_reference_number
 
   def initialize(params)
     self.params = params
@@ -73,29 +73,33 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
 
   def success
     params[:request_status] = request_status
+    params[:bank_reference_number] = self.bank_reference_number
     YesBankApi::Status::GetStatus::SuccessStatusPresenter.new(params)
   end
 
   def failure
     params[:request_status] = request_status
+    params[:bank_reference_number] = self.bank_reference_number
     YesBankApi::Status::GetStatus::SuccessStatusPresenter.new(params)
   end
 
   class YesBankApi::Status::GetStatus::SuccessStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :request_status
+    attr_accessor :request_status, :bank_reference_number
 
     def initialize(params)
       self.request_status = params[:request_status]
+      self.bank_reference_number = params[:bank_reference_number]
     end
   end
 
   class YesBankApi::Status::GetStatus::FailureStatusPresenter < BaseOperation::BasePresenter::FailurePresenter
 
-    attr_accessor :request_status
+    attr_accessor :request_status, :bank_reference_number
 
     def initialize(params)
       self.request_status = params[:request_status]
+      self.bank_reference_number = params[:bank_reference_number]
     end
   end
 
@@ -112,6 +116,7 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
 
   def set_response_parameters
     self.request_status = parsed_response["Envelope"]&.dig("Body")&.dig("getStatusResponse")&.dig("transactionStatus")&.dig("statusCode")
+    self.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("getStatusResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
   end
 
 end
