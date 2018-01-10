@@ -74,7 +74,6 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         # do nothing?
       end
     end
-
   end
 
   def post_process
