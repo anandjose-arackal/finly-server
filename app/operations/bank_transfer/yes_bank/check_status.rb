@@ -46,6 +46,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     if op.success?
       if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
       # if true
+        bank_reference_number = op.bank_reference_number
+        bank_transaction.update(bank_reference_number: bank_reference_number) if bank_transaction.bank_reference_number.blank?
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
