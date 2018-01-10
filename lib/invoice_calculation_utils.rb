@@ -22,9 +22,9 @@ class InvoiceCalculationUtils
     calculate_freight_charges
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
     if self.roundoff_amount != 0
-      self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount)
+      self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount), 0
     else
-      self.balance_due_amount = self.net_amount
+      self.balance_due_amount = precision_value self.net_amount, 0
     end
 
     # assign TDS amount
@@ -97,9 +97,9 @@ class InvoiceCalculationUtils
     end
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
     if self.roundoff_amount != 0
-      self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount)
+      self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount), 0
     else
-      self.balance_due_amount = self.net_amount
+      self.balance_due_amount = precision_value self.net_amount, 0
     end
 
     # assign the respective calculated amounts to the payment and invoice object
@@ -108,7 +108,7 @@ class InvoiceCalculationUtils
     if self.invoice.amount.present?
       self.invoice.amount.value = self.invoice_amount
     else
-      self.invoice_amount = Amount.new(value: self.invoice_amount, currency_id: 1)
+      self.invoice.amount = Amount.new(value: self.invoice_amount, currency_id: 1)
     end
 
     # assign gross amount
