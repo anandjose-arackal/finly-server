@@ -1,9 +1,13 @@
 # config valid only for current version of Capistrano
 lock '3.9.1'
 
+deploy_env_config = YAML.load('config/deploy_config.yml')
+unless deploy_env_config.present?
+  raise 'deploy_config.yml not found'
+end
 set :application, 'finly-server'
 
-set :repo_url, 'https://vivek_a17:pw2J6u8LwW3vPpyaHrkC@bitbucket.org/finlycore/finly-server.git'
+set :repo_url, deploy_env_config&.dig(:repo_url)
 
 set :branch, ENV['BRANCH'] || :master
 
@@ -36,6 +40,15 @@ set :pty, true
 set :linked_files, %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml config/finly_collect.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
+if fetch(:rails_env) == 'production'
+  set :default_env, {
+      'SECURE_STORAGE_USERNAME' => deploy_env_config&.dig(:secure_storage, :username),
+      'SECURE_STORAGE_PASSWORD' => deploy_env_config&.dig(:secure_storage, :password)
+  }
+  unless deploy_env_config&.dig(:secure_storage).present? and deploy_env_config&.dig(:aws).present?
+    raise 'Error loading deploy configuration'
+  end
+end
 # set :rails_env, "staging"
 # set :rails_env, 'production'
 # set :rvm_type, :user
@@ -51,7 +64,7 @@ set :rollbar_role, Proc.new { :app }
 set :puma_rackup, -> { File.join(current_path, 'config.ru') }
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"
 set :puma_pid, "#{shared_path}/tmp/pids/puma.pid"
-set :puma_bind, "unix://#{shared_path}/tmp/sockets/puma.sock"    #accept array for multi-bind
+set :puma_bind, "unix://#{shared_path}/tmp/sockets/puma.sock" #accept array for multi-bind
 set :puma_conf, "#{shared_path}/puma.rb"
 set :puma_access_log, "#{shared_path}/log/puma_error.log"
 set :puma_error_log, "#{shared_path}/log/puma_access.log"
@@ -63,7 +76,9 @@ set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
 
+before 'deploy', 'aws:enable_secure_storage'
 after 'deploy', 'runner:restart'
+after 'deploy', 'aws:disable_secure_storage'
 
 # Restart runner
 namespace :runner do
@@ -75,6 +90,35 @@ namespace :runner do
           `ssh -t viveka@finly.io -p2212 ssh viveka@192.168.5.12 'sh app/current/msgqueue_restart.sh #{fetch(:rails_env)}'`
       end
       # execute("sh app/shared/msgqueue_restart.sh production")
+    end
+  end
+end
+
+namespace :aws do
+  task :enable_secure_storage do
+    on roles(:app) do
+      env = fetch(:rails_env)
+      case env
+        when 'production'
+          aws =Aws::EC2::Client.new(access_key_id: deploy_env_config&.dig(:aws, :access_key_id),
+                                    secret_access_key: deploy_env_config&.dig(:aws, :secret_access_key),
+                                    region: deploy_env_config&.dig(:aws, :region))
+          aws.authorize_security_group_ingress(deploy_env_config&.dig(:aws, :params))
+      end
+    end
+  end
+  task :disable_secure_storage do
+    on roles(:app) do
+      env = fetch(:rails_env)
+      case env
+        when 'production'
+          if deploy_env_config&.dig(:aws).present?
+            aws =Aws::EC2::Client.new(access_key_id: deploy_env_config&.dig(:aws, :access_key_id),
+                                      secret_access_key: deploy_env_config&.dig(:aws, :secret_access_key),
+                                      region: deploy_env_config&.dig(:aws, :region))
+            aws.revoke_security_group_ingress(deploy_env_config&.dig(:aws, :params))
+          end
+      end
     end
   end
 end

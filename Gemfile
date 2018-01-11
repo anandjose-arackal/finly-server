@@ -169,6 +169,7 @@ group :development, :test do
   gem 'memory_profiler'
   gem 'active_record_query_trace'
   gem 'aws-sdk-ec2'
+  gem 'capistrano-rails-console', require: false
   # gem 'better_errors'
   # gem 'binding_of_caller'
 

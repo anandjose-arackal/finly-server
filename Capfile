@@ -27,6 +27,7 @@ require 'capistrano/puma'
 
 require 'capistrano/crono'
 require 'capistrano/sidekiq'
+require 'capistrano/rails/console'
 
 # adding rollbar capistrano for deploy tracking
 require 'rollbar/capistrano3'

@@ -1,0 +1,4 @@
+# SecureStorage.load(ENV['SECURE_STORAGE_USERNAME'], ENV['SECURE_STORAGE_PASSWORD'])
+unless SecureStorage.loaded?
+  SecureStorage.load(ENV['SECURE_STORAGE_USERNAME'], ENV['SECURE_STORAGE_PASSWORD'])
+end

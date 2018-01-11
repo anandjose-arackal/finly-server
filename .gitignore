@@ -12,6 +12,8 @@
 /config/finly_collect.yml
 /.byebug_history
 config/finly_collect.yml
+config/deploy_config.yml
+config/yes_bank_config.yml
 
 # Ignore all logfiles and tempfiles.
 /log/*
