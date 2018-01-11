@@ -1,6 +1,6 @@
 class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountManager::BaseAdapter
 
-  attr_accessor :errors, :yes_bank_account
+  attr_accessor :errors, :yes_bank_account, :company
 
   def account_class
     YesBankCompanyAccount
@@ -47,10 +47,21 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
   def balance(options = {})
     # can either be an operation or a specific call with
     # a model call
-    payment_order = options[:payment_order]
-    balance = self.account.balance_value
-    blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
-    return (balance - blocked_amount_for_payments)
+    self.company = self.acocunt.company
+    if self.company.yes_bank_api_enabled?
+      payment_order = options[:payment_order]
+      balance = self.account.balance_value
+      blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
+      return (balance - blocked_amount_for_payments)
+    else
+      op = YesBankApi::Balance::GetBalance.(self.company)
+      # return the balance given by the API
+      if op.success?
+        return op.balance
+      else
+        return 0
+      end
+    end
   end
 
   def creditable_accounts

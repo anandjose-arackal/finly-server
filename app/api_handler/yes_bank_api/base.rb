@@ -3,7 +3,7 @@ class YesBankApi::Base < BaseHandler
   attr_accessor :client_id, :client_secret, :auth_username,
                 :auth_password, :template, :config_path, :application_id,
                 :customer_id, :resource_not_found, :transfer_status_id,
-                :configuration, :company_id
+                :configuration, :company_id, :account_number
 
   ILLEGAL_CHARACTERS = ['%', ',' "/", '\\', '(', ')', '@', '&', '.']
 
@@ -25,6 +25,7 @@ class YesBankApi::Base < BaseHandler
     self.auth_password = YAML.load_file(config_path)[Rails.env][self.configuration]['password']
     self.application_id = YAML.load_file(config_path)[Rails.env][self.configuration]['application_id']
     self.customer_id = YAML.load_file(config_path)[Rails.env][self.configuration]['customer_id']
+    self.account_number = YAML.load_file(config_path)[Rails.env][self.configuration]['account_number']
     # now calling the load_connection method to initialize the connection
     super()
   end
