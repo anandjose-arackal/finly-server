@@ -1,13 +1,13 @@
 # config valid only for current version of Capistrano
 lock '3.9.1'
 
-deploy_env_config = YAML.load('config/deploy_config.yml')
-unless deploy_env_config.present?
+deploy_env_config = YAML.load(File.read('config/deploy_config.yml'))
+if deploy_env_config == nil
   raise 'deploy_config.yml not found'
 end
 set :application, 'finly-server'
 
-set :repo_url, deploy_env_config&.dig(:repo_url)
+set :repo_url, deploy_env_config&.dig('repo_url')
 
 set :branch, ENV['BRANCH'] || :master
 
@@ -42,10 +42,10 @@ set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/sys
 set :keep_releases, 5
 if fetch(:rails_env) == 'production'
   set :default_env, {
-      'SECURE_STORAGE_USERNAME' => deploy_env_config&.dig(:secure_storage, :username),
-      'SECURE_STORAGE_PASSWORD' => deploy_env_config&.dig(:secure_storage, :password)
+      'SECURE_STORAGE_USERNAME' => deploy_env_config&.dig('secure_storage', 'username'),
+      'SECURE_STORAGE_PASSWORD' => deploy_env_config&.dig('secure_storage', 'password')
   }
-  unless deploy_env_config&.dig(:secure_storage).present? and deploy_env_config&.dig(:aws).present?
+  unless deploy_env_config&.dig('secure_storage').present? and deploy_env_config&.dig('aws').present?
     raise 'Error loading deploy configuration'
   end
 end
