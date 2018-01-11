@@ -27,6 +27,11 @@ class AdminUsers::CompaniesController < ApplicationController
     respond
   end
 
+  def count
+    @result = Admin::Companies::Count.(current_user, params)
+    render json: @result.count.as_json
+  end
+
   def update
     @result = Admin::Companies::Update.(current_user, params)
     if @result.success?

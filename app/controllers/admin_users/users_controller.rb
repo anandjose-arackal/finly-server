@@ -33,6 +33,11 @@ class AdminUsers::UsersController < ApplicationController
     respond
   end
 
+  def count
+    @result = Admin::Users::Count.(current_user, params)
+    render json: @result.count.as_json
+  end
+
   # returns the respective menus that a particular user has access to
   def admin_menus
     @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/menu_data_admin.yml.erb", {current_company: current_company, current_user: current_user})
