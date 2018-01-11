@@ -161,6 +161,7 @@ group :development, :test do
   gem 'capistrano-rbenv', '2.1.0'
   gem 'capistrano-crono', '0.1.2'
   gem 'capistrano-sidekiq', '0.10.0'
+  gem 'capistrano-rails-console', require: false
   gem 'hirb', '0.7.3'
   gem 'meta_request'
   gem 'rack-mini-profiler'
@@ -169,7 +170,6 @@ group :development, :test do
   gem 'memory_profiler'
   gem 'active_record_query_trace'
   gem 'aws-sdk-ec2'
-  gem 'capistrano-rails-console', require: false
   # gem 'better_errors'
   # gem 'binding_of_caller'
 
