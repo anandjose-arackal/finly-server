@@ -55,6 +55,7 @@ json.payments do
     json.id payment.id
     json.note payment.note
     json.account_id payment.receiving_account.id
+    json.beneficiary_id payment.receiving_account.account_owner&.id
     json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
     json.system_messages do
       json.array! (payment.system_messages)
@@ -103,6 +104,7 @@ json.payments do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
           json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
+          json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -150,6 +152,7 @@ json.payments_verified do
     json.id payment.id
     json.note payment.note
     json.account_id payment.receiving_account.id
+    json.beneficiary_id payment.receiving_account.account_owner&.id
     json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
     json.system_messages do
       json.array! (payment.system_messages)
@@ -195,6 +198,7 @@ json.payments_verified do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
           json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
+          json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -204,7 +208,6 @@ json.payments_verified do
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 
-        #
         json.invoice_items do
           json.array!(invoice.invoice_items) do |item|
             json.rate item.rate
@@ -243,6 +246,7 @@ json.payments_unverified do
     json.id payment.id
     json.note payment.note
     json.account_id payment.receiving_account.id
+    json.beneficiary_id payment.receiving_account.account_owner&.id
     json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
     json.system_messages do
       json.array! (payment.system_messages)
@@ -288,6 +292,7 @@ json.payments_unverified do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
           json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
+          json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -330,6 +335,7 @@ json.attachments do
     json.description attachment.description
     json.file_type attachment.file_format(attachment.attached_file)
     json.content_type attachment.attached_file.content_type
+    json.file_name attachment.attached_file.original_filename
   end
 end
 

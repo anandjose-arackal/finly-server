@@ -104,7 +104,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   def create_refund_payment
     admin_user = AdminUser.find_by(email: 'vivek.a@finly.io')
     original_debit_account = self.payment.initiating_account
-    self.payment_request = ::PaymentRequest.(admin_user, nil, original_debit_account.class, :credit, :corporate_balance_refund, company_id: self.company.id)
+    self.payment_request = ::PaymentRequest.(admin_user, nil, original_debit_account.class.name, :credit, :corporate_balance_refund, company_id: self.company.id)
     self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(nil, original_debit_account, self.bank_transaction.amount_value))
 
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
