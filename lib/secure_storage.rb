@@ -20,7 +20,13 @@ class SecureStorage
         puts 'FAILED TO LOAD FROM SECURE STORAGE'
       end
     else
-
+      begin
+        SimpleConfig.for :application do
+          set :secure_storage, YAML.load('config/secure_storage_dev_config.yml').with_indifferent_access
+        end
+      rescue Exception
+        puts 'FAILED TO LOAD FROM SECURE STORAGE'
+      end
     end
   end
 
