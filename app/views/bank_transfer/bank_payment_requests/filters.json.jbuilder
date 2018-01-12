@@ -1,6 +1,6 @@
 json.custom_fields do
   # json.array!(@result.field_configurations, :field_name, :id, :field_type, :drop_down_items)
-  json.array!(@result.field_configurations) do |fc|
+  json.array!(@field_configurations) do |fc|
     json.field_name fc.field_name
     json.id fc.id
     json.field_type fc.field_type
@@ -12,5 +12,12 @@ json.custom_fields do
       else
         # do nothing?
     end
+  end
+end
+
+json.policies do
+  json.array!(@policies) do |policy|
+    json.id policy.id
+    json.name policy.id
   end
 end

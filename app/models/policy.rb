@@ -66,6 +66,8 @@ class Policy < ActiveRecord::Base
 
   default_scope { order('policies.created_at ASC') }
 
+  scope :vendor_payment_policies, -> { where application: "vp" }
+
   def admins
     admin_mapping_ids = self.user_mapping.admin.pluck(:user_id)
     User.where(id: admin_mapping_ids)
