@@ -13,6 +13,9 @@ class SecureStorage
   end
 
   def self.load(username, password, keys = nil)
+    if $secure_storage_cache.nil?
+      $secure_storage_cache = ActiveSupport::Cache::MemoryStore.new
+    end
     base_url = YAML.load(File.read('config/secure_storage_config.yml'))&.dig('base_url')
     if base_url.present?
       conn = Faraday.new(:url => base_url)
@@ -21,36 +24,34 @@ class SecureStorage
       response = conn.get '/core', {keys: keys_to_load}
       if response.status == 200
         begin
-          SimpleConfig.for :application do
-            set :secure_storage, JSON.parse(response.body)&.with_indifferent_access
-          end
+          values = JSON.parse(response.body)&.with_indifferent_access
         rescue => e
           puts "FAILED TO LOAD FROM SECURE STORAGE ( Message :#{e.message} )"
+          return
         end
       else
         puts "FAILED TO LOAD FROM SECURE STORAGE ( Response: #{response.status} )"
+        return
       end
     else
       begin
-        SimpleConfig.for :application do
-          set :secure_storage, YAML.load(File.read('config/secure_storage_config.yml'))&.with_indifferent_access
-        end
+        values = YAML.load(File.read('config/secure_storage_config.yml'))&.with_indifferent_access
       rescue => e
         puts "FAILED TO LOAD FROM SECURE STORAGE ( Local Exception : #{e.message} )"
+        return
       end
+    end
+    keys.each do |key|
+      $secure_storage_cache.write(key, values[key])
     end
   end
 
   def self.read(key)
-    if SimpleConfig.for(:application).exists? :secure_storage
-      return SimpleConfig.for(:application).secure_storage[key]
-    end
+    $secure_storage_cache&.read(key)
   end
 
   def self.loaded?(key=nil)
-    loaded = SimpleConfig.for(:application).exists? :secure_storage
-    return loaded unless loaded and key.present?
-    return !!SimpleConfig.for(:application).secure_storage[key]
+    key.present? ? $secure_storage_cache&.dig(key).present? : $secure_storage_cache.present?
   end
 
 end
