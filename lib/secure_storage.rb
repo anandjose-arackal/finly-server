@@ -3,7 +3,7 @@ class SecureStorage
   KEYS_TO_LOAD = %w(core/finly_collect core/yes_bank core/database)
 
   def self.load(username, password, keys = nil)
-    base_url = YAML.load(File.read('config/secure_storage_config.yml'))&.dig(:base_url)
+    base_url = YAML.load(File.read('config/secure_storage_config.yml'))&.dig('base_url')
     if base_url.present?
       conn = Faraday.new(:url => base_url)
       conn.basic_auth(username, password)
@@ -23,7 +23,7 @@ class SecureStorage
     else
       begin
         SimpleConfig.for :application do
-          set :secure_storage, YAML.load('config/secure_storage_config.yml').with_indifferent_access
+          set :secure_storage, YAML.load('config/secure_storage_config.yml')
         end
       rescue => e
         puts "FAILED TO LOAD FROM SECURE STORAGE ( Local Exception : #{e.message} )"
