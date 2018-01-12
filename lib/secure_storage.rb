@@ -17,10 +17,10 @@ class SecureStorage
       $secure_storage_cache = ActiveSupport::Cache::MemoryStore.new
     end
     base_url = YAML.load(File.read('config/secure_storage_config.yml'))&.dig('base_url')
+    keys_to_load = keys || KEYS_TO_LOAD
     if base_url.present?
       conn = Faraday.new(:url => base_url)
       conn.basic_auth(username, password)
-      keys_to_load = keys || KEYS_TO_LOAD
       response = conn.get '/core', {keys: keys_to_load}
       if response.status == 200
         begin
@@ -41,7 +41,7 @@ class SecureStorage
         return
       end
     end
-    keys.each do |key|
+    keys_to_load.each do |key|
       $secure_storage_cache.write(key, values[key])
     end
   end
