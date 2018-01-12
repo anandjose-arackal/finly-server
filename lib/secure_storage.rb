@@ -16,11 +16,11 @@ class SecureStorage
           SimpleConfig.for :application do
             set :secure_storage, JSON.parse(response.body)&.with_indifferent_access
           end
-        rescue Exception
-          puts 'FAILED TO LOAD FROM SECURE STORAGE'
+        rescue => e
+          puts "FAILED TO LOAD FROM SECURE STORAGE ( message :#{e.message} )"
         end
       else
-        puts 'FAILED TO LOAD FROM SECURE STORAGE'
+        puts "FAILED TO LOAD FROM SECURE STORAGE ( response: #{response.status} )"
       end
     # else
     #   begin
