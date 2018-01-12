@@ -23,7 +23,7 @@ class SecureStorage
     else
       begin
         SimpleConfig.for :application do
-          set :secure_storage, YAML.load('config/secure_storage_config.yml')
+          set :secure_storage, YAML.load(File.read('config/secure_storage_config.yml'))&.with_indifferent_access
         end
       rescue => e
         puts "FAILED TO LOAD FROM SECURE STORAGE ( Local Exception : #{e.message} )"
