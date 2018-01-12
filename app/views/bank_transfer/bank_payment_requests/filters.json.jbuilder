@@ -18,6 +18,6 @@ end
 json.policies do
   json.array!(@policies) do |policy|
     json.id policy.id
-    json.name policy.id
+    json.name policy.name
   end
 end

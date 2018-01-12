@@ -136,8 +136,10 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   def filters
     custom_field_op = CustomField::Configuration::Index.(current_user, {filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)], filter_parent_type_id: [FieldParentType.id_for(:invoice)]})
     @field_configurations = custom_field_op.field_configurations
-    @policies = current_company.policies.vendor_payment_policies
-    respond
+    @policies = current_company.vendor_payment_policies
+    respond_to do |format|
+      format.json {}
+    end
   end
 
   private
