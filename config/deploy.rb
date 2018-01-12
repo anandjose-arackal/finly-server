@@ -1,7 +1,8 @@
 # config valid only for current version of Capistrano
 lock '3.10.1'
 
-deploy_env_config = YAML.load(File.read("config/secure_storage/#{fetch(:stage)}.yml"))
+type = fetch(:stage) == 'itzcash_production' ? :production : :development
+deploy_env_config = YAML.load(File.read("config/secure_storage/#{type}.yml"))
 if deploy_env_config == nil
   raise 'deploy_config.yml not found'
 end
@@ -23,16 +24,7 @@ case fetch(:stage)
   when :itzcash
     set :deploy_to, '/usr/local/app'
     set :rails_env, 'itzcash_uat'
-  when :staging, :development
-    set :deploy_to, '/home/centos/app'
-    set :rails_env, 'staging'
-  when :local_vm
-    set :deploy_to, '/home/vivek/app'
-    set :rails_env, 'local_vm'
-  when :development
-    set :deploy_to, '/home/centos/app'
-    set :rails_env, 'staging'
-  when :combined_development
+  when :staging, :development, :combined_development, :secure_storage_dev
     set :deploy_to, '/home/centos/app'
     set :rails_env, 'staging'
 end

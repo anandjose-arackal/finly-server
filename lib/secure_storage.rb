@@ -2,6 +2,16 @@ class SecureStorage
 
   KEYS_TO_LOAD = %w(core/finly_collect core/yes_bank core/database)
 
+  def self.config_for(stage)
+    return nil unless stage.present?
+    case stage&.to_s&.to_sym
+      when :itzcash_production
+        YAML.load(File.read('config/secure_storage/production.yml'))
+      else
+        YAML.load(File.read('config/secure_storage/development.yml'))
+    end
+  end
+
   def self.load(username, password, keys = nil)
     base_url = YAML.load(File.read('config/secure_storage_config.yml'))&.dig('base_url')
     if base_url.present?

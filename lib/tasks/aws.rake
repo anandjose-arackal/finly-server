@@ -1,7 +1,8 @@
 namespace :aws do
   desc 'Enable AWS Secure Storage'
   task :enable_secure_storage do
-    deploy_env_config = YAML.load(File.read("config/secure_storage/#{ENV['STAGE']}.yml"))
+    type = ENV['STAGE'] == 'itzcash_production' ? :production : :development
+    deploy_env_config = YAML.load(File.read("config/secure_storage/#{type}.yml"))
     if deploy_env_config == nil or deploy_env_config&.dig('aws').blank?
       raise 'deploy_config.yml not found or has missing configuration'
     end
@@ -13,7 +14,8 @@ namespace :aws do
 
   desc 'Disable AWS Secure Storage'
   task :disable_secure_storage do
-    deploy_env_config = YAML.load(File.read("config/secure_storage/#{ENV['STAGE']}.yml"))
+    type = ENV['STAGE'] == 'itzcash_production' ? :production : :development
+    deploy_env_config = YAML.load(File.read("config/secure_storage/#{type}.yml"))
     if deploy_env_config == nil or deploy_env_config&.dig('aws').blank?
       raise 'deploy_config.yml not found or has missing configuration'
     end
