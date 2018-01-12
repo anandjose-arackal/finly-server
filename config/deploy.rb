@@ -41,11 +41,12 @@ set :pty, true
 set :linked_files, %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml config/finly_collect.yml config/secure_storage_config.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
-if ['itzcash_production', 'development'].include?(fetch(:stage))
-  set :default_env, {
-      'SECURE_STORAGE_USERNAME' => deploy_env_config&.dig('secure_storage', 'username'),
-      'SECURE_STORAGE_PASSWORD' => deploy_env_config&.dig('secure_storage', 'password')
-  }
+
+set :default_env, {
+    'SECURE_STORAGE_USERNAME' => deploy_env_config&.dig('secure_storage', 'username'),
+    'SECURE_STORAGE_PASSWORD' => deploy_env_config&.dig('secure_storage', 'password')
+}
+if ['itzcash_production'].include?(fetch(:stage))
   if deploy_env_config&.dig('secure_storage') == nil
     raise 'Error loading deploy configuration'
   end
