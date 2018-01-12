@@ -3,15 +3,20 @@ class SecureStorage
   KEYS_TO_LOAD = %w(core/finly_collect core/yes_bank core/database)
 
   def self.load(username, password, keys = nil)
-    if Rails.env.production? or Rails.env.development?
-      conn = Faraday.new(:url => 'https://securestoragestaging.finly.io')
+    # if Rails.env.production? or Rails.env.staging?
+      stage = ENV['STAGE']
+      if stage.blank?
+        raise 'Stage not defined'
+      end
+      deploy_env_config = YAML.load(File.read("config/secure_storage/#{stage}.yml"))
+      if deploy_env_config == nil
+        raise 'deploy_config.yml not found'
+      end
+      base_url = deploy_env_config&.dig('secure_storage', 'base_url')
+      conn = Faraday.new(:url => base_url)
       conn.basic_auth(username, password)
       keys_to_load = keys || KEYS_TO_LOAD
       response = conn.get '/core', {keys: keys_to_load}
-      puts "username: #{username} password: #{password}"
-      puts "response status: #{response.status}"
-      puts "response body: #{response.body}"
-      puts "response: #{response}"
       if response.status == 200
         begin
           SimpleConfig.for :application do
@@ -23,15 +28,15 @@ class SecureStorage
       else
         puts "FAILED TO LOAD FROM SECURE STORAGE ( response: #{response.status} )"
       end
-    else
-      begin
-        SimpleConfig.for :application do
-          set :secure_storage, YAML.load('config/secure_storage_dev_config.yml').with_indifferent_access
-        end
-      rescue Exception
-        puts 'FAILED TO LOAD FROM SECURE STORAGE'
-      end
-    end
+    # else
+    #   begin
+    #     SimpleConfig.for :application do
+    #       set :secure_storage, YAML.load('config/secure_storage_dev_config.yml').with_indifferent_access
+    #     end
+    #   rescue Exception
+    #     puts 'FAILED TO LOAD FROM SECURE STORAGE'
+    #   end
+    # end
   end
 
   def self.read(key)
