@@ -77,9 +77,10 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         item[:invoice_items_attributes] = item[:invoice_attributes][:invoice_items_attributes]
       end
 
-      tds_amount = item[:tds_amount]&.to_f
+      tds_amount = item[:tds_amount].to_f
       discount = item[:discount]
-      advance_amount = item[:advance_amount]&.to_f
+      advance_amount = item[:advance_amount].to_f
+      roundoff_amount = item[:roundoff_amount].to_f
       advance = item[:advance]
       freight = item[:freight]
       tds = item[:tds]
@@ -95,9 +96,9 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       tax_amount = discount_amount = amount = sub_total = 0
       if item[:invoice_items_attributes].present?
         item[:invoice_items_attributes].each do |line_item|
-          tax_amount = line_item[:tax_amount]&.to_f
-          discount_amount = line_item[:discount_amount]&.to_f
-          sub_total = line_item[:amount]&.to_f
+          tax_amount = line_item[:tax_amount].to_f
+          discount_amount = line_item[:discount_amount].to_f
+          sub_total = line_item[:amount].to_f
           if inclusive_of_taxes
             amount += sub_total
           else
@@ -106,12 +107,18 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
         end
         net_amount = amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
       else
-        tax_amount = item[:tax_amount]&.to_f
-        discount_amount = item[:discount_amount]&.to_f
-        amount += item[:original_amount]&.to_f
+        tax_amount = item[:tax_amount].to_f
+        discount_amount = item[:discount_amount].to_f
+        amount += item[:original_amount].to_f
         net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
       end
 
+      # calculate balance due with roundoff amount
+      if roundoff_amount != 0
+        balance_due = net_amount + roundoff_amount
+      else
+        balance_due = net_amount
+      end
 
       self.valid = true
       self.error_messages = []
@@ -184,27 +191,28 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       invoice_net_amount = net_amount
 
+      item_tax_total = item_discount_total = 0
       if item&.dig(:invoice_items_attributes).present?
         # i.e. if the line items are present, recalculate the net amount
         invoice_net_amount = 0
 
         item[:invoice_items_attributes]&.each do |invoice_item|
-          item_amount = invoice_item[:amount]
-          item_discount = invoice_item[:discount]
-          item_tax = invoice_item[:tax]
+          item_amount = invoice_item[:amount].to_f
+          item_discount = invoice_item[:discount].to_f
+          item_tax = invoice_item[:tax].to_f
           item_gst_type = invoice_item[:gst_type_id]
-          item_rate = invoice_item[:rate]
-          item_quantity = invoice_item[:quantity]
+          item_rate = invoice_item[:rate].to_f
+          item_quantity = invoice_item[:quantity].to_f
           item_description = invoice_item[:description]
           item_category_id = invoice_item[:category_id]
-          item_discount_amount = invoice_item[:discount_amount]
-          item_tax_amount = invoice_item[:tax_amount]
+          item_discount_amount = invoice_item[:discount_amount].to_f
+          item_tax_amount = invoice_item[:tax_amount].to_f
           item_hsn_sac = invoice_item[:hsn_sac]
 
           if inclusive_of_taxes
-            total_amount = item_amount&.to_f
+            total_amount = item_amount.to_f
           else
-            total_amount = item_amount&.to_f - item_discount_amount&.to_f + item_tax_amount&.to_f
+            total_amount = item_amount.to_f - item_discount_amount.to_f + item_tax_amount.to_f
           end
 
           unless validate_rate item_tax, 1
@@ -215,6 +223,10 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           unless validate_rate item_discount, 1
             self.error_messages << "Invoice item discount rate is invalid"
             self.valid = false
+          end
+
+          if item_description.blank?
+            self.error_messages << "Item description canonot be blank"
           end
 
           # insert custom fields here
@@ -235,10 +247,15 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           }
 
           invoice_net_amount += total_amount
+          item_tax_total += item_tax_amount
+          item_discount_total += item_discount_amount
         end
 
         # accounting for TDS, Advance and Freight in light of the new amount
         invoice_net_amount = invoice_net_amount - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        # assigning discount amount, and tax amount as the sum of the individual amounts
+        discount_amount = item_discount_total
+        tax_amount = item_tax_total
       end
 
       # adding processable amount irrespective of whether it's valid or not
@@ -255,7 +272,8 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
                                discount_amount: discount_amount, discount: discount, inclusive_of_taxes: inclusive_of_taxes,
                                advance: advance, advance_amount: advance_amount, freight: freight, category_id: category_id, total_amount: amount,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
-                               net_amount: invoice_net_amount, invoice_items: invoice_items,
+                               net_amount: invoice_net_amount, invoice_items: invoice_items, roundoff_amount: roundoff_amount, balance_due: balance_due,
+                               item_tax_total: item_tax_total, item_discount_total: item_discount_total,
                                valid: self.valid, messages: self.error_messages}
     end
   end
@@ -330,7 +348,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
   end
 
   def validate_amount(amount)
-    if amount.blank? || !amount&.to_f&.is_a?(Numeric) || amount&.to_f < 0
+    if amount.blank? || !amount.to_f&.is_a?(Numeric) || amount.to_f < 0
       return false
     end
     true

@@ -40,12 +40,15 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def process
     params = {
-        request_reference_number: bank_transaction.unique_request_number
+        request_reference_number: bank_transaction.unique_request_number,
+        company_id: bank_transaction.company_id
     }
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?
       if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
       # if true
+        bank_reference_number = op.bank_reference_number
+        bank_transaction.update(bank_reference_number: bank_reference_number) if bank_transaction.bank_reference_number.blank?
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
@@ -72,7 +75,6 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         # do nothing?
       end
     end
-
   end
 
   def post_process

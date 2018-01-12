@@ -250,6 +250,7 @@ class Company < ActiveRecord::Base
     self.feature_subscription.yes_bank_api_enabled
   end
 
+
   def invoicing_system_enabled?
     self.feature_subscription.invoicing_system
   end

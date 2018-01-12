@@ -25,11 +25,10 @@
 #  application             :string(255)
 #  payment_mode            :string(255)
 #  reference_id            :string(255)      not null
-#  retry_count             :integer          default(0)
-#  post_operation          :text(65535)
-#  post_operation_payload  :text(65535)
 #  invoice_id              :integer
+#  retry_count             :integer          default(0)
 #
+
 
 
 
@@ -207,7 +206,7 @@ class Payment < ActiveRecord::Base
   }
 
   scope :filter_vendor_payments, -> (enabled){
-    if ['1', 1].include?(enabled)
+    if StringUtils.to_bool(enabled)
       where payment_purpose_id: PaymentPurpose.id_for(:vendor_payment)
     end
   }
@@ -359,6 +358,10 @@ class Payment < ActiveRecord::Base
   def invoice_amount
     return self.amount.value unless self.invoice.present?
     self.invoice.amount&.value # in this case return the actual invoice amount
+  end
+
+  def company_id
+    self.payment_order.company_id
   end
 
   private

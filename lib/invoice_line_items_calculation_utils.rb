@@ -1,10 +1,12 @@
 # this class will handle all calculations regarding invoice items
 class InvoiceLineItemsCalculationUtils
 
+  include MathUtil
+
   attr_accessor :invoice_item_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tax_amount, :after_tax_amount,
-                :invoice_total
+                :invoice_total, :roundoff_amount, :total_discount, :total_tax
 
   # this method should take the invoice, payment object and the params object and
   # assign the respective calculated amounts to the params object for direct assign
@@ -13,7 +15,7 @@ class InvoiceLineItemsCalculationUtils
     if invoice.blank?
       return
     end
-    self.invoice_total = 0
+    self.invoice_total = self.total_discount = self.total_tax = 0
     invoice.invoice_items.each_with_index do |item, index|
       if invoice.inclusive_of_taxes # calculate the other amounts retrospectively
         self.after_tax_amount = item.quantity * item.rate
@@ -29,6 +31,8 @@ class InvoiceLineItemsCalculationUtils
         self.net_amount = self.gross_amount + self.tax_amount
       end
       self.invoice_total += self.net_amount
+      self.total_discount += self.discount_amount
+      self.total_tax += self.tax_amount
       # assign the respective calculated parameters to the payment params
       # invoice line item raw amount
       if item.amount.present?
@@ -68,6 +72,20 @@ class InvoiceLineItemsCalculationUtils
       invoice.amount.value = self.invoice_total
     else
       invoice.amount = Amount.new(value: self.invoice_total, currency_id: 1)
+    end
+
+    # assign invoice tax amount - which is a summation of all taxes of all invoice items
+    if invoice.tax_amount.present?
+      invoice.tax_amount.value = self.total_tax
+    else
+      invoice.tax_amount = Amount.new(value: self.total_tax, currency_id: 1)
+    end
+
+    # assign invoice discount amount - which is a summation of all discounts of all invoice items
+    if invoice.discount_amount.present?
+      invoice.discount_amount.value = self.total_discount
+    else
+      invoice.discount_amount = Amount.new(value: self.total_discount, currency_id: 1)
     end
 
     # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here

@@ -39,8 +39,8 @@ class Admin::Verifier::CompanyIndex < Admin::Cards::AssignRequests::Base
     end
     user_ids.uniq!
 
-    pending_comapany_ids = User.with_id(user_ids).pluck(:company_id)
-    self.companies = Company.with_id(pending_comapany_ids)
+    pending_company_ids = User.with_id(user_ids).pluck(:company_id)
+    self.companies = Company.with_id(pending_company_ids)
   end
 
   def validate
