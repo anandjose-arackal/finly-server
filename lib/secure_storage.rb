@@ -8,6 +8,7 @@ class SecureStorage
       conn.basic_auth(username, password)
       keys_to_load = keys || KEYS_TO_LOAD
       response = conn.get '/core', {keys: keys_to_load}
+      puts "username: #{username} password: #{password}"
       puts "response status: #{response.status}"
       puts "response body: #{response.body}"
       puts "response: #{response}"
