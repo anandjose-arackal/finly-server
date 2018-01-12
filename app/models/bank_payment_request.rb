@@ -120,6 +120,14 @@ class BankPaymentRequest < ActiveRecord::Base
     where(id: bpr_ids)
   }
 
+  scope :filter_policy_id, -> (policy_id) {
+    where policy_id: policy_id
+  }
+
+  scope :filter_owner_id, -> (owner_id) {
+    where owner_id: owner_id
+  }
+
   attr_accessor :cache_users
 
   before_save do
