@@ -153,7 +153,7 @@ gem 'awesome_print', '1.7.0'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', '9.0.6'
-  gem 'capistrano', '3.9.1'
+  gem 'capistrano', '3.10.1'
   gem 'capistrano3-puma', '1.2.1'
   gem 'capistrano-rails', '1.2.2', require: false
   gem 'capistrano-bundler', '1.2.0', require: false
@@ -169,7 +169,7 @@ group :development, :test do
   gem 'stackprof' # ruby 2.1+ only
   gem 'memory_profiler'
   gem 'active_record_query_trace'
-  gem 'aws-sdk-ec2'
+  gem 'aws-sdk-ec2', '1.24.0'
   # gem 'better_errors'
   # gem 'binding_of_caller'
 

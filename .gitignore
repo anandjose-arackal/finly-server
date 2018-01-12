@@ -15,6 +15,7 @@ config/finly_collect.yml
 config/deploy_config.yml
 config/yes_bank_config.yml
 config/secure_storage_dev_config.yml
+lib/tasks/aws.rake
 
 # Ignore all logfiles and tempfiles.
 /log/*

@@ -3,11 +3,14 @@ class SecureStorage
   KEYS_TO_LOAD = %w(core/finly_collect core/yes_bank core/database)
 
   def self.load(username, password, keys = nil)
-    if Rails.env.production?
-      conn = Faraday.new(:url => 'http://localhost:3003')
+    # if Rails.env.production? or Rails.env.development?
+      conn = Faraday.new(:url => 'https://35.154.145.138')
       conn.basic_auth(username, password)
       keys_to_load = keys || KEYS_TO_LOAD
       response = conn.get '/core', {keys: keys_to_load}
+      puts "response status: #{response.status}"
+      puts "response body: #{response.body}"
+      puts "response: #{response}"
       if response.status == 200
         begin
           SimpleConfig.for :application do
@@ -19,15 +22,15 @@ class SecureStorage
       else
         puts 'FAILED TO LOAD FROM SECURE STORAGE'
       end
-    else
-      begin
-        SimpleConfig.for :application do
-          set :secure_storage, YAML.load('config/secure_storage_dev_config.yml').with_indifferent_access
-        end
-      rescue Exception
-        puts 'FAILED TO LOAD FROM SECURE STORAGE'
-      end
-    end
+    # else
+    #   begin
+    #     SimpleConfig.for :application do
+    #       set :secure_storage, YAML.load('config/secure_storage_dev_config.yml').with_indifferent_access
+    #     end
+    #   rescue Exception
+    #     puts 'FAILED TO LOAD FROM SECURE STORAGE'
+    #   end
+    # end
   end
 
   def self.read(key)
