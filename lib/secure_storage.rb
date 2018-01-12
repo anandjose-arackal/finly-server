@@ -4,7 +4,7 @@ class SecureStorage
 
   def self.load(username, password, keys = nil)
     # if Rails.env.production? or Rails.env.development?
-      conn = Faraday.new(:url => 'https://35.154.145.138')
+      conn = Faraday.new(:url => 'https://securestoragestaging.finly.io')
       conn.basic_auth(username, password)
       keys_to_load = keys || KEYS_TO_LOAD
       response = conn.get '/core', {keys: keys_to_load}
