@@ -86,19 +86,6 @@ end
 
 after 'deploy', 'runner:restart'
 
-before 'deploy:starting', :enable_secure_storage do
-  `bundle exec rake aws:enable_secure_storage STAGE=#{fetch(:stage)}`
-end
-
-after 'deploy:finished', :disable_secure_storage do
-  `bundle exec rake aws:disable_secure_storage STAGE=#{fetch(:stage)}`
-end
-
-after 'deploy:failed', :disable_secure_storage_on_failed do
-  `bundle exec rake aws:disable_secure_storage STAGE=#{fetch(:stage)}`
-end
-
-
 # after 'deploy:symlink', 'aws:enable_secure_storage'
 # after 'deploy', 'aws:disable_secure_storage'
 

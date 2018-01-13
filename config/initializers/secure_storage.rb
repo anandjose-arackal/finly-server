@@ -1,7 +1,4 @@
-if $secure_storage_cache.nil?
-  $secure_storage_cache = ActiveSupport::Cache::MemoryStore.new
-end
-# SecureStorage.load(ENV['SECURE_STORAGE_USERNAME'], ENV['SECURE_STORAGE_PASSWORD'])
-unless SecureStorage.loaded?
-  SecureStorage.load(ENV['SECURE_STORAGE_USERNAME'], ENV['SECURE_STORAGE_PASSWORD'])
+SecureStorage::Connector.configuration do |config|
+  config.keys = %w(core/finly_collect core/yes_bank core/database)
+  config.local = true
 end
