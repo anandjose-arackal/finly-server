@@ -3,8 +3,9 @@ require_relative 'configuration'
 module SecureStorage
   class Connector < ::SecureStorage::Configuration
 
+    # define_setting is used to define class static variables ( one instance across application, not just request )
     define_setting :cache, ActiveSupport::Cache::MemoryStore.new
-    define_setting :keys
+    define_setting :keys, SECURE_STORAGE_KEYS
     define_setting :path, 'config/secure_storage_config.yml'
 
     def self.configuration
@@ -13,12 +14,11 @@ module SecureStorage
     end
 
     def self.init
-      unless SecureStorage::Connector.loaded?
-        SecureStorage::Connector.load
-      end
+      SecureStorage::Connector.load
     end
 
     def self.load
+      return if SecureStorage::Connector.loaded?
       # Load only if the require key has not yet been loaded previously
       config = YAML.load(File.read(SecureStorage::Connector.path))&.with_indifferent_access
       if !!config&.dig(:local)
