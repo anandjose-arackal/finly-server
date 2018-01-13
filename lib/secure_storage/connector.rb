@@ -5,7 +5,7 @@ module SecureStorage
 
     # define_setting is used to define class static variables ( one instance across application, not just request )
     define_setting :cache, ActiveSupport::Cache::MemoryStore.new
-    define_setting :keys, SECURE_STORAGE_KEYS
+    define_setting :keys
     define_setting :path, 'config/secure_storage_config.yml'
 
     def self.configuration
