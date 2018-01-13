@@ -18,7 +18,7 @@ module SecureStorage
     end
 
     def self.load
-      return if SecureStorage::Connector.loaded?
+      return if SecureStorage::Connector.loaded? or SecureStorage::Connector.keys.nil?
       # Load only if the require key has not yet been loaded previously
       config = YAML.load(File.read(SecureStorage::Connector.path))&.with_indifferent_access
       if !!config&.dig(:local)
