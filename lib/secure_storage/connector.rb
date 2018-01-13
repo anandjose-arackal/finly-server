@@ -5,7 +5,6 @@ module SecureStorage
 
     define_setting :keys
     define_setting :path, 'config/secure_storage_config.yml'
-    define_setting :local, false
 
     def self.configuration
       super()
@@ -20,11 +19,11 @@ module SecureStorage
 
     def self.load(keys_to_load = nil)
       keys_to_load = keys_to_load || SecureStorage::Connector.keys
-
-      if SecureStorage::Connector.local
-        load_from_local(keys_to_load)
+      config = YAML.load(File.read(SecureStorage::Connector.path))&.with_indifferent_access
+      if !!config&.dig(:local)
+        load_config(config, keys_to_load)
       else
-        load_from_server(keys_to_load)
+        load_from_server(config, keys_to_load)
       end
     end
 
@@ -43,8 +42,8 @@ module SecureStorage
       end
     end
 
-    def self.load_from_server(keys_to_load)
-      base_url = YAML.load(File.read(SecureStorage::Connector.path))&.dig('base_url')
+    def self.load_from_server(config, keys_to_load)
+      base_url = config&.dig('base_url')
       return unless base_url.present?
       conn = Faraday.new(:url => base_url)
       conn.basic_auth(ENV['SECURE_STORAGE_USERNAME'], ENV['SECURE_STORAGE_PASSWORD'])
@@ -58,17 +57,6 @@ module SecureStorage
         end
       else
         puts "FAILED TO LOAD FROM SECURE STORAGE ( Response: #{response.status} )"
-        return
-      end
-      load_config(values, keys_to_load)
-    end
-
-    def self.load_from_local(keys_to_load)
-      values = nil
-      begin
-        values = YAML.load(File.read('config/secure_storage_config.yml'))&.with_indifferent_access
-      rescue => e
-        puts "FAILED TO LOAD FROM SECURE STORAGE ( Local Exception : #{e.message} )"
         return
       end
       load_config(values, keys_to_load)

@@ -1,4 +1,5 @@
 base_url: 'https://securestoragestaging.finly.io'
+local: true
 core/database:
   username: 'root'
   password: 'smart22'
