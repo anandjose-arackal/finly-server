@@ -11,9 +11,7 @@
 /config/database.yml
 /.byebug_history
 config/finly_collect.yml
-config/secure_storage/*
-config/yes_bank_config.yml
-config/secure_storage_dev_config.yml
+config/deploy/config/*
 lib/tasks/aws.rake
 
 # Ignore all logfiles and tempfiles.
