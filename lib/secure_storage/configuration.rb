@@ -1,3 +1,4 @@
+# Implementation based on : https://www.viget.com/articles/easy-gem-configuration-variables-with-defaults/
 module SecureStorage
   class Configuration
 
