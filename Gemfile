@@ -38,6 +38,8 @@ gem 'omniauth'
 gem 'omniauth-quickbooks'
 gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref: '22c8df58bbed441207f3d0d8ac5a786cdb4821a5'
 
+gem 'finly-secure_storage-sdk', git: 'ssh://git@altssh.bitbucket.org:443/vivek_a17/finly-secure_storage-sdk.git'
+
 gem 'rubyzip', '1.2.1'
 
 # gem to import from excel

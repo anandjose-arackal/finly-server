@@ -31,8 +31,7 @@ require 'capistrano/rails/console'
 
 # adding rollbar capistrano for deploy tracking
 require 'rollbar/capistrano3'
-
-Dir.glob('lib/secure_storage/capistrano/connector.cap').each { |r| import r }
+require 'finly/secure_storage/capistrano/connector'
 # Load custom tasks from `lib/capistrano/tasks` if you have any defined
 Dir.glob("lib/capistrano/tasks/*.rake").each { |r| import r }
 
