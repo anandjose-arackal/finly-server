@@ -1,7 +1,5 @@
 class FinlyCollect::Base < BaseHandler
 
-  CONFIG = YAML.load_file "#{Rails.root}/config/finly_collect.yml"
-
   def env_key
     'finly_collect'
   end
@@ -18,7 +16,8 @@ class FinlyCollect::Base < BaseHandler
   end
 
   def load_custom_connection(faraday)
-    faraday&.basic_auth(CONFIG['username'], CONFIG['password'])
+    config = Finly::SecureStorage::Connector.read('core/finly_collect')
+    faraday&.basic_auth(config[:username], config[:password])
   end
 
   def expect_receivable?

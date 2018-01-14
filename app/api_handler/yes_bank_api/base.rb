@@ -17,7 +17,7 @@ class YesBankApi::Base < BaseHandler
     unless config_path.present?
       add_message :error, "Server error, try again later"
     end
-    values = SecureStorage.read('core/yes_bank')
+    values = Finly::SecureStorage::Connector.read('core/yes_bank')
     # checking of there's a custom configuration for a particular company - stored in a variable called configuration
     type = (values[Rails.env][self.company_id]).present? ? self.company_id : 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
     self.configuration = values(config_path)[Rails.env][type]
