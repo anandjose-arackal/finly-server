@@ -50,3 +50,4 @@ ehthumbs.db
 Thumbs.db
 dump.rdb
 .idea/
+config/secure_storage_config.yml

@@ -4,7 +4,7 @@ lock '3.10.1'
 type = fetch(:stage) == 'itzcash_production' ? :production : :development
 deploy_env_config = YAML.load(File.read("config/deploy/config/#{type}.yml"))
 if deploy_env_config == nil
-  raise 'deploy_config.yml not found'
+  raise 'Deploy config not found'
 end
 
 set :application, 'finly-server'
