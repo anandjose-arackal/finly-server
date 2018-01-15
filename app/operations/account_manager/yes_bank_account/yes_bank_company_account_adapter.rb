@@ -47,7 +47,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
   def balance(options = {})
     # can either be an operation or a specific call with
     # a model call
-    self.company = self.acocunt.company
+    self.company = self.account.company
     if self.company.yes_bank_api_enabled?
       payment_order = options[:payment_order]
       balance = self.account.balance_value
