@@ -16,7 +16,7 @@ class FinlyCollect::Base < BaseHandler
   end
 
   def load_custom_connection(faraday)
-    config = Finly::SecureStorage::Connector.read('core/finly_collect')
+    config = Finly::SecureStorage::Connector.read('core/finly_collect')&.dig('outgoing')
     faraday&.basic_auth(config[:username], config[:password])
   end
 

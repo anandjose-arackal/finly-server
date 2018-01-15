@@ -228,6 +228,13 @@ class ApplicationController < ActionController::Base
     root_url
   end
 
+  def authorize_ip(authorized_list)
+    authorized_list = [authorized_list] if authorized_list.class.name == String.name
+    unless authorized_list.include?(request.remote_ip)
+      head 403
+    end
+  end
+
   def whitelisted?(ip, type_id)
     return true if WhitelistedIp.with_type(type_id).with_ip(ip).present?
     false

@@ -14,5 +14,12 @@ core/yes_bank:
   application_id: '448995'
   customer_id: '448995'
 core/finly_collect:
-  username: 'finly'
-  password: 'password'
+  outgoing:
+    username: 'finly'
+    password: 'password'
+  incoming:
+    username: 'finlycollectstaging'
+    password: 'stagingpassword'
+    whitelisted_ip:
+      - '127.0.0.1'
+      - '::1'
