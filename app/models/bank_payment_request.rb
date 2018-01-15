@@ -128,6 +128,10 @@ class BankPaymentRequest < ActiveRecord::Base
     where owner_id: owner_id
   }
 
+  scope :filter_user_id, -> (owner_id) {
+    where owner_id: owner_id
+  }
+
   attr_accessor :cache_users
 
   before_save do
