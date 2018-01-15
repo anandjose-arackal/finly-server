@@ -1,15 +1,11 @@
 # config valid only for current version of Capistrano
 lock '3.10.1'
 
-type = fetch(:stage) == 'itzcash_production' ? :production : :development
-deploy_env_config = YAML.load(File.read("config/deploy/config/#{type}.yml"))
-if deploy_env_config == nil
-  raise 'Deploy config not found'
-end
+load_secure_storage((fetch(:stage) == 'itzcash_production' ? :production : :development))
 
 set :application, 'finly-server'
 
-set :repo_url, deploy_env_config&.dig('repo_url')
+set :repo_url, 'ssh://git@altssh.bitbucket.org:443/finlycore/finly-server.git'
 
 set :branch, ENV['BRANCH'] || :master
 
@@ -34,15 +30,6 @@ set :linked_files, %w{config/database.yml config/application.yml config/data/byp
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
 
-set :default_env, {
-    'SECURE_STORAGE_USERNAME' => deploy_env_config&.dig('secure_storage', 'username'),
-    'SECURE_STORAGE_PASSWORD' => deploy_env_config&.dig('secure_storage', 'password')
-}
-if ['itzcash_production'].include?(fetch(:stage))
-  if deploy_env_config&.dig('secure_storage') == nil
-    raise 'Error loading deploy configuration'
-  end
-end
 # set :rails_env, "staging"
 # set :rails_env, 'production'
 # set :rvm_type, :user
