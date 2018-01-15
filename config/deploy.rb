@@ -3,7 +3,9 @@ lock '3.9.1'
 
 set :application, 'finly-server'
 
-set :repo_url, 'https://vivek_a17:pw2J6u8LwW3vPpyaHrkC@bitbucket.org/finlycore/finly-server.git'
+# set :repo_url, 'https://vivek_a17:pw2J6u8LwW3vPpyaHrkC@bitbucket.org/finlycore/finly-server.git'
+
+set :repo_url, 'ssh://git@altssh.bitbucket.org:443/finlycore/finly-server.git'
 
 set :branch, ENV['BRANCH'] || :master
 
