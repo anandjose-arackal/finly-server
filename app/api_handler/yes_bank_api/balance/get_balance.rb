@@ -3,14 +3,14 @@
 
 class YesBankApi::Balance::GetBalance < YesBankApi::Base
 
-  attr_accessor :account_number, :balance
+  attr_accessor :account_number, :balance, :company
 
-  def initialize(params)
-    self.params = params
+  def initialize(company)
+    self.company = company
   end
 
-  def self.call(params)
-    self.new(params).run
+  def self.call(company)
+    self.new(company).run
   end
 
   # defines the respective action that this API handler is executing
@@ -28,7 +28,6 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
 
   def init
     super()
-    self.account_number = params[:account_number]
     set_xml_params
   end
 
