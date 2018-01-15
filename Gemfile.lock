@@ -19,9 +19,9 @@ GIT
 
 GIT
   remote: ssh://git@altssh.bitbucket.org:443/vivek_a17/finly-secure_storage-sdk.git
-  revision: 45d7056e489fa5112133ba434464ba860a8e4e77
+  revision: c4a99b24089dc8db24d50d451d011bb7fe3e33a7
   specs:
-    finly-secure_storage-sdk (0.1.6)
+    finly-secure_storage-sdk (0.1.82)
       rails (>= 4.2)
 
 GEM
