@@ -304,11 +304,13 @@ class BaseHandler
   end
 
   def load_connection(url = base_url)
+    logger = Logger.new $stderr
+    logger.level = Logger::INFO
     self.connection = Faraday.new(:url => url) do |faraday|
       # builder.use Faraday::Request::UrlEncoded
       if load_custom_connection(faraday)
         faraday.request :url_encoded # form-encode POST params
-        faraday.response :logger # log requests to STDOUT
+        faraday.response :logger, logger # log requests to STDOUT
         faraday.options[:timeout] = 60 # time out is 60 seconds
         faraday.use FaradayMiddleware::FollowRedirects, limit: 5
         faraday.adapter Faraday.default_adapter # make requests with Net::HTTP

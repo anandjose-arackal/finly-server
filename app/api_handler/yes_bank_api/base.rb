@@ -189,10 +189,12 @@ class YesBankApi::Base < BaseHandler
         client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
         verify: verify
     }
+    logger = Logger.new $stderr
+    logger.level = Logger::INFO
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|
       # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params
-      faraday.response :logger # log requests to STDOUT
+      faraday.response :logger, logger # log requests to STDOUT
       faraday.options[:timeout] = 60 # time out is 60 seconds
       faraday.use Faraday::Request::BasicAuthentication, auth_username, auth_password # use basic authentication
       faraday.use FaradayMiddleware::FollowRedirects, limit: 5
