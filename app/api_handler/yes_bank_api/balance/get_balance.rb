@@ -56,7 +56,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def failure
-    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter
+    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter.new
   end
 
   class YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -68,7 +68,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
     end
   end
 
-  class YesBankApi::Transfer::BankTransfer::FailureBalancePresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class YesBankApi::Transfer::BankTransfer::FailureBalancePresenter < BaseOperation::BasePresenter::FailurePresenter
 
     attr_accessor :balance
 
