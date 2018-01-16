@@ -118,14 +118,14 @@ class User::Balances::Show < User::Base
     bank_wallet_adapter = retrieve_adapter user.bank_wallet
     cash_on_hand_adapter = retrieve_adapter user.cash_on_hand
 
+    self.card_info = {}
     selected_user.cards.each do |card|
       card_adapter = retrieve_adapter(card)
-      self.card_info = {
-         card.id => {
+      self.card_info[card.id] =
+         {
              balance: card_adapter.balance,
              eligibility: card_adapter.credit_eligibility
          }
-      }
     end
     self.company_credits_info = {
         yes_bank: {

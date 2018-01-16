@@ -18,6 +18,7 @@ json.array! @result.paginated_payments.each do |payment|
   json.note payment.note
   json.account_id payment.receiving_account.id
   json.beneficiary_id payment.receiving_account.account_owner&.id
+  json.beneficiary_type payment.receiving_account.account_owner_type == "YesBankVendor" ? 2 : 1
   json.system_messages do
     json.array! (payment.system_messages)
   end

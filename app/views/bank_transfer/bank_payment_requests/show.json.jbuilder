@@ -23,6 +23,7 @@ json.summary do
   json.crediting_user creditor
   json.beneficiary_type @result.bank_payment_request.beneficiary_type
   json.approvers @result.approvers
+  json.name @result.bank_payment_request.name
 end
 
 json.invoice_categories do
