@@ -59,7 +59,7 @@ class Invoice < ActiveRecord::Base
   # because multiple payments can be made against one invoice
   has_many :payments
 
-  has_many :invoice_items, class_name: "InvoiceLineItem"
+  has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :invoice_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
 

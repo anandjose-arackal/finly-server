@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180111155546) do
+ActiveRecord::Schema.define(version: 20180116110133) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1848,6 +1848,8 @@ ActiveRecord::Schema.define(version: 20180111155546) do
     t.datetime "updated_at",                                               null: false
     t.integer  "net_amount_id",      limit: 4
     t.string   "hsn_sac",            limit: 255
+    t.string   "parent_type",        limit: 255
+    t.string   "parent_id",          limit: 255
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -3558,6 +3560,14 @@ ActiveRecord::Schema.define(version: 20180111155546) do
   end
 
   add_index "yes_bank_company_accounts", ["company_id"], name: "index_yes_bank_company_accounts_on_company_id", using: :btree
+
+  create_table "yes_bank_configurations", force: :cascade do |t|
+    t.boolean  "custom_bank_account",            default: false
+    t.integer  "company_id",           limit: 4
+    t.boolean  "yes_bank_api_enabled",           default: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+  end
 
   create_table "yes_bank_vendors", force: :cascade do |t|
     t.string   "name",           limit: 255

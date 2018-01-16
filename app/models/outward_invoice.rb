@@ -26,4 +26,27 @@
 class OutwardInvoice < ActiveRecord::Base
   belongs_to :customer
   belongs_to :amount
+  belongs_to :discount_amount, class_name: "Amount"
+  belongs_to :tax_amount, class_name: "Amount"
+  belongs_to :original_amount, class_name: "Amount"
+  belongs_to :paid_amount, class_name: "Amount"
+  belongs_to :balance_due, class_name: "Amount"
+  belongs_to :freight_amount, class_name: "Amount"
+  belongs_to :advance_amount, class_name: "Amount"
+  belongs_to :net_amount, class_name: "Amount"
+
+  has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
+
+  accepts_nested_attributes_for :amount
+  # accepts_nested_attributes_for :gross_amount
+  accepts_nested_attributes_for :net_amount
+  accepts_nested_attributes_for :discount_amount
+  # accepts_nested_attributes_for :tds_amount
+  accepts_nested_attributes_for :tax_amount
+  accepts_nested_attributes_for :original_amount
+  accepts_nested_attributes_for :freight_amount
+  # accepts_nested_attributes_for :custom_fields
+  accepts_nested_attributes_for :advance_amount
+  accepts_nested_attributes_for :balance_due
+  accepts_nested_attributes_for :invoice_items, allow_destroy: true
 end
