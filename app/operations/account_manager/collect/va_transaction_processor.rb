@@ -43,7 +43,7 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
     return if has_errors?
     case self.virtual_account.purpose_id
       when VirtualAccountPurpose.id_for(:payment_receivable)
-        AccountManager::Collect::PaymentReceivable::Accept.(virtual_account_transaction: self.virtual_account_transaction)
+        AccountManager::Collect::PaymentReceivable::Accept.(nil, virtual_account_transaction: self.virtual_account_transaction)
       # when VirtualAccountPurpose.id_for(:invoice)
       #   AccountManager::Collect::Invoice::Accept.(self.virtual_account_transaction.id)
       else
