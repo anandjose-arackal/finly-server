@@ -21,6 +21,7 @@
 #  roundoff_amount    :decimal(10, 5)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  gross_amount_id    :integer
 #
 
 require 'test_helper'

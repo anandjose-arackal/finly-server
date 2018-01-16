@@ -21,6 +21,7 @@
 #  roundoff_amount    :decimal(10, 5)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  gross_amount_id    :integer
 #
 
 class OutwardInvoice < ActiveRecord::Base
@@ -39,11 +40,12 @@ class OutwardInvoice < ActiveRecord::Base
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :payments, as: :parent
 
+  delegate :unpaid?, :partially_paid?, :closed?, to: :invoice_status
+
   accepts_nested_attributes_for :amount
   # accepts_nested_attributes_for :gross_amount
   accepts_nested_attributes_for :net_amount
   accepts_nested_attributes_for :discount_amount
-  # accepts_nested_attributes_for :tds_amount
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :original_amount
   accepts_nested_attributes_for :freight_amount

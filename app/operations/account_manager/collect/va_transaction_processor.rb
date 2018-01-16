@@ -45,6 +45,7 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
       when VirtualAccountPurpose.id_for(:payment_receivable)
         AccountManager::Collect::PaymentReceivable::Accept.(nil, virtual_account_transaction: self.virtual_account_transaction)
       when VirtualAccountPurpose.id_for(:invoice)
+        # this will take the respective payment for the invoice and mark it as paid or partially paid accordingly
         AccountManager::Collect::Invoice::Accept.(self.virtual_account_transaction.id)
       else
         # do nothing?

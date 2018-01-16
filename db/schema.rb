@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180116144111) do
+ActiveRecord::Schema.define(version: 20180116153027) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1335,6 +1335,7 @@ ActiveRecord::Schema.define(version: 20180116144111) do
     t.integer  "company_id",    limit: 4
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
+    t.string   "gst",           limit: 255
   end
 
   create_table "desktop_users", force: :cascade do |t|
@@ -2370,6 +2371,7 @@ ActiveRecord::Schema.define(version: 20180116144111) do
     t.decimal  "roundoff_amount",              precision: 10, scale: 5
     t.datetime "created_at",                                            null: false
     t.datetime "updated_at",                                            null: false
+    t.integer  "gross_amount_id",    limit: 4
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
