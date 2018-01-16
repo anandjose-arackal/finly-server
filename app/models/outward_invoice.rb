@@ -34,8 +34,10 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :freight_amount, class_name: "Amount"
   belongs_to :advance_amount, class_name: "Amount"
   belongs_to :net_amount, class_name: "Amount"
+  belongs_to :invoice_status, class_name: "OutwardInvoiceStatus"
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
+  has_many :payments, as: :parent
 
   accepts_nested_attributes_for :amount
   # accepts_nested_attributes_for :gross_amount
