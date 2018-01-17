@@ -21,8 +21,8 @@
 #  yes_bank_account           :boolean
 #  bank_account_reimbursement :boolean
 #  payroll_card_enabled       :boolean          default(FALSE)
-#  invoicing_system           :boolean          default(FALSE)
 #  yes_bank_api_enabled       :boolean
+#  invoicing_system           :boolean          default(FALSE)
 #
 
 require 'test_helper'

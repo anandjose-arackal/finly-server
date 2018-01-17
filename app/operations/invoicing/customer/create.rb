@@ -20,7 +20,4 @@ class Invoicing::Customer::Create < Invoicing::Customer::Base
 
   private
 
-  def customer_parameters
-    params.require(:customer).permit(:name, :email, :mobile_number, :description)
-  end
 end

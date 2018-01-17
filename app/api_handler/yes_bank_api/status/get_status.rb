@@ -4,10 +4,11 @@
 class YesBankApi::Status::GetStatus < YesBankApi::Base
 
   attr_accessor :request_reference_number, :request_status, :transaction_status,
-                :bank_error_message, :bank_reference_number
+                :bank_error_message, :bank_reference_number, :company_id
 
   def initialize(params)
     self.params = params
+    self.company_id = params[:company_id]
   end
 
   def self.call(params)

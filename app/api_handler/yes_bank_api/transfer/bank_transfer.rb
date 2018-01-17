@@ -39,8 +39,9 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   end
 
   def init
+    self.company_id = self.payment.payment_order.company_id
     super()
-    self.account_number = YAML.load_file(config_path)[Rails.env]['account_number']
+    self.account_number = YAML.load_file(config_path)[Rails.env][self.configuration]['account_number']
     self.account = payment.receiving_account
     set_xml_params
   end
@@ -52,6 +53,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
   def post_process
     # handle the various error cases here
+    # case 500
     case self.response.status
       when 404
         add_message :error, "The service is temporarily down. Please try again later"
@@ -167,9 +169,10 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
     liquid_template = load_soap_template
     # sanitizing beneficiary name before request
     beneficiary_name = transfer_request.beneficiary_name
-    ILLEGAL_CHARACTERS.each do |character|
-      beneficiary_name = beneficiary_name.sub(character, '')
-    end
+    # ILLEGAL_CHARACTERS.each do |character|
+    #   beneficiary_name = beneficiary_name.sub(character, '')
+    # end
+    beneficiary_name = beneficiary_name.gsub(/[^0-9A-Za-z]/, '')
     beneficiary_name = beneficiary_name[0..30]&.strip
     self.template = liquid_template.render(
         'UNIQUE_REFERENCE_NUMBER' => transfer_request.generate_unique_reference,

@@ -40,7 +40,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def process
     params = {
-        request_reference_number: bank_transaction.unique_request_number
+        request_reference_number: bank_transaction.unique_request_number,
+        company_id: bank_transaction.company_id
     }
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?

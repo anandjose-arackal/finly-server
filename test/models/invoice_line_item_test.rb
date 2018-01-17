@@ -18,6 +18,8 @@
 #  updated_at         :datetime         not null
 #  net_amount_id      :integer
 #  hsn_sac            :string(255)
+#  parent_type        :string(255)
+#  parent_id          :string(255)
 #
 
 require 'test_helper'

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180111155546) do
+ActiveRecord::Schema.define(version: 20180116153027) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1335,6 +1335,7 @@ ActiveRecord::Schema.define(version: 20180111155546) do
     t.integer  "company_id",    limit: 4
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
+    t.string   "gst",           limit: 255
   end
 
   create_table "desktop_users", force: :cascade do |t|
@@ -1848,6 +1849,8 @@ ActiveRecord::Schema.define(version: 20180111155546) do
     t.datetime "updated_at",                                               null: false
     t.integer  "net_amount_id",      limit: 4
     t.string   "hsn_sac",            limit: 255
+    t.string   "parent_type",        limit: 255
+    t.string   "parent_id",          limit: 255
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -2343,6 +2346,12 @@ ActiveRecord::Schema.define(version: 20180111155546) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "outward_invoice_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "outward_invoices", force: :cascade do |t|
     t.integer  "customer_id",        limit: 4
     t.date     "invoice_date"
@@ -2362,6 +2371,7 @@ ActiveRecord::Schema.define(version: 20180111155546) do
     t.decimal  "roundoff_amount",              precision: 10, scale: 5
     t.datetime "created_at",                                            null: false
     t.datetime "updated_at",                                            null: false
+    t.integer  "gross_amount_id",    limit: 4
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
@@ -2542,6 +2552,8 @@ ActiveRecord::Schema.define(version: 20180111155546) do
     t.string   "reference_id",            limit: 255,               null: false
     t.integer  "retry_count",             limit: 4,     default: 0
     t.integer  "invoice_id",              limit: 4
+    t.string   "parent_type",             limit: 255
+    t.integer  "parent_id",               limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -3558,6 +3570,14 @@ ActiveRecord::Schema.define(version: 20180111155546) do
   end
 
   add_index "yes_bank_company_accounts", ["company_id"], name: "index_yes_bank_company_accounts_on_company_id", using: :btree
+
+  create_table "yes_bank_configurations", force: :cascade do |t|
+    t.boolean  "custom_bank_account",            default: false
+    t.integer  "company_id",           limit: 4
+    t.boolean  "yes_bank_api_enabled",           default: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+  end
 
   create_table "yes_bank_vendors", force: :cascade do |t|
     t.string   "name",           limit: 255
