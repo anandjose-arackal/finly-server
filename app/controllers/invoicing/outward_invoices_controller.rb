@@ -4,6 +4,10 @@ class Invoicing::OutwardInvoicesController < ApplicationController
 
   end
 
+  def show
+
+  end
+
   def create
     
   end
