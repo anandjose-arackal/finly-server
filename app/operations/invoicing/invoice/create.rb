@@ -24,4 +24,9 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
     add_message :success, "Invoice successfully created!"
   end
 
+  def success
+    params[:invoice] = self.invoice
+    Invoicing::Invoice::Base::InvoicePresenter.new(user, params, messages)
+  end
+
 end
