@@ -8,8 +8,9 @@ class Invoicing::CustomersController < ApplicationController
   end
 
   def index
-    @result = Invoicing::Customer::Index.(current_user, params)
-    respond
+    #todo uncomment after creating customer index operation
+    # @result = Invoicing::Customer::Index.(current_user, params)
+    # respond
   end
 
   def update

@@ -2437,6 +2437,8 @@ Rails.application.routes.draw do
 
   namespace :invoicing do
     resources :payment_receivables
+    resources :outward_invoices
+    resources :customers
     resources :virtual_bank_accounts do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
     end
