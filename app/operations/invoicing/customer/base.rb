@@ -12,7 +12,7 @@ class Invoicing::Customer::Base < BaseOperation
 
   def customer_parameters
     params.require(:customer).permit(:name, :email, :mobile_number, :description, :gst,
-                                     addresses_attributes: [:line_1, :line_2, :city, :state_id, :name, :pin_code, :id])
+                                     addresses_attributes: [:line_1, :line_2, :city, :state_id, :name, :pin_code, :id, :default])
   end
 
 

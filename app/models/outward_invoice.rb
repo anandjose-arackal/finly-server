@@ -53,4 +53,7 @@ class OutwardInvoice < ActiveRecord::Base
   accepts_nested_attributes_for :advance_amount
   accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
+
+  # todo - add validations for the particular invoice when it moves to unpaid state
+
 end
