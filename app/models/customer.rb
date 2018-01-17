@@ -17,7 +17,8 @@ class Customer < ActiveRecord::Base
 
   belongs_to :company
 
-  has_many :addresses
+  has_many :addresses, as: :parent
+  has_many :customer_attachments
 
   accepts_nested_attributes_for :addresses
 end

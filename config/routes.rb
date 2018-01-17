@@ -1040,6 +1040,22 @@
 #                                                         PATCH  /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
 #                                                         PUT    /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
 #                                                         DELETE /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#destroy
+#                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#index
+#                                                         POST   /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#create
+#                           new_invoicing_outward_invoice GET    /invoicing/outward_invoices/new(.:format)                                                  invoicing/outward_invoices#new
+#                          edit_invoicing_outward_invoice GET    /invoicing/outward_invoices/:id/edit(.:format)                                             invoicing/outward_invoices#edit
+#                               invoicing_outward_invoice GET    /invoicing/outward_invoices/:id(.:format)                                                  invoicing/outward_invoices#show
+#                                                         PATCH  /invoicing/outward_invoices/:id(.:format)                                                  invoicing/outward_invoices#update
+#                                                         PUT    /invoicing/outward_invoices/:id(.:format)                                                  invoicing/outward_invoices#update
+#                                                         DELETE /invoicing/outward_invoices/:id(.:format)                                                  invoicing/outward_invoices#destroy
+#                                     invoicing_customers GET    /invoicing/customers(.:format)                                                             invoicing/customers#index
+#                                                         POST   /invoicing/customers(.:format)                                                             invoicing/customers#create
+#                                  new_invoicing_customer GET    /invoicing/customers/new(.:format)                                                         invoicing/customers#new
+#                                 edit_invoicing_customer GET    /invoicing/customers/:id/edit(.:format)                                                    invoicing/customers#edit
+#                                      invoicing_customer GET    /invoicing/customers/:id(.:format)                                                         invoicing/customers#show
+#                                                         PATCH  /invoicing/customers/:id(.:format)                                                         invoicing/customers#update
+#                                                         PUT    /invoicing/customers/:id(.:format)                                                         invoicing/customers#update
+#                                                         DELETE /invoicing/customers/:id(.:format)                                                         invoicing/customers#destroy
 #            invoicing_virtual_bank_account_show_payments GET    /invoicing/virtual_bank_accounts/:virtual_bank_account_id/transactions(.:format)           invoicing/virtual_bank_accounts#show_payments
 #                         invoicing_virtual_bank_accounts GET    /invoicing/virtual_bank_accounts(.:format)                                                 invoicing/virtual_bank_accounts#index
 #                                                         POST   /invoicing/virtual_bank_accounts(.:format)                                                 invoicing/virtual_bank_accounts#create
