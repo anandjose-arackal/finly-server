@@ -4,10 +4,16 @@ class Invoicing::CustomersController < ApplicationController
 
   def create
     @result = Invoicing::Customer::Create.(current_user, params)
-    respond
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def index
+    @result = Invoicing::Customer::Index.(current_user, params)
+    respond
     #todo uncomment after creating customer index operation
     # @result = Invoicing::Customer::Index.(current_user, params)
     # respond
@@ -15,7 +21,11 @@ class Invoicing::CustomersController < ApplicationController
 
   def update
     @result = Invoicing::Customer::Update.(current_user, params)
-    respond
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def destroy

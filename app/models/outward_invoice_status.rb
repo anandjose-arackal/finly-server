@@ -12,6 +12,6 @@ class OutwardInvoiceStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:unpaid, :saved, :partially_paid, :closed, :cancelled, :sent_to_customer]
+    [:unpaid, :saved, :partially_paid, :closed, :cancelled, :sent_to_customer, :incomplete]
   end
 end

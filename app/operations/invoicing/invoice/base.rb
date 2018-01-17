@@ -1,5 +1,16 @@
 class Invoicing::Invoice::Base < BaseOperation
 
+  class Invoicing::Invoice::Base::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :invoice
+
+    def init
+      self.invoice = params[:invoice]
+    end
+
+  end
+
+
   def invoice_params
     params.permit(:tax, :gst_type_id, :tds, :tds_type_id, :category_id,
                    :tax_type_id, :discount, :date, :discount_type_id, :due_date,

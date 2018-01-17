@@ -11,6 +11,7 @@
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
 #  gst           :string(255)
+#  pan           :string(255)
 #
 
 class Customer < ActiveRecord::Base
