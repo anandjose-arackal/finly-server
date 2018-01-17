@@ -14,4 +14,20 @@ class OutwardInvoiceStatus < ActiveRecord::Base
   def self.values
     [:unpaid, :saved, :partially_paid, :closed, :cancelled, :sent_to_customer, :incomplete]
   end
+
+  def unpaid?
+    self.id == OutwardInvoiceStatus.id_for(:unpaid)
+  end
+
+  def partially_paid?
+    self.id == OutwardInvoiceStatus.id_for(:partially_paid)
+  end
+
+  def closed?
+    self.id == OutwardInvoiceStatus.id_for(:closed)
+  end
+
+  def incomplete?
+    self.id == OutwardInvoiceStatus.id_for(:incomplete)
+  end
 end

@@ -67,3 +67,30 @@ json.invoice do
     end
   end
 end
+
+invoice = @result.invoice
+json.summary do
+  json.order_status do
+    json.name invoice.invoice_status&.name
+    json.identifier invoice.invoice_status_identifier
+  end
+  json.invoice_number invoice.invoice_number
+  json.invoice_date invoice.invoice_date
+  json.due_date invoice.due_date
+
+  json.payment_term_name invoice.payment_term&.name
+  json.payment_term_id invoice.payment_term&.id
+
+  json.policy do
+    json.id invoice.policy_id
+    json.name invoice.policy.name
+  end
+
+  json.shipping_address do
+
+  end
+
+  json.billing_address do
+    # shiping address details
+  end
+end

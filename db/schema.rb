@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180117131056) do
+ActiveRecord::Schema.define(version: 20180117172806) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2370,25 +2370,28 @@ ActiveRecord::Schema.define(version: 20180117131056) do
   end
 
   create_table "outward_invoices", force: :cascade do |t|
-    t.integer  "customer_id",        limit: 4
+    t.integer  "customer_id",         limit: 4
     t.date     "invoice_date"
     t.date     "invoice_due_date"
-    t.integer  "amount_id",          limit: 4
-    t.decimal  "discount",                     precision: 10, scale: 5
-    t.decimal  "tax",                          precision: 10, scale: 5
-    t.integer  "discount_amount_id", limit: 4
-    t.integer  "tax_amount_id",      limit: 4
-    t.integer  "original_amount_id", limit: 4
-    t.integer  "paid_amount_id",     limit: 4
-    t.decimal  "advance",                      precision: 10, scale: 5
-    t.integer  "freight_amount_id",  limit: 4
-    t.integer  "tds_amount_id",      limit: 4
-    t.integer  "category_id",        limit: 4
-    t.integer  "balance_due_id",     limit: 4
-    t.decimal  "roundoff_amount",              precision: 10, scale: 5
-    t.datetime "created_at",                                            null: false
-    t.datetime "updated_at",                                            null: false
-    t.integer  "gross_amount_id",    limit: 4
+    t.integer  "amount_id",           limit: 4
+    t.decimal  "discount",                      precision: 10, scale: 5
+    t.decimal  "tax",                           precision: 10, scale: 5
+    t.integer  "discount_amount_id",  limit: 4
+    t.integer  "tax_amount_id",       limit: 4
+    t.integer  "original_amount_id",  limit: 4
+    t.integer  "paid_amount_id",      limit: 4
+    t.decimal  "advance",                       precision: 10, scale: 5
+    t.integer  "freight_amount_id",   limit: 4
+    t.integer  "tds_amount_id",       limit: 4
+    t.integer  "category_id",         limit: 4
+    t.integer  "balance_due_id",      limit: 4
+    t.decimal  "roundoff_amount",               precision: 10, scale: 5
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.integer  "gross_amount_id",     limit: 4
+    t.integer  "policy_id",           limit: 4
+    t.integer  "billing_address_id",  limit: 4
+    t.integer  "shipping_address_id", limit: 4
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
@@ -2517,6 +2520,12 @@ ActiveRecord::Schema.define(version: 20180117131056) do
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "payment_terms", force: :cascade do |t|
+    t.text     "name",       limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
   end
 
   create_table "payment_trails", force: :cascade do |t|

@@ -35,15 +35,20 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :freight_amount, class_name: "Amount"
   belongs_to :advance_amount, class_name: "Amount"
   belongs_to :net_amount, class_name: "Amount"
+  belongs_to :gross_amount, class_name: "Amount"
   belongs_to :invoice_status, class_name: "OutwardInvoiceStatus"
+  belongs_to :payment_term
+  belongs_to :shipping_address, class_name: "Address"
+  belongs_to :billing_address, class_name: "Address"
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :payments, as: :parent
 
-  delegate :unpaid?, :partially_paid?, :closed?, to: :invoice_status
+  delegate :unpaid?, :partially_paid?, :closed?, :incomplete?, to: :invoice_status
 
+  accepts_nested_attributes_for :customer
   accepts_nested_attributes_for :amount
-  # accepts_nested_attributes_for :gross_amount
+  accepts_nested_attributes_for :gross_amount
   accepts_nested_attributes_for :net_amount
   accepts_nested_attributes_for :discount_amount
   accepts_nested_attributes_for :tax_amount
@@ -55,5 +60,16 @@ class OutwardInvoice < ActiveRecord::Base
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
 
   # todo - add validations for the particular invoice when it moves to unpaid state
+  validates :invoice_items, presence: true, if: :invoice_saved?
+
+  def invoice_status_identifier
+    self.invoice_status.name
+  end
+
+  private
+
+  def invoice_saved?
+
+  end
 
 end
