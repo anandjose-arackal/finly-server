@@ -2470,8 +2470,8 @@ Rails.application.routes.draw do
     resources :outward_invoices do
       patch 'add_customer', to: 'outward_invoices#add_customer', as: :add_customer
       patch 'remove_customer', to: 'outward_invoices#remove_customer', as: :remove_customer
-      patch 'update_address', to: 'update_address', as: :update_address
-      patch 'update_virtual_account', as: :update_virtual_account
+      patch 'update_address', to: 'outward_invoices#update_address', as: :update_address
+      patch 'update_virtual_account', to: 'outward_invoices#update_virtual_account', as: :update_virtual_account
     end
     resources :customers
     resources :virtual_bank_accounts do
