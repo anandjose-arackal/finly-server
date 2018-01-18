@@ -29,4 +29,12 @@ class Invoicing::OutwardInvoicesController < ApplicationController
 
   end
 
+  def add_customer
+
+  end
+
+  def remove_customer
+
+  end
+
 end

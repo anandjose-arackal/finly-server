@@ -1,5 +1,11 @@
 class Invoicing::Invoice::Base < BaseOperation
 
+  def pre_validate
+    if user.blank? || params.blank?
+      add_message :error, "Invalid parameters"
+    end
+  end
+
   class Invoicing::Invoice::Base::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :invoice

@@ -1040,6 +1040,10 @@
 #                                                         PATCH  /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
 #                                                         PUT    /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
 #                                                         DELETE /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#destroy
+#                  invoicing_outward_invoice_add_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/add_customer(.:format)                     invoicing/outward_invoices#add_customer
+#               invoicing_outward_invoice_remove_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/remove_customer(.:format)                  invoicing/outward_invoices#remove_customer
+#                invoicing_outward_invoice_update_address PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_address(.:format)                   invoicing/update_address#update_address
+#        invoicing_outward_invoice_update_virtual_account PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_virtual_account(.:format)           invoicing/outward_invoices#update_virtual_account
 #                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#index
 #                                                         POST   /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#create
 #                           new_invoicing_outward_invoice GET    /invoicing/outward_invoices/new(.:format)                                                  invoicing/outward_invoices#new
@@ -2453,7 +2457,12 @@ Rails.application.routes.draw do
 
   namespace :invoicing do
     resources :payment_receivables
-    resources :outward_invoices
+    resources :outward_invoices do
+      patch 'add_customer', to: 'outward_invoices#add_customer', as: :add_customer
+      patch 'remove_customer', to: 'outward_invoices#remove_customer', as: :remove_customer
+      patch 'update_address', to: 'update_address', as: :update_address
+      patch 'update_virtual_account', as: :update_virtual_account
+    end
     resources :customers
     resources :virtual_bank_accounts do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments

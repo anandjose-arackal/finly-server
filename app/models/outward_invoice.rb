@@ -74,6 +74,10 @@ class OutwardInvoice < ActiveRecord::Base
     self.invoice_status&.name
   end
 
+  def editable?
+    self.invoice_status_id == OutwardInvoiceStatus.id_for(:incomplete)
+  end
+
   private
 
   def invoice_saved?
