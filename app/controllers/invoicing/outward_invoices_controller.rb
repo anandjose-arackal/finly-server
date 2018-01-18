@@ -1,7 +1,8 @@
 class Invoicing::OutwardInvoicesController < ApplicationController
 
   def index
-
+    @result = Invoicing::Invoice::Index.(current_user, params)
+    respond
   end
 
   def show
