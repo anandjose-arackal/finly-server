@@ -1,0 +1,17 @@
+customer = @result.customer
+json.extract! customer, :name, :email, :mobile_number, :description, :gst, :pan
+json.company do
+  json.name customer.company&.name
+  json.id customer.company&.id
+end
+json.addresses do
+  json.array!(customer.addresses) do |address|
+    json.name address.name
+    json.city address.city
+    json.line_1 address.line_1
+    json.line_2 address.line_2
+    json.line_3 address.line_3
+    json.pin_code address.pin_code
+    json.default address.default
+  end
+end

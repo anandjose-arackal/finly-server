@@ -4,10 +4,11 @@ class Invoicing::Customer::Show < Invoicing::Customer::Base
 
   class Invoicing::Customer::Show::CustomerPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :customer
+    attr_accessor :customer, :payments
 
     def init
       self.customer = params[:customer]
+      self.payments = params[:payments]
     end
 
   end
@@ -20,10 +21,11 @@ class Invoicing::Customer::Show < Invoicing::Customer::Base
   def process
     # extracting payments made by the particular customer to this company
     # todo - the below is just a sample for how the call will look like
-    self.payments = Invoicing::Customer::Payments::Show.(self.customer)
+    # self.payments = Invoicing::Customer::Payments::Show.(self.customer)
+    self.payments = []
   end
 
-  def post_process
+  def  post_process
 
   end
 

@@ -28,6 +28,11 @@ class Invoicing::CustomersController < ApplicationController
     end
   end
 
+  def show
+    @result = Invoicing::Customer::Show.(current_user, params)
+    respond
+  end
+
   def destroy
     @result = Invoicing::Customer::Destroy.(current_user, params)
     respond
