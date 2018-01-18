@@ -87,10 +87,28 @@ json.summary do
   end
 
   json.shipping_address do
-
+    json.line_1 invoice.shipping_address.line_1
+    json.line_2 invoice.shipping_address.line_2
+    json.line_3 invoice.shipping_address.line_3
+    json.name invoice.shipping_address.name
+    json.state_id invoice.shipping_address.state_id
+    json.name invoice.shipping_address.name
+    json.pin_code invoice.shipping_address.pin_code
   end
 
   json.billing_address do
-    # shiping address details
+    # billing address details
+    json.line_1 invoice.billing_address.line_1
+    json.line_2 invoice.billing_address.line_2
+    json.line_3 invoice.billing_address.line_3
+    json.name invoice.billing_address.name
+    json.state_id invoice.billing_address.state_id
+    json.name invoice.billing_address.name
+    json.pin_code invoice.billing_address.pin_code
   end
+
+end
+
+json.customer do
+  
 end
