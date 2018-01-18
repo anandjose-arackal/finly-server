@@ -47,6 +47,8 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :shipping_address, class_name: "Address"
   belongs_to :billing_address, class_name: "Address"
 
+  has_one :virtual_bank_account, as: :parent
+
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :payments, as: :parent
 

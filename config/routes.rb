@@ -1032,6 +1032,14 @@
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                             bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                       bank_transfer/vendor_payment_wallets#transfer_options
 #                                     public_bank_account GET    /account/:account_number(.:format)                                                         invoicing/public_links#virtual_bank_account_show
+#                                               addresses GET    /addresses(.:format)                                                                       addresses#index
+#                                                         POST   /addresses(.:format)                                                                       addresses#create
+#                                             new_address GET    /addresses/new(.:format)                                                                   addresses#new
+#                                            edit_address GET    /addresses/:id/edit(.:format)                                                              addresses#edit
+#                                                 address GET    /addresses/:id(.:format)                                                                   addresses#show
+#                                                         PATCH  /addresses/:id(.:format)                                                                   addresses#update
+#                                                         PUT    /addresses/:id(.:format)                                                                   addresses#update
+#                                                         DELETE /addresses/:id(.:format)                                                                   addresses#destroy
 #                           invoicing_payment_receivables GET    /invoicing/payment_receivables(.:format)                                                   invoicing/payment_receivables#index
 #                                                         POST   /invoicing/payment_receivables(.:format)                                                   invoicing/payment_receivables#create
 #                        new_invoicing_payment_receivable GET    /invoicing/payment_receivables/new(.:format)                                               invoicing/payment_receivables#new
@@ -2454,6 +2462,8 @@ Rails.application.routes.draw do
 
 
   get 'account/:account_number', to: 'invoicing/public_links#virtual_bank_account_show', as: :public_bank_account
+
+  resources :addresses
 
   namespace :invoicing do
     resources :payment_receivables
