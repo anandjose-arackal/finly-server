@@ -2,30 +2,36 @@
 #
 # Table name: outward_invoices
 #
-#  id                 :integer          not null, primary key
-#  customer_id        :integer
-#  invoice_date       :date
-#  invoice_due_date   :date
-#  amount_id          :integer
-#  discount           :decimal(10, 5)
-#  tax                :decimal(10, 5)
-#  discount_amount_id :integer
-#  tax_amount_id      :integer
-#  original_amount_id :integer
-#  paid_amount_id     :integer
-#  advance            :decimal(10, 5)
-#  freight_amount_id  :integer
-#  tds_amount_id      :integer
-#  category_id        :integer
-#  balance_due_id     :integer
-#  roundoff_amount    :decimal(10, 5)
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  gross_amount_id    :integer
+#  id                  :integer          not null, primary key
+#  customer_id         :integer
+#  invoice_date        :date
+#  invoice_due_date    :date
+#  amount_id           :integer
+#  discount            :decimal(10, 5)
+#  tax                 :decimal(10, 5)
+#  discount_amount_id  :integer
+#  tax_amount_id       :integer
+#  original_amount_id  :integer
+#  paid_amount_id      :integer
+#  advance             :decimal(10, 5)
+#  freight_amount_id   :integer
+#  tds_amount_id       :integer
+#  category_id         :integer
+#  balance_due_id      :integer
+#  roundoff_amount     :decimal(10, 5)
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#  gross_amount_id     :integer
+#  policy_id           :integer
+#  billing_address_id  :integer
+#  shipping_address_id :integer
+#  invoice_status_id   :integer
+#  company_id          :integer
 #
 
 class OutwardInvoice < ActiveRecord::Base
   belongs_to :customer
+  belongs_to :company
   belongs_to :amount
   belongs_to :discount_amount, class_name: "Amount"
   belongs_to :tax_amount, class_name: "Amount"

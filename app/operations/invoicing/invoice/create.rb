@@ -17,7 +17,10 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
   end
 
   def process
-    self.invoice = OutwardInvoice.create(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete))
+    self.invoice = OutwardInvoice.new(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete))
+    unless self.invoice.save
+      add_message :error, self.invoice.errors.full_messages
+    end
   end
 
   def post_process
