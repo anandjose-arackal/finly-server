@@ -46,12 +46,12 @@ class Statements::Show < Statements::Base
             self.account = sel_user.cash_on_hand
         end
       when :card
-        user_presenter = User::Show.(user, params)
+        user_presenter = User::Index.(user, params)
         unless user_presenter.success?
           add_message :error, user_presenter.messages[:error]
           return
         end
-        users = user_presenter.users
+        users = user_presenter.team
         self.account = Card.with_user(users.pluck(:id)).with_proxy(params[:proxy])&.first
     end
 
