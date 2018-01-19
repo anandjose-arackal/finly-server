@@ -3,7 +3,7 @@ class InvoiceLineItemsCalculationUtils
 
   include MathUtil
 
-  attr_accessor :invoice_item_amount, :payment_amount,
+  attr_accessor :invoice_item_amount, :payment_amount, :after_discount_amount,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tax_amount, :after_tax_amount,
                 :invoice_total, :roundoff_amount, :total_discount, :total_tax
@@ -18,12 +18,13 @@ class InvoiceLineItemsCalculationUtils
     self.invoice_total = self.total_discount = self.total_tax = 0
     invoice.invoice_items.each_with_index do |item, index|
       if invoice.inclusive_of_taxes # calculate the other amounts retrospectively
-        self.after_tax_amount = item.quantity * item.rate
-        # first calculate the gross amount from the =
-        calculate_inclusive_taxes(item)
+        # self.after_tax_amount = item.quantity * item.rate
+        self.invoice_item_amount = item.quantity * item.rate
+        # first calculate the net amount to be paid after discount
         calculate_discount_inclusive(item)
-        self.invoice_item_amount = self.gross_amount + self.discount_amount
-        self.net_amount = self.after_tax_amount
+        calculate_inclusive_taxes(item)
+        # self.invoice_item_amount = self.gross_amount + self.discount_amount
+        self.net_amount = self.invoice_item_amount - self.discount_amount
       else # calculate proactively
         self.invoice_item_amount = item.quantity * item.rate
         calculate_discount_exclusive(item)
@@ -107,12 +108,12 @@ class InvoiceLineItemsCalculationUtils
   def calculate_discount_inclusive(item)
     if item.discount.blank?
       self.discount_amount = 0
-      self.invoice_item_amount = self.gross_amount
+      self.after_discount_amount = self.invoice_item_amount
       return
     end
     # because the discount is also always shown
-    self.invoice_item_amount = (self.gross_amount*100)/(100 - item.discount)
-    self.discount_amount = self.invoice_item_amount - self.gross_amount
+    self.discount_amount = (item.discount * self.invoice_item_amount) / 100
+    self.after_discount_amount = self.invoice_item_amount - self.discount_amount
   end
 
   def calculate_exclusive_taxes(item)
@@ -127,12 +128,12 @@ class InvoiceLineItemsCalculationUtils
 
   def calculate_inclusive_taxes(item)
     if item.tax.blank?
-      self.after_tax_amount = self.gross_amount
+      self.gross_amount = self.after_discount_amount
       self.tax_amount = 0
       return
     end
-    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (item.tax))
-    self.tax_amount = self.after_tax_amount - self.gross_amount
+    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax))
+    self.tax_amount = self.after_discount_amount - self.gross_amount
   end
 
 

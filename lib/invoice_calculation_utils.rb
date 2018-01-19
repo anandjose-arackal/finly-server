@@ -5,7 +5,7 @@ class InvoiceCalculationUtils
 
   attr_accessor :invoice_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
-                :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
+                :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_discount_amount,
                 :advance, :advance_amount, :invoice_total, :freight_amount,
                 :roundoff_amount, :balance_due_amount
 
@@ -15,7 +15,8 @@ class InvoiceCalculationUtils
     if self.invoice.blank?
       return
     end
-    self.gross_amount = invoice_total
+    # here the gross amount will be the total of invoices minus the discount
+    self.gross_amount = invoice_total - self.invoice.discount_amount&.value
     calculate_tds
     self.net_amount = self.gross_amount - self.tds_amount
     calculate_advance_paid
@@ -76,13 +77,14 @@ class InvoiceCalculationUtils
       return
     end
     if self.invoice.inclusive_of_taxes # calculate the other amounts retrospectively
-      self.after_tax_amount = self.invoice.original_amount&.value
-      # first calculate the gross amount from the
+      self.original_amount = self.invoice.original_amount&.value
+      # first calculate the gross amount by deducting the discount from
+      # the original amount entered
+      calculate_discount_inclusive
       calculate_inclusive_taxes
       calculate_tds
-      calculate_discount_inclusive
-      self.net_amount = self.after_tax_amount - self.tds_amount
-      self.invoice_amount = self.gross_amount + self.discount_amount
+      self.net_amount = self.after_discount_amount - self.tds_amount
+      self.invoice_amount = self.original_amount # todo - gotta check the ramifications of this
       calculate_advance_paid
       calculate_freight_charges
     else # calculate proactively
@@ -186,12 +188,12 @@ class InvoiceCalculationUtils
   def calculate_discount_inclusive
     if self.invoice.discount.blank?
       self.discount_amount = 0
-      self.invoice_amount = self.gross_amount
+      self.after_discount_amount = self.original_amount
       return
     end
     # because the discount is also always shown
-    self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
-    self.discount_amount = self.invoice_amount - self.gross_amount
+    self.discount_amount = (invoice.discount * self.original_amount)/100
+    self.after_discount_amount = self.original_amount - self.discount_amount
   end
 
   def calculate_exclusive_taxes
@@ -206,12 +208,12 @@ class InvoiceCalculationUtils
 
   def calculate_inclusive_taxes
     if self.invoice.tax.blank?
-      self.after_tax_amount = self.gross_amount
+      self.gross_amount = self.after_discount_amount
       self.tax_amount = 0
       return
     end
-    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax))
-    self.tax_amount = self.after_tax_amount - self.gross_amount
+    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (self.invoice.tax))
+    self.tax_amount = self.after_discount_amount - self.gross_amount
   end
 
   def calculate_tds
