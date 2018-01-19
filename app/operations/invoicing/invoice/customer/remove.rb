@@ -1,5 +1,6 @@
 class Invoicing::Invoice::Customer::Remove < Invoicing::Invoice::Base
 
+  attr_accessor :invoice
 
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:outward_invoice_id]

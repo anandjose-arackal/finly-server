@@ -1050,7 +1050,7 @@
 #                                                         DELETE /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#destroy
 #                  invoicing_outward_invoice_add_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/add_customer(.:format)                     invoicing/outward_invoices#add_customer
 #               invoicing_outward_invoice_remove_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/remove_customer(.:format)                  invoicing/outward_invoices#remove_customer
-#                invoicing_outward_invoice_update_address PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_address(.:format)                   invoicing/update_address#update_address
+#                invoicing_outward_invoice_update_address PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_address(.:format)                   invoicing/outward_invoices#update_address
 #        invoicing_outward_invoice_update_virtual_account PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_virtual_account(.:format)           invoicing/outward_invoices#update_virtual_account
 #                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#index
 #                                                         POST   /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#create

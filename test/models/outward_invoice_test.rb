@@ -27,6 +27,8 @@
 #  shipping_address_id :integer
 #  invoice_status_id   :integer
 #  company_id          :integer
+#  invoice_number      :string(255)
+#  gst_type_id         :integer
 #
 
 require 'test_helper'

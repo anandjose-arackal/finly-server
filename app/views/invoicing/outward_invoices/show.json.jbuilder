@@ -77,35 +77,35 @@ if invoice.present?
     end
     json.invoice_number invoice.invoice_number
     json.invoice_date invoice.invoice_date
-    json.due_date invoice.due_date
+    json.due_date invoice.invoice_due_date
 
     json.payment_term_name invoice.payment_term&.name
     json.payment_term_id invoice.payment_term&.id
 
     json.policy do
       json.id invoice.policy_id
-      json.name invoice.policy.name
+      json.name invoice.policy&.name
     end
 
     json.shipping_address do
-      json.line_1 invoice.shipping_address.line_1
-      json.line_2 invoice.shipping_address.line_2
-      json.line_3 invoice.shipping_address.line_3
-      json.name invoice.shipping_address.name
-      json.state_id invoice.shipping_address.state_id
-      json.name invoice.shipping_address.name
-      json.pin_code invoice.shipping_address.pin_code
+      json.line_1 invoice.shipping_address&.line_1
+      json.line_2 invoice.shipping_address&.line_2
+      json.line_3 invoice.shipping_address&.line_3
+      json.name invoice.shipping_address&.name
+      json.state_id invoice.shipping_address&.state_id
+      json.name invoice.shipping_address&.name
+      json.pin_code invoice.shipping_address&.pin_code
     end
 
     json.billing_address do
       # billing address details
-      json.line_1 invoice.billing_address.line_1
-      json.line_2 invoice.billing_address.line_2
-      json.line_3 invoice.billing_address.line_3
-      json.name invoice.billing_address.name
-      json.state_id invoice.billing_address.state_id
-      json.name invoice.billing_address.name
-      json.pin_code invoice.billing_address.pin_code
+      json.line_1 invoice.billing_address&.line_1
+      json.line_2 invoice.billing_address&.line_2
+      json.line_3 invoice.billing_address&.line_3
+      json.name invoice.billing_address&.name
+      json.state_id invoice.billing_address&.state_id
+      json.name invoice.billing_address&.name
+      json.pin_code invoice.billing_address&.pin_code
     end
 
   end
@@ -113,12 +113,12 @@ if invoice.present?
   json.customer do
     json.name invoice.customer&.name
     json.id invoice.customer&.id
-    json.mobile_number invoice.mobile_number
-    json.email invoice.email
+    json.mobile_number invoice.customer&.mobile_number
+    json.email invoice.customer&.email
   end
 
   json.invoice do
-    json.total_amount precision_value invoice.invoice_amount&.value
+    json.total_amount precision_value invoice.amount&.value
     json.advance precision_value invoice.advance
     json.advance_amount precision_value invoice.advance_amount&.value
     json.gst_type_id invoice.gst_type_id
@@ -127,7 +127,7 @@ if invoice.present?
     json.balance_due precision_value invoice.balance_due&.value
 
     json.invoice_items do
-      json.array!(invoice_items) do |item|
+      json.array!(invoice.invoice_items) do |item|
         json.rate item.rate
         json.quantity item.quantity
         json.tax item.tax

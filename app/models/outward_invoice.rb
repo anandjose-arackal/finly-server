@@ -27,12 +27,18 @@
 #  shipping_address_id :integer
 #  invoice_status_id   :integer
 #  company_id          :integer
+#  invoice_number      :string(255)
+#  gst_type_id         :integer
 #
 
 class OutwardInvoice < ActiveRecord::Base
+
+  include MathUtil
+
   belongs_to :customer
   belongs_to :company
   belongs_to :amount
+  belongs_to :policy
   belongs_to :discount_amount, class_name: "Amount"
   belongs_to :tax_amount, class_name: "Amount"
   belongs_to :original_amount, class_name: "Amount"
@@ -70,7 +76,18 @@ class OutwardInvoice < ActiveRecord::Base
   validates :invoice_status, presence: true
 
   # todo - add validations for the particular invoice when it moves to unpaid state
-  validates :invoice_items, presence: true, if: :invoice_saved?
+  validates :invoice_items, presence: true, if: :valid_invoice?
+  validates :invoice_number, presence: true, if: :valid_invoice?
+  validates :customer_id, presence: true, if: :valid_invoice?
+  validates :billing_address_id, presence: true, if: :valid_invoice?
+  validates :shipping_address_id, presence: true, if: :valid_invoice?
+  validates :company_id, presence: true, if: :valid_invoice?
+
+  before_save do
+    if self.invoice_number.blank? && valid_invoice?
+      generate_invoice_number
+    end
+  end
 
   def invoice_status_identifier
     self.invoice_status&.name
@@ -82,8 +99,25 @@ class OutwardInvoice < ActiveRecord::Base
 
   private
 
-  def invoice_saved?
-
+  # as in, an invoice that has been saved and is payable by
+  # the customer
+  def valid_invoice?
+    !(self.invoice_status_id == OutwardInvoiceStatus.id_for(:incomplete))
   end
+
+  def generate_invoice_number
+    company = self.company
+    if company.blank?
+      return nil
+    else
+      number = MathUtil.generate_random_number(10)
+      while OutwardInvoice.find_by(invoice_number: number)
+        number = MathUtil.generate_random_number(10)
+      end
+    end
+    number
+  end
+
+
 
 end

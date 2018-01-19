@@ -26,6 +26,11 @@ class Invoicing::Invoice::Customer::Update < Invoicing::Invoice::Base
       return
     end
 
+    if self.invoice.blank?
+      add_message :error, "Invoice not found"
+      return
+    end
+
     unless self.invoice.editable?
       add_message :error, "Invoice cannot be changed in this state"
     end
@@ -49,7 +54,7 @@ class Invoicing::Invoice::Customer::Update < Invoicing::Invoice::Base
   end
 
   def post_process
-    add_message :error, "Customer updated!"
+    add_message :success, "Customer updated!"
   end
 
 
