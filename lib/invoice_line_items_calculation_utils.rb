@@ -17,6 +17,7 @@ class InvoiceLineItemsCalculationUtils
     end
     self.invoice_total = self.total_discount = self.total_tax = self.taxable_amount = 0
     invoice.invoice_items.each_with_index do |item, index|
+      self.item_taxable_amount = 0
       if invoice.inclusive_of_taxes # calculate the other amounts retrospectively
         # self.after_tax_amount = item.quantity * item.rate
         self.invoice_item_amount = item.quantity * item.rate
@@ -101,7 +102,7 @@ class InvoiceLineItemsCalculationUtils
     end
 
     # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here
-    InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, payment)
+    InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, self.invoice_total, payment)
     params
   end
 
