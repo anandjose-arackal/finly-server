@@ -16,7 +16,7 @@ class InvoiceCalculationUtils
       return
     end
     # here the gross amount will be the total of invoices minus the discount
-    self.gross_amount = invoice_total - self.invoice.discount_amount&.value
+    self.gross_amount = invoice_total - self.invoice.tax_amount&.value
     calculate_tds
     self.net_amount = self.gross_amount - self.tds_amount
     calculate_advance_paid
