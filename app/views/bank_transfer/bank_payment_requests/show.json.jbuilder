@@ -120,6 +120,9 @@ json.payments do
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 
+        # invoice amounts total
+        json.item_amounts_total invoice.item_amounts_total
+
         # invoice items
         json.invoice_items do
           json.array!(invoice.invoice_items) do |item|
@@ -220,6 +223,9 @@ json.payments_verified do
         end
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
+
+        # invoice amounts total
+        json.item_amounts_total invoice.item_amounts_total
 
         json.invoice_items do
           json.array!(invoice.invoice_items) do |item|
@@ -322,6 +328,9 @@ json.payments_unverified do
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 
+        # invoice amounts total
+        json.item_amounts_total invoice.item_amounts_total
+        
         json.invoice_items do
           json.array!(invoice.invoice_items) do |item|
             json.rate item.rate
