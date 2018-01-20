@@ -4,7 +4,7 @@ class InvoiceLineItemsCalculationUtils
   include MathUtil
 
   attr_accessor :invoice_item_amount, :payment_amount, :after_discount_amount,
-                :gross_amount, :net_amount, :invoice,
+                :gross_amount, :net_amount, :invoice, :item_taxable_amount, :taxable_amount,
                 :discount_amount, :tax_amount, :after_tax_amount,
                 :invoice_total, :roundoff_amount, :total_discount, :total_tax
 
@@ -15,7 +15,7 @@ class InvoiceLineItemsCalculationUtils
     if invoice.blank?
       return
     end
-    self.invoice_total = self.total_discount = self.total_tax = 0
+    self.invoice_total = self.total_discount = self.total_tax = self.taxable_amount = 0
     invoice.invoice_items.each_with_index do |item, index|
       if invoice.inclusive_of_taxes # calculate the other amounts retrospectively
         # self.after_tax_amount = item.quantity * item.rate
@@ -23,17 +23,20 @@ class InvoiceLineItemsCalculationUtils
         # first calculate the net amount to be paid after discount
         calculate_discount_inclusive(item)
         calculate_inclusive_taxes(item)
+        self.item_taxable_amount += self.gross_amount
         # self.invoice_item_amount = self.gross_amount + self.discount_amount
         self.net_amount = self.invoice_item_amount - self.discount_amount
       else # calculate proactively
         self.invoice_item_amount = item.quantity * item.rate
         calculate_discount_exclusive(item)
         calculate_exclusive_taxes(item)
+        self.item_taxable_amount += self.gross_amount
         self.net_amount = self.gross_amount + self.tax_amount
       end
       self.invoice_total += self.net_amount
       self.total_discount += self.discount_amount
       self.total_tax += self.tax_amount
+      self.taxable_amount += self.item_taxable_amount
       # assign the respective calculated parameters to the payment params
       # invoice line item raw amount
       if item.amount.present?
@@ -66,6 +69,14 @@ class InvoiceLineItemsCalculationUtils
       else
         item.net_amount = Amount.new(value: self.net_amount, currency_id: 1)
       end
+
+      # invoice item taxable amount
+      if item.taxable_amount.present?
+        item.taxable_amount.value = self.item_taxable_amount
+        item.net_amount.currency_id = Currency.first.id
+      else
+        item.taxable_amount = Amount.new(value: self.taxable_amount, currency_id: 1)
+      end
     end
 
     # assign invoice amount
@@ -90,7 +101,7 @@ class InvoiceLineItemsCalculationUtils
     end
 
     # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here
-    InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.invoice_total, payment)
+    InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, payment)
     params
   end
 

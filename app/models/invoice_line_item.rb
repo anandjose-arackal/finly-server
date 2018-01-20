@@ -27,6 +27,7 @@ class InvoiceLineItem < ActiveRecord::Base
   belongs_to :discount_amount, class_name: "Amount"
   belongs_to :tax_amount, class_name: "Amount"
   belongs_to :net_amount, class_name: "Amount"
+  belongs_to :taxable_amount, class_name: "Amount"
 
   accepts_nested_attributes_for :discount_amount
   accepts_nested_attributes_for :tax_amount

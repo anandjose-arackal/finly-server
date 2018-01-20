@@ -10,13 +10,13 @@ class InvoiceCalculationUtils
                 :roundoff_amount, :balance_due_amount
 
   # don't go by the name - this calculates the Freight paid as well
-  def calculate_tds_and_advance(params, invoice_total, payment = nil, invoice = nil)
+  def calculate_tds_and_advance(params, taxable_amount, payment = nil, invoice = nil)
     self.invoice = invoice || payment&.invoice
     if self.invoice.blank?
       return
     end
     # here the gross amount will be the total of invoices minus the discount
-    self.gross_amount = invoice_total - self.invoice.tax_amount&.value
+    self.gross_amount = taxable_amount
     calculate_tds
     self.net_amount = self.gross_amount - self.tds_amount
     calculate_advance_paid
