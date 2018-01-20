@@ -19,9 +19,10 @@ GIT
 
 GIT
   remote: ssh://git@altssh.bitbucket.org:443/vivek_a17/finly-secure_storage-sdk.git
-  revision: c4a99b24089dc8db24d50d451d011bb7fe3e33a7
+  revision: 852678eb99cf332dfc582e224ad06f9563ffa90b
   specs:
-    finly-secure_storage-sdk (0.1.82)
+    finly-secure_storage-sdk (0.1.30)
+      aws-sdk-ec2 (>= 1.24.0)
       rails (>= 4.2)
 
 GEM
@@ -78,8 +79,8 @@ GEM
     autoprefixer-rails (6.5.0.1)
       execjs
     awesome_print (1.7.0)
-    aws-partitions (1.53.0)
-    aws-sdk-core (3.13.1)
+    aws-partitions (1.55.0)
+    aws-sdk-core (3.14.0)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.0)
       jmespath (~> 1.0)
