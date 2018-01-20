@@ -1,7 +1,7 @@
 # config valid only for current version of Capistrano
 lock '3.10.1'
 
-load_secure_storage((fetch(:stage) == 'itzcash_production' ? :production : :development))
+load_secure_storage((fetch(:stage)&.to_s == 'itzcash_production' ? :production : :development))
 
 set :application, 'finly-server'
 
