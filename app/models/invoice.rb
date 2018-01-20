@@ -37,6 +37,7 @@
 #  freight            :decimal(20, 10)
 #  roundoff_amount    :decimal(20, 10)
 #  balance_due_id     :integer
+#  taxable_amount_id  :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -54,6 +55,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :advance_amount, class_name: "Amount"
   belongs_to :freight_amount, class_name: "Amount"
   belongs_to :balance_due, class_name: "Amount"
+  belongs_to :taxable_amount, class_name: "Amount"
   belongs_to :category
 
   # because multiple payments can be made against one invoice

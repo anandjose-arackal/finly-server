@@ -99,6 +99,7 @@ json.payments do
         json.freight_amount invoice.freight_amount&.value
         json.roundoff_amount invoice.roundoff_amount
         json.balance_due invoice.balance_due&.value
+        json.taxable_amount precision_value invoice.gross_amount&.value
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate
@@ -135,6 +136,7 @@ json.payments do
             json.description item.description
             json.total_amount precision_value item.net_amount&.value
             json.hsn_sac item.hsn_sac
+            json.taxable_amount precision_value item.taxable_amount&.value
           end
         end
       end
@@ -198,6 +200,7 @@ json.payments_verified do
         json.freight_amount invoice.freight_amount&.value
         json.roundoff_amount invoice.roundoff_amount
         json.balance_due invoice.balance_due&.value
+        json.taxable_amount precision_value invoice.gross_amount&.value
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate
@@ -233,6 +236,7 @@ json.payments_verified do
             json.description item.description
             json.total_amount precision_value item.net_amount&.value
             json.hsn_sac item.hsn_sac
+            json.taxable_amount precision_value item.taxable_amount&.value
           end
         end
       end
@@ -297,6 +301,7 @@ json.payments_unverified do
         json.freight_amount invoice.freight_amount&.value
         json.roundoff_amount invoice.roundoff_amount
         json.balance_due invoice.balance_due&.value
+        json.taxable_amount precision_value invoice.gross_amount&.value
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate
@@ -332,6 +337,7 @@ json.payments_unverified do
             json.description item.description
             json.total_amount precision_value item.net_amount&.value
             json.hsn_sac item.hsn_sac
+            json.taxable_amount precision_value item.taxable_amount&.value
           end
         end
       end
