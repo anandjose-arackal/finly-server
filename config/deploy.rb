@@ -26,7 +26,7 @@ case fetch(:stage)
 end
 
 set :pty, true
-set :linked_files, %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml config/finly_collect.yml config/secure_storage_config.yml}
+set :linked_files, %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml config/finly_collect.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
 
@@ -57,6 +57,8 @@ set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
 
+after 'deploy', 'runner:restart'
+
 # Restart runner
 namespace :runner do
   task :restart do
@@ -70,11 +72,6 @@ namespace :runner do
     end
   end
 end
-
-after 'deploy', 'runner:restart'
-
-# after 'deploy:symlink', 'aws:enable_secure_storage'
-# after 'deploy', 'aws:disable_secure_storage'
 
 #
 # Example: cap staging rake:invoke task=rebuild_table_abc

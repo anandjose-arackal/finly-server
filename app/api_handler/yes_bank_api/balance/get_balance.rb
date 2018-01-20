@@ -31,6 +31,13 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
     set_xml_params
   end
 
+  def validate
+    super
+    if self.account_number.blank?
+      add_message :error, "No account number present"
+    end
+  end
+
   def success?
     self.parsed_response = Hash.from_xml(response.body)
     ap parsed_response
@@ -49,7 +56,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def failure
-
+    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter.new
   end
 
   class YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -58,6 +65,15 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
 
     def initialize(balance)
       self.balance = balance
+    end
+  end
+
+  class YesBankApi::Transfer::BankTransfer::FailureBalancePresenter < BaseOperation::BasePresenter::FailurePresenter
+
+    attr_accessor :balance
+
+    def initialize
+      self.balance = 0
     end
   end
 

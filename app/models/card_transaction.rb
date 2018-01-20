@@ -147,6 +147,10 @@ class CardTransaction < ActiveRecord::Base
     debit? and (transaction_mode == 'POS' or transaction_mode == 'ECOM')
   end
 
+  def atm_usage_fees?
+    self.merchant_name.contains?('ATM USAGE FEES')
+  end
+
   def refund?
     if CardTransaction.refunds.include?(self)
       if self.transaction_type == 'Credit'

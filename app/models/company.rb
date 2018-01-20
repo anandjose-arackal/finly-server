@@ -126,6 +126,12 @@ class Company < ActiveRecord::Base
     joins(:auto_sync_configs).select('companies.*').where(reports_sync: true)
   }
 
+  def vendor_payment_policies
+    ids = self.policies.with_application("vp").pluck(:id)
+    ids << self.default_policy.id
+    Policy.where(id: ids)
+  end
+
   def default_policy
     self.policies.default&.first
   end
