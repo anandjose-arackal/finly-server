@@ -147,6 +147,9 @@ gem 'hooks', '0.4.1'
 
 gem 'bullet', '5.4.2', :group => 'development'
 
+gem 'logstasher', '1.2.2'
+
+
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print', '1.7.0'
 
