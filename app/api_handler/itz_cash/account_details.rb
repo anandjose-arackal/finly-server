@@ -107,7 +107,7 @@ class ItzCash::AccountDetails < ItzCash::Base
     status = :unassigned
     if card.user_id.present?
       status = :assign_requested
-      if params[:distributor_id] == card.user.company.d_code
+      unless params[:distributor_id] == "D000000000" || params[:distributor_id] == "NA"
         status = :assigned
         balance = (params[:balance] or 0)
         eligibility = (params[:available_card_eligibility] or 0)
