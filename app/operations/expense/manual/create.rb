@@ -68,7 +68,7 @@ class Expense::Manual::Create < Expense::Manual::Base
 
   def pre_process
     # if the expense is from cash on hand, mark it as non-reimbursable by default
-    if ['1', 1].include?(expense_params[:from_cash_on_hand])
+    if StringUtils.to_bool(expense_params[:from_cash_on_hand])
       expense_params[:reimbursable] = false
     end
   end

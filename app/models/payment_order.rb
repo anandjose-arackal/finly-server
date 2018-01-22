@@ -23,8 +23,6 @@
 #  currency_id               :integer          not null
 #  application               :string(255)
 #  payment_mode              :string(255)
-#  post_operation            :text(65535)
-#  post_operation_payload    :text(65535)
 #
 
 class PaymentOrder < ActiveRecord::Base
@@ -207,6 +205,20 @@ class PaymentOrder < ActiveRecord::Base
   # again, for convenience, and only applies to bank transfer poyments
   def bank_transfer_type
     self.payments.first.payment_mode
+  end
+
+  def update_order_status
+    status_ids = self.payments.pluck(:payment_status_id)
+    if status_ids.include?(PaymentStatus.id_for(:failed))
+      # now further check if there are successes as well
+      if status_ids.include?(PaymentStatus.id_for(:completed))
+        self.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
+      else # i.e. if there are only failures in this payment order
+        self.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
+      end
+    else
+      self.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+    end
   end
 
 end

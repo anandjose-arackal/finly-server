@@ -387,6 +387,7 @@
 #                                                         PATCH  /transcriber/companies/:id(.:format)                                                       transcriber/companies#update
 #                                                         PUT    /transcriber/companies/:id(.:format)                                                       transcriber/companies#update
 #                                                         DELETE /transcriber/companies/:id(.:format)                                                       transcriber/companies#destroy
+#                                       transcriber_count GET    /transcriber/receipts/count(.:format)                                                      transcriber/receipts#count
 #                                    transcriber_receipts GET    /transcriber/receipts(.:format)                                                            transcriber/receipts#index
 #                                                         POST   /transcriber/receipts(.:format)                                                            transcriber/receipts#create
 #                                 new_transcriber_receipt GET    /transcriber/receipts/new(.:format)                                                        transcriber/receipts#new
@@ -395,6 +396,7 @@
 #                                                         PATCH  /transcriber/receipts/:id(.:format)                                                        transcriber/receipts#update
 #                                                         PUT    /transcriber/receipts/:id(.:format)                                                        transcriber/receipts#update
 #                                                         DELETE /transcriber/receipts/:id(.:format)                                                        transcriber/receipts#destroy
+#                             admin_users_companies_count GET    /admin_users/companies/count(.:format)                                                     admin_users/companies#count
 #                         admin_users_company_dcode_check POST   /admin_users/companies/:company_id/dcode_check(.:format)                                   admin_users/companies#check_dcode
 #                      admin_users_company_configure_payu POST   /admin_users/companies/:company_id/configure_payu(.:format)                                admin_users/companies#configure_payu
 #                                   admin_users_companies GET    /admin_users/companies(.:format)                                                           admin_users/companies#index
@@ -406,6 +408,7 @@
 #                                                         PUT    /admin_users/companies/:id(.:format)                                                       admin_users/companies#update
 #                                                         DELETE /admin_users/companies/:id(.:format)                                                       admin_users/companies#destroy
 #                               admin_users_company_types GET    /admin_users/company_types(.:format)                                                       admin_users/companies#company_types
+#                                 admin_users_users_count GET    /admin_users/users/count(.:format)                                                         admin_users/users#count
 #                          admin_users_user_update_status PATCH  /admin_users/users/:user_id/update_status(.:format)                                        admin_users/users#update_status
 #                         admin_users_user_update_mapping PATCH  /admin_users/users/:user_id/update_mapping(.:format)                                       admin_users/users#update_mapping
 #                        admin_users_user_destroy_mapping DELETE /admin_users/users/:user_id/destroy_mapping(.:format)                                      admin_users/users#destroy_mapping
@@ -749,6 +752,10 @@
 #                      statements_company_balance_summary GET    /statements/company_balance_summary(.:format)                                              statements#company_balance_summary
 #                 statements_company_transactions_summary GET    /statements/company_transactions_summary(.:format)                                         statements#company_transactions_summary
 #                     statements_company_policies_summary GET    /statements/company_policies_summary(.:format)                                             statements#company_policies_summary
+#                                 statements_user_summary GET    /statements/user_summary(.:format)                                                         statements#user_summary
+#                          statements_user_summary_export GET    /statements/user_summary/export(.:format)                                                  statements#user_summary_export
+#                                                         POST   /statements/user_summary(.:format)                                                         statements#user_summary
+#                                                         POST   /statements/user_summary/export(.:format)                                                  statements#user_summary_export
 #                                                         GET    /statements/:id/summary(.:format)                                                          statements#summary
 #                                        export_statement GET    /export/:id/statements(.:format)                                                           export#statement
 #                                              statements GET    /statements(.:format)                                                                      statements#index
@@ -1899,15 +1906,18 @@ Rails.application.routes.draw do
     get 'expenses/currencies', to: 'expenses#currencies'
     resources :expenses
     resources :companies
+    get 'receipts/count', to: 'receipts#count', as: :count
     resources :receipts
   end
 
   namespace :admin_users do
+    get 'companies/count', to: 'companies#count'
     resources :companies do
       post 'dcode_check', to: 'companies#check_dcode'
       post 'configure_payu', to: 'companies#configure_payu'
     end
     get 'company_types', to: 'companies#company_types'
+    get 'users/count', to: 'users#count'
     resources :users do
       patch 'update_status', to: 'users#update_status', as: :update_status
       patch 'update_mapping', to: 'users#update_mapping', as: :update_mapping

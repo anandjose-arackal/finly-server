@@ -40,12 +40,15 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def process
     params = {
-        request_reference_number: bank_transaction.unique_request_number
+        request_reference_number: bank_transaction.unique_request_number,
+        company_id: bank_transaction.company_id
     }
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?
       if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
       # if true
+        bank_reference_number = op.bank_reference_number
+        bank_transaction.update(bank_reference_number: bank_reference_number) if bank_transaction.bank_reference_number.blank?
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
@@ -72,7 +75,6 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         # do nothing?
       end
     end
-
   end
 
   def post_process
@@ -104,7 +106,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   def create_refund_payment
     admin_user = AdminUser.find_by(email: 'vivek.a@finly.io')
     original_debit_account = self.payment.initiating_account
-    self.payment_request = ::PaymentRequest.(admin_user, nil, original_debit_account.class, :credit, :corporate_balance_refund, company_id: self.company.id)
+    self.payment_request = ::PaymentRequest.(admin_user, nil, original_debit_account.class.name, :credit, :corporate_balance_refund, company_id: self.company.id)
     self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(nil, original_debit_account, self.bank_transaction.amount_value))
 
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})

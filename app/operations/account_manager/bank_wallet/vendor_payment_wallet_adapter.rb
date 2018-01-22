@@ -56,7 +56,7 @@ class AccountManager::BankWallet::VendorPaymentWalletAdapter < AccountManager::B
   end
 
   def creditable_accounts
-    [BankAccount, VendorPaymentWallet, YesBankCompanyAccount]
+    [nil, 'OutsideFinly', BankAccount, VendorPaymentWallet, YesBankCompanyAccount]
   end
 
   def debitable_accounts

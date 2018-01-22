@@ -2,25 +2,30 @@ class YesBankApi::Base < BaseHandler
 
   attr_accessor :client_id, :client_secret, :auth_username,
                 :auth_password, :template, :config_path, :application_id,
-                :customer_id, :resource_not_found, :transfer_status_id
+                :customer_id, :resource_not_found, :transfer_status_id,
+                :configuration, :company_id, :account_number
 
-  ILLEGAL_CHARACTERS = ['%', ',' "/", '\\', '(', ')', '@', '&']
+  ILLEGAL_CHARACTERS = ['%', ',' "/", '\\', '(', ')', '@', '&', '.']
 
   def env_key
     'yes_bank'
   end
 
   def init
-    self.config_path = Rails.root.join('config', 'yes_bank_config.yml').to_s
+    # self.config_path = Rails.root.join('config', 'yes_bank_config.yml').to_s
+    self.config_path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
     unless config_path.present?
       add_message :error, "Server error, try again later"
     end
-    self.client_id = YAML.load_file(config_path)[Rails.env]['client_id']
-    self.client_secret = YAML.load_file(config_path)[Rails.env]['client_secret']
-    self.auth_username = YAML.load_file(config_path)[Rails.env]['username']
-    self.auth_password = YAML.load_file(config_path)[Rails.env]['password']
-    self.application_id = YAML.load_file(config_path)[Rails.env]['application_id']
-    self.customer_id = YAML.load_file(config_path)[Rails.env]['customer_id']
+    # checking of there's a custom configuration for a particular company - stored in a variable called configuration
+    self.configuration = (YAML.load_file(config_path)[Rails.env][self.company_id]).present? ? self.company_id : 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
+    self.client_id = YAML.load_file(config_path)[Rails.env][self.configuration]['client_id']
+    self.client_secret = YAML.load_file(config_path)[Rails.env][self.configuration]['client_secret']
+    self.auth_username = YAML.load_file(config_path)[Rails.env][self.configuration]['username']
+    self.auth_password = YAML.load_file(config_path)[Rails.env][self.configuration]['password']
+    self.application_id = YAML.load_file(config_path)[Rails.env][self.configuration]['application_id']
+    self.customer_id = YAML.load_file(config_path)[Rails.env][self.configuration]['customer_id']
+    self.account_number = YAML.load_file(config_path)[Rails.env][self.configuration]['account_number']
     # now calling the load_connection method to initialize the connection
     super()
   end
@@ -134,34 +139,34 @@ class YesBankApi::Base < BaseHandler
     #   #         }
     #   #     }
     #   # }
-    #
-    #   self.parsed_response = {
-    #       "Envelope" => {
-    #           "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-    #           "Body" => {
-    #               "Fault" => {
-    #                   "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
-    #                   "xmlns:flex" => "http://www.oracle.com/flexcube",
-    #                   "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
-    #                   "xmlns:ycs" => "https://uat.yalamanchili.in/",
-    #                   "xmlns:pt" => "https://www.puratech.co.in/",
-    #                   "xmlns:http" => "http://www.quantiguous.com/services",
-    #                   "xmlns:ns" => "http://www.quantiguous.com/services",
-    #                   "xmlns:iib" => "http://www.ibm.com/iib",
-    #                   "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
-    #                   "Code" => {
-    #                       "Value" => "soapenv12:Sender",
-    #                       "Subcode" => {
-    #                           "Value" => "ns:E1001"
-    #                       }
-    #                   },
-    #                   "Reason" => {
-    #                       "Text" => "The transaction amount exceeds the maximum amount for IMPS: 200000"
-    #                   }
-    #               }
-    #           }
-    #       }
-    #   }
+    #   #
+    #   # self.parsed_response = {
+    #   #     "Envelope" => {
+    #   #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
+    #   #         "Body" => {
+    #   #             "Fault" => {
+    #   #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
+    #   #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
+    #   #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
+    #   #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
+    #   #                 "xmlns:pt" => "https://www.puratech.co.in/",
+    #   #                 "xmlns:http" => "http://www.quantiguous.com/services",
+    #   #                 "xmlns:ns" => "http://www.quantiguous.com/services",
+    #   #                 "xmlns:iib" => "http://www.ibm.com/iib",
+    #   #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
+    #   #                 "Code" => {
+    #   #                     "Value" => "soapenv12:Sender",
+    #   #                     "Subcode" => {
+    #   #                         "Value" => "ns:E1001"
+    #   #                     }
+    #   #                 },
+    #   #                 "Reason" => {
+    #   #                     "Text" => "The transaction amount exceeds the maximum amount for IMPS: 200000"
+    #   #                 }
+    #   #             }
+    #   #         }
+    #   #     }
+    #   # }
     rescue Faraday::ResourceNotFound
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"

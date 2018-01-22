@@ -108,14 +108,28 @@ class BankPaymentRequest < ActiveRecord::Base
     drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
     multiselect_item_ids = FieldMultiselectItem.where(id: drop_down_item_id).pluck(:id)
     raw_po_ids = self.pluck(:payment_order_id)
-    raw_payment_ids = Payment.where(payment_order_id: raw_po_ids)
-    raw_invoice_ids = Invoice.where(payment_id: raw_payment_ids)
+    raw_invoice_ids = Payment.where(payment_order_id: raw_po_ids).pluck(:invoice_id)
+    # raw_invoice_ids = Invoice.where(payment_id: raw_payment_ids)
     invoice_ids = CustomField.with_drop_down_selection(drop_down_selection_ids).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
     invoice_ids += CustomField.with_multi_select_selection(multiselect_item_ids).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
-    payment_ids = Invoice.where(id: invoice_ids).pluck(:payment_id)
-    po_ids = Payment.where(id: payment_ids).pluck(:payment_order_id)
+    po_ids = Payment.where(invoice_id: invoice_ids).pluck(:payment_order_id)
+    # payment_ids = Payment.where(invoice_id: invoice_ids)
+    # payment_ids = Invoice.where(id: invoice_ids).pluck(:payment_id)
+    # po_ids = Payment.where(id: payment_ids).pluck(:payment_order_id)
     bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids).pluck(:id)
     where(id: bpr_ids)
+  }
+
+  scope :filter_policy_id, -> (policy_id) {
+    where policy_id: policy_id
+  }
+
+  scope :filter_owner_id, -> (owner_id) {
+    where owner_id: owner_id
+  }
+
+  scope :filter_user_id, -> (owner_id) {
+    where owner_id: owner_id
   }
 
   attr_accessor :cache_users

@@ -17,6 +17,8 @@ json.array! @result.paginated_payments.each do |payment|
   json.id payment.id
   json.note payment.note
   json.account_id payment.receiving_account.id
+  json.beneficiary_id payment.receiving_account.account_owner&.id
+  json.beneficiary_type payment.receiving_account.account_owner_type == "YesBankVendor" ? 2 : 1
   json.system_messages do
     json.array! (payment.system_messages)
   end
@@ -61,6 +63,8 @@ json.array! @result.paginated_payments.each do |payment|
       json.invoice_attachment do
         json.url invoice.invoice_attachments.first&.attached_file&.url
         json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
+        json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
+        json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
       end
       json.net_amount precision_value invoice.net_amount&.value
       json.gross_amount precision_value invoice.gross_amount&.value
@@ -69,6 +73,24 @@ json.array! @result.paginated_payments.each do |payment|
       end
       json.category_id invoice.category_id
       json.category_name invoice.category&.name
+
+      json.invoice_items do
+        json.array!(invoice.invoice_items) do |item|
+          json.rate item.rate
+          json.quantity item.quantity
+          json.tax item.tax
+          json.discount item.discount
+          json.category_id item.category_id
+          json.tax_amount precision_value item.tax_amount&.value
+          json.discount_amount precision_value item.discount_amount&.value
+          json.amount precision_value item.amount&.value
+          json.category_name item.category&.name
+          json.id item.id
+          json.description item.description
+          json.total_amount precision_value item.net_amount&.value
+          json.hsn_sac item.hsn_sac
+        end
+      end
     end
   else
     json.raw_amount precision_value payment.amount_value

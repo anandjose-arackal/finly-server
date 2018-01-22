@@ -51,6 +51,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -393,6 +394,10 @@ class User < ActiveRecord::Base
 
   scope :filter_card_number, -> (term) {
     joins(:cards).select('users.*').where('proxy like ?', "%#{term}%")
+  }
+
+  scope :includes_for_admin_panel, -> {
+    includes(:cards, :company)
   }
 
 

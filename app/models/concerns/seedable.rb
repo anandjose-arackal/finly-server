@@ -18,13 +18,13 @@ module Seedable
       end
       ids = []
       fetch_items.each do |key, value|
-        ids << value if keys.include? key&.to_sym
+        ids << value if keys.include? key&.to_sym&.downcase
       end
       ids
     end
 
     def id_for(key)
-      return fetch_items[key]
+      return fetch_items[key&.downcase]
     end
 
     def name_for(id)

@@ -23,6 +23,7 @@ json.summary do
   json.crediting_user creditor
   json.beneficiary_type @result.bank_payment_request.beneficiary_type
   json.approvers @result.approvers
+  json.name @result.bank_payment_request.name
 end
 
 json.invoice_categories do
@@ -55,13 +56,16 @@ json.payments do
     json.id payment.id
     json.note payment.note
     json.account_id payment.receiving_account.id
+    json.beneficiary_id payment.receiving_account.account_owner&.id
     json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
     json.system_messages do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
-    # json.retriable payment.retriable?
-
+    json.retriable do
+      json.retriable payment.retriable?
+      json.change_mode payment.payment_order.failed?
+    end
     invoice = payment.invoice
 
     if payment.invoice.present?
@@ -93,6 +97,8 @@ json.payments do
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
         json.freight_amount invoice.freight_amount&.value
+        json.roundoff_amount invoice.roundoff_amount
+        json.balance_due invoice.balance_due&.value
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate
@@ -103,6 +109,7 @@ json.payments do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
           json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
+          json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -150,12 +157,16 @@ json.payments_verified do
     json.id payment.id
     json.note payment.note
     json.account_id payment.receiving_account.id
+    json.beneficiary_id payment.receiving_account.account_owner&.id
     json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
     json.system_messages do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
-    # json.retriable payment.retriable?
+    json.retriable do
+      json.retriable payment.retriable?
+      json.change_mode payment.payment_order.failed?
+    end
 
     invoice = payment.invoice
 
@@ -185,6 +196,8 @@ json.payments_verified do
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
         json.freight_amount invoice.freight_amount&.value
+        json.roundoff_amount invoice.roundoff_amount
+        json.balance_due invoice.balance_due&.value
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate
@@ -195,6 +208,7 @@ json.payments_verified do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
           json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
+          json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -204,7 +218,6 @@ json.payments_verified do
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 
-        #
         json.invoice_items do
           json.array!(invoice.invoice_items) do |item|
             json.rate item.rate
@@ -243,12 +256,16 @@ json.payments_unverified do
     json.id payment.id
     json.note payment.note
     json.account_id payment.receiving_account.id
+    json.beneficiary_id payment.receiving_account.account_owner&.id
     json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
     json.system_messages do
       json.array! (payment.system_messages)
     end
     json.bank_reference_number payment.reference_resource&.bank_reference_number
-    # json.retriable payment.retriable?
+    json.retriable do
+      json.retriable payment.retriable?
+      json.change_mode payment.payment_order.failed?
+    end
 
     invoice = payment.invoice
 
@@ -278,6 +295,8 @@ json.payments_unverified do
         json.invoice_number invoice.invoice_number
         json.inclusive_of_taxes invoice.inclusive_of_taxes
         json.freight_amount invoice.freight_amount&.value
+        json.roundoff_amount invoice.roundoff_amount
+        json.balance_due invoice.balance_due&.value
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate
@@ -288,6 +307,7 @@ json.payments_unverified do
           json.url invoice.invoice_attachments.first&.attached_file&.url
           json.thumb invoice.invoice_attachments.first&.attached_file&.url(:thumb)
           json.content_type invoice.invoice_attachments.first&.attached_file&.content_type
+          json.file_name invoice.invoice_attachments.first&.attached_file&.original_filename
         end
         json.net_amount precision_value invoice.net_amount&.value
         json.gross_amount precision_value invoice.gross_amount&.value
@@ -330,6 +350,7 @@ json.attachments do
     json.description attachment.description
     json.file_type attachment.file_format(attachment.attached_file)
     json.content_type attachment.attached_file.content_type
+    json.file_name attachment.attached_file.original_filename
   end
 end
 
