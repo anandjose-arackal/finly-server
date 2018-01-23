@@ -223,7 +223,7 @@ class InvoiceCalculationUtils
   end
 
   def calculate_advance_paid
-    if self.invoice.advance.blank?
+    if self.invoice.advance_amount.blank?
       # no change in net amount
       self.advance_amount = 0
       return
