@@ -58,6 +58,9 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
       when 404
         add_message :error, "The service is temporarily down. Please try again later"
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
+      when 401
+        add_message :error, "Unauthorized. Please check the credentials being used for the API"
+        self.transfer_status_id = BankTransferStatus.id_for(:failed)
       when 500
         self.parsed_response = Hash.from_xml(response.body)
         ap parsed_response
