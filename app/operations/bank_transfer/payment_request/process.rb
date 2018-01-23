@@ -187,7 +187,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       invoice_net_amount = net_amount
 
-      item_tax_total = item_discount_total = 0
+      item_tax_total = item_discount_total = items_net_total = item_amounts_total = 0
       if item&.dig(:invoice_items_attributes).present?
         # i.e. if the line items are present, recalculate the net amount
         invoice_net_amount = 0
@@ -204,7 +204,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           item_discount_amount = invoice_item[:discount_amount].to_f
           item_tax_amount = invoice_item[:tax_amount].to_f
           item_hsn_sac = invoice_item[:hsn_sac]
-          total_amount = invoice_item[:net_amount].to_f
+          total_amount = invoice_item[:net_total].to_f
 
           unless validate_rate item_tax, 1
             self.error_messages << "Invoice item tax rate is invalid"
@@ -222,6 +222,12 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
           # insert custom fields here
 
+          if inclusive_of_taxes
+            total_amount = item_amount - item_discount_amount
+          else
+            total_amount = item_amount - item_discount_amount + item_tax_amount
+          end
+
           invoice_items << {
             description: item_description,
             tax: item_tax,
@@ -234,17 +240,19 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
             amount: item_amount,
             gst_type_id: item_gst_type,
             total_amount: total_amount,
-            hsn_sac: item_hsn_sac
+            hsn_sac: item_hsn_sac,
+            net_total: total_amount
           }
 
-          invoice_net_amount += total_amount
+          items_net_total += total_amount
           item_tax_total += item_tax_amount
           item_discount_total += item_discount_amount
+          item_amounts_total += item_amount
 
         end
 
         # accounting for TDS, Advance and Freight in light of the new amount
-        invoice_net_amount = invoice_net_amount - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        invoice_net_amount = items_net_total.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
         # assigning discount amount, and tax amount as the sum of the individual amounts
         discount_amount = item_discount_total
         tax_amount = item_tax_total
@@ -265,7 +273,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
                                advance: advance, advance_amount: advance_amount, freight: freight, category_id: category_id, total_amount: amount,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
                                net_amount: invoice_net_amount, invoice_items: invoice_items, roundoff_amount: roundoff_amount, balance_due: balance_due,
-                               item_tax_total: item_tax_total, item_discount_total: item_discount_total,
+                               item_taxes_total: item_tax_total, item_discounts_total: item_discount_total, items_net_total: items_net_total, item_amounts_total: item_amounts_total,
                                valid: self.valid, messages: self.error_messages}
     end
   end
