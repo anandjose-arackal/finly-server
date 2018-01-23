@@ -17,6 +17,14 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
 
   attr_accessor :expense_params, :receipt
 
+  def personalizer
+    {
+        process: {
+            before: Personalizer::Process.new([:expense, :distance_create], :process, self)
+        }
+    }
+  end
+
   def authorized_user_types
     [:employee]
   end
