@@ -204,7 +204,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           item_discount_amount = invoice_item[:discount_amount].to_f
           item_tax_amount = invoice_item[:tax_amount].to_f
           item_hsn_sac = invoice_item[:hsn_sac]
-          total_amount = invoice_item[:net_amount]
+          total_amount = invoice_item[:net_amount].to_f
 
           unless validate_rate item_tax, 1
             self.error_messages << "Invoice item tax rate is invalid"
