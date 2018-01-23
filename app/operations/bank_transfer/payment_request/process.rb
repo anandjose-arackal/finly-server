@@ -93,15 +93,20 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       gst_type_id = item[:gst_type_id]
 
       # deciding tax based on whether invoice items were entered or not
-      tax_amount = discount_amount = amount = sub_total = 0
+      tax_amount = discount_amount = amount = sub_total = items_net_amount = 0
       if item[:invoice_items_attributes].present?
         item[:invoice_items_attributes].each do |line_item|
           tax_amount = line_item[:tax_amount].to_f
           discount_amount = line_item[:discount_amount].to_f
-          sub_total = line_item[:net_total].to_f
-          amount += sub_total
+          amount = line_item[:amount].to_f
+          if inclusive_of_taxes
+            sub_total = amount - discount_amount
+          else
+            sub_total = amount - discount_amount + tax_amount
+          end
+          items_net_amount += sub_total
         end
-        net_amount = amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        net_amount = items_net_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
       else
         tax_amount = item[:tax_amount].to_f
         discount_amount = item[:discount_amount].to_f
@@ -204,7 +209,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           item_discount_amount = invoice_item[:discount_amount].to_f
           item_tax_amount = invoice_item[:tax_amount].to_f
           item_hsn_sac = invoice_item[:hsn_sac]
-          total_amount = invoice_item[:net_total].to_f
 
           unless validate_rate item_tax, 1
             self.error_messages << "Invoice item tax rate is invalid"
