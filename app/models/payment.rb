@@ -373,7 +373,7 @@ class Payment < ActiveRecord::Base
     unless PaymentPurpose.ids_for([:advance_outside_finly, :reimbursement_outside_finly, :balance_clearance_outside_finly, :failed_transaction_reversal,
                                    :personal_expense, :atm_withdrawal, :card_transaction, :advance, :corporate_balance_load,
                                    :corporate_balance_refund, :cash_advance, :balance_clearance_against_cash_on_hand, :settlement_against_cash_on_hand,
-                                   :advance_against_report_unapproval]).include?(self.payment_purpose_id)
+                                   :advance_against_report_unapproval, :cash_on_hand_reversal]).include?(self.payment_purpose_id)
       if initiating_account_id.blank? || receiving_account_type.blank?
         errors.add(:initiating_account, "cannot be blank")
       end

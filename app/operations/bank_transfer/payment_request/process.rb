@@ -99,12 +99,8 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           tax_amount = line_item[:tax_amount].to_f
           discount_amount = line_item[:discount_amount].to_f
           sub_total = line_item[:amount].to_f
-          if inclusive_of_taxes
-            amount += sub_total
-          else
-            amount += sub_total - discount_amount + tax_amount
-          end
         end
+        amount = item[:invoice_attributes][:item_amounts_total].to_f
         net_amount = amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
       else
         tax_amount = item[:tax_amount].to_f
@@ -210,7 +206,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           item_hsn_sac = invoice_item[:hsn_sac]
 
           if inclusive_of_taxes
-            total_amount = item_amount.to_f
+            total_amount = item_amount.to_f - item_discount_amount.to_f
           else
             total_amount = item_amount.to_f - item_discount_amount.to_f + item_tax_amount.to_f
           end
@@ -246,10 +242,11 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
             hsn_sac: item_hsn_sac
           }
 
-          invoice_net_amount += total_amount
-          item_tax_total += item_tax_amount
-          item_discount_total += item_discount_amount
         end
+
+        invoice_net_amount = total_amount
+        item_tax_total = item_tax_amount
+        item_discount_total = item_discount_amount
 
         # accounting for TDS, Advance and Freight in light of the new amount
         invoice_net_amount = invoice_net_amount - tds_amount.to_f - advance_amount.to_f + freight.to_f
