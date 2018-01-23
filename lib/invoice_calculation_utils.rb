@@ -229,7 +229,7 @@ class InvoiceCalculationUtils
       return
     end
     original_net_amount = self.net_amount
-    self.advance_amount = (self.invoice.advance*self.net_amount)/100
+    self.advance_amount = self.invoice.advance_amount&.value.to_f
     self.net_amount = original_net_amount - self.advance_amount
   end
 
