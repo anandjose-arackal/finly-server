@@ -5,10 +5,10 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadPending < BankTransfer:
     op = BankTransfer::PaymentRequest::Index.(user, params)
     if op.success?
       self.bank_payment_requests = op.payment_requests
+      self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id)
     else
       add_message :error, op.messages[:error]
     end
-    self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id)
   end
 
   def validate
