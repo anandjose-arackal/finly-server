@@ -135,6 +135,7 @@ class ApplicationController < ActionController::Base
             format.js {}
             format.json {}
             format.html {}
+            format.xls {}
           end
         end
       else
@@ -142,6 +143,7 @@ class ApplicationController < ActionController::Base
           format.js { render 'layouts/application' }
           format.json { render 'layouts/application' }
           format.html {}
+          format.xls {}
         end
       end
     else

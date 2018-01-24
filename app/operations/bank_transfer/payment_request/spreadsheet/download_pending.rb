@@ -8,11 +8,12 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadPending < BankTransfer:
     else
       add_message :error, op.messages[:error]
     end
+    self.bank_payment_requests = self.bank_payment_requests.with_controlling_user(user.id)
   end
 
   def validate
     # if self.bank_payment_requests.empty?
-    #   add_message :error, "No payment orders passed"
+    #   add_message :error, "No payment orders are pending approval"
     # end
   end
 
