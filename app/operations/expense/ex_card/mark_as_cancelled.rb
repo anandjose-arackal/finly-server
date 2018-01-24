@@ -53,8 +53,8 @@ class Expense::ExCard::MarkAsCancelled < Expense::ExCard::Base
         add_message :error, selected_expense.card_expense.errors.full_messages
       end
     else
-      if selected_expense.card_expense.update(cancelled: true, cancelled_against_transaction: self.cancelled_transaction)
-        self.cancelled_transaction.update(cancelled: true)
+      if selected_expense.card_expense.update(cancelled: true)
+        self.cancelled_transaction.update(cancelled: true, cancelled_against_expense_id: selected_expense.card_expense.id)
       else
         add_message :error, selected_expense.card_expense.errors.full_messages
       end
