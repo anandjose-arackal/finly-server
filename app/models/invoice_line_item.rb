@@ -20,6 +20,9 @@
 #  hsn_sac            :string(255)
 #  parent_type        :string(255)
 #  parent_id          :string(255)
+#  parent_type        :string(255)
+#  parent_id          :string(255)
+#  taxable_amount_id  :integer
 #
 
 class InvoiceLineItem < ActiveRecord::Base
@@ -30,6 +33,7 @@ class InvoiceLineItem < ActiveRecord::Base
   belongs_to :tax_amount, class_name: "Amount"
   belongs_to :net_amount, class_name: "Amount"
   belongs_to :parent, polymorphic: true
+  belongs_to :taxable_amount, class_name: "Amount"
 
   accepts_nested_attributes_for :discount_amount
   accepts_nested_attributes_for :tax_amount
