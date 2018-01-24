@@ -202,7 +202,22 @@ class Card::Transaction::Create < BaseOperation
               end
             elsif CardTransaction.find_by(reference_id: params[:reference_id]) && params[:type_of_details] == 'RF'
               # handle the cancellation of the ATM surcharge fee expense that is created during the original card swipe at the ATM
-              
+              self.transaction = CardTransaction.new(params)
+              unless transaction.save
+                add_message :error, transaction.errors.full_messages
+                return
+              end
+              original_transaction = CardTransaction.find_by(reference_id: params[:reference_id], type_of_details: 'F')
+              orig_sur_card_exp = CardExpense.find_by(card_transaction_id: original_transaction&.id)
+              original_surcharge_expense = orig_sur_card_exp&.expense
+              if original_surcharge_expense.present?
+                if orig_sur_card_exp.update(cancelled: true)
+                  self.transaction.update(cancelled: true, cancelled_against_expense_id: orig_sur_card_exp.id)
+                else
+                  add_message :error, orig_sur_card_exp.errors.full_messages
+                  return
+                end
+              end
             end
           else
             # just save the transaction for now
