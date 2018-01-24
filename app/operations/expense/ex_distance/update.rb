@@ -19,6 +19,14 @@ class Expense::ExDistance::Update < Expense::ExDistance::Base
   attr_accessor :updated_expense_params, :locations_marked_for_destruction
   attr_accessor :editable_attrs, :receipt, :old_receipt, :destroy_receipts
 
+  def personalizer
+    {
+        process: {
+            before: Personalizer::Process.new([:expense, :distance_update], :process, self)
+        }
+    }
+  end
+
   def pre_validate
     if params.blank? or user.blank?
       messages[:error] << 'Parameters or user not found'

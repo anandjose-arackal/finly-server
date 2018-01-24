@@ -98,6 +98,32 @@ class Card::Transaction::Create < BaseOperation
               transaction.card_expense = @result.expense.card_expense
               transaction.expensed = true
               transaction.save
+            # handling the case of ATM reversals here, where the type of details will be 'R'
+            elsif CardTransaction.find_by(reference_id: params[:reference_id]) && params[:type_of_details] == 'R'
+              # i.e. it's a reversal of a particular ATM withdrawal
+              self.transaction = CardTransaction.new(params)
+              unless transaction.save
+                add_message :error, transaction.errors.full_messages
+                return
+              end
+
+              # check if the card is even an expense card at this point
+              return true unless card.card_program.create_expense
+
+              # add to cash on hand
+              payment_request = PaymentRequest.(user, nil, CashOnHand.name, :debit, :cash_on_hand_reversal)
+              payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, transaction.transaction_amount_value, reference_resource: self.transaction))
+              op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+              if op.success?
+                return true
+              else
+                add_message :error, op.messages[:error]
+                transaction.expensed = false
+                transaction.error_message = op.messages[:error]
+                transaction.save
+                return false
+              end
+
             elsif params[:type_of_details] == 'F'
               # this is an ATM surcharge that is incurred for balance checks, or any other operation done in
               # an ATM
@@ -199,8 +225,13 @@ class Card::Transaction::Create < BaseOperation
       purpose_id = PaymentPurpose.id_for(:card_transaction)
       amount = transaction.billing_amount
       if transaction.transaction_mode == 'ATM'
-        amount = transaction.transaction_amount
-        purpose_id = PaymentPurpose.id_for(:atm_withdrawal)
+        if type == "CREDIT"
+          amount = transaction.transaction_amount
+          purpose_id = PaymentPurpose.id_for(:cash_on_hand_reversal)
+        elsif type == "DEBIT"
+          amount = transaction.transaction_amount
+          purpose_id = PaymentPurpose.id_for(:atm_withdrawal)
+        end
       end
       closing_balance = nil
       bal_check = AccountManager::Balance::Check.(account)
