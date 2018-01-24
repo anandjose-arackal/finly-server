@@ -98,32 +98,6 @@ class Card::Transaction::Create < BaseOperation
               transaction.card_expense = @result.expense.card_expense
               transaction.expensed = true
               transaction.save
-            # handling the case of ATM reversals here, where the type of details will be 'R'
-            elsif CardTransaction.find_by(reference_id: params[:reference_id]) && params[:type_of_details] == 'R'
-              # i.e. it's a reversal of a particular ATM withdrawal
-              self.transaction = CardTransaction.new(params)
-              unless transaction.save
-                add_message :error, transaction.errors.full_messages
-                return
-              end
-
-              # check if the card is even an expense card at this point
-              return true unless card.card_program.create_expense
-
-              # add to cash on hand
-              payment_request = PaymentRequest.(user, nil, CashOnHand.name, :debit, :cash_on_hand_reversal)
-              payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, transaction.transaction_amount_value, reference_resource: self.transaction))
-              op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
-              if op.success?
-                return true
-              else
-                add_message :error, op.messages[:error]
-                transaction.expensed = false
-                transaction.error_message = op.messages[:error]
-                transaction.save
-                return false
-              end
-
             elsif params[:type_of_details] == 'F'
               # this is an ATM surcharge that is incurred for balance checks, or any other operation done in
               # an ATM
@@ -198,9 +172,44 @@ class Card::Transaction::Create < BaseOperation
             end
         end
       when 'CREDIT'
-        self.transaction = CardTransaction.new(params)
-        unless transaction.save
-          add_message :error, transaction.errors.full_messages
+        case mode
+          when 'ATM'
+            # handling the case of ATM reversals here, where the type of details will be 'R'
+            if CardTransaction.find_by(reference_id: params[:reference_id]) && params[:type_of_details] == 'R'
+              # i.e. it's a reversal of a particular ATM withdrawal
+              self.transaction = CardTransaction.new(params)
+              unless transaction.save
+                add_message :error, transaction.errors.full_messages
+                return
+              end
+
+              # check if the card is even an expense card at this point
+              return true unless card.card_program.create_expense
+
+              # add to cash on hand
+              payment_request = PaymentRequest.(user, nil, CashOnHand.name, :debit, :cash_on_hand_reversal)
+              payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, user.cash_on_hand, transaction.transaction_amount_value, reference_resource: self.transaction))
+              op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+
+              if op.success?
+                return true
+              else
+                add_message :error, op.messages[:error]
+                transaction.expensed = false
+                transaction.error_message = op.messages[:error]
+                transaction.save
+                return false
+              end
+            elsif CardTransaction.find_by(reference_id: params[:reference_id]) && params[:type_of_details] == 'RF'
+              # handle the cancellation of the ATM surcharge fee expense that is created during the original card swipe at the ATM
+              
+            end
+          else
+            # just save the transaction for now
+            self.transaction = CardTransaction.new(params)
+            unless transaction.save
+              add_message :error, transaction.errors.full_messages
+            end
         end
       # gets added to user's card balance, so do nothing
       else
