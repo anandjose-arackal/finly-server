@@ -4,7 +4,6 @@ if LogStasher.enabled?
     # so you have access to all controller methods
     user = current_user
     fields[:user] = {id: user&.id, email: user&.email, mobile_number: user&.mobile_number}
-    # fields[:site] = request.path =~ /^\/api/ ? 'api' : 'user'
 
     # If you are using custom instrumentation, just add it to logstasher custom fields
     # LogStasher.custom_fields << :myapi_runtime
