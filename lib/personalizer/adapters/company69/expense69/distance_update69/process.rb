@@ -2,10 +2,12 @@ class Personalizer::Adapters::Company69::Expense69::DistanceUpdate69::Process < 
 
   def validate
     expense_attributes = op_instance.updated_expense_params
-    user_distance = expense_attributes&.dig(:distance_expense_attributes, :distance_attributes, :value)&.to_d
-    maps_distance = expense_attributes&.dig(:distance_expense_attributes, :maps_distance_attributes, :value)&.to_d
-    locations = expense_attributes&.dig(:distance_expense_attributes, :locations_attributes)
-    type = expense_attributes&.dig(:distance_expense_attributes, :type_id)
+    expense = op_instance.expense
+    expense.assign_attributes(expense_attributes)
+    user_distance = expense.distance_expense.distance&.value
+    maps_distance = expense.distance_expense.maps_distance&.value
+    locations = expense.distance_expense.locations
+    type = expense.distance_expense.type_id
     return unless [nil, DistanceExpenseType.id_for(:distance)].include?(type)
     unless maps_distance.present? and maps_distance > 0 and locations&.size > 1
       add_message :error, 'You need to enter atleast 2 way points to create Distance Expense'
