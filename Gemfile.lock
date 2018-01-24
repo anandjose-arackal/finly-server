@@ -91,7 +91,7 @@ GEM
       uniform_notifier (~> 1.10.0)
     byebug (9.0.6)
     callsite (0.0.11)
-    capistrano (3.9.1)
+    capistrano (3.10.1)
       airbrussh (>= 1.0.0)
       i18n
       rake (>= 10.0.0)
@@ -415,7 +415,7 @@ DEPENDENCIES
   bootstrap-will_paginate (= 0.0.10)
   bullet (= 5.4.2)
   byebug (= 9.0.6)
-  capistrano (= 3.9.1)
+  capistrano (= 3.10.1)
   capistrano-bundler (= 1.2.0)
   capistrano-crono (= 0.1.2)
   capistrano-rails (= 1.2.2)
