@@ -3,9 +3,7 @@ if LogStasher.enabled?
     # This block is run in application_controller context,
     # so you have access to all controller methods
     user = current_user
-    fields[:user_id] = user&.id
-    fields[:user_email] = current_user&.email
-    fields[:user_mobile_number] = current_user&.mobile_number
+    fields[:user] = {id: user&.id, email: user&.email, mobile_number: user&.mobile_number}
     # fields[:site] = request.path =~ /^\/api/ ? 'api' : 'user'
 
     # If you are using custom instrumentation, just add it to logstasher custom fields
