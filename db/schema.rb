@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180112222135) do
+ActiveRecord::Schema.define(version: 20180120095403) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1813,6 +1813,26 @@ ActiveRecord::Schema.define(version: 20180112222135) do
     t.text     "admin_note",                 limit: 65535
     t.datetime "submitted_on"
     t.datetime "upgraded_on"
+    t.string   "aadhar_front_file_name",     limit: 255
+    t.string   "aadhar_front_content_type",  limit: 255
+    t.integer  "aadhar_front_file_size",     limit: 4
+    t.datetime "aadhar_front_updated_at"
+    t.string   "aadhar_back_file_name",      limit: 255
+    t.string   "aadhar_back_content_type",   limit: 255
+    t.integer  "aadhar_back_file_size",      limit: 4
+    t.datetime "aadhar_back_updated_at"
+    t.string   "photo_file_name",            limit: 255
+    t.string   "photo_content_type",         limit: 255
+    t.integer  "photo_file_size",            limit: 4
+    t.datetime "photo_updated_at"
+    t.string   "signature_file_name",        limit: 255
+    t.string   "signature_content_type",     limit: 255
+    t.integer  "signature_file_size",        limit: 4
+    t.datetime "signature_updated_at"
+    t.string   "combined_kyc_file_name",     limit: 255
+    t.string   "combined_kyc_content_type",  limit: 255
+    t.integer  "combined_kyc_file_size",     limit: 4
+    t.datetime "combined_kyc_updated_at"
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
@@ -1848,6 +1868,7 @@ ActiveRecord::Schema.define(version: 20180112222135) do
     t.datetime "updated_at",                                               null: false
     t.integer  "net_amount_id",      limit: 4
     t.string   "hsn_sac",            limit: 255
+    t.integer  "taxable_amount_id",  limit: 4
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -1891,6 +1912,7 @@ ActiveRecord::Schema.define(version: 20180112222135) do
     t.decimal  "freight",                        precision: 20, scale: 10
     t.decimal  "roundoff_amount",                precision: 20, scale: 10
     t.integer  "balance_due_id",     limit: 4
+    t.integer  "taxable_amount_id",  limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -3238,7 +3260,7 @@ ActiveRecord::Schema.define(version: 20180112222135) do
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
     t.date     "date_of_birth"
-    t.string   "gender",              limit: 255, null: false
+    t.string   "gender",              limit: 255
     t.string   "address_1",           limit: 255
     t.string   "address_2",           limit: 255
     t.string   "city",                limit: 255
@@ -3527,6 +3549,14 @@ ActiveRecord::Schema.define(version: 20180112222135) do
   end
 
   add_index "yes_bank_company_accounts", ["company_id"], name: "index_yes_bank_company_accounts_on_company_id", using: :btree
+
+  create_table "yes_bank_configurations", force: :cascade do |t|
+    t.boolean  "custom_bank_account",            default: false
+    t.integer  "company_id",           limit: 4
+    t.boolean  "yes_bank_api_enabled",           default: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+  end
 
   create_table "yes_bank_vendors", force: :cascade do |t|
     t.string   "name",           limit: 255
