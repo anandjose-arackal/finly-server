@@ -13,7 +13,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     self.bank_transaction = bank_transaction
     self.company = bank_transaction.company
     self.payment = bank_transaction.payment
-    self.payment_order = payment&.payment_order
+    self.payment_order = self.payment&.payment_order
   end
 
   def authorized_user_types
@@ -54,8 +54,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
         # destroying previous messages first, before adding the processing message
-        payment.system_messages.destroy_all
-        payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
+        self.payment.system_messages.destroy_all
+        self.payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
                                       content: "Payment processed. Awaiting credit confirmation").save
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
       # elsif true
@@ -63,9 +63,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
         # destroying previous messages first, before adding the failure message
-        payment.system_messages.destroy_all
+        self.payment.system_messages.destroy_all
         # adding message regarding payment refund
-        payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+        self.payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
         create_refund_payment
@@ -96,7 +96,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     end
 
     # trigger event for sending mailer to the receiver of the payment
-    if payment.completed?
+    if self.payment.completed?
       op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment)
     end
   end
@@ -120,7 +120,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   end
 
   def handle_successful_transaction
-    if payment&.cash_on_hand_credit?
+    if self.payment&.cash_on_hand_credit?
       init_payment_request
       # now execute the payment that adds to the user's cash on hand
       op = AccountManager::Payments::PaymentProcessor.(self.payment.initiating_user, {payment_request: self.payment_request})
@@ -130,7 +130,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     # now mark the respective bank transaction and payment as completed
     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
     self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-    if self.payment.note.blank? || payment.note == 'Reimbursement processed. Awaiting credit confirmation'
+    if self.payment.note.blank? || self.payment.note == 'Reimbursement processed. Awaiting credit confirmation'
       self.payment.update(note: "Payment credit confirmed")
     end
     self.payment.system_messages.destroy_all # deleting the previous system messages
@@ -146,7 +146,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def nullify_reimbursed_reports
     # setting their status as approved, and disassociating the reimbursement payment with these reports
-    reports = payment.reimbursed_reports
+    reports = self.payment.reimbursed_reports
     reports.each do |report|
       report.update(report_status_id: ReportStatus.id_for(:approved), reimbursement_id: nil)
     end
