@@ -128,7 +128,7 @@ class YesBankApi::Base < BaseHandler
     #   #                 "transferType" => "IMPS",
     #   #                 "lowBalanceAlert" => "false",
     #   #                 "transactionStatus" => {
-    #   #                     "statusCode" => "COMPLETED",
+    #   #                     "statusCode" => "SENT_TO_BENEFICIARY",
     #   #                     "subStatusCode" => "0",
     #   #                     "bankReferenceNo" => "736015422593",
     #   #                     "beneficiaryReferenceNo" => nil

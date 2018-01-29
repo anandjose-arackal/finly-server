@@ -52,7 +52,7 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     # setting the initiating account based on what is sent from the front end
     self.initiating_account = retrieve_initiating_account(payment_param[:initiating_account_type])
     self.receiving_account = retrieve_receiving_account(payment_param[:receiving_account_type])
-    self.payment_purpose = [1, '1'].include?(payment_param[:receiving_account_type]) ? :cash_advance : :advance_outside_finly
+    self.payment_purpose = StringUtils.to_bool(payment_param[:receiving_account_type]) ? :cash_advance : :advance_outside_finly
 
     # this is creating the payment request for crediting money to the bank account, if at all they choose to
     init_payment_request(:credit, payment_purpose, {amount: amount, initiating_account: self.initiating_account, receiving_account: self.receiving_account})
@@ -78,14 +78,13 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_param[:payment_mode]&.upcase})
     if op.success?
       self.payment = op.payments.first
-      bank_transaction = payment.reference_resource
+      bank_transaction = self.payment.reload.reference_resource
       # only if the bank transaction has been completed, will the cash on hand be added to the user's account
       # if the payment was done through a bank transfer, create a payment request for crediting the user's cash on hand
-      if payment_purpose == :advance && bank_transaction&.completed?
+      if self.payment_purpose == :cash_advance && bank_transaction&.completed?
         init_payment_request(:credit, :advance, {amount: amount, initiating_account: nil, receiving_account: user.cash_on_hand})
         # now payment request will have the new details of money to be added - so add it to the cash on hand
         op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
-
         payment = op.payments.first
         # setting the reference resource for the cash on hand payment as the bank transfer payment
         payment.update(reference_resource: self.payment)

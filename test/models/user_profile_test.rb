@@ -16,7 +16,7 @@
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
 #  date_of_birth       :date
-#  gender              :string(255)
+#  gender              :string(255)      not null
 #  address_1           :string(255)
 #  address_2           :string(255)
 #  city                :string(255)
