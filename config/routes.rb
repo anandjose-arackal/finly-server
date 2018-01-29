@@ -2392,6 +2392,7 @@ Rails.application.routes.draw do
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
     post 'download_selected', to: 'bank_payment_requests#download_selected', as: :download_selected
     post 'download_pending', to: 'bank_payment_requests#download_pending', as: :download_pending
+    post 'download_all', to: 'bank_payment_requests#download_all', as: :download_all
 
     resources :bank_payment_requests do
       post 'comment', to: 'bank_payment_requests#comment', as: :comment
