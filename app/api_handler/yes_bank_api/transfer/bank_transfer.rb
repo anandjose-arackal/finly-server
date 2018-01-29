@@ -53,8 +53,8 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
   def post_process
     # handle the various error cases here
-    # case 500
-    case self.response.status
+    case 200
+    # case self.response.status
       when 404
         add_message :error, "The service is temporarily down. Please try again later"
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
@@ -62,7 +62,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         add_message :error, "Unauthorized. Please check the credentials being used for the API"
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
       when 500
-        self.parsed_response = Hash.from_xml(response.body)
+        # self.parsed_response = Hash.from_xml(response.body)
         ap parsed_response
         self.error_code = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Code")&.dig("Subcode")&.dig("Value")
         # if the transfer failed, we will see it the error message here, else it'll be nil
@@ -84,7 +84,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
             self.transfer_status_id = BankTransferStatus.id_for(:failed)
         end
       when 200
-        self.parsed_response = Hash.from_xml(response.body)
+        # self.parsed_response = Hash.from_xml(response.body)
         ap parsed_response
         # if the below is nil, i.e. the transaction most likely failed, the transaction result won't be either of the success ones
         self.transfer_request.transaction_result = parsed_response["Envelope"]&.dig("Body")&.dig("transferResponse")&.dig("transactionStatus")&.dig("statusCode")

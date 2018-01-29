@@ -123,7 +123,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     if payment&.cash_on_hand_credit?
       init_payment_request
       # now execute the payment that adds to the user's cash on hand
-      AccountManager::Payments::PaymentProcessor.(self.payment.initiating_user, {payment_request: self.payment_request})
+      op = AccountManager::Payments::PaymentProcessor.(self.payment.initiating_user, {payment_request: self.payment_request})
+      payment = op.payments.first
+      payment.update(application: "em") # because this should show up in the settlement history of this particular user
     end
     # now mark the respective bank transaction and payment as completed
     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
