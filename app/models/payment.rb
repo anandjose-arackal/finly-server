@@ -27,6 +27,8 @@
 #  reference_id            :string(255)      not null
 #  retry_count             :integer          default(0)
 #  invoice_id              :integer
+#  parent_type             :string(255)
+#  parent_id               :integer
 #
 
 
