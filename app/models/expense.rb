@@ -28,9 +28,6 @@
 
 
 
-
-
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -472,7 +469,11 @@ class Expense < ActiveRecord::Base
         return "#{policy_name} - #{per_diem_name}"
       else
         if self.report.nil?
-          return "- -"
+          if self.distance_expense?
+            return "#{self.distance_expense.distance_value} KM"
+          elsif self.time_expense?
+            return "#{self.time_expense.time_object_value} Hours"
+          end
         else
           if self.distance_expense?
             if simple

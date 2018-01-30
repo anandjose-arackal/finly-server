@@ -20,8 +20,6 @@
 #  hsn_sac            :string(255)
 #  parent_type        :string(255)
 #  parent_id          :string(255)
-#  parent_type        :string(255)
-#  parent_id          :string(255)
 #  taxable_amount_id  :integer
 #
 

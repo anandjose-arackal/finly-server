@@ -4,6 +4,7 @@ module Constants
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
   VALID_GENDER = /\A[MmFf]\z/i
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
+  VALID_IFSC = /[A-Za-z]{4}[a-zA-Z0-9]{7}/i
 
   OTP_RESEND_INTERVAL = 60
 

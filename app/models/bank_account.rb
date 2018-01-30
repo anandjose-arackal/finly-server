@@ -32,7 +32,7 @@ class BankAccount < ActiveRecord::Base
   has_many :finly_transactions, as: :finly_account
 
   validates :account_number, presence: true
-  validates :ifsc, presence: true
+  validates :ifsc, presence: true, format: Constants::VALID_IFSC
   validates :name, presence: true
 
   accepts_nested_attributes_for :account_owner

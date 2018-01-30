@@ -253,8 +253,8 @@ class Company < ActiveRecord::Base
     self.feature_subscription.yes_bank_account
   end
 
-  def yes_bank_api_enabled?
-    self.feature_subscription.yes_bank_api_enabled
+  def current_account_connected?
+    self.feature_subscription.current_account_connected
   end
 
 
