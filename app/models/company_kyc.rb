@@ -261,7 +261,7 @@ class CompanyKyc < ActiveRecord::Base
         documents << supporting_documents
 
       ## PRIVATE LIMITED COMPANY ##
-      when CompanyType.id_for('Private Ltd Company')
+      when CompanyType.id_for('Private Ltd Company'), CompanyType.id_for('Ltd Company')
 
         certificate_of_incorporation = {}
         certificate_of_incorporation[:name] = "Certificate of Incorporation"
