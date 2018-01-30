@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180119083720) do
+ActiveRecord::Schema.define(version: 20180130124030) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1577,7 +1577,7 @@ ActiveRecord::Schema.define(version: 20180119083720) do
     t.boolean  "yes_bank_account"
     t.boolean  "bank_account_reimbursement"
     t.boolean  "payroll_card_enabled",                   default: false
-    t.boolean  "yes_bank_api_enabled"
+    t.boolean  "current_account_connected"
     t.boolean  "invoicing_system",                       default: false
   end
 
@@ -1866,6 +1866,7 @@ ActiveRecord::Schema.define(version: 20180119083720) do
     t.datetime "updated_at",                                               null: false
     t.integer  "net_amount_id",      limit: 4
     t.string   "hsn_sac",            limit: 255
+    t.integer  "taxable_amount_id",  limit: 4
     t.string   "parent_type",        limit: 255
     t.string   "parent_id",          limit: 255
   end
@@ -1911,6 +1912,7 @@ ActiveRecord::Schema.define(version: 20180119083720) do
     t.decimal  "freight",                        precision: 20, scale: 10
     t.decimal  "roundoff_amount",                precision: 20, scale: 10
     t.integer  "balance_due_id",     limit: 4
+    t.integer  "taxable_amount_id",  limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -3572,6 +3574,8 @@ ActiveRecord::Schema.define(version: 20180119083720) do
     t.integer  "maximum_amount_id",             limit: 4
     t.integer  "exact_transaction_amount_id",   limit: 4
     t.string   "application",                   limit: 255,                   null: false
+    t.integer  "customer_id",                   limit: 4
+    t.boolean  "default_account"
   end
 
   create_table "whitelisted_ip_types", force: :cascade do |t|

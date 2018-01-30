@@ -25,7 +25,7 @@ class Invoicing::Customer::Show < Invoicing::Customer::Base
     self.payments = []
   end
 
-  def  post_process
+  def post_process
 
   end
 

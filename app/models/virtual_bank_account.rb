@@ -33,6 +33,8 @@
 #  maximum_amount_id             :integer
 #  exact_transaction_amount_id   :integer
 #  application                   :string(255)      not null
+#  customer_id                   :integer
+#  default_account               :boolean
 #
 
 # parent here will be either the payment receivable, or user, or whatever
@@ -43,6 +45,7 @@ class VirtualBankAccount < ActiveRecord::Base
   belongs_to :purpose, class_name: "VirtualAccountPurpose"
   belongs_to :company
   belongs_to :initiating_user, class_name: "User"
+  belongs_to :customer
   belongs_to :receiving_account, polymorphic: true
   belongs_to :maximum_transaction_amount, class_name: "Amount"
   belongs_to :minimum_transaction_amount, class_name: "Amount"
