@@ -22,6 +22,8 @@ end
 
 json.virtual_accounts do
   json.array!(customer.virtual_bank_accounts) do |virtual_account|
-
+    json.account_number virtual_account.account_number
+    json.ifsc virtual_account.ifsc
+    json.id virtual_account.id
   end
 end

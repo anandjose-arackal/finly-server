@@ -20,6 +20,7 @@ class Invoicing::Invoice::Update < Invoicing::Invoice::Base
   end
 
   def pre_process
+    # todo - add conditions where a particular line item will be destroyed etc.
 
   end
 
