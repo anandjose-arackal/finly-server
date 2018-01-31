@@ -37,4 +37,9 @@ class Invoicing::CustomersController < ApplicationController
     @result = Invoicing::Customer::Destroy.(current_user, params)
     respond
   end
+
+  def virtual_bank_accounts
+    @result = Invoicing::Customer::VirtualBankAccounts::Index.(current_user, params)
+    respond
+  end
 end
