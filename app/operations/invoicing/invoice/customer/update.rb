@@ -38,14 +38,24 @@ class Invoicing::Invoice::Customer::Update < Invoicing::Invoice::Base
 
   def process
     if self.customer.present?
-      unless self.invoice.update(customer_id: self.customer.id)
+      # setting the shipping and billing address of this invoice as the default address of the customer
+      default_address_id = nil
+      if self.customer.addresses.default.present?
+        default_address_id = self.customer.addresses.default.first.id
+      end
+      unless self.invoice.update(customer_id: self.customer.id, billing_address_id: default_address_id, shipping_address_id: default_address_id)
         add_message :error, self.invoice.errors.full_messages
         return
       end
     else
       self.customer = user.company.customers.build(self.customer_params)
       if self.customer.save
-        self.invoice.update(customer_id: self.customer.id)
+        # setting the shipping and billing address of this invoice as the default address of the customer
+        default_address_id = nil
+        if self.customer.addresses.default.present?
+          default_address_id = self.customer.addresses.default.first.id
+        end
+        self.invoice.update(customer_id: self.customer.id, billing_address_id: default_address_id, shipping_address_id: default_address_id)
       else
         add_message :error, self.invoice.errors.full_messages
         return

@@ -57,6 +57,8 @@ if invoice.present?
     json.freight_amount precision_value invoice.freight_amount&.value
     json.roundoff_amount precision_value invoice.roundoff_amount&.value
     json.balance_due precision_value invoice.balance_due&.value
+    json.net_amount precision_value invoice.net_amount&.value
+    json.inclusive_of_taxes invoice.inclusive_of_taxes
 
     json.invoice_items do
       json.array!(invoice.invoice_items) do |item|

@@ -30,6 +30,8 @@
 #  invoice_number      :string(255)
 #  gst_type_id         :integer
 #  inclusive_of_taxes  :boolean
+#  advance_amount_id   :integer
+#  net_amount_id       :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

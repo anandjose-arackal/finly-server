@@ -27,4 +27,6 @@ class Address < ActiveRecord::Base
   validates :name, presence: true
   validates :address_name, presence: true
   validates :city, presence: true
+
+  scope :default, -> { where default: true }
 end
