@@ -1061,6 +1061,7 @@
 #                                                         PATCH  /invoicing/outward_invoices/:id(.:format)                                                  invoicing/outward_invoices#update
 #                                                         PUT    /invoicing/outward_invoices/:id(.:format)                                                  invoicing/outward_invoices#update
 #                                                         DELETE /invoicing/outward_invoices/:id(.:format)                                                  invoicing/outward_invoices#destroy
+#                     invoicing_customer_virtual_accounts GET    /invoicing/customers/:customer_id/virtual_accounts(.:format)                               invoicing/virtual_bank_accounts#virtual_accounts
 #                                     invoicing_customers GET    /invoicing/customers(.:format)                                                             invoicing/customers#index
 #                                                         POST   /invoicing/customers(.:format)                                                             invoicing/customers#create
 #                                  new_invoicing_customer GET    /invoicing/customers/new(.:format)                                                         invoicing/customers#new
@@ -2475,7 +2476,9 @@ Rails.application.routes.draw do
       patch 'update_address', to: 'outward_invoices#update_address', as: :update_address
       patch 'update_virtual_account', to: 'outward_invoices#update_virtual_account', as: :update_virtual_account
     end
-    resources :customers
+    resources :customers do
+      get 'virtual_accounts', to: 'virtual_bank_accounts', as: :virtual_accounts
+    end
     resources :virtual_bank_accounts do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
     end
