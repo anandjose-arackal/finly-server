@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180131082833) do
+ActiveRecord::Schema.define(version: 20180131094054) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -29,18 +29,20 @@ ActiveRecord::Schema.define(version: 20180131082833) do
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
 
   create_table "addresses", force: :cascade do |t|
-    t.text     "line_1",      limit: 65535
-    t.text     "line_2",      limit: 65535
-    t.text     "line_3",      limit: 65535
-    t.string   "city",        limit: 255
-    t.integer  "state_id",    limit: 4
-    t.string   "name",        limit: 255
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-    t.string   "pin_code",    limit: 255
+    t.text     "line_1",       limit: 65535
+    t.text     "line_2",       limit: 65535
+    t.text     "line_3",       limit: 65535
+    t.string   "city",         limit: 255
+    t.integer  "state_id",     limit: 4
+    t.string   "name",         limit: 255
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.string   "pin_code",     limit: 255
     t.boolean  "default"
-    t.string   "parent_type", limit: 255
-    t.integer  "parent_id",   limit: 4
+    t.string   "parent_type",  limit: 255
+    t.integer  "parent_id",    limit: 4
+    t.string   "address_name", limit: 255
+    t.text     "landmark",     limit: 65535
   end
 
   add_index "addresses", ["state_id"], name: "fk_rails_2d87b6c11e", using: :btree

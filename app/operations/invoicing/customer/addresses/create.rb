@@ -1,11 +1,11 @@
 class Invoicing::Customer::Addresses::Create < Invoicing::Customer::Addresses::Base
 
-  attr_accessor :customer, :address, :customer_parameters
+  attr_accessor :customer, :address, :address_parameters
 
   def init
     id = params[:id] || params[:customer_id]
     self.customer = user.company.customers.find_by(id: id)
-    self.customer_parameters = customer_params
+    self.address_parameters = address_params
   end
 
   def validate
@@ -15,7 +15,7 @@ class Invoicing::Customer::Addresses::Create < Invoicing::Customer::Addresses::B
   end
 
   def process
-    self.address = self.customer.addresses.build(self.customer_parameters)
+    self.address = self.customer.addresses.build(self.address_parameters)
     unless self.address.save
       add_message :error, self.address.errors.full_messages
     end
