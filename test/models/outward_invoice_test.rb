@@ -29,6 +29,7 @@
 #  company_id          :integer
 #  invoice_number      :string(255)
 #  gst_type_id         :integer
+#  inclusive_of_taxes  :boolean
 #
 
 require 'test_helper'
