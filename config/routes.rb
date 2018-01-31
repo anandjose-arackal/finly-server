@@ -2477,7 +2477,7 @@ Rails.application.routes.draw do
       patch 'update_virtual_account', to: 'outward_invoices#update_virtual_account', as: :update_virtual_account
     end
     resources :customers do
-      get 'virtual_accounts', to: 'virtual_bank_accounts', as: :virtual_accounts
+      get 'virtual_accounts', to: 'customers#virtual_bank_accounts', as: :virtual_accounts
     end
     resources :virtual_bank_accounts do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
