@@ -20,8 +20,31 @@ class Invoicing::Invoice::Update < Invoicing::Invoice::Base
   end
 
   def pre_process
-    # todo - add conditions where a particular line item will be destroyed etc.
 
+    # add logic to remove line items if required
+    if self.invoice_parameters&.dig(:invoice_items_attributes).present?
+      self.invoice_parameters[:invoice_items_attributes].each do |data|
+        if StringUtils.to_bool(data[:remove_line_item])
+          data[:_destroy] = true
+          data.delete(:remove_line_item)
+        else
+          data.delete(:remove_line_item)
+        end
+      end
+    end
+
+    # if nothing is passed inside invoice items attributes, assume that all are to be deleted
+    if self.invoice_parameters&.dig(:invoice_items_attributes).blank?
+      if self.invoice&.invoice_items.present?
+        self.invoice_parameters[:invoice_items_attributes] = []
+        self.invoice&.invoice_items.each do |item|
+          self.invoice_parameters[:invoice_items_attributes] << {
+              id: item.id,
+              _destroy: true
+          }
+        end
+      end
+    end
   end
 
   def process
