@@ -31,11 +31,11 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
           payment[:amount],
           retrieve_payment_mode(payment),
           payment[:date],
-          payment[:ifsc],
+          payment[:beneficiary_ifsc],
           "",
           "",
           payment[:receiving_mobile_number],
-          payment[:email],
+          payment[:receiving_user_email],
           "",
           "",
           "",
@@ -46,14 +46,17 @@ class PaymentFiles::Formats::IciciBank::Process < PaymentFiles::Formats::BaseFor
           "",
           "",
           "",
-          payment[:note]
+          payment[:note],
+          payment[:initiating_user_email]
       ]
+      # Todo Remove the last entry of "payment[:initiating_user_email]", this was specifically built as per Toppr's requirements
     end
     self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
   end
 
   def retrieve_icici_headers
-    ["Debit Ac No", "Beneficiary Ac No", "Beneficiary Name", "Amt", "Pay Mod", "Date", "IFSC", "Payable Location", "Print Location", "Bene Mobile No.", "Bene Email ID", "Bene add1", "Bene add2", "Bene add3", "Bene add4", "Add Details 1", "Add Details 2", "Add Details 3", "Add Details 4", "Add Details 5", "Remarks"]
+    # Todo Remove the last entry of "Initiating User Email", this was specifically built as per Toppr's requirements
+    ["Debit Ac No", "Beneficiary Ac No", "Beneficiary Name", "Amt", "Pay Mod", "Date", "IFSC", "Payable Location", "Print Location", "Bene Mobile No.", "Bene Email ID", "Bene add1", "Bene add2", "Bene add3", "Bene add4", "Add Details 1", "Add Details 2", "Add Details 3", "Add Details 4", "Add Details 5", "Remarks", "Initiating User Email"]
   end
 
   def retrieve_payment_mode(payment)
