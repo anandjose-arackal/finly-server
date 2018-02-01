@@ -4,8 +4,8 @@
 #
 #  id                  :integer          not null, primary key
 #  customer_id         :integer
-#  invoice_date        :date
-#  invoice_due_date    :date
+#  date                :date
+#  due_date            :date
 #  amount_id           :integer
 #  discount            :decimal(10, 5)
 #  tax                 :decimal(10, 5)

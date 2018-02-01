@@ -6,8 +6,8 @@ if invoice.present?
       json.identifier invoice.invoice_status_identifier
     end
     json.invoice_number invoice.invoice_number
-    json.invoice_date invoice.invoice_date
-    json.due_date invoice.invoice_due_date
+    json.invoice_date invoice.date
+    json.due_date invoice.due_date
 
     json.payment_term_name invoice.payment_term&.name
     json.payment_term_id invoice.payment_term&.id
@@ -26,6 +26,7 @@ if invoice.present?
       json.name invoice.shipping_address&.name
       json.pin_code invoice.shipping_address&.pin_code
       json.city invoice.shipping_address&.city
+      json.state_name invoice.shipping_address&.state&.name
     end
 
     json.billing_address do
@@ -38,6 +39,7 @@ if invoice.present?
       json.name invoice.billing_address&.name
       json.pin_code invoice.billing_address&.pin_code
       json.city invoice.billing_address&.city
+      json.state_name invoice.billing_address&.state&.name
     end
 
   end
