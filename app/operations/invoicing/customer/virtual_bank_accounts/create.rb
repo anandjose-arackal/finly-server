@@ -23,8 +23,9 @@ class Invoicing::Customer::VirtualBankAccounts::Create < Invoicing::Customer::Ba
   end
 
   def process
+    purpose_id = self.invoice.present? ? VirtualAccountPurpose.id_for(:invoice) : nil
     op = Invoicing::VirtualBankAccount::Create.(user, {
-        purpose_id: VirtualAccountPurpose.id_for(:invoice),
+        purpose_id: purpose_id,
         parent: self.invoice,
         customer: self.customer
     })
