@@ -26,5 +26,6 @@ json.virtual_accounts do
     json.account_number virtual_account.account_number
     json.ifsc virtual_account.ifsc
     json.id virtual_account.id
+    json.name virtual_account.name
   end
 end
