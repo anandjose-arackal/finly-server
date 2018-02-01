@@ -20,7 +20,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def pre_validate
-    if params.blank?
+    if self.company.blank?
       add_message :error, "Invalid parameters"
       return
     end
