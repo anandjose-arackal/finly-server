@@ -14,6 +14,7 @@ class Invoicing::Customer::Create < Invoicing::Customer::Base
       op = FinlyCollect::Create.(user, {})
       if op.success?
         self.virtual_account_number = op.account_number
+        name = self.customer_params[:virtual_account_attributes][:name]
         # now add this to the customer parameters so that on creation it is linked to this customer
         self.customer_params[:virtual_account_attributes] = {
             account_number: self.virtual_account_number,
@@ -22,12 +23,15 @@ class Invoicing::Customer::Create < Invoicing::Customer::Base
             initiating_user: user,
             company_id: user.company_id,
             receiving_account: user.company.yes_bank_company_account,
-            default_account: true
+            default_account: true,
+            name: name
         }
       else
         # in this case Finly Collect responded with a failure, so do nothing?
         # Probably trigger a mailer or something IDK
       end
+    else
+      self.customer_params.delete(:virtual_bank_accounts_attributes)
     end
     # delete the 'create_virtual_account' key irrespective
     self.customer_params.delete(:create_virtual_account)
@@ -35,6 +39,7 @@ class Invoicing::Customer::Create < Invoicing::Customer::Base
 
 
   def process
+    debugger
     self.customer = self.company.customers.build(self.customer_params)
     unless self.customer.save
       # delete the virtual account that was created for this company if it's present
