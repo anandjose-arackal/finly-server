@@ -29,6 +29,8 @@ class Invoicing::Customer::Create < Invoicing::Customer::Base
         # Probably trigger a mailer or something IDK
       end
     end
+    # delete the 'create_virtual_account' key irrespective
+    self.customer_params.delete(:create_virtual_account)
   end
 
 
