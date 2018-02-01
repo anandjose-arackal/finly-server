@@ -3,7 +3,7 @@
 
 class YesBankApi::Balance::GetBalance < YesBankApi::Base
 
-  attr_accessor :account_number, :balance, :company
+  attr_accessor :account_number, :balance, :company, :company_id
 
   def initialize(company)
     self.company = company
@@ -27,6 +27,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def init
+    self.company_id = self.company.id
     super()
     set_xml_params
   end
