@@ -20,7 +20,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def pre_validate
-    if params.blank?
+    if self.company.blank?
       add_message :error, "Invalid parameters"
       return
     end
@@ -56,7 +56,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def failure
-    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter.new
+    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter.new(nil, nil, messages)
   end
 
   class YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter < BaseOperation::BasePresenter::SuccessPresenter
