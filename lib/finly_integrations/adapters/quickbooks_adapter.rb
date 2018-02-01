@@ -209,7 +209,9 @@ module FinlyIntegrations
         fi_item.company_id = @finly_company_id
         fi_item.quickbooks_integration_type = QuickbooksFinlyIntegratable::ALLOWED_INTEGRATION_TYPES.first
         fi_item.quickbooks_updated_at = item.meta_data.last_updated_time
-        fi_item.category_sub_type = QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES.last
+        if item.account_type&.upcase == 'Expense'
+          fi_item.category_sub_type = QuickbooksFinlyIntegrationsCategory::QUICKBOOKS_CATEGORY_SUB_TYPES.last
+        end
         save_additional_information(fi_item, item)
         fi_item
       end
