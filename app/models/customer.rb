@@ -28,5 +28,5 @@ class Customer < ActiveRecord::Base
   accepts_nested_attributes_for :virtual_bank_accounts
 
   validates :name, presence: true
-  validates :created_by, presence: true
+  # validates :created_by, presence: true
 end

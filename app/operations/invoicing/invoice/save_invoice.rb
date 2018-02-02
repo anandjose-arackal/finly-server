@@ -27,7 +27,9 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   end
 
   def process
-    unless self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved))
+    if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved))
+      self.invoice.update(paid_amount: Amount.create(value: 0, currency_id: 1)) # setting the paid amount as 0 at the time of saving
+    else
       add_message :error, self.invoice.errors.full_messages
       return
     end

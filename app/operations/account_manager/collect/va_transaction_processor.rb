@@ -46,7 +46,12 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
         AccountManager::Collect::PaymentReceivable::Accept.(nil, virtual_account_transaction: self.virtual_account_transaction)
       when VirtualAccountPurpose.id_for(:invoice)
         # this will take the respective payment for the invoice and mark it as paid or partially paid accordingly
-        AccountManager::Collect::Invoice::Accept.(self.virtual_account_transaction.id)
+        op = AccountManager::Collect::Invoice::Accept.(nil, virtual_account_transaction: self.virtual_account_transaction)
+        # if this operation isn't successful, update the virtual account transaction as not reconciled
+        unless op.success?
+          self.virtual_account_transaction.update(processed: false)
+          self.virtual_account_transaction.log_state(:error, 'Invoice payment not reconciled')
+        end
       else
         # do nothing?
     end

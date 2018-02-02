@@ -7,17 +7,21 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
     self.virtual_account_transaction = params[:virtual_account_transaction]
     self.virtual_account = virtual_account_transaction.virtual_account
     self.company = virtual_account.company
-    self.outward_invoice = self.virtual_account.parent
-    self.amount_due = self.outward_invoice.balance_due&.value.to_f - self.outward_invoice.paid_amount&.value.to_f
+    self.outward_invoice = self.virtual_account.outward_invoices.unpaid.first
+    self.amount_due = self.outward_invoice&.balance_due&.value.to_f - self.outward_invoice&.paid_amount&.value.to_f
   end
 
   def validate
-    # ensure that the invoice is still in an unpaid state
-    unless self.outward_invoice.unpaid? || self.outward_invoice.partially_paid?
-      add_message :error, "Only unpaid or partially paid invoices can accept payments"
+    unless self.outward_invoice.present?
+      add_message :error, "Invoice not found"
       return
     end
 
+    # ensure that the invoice is still in an unpaid state
+    unless OutwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :saved, :sent_to_customer).include?(self.outward_invoice.invoice_status_id)
+      add_message :error, "Only unpaid or partially paid invoices can accept payments"
+      return
+    end
   end
 
   def process
@@ -29,7 +33,7 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
     elsif self.virtual_account_transaction.transfer_amount&.to_f < self.amount_due
       amount_paid = self.outward_invoice.paid_amount&.value.to_f + self.virtual_account_transaction.transfer_amount&.to_f
       self.outward_invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid))
-      self.outward_invoice.paid_amount.update(value: amount_paid)
+      self.outward_invoice.paid_amount&.update(value: amount_paid)
     end
   end
 

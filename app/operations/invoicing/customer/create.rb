@@ -44,6 +44,9 @@ class Invoicing::Customer::Create < Invoicing::Customer::Base
     end
     # delete the 'create_virtual_account' key irrespective
     self.customer_params.delete(:create_virtual_account)
+
+    # add details of the user who's creating the customer
+    # self.customer_params[:created_by_id] = self.user.id
   end
 
 

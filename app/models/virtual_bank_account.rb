@@ -52,7 +52,7 @@ class VirtualBankAccount < ActiveRecord::Base
   belongs_to :maximum_amount, class_name: "Amount"
   belongs_to :exact_transaction_amount, class_name: "Amount"
 
-  has_many :outward_invoices
+  has_many :outward_invoices, foreign_key: :virtual_account_id
 
   has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
 

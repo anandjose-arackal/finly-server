@@ -91,6 +91,9 @@ class OutwardInvoice < ActiveRecord::Base
   validates :net_amount, presence: true, if: :valid_invoice?
   validates :gst_type_id, presence: true, if: :valid_invoice?
 
+  scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
+  scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:closed) }
+
   before_save do
     if self.invoice_number.blank? && valid_invoice?
       generate_invoice_number

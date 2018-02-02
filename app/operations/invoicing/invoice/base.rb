@@ -21,6 +21,7 @@ class Invoicing::Invoice::Base < BaseOperation
                                      :tax_type_id, :discount, :date, :discount_type_id, :due_date,
                                      :invoice_number, :inclusive_of_taxes,
                                      original_amount_attributes: [:value, :currency_id],
+                                     advance_amount_attributes: [:value, :currency_id],
                                      freight_amount_attributes: [:value, :currency_id],
                                      invoice_attachments_attributes: [:attached_file, :description],
                                      invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax])
