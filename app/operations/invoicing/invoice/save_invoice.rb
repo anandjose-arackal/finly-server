@@ -4,11 +4,16 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   attr_accessor :invoice
 
   def init
-    id = params[:id] || params[:outward_invoice]
+    id = params[:id] || params[:outward_invoice_id]
     self.invoice = user.company.outward_invoices.find_by(id: id)
   end
 
   def validate
+    if self.invoice.blank?
+      add_message :error, "Invoice not found"
+      return
+    end
+
     unless self.invoice.incomplete?
       add_message :error, "Invoice cannot be created in this state"
       return

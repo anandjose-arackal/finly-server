@@ -1,7 +1,9 @@
 class Invoicing::Invoice::Cancel < Invoicing::Invoice::Base
 
+  attr_accessor :invoice
+
   def init
-    id = params[:id] || params[:outward_invoice]
+    id = params[:id] || params[:outward_invoice_id]
     self.invoice = user.company.outward_invoices.find_by(id: id)
   end
 
