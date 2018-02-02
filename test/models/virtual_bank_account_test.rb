@@ -33,6 +33,8 @@
 #  maximum_amount_id             :integer
 #  exact_transaction_amount_id   :integer
 #  application                   :string(255)      not null
+#  customer_id                   :integer
+#  default_account               :boolean
 #
 
 require 'test_helper'
