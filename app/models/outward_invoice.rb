@@ -32,6 +32,7 @@
 #  inclusive_of_taxes  :boolean
 #  advance_amount_id   :integer
 #  net_amount_id       :integer
+#  virtual_account_id  :integer
 #
 
 class OutwardInvoice < ActiveRecord::Base
@@ -56,7 +57,8 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :shipping_address, class_name: "Address"
   belongs_to :billing_address, class_name: "Address"
 
-  has_one :virtual_bank_account, as: :parent
+  # has_one :virtual_bank_account, as: :parent
+  belongs_to :virtual_account, class_name: "VirtualBankAccount"
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :payments, as: :parent

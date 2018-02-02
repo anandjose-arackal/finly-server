@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180202150355) do
+ActiveRecord::Schema.define(version: 20180202164641) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1355,6 +1355,7 @@ ActiveRecord::Schema.define(version: 20180202150355) do
     t.datetime "updated_at",                  null: false
     t.string   "gst",           limit: 255
     t.string   "pan",           limit: 255
+    t.integer  "created_by_id", limit: 4
   end
 
   create_table "desktop_users", force: :cascade do |t|
@@ -2403,6 +2404,7 @@ ActiveRecord::Schema.define(version: 20180202150355) do
     t.boolean  "inclusive_of_taxes"
     t.integer  "advance_amount_id",   limit: 4
     t.integer  "net_amount_id",       limit: 4
+    t.integer  "virtual_account_id",  limit: 4
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree

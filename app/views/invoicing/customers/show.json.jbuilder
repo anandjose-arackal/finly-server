@@ -8,6 +8,8 @@ json.company do
   json.id customer.company&.id
 end
 
+json.created_by customer.created_by&.name
+
 json.addresses do
   json.array!(customer.addresses) do |address|
     json.name address.name

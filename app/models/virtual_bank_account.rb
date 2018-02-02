@@ -52,6 +52,8 @@ class VirtualBankAccount < ActiveRecord::Base
   belongs_to :maximum_amount, class_name: "Amount"
   belongs_to :exact_transaction_amount, class_name: "Amount"
 
+  has_many :outward_invoices
+
   has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
 
   accepts_nested_attributes_for :maximum_amount

@@ -31,7 +31,9 @@ class Invoicing::Invoice::VirtualAccount::Update < Invoicing::Invoice::Base
   end
 
   def process
-    unless self.virtual_account.update(parent: self.invoice, purpose_id: VirtualAccountPurpose.id_for(:invoice))
+    if self.invoice.update(virtual_account_id: self.virtual_account.id)
+      self.virtual_account.update(purpose_id: VirtualAccountPurpose.id_for(:invoice))
+    else
       add_message :error, self.virtual_account.errors.full_messages
     end
   end
