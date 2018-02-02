@@ -18,7 +18,7 @@ if invoice.present?
     end
 
     json.status do
-      json.name invoice.invoice_status&.name
+      json.name invoice.invoice_status&.name&.humanize
     end
 
     json.virtual_account do

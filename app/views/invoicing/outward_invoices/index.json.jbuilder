@@ -19,5 +19,5 @@ json.array!(@result.invoices) do |invoice|
     json.name invoice.customer&.name
   end
   json.balance_due invoice.balance_due&.value
-  json.status invoice.invoice_status&.name
+  json.status invoice.invoice_status&.name&.humanize
 end

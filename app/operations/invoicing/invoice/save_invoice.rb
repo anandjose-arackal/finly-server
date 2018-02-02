@@ -34,6 +34,6 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   end
 
   def post_process
-    add_message :error, "Invoice successfully created!"
+    add_message :success, "Invoice successfully created!"
   end
 end
