@@ -1,6 +1,6 @@
 class Invoicing::Customer::Update < Invoicing::Customer::Base
 
-  attr_accessor :customer_attributes
+  attr_accessor :customer_attributes, :customer
 
   def init
     self.customer_attributes = customer_parameters
