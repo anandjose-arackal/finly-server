@@ -32,7 +32,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
   def retrieve_data
     return [] if bank_payment_requests.empty?
     content = []
-    bank_payment_requests.each do |pr|
+    bank_payment_requests.include_for_data_retrieval.each do |pr|
       po = pr.payment_order
       po.payments.each do |payment|
         payment_details = [

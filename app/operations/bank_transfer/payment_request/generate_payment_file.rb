@@ -33,11 +33,15 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
       request.payment_order.payments.each do |payment|
         data << {
             beneficiary_account_number: payment.receiving_account.account_number,
+            beneficiary_ifsc: payment.receiving_account.ifsc,
+            initiating_user_name: payment.initiating_user&.name,
+            initiating_user_email: payment.initiating_user&.email,
+            initiating_user_mobile_number: payment.initiating_user&.mobile_number,
             receiving_user_name: payment.receiving_user.name,
+            receiving_user_email: payment.receiving_user.email,
+            receiving_user_mobile_number: payment.receiving_user.mobile_number,
             amount: payment.amount_value,
             date: Date.today.strftime("%d-%^b-%Y"),
-            ifsc: payment.receiving_account.ifsc,
-            email: payment.receiving_user.email,
             note: payment.note,
             payment_mode: payment.payment_mode
         }

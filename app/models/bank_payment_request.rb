@@ -92,6 +92,12 @@ class BankPaymentRequest < ActiveRecord::Base
     end
   }
 
+  scope :include_for_data_retrieval, -> { includes(payment_order: {payments: [{receiving_account: :account_owner},
+                                                   :initiating_user,
+                                                    {payment_order: [bank_payment_request: [:status, :controlling_user]]},
+                                                   {invoice: [:amount, :discount_amount, :tax_amount, :tds_amount, :advance_amount]},
+                                                   :amount]}) }
+
   scope :filter_date, -> (date_from, date_to) {
     date_from = "1990-01-01" if date_from.blank?
     date_to = DateUtils.local_date_time if date_to.blank?
