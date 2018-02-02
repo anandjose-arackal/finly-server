@@ -18,21 +18,24 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
             url: Rails.application.routes.url_helpers.invoicing_outward_invoice_save_path(self.invoice),
             name: "Create Invoice",
             method: "patch",
-            id: "create_invoice"
+            id: "create_invoice",
+            btn_class: "primary"
         }
         actions << {
             url: Rails.application.routes.url_helpers.invoicing_outward_invoice_path(self.invoice),
             name: "Delete Invoice",
             method: "delete",
-            id: "delete_invoice"
+            id: "delete_invoice",
+            btn_class: "danger"
         }
       end
       if self.invoice.saved? || self.invoice.sent_to_customer?
         actions << {
-            url: Rails.application.routes.url_helpers.(self.invoice),
+            url: Rails.application.routes.url_helpers.invoicing_outward_invoice_cancel_path(self.invoice),
             name: "Cancel Invoice",
             method: "patch",
-            id: "cancel_invoice"
+            id: "cancel_invoice",
+            btn_class: "danger"
         }
       end
       actions
