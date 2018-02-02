@@ -93,6 +93,7 @@ class OutwardInvoice < ActiveRecord::Base
 
   scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
   scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:closed) }
+  scope :payments_receivable, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer])) }
 
   before_save do
     if self.invoice_number.blank? && valid_invoice?
