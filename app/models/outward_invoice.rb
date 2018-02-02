@@ -108,7 +108,7 @@ class OutwardInvoice < ActiveRecord::Base
   # as in, an invoice that has been saved and is payable by
   # the customer
   def valid_invoice?
-    !(self.invoice_status_id == OutwardInvoiceStatus.id_for(:incomplete))
+    !(self.invoice_status_id == OutwardInvoiceStatus.id_for(:incomplete) || self.invoice_status_id == OutwardInvoiceInvoice.id_for(:cancelled))
   end
 
   def generate_invoice_number
