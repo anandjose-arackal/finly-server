@@ -21,6 +21,12 @@ if invoice.present?
       json.name invoice.invoice_status&.name
     end
 
+    json.virtual_account do
+      json.id invoice.virtual_bank_account&.id
+      json.account_number invoice.virtual_bank_account&.account_number
+      json.ifsc invoice.virtual_bank_account&.ifsc
+    end
+
     json.shipping_address do
       json.line_1 invoice.shipping_address&.line_1
       json.line_2 invoice.shipping_address&.line_2
