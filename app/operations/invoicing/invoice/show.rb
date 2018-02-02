@@ -10,6 +10,34 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
       self.invoice = params[:invoice]
     end
 
+    def navbar_actions
+      actions = []
+      if invoice.incomplete?
+        # adding the save action
+        actions << {
+            url: Rails.application.routes.url_helpers.invoicing_outward_invoice_save_path(self.invoice),
+            name: "Create Invoice",
+            method: "patch",
+            id: "create_invoice"
+        }
+        actions << {
+            url: Rails.application.routes.url_helpers.invoicing_outward_invoice_path(self.invoice),
+            name: "Delete Invoice",
+            method: "delete",
+            id: "delete_invoice"
+        }
+      end
+      if self.invoice.saved? || self.invoice.sent_to_customer?
+        actions << {
+            url: Rails.application.routes.url_helpers.(self.invoice),
+            name: "Cancel Invoice",
+            method: "patch",
+            id: "cancel_invoice"
+        }
+      end
+      actions
+    end
+
   end
 
   def init

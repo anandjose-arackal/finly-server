@@ -33,8 +33,6 @@
 #  maximum_amount_id             :integer
 #  exact_transaction_amount_id   :integer
 #  application                   :string(255)      not null
-#  customer_id                   :integer
-#  default_account               :boolean
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

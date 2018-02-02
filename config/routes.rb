@@ -1053,6 +1053,8 @@
 #               invoicing_outward_invoice_remove_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/remove_customer(.:format)                  invoicing/outward_invoices#remove_customer
 #                invoicing_outward_invoice_update_address PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_address(.:format)                   invoicing/outward_invoices#update_address
 #        invoicing_outward_invoice_update_virtual_account PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_virtual_account(.:format)           invoicing/outward_invoices#update_virtual_account
+#                        invoicing_outward_invoice_cancel PATCH  /invoicing/outward_invoices/:outward_invoice_id/cancel(.:format)                           invoicing/outward_invoices#cancel
+#                          invoicing_outward_invoice_save PATCH  /invoicing/outward_invoices/:outward_invoice_id/save(.:format)                             invoicing/outward_invoices#save
 #                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#index
 #                                                         POST   /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#create
 #                           new_invoicing_outward_invoice GET    /invoicing/outward_invoices/new(.:format)                                                  invoicing/outward_invoices#new
@@ -2476,6 +2478,8 @@ Rails.application.routes.draw do
       patch 'remove_customer', to: 'outward_invoices#remove_customer', as: :remove_customer
       patch 'update_address', to: 'outward_invoices#update_address', as: :update_address
       patch 'update_virtual_account', to: 'outward_invoices#update_virtual_account', as: :update_virtual_account
+      patch 'cancel', to: 'outward_invoices#cancel', as: :cancel
+      patch 'save', to: 'outward_invoices#save', as: :save
     end
     resources :customers do
       get 'virtual_accounts', to: 'customers#virtual_bank_accounts', as: :virtual_accounts

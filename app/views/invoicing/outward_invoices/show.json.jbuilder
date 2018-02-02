@@ -6,7 +6,7 @@ if invoice.present?
       json.identifier invoice.invoice_status_identifier
     end
     json.invoice_number invoice.invoice_number
-    json.invoice_date invoice.date
+    json.date invoice.date
     json.due_date invoice.due_date
 
     json.payment_term_name invoice.payment_term&.name
@@ -15,6 +15,10 @@ if invoice.present?
     json.policy do
       json.id invoice.policy_id
       json.name invoice.policy&.name
+    end
+
+    json.status do
+      json.name invoice.invoice_status&.name
     end
 
     json.shipping_address do
@@ -41,14 +45,15 @@ if invoice.present?
       json.city invoice.billing_address&.city
       json.state_name invoice.billing_address&.state&.name
     end
-
   end
 
-  json.customer do
-    json.name invoice.customer&.name
-    json.id invoice.customer&.id
-    json.mobile_number invoice.customer&.mobile_number
-    json.email invoice.customer&.email
+  if invoice.customer.present?
+    json.customer do
+      json.name invoice.customer&.name
+      json.id invoice.customer&.id
+      json.mobile_number invoice.customer&.mobile_number
+      json.email invoice.customer&.email
+    end
   end
 
   json.invoice do
@@ -61,6 +66,7 @@ if invoice.present?
     json.balance_due precision_value invoice.balance_due&.value
     json.net_amount precision_value invoice.net_amount&.value
     json.inclusive_of_taxes invoice.inclusive_of_taxes
+    json.paid_amount precision_value invoice.paid_amount&.value
 
     json.invoice_items do
       json.array!(invoice.invoice_items) do |item|
@@ -79,6 +85,11 @@ if invoice.present?
         json.hsn_sac item.hsn_sac
       end
     end
+  end
+
+  json.actions do
+    json.editable invoice.editable?
+    json.navbar @result.navbar_actions
   end
 end
 

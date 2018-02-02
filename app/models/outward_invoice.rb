@@ -61,7 +61,7 @@ class OutwardInvoice < ActiveRecord::Base
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :payments, as: :parent
 
-  delegate :unpaid?, :partially_paid?, :closed?, :incomplete?, to: :invoice_status
+  delegate :unpaid?, :partially_paid?, :closed?, :incomplete?, :saved?, :sent_to_customer?, to: :invoice_status
 
   accepts_nested_attributes_for :customer
   accepts_nested_attributes_for :amount

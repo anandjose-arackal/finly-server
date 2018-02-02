@@ -28,7 +28,12 @@ class Invoicing::OutwardInvoicesController < ApplicationController
   end
 
   def destroy
-
+    @result = Invoicing::Invoice::Destroy.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   def add_customer
@@ -60,6 +65,19 @@ class Invoicing::OutwardInvoicesController < ApplicationController
 
   def update_virtual_account
     @result = Invoicing::Invoice::VirtualAccount::Update.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def save
+
+  end
+
+  def cancel
+    @result = Invoicing::Invoice::Cancel.(current_user, params)
     if @result.success?
       respond response: :success, message: @result.messages[:success]
     else

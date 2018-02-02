@@ -30,4 +30,16 @@ class OutwardInvoiceStatus < ActiveRecord::Base
   def incomplete?
     self.id == OutwardInvoiceStatus.id_for(:incomplete)
   end
+
+  def saved?
+    self.id == OutwardInvoiceStatus.id_for(:saved)
+  end
+
+  def sent_to_customer?
+    self.id == OutwardInvoiceStatus.id_for(:sent_to_customer)
+  end
+
+  def cancelled?
+    self.id == OutwardInvoiceStatus.id_for(:cancelled)
+  end
 end
