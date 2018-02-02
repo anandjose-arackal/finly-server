@@ -71,20 +71,23 @@ class OutwardInvoice < ActiveRecord::Base
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :original_amount
   accepts_nested_attributes_for :freight_amount
-  # accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :advance_amount
   accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
 
   validates :invoice_status, presence: true
 
-  # todo - add validations for the particular invoice when it moves to unpaid state
   validates :invoice_items, presence: true, if: :valid_invoice?
   validates :invoice_number, presence: true, if: :valid_invoice?
   validates :customer_id, presence: true, if: :valid_invoice?
   validates :billing_address_id, presence: true, if: :valid_invoice?
   validates :shipping_address_id, presence: true, if: :valid_invoice?
   validates :company_id, presence: true, if: :valid_invoice?
+  validates :balance_due, presence: true, if: :valid_invoice?
+  validates :discount_amount, presence: true, if: :valid_invoice?
+  validates :tax_amount, presence: true, if: :valid_invoice?
+  validates :net_amount, presence: true, if: :valid_invoice?
+  validates :gst_type_id, presence: true, if: :valid_invoice?
 
   before_save do
     if self.invoice_number.blank? && valid_invoice?
