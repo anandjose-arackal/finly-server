@@ -1033,6 +1033,14 @@
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                             bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                       bank_transfer/vendor_payment_wallets#transfer_options
 #                                     public_bank_account GET    /account/:account_number(.:format)                                                         invoicing/public_links#virtual_bank_account_show
+#                                               addresses GET    /addresses(.:format)                                                                       addresses#index
+#                                                         POST   /addresses(.:format)                                                                       addresses#create
+#                                             new_address GET    /addresses/new(.:format)                                                                   addresses#new
+#                                            edit_address GET    /addresses/:id/edit(.:format)                                                              addresses#edit
+#                                                 address GET    /addresses/:id(.:format)                                                                   addresses#show
+#                                                         PATCH  /addresses/:id(.:format)                                                                   addresses#update
+#                                                         PUT    /addresses/:id(.:format)                                                                   addresses#update
+#                                                         DELETE /addresses/:id(.:format)                                                                   addresses#destroy
 #                           invoicing_payment_receivables GET    /invoicing/payment_receivables(.:format)                                                   invoicing/payment_receivables#index
 #                                                         POST   /invoicing/payment_receivables(.:format)                                                   invoicing/payment_receivables#create
 #                        new_invoicing_payment_receivable GET    /invoicing/payment_receivables/new(.:format)                                               invoicing/payment_receivables#new
@@ -1041,6 +1049,30 @@
 #                                                         PATCH  /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
 #                                                         PUT    /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#update
 #                                                         DELETE /invoicing/payment_receivables/:id(.:format)                                               invoicing/payment_receivables#destroy
+#                  invoicing_outward_invoice_add_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/add_customer(.:format)                     invoicing/outward_invoices#add_customer
+#               invoicing_outward_invoice_remove_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/remove_customer(.:format)                  invoicing/outward_invoices#remove_customer
+#                invoicing_outward_invoice_update_address PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_address(.:format)                   invoicing/outward_invoices#update_address
+#        invoicing_outward_invoice_update_virtual_account PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_virtual_account(.:format)           invoicing/outward_invoices#update_virtual_account
+#                        invoicing_outward_invoice_cancel PATCH  /invoicing/outward_invoices/:outward_invoice_id/cancel(.:format)                           invoicing/outward_invoices#cancel
+#                          invoicing_outward_invoice_save PATCH  /invoicing/outward_invoices/:outward_invoice_id/save(.:format)                             invoicing/outward_invoices#save
+#                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#index
+#                                                         POST   /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#create
+#                           new_invoicing_outward_invoice GET    /invoicing/outward_invoices/new(.:format)                                                  invoicing/outward_invoices#new
+#                          edit_invoicing_outward_invoice GET    /invoicing/outward_invoices/:id/edit(.:format)                                             invoicing/outward_invoices#edit
+#                               invoicing_outward_invoice GET    /invoicing/outward_invoices/:id(.:format)                                                  invoicing/outward_invoices#show
+#                                                         PATCH  /invoicing/outward_invoices/:id(.:format)                                                  invoicing/outward_invoices#update
+#                                                         PUT    /invoicing/outward_invoices/:id(.:format)                                                  invoicing/outward_invoices#update
+#                                                         DELETE /invoicing/outward_invoices/:id(.:format)                                                  invoicing/outward_invoices#destroy
+#                     invoicing_customer_virtual_accounts GET    /invoicing/customers/:customer_id/virtual_accounts(.:format)                               invoicing/customers#virtual_bank_accounts
+#               invoicing_customer_create_virtual_account POST   /invoicing/customers/:customer_id/create_virtual_account(.:format)                         invoicing/customers#create_virtual_account
+#                                     invoicing_customers GET    /invoicing/customers(.:format)                                                             invoicing/customers#index
+#                                                         POST   /invoicing/customers(.:format)                                                             invoicing/customers#create
+#                                  new_invoicing_customer GET    /invoicing/customers/new(.:format)                                                         invoicing/customers#new
+#                                 edit_invoicing_customer GET    /invoicing/customers/:id/edit(.:format)                                                    invoicing/customers#edit
+#                                      invoicing_customer GET    /invoicing/customers/:id(.:format)                                                         invoicing/customers#show
+#                                                         PATCH  /invoicing/customers/:id(.:format)                                                         invoicing/customers#update
+#                                                         PUT    /invoicing/customers/:id(.:format)                                                         invoicing/customers#update
+#                                                         DELETE /invoicing/customers/:id(.:format)                                                         invoicing/customers#destroy
 #            invoicing_virtual_bank_account_show_payments GET    /invoicing/virtual_bank_accounts/:virtual_bank_account_id/transactions(.:format)           invoicing/virtual_bank_accounts#show_payments
 #                         invoicing_virtual_bank_accounts GET    /invoicing/virtual_bank_accounts(.:format)                                                 invoicing/virtual_bank_accounts#index
 #                                                         POST   /invoicing/virtual_bank_accounts(.:format)                                                 invoicing/virtual_bank_accounts#create
@@ -2437,8 +2469,22 @@ Rails.application.routes.draw do
 
   get 'account/:account_number', to: 'invoicing/public_links#virtual_bank_account_show', as: :public_bank_account
 
+  resources :addresses
+
   namespace :invoicing do
     resources :payment_receivables
+    resources :outward_invoices do
+      patch 'add_customer', to: 'outward_invoices#add_customer', as: :add_customer
+      patch 'remove_customer', to: 'outward_invoices#remove_customer', as: :remove_customer
+      patch 'update_address', to: 'outward_invoices#update_address', as: :update_address
+      patch 'update_virtual_account', to: 'outward_invoices#update_virtual_account', as: :update_virtual_account
+      patch 'cancel', to: 'outward_invoices#cancel', as: :cancel
+      patch 'save', to: 'outward_invoices#save', as: :save
+    end
+    resources :customers do
+      get 'virtual_accounts', to: 'customers#virtual_bank_accounts', as: :virtual_accounts
+      post 'create_virtual_account', to: 'customers#create_virtual_account', as: :create_virtual_account
+    end
     resources :virtual_bank_accounts do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
     end

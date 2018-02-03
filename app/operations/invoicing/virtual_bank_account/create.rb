@@ -4,7 +4,7 @@
 class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Base
 
   attr_accessor :account_params, :purpose_id, :bank_account, :parent, :expire_by, :exact_transaction_amount,
-                :virtual_bank_account_params, :receiving_account, :application
+                :virtual_bank_account_params, :receiving_account, :application, :customer
 
   def init
     self.company = user&.company || params[:company]
@@ -13,6 +13,7 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
     self.virtual_bank_account_params = virtual_account_params
     self.receiving_account = params[:receiving_account] || self.company.yes_bank_company_account # by default it will be the company virtual account, until the config to change that is built
     self.application = current_app || params[:application]
+    self.customer = params[:customer]
   end
 
   def validate
@@ -26,7 +27,7 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
           add_message :error, 'Invalid parent type'
         end
       when ::VirtualAccountPurpose.id_for(:invoice)
-        unless self.parent&.is_a(Invoice)
+        unless self.parent&.is_a(Invoice) && self.customer.present?
           add_message :error, 'Invalid parent type'
         end
       else
@@ -43,6 +44,7 @@ class Invoicing::VirtualBankAccount::Create < Invoicing::VirtualBankAccount::Bas
     self.virtual_bank_account_params[:receiving_account] = self.receiving_account
     self.virtual_bank_account_params[:ifsc] = Constants::YesBank::YES_BANK_COLLECT_IFSC
     self.virtual_bank_account_params[:application] = self.application
+    self.virtual_bank_account_params[:customer_id] = self.customer&.id
   end
 
   def process
