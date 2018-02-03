@@ -2,37 +2,33 @@
 #
 # Table name: outward_invoices
 #
-#  id                  :integer          not null, primary key
-#  customer_id         :integer
-#  date                :date
-#  due_date            :date
-#  amount_id           :integer
-#  discount            :decimal(10, 5)
-#  tax                 :decimal(10, 5)
-#  discount_amount_id  :integer
-#  tax_amount_id       :integer
-#  original_amount_id  :integer
-#  paid_amount_id      :integer
-#  advance             :decimal(10, 5)
-#  freight_amount_id   :integer
-#  tds_amount_id       :integer
-#  category_id         :integer
-#  balance_due_id      :integer
-#  roundoff_amount     :decimal(10, 5)
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  gross_amount_id     :integer
-#  policy_id           :integer
-#  billing_address_id  :integer
-#  shipping_address_id :integer
-#  invoice_status_id   :integer
-#  company_id          :integer
-#  invoice_number      :string(255)
-#  gst_type_id         :integer
-#  inclusive_of_taxes  :boolean
-#  advance_amount_id   :integer
-#  net_amount_id       :integer
-#  virtual_account_id  :integer
+#  id                 :integer          not null, primary key
+#  customer_id        :integer
+#  date               :date
+#  due_date           :date
+#  amount_id          :integer
+#  discount_amount_id :integer
+#  tax_amount_id      :integer
+#  paid_amount_id     :integer
+#  advance            :decimal(10, 5)
+#  freight_amount_id  :integer
+#  balance_due_id     :integer
+#  roundoff_amount    :decimal(10, 5)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  policy_id          :integer
+#  invoice_status_id  :integer
+#  company_id         :integer
+#  invoice_number     :string(255)
+#  gst_type_id        :integer
+#  inclusive_of_taxes :boolean
+#  advance_amount_id  :integer
+#  net_amount_id      :integer
+#  virtual_account_id :integer
+#  billing_address    :text(65535)
+#  shipping_address   :text(65535)
+#  email              :string(255)
+#  mobile_number      :string(255)
 #
 
 require 'test_helper'
