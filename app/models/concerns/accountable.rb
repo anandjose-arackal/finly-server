@@ -36,17 +36,17 @@ module Accountable
     from = (date - 1.day)
     case self.class.name
       when Card.name
-        self.user.user_balance_histories.with_date(from)&.first&.card_balance&.value || 0
+        return self.user.user_balance_histories.with_date(from)&.first&.card_balance&.value || 0
       when ItzCashCompanyAccount.name
-        self.company.company_balance_histories.with_date(from)&.first&.company_balance&.value || 0
+        return self.company.company_balance_histories.with_date(from)&.first&.company_balance&.value || 0
       when UserWallet.name
-        self.user.user_balance_histories.with_date(from)&.first&.finly_money_balance&.value || 0
+        return self.user.user_balance_histories.with_date(from)&.first&.finly_money_balance&.value || 0
       when CashOnHand.name
-        self.user.user_balance_histories.with_date(from)&.first&.cash_on_hand_balance&.value || 0
+        return self.user.user_balance_histories.with_date(from)&.first&.cash_on_hand_balance&.value || 0
       when YesBankCompanyAccount.name
-        0
+        return 0
     end
-    0
+    return 0
   end
 
   def closing_balance(date)
@@ -60,17 +60,17 @@ module Accountable
     to = date
     case self.class.name
       when Card.name
-        self.user.user_balance_histories.with_date(to)&.first&.card_balance&.value || 0
+        return self.user.user_balance_histories.with_date(to)&.first&.card_balance&.value || 0
       when ItzCashCompanyAccount.name
-        self.company.company_balance_histories.with_date(to)&.first&.company_balance&.value || 0
+        return self.company.company_balance_histories.with_date(to)&.first&.company_balance&.value || 0
       when UserWallet.name
-        self.user.user_balance_histories.with_date(to)&.first&.finly_money_balance&.value || 0
+        return self.user.user_balance_histories.with_date(to)&.first&.finly_money_balance&.value || 0
       when CashOnHand.name
-        self.user.user_balance_histories.with_date(to)&.first&.cash_on_hand_balance&.value || 0
+        return self.user.user_balance_histories.with_date(to)&.first&.cash_on_hand_balance&.value || 0
       when YesBankCompanyAccount.name
-        0
+        return 0
     end
-    0
+    return 0
   end
 
 end
