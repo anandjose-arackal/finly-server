@@ -47,7 +47,7 @@ class Report::AutoSubmit < Report::Base
   def post_process
     return if self.report.blank?
 
-    Event::EReport::Submit.(user, report: report)
+    Event::EReport::Submit.(selected_user, report: report)
 
     add_message :success, 'Report Submitted'
   end
@@ -65,7 +65,7 @@ class Report::AutoSubmit < Report::Base
                                               controlling_user_role_id: role_id, policy_id: auto_submit_config.default_policy_id,
                                               name: params[:name], auto_submit: true, memo: memo
     if report.save
-      Report::Expenses::Add.(user, {selected_user: selected_user, report: report, expenses: processing_expenses, auto_submit: true})
+      Report::Expenses::Add.(selected_user, {selected_user: selected_user, report: report, expenses: processing_expenses, auto_submit: true})
     else
       add_message :error, report.errors.full_messages
     end
@@ -90,12 +90,12 @@ class Report::AutoSubmit < Report::Base
     manager = presenter.user
     manager_role_id = presenter.role_id
 
-    comment = report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
+    comment = report.comments.create user: selected_user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
 
     # If no manager assigned, auto approve the report
     if manager.blank?
       # call the approve class with the right parameters
-      approve_op = Report::Approve.new(user, {report: self.report, auto_approve: true, auto_submit: true})
+      approve_op = Report::Approve.new(selected_user, {report: self.report, auto_approve: true, auto_submit: true})
       unless approve_op.run.success?
         self.add_message :error, approve_op.messages[:error]
         comment.destroy
@@ -122,13 +122,13 @@ class Report::AutoSubmit < Report::Base
                                 controlling_for_user_role_id: nil,
                                 submitted_at: submitted_at,
                                 submitted_amount_attributes: {value: report.total_amount, currency_id: 1}
-      report.tracks.create action_user: user,
+      report.tracks.create action_user: selected_user,
                            action_user_role_id: manager_role_id,
                            modified_user_id: report.controlling_user_id,
                            modified_user_role_id: manager_role_id,
                            report_tracking_action_id: ReportTrackingAction.id_for(:submit),
                            report_status_id: ReportStatus.processing_id
-      report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
+      report.comments.create user: selected_user, report_comment_action_id: ReportCommentAction.id_for(:report_auto_submit)
       report.expenses.each do |expense|
         expense.update_attribute(:expense_status_id, ExpenseStatus.submitted_id)
       end
