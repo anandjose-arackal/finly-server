@@ -17,6 +17,10 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
 
   end
 
+  def pre_process
+
+  end
+
   def process
     self.invoice = user.company.outward_invoices.build(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete))
     if self.invoice.save

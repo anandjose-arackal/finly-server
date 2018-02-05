@@ -73,8 +73,10 @@ if invoice.present?
     json.balance_due precision_value invoice.balance_due&.value
     json.net_amount precision_value invoice.net_amount&.value
     json.inclusive_of_taxes invoice.inclusive_of_taxes
-    # json.paid_amount precision_value invoice.paid_amount&.value
-    json.paid_amount 120.0
+    json.paid_amount precision_value invoice.paid_amount&.value
+    json.discount_amount precision_value invoice.discount_amount&.value
+    json.tax_amount precision_value invoice.tax_amount&.value
+    # json.paid_amount 120.0
 
     json.invoice_items do
       json.array!(invoice.invoice_items) do |item|
