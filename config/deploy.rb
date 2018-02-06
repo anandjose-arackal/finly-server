@@ -12,7 +12,7 @@ set :branch, ENV['BRANCH'] || :master
 case fetch(:stage)
   when :itzcash_production
     branch = fetch :branch
-    unless ['staging', 'uat-secure-storage'].include?(branch)
+    unless ['staging'].include?(branch)
       raise 'This branch cannot be deploy to production. Please select the correct branch'
     end
     set :deploy_to, '/home/viveka/app'
