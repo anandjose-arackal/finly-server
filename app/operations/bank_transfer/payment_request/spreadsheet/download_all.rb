@@ -15,9 +15,10 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadAll < BankTransfer::Pay
     # end
   end
 
-  def process
+  def success
     headers = retrieve_headers
     content = retrieve_data
     self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
   end
+
 end
