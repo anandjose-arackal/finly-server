@@ -26,7 +26,7 @@ case fetch(:stage)
 end
 
 set :pty, true
-set :linked_files, %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml}
+set :linked_files, %w{config/database.yml config/application.yml config/data/bypass_authorized_users.ymls}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
 
