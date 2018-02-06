@@ -2,6 +2,15 @@ class Invoicing::Customer::Create < Invoicing::Customer::Base
 
   attr_accessor :customer, :customer_params, :company, :virtual_account_details, :create_virtual_account
 
+  class Invoicing::Customer::Create::CustomerPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :customer
+
+    def init
+      self.customer = params[:customer]
+    end
+  end
+
   def init
     self.company = user.company
     self.customer_params = customer_parameters
@@ -68,6 +77,11 @@ class Invoicing::Customer::Create < Invoicing::Customer::Base
 
   def post_process
     add_message :success, "Customer successfully created"
+  end
+
+  def success
+    params[:customer] = self.customer
+    Invoicing::Customer::Create::CustomerPresenter.new(user, params, messages)
   end
 
 end
