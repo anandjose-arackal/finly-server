@@ -29,7 +29,8 @@ module Accountable
   def opening_balance(date)
     return 0 if date.blank?
     date = date.beginning_of_day
-    balance = finly_transactions.before_date(date).limit_to_one&.first&.closing_balance&.value
+    # balance = finly_transactions.before_date(date).limit_to_one&.first&.closing_balance&.value
+    balance = finly_transactions.on_or_after_date(date)&.sort_date_asc&.limit_to_one&.first&.opening_balance&.value
     return balance unless balance.nil?
 
     # todo Jugaad to access historical data
@@ -51,9 +52,10 @@ module Accountable
 
   def closing_balance(date)
     return 0 if date.blank?
-    date = date + 1
-    date = date.beginning_of_day
-    balance = finly_transactions.before_date(date).limit_to_one&.first&.closing_balance&.value
+    # date = date + 1
+    date = date.end_of_day
+    # balance = finly_transactions.before_date(date).limit_to_one&.first&.closing_balance&.value
+    balance = finly_transactions.on_or_before_date(date)&.sort_date_desc&.limit_to_one&.first&.closing_balance&.value
     return balance unless balance.nil?
 
     # todo Jugaad to access historical data
