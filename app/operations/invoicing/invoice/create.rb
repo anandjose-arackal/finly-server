@@ -1,6 +1,6 @@
 class Invoicing::Invoice::Create < Invoicing::Invoice::Base
 
-  attr_accessor :invoice_params, :invoice
+  attr_accessor :invoice_params, :invoice, :customer
 
   def pre_validate
     if user.blank? || params.blank?
@@ -9,8 +9,8 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
   end
 
   def init
-    id = params[:id] || params[:payment_id]
-    self.payment = Payment.find_by(id: id)
+    customer_id = params[:customer_id]
+    self.customer = user.company.customers.find_by(id: customer_id)
   end
 
   def validate
@@ -18,19 +18,28 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
   end
 
   def process
-    if self.payment.present?
-      self.invoice = self.payment.build_invoice(invoice_params)
-      unless self.invoice.save
-        add_message :error, self.invoice.errors.full_messages
-        return
+    self.invoice = user.company.outward_invoices.build(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete))
+    if self.invoice.save
+      if self.customer.present?
+        # call the operation that assigns a particular invoice to a customer - ideally operation should success
+        op = Invoicing::Invoice::Customer::Update.(user, {invoice_id: self.invoice.id, customer_id: self.customer.id})
+        unless op.success?
+          add_message :error, op.messages[:error]
+          self.invoice.destroy
+        end
       end
     else
-      self.invoice = Invoice.new(invoice_params)
-      unless self.invoice.save
-        add_message :error, self.invoice.errors.full_messages
-        return
-      end
+      add_message :error, self.invoice.errors.full_messages
     end
+  end
+
+  def post_process
+    add_message :success, "Invoice successfully created!"
+  end
+
+  def success
+    params[:invoice] = self.invoice
+    Invoicing::Invoice::Base::InvoicePresenter.new(user, params, messages)
   end
 
 end

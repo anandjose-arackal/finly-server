@@ -3,7 +3,7 @@
 
 class YesBankApi::Balance::GetBalance < YesBankApi::Base
 
-  attr_accessor :account_number, :balance, :company
+  attr_accessor :account_number, :balance, :company, :company_id
 
   def initialize(company)
     self.company = company
@@ -20,13 +20,14 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def pre_validate
-    if params.blank?
+    if self.company.blank?
       add_message :error, "Invalid parameters"
       return
     end
   end
 
   def init
+    self.company_id = self.company.id
     super()
     set_xml_params
   end
@@ -56,7 +57,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def failure
-    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter.new
+    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter.new(nil, nil, messages)
   end
 
   class YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter < BaseOperation::BasePresenter::SuccessPresenter

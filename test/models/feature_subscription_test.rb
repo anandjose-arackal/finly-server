@@ -21,7 +21,7 @@
 #  yes_bank_account           :boolean
 #  bank_account_reimbursement :boolean
 #  payroll_card_enabled       :boolean          default(FALSE)
-#  vendor_payments            :boolean
+#  current_account_connected  :boolean
 #  invoicing_system           :boolean          default(FALSE)
 #
 

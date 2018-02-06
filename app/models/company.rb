@@ -53,6 +53,7 @@ class Company < ActiveRecord::Base
   has_many :payment_receivables
   has_many :virtual_bank_accounts
   has_many :customers
+  has_many :outward_invoices
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -252,8 +253,8 @@ class Company < ActiveRecord::Base
     self.feature_subscription.yes_bank_account
   end
 
-  def yes_bank_api_enabled?
-    self.feature_subscription.yes_bank_api_enabled
+  def current_account_connected?
+    self.feature_subscription.current_account_connected
   end
 
 
