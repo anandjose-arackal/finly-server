@@ -93,6 +93,7 @@ class OutwardInvoice < ActiveRecord::Base
 
   scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid, :closed, :cancelled]) }
   scope :invoice_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
+  scope :without_id, -> (id){ where.not id: id}
 
   before_save do
     if self.invoice_number.blank? && valid_invoice?

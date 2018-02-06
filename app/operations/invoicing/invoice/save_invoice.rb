@@ -25,6 +25,12 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       add_message :error, self.invoice.errors.full_messages
       return
     end
+
+    # checking if the invoice number is unique for this company
+    invoice_number = self.invoice_parameters[:invoice_number]
+    if self.company.outward_invoices.without_id(self.invoice.id).pluck(:invoice_number).include?(invoice_number)
+      add_message :error, "This invoice number is already taken. Please enter a new one"
+    end
   end
 
   def pre_process
@@ -78,7 +84,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   def invoice_params
     params.require(:invoice).permit(:tax, :gst_type_id, :tds, :tds_type_id, :category_id,
                                     :tax_type_id, :discount, :date, :discount_type_id, :due_date,
-                                    :invoice_number, :inclusive_of_taxes, :billing_address, :shipping_address,
+                                    :invoice_number, :inclusive_of_taxes, :billing_address, :shipping_address, :override_invoice_number,
                                     :email, :mobile_number, :virtual_account_id,
                                     original_amount_attributes: [:value, :currency_id],
                                     advance_amount_attributes: [:value, :currency_id],
