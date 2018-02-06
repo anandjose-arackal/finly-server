@@ -27,8 +27,9 @@
 #  reference_id            :string(255)      not null
 #  retry_count             :integer          default(0)
 #  invoice_id              :integer
+#  parent_type             :string(255)
+#  parent_id               :integer
 #
-
 
 
 
@@ -60,6 +61,8 @@ class Payment < ActiveRecord::Base
 
   # because there needs to be a reference against which an invoice payment was made
   belongs_to :invoice
+
+  belongs_to :parent, polymorphic: true
 
   belongs_to :payment_order
   belongs_to :payment_status
