@@ -26,7 +26,8 @@ class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
 
   def process
     self.invoice_number = ""
-    # loop do
+    iteration = 1
+    loop do
       if self.invoice_number_config.prefix.present?
         self.invoice_number = self.invoice_number_config.prefix
       end
@@ -34,15 +35,26 @@ class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
         last_invoice = user.company.outward_invoices.invoice_number_generated_in_finly.valid.reorder(created_at: :desc).first
         if last_invoice.present? && last_invoice.created_at > self.invoice_number_config.updated_at
           numeric_section = last_invoice.invoice_number.gsub(/[^0-9a-z ]/i, '')
-          new_numeral = numeric_section.succ
+          new_numeral = numeric_section
+          iteration.times do
+            new_numeral = numeric_section.succ
+          end
           self.invoice_number += new_numeral.to_s
         elsif (last_invoice.present? && last_invoice.created_at <= self.invoice_number_config.updated_at) || last_invoice.blank?
           numeric_section = self.invoice_number_config.sequence_start
-          new_numeral = numeric_section.succ
+          new_numeral = numeric_section
+          iteration.times do
+            new_numeral = numeric_section.succ
+          end
           self.invoice_number += new_numeral.to_s
         end
       end
-    # end
+      if user.company.outward_invoices.find_by(invoice_number: self.invoice_number)
+        iteration += 1
+      else
+        break
+      end
+    end
   end
 
   def success
