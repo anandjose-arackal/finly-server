@@ -20,7 +20,7 @@ class YesBankApi::Base < BaseHandler
     values = Finly::SecureStorage::Connector.read('core/yes_bank')
     # checking of there's a custom configuration for a particular company - stored in a variable called configuration
     type = (values[self.company_id]).present? ? self.company_id : 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
-    self.configuration = values(config_path)[Rails.env][type]
+    self.configuration = values(config_path)[type]
     self.client_id = self.configuration['client_id']
     self.client_secret = self.configuration['client_secret']
     self.auth_username = self.configuration['username']
