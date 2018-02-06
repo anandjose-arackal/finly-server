@@ -1,11 +1,12 @@
 # this checks the invoice for all validations and eventually saves the invoice which can now be sent to the customer
 class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
-  attr_accessor :invoice
+  attr_accessor :invoice, :invoice_parameters
 
   def init
     id = params[:id] || params[:outward_invoice_id]
     self.invoice = user.company.outward_invoices.find_by(id: id)
+    self.invoice_parameters = invoice_params
   end
 
   def validate
@@ -26,7 +27,40 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     end
   end
 
+  def pre_process
+    # add logic to remove line items if required
+    if self.invoice_parameters&.dig(:invoice_items_attributes).present?
+      self.invoice_parameters[:invoice_items_attributes].each do |data|
+        if StringUtils.to_bool(data[:remove_line_item])
+          data[:_destroy] = true
+          data.delete(:remove_line_item)
+        else
+          data.delete(:remove_line_item)
+        end
+      end
+    end
+
+    # if nothing is passed inside invoice items attributes, assume that all are to be deleted
+    if self.invoice_parameters&.dig(:invoice_items_attributes).blank?
+      if self.invoice&.invoice_items.present?
+        self.invoice_parameters[:invoice_items_attributes] = []
+        self.invoice&.invoice_items.each do |item|
+          self.invoice_parameters[:invoice_items_attributes] << {
+              id: item.id,
+              _destroy: true
+          }
+        end
+      end
+    end
+  end
+
   def process
+    # assign the attributes for this particular invoice first
+    self.invoice.assign_attributes(self.invoice_parameters)
+    # calculate the tax and discounts that need to be done for this particular invoice
+    # and store it in the invoice object for further calculation
+    calculate_tax_and_discounts
+
     if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved))
       self.invoice.update(paid_amount: Amount.create(value: 0, currency_id: 1)) # setting the paid amount as 0 at the time of saving
     else
@@ -44,12 +78,17 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   def invoice_params
     params.require(:invoice).permit(:tax, :gst_type_id, :tds, :tds_type_id, :category_id,
                                     :tax_type_id, :discount, :date, :discount_type_id, :due_date,
-                                    :invoice_number, :inclusive_of_taxes,
+                                    :invoice_number, :inclusive_of_taxes, :billing_address, :shipping_address,
+                                    :email, :mobile_number, :virtual_account_id,
                                     original_amount_attributes: [:value, :currency_id],
                                     advance_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
                                     invoice_attachments_attributes: [:attached_file, :description],
                                     invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax])
+  end
+
+  def calculate_tax_and_discounts
+    InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_parameters, nil, self.invoice)
   end
 
 end

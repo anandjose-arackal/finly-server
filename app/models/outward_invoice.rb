@@ -90,6 +90,8 @@ class OutwardInvoice < ActiveRecord::Base
   scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
   scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:closed) }
 
+  scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid, :closed, :cancelled]) }
+
   before_save do
     if self.invoice_number.blank? && valid_invoice?
       generate_invoice_number
@@ -102,6 +104,10 @@ class OutwardInvoice < ActiveRecord::Base
 
   def editable?
     self.invoice_status_id == OutwardInvoiceStatus.id_for(:incomplete)
+  end
+
+  def line_items_total
+    self.invoice_items.joins(:net_amount).sum(:value)
   end
 
   private
@@ -124,7 +130,5 @@ class OutwardInvoice < ActiveRecord::Base
     end
     number
   end
-
-
 
 end

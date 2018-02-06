@@ -37,6 +37,7 @@ class Company < ActiveRecord::Base
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
   has_one  :payment_file_configuration
+  has_one :invoice_number_config
 
   has_many :payment_orders
   has_many :user_groups
@@ -347,6 +348,9 @@ class Company < ActiveRecord::Base
     self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
     self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+
+    # creating the invoice numbering configuration for all companies with default values
+    self.build_invoice_number_config(sequence_start: "0000").save
   end
 
 end
