@@ -13,10 +13,10 @@ class YesBankApi::Base < BaseHandler
 
   def init
     # self.config_path = Rails.root.join('config', 'yes_bank_config.yml').to_s
-    self.config_path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
-    unless config_path.present?
-      add_message :error, "Server error, try again later"
-    end
+    # self.config_path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
+    # unless config_path.present?
+    #   add_message :error, "Server error, try again later"
+    # end
     values = Finly::SecureStorage::Connector.read('core/yes_bank')
     # checking of there's a custom configuration for a particular company - stored in a variable called configuration
     type = (values[Rails.env][self.company_id]).present? ? self.company_id : 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
