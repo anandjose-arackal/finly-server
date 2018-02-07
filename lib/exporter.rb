@@ -168,6 +168,10 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
       self.files = [] if self.files.blank?
       zip_buffer = Zip::OutputStream.write_buffer do |stream|
         self.files.each do |file_details|
+          puts "File Details: #{file_details}"
+          puts "File Details hash: #{file_details.is_a?(Hash)}"
+          puts "File Details name: #{file_details[:name].blank?}"
+          puts "File Details file_contents: #{(file_details[:path].blank? and file_details[:file_contents].blank?)}"
           raise 'Invalid data format' if not file_details.is_a?(Hash) or file_details[:name].blank? or
               (file_details[:path].blank? and file_details[:file_contents].blank?)
           stream.put_next_entry(file_details[:name])

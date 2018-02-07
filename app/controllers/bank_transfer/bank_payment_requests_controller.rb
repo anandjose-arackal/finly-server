@@ -141,7 +141,6 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def download_selected_attachment
     @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadSelectedAttachment.(current_user, params)
-    puts "#{@result.messages.as_json}"
     respond
   end
 
