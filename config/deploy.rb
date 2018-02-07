@@ -7,12 +7,12 @@ set :application, 'finly-server'
 
 set :repo_url, 'ssh://git@altssh.bitbucket.org:443/finlycore/finly-server.git'
 
-set :branch, ENV['BRANCH'] || :master
+set :branch, ENV['BRANCH'] || :staging
 
 case fetch(:stage)
   when :itzcash_production
     branch = fetch :branch
-    unless ['staging'].include?(branch)
+    unless ['staging', :staging].include?(branch)
       raise 'This branch cannot be deploy to production. Please select the correct branch'
     end
     set :deploy_to, '/home/viveka/app'
