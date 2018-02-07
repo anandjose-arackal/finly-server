@@ -38,11 +38,7 @@ class Invoicing::CustomersController < ApplicationController
 
   def create_virtual_account
     @result = Invoicing::Customer::VirtualBankAccounts::Create.(current_user, params)
-    if @result.success?
-      respond response: :success, message: @result.messages[:success]
-    else
-      respond response: :failure, message: @result.messages[:error]
-    end
+    respond
   end
 
 end
