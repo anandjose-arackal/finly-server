@@ -27,7 +27,8 @@ class Invoicing::Customer::VirtualBankAccounts::Create < Invoicing::Customer::Ba
     op = Invoicing::VirtualBankAccount::Create.(user, {
         purpose_id: purpose_id,
         parent: self.invoice,
-        customer: self.customer
+        customer: self.customer,
+        name: params&.dig(:virtual_account, :name)
     })
     if op.success?
       self.virtual_account = op.virtual_bank_account
