@@ -40,6 +40,13 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
     self.invoice = user.company.outward_invoices.find_by(id: id)
   end
 
+  def validate
+    if self.invoice.blank?
+      add_message :error, "Invoice not found"
+      return
+    end
+  end
+
   def process
 
   end
