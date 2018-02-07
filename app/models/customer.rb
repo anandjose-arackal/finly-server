@@ -26,6 +26,7 @@ class Customer < ActiveRecord::Base
 
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :virtual_bank_accounts
+  accepts_nested_attributes_for :customer_attachments
 
   validates :name, presence: true
   # validates :created_by, presence: true

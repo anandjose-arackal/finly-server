@@ -15,17 +15,6 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       return
     end
 
-    unless self.invoice.incomplete?
-      add_message :error, "Invoice cannot be created in this state"
-      return
-    end
-
-    self.invoice.invoice_status_id = OutwardInvoiceStatus.id_for(:saved)
-    # unless self.invoice.valid?
-    #   add_message :error, self.invoice.errors.full_messages
-    #   return
-    # end
-
     # checking if the invoice number is unique for this company
     invoice_number = self.invoice_parameters[:invoice_number]
     if invoice_number.present? && self.user.company.outward_invoices.without_id(self.invoice.id).pluck(:invoice_number).include?(invoice_number)
@@ -60,7 +49,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     end
 
     # todo - temporary, will change once FE fixes it
-    self.invoice_parameters[:customer_id] = 1
+    # self.invoice_parameters[:customer_id] = 3
   end
 
   def process
