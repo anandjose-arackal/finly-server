@@ -63,8 +63,8 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
     # checking if this particular operation has the customer's new GSTIN
     if params[:customer].present?
-      if self.customer_params.present?
-        self.invoice.customer.gst = self.customer_params[:gst]
+      if customer_params.present?
+        self.invoice.customer.gst = customer_params[:gst]
       end
     end
 
