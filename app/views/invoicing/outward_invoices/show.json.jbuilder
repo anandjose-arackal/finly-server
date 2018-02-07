@@ -64,6 +64,13 @@ json.invoice do
     json.id invoice.virtual_account&.id
     json.name invoice.virtual_account&.name
   end
+
+  json.invoice_items_categories do
+    json.array!(current_company.categories.outward_invoice_items_categories) do |category|
+      json.id category.id
+      json.name category.name
+    end
+  end
 end
 
 json.actions do
