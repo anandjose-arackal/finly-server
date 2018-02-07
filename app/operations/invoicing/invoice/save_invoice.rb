@@ -48,13 +48,12 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       end
     end
 
-    # todo - temporary, will change once FE fixes it
-    # self.invoice_parameters[:customer_id] = 3
   end
 
   def process
     # assign the attributes for this particular invoice first
     self.invoice.assign_attributes(self.invoice_parameters)
+
     # calculate the tax and discounts that need to be done for this particular invoice
     # and store it in the invoice object for further calculation
     calculate_tax_and_discounts
