@@ -51,8 +51,6 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :gross_amount, class_name: "Amount"
   belongs_to :invoice_status, class_name: "OutwardInvoiceStatus"
   belongs_to :payment_term
-  # belongs_to :shipping_address, class_name: "Address"
-  # belongs_to :billing_address, class_name: "Address"
 
   # has_one :virtual_bank_account, as: :parent
   belongs_to :virtual_account, class_name: "VirtualBankAccount"
@@ -106,7 +104,7 @@ class OutwardInvoice < ActiveRecord::Base
   end
 
   def editable?
-    self.invoice_status_id == OutwardInvoiceStatus.id_for(:incomplete)
+    !(self.invoice_status_id == OutwardInvoiceStatus.id_for(:cancelled))
   end
 
   def line_items_total

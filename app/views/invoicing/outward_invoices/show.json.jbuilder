@@ -16,7 +16,7 @@ json.invoice do
   end
 
   json.invoice_amounts do
-    json.line_amounts_total invoice.line_items_total
+    json.item_amounts_total invoice.line_items_total
     json.discount_amount invoice.discount_amount&.value
     json.tax_amount invoice.tax_amount&.value
     json.gst_type_id invoice.gst_type_id
@@ -61,6 +61,11 @@ json.invoice do
     json.ifsc invoice.virtual_account&.ifsc
     json.account_number invoice.virtual_account&.account_number
   end
+end
+
+json.actions do
+  json.editable invoice.editable?
+  json.navbar @result.navbar_actions
 end
 
 
