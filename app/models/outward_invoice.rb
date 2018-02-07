@@ -111,6 +111,10 @@ class OutwardInvoice < ActiveRecord::Base
     self.invoice_items.joins(:amount).sum(:value)
   end
 
+  def line_items_net_total
+    self.invoice_items.joins(:net_amount).sum(:value)
+  end
+
   private
 
   # as in, an invoice that has been saved and is payable by

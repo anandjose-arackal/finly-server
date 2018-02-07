@@ -17,6 +17,7 @@ json.invoice do
 
   json.invoice_amounts do
     json.item_amounts_total invoice.line_items_total
+    json.item_net_amounts_total invoice.line_items_net_total
     json.discount_amount invoice.discount_amount&.value
     json.tax_amount invoice.tax_amount&.value
     json.gst_type_id invoice.gst_type_id
@@ -67,8 +68,3 @@ json.actions do
   json.editable invoice.editable?
   json.navbar @result.navbar_actions
 end
-
-
-
-
-
