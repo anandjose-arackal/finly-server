@@ -961,8 +961,11 @@
 #                     bank_transfer_bulk_approve_validate PATCH  /bank_transfer/bulk_approve_validate(.:format)                                             bank_transfer/bank_payment_requests#bulk_approve_validate
 #                              bank_transfer_bulk_approve PATCH  /bank_transfer/bulk_approve(.:format)                                                      bank_transfer/bank_payment_requests#bulk_approve
 #                         bank_transfer_download_selected POST   /bank_transfer/download_selected(.:format)                                                 bank_transfer/bank_payment_requests#download_selected
+#              bank_transfer_download_selected_attachment POST   /bank_transfer/download_selected_attachment(.:format)                                      bank_transfer/bank_payment_requests#download_selected_attachment
 #                          bank_transfer_download_pending POST   /bank_transfer/download_pending(.:format)                                                  bank_transfer/bank_payment_requests#download_pending
+#               bank_transfer_download_pending_attachment POST   /bank_transfer/download_pending_attachment(.:format)                                       bank_transfer/bank_payment_requests#download_pending_attachment
 #                              bank_transfer_download_all POST   /bank_transfer/download_all(.:format)                                                      bank_transfer/bank_payment_requests#download_all
+#                   bank_transfer_download_all_attachment POST   /bank_transfer/download_all_attachment(.:format)                                           bank_transfer/bank_payment_requests#download_all_attachment
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format)            bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)             bank_transfer/bank_payment_requests#review
 #               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)             bank_transfer/bank_payment_requests#credit
