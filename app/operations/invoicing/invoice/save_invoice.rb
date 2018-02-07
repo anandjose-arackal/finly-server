@@ -15,6 +15,11 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       return
     end
 
+    if self.invoice.cancelled? || self.invoice.partially_paid? || self.invoice.closed?
+      add_message :error, "Invoice cannot be edited in this state"
+      return
+    end
+
     # checking if the invoice number is unique for this company
     invoice_number = self.invoice_parameters[:invoice_number]
     if invoice_number.present? && self.user.company.outward_invoices.without_id(self.invoice.id).pluck(:invoice_number).include?(invoice_number)
