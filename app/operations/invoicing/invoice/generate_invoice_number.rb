@@ -25,9 +25,9 @@ class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
   end
 
   def process
-    self.invoice_number = ""
     iteration = 1
     loop do
+      self.invoice_number = ""
       if self.invoice_number_config.prefix.present?
         self.invoice_number = self.invoice_number_config.prefix
       end
@@ -37,14 +37,14 @@ class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
           numeric_section = last_invoice.invoice_number.gsub(/[^0-9a-z ]/i, '')
           new_numeral = numeric_section
           iteration.times do
-            new_numeral = numeric_section.succ
+            new_numeral = new_numeral.succ
           end
           self.invoice_number += new_numeral.to_s
         elsif (last_invoice.present? && last_invoice.created_at <= self.invoice_number_config.updated_at) || last_invoice.blank?
           numeric_section = self.invoice_number_config.sequence_start
           new_numeral = numeric_section
           iteration.times do
-            new_numeral = numeric_section.succ
+            new_numeral = new_numeral.succ
           end
           self.invoice_number += new_numeral.to_s
         end
