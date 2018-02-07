@@ -28,7 +28,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
     # checking if the invoice number is unique for this company
     invoice_number = self.invoice_parameters[:invoice_number]
-    if self.user.company.outward_invoices.without_id(self.invoice.id).pluck(:invoice_number).include?(invoice_number)
+    if invoice_number.present? && self.user.company.outward_invoices.without_id(self.invoice.id).pluck(:invoice_number).include?(invoice_number)
       add_message :error, "This invoice number is already taken. Please enter a new one"
     end
   end
