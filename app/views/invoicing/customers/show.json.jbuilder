@@ -1,6 +1,6 @@
 customer = @result.customer
 json.details do
-  json.extract! customer, :name, :email, :mobile_number, :description, :pan
+  json.extract! customer, :id, :name, :email, :mobile_number, :description, :pan
   json.gstin customer.gst
 end
 
