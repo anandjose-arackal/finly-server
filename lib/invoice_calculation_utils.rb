@@ -245,7 +245,7 @@ class InvoiceCalculationUtils
       return
     end
     original_net_amount = self.net_amount
-    self.freight_amount = self.invoice.freight_amount&.value
+    self.freight_amount = self.invoice.freight_amount&.value.to_f
     self.net_amount = original_net_amount + self.freight_amount
   end
 

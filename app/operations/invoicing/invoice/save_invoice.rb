@@ -48,19 +48,25 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       end
     end
 
-    # todo - temporary, will change once FE fixes it
-    # self.invoice_parameters[:customer_id] = 3
   end
 
   def process
     # assign the attributes for this particular invoice first
     self.invoice.assign_attributes(self.invoice_parameters)
+
     # calculate the tax and discounts that need to be done for this particular invoice
     # and store it in the invoice object for further calculation
     calculate_tax_and_discounts
     unless self.invoice.valid?
       add_message :error, self.invoice.errors.full_messages
       return
+    end
+
+    # checking if this particular operation has the customer's new GSTIN
+    if params[:customer].present?
+      if self.customer_params.present?
+        self.invoice.customer.gst = self.customer_params[:gst]
+      end
     end
 
     if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved))
@@ -87,6 +93,10 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
                                     freight_amount_attributes: [:value, :currency_id],
                                     invoice_attachments_attributes: [:attached_file, :description],
                                     invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax])
+  end
+
+  def customer_params
+    params.require(:customer).permit(:gst)
   end
 
   def calculate_tax_and_discounts

@@ -28,7 +28,7 @@ class InvoiceLineItemsCalculationUtils
         # self.invoice_item_amount = self.gross_amount + self.discount_amount
         self.net_amount = self.invoice_item_amount - self.discount_amount
       else # calculate proactively
-        self.invoice_item_amount = item.quantity * item.rate
+        self.invoice_item_amount = item.quantity.to_f * item.rate.to_f
         calculate_discount_exclusive(item)
         calculate_exclusive_taxes(item)
         self.item_taxable_amount += self.gross_amount
@@ -113,7 +113,7 @@ class InvoiceLineItemsCalculationUtils
       return
     end
     # because the discount rate will always be known
-    self.discount_amount = (item.discount * self.invoice_item_amount)/100
+    self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f)/100
     self.gross_amount = self.invoice_item_amount - self.discount_amount
   end
 
@@ -124,7 +124,7 @@ class InvoiceLineItemsCalculationUtils
       return
     end
     # because the discount is also always shown
-    self.discount_amount = (item.discount * self.invoice_item_amount) / 100
+    self.discount_amount = (item.discount.to_f * self.invoice_item_amount.to_f) / 100
     self.after_discount_amount = self.invoice_item_amount - self.discount_amount
   end
 

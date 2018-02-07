@@ -79,8 +79,8 @@ class OutwardInvoice < ActiveRecord::Base
   validates :invoice_items, presence: true, if: :valid_invoice?
   validates :invoice_number, presence: true, if: :valid_invoice?
   validates :customer_id, presence: true, if: :valid_invoice?
-  # validates :billing_address_id, presence: true, if: :valid_invoice?
-  # validates :shipping_address_id, presence: true, if: :valid_invoice?
+  validates :billing_address, presence: true, if: :valid_invoice?
+  validates :shipping_address, presence: true, if: :valid_invoice?
   validates :company_id, presence: true, if: :valid_invoice?
   validates :balance_due, presence: true, if: :valid_invoice?
   validates :discount_amount, presence: true, if: :valid_invoice?

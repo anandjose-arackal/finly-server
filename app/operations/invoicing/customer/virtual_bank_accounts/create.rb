@@ -39,4 +39,9 @@ class Invoicing::Customer::VirtualBankAccounts::Create < Invoicing::Customer::Ba
   def post_process
     add_message :success, "Virtual account created"
   end
+
+  def success
+    params[:virtual_account] = self.virtual_account
+    Invoicing::Customer::VirtualBankAccounts::Base::VirtualAccountPresenter.new(user, params, messages)
+  end
 end
