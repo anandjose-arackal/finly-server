@@ -1869,9 +1869,9 @@ ActiveRecord::Schema.define(version: 20180207193723) do
     t.datetime "updated_at",                                               null: false
     t.integer  "net_amount_id",      limit: 4
     t.string   "hsn_sac",            limit: 255
-    t.integer  "taxable_amount_id",  limit: 4
     t.string   "parent_type",        limit: 255
     t.string   "parent_id",          limit: 255
+    t.integer  "taxable_amount_id",  limit: 4
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree

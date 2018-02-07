@@ -22,7 +22,7 @@ class Company::Collect::InvoiceNumberConfiguration::Update < Company::Base
   end
 
   def post_process
-    add_message :error, "Configuration updated"
+    add_message :success, "Configuration updated"
   end
 
   private

@@ -17,5 +17,6 @@ class Company::Collect::InvoiceNumberConfiguration::Show < Company::Base
 
   def success
     params[:config] = self.config
+    Company::Collect::InvoiceNumberConfiguration::Show::ConfigPresenter.new(user, params, messages)
   end
 end
