@@ -17,7 +17,7 @@
                <VOUCHER VCHTYPE="Payment" ACTION="Create">
                   <VOUCHERTYPENAME>Payment</VOUCHERTYPENAME>
                   <DATE><%= configuration.date_for(expense) %></DATE>
-                  <NARRATION><%= html_escape expense.merchant_name(simple: true) %></NARRATION>
+                  <NARRATION><%= html_escape "#{expense.merchant_name(simple: true)} - #{expense.user.name}" %></NARRATION>
                   <EFFECTIVEDATE><%= configuration.date_for(expense) %></EFFECTIVEDATE>
                   <ALLLEDGERENTRIES.LIST>
                      <LEDGERNAME><%= html_escape expense.category.name %></LEDGERNAME>
