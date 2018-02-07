@@ -2426,7 +2426,7 @@ Rails.application.routes.draw do
     post 'download_selected', to: 'bank_payment_requests#download_selected', as: :download_selected
     post 'download_selected_attachment', to: 'bank_payment_requests#download_selected_attachment', as: :download_selected_attachment
     post 'download_pending', to: 'bank_payment_requests#download_pending', as: :download_pending
-    post 'download_pending_attachment', to: 'bank_payment_requests#download_pending_attachment', as: :download_pending_attachment
+    get 'download_pending_attachment', to: 'bank_payment_requests#download_pending_attachment', as: :download_pending_attachment
     post 'download_all', to: 'bank_payment_requests#download_all', as: :download_all
     post 'download_all_attachment', to: 'bank_payment_requests#download_all_attachment', as: :download_all_attachment
 
