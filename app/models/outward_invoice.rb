@@ -110,7 +110,7 @@ class OutwardInvoice < ActiveRecord::Base
   end
 
   def line_items_total
-    self.invoice_items.joins(:net_amount).sum(:value)
+    self.invoice_items.joins(:amount).sum(:value)
   end
 
   private
