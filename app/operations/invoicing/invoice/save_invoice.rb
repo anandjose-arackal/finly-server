@@ -63,6 +63,13 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       return
     end
 
+    # checking if this particular operation has the customer's new GSTIN
+    if params[:customer].present?
+      if self.customer_params.present?
+        self.invoice.customer.gst = self.customer_params[:gst]
+      end
+    end
+
     if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved))
       self.invoice.update(paid_amount: Amount.create(value: 0, currency_id: 1)) # setting the paid amount as 0 at the time of saving
     else
@@ -87,6 +94,10 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
                                     freight_amount_attributes: [:value, :currency_id],
                                     invoice_attachments_attributes: [:attached_file, :description],
                                     invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax])
+  end
+
+  def customer_params
+    params.require(:customer).permit(:gst)
   end
 
   def calculate_tax_and_discounts
