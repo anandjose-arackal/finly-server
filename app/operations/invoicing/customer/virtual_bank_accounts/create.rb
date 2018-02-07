@@ -27,7 +27,8 @@ class Invoicing::Customer::VirtualBankAccounts::Create < Invoicing::Customer::Ba
     op = Invoicing::VirtualBankAccount::Create.(user, {
         purpose_id: purpose_id,
         parent: self.invoice,
-        customer: self.customer
+        customer: self.customer,
+        name: params&.dig(:virtual_account, :name)
     })
     if op.success?
       self.virtual_account = op.virtual_bank_account
@@ -37,6 +38,11 @@ class Invoicing::Customer::VirtualBankAccounts::Create < Invoicing::Customer::Ba
   end
 
   def post_process
-    add_message :error, "Virtual account created"
+    add_message :success, "Virtual account created"
+  end
+
+  def success
+    params[:virtual_account] = self.virtual_account
+    Invoicing::Customer::VirtualBankAccounts::Base::VirtualAccountPresenter.new(user, params, messages)
   end
 end

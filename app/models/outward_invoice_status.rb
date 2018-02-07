@@ -12,11 +12,7 @@ class OutwardInvoiceStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:unpaid, :saved, :partially_paid, :closed, :cancelled, :sent_to_customer, :incomplete]
-  end
-
-  def unpaid?
-    self.id == OutwardInvoiceStatus.id_for(:unpaid)
+    [:saved, :partially_paid, :closed, :cancelled, :incomplete]
   end
 
   def partially_paid?
@@ -33,10 +29,6 @@ class OutwardInvoiceStatus < ActiveRecord::Base
 
   def saved?
     self.id == OutwardInvoiceStatus.id_for(:saved)
-  end
-
-  def sent_to_customer?
-    self.id == OutwardInvoiceStatus.id_for(:sent_to_customer)
   end
 
   def cancelled?

@@ -1,3 +1,4 @@
+# once saved, except for the invoice number, all other details can be changed for this invoice
 class Invoicing::Invoice::Update < Invoicing::Invoice::Base
 
   attr_accessor :invoice_parameters, :invoice

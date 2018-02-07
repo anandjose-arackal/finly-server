@@ -961,8 +961,11 @@
 #                     bank_transfer_bulk_approve_validate PATCH  /bank_transfer/bulk_approve_validate(.:format)                                             bank_transfer/bank_payment_requests#bulk_approve_validate
 #                              bank_transfer_bulk_approve PATCH  /bank_transfer/bulk_approve(.:format)                                                      bank_transfer/bank_payment_requests#bulk_approve
 #                         bank_transfer_download_selected POST   /bank_transfer/download_selected(.:format)                                                 bank_transfer/bank_payment_requests#download_selected
+#              bank_transfer_download_selected_attachment POST   /bank_transfer/download_selected_attachment(.:format)                                      bank_transfer/bank_payment_requests#download_selected_attachment
 #                          bank_transfer_download_pending POST   /bank_transfer/download_pending(.:format)                                                  bank_transfer/bank_payment_requests#download_pending
+#               bank_transfer_download_pending_attachment POST   /bank_transfer/download_pending_attachment(.:format)                                       bank_transfer/bank_payment_requests#download_pending_attachment
 #                              bank_transfer_download_all POST   /bank_transfer/download_all(.:format)                                                      bank_transfer/bank_payment_requests#download_all
+#                   bank_transfer_download_all_attachment POST   /bank_transfer/download_all_attachment(.:format)                                           bank_transfer/bank_payment_requests#download_all_attachment
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format)            bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)             bank_transfer/bank_payment_requests#review
 #               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)             bank_transfer/bank_payment_requests#credit
@@ -1084,6 +1087,14 @@
 #                                                         DELETE /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#destroy
 #                            invoicing_categories_invoice GET    /invoicing/categories/invoice(.:format)                                                    invoicing/categories#invoice_categories
 #                 invoicing_categories_invoice_line_items GET    /invoicing/categories/invoice_line_items(.:format)                                         invoicing/categories#invoice_items_categories
+#                        invoicing_invoice_number_configs GET    /invoicing/invoice_number_configs(.:format)                                                invoicing/invoice_number_configs#index
+#                                                         POST   /invoicing/invoice_number_configs(.:format)                                                invoicing/invoice_number_configs#create
+#                     new_invoicing_invoice_number_config GET    /invoicing/invoice_number_configs/new(.:format)                                            invoicing/invoice_number_configs#new
+#                    edit_invoicing_invoice_number_config GET    /invoicing/invoice_number_configs/:id/edit(.:format)                                       invoicing/invoice_number_configs#edit
+#                         invoicing_invoice_number_config GET    /invoicing/invoice_number_configs/:id(.:format)                                            invoicing/invoice_number_configs#show
+#                                                         PATCH  /invoicing/invoice_number_configs/:id(.:format)                                            invoicing/invoice_number_configs#update
+#                                                         PUT    /invoicing/invoice_number_configs/:id(.:format)                                            invoicing/invoice_number_configs#update
+#                                                         DELETE /invoicing/invoice_number_configs/:id(.:format)                                            invoicing/invoice_number_configs#destroy
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)            admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)             admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                           admin_users/funds_load_requests#index
@@ -2494,6 +2505,8 @@ Rails.application.routes.draw do
 
     get 'categories/invoice', to: 'categories#invoice_categories'
     get 'categories/invoice_line_items', to: 'categories#invoice_items_categories'
+
+    resources :invoice_number_configs
   end
 
 
