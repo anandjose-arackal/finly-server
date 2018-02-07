@@ -8,7 +8,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadSelectedAttachment < Ba
     exported_xls = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages).spreadsheet_exporter.generate_xls
     self.files << {name: 'export.xls', file_contents: exported_xls}
     bank_payment_requests.include_attachments.each do |bpr|
-      file_name_prefix = "#{bpr.id}_"
+      file_name_prefix = "#{bpr.id}"
       count = 1
       bpr.payment_order&.payment_order_attachments&.each do |attachment|
         file = attachment.attached_file
