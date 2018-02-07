@@ -42,7 +42,7 @@ namespace :transaction_poller do
     end
   end
 
-  desc 'Restart crono'
+  desc 'Restart Transaction Poller'
   task :restart do
     invoke 'transaction_poller:stop'
     invoke 'transaction_poller:start'

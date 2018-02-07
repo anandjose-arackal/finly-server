@@ -41,7 +41,7 @@ namespace :balance_poller do
     end
   end
 
-  desc 'Restart crono'
+  desc 'Restart Balance Poller'
   task :restart do
     invoke 'balance_poller:stop'
     invoke 'balance_poller:start'
