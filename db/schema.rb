@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180202164641) do
+ActiveRecord::Schema.define(version: 20180207114651) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3116,11 +3116,12 @@ ActiveRecord::Schema.define(version: 20180202164641) do
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
 
   create_table "tally_configurations", force: :cascade do |t|
-    t.integer  "company_id",   limit: 4,   null: false
-    t.string   "company_name", limit: 255
+    t.integer  "company_id",           limit: 4,   null: false
+    t.string   "company_name",         limit: 255
     t.boolean  "active"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.string   "voucher_expense_date", limit: 255
   end
 
   add_index "tally_configurations", ["company_id"], name: "index_tally_configurations_on_company_id", using: :btree

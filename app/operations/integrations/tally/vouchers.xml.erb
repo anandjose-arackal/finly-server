@@ -8,7 +8,7 @@
          <REQUESTDESC>
             <REPORTNAME>Vouchers</REPORTNAME>
             <STATICVARIABLES>
-               <SVCURRENTCOMPANY><%= html_escape company_name %></SVCURRENTCOMPANY>
+               <SVCURRENTCOMPANY><%= html_escape configuration.company_name %></SVCURRENTCOMPANY>
             </STATICVARIABLES>
          </REQUESTDESC>
          <REQUESTDATA>
@@ -16,9 +16,9 @@
             <% expenses.each do |expense| %>
                <VOUCHER VCHTYPE="Payment" ACTION="Create">
                   <VOUCHERTYPENAME>Payment</VOUCHERTYPENAME>
-                  <DATE><%= expense.date.strftime('%Y%m%d') %></DATE>
+                  <DATE><%= configuration.date_for(expense) %></DATE>
                   <NARRATION><%= html_escape expense.merchant_name(simple: true) %></NARRATION>
-                  <EFFECTIVEDATE><%= expense.date.strftime('%Y%m%d') %></EFFECTIVEDATE>
+                  <EFFECTIVEDATE><%= configuration.date_for(expense) %></EFFECTIVEDATE>
                   <ALLLEDGERENTRIES.LIST>
                      <LEDGERNAME><%= html_escape expense.category.name %></LEDGERNAME>
                      <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
