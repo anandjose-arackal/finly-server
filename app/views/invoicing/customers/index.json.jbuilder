@@ -17,4 +17,5 @@ json.array!(@result.customers) do |customer|
   json.company do
     json.name customer.company.name
   end
+  json.description customer.description
 end

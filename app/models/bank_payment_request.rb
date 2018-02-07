@@ -110,6 +110,8 @@ class BankPaymentRequest < ActiveRecord::Base
 
   scope :includes_details, -> { includes(:status, :owner, :requested_amount)}
 
+  scope :include_attachments, -> { includes(payment_order: [:payment_order_attachments, payments: [invoice: [:invoice_attachments]]]) }
+
   scope :filter_custom_drop_down_selection, -> (drop_down_item_id) {
     drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
     multiselect_item_ids = FieldMultiselectItem.where(id: drop_down_item_id).pluck(:id)
