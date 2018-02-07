@@ -68,6 +68,10 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     self.invoice.assign_attributes(self.invoice_parameters)
     # calculate the tax and discounts that need to be done for this particular invoice
     # and store it in the invoice object for further calculation
+    unless self.invoice.valid?
+      add_message :error, self.invoice.errors.full_messages
+      return
+    end
     calculate_tax_and_discounts
 
     if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved))
