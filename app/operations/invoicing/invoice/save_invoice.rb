@@ -21,14 +21,14 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     end
 
     self.invoice.invoice_status_id = OutwardInvoiceStatus.id_for(:saved)
-    unless self.invoice.valid?
-      add_message :error, self.invoice.errors.full_messages
-      return
-    end
+    # unless self.invoice.valid?
+    #   add_message :error, self.invoice.errors.full_messages
+    #   return
+    # end
 
     # checking if the invoice number is unique for this company
     invoice_number = self.invoice_parameters[:invoice_number]
-    if self.company.outward_invoices.without_id(self.invoice.id).pluck(:invoice_number).include?(invoice_number)
+    if self.user.company.outward_invoices.without_id(self.invoice.id).pluck(:invoice_number).include?(invoice_number)
       add_message :error, "This invoice number is already taken. Please enter a new one"
     end
   end
@@ -58,6 +58,9 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
         end
       end
     end
+
+    # todo - temporary, will change once FE fixes it
+    self.invoice_parameters[:customer_id] = 1
   end
 
   def process
@@ -82,8 +85,8 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   private
 
   def invoice_params
-    params.require(:invoice).permit(:tax, :gst_type_id, :tds, :tds_type_id, :category_id,
-                                    :tax_type_id, :discount, :date, :discount_type_id, :due_date,
+    params.require(:invoice).permit(:gst_type_id, :tds, :tds_type_id, :category_id, :customer_id,
+                                    :tax_type_id, :date, :discount_type_id, :due_date,
                                     :invoice_number, :inclusive_of_taxes, :billing_address, :shipping_address, :override_invoice_number,
                                     :email, :mobile_number, :virtual_account_id,
                                     original_amount_attributes: [:value, :currency_id],

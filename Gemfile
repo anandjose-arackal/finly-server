@@ -38,6 +38,8 @@ gem 'omniauth'
 gem 'omniauth-quickbooks'
 gem 'quickbooks-ruby', git: 'https://github.com/ruckus/quickbooks-ruby.git', ref: '22c8df58bbed441207f3d0d8ac5a786cdb4821a5'
 
+gem 'finly-secure_storage-sdk', git: 'ssh://git@altssh.bitbucket.org:443/vivek_a17/finly-secure_storage-sdk.git'
+
 gem 'rubyzip', '1.2.1'
 
 # gem to import from excel
@@ -161,6 +163,7 @@ group :development, :test do
   gem 'capistrano-rbenv', '2.1.0'
   gem 'capistrano-crono', '0.1.2'
   gem 'capistrano-sidekiq', '0.10.0'
+  gem 'capistrano-rails-console', require: false
   gem 'hirb', '0.7.3'
   gem 'meta_request'
   gem 'rack-mini-profiler'
@@ -168,6 +171,7 @@ group :development, :test do
   gem 'stackprof' # ruby 2.1+ only
   gem 'memory_profiler'
   gem 'active_record_query_trace'
+  gem 'aws-sdk-ec2', '1.24.0'
   # gem 'better_errors'
   # gem 'binding_of_caller'
 
