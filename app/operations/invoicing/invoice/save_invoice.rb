@@ -53,7 +53,6 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   def process
     # assign the attributes for this particular invoice first
     self.invoice.assign_attributes(self.invoice_parameters)
-
     # calculate the tax and discounts that need to be done for this particular invoice
     # and store it in the invoice object for further calculation
     calculate_tax_and_discounts
@@ -70,6 +69,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     end
 
     if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved))
+      recalculate_totals
       self.invoice.update(paid_amount: Amount.create(value: 0, currency_id: 1)) # setting the paid amount as 0 at the time of saving
     else
       add_message :error, self.invoice.errors.full_messages
@@ -87,7 +87,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     params.require(:invoice).permit(:gst_type_id, :tds, :tds_type_id, :category_id, :customer_id,
                                     :tax_type_id, :date, :discount_type_id, :due_date,
                                     :invoice_number, :inclusive_of_taxes, :billing_address, :shipping_address, :override_invoice_number,
-                                    :email, :mobile_number, :virtual_account_id,
+                                    :email, :mobile_number, :virtual_account_id, :roundoff_amount,
                                     original_amount_attributes: [:value, :currency_id],
                                     advance_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
@@ -101,6 +101,11 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
   def calculate_tax_and_discounts
     InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_parameters, nil, self.invoice)
+  end
+
+  def recalculate_totals
+    InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_parameters, nil, self.invoice)
+    self.invoice.save
   end
 
 end

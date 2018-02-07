@@ -61,6 +61,7 @@ json.invoice do
     json.account_name invoice.virtual_account&.name
     json.ifsc invoice.virtual_account&.ifsc
     json.account_number invoice.virtual_account&.account_number
+    json.id invoice.virtual_account&.id
   end
 end
 
