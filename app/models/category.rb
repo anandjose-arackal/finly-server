@@ -18,6 +18,7 @@
 
 class Category < ActiveRecord::Base
   belongs_to :company
+  belongs_to :purpose
 
   has_one :quickbooks_category, dependent: :destroy
 
