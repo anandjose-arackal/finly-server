@@ -11,6 +11,7 @@ json.invoice do
   json.date invoice.date
   json.due_date invoice.due_date
   json.status do
+    json.id invoice.invoice_status&.id
     json.name invoice.invoice_status&.name
     json.bs_class ""
   end
