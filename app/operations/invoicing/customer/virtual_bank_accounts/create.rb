@@ -37,6 +37,6 @@ class Invoicing::Customer::VirtualBankAccounts::Create < Invoicing::Customer::Ba
   end
 
   def post_process
-    add_message :error, "Virtual account created"
+    add_message :success, "Virtual account created"
   end
 end

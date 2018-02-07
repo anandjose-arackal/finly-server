@@ -20,6 +20,9 @@ json.addresses do
     json.pin_code address.pin_code
     json.default address.default
     json.id address.id
+    json.landmark address.landmark
+    json.state_id address.state_id
+    json.state_name address.state&.name
   end
 end
 
