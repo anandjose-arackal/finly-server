@@ -12,7 +12,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadAllAttachment < BankTra
       count = 1
       bpr.payment_order&.payment_order_attachments&.each do |attachment|
         file = attachment.attached_file
-        next if file.nil?
+        next if file.blank?
         name_splits = attachment.attached_file_file_name&.split('.')
         extension = (name_splits.present? and name_splits.size > 1) ? ".#{name_splits&.last}" : ''
         files << {name: "#{file_name_prefix}_#{count}#{extension}", path: file.path}
@@ -23,7 +23,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadAllAttachment < BankTra
         count = 1
         invoice&.invoice_attachments&.each do |attachment|
           file = attachment.attached_file
-          next if file.nil?
+          next if file.blank?
           name_splits = attachment.attached_file_file_name&.split('.')
           extension = (name_splits.present? and name_splits.size > 1) ? ".#{name_splits&.last}" : ''
           files << {name: "#{file_name_prefix}_payment_#{count}#{extension}", path: file.path}
