@@ -33,6 +33,8 @@ class Purpose < ActiveRecord::Base
         return Purpose.id_for(:invoice)
       when 'em', :em, :ft, 'ft'
         return Purpose.id_for(:expense_management)
+      when 'fc', :fc
+        return Purpose.id_for(:invoice_items) # because from the outward invoice system, only invoice items categories can be created
       else
         # do nothing?
     end
