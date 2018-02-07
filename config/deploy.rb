@@ -1,8 +1,9 @@
 # config valid only for current version of Capistrano
 lock '3.10.1'
 
-load_secure_storage((fetch(:stage)&.to_s == 'itzcash_production' ? :production : :development))
-
+if Rails.env.production?
+  load_secure_storage((fetch(:stage)&.to_s == 'itzcash_production' ? :production : :development))
+end
 set :application, 'finly-server'
 
 set :repo_url, 'ssh://git@altssh.bitbucket.org:443/finlycore/finly-server.git'

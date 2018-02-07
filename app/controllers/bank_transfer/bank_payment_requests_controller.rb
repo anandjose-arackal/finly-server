@@ -1,6 +1,6 @@
 class BankTransfer::BankPaymentRequestsController < ApplicationController
 
-  before_action :set_tokens_in_header_admin, only: [:download_pending_attachment, :download_selected_attachment, :download_all_attachment]
+  before_action :set_tokens_in_header, only: [:download_pending_attachment, :download_selected_attachment, :download_all_attachment]
   before_action {finly_authorize! :web}
 
   def show
