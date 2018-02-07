@@ -13,14 +13,6 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
     def navbar_actions
       actions = []
       if invoice.incomplete?
-        # adding the save action
-        actions << {
-            url: Rails.application.routes.url_helpers.invoicing_outward_invoice_save_path(self.invoice),
-            name: "Create Invoice",
-            method: "patch",
-            id: "create_invoice",
-            btn_class: "primary"
-        }
         actions << {
             url: Rails.application.routes.url_helpers.invoicing_outward_invoice_path(self.invoice),
             name: "Delete Invoice",
@@ -29,7 +21,7 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
             btn_class: "danger"
         }
       end
-      if self.invoice.saved? || self.invoice.sent_to_customer?
+      if self.invoice.saved?
         actions << {
             url: Rails.application.routes.url_helpers.invoicing_outward_invoice_cancel_path(self.invoice),
             name: "Cancel Invoice",
