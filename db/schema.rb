@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180208062409) do
+ActiveRecord::Schema.define(version: 20180208093445) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2412,6 +2412,8 @@ ActiveRecord::Schema.define(version: 20180208062409) do
     t.string   "mobile_number",           limit: 255
     t.boolean  "override_invoice_number"
     t.boolean  "is_deleted"
+    t.string   "sequence_start",          limit: 255
+    t.string   "prefix",                  limit: 255
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree

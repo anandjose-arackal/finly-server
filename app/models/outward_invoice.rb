@@ -31,8 +31,8 @@
 #  mobile_number           :string(255)
 #  override_invoice_number :boolean
 #  is_deleted              :boolean
+#  sequence_start          :string(255)
 #  prefix                  :string(255)
-#  sequence                :string(255)
 #
 
 class OutwardInvoice < ActiveRecord::Base
