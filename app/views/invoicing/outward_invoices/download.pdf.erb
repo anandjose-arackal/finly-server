@@ -92,17 +92,7 @@
         <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @result.invoice.date %></b></span>
       </div>
 
-      <div style="width: 100%; height: auto; overflow: hidden; width: calc(100% - 10px);  margin-right: 10px; margin-top: 10px; border: 1px solid #c4c4c4; border-left: none !important; padding-top: 5px; padding-bottom: 5px;">
-        <% if @result.invoice.virtual_account.present? %>
-            <div class="invoice-number">
-              <span class="fixed-span-big">   Invoice Payment Account  &nbsp;  </span> <span><b><%= @result.invoice.virtual_account.account_number %></b></span>
-            </div>
-            <div class="invoice-number">
-              <span class="fixed-span-big">  Invoice Payment IFSC  &nbsp;  </span> <span><b><%= @result.invoice.virtual_account.ifsc %></b></span>
-            </div>
-        <% end %>
 
-      </div>
 
     </div>
 
@@ -153,78 +143,100 @@
       <!--</div>-->
     </div>
   </div>
+  <% if @result.invoice.virtual_account.present? %>
+      <div style="font-size: 11px; width: 100%; height: auto; text-align: left; overflow: hidden; margin-top: 80px">
+        <div class="address-title">
+          Invoice Payment : <br>
+        </div>
+
+        <div class="invoice-number">
+          <span class="fixed-span-big">Account Number  &nbsp;  </span> <span><b><%= @result.invoice.virtual_account.account_number %></b></span>
+        </div>
+        <div class="invoice-number">
+          <span class="fixed-span-big">IFSC Code  &nbsp;  </span> <span><b><%= @result.invoice.virtual_account.ifsc %></b></span>
+        </div>
+
+
+      </div>
+  <% end %>
 
 </div>
+
+<% if @result.invoice.inclusive_of_taxes %>
+  <div style="width: calc(100% - 10px); height: auto; overflow: hidden;font-size: 12px; color: #7b7b7b; font-weight: 300; margin-top: 10px; margin-left: 10px; ">
+    <span style="color: darkred;">* &nbsp;&nbsp;</span> Inclusive of taxes
+  </div>
+<% end %>
 
 <div class="item-details-table" style="overflow-x: auto; margin: 10px; width: calc(100% - 20px); margin-top: 0;">
 
   <table class="line-items-table" style="width: 100%;border-collapse: collapse;margin: 1% auto;margin-bottom: 1%;">
-    <thead>
+    <thead style="background-color: rgba(201,209,226,1); color: rgba(25,51,113,1); color: black;">
     <tr>
-      <th scope="col" style="width: 20px; background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">#</th>
-      <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">Name/Description</th>
-      <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">HSN/SAC</th>
-      <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">Quantity</th>
-      <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">Rate</th>
-      <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">Amount</th>
-      <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">Discount</th>
-      <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; "><%= @result.invoice.gst_type_id == 1 ? "IGST" : "CGST + SGST" %></th>
-      <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " colspan="2">Total</th>
+      <th scope="col" style="width: 20px;font-weight: 300;padding: 5px; border: none !important; text-align: left; font-size: 11px; ">#</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Name/Description</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">HSN/SAC</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Quantity</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Rate</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Amount</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Discount</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; "><%= @result.invoice.gst_type_id == 1 ? "IGST" : "CGST + SGST" %></th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; " colspan="2">Total</th>
     </tr>
     </thead>
     <tbody>
     <% @result.invoice.invoice_items.each do |item| %>
         <tr>
-          <th style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " scope="row">2</th>
-          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; "><%= item.description%></td>
-          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; "><%= item.hsn_sac%></td>
-          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; "><%= item.quantity%></td>
-          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.rate %></td>
-          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.amount&.value%></td>
-          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.discount_amount&.value %></td>
-          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.tax_amount&.value %></td>
-          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.net_amount&.value%></td>
+          <th style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " scope="row">2</th>
+          <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.description%></td>
+          <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.hsn_sac%></td>
+          <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.quantity%></td>
+          <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; ">INR <%= item.rate %></td>
+          <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; ">INR <%= item.amount&.value%></td>
+          <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; ">INR <%= item.discount_amount&.value %></td>
+          <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; ">INR <%= item.tax_amount&.value %></td>
+          <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; ">INR <%= item.net_amount&.value%></td>
         </tr>
     <% end %>
     <tr>
-      <th class="plain" colspan="6"></th>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">Total :</td>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-data line-items-total" colspan="2">INR <%= @result.invoice.line_items_net_total%></td>
+      <th class="plain" colspan="7"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Total </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-total" colspan="1">INR <%= @result.invoice.line_items_net_total%></td>
     </tr>
     <tr>
-      <th class="plain" colspan="6"></th>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">Discount :</td>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-data line-items-discount" colspan="2">INR <%= @result.invoice.discount_amount&.value%></td>
+      <th class="plain" colspan="7"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Discount </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-discount" colspan="1">INR <%= @result.invoice.discount_amount&.value%></td>
     </tr>
     <tr>
-      <th class="plain" colspan="6"></th>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">TAX :</td>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-data line-items-tax" colspan="2">INR <%= @result.invoice.tax_amount&.value%></td>
+      <th class="plain" colspan="7"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Tax </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-tax" colspan="1">INR <%= @result.invoice.tax_amount&.value%></td>
     </tr>
     <!--<tr>-->
     <!--<th class="plain" colspan="6"></th>-->
-    <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">TDS :</td>-->
-    <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-data line-items-tds" colspan="2">INR 67</td>-->
+    <!--<td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">TDS :</td>-->
+    <!--<td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " class="plain line-items-data line-items-tds" colspan="2">INR 67</td>-->
     <!--</tr>-->
     <tr>
-      <th class="plain" colspan="6"></th>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">Advance Payment :</td>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-data line-items-advance-payment" colspan="2">INR <%= @result.invoice.advance_amount&.value%></td>
+      <th class="plain" colspan="7"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Advance Payment </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-advance-payment" colspan="1">INR <%= @result.invoice.advance_amount&.value%></td>
     </tr>
     <tr>
-      <th class="plain" colspan="6"></th>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">Freight :</td>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-data line-items-freight" colspan="2">INR <%= @result.invoice.freight_amount&.value %></td>
+      <th class="plain" colspan="7"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Freight </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-freight" colspan="1">INR <%= @result.invoice.freight_amount&.value %></td>
     </tr>
     <tr>
-      <th class="plain" colspan="6"></th>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">Roundoff :</td>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-data line-items-roundoff" colspan="2">INR <%= @result.invoice.roundoff_amount%></td>
+      <th class="plain" colspan="7"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Roundoff </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-roundoff" colspan="1">INR <%= @result.invoice.roundoff_amount%></td>
     </tr>
     <tr>
-      <th class="plain" colspan="6" ></th>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">Balance Due :</td>
-      <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-data line-items-balance-due" colspan="2">INR <%= @result.invoice.balance_due&.value %></td>
+      <th class="plain" colspan="7" ></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Balance Due </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-balance-due" colspan="1">INR <%= @result.invoice.balance_due&.value %></td>
     </tr>
     </tbody>
   </table>
@@ -255,9 +267,9 @@
 
   .line-items-title
   {
-    font-weight: bolder;
     border: 1px solid #ccc !important;
-    color:#000000c9;
+    color:#7b7b7b !important;
+    font-weight: 300 !important;
   }
 
   .line-items-data
@@ -300,8 +312,8 @@
   .address-title
   {
     font-size: 15px;
-    font-weight: bold;
     margin-bottom: 10px;
+    color: gray;
   }
 
   .company-details-container
@@ -333,6 +345,11 @@
     margin-top: -25px;
   }
 
+  table {
+    border-collapse: separate !important;
+    border-spacing: 0px 5px;
+  }
+
   .company-logo
   {
     width: 50%;
@@ -357,11 +374,10 @@
   }
   .invoice-title
   {
-    background-color: black;
-    color: white;
-    border-radius: 6px;
-    box-shadow: 0 0 10px #C4C4C4;
-    font-size: 18px;
+    color: rgba(25,51,113,0.7);
+    border-radius: 0;
+    border-bottom: 1px dotted;
+    font-size: 22px;
     letter-spacing: 0px;
     margin-bottom: 2.5%;
     text-align: center;
@@ -404,6 +420,6 @@
   .fixed-span-big
   {
     display: inline-block;
-    width: 150px;
+    width: 100px;
   }
 </style>

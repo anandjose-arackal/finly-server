@@ -18,16 +18,11 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
       return
     end
 
-    if self.amount_due <=0
-      add_message :error, "Amount due is negative for invoices with this account number"
-      return
-    end
-
-    # # ensure that the invoice is still in an unpaid state
-    # unless OutwardInvoiceStatus.ids_for(:unpaid, :partially_paid, :saved, :sent_to_customer).include?(self.outward_invoice.invoice_status_id)
-    #   add_message :error, "Only unpaid or partially paid invoices can accept payments"
+    # if self.amount_due <=0
+    #   add_message :error, "Amount due is negative for invoices with this account number"
     #   return
     # end
+
   end
 
   def process
@@ -37,9 +32,15 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
       due_amount = invoice.balance_due&.value - invoice.paid_amount&.value
       if remaining_amount < due_amount
         paid_amount = invoice.paid_amount&.value + self.transaction_amount
-        invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid), paid_amount_attributes: {id: invoice.paid_amount.id, value: paid_amount})
+        balance_due = invoice.balance_due&.value - remaining_amount
+        invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid),
+                       paid_amount_attributes: {id: invoice.paid_amount.id, value: paid_amount},
+                       balance_due_attributes: {id: invoice.balance_due.id, value: balance_due})
       elsif remaining_amount >= due_amount
+
         invoice.paid_amount.update(value: invoice.balance_due.value)
+        invoice.balance_due.update(value: 0)
+        invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:closed))
         remaining_amount = remaining_amount - due_amount
       end
       if remaining_amount <= 0
@@ -48,7 +49,7 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
     end
     # if there's still any amount remaining in remaining_amount, add it to the last invoice's paid amount
     if remaining_amount > 0
-      last_invoice = self.outward_invoice.reorder(created_at: :desc).first
+      last_invoice = self.outward_invoices.reorder(created_at: :desc).first
       paid_amount = last_invoice.paid_amount.value
       last_invoice.paid_amount.update(value: (paid_amount + remaining_amount))
     end
