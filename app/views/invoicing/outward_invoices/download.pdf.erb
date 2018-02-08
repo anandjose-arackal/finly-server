@@ -92,7 +92,7 @@
         <span> <b> Invoice Date : &nbsp; </b> </span> <span><%= @result.invoice.date %></span>
       </div>
 
-      <div style="width: 100%; height: auto; overflow: hidden; width: 250px; margin-top: 10px; border: 1px solid #c4c4c4; border-left: none !important; padding-top: 5px; padding-bottom: 5px;">
+      <div style="width: 100%; height: auto; overflow: hidden; width: calc(100% - 10px);  margin-right: 10px; margin-top: 10px; border: 1px solid #c4c4c4; border-left: none !important; padding-top: 5px; padding-bottom: 5px;">
         <% if @result.invoice.virtual_account.present? %>
           <div class="invoice-number">
             <span> <b> Invoice Payment Account : &nbsp; </b> </span> <span><%= @result.invoice.virtual_account.account_number %></span>
@@ -168,18 +168,6 @@
     </tr>
     </thead>
     <tbody>
-    <!--<tr>-->
-      <!--<th style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " scope="row">1</th>-->
-      <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">Motorolo Headphone</td>-->
-      <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">Headphones</td>-->
-      <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">7678678213</td>-->
-      <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">2</td>-->
-      <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR 5500</td>-->
-      <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR 11000</td>-->
-      <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR 850</td>-->
-      <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR 150</td>-->
-      <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR 10000</td>-->
-    <!--</tr>-->
     <% @result.invoice.invoice_items.each do |item| %>
       <tr>
         <th style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " scope="row">2</th>
@@ -370,7 +358,7 @@
     border-radius: 6px;
     box-shadow: 0 0 10px #C4C4C4;
     font-size: 18px;
-    letter-spacing: 10px;
+    letter-spacing: 2px;
     margin-bottom: 2.5%;
     text-align: center;
     padding: 0.1%;
@@ -380,7 +368,6 @@
 
   .billing-details-block
   {
-    padding-left: 15px;
     font-size: 11px;
   }
 
@@ -391,7 +378,6 @@
 
   .shipping-details-block
   {
-    padding-left: 15px;
     font-size: 11px;
   }
 
@@ -402,6 +388,6 @@
 
   .address-line
   {
-    width:225px;
+    width:175px;
   }
 </style>
