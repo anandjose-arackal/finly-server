@@ -1,6 +1,6 @@
 class Invoicing::OutwardInvoicesController < ApplicationController
 
-  before_action -> { finly_authorize! :web }
+  # before_action -> { finly_authorize! :web }
 
   def index
     @result = Invoicing::Invoice::Index.(current_user, params)
@@ -92,7 +92,11 @@ class Invoicing::OutwardInvoicesController < ApplicationController
 
   def download
     @result = Invoicing::Invoice::DownloadInvoice.(current_user, params)
-    render pdf: "Invoice-#{@result.invoice.invoice_number}", layout: "pdf.html.erb", print_media_type: true
+    respond_to do |format|
+      format.pdf {
+          render pdf: "Invoice-#{@result.invoice.invoice_number}", layout: "pdf.html.erb", print_media_type: true
+      }
+    end
   end
 
 end

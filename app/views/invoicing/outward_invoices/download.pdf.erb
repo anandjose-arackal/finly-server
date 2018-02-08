@@ -92,6 +92,18 @@
         <span> <b> Invoice Date : &nbsp; </b> </span> <span><%= @result.invoice.date %></span>
       </div>
 
+      <div style="width: 100%; height: auto; overflow: hidden; width: 250px; margin-top: 10px; border: 1px solid #c4c4c4; border-left: none !important; padding-top: 5px; padding-bottom: 5px;">
+        <% if @result.invoice.virtual_account.present? %>
+          <div class="invoice-number">
+            <span> <b> Invoice Payment Account : &nbsp; </b> </span> <span><%= @result.invoice.virtual_account.account_number %></span>
+          </div>
+          <div class="invoice-number">
+            <span> <b> Invoice Payment IFSC : &nbsp; </b> </span> <span><%= @result.invoice.virtual_account.ifsc %></span>
+          </div>
+        <% end %>
+
+      </div>
+
     </div>
 
   </div>
@@ -250,46 +262,6 @@
   </table>
 
 </div>
-
-<!-- <div class="item-totals-block">
-
-  <div class="item-totals-individual-block">
-    <div class="item-totals-block-title">
-       Net Total :
-    </div>
-    <div class="item-totals-block-data">
-       INR 55000
-    </div>
-  </div>
-
-  <div class="item-totals-individual-block">
-    <div class="item-totals-block-title">
-       Due Amount :
-    </div>
-    <div class="item-totals-block-data">
-       INR 5000
-    </div>
-  </div>
-
-  <div class="item-totals-individual-block">
-    <div class="item-totals-block-title">
-       Paid Amount :
-    </div>
-    <div class="item-totals-block-data">
-       INR 50000
-    </div>
-  </div>
-
-  <div class="item-totals-individual-block">
-    <div class="item-totals-block-title">
-       Due Date :
-    </div>
-    <div class="item-totals-block-data">
-       21 January 2018
-    </div>
-  </div>
-
-</div> -->
 
 <div class="legal-statement" id="legalcopy">
   <p class="legal"><strong>Thank you for your business! </strong>
