@@ -31,13 +31,15 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
             btn_class: "danger"
         }
       end
-      actions << {
-          url: "",
-          name: "Download Invoice",
-          method: "get",
-          id: "download_invoice",
-          btn_class: "info"
-      }
+      unless self.invoice.incomplete?
+        actions << {
+            url: Rails.application.routes.url_helpers.invoicing_outward_invoice_download_path(self.invoice),
+            name: "Download Invoice",
+            method: "get",
+            id: "download_invoice",
+            btn_class: "info"
+        }
+      end
       actions
     end
   end

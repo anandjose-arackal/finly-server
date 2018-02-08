@@ -1058,6 +1058,7 @@
 #        invoicing_outward_invoice_update_virtual_account PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_virtual_account(.:format)           invoicing/outward_invoices#update_virtual_account
 #                        invoicing_outward_invoice_cancel PATCH  /invoicing/outward_invoices/:outward_invoice_id/cancel(.:format)                           invoicing/outward_invoices#cancel
 #                          invoicing_outward_invoice_save PATCH  /invoicing/outward_invoices/:outward_invoice_id/save(.:format)                             invoicing/outward_invoices#save
+#                      invoicing_outward_invoice_download GET    /invoicing/outward_invoices/:outward_invoice_id/download_pdf(.:format)                     invoicing/outward_invoices#download
 #                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#index
 #                                                         POST   /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#create
 #                           new_invoicing_outward_invoice GET    /invoicing/outward_invoices/new(.:format)                                                  invoicing/outward_invoices#new
@@ -2494,6 +2495,7 @@ Rails.application.routes.draw do
       patch 'update_virtual_account', to: 'outward_invoices#update_virtual_account', as: :update_virtual_account
       patch 'cancel', to: 'outward_invoices#cancel', as: :cancel
       patch 'save', to: 'outward_invoices#save', as: :save
+      get 'download_pdf', to: 'outward_invoices#download', as: :download
     end
     resources :customers do
       get 'virtual_accounts', to: 'customers#virtual_bank_accounts', as: :virtual_accounts

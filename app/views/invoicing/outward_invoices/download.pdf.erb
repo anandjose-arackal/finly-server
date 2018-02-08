@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+  <title>Invoicing System</title>
+</head>
+<body>
+
+<div class="first-container">
+
+  <div class="invoice-title container-fluid">
+    <span> <b> INVOICE </b> </span>
+  </div>
+
+  <div class="float-container">
+    <div class=" company-name company-address">
+      <b> Finly Spend and Expense Management </b>,
+    </div>
+    <div class="company-details-container">
+      <div class="company-address-line-one company-address">
+        3rd Floor, Salarpuria Towers 1, Koramangala,
+      </div>
+      <div class="company-address-line-two company-address">
+        Bengaluru, Karnataka.
+      </div>
+      <div class="company-pin-code company-address">
+        PIN : 590095
+      </div>
+
+
+    </div>
+
+    <div class="company-logo-container">
+      <img src="company_logo.png" class="company-logo">
+    </div>
+  </div>
+
+</div>
+<div class="first-container">
+  <div class="address-title">
+    Invoice Details : <br>
+  </div>
+  <div class="customer-block">
+
+    <div class="invoice-number">
+      <span> <b> Invoice Number : &nbsp; </b> </span> <span><%= @result.invoice.invoice_number%></span>
+    </div>
+    <!--<div class="invoice-number">-->
+      <!--<span> <b> Invoice Details : &nbsp; </b> </span> <span>KA-12368763471-1238</span>-->
+    <!--</div>-->
+    <div class="invoice-date">
+      <span> <b> Invoice Date : &nbsp; </b> </span> <span><%= @result.invoice.date%></span>
+    </div>
+    <!--<div class="order-number">-->
+      <!--<span> <b> Order Number : &nbsp; </b> </span> <span>407-213879821-213</span>-->
+    <!--</div>-->
+    <div class="order-date">
+      <span> <b> Due Date : &nbsp; </b> </span> <span><%= @result.invoice.due_date%></span>
+    </div>
+    <% if @result.invoice.customer.pan.present? %>
+      <div class="pan-no">
+        <span> <b> PAN Number : &nbsp; </b> </span> <span><%= @result.invoice.customer.pan%></span>
+      </div>
+    <% end %>
+    <% if @result.invoice.customer.gst.present? %>
+      <div class="gst-registered">
+        <span> <b> GST Registration Number : &nbsp; </b> </span> <span><%= @result.invoice.customer.gst%></span>
+      </div>
+    <% end %>
+  </div>
+
+</div>
+
+<div class="float-container address-block">
+
+  <div class="customer-details-block three-columns-float">
+    <div class="address-title">
+      Customer Details : <br>
+    </div>
+    <div class="customer-block">
+
+      <div class="invoice-care-of-name">
+        <span> <b> C/O : &nbsp; </b></span> <span><% @result.invoice.customer.name %></span>
+      </div>
+      <!--<div class="invoice-number">-->
+        <!--<span> <b> Invoice Number : &nbsp; </b> </span> <span>6589798746</span>-->
+      <!--</div>-->
+      <div class="invoice-number">
+        <span> <b> Mobile : &nbsp; </b> </span> <span><%= @result.invoice.mobile_number%></span>
+      </div>
+      <div class="invoice-number">
+        <span> <b> Invoice Date : &nbsp; </b> </span> <span><%= @result.invoice.date %></span>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="billing-address-block boxes three-columns-float">
+    <div class="address-title">
+      Billing Address : <br>
+    </div>
+    <div class="billing-details-block">
+      <div class="shipping-customer-name">
+        <% @result.invoice.customer.name %>
+      </div>
+      <div class="billing-address-line-one billing-address">
+        <%= @result.invoice.billing_address %>
+      </div>
+      <!--<div class="billing-address-line-two billing-address">-->
+        <!---->
+      <!--</div>-->
+      <!--<div class="billing-pin-code billing-address">-->
+        <!---->
+      <!--</div>-->
+    </div>
+  </div>
+
+  <div class="shipping-address-block boxes three-columns-float">
+    <div class="address-title">
+      Shipping Address : <br>
+    </div>
+    <div class="shipping-details-block">
+      <div class="shipping-customer-name">
+        <% @result.invoice.customer.name %>
+      </div>
+      <div class="shipping-address-line-one shipping-address">
+        <%= @result.invoice.shipping_address %>
+      </div>
+      <!--<div class="shipping-address-line-two shipping-address">-->
+        <!--Bengaluru, Karnataka.-->
+      <!--</div>-->
+      <!--<div class="shipping-pin-code shipping-address">-->
+        <!--PIN : 590095-->
+      <!--</div>-->
+    </div>
+  </div>
+
+</div>
+
+<div class="item-details-table" style="overflow-x: auto; margin: 10px; width: calc(100% - 20px); margin-top: 0;">
+
+  <table class="line-items-table">
+    <thead>
+    <tr>
+      <th scope="col" style="width: 20px;">#</th>
+      <th scope="col">Name/Description</th>
+      <th scope="col">Category</th>
+      <th scope="col">HSN/SAC</th>
+      <th scope="col">Quantity</th>
+      <th scope="col">Rate</th>
+      <th scope="col">Amount</th>
+      <th scope="col">Discount</th>
+      <th scope="col">CGST+SGST / IGST</th>
+      <th scope="col" colspan="2">Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @result.invoice.invoice_items.each do |item| %>
+      <tr>
+        <th scope="row">1</th>
+        <td><%= item.description %></td>
+        <td><%= item.category&.name %></td>
+        <td><%= item.hsn_sac %></td>
+        <td><%= item.quantity %></td>
+        <td>INR <%= item.rate %></td>
+        <td>INR <%= item.amount&.value %></td>
+        <td>INR <%= item.discount_amount&.value%></td>
+        <td>INR <%= item.tax_amount&.value %></td>
+        <td>INR <%= item.net_amount&.value %></td>
+      </tr>
+    <% end %>
+    <!--<tr>-->
+      <!--<th scope="row">2</th>-->
+      <!--<td>Motorolo Headphone</td>-->
+      <!--<td>Headphones</td>-->
+      <!--<td>7678678213</td>-->
+      <!--<td>2</td>-->
+      <!--<td>INR 5500</td>-->
+      <!--<td>INR 11000</td>-->
+      <!--<td>INR 850</td>-->
+      <!--<td>INR 150</td>-->
+      <!--<td>INR 10000</td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+      <!--<th scope="row">3</th>-->
+      <!--<td>Motorolo Headphone</td>-->
+      <!--<td>Headphones</td>-->
+      <!--<td>7678678213</td>-->
+      <!--<td>2</td>-->
+      <!--<td>INR 5500</td>-->
+      <!--<td>INR 11000</td>-->
+      <!--<td>INR 850</td>-->
+      <!--<td>INR 150</td>-->
+      <!--<td>INR 10000</td>-->
+    <!--</tr>-->
+    <!--<tr>-->
+      <!--<th scope="row">4</th>-->
+      <!--<td>Motorolo Headphone</td>-->
+      <!--<td>Headphones</td>-->
+      <!--<td>7678678213</td>-->
+      <!--<td>2</td>-->
+      <!--<td>INR 5500</td>-->
+      <!--<td>INR 11000</td>-->
+      <!--<td>INR 850</td>-->
+      <!--<td>INR 150</td>-->
+      <!--<td>INR 10000</td>-->
+    <!--</tr>-->
+    <tr>
+      <th class="plain" colspan="6"></th>
+      <td class="plain line-items-title" colspan="2">Total :</td>
+      <td class="plain line-items-data line-items-total" colspan="2">INR <%= @result.invoice.line_items_net_total%></td>
+    </tr>
+    <tr>
+      <th class="plain" colspan="6"></th>
+      <td class="plain line-items-title" colspan="2">Discount :</td>
+      <td class="plain line-items-data line-items-discount" colspan="2">INR <%= @result.invoice.discount_amount&.value %></td>
+    </tr>
+    <tr>
+      <th class="plain" colspan="6"></th>
+      <td class="plain line-items-title" colspan="2">TAX :</td>
+      <td class="plain line-items-data line-items-tax" colspan="2">INR <%= @result.invoice.tax_amount&.value%></td>
+    </tr>
+    <!--<tr>-->
+      <!--<th class="plain" colspan="6"></th>-->
+      <!--<td class="plain line-items-title" colspan="2">TDS :</td>-->
+      <!--<td class="plain line-items-data line-items-tds" colspan="2">INR </td>-->
+    <!--</tr>-->
+    <tr>
+      <th class="plain" colspan="6"></th>
+      <td class="plain line-items-title" colspan="2">Advance Payment :</td>
+      <td class="plain line-items-data line-items-advance-payment" colspan="2">INR <%= @result.invoice.advance_amount&.value %></td>
+    </tr>
+    <tr>
+      <th class="plain" colspan="6"></th>
+      <td class="plain line-items-title" colspan="2">Freight :</td>
+      <td class="plain line-items-data line-items-freight" colspan="2">INR <%= @result.invoice.freight_amount&.value %></td>
+    </tr>
+    <tr>
+      <th class="plain" colspan="6"></th>
+      <td class="plain line-items-title" colspan="2">Roundoff :</td>
+      <td class="plain line-items-data line-items-roundoff" colspan="2">INR <%= @result.invoice.roundoff_amount %></td>
+    </tr>
+    <tr>
+      <th class="plain" colspan="6"></th>
+      <td class="plain line-items-title" colspan="2">Balance Due :</td>
+      <td class="plain line-items-data line-items-balance-due" colspan="2">INR <%= @result.invoice.balance_due&.value %></td>
+    </tr>
+    </tbody>
+  </table>
+
+</div>
+
+<!-- <div class="item-totals-block">
+
+  <div class="item-totals-individual-block">
+    <div class="item-totals-block-title">
+       Net Total :
+    </div>
+    <div class="item-totals-block-data">
+       INR 55000
+    </div>
+  </div>
+
+  <div class="item-totals-individual-block">
+    <div class="item-totals-block-title">
+       Due Amount :
+    </div>
+    <div class="item-totals-block-data">
+       INR 5000
+    </div>
+  </div>
+
+  <div class="item-totals-individual-block">
+    <div class="item-totals-block-title">
+       Paid Amount :
+    </div>
+    <div class="item-totals-block-data">
+       INR 50000
+    </div>
+  </div>
+
+  <div class="item-totals-individual-block">
+    <div class="item-totals-block-title">
+       Due Date :
+    </div>
+    <div class="item-totals-block-data">
+       21 January 2018
+    </div>
+  </div>
+
+</div> -->
+
+<div class="legal-statement" id="legalcopy">
+  <p class="legal"><strong>Thank you for your business! </strong>
+  <!--Payment is expected within 31 days; please process this invoice within that time. There will be a 5% interest charge per month on late invoices. Terms and condition are subject to market risks.-->
+  </p>
+</div>
+
+
+
+</body>
+</html>
+
+<style type="text/css">
+
+  #legalcopy
+  {
+    margin-top: 5%;
+    margin-bottom: 1%;
+    text-align: center;
+    font-size: 12px;
+
+  }
+
+  .line-items-title
+  {
+    font-weight: bolder;
+    border: 1px solid #ccc !important;
+    color:#000000c9;
+  }
+
+  .line-items-data
+  {
+    font-weight: bold;
+    border: 1px solid #ccc !important;
+    color:black;
+    text-align: right;
+  }
+
+  .plain
+  {
+    border: none;
+    background-color: white;
+  }
+
+  .avoidBreak {
+    border: 2px solid;
+    page-break-inside:avoid;
+  }
+
+  .float-container
+  {
+    width: 100%;
+    display: inline-block;
+  }
+
+  .three-columns-float
+  {
+    width: 33.3%;
+    float: left;
+  }
+
+  .address-block
+  {
+    margin: 10px;
+    width: calc(100% - 20px);
+  }
+
+  .address-title
+  {
+    font-size: 15px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .company-details-container
+  {
+    float: left;
+    width: calc(100% - 500px);
+  }
+
+  .item-totals-block-title
+  {
+    float: left;
+    width: 200px;
+    font-weight: bolder;
+    color: #443636;
+  }
+
+  .item-totals-block-data
+  {
+    float: left;
+    width: calc(100%-200px);
+    font-weight: bold;
+  }
+
+  .company-logo-container
+  {
+    float: left;
+    width: 500px;
+    text-align: right;
+    margin-top: -25px;
+  }
+
+  .company-logo
+  {
+    width: 50%;
+    height: 50%;
+
+  }
+
+  .first-container
+  {
+    margin: 10px;
+    width: calc(100% - 20px);
+  }
+
+  .company-name
+  {
+    font-size: 18px;
+  }
+
+  body
+  {
+    font-family: 'Roboto',sans-serif;
+  }
+  .invoice-title
+  {
+    background-color: black;
+    color: white;
+    border-radius: 6px;
+    box-shadow: 0 0 10px #C4C4C4;
+    font-size: 18px;
+    letter-spacing: 10px;
+    margin-bottom: 2.5%;
+    text-align: center;
+    padding: 0.1%;
+    padding-top: 0.2%;
+    padding-bottom: 0.2%;
+  }
+
+  .billing-details-block
+  {
+    padding-left: 15px;
+    font-size: 11px;
+  }
+
+  .company-details-container
+  {
+    font-size: 11px;
+  }
+
+  .shipping-details-block
+  {
+    padding-left: 15px;
+    font-size: 11px;
+  }
+
+  .customer-block
+  {
+    font-size: 11px;
+  }
+
+  @media print
+  {
+    table
+    {
+      width: 100% !important;
+      margin: 0 !important;
+    }
+
+    #legalcopy
+    {
+      margin-top: 1%;
+      margin-bottom: 0 !important;
+      text-align: center;
+    }
+    .float-container
+    {
+      width: 100%;
+      display: inline-block;
+    }
+
+    .line-items-title
+    {
+      color: #2f2d2dbd !important;
+    }
+
+    .line-items-data
+    {
+      color: black !important;
+    }
+
+    .three-columns-float
+    {
+      width: 33.3%;
+      float: left;
+    }
+
+    .address-block
+    {
+      margin: 10px;
+      width: calc(100% - 20px);
+      margin-top: 0;
+    }
+
+    .address-title
+    {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .company-details-container
+    {
+      float: left;
+      width: calc(100% - 400px);
+    }
+
+    .company-logo-container
+    {
+      float: left;
+      width: 400px;
+      text-align: right;
+    }
+
+    .item-totals-individual-block
+    {
+      width: 50%;
+      margin-left: 50%;
+      display: inline-block;
+    }
+
+    .company-logo
+    {
+      width: 50%;
+      height: 50%;
+
+    }
+
+    .first-container
+    {
+      margin: 10px;
+      width: calc(100% - 20px);
+    }
+
+    .company-name
+    {
+      font-size: 1.2em;
+      margin-bottom: 5px;
+    }
+
+    body
+    {
+      font-family: 'Roboto',sans-serif;
+    }
+    .invoice-title
+    {
+      color: black;
+      border-bottom: 2px solid #C4C4C4;
+      border-radius: 6px;
+      font-size: 18px;
+      box-shadow: none !important;
+      letter-spacing: 10px;
+      margin-bottom: 2.5%;
+      text-align: center;
+      padding: 0.1%;
+      padding-top: 0.2%;
+      padding-bottom: 0.2%;
+    }
+  }
+</style>
+
+<style type="text/css">
+
+
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1% auto;
+    margin-bottom: 1%;
+
+  }
+
+  /* Zebra striping */
+  tr:nth-of-type(odd) {
+    background: #eee;
+  }
+
+  th {
+    background: white;
+    color: black;
+    font-weight: bold;
+  }
+
+  td, th {
+    padding: 5px;
+    border: 1px solid #ccc;
+    text-align: left;
+    font-size: 11px;
+  }
+
+  /*
+  Max width before this PARTICULAR table gets nasty
+  This query will take effect for any screen smaller than 760px
+  and also iPads specifically.
+  */
+  @media
+  only screen and (max-width: 760px),
+  (min-device-width: 768px) and (max-device-width: 1024px)  {
+
+    table {
+      width: 100%;
+    }
+
+    /* Force table to not be like tables anymore */
+    table, thead, tbody, th, td, tr {
+      display: block;
+    }
+
+    /* Hide table headers (but not display: none;, for accessibility) */
+    thead tr {
+      position: absolute;
+      top: -9999px;
+      left: -9999px;
+    }
+
+    tr { border: 1px solid #ccc; }
+
+    td {
+      /* Behave  like a "row" */
+      border: none;
+      border-bottom: 1px solid #eee;
+      position: relative;
+      padding-left: 50%;
+    }
+
+    td:before {
+      /* Now like a table header */
+      position: absolute;
+      /* Top/left values mimic padding */
+      top: 6px;
+      left: 6px;
+      width: 45%;
+      padding-right: 10px;
+      white-space: nowrap;
+      /* Label the data */
+      content: attr(data-column);
+
+      color: #000;
+      font-weight: bold;
+    }
+
+  }
+
+</style>
