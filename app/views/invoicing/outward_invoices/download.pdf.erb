@@ -80,7 +80,7 @@
     <div class="customer-block">
 
       <div class="invoice-care-of-name">
-        <span> <b> C/O : &nbsp; </b></span> <span><% @result.invoice.customer.name %></span>
+        <span> <b> C/O : &nbsp; </b></span> <span><%= @result.invoice.customer.name %></span>
       </div>
       <!--<div class="invoice-number">-->
         <!--<span> <b> Invoice Number : &nbsp; </b> </span> <span>6589798746</span>-->
@@ -116,9 +116,12 @@
       <div class="shipping-customer-name">
         <% @result.invoice.customer.name %>
       </div>
-      <div class="address-line billing-address">
-        <%= @result.invoice.billing_address %>
-      </div>
+      <% address = @result.invoice.billing_address.split("\n") %>
+      <% address.each do |addr| %>
+        <div class="address-line billing-address">
+          <%= addr %>
+        </div>
+      <% end %>
       <!--<div class="billing-address-line-two billing-address">-->
         <!---->
       <!--</div>-->
@@ -136,9 +139,12 @@
       <div class="shipping-customer-name">
         <% @result.invoice.customer.name %>
       </div>
-      <div class="address-line shipping-address">
-        <%= @result.invoice.shipping_address %>
-      </div>
+      <% address = @result.invoice.shipping_address.split("\n") %>
+      <% address.each do |addr| %>
+          <div class="address-line billing-address">
+            <%= addr %>
+          </div>
+      <% end %>
       <!--<div class="shipping-address-line-two shipping-address">-->
         <!--Bengaluru, Karnataka.-->
       <!--</div>-->
@@ -163,7 +169,7 @@
       <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">Rate</th>
       <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">Amount</th>
       <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">Discount</th>
-      <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">CGST+SGST / IGST</th>
+      <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; "><%= @result.invoice.gst_type_id == 1 ? "IGST" : "CGST + SGST" %></th>
       <th scope="col" style="background: white; color: black; font-weight: bold;padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " colspan="2">Total</th>
     </tr>
     </thead>
@@ -358,7 +364,7 @@
     border-radius: 6px;
     box-shadow: 0 0 10px #C4C4C4;
     font-size: 18px;
-    letter-spacing: 2px;
+    letter-spacing: 0px;
     margin-bottom: 2.5%;
     text-align: center;
     padding: 0.1%;
