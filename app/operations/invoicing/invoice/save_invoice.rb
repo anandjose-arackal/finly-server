@@ -55,7 +55,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
     # adding the prefix and sequence to the invoice
     prefix = user.company.invoice_number_config.prefix
-    sequence = self.invoice_number.gsub(prefix, '')
+    sequence = self.invoice_number&.gsub(prefix, '')
     self.invoice_parameters[:prefix] = prefix
     self.invoice_parameters[:sequence_start] = sequence
 

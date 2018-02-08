@@ -96,6 +96,7 @@ class Invoicing::OutwardInvoicesController < ApplicationController
       format.pdf {
           render pdf: "Invoice-#{@result.invoice.invoice_number}", layout: "pdf.html.erb", print_media_type: true
       }
+      format.html {}
     end
   end
 
