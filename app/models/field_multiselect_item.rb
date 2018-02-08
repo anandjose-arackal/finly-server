@@ -11,7 +11,10 @@
 #
 
 class FieldMultiselectItem < ActiveRecord::Base
+  include SoftDeletable
 
   belongs_to :field_configuration
 
+  default_scope { unscope(:where) }
+  
 end
