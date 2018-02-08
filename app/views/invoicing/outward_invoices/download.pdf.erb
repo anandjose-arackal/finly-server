@@ -43,29 +43,29 @@
   <div class="customer-block">
 
     <div class="invoice-number">
-      <span> <b> Invoice Number : &nbsp; </b> </span> <span><%= @result.invoice.invoice_number%></span>
+      <span class="fixed-span">  Invoice Number  &nbsp;  </span> <span><b><%= @result.invoice.invoice_number%></b></span>
     </div>
     <!--<div class="invoice-number">-->
-      <!--<span> <b> Invoice Details : &nbsp; </b> </span> <span>KA-12368763471-1238</span>-->
+    <!--<span> <b> Invoice Details : &nbsp; </b> </span> <span>KA-12368763471-1238</span>-->
     <!--</div>-->
     <div class="invoice-date">
-      <span> <b> Invoice Date : &nbsp; </b> </span> <span><%= @result.invoice.date%></span>
+      <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @result.invoice.date%></b></span>
     </div>
     <!--<div class="order-number">-->
-      <!--<span> <b> Order Number : &nbsp; </b> </span> <span>407-213879821-213</span>-->
+    <!--<span> <b> Order Number : &nbsp; </b> </span> <span>407-213879821-213</span>-->
     <!--</div>-->
     <div class="order-date">
-      <span> <b> Due Date : &nbsp; </b> </span> <span><%= @result.invoice.due_date%></span>
+      <span class="fixed-span">  Due Date  &nbsp;  </span> <span><b><%= @result.invoice.due_date%> </b></span>
     </div>
     <% if @result.invoice.customer.pan.present? %>
-      <div class="pan-no">
-        <span> <b> PAN Number : &nbsp; </b> </span> <span><%= @result.invoice.customer.pan%></span>
-      </div>
+        <div class="pan-no">
+          <span class="fixed-span">  PAN Number  &nbsp;  </span> <span><b><%= @result.invoice.customer.pan%></b></span>
+        </div>
     <% end %>
     <% if @result.invoice.customer.gst.present? %>
-      <div class="gst-registered">
-        <span> <b> GST Registration Number : &nbsp; </b> </span> <span><%= @result.invoice.customer.gst%></span>
-      </div>
+        <div class="gst-registered">
+          <span class="fixed-span">  GSTIN  &nbsp;  </span> <span><b><%= @result.invoice.customer.gst%></b></span>
+        </div>
     <% end %>
   </div>
 
@@ -80,26 +80,26 @@
     <div class="customer-block">
 
       <div class="invoice-care-of-name">
-        <span> <b> C/O : &nbsp; </b></span> <span><%= @result.invoice.customer.name %></span>
+        <span class="fixed-span">  C/O  &nbsp; </span> <span><b><%= @result.invoice.customer.name %></b></span>
       </div>
       <!--<div class="invoice-number">-->
-        <!--<span> <b> Invoice Number : &nbsp; </b> </span> <span>6589798746</span>-->
+      <!--<span> <b> Invoice Number : &nbsp; </b> </span> <span>6589798746</span>-->
       <!--</div>-->
       <div class="invoice-number">
-        <span> <b> Mobile : &nbsp; </b> </span> <span><%= @result.invoice.mobile_number%></span>
+        <span class="fixed-span">  Mobile  &nbsp;  </span> <span><b><%= @result.invoice.mobile_number%></b></span>
       </div>
       <div class="invoice-number">
-        <span> <b> Invoice Date : &nbsp; </b> </span> <span><%= @result.invoice.date %></span>
+        <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @result.invoice.date %></b></span>
       </div>
 
       <div style="width: 100%; height: auto; overflow: hidden; width: calc(100% - 10px);  margin-right: 10px; margin-top: 10px; border: 1px solid #c4c4c4; border-left: none !important; padding-top: 5px; padding-bottom: 5px;">
         <% if @result.invoice.virtual_account.present? %>
-          <div class="invoice-number">
-            <span> <b> Invoice Payment Account : &nbsp; </b> </span> <span><%= @result.invoice.virtual_account.account_number %></span>
-          </div>
-          <div class="invoice-number">
-            <span> <b> Invoice Payment IFSC : &nbsp; </b> </span> <span><%= @result.invoice.virtual_account.ifsc %></span>
-          </div>
+            <div class="invoice-number">
+              <span class="fixed-span-big">   Invoice Payment Account  &nbsp;  </span> <span><b><%= @result.invoice.virtual_account.account_number %></b></span>
+            </div>
+            <div class="invoice-number">
+              <span class="fixed-span-big">  Invoice Payment IFSC  &nbsp;  </span> <span><b><%= @result.invoice.virtual_account.ifsc %></b></span>
+            </div>
         <% end %>
 
       </div>
@@ -118,15 +118,15 @@
       </div>
       <% address = @result.invoice.billing_address.split("\n") %>
       <% address.each do |addr| %>
-        <div class="address-line billing-address">
-          <%= addr %>
-        </div>
+          <div class="address-line billing-address">
+            <%= addr %>
+          </div>
       <% end %>
       <!--<div class="billing-address-line-two billing-address">-->
-        <!---->
+      <!---->
       <!--</div>-->
       <!--<div class="billing-pin-code billing-address">-->
-        <!---->
+      <!---->
       <!--</div>-->
     </div>
   </div>
@@ -146,10 +146,10 @@
           </div>
       <% end %>
       <!--<div class="shipping-address-line-two shipping-address">-->
-        <!--Bengaluru, Karnataka.-->
+      <!--Bengaluru, Karnataka.-->
       <!--</div>-->
       <!--<div class="shipping-pin-code shipping-address">-->
-        <!--PIN : 590095-->
+      <!--PIN : 590095-->
       <!--</div>-->
     </div>
   </div>
@@ -174,17 +174,17 @@
     </thead>
     <tbody>
     <% @result.invoice.invoice_items.each do |item| %>
-      <tr>
-        <th style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " scope="row">2</th>
-        <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; "><%= item.description%></td>
-        <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; "><%= item.hsn_sac%></td>
-        <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; "><%= item.quantity%></td>
-        <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.rate %></td>
-        <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.amount&.value%></td>
-        <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.discount_amount&.value %></td>
-        <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.tax_amount&.value %></td>
-        <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.net_amount&.value%></td>
-      </tr>
+        <tr>
+          <th style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " scope="row">2</th>
+          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; "><%= item.description%></td>
+          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; "><%= item.hsn_sac%></td>
+          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; "><%= item.quantity%></td>
+          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.rate %></td>
+          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.amount&.value%></td>
+          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.discount_amount&.value %></td>
+          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.tax_amount&.value %></td>
+          <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; ">INR <%= item.net_amount&.value%></td>
+        </tr>
     <% end %>
     <tr>
       <th class="plain" colspan="6"></th>
@@ -202,9 +202,9 @@
       <td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-data line-items-tax" colspan="2">INR <%= @result.invoice.tax_amount&.value%></td>
     </tr>
     <!--<tr>-->
-      <!--<th class="plain" colspan="6"></th>-->
-      <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">TDS :</td>-->
-      <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-data line-items-tds" colspan="2">INR 67</td>-->
+    <!--<th class="plain" colspan="6"></th>-->
+    <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">TDS :</td>-->
+    <!--<td style="padding: 5px; border: 1px solid #ccc; text-align: left; font-size: 11px; " class="plain line-items-data line-items-tds" colspan="2">INR 67</td>-->
     <!--</tr>-->
     <tr>
       <th class="plain" colspan="6"></th>
@@ -233,7 +233,7 @@
 
 <div class="legal-statement" id="legalcopy">
   <p class="legal"><strong>Thank you for your business! </strong>
-  <!--Payment is expected within 31 days; please process this invoice within that time. There will be a 5% interest charge per month on late invoices. Terms and condition are subject to market risks.-->
+    <!--Payment is expected within 31 days; please process this invoice within that time. There will be a 5% interest charge per month on late invoices. Terms and condition are subject to market risks.-->
   </p>
 </div>
 
@@ -393,5 +393,17 @@
   .address-line
   {
     width:175px;
+  }
+
+  .fixed-span
+  {
+    display: inline-block;
+    width: 100px;
+  }
+
+  .fixed-span-big
+  {
+    display: inline-block;
+    width: 150px;
   }
 </style>
