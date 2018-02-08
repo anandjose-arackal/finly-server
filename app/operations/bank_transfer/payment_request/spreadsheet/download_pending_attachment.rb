@@ -9,21 +9,25 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadPendingAttachment < Ban
     exported_xls = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages).spreadsheet_exporter.generate_xls
     self.files << {name: 'export.xls', file_contents: exported_xls}
     bank_payment_requests.include_attachments.each do |bpr|
-      file_name_prefix = "#{bpr.id}_"
+      file_name_prefix = "#{bpr.id}"
       count = 1
-      bpr.payment_order.payment_order_attachments.each do |attachment|
+      bpr.payment_order&.payment_order_attachments&.each do |attachment|
         file = attachment.attached_file
-        extension = attachment.attached_file_file_name.split('.')&.last
-        self.files << {name: "#{file_name_prefix}_#{count}.#{extension}", path: file.path}
+        next if file.blank?
+        name_splits = attachment.attached_file_file_name&.split('.')
+        extension = (name_splits.present? and name_splits.size > 1) ? ".#{name_splits&.last}" : ''
+        files << {name: "#{file_name_prefix}_#{count}#{extension}", path: file.path}
         count += 1
       end
-      bpr.payment_order.payments.each do |payment|
+      bpr.payment_order&.payments&.each do |payment|
         invoice = payment.invoice
         count = 1
-        invoice.invoice_attachments.each do |attachment|
+        invoice&.invoice_attachments&.each do |attachment|
           file = attachment.attached_file
-          extension = attachment.attached_file_file_name.split('.')&.last
-          self.files << {name: "#{file_name_prefix}_payment_#{count}.#{extension}", path: file.path}
+          next if file.blank?
+          name_splits = attachment.attached_file_file_name&.split('.')
+          extension = (name_splits.present? and name_splits.size > 1) ? ".#{name_splits&.last}" : ''
+          files << {name: "#{file_name_prefix}_payment_#{count}#{extension}", path: file.path}
           count += 1
         end
       end

@@ -1,6 +1,7 @@
 customer = @result.customer
 json.details do
-  json.extract! customer, :name, :email, :mobile_number, :description, :gst, :pan
+  json.extract! customer, :id, :name, :email, :mobile_number, :description, :pan
+  json.gstin customer.gst
 end
 
 json.company do
@@ -20,6 +21,9 @@ json.addresses do
     json.pin_code address.pin_code
     json.default address.default
     json.id address.id
+    json.landmark address.landmark
+    json.state_id address.state_id
+    json.state_name address.state&.name
   end
 end
 

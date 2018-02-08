@@ -14,5 +14,12 @@
 #
 
 class CustomerAttachment < ActiveRecord::Base
+  include Attachable
+
   belongs_to :customer
+
+  CONTENT_TYPES = {content_type: []}
+
+  has_attached_file :attached_file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
+  validates_attachment :attached_file, content_type: CONTENT_TYPES
 end

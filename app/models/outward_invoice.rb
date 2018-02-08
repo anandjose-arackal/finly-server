@@ -51,8 +51,6 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :gross_amount, class_name: "Amount"
   belongs_to :invoice_status, class_name: "OutwardInvoiceStatus"
   belongs_to :payment_term
-  belongs_to :shipping_address, class_name: "Address"
-  belongs_to :billing_address, class_name: "Address"
 
   # has_one :virtual_bank_account, as: :parent
   belongs_to :virtual_account, class_name: "VirtualBankAccount"
@@ -60,7 +58,7 @@ class OutwardInvoice < ActiveRecord::Base
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :payments, as: :parent
 
-  delegate :unpaid?, :partially_paid?, :closed?, :incomplete?, :saved?, :sent_to_customer?, to: :invoice_status
+  delegate :partially_paid?, :closed?, :incomplete?, :saved?, :cancelled?, to: :invoice_status
 
   accepts_nested_attributes_for :customer
   accepts_nested_attributes_for :amount
@@ -79,8 +77,8 @@ class OutwardInvoice < ActiveRecord::Base
   validates :invoice_items, presence: true, if: :valid_invoice?
   validates :invoice_number, presence: true, if: :valid_invoice?
   validates :customer_id, presence: true, if: :valid_invoice?
-  validates :billing_address_id, presence: true, if: :valid_invoice?
-  validates :shipping_address_id, presence: true, if: :valid_invoice?
+  validates :billing_address, presence: true, if: :valid_invoice?
+  validates :shipping_address, presence: true, if: :valid_invoice?
   validates :company_id, presence: true, if: :valid_invoice?
   validates :balance_due, presence: true, if: :valid_invoice?
   validates :discount_amount, presence: true, if: :valid_invoice?
@@ -90,6 +88,10 @@ class OutwardInvoice < ActiveRecord::Base
 
   scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
   scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:closed) }
+
+  scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid, :closed, :cancelled]) }
+  scope :invoice_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
+  scope :without_id, -> (id){ where.not id: id}
 
   before_save do
     if self.invoice_number.blank? && valid_invoice?
@@ -102,7 +104,15 @@ class OutwardInvoice < ActiveRecord::Base
   end
 
   def editable?
-    self.invoice_status_id == OutwardInvoiceStatus.id_for(:incomplete)
+    !(self.invoice_status_id == OutwardInvoiceStatus.id_for(:cancelled))
+  end
+
+  def line_items_total
+    self.invoice_items.joins(:amount).sum(:value)
+  end
+
+  def line_items_net_total
+    self.invoice_items.joins(:net_amount).sum(:value)
   end
 
   private
@@ -125,7 +135,5 @@ class OutwardInvoice < ActiveRecord::Base
     end
     number
   end
-
-
 
 end

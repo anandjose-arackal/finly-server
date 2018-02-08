@@ -1087,6 +1087,14 @@
 #                                                         DELETE /invoicing/virtual_bank_accounts/:id(.:format)                                             invoicing/virtual_bank_accounts#destroy
 #                            invoicing_categories_invoice GET    /invoicing/categories/invoice(.:format)                                                    invoicing/categories#invoice_categories
 #                 invoicing_categories_invoice_line_items GET    /invoicing/categories/invoice_line_items(.:format)                                         invoicing/categories#invoice_items_categories
+#                        invoicing_invoice_number_configs GET    /invoicing/invoice_number_configs(.:format)                                                invoicing/invoice_number_configs#index
+#                                                         POST   /invoicing/invoice_number_configs(.:format)                                                invoicing/invoice_number_configs#create
+#                     new_invoicing_invoice_number_config GET    /invoicing/invoice_number_configs/new(.:format)                                            invoicing/invoice_number_configs#new
+#                    edit_invoicing_invoice_number_config GET    /invoicing/invoice_number_configs/:id/edit(.:format)                                       invoicing/invoice_number_configs#edit
+#                         invoicing_invoice_number_config GET    /invoicing/invoice_number_configs/:id(.:format)                                            invoicing/invoice_number_configs#show
+#                                                         PATCH  /invoicing/invoice_number_configs/:id(.:format)                                            invoicing/invoice_number_configs#update
+#                                                         PUT    /invoicing/invoice_number_configs/:id(.:format)                                            invoicing/invoice_number_configs#update
+#                                                         DELETE /invoicing/invoice_number_configs/:id(.:format)                                            invoicing/invoice_number_configs#destroy
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)            admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)             admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                           admin_users/funds_load_requests#index
@@ -2427,11 +2435,11 @@ Rails.application.routes.draw do
     patch 'bulk_approve_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_approve_validate
     patch 'bulk_approve', to: 'bank_payment_requests#bulk_approve', as: :bulk_approve
     post 'download_selected', to: 'bank_payment_requests#download_selected', as: :download_selected
-    post 'download_selected_attachment', to: 'bank_payment_requests#download_selected_attachment', as: :download_selected_attachment
+    get 'download_selected_attachment', to: 'bank_payment_requests#download_selected_attachment', as: :download_selected_attachment
     post 'download_pending', to: 'bank_payment_requests#download_pending', as: :download_pending
-    post 'download_pending_attachment', to: 'bank_payment_requests#download_pending_attachment', as: :download_pending_attachment
+    get 'download_pending_attachment', to: 'bank_payment_requests#download_pending_attachment', as: :download_pending_attachment
     post 'download_all', to: 'bank_payment_requests#download_all', as: :download_all
-    post 'download_all_attachment', to: 'bank_payment_requests#download_all_attachment', as: :download_all_attachment
+    get 'download_all_attachment', to: 'bank_payment_requests#download_all_attachment', as: :download_all_attachment
 
     resources :bank_payment_requests do
       post 'comment', to: 'bank_payment_requests#comment', as: :comment
@@ -2497,6 +2505,8 @@ Rails.application.routes.draw do
 
     get 'categories/invoice', to: 'categories#invoice_categories'
     get 'categories/invoice_line_items', to: 'categories#invoice_items_categories'
+
+    resources :invoice_number_configs
   end
 
 
