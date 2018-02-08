@@ -31,6 +31,8 @@
 #  mobile_number           :string(255)
 #  override_invoice_number :boolean
 #  is_deleted              :boolean
+#  prefix                  :string(255)
+#  sequence                :string(255)
 #
 
 require 'test_helper'
