@@ -1,6 +1,6 @@
 class Invoicing::OutwardInvoicesController < ApplicationController
 
-  # before_action -> { finly_authorize! :web }
+  before_action -> { finly_authorize! :web }
 
   def index
     @result = Invoicing::Invoice::Index.(current_user, params)
