@@ -34,11 +34,12 @@ class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
       if self.invoice_number_config.sequence_start.present?
         last_invoice = user.company.outward_invoices.invoice_number_generated_in_finly.valid.reorder(created_at: :desc).first
         if last_invoice.present? && last_invoice.created_at > self.invoice_number_config.updated_at
-          numeric_section = last_invoice.invoice_number.gsub(/[^0-9a-z ]/i, '')
+          numeric_section = last_invoice.invoice_number.gsub(/[^0-9 ]/i, '')
           new_numeral = numeric_section
           iteration.times do
             new_numeral = new_numeral.succ
           end
+          debugger
           self.invoice_number += new_numeral.to_s
         elsif (last_invoice.present? && last_invoice.created_at <= self.invoice_number_config.updated_at) || last_invoice.blank?
           numeric_section = self.invoice_number_config.sequence_start
@@ -46,6 +47,7 @@ class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
           iteration.times do
             new_numeral = new_numeral.succ
           end
+          debugger
           self.invoice_number += new_numeral.to_s
         end
       end

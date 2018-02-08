@@ -30,9 +30,12 @@
 #  email                   :string(255)
 #  mobile_number           :string(255)
 #  override_invoice_number :boolean
+#  is_deleted              :boolean
 #
 
 class OutwardInvoice < ActiveRecord::Base
+
+  include SoftDeletable
 
   include MathUtil
 
@@ -98,6 +101,8 @@ class OutwardInvoice < ActiveRecord::Base
       generate_invoice_number
     end
   end
+
+  default_scope { unscope(:where) }
 
   def invoice_status_identifier
     self.invoice_status&.name

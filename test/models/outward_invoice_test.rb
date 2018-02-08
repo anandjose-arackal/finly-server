@@ -30,6 +30,7 @@
 #  email                   :string(255)
 #  mobile_number           :string(255)
 #  override_invoice_number :boolean
+#  is_deleted              :boolean
 #
 
 require 'test_helper'
