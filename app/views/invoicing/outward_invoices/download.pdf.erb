@@ -203,31 +203,39 @@
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Total </td>
       <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-total" colspan="1">INR <%= @result.invoice.line_items_net_total%></td>
     </tr>
+    <% if @result.invoice.discount_amount&.value > 0 %>
     <tr>
       <th class="plain" colspan="7"></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Discount </td>
       <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-discount" colspan="1">INR <%= @result.invoice.discount_amount&.value%></td>
     </tr>
+    <% end %>
+    <% if @result.invoice.tax_amount&.value > 0 %>
     <tr>
       <th class="plain" colspan="7"></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Tax </td>
       <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-tax" colspan="1">INR <%= @result.invoice.tax_amount&.value%></td>
     </tr>
+    <% end %>
     <!--<tr>-->
     <!--<th class="plain" colspan="6"></th>-->
     <!--<td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">TDS :</td>-->
     <!--<td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " class="plain line-items-data line-items-tds" colspan="2">INR 67</td>-->
     <!--</tr>-->
+    <% if @result.invoice.advance_amount&.value > 0 %>
     <tr>
       <th class="plain" colspan="7"></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Advance Payment </td>
       <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-advance-payment" colspan="1">INR <%= @result.invoice.advance_amount&.value%></td>
     </tr>
+    <% end %>
+    <% if @result.invoice.freight_amount&.value > 0 %>
     <tr>
       <th class="plain" colspan="7"></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Freight </td>
       <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-freight" colspan="1">INR <%= @result.invoice.freight_amount&.value %></td>
     </tr>
+    <% end %>
     <tr>
       <th class="plain" colspan="7"></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Roundoff </td>
@@ -237,6 +245,11 @@
       <th class="plain" colspan="7" ></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Balance Due </td>
       <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-balance-due" colspan="1">INR <%= @result.invoice.balance_due&.value %></td>
+    </tr>
+    <tr>
+      <th class="plain" colspan="7" ></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Paid Amount </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-balance-due" colspan="1">INR <%= @result.invoice.paid_amount&.value %></td>
     </tr>
     </tbody>
   </table>

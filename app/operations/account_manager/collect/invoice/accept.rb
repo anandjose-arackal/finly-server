@@ -28,40 +28,32 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
   def process
     # FIFO for all the invoices
     remaining_amount = self.transaction_amount
+    last_invoice = self.outward_invoices.first
     self.outward_invoices.each do |invoice|
-      due_amount = invoice.balance_due&.value - invoice.paid_amount&.value
+      due_amount = invoice.balance_due&.value
       if remaining_amount < due_amount
-        paid_amount = invoice.paid_amount&.value + self.transaction_amount
+        new_paid_amount = invoice.paid_amount&.value + remaining_amount
         balance_due = invoice.balance_due&.value - remaining_amount
         invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid),
-                       paid_amount_attributes: {id: invoice.paid_amount.id, value: paid_amount},
+                       paid_amount_attributes: {id: invoice.paid_amount.id, value: new_paid_amount},
                        balance_due_attributes: {id: invoice.balance_due.id, value: balance_due})
+        remaining_amount = 0
       elsif remaining_amount >= due_amount
-
-        invoice.paid_amount.update(value: invoice.balance_due.value)
+        invoice.paid_amount.update(value: (invoice.net_amount&.value + invoice.roundoff_amount)) # i.e. setting the paid amount as the total of what was supposed to be paid for this invoice
         invoice.balance_due.update(value: 0)
         invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:closed))
         remaining_amount = remaining_amount - due_amount
       end
+      last_invoice = invoice # setting this as the last invoice that was processed
       if remaining_amount <= 0
         break
       end
     end
     # if there's still any amount remaining in remaining_amount, add it to the last invoice's paid amount
     if remaining_amount > 0
-      last_invoice = self.outward_invoices.reorder(created_at: :desc).first
       paid_amount = last_invoice.paid_amount.value
       last_invoice.paid_amount.update(value: (paid_amount + remaining_amount))
     end
-    # # update the amount paid for this particular invoice, and status accordingly
-    # if self.virtual_account_transaction.transfer_amount&.to_f >= self.amount_due
-    #   amount_paid = self.outward_invoice.paid_amount&.value.to_f + self.virtual_account_transaction.transfer_amount&.to_f
-    #   self.outward_invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:closed))
-    #   self.outward_invoice.paid_amount.update(value: amount_paid)
-    # elsif self.virtual_account_transaction.transfer_amount&.to_f < self.amount_due
-    #   amount_paid = self.outward_invoice.paid_amount&.value.to_f + self.virtual_account_transaction.transfer_amount&.to_f
-    #   self.outward_invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid))
-    #   self.outward_invoice.paid_amount&.update(value: amount_paid)
     # end
   end
 
