@@ -24,6 +24,7 @@ class User::Verification::Otp::Verify < User::Verification::Otp::Base
   def validate
     if params[:verification_code].length < 6 or params[:verification_code].length > 6 or selected_user.otp != params[:verification_code]
       messages[:error] << 'Invalid verification code'
+      return
     end
   end
 
