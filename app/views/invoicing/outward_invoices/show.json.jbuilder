@@ -30,6 +30,7 @@ json.invoice do
     json.balance_due invoice.balance_due&.value
     json.paid_amount invoice.paid_amount&.value
     json.total_payable invoice.total_payable&.value
+    json.roundoff_total_enabled invoice.roundoff_total_enabled
   end
 
   json.invoice_items do
