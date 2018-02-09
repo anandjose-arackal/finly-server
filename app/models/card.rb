@@ -80,6 +80,7 @@ class Card < ActiveRecord::Base
     where hotlisted: false
     # end
   }
+  scope :pluck_proxy, -> { pluck :proxy }
   scope :include_hotlisted, -> { unscope(where: :hotlisted) }
 
   scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
@@ -232,6 +233,14 @@ class Card < ActiveRecord::Base
 
   def upgraded?
     self.card_status_id == CardStatus.id_for(:upgraded)
+  end
+
+  def atm_allowed?
+    upgraded? and card_restriction.channel_atm
+  end
+
+  def max_eligibility
+    upgraded? ? 50000 : 20000
   end
 
   def assigned?
