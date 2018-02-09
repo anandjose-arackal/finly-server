@@ -6,7 +6,7 @@ json.customer do
 end
 
 json.invoice do
-  json.invoice_number invoice.invoice_number
+  json.invoice_number invoice.invoice_number || @result.invoice_number
   json.created_at invoice.created_at
   json.date invoice.date
   json.due_date invoice.due_date

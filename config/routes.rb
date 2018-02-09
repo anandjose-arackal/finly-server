@@ -961,11 +961,11 @@
 #                     bank_transfer_bulk_approve_validate PATCH  /bank_transfer/bulk_approve_validate(.:format)                                             bank_transfer/bank_payment_requests#bulk_approve_validate
 #                              bank_transfer_bulk_approve PATCH  /bank_transfer/bulk_approve(.:format)                                                      bank_transfer/bank_payment_requests#bulk_approve
 #                         bank_transfer_download_selected POST   /bank_transfer/download_selected(.:format)                                                 bank_transfer/bank_payment_requests#download_selected
-#              bank_transfer_download_selected_attachment POST   /bank_transfer/download_selected_attachment(.:format)                                      bank_transfer/bank_payment_requests#download_selected_attachment
+#              bank_transfer_download_selected_attachment GET    /bank_transfer/download_selected_attachment(.:format)                                      bank_transfer/bank_payment_requests#download_selected_attachment
 #                          bank_transfer_download_pending POST   /bank_transfer/download_pending(.:format)                                                  bank_transfer/bank_payment_requests#download_pending
-#               bank_transfer_download_pending_attachment POST   /bank_transfer/download_pending_attachment(.:format)                                       bank_transfer/bank_payment_requests#download_pending_attachment
+#               bank_transfer_download_pending_attachment GET    /bank_transfer/download_pending_attachment(.:format)                                       bank_transfer/bank_payment_requests#download_pending_attachment
 #                              bank_transfer_download_all POST   /bank_transfer/download_all(.:format)                                                      bank_transfer/bank_payment_requests#download_all
-#                   bank_transfer_download_all_attachment POST   /bank_transfer/download_all_attachment(.:format)                                           bank_transfer/bank_payment_requests#download_all_attachment
+#                   bank_transfer_download_all_attachment GET    /bank_transfer/download_all_attachment(.:format)                                           bank_transfer/bank_payment_requests#download_all_attachment
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format)            bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)             bank_transfer/bank_payment_requests#review
 #               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)             bank_transfer/bank_payment_requests#credit
@@ -1058,6 +1058,7 @@
 #        invoicing_outward_invoice_update_virtual_account PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_virtual_account(.:format)           invoicing/outward_invoices#update_virtual_account
 #                        invoicing_outward_invoice_cancel PATCH  /invoicing/outward_invoices/:outward_invoice_id/cancel(.:format)                           invoicing/outward_invoices#cancel
 #                          invoicing_outward_invoice_save PATCH  /invoicing/outward_invoices/:outward_invoice_id/save(.:format)                             invoicing/outward_invoices#save
+#                      invoicing_outward_invoice_download GET    /invoicing/outward_invoices/:outward_invoice_id/download_pdf(.:format)                     invoicing/outward_invoices#download
 #                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#index
 #                                                         POST   /invoicing/outward_invoices(.:format)                                                      invoicing/outward_invoices#create
 #                           new_invoicing_outward_invoice GET    /invoicing/outward_invoices/new(.:format)                                                  invoicing/outward_invoices#new
@@ -2494,6 +2495,7 @@ Rails.application.routes.draw do
       patch 'update_virtual_account', to: 'outward_invoices#update_virtual_account', as: :update_virtual_account
       patch 'cancel', to: 'outward_invoices#cancel', as: :cancel
       patch 'save', to: 'outward_invoices#save', as: :save
+      get 'download_pdf', to: 'outward_invoices#download', as: :download
     end
     resources :customers do
       get 'virtual_accounts', to: 'customers#virtual_bank_accounts', as: :virtual_accounts

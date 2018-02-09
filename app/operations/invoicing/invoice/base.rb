@@ -8,10 +8,11 @@ class Invoicing::Invoice::Base < BaseOperation
 
   class Invoicing::Invoice::Base::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoice
+    attr_accessor :invoice, :invoice_number
 
     def init
       self.invoice = params[:invoice]
+      self.invoice_number = params[:invoice_number]
     end
 
   end

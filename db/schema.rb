@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180207114651) do
+ActiveRecord::Schema.define(version: 20180208093445) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1685,6 +1685,7 @@ ActiveRecord::Schema.define(version: 20180207114651) do
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
     t.integer  "field_configuration_id", limit: 4
+    t.boolean  "is_deleted"
   end
 
   create_table "field_multiselect_selection_items", force: :cascade do |t|
@@ -1879,6 +1880,14 @@ ActiveRecord::Schema.define(version: 20180207114651) do
   add_index "invoice_line_items", ["gst_type_id"], name: "index_invoice_line_items_on_gst_type_id", using: :btree
   add_index "invoice_line_items", ["invoice_id"], name: "index_invoice_line_items_on_invoice_id", using: :btree
   add_index "invoice_line_items", ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id", using: :btree
+
+  create_table "invoice_number_configs", force: :cascade do |t|
+    t.string   "prefix",         limit: 255, default: ""
+    t.string   "sequence_start", limit: 255
+    t.integer  "company_id",     limit: 4
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+  end
 
   create_table "invoices", force: :cascade do |t|
     t.integer  "address_id",         limit: 4
@@ -2375,36 +2384,36 @@ ActiveRecord::Schema.define(version: 20180207114651) do
   end
 
   create_table "outward_invoices", force: :cascade do |t|
-    t.integer  "customer_id",         limit: 4
+    t.integer  "customer_id",             limit: 4
     t.date     "date"
     t.date     "due_date"
-    t.integer  "amount_id",           limit: 4
-    t.decimal  "discount",                        precision: 10, scale: 5
-    t.decimal  "tax",                             precision: 10, scale: 5
-    t.integer  "discount_amount_id",  limit: 4
-    t.integer  "tax_amount_id",       limit: 4
-    t.integer  "original_amount_id",  limit: 4
-    t.integer  "paid_amount_id",      limit: 4
-    t.decimal  "advance",                         precision: 10, scale: 5
-    t.integer  "freight_amount_id",   limit: 4
-    t.integer  "tds_amount_id",       limit: 4
-    t.integer  "category_id",         limit: 4
-    t.integer  "balance_due_id",      limit: 4
-    t.decimal  "roundoff_amount",                 precision: 10, scale: 5
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
-    t.integer  "gross_amount_id",     limit: 4
-    t.integer  "policy_id",           limit: 4
-    t.integer  "billing_address_id",  limit: 4
-    t.integer  "shipping_address_id", limit: 4
-    t.integer  "invoice_status_id",   limit: 4
-    t.integer  "company_id",          limit: 4
-    t.string   "invoice_number",      limit: 255
-    t.integer  "gst_type_id",         limit: 4
+    t.integer  "amount_id",               limit: 4
+    t.integer  "discount_amount_id",      limit: 4
+    t.integer  "tax_amount_id",           limit: 4
+    t.integer  "paid_amount_id",          limit: 4
+    t.decimal  "advance",                               precision: 10, scale: 5
+    t.integer  "freight_amount_id",       limit: 4
+    t.integer  "balance_due_id",          limit: 4
+    t.decimal  "roundoff_amount",                       precision: 10, scale: 5
+    t.datetime "created_at",                                                     null: false
+    t.datetime "updated_at",                                                     null: false
+    t.integer  "policy_id",               limit: 4
+    t.integer  "invoice_status_id",       limit: 4
+    t.integer  "company_id",              limit: 4
+    t.string   "invoice_number",          limit: 255
+    t.integer  "gst_type_id",             limit: 4
     t.boolean  "inclusive_of_taxes"
-    t.integer  "advance_amount_id",   limit: 4
-    t.integer  "net_amount_id",       limit: 4
-    t.integer  "virtual_account_id",  limit: 4
+    t.integer  "advance_amount_id",       limit: 4
+    t.integer  "net_amount_id",           limit: 4
+    t.integer  "virtual_account_id",      limit: 4
+    t.text     "billing_address",         limit: 65535
+    t.text     "shipping_address",        limit: 65535
+    t.string   "email",                   limit: 255
+    t.string   "mobile_number",           limit: 255
+    t.boolean  "override_invoice_number"
+    t.boolean  "is_deleted"
+    t.string   "sequence_start",          limit: 255
+    t.string   "prefix",                  limit: 255
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
@@ -2412,10 +2421,8 @@ ActiveRecord::Schema.define(version: 20180207114651) do
   add_index "outward_invoices", ["customer_id"], name: "index_outward_invoices_on_customer_id", using: :btree
   add_index "outward_invoices", ["discount_amount_id"], name: "index_outward_invoices_on_discount_amount_id", using: :btree
   add_index "outward_invoices", ["freight_amount_id"], name: "index_outward_invoices_on_freight_amount_id", using: :btree
-  add_index "outward_invoices", ["original_amount_id"], name: "index_outward_invoices_on_original_amount_id", using: :btree
   add_index "outward_invoices", ["paid_amount_id"], name: "index_outward_invoices_on_paid_amount_id", using: :btree
   add_index "outward_invoices", ["tax_amount_id"], name: "index_outward_invoices_on_tax_amount_id", using: :btree
-  add_index "outward_invoices", ["tds_amount_id"], name: "index_outward_invoices_on_tds_amount_id", using: :btree
 
   create_table "payment_file_configurations", force: :cascade do |t|
     t.string   "file_format", limit: 255

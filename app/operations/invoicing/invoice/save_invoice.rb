@@ -1,7 +1,7 @@
 # this checks the invoice for all validations and eventually saves the invoice which can now be sent to the customer
 class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
-  attr_accessor :invoice, :invoice_parameters
+  attr_accessor :invoice, :invoice_parameters, :invoice_number
 
   def init
     id = params[:id] || params[:outward_invoice_id]
@@ -21,8 +21,8 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     end
 
     # checking if the invoice number is unique for this company
-    invoice_number = self.invoice_parameters[:invoice_number]
-    if invoice_number.present? && self.user.company.outward_invoices.without_id(self.invoice.id).pluck(:invoice_number).include?(invoice_number)
+    self.invoice_number = self.invoice_parameters[:invoice_number]
+    if self.invoice_number.present? && self.user.company.outward_invoices.without_id(self.invoice.id).pluck(:invoice_number).include?(self.invoice_number)
       add_message :error, "This invoice number is already taken. Please enter a new one"
     end
   end
@@ -53,6 +53,12 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       end
     end
 
+    # adding the prefix and sequence to the invoice
+    prefix = user.company.invoice_number_config.prefix
+    sequence = self.invoice_number&.gsub(prefix, '')
+    self.invoice_parameters[:prefix] = prefix
+    self.invoice_parameters[:sequence_start] = sequence
+
   end
 
   def process
@@ -73,9 +79,10 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       end
     end
 
-    if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved))
+    if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved), is_deleted: false)
       recalculate_totals
       self.invoice.update(paid_amount: Amount.create(value: 0, currency_id: 1)) # setting the paid amount as 0 at the time of saving
+      self.invoice.virtual_account&.update(purpose_id: VirtualAccountPurpose.id_for(:invoice))
     else
       add_message :error, self.invoice.errors.full_messages
       return
