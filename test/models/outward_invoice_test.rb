@@ -34,6 +34,7 @@
 #  sequence_start          :string(255)
 #  prefix                  :string(255)
 #  total_payable_id        :integer
+#  roundoff_total_enabled  :boolean
 #
 
 require 'test_helper'
