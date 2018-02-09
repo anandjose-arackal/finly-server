@@ -33,6 +33,7 @@
 #  is_deleted              :boolean
 #  sequence_start          :string(255)
 #  prefix                  :string(255)
+#  total_payable_id        :integer
 #
 
 class OutwardInvoice < ActiveRecord::Base
@@ -54,6 +55,7 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :advance_amount, class_name: "Amount"
   belongs_to :net_amount, class_name: "Amount"
   belongs_to :gross_amount, class_name: "Amount"
+  belongs_to :total_payable, class_name: "Amount"
   belongs_to :invoice_status, class_name: "OutwardInvoiceStatus"
   belongs_to :payment_term
 

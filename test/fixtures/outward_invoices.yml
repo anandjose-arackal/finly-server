@@ -33,6 +33,7 @@
 #  is_deleted              :boolean
 #  sequence_start          :string(255)
 #  prefix                  :string(255)
+#  total_payable_id        :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

@@ -58,6 +58,15 @@ class InvoiceCalculationUtils
       self.invoice.balance_due = Amount.new(value: self.balance_due_amount, currency_id: 1)
     end
 
+    # set total payable if it's an outward invoice
+    if self.invoice.is_a?(OutwardInvoice)
+      if self.invoice.total_payable.present?
+        self.invoice.total_payable.value = self.balance_due_amount
+      else
+        self.invoice.total_payable = Amount.new(value: self.balance_due_amount, currency_id: 1)
+      end
+    end
+
     # now calculating the final amount to be paid
     # assigning the final amount to the payment
     if payment.present?
