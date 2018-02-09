@@ -158,7 +158,7 @@ class FieldConfiguration < ActiveRecord::Base
     if field_type_id == FieldType.id_for(:drop_down)
       options = drop_down_items.exclude_deleted
     elsif field_type_id == FieldType.id_for(:multiselect)
-      options = multiselect_items
+      options = multiselect_items.non_deleted
     end
     {
         id: id,

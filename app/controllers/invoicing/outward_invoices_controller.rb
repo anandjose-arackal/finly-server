@@ -1,5 +1,6 @@
 class Invoicing::OutwardInvoicesController < ApplicationController
 
+  before_action :set_tokens_in_header, only: [:download]
   before_action -> { finly_authorize! :web }
 
   def index
@@ -87,6 +88,16 @@ class Invoicing::OutwardInvoicesController < ApplicationController
       respond response: :success, message: @result.messages[:success]
     else
       respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def download
+    @result = Invoicing::Invoice::DownloadInvoice.(current_user, params)
+    respond_to do |format|
+      format.pdf {
+          render pdf: "Invoice-#{@result.invoice.invoice_number}", layout: "pdf.html.erb", print_media_type: true
+      }
+      format.html {}
     end
   end
 

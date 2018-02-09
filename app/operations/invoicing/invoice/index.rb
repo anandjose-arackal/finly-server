@@ -13,7 +13,7 @@ class Invoicing::Invoice::Index < Invoicing::Invoice::Base
   end
 
   def init
-    self.invoices = user.company.outward_invoices
+    self.invoices = user.company.outward_invoices.exclude_deleted
   end
 
   def success

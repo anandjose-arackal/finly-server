@@ -1,6 +1,6 @@
 class Invoicing::Invoice::Create < Invoicing::Invoice::Base
 
-  attr_accessor :invoice_params, :invoice, :customer
+  attr_accessor :invoice_params, :invoice, :customer, :invoice_number
 
   def pre_validate
     if user.blank? || params.blank?
@@ -17,8 +17,12 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
 
   end
 
+  def pre_process
+
+  end
+
   def process
-    self.invoice = user.company.outward_invoices.build(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete))
+    self.invoice = user.company.outward_invoices.build(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete), is_deleted: true)
     if self.invoice.save
       if self.customer.present?
         # call the operation that assigns a particular invoice to a customer - ideally operation should success

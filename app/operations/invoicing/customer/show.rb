@@ -18,6 +18,13 @@ class Invoicing::Customer::Show < Invoicing::Customer::Base
     self.customer = user.company.customers.find_by(id: id)
   end
 
+  def validate
+    if self.customer.blank?
+      add_message :error, "Customer not found"
+      return
+    end
+  end
+
   def process
     # extracting payments made by the particular customer to this company
     # todo - the below is just a sample for how the call will look like

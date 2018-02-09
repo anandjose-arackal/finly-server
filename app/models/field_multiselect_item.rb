@@ -7,10 +7,14 @@
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
 #  field_configuration_id :integer
+#  is_deleted             :boolean
 #
 
 class FieldMultiselectItem < ActiveRecord::Base
+  include SoftDeletable
 
   belongs_to :field_configuration
 
+  default_scope { unscope(:where) }
+  
 end
