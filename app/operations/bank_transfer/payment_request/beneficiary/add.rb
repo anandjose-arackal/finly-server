@@ -126,6 +126,10 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
                   value: order_details[:freight],
                   currency_id: 1
               },
+              advance_amount_attributes: {
+                  value: order_details[:advance_amount],
+                  currency_id: 1
+              },
               invoice_number: order_details[:invoice_number],
               date: order_details[:invoice_date],
               due_date: order_details[:due_date],

@@ -54,7 +54,7 @@ class KycProcess::Company::Update < KycProcess::Company::Base
         else
           company_kyc.update(kyc_status_id: KycStatus.id_for(:incomplete))
         end
-      when CompanyType.id_for('Private Ltd Company')
+      when CompanyType.id_for('Private Ltd Company'), CompanyType.id_for('Ltd Company')
         if company_kyc.kyc_documents.pan_card.present? && company_kyc.kyc_documents.certificate_of_incorporation.present? && company_kyc.system_messages.empty?
           company_kyc.update(kyc_status_id: KycStatus.id_for(:submitted))
         else

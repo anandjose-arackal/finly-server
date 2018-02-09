@@ -93,19 +93,20 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       gst_type_id = item[:gst_type_id]
 
       # deciding tax based on whether invoice items were entered or not
-      tax_amount = discount_amount = amount = sub_total = 0
+      tax_amount = discount_amount = amount = sub_total = items_net_amount = 0
       if item[:invoice_items_attributes].present?
         item[:invoice_items_attributes].each do |line_item|
           tax_amount = line_item[:tax_amount].to_f
           discount_amount = line_item[:discount_amount].to_f
-          sub_total = line_item[:amount].to_f
+          amount = line_item[:amount].to_f
           if inclusive_of_taxes
-            amount += sub_total
+            sub_total = amount - discount_amount
           else
-            amount += sub_total - discount_amount + tax_amount
+            sub_total = amount - discount_amount + tax_amount
           end
+          items_net_amount += sub_total
         end
-        net_amount = amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        net_amount = items_net_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
       else
         tax_amount = item[:tax_amount].to_f
         discount_amount = item[:discount_amount].to_f
@@ -191,7 +192,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
       invoice_net_amount = net_amount
 
-      item_tax_total = item_discount_total = 0
+      item_tax_total = item_discount_total = items_net_total = item_amounts_total = 0
       if item&.dig(:invoice_items_attributes).present?
         # i.e. if the line items are present, recalculate the net amount
         invoice_net_amount = 0
@@ -209,12 +210,6 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
           item_tax_amount = invoice_item[:tax_amount].to_f
           item_hsn_sac = invoice_item[:hsn_sac]
 
-          if inclusive_of_taxes
-            total_amount = item_amount.to_f
-          else
-            total_amount = item_amount.to_f - item_discount_amount.to_f + item_tax_amount.to_f
-          end
-
           unless validate_rate item_tax, 1
             self.error_messages << "Invoice item tax rate is invalid"
             self.valid = false
@@ -231,6 +226,12 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
 
           # insert custom fields here
 
+          if inclusive_of_taxes
+            total_amount = item_amount - item_discount_amount
+          else
+            total_amount = item_amount - item_discount_amount + item_tax_amount
+          end
+
           invoice_items << {
             description: item_description,
             tax: item_tax,
@@ -243,16 +244,19 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
             amount: item_amount,
             gst_type_id: item_gst_type,
             total_amount: total_amount,
-            hsn_sac: item_hsn_sac
+            hsn_sac: item_hsn_sac,
+            net_total: total_amount
           }
 
-          invoice_net_amount += total_amount
+          items_net_total += total_amount
           item_tax_total += item_tax_amount
           item_discount_total += item_discount_amount
+          item_amounts_total += item_amount
+
         end
 
         # accounting for TDS, Advance and Freight in light of the new amount
-        invoice_net_amount = invoice_net_amount - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        invoice_net_amount = items_net_total.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
         # assigning discount amount, and tax amount as the sum of the individual amounts
         discount_amount = item_discount_total
         tax_amount = item_tax_total
@@ -273,7 +277,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
                                advance: advance, advance_amount: advance_amount, freight: freight, category_id: category_id, total_amount: amount,
                                invoice_number: invoice_number, invoice_date: invoice_date, due_date: due_date, custom_fields: {invoice: self.ghost_invoice.custom_fields},
                                net_amount: invoice_net_amount, invoice_items: invoice_items, roundoff_amount: roundoff_amount, balance_due: balance_due,
-                               item_tax_total: item_tax_total, item_discount_total: item_discount_total,
+                               item_taxes_total: item_tax_total, item_discounts_total: item_discount_total, items_net_total: items_net_total, item_amounts_total: item_amounts_total,
                                valid: self.valid, messages: self.error_messages}
     end
   end

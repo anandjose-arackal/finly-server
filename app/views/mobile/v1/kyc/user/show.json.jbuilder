@@ -1,4 +1,5 @@
 kyc = @result.individual_kyc
+json.require_photo kyc.require_photo?
 json.editable kyc.editable?
 json.retractable kyc.retractable?
 json.kyc_number kyc&.kyc_number

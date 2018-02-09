@@ -51,4 +51,8 @@ class KycProcess::User::Submit < KycProcess::User::Base
     self.individual_kyc.tracks.create track_params
   end
 
+  def post_process
+    self.individual_kyc.generate_single_kyc
+  end
+
 end

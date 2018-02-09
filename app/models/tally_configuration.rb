@@ -2,14 +2,27 @@
 #
 # Table name: tally_configurations
 #
-#  id           :integer          not null, primary key
-#  company_id   :integer          not null
-#  company_name :string(255)
-#  active       :boolean
-#  created_at   :datetime         not null
-#  updated_at   :datetime         not null
+#  id                   :integer          not null, primary key
+#  company_id           :integer          not null
+#  company_name         :string(255)
+#  active               :boolean
+#  created_at           :datetime         not null
+#  updated_at           :datetime         not null
+#  voucher_expense_date :string(255)
 #
 
 class TallyConfiguration < ActiveRecord::Base
   belongs_to :company
+
+  validates :voucher_expense_date, inclusion: {in: [nil, 'approval', 'expense']}
+
+  def date_for(expense)
+    case voucher_expense_date
+      when 'approval'
+        date = expense.report.approved_at&.strftime('%Y%m%d')
+        return date unless date.blank?
+    end
+    expense.date.strftime('%Y%m%d')
+  end
+
 end

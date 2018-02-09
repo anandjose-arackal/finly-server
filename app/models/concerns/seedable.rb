@@ -55,6 +55,7 @@ module Seedable
     # Generates a hash out of all the values in {name: id} format
     def as_hash
       values = {}
+      return {} unless ActiveRecord::Base.connection.table_exists? self.table_name
       self.all.each do |item|
         values[item.name] = item.id
       end

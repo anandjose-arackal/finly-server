@@ -65,6 +65,14 @@ json.array! @result.individual_kycs.each do |kyc|
         json.thumb kyc&.kyc_file_2&.url(:thumb)
       end
     end
+    if kyc&.combined_kyc.blank?
+      json.file_1 nil
+    else
+      json.file_1 do
+        json.original kyc&.combined_kyc&.url(:normal)
+        json.thumb kyc&.combined_kyc&.url(:thumb)
+      end
+    end
   end
   json.tracks do
     json.array! kyc.tracks do |track|

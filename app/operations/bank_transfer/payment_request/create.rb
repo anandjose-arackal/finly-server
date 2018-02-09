@@ -225,7 +225,6 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
           }
         end
       end
-
       bank_account = retrieve_bank_account order_details
       p[:payment_order_attributes][:payments_attributes] << {
           payment_type_id: PaymentType.id_for(:credit),
@@ -266,6 +265,10 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               },
               freight_amount_attributes: {
                   value: order_details[:freight],
+                  currency_id: 1
+              },
+              advance_amount_attributes: {
+                  value: order_details[:advance_amount],
                   currency_id: 1
               },
               roundoff_amount: order_details[:roundoff_amount],

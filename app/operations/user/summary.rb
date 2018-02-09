@@ -88,7 +88,7 @@ class User::Summary < User::Base
 
     summary[:current_user_name] = user.name
 
-    summary[:request_update_kyc] = true or (has_cards and not (user.individual_kyc.completed?))
+    summary[:request_update_kyc] = (has_cards and (user.individual_kyc.incomplete? or user.individual_kyc.retracted? or user.individual_kyc.rejected? ))
 
     summary[:personal] = {}
     summary[:personal][:unreported_expenses] = selected_user.expenses.unreported.count

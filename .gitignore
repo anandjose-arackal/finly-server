@@ -9,9 +9,10 @@
 /.bundle
 #Gemfile.lock
 /config/database.yml
-/config/finly_collect.yml
 /.byebug_history
 config/finly_collect.yml
+config/deploy/config/*
+lib/tasks/aws.rake
 
 # Ignore all logfiles and tempfiles.
 /log/*
@@ -26,8 +27,6 @@ config/finly_collect.yml
 /public/system/agreements/*
 /public/system/invoice_attachments/*
 /public/system/kyc_documents/*
-/public/system/invoice_attachments/*
-public/system/payment_order_attachments/attached_files/*
 public/system/vendor_attachments/*
 /public/common/files/temp_files/*
 /sample_atm_transactions.txt
@@ -52,3 +51,4 @@ Thumbs.db
 dump.rdb
 .idea/
 config/secure_storage_config.yml
+config/deploy/config/*

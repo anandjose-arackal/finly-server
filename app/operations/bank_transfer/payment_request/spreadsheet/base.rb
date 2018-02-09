@@ -12,6 +12,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
      "Beneficiary IFSC",
      "Payment Mode",
      "Initiated By",
+     "Initiator Email",
      "Status",
      "Awaiting Action From",
      "Invoice Number",
@@ -31,7 +32,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
   def retrieve_data
     return [] if bank_payment_requests.empty?
     content = []
-    bank_payment_requests.each do |pr|
+    bank_payment_requests.include_for_data_retrieval.each do |pr|
       po = pr.payment_order
       po.payments.each do |payment|
         payment_details = [
@@ -43,6 +44,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
             payment.receiving_account.ifsc,
             payment.payment_mode&.upcase,
             payment.initiating_user.name,
+            payment.initiating_user.email,
             payment.payment_order.bank_payment_request.status&.name&.humanize,
             payment.payment_order.bank_payment_request.controlling_user&.name,
             payment.invoice&.invoice_number,

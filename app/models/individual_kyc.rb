@@ -99,6 +99,18 @@ class IndividualKyc < ActiveRecord::Base
     KycStatus.ids_for([:processing, :submitted]).include?(self.kyc_status_id)
   end
 
+  def incomplete?
+    KycStatus.id_for(:incomplete) == self.kyc_status_id
+  end
+
+  def retracted?
+    KycStatus.id_for(:retracted) == self.kyc_status_id
+  end
+
+  def rejected?
+    KycStatus.id_for(:rejected) == self.kyc_status_id
+  end
+
   def completed?
     KycStatus.id_for(:completed) == self.kyc_status_id
   end
@@ -113,7 +125,7 @@ class IndividualKyc < ActiveRecord::Base
 
   def generate_single_kyc
     return false unless (self.aadhar_front.present? and self.aadhar_back.present? and
-        self.photo.present? and self.signature.present?)
+        self.signature.present?)
     view = ActionView::Base.new(ActionController::Base.view_paths)
     view.extend ApplicationHelper
     html_string = view.render(file: 'kyc/user/kyc_template.html.erb', locals: {kyc: self})
@@ -125,9 +137,18 @@ class IndividualKyc < ActiveRecord::Base
   end
 
   def can_submit?
+    if require_photo?
+      photo_check = self.photo.present?
+    else
+      photo_check = true
+    end
     (self.kyc_file_1.present? or (self.aadhar_front.present? and self.aadhar_back.present? and
-        self.photo.present? and self.signature.present?)) and
+        photo_check and self.signature.present?)) and
         self.kyc_number.present?
+  end
+
+  def require_photo?
+    [nil, 'HDFC'].include?(self.user.company.configuration.bank_type)
   end
 
 end

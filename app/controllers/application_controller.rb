@@ -135,6 +135,7 @@ class ApplicationController < ActionController::Base
             format.js {}
             format.json {}
             format.html {}
+            format.xls {}
           end
         end
       else
@@ -142,6 +143,7 @@ class ApplicationController < ActionController::Base
           format.js { render 'layouts/application' }
           format.json { render 'layouts/application' }
           format.html {}
+          format.xls {}
         end
       end
     else
@@ -226,6 +228,13 @@ class ApplicationController < ActionController::Base
 
   def after_sign_out_path_for(resource)
     root_url
+  end
+
+  def authorize_ip(authorized_list)
+    authorized_list = [authorized_list] if authorized_list.class.name == String.name
+    unless authorized_list.include?(request.remote_ip)
+      head 403
+    end
   end
 
   def whitelisted?(ip, type_id)
