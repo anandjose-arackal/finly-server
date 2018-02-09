@@ -34,9 +34,15 @@ class KycProcess::User::Update < KycProcess::User::Base
     ## DEPRECATED START ##
     params[:id_proof]= self.params[:individual_kyc][:id_proof] if self.params[:individual_kyc][:id_proof].present?
     params[:address_proof] = self.params[:individual_kyc][:address_proof] if self.params[:individual_kyc][:address_proof].present?
-    ## DEPRECATED END ##
     params[:kyc_file_1]= self.params[:individual_kyc][:kyc_file_1] if self.params[:individual_kyc][:kyc_file_1].present?
     params[:kyc_file_2] = self.params[:individual_kyc][:kyc_file_2] if self.params[:individual_kyc][:kyc_file_2].present?
+    ## DEPRECATED END ##
+
+    params[:aadhar_front] = self.params[:individual_kyc][:aadhar_front] if self.params[:individual_kyc][:aadhar_front].present?
+    params[:aadhar_back]= self.params[:individual_kyc][:aadhar_back] if self.params[:individual_kyc][:aadhar_back].present?
+    params[:photo] = self.params[:individual_kyc][:photo] if self.params[:individual_kyc][:photo].present?
+    params[:signature] = self.params[:individual_kyc][:signature] if self.params[:individual_kyc][:signature].present?
+
     params
   end
 

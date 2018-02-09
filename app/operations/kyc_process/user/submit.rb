@@ -3,9 +3,35 @@ class KycProcess::User::Submit < KycProcess::User::Base
   def validate
     super
     return if has_errors?
-    if self.individual_kyc.type_id.blank? or self.individual_kyc.kyc_file_1.blank? or self.individual_kyc.kyc_number.blank?
+    unless self.individual_kyc.can_submit?
       add_message :error, 'Please complete your KYC Details before submitting'
       return
+    end
+    validate_user_profile
+  end
+
+  def validate_user_profile
+    user_profile = self.individual_kyc.user.profile
+    unless user_profile.date_of_birth.present?
+      add_message :error, 'Date of birth cannot be blank'
+    end
+    unless user_profile.gender.present?
+      add_message :error, 'Gender has not been selected'
+    end
+    unless user_profile.address_1.present?
+      add_message :error, 'Address 1 cannot be blank'
+    end
+    unless user_profile.address_2.present?
+      add_message :error, 'Address 2 cannot be blank'
+    end
+    unless user_profile.city.present?
+      add_message :error, 'City cannot be blank'
+    end
+    unless user_profile.state_id.present?
+      add_message :error, 'State has not been selected'
+    end
+    unless user_profile.pin_code.present?
+      add_message :error, 'Pin Code cannot be blank'
     end
   end
 
@@ -23,6 +49,10 @@ class KycProcess::User::Submit < KycProcess::User::Base
         action_id: IndividualKycTrackAction.id_for(:submit)
     }
     self.individual_kyc.tracks.create track_params
+  end
+
+  def post_process
+    self.individual_kyc.generate_single_kyc
   end
 
 end
