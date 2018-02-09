@@ -25,9 +25,7 @@ class InvoiceCalculationUtils
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
 
     if self.roundoff_amount != 0
-      if (self.invoice.is_a?(OutwardInvoice) && self.invoice.roundoff_total_enabled) || self.invoice.is_a?(Invoice)
-        self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount), 0
-      end
+      self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount), 0
     else
       self.balance_due_amount = precision_value self.net_amount, 0
     end
