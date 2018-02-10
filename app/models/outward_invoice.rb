@@ -94,7 +94,7 @@ class OutwardInvoice < ActiveRecord::Base
   validates :discount_amount, presence: true, if: :valid_invoice?
   validates :tax_amount, presence: true, if: :valid_invoice?
   validates :net_amount, presence: true, if: :valid_invoice?
-  validates :gst_type_id, presence: true, if: :valid_invoice?
+  validate :gst_type_selection, if: :valid_invoice?
 
   scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
   scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:closed) }
@@ -147,6 +147,14 @@ class OutwardInvoice < ActiveRecord::Base
       end
     end
     number
+  end
+
+  def gst_type_selection
+    if self.tax_amount&.value > 0
+      if self.gst_type_id.blank?
+        errors.add(:gst_type, "cannot be blank")
+      end
+    end
   end
 
 end
