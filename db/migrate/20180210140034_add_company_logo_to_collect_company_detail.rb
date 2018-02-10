@@ -1,5 +1,5 @@
 class AddCompanyLogoToCollectCompanyDetail < ActiveRecord::Migration
   def change
-    add_attachment :collect_company_details, :company_logo
+    # add_attachment :collect_company_details, :company_logo
   end
 end

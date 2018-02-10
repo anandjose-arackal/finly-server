@@ -4,6 +4,7 @@ class CreateCollectCompanyDetails < ActiveRecord::Migration
       t.string :gst
       t.string :pan
       t.references :company, index: true, foreign_key: true
+      t.attachment :company_logo
 
       t.timestamps null: false
     end
