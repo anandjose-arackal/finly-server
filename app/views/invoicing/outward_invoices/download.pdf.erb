@@ -2,7 +2,7 @@
 <html>
 <head>
 
-  <title>Invoice</title>
+  <title>Invoicing System</title>
 </head>
 <body>
 
@@ -11,6 +11,17 @@
   <div class="invoice-title container-fluid">
     <span> <b> INVOICE </b> </span>
   </div>
+
+  <% if @result.invoice.cancelled? %>
+  <!-- Add your own logic when to display this cancelled invoice image -->
+  <div style="width: 100%; height: auto; overflow: hidden;text-align: center;">
+
+    <%= wicked_pdf_image_tag('/common/images/cancelled-dark.png', style: "width: 200px; height: auto;") %>
+    <!--<img src='/home/aditya26381/dev/work/finly-web/public/common/images/cancelled-dark.png' style="width: 200px; height: auto;">-->
+
+  </div>
+  <% end %>
+  <!--  -->
 
   <div class="float-container">
     <div class=" company-name company-address">
@@ -31,7 +42,7 @@
     </div>
 
     <div class="company-logo-container">
-      <%= wicked_pdf_image_tag('/common/images/company_logo.png', style: "width: 50%; height: 50%") %>
+      <img src="/home/aditya26381/dev/work/finly-web/public/common/images/company_logo.png" class="company-logo">
     </div>
   </div>
 
@@ -76,8 +87,6 @@
 
   <div style="width: 50%; float: left; height: auto; text-align: right;">
     <!-- Write a if else logic which displays the image only if the invoice has status as 'cancelled' -->
-    <%= wicked_pdf_image_tag('/common/images/rejected.png', style: "width: 200px; height: auto") %>
-    <!--<img src="/common/images/rejected.png" class="invoice-status">-->
   </div>
 
 
@@ -253,11 +262,11 @@
 
 </div>
 
-<div class="legal-statement" id="legalcopy">
+<!-- <div class="legal-statement" id="legalcopy">
   <p class="legal">Designed By <span style="font-weight: bold;">Finly</span>, With  <span style="color: red; font-weight: bold; font-size: 18px;"> &hearts;</span>  In <span style="font-weight: bold;">Bangalore, India.</span>
-    <!--Payment is expected within 31 days; please process this invoice within that time. There will be a 5% interest charge per month on late invoices. Terms and condition are subject to market risks.-->
+
   </p>
-</div>
+</div> -->
 
 
 
@@ -272,7 +281,7 @@
     margin-bottom: 1%;
     text-align: center;
     font-size: 14px;
-    /*letter-spacing: 2px;*/
+    letter-spacing: 2px;
     color: #7b7b7b;
 
   }
@@ -397,7 +406,7 @@
     border-bottom: 1px dotted;
     font-size: 22px;
     letter-spacing: 0px;
-    margin-bottom: 2.5%;
+    margin-bottom: 10px;
     text-align: center;
     padding: 0.1%;
     padding-top: 0.2%;
