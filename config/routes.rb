@@ -1099,6 +1099,8 @@
 #   invoicing_company_configuration_update_credit_account PATCH  /invoicing/company_configurations/:company_configuration_id/update_credit_account(.:format)  invoicing/company_configurations#update_credit_account
 #  invoicing_company_configuration_update_collect_details PATCH  /invoicing/company_configurations/:company_configuration_id/update_collect_details(.:format) invoicing/company_configurations#update_collect_details
 #     invoicing_company_configuration_update_collect_logo PATCH  /invoicing/company_configurations/:company_configuration_id/update_collect_logo(.:format)    invoicing/company_configurations#update_collect_logo
+#     invoicing_company_configuration_show_collect_detail GET    /invoicing/company_configurations/:company_configuration_id/show_collect_detail(.:format)    invoicing/company_configurations#show_collect_detail
+#     invoicing_company_configuration_show_credit_account GET    /invoicing/company_configurations/:company_configuration_id/show_credit_account(.:format)    invoicing/company_configurations#show_credit_account
 #                        invoicing_company_configurations GET    /invoicing/company_configurations(.:format)                                                  invoicing/company_configurations#index
 #                                                         POST   /invoicing/company_configurations(.:format)                                                  invoicing/company_configurations#create
 #                     new_invoicing_company_configuration GET    /invoicing/company_configurations/new(.:format)                                              invoicing/company_configurations#new
@@ -2524,6 +2526,8 @@ Rails.application.routes.draw do
       patch 'update_credit_account', to: 'company_configurations#update_credit_account'
       patch 'update_collect_details', to: 'company_configurations#update_collect_details'
       patch 'update_collect_logo', to: 'company_configurations#update_collect_logo'
+      get 'show_collect_detail', to: 'company_configurations#show_collect_detail'
+      get 'show_credit_account', to: 'company_configurations#show_credit_account'
     end
   end
 

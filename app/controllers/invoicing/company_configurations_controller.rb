@@ -27,4 +27,14 @@ class Invoicing::CompanyConfigurationsController < ApplicationController
       respond(response: :failure, message: @result.messages[:error])
     end
   end
+
+  def show_credit_account
+    @result = Company::Collect::CollectCreditAccount::Show.(current_user, params)
+    respond
+  end
+
+  def show_collect_details
+    @result = Company::Collect::CompanyDetails::Show.(current_user, params)
+    respond
+  end
 end
