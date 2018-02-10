@@ -71,16 +71,6 @@
       <div class="order-date">
         <span class="fixed-span">  Due Date  &nbsp;  </span> <span><b><%= @result.invoice.due_date%> </b></span>
       </div>
-      <% if @result.invoice.customer.pan.present? %>
-          <div class="pan-no">
-            <span class="fixed-span">  PAN Number  &nbsp;  </span> <span><b><%= @result.invoice.customer.pan%></b></span>
-          </div>
-      <% end %>
-      <% if @result.invoice.customer.gst.present? %>
-          <div class="gst-registered">
-            <span class="fixed-span">  GSTIN  &nbsp;  </span> <span><b><%= @result.invoice.customer.gst%></b></span>
-          </div>
-      <% end %>
     </div>
 
   </div>
@@ -112,6 +102,16 @@
       <div class="invoice-number">
         <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @result.invoice.date %></b></span>
       </div>
+      <% if @result.invoice.customer.pan.present? %>
+          <div class="pan-no">
+            <span class="fixed-span">  PAN Number  &nbsp;  </span> <span><b><%= @result.invoice.customer.pan%></b></span>
+          </div>
+      <% end %>
+      <% if @result.invoice.customer.gst.present? %>
+          <div class="gst-registered">
+            <span class="fixed-span">  GSTIN  &nbsp;  </span> <span><b><%= @result.invoice.customer.gst%></b></span>
+          </div>
+      <% end %>
 
 
 
@@ -166,7 +166,7 @@
   </div>
 
   <% if @result.invoice.virtual_account.present? %>
-      <div style="font-size: 11px; width: 100%; height: auto; text-align: left; overflow: hidden; margin-top: 60px;">
+      <div style="font-size: 11px; width: 100%; height: auto; text-align: left; overflow: hidden; margin-top: 80px;">
         <div class="address-title">
           Invoice Payment : <br>
         </div>
@@ -263,7 +263,7 @@
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Roundoff </td>
       <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-roundoff" colspan="1">INR <%= @result.invoice.roundoff_amount%></td>
     </tr>
-    <% if @result.invoice.partially_paid? || @result.invoice.closed? %>
+    <% if @result.invoice.partially_paid? || @result.invoice.closed? || @result.invoice.saved? %>
     <tr>
       <th colspan="6" ></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Balance Due </td>
