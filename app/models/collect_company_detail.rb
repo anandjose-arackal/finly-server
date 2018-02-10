@@ -1,0 +1,27 @@
+# == Schema Information
+#
+# Table name: collect_company_details
+#
+#  id                        :integer          not null, primary key
+#  gst                       :string(255)
+#  pan                       :string(255)
+#  company_id                :integer
+#  created_at                :datetime         not null
+#  updated_at                :datetime         not null
+#  company_logo_file_name    :string(255)
+#  company_logo_content_type :string(255)
+#  company_logo_file_size    :integer
+#  company_logo_updated_at   :datetime
+#
+
+class CollectCompanyDetail < ActiveRecord::Base
+  include Attachable
+
+  belongs_to :company
+
+  has_attached_file :company_logo, styles: lambda { |a| a.instance.check_file_type },
+                    default_url: '/assets/:style/missing.png'
+  validates_attachment :company_logo, content_type: {
+      content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)
+  }
+end
