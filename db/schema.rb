@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180209102521) do
+ActiveRecord::Schema.define(version: 20180209153900) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1835,6 +1835,26 @@ ActiveRecord::Schema.define(version: 20180209102521) do
     t.text     "admin_note",                 limit: 65535
     t.datetime "submitted_on"
     t.datetime "upgraded_on"
+    t.string   "aadhar_front_file_name",     limit: 255
+    t.string   "aadhar_front_content_type",  limit: 255
+    t.integer  "aadhar_front_file_size",     limit: 4
+    t.datetime "aadhar_front_updated_at"
+    t.string   "aadhar_back_file_name",      limit: 255
+    t.string   "aadhar_back_content_type",   limit: 255
+    t.integer  "aadhar_back_file_size",      limit: 4
+    t.datetime "aadhar_back_updated_at"
+    t.string   "photo_file_name",            limit: 255
+    t.string   "photo_content_type",         limit: 255
+    t.integer  "photo_file_size",            limit: 4
+    t.datetime "photo_updated_at"
+    t.string   "signature_file_name",        limit: 255
+    t.string   "signature_content_type",     limit: 255
+    t.integer  "signature_file_size",        limit: 4
+    t.datetime "signature_updated_at"
+    t.string   "combined_kyc_file_name",     limit: 255
+    t.string   "combined_kyc_content_type",  limit: 255
+    t.integer  "combined_kyc_file_size",     limit: 4
+    t.datetime "combined_kyc_updated_at"
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
@@ -3330,7 +3350,7 @@ ActiveRecord::Schema.define(version: 20180209102521) do
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
     t.date     "date_of_birth"
-    t.string   "gender",              limit: 255, null: false
+    t.string   "gender",              limit: 255
     t.string   "address_1",           limit: 255
     t.string   "address_2",           limit: 255
     t.string   "city",                limit: 255
@@ -3467,6 +3487,7 @@ ActiveRecord::Schema.define(version: 20180209102521) do
     t.integer  "otp_request_type_id",    limit: 4
     t.boolean  "default_password",                   default: false
     t.boolean  "point_of_contact",                   default: false
+    t.integer  "otp_attempts",           limit: 4,   default: 0
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
