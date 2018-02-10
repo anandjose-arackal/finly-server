@@ -46,6 +46,7 @@
 #  otp_request_type_id    :integer
 #  default_password       :boolean          default(FALSE)
 #  point_of_contact       :boolean          default(FALSE)
+#  otp_attempts           :integer          default(0)
 #
 
 require 'test_helper'

@@ -252,11 +252,13 @@
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Roundoff </td>
       <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-roundoff" colspan="1">INR <%= @result.invoice.roundoff_amount%></td>
     </tr>
+    <% if @result.invoice.partially_paid? || @result.invoice.closed? %>
     <tr>
       <th colspan="6" ></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Balance Due </td>
       <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-balance-due" colspan="1">INR <%= @result.invoice.balance_due&.value %></td>
     </tr>
+    <% end %>
     </tbody>
   </table>
 

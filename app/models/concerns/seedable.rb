@@ -57,7 +57,7 @@ module Seedable
       values = {}
       return {} unless ActiveRecord::Base.connection.table_exists? self.table_name
       self.all.each do |item|
-        values[item.name.downcase] = item.id
+        values[item.name] = item.id
       end
       values.with_indifferent_access
     end
