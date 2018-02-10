@@ -12,6 +12,17 @@
     <span> <b> INVOICE </b> </span>
   </div>
 
+  <% if @result.invoice.cancelled? %>
+  <!-- Add your own logic when to display this cancelled invoice image -->
+  <div style="width: 100%; height: auto; overflow: hidden;text-align: center;">
+
+    <%= wicked_pdf_image_tag('/common/images/cancelled-dark.png', style: "width: 200px; height: auto;") %>
+    <!--<img src='/home/aditya26381/dev/work/finly-web/public/common/images/cancelled-dark.png' style="width: 200px; height: auto;">-->
+
+  </div>
+  <% end %>
+  <!--  -->
+
   <div class="float-container">
     <div class=" company-name company-address">
       <b> Finly Spend and Expense Management </b>,
@@ -31,43 +42,43 @@
     </div>
 
     <div class="company-logo-container">
-      <img src="company_logo.png" class="company-logo">
+      <img src="/home/aditya26381/dev/work/finly-web/public/common/images/company_logo.png" class="company-logo">
     </div>
   </div>
 
 </div>
 <div class="first-container">
-  <div class="address-title">
-    Invoice Details : <br>
-  </div>
-  <div class="customer-block">
 
-    <div class="invoice-number">
-      <span class="fixed-span">  Invoice Number  &nbsp;  </span> <span><b><%= @result.invoice.invoice_number%></b></span>
+  <div style="width: 50%; height: auto; float: left;">
+
+    <div class="address-title">
+      Invoice Details : <br>
     </div>
-    <!--<div class="invoice-number">-->
-    <!--<span> <b> Invoice Details : &nbsp; </b> </span> <span>KA-12368763471-1238</span>-->
-    <!--</div>-->
-    <div class="invoice-date">
-      <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @result.invoice.date%></b></span>
+    <div class="customer-block">
+
+      <div class="invoice-number">
+        <span class="fixed-span">  Invoice Number  &nbsp;  </span> <span><b><%= @result.invoice.invoice_number%></b></span>
+      </div>
+      <!--<div class="invoice-number">-->
+      <!--<span> <b> Invoice Details : &nbsp; </b> </span> <span>KA-12368763471-1238</span>-->
+      <!--</div>-->
+      <div class="invoice-date">
+        <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @result.invoice.date%></b></span>
+      </div>
+      <!--<div class="order-number">-->
+      <!--<span> <b> Order Number : &nbsp; </b> </span> <span>407-213879821-213</span>-->
+      <!--</div>-->
+      <div class="order-date">
+        <span class="fixed-span">  Due Date  &nbsp;  </span> <span><b><%= @result.invoice.due_date%> </b></span>
+      </div>
     </div>
-    <!--<div class="order-number">-->
-    <!--<span> <b> Order Number : &nbsp; </b> </span> <span>407-213879821-213</span>-->
-    <!--</div>-->
-    <div class="order-date">
-      <span class="fixed-span">  Due Date  &nbsp;  </span> <span><b><%= @result.invoice.due_date%> </b></span>
-    </div>
-    <% if @result.invoice.customer.pan.present? %>
-        <div class="pan-no">
-          <span class="fixed-span">  PAN Number  &nbsp;  </span> <span><b><%= @result.invoice.customer.pan%></b></span>
-        </div>
-    <% end %>
-    <% if @result.invoice.customer.gst.present? %>
-        <div class="gst-registered">
-          <span class="fixed-span">  GSTIN  &nbsp;  </span> <span><b><%= @result.invoice.customer.gst%></b></span>
-        </div>
-    <% end %>
+
   </div>
+
+  <div style="width: 50%; float: left; height: auto; text-align: right;">
+    <!-- Write a if else logic which displays the image only if the invoice has status as 'cancelled' -->
+  </div>
+
 
 </div>
 
@@ -91,6 +102,16 @@
       <div class="invoice-number">
         <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @result.invoice.date %></b></span>
       </div>
+      <% if @result.invoice.customer.pan.present? %>
+          <div class="pan-no">
+            <span class="fixed-span">  PAN Number  &nbsp;  </span> <span><b><%= @result.invoice.customer.pan%></b></span>
+          </div>
+      <% end %>
+      <% if @result.invoice.customer.gst.present? %>
+          <div class="gst-registered">
+            <span class="fixed-span">  GSTIN  &nbsp;  </span> <span><b><%= @result.invoice.customer.gst%></b></span>
+          </div>
+      <% end %>
 
 
 
@@ -143,8 +164,9 @@
       <!--</div>-->
     </div>
   </div>
+
   <% if @result.invoice.virtual_account.present? %>
-      <div style="font-size: 11px; width: 100%; height: auto; text-align: left; overflow: hidden; margin-top: 80px">
+      <div style="font-size: 11px; width: 100%; height: auto; text-align: left; overflow: hidden; margin-top: 80px;">
         <div class="address-title">
           Invoice Payment : <br>
         </div>
@@ -199,22 +221,22 @@
         </tr>
     <% end %>
     <tr>
-      <th class="plain" colspan="7"></th>
-      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Total </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-total" colspan="1">INR <%= @result.invoice.line_items_net_total%></td>
+      <th colspan="6"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Total </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-total" colspan="1">INR <%= @result.invoice.line_items_net_total%></td>
     </tr>
     <% if @result.invoice.discount_amount&.value > 0 %>
     <tr>
-      <th class="plain" colspan="7"></th>
-      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Discount </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-discount" colspan="1">INR <%= @result.invoice.discount_amount&.value%></td>
+      <th colspan="6"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Discount </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-discount" colspan="1">INR <%= @result.invoice.discount_amount&.value%></td>
     </tr>
     <% end %>
     <% if @result.invoice.tax_amount&.value > 0 %>
     <tr>
-      <th class="plain" colspan="7"></th>
-      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Tax </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-tax" colspan="1">INR <%= @result.invoice.tax_amount&.value%></td>
+      <th colspan="6"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class=" line-items-title" colspan="2">Tax </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-tax" colspan="1">INR <%= @result.invoice.tax_amount&.value%></td>
     </tr>
     <% end %>
     <!--<tr>-->
@@ -224,33 +246,28 @@
     <!--</tr>-->
     <% if @result.invoice.advance_amount&.value > 0 %>
     <tr>
-      <th class="plain" colspan="7"></th>
-      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Advance Payment </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-advance-payment" colspan="1">INR <%= @result.invoice.advance_amount&.value%></td>
+      <th colspan="6"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class=" line-items-title" colspan="2">Advance Payment </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-advance-payment" colspan="1">INR <%= @result.invoice.advance_amount&.value%></td>
     </tr>
     <% end %>
     <% if @result.invoice.freight_amount&.value > 0 %>
     <tr>
-      <th class="plain" colspan="7"></th>
-      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Freight </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-freight" colspan="1">INR <%= @result.invoice.freight_amount&.value %></td>
+      <th colspan="6"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Freight </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-freight" colspan="1">INR <%= @result.invoice.freight_amount&.value %></td>
     </tr>
     <% end %>
     <tr>
-      <th class="plain" colspan="7"></th>
-      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Roundoff </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-roundoff" colspan="1">INR <%= @result.invoice.roundoff_amount%></td>
+      <th colspan="6"></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Roundoff </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-roundoff" colspan="1">INR <%= @result.invoice.roundoff_amount%></td>
     </tr>
+    <% if @result.invoice.partially_paid? || @result.invoice.closed? || @result.invoice.saved? %>
     <tr>
-      <th class="plain" colspan="7" ></th>
-      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Balance Due </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-balance-due" colspan="1">INR <%= @result.invoice.balance_due&.value %></td>
-    </tr>
-    <% if @result.invoice.partially_paid? || @result.invoice.closed? %>
-    <tr>
-      <th class="plain" colspan="7" ></th>
-      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="plain line-items-title" colspan="2">Paid Amount </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="plain line-items-data line-items-balance-due" colspan="1">INR <%= @result.invoice.paid_amount&.value %></td>
+      <th colspan="6" ></th>
+      <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Balance Due </td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-balance-due" colspan="1">INR <%= @result.invoice.balance_due&.value %></td>
     </tr>
     <% end %>
     </tbody>
@@ -258,11 +275,11 @@
 
 </div>
 
-<div class="legal-statement" id="legalcopy">
-  <p class="legal"><strong>Thank you for your business! </strong>
-    <!--Payment is expected within 31 days; please process this invoice within that time. There will be a 5% interest charge per month on late invoices. Terms and condition are subject to market risks.-->
+<!-- <div class="legal-statement" id="legalcopy">
+  <p class="legal">Designed By <span style="font-weight: bold;">Finly</span>, With  <span style="color: red; font-weight: bold; font-size: 18px;"> &hearts;</span>  In <span style="font-weight: bold;">Bangalore, India.</span>
+
   </p>
-</div>
+</div> -->
 
 
 
@@ -276,7 +293,9 @@
     margin-top: 5%;
     margin-bottom: 1%;
     text-align: center;
-    font-size: 12px;
+    font-size: 14px;
+    letter-spacing: 2px;
+    color: #7b7b7b;
 
   }
 
@@ -322,6 +341,12 @@
   {
     margin: 10px;
     width: calc(100% - 20px);
+  }
+
+  .invoice-status
+  {
+    width: 200px;
+    height: auto;
   }
 
   .address-title
@@ -394,7 +419,7 @@
     border-bottom: 1px dotted;
     font-size: 22px;
     letter-spacing: 0px;
-    margin-bottom: 2.5%;
+    margin-bottom: 10px;
     text-align: center;
     padding: 0.1%;
     padding-top: 0.2%;
@@ -437,4 +462,5 @@
     display: inline-block;
     width: 100px;
   }
+
 </style>

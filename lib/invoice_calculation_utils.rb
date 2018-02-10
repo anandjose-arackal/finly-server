@@ -23,6 +23,7 @@ class InvoiceCalculationUtils
     calculate_advance_paid
     calculate_freight_charges
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
+
     if self.roundoff_amount != 0
       self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount), 0
     else
@@ -56,6 +57,15 @@ class InvoiceCalculationUtils
       self.invoice.balance_due.value = self.balance_due_amount
     else
       self.invoice.balance_due = Amount.new(value: self.balance_due_amount, currency_id: 1)
+    end
+
+    # set total payable if it's an outward invoice
+    if self.invoice.is_a?(OutwardInvoice)
+      if self.invoice.total_payable.present?
+        self.invoice.total_payable.value = self.balance_due_amount
+      else
+        self.invoice.total_payable = Amount.new(value: self.balance_due_amount, currency_id: 1)
+      end
     end
 
     # now calculating the final amount to be paid

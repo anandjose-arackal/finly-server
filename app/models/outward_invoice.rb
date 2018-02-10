@@ -56,6 +56,7 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :advance_amount, class_name: "Amount"
   belongs_to :net_amount, class_name: "Amount"
   belongs_to :gross_amount, class_name: "Amount"
+  belongs_to :total_payable, class_name: "Amount"
   belongs_to :invoice_status, class_name: "OutwardInvoiceStatus"
   belongs_to :payment_term
 
@@ -78,6 +79,7 @@ class OutwardInvoice < ActiveRecord::Base
   accepts_nested_attributes_for :advance_amount
   accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :paid_amount
+  accepts_nested_attributes_for :total_payable
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
 
   validates :invoice_status, presence: true
@@ -92,7 +94,7 @@ class OutwardInvoice < ActiveRecord::Base
   validates :discount_amount, presence: true, if: :valid_invoice?
   validates :tax_amount, presence: true, if: :valid_invoice?
   validates :net_amount, presence: true, if: :valid_invoice?
-  validates :gst_type_id, presence: true, if: :valid_invoice?
+  validate :gst_type_selection, if: :valid_invoice?
 
   scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
   scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:closed) }
@@ -145,6 +147,14 @@ class OutwardInvoice < ActiveRecord::Base
       end
     end
     number
+  end
+
+  def gst_type_selection
+    if self.tax_amount&.value > 0
+      if self.gst_type_id.blank?
+        errors.add(:gst_type, "cannot be blank")
+      end
+    end
   end
 
 end
