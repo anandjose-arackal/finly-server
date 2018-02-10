@@ -9,6 +9,8 @@ if LogStasher.enabled?
       fields[:user_mobile_number] = user&.mobile_number
       fields[:current_app] = current_app
       fields[:current_device] = current_device
+      view = (params&.dig(:view) rescue nil)
+      fields[:current_view] = view
     end
     # If you are using custom instrumentation, just add it to logstasher custom fields
     # LogStasher.custom_fields << :myapi_runtime
