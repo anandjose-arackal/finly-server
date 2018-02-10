@@ -38,7 +38,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     self.amounts = retrieve_data(:original_amount)
     self.notes = retrieve_data(:note)
     [:tax_amount, :tds_amount, :gst_type_id, :discount_amount, :discount, :tax, :tds, :advance_amount, :advance, :freight, :invoice_date, :invoice_number, :due_date,
-     :category_id, :custom_fields, :inclusive_of_taxes, :roundoff_amount, :balance_due].each do |attr|
+     :category_id, :custom_fields, :inclusive_of_taxes, :roundoff_amount, :balance_due, :item_amounts_total, :item_discounts_total, :item_taxes_total].each do |attr|
       self.class.send(:attr_accessor, attr)
       instance_variable_set("@#{attr}", retrieve_data(attr))
     end
@@ -111,7 +111,10 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           invoice_items_attributes: self.invoice_items[index],
           inclusive_of_taxes: self.inclusive_of_taxes[index],
           roundoff_amount: self.roundoff_amount[index],
-          balance_due: self.balance_due[index]
+          balance_due: self.balance_due[index],
+          item_discounts_total: self.item_discounts_total[index],
+          item_taxes_total: self.item_taxes_total[index],
+          item_amounts_total: self.item_amounts_total[index]
       }
     end
     data

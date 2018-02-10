@@ -16,8 +16,10 @@
 
 
 
+
 class Category < ActiveRecord::Base
   belongs_to :company
+  belongs_to :purpose
 
   has_one :quickbooks_category, dependent: :destroy
 
@@ -38,5 +40,6 @@ class Category < ActiveRecord::Base
   scope :with_purpose, -> (purpose_id) {
     where purpose_id: purpose_id
   }
+  scope :outward_invoice_items_categories, -> { where purpose_id: Purpose.id_for(:outward_invoice_items) }
 
 end

@@ -41,7 +41,6 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   def init
     self.company_id = self.payment.payment_order.company_id
     super()
-    self.account_number = YAML.load_file(config_path)[Rails.env][self.configuration]['account_number']
     self.account = payment.receiving_account
     set_xml_params
   end
@@ -53,10 +52,13 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
   def post_process
     # handle the various error cases here
-    # case 500
+    # case 200
     case self.response.status
       when 404
         add_message :error, "The service is temporarily down. Please try again later"
+        self.transfer_status_id = BankTransferStatus.id_for(:failed)
+      when 401
+        add_message :error, "Unauthorized. Please check the credentials being used for the API"
         self.transfer_status_id = BankTransferStatus.id_for(:failed)
       when 500
         self.parsed_response = Hash.from_xml(response.body)

@@ -13,19 +13,21 @@ class YesBankApi::Base < BaseHandler
 
   def init
     # self.config_path = Rails.root.join('config', 'yes_bank_config.yml').to_s
-    self.config_path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
-    unless config_path.present?
-      add_message :error, "Server error, try again later"
-    end
+    # self.config_path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
+    # unless config_path.present?
+    #   add_message :error, "Server error, try again later"
+    # end
+    values = Finly::SecureStorage::Connector.read('core/yes_bank')
     # checking of there's a custom configuration for a particular company - stored in a variable called configuration
-    self.configuration = (YAML.load_file(config_path)[Rails.env][self.company_id]).present? ? self.company_id : 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
-    self.client_id = YAML.load_file(config_path)[Rails.env][self.configuration]['client_id']
-    self.client_secret = YAML.load_file(config_path)[Rails.env][self.configuration]['client_secret']
-    self.auth_username = YAML.load_file(config_path)[Rails.env][self.configuration]['username']
-    self.auth_password = YAML.load_file(config_path)[Rails.env][self.configuration]['password']
-    self.application_id = YAML.load_file(config_path)[Rails.env][self.configuration]['application_id']
-    self.customer_id = YAML.load_file(config_path)[Rails.env][self.configuration]['customer_id']
-    self.account_number = YAML.load_file(config_path)[Rails.env][self.configuration]['account_number']
+    type = (values[self.company_id.to_s]).present? ? self.company_id.to_s : 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
+    self.configuration = values[type]
+    self.client_id = self.configuration['client_id']
+    self.client_secret = self.configuration['client_secret']
+    self.auth_username = self.configuration['username']
+    self.auth_password = self.configuration['password']
+    self.application_id = self.configuration['application_id']
+    self.customer_id = self.configuration['customer_id']
+    self.account_number = self.configuration['account_number']
     # now calling the load_connection method to initialize the connection
     super()
   end
@@ -187,10 +189,12 @@ class YesBankApi::Base < BaseHandler
         client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
         verify: verify
     }
+    logger = Logger.new $stderr
+    logger.level = Logger::INFO
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|
       # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params
-      faraday.response :logger # log requests to STDOUT
+      faraday.response :logger, logger # log requests to STDOUT
       faraday.options[:timeout] = 60 # time out is 60 seconds
       faraday.use Faraday::Request::BasicAuthentication, auth_username, auth_password # use basic authentication
       faraday.use FaradayMiddleware::FollowRedirects, limit: 5

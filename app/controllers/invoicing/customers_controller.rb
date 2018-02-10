@@ -14,6 +14,15 @@ class Invoicing::CustomersController < ApplicationController
 
   def update
     @result = Invoicing::Customer::Update.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def show
+    @result = Invoicing::Customer::Show.(current_user, params)
     respond
   end
 
@@ -21,4 +30,15 @@ class Invoicing::CustomersController < ApplicationController
     @result = Invoicing::Customer::Destroy.(current_user, params)
     respond
   end
+
+  def virtual_bank_accounts
+    @result = Invoicing::Customer::VirtualBankAccounts::Index.(current_user, params)
+    respond
+  end
+
+  def create_virtual_account
+    @result = Invoicing::Customer::VirtualBankAccounts::Create.(current_user, params)
+    respond
+  end
+
 end

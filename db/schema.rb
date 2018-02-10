@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180106103922) do
+ActiveRecord::Schema.define(version: 20180209153900) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -29,15 +29,20 @@ ActiveRecord::Schema.define(version: 20180106103922) do
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
 
   create_table "addresses", force: :cascade do |t|
-    t.text     "line_1",     limit: 65535
-    t.text     "line_2",     limit: 65535
-    t.text     "line_3",     limit: 65535
-    t.string   "city",       limit: 255
-    t.integer  "state_id",   limit: 4
-    t.string   "name",       limit: 255
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-    t.string   "pin_code",   limit: 255
+    t.text     "line_1",       limit: 65535
+    t.text     "line_2",       limit: 65535
+    t.text     "line_3",       limit: 65535
+    t.string   "city",         limit: 255
+    t.integer  "state_id",     limit: 4
+    t.string   "name",         limit: 255
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.string   "pin_code",     limit: 255
+    t.boolean  "default"
+    t.string   "parent_type",  limit: 255
+    t.integer  "parent_id",    limit: 4
+    t.string   "address_name", limit: 255
+    t.text     "landmark",     limit: 65535
   end
 
   add_index "addresses", ["state_id"], name: "fk_rails_2d87b6c11e", using: :btree
@@ -1327,6 +1332,19 @@ ActiveRecord::Schema.define(version: 20180106103922) do
   add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
+  create_table "customer_attachments", force: :cascade do |t|
+    t.string   "attached_file_file_name",    limit: 255
+    t.string   "attached_file_content_type", limit: 255
+    t.integer  "attached_file_file_size",    limit: 4
+    t.datetime "attached_file_updated_at"
+    t.integer  "customer_id",                limit: 4
+    t.text     "note",                       limit: 65535
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+  end
+
+  add_index "customer_attachments", ["customer_id"], name: "index_customer_attachments_on_customer_id", using: :btree
+
   create_table "customers", force: :cascade do |t|
     t.string   "name",          limit: 255
     t.string   "email",         limit: 255
@@ -1335,6 +1353,9 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.integer  "company_id",    limit: 4
     t.datetime "created_at",                  null: false
     t.datetime "updated_at",                  null: false
+    t.string   "gst",           limit: 255
+    t.string   "pan",           limit: 255
+    t.integer  "created_by_id", limit: 4
   end
 
   create_table "desktop_users", force: :cascade do |t|
@@ -1559,7 +1580,7 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.boolean  "yes_bank_account"
     t.boolean  "bank_account_reimbursement"
     t.boolean  "payroll_card_enabled",                   default: false
-    t.boolean  "yes_bank_api_enabled"
+    t.boolean  "current_account_connected"
     t.boolean  "invoicing_system",                       default: false
   end
 
@@ -1664,6 +1685,7 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
     t.integer  "field_configuration_id", limit: 4
+    t.boolean  "is_deleted"
   end
 
   create_table "field_multiselect_selection_items", force: :cascade do |t|
@@ -1813,6 +1835,26 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.text     "admin_note",                 limit: 65535
     t.datetime "submitted_on"
     t.datetime "upgraded_on"
+    t.string   "aadhar_front_file_name",     limit: 255
+    t.string   "aadhar_front_content_type",  limit: 255
+    t.integer  "aadhar_front_file_size",     limit: 4
+    t.datetime "aadhar_front_updated_at"
+    t.string   "aadhar_back_file_name",      limit: 255
+    t.string   "aadhar_back_content_type",   limit: 255
+    t.integer  "aadhar_back_file_size",      limit: 4
+    t.datetime "aadhar_back_updated_at"
+    t.string   "photo_file_name",            limit: 255
+    t.string   "photo_content_type",         limit: 255
+    t.integer  "photo_file_size",            limit: 4
+    t.datetime "photo_updated_at"
+    t.string   "signature_file_name",        limit: 255
+    t.string   "signature_content_type",     limit: 255
+    t.integer  "signature_file_size",        limit: 4
+    t.datetime "signature_updated_at"
+    t.string   "combined_kyc_file_name",     limit: 255
+    t.string   "combined_kyc_content_type",  limit: 255
+    t.integer  "combined_kyc_file_size",     limit: 4
+    t.datetime "combined_kyc_updated_at"
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
@@ -1848,6 +1890,9 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.datetime "updated_at",                                               null: false
     t.integer  "net_amount_id",      limit: 4
     t.string   "hsn_sac",            limit: 255
+    t.integer  "taxable_amount_id",  limit: 4
+    t.string   "parent_type",        limit: 255
+    t.string   "parent_id",          limit: 255
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -1855,6 +1900,14 @@ ActiveRecord::Schema.define(version: 20180106103922) do
   add_index "invoice_line_items", ["gst_type_id"], name: "index_invoice_line_items_on_gst_type_id", using: :btree
   add_index "invoice_line_items", ["invoice_id"], name: "index_invoice_line_items_on_invoice_id", using: :btree
   add_index "invoice_line_items", ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id", using: :btree
+
+  create_table "invoice_number_configs", force: :cascade do |t|
+    t.string   "prefix",         limit: 255, default: ""
+    t.string   "sequence_start", limit: 255
+    t.integer  "company_id",     limit: 4
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+  end
 
   create_table "invoices", force: :cascade do |t|
     t.integer  "address_id",         limit: 4
@@ -1891,6 +1944,7 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.decimal  "freight",                        precision: 20, scale: 10
     t.decimal  "roundoff_amount",                precision: 20, scale: 10
     t.integer  "balance_due_id",     limit: 4
+    t.integer  "taxable_amount_id",  limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -2343,6 +2397,55 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "outward_invoice_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "outward_invoices", force: :cascade do |t|
+    t.integer  "customer_id",             limit: 4
+    t.date     "date"
+    t.date     "due_date"
+    t.integer  "amount_id",               limit: 4
+    t.integer  "discount_amount_id",      limit: 4
+    t.integer  "tax_amount_id",           limit: 4
+    t.integer  "paid_amount_id",          limit: 4
+    t.decimal  "advance",                               precision: 10, scale: 5
+    t.integer  "freight_amount_id",       limit: 4
+    t.integer  "balance_due_id",          limit: 4
+    t.decimal  "roundoff_amount",                       precision: 10, scale: 5
+    t.datetime "created_at",                                                     null: false
+    t.datetime "updated_at",                                                     null: false
+    t.integer  "policy_id",               limit: 4
+    t.integer  "invoice_status_id",       limit: 4
+    t.integer  "company_id",              limit: 4
+    t.string   "invoice_number",          limit: 255
+    t.integer  "gst_type_id",             limit: 4
+    t.boolean  "inclusive_of_taxes"
+    t.integer  "advance_amount_id",       limit: 4
+    t.integer  "net_amount_id",           limit: 4
+    t.integer  "virtual_account_id",      limit: 4
+    t.text     "billing_address",         limit: 65535
+    t.text     "shipping_address",        limit: 65535
+    t.string   "email",                   limit: 255
+    t.string   "mobile_number",           limit: 255
+    t.boolean  "override_invoice_number"
+    t.boolean  "is_deleted"
+    t.string   "sequence_start",          limit: 255
+    t.string   "prefix",                  limit: 255
+    t.integer  "total_payable_id",        limit: 4
+    t.boolean  "roundoff_total_enabled"
+  end
+
+  add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
+  add_index "outward_invoices", ["balance_due_id"], name: "index_outward_invoices_on_balance_due_id", using: :btree
+  add_index "outward_invoices", ["customer_id"], name: "index_outward_invoices_on_customer_id", using: :btree
+  add_index "outward_invoices", ["discount_amount_id"], name: "index_outward_invoices_on_discount_amount_id", using: :btree
+  add_index "outward_invoices", ["freight_amount_id"], name: "index_outward_invoices_on_freight_amount_id", using: :btree
+  add_index "outward_invoices", ["paid_amount_id"], name: "index_outward_invoices_on_paid_amount_id", using: :btree
+  add_index "outward_invoices", ["tax_amount_id"], name: "index_outward_invoices_on_tax_amount_id", using: :btree
+
   create_table "payment_file_configurations", force: :cascade do |t|
     t.string   "file_format", limit: 255
     t.integer  "company_id",  limit: 4,     null: false
@@ -2461,6 +2564,12 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "payment_terms", force: :cascade do |t|
+    t.text     "name",       limit: 65535
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
   create_table "payment_trails", force: :cascade do |t|
     t.date     "date"
     t.integer  "initiating_account_id",   limit: 4
@@ -2509,8 +2618,10 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.string   "application",             limit: 255
     t.string   "payment_mode",            limit: 255
     t.string   "reference_id",            limit: 255,               null: false
-    t.integer  "invoice_id",              limit: 4
     t.integer  "retry_count",             limit: 4,     default: 0
+    t.integer  "invoice_id",              limit: 4
+    t.string   "parent_type",             limit: 255
+    t.integer  "parent_id",               limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -3034,11 +3145,12 @@ ActiveRecord::Schema.define(version: 20180106103922) do
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
 
   create_table "tally_configurations", force: :cascade do |t|
-    t.integer  "company_id",   limit: 4,   null: false
-    t.string   "company_name", limit: 255
+    t.integer  "company_id",           limit: 4,   null: false
+    t.string   "company_name",         limit: 255
     t.boolean  "active"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.string   "voucher_expense_date", limit: 255
   end
 
   add_index "tally_configurations", ["company_id"], name: "index_tally_configurations_on_company_id", using: :btree
@@ -3238,7 +3350,7 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
     t.date     "date_of_birth"
-    t.string   "gender",              limit: 255, null: false
+    t.string   "gender",              limit: 255
     t.string   "address_1",           limit: 255
     t.string   "address_2",           limit: 255
     t.string   "city",                limit: 255
@@ -3375,6 +3487,7 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.integer  "otp_request_type_id",    limit: 4
     t.boolean  "default_password",                   default: false
     t.boolean  "point_of_contact",                   default: false
+    t.integer  "otp_attempts",           limit: 4,   default: 0
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
@@ -3499,6 +3612,8 @@ ActiveRecord::Schema.define(version: 20180106103922) do
     t.integer  "maximum_amount_id",             limit: 4
     t.integer  "exact_transaction_amount_id",   limit: 4
     t.string   "application",                   limit: 255,                   null: false
+    t.integer  "customer_id",                   limit: 4
+    t.boolean  "default_account"
   end
 
   create_table "whitelisted_ip_types", force: :cascade do |t|
@@ -3613,6 +3728,7 @@ ActiveRecord::Schema.define(version: 20180106103922) do
   add_foreign_key "company_kycs", "companies"
   add_foreign_key "company_tags", "companies"
   add_foreign_key "custom_fields", "field_configurations"
+  add_foreign_key "customer_attachments", "customers"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
   add_foreign_key "email_authorizations", "users"
@@ -3683,6 +3799,8 @@ ActiveRecord::Schema.define(version: 20180106103922) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "outward_invoices", "amounts"
+  add_foreign_key "outward_invoices", "customers"
   add_foreign_key "payment_file_configurations", "companies"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
