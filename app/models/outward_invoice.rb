@@ -79,6 +79,7 @@ class OutwardInvoice < ActiveRecord::Base
   accepts_nested_attributes_for :advance_amount
   accepts_nested_attributes_for :balance_due
   accepts_nested_attributes_for :paid_amount
+  accepts_nested_attributes_for :total_payable
   accepts_nested_attributes_for :invoice_items, allow_destroy: true
 
   validates :invoice_status, presence: true
