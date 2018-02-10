@@ -33,6 +33,8 @@
 #  is_deleted              :boolean
 #  sequence_start          :string(255)
 #  prefix                  :string(255)
+#  total_payable_id        :integer
+#  roundoff_total_enabled  :boolean
 #
 
 class OutwardInvoice < ActiveRecord::Base

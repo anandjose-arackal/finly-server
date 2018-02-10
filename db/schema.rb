@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180208093445) do
+ActiveRecord::Schema.define(version: 20180209153900) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2434,6 +2434,8 @@ ActiveRecord::Schema.define(version: 20180208093445) do
     t.boolean  "is_deleted"
     t.string   "sequence_start",          limit: 255
     t.string   "prefix",                  limit: 255
+    t.integer  "total_payable_id",        limit: 4
+    t.boolean  "roundoff_total_enabled"
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
@@ -3485,6 +3487,7 @@ ActiveRecord::Schema.define(version: 20180208093445) do
     t.integer  "otp_request_type_id",    limit: 4
     t.boolean  "default_password",                   default: false
     t.boolean  "point_of_contact",                   default: false
+    t.integer  "otp_attempts",           limit: 4,   default: 0
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree

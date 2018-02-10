@@ -10,13 +10,23 @@ class User::Password::VerifyResetPasswordOtp < BaseOperation
       add_message :error, "Mobile number does not match"
       return
     end
+
+    # adding validation to check if the OTP has been checked more than 3 times since being sent
+    if selected_user.otp_attempts >= 6
+      add_message :error, "You have reached the maximum number of attempts for OTP Verification. Please reset the OTP and try again"
+      return
+    end
+
     unless selected_user.otp == params[:otp]
       add_message :error, "OTP entered does not match. Please enter the OTP sent to your mobile number"
+      selected_user.update_attribute(:otp_attempts, (selected_user.otp_attempts + 1))
+      return
     end
+
   end
 
   def process
-    selected_user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true)
+    selected_user.update_attributes(otp: nil, otp_verified_at: DateTime.now, otp_verified: true, otp_attempts: 0)
   end
 
 end
