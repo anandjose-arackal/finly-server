@@ -2526,7 +2526,7 @@ Rails.application.routes.draw do
       patch 'update_credit_account', to: 'company_configurations#update_credit_account'
       patch 'update_collect_details', to: 'company_configurations#update_collect_details'
       patch 'update_collect_logo', to: 'company_configurations#update_collect_logo'
-      get 'show_collect_detail', to: 'company_configurations#show_collect_detail'
+      get 'show_collect_detail', to: 'company_configurations#show_collect_details'
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
     end
   end
