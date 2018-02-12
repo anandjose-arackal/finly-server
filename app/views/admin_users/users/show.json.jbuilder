@@ -3,7 +3,7 @@ if @result.selected_user.first_name.present?
                                      :company_name, :id, :mothers_maiden_name, :active, :employee_id, :payroll_id
 
 
-  json.date_of_birth (@result.selected_user.date_of_birth.strftime("%d-%m-%Y"))
+  json.date_of_birth (@result.selected_user.date_of_birth&.strftime("%d-%m-%Y"))
   json.gender (@result.selected_user.gender_name)
 else
   json.email @result.selected_user.email
