@@ -19,7 +19,7 @@ class CollectCompanyDetail < ActiveRecord::Base
 
   belongs_to :company
 
-  has_attached_file :company_logo, styles: lambda { |a| a.instance.check_file_type },
+  has_attached_file :company_logo, styles: lambda { |a| a.instance.check_file_type(a) },
                     default_url: '/assets/:style/missing.png'
   validates_attachment :company_logo, content_type: {
       content_type: %w(image/jpg image/jpeg image/png image/gif)
