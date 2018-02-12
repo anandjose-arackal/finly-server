@@ -1,6 +1,14 @@
 class Settlement::Payment::Base < Settlement::Base
   attr_accessor :payment, :payment_request, :amount, :currency_id, :note
 
+  class Settlement::Payment::Base::Presenter < Settlement::Base::BasePresenter::SuccessPresenter
+    attr_accessor :payment
+
+    def init
+      self.payment = params[:payment]
+    end
+  end
+
   def init_payment_request(payment_type, payment_purpose, options = {})
     initiating_account = options[:initiating_account]
     amount = options[:amount]
@@ -9,13 +17,6 @@ class Settlement::Payment::Base < Settlement::Base
     self.payment_request.add_payment_item(PaymentRequest::PaymentItem.(to_user, receiving_account, amount, note: self.note))
   end
 
-  class Settlement::Payment::Base::Presenter < Settlement::Base::BasePresenter::SuccessPresenter
-    attr_accessor :payment
-
-    def init
-      self.payment = params[:payment]
-    end
-  end
 
   def pre_validate
     super()

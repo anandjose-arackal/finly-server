@@ -1,241 +1,147 @@
 class Settlement::Summary < Settlement::Base
-  attr_accessor :selected_user, :actions, :balances
+  attr_accessor :reports_summary, :money_requests_summary, :users_summary, :currency_id,
+                :finly_money_summary, :cash_on_hand_summary, :expense_cards_summary,
+                :reimbursement_cards_summary, :cards_enabled, :bank_transfer_enabled
+
+  class Settlement::Summary::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :reports_summary, :money_requests_summary, :users_summary, :finly_money_summary,
+                  :cash_on_hand_summary, :expense_cards_summary, :reimbursement_cards_summary,
+                  :cards_enabled, :bank_transfer_enabled
+
+    def init
+      self.reports_summary = params[:reports_summary]
+      self.money_requests_summary = params[:money_requests_summary]
+      self.users_summary = params[:users_summary]
+      self.cash_on_hand_summary = params[:cash_on_hand_summary]
+      self.finly_money_summary = params[:finly_money_summary]
+      self.expense_cards_summary = params[:expense_cards_summary]
+      self.reimbursement_cards_summary = params[:reimbursement_cards_summary]
+    end
+
+  end
+
+  def authorized_user_types
+    [:admin, :manager, :finance_manager, :auditor]
+  end
 
   def pre_validate
-    unless user.present?
+    if user.blank?
       add_message :error, 'User not found'
+      return
     end
   end
 
   def init
-    load_selected_user
-    return if has_errors?
-    load_balances
+    self.currency_id = Currency.id_for(:INR)
+    self.cards_enabled = user.company.cards_enabled?
+    self.bank_transfer_enabled = user.company.bank_reimbursement_enabled?
+
+    load_reports_summary
+    load_money_requests_summary
+
+    users_presenter = User::Index.(user, params)
+    unless users_presenter.success?
+      add_message :error, users_presenter.errors.full_messages
+    end
+    users = users_presenter.team
+    user_ids = users.pluck(:id)
+    load_users_summary(users)
+    load_cash_on_hand_summary(user_ids)
+
+    if cards_enabled or bank_transfer_enabled
+      load_finly_money_summary(user_ids)
+    end
+    if cards_enabled
+      load_expense_cards_summary(user_ids)
+      load_reimbursement_cards_summary(user_ids)
+    end
   end
 
   def success
-    params[:selected_user] = selected_user
-    params[:actions] = actions
-    params[:balances] = balances
-    Settlement::Summary::Presenter.new(user, params, messages)
+    params[:reports_summary] = self.reports_summary
+    params[:money_requests_summary] = self.money_requests_summary
+    params[:users_summary] = self.users_summary
+    params[:cash_on_hand_summary] = self.cash_on_hand_summary
+    params[:finly_money_summary] = self.finly_money_summary
+    params[:expense_cards_summary] = self.expense_cards_summary
+    params[:reimbursement_cards_summary] = self.reimbursement_cards_summary
+    Settlement::Summary::SuccessPresenter.new(user, params, messages)
   end
 
-  class Settlement::Summary::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :selected_user, :actions, :balances
-    def init
-      self.selected_user = params[:selected_user]
-      self.balances = params[:balances]
-      self.actions = params[:actions]
-    end
+  protected
 
-  end
-
-  private
-
-  def load_selected_user
-    if personal_view?
-      self.selected_user = self.user
+  def load_reports_summary
+    reports_presenter = Report::Index.(user, params)
+    unless reports_presenter.success?
+      add_message :error, reports_presenter.messages[:error]
       return
     end
-    user_op = Settlement::Index.new(user, params)
-    user_result = user_op.run
-    unless user_op.success?
-      add_message :error, user_op.messages[:error]
-      return
-    end
-    user_id = (params[:id] or params[:user_id])
-    self.selected_user = user_result.users.with_id(user_id).first rescue nil
-    if self.selected_user.blank?
-      add_message :error, 'User not found'
-    end
-  end
-
-  def load_balances
-    personal = user == selected_user
-    result = User::Balance.(user, target_user: selected_user, current_user_all: true, target_user_all: true, virtual_account: true, view: params[:view]).balances
-
-    load_transfer_options(result)
-
-    self.balances = {}
-    self.balances[:wallet] = {balance: result[:target_user][:wallet][:balance], name: 'Finly Money', id: selected_user.wallet.id}
-    if result[:target_user][:card].present?
-      self.balances[:cards] = []
-      result[:target_user][:card].each do |id, item|
-        card = Card.with_id(id).first
-        creditable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_credit))
-        debitable = ((personal and card.card_program.personal_wallet_fund_transfer) or (!personal and card.card_program.manager_debit))
-        disabler = nil
-        if not card.active and card.disabled_by_role_id.present? and card.disabled_by_user_id.present?
-          disabler = {role: {id: card.disabled_by_role_id, name: card.disabled_by_role.name},
-                      user: {id: card.disabled_by_user_id,
-                             name: card.disabled_by_user.name}}
-        end
-        self.balances[:cards] << {id: item[:id], name: "#{item[:name]} Card",
-                                  show_balance: item[:show_balance], balance: item[:balance],
-                                  show_eligibility: item[:show_eligibility],
-                                  eligibility: item[:eligibility], creditable: creditable,
-                                  debitable: debitable, active: card.active, disabler: disabler}
-      end
-    end
-
-    self.balances[:cash_on_hand] = {balance: result[:target_user][:cash_on_hand][:balance], name: 'Cash on Hand',
-                                    meta: {credit: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:add_cash_on_hand))},
-                                           debit: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:deduct_cash_on_hand))}}}
-    self.balances[:pending_money_requests] = {balance: result[:target_user][:pending_money_requests][:balance], count: result[:target_user][:pending_money_requests][:count],
-                                              meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:add_cash_on_hand))}}
-
-
-    reimbursement = load_reimbursement(personal, result)
-
-    self.balances[:pending_reports] = {balance: result[:target_user][:pending_reports][:balance],
-                                       count: result[:target_user][:pending_reports][:count],
-                                       reimbursement: reimbursement,
-                                       meta: {base_url: Rails.application.routes.url_helpers.settlements_path(id: selected_user.id, payment_type: PaymentType.id_for(:reimbursement).to_s)}}
-
-    # adding bank accounts of the user if any
-    if selected_user.bank_accounts.present?
-      self.balances[:bank_accounts] = selected_user.bank_accounts
-    end
-  end
-
-  def load_reimbursement(personal, balances)
-    to_user_reimbursable_card = selected_user.cards.reimbursable_cards&.first
-    reimbursement = {associated_reimbursement_card: !!to_user_reimbursable_card&.active,
-                     card: {},
-                     associated_reimbursement_bank_account: selected_user.bank_accounts.present?,
-                     initiating_accounts: []
-                    }
-
-    # adding reimbursement bank accounts for this user
-    reimbursement[:bank_accounts] = []
-    selected_user.bank_accounts.each do |bank_account|
-      reimbursement[:bank_accounts] << {
-          id: bank_account.id,
-          account_number: bank_account.account_number,
-          ifsc: bank_account.ifsc
-      }
-    end
-    if to_user_reimbursable_card
-      name = personal ? 'Your Reimbursement card' : "#{selected_user.name}'s Reimbursement Card"
-      eligibility = balances[:target_user][:card][to_user_reimbursable_card.id][:eligibility]
-      reimbursement[:card] = {id: to_user_reimbursable_card.id, name: name, eligibility: eligibility}
-    end
-    reimbursement[:initiating_accounts] = self.actions[:credit_actions][:initiating_accounts]
-    reimbursement
-  end
-
-  def load_transfer_options(balances)
-    credit_actions = {initiating_accounts: [], receiving_accounts: []}
-    debit_actions={initiating_accounts: [], receiving_accounts: []}
-
-    from_user_transferable_cards =  user.cards.with_non_personal_fund_transfer
-    to_user_creditable_cards = selected_user.cards.creditable_cards
-
-    from_user_name = 'Your'
-    personal_transfer = self.user == self.selected_user
-    to_user_name = personal_transfer ? 'Your' : "#{self.selected_user.name}'s "
-
-    # From Actions
-    # Virtual Account
-    if user.company_admin?
-      balance = balances[:virtual_account][:balance] rescue nil
-      action = {type: :virtual_account, id: user.company.id, name: 'Company Credits', balance: balance, active: true}
-      credit_actions[:initiating_accounts] << action
-      debit_actions[:initiating_accounts] << action
-    end
-
-    # Wallet
-    balance = balances[:current_user][:wallet][:balance] rescue nil
-    action = {type: :wallet, id: user.wallet.id, name: "#{from_user_name} Finly Money", balance: balance, active: true}
-    credit_actions[:initiating_accounts] << action
-    debit_actions[:initiating_accounts] << action
-
-    # Cards
-    if from_user_transferable_cards.present?
-      from_user_transferable_cards.each do |card|
-
-        next if (not personal_transfer and not card.card_program.non_personal_fund_transfer) or (personal_transfer and not card.card_program.personal_wallet_fund_transfer)
-
-        balance = balances[:current_user][:card][card.id][:balance] rescue nil
-        eligibility = balances[:current_user][:card][card.id][:balance] rescue nil
-        disabler = nil
-        disabler_name = card.disabled_by_user.name rescue nil
-        disabled_by_role = card.disabled_by_role_id == UserRole.id_for(:employee) ? "" : (card.disabled_by_role.name rescue nil)
-        unless card.active
-          disabler = {role: {id: card.disabled_by_role_id, name: disabled_by_role}, user: {id: card.disabled_by_user_id, name: disabler_name}}
-        end
-
-        action = {type: :card, id: card.id,
-                  name: "#{from_user_name} #{card.card_program.name} Card",
-                  balance: balance, eligibility: eligibility, show_balance: true,
-                  show_eligibility: true, active: card.active, disabler: disabler}
-
-
-        card_program = card.card_program
-        if personal_transfer
-          next unless card_program.personal_wallet_fund_transfer
-          credit_actions[:initiating_accounts] << action
-          debit_actions[:initiating_accounts] << action
-        else
-          next unless card_program.non_personal_fund_transfer
-          credit_actions[:initiating_accounts] << action
-          debit_actions[:initiating_accounts] << action
-        end
-      end
-    end
-
-    # To Actions
-    # Wallet
-    balance = balances[:target_user][:wallet][:balance] rescue nil
-    action = {type: :wallet, id: selected_user.wallet.id, name: "#{to_user_name} Finly Money", balance: balance, active: true}
-    credit_actions[:receiving_accounts] << action
-    debit_actions[:receiving_accounts] << action
-
-    # Cards
-    if to_user_creditable_cards.present?
-      to_user_creditable_cards.each do |card|
-        show_balance = (personal_transfer or card.card_program.manager_view_balance)
-        show_eligibility = (personal_transfer or card.card_program.manager_view_eligibility)
-        balance = balances[:target_user][:card][card.id][:balance] rescue nil
-        eligibility = balances[:target_user][:card][card.id][:eligibility] rescue nil
-        disabler = nil
-        if not card.active and card.disabled_by_role_id.present? and card.disabled_by_user_id.present?
-          disabler_name = card.disabled_by_user.name rescue nil
-          disabled_by_role = card.disabled_by_role_id == UserRole.id_for(:employee) ? "" : (card.disabled_by_role.name rescue nil)
-          disabler = {role: {id: card.disabled_by_role_id, name: disabled_by_role},
-                      user: {id: card.disabled_by_user_id,
-                             name: disabler_name}}
-        end
-
-        action = {type: :card, id: card.id, name: "#{to_user_name} #{card.card_program.name} Card",
-                  balance: balance, eligibility: eligibility, show_balance: show_balance,
-                  show_eligibility: show_eligibility, active: card.active, disabler: disabler}
-
-        card_program = card.card_program
-        # Verify is user is allowed to credit / debit from the card based on the card program
-        if personal_transfer
-          next unless card_program.personal_wallet_fund_transfer
-          credit_actions[:receiving_accounts] << action
-          debit_actions[:receiving_accounts] << action
-        else
-          if card_program.manager_credit
-            credit_actions[:receiving_accounts] << action
-          end
-          if card_program.manager_debit
-            debit_actions[:receiving_accounts] << action
-          end
-        end
-
-      end
-    end
-
-    pending_cash_on_hand_credits = {
-        present: self.selected_user.cash_on_hand_credits_awaiting_confirmation?,
-        message: "Some money has been added to your cash on hand. They will reflect once the payment is confirmed"
+    reports = reports_presenter.reports.approved.without_associated_processor
+    self.reports_summary = {
+        count: reports.count,
+        expenses_total: Amount.new(value: reports.expenses_total, currency_id: self.currency_id),
+        reimbursement_total: Amount.new(value: reports.expenses_reimbursable_total, currency_id: self.currency_id),
+        user_count: reports.pluck(:user_id).uniq.count
     }
-    self.actions = {meta: {base_url: Rails.application.routes.url_helpers.update_balance_path(receiving_user_id: selected_user.id, view: params[:view])},
-                    credit: true, debit: true, credit_actions: credit_actions, debit_actions: debit_actions,
-                    bank_transfer_enabled: selected_user.bank_transfer_enabled?, pending_cash_on_hand_credits: pending_cash_on_hand_credits}
+  end
+
+  def load_money_requests_summary
+    money_requests_presenter = Object.const_get('MoneyRequest::Index').(user, params)
+    unless money_requests_presenter.success?
+      add_message :error, money_requests_presenter.messages[:error]
+      return
+    end
+    money_requests = money_requests_presenter.money_requests.approved.without_associated_processor
+    self.money_requests_summary = {
+        count: money_requests.count,
+        total: Amount.new(value: money_requests.total_value, currency_id: self.currency_id),
+        user_count: money_requests.pluck(:user_id).uniq.count
+    }
+  end
+
+  def load_users_summary(users)
+    self.users_summary = {
+        active: users.active.count,
+        pending: users.pending.count,
+        inactive: users.inactive.count
+    }
+  end
+
+  def load_cash_on_hand_summary(user_ids)
+    self.cash_on_hand_summary = {
+        card_transfer_wallet: Amount.new(value: CashOnHand.with_user(user_ids).sum_balance, currency_id: self.currency_id)
+    }
+  end
+
+  def load_finly_money_summary(user_ids)
+    return nil unless cards_enabled or bank_transfer_enabled
+    self.finly_money_summary = {}
+    if cards_enabled
+      self.finly_money_summary[:card_transfer_wallet] = Amount.new(value: UserWallet.with_user(user_ids).sum_balance, currency_id: self.currency_id)
+    else
+      self.finly_money_summary[:card_transfer_wallet] = nil
+    end
+    if bank_transfer_enabled
+      self.finly_money_summary[:bank_transfer_wallet] = Amount.new(value: VendorPaymentWallet.with_user(user_ids).sum_balance, currency_id: self.currency_id)
+    else
+      self.finly_money_summary[:bank_transfer_wallet] = nil
+    end
+  end
+
+  def load_expense_cards_summary(user_ids)
+    expense_cards = Card.with_user(user_ids).expense_cards
+    self.expense_cards_summary = {
+        count: expense_cards.count,
+        total: Amount.new(value: expense_cards.sum_balance, currency_id: self.currency_id)
+    }
+  end
+
+  def load_reimbursement_cards_summary(user_ids)
+    reimbursement_cards = Card.with_user(user_ids).reimbursement_cards
+    self.reimbursement_cards_summary = {
+        count: reimbursement_cards.count,
+        # total: Amount.new(value: reimbursement_cards.sum_balance, currency_id: self.currency_id)
+    }
   end
 
 end

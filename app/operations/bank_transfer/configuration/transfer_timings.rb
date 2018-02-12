@@ -3,7 +3,7 @@
 
 class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration::Base
 
-  attr_accessor :timings, :payment_order, :payment_request
+  attr_accessor :timings, :payment_order, :payment_request, :payment_mode, :date
 
   class BankTransfer::Configuration::TransferTimings::TimingsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -18,18 +18,27 @@ class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration
   end
 
   def pre_validate
-
   end
 
   def init
     id = params[:id] || params[:bank_payment_request_id]
-    self.payment_request = BankPaymentRequest.find_by(id: id)
-    self.payment_order = payment_request.payment_order
+    if id.present?
+        init_bank_payment_request(id)
+    else
+      self.payment_mode = params[:payment_mode]
+      self.date = params[:date]
+    end
   end
 
   def validate
-    if self.payment_request.blank? || self.payment_order.blank?
-      add_message :error, "Payment order not found"
+    id = params[:id] || params[:bank_payment_request_id]
+    if id.present? and self.payment_request.blank? and self.payment_order.blank?
+      add_message :error, 'Payment order not found'
+      return
+    end
+    if self.payment_mode.blank?
+      add_message :error, 'Payment mode cannot be blank'
+      return
     end
   end
 
@@ -38,9 +47,18 @@ class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration
   end
 
   def success
-    params[:allowed] = TransferTimingUtils.within_timeframe?(payment_order.payment_mode)
-    params[:next_date] = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_order.payment_mode)
+    params[:allowed] = TransferTimingUtils.within_timeframe?(self.payment_mode, self.date)
+    params[:next_date] = TransferTimingUtils.next_valid_date(self.date, self.payment_mode)
     BankTransfer::Configuration::TransferTimings::TimingsPresenter.new(user, params, messages)
+  end
+
+  protected
+
+  def init_bank_payment_request(id)
+    self.payment_request = BankPaymentRequest.find_by(id: id)
+    self.payment_order = payment_request&.payment_order
+    self.date = payment_order&.scheduled_at
+    self.payment_mode = payment_order&.payment_mode
   end
 
 end

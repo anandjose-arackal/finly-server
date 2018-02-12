@@ -30,6 +30,11 @@ class SettlementsController < ApplicationController
     respond
   end
 
+  def user_summary
+    @result = Settlement::UserSummary.(current_user, params)
+    respond
+  end
+
   def summary
     @result = Settlement::Summary.(current_user, params)
     respond

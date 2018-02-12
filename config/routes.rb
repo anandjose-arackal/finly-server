@@ -2207,6 +2207,7 @@ Rails.application.routes.draw do
     patch 'accept', to: 'pending_invites#accept', as: :accept
   end
 
+  get 'settlements/:id/summary' => 'settlements#user_summary'
   get 'settlements/summary' => 'settlements#summary'
   resources :settlements
   post 'settlements/:id/add_payment' => 'settlements#add_payment', as: :settlement_add_payment
@@ -2215,6 +2216,43 @@ Rails.application.routes.draw do
   patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update
   get 'groups_teams', to: 'expense_types_configuration#groups_teams'
   get 'expense_filters', to: 'expense_types_configuration#expense_filters'
+
+  scope :settlements do
+    scope :reports do
+      get 'pending', to: 'settlement/report#pending_index'
+      get 'pending/count', to: 'settlement/report#pending_count'
+      scope :processing do
+        get '/', to: 'settlement/report#processing_index'
+        get 'count', to: 'settlement/report#processing_count'
+        post 'init', to: 'settlement/report#processing_init'
+        post 'create', to: 'settlement/report#processing_create'
+        post 'cancel', to: 'settlement/report#processing_cancel'
+        post 'mark_as_paid', to: 'settlement/report#processing_mark_paid'
+        get 'payment_file', to: 'settlement/report#processing_payment_file'
+      end
+      get 'completed', to: 'settlement/report#completed_index'
+      get 'completed/count', to: 'settlement/report#completed_count'
+      get 'completed/batch', to: 'settlement/report#completed_batch_index'
+      get 'completed/batch/count', to: 'settlement/report#completed_batch_count'
+    end
+    scope :money_requests do
+      get 'pending', to: 'settlement/money_requests#pending_index'
+      get 'pending/count', to: 'settlement/money_requests#pending_count'
+      scope :processing do
+        get '/', to: 'settlement/money_requests#processing_index'
+        get 'count', to: 'settlement/money_requests#processing_count'
+        post 'init', to: 'settlement/money_requests#processing_init'
+        post 'create', to: 'settlement/money_requests#processing_create'
+        post 'cancel', to: 'settlement/money_requests#processing_cancel'
+        post 'mark_as_paid', to: 'settlement/money_requests#processing_mark_paid'
+        get 'payment_file', to: 'settlement/money_requests#processing_payment_file'
+      end
+      get 'completed', to: 'settlement/money_requests#completed_index'
+      get 'completed/count', to: 'settlement/money_requests#completed_count'
+      get 'completed/batch', to: 'settlement/money_requests#completed_batch_index'
+      get 'completed/batch/count', to: 'settlement/money_requests#completed_batch_count'
+    end
+  end
 
   resources :per_diems
 
@@ -2235,7 +2273,8 @@ Rails.application.routes.draw do
   get 'statements/user_summary/export' => 'statements#user_summary_export'
   post 'statements/user_summary' => 'statements#user_summary'
   post 'statements/user_summary/export' => 'statements#user_summary_export'
-  get 'statements/:id/summary' => 'statements#summary'
+  #get 'statements/:id/summary' => 'statements#summary'
+  get 'statements/summary' => 'statements#summary'
   get 'export/:id/statements(.:format)', to: 'export#statement', as: :export_statement
   resources :statements
   get 'statements/:id/export', to: 'statements#export'
@@ -2453,6 +2492,8 @@ Rails.application.routes.draw do
       get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
       patch 'update_payment', to: 'bank_payment_requests#update_payment'
     end
+
+    get 'transfer_timings', to: 'bank_payment_requests#within_timeframe'
 
     get 'account_owners/count', to: 'account_owners#count'
     resources :account_owners

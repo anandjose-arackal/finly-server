@@ -1,0 +1,2 @@
+module Settlement::MoneyRequestsHelper
+end

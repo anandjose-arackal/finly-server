@@ -22,10 +22,13 @@
 #  payment_purpose_id        :integer          not null
 #  currency_id               :integer          not null
 #  application               :string(255)
+#  post_operation            :text(65535)
+#  post_operation_payload    :text(65535)
 #  payment_mode              :string(255)
 #
 
 class PaymentOrder < ActiveRecord::Base
+  include PostOperationExecution
 
   CONFIG = {
       meal_card: {
@@ -142,6 +145,14 @@ class PaymentOrder < ActiveRecord::Base
 
   # method for total of all the payments in this particular payment order
   def request_total
+    # in case the payment order is not yet created
+    if self.id.blank?
+      total = 0
+      self.payments.each do |payment|
+        total += payment.amount.value
+      end
+      return total
+    end
     self.payments.joins(:amount).sum(:value)
   end
 

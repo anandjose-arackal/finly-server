@@ -27,7 +27,7 @@ class YesBankVendor < ActiveRecord::Base
   belongs_to :created_by, class_name: "User"
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
-  has_many :receiving_payments, as: :receiving_user, class_name: "Payment"
+  has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
 
   accepts_nested_attributes_for :bank_accounts
@@ -36,6 +36,16 @@ class YesBankVendor < ActiveRecord::Base
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> { where is_deleted: [false, nil]}
   scope :authorized, -> { where authorized: true}
+
+  def as_json(options={})
+    {
+        name: name,
+        email: email,
+        mobile_number: mobile_number,
+        description: description
+    }
+  end
+
 
   scope :filter_search, -> (term) {
     vendor_ids = where("name like ? OR email like ? OR mobile_number like ? OR description like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
