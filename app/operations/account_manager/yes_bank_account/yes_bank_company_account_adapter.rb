@@ -57,7 +57,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
       op = YesBankApi::Balance::GetBalance.(self.company)
       # return the balance given by the API
       if op.success?
-        return op.balance
+        return op.balance&.to_d
       else
         return 0
       end
