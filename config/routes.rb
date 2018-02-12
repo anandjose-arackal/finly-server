@@ -2501,6 +2501,7 @@ Rails.application.routes.draw do
 
   namespace :invoicing do
     resources :payment_receivables
+    get 'outward_invoices/count', to: 'outward_invoices#count'
     resources :outward_invoices do
       patch 'add_customer', to: 'outward_invoices#add_customer', as: :add_customer
       patch 'remove_customer', to: 'outward_invoices#remove_customer', as: :remove_customer
@@ -2510,6 +2511,7 @@ Rails.application.routes.draw do
       patch 'save', to: 'outward_invoices#save', as: :save
       get 'download_pdf', to: 'outward_invoices#download', as: :download
     end
+    get 'customers/count', to: 'customers#count'
     resources :customers do
       get 'virtual_accounts', to: 'customers#virtual_bank_accounts', as: :virtual_accounts
       post 'create_virtual_account', to: 'customers#create_virtual_account', as: :create_virtual_account

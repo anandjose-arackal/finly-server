@@ -1,4 +1,4 @@
-json.array!(@result.customers) do |customer|
+json.array!(@result.paginated_customers) do |customer|
   json.id customer.id
   json.name customer.name
   json.mobile_number customer.mobile_number

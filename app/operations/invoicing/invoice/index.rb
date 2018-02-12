@@ -4,10 +4,11 @@ class Invoicing::Invoice::Index < Invoicing::Invoice::Base
 
   class Invoicing::Invoice::Index::InvoicesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoices
+    attr_accessor :invoices, :paginated_invoices
 
     def init
       self.invoices = params[:invoices]
+      self.paginated_invoices = invoices.paginate(page: params[:page], per_page: params[:per_page])
     end
 
   end
