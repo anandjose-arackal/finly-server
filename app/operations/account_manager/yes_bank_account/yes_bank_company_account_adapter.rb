@@ -48,7 +48,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
     # can either be an operation or a specific call with
     # a model call
     self.company = self.account.company
-    if (self.company.vendor_payments_enabled? && !self.company.current_account_connected?) || self.company.bank_reimbursement_enabled?
+    if (self.company.vendor_payments_enabled? && !self.company.current_account_connected?) || (self.company.bank_reimbursement_enabled? && !self.company.current_account_connected?)
       payment_order = options[:payment_order]
       balance = self.account.balance_value
       blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
