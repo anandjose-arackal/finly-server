@@ -11,6 +11,7 @@
 
 
 
+
 class UserRole < ActiveRecord::Base
   has_many :users, through: :user_role_mappings
 
@@ -38,6 +39,13 @@ class UserRole < ActiveRecord::Base
 
   def self.name_for(role_id)
     VALUES.key(role_id)
+  end
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
   end
 
 end

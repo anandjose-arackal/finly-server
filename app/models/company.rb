@@ -51,6 +51,8 @@ class Company < ActiveRecord::Base
   has_many :yes_bank_vendors
   has_many :bank_accounts
   has_many :quickbooks_departments
+  has_many :report_processor_groups
+  has_many :money_request_processors
   has_many :payment_receivables
   has_many :virtual_bank_accounts
   has_many :customers

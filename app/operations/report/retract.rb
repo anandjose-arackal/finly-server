@@ -68,7 +68,7 @@ class Report::Retract < Report::Base
     report.submitted_amount&.destroy
 
     if prev_status.approved? || report.auto_approve
-      op = Settlement::Report::Unapproved.(user, report: report)
+      op = Settlement::SReport::Unapproved.(user, report: report)
       report.update(auto_approve: false)
     end
 

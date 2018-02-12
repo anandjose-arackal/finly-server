@@ -36,6 +36,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       add_message :error, 'You cannot credit from this account'
       payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                     content: "You cannot credit from #{source_account_name} to #{receiving_account_name}").save
+      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
       return
     end
 
@@ -43,6 +44,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       add_message :error, 'Insufficient eligibility to transfer the funds'
       payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value} due to lack of eligibility",
                                         system_message_type_id: SystemMessageType.id_for(:error)).save
+      payment.update(payment_status_id: PaymentStatus.id_for(:failed))
       return
     end
 
@@ -51,24 +53,27 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         add_message :error, "You cannot debit to this account"
         payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "You cannot debit from #{receiving_account_name} to #{source_account_name}").save
+        payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         return
       end
 
 
       if payment.credit?
         balance = source_account_adapter.balance(payment_order: payment.payment_order)
-        unless balance >= payment.amount_value
+        unless balance and balance >= payment.amount_value
           add_message :error, "The source account does not have enough balance for this transaction"
           payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                         content: "Not enough funds in #{payment.initiating_account_type.to_s} to initiate the transfer").save
+          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
           return
         end
       else
         balance = receiving_account_adapter.balance(payment_order: payment.payment_order)
-        unless balance >= payment.amount_value
+        unless balance and balance >= payment.amount_value
           add_message :error, "The source account does not have enough balance for this transaction"
           payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                         content: "Not enough funds in #{payment.receiving_account_type.to_s} to initiate the transfer").save
+          payment.update(payment_status_id: PaymentStatus.id_for(:failed))
           return
         end
       end
@@ -146,6 +151,10 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
 
   def post_process
 
+  end
+
+  def execute_callbacks(success)
+    self.payment.trigger_callbacks(success)
   end
 
 
