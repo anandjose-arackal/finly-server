@@ -96,7 +96,7 @@ class Settlement::SMoneyRequest::Processing::PostOperation < FinlyPostOperation
   end
 
   def add_cash_on_hand(mapping)
-    if mapping.bank_transfer?
+    if money_request_processor.bank_transfer?
       purpose = :advance
     else
       purpose = :advance_outside_finly
