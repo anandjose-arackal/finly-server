@@ -2550,6 +2550,8 @@ Rails.application.routes.draw do
     delete 'configurations/manager/:id', to: 'configuration#manager_destroy'
   end
 
+  get 'ping', to: 'ping#ping'
+
 
 
   # The priority is based upon order of creation: first created -> highest priority.
