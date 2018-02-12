@@ -16,7 +16,7 @@
 #     }
 # }
 class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest::Processing::Base
-  attr_accessor :processor_params, :money_request_processor, :scheduled, :payment_request
+  attr_accessor :processor_params, :money_request_processor, :scheduled, :payment_request, :bank_transfer_type
 
   def authorized_user_types
     [:admin, :finance_manager]
@@ -76,7 +76,7 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
   def process
     self.money_request_processor.save
     if self.money_request_processor.process_via_finly?
-      AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+      AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request, bank_transfer_type: self.bank_transfer_type)
     elsif self.money_request_processor.rejected?
       Settlement::SMoneyRequest::Processing::PostOperation.(self.money_request_processor, {rejected: true}, true)
     end
@@ -91,6 +91,7 @@ class Settlement::SMoneyRequest::Processing::Create < Settlement::SMoneyRequest:
   def set_source_account
     case params&.dig(:payment_type)
       when 'bank_transfer'
+        self.bank_transfer_type = self.money_request_processor.payment_mode
         case params[:source_account_type]
           when 'company_credits'
             self.money_request_processor.source_account = current_company.yes_bank_company_account
