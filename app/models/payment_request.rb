@@ -141,7 +141,7 @@ class PaymentRequest < NonPersistentModel
   end
 
   def current_company
-    RequestStore.store[:current_company]
+    RequestStore.store[:current_company] || initiating_user&.company
   end
 
   def payment_order_params
