@@ -16,7 +16,7 @@
 #     }
 # }
 class Settlement::SReport::Processing::Create < Settlement::SReport::Processing::Base
-  attr_accessor :processor_params, :report_processor_group, :scheduled, :payment_request
+  attr_accessor :processor_params, :report_processor_group, :scheduled, :payment_request, :bank_transfer_type
 
   class Settlement::SReport::Processing::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report_processor_group
@@ -85,7 +85,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
   def process
     self.report_processor_group.save
     if self.report_processor_group.process_via_finly?
-      AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+      AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request, bank_transfer_type: self.bank_transfer_type)
     elsif self.report_processor_group.mark_as_closed?
       Settlement::SReport::Processing::PostOperation.(self.report_processor_group, {marked_as_closed: true}, true)
     end
@@ -109,6 +109,7 @@ class Settlement::SReport::Processing::Create < Settlement::SReport::Processing:
   def set_source_account
     case params&.dig(:payment_type)
       when 'bank_transfer'
+        self.bank_transfer_type = self.report_processor_group.payment_mode
         case params[:source_account_type]
           when 'company_credits'
             self.report_processor_group.source_account = current_company.yes_bank_company_account
