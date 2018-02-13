@@ -1,0 +1,31 @@
+class Company::Collect::CompanyDetails::Show < Company::Base
+
+  attr_accessor :collect_detail
+
+  class Company::Collect::CompanyDetails::Show::DetailPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :collect_detail
+
+    def init
+      self.collect_detail = params[:collect_detail]
+    end
+
+  end
+
+  def init
+    self.collect_detail = user.company.collect_company_detail
+  end
+
+  def validate
+    if self.collect_detail.blank?
+      add_message :error, "Company detail not found"
+      return
+    end
+  end
+
+  def success
+    params[:collect_detail] = self.collect_detail
+    Company::Collect::CompanyDetails::Show::DetailPresenter.new(user, params, messages)
+  end
+
+end

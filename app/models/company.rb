@@ -39,6 +39,9 @@ class Company < ActiveRecord::Base
   has_one  :payment_file_configuration
   has_one :invoice_number_config
 
+  has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
+  has_one :collect_company_detail
+
   has_many :payment_orders
   has_many :user_groups
   has_many :user_teams
@@ -353,6 +356,7 @@ class Company < ActiveRecord::Base
 
     # creating the invoice numbering configuration for all companies with default values
     self.build_invoice_number_config(sequence_start: "0000").save
+    self.build_collect_company_detail.save
   end
 
 end
