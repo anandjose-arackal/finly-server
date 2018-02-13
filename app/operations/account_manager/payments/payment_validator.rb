@@ -18,6 +18,11 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
   def pre_validate
     if payment_order.blank?
       add_message :error, "Payment Order not passed"
+      return
+    end
+    unless payment_order.valid?
+      add_message :error, payment_order.errors.full_messages
+      return
     end
     # this validation is irrespective of the source and destination of the payment
     # i.e. checking for consistency of initiating and receiving account types etc.
@@ -67,8 +72,11 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
         receiving_account_adapter = retrieve_adapter payment.receiving_account
         unless receiving_account_adapter.eligibility(payment.amount_value)
           valid = false
-          payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value}",
-                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+          # If the object exists, i.e only validator is not being called
+          if payment.id.present?
+            payment.system_messages.build(content: "This account cannot be credited with #{payment.amount_value}",
+                                          system_message_type_id: SystemMessageType.id_for(:error)).save
+          end
         end
       end
       unless valid
@@ -82,8 +90,11 @@ class AccountManager::Payments::PaymentValidator < AccountManager::Base
         receiving_account_adapter = retrieve_adapter payment.receiving_account
         unless receiving_account_adapter.balance >= payment.amount_value
           valid = false
-          payment.system_messages.build(content: "#{receiving_account_adapter.name} has insufficient balance",
-                                        system_message_type_id: SystemMessageType.id_for(:error)).save
+          # If the object exists, i.e only validator is not being called
+          if payment.id.present?
+            payment.system_messages.build(content: "#{receiving_account_adapter.name} has insufficient balance",
+                                          system_message_type_id: SystemMessageType.id_for(:error)).save
+          end
         end
       end
       unless valid

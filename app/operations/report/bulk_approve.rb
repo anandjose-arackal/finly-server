@@ -258,7 +258,7 @@ class Report::BulkApprove < BaseOperation
 
             # set the reimbursement amount of the report
             unless report.processing?
-              Settlement::Report::Approved.(user, report: report)
+              Settlement::SReport::Approved.(user, report: report)
               report.reload
             end
             # if report is closed, add the relevant comment

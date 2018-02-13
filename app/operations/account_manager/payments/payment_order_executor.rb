@@ -105,4 +105,8 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
 
   end
 
+  def execute_post_operations(success)
+    self.payment_order.execute_post_operation(success)
+  end
+
 end

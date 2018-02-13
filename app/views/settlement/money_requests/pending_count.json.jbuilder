@@ -1,0 +1,1 @@
+json.count @result.money_requests.count

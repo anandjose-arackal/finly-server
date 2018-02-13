@@ -1,0 +1,1 @@
+json.count @result.money_request_processors.count
