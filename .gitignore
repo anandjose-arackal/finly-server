@@ -29,6 +29,7 @@ lib/tasks/aws.rake
 /public/system/kyc_documents/*
 public/system/vendor_attachments/*
 /public/common/files/temp_files/*
+/public/system/collect_company_details/*
 /sample_atm_transactions.txt
 /junk_expenses.rb
 /Sample transactions
