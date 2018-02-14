@@ -8,40 +8,53 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
 
   def credit(payment, options = {})
     # this will add money to this company's balance
-    success = false
-    opening_balance = balance
-    balance_amount = self.account.balance
-    balance_amount.with_lock do
-      balance_amount.value += payment.amount_value
-      success = balance_amount.save
-    end
-    closing_balance = balance
-    if success
-      store_transaction payment, :credit, :success, opening_balance, closing_balance, account.company_id
+    self.company = self.account.company
+    if self.company.current_account_connected?
+      both_balances = balance
+      store_transaction payment, :credit, :success, both_balances, both_balances, account.company_id
       return true
+    else
+      success = false
+      opening_balance = balance
+      balance_amount = self.account.balance
+      balance_amount.with_lock do
+        balance_amount.value += payment.amount_value
+        success = balance_amount.save
+      end
+      closing_balance = balance
+      if success
+        store_transaction payment, :credit, :success, opening_balance, closing_balance, account.company_id
+        return true
+      end
+      self.errors = self.account.errors.full_messages
+      store_transaction payment, :credit, :failure, opening_balance, closing_balance, account.company_id, error: self.errors
+      false
     end
-    self.errors = self.account.errors.full_messages
-    store_transaction payment, :credit, :failure, opening_balance, closing_balance, account.company_id, error: self.errors
-    false
   end
 
   def debit(payment, options = {})
     # this will debit money from the company balance
-    success = false
-    opening_balance = balance
-    balance_amount = self.account.balance
-    balance_amount.with_lock do
-      balance_amount.value -= payment.amount_value
-      success = balance_amount.save
-    end
-    closing_balance = balance
-    if success
-      store_transaction payment, :debit, :success, opening_balance, closing_balance, account.company_id
+    if self.company.current_account_connected?
+      both_balances = balance
+      store_transaction payment, :debit, :success, both_balances, both_balances, account.company_id
       return true
+    else
+      success = false
+      opening_balance = balance
+      balance_amount = self.account.balance
+      balance_amount.with_lock do
+        balance_amount.value -= payment.amount_value
+        success = balance_amount.save
+      end
+      closing_balance = balance
+      if success
+        store_transaction payment, :debit, :success, opening_balance, closing_balance, account.company_id
+        return true
+      end
+      self.errors = self.account.errors.full_messages
+      store_transaction payment, :debit, :failure, opening_balance, closing_balance, account.company_id, error: self.errors
+      false
     end
-    self.errors = self.account.errors.full_messages
-    store_transaction payment, :debit, :failure, opening_balance, closing_balance, account.company_id, error: self.errors
-    false
   end
 
   def balance(options = {})
