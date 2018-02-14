@@ -3,7 +3,10 @@
 
 class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration::Base
 
-  attr_accessor :timings, :payment_order, :payment_request, :payment_mode, :date
+  attr_accessor :timings, :payment_order, :payment_request, :payment_mode, :date,
+                :payment_requests, :payment_orders, :payment_modes,
+                :non_processable_requests, :processable_requests,
+                :allowed
 
   class BankTransfer::Configuration::TransferTimings::TimingsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -28,26 +31,36 @@ class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration
       self.payment_mode = params[:payment_mode]
       self.date = params[:date]
     end
+    self.processable_requests = self.non_processable_requests = []
   end
 
   def validate
     id = params[:id] || params[:bank_payment_request_id]
-    if id.present? and self.payment_request.blank? and self.payment_order.blank?
+    if id.present? and self.payment_requests.blank? && self.payment_orders.blank?
       add_message :error, 'Payment order not found'
       return
     end
-    if self.payment_mode.blank?
+    if self.payment_mode.blank? && self.payment_modes.blank?
       add_message :error, 'Payment mode cannot be blank'
       return
     end
   end
 
   def process
-
+    self.allowed = true
+    self.payment_orders.each do |order|
+      status = TransferTimingUtils.within_timeframe?(order.payment_mode)
+      if status
+        self.processable_requests << order.bank_payment_request&.id
+      else
+        self.non_processable_requests << order.bank_payment_request&.id
+        self.allowed = false
+      end
+    end
   end
 
   def success
-    params[:allowed] = TransferTimingUtils.within_timeframe?(self.payment_mode, self.date)
+    params[:allowed] = self.allowed
     params[:next_date] = TransferTimingUtils.next_valid_date(self.date, self.payment_mode)
     BankTransfer::Configuration::TransferTimings::TimingsPresenter.new(user, params, messages)
   end
@@ -55,8 +68,8 @@ class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration
   protected
 
   def init_bank_payment_request(id)
-    self.payment_request = BankPaymentRequest.find_by(id: id)
-    self.payment_order = payment_request&.payment_order
+    self.payment_requests = BankPaymentRequest.with_id(id)
+    self.payment_order = PaymentOrder.with_id(self.payment_requests.pluck(:payment_order_id))
     self.date = payment_order&.scheduled_at
     self.payment_mode = payment_order&.payment_mode
   end
