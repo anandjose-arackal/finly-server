@@ -96,7 +96,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:summary_editable] = true
           actions[:payments_editable] = true
           actions[:attachments_editable] = true
-          actions[:credit] = true
+          actions[:credit] = !bank_payment_request.credit_card?
           balance = retrieve_balance(:vendor_payment_wallet, user)
           admins = []
           user.company.users.only_vendor_payment_admins.each do |admin|
@@ -105,16 +105,15 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                 name: admin.name
             }
           end
+          actions[:credit_options] = {}
           unless bank_payment_request.credit_card?
-            actions[:credit_options] = {
-                credit: {
-                    url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
-                    enabled: true,
-                    messages: "You can directly credit this payment order from your Finly Money or Company Credits",
-                    require_password: true,
-                    initiating_account: true,
-                    method: "patch"
-                }
+            actions[:credit_options][:credit] = {
+                  url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+                  enabled: true,
+                  messages: "You can directly credit this payment order from your Finly Money or Company Credits",
+                  require_password: true,
+                  initiating_account: true,
+                  method: "patch"
             }
           end
           # based on whether the configuration for payment file is enabled or not, add this block
@@ -207,7 +206,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:summary_editable] = true
           actions[:payments_editable] = true
           actions[:attachments_editable] = true
-          actions[:credit] = true
+          actions[:credit] = !bank_payment_request.credit_card?
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
           admin = false
@@ -290,7 +289,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:summary_editable] = true
           actions[:payments_editable] = true
           actions[:attachments_editable] = true
-          actions[:credit] = true
+          actions[:credit] = !bank_payment_request.credit_card?
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
           admin = false
@@ -380,7 +379,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           balance = retrieve_balance(:vendor_payment_wallet, user)
           credit_enabled = false
           admin = false
-          if balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval
+          if (balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval) && !bank_payment_request.credit_card?
             credit_enabled = true
           elsif user.vendor_payments_admin? && !bank_payment_request.credit_card?
             credit_enabled = true
