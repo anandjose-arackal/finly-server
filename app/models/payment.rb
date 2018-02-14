@@ -25,14 +25,14 @@
 #  application             :string(255)
 #  payment_mode            :string(255)
 #  reference_id            :string(255)      not null
-#  post_operation          :text(65535)
-#  post_operation_payload  :text(65535)
-#  invoice_id              :integer
 #  retry_count             :integer          default(0)
 #  invoice_id              :integer
 #  parent_type             :string(255)
 #  parent_id               :integer
+#  post_operation          :text(65535)
+#  post_operation_payload  :text(65535)
 #
+
 
 
 

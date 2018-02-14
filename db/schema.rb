@@ -856,12 +856,12 @@ ActiveRecord::Schema.define(version: 20180210140034) do
     t.string   "gst",                       limit: 255
     t.string   "pan",                       limit: 255
     t.integer  "company_id",                limit: 4
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
     t.string   "company_logo_file_name",    limit: 255
     t.string   "company_logo_content_type", limit: 255
     t.integer  "company_logo_file_size",    limit: 4
     t.datetime "company_logo_updated_at"
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
   end
 
   add_index "collect_company_details", ["company_id"], name: "index_collect_company_details_on_company_id", using: :btree
