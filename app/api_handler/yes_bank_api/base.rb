@@ -17,7 +17,10 @@ class YesBankApi::Base < BaseHandler
     # unless config_path.present?
     #   add_message :error, "Server error, try again later"
     # end
-    values = Finly::SecureStorage::Connector.read('core/yes_bank')
+    # values = Finly::SecureStorage::Connector.read('core/yes_bank')
+    path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
+    values = YAML.load_file(path)
+
     # checking of there's a custom configuration for a particular company - stored in a variable called configuration
     type = (values[self.company_id.to_s]).present? ? self.company_id.to_s : 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default
     self.configuration = values[type]
@@ -60,115 +63,140 @@ class YesBankApi::Base < BaseHandler
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
+      # create a failed bank transacton so that the record is preserved
+      self.company = Company.find_by(id: self.transfer_request.company_id)
+      if self.payment&.reference_resource&.is_a?(BankTransaction)
+        # just update the bank transaction with the latest details
+        self.bank_transaction = payment.reference_resource
+        self.bank_transaction.update(
+            bank_reference_number: self.transfer_request.bank_reference_number,
+            transfer_status_id: BankTransferStatus.id_for(:possible_failure),
+            bank_response: self.transfer_request.transaction_result
+        )
+        self.payment.retry_count += 1
+        # otherwise create a new bank transaction
+      else
+        self.bank_transaction = company.bank_transactions.create(unique_request_number: transfer_request.unique_reference_number,
+                                                                 transfer_type: transfer_request.transfer_type,
+                                                                 bank_reference_number: transfer_request.bank_reference_number,
+                                                                 beneficiary_bank_account: self.account,
+                                                                 transfer_status_id: BankTransferStatus.id_for(:possible_failure),
+                                                                 bank_response: transfer_request.transaction_result,
+                                                                 amount_attributes: {
+                                                                     value: self.payment.amount_value,
+                                                                     currency_id: Currency.first.id
+                                                                 })
+        self.payment.update(reference_resource: self.bank_transaction)
+      end
     # temporary - rescue SSL error to simulate various cases
     # rescue Faraday::SSLError
-    #   # simulating different cases
+    # #   # simulating different cases
     #   puts "WE GOT HERE EVERYBODY! LOOKS LIKE THIS IS GONNA BE A GOOD RIDE!"
-    #   # self.response.status_code = 500
-    #   # self.parsed_response = {
-    #   #     "Envelope" => {
-    #   #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-    #   #         "Body" => {
-    #   #             "Fault" => {
-    #   #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
-    #   #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
-    #   #                 "xmlns:npci" => "http://www.npci.org.in",
-    #   #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
-    #   #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
-    #   #                 "xmlns:pt" => "https://www.puratech.co.in/",
-    #   #                 "xmlns:http" => "http://www.quantiguous.com/services",
-    #   #                 "xmlns:ns" => "http://www.quantiguous.com/services",
-    #   #                 "xmlns:atom" => "http://www.atomtech.in/imps",
-    #   #                 "xmlns:iib" => "http://www.ibm.com/iib",
-    #   #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
-    #   #                 "Code" => {
-    #   #                     "Value" => "soapenv12:Sender",
-    #   #                     "Subcode" => {
-    #   #                         "Value" => "ns:E504",
-    #   #                         "Subcode" => {
-    #   #                             "Value" => "ns:E504"
-    #   #                         }
-    #   #                     }
-    #   #                 },
-    #   #                 "Reason" => {
-    #   #                     "Text" => "Bad Gateway"
-    #   #                 },
-    #   #                 "Detail" => {
-    #   #                     "ExceptionList" => {
-    #   #                         "RecoverableException" => {
-    #   #                             "File" => "/build/slot1/S900_P/src/DataFlowEngine/PluginInterface/ImbJniNode.cpp",
-    #   #                             "Line" => "1304",
-    #   #                             "Function" => "ImbJniNode::evaluate",
-    #   #                             "Type" => "ComIbmRouteNode",
-    #   #                             "Name" => "gen/fundsTransferByCustomerService2#FCMComposite_1_8.gen/transfer_Request_Response#FCMComposite_1_28.atom/invoke5#FCMComposite_1_1.atom/invoke2#FCMComposite_1_1.atom/invoke#FCMComposite_1_1",
-    #   #                             "Label" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?",
-    #   #                             "Catalog" => "BIPmsgs",
-    #   #                             "Severity" => "3",
-    #   #                             "Number" => "2230",
-    #   #                             "Text" => "Caught exception and rethrowing",
-    #   #                             "Insert" => {
-    #   #                                 "Type" => "14",
-    #   #                                 "Text" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?"
-    #   #                             },
-    #   #                         }
-    #   #                     }
-    #   #                 }
-    #   #             }
-    #   #         }
-    #   #     }
-    #   # }
-    #
-    #   # self.parsed_response = {
-    #   #     "Envelope" => {
-    #   #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-    #   #         "Body" => {
-    #   #             "transferResponse" => {
-    #   #                 "xmlns:io" => "http://www.quantiguous.com/services",
-    #   #                 "version" => "2.0",
-    #   #                 "uniqueResponseNo" => "f7ae85caea2111e7b84a0a0047340000",
-    #   #                 "attemptNo" => "1",
-    #   #                 "transferType" => "IMPS",
-    #   #                 "lowBalanceAlert" => "false",
-    #   #                 "transactionStatus" => {
-    #   #                     "statusCode" => "COMPLETED",
-    #   #                     "subStatusCode" => "0",
-    #   #                     "bankReferenceNo" => "736015422593",
-    #   #                     "beneficiaryReferenceNo" => nil
-    #   #                 },
-    #   #                 "nameWithBeneficiaryBank" => "GURUKRIPA MILK SUPPL",
-    #   #                 "requestReferenceNo" => "FINLYIMPS71012974914"
-    #   #             }
-    #   #         }
-    #   #     }
-    #   # }
-    #   #
-    #   # self.parsed_response = {
-    #   #     "Envelope" => {
-    #   #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-    #   #         "Body" => {
-    #   #             "Fault" => {
-    #   #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
-    #   #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
-    #   #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
-    #   #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
-    #   #                 "xmlns:pt" => "https://www.puratech.co.in/",
-    #   #                 "xmlns:http" => "http://www.quantiguous.com/services",
-    #   #                 "xmlns:ns" => "http://www.quantiguous.com/services",
-    #   #                 "xmlns:iib" => "http://www.ibm.com/iib",
-    #   #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
-    #   #                 "Code" => {
-    #   #                     "Value" => "soapenv12:Sender",
-    #   #                     "Subcode" => {
-    #   #                         "Value" => "ns:E1001"
-    #   #                     }
-    #   #                 },
-    #   #                 "Reason" => {
-    #   #                     "Text" => "The transaction amount exceeds the maximum amount for IMPS: 200000"
-    #   #                 }
-    #   #             }
-    #   #         }
-    #   #     }
-    #   # }
+      # self.response.status_code = 500
+      # self.parsed_response = {
+      #     "Envelope" => {
+      #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
+      #         "Body" => {
+      #             "Fault" => {
+      #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
+      #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
+      #                 "xmlns:npci" => "http://www.npci.org.in",
+      #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
+      #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
+      #                 "xmlns:pt" => "https://www.puratech.co.in/",
+      #                 "xmlns:http" => "http://www.quantiguous.com/services",
+      #                 "xmlns:ns" => "http://www.quantiguous.com/services",
+      #                 "xmlns:atom" => "http://www.atomtech.in/imps",
+      #                 "xmlns:iib" => "http://www.ibm.com/iib",
+      #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
+      #                 "Code" => {
+      #                     "Value" => "soapenv12:Sender",
+      #                     "Subcode" => {
+      #                         "Value" => "ns:E504",
+      #                         "Subcode" => {
+      #                             "Value" => "ns:E504"
+      #                         }
+      #                     }
+      #                 },
+      #                 "Reason" => {
+      #                     "Text" => "Bad Gateway"
+      #                 },
+      #                 "Detail" => {
+      #                     "ExceptionList" => {
+      #                         "RecoverableException" => {
+      #                             "File" => "/build/slot1/S900_P/src/DataFlowEngine/PluginInterface/ImbJniNode.cpp",
+      #                             "Line" => "1304",
+      #                             "Function" => "ImbJniNode::evaluate",
+      #                             "Type" => "ComIbmRouteNode",
+      #                             "Name" => "gen/fundsTransferByCustomerService2#FCMComposite_1_8.gen/transfer_Request_Response#FCMComposite_1_28.atom/invoke5#FCMComposite_1_1.atom/invoke2#FCMComposite_1_1.atom/invoke#FCMComposite_1_1",
+      #                             "Label" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?",
+      #                             "Catalog" => "BIPmsgs",
+      #                             "Severity" => "3",
+      #                             "Number" => "2230",
+      #                             "Text" => "Caught exception and rethrowing",
+      #                             "Insert" => {
+      #                                 "Type" => "14",
+      #                                 "Text" => "gen.fundsTransferByCustomerService2.atom/invoke.is.ForeignRemittance?"
+      #                             },
+      #                         }
+      #                     }
+      #                 }
+      #             }
+      #         }
+      #     }
+      # }
+
+      # self.parsed_response = {
+      #     "Envelope" => {
+      #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
+      #         "Body" => {
+      #             "transferResponse" => {
+      #                 "xmlns:io" => "http://www.quantiguous.com/services",
+      #                 "version" => "2.0",
+      #                 "uniqueResponseNo" => "f7ae85caea2111e7b84a0a0047340000",
+      #                 "attemptNo" => "1",
+      #                 "transferType" => "IMPS",
+      #                 "lowBalanceAlert" => "false",
+      #                 "transactionStatus" => {
+      #                     "statusCode" => "COMPLETED",
+      #                     "subStatusCode" => "0",
+      #                     "bankReferenceNo" => "736015422593",
+      #                     "beneficiaryReferenceNo" => nil
+      #                 },
+      #                 "nameWithBeneficiaryBank" => "GURUKRIPA MILK SUPPL",
+      #                 "requestReferenceNo" => "FINLYIMPS71012974914"
+      #             }
+      #         }
+      #     }
+      # }
+      #
+      # self.parsed_response = {
+      #     "Envelope" => {
+      #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
+      #         "Body" => {
+      #             "Fault" => {
+      #                 "xmlns:billdesk" => "http://www.quantiguous.com/dfdl/billdesk",
+      #                 "xmlns:flex" => "http://www.oracle.com/flexcube",
+      #                 "xmlns:vp" => "http://www.ibm.com/dfdl/ISO8583-1993",
+      #                 "xmlns:ycs" => "https://uat.yalamanchili.in/",
+      #                 "xmlns:pt" => "https://www.puratech.co.in/",
+      #                 "xmlns:http" => "http://www.quantiguous.com/services",
+      #                 "xmlns:ns" => "http://www.quantiguous.com/services",
+      #                 "xmlns:iib" => "http://www.ibm.com/iib",
+      #                 "xmlns:soapenv12" => "http://www.w3.org/2003/05/soap-envelope",
+      #                 "Code" => {
+      #                     "Value" => "soapenv12:Sender",
+      #                     "Subcode" => {
+      #                         "Value" => "ns:E1001"
+      #                     }
+      #                 },
+      #                 "Reason" => {
+      #                     "Text" => "The transaction amount exceeds the maximum amount for IMPS: 200000"
+      #                 }
+      #             }
+      #         }
+      #     }
+      # }
     rescue Faraday::ResourceNotFound
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
