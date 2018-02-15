@@ -57,7 +57,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def failure
-    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter.new(nil, nil, messages)
+    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter.new
   end
 
   class YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter < BaseOperation::BasePresenter::SuccessPresenter
