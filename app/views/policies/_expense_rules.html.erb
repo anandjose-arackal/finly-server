@@ -8,7 +8,7 @@
     <div class="col-sm-6 no-padding" style="padding: 10px;">
       <div class="warning-rules" style="background: white; padding: 10px;border: 1px solid #C5CAE9;">
         <div class="row no-margin">
-          <div class="col-sm-6 no-padding">WARNING RULES</div>
+          <div class="col-sm-6 no-padding"><img src="<%= image_url('warn_rule') %>" style="height: 35px; margin-right: 20px;">WARNING RULES</div>
           <div class="col-sm-6 text-right">
             <% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
               <button class="btn-new-rule btn btn-primary btn-sm" data-rule-type="warning" data-rule-category="expense">Create New Rule</button>
@@ -77,7 +77,7 @@
     <div class="col-sm-6 no-padding" style="padding: 10px;">
       <div class="warning-rules" style="background: white; padding: 10px;border: 1px solid #C5CAE9;">
         <div class="row no-margin">
-          <div class="col-sm-6 no-padding">BLOCKING RULES</div>
+          <div class="col-sm-6 no-padding"><img src="<%= image_url('block_rule') %>" style="height: 35px; margin-right: 20px;">BLOCKING RULES</div>
           <div class="col-sm-6 text-right">
             <% if (current_user.admin? or current_user.policy_admin?(@result.policy)) and params[:view] == 'admin' %>
               <button class="btn-new-rule btn btn-primary btn-sm" data-rule-type="blocking" data-rule-category="expense">Create New Rule</button>
