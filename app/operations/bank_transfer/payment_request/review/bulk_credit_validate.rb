@@ -23,7 +23,6 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
     else
       add_message :error, op.messages[:error]
     end
-    debugger
     self.result = []
   end
 
