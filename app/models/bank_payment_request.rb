@@ -242,6 +242,10 @@ class BankPaymentRequest < ActiveRecord::Base
     [BankPaymentRequestStatus.ids_for([:approved, :credited])].include?(self.status_id)
   end
 
+  def credit_card?
+    self.payment_order.payment_mode.upcase == "CREDITCARD"
+  end
+
   private
 
   def generate_name

@@ -716,6 +716,7 @@
 #                                                         PATCH  /pending_invites/:id(.:format)                                                               pending_invites#update
 #                                                         PUT    /pending_invites/:id(.:format)                                                               pending_invites#update
 #                                                         DELETE /pending_invites/:id(.:format)                                                               pending_invites#destroy
+#                                                         GET    /settlements/:id/summary(.:format)                                                           settlements#user_summary
 #                                     settlements_summary GET    /settlements/summary(.:format)                                                               settlements#summary
 #                                             settlements GET    /settlements(.:format)                                                                       settlements#index
 #                                                         POST   /settlements(.:format)                                                                       settlements#create
@@ -730,6 +731,32 @@
 #                       expense_type_configuration_update PATCH  /expense_type_configurations(.:format)                                                       expense_types_configuration#update
 #                                            groups_teams GET    /groups_teams(.:format)                                                                      expense_types_configuration#groups_teams
 #                                         expense_filters GET    /expense_filters(.:format)                                                                   expense_types_configuration#expense_filters
+#                                                 pending GET    /settlements/reports/pending(.:format)                                                       settlement/report#pending_index
+#                                           pending_count GET    /settlements/reports/pending/count(.:format)                                                 settlement/report#pending_count
+#                                                         GET    /settlements/reports/processing(.:format)                                                    settlement/report#processing_index
+#                                                   count GET    /settlements/reports/processing/count(.:format)                                              settlement/report#processing_count
+#                                                    init POST   /settlements/reports/processing/init(.:format)                                               settlement/report#processing_init
+#                                                  create POST   /settlements/reports/processing/create(.:format)                                             settlement/report#processing_create
+#                                                  cancel POST   /settlements/reports/processing/cancel(.:format)                                             settlement/report#processing_cancel
+#                                            mark_as_paid POST   /settlements/reports/processing/mark_as_paid(.:format)                                       settlement/report#processing_mark_paid
+#                                            payment_file GET    /settlements/reports/processing/payment_file(.:format)                                       settlement/report#processing_payment_file
+#                                               completed GET    /settlements/reports/completed(.:format)                                                     settlement/report#completed_index
+#                                         completed_count GET    /settlements/reports/completed/count(.:format)                                               settlement/report#completed_count
+#                                         completed_batch GET    /settlements/reports/completed/batch(.:format)                                               settlement/report#completed_batch_index
+#                                   completed_batch_count GET    /settlements/reports/completed/batch/count(.:format)                                         settlement/report#completed_batch_count
+#                                                         GET    /settlements/money_requests/pending(.:format)                                                settlement/money_requests#pending_index
+#                                                         GET    /settlements/money_requests/pending/count(.:format)                                          settlement/money_requests#pending_count
+#                                                         GET    /settlements/money_requests/processing(.:format)                                             settlement/money_requests#processing_index
+#                                                         GET    /settlements/money_requests/processing/count(.:format)                                       settlement/money_requests#processing_count
+#                                                         POST   /settlements/money_requests/processing/init(.:format)                                        settlement/money_requests#processing_init
+#                                                         POST   /settlements/money_requests/processing/create(.:format)                                      settlement/money_requests#processing_create
+#                                                         POST   /settlements/money_requests/processing/cancel(.:format)                                      settlement/money_requests#processing_cancel
+#                                                         POST   /settlements/money_requests/processing/mark_as_paid(.:format)                                settlement/money_requests#processing_mark_paid
+#                                                         GET    /settlements/money_requests/processing/payment_file(.:format)                                settlement/money_requests#processing_payment_file
+#                                                         GET    /settlements/money_requests/completed(.:format)                                              settlement/money_requests#completed_index
+#                                                         GET    /settlements/money_requests/completed/count(.:format)                                        settlement/money_requests#completed_count
+#                                                         GET    /settlements/money_requests/completed/batch(.:format)                                        settlement/money_requests#completed_batch_index
+#                                                         GET    /settlements/money_requests/completed/batch/count(.:format)                                  settlement/money_requests#completed_batch_count
 #                                               per_diems GET    /per_diems(.:format)                                                                         per_diems#index
 #                                                         POST   /per_diems(.:format)                                                                         per_diems#create
 #                                            new_per_diem GET    /per_diems/new(.:format)                                                                     per_diems#new
@@ -756,7 +783,7 @@
 #                          statements_user_summary_export GET    /statements/user_summary/export(.:format)                                                    statements#user_summary_export
 #                                                         POST   /statements/user_summary(.:format)                                                           statements#user_summary
 #                                                         POST   /statements/user_summary/export(.:format)                                                    statements#user_summary_export
-#                                                         GET    /statements/:id/summary(.:format)                                                            statements#summary
+#                                      statements_summary GET    /statements/summary(.:format)                                                                statements#summary
 #                                        export_statement GET    /export/:id/statements(.:format)                                                             export#statement
 #                                              statements GET    /statements(.:format)                                                                        statements#index
 #                                                         POST   /statements(.:format)                                                                        statements#create
@@ -983,6 +1010,7 @@
 #                                                         PATCH  /bank_transfer/bank_payment_requests/:id(.:format)                                           bank_transfer/bank_payment_requests#update
 #                                                         PUT    /bank_transfer/bank_payment_requests/:id(.:format)                                           bank_transfer/bank_payment_requests#update
 #                                                         DELETE /bank_transfer/bank_payment_requests/:id(.:format)                                           bank_transfer/bank_payment_requests#destroy
+#                          bank_transfer_transfer_timings GET    /bank_transfer/transfer_timings(.:format)                                                    bank_transfer/bank_payment_requests#within_timeframe
 #                      bank_transfer_account_owners_count GET    /bank_transfer/account_owners/count(.:format)                                                bank_transfer/account_owners#count
 #                            bank_transfer_account_owners GET    /bank_transfer/account_owners(.:format)                                                      bank_transfer/account_owners#index
 #                                                         POST   /bank_transfer/account_owners(.:format)                                                      bank_transfer/account_owners#create
@@ -1052,6 +1080,7 @@
 #                                                         PATCH  /invoicing/payment_receivables/:id(.:format)                                                 invoicing/payment_receivables#update
 #                                                         PUT    /invoicing/payment_receivables/:id(.:format)                                                 invoicing/payment_receivables#update
 #                                                         DELETE /invoicing/payment_receivables/:id(.:format)                                                 invoicing/payment_receivables#destroy
+#                        invoicing_outward_invoices_count GET    /invoicing/outward_invoices/count(.:format)                                                  invoicing/outward_invoices#count
 #                  invoicing_outward_invoice_add_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/add_customer(.:format)                       invoicing/outward_invoices#add_customer
 #               invoicing_outward_invoice_remove_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/remove_customer(.:format)                    invoicing/outward_invoices#remove_customer
 #                invoicing_outward_invoice_update_address PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_address(.:format)                     invoicing/outward_invoices#update_address
@@ -1067,6 +1096,7 @@
 #                                                         PATCH  /invoicing/outward_invoices/:id(.:format)                                                    invoicing/outward_invoices#update
 #                                                         PUT    /invoicing/outward_invoices/:id(.:format)                                                    invoicing/outward_invoices#update
 #                                                         DELETE /invoicing/outward_invoices/:id(.:format)                                                    invoicing/outward_invoices#destroy
+#                               invoicing_customers_count GET    /invoicing/customers/count(.:format)                                                         invoicing/customers#count
 #                     invoicing_customer_virtual_accounts GET    /invoicing/customers/:customer_id/virtual_accounts(.:format)                                 invoicing/customers#virtual_bank_accounts
 #               invoicing_customer_create_virtual_account POST   /invoicing/customers/:customer_id/create_virtual_account(.:format)                           invoicing/customers#create_virtual_account
 #                                     invoicing_customers GET    /invoicing/customers(.:format)                                                               invoicing/customers#index
@@ -1099,7 +1129,7 @@
 #   invoicing_company_configuration_update_credit_account PATCH  /invoicing/company_configurations/:company_configuration_id/update_credit_account(.:format)  invoicing/company_configurations#update_credit_account
 #  invoicing_company_configuration_update_collect_details PATCH  /invoicing/company_configurations/:company_configuration_id/update_collect_details(.:format) invoicing/company_configurations#update_collect_details
 #     invoicing_company_configuration_update_collect_logo PATCH  /invoicing/company_configurations/:company_configuration_id/update_collect_logo(.:format)    invoicing/company_configurations#update_collect_logo
-#     invoicing_company_configuration_show_collect_detail GET    /invoicing/company_configurations/:company_configuration_id/show_collect_detail(.:format)    invoicing/company_configurations#show_collect_detail
+#     invoicing_company_configuration_show_collect_detail GET    /invoicing/company_configurations/:company_configuration_id/show_collect_detail(.:format)    invoicing/company_configurations#show_collect_details
 #     invoicing_company_configuration_show_credit_account GET    /invoicing/company_configurations/:company_configuration_id/show_credit_account(.:format)    invoicing/company_configurations#show_credit_account
 #                        invoicing_company_configurations GET    /invoicing/company_configurations(.:format)                                                  invoicing/company_configurations#index
 #                                                         POST   /invoicing/company_configurations(.:format)                                                  invoicing/company_configurations#create
@@ -1124,6 +1154,7 @@
 #                                                 summary DELETE /summary/configurations/admin/:id(.:format)                                                  summary/configuration#admin_destroy
 #                          summary_configurations_manager POST   /summary/configurations/manager(.:format)                                                    summary/configuration#manager_create
 #                                                         DELETE /summary/configurations/manager/:id(.:format)                                                summary/configuration#manager_destroy
+#                                                    ping GET    /ping(.:format)                                                                              ping#ping
 #
 
 #                               crono_web        /crono                                                      Crono::Web
