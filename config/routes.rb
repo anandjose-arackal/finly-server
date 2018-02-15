@@ -993,6 +993,8 @@
 #               bank_transfer_download_pending_attachment GET    /bank_transfer/download_pending_attachment(.:format)                                         bank_transfer/bank_payment_requests#download_pending_attachment
 #                              bank_transfer_download_all POST   /bank_transfer/download_all(.:format)                                                        bank_transfer/bank_payment_requests#download_all
 #                   bank_transfer_download_all_attachment GET    /bank_transfer/download_all_attachment(.:format)                                             bank_transfer/bank_payment_requests#download_all_attachment
+#                      bank_transfer_bulk_credit_validate PATCH  /bank_transfer/bulk_credit_validate(.:format)                                                bank_transfer/bank_payment_requests#bulk_credit_validate
+#                               bank_transfer_bulk_credit PATCH  /bank_transfer/bulk_credit(.:format)                                                         bank_transfer/bank_payment_requests#bulk_credit
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format)              bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)               bank_transfer/bank_payment_requests#review
 #               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)               bank_transfer/bank_payment_requests#credit
@@ -2524,6 +2526,8 @@ Rails.application.routes.draw do
     get 'download_pending_attachment', to: 'bank_payment_requests#download_pending_attachment', as: :download_pending_attachment
     post 'download_all', to: 'bank_payment_requests#download_all', as: :download_all
     get 'download_all_attachment', to: 'bank_payment_requests#download_all_attachment', as: :download_all_attachment
+    patch 'bulk_credit_validate', to: 'bank_payment_requests#bulk_credit_validate', as: :bulk_credit_validate
+    patch 'bulk_credit', to: 'bank_payment_requests#bulk_credit', as: :bulk_credit
 
     resources :bank_payment_requests do
       post 'comment', to: 'bank_payment_requests#comment', as: :comment

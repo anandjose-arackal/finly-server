@@ -140,6 +140,8 @@ class BankPaymentRequest < ActiveRecord::Base
     where owner_id: owner_id
   }
 
+  scope :non_approved, -> { where.not(status_id: BankPaymentRequestStatus.id_for(:approved)) }
+
   attr_accessor :cache_users
 
   before_save do
