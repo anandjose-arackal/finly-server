@@ -169,7 +169,8 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def bulk_credit
-
+    @result = BankTransfer::PaymentRequest::Review::BulkCredit.(current_user, params)
+    respond
   end
 
   private
