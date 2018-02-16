@@ -42,6 +42,7 @@ class ItzCash::AccountDetails < ItzCash::Base
       if op.success?
         params[:balance] = op.balance
         params[:available_card_eligibility] = op.available_card_eligibility
+        params[:distributor_id] = op.distributor_id
       end
     end
     ItzCash::AccountDetails::SuccessPresenter.new(self.user, self.params, self.messages)
