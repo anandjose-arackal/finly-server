@@ -42,14 +42,21 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
 
     # scheduling the payment orders that can be scheduled here, and excluding them from the
     # eventually processed payment orders
-    schedulable_payment_order_ids = []
+    schedulable_payment_request_ids = []
     self.payment_requests.each do |payment_request|
       allowed = TransferTimingUtils.within_timeframe?(payment_request.payment_order.payment_mode, nil)
-      unless allowed
-        schedulable_payment_order_ids << payment_request.id
+      # now if the payment order is either scheduled or cannot be processed at this time, we mark it as to be scheduled
+      if !allowed || (payment_request.payment_order.scheduled_at.present? && payment_request.payment_order.scheduled_at >= DateUtils.local_date)
+        schedulable_payment_request_ids << payment_request.id
       end
     end
-    self.payment_requests = self.payment_requests.without_id(schedulable_payment_order_ids)
+    schedulable_payment_requests = BankPaymentRequest.with_id(schedulable_payment_request_ids)
+    schedulable_payment_requests.each do |payment_request|
+      # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
+      next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_request.payment_order.payment_mode)
+      payment_request.payment_order.update(scheduled_at: next_date)
+    end
+    self.payment_requests = self.payment_requests.without_id(schedulable_payment_request_ids)
   end
 
   def process
