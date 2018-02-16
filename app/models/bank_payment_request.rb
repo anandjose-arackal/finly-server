@@ -59,6 +59,7 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :with_user, -> (user_id) { where owner_id: user_id }
   scope :not_open, -> { where.not status_id: BankPaymentRequestStatus.id_for(:open) }
   scope :with_id, -> (id) { where id: id }
+  scope :without_id, -> (id) { where.not id: id }
   scope :approved, -> { where status_id: BankPaymentRequestStatus.id_for(:approved) }
   scope :filter_status_id, -> (status_id) {
     case status_id

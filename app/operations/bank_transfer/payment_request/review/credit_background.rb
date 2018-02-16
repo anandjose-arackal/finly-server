@@ -29,7 +29,29 @@ class BankTransfer::PaymentRequest::Review::CreditBackground < BankTransfer::Pay
 
   end
 
-  def process
+  def validate
+    # todo - validations for the background process that will credit these payment orders
 
+  end
+
+  def process
+    self.payment_requests.each do |payment_request|
+      op = BankTransfer::YesBank::Create.(user, bank_payment_request: payment_request)
+      if op.success?
+        # update the bank_payment_request to credited
+        payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil,
+                                    controlling_for_user_id: nil, controlling_for_user_role_id: nil)
+        # create a trail to show that the BPR was credited
+        payment_request.bank_payment_request_trails.create action_user: user,
+                                                                action_user_role_id: self.view_role,
+                                                                action_id: BankPaymentRequestTrailAction.id_for(:credit),
+                                                                modified_user_id: nil,
+                                                                modified_user_role_id: nil
+      else
+        add_message :error, op.messages[:error]
+        payment_request.update(status_id: BankPaymentRequestStatus.id_for(:failed))
+        return
+      end
+    end
   end
 end
