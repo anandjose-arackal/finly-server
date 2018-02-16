@@ -63,7 +63,7 @@
 #  combined_kyc_file_size     :integer
 #  combined_kyc_updated_at    :datetime
 #
-
+require 'fileutils'
 class IndividualKyc < ActiveRecord::Base
   include Attachable, Magick
 
@@ -151,6 +151,7 @@ class IndividualKyc < ActiveRecord::Base
     view.extend ApplicationHelper
     html_string = view.render(file: 'kyc/user/kyc_template.html.erb', locals: {kyc: self})
 
+    FileUtils::mkdir_p "#{Rails.root}/tmp/images"
     image_tmp_path = "#{Rails.root}/tmp/images/#{id}_combined_kyc.jpg"
     converter = ReceiptProcessor::HTMLConverter.new
     self.combined_kyc = converter.convert(html_string, image_tmp_path)&.first
