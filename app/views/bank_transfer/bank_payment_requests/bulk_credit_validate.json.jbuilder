@@ -3,6 +3,8 @@ json.summary do
   json.unprocessable_amount @result.unprocessable_amount
   json.scheduled_amount @result.scheduled_amount
   json.processable @result.processable?
+  json.finly_money_balance @result.wallet_balance
+  json.company_credits_balance @result.company_credits_balance
 end
 
 json.orders do

@@ -1,11 +1,13 @@
 class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::PaymentRequest::Base
 
   attr_accessor :payment_requests, :result, :processable_amount, :unprocessable_amount, :scheduled_amount,
-                :initiating_account_adapter, :source_account_balance
+                :initiating_account_adapter, :source_account_balance,
+                :wallet_adapter, :company_credits_adapter
 
   class BankTransfer::PaymentRequest::Review::BulkCreditValidate::BulkCreditValidationPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :result, :processable_amount, :unprocessable_amount, :scheduled_amount, :source_account_balance
+    attr_accessor :result, :processable_amount, :unprocessable_amount, :scheduled_amount, :source_account_balance,
+                  :wallet_balance, :company_credits_balance
 
     def init
       self.result = params[:result]
@@ -13,6 +15,8 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
       self.unprocessable_amount = params[:unprocessable_amount]
       self.scheduled_amount = params[:scheduled_amount]
       self.source_account_balance = params[:source_account_balance]
+      self.wallet_balance = params[:wallet_balance]
+      self.company_credits_balance = params[:company_credits_balance]
     end
 
     def processable?
@@ -36,6 +40,8 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
     self.processable_amount = self.unprocessable_amount = self.scheduled_amount = 0
     self.initiating_account_adapter = retrieve_initiating_account_adapter
     self.source_account_balance = self.initiating_account_adapter.balance
+    self.wallet_adapter = AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+    self.company_credits_adapter = AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
   end
 
   def validate
@@ -88,6 +94,8 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
     params[:unprocessable_amount] = self.unprocessable_amount
     params[:scheduled_amount] = self.scheduled_amount
     params[:source_account_balance] = self.source_account_balance
+    params[:wallet_balance] = self.wallet_adapter.balance
+    params[:company_credits_balance] = self.company_credits_adapter.balance
     BankTransfer::PaymentRequest::Review::BulkCreditValidate::BulkCreditValidationPresenter.new(user, params, messages)
   end
 
