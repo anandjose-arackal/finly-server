@@ -2,6 +2,7 @@ json.summary do
   json.processable_amount @result.processable_amount
   json.unprocessable_amount @result.unprocessable_amount
   json.scheduled_amount @result.scheduled_amount
+  json.processable @result.processable?
 end
 
 json.orders do
@@ -14,6 +15,7 @@ json.orders do
     json.created_at payment_request[:created_at]
     json.errors payment_request[:errors]
     json.selectable payment_request[:selectable]
+    json.payment_mode payment_request[:payment_mode]
     json.payments do
       json.array!(payment_request[:payment_request].payment_order.payments) do |payment|
         json.beneficiary_account_number payment.receiving_account.account_number

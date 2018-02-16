@@ -1,6 +1,6 @@
 class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :payment_requests, :result
+  attr_accessor :payment_requests, :result, :initiating_account
 
   def init
     ids = params[:payment_request_ids]
@@ -20,6 +20,9 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
       add_message :error, "Payment orders not found"
       return
     end
+
+    # check if there is enough balance in the source account for this transaction
+
   end
 
   def process

@@ -1,16 +1,22 @@
 class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :payment_requests, :result, :processable_amount, :unprocessable_amount, :scheduled_amount
+  attr_accessor :payment_requests, :result, :processable_amount, :unprocessable_amount, :scheduled_amount,
+                :initiating_account_adapter, :source_account_balance
 
   class BankTransfer::PaymentRequest::Review::BulkCreditValidate::BulkCreditValidationPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :result, :processable_amount, :unprocessable_amount, :scheduled_amount
+    attr_accessor :result, :processable_amount, :unprocessable_amount, :scheduled_amount, :source_account_balance
 
     def init
       self.result = params[:result]
       self.processable_amount = params[:processable_amount]
       self.unprocessable_amount = params[:unprocessable_amount]
       self.scheduled_amount = params[:scheduled_amount]
+      self.source_account_balance = params[:source_account_balance]
+    end
+
+    def processable?
+      self.source_account_balance >= (self.processable_amount + self.scheduled_amount)
     end
 
   end
@@ -28,6 +34,8 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
     end
     self.result = []
     self.processable_amount = self.unprocessable_amount = self.scheduled_amount = 0
+    self.initiating_account_adapter = retrieve_initiating_account_adapter
+    self.source_account_balance = self.initiating_account_adapter.balance
   end
 
   def validate
@@ -35,6 +43,9 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
       add_message :error, "No payment orders to process"
       return
     end
+
+    # validating that the source account has enough balance for the above transaction
+
   end
 
   def process
@@ -47,7 +58,8 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
           next_date: TransferTimingUtils.next_valid_date(nil, payment_request.payment_order.payment_mode),
           total_amount: payment_request.payment_order.amount_requested&.value,
           created_at: payment_request.created_at.strftime("%d-%m-%Y"),
-          selectable: true
+          selectable: true,
+          payment_mode: payment_request.payment_mode
       }
       errors = []
       # first check if the payment request has been approved
@@ -75,7 +87,21 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
     params[:processable_amount] = self.processable_amount
     params[:unprocessable_amount] = self.unprocessable_amount
     params[:scheduled_amount] = self.scheduled_amount
+    params[:source_account_balance] = self.source_account_balance
     BankTransfer::PaymentRequest::Review::BulkCreditValidate::BulkCreditValidationPresenter.new(user, params, messages)
+  end
+
+  private
+
+  def retrieve_initiating_account_adapter
+    case params[:initiating_account_type]
+      when 1, '1'
+        return AccountManager::YesBankAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
+      when 2, '2'
+        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+      else
+        return AccountManager::BankWallet::VendorPaymentWalletAdapter.new(user.bank_wallet)
+    end
   end
 
 end
