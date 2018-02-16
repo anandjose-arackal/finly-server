@@ -38,15 +38,27 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
 
   def process
     self.payment_requests.each do |payment_request|
-      self.result << {
+      hash = {
           id: payment_request.id,
           name: payment_request.name,
           payment_request: payment_request,
           allowed: TransferTimingUtils.within_timeframe?(payment_request.payment_order.payment_mode, nil),
           next_date: TransferTimingUtils.next_valid_date(nil, payment_request.payment_order.payment_mode),
           total_amount: payment_request.payment_order.amount_requested&.value,
-          created_at: payment_request.created_at.strftime("%d-%m-%Y")
+          created_at: payment_request.created_at.strftime("%d-%m-%Y"),
+          selectable: true
       }
+      errors = []
+      unless hash[:allowed]
+        errors << "#{payment_request.payment_mode} transfers are outside the bank transfer window for today. You can either change the transfer type to IMPS or proceed and we will schedule the payment for the next transfer window"
+        errors << "Next available window for this order starts at: 8:00 AM on #{hash[:next_date].strftime("%d %B, %Y")}"
+      end
+      unless payment_request.approved?
+        errors << "Only approved payment orders can be credited"
+        hash[:selectable] = false
+      end
+      hash[:errors] = errors
+      self.result << hash
     end
   end
 
