@@ -43,7 +43,9 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
           name: payment_request.name,
           payment_request: payment_request,
           allowed: TransferTimingUtils.within_timeframe?(payment_request.payment_order.payment_mode, nil),
-          next_date: TransferTimingUtils.next_valid_date(nil, payment_request.payment_order.payment_mode)
+          next_date: TransferTimingUtils.next_valid_date(nil, payment_request.payment_order.payment_mode),
+          total_amount: payment_request.payment_order.amount_requested&.value,
+          created_at: payment_request.created_at.strftime("%d-%m-%Y")
       }
     end
   end
