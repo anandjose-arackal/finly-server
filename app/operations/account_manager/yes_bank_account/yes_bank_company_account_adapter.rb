@@ -15,13 +15,13 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
       return true
     else
       success = false
-      opening_balance = balance
+      opening_balance = database_balance
       balance_amount = self.account.balance
       balance_amount.with_lock do
         balance_amount.value += payment.amount_value
         success = balance_amount.save
       end
-      closing_balance = balance
+      closing_balance = database_balance
       if success
         store_transaction payment, :credit, :success, opening_balance, closing_balance, account.company_id
         return true
@@ -40,13 +40,13 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
       return true
     else
       success = false
-      opening_balance = balance
+      opening_balance = database_balance
       balance_amount = self.account.balance
       balance_amount.with_lock do
         balance_amount.value -= payment.amount_value
         success = balance_amount.save
       end
-      closing_balance = balance
+      closing_balance = database_balance
       if success
         store_transaction payment, :debit, :success, opening_balance, closing_balance, account.company_id
         return true
@@ -78,6 +78,10 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
         return 0
       end
     end
+  end
+
+  def database_balance
+    self.account.balance_value
   end
 
   def creditable_accounts
