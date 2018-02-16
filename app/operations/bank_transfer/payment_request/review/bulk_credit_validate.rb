@@ -32,8 +32,6 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
       return
     end
 
-    #todo - validation to ensure that only approved payment orders can be credited
-
   end
 
   def process

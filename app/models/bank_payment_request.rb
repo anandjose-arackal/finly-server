@@ -141,6 +141,7 @@ class BankPaymentRequest < ActiveRecord::Base
   }
 
   scope :non_approved, -> { where.not(status_id: BankPaymentRequestStatus.id_for(:approved)) }
+  scope :creditable, -> { where status_id: BankPaymentRequestStatus.ids_for(:approved) }
 
   attr_accessor :cache_users
 
