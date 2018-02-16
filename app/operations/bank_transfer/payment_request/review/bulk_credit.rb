@@ -26,7 +26,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
 
     # check if there is enough balance in the source account for this transaction
     self.initiating_account_adapter = retrieve_initiating_account_adapter
-    approved_payment_orders = self.bank_payment_requests.creditable.pluck(:payment_order_id)
+    approved_payment_orders = self.payment_requests.creditable.pluck(:payment_order_id)
     requested_amount = PaymentOrder.with_id(approved_payment_orders).joins(:amount_requested).sum(:value)
     unless requested_amount <= self.initiating_account_adapter.balance
       add_message :error, "You do not have enough balance in the initiating account to initiate this transfer"
@@ -36,9 +36,9 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
 
   def pre_process
     # update the initiating account for all these payment orders as the one passed in the params
-    self.payment_orders.update_all(initiating_account: self.initiating_account)
-    payments = Payment.with_payment_order_id(self.payment_orders.pluck(:id))
-    payments.update_all(initiating_account: self.initiating_account)
+    self.payment_orders.update_all(initiating_account_type: self.initiating_account.class.name)
+    payments = ::Payment.with_payment_order_id(self.payment_orders.pluck(:id))
+    payments.update_all(initiating_account_id: self.initiating_account.id, initiating_account_type: self.initiating_account.class.name)
 
     # scheduling the payment orders that can be scheduled here, and excluding them from the
     # eventually processed payment orders
@@ -62,7 +62,7 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
   def process
     # update the status of all payment orders as pending
     self.payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
-    ids = self.bank_payment_requests.pluck(:id)
+    ids = self.payment_requests.pluck(:id)
     BankTransfer::PaymentRequest::Review::CreditBackground.call_async(ids, initiating_user_id: user.id)
   end
 

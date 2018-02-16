@@ -1,4 +1,4 @@
-class BankTransfer::PaymentRequest::Review::CreditBackground < BankTransfer::PaymentRequest::Base
+class BankTransfer::PaymentRequest::Review::CreditBackground < BackgroundOperation
 
   attr_accessor :payment_requests, :options, :initiating_user
 
@@ -32,6 +32,10 @@ class BankTransfer::PaymentRequest::Review::CreditBackground < BankTransfer::Pay
   def validate
     # todo - validations for the background process that will credit these payment orders
     
+  end
+
+  def pre_process
+    # set the status of these payment orders as scheduled
   end
 
   def process
