@@ -69,7 +69,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
       }
       errors = []
       # first check if the payment request has been approved
-      if payment_request.approved?
+      if payment_request.controlling_user_id == user.id
         if hash[:allowed]
           self.processable_amount += payment_request.payment_order.amount_requested&.value
         else
@@ -78,7 +78,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
           self.scheduled_amount += payment_request.payment_order.amount_requested&.value
         end
       else
-        errors << "Only approved payment orders can be credited"
+        errors << "You can only credit payment orders which are awaiting your approval"
         hash[:selectable] = false
         self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
       end

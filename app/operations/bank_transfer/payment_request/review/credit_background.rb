@@ -41,7 +41,7 @@ class BankTransfer::PaymentRequest::Review::CreditBackground < BackgroundOperati
   def process
     self.payment_requests.each do |payment_request|
       order = payment_request.payment_order
-      BankTransfer::YesBank::Execute.call(order.initiating_user, payment_order_id: order.id)
+      op = BankTransfer::YesBank::Execute.call(order.initiating_user, payment_order_id: order.id)
     end
   end
 end

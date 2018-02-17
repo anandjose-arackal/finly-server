@@ -61,8 +61,13 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
 
   def process
     # update the status of all payment orders as pending
-    self.payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
     ids = self.payment_requests.pluck(:id)
+    self.payment_requests.update_all(status_id: BankPaymentRequestStatus.id_for(:pending))
+    # updating all the payment orders to pending state
+    self.payment_orders.update_all(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
+    # updating all the individual payments to pending state
+    payments = ::Payment.with_payment_order_id(self.payment_orders.pluck(:id))
+    payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
     BankTransfer::PaymentRequest::Review::CreditBackground.call_async(ids, initiating_user_id: user.id)
   end
 
