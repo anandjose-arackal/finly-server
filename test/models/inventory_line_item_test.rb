@@ -13,6 +13,7 @@
 #  category_id :integer
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  note        :text(65535)
 #
 
 require 'test_helper'

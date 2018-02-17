@@ -13,6 +13,7 @@
 #  category_id :integer
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  note        :text(65535)
 #
 
 class InventoryLineItem < ActiveRecord::Base
@@ -21,4 +22,8 @@ class InventoryLineItem < ActiveRecord::Base
 
   validates :rate, presence: true
   validates :description, presence: true
+
+  scope :search, -> (term) {
+    where('description like ?', "%#{term}%")
+  }
 end
