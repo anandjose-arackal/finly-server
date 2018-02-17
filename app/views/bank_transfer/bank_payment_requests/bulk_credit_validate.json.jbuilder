@@ -21,64 +21,61 @@ json.orders do
     json.initiating_user payment_request[:payment_request]&.owner&.name
     json.payments do
       json.array!(payment_request[:payment_request].payment_order.payments) do |payment|
-        json.beneficiary_account_number payment.receiving_account.account_number
-        json.ifsc payment.receiving_account.ifsc
-        json.name payment.receiving_user&.name
-        json.amount payment.amount_value
-        json.owner_name payment.receiving_account&.account_owner&.name
-        json.name payment.receiving_account&.name
+        json.bank_payment_request do
+          json.id payment.payment_order.bank_payment_request.id
+          json.policy do
+            json.id payment.payment_order.bank_payment_request.policy&.id
+            json.name payment.payment_order.bank_payment_request.policy&.name
+          end
+          json.scheduled_at payment.payment_order.scheduled_at&.strftime "%d %b %Y"
+          json.processed_at payment.payment_order.processed_at&.strftime "%d %b %Y"
+        end
+        json.name payment.receiving_account.account_owner.name
         json.account_number payment.receiving_account.account_number
         json.ifsc payment.receiving_account.ifsc
-        json.invoice_amount precision_value payment.invoice_amount
         json.net_amount precision_value payment.amount_value
+        json.invoice_amount precision_value payment.invoice_amount
         json.status payment.payment_status_name
         json.id payment.id
         json.note payment.note
         json.account_id payment.receiving_account.id
         json.beneficiary_id payment.receiving_account.account_owner&.id
-        json.beneficiary_type (payment.receiving_account.account_owner_type == "User" ? 1 : 2)
+        json.beneficiary_type payment.receiving_account.account_owner_type == "YesBankVendor" ? 2 : 1
         json.system_messages do
           json.array! (payment.system_messages)
         end
+        json.bank_transfer_type payment.payment_mode&.upcase
         json.bank_reference_number payment.reference_resource&.bank_reference_number
-        json.retriable do
-          json.retriable payment.retriable?
-          json.change_mode payment.payment_order.failed?
+        json.initiating_user do
+          json.name payment.initiating_user.name
+          json.email payment.initiating_user.email
+          json.mobile_number payment.initiating_user.mobile_number
         end
+        # json.retriable payment.retriable?
+
         invoice = payment.invoice
 
         if payment.invoice.present?
           json.raw_amount precision_value invoice&.amount&.value
-          # conditionally set the original amount as invoice amount is there are line items
-          if payment.invoice&.invoice_items.present?
-            json.original_amount precision_value invoice.amount&.value
-          else
-            json.original_amount precision_value invoice.original_amount&.value
-          end
+          json.original_amount precision_value invoice.original_amount&.value
           json.invoice do
             json.advance invoice.advance
-            json.advance_amount precision_value invoice.advance_amount&.value
+            json.advance_amount invoice.advance_amount&.value
             json.tax_amount precision_value invoice.tax_amount&.value
             json.tds_amount precision_value invoice.tds_amount&.value
             json.tax precision_value invoice.tax
             json.tds precision_value invoice.tds
-            json.gst_type_id invoice.gst_type
+            json.gst_type_id invoice.gst_type_id
             json.tax_type_id invoice.tax_type_id
             json.tds_type_id invoice.tds_type_id
             json.discount_amount precision_value invoice.discount_amount&.value
             json.discount precision_value invoice.discount
-            json.advance_type_id invoice.advance_type_id
-            json.advance invoice.advance
-            json.freight_amount invoice.freight_amount&.value
             json.date invoice.date
             json.discount_type_id invoice.discount_type_id
             json.due_date invoice.due_date
             json.invoice_number invoice.invoice_number
             json.inclusive_of_taxes invoice.inclusive_of_taxes
             json.freight_amount invoice.freight_amount&.value
-            json.roundoff_amount invoice.roundoff_amount
-            json.balance_due invoice.balance_due&.value
-            json.taxable_amount precision_value invoice.gross_amount&.value
             # adding the respective rates
             json.tax_rate precision_value invoice.tax_rate
             json.tds_rate precision_value invoice.tds_rate
@@ -99,10 +96,6 @@ json.orders do
             json.category_id invoice.category_id
             json.category_name invoice.category&.name
 
-            # invoice amounts total
-            json.item_amounts_total invoice.item_amounts_total
-
-            # invoice items
             json.invoice_items do
               json.array!(invoice.invoice_items) do |item|
                 json.rate item.rate
@@ -118,7 +111,6 @@ json.orders do
                 json.description item.description
                 json.total_amount precision_value item.net_amount&.value
                 json.hsn_sac item.hsn_sac
-                json.taxable_amount precision_value item.taxable_amount&.value
               end
             end
           end
