@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180214110745) do
+ActiveRecord::Schema.define(version: 20180217080501) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -856,12 +856,12 @@ ActiveRecord::Schema.define(version: 20180214110745) do
     t.string   "gst",                       limit: 255
     t.string   "pan",                       limit: 255
     t.integer  "company_id",                limit: 4
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
     t.string   "company_logo_file_name",    limit: 255
     t.string   "company_logo_content_type", limit: 255
     t.integer  "company_logo_file_size",    limit: 4
     t.datetime "company_logo_updated_at"
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
   end
 
   add_index "collect_company_details", ["company_id"], name: "index_collect_company_details_on_company_id", using: :btree
@@ -1874,6 +1874,22 @@ ActiveRecord::Schema.define(version: 20180214110745) do
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
   add_index "individual_kycs", ["company_id"], name: "index_individual_kycs_on_company_id", using: :btree
   add_index "individual_kycs", ["user_id"], name: "index_individual_kycs_on_user_id", using: :btree
+
+  create_table "inventory_line_items", force: :cascade do |t|
+    t.decimal  "tax",                       precision: 10, scale: 5
+    t.decimal  "discount",                  precision: 10, scale: 5
+    t.string   "hsn_sac",     limit: 255
+    t.integer  "company_id",  limit: 4
+    t.string   "sku",         limit: 255
+    t.decimal  "rate",                      precision: 10, scale: 5
+    t.text     "description", limit: 65535
+    t.integer  "category_id", limit: 4
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+  end
+
+  add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
+  add_index "inventory_line_items", ["company_id"], name: "index_inventory_line_items_on_company_id", using: :btree
 
   create_table "invoice_attachments", force: :cascade do |t|
     t.string   "attached_file_file_name",    limit: 255
@@ -3924,6 +3940,8 @@ ActiveRecord::Schema.define(version: 20180214110745) do
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
+  add_foreign_key "inventory_line_items", "categories"
+  add_foreign_key "inventory_line_items", "companies"
   add_foreign_key "invoice_attachments", "invoices"
   add_foreign_key "invoice_line_items", "categories"
   add_foreign_key "invoice_line_items", "invoices"

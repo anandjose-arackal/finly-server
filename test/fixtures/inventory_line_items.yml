@@ -1,0 +1,38 @@
+# == Schema Information
+#
+# Table name: inventory_line_items
+#
+#  id          :integer          not null, primary key
+#  tax         :decimal(10, 5)
+#  discount    :decimal(10, 5)
+#  hsn_sac     :string(255)
+#  company_id  :integer
+#  sku         :string(255)
+#  rate        :decimal(10, 5)
+#  description :text(65535)
+#  category_id :integer
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  tax: 9.99
+  discount: 9.99
+  hsn_sac: 9.99
+  company_id: 
+  sku: MyString
+  rate: 9.99
+  description: MyText
+  category_id: 
+
+two:
+  tax: 9.99
+  discount: 9.99
+  hsn_sac: 9.99
+  company_id: 
+  sku: MyString
+  rate: 9.99
+  description: MyText
+  category_id: 

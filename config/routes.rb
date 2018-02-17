@@ -2612,7 +2612,7 @@ Rails.application.routes.draw do
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
     end
 
-    resources :outward_invoices_line_items
+    resources :inventory_line_items
   end
 
 
