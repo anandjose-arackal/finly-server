@@ -10,6 +10,11 @@ class Invoicing::InventoryLineItemsController < ApplicationController
     respond
   end
 
+  def update
+    @result = Invoicing::InventoryLineItem::Index.(current_user, params)
+    respond
+  end
+
   def create
     @result = Invoicing::InventoryLineItem::Create.(current_user, params)
     if @result.success?
@@ -26,5 +31,9 @@ class Invoicing::InventoryLineItemsController < ApplicationController
     else
       respond response: :failure, message: @result.messages[:error]
     end
+  end
+
+  def count
+
   end
 end

@@ -1139,14 +1139,14 @@
 #                                                         PATCH  /invoicing/company_configurations/:id(.:format)                                              invoicing/company_configurations#update
 #                                                         PUT    /invoicing/company_configurations/:id(.:format)                                              invoicing/company_configurations#update
 #                                                         DELETE /invoicing/company_configurations/:id(.:format)                                              invoicing/company_configurations#destroy
-#                   invoicing_outward_invoices_line_items GET    /invoicing/outward_invoices_line_items(.:format)                                             invoicing/outward_invoices_line_items#index
-#                                                         POST   /invoicing/outward_invoices_line_items(.:format)                                             invoicing/outward_invoices_line_items#create
-#                new_invoicing_outward_invoices_line_item GET    /invoicing/outward_invoices_line_items/new(.:format)                                         invoicing/outward_invoices_line_items#new
-#               edit_invoicing_outward_invoices_line_item GET    /invoicing/outward_invoices_line_items/:id/edit(.:format)                                    invoicing/outward_invoices_line_items#edit
-#                    invoicing_outward_invoices_line_item GET    /invoicing/outward_invoices_line_items/:id(.:format)                                         invoicing/outward_invoices_line_items#show
-#                                                         PATCH  /invoicing/outward_invoices_line_items/:id(.:format)                                         invoicing/outward_invoices_line_items#update
-#                                                         PUT    /invoicing/outward_invoices_line_items/:id(.:format)                                         invoicing/outward_invoices_line_items#update
-#                                                         DELETE /invoicing/outward_invoices_line_items/:id(.:format)                                         invoicing/outward_invoices_line_items#destroy
+#                          invoicing_inventory_line_items GET    /invoicing/inventory_line_items(.:format)                                                    invoicing/inventory_line_items#index
+#                                                         POST   /invoicing/inventory_line_items(.:format)                                                    invoicing/inventory_line_items#create
+#                       new_invoicing_inventory_line_item GET    /invoicing/inventory_line_items/new(.:format)                                                invoicing/inventory_line_items#new
+#                      edit_invoicing_inventory_line_item GET    /invoicing/inventory_line_items/:id/edit(.:format)                                           invoicing/inventory_line_items#edit
+#                           invoicing_inventory_line_item GET    /invoicing/inventory_line_items/:id(.:format)                                                invoicing/inventory_line_items#show
+#                                                         PATCH  /invoicing/inventory_line_items/:id(.:format)                                                invoicing/inventory_line_items#update
+#                                                         PUT    /invoicing/inventory_line_items/:id(.:format)                                                invoicing/inventory_line_items#update
+#                                                         DELETE /invoicing/inventory_line_items/:id(.:format)                                                invoicing/inventory_line_items#destroy
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)              admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)               admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                             admin_users/funds_load_requests#index

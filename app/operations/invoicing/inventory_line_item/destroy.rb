@@ -1,6 +1,6 @@
-class Invoicing::InventoryLineItem::Destroy < Invocing::InventoryLineItem::Base
+class Invoicing::InventoryLineItem::Destroy < Invoicing::InventoryLineItem::Base
 
-  attr_accessor :inventory_item, :inventory_item_parameters
+  attr_accessor :inventory_item
 
   def init
     id = params[:id] || params[:inventory_item_id]
