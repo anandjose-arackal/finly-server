@@ -809,6 +809,7 @@
 #                                   autocomplete_merchant GET    /autocomplete/merchant(.:format)                                                             autocomplete#merchant
 #                                       autocomplete_user GET    /autocomplete/user(.:format)                                                                 autocomplete#user
 #                                       autocomplete_card GET    /autocomplete/card(.:format)                                                                 autocomplete#card
+#                            autocomplete_inventory_items GET    /autocomplete/inventory_items(.:format)                                                      autocomplete#inventory_items
 #                                     external_url_report GET    /external/reports/:id(.:format)                                                              external_url#report
 #                              external_url_money_request GET    /external/requests/:id(.:format)                                                             external_url#money_request
 #                                 external_url_settlement GET    /external/settlements/:id(.:format)                                                          external_url#payment
@@ -2348,7 +2349,7 @@ Rails.application.routes.draw do
   get 'autocomplete/merchant'
   get 'autocomplete/user'
   get 'autocomplete/card', to: 'autocomplete#card'
-
+  get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
 
   # get 'features', to: 'static_pages#features'
 
