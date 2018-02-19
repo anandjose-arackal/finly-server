@@ -145,6 +145,8 @@ class User < ActiveRecord::Base
   has_many :card_upgrade_requests, foreign_key: :card_owner_id
   has_many :virtual_bank_accounts, foreign_key: :initiating_user_id
 
+  has_many :web_hooks, foreign_key: :created_by_user_id
+
   # adding associations for the user manager mapping for payment requests
   has_many :bank_payment_requests, foreign_key: :owner_id
   has_many :bank_payment_request_trails, class_name: "BankPaymentRequestTrail", foreign_key: :action_user_id
