@@ -56,7 +56,7 @@ class BankTransfer::PaymentRequest::Review::BulkApproveValidate < BankTransfer::
       self.validate_result << {
           user: payment_request.owner.name,
           name: payment_request.name,
-          amount: payment_request.requested_amount&.value,
+          amount: payment_request.payment_order.amount_requested&.value,
           errors: errors,
           valid: (errors.empty? ? true : false),
           id: payment_request.id,
