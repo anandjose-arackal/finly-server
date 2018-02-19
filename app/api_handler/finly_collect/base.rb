@@ -5,6 +5,7 @@ class FinlyCollect::Base < BaseHandler
   end
 
   def parse
+    debugger
     self.parsed_response = JSON.parse(self.response&.body).with_indifferent_access rescue nil
     unless self.parsed_response&.dig(:success)
       message = self.parsed_response&.dig(:messages, :error)
@@ -17,7 +18,7 @@ class FinlyCollect::Base < BaseHandler
 
   def load_custom_connection(faraday)
     # config = Finly::SecureStorage::Connector.read('core/finly_collect')&.dig('outgoing')
-    # faraday&.basic_auth(config[:username], config[:password])
+    faraday&.basic_auth('finly','2dd8284e013bf29c')
   end
 
   def expect_receivable?
