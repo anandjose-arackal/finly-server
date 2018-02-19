@@ -6,6 +6,7 @@
 #                         qukickbooks_configurations_show GET    /qukickbooks_configurations/show(.:format)                                                   qukickbooks_configurations#show
 #                                           accept_invite GET    /users/invitation/accept(.:format)                                                           pending_invites#edit
 #                                          collect_notify POST   /collect/notify(.:format)                                                                    finly_collect#notify
+#                                collect_test_transaction POST   /collect/test_transaction(.:format)                                                          finly_collect#notify
 #                                               crono_web        /crono                                                                                       Crono::Web
 #                                  new_admin_user_session GET    /admin_users/sign_in(.:format)                                                               admin_users/sessions#new
 #                                      admin_user_session POST   /admin_users/sign_in(.:format)                                                               admin_users/sessions#create
@@ -1744,7 +1745,8 @@ Rails.application.routes.draw do
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
   ######### FINLY COLLECT START ###########
-    post 'collect/notify', to: 'finly_collect#notify'
+  post 'collect/notify', to: 'finly_collect#notify'
+  post 'collect/test_transaction', to: 'finly_collect#notify'
   ######### FINLY COLLECT END ###########
 
   ######### GEMS SPECIFIC START ###########
