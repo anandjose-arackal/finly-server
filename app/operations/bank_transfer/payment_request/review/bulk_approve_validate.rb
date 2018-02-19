@@ -61,7 +61,7 @@ class BankTransfer::PaymentRequest::Review::BulkApproveValidate < BankTransfer::
           valid: (errors.empty? ? true : false),
           id: payment_request.id,
           payment_request: payment_request,
-          created_at: payment_request.created_at,
+          created_at: payment_request.created_at.strftime("%d-%m-%Y"),
           payment_mode: payment_request.payment_mode
       }
     end
