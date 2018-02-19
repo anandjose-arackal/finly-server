@@ -1,1 +1,1 @@
-json.extract! @result.inventory_item, :hsn_sac, :category_id, :rate, :description, :discount, :sku, :discount
+json.extract! @result.inventory_item, :id, :hsn_sac, :category_id, :rate, :description, :discount, :sku, :tax
