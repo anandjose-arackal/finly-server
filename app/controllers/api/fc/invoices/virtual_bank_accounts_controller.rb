@@ -2,7 +2,7 @@ class Api::Fc::Invoices::VirtualBankAccountsController < ApplicationController
 
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :api }
+  before_action -> { finly_authorize! [:api, :mobile, :web] }
 
   def create
     param = RequestFormatter::VirtualBankAccountParser::Parse.(current_user, params).formatted_request
