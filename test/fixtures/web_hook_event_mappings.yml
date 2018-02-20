@@ -1,3 +1,15 @@
+# == Schema Information
+#
+# Table name: web_hook_event_mappings
+#
+#  id                :integer          not null, primary key
+#  web_hook_id       :integer          not null
+#  web_hook_event_id :integer          not null
+#  is_deleted        :boolean          default(FALSE)
+#  created_at        :datetime         not null
+#  updated_at        :datetime         not null
+#
+
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 one:

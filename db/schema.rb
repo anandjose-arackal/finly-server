@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180219143939) do
+ActiveRecord::Schema.define(version: 20180219162804) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3797,6 +3797,27 @@ ActiveRecord::Schema.define(version: 20180219143939) do
 
   add_index "web_hook_events", ["name"], name: "index_web_hook_events_on_name", using: :btree
 
+  create_table "web_hook_tracks", force: :cascade do |t|
+    t.integer  "web_hook_id",       limit: 4
+    t.integer  "web_hook_event_id", limit: 4
+    t.integer  "company_id",        limit: 4
+    t.text     "url",               limit: 65535
+    t.text     "request_body",      limit: 65535
+    t.text     "request_header",    limit: 65535
+    t.decimal  "response_time",                   precision: 10
+    t.text     "response_body",     limit: 65535
+    t.integer  "response_status",   limit: 4
+    t.integer  "attempt",           limit: 4
+    t.datetime "last_attempted_at"
+    t.boolean  "attempt_success"
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+  end
+
+  add_index "web_hook_tracks", ["company_id"], name: "index_web_hook_tracks_on_company_id", using: :btree
+  add_index "web_hook_tracks", ["web_hook_event_id"], name: "index_web_hook_tracks_on_web_hook_event_id", using: :btree
+  add_index "web_hook_tracks", ["web_hook_id"], name: "index_web_hook_tracks_on_web_hook_id", using: :btree
+
   create_table "web_hooks", force: :cascade do |t|
     t.text     "url",                limit: 65535,                 null: false
     t.string   "secret",             limit: 255
@@ -4079,6 +4100,9 @@ ActiveRecord::Schema.define(version: 20180219143939) do
   add_foreign_key "vendor_payment_wallets", "users"
   add_foreign_key "web_hook_event_mappings", "web_hook_events"
   add_foreign_key "web_hook_event_mappings", "web_hooks"
+  add_foreign_key "web_hook_tracks", "companies"
+  add_foreign_key "web_hook_tracks", "web_hook_events"
+  add_foreign_key "web_hook_tracks", "web_hooks"
   add_foreign_key "whitelisted_ips", "companies"
   add_foreign_key "yes_bank_company_accounts", "companies"
   add_foreign_key "yes_bank_vendors", "companies"
