@@ -14,7 +14,7 @@ class User::Role::Set < BaseOperation
   end
 
   def pre_authorize
-    unless user.company_admin?
+    unless user.company_admin? || user.vendor_payments_admin?
       raise_unauthorized_exception
     end
   end
