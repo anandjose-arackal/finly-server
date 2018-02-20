@@ -106,4 +106,9 @@ class Invoicing::OutwardInvoicesController < ApplicationController
     end
   end
 
+  # this action should create an invoice, as well as update it with the valid details
+  def create_valid
+
+  end
+
 end

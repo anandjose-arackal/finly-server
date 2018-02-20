@@ -59,6 +59,23 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     self.invoice_parameters[:prefix] = prefix
     self.invoice_parameters[:sequence_start] = sequence
 
+    # creating the customer if the customer_id isn't present in the params for this request
+    if invoice_parameters[:customer_id].blank?
+      # try creating an invoice here
+      cust_params = customer_params
+      cust_params[:create_virtual_account] = true
+      cust_params = {customer: cust_params}
+      op = Invoicing::Customer::Create.(user, cust_params)
+      if op.success?
+        self.invoice_parameters[:customer_id] = op.customer.id
+        # add attributes of the customer to the invoice
+        self.invoice_parameters[:virtual_account_id] = op.customer.virtual_bank_accounts.first&.id
+      else
+        add_message :error, op.messages[:error]
+        return
+      end
+    end
+
   end
 
   def process
@@ -108,7 +125,10 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   end
 
   def customer_params
-    params.require(:customer).permit(:gst)
+    params.require(:customer).permit(:name, :email, :mobile_number, :description, :gst, :pan, :create_virtual_account,
+                                     addresses_attributes: [:line_1, :line_2, :city, :state_id, :name, :pin_code, :id, :default, :address_name],
+                                     virtual_bank_accounts_attributes: [:default_account, :name],
+                                     customer_attachments_attributes: [:attached_file, :note])
   end
 
   def calculate_tax_and_discounts
