@@ -8,8 +8,10 @@
 #  company_id        :integer
 #  url               :text(65535)
 #  request_body      :text(65535)
+#  request_header    :text(65535)
 #  response_time     :decimal(10, )
 #  response_body     :text(65535)
+#  response_status   :integer
 #  attempt           :integer
 #  last_attempted_at :datetime
 #  attempt_success   :boolean
@@ -22,6 +24,7 @@ class WebHookTrack < ActiveRecord::Base
   belongs_to :company
   belongs_to :web_hook
 
+  serialize :request_header, JSON
   serialize :request_body, JSON
   serialize :response_body, JSON
 end

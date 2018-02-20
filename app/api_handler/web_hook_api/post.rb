@@ -11,6 +11,7 @@ class WebHookApi::Post < BaseHandler
 
   def init
     self.web_hook_track = params[:web_hook_track]
+    super
   end
 
   def base_url
@@ -22,11 +23,10 @@ class WebHookApi::Post < BaseHandler
   end
 
   def post_params
-    self.web_hook_track.request_body
+    {token: self.web_hook_track.request_header, body: self.web_hook_track.request_body}
   end
 
   def header_params
-    self.web_hook_track.header_params
   end
 
   def pre_process
