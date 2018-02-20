@@ -23,7 +23,7 @@ class WebHookApi::Post < BaseHandler
   end
 
   def post_params
-    {token: self.web_hook_track.request_header, body: self.web_hook_track.request_body}
+    {token: self.web_hook_track.request_header, event: web_hook_track.web_hook_event.name, body: self.web_hook_track.request_body}
   end
 
   def header_params
