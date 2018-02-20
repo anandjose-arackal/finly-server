@@ -7,11 +7,12 @@ class Api::Fc::Invoices::VirtualBankAccountsController < ApplicationController
   def create
     param = RequestFormatter::VirtualBankAccountParser::Parse.(current_user, params).formatted_request
     @result = Invoicing::VirtualBankAccount::Create.(current_user, param)
-    if @result.success?
-      respond response: :success, message: @result.messages[:success]
-    else
-      respond response: :failure, message: @result.messages[:error]
-    end
+    respond
+    # if @result.success?
+    #   respond response: :success, message: @result.messages[:success]
+    # else
+    #   respond response: :failure, message: @result.messages[:error]
+    # end
   end
 
   def update
