@@ -60,6 +60,9 @@ class AccountManager::Collect::VATransactionProcessor < BackgroundOperation
   def post_process
     self.virtual_account_transaction.update(processed: true)
     self.virtual_account_transaction.log_state(:info, 'Processed')
+
+    # trigger the api call for Webhooks
+    Webhook::Process.(nil, {company: self.virtual_account.company, body: "This is a test callback for a virtual account credit of account: #{self.virtual_account.account_number}", web_hook_event_id: WebHookEvent.id_for('collect.transaction')})
   end
 
   protected
