@@ -47,10 +47,11 @@ class Event::EPaymentOrderDownload::Create < Event::EPaymentOrderDownload::Base
     params[:body] = self.mailer_body(user)
     params[:button_name] = self.mailer_button_name(user)
     params[:action_name] = self.action_name
+    params[:download_url] = params&.dig(:download_url)
   end
 
   class Event::EPaymentOrderDownload::Base::MailerPresenter < Event::SetNotifier::MailerPresenter
-    attr_accessor :user, :body_val, :subject_val, :button_val, :action_name, :company
+    attr_accessor :user, :body_val, :subject_val, :button_val, :action_name, :company, :download_url_val
 
     def initialize(user, params)
       self.user = user
@@ -59,6 +60,7 @@ class Event::EPaymentOrderDownload::Create < Event::EPaymentOrderDownload::Base
       self.button_val = params[:button_name]
       self.action_name = params[:action_name]
       self.company = user.company
+      self.download_url_val = params[:download_url]
     end
 
     def validate
@@ -75,6 +77,10 @@ class Event::EPaymentOrderDownload::Create < Event::EPaymentOrderDownload::Base
 
     def body
       self.body_val
+    end
+
+    def download_url
+      Constants::BASE_ASSETS_URL + self.download_url_val
     end
 
     def button_name
