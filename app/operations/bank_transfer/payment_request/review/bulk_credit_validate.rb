@@ -60,7 +60,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
           id: payment_request.id,
           name: payment_request.name,
           payment_request: payment_request,
-          allowed: TransferTimingUtils.within_timeframe?(payment_request.payment_order.payment_mode, nil),
+          allowed: TransferTimingUtils.within_timeframe?(payment_request.payment_order.payment_mode, nil) ,
           next_date: TransferTimingUtils.next_valid_date(nil, payment_request.payment_order.payment_mode),
           total_amount: payment_request.payment_order.amount_requested&.value,
           created_at: payment_request.created_at.strftime("%d-%m-%Y"),
@@ -68,24 +68,50 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
           payment_mode: payment_request.payment_mode
       }
       errors = []
-      # first check if the payment request has been approved
-      if payment_request.controlling_user_id == user.id
-        if hash[:allowed]
-          self.processable_amount += payment_request.payment_order.amount_requested&.value
-        else
-          errors << "#{payment_request.payment_mode} transfers are outside the bank transfer window for today. You can either change the transfer type to IMPS and try again or proceed and we will schedule the payment for the next transfer window"
-          errors << "Next available window for this order starts at: 8:00 AM on #{hash[:next_date].strftime("%d %B, %Y")}"
-          self.scheduled_amount += payment_request.payment_order.amount_requested&.value
-        end
-      else
-        errors << "You can only credit payment orders which are awaiting your approval"
-        hash[:selectable] = false
+      if payment_request.credit_card?
         self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
+        errors << "Credit Card payments cannot be processed from this screen. You can mark them as credited from the Payment Orders screen"
+        hash[:allowed] = false
+        hash[:selectable] = false
+      else
+        # check if the payment request can be credited by the selecting user
+        if (payment_request.controlling_user_id == user.id) || (user.vendor_payments_admin? && payment_request.approved?)
+          if hash[:allowed]
+            self.processable_amount += payment_request.payment_order.amount_requested&.value
+          else
+            errors << "#{payment_request.payment_mode} transfers are outside the bank transfer window for today. You can either change the transfer type to IMPS and try again or proceed and we will schedule the payment for the next transfer window"
+            errors << "Next available window for this order starts at: 8:00 AM on #{hash[:next_date].strftime("%d %B, %Y")}"
+            self.scheduled_amount += payment_request.payment_order.amount_requested&.value
+          end
+        else
+          errors << "You can only credit payment orders which are awaiting your approval"
+          hash[:selectable] = false
+          self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
+        end
       end
 
       hash[:errors] = errors
       self.result << hash
     end
+  end
+
+  def post_process
+    # sorting the payment orders as creditable, schedulable, and non-creditable
+    creditable_orders = []
+    schedulable_orders = []
+    non_creditable_orders = []
+    self.result.each do |order|
+      if order[:selectable]
+        if order[:allowed]
+          creditable_orders << order
+        else
+          schedulable_orders << order
+        end
+      else
+        non_creditable_orders << order
+      end
+    end
+    self.result = creditable_orders + schedulable_orders + non_creditable_orders
   end
 
   def success

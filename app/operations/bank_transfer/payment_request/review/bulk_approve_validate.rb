@@ -67,6 +67,21 @@ class BankTransfer::PaymentRequest::Review::BulkApproveValidate < BankTransfer::
     end
   end
 
+  def post_process
+    # here we will sort the orders according to valid first and then invalid later
+    approvable_orders = []
+    non_approvable_orders = []
+    self.validate_result.each do |order|
+      if order[:valid]
+        approvable_orders << order
+      else
+        non_approvable_orders << order
+      end
+    end
+    debugger
+    self.validate_result = approvable_orders + non_approvable_orders
+  end
+
   def success
     params[:errors_found] = self.errors_found,
     params[:validate_result] = self.validate_result
