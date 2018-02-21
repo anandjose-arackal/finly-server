@@ -4,10 +4,11 @@ class Invoicing::InventoryLineItem::Index < Invoicing::InventoryLineItem::Base
 
   class Invoicing::InventoryLineItem::Index::InventoryLineItemsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :inventory_line_items
+    attr_accessor :inventory_line_items, :paginated_line_items
 
     def init
       self.inventory_line_items = params[:inventory_line_items]
+      self.paginated_line_items = self.inventory_line_items.paginate(page: params[:page], per_page: 30)
     end
   end
 
