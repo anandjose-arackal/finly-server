@@ -75,8 +75,3 @@ json.invoice do
     end
   end
 end
-
-json.actions do
-  json.editable invoice.editable?
-  json.navbar @result.navbar_actions
-end
