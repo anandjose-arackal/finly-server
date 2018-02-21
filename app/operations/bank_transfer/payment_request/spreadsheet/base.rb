@@ -11,7 +11,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::Base < BankTransfer::PaymentReq
   end
 
   def post_process
-    BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor.call(user.id,
+    BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor.call_async(user.id,
                                                                                  bank_payment_request_id: bank_payment_requests.pluck(:id), include_attachments: self.include_attachments)
     # if response&.success?
       add_message :success, 'You will receive the download link in an email in the next 5 - 10 minutes'
