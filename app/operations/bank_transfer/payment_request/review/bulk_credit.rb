@@ -62,13 +62,13 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
       # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
       next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_request.payment_order.payment_mode)
       payment_request.payment_order.update(scheduled_at: next_date)
+      payment_request.payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled))
     end
     # self.creditable_payment_requests = self.payment_requests.without_id(schedulable_payment_request_ids)
     # self.creditable_payment_orders = ::PaymentOrder.with_id(self.creditable_payment_requests.pluck(:payment_order_id))
   end
 
   def process
-    debugger
     # iterate through all the payment orders and create a credited trail for all of them
     ids = []
     self.payment_requests.each do |payment_request|
@@ -81,14 +81,13 @@ class BankTransfer::PaymentRequest::Review::BulkCredit < BankTransfer::PaymentRe
                                                          action_id: BankPaymentRequestTrailAction.id_for(:credit),
                                                          modified_user_id: nil,
                                                          modified_user_role_id: nil
-      unless payment_request.payment_order.scheduled?
+      unless payment_request.payment_order.reload.scheduled?
         # accumulating the ids of all the payment orders that are to be processed right away
         ids << payment_request.id
       end
     end
     self.creditable_payment_requests = ::BankPaymentRequest.with_id(ids)
     self.creditable_payment_orders = ::PaymentOrder.with_id(self.creditable_payment_requests.pluck(:payment_order_id))
-    debugger
     # updating all the payment orders to pending state
     self.creditable_payment_orders.update_all(payment_order_status_id: PaymentOrderStatus.id_for(:pending))
     # updating all the individual payments to pending state

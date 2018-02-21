@@ -78,7 +78,6 @@ class BankTransfer::PaymentRequest::Review::BulkApproveValidate < BankTransfer::
         non_approvable_orders << order
       end
     end
-    debugger
     self.validate_result = approvable_orders + non_approvable_orders
   end
 
