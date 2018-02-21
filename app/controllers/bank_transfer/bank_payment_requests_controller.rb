@@ -126,32 +126,32 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def download_pending
     @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadPending.(current_user, params)
-    respond
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def download_pending_attachment
     @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadPendingAttachment.(current_user, params)
-    respond
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def download_selected
     @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadSelected.(current_user, params)
-    respond
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def download_selected_attachment
     @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadSelectedAttachment.(current_user, params)
-    respond
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def download_all
     @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadAll.(current_user, params)
-    respond
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def download_all_attachment
     @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadAllAttachment.(current_user, params)
-    respond
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def filters
