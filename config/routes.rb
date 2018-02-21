@@ -485,6 +485,7 @@
 #                                        virtual_accounts POST   /virtual_accounts(.:format)                                                                  api/fc/invoices/virtual_bank_accounts#create
 #                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#update
 #                                                         DELETE /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#deactivate
+#                                                invoices POST   /invoices(.:format)                                                                          api/fc/invoices/outward_invoices#create_valid
 #                                               junk_show GET    /junk/show(.:format)                                                                         junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                         users#menu_data
 #                              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                                                 admin_users/oauth/token#create {:format=>"json"}
@@ -2075,6 +2076,7 @@ Rails.application.routes.draw do
   post 'virtual_accounts', to: 'api/fc/invoices/virtual_bank_accounts#create'
   patch 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#update'
   delete 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#deactivate'
+  post 'invoices', to: 'api/fc/invoices/outward_invoices#create_valid'
 
   ################### Virtual Bank Accounts End ######################
 

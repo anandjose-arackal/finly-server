@@ -64,6 +64,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       # try creating an invoice here
       cust_params = customer_params
       cust_params[:create_virtual_account] = true
+      cust_params[:virtual_bank_accounts_attributes] = [{name: "#{customer_params[:name]}'s Virtual Account"}]
       cust_params = {customer: cust_params}
       op = Invoicing::Customer::Create.(user, cust_params)
       if op.success?
@@ -108,6 +109,11 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
   def post_process
     add_message :success, "Invoice successfully created!"
+  end
+
+  def success
+    params[:invoice] = self.invoice
+    Invoicing::Invoice::Base::InvoicePresenter.new(user, params, messages)
   end
 
   private
