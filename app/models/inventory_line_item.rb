@@ -3,12 +3,12 @@
 # Table name: inventory_line_items
 #
 #  id          :integer          not null, primary key
-#  tax         :decimal(10, 5)
-#  discount    :decimal(10, 5)
+#  tax         :decimal(20, 10)
+#  discount    :decimal(20, 10)
 #  hsn_sac     :string(255)
 #  company_id  :integer
 #  sku         :string(255)
-#  rate        :decimal(10, 5)
+#  rate        :decimal(20, 10)
 #  description :text(65535)
 #  category_id :integer
 #  created_at  :datetime         not null
