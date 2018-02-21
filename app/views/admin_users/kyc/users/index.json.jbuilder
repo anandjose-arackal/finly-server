@@ -49,7 +49,12 @@ json.array! @result.individual_kycs.each do |kyc|
         json.name kyc.type.name
       end
     end
-    if kyc&.kyc_file_1.blank?
+    if kyc&.combined_kyc.present?
+      json.file_1 do
+        json.original kyc&.combined_kyc&.url(:normal)
+        json.thumb kyc&.combined_kyc&.url(:thumb)
+      end
+    elsif kyc&.kyc_file_1.blank?
       json.file_1 nil
     else
       json.file_1 do
@@ -63,12 +68,6 @@ json.array! @result.individual_kycs.each do |kyc|
       json.file_2 do
         json.original kyc&.kyc_file_2&.url(:normal)
         json.thumb kyc&.kyc_file_2&.url(:thumb)
-      end
-    end
-    if kyc&.combined_kyc.present?
-      json.file_1 do
-        json.original kyc&.combined_kyc&.url(:normal)
-        json.thumb kyc&.combined_kyc&.url(:thumb)
       end
     end
   end
