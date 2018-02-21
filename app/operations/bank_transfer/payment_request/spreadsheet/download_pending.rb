@@ -11,16 +11,4 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadPending < BankTransfer:
     end
   end
 
-  def validate
-    # if self.bank_payment_requests.empty?
-    #   add_message :error, "No payment orders are pending approval"
-    # end
-  end
-
-  def process
-    headers = retrieve_headers
-    content = retrieve_data
-    self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
-  end
-
 end
