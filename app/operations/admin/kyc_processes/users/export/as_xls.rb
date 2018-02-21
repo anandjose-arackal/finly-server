@@ -67,7 +67,7 @@ class Admin::KycProcesses::Users::Export::AsXls < Admin::KycProcesses::Users::Ba
           profile.pin_code,
           user.mobile_number,
           serial_id,
-          kyc.type.name,
+          'Aadhar Card',
           kyc.kyc_number
       ]
     end
