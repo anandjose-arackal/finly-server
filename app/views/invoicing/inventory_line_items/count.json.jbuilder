@@ -1,1 +1,1 @@
-10
+@result.count

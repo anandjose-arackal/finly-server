@@ -10,4 +10,14 @@ class Invoicing::InventoryLineItem::Base < BaseOperation
   def inventory_item_params
     params.require(:inventory_item).permit(:rate, :tax, :discount, :hsn_sac, :category_id, :description, :sku, :note)
   end
+
+  class Invoicing::InventoryLineItem::Base::ItemPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :inventory_item
+
+    def init
+      self.inventory_item = params[:inventory_line_item]
+    end
+
+  end
 end
