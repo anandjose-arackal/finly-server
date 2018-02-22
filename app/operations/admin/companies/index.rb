@@ -37,6 +37,7 @@ class Admin::Companies::Index < Admin::Companies::Base
     has_scope :filter_cards
     has_scope :filter_date_from
     has_scope :filter_date_to
+    has_scope :filter_status_id
 
     def init
       self.companies = params[:companies]

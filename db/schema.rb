@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180210140034) do
+ActiveRecord::Schema.define(version: 20180222155805) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -836,6 +836,7 @@ ActiveRecord::Schema.define(version: 20180210140034) do
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
     t.integer  "purpose_id",   limit: 4
+    t.integer  "parent_id",    limit: 4
   end
 
   add_index "categories", ["company_id"], name: "index_categories_on_company_id", using: :btree
@@ -885,6 +886,7 @@ ActiveRecord::Schema.define(version: 20180210140034) do
     t.datetime "updated_at",                                  null: false
     t.boolean  "active",                       default: true, null: false
     t.integer  "base_currency_id", limit: 4,   default: 1
+    t.integer  "status_id",        limit: 4,   default: 1,    null: false
   end
 
   create_table "company_account_types", force: :cascade do |t|
@@ -1088,6 +1090,14 @@ ActiveRecord::Schema.define(version: 20180210140034) do
   end
 
   add_index "company_kycs", ["company_id"], name: "index_company_kycs_on_company_id", using: :btree
+
+  create_table "company_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "company_statuses", ["name"], name: "index_company_statuses_on_name", using: :btree
 
   create_table "company_tags", force: :cascade do |t|
     t.integer  "company_id", limit: 4,                  null: false
@@ -3316,6 +3326,18 @@ ActiveRecord::Schema.define(version: 20180210140034) do
 
   add_index "tally_configurations", ["company_id"], name: "index_tally_configurations_on_company_id", using: :btree
 
+  create_table "temporary_files", force: :cascade do |t|
+    t.string   "file_file_name",    limit: 255
+    t.string   "file_content_type", limit: 255
+    t.integer  "file_file_size",    limit: 4
+    t.datetime "file_updated_at"
+    t.datetime "expires_on"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "temporary_files", ["expires_on"], name: "index_temporary_files_on_expires_on", using: :btree
+
   create_table "time_expense_configs", force: :cascade do |t|
     t.datetime "created_at",                    null: false
     t.datetime "updated_at",                    null: false
@@ -3406,6 +3428,34 @@ ActiveRecord::Schema.define(version: 20180210140034) do
   add_index "user_balance_histories", ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id", using: :btree
   add_index "user_balance_histories", ["user_id"], name: "index_user_balance_histories_on_user_id", using: :btree
 
+  create_table "user_group_department_location_mappings", force: :cascade do |t|
+    t.integer  "location_id",   limit: 4, null: false
+    t.integer  "department_id", limit: 4, null: false
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+  end
+
+  add_index "user_group_department_location_mappings", ["department_id"], name: "index_user_group_department_location_mappings_on_department_id", using: :btree
+  add_index "user_group_department_location_mappings", ["location_id"], name: "index_user_group_department_location_mappings_on_location_id", using: :btree
+
+  create_table "user_group_departments", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.integer  "company_id", limit: 4,   null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "user_group_departments", ["company_id"], name: "index_user_group_departments_on_company_id", using: :btree
+
+  create_table "user_group_designations", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.integer  "company_id", limit: 4,   null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "user_group_designations", ["company_id"], name: "index_user_group_designations_on_company_id", using: :btree
+
   create_table "user_group_item_mappings", force: :cascade do |t|
     t.integer  "user_id",            limit: 4
     t.integer  "user_group_item_id", limit: 4
@@ -3429,13 +3479,24 @@ ActiveRecord::Schema.define(version: 20180210140034) do
   add_index "user_group_items", ["name"], name: "index_user_group_items_on_name", using: :btree
   add_index "user_group_items", ["user_group_id"], name: "index_user_group_items_on_user_group_id", using: :btree
 
+  create_table "user_group_locations", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.string   "email",      limit: 255
+    t.string   "phone",      limit: 255
+    t.string   "website",    limit: 255
+    t.integer  "company_id", limit: 4,   null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "user_group_locations", ["company_id"], name: "index_user_group_locations_on_company_id", using: :btree
+
   create_table "user_groups", force: :cascade do |t|
-    t.string   "name",        limit: 255,                 null: false
-    t.integer  "company_id",  limit: 4,                   null: false
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-    t.boolean  "is_deleted",              default: false
-    t.string   "application", limit: 255
+    t.string   "name",       limit: 255,                 null: false
+    t.integer  "company_id", limit: 4,                   null: false
+    t.datetime "created_at",                             null: false
+    t.datetime "updated_at",                             null: false
+    t.boolean  "is_deleted",             default: false
   end
 
   add_index "user_groups", ["company_id"], name: "index_user_groups_on_company_id", using: :btree
@@ -3605,50 +3666,53 @@ ActiveRecord::Schema.define(version: 20180210140034) do
   add_index "user_wallets", ["user_id"], name: "index_user_wallets_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                  limit: 255, default: ""
-    t.string   "encrypted_password",     limit: 255, default: "",    null: false
-    t.string   "reset_password_token",   limit: 255
+    t.string   "email",                     limit: 255, default: ""
+    t.string   "encrypted_password",        limit: 255, default: "",    null: false
+    t.string   "reset_password_token",      limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          limit: 4,   default: 0,     null: false
+    t.integer  "sign_in_count",             limit: 4,   default: 0,     null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip",     limit: 255
-    t.string   "last_sign_in_ip",        limit: 255
-    t.string   "confirmation_token",     limit: 255
+    t.string   "current_sign_in_ip",        limit: 255
+    t.string   "last_sign_in_ip",           limit: 255
+    t.string   "confirmation_token",        limit: 255
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
-    t.string   "unconfirmed_email",      limit: 255
-    t.integer  "failed_attempts",        limit: 4,   default: 0,     null: false
-    t.string   "unlock_token",           limit: 255
+    t.string   "unconfirmed_email",         limit: 255
+    t.integer  "failed_attempts",           limit: 4,   default: 0,     null: false
+    t.string   "unlock_token",              limit: 255
     t.datetime "locked_at"
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
-    t.integer  "company_id",             limit: 4,                   null: false
-    t.string   "mobile_number",          limit: 255
-    t.boolean  "active",                             default: true,  null: false
-    t.string   "invitation_token",       limit: 255
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.integer  "company_id",                limit: 4,                   null: false
+    t.string   "mobile_number",             limit: 255
+    t.boolean  "active",                                default: true,  null: false
+    t.string   "invitation_token",          limit: 255
     t.datetime "invitation_created_at"
     t.datetime "invitation_sent_at"
     t.datetime "invitation_accepted_at"
-    t.integer  "invitation_limit",       limit: 4
-    t.integer  "invited_by_id",          limit: 4
-    t.string   "invited_by_type",        limit: 255
-    t.integer  "invitations_count",      limit: 4,   default: 0
-    t.string   "otp",                    limit: 255
+    t.integer  "invitation_limit",          limit: 4
+    t.integer  "invited_by_id",             limit: 4
+    t.string   "invited_by_type",           limit: 255
+    t.integer  "invitations_count",         limit: 4,   default: 0
+    t.string   "otp",                       limit: 255
     t.datetime "otp_sent_at"
     t.datetime "otp_verified_at"
-    t.boolean  "otp_verified",                       default: false, null: false
-    t.integer  "otp_count",              limit: 4,   default: 0,     null: false
-    t.string   "first_name",             limit: 255
-    t.string   "last_name",              limit: 255
-    t.boolean  "mobile_only_invite",                 default: false
-    t.string   "mothers_maiden_name",    limit: 255
-    t.boolean  "verified",                           default: false
-    t.integer  "otp_request_type_id",    limit: 4
-    t.boolean  "default_password",                   default: false
-    t.boolean  "point_of_contact",                   default: false
-    t.integer  "otp_attempts",           limit: 4,   default: 0
+    t.boolean  "otp_verified",                          default: false, null: false
+    t.integer  "otp_count",                 limit: 4,   default: 0,     null: false
+    t.string   "first_name",                limit: 255
+    t.string   "last_name",                 limit: 255
+    t.boolean  "mobile_only_invite",                    default: false
+    t.string   "mothers_maiden_name",       limit: 255
+    t.boolean  "verified",                              default: false
+    t.integer  "otp_request_type_id",       limit: 4
+    t.boolean  "default_password",                      default: false
+    t.boolean  "point_of_contact",                      default: false
+    t.integer  "otp_attempts",              limit: 4,   default: 0
+    t.integer  "user_group_location_id",    limit: 4
+    t.integer  "user_group_department_id",  limit: 4
+    t.integer  "user_group_designation_id", limit: 4
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
@@ -3776,6 +3840,61 @@ ActiveRecord::Schema.define(version: 20180210140034) do
     t.integer  "customer_id",                   limit: 4
     t.boolean  "default_account"
   end
+
+  create_table "web_hook_event_mappings", force: :cascade do |t|
+    t.integer  "web_hook_id",       limit: 4,                 null: false
+    t.integer  "web_hook_event_id", limit: 4,                 null: false
+    t.boolean  "is_deleted",                  default: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+  end
+
+  add_index "web_hook_event_mappings", ["is_deleted"], name: "index_web_hook_event_mappings_on_is_deleted", using: :btree
+  add_index "web_hook_event_mappings", ["web_hook_event_id"], name: "index_web_hook_event_mappings_on_web_hook_event_id", using: :btree
+  add_index "web_hook_event_mappings", ["web_hook_id"], name: "index_web_hook_event_mappings_on_web_hook_id", using: :btree
+
+  create_table "web_hook_events", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "web_hook_events", ["name"], name: "index_web_hook_events_on_name", using: :btree
+
+  create_table "web_hook_tracks", force: :cascade do |t|
+    t.integer  "web_hook_id",       limit: 4
+    t.integer  "web_hook_event_id", limit: 4
+    t.integer  "company_id",        limit: 4
+    t.text     "url",               limit: 65535
+    t.text     "request_body",      limit: 65535
+    t.text     "request_header",    limit: 65535
+    t.decimal  "response_time",                   precision: 10
+    t.text     "response_body",     limit: 65535
+    t.integer  "response_status",   limit: 4
+    t.integer  "attempt",           limit: 4
+    t.datetime "last_attempted_at"
+    t.boolean  "attempt_success"
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+  end
+
+  add_index "web_hook_tracks", ["company_id"], name: "index_web_hook_tracks_on_company_id", using: :btree
+  add_index "web_hook_tracks", ["web_hook_event_id"], name: "index_web_hook_tracks_on_web_hook_event_id", using: :btree
+  add_index "web_hook_tracks", ["web_hook_id"], name: "index_web_hook_tracks_on_web_hook_id", using: :btree
+
+  create_table "web_hooks", force: :cascade do |t|
+    t.text     "url",                limit: 65535,                 null: false
+    t.string   "secret",             limit: 255
+    t.integer  "created_by_user_id", limit: 4,                     null: false
+    t.integer  "company_id",         limit: 4,                     null: false
+    t.boolean  "is_deleted",                       default: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
+  add_index "web_hooks", ["company_id"], name: "index_web_hooks_on_company_id", using: :btree
+  add_index "web_hooks", ["created_by_user_id"], name: "index_web_hooks_on_created_by_user_id", using: :btree
+  add_index "web_hooks", ["is_deleted"], name: "index_web_hooks_on_is_deleted", using: :btree
 
   create_table "whitelisted_ip_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -4018,10 +4137,13 @@ ActiveRecord::Schema.define(version: 20180210140034) do
   add_foreign_key "transcribed_expenses", "users"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
+  add_foreign_key "user_group_departments", "companies"
+  add_foreign_key "user_group_designations", "companies"
   add_foreign_key "user_group_item_mappings", "user_group_items"
   add_foreign_key "user_group_item_mappings", "user_groups"
   add_foreign_key "user_group_item_mappings", "users"
   add_foreign_key "user_group_items", "user_groups"
+  add_foreign_key "user_group_locations", "companies"
   add_foreign_key "user_groups", "companies"
   add_foreign_key "user_login_tracks", "users"
   add_foreign_key "user_manager_mappings", "policies"
@@ -4043,6 +4165,11 @@ ActiveRecord::Schema.define(version: 20180210140034) do
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
   add_foreign_key "vendor_payment_wallets", "users"
+  add_foreign_key "web_hook_event_mappings", "web_hook_events"
+  add_foreign_key "web_hook_event_mappings", "web_hooks"
+  add_foreign_key "web_hook_tracks", "companies"
+  add_foreign_key "web_hook_tracks", "web_hook_events"
+  add_foreign_key "web_hook_tracks", "web_hooks"
   add_foreign_key "whitelisted_ips", "companies"
   add_foreign_key "yes_bank_company_accounts", "companies"
   add_foreign_key "yes_bank_vendors", "companies"
