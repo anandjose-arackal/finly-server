@@ -22,7 +22,7 @@ class BankTransfer::YesBank::Execute < BankTransfer::YesBank::Base
       add_message :error, 'Order not found'
       return
     end
-    unless self.payment_order.scheduled?
+    unless self.payment_order.scheduled? || self.payment_order.pending? # because now this operation can be called by the bulk credit operation as well
       add_message :error, "Cannot be processed yet"
     end
   end
@@ -30,8 +30,7 @@ class BankTransfer::YesBank::Execute < BankTransfer::YesBank::Base
   def process
     # this will simply pass the payment order to the PaymentOrderExecutor and it will run the respective
     # operations needed to schedule it
-    AccountManager::Payments::PaymentOrderExecutor.(payment_order, bank_transfer_type: self.payment_order.bank_transfer_type)
-
+    op = AccountManager::Payments::PaymentOrderExecutor.(payment_order, bank_transfer_type: self.payment_order.bank_transfer_type)
   end
 
   def post_process

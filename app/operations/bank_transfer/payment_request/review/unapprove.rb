@@ -36,7 +36,8 @@ class BankTransfer::PaymentRequest::Review::Unapprove < BankTransfer::PaymentReq
     if bank_payment_request.update_attributes controlling_user_id: user.id,
                                 controlling_for_user_id: nil,
                                 controlling_user_role_id: role_id,
-                                controlling_for_user_role_id: nil
+                                controlling_for_user_role_id: nil,
+                                status_id: BankPaymentRequestStatus.id_for(:processing)
 
       bank_payment_request.bank_payment_request_trails.create action_user: user,
                            action_user_role_id: role_id,
