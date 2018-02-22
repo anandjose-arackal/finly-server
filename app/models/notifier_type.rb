@@ -106,6 +106,8 @@ class NotifierType < ActiveRecord::Base
              {key: :bank_payment_request_credit_confirm, has_push_notification: true, has_mailer: true,
               configurable_push_notification: true, configurable_mailer: true},
              {key: :system_alert, has_push_notification: false, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: false},
+             {key: :payment_order_bulk_download, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false}
             ]
 
