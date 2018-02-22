@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180221094914) do
+ActiveRecord::Schema.define(version: 20180222131022) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1906,24 +1906,25 @@ ActiveRecord::Schema.define(version: 20180221094914) do
   add_index "invoice_attachments", ["invoice_id"], name: "index_invoice_attachments_on_invoice_id", using: :btree
 
   create_table "invoice_line_items", force: :cascade do |t|
-    t.integer  "invoice_id",         limit: 4
-    t.string   "description",        limit: 255
-    t.integer  "quantity",           limit: 4
-    t.decimal  "rate",                           precision: 20, scale: 10
-    t.decimal  "tax",                            precision: 20, scale: 10
-    t.decimal  "discount",                       precision: 20, scale: 10
-    t.integer  "category_id",        limit: 4
-    t.integer  "gst_type_id",        limit: 4
-    t.integer  "tax_amount_id",      limit: 4
-    t.integer  "discount_amount_id", limit: 4
-    t.integer  "amount_id",          limit: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
-    t.integer  "net_amount_id",      limit: 4
-    t.string   "hsn_sac",            limit: 255
-    t.integer  "taxable_amount_id",  limit: 4
-    t.string   "parent_type",        limit: 255
-    t.string   "parent_id",          limit: 255
+    t.integer  "invoice_id",             limit: 4
+    t.string   "description",            limit: 255
+    t.integer  "quantity",               limit: 4
+    t.decimal  "rate",                               precision: 20, scale: 10
+    t.decimal  "tax",                                precision: 20, scale: 10
+    t.decimal  "discount",                           precision: 20, scale: 10
+    t.integer  "category_id",            limit: 4
+    t.integer  "gst_type_id",            limit: 4
+    t.integer  "tax_amount_id",          limit: 4
+    t.integer  "discount_amount_id",     limit: 4
+    t.integer  "amount_id",              limit: 4
+    t.datetime "created_at",                                                   null: false
+    t.datetime "updated_at",                                                   null: false
+    t.integer  "net_amount_id",          limit: 4
+    t.string   "hsn_sac",                limit: 255
+    t.integer  "taxable_amount_id",      limit: 4
+    t.string   "parent_type",            limit: 255
+    t.string   "parent_id",              limit: 255
+    t.integer  "inventory_line_item_id", limit: 4
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -3333,6 +3334,18 @@ ActiveRecord::Schema.define(version: 20180221094914) do
   end
 
   add_index "tally_configurations", ["company_id"], name: "index_tally_configurations_on_company_id", using: :btree
+
+  create_table "temporary_files", force: :cascade do |t|
+    t.string   "file_file_name",    limit: 255
+    t.string   "file_content_type", limit: 255
+    t.integer  "file_file_size",    limit: 4
+    t.datetime "file_updated_at"
+    t.datetime "expires_on"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "temporary_files", ["expires_on"], name: "index_temporary_files_on_expires_on", using: :btree
 
   create_table "time_expense_configs", force: :cascade do |t|
     t.datetime "created_at",                    null: false

@@ -48,6 +48,7 @@ json.invoice do
       json.description item.description
       json.total_amount precision_value item.net_amount&.value
       json.hsn_sac item.hsn_sac
+      json.inventory_item_id item.inventory_item_id
     end
   end
 
