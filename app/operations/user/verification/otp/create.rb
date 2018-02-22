@@ -50,10 +50,10 @@ class User::Verification::Otp::Create < User::Verification::Otp::Base
   def process
     response = Sms::UserOtp.(user, otp: self.otp)
     if response.success?
-      selected_user.update_attributes(otp_count: (selected_user.otp_count+1))
+      selected_user.update_attributes(otp_count: (selected_user.otp_count+1), otp_attempts: 0)
       # further update the otp and sent_at only if a new type of otp has been requested
       if selected_user.otp != otp
-        selected_user.update_attributes(otp: otp, otp_sent_at: DateTime.now, otp_request_type_id: otp_request_type_id)
+        selected_user.update_attributes(otp: otp, otp_sent_at: DateTime.now, otp_request_type_id: otp_request_type_id, otp_attempts: 0)
       end
     else
       messages[:error] = response.messages[:error]

@@ -34,7 +34,7 @@ module Accountable
     # As company balance load's do not have opening or closing balance, this is to handle cases which do not have opening or closing balance
     # In case opening balance is required where company balance load was the first transaction performed, then fetch the previous day's last transactions closing balance as the day's closing balance
     transaction = finly_transactions.on_or_after_date(date)&.sort_date_asc&.limit_to_one&.first
-    if transaction.opening_balance_id.present?
+    if transaction&.opening_balance_id.present?
       balance = transaction&.opening_balance&.value
     else
       balance = finly_transactions.before_date(date)&.sort_date_desc&.limit_to_one&.first&.closing_balance&.value
@@ -67,7 +67,7 @@ module Accountable
     # As company balance load's do not have opening or closing balance, this is to handle cases which do not have opening or closing balance
     # In case opening balance is required where company balance load was the last transaction performed, then fetch the next day's first transactions opening balance as the day's closing balance
     transaction = finly_transactions.on_or_before_date(date)&.sort_date_desc&.limit_to_one&.first
-    if transaction.closing_balance_id.present?
+    if transaction&.closing_balance_id.present?
       balance = transaction&.closing_balance&.value
     else
       balance = finly_transactions.after_date(date)&.sort_date_asc&.limit_to_one&.first&.opening_balance&.value
