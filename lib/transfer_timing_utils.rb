@@ -69,6 +69,7 @@ class TransferTimingUtils
   end
 
   def self.next_valid_date(date, payment_mode)
+    # date = date
     if date.blank?
       date = DateTime.now
     end

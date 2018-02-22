@@ -163,6 +163,16 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     end
   end
 
+  def bulk_credit_validate
+    @result = BankTransfer::PaymentRequest::Review::BulkCreditValidate.(current_user, params)
+    respond
+  end
+
+  def bulk_credit
+    @result = BankTransfer::PaymentRequest::Review::BulkCredit.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type)
