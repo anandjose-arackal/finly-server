@@ -84,7 +84,7 @@ class BankTransfer::PaymentRequest::Review::BulkCreditValidate < BankTransfer::P
             self.scheduled_amount += payment_request.payment_order.amount_requested&.value
           end
         else
-          errors << "You can only credit payment orders which are awaiting your approval"
+          errors << "You can only credit payment orders which are awaiting your approval or have already been approved"
           hash[:selectable] = false
           self.unprocessable_amount += payment_request.payment_order.amount_requested&.value
         end
