@@ -62,8 +62,8 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
       reimbursable_expenses = report.expenses.reimbursable
       # reimbursable_qb_report = non_reimbursable_qb_report = nil
       if reimbursable_expenses.present?
-        self.department_split = generate_department_split(reimbursable_expenses)
-        self.department_split.each do |key, value|
+        department_split = generate_department_split(reimbursable_expenses)
+        department_split.each do |key, value|
           department = QuickbooksDepartment.find_by(id: key)
           qb_report = QuickbooksReportConfig.new(report.user, true, value, {department_id: department&.quickbooks_id})
           if date_type == 1
@@ -76,10 +76,10 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
       end
       # adding reimbursable reports to the qb_report array
       # self.qb_reports << reimbursable_qb_report if reimbursable_qb_report
-      non_reimbursable_expenses = report.expenses.non_reimbursable
+      non_reimbursable_expenses = report.expenses.quickbooks_non_reimbursable
       if non_reimbursable_expenses.present?
-        self.department_split = generate_department_split(non_reimbursable_expenses)
-        self.department_split.each do |key, value|
+        department_split = generate_department_split(non_reimbursable_expenses)
+        department_split.each do |key, value|
           department = QuickbooksDepartment.find_by(id: key)
           qb_report = QuickbooksReportConfig.new(report.user, false, value, {department_id: department&.quickbooks_id})
           if date_type == 1
@@ -181,26 +181,27 @@ class Integrations::Quickbooks::SyncReports < Integrations::Quickbooks::AsyncBas
 
   # this method will take a bunch of expenses and split them according to quickbooks department
   def generate_department_split(expenses)
+    department_split = {}
     expenses.each do |expense|
       department_value = expense.custom_fields.with_field_configuration_ids(self.department_field_configuration_ids).first&.value&.value&.name
       department = company.quickbooks_departments.with_name(department_value).first
       if department.present?
-        if self.department_split[department.id].is_a?(Array)
-          self.department_split[department.id] << expense
+        if department_split[department.id].is_a?(Array)
+          department_split[department.id] << expense
         else
-          self.department_split[department.id] = []
-          self.department_split[department.id] << expense
+          department_split[department.id] = []
+          department_split[department.id] << expense
         end
       else
-        if self.department_split[nil].is_a?(Array)
-          self.department_split[nil] << expense
+        if department_split[nil].is_a?(Array)
+          department_split[nil] << expense
         else
-          self.department_split[nil] = []
-          self.department_split[nil] << expense
+          department_split[nil] = []
+          department_split[nil] << expense
         end
       end
     end
-    self.department_split
+    department_split
   end
 
   def retrieve_department_field_configuration
