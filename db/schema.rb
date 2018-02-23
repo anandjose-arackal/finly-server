@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180222131022) do
+ActiveRecord::Schema.define(version: 20180222155805) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -885,6 +885,7 @@ ActiveRecord::Schema.define(version: 20180222131022) do
     t.datetime "updated_at",                                  null: false
     t.boolean  "active",                       default: true, null: false
     t.integer  "base_currency_id", limit: 4,   default: 1
+    t.integer  "status_id",        limit: 4,   default: 1,    null: false
   end
 
   create_table "company_account_types", force: :cascade do |t|
@@ -1088,6 +1089,14 @@ ActiveRecord::Schema.define(version: 20180222131022) do
   end
 
   add_index "company_kycs", ["company_id"], name: "index_company_kycs_on_company_id", using: :btree
+
+  create_table "company_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "company_statuses", ["name"], name: "index_company_statuses_on_name", using: :btree
 
   create_table "company_tags", force: :cascade do |t|
     t.integer  "company_id", limit: 4,                  null: false

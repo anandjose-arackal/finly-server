@@ -30,6 +30,13 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
             id: "cancel_invoice",
             btn_class: "danger"
         }
+        actions << {
+            url: Rails.application.routes.url_helpers.invoicing_outward_invoice_mark_as_closed_path(self.invoice),
+            name: "Mark as Closed",
+            method: "patch",
+            id: "mark_as_closed",
+            btn_class: "info"
+        }
       end
       unless self.invoice.incomplete?
         actions << {

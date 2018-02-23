@@ -1091,6 +1091,7 @@
 #                        invoicing_outward_invoice_cancel PATCH  /invoicing/outward_invoices/:outward_invoice_id/cancel(.:format)                             invoicing/outward_invoices#cancel
 #                          invoicing_outward_invoice_save PATCH  /invoicing/outward_invoices/:outward_invoice_id/save(.:format)                               invoicing/outward_invoices#save
 #                      invoicing_outward_invoice_download GET    /invoicing/outward_invoices/:outward_invoice_id/download_pdf(.:format)                       invoicing/outward_invoices#download
+#                invoicing_outward_invoice_mark_as_closed PATCH  /invoicing/outward_invoices/:outward_invoice_id/mark_as_closed(.:format)                     invoicing/outward_invoices#mark_as_closed
 #                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                        invoicing/outward_invoices#index
 #                                                         POST   /invoicing/outward_invoices(.:format)                                                        invoicing/outward_invoices#create
 #                           new_invoicing_outward_invoice GET    /invoicing/outward_invoices/new(.:format)                                                    invoicing/outward_invoices#new
@@ -2596,6 +2597,7 @@ Rails.application.routes.draw do
       patch 'cancel', to: 'outward_invoices#cancel', as: :cancel
       patch 'save', to: 'outward_invoices#save', as: :save
       get 'download_pdf', to: 'outward_invoices#download', as: :download
+      patch 'mark_as_closed', to: 'outward_invoices#mark_as_closed', as: :mark_as_closed
     end
     get 'customers/count', to: 'customers#count'
     resources :customers do
