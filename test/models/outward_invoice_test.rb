@@ -35,6 +35,7 @@
 #  prefix                  :string(255)
 #  total_payable_id        :integer
 #  roundoff_total_enabled  :boolean
+#  memo                    :string(255)
 #
 
 require 'test_helper'
