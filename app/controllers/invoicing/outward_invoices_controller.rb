@@ -8,6 +8,11 @@ class Invoicing::OutwardInvoicesController < ApplicationController
     respond
   end
 
+  def count
+    @result = Invoicing::Invoice::Count.(current_user, params)
+    render json: @result.count.as_json
+  end
+
   def show
     @result = Invoicing::Invoice::Show.(current_user, params)
     respond

@@ -41,7 +41,8 @@ class Settlement::Summary < Settlement::Base
 
     users_presenter = User::Index.(user, params)
     unless users_presenter.success?
-      add_message :error, users_presenter.errors.full_messages
+      add_message :error, users_presenter.messages[:error]
+      return
     end
     users = users_presenter.team
     user_ids = users.pluck(:id)

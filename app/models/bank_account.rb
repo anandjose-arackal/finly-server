@@ -93,7 +93,11 @@ class BankAccount < ActiveRecord::Base
   }
 
   after_create do
-    self.update(company_id: self.account_owner.company_id)
+    if self.account_owner.is_a?(Company)
+      self.update(company_id: self.account_owner_id)
+    else
+      self.update(company_id: self.account_owner.company_id)
+    end
   end
 
   def as_json(options={})

@@ -59,6 +59,7 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :with_user, -> (user_id) { where owner_id: user_id }
   scope :not_open, -> { where.not status_id: BankPaymentRequestStatus.id_for(:open) }
   scope :with_id, -> (id) { where id: id }
+  scope :without_id, -> (id) { where.not id: id }
   scope :approved, -> { where status_id: BankPaymentRequestStatus.id_for(:approved) }
   scope :filter_status_id, -> (status_id) {
     case status_id
@@ -139,6 +140,9 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :filter_user_id, -> (owner_id) {
     where owner_id: owner_id
   }
+
+  scope :non_approved, -> { where.not(status_id: BankPaymentRequestStatus.id_for(:approved)) }
+  scope :creditable, -> { where status_id: BankPaymentRequestStatus.ids_for(:approved) }
 
   attr_accessor :cache_users
 
@@ -240,6 +244,10 @@ class BankPaymentRequest < ActiveRecord::Base
 
   def verified?
     [BankPaymentRequestStatus.ids_for([:approved, :credited])].include?(self.status_id)
+  end
+
+  def credit_card?
+    self.payment_order.payment_mode.upcase == "CREDITCARD"
   end
 
   private

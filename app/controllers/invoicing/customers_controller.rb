@@ -12,6 +12,11 @@ class Invoicing::CustomersController < ApplicationController
     respond
   end
 
+  def count
+    @result = Invoicing::Customer::Count.(current_user, params)
+    render json: @result.count.as_json
+  end
+
   def update
     @result = Invoicing::Customer::Update.(current_user, params)
     if @result.success?

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180209153900) do
+ActiveRecord::Schema.define(version: 20180210140034) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -851,6 +851,20 @@ ActiveRecord::Schema.define(version: 20180209153900) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "collect_company_details", force: :cascade do |t|
+    t.string   "gst",                       limit: 255
+    t.string   "pan",                       limit: 255
+    t.integer  "company_id",                limit: 4
+    t.string   "company_logo_file_name",    limit: 255
+    t.string   "company_logo_content_type", limit: 255
+    t.integer  "company_logo_file_size",    limit: 4
+    t.datetime "company_logo_updated_at"
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "collect_company_details", ["company_id"], name: "index_collect_company_details_on_company_id", using: :btree
 
   create_table "collect_transaction_purposes", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -3862,6 +3876,7 @@ ActiveRecord::Schema.define(version: 20180209153900) do
   add_foreign_key "cards", "users"
   add_foreign_key "cash_on_hands", "users"
   add_foreign_key "categories", "companies"
+  add_foreign_key "collect_company_details", "companies"
   add_foreign_key "company_accounts", "companies"
   add_foreign_key "company_accounts", "company_account_types"
   add_foreign_key "company_agreement_tracks", "agreements"
