@@ -1,4 +1,4 @@
-class BankTransfer::PaymentRequest::Review:: ApproveBackground < BackgroundOperation
+class BankTransfer::PaymentRequest::Review::ApproveBackground < BackgroundOperation
 
   attr_accessor :payment_requests, :options, :initiating_user
 

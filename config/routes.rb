@@ -994,6 +994,8 @@
 #               bank_transfer_download_pending_attachment GET    /bank_transfer/download_pending_attachment(.:format)                                         bank_transfer/bank_payment_requests#download_pending_attachment
 #                              bank_transfer_download_all POST   /bank_transfer/download_all(.:format)                                                        bank_transfer/bank_payment_requests#download_all
 #                   bank_transfer_download_all_attachment GET    /bank_transfer/download_all_attachment(.:format)                                             bank_transfer/bank_payment_requests#download_all_attachment
+#                      bank_transfer_bulk_credit_validate PATCH  /bank_transfer/bulk_credit_validate(.:format)                                                bank_transfer/bank_payment_requests#bulk_credit_validate
+#                               bank_transfer_bulk_credit PATCH  /bank_transfer/bulk_credit(.:format)                                                         bank_transfer/bank_payment_requests#bulk_credit
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format)              bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)               bank_transfer/bank_payment_requests#review
 #               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)               bank_transfer/bank_payment_requests#credit
@@ -1089,6 +1091,7 @@
 #                        invoicing_outward_invoice_cancel PATCH  /invoicing/outward_invoices/:outward_invoice_id/cancel(.:format)                             invoicing/outward_invoices#cancel
 #                          invoicing_outward_invoice_save PATCH  /invoicing/outward_invoices/:outward_invoice_id/save(.:format)                               invoicing/outward_invoices#save
 #                      invoicing_outward_invoice_download GET    /invoicing/outward_invoices/:outward_invoice_id/download_pdf(.:format)                       invoicing/outward_invoices#download
+#                invoicing_outward_invoice_mark_as_closed PATCH  /invoicing/outward_invoices/:outward_invoice_id/mark_as_closed(.:format)                     invoicing/outward_invoices#mark_as_closed
 #                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                        invoicing/outward_invoices#index
 #                                                         POST   /invoicing/outward_invoices(.:format)                                                        invoicing/outward_invoices#create
 #                           new_invoicing_outward_invoice GET    /invoicing/outward_invoices/new(.:format)                                                    invoicing/outward_invoices#new
@@ -2533,6 +2536,9 @@ Rails.application.routes.draw do
     get 'download_pending_attachment', to: 'bank_payment_requests#download_pending_attachment', as: :download_pending_attachment
     post 'download_all', to: 'bank_payment_requests#download_all', as: :download_all
     get 'download_all_attachment', to: 'bank_payment_requests#download_all_attachment', as: :download_all_attachment
+    patch 'bulk_credit_validate', to: 'bank_payment_requests#bulk_credit_validate', as: :bulk_credit_validate
+    patch 'bulk_credit', to: 'bank_payment_requests#bulk_credit', as: :bulk_credit
+    # patch 'bulk_credit_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_credit_validate
 
     resources :bank_payment_requests do
       post 'comment', to: 'bank_payment_requests#comment', as: :comment
@@ -2591,6 +2597,7 @@ Rails.application.routes.draw do
       patch 'cancel', to: 'outward_invoices#cancel', as: :cancel
       patch 'save', to: 'outward_invoices#save', as: :save
       get 'download_pdf', to: 'outward_invoices#download', as: :download
+      patch 'mark_as_closed', to: 'outward_invoices#mark_as_closed', as: :mark_as_closed
     end
     get 'customers/count', to: 'customers#count'
     resources :customers do

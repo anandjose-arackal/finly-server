@@ -11,6 +11,7 @@ class Admin::Companies::Create < Admin::Companies::Base
 
   def init
     self.company_create_params = company_params
+    self.company_create_params[:status_id] = CompanyStatus.id_for(:active)
   end
 
   def validate

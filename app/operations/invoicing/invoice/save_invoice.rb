@@ -104,7 +104,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
                                     advance_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
                                     invoice_attachments_attributes: [:attached_file, :description],
-                                    invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax])
+                                    invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax, :inventory_line_item_id])
   end
 
   def customer_params

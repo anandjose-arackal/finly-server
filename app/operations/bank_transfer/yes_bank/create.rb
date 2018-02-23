@@ -58,7 +58,7 @@ class BankTransfer::YesBank::Create < BankTransfer::YesBank::Base
 
       add_message :error, op.messages[:error]
       payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:failed))
-      payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:pending))
+      payment_order.payments.update_all(payment_status_id: PaymentStatus.id_for(:failed))
       payment_order.payments.each do |payment|
         payment.system_messages.create(content: op.messages[:error].to_sentence,
                                        system_message_type_id: SystemMessageType.id_for(:error))

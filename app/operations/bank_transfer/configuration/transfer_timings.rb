@@ -23,7 +23,7 @@ class BankTransfer::Configuration::TransferTimings < BankTransfer::Configuration
   def init
     id = params[:id] || params[:bank_payment_request_id]
     if id.present?
-        init_bank_payment_request(id)
+      init_bank_payment_request(id)
     else
       self.payment_mode = params[:payment_mode]
       self.date = params[:date]
