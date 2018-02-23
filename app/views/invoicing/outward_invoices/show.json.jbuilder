@@ -70,7 +70,7 @@ json.invoice do
   end
 
   json.invoice_items_categories do
-    json.array!(current_company.categories.outward_invoice_items_categories) do |category|
+    json.array!(current_company.categories.outward_invoice_items_categories.active) do |category|
       json.id category.id
       json.name category.name
     end
