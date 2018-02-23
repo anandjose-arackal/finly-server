@@ -71,7 +71,7 @@ class Admin::Users::Create < Admin::Users::Base
                                  profile_attributes: [:date_of_birth, :gender, :address_1,
                                                       :address_2, :city, :state_id, :pin_code, :employee_id, :payroll_id],
                                  role_mapping_attributes: [:user_role_id],
-                                 user_panel_subscription_attributes: [:expense_management, :disburse])
+                                 user_panel_subscription_attributes: [:expense_management, :disburse, :yes_bank_account_transfer, :invoicing_system])
 
   end
 end
