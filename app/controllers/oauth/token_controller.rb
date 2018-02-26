@@ -27,7 +27,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   protected
   def verify_company_status(user)
-    company = user&.company
+    company = user&.company rescue nil
     if company.present?
       case company.status_id
         when CompanyStatus.id_for(:active)
