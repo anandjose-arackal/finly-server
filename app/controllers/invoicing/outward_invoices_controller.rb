@@ -98,6 +98,7 @@ class Invoicing::OutwardInvoicesController < ApplicationController
 
   def download
     @result = Invoicing::Invoice::DownloadInvoice.(current_user, params)
+    @invoice = @result.invoice
     respond_to do |format|
       format.pdf {
           render pdf: "Invoice-#{@result.invoice.invoice_number}", layout: "pdf.html.erb", print_media_type: true
