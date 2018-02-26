@@ -126,7 +126,8 @@ class PaymentRequest < NonPersistentModel
 
   def build_payment_order
     unless self.payment_order.present?
-      self.payment_order = current_company.payment_orders.build payment_order_params
+      cc = current_company || Company.find_by(id: self.company_id)
+      self.payment_order = cc.payment_orders.build payment_order_params
     end
     self.payment_order
     self.payment_items.each do |item|
