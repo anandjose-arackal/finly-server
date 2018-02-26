@@ -46,6 +46,9 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
             id: "download_invoice",
             btn_class: "info"
         }
+        actions << {
+
+        }
       end
       actions
     end

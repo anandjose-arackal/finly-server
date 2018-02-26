@@ -1084,6 +1084,7 @@
 #                                                         PUT    /invoicing/payment_receivables/:id(.:format)                                                 invoicing/payment_receivables#update
 #                                                         DELETE /invoicing/payment_receivables/:id(.:format)                                                 invoicing/payment_receivables#destroy
 #                        invoicing_outward_invoices_count GET    /invoicing/outward_invoices/count(.:format)                                                  invoicing/outward_invoices#count
+#                              invoicing_send_to_customer PATCH  /invoicing/outward_invoices/send_to_customer(.:format)                                       invoicing/outward_invoices#send_to_customer
 #                  invoicing_outward_invoice_add_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/add_customer(.:format)                       invoicing/outward_invoices#add_customer
 #               invoicing_outward_invoice_remove_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/remove_customer(.:format)                    invoicing/outward_invoices#remove_customer
 #                invoicing_outward_invoice_update_address PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_address(.:format)                     invoicing/outward_invoices#update_address
@@ -1092,6 +1093,7 @@
 #                          invoicing_outward_invoice_save PATCH  /invoicing/outward_invoices/:outward_invoice_id/save(.:format)                               invoicing/outward_invoices#save
 #                      invoicing_outward_invoice_download GET    /invoicing/outward_invoices/:outward_invoice_id/download_pdf(.:format)                       invoicing/outward_invoices#download
 #                invoicing_outward_invoice_mark_as_closed PATCH  /invoicing/outward_invoices/:outward_invoice_id/mark_as_closed(.:format)                     invoicing/outward_invoices#mark_as_closed
+#              invoicing_outward_invoice_send_to_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/send_to_customer(.:format)                   invoicing/outward_invoices#send_to_customer
 #                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                        invoicing/outward_invoices#index
 #                                                         POST   /invoicing/outward_invoices(.:format)                                                        invoicing/outward_invoices#create
 #                           new_invoicing_outward_invoice GET    /invoicing/outward_invoices/new(.:format)                                                    invoicing/outward_invoices#new
@@ -2589,6 +2591,7 @@ Rails.application.routes.draw do
   namespace :invoicing do
     resources :payment_receivables
     get 'outward_invoices/count', to: 'outward_invoices#count'
+    patch 'outward_invoices/send_to_customer', to: 'outward_invoices#send_to_customer', as: :send_to_customer
     resources :outward_invoices do
       patch 'add_customer', to: 'outward_invoices#add_customer', as: :add_customer
       patch 'remove_customer', to: 'outward_invoices#remove_customer', as: :remove_customer
@@ -2598,6 +2601,7 @@ Rails.application.routes.draw do
       patch 'save', to: 'outward_invoices#save', as: :save
       get 'download_pdf', to: 'outward_invoices#download', as: :download
       patch 'mark_as_closed', to: 'outward_invoices#mark_as_closed', as: :mark_as_closed
+      patch 'send_to_customer', to: 'outward_invoices#send_to_customer', as: :send_to_customer
     end
     get 'customers/count', to: 'customers#count'
     resources :customers do
@@ -2619,7 +2623,6 @@ Rails.application.routes.draw do
       get 'show_collect_detail', to: 'company_configurations#show_collect_details'
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
     end
-
     resources :inventory_line_items
   end
 
