@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180222155805) do
+ActiveRecord::Schema.define(version: 20180226151535) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2542,6 +2542,7 @@ ActiveRecord::Schema.define(version: 20180222155805) do
     t.integer  "total_payable_id",        limit: 4
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
+    t.text     "customer_memo",           limit: 65535
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
