@@ -44,12 +44,12 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
         # handle error
         self.parsed_response = Hash.from_xml(response.body)
         ap parsed_response
-        set_response_parameters
+        set_failure_response_parameters
       when 200
         # handle success cases
         self.parsed_response = Hash.from_xml(response.body)
         ap parsed_response
-        set_response_parameters
+        set_success_response_parameters
       else
         # do nothing?
     end
@@ -81,7 +81,7 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
   def failure
     params[:request_status] = request_status
     params[:bank_reference_number] = self.bank_reference_number
-    YesBankApi::Status::GetStatus::SuccessStatusPresenter.new(params)
+    YesBankApi::Status::GetStatus::FailureStatusPresenter.new(params)
   end
 
   class YesBankApi::Status::GetStatus::SuccessStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
@@ -115,9 +115,14 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
     )
   end
 
-  def set_response_parameters
+  def set_success_response_parameters
     self.request_status = parsed_response["Envelope"]&.dig("Body")&.dig("getStatusResponse")&.dig("transactionStatus")&.dig("statusCode")
     self.bank_reference_number = parsed_response["Envelope"]&.dig("Body")&.dig("getStatusResponse")&.dig("transactionStatus")&.dig("bankReferenceNo")
+  end
+
+  def set_failure_response_parameters
+    self.request_status = parsed_response["Envelope"]&.dig("Body")&.dig("Fault")&.dig("Reason")&.dig("Text")
+    self.bank_reference_number = ""
   end
 
 end
