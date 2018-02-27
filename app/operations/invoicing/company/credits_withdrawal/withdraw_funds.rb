@@ -2,7 +2,7 @@
 # to the respective configured current account of the company. It uses
 # the same APIs and operation as any regular vendor payment
 
-class Invoicing::Company::WithdrawFunds < BaseOperation
+class Invoicing::Company::WithdrawFunds < Invoicing::Company::Base
 
   attr_accessor :company, :collect_credit_account, :payment_request,
                 :transferable_amount, :transfer_mode, :transfer_mode

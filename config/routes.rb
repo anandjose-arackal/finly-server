@@ -1162,6 +1162,8 @@
 #                                                         PUT    /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#update
 #                                                         DELETE /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#destroy
 #                                invoicing_withdraw_funds PATCH  /invoicing/companies/withdraw_funds(.:format)                                                invoicing/companies#withdraw_funds
+#                           invoicing_show_credit_account GET    /invoicing/companies/show_credit_account(.:format)                                           invoicing/companies#show_credit_account
+#                              invoicing_transfer_history GET    /invoicing/companies/transfer_history(.:format)                                              invoicing/companies#transfer_history
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)              admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)               admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                             admin_users/funds_load_requests#index
@@ -2635,6 +2637,8 @@ Rails.application.routes.draw do
     resources :inventory_line_items
     resources :payment_terms
     patch 'companies/withdraw_funds', to: 'companies#withdraw_funds', as: :withdraw_funds
+    get 'companies/show_credit_account', to: 'companies#show_credit_account', as: :show_credit_account
+    get 'companies/transfer_history', to: 'companies#transfer_history', as: :transfer_history
   end
 
 
