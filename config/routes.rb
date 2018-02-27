@@ -1153,6 +1153,14 @@
 #                                                         PATCH  /invoicing/inventory_line_items/:id(.:format)                                                invoicing/inventory_line_items#update
 #                                                         PUT    /invoicing/inventory_line_items/:id(.:format)                                                invoicing/inventory_line_items#update
 #                                                         DELETE /invoicing/inventory_line_items/:id(.:format)                                                invoicing/inventory_line_items#destroy
+#                                 invoicing_payment_terms GET    /invoicing/payment_terms(.:format)                                                           invoicing/payment_terms#index
+#                                                         POST   /invoicing/payment_terms(.:format)                                                           invoicing/payment_terms#create
+#                              new_invoicing_payment_term GET    /invoicing/payment_terms/new(.:format)                                                       invoicing/payment_terms#new
+#                             edit_invoicing_payment_term GET    /invoicing/payment_terms/:id/edit(.:format)                                                  invoicing/payment_terms#edit
+#                                  invoicing_payment_term GET    /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#show
+#                                                         PATCH  /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#update
+#                                                         PUT    /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#update
+#                                                         DELETE /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#destroy
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)              admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)               admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                             admin_users/funds_load_requests#index
@@ -2624,6 +2632,7 @@ Rails.application.routes.draw do
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
     end
     resources :inventory_line_items
+    resources :payment_terms
   end
 
 
