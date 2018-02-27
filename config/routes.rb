@@ -1161,6 +1161,7 @@
 #                                                         PATCH  /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#update
 #                                                         PUT    /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#update
 #                                                         DELETE /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#destroy
+#                                invoicing_withdraw_funds PATCH  /invoicing/companies/withdraw_funds(.:format)                                                invoicing/companies#withdraw_funds
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)              admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)               admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                             admin_users/funds_load_requests#index
@@ -2633,6 +2634,7 @@ Rails.application.routes.draw do
     end
     resources :inventory_line_items
     resources :payment_terms
+    patch 'companies/withdraw_funds', to: 'companies#withdraw_funds', as: :withdraw_funds
   end
 
 
