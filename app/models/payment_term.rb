@@ -2,16 +2,73 @@
 #
 # Table name: payment_terms
 #
-#  id         :integer          not null, primary key
-#  name       :text(65535)
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id          :integer          not null, primary key
+#  name        :text(65535)
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  days_after  :integer
+#  description :text(65535)
+#  company_id  :integer
 #
 
 class PaymentTerm < ActiveRecord::Base
 
+  belongs_to :company
+
   # have to seed this with common values from the internet
   def self.values
     []
+  end
+
+  # contains the attributes of a few common payment terms
+  def default_terms
+    [
+        {
+            name: "Net 7",
+            days_after: 7,
+            description: "Payment seven days after invoice date",
+        },
+        {
+            name: "Net 10",
+            days_after: 10,
+            description: "Payment 10 days after invoice date"
+        },
+        {
+            name: "Net 30",
+            days_after: 30,
+            description: "Payment 30 days after invoice date"
+        },
+        {
+            name: "Net 60",
+            days_after: 60,
+            description: "Payment 60 days after invoice date"
+        },
+        {
+            name: "Net 90",
+            days_after: 90,
+            description: "Payment 90 days after invoice date"
+        },
+        {
+            name: "EOM",
+            description: "Payment to be made by end of month"
+        },
+        {
+            name: "15 MFI",
+            description: "Payment to be made on 15th of month following Invoice date"
+        },
+        {
+            name: "21 MFI",
+            description: "Payment to be made on 21st of month following Invoice date"
+        },
+    ]
+  end
+
+  # this method seeds the default payment terms for all
+  def self.seed_defaults(company_id)
+    values = default_terms
+    values.each do |val|
+      val[:company_id] = company_id
+      PaymentTerm.create(val)
+    end
   end
 end

@@ -2,10 +2,13 @@
 #
 # Table name: payment_terms
 #
-#  id         :integer          not null, primary key
-#  name       :text(65535)
-#  created_at :datetime         not null
-#  updated_at :datetime         not null
+#  id          :integer          not null, primary key
+#  name        :text(65535)
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  days_after  :integer
+#  description :text(65535)
+#  company_id  :integer
 #
 
 require 'test_helper'

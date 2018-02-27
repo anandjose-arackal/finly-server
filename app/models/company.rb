@@ -37,6 +37,7 @@ class Company < ActiveRecord::Base
   has_many :field_configurations, as: :configurable
   has_many :bank_transactions
   has_many :inventory_line_items
+  has_many :payment_terms
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
@@ -368,6 +369,8 @@ class Company < ActiveRecord::Base
     # creating the invoice numbering configuration for all companies with default values
     self.build_invoice_number_config(sequence_start: "0000").save
     self.build_collect_company_detail.save
+    # seeding the default payment terms for this company
+    PaymentTerm.seed_defaults(self.id)
   end
 
 end
