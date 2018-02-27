@@ -15,13 +15,9 @@ class PaymentTerm < ActiveRecord::Base
 
   belongs_to :company
 
-  # have to seed this with common values from the internet
-  def self.values
-    []
-  end
 
   # contains the attributes of a few common payment terms
-  def default_terms
+  def self.default_terms
     [
         {
             name: "Net 7",
@@ -65,8 +61,7 @@ class PaymentTerm < ActiveRecord::Base
 
   # this method seeds the default payment terms for all
   def self.seed_defaults(company_id)
-    values = default_terms
-    values.each do |val|
+    self.default_terms.each do |val|
       val[:company_id] = company_id
       PaymentTerm.create(val)
     end
