@@ -10,6 +10,8 @@ json.invoice do
   json.created_at invoice.created_at
   json.date invoice.date
   json.due_date invoice.due_date
+  json.memo invoice.memo
+  json.customer_memo invoice.customer_memo
   json.status do
     json.id invoice.invoice_status&.id
     json.name invoice.invoice_status&.name

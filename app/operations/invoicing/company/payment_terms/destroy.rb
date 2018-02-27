@@ -1,5 +1,7 @@
 class Invoicing::Company::PaymentTerms::Destroy < Invoicing::Company::PaymentTerms::Base
 
+  attr_accessor :payment_term
+  
   def init
     id = params[:id] || params[:payment_term_id]
     self.payment_term = user.company.payment_terms.find_by(id: id)
