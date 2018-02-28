@@ -14,7 +14,7 @@ json.invoice do
   json.customer_memo invoice.customer_memo
   json.status do
     json.id invoice.invoice_status&.id
-    json.name invoice.invoice_status&.name
+    json.name invoice.invoice_status&.name&.humanize
     json.bs_class ""
   end
 
