@@ -25,20 +25,18 @@
 
   <div class="float-container">
     <div class=" company-name company-address">
-      <b> Finly Spend and Expense Management </b>
+      <b> <%= @invoice.company.name %> </b>
     </div>
     <div class="company-details-container">
       <div class="company-address-line-one company-address">
-        3rd Floor, Salarpuria Towers 1, Koramangala,
-      </div>
-      <div class="company-address-line-two company-address">
-        Bengaluru, Karnataka.
-      </div>
-      <div class="company-pin-code company-address">
-        PIN : 590095
-      </div>
-
-
+        <%= @invoice.company.collect_company_detail&.address %>
+      <!--</div>-->
+      <!--<div class="company-address-line-two company-address">-->
+        <!--Bengaluru, Karnataka.-->
+      <!--</div>-->
+      <!--<div class="company-pin-code company-address">-->
+        <!--PIN : 590095-->
+      <!--</div>-->
     </div>
 
     <div class="company-logo-container">

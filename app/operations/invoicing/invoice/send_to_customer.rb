@@ -31,4 +31,8 @@ class Invoicing::Invoice::SendToCustomer < Invoicing::Invoice::Base
     end
   end
 
+  def post_process
+    add_message :success, "Invoice successfully sent!"
+  end
+
 end
