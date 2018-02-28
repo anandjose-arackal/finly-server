@@ -16,11 +16,11 @@
       </div>
       <div class="company-details-container" style=" font-size: 12px;">
         <div class="company-address-line-one company-address" style="padding-right: 10px;">
-          3rd Floor, Salarpuria Towers 1, Koramangala, Bengaluru, Karnataka.
+          <%= @invoice.company.collect_company_detail.address %>
         </div>
-        <div class="company-pin-code company-address">
-          PIN :
-        </div>
+        <!--<div class="company-pin-code company-address">-->
+          <!--PIN :-->
+        <!--</div>-->
         <div class="pan-no">
           <span style="width:100px;display:inline-block;">  PAN Number :  &nbsp;  </span> <span style="font-weight: bold; color: #333333;"><%= @invoice.company.collect_company_detail.pan %></span>
         </div>

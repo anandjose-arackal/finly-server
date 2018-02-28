@@ -8,6 +8,13 @@ class Invoicing::InventoryLineItem::Update < Invoicing::InventoryLineItem::Base
     self.inventory_item_parameters = inventory_item_params
   end
 
+  def validate
+    if self.inventory_item.blank?
+      add_message :error, "Inventory item not found"
+      return
+    end
+  end
+
   def process
     unless self.inventory_item.update(self.inventory_item_parameters)
       add_message :error, self.inventory_item.errors.full_messages
@@ -16,6 +23,6 @@ class Invoicing::InventoryLineItem::Update < Invoicing::InventoryLineItem::Base
   end
 
   def post_process
-    add_message :success, "Inventory item created"
+    add_message :success, "Inventory item updated!"
   end
 end

@@ -46,13 +46,15 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
             id: "download_invoice",
             btn_class: "info"
         }
-        actions << {
-            url: Rails.application.routes.url_helpers.invoicing_outward_invoice_send_to_customer_path(self.invoice),
-            name: "Send to Customer",
-            method: "patch",
-            id: "send_invoice",
-            btn_class: "info"
-        }
+        unless self.invoice.cancelled?
+          actions << {
+              url: Rails.application.routes.url_helpers.invoicing_outward_invoice_send_to_customer_path(self.invoice),
+              name: "Send to Customer",
+              method: "patch",
+              id: "send_invoice",
+              btn_class: "info"
+          }
+        end
       end
       actions
     end
