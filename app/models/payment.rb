@@ -133,6 +133,10 @@ class Payment < ActiveRecord::Base
     where initiating_account: initiating_account
   }
 
+  scope :with_receiving_account, -> (receiving_account) {
+    where receiving_account: receiving_account
+  }
+
   # Personal are card transactions from own wallet to own card
 
   scope :personal, -> { where('initiating_user_id = receiving_user_id AND (payment_purpose_id IN (?) OR (payment_type_id IN (?) AND initiating_account_type IN (?) AND receiving_account_type IN (?)))',
@@ -178,6 +182,7 @@ class Payment < ActiveRecord::Base
   scope :processing, -> { where payment_status_id: PaymentStatus.id_for(:processing) }
   scope :successful_and_failed_only, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:failed)] }
   scope :completed, -> { where payment_status_id: PaymentStatus.id_for(:completed) }
+  scope :processed, -> { where payment_status_id: [PaymentStatus.id_for(:completed), PaymentStatus.id_for(:processing)] }
 
   scope :transfer_to_card, -> { where('(payment_type_id = ? AND receiving_account_type = ?) OR (payment_type_id = ? AND initiating_account_type = ?)',
                                       PaymentType.id_for(:credit), Payment::AccountType::CARD, PaymentType.id_for(:debit), Payment::AccountType::CARD) }
@@ -190,6 +195,10 @@ class Payment < ActiveRecord::Base
 
   scope :with_payment_order_id, -> (ids) {
     where payment_order_id: ids
+  }
+
+  scope :with_payment_purpose, -> (purpose_id) {
+    where payment_purpose_id: purpose_id
   }
 
   scope :cash_additions_to_employee, -> { where(payment_purpose_id: [PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly)]) }

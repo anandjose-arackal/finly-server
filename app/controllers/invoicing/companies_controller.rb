@@ -17,7 +17,8 @@ class Invoicing::CompaniesController < ApplicationController
 
   # this action shows the history of transfers for this particular company
   def transfer_history
-
+    @result = Invoicing::Company::CreditsWithdrawal::ShowHistory.(current_user, params)
+    respond
   end
 
 end
