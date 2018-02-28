@@ -2,10 +2,22 @@
 # to the respective configured current account of the company. It uses
 # the same APIs and operation as any regular vendor payment
 
-class Invoicing::Company::WithdrawFunds < Invoicing::Company::Base
+class Invoicing::Company::CreditsWithdrawal::WithdrawFunds < Invoicing::Company::Base
 
   attr_accessor :company, :collect_credit_account, :payment_request,
                 :transferable_amount, :transfer_mode, :transfer_mode
+
+  def pre_validate
+    super
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password to initiate the transfer'
+      return
+    end
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
+  end
 
   def init
     self.company = user.company
@@ -65,8 +77,9 @@ class Invoicing::Company::WithdrawFunds < Invoicing::Company::Base
   private
 
   def build_payment_request
-    payment_request = ::PaymentRequest.call(user, self.company.yes_bank_company_account, BankAccount.name, :collect_funds_withdrawal, :credit, {bank_transfer_type: self.transfer_mode, company_id: user.company_id})
-    payment_request.add_payment_item(::PaymentReqyest::PaymentItem.call(user.company, self.collect_credit_account, self.transferable_amount))
+    payment_request = ::PaymentRequest.call(user, self.company.yes_bank_company_account, BankAccount.name, :credit, :collect_funds_withdrawal, {bank_transfer_type: self.transfer_mode, company_id: user.company_id})
+    payment_request.add_payment_item(::PaymentRequest::PaymentItem.call(user, self.collect_credit_account, self.transferable_amount))
     payment_request
   end
 end
+

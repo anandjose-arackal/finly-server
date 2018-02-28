@@ -1145,6 +1145,7 @@
 #                                                         PATCH  /invoicing/company_configurations/:id(.:format)                                              invoicing/company_configurations#update
 #                                                         PUT    /invoicing/company_configurations/:id(.:format)                                              invoicing/company_configurations#update
 #                                                         DELETE /invoicing/company_configurations/:id(.:format)                                              invoicing/company_configurations#destroy
+#                    invoicing_inventory_line_items_count GET    /invoicing/inventory_line_items/count(.:format)                                              invoicing/inventory_line_items#count
 #                          invoicing_inventory_line_items GET    /invoicing/inventory_line_items(.:format)                                                    invoicing/inventory_line_items#index
 #                                                         POST   /invoicing/inventory_line_items(.:format)                                                    invoicing/inventory_line_items#create
 #                       new_invoicing_inventory_line_item GET    /invoicing/inventory_line_items/new(.:format)                                                invoicing/inventory_line_items#new
@@ -2634,6 +2635,7 @@ Rails.application.routes.draw do
       get 'show_collect_detail', to: 'company_configurations#show_collect_details'
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
     end
+    get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
     resources :inventory_line_items
     resources :payment_terms
     patch 'companies/withdraw_funds', to: 'companies#withdraw_funds', as: :withdraw_funds

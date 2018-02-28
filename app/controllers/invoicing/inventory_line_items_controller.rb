@@ -35,6 +35,6 @@ class Invoicing::InventoryLineItemsController < ApplicationController
 
   def count
     @result = Invoicing::InventoryLineItem::Count.(current_user, params)
-    respond
+    render json: @result.count.as_json
   end
 end
