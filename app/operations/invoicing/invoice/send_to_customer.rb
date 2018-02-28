@@ -23,6 +23,16 @@ class Invoicing::Invoice::SendToCustomer < Invoicing::Invoice::Base
       add_message :error, "Incomplete invoices cannot be sent to customers. The following invoices are incomplete: #{spurious_ids.to_sentence}"
       return
     end
+
+    without_email = []
+    self.invoices.each do |invoice|
+      if invoice.email.blank?
+        without_email << invoice.invoice_number
+      end
+    end
+    unless without_email.empty?
+      add_message :error, "The following invoices don't have an email address associated with them: #{without_email.to_sentence}"
+    end
   end
 
   def process
