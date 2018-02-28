@@ -13,9 +13,9 @@ class RegistrationsController < ApplicationController
   def signup
     @result = Company::Signup.(nil, params)
     if @result.success?
-      respond reponse: success, message: @result.messages[:success]
+      respond response: :success, messages: @result.messages[:success]
     else
-      respond response: :error, message: @result.messages[:error]
+      respond response: :error, messages: @result.messages[:error]
     end
 
   end
