@@ -2088,6 +2088,7 @@ Rails.application.routes.draw do
   post 'admin/oauth/bypass_token', to: 'admin_users/oauth/bypass_token#create', defaults: {format: 'json'}
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
+  post 'welcome/signup', to: 'registrations#signup', as: :welcome_signup
   post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
   get 'download_resource', to: 'registrations#resources_download', as: :resources_download
 
