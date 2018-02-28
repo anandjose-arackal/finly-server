@@ -9,4 +9,5 @@ json.array!(@result.paginated_invoices) do |invoice|
   end
   json.balance_due invoice.balance_due&.value
   json.status invoice.invoice_status&.name&.humanize
+  json.status_id invoice.invoice_status&.id
 end

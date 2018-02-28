@@ -10,9 +10,11 @@ json.invoice do
   json.created_at invoice.created_at
   json.date invoice.date
   json.due_date invoice.due_date
+  json.memo invoice.memo
+  json.customer_memo invoice.customer_memo
   json.status do
     json.id invoice.invoice_status&.id
-    json.name invoice.invoice_status&.name
+    json.name invoice.invoice_status&.name&.humanize
     json.bs_class ""
   end
 
@@ -48,6 +50,7 @@ json.invoice do
       json.description item.description
       json.total_amount precision_value item.net_amount&.value
       json.hsn_sac item.hsn_sac
+      json.inventory_item_id item.inventory_line_item_id
     end
   end
 
@@ -69,7 +72,7 @@ json.invoice do
   end
 
   json.invoice_items_categories do
-    json.array!(current_company.categories.outward_invoice_items_categories) do |category|
+    json.array!(current_company.categories.outward_invoice_items_categories.active) do |category|
       json.id category.id
       json.name category.name
     end

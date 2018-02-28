@@ -12,7 +12,7 @@
     <span> <b> INVOICE </b> </span>
   </div>
 
-  <% if @result.invoice.cancelled? %>
+  <% if @invoice.cancelled? %>
   <!-- Add your own logic when to display this cancelled invoice image -->
   <div style="width: 100%; height: auto; overflow: hidden;text-align: center;">
 
@@ -25,20 +25,18 @@
 
   <div class="float-container">
     <div class=" company-name company-address">
-      <b> Finly Spend and Expense Management </b>,
+      <b> <%= @invoice.company.name %> </b>
     </div>
     <div class="company-details-container">
       <div class="company-address-line-one company-address">
-        3rd Floor, Salarpuria Towers 1, Koramangala,
-      </div>
-      <div class="company-address-line-two company-address">
-        Bengaluru, Karnataka.
-      </div>
-      <div class="company-pin-code company-address">
-        PIN : 590095
-      </div>
-
-
+        <%= @invoice.company.collect_company_detail&.address %>
+      <!--</div>-->
+      <!--<div class="company-address-line-two company-address">-->
+        <!--Bengaluru, Karnataka.-->
+      <!--</div>-->
+      <!--<div class="company-pin-code company-address">-->
+        <!--PIN : 590095-->
+      <!--</div>-->
     </div>
 
     <div class="company-logo-container">
@@ -57,19 +55,19 @@
     <div class="customer-block">
 
       <div class="invoice-number">
-        <span class="fixed-span">  Invoice Number  &nbsp;  </span> <span><b><%= @result.invoice.invoice_number%></b></span>
+        <span class="fixed-span">  Invoice Number  &nbsp;  </span> <span><b><%= @invoice.invoice_number%></b></span>
       </div>
       <!--<div class="invoice-number">-->
       <!--<span> <b> Invoice Details : &nbsp; </b> </span> <span>KA-12368763471-1238</span>-->
       <!--</div>-->
       <div class="invoice-date">
-        <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @result.invoice.date%></b></span>
+        <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @invoice.date%></b></span>
       </div>
       <!--<div class="order-number">-->
       <!--<span> <b> Order Number : &nbsp; </b> </span> <span>407-213879821-213</span>-->
       <!--</div>-->
       <div class="order-date">
-        <span class="fixed-span">  Due Date  &nbsp;  </span> <span><b><%= @result.invoice.due_date%> </b></span>
+        <span class="fixed-span">  Due Date  &nbsp;  </span> <span><b><%= @invoice.due_date%> </b></span>
       </div>
     </div>
 
@@ -91,25 +89,25 @@
     <div class="customer-block">
 
       <div class="invoice-care-of-name">
-        <span class="fixed-span">  C/O  &nbsp; </span> <span><b><%= @result.invoice.customer.name %></b></span>
+        <span class="fixed-span">  C/O  &nbsp; </span> <span><b><%= @invoice.customer.name %></b></span>
       </div>
       <!--<div class="invoice-number">-->
       <!--<span> <b> Invoice Number : &nbsp; </b> </span> <span>6589798746</span>-->
       <!--</div>-->
       <div class="invoice-number">
-        <span class="fixed-span">  Mobile  &nbsp;  </span> <span><b><%= @result.invoice.mobile_number%></b></span>
+        <span class="fixed-span">  Mobile  &nbsp;  </span> <span><b><%= @invoice.mobile_number%></b></span>
       </div>
       <div class="invoice-number">
-        <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @result.invoice.date %></b></span>
+        <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @invoice.date %></b></span>
       </div>
-      <% if @result.invoice.customer.pan.present? %>
+      <% if @invoice.customer.pan.present? %>
           <div class="pan-no">
-            <span class="fixed-span">  PAN Number  &nbsp;  </span> <span><b><%= @result.invoice.customer.pan%></b></span>
+            <span class="fixed-span">  PAN Number  &nbsp;  </span> <span><b><%= @invoice.customer.pan%></b></span>
           </div>
       <% end %>
-      <% if @result.invoice.customer.gst.present? %>
+      <% if @invoice.customer.gst.present? %>
           <div class="gst-registered">
-            <span class="fixed-span">  GSTIN  &nbsp;  </span> <span><b><%= @result.invoice.customer.gst%></b></span>
+            <span class="fixed-span">  GSTIN  &nbsp;  </span> <span><b><%= @invoice.customer.gst%></b></span>
           </div>
       <% end %>
 
@@ -125,9 +123,9 @@
     </div>
     <div class="billing-details-block">
       <div class="shipping-customer-name">
-        <% @result.invoice.customer.name %>
+        <% @invoice.customer.name %>
       </div>
-      <% address = @result.invoice.billing_address.split("\n") %>
+      <% address = @invoice.billing_address.split("\n") %>
       <% address.each do |addr| %>
           <div class="address-line billing-address">
             <%= addr %>
@@ -148,9 +146,9 @@
     </div>
     <div class="shipping-details-block">
       <div class="shipping-customer-name">
-        <% @result.invoice.customer.name %>
+        <% @invoice.customer.name %>
       </div>
-      <% address = @result.invoice.shipping_address.split("\n") %>
+      <% address = @invoice.shipping_address.split("\n") %>
       <% address.each do |addr| %>
           <div class="address-line billing-address">
             <%= addr %>
@@ -165,17 +163,17 @@
     </div>
   </div>
 
-  <% if @result.invoice.virtual_account.present? %>
+  <% if @invoice.virtual_account.present? %>
       <div style="font-size: 11px; width: 100%; height: auto; text-align: left; overflow: hidden; margin-top: 80px;">
         <div class="address-title">
           Invoice Payment : <br>
         </div>
 
         <div class="invoice-number">
-          <span class="fixed-span-big">Account Number  &nbsp;  </span> <span><b><%= @result.invoice.virtual_account.account_number %></b></span>
+          <span class="fixed-span-big">Account Number  &nbsp;  </span> <span><b><%= @invoice.virtual_account.account_number %></b></span>
         </div>
         <div class="invoice-number">
-          <span class="fixed-span-big">IFSC Code  &nbsp;  </span> <span><b><%= @result.invoice.virtual_account.ifsc %></b></span>
+          <span class="fixed-span-big">IFSC Code  &nbsp;  </span> <span><b><%= @invoice.virtual_account.ifsc %></b></span>
         </div>
 
 
@@ -184,7 +182,7 @@
 
 </div>
 
-<% if @result.invoice.inclusive_of_taxes %>
+<% if @invoice.inclusive_of_taxes %>
   <div style="width: calc(100% - 10px); height: auto; overflow: hidden;font-size: 12px; color: #7b7b7b; font-weight: 300; margin-top: 10px; margin-left: 10px; ">
     <span style="color: darkred;">* &nbsp;&nbsp;</span> Inclusive of taxes
   </div>
@@ -202,12 +200,12 @@
       <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Rate</th>
       <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Amount</th>
       <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Discount</th>
-      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; "><%= @result.invoice.gst_type_id == 1 ? "IGST" : "CGST + SGST" %></th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; "><%= @invoice.gst_type_id == 1 ? "IGST" : "CGST + SGST" %></th>
       <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; " colspan="2">Total</th>
     </tr>
     </thead>
     <tbody>
-    <% @result.invoice.invoice_items.each do |item| %>
+    <% @invoice.invoice_items.each do |item| %>
         <tr>
           <th style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " scope="row">2</th>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.description%></td>
@@ -223,20 +221,20 @@
     <tr>
       <th colspan="6"></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Total </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-total" colspan="1">INR <%= @result.invoice.line_items_net_total%></td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-total" colspan="1">INR <%= @invoice.line_items_net_total%></td>
     </tr>
-    <% if @result.invoice.discount_amount&.value > 0 %>
+    <% if @invoice.discount_amount&.value > 0 %>
     <tr>
       <th colspan="6"></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Discount </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-discount" colspan="1">INR <%= @result.invoice.discount_amount&.value%></td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-discount" colspan="1">INR <%= @invoice.discount_amount&.value%></td>
     </tr>
     <% end %>
-    <% if @result.invoice.tax_amount&.value > 0 %>
+    <% if @invoice.tax_amount&.value > 0 %>
     <tr>
       <th colspan="6"></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class=" line-items-title" colspan="2">Tax </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-tax" colspan="1">INR <%= @result.invoice.tax_amount&.value%></td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-tax" colspan="1">INR <%= @invoice.tax_amount&.value%></td>
     </tr>
     <% end %>
     <!--<tr>-->
@@ -244,30 +242,30 @@
     <!--<td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " class="plain line-items-title" colspan="2">TDS :</td>-->
     <!--<td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " class="plain line-items-data line-items-tds" colspan="2">INR 67</td>-->
     <!--</tr>-->
-    <% if @result.invoice.advance_amount&.value > 0 %>
+    <% if @invoice.advance_amount&.value > 0 %>
     <tr>
       <th colspan="6"></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class=" line-items-title" colspan="2">Advance Payment </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-advance-payment" colspan="1">INR <%= @result.invoice.advance_amount&.value%></td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-advance-payment" colspan="1">INR <%= @invoice.advance_amount&.value%></td>
     </tr>
     <% end %>
-    <% if @result.invoice.freight_amount&.value > 0 %>
+    <% if @invoice.freight_amount&.value > 0 %>
     <tr>
       <th colspan="6"></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Freight </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-freight" colspan="1">INR <%= @result.invoice.freight_amount&.value %></td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-freight" colspan="1">INR <%= @invoice.freight_amount&.value %></td>
     </tr>
     <% end %>
     <tr>
       <th colspan="6"></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Roundoff </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-roundoff" colspan="1">INR <%= @result.invoice.roundoff_amount%></td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-roundoff" colspan="1">INR <%= @invoice.roundoff_amount%></td>
     </tr>
-    <% if @result.invoice.partially_paid? || @result.invoice.closed? || @result.invoice.saved? %>
+    <% if @invoice.partially_paid? || @invoice.closed? || @invoice.saved? %>
     <tr>
       <th colspan="6" ></th>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 14px; " class="line-items-title" colspan="2">Balance Due </td>
-      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-balance-due" colspan="1">INR <%= @result.invoice.balance_due&.value %></td>
+      <td style="padding: 5px; border: none !important; text-align: left; font-size: 14px; " class="line-items-data line-items-balance-due" colspan="1">INR <%= @invoice.balance_due&.value %></td>
     </tr>
     <% end %>
     </tbody>
