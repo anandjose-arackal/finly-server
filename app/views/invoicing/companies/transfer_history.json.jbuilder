@@ -1,6 +1,6 @@
 json.array!(@result.credit_payments) do |payment|
   json.date payment.date.strftime("%Y-%m-%d")
-  json.initiated_by payment.initiating_resource&.name
+  json.initiated_by payment.initiating_user&.name
   json.received_by payment.receiving_account&.name
   json.account_number payment.receiving_account&.account_number
   json.ifsc payment.receiving_account&.ifsc

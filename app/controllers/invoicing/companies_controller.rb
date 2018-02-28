@@ -1,5 +1,7 @@
 class Invoicing::CompaniesController < ApplicationController
 
+  before_action -> { finly_authorize! :web }
+
   def withdraw_funds
     @result = Invoicing::Company::CreditsWithdrawal::WithdrawFunds.(current_user, params)
     if @result.success?
