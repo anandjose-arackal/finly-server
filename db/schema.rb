@@ -3299,6 +3299,17 @@ ActiveRecord::Schema.define(version: 20180228101712) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "signedup_users", force: :cascade do |t|
+    t.string   "name",               limit: 255
+    t.string   "mobile_number",      limit: 255
+    t.string   "email",              limit: 255
+    t.string   "encrypted_password", limit: 255
+    t.string   "products",           limit: 255
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.string   "company_name",       limit: 255
+  end
+
   create_table "states", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.string   "code",       limit: 255, null: false
