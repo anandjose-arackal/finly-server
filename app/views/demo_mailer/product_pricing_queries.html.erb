@@ -15,6 +15,10 @@
   <% if @product_pricing_query.monthly_transactions %>
     <h4>Monthly Transactions: <%= @product_pricing_query.monthly_transactions %></h4>
   <% end %>
+
+  <% if @product_pricing_query.prepaid_cards %>
+    <h4>Number of Prepaid Cards: <%= @product_pricing_query.prepaid_cards %></h4>
+  <% end %>
   <% if @product_pricing_query.monthly_invoices %>
     <h4>Monthly Invoices: <%= @product_pricing_query.monthly_invoices %></h4>
   <% end %>

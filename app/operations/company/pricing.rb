@@ -40,6 +40,6 @@ class Company::Pricing < BaseOperation
   private
 
   def signup_params
-    params.require(:pricing).permit(:name, :mobile_number, :email, :employees, :accounting_system, :monthly_transactions, :monthly_invoices, :product)
+    params.require(:pricing).permit(:name, :mobile_number, :email, :employees, :accounting_system, :monthly_transactions, :monthly_invoices, :prepaid_cards, :product)
   end
 end
