@@ -14,17 +14,18 @@ class Invoicing::Invoice::MarkAsClosed < Invoicing::Invoice::Base
       return
     end
 
-    if self.paid_amount < 0
+    if self.paid_amount.to_f < 0
       add_message :error, "Paid amount cannot be negative"
       return
     end
   end
 
   def process
-    unless self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:closed))
+    if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:closed))
       balance_due = (self.invoice.total_payable&.value - self.paid_amount.to_f) > 0 ? (self.invoice.total_payable&.value - self.paid_amount.to_f) : 0
       self.invoice.balance_due.update(value: balance_due)
       self.invoice.paid_amount.update(value: self.paid_amount)
+    else
       add_message :error, self.invoice.errors.full_messages
     end
   end

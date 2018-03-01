@@ -3365,7 +3365,7 @@ ActiveRecord::Schema.define(version: 20180228132243) do
   create_table "temporary_files", force: :cascade do |t|
     t.string   "file_file_name",    limit: 255
     t.string   "file_content_type", limit: 255
-    t.integer  "file_file_size",    limit: 4
+    t.integer  "file_file_size",    limit: 8
     t.datetime "file_updated_at"
     t.datetime "expires_on"
     t.datetime "created_at",                    null: false
