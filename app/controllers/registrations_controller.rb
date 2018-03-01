@@ -17,7 +17,15 @@ class RegistrationsController < ApplicationController
     else
       respond response: :error, messages: @result.messages[:error]
     end
+  end
 
+  def pricing
+    @result = Company::Pricing.(nil, params)
+    if @result.success?
+      respond response: :success, messages: @result.messages[:success]
+    else
+      respond response: :error, messages: @result.messages[:error]
+    end
   end
 
   def resource_requests

@@ -18,4 +18,9 @@ class DemoMailer < ApplicationMailer
     @signedup_user = signedup_user
     mail to: recipient, subject: "Someone Self-Signed Up"
   end
+
+  def product_pricing_queries(product_pricing_query, recipient)
+    @product_pricing_query = product_pricing_query
+    mail to: recipient, subject: "New Product Pricing Query"
+  end
 end

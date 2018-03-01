@@ -18,7 +18,7 @@ module Constants
   end
 
   PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
-  # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io']
+  # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
   RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io', 'venu.reddy@finly.io']

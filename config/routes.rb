@@ -2114,6 +2114,7 @@ Rails.application.routes.draw do
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
   post 'welcome/signup', to: 'registrations#signup', as: :welcome_signup
+  post 'welcome/pricing', to: 'registrations#pricing', as: :welcome_pricing
   post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
   get 'download_resource', to: 'registrations#resources_download', as: :resources_download
 
