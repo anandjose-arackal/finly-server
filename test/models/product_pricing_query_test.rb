@@ -13,6 +13,7 @@
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  product              :string(255)
+#  prepaid_cards        :string(255)
 #
 
 require 'test_helper'

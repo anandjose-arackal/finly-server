@@ -11,8 +11,6 @@
 #  created_at   :datetime         not null
 #  updated_at   :datetime         not null
 #  purpose_id   :integer
-#  parent_id    :integer
-#  code         :string(255)
 #
 
 
