@@ -1,0 +1,25 @@
+<% content_for :body do %>
+  <h3>New Product Pricing Query with following details: </h3>
+  <h4>Product: <%= @product_pricing_query.product %></h4>
+  <br />
+  <h4>User Email: <%= @product_pricing_query.email %></h4>
+
+  <h4>User Mobile Number: <%= @product_pricing_query.mobile_number %></h4>
+  <br/>
+  <% if @product_pricing_query.employees %>
+    <h4>No. of Employees: <%= @product_pricing_query.employees %></h4>
+  <% end %>
+  <% if @product_pricing_query.accounting_system %>
+    <h4>Accounting System: <%= @product_pricing_query.accounting_system %></h4>
+  <% end %>
+  <% if @product_pricing_query.monthly_transactions %>
+    <h4>Monthly Transactions: <%= @product_pricing_query.monthly_transactions %></h4>
+  <% end %>
+  <% if @product_pricing_query.monthly_invoices %>
+    <h4>Monthly Invoices: <%= @product_pricing_query.monthly_invoices %></h4>
+  <% end %>
+
+  <br/>
+<% end %>
+
+<%= render 'application_mailer/template' %>

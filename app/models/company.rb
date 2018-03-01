@@ -8,6 +8,7 @@
 #  updated_at       :datetime         not null
 #  active           :boolean          default(TRUE), not null
 #  base_currency_id :integer          default(1)
+#  status_id        :integer          default(1), not null
 #
 
 class Company < ActiveRecord::Base
