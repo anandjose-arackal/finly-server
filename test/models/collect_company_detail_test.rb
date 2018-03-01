@@ -12,6 +12,8 @@
 #  company_logo_content_type :string(255)
 #  company_logo_file_size    :integer
 #  company_logo_updated_at   :datetime
+#  address                   :text(65535)
+#  pin                       :text(65535)
 #
 
 require 'test_helper'

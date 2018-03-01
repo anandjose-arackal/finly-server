@@ -486,6 +486,15 @@
 #                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#update
 #                                                         DELETE /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#deactivate
 #                                                invoices POST   /invoices(.:format)                                                                          api/fc/invoices/outward_invoices#create_valid
+#        api_vp_bank_transfer_bank_payment_request_credit PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)        api/vp/bank_transfer/bank_payment_requests#credit
+#              api_vp_bank_transfer_bank_payment_requests GET    /api/vp/bank_transfer/bank_payment_requests(.:format)                                        api/vp/bank_transfer/bank_payment_requests#index
+#                                                         POST   /api/vp/bank_transfer/bank_payment_requests(.:format)                                        api/vp/bank_transfer/bank_payment_requests#create
+#           new_api_vp_bank_transfer_bank_payment_request GET    /api/vp/bank_transfer/bank_payment_requests/new(.:format)                                    api/vp/bank_transfer/bank_payment_requests#new
+#          edit_api_vp_bank_transfer_bank_payment_request GET    /api/vp/bank_transfer/bank_payment_requests/:id/edit(.:format)                               api/vp/bank_transfer/bank_payment_requests#edit
+#               api_vp_bank_transfer_bank_payment_request GET    /api/vp/bank_transfer/bank_payment_requests/:id(.:format)                                    api/vp/bank_transfer/bank_payment_requests#show
+#                                                         PATCH  /api/vp/bank_transfer/bank_payment_requests/:id(.:format)                                    api/vp/bank_transfer/bank_payment_requests#update
+#                                                         PUT    /api/vp/bank_transfer/bank_payment_requests/:id(.:format)                                    api/vp/bank_transfer/bank_payment_requests#update
+#                                                         DELETE /api/vp/bank_transfer/bank_payment_requests/:id(.:format)                                    api/vp/bank_transfer/bank_payment_requests#destroy
 #                                               junk_show GET    /junk/show(.:format)                                                                         junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                         users#menu_data
 #                              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                                                 admin_users/oauth/token#create {:format=>"json"}
@@ -2080,6 +2089,19 @@ Rails.application.routes.draw do
 
   ################### Virtual Bank Accounts End ######################
 
+  ################### Vendor Payments APIs start #####################
+
+  namespace :api do
+    namespace :vp do
+      namespace :bank_transfer do
+        resources :bank_payment_requests do
+          patch 'credit', to: 'bank_payment_requests#credit', as: :credit
+        end
+      end
+    end
+  end
+
+  ################### Vendor Payments APIs end ########################
 
   get 'junk/show', to: 'junk#show'
 
@@ -2130,7 +2152,7 @@ Rails.application.routes.draw do
   end
 
   # get 'organization_account' => 'organization_account#show'
-  get 'organization_account/policies_list' => 'organization_account#policies_list' #todo
+  get 'organization_account/policies_list' => 'organization_account#policies_list'
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
   get 'state_codes', to: 'organization_account#gst_state_codes', as: :state_codes
