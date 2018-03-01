@@ -490,6 +490,7 @@
 #                                admin_oauth_bypass_token POST   /admin/oauth/bypass_token(.:format)                                                          admin_users/oauth/bypass_token#create {:format=>"json"}
 #                                    preview_registration POST   /welcome/preview(.:format)                                                                   registrations#preview
 #                                          welcome_signup POST   /welcome/signup(.:format)                                                                    registrations#signup
+#                                         welcome_pricing POST   /welcome/pricing(.:format)                                                                   registrations#pricing
 #                                       resources_details POST   /resources_details(.:format)                                                                 registrations#resource_requests
 #                                      resources_download GET    /download_resource(.:format)                                                                 registrations#resources_download
 #                                  policies_expense_rules GET    /policies/expense_rules(.:format)                                                            policies#expense_rules
