@@ -118,7 +118,7 @@ class OutwardInvoice < ActiveRecord::Base
   end
 
   def editable?
-    !(self.invoice_status_id == OutwardInvoiceStatus.id_for(:cancelled) || self.invoice_status_id == OutwardInvoiceStatus.id_for(:closed))
+    !((OutwardInvoiceStatus.id_for(:closed, :cancelled, :partially_paid)).include?(self.invoice_status_id))
   end
 
   def line_items_total
