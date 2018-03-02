@@ -36,6 +36,11 @@ class Invoicing::CustomersController < ApplicationController
     respond
   end
 
+  def payments
+    @result = Invoicing::Customer::Payments::Index.(current_user, params)
+    respond
+  end
+
   def virtual_bank_accounts
     @result = Invoicing::Customer::VirtualBankAccounts::Index.(current_user, params)
     respond

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180301071634) do
+ActiveRecord::Schema.define(version: 20180302121928) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1952,6 +1952,16 @@ ActiveRecord::Schema.define(version: 20180301071634) do
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
   end
+
+  create_table "invoice_transaction_mappings", force: :cascade do |t|
+    t.integer  "invoice_id",        limit: 4
+    t.integer  "va_transaction_id", limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "invoice_transaction_mappings", ["invoice_id"], name: "index_invoice_transaction_mappings_on_invoice_id", using: :btree
+  add_index "invoice_transaction_mappings", ["va_transaction_id"], name: "index_invoice_transaction_mappings_on_va_transaction_id", using: :btree
 
   create_table "invoices", force: :cascade do |t|
     t.integer  "address_id",         limit: 4

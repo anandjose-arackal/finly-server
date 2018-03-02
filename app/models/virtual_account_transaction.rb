@@ -30,6 +30,8 @@ class VirtualAccountTransaction < ActiveRecord::Base
 
   has_one :payment, as: :reference_resource
   belongs_to :virtual_account, class_name: "VirtualBankAccount"
+  has_many :invoice_transaction_mappings, foreign_key: :va_transaction_id
+  has_many :invoices, through: :invoice_transaction_mappings
 
   validates :transfer_id, uniqueness: true
 
