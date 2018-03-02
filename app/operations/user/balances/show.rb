@@ -127,12 +127,16 @@ class User::Balances::Show < User::Base
              eligibility: card_adapter.credit_eligibility
          }
     end
+    comp_balance = itz_cash_company_adapter.balance
+    unless comp_balance
+      comp_balance = "Temporarily unavailable"
+    end
     self.company_credits_info = {
         yes_bank: {
             balance: yes_bank_company_adapter.balance
         },
         itz_cash: {
-            balance: itz_cash_company_adapter.balance
+            balance: comp_balance
         }
     }
     self.wallet_info = {
