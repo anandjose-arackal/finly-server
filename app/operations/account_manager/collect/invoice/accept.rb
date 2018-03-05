@@ -44,6 +44,8 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
         invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:closed))
         remaining_amount = remaining_amount - due_amount
       end
+      # associating the particular invoice and virtual account transaction ID for the mapping
+      InvoiceTransactionMapping.create(invoice_id: invoice.id, va_transaction_id: self.virtual_account_transaction.id)
       last_invoice = invoice # setting this as the last invoice that was processed
       if remaining_amount <= 0
         break
@@ -53,6 +55,9 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
     if remaining_amount > 0
       paid_amount = last_invoice.paid_amount.value
       last_invoice.paid_amount.update(value: (paid_amount + remaining_amount))
+      unless self.virtual_account_transaction.invoices.include?(last_invoice)
+        InvoiceTransactionMapping.create(invoice_id: last_invoice.id, va_transaction_id: self.virtual_account_transaction.id)
+      end
     end
     # end
   end
