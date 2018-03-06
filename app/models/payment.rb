@@ -138,6 +138,10 @@ class Payment < ActiveRecord::Base
     where receiving_account: receiving_account
   }
 
+  scope :with_receiving_user_type, -> (type) {
+    where receiving_user_type: type
+  }
+
   # Personal are card transactions from own wallet to own card
 
   scope :personal, -> { where('initiating_user_id = receiving_user_id AND (payment_purpose_id IN (?) OR (payment_type_id IN (?) AND initiating_account_type IN (?) AND receiving_account_type IN (?)))',
