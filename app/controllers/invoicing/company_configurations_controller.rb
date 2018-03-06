@@ -1,5 +1,6 @@
 class Invoicing::CompanyConfigurationsController < ApplicationController
 
+  before_action -> { finly_authorize! :web }
 
   def update_credit_account
     @result = Company::Collect::CollectCreditAccount::Update.(current_user, params)

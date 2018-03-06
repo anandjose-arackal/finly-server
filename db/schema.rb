@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180228053802) do
+ActiveRecord::Schema.define(version: 20180301071634) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -836,23 +836,9 @@ ActiveRecord::Schema.define(version: 20180228053802) do
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
     t.integer  "purpose_id",   limit: 4
-    t.integer  "parent_id",    limit: 4
-    t.string   "account_code", limit: 255
   end
 
   add_index "categories", ["company_id"], name: "index_categories_on_company_id", using: :btree
-
-  create_table "category_department_mappings", force: :cascade do |t|
-    t.integer  "category_id",   limit: 4, null: false
-    t.integer  "location_id",   limit: 4, null: false
-    t.integer  "department_id", limit: 4, null: false
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-  end
-
-  add_index "category_department_mappings", ["category_id"], name: "index_category_department_mappings_on_category_id", using: :btree
-  add_index "category_department_mappings", ["department_id"], name: "index_category_department_mappings_on_department_id", using: :btree
-  add_index "category_department_mappings", ["location_id"], name: "index_category_department_mappings_on_location_id", using: :btree
 
   create_table "channel_types", force: :cascade do |t|
     t.string "name",         limit: 255
@@ -870,12 +856,14 @@ ActiveRecord::Schema.define(version: 20180228053802) do
     t.string   "gst",                       limit: 255
     t.string   "pan",                       limit: 255
     t.integer  "company_id",                limit: 4
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
     t.string   "company_logo_file_name",    limit: 255
     t.string   "company_logo_content_type", limit: 255
     t.integer  "company_logo_file_size",    limit: 4
     t.datetime "company_logo_updated_at"
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.text     "address",                   limit: 65535
+    t.text     "pin",                       limit: 65535
   end
 
   add_index "collect_company_details", ["company_id"], name: "index_collect_company_details_on_company_id", using: :btree
@@ -1388,11 +1376,12 @@ ActiveRecord::Schema.define(version: 20180228053802) do
     t.string   "mobile_number", limit: 255
     t.text     "description",   limit: 65535
     t.integer  "company_id",    limit: 4
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
     t.string   "gst",           limit: 255
     t.string   "pan",           limit: 255
     t.integer  "created_by_id", limit: 4
+    t.boolean  "active",                      default: true
   end
 
   create_table "desktop_users", force: :cascade do |t|
@@ -1656,21 +1645,12 @@ ActiveRecord::Schema.define(version: 20180228053802) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "field_category_mappings", force: :cascade do |t|
-    t.integer  "category_id",            limit: 4, null: false
-    t.integer  "field_configuration_id", limit: 4, null: false
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-  end
-
-  add_index "field_category_mappings", ["category_id"], name: "index_field_category_mappings_on_category_id", using: :btree
-  add_index "field_category_mappings", ["field_configuration_id"], name: "index_field_category_mappings_on_field_configuration_id", using: :btree
-
   create_table "field_configurations", force: :cascade do |t|
     t.boolean  "enabled",                             default: true,  null: false
     t.integer  "field_type_id",           limit: 4,                   null: false
     t.boolean  "mandatory",                           default: false, null: false
     t.integer  "company_id",              limit: 4,                   null: false
+    t.integer  "field_parent_type_id",    limit: 4,                   null: false
     t.integer  "configurable_id",         limit: 4,                   null: false
     t.string   "configurable_type",       limit: 255,                 null: false
     t.datetime "created_at",                                          null: false
@@ -1687,6 +1667,7 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
   add_index "field_configurations", ["configurable_id"], name: "index_field_configurations_on_configurable_id", using: :btree
   add_index "field_configurations", ["configurable_type"], name: "index_field_configurations_on_configurable_type", using: :btree
+  add_index "field_configurations", ["field_parent_type_id"], name: "index_field_configurations_on_field_parent_type_id", using: :btree
   add_index "field_configurations", ["field_type_id"], name: "index_field_configurations_on_field_type_id", using: :btree
 
   create_table "field_date_times", force: :cascade do |t|
@@ -1752,16 +1733,6 @@ ActiveRecord::Schema.define(version: 20180228053802) do
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
   end
-
-  create_table "field_parent_type_mappings", force: :cascade do |t|
-    t.integer  "field_parent_type_id",   limit: 4, null: false
-    t.integer  "field_configuration_id", limit: 4, null: false
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-  end
-
-  add_index "field_parent_type_mappings", ["field_configuration_id"], name: "index_field_parent_type_mappings_on_field_configuration_id", using: :btree
-  add_index "field_parent_type_mappings", ["field_parent_type_id"], name: "index_field_parent_type_mappings_on_field_parent_type_id", using: :btree
 
   create_table "field_parent_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -1916,6 +1887,23 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_index "individual_kycs", ["company_id"], name: "index_individual_kycs_on_company_id", using: :btree
   add_index "individual_kycs", ["user_id"], name: "index_individual_kycs_on_user_id", using: :btree
 
+  create_table "inventory_line_items", force: :cascade do |t|
+    t.decimal  "tax",                       precision: 20, scale: 10
+    t.decimal  "discount",                  precision: 20, scale: 10
+    t.string   "hsn_sac",     limit: 255
+    t.integer  "company_id",  limit: 4
+    t.string   "sku",         limit: 255
+    t.decimal  "rate",                      precision: 20, scale: 10
+    t.text     "description", limit: 65535
+    t.integer  "category_id", limit: 4
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
+    t.text     "note",        limit: 65535
+  end
+
+  add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
+  add_index "inventory_line_items", ["company_id"], name: "index_inventory_line_items_on_company_id", using: :btree
+
   create_table "invoice_attachments", force: :cascade do |t|
     t.string   "attached_file_file_name",    limit: 255
     t.string   "attached_file_content_type", limit: 255
@@ -1930,24 +1918,25 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_index "invoice_attachments", ["invoice_id"], name: "index_invoice_attachments_on_invoice_id", using: :btree
 
   create_table "invoice_line_items", force: :cascade do |t|
-    t.integer  "invoice_id",         limit: 4
-    t.string   "description",        limit: 255
-    t.integer  "quantity",           limit: 4
-    t.decimal  "rate",                           precision: 20, scale: 10
-    t.decimal  "tax",                            precision: 20, scale: 10
-    t.decimal  "discount",                       precision: 20, scale: 10
-    t.integer  "category_id",        limit: 4
-    t.integer  "gst_type_id",        limit: 4
-    t.integer  "tax_amount_id",      limit: 4
-    t.integer  "discount_amount_id", limit: 4
-    t.integer  "amount_id",          limit: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
-    t.integer  "net_amount_id",      limit: 4
-    t.string   "hsn_sac",            limit: 255
-    t.integer  "taxable_amount_id",  limit: 4
-    t.string   "parent_type",        limit: 255
-    t.string   "parent_id",          limit: 255
+    t.integer  "invoice_id",             limit: 4
+    t.string   "description",            limit: 255
+    t.integer  "quantity",               limit: 4
+    t.decimal  "rate",                               precision: 20, scale: 10
+    t.decimal  "tax",                                precision: 20, scale: 10
+    t.decimal  "discount",                           precision: 20, scale: 10
+    t.integer  "category_id",            limit: 4
+    t.integer  "gst_type_id",            limit: 4
+    t.integer  "tax_amount_id",          limit: 4
+    t.integer  "discount_amount_id",     limit: 4
+    t.integer  "amount_id",              limit: 4
+    t.datetime "created_at",                                                   null: false
+    t.datetime "updated_at",                                                   null: false
+    t.integer  "net_amount_id",          limit: 4
+    t.string   "hsn_sac",                limit: 255
+    t.integer  "taxable_amount_id",      limit: 4
+    t.string   "parent_type",            limit: 255
+    t.string   "parent_id",              limit: 255
+    t.integer  "inventory_line_item_id", limit: 4
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -2133,20 +2122,6 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_index "login_agreement_mappings", ["agreement_id"], name: "index_login_agreement_mappings_on_agreement_id", using: :btree
   add_index "login_agreement_mappings", ["user_id"], name: "index_login_agreement_mappings_on_user_id", using: :btree
 
-  create_table "manager_mappings", force: :cascade do |t|
-    t.integer  "user_id",         limit: 4, null: false
-    t.integer  "manager_type_id", limit: 4, null: false
-    t.integer  "location_id",     limit: 4, null: false
-    t.integer  "department_id",   limit: 4, null: false
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  add_index "manager_mappings", ["department_id"], name: "index_manager_mappings_on_department_id", using: :btree
-  add_index "manager_mappings", ["location_id"], name: "index_manager_mappings_on_location_id", using: :btree
-  add_index "manager_mappings", ["manager_type_id"], name: "index_manager_mappings_on_manager_type_id", using: :btree
-  add_index "manager_mappings", ["user_id"], name: "index_manager_mappings_on_user_id", using: :btree
-
   create_table "manager_summary_mail_configs", force: :cascade do |t|
     t.integer  "user_id",                limit: 4,   null: false
     t.integer  "period_id",              limit: 4,   null: false
@@ -2166,12 +2141,6 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_index "manager_summary_mail_configs", ["scheduled_day_of_week"], name: "index_manager_summary_mail_configs_on_scheduled_day_of_week", using: :btree
   add_index "manager_summary_mail_configs", ["scheduled_time"], name: "index_manager_summary_mail_configs_on_scheduled_time", using: :btree
   add_index "manager_summary_mail_configs", ["user_id"], name: "index_manager_summary_mail_configs_on_user_id", using: :btree
-
-  create_table "manager_types", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
 
   create_table "manual_expenses", force: :cascade do |t|
     t.integer  "expense_id", limit: 4
@@ -2575,6 +2544,8 @@ ActiveRecord::Schema.define(version: 20180228053802) do
     t.string   "prefix",                  limit: 255
     t.integer  "total_payable_id",        limit: 4
     t.boolean  "roundoff_total_enabled"
+    t.string   "memo",                    limit: 255
+    t.text     "customer_memo",           limit: 65535
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
@@ -2706,9 +2677,12 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   end
 
   create_table "payment_terms", force: :cascade do |t|
-    t.text     "name",       limit: 65535
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.text     "name",        limit: 65535
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "days_after",  limit: 4
+    t.text     "description", limit: 65535
+    t.integer  "company_id",  limit: 4
   end
 
   create_table "payment_trails", force: :cascade do |t|
@@ -2857,18 +2831,6 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_index "policy_configurations", ["report_currency_id"], name: "index_policy_configurations_on_report_currency_id", using: :btree
   add_index "policy_configurations", ["technical_contact_id"], name: "index_policy_configurations_on_technical_contact_id", using: :btree
 
-  create_table "policy_department_mappings", force: :cascade do |t|
-    t.integer  "policy_id",     limit: 4, null: false
-    t.integer  "location_id",   limit: 4, null: false
-    t.integer  "department_id", limit: 4, null: false
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-  end
-
-  add_index "policy_department_mappings", ["department_id"], name: "index_policy_department_mappings_on_department_id", using: :btree
-  add_index "policy_department_mappings", ["location_id"], name: "index_policy_department_mappings_on_location_id", using: :btree
-  add_index "policy_department_mappings", ["policy_id"], name: "index_policy_department_mappings_on_policy_id", using: :btree
-
   create_table "policy_user_mappings", force: :cascade do |t|
     t.integer  "user_id",    limit: 4,                 null: false
     t.integer  "policy_id",  limit: 4,                 null: false
@@ -2908,6 +2870,20 @@ ActiveRecord::Schema.define(version: 20180228053802) do
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "product_pricing_queries", force: :cascade do |t|
+    t.string   "name",                 limit: 255
+    t.string   "mobile_number",        limit: 255
+    t.string   "email",                limit: 255
+    t.string   "employees",            limit: 255
+    t.string   "accounting_system",    limit: 255
+    t.string   "monthly_transactions", limit: 255
+    t.string   "monthly_invoices",     limit: 255
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.string   "product",              limit: 255
+    t.string   "prepaid_cards",        limit: 255
   end
 
   create_table "purposes", force: :cascade do |t|
@@ -3339,6 +3315,17 @@ ActiveRecord::Schema.define(version: 20180228053802) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "signedup_users", force: :cascade do |t|
+    t.string   "name",               limit: 255
+    t.string   "mobile_number",      limit: 255
+    t.string   "email",              limit: 255
+    t.string   "encrypted_password", limit: 255
+    t.string   "products",           limit: 255
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.string   "company_name",       limit: 255
+  end
+
   create_table "states", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.string   "code",       limit: 255, null: false
@@ -3491,34 +3478,6 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_index "user_balance_histories", ["finly_money_withdrawal_id"], name: "index_user_balance_histories_on_finly_money_withdrawal_id", using: :btree
   add_index "user_balance_histories", ["user_id"], name: "index_user_balance_histories_on_user_id", using: :btree
 
-  create_table "user_group_department_location_mappings", force: :cascade do |t|
-    t.integer  "location_id",   limit: 4, null: false
-    t.integer  "department_id", limit: 4, null: false
-    t.datetime "created_at",              null: false
-    t.datetime "updated_at",              null: false
-  end
-
-  add_index "user_group_department_location_mappings", ["department_id"], name: "index_user_group_department_location_mappings_on_department_id", using: :btree
-  add_index "user_group_department_location_mappings", ["location_id"], name: "index_user_group_department_location_mappings_on_location_id", using: :btree
-
-  create_table "user_group_departments", force: :cascade do |t|
-    t.string   "name",       limit: 255, null: false
-    t.integer  "company_id", limit: 4,   null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "user_group_departments", ["company_id"], name: "index_user_group_departments_on_company_id", using: :btree
-
-  create_table "user_group_designations", force: :cascade do |t|
-    t.string   "name",       limit: 255, null: false
-    t.integer  "company_id", limit: 4,   null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "user_group_designations", ["company_id"], name: "index_user_group_designations_on_company_id", using: :btree
-
   create_table "user_group_item_mappings", force: :cascade do |t|
     t.integer  "user_id",            limit: 4
     t.integer  "user_group_item_id", limit: 4
@@ -3542,24 +3501,13 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_index "user_group_items", ["name"], name: "index_user_group_items_on_name", using: :btree
   add_index "user_group_items", ["user_group_id"], name: "index_user_group_items_on_user_group_id", using: :btree
 
-  create_table "user_group_locations", force: :cascade do |t|
-    t.string   "name",       limit: 255, null: false
-    t.string   "email",      limit: 255
-    t.string   "phone",      limit: 255
-    t.string   "website",    limit: 255
-    t.integer  "company_id", limit: 4,   null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "user_group_locations", ["company_id"], name: "index_user_group_locations_on_company_id", using: :btree
-
   create_table "user_groups", force: :cascade do |t|
-    t.string   "name",       limit: 255,                 null: false
-    t.integer  "company_id", limit: 4,                   null: false
-    t.datetime "created_at",                             null: false
-    t.datetime "updated_at",                             null: false
-    t.boolean  "is_deleted",             default: false
+    t.string   "name",        limit: 255,                 null: false
+    t.integer  "company_id",  limit: 4,                   null: false
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.boolean  "is_deleted",              default: false
+    t.string   "application", limit: 255
   end
 
   add_index "user_groups", ["company_id"], name: "index_user_groups_on_company_id", using: :btree
@@ -3729,53 +3677,50 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_index "user_wallets", ["user_id"], name: "index_user_wallets_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                     limit: 255, default: ""
-    t.string   "encrypted_password",        limit: 255, default: "",    null: false
-    t.string   "reset_password_token",      limit: 255
+    t.string   "email",                  limit: 255, default: ""
+    t.string   "encrypted_password",     limit: 255, default: "",    null: false
+    t.string   "reset_password_token",   limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",             limit: 4,   default: 0,     null: false
+    t.integer  "sign_in_count",          limit: 4,   default: 0,     null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip",        limit: 255
-    t.string   "last_sign_in_ip",           limit: 255
-    t.string   "confirmation_token",        limit: 255
+    t.string   "current_sign_in_ip",     limit: 255
+    t.string   "last_sign_in_ip",        limit: 255
+    t.string   "confirmation_token",     limit: 255
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
-    t.string   "unconfirmed_email",         limit: 255
-    t.integer  "failed_attempts",           limit: 4,   default: 0,     null: false
-    t.string   "unlock_token",              limit: 255
+    t.string   "unconfirmed_email",      limit: 255
+    t.integer  "failed_attempts",        limit: 4,   default: 0,     null: false
+    t.string   "unlock_token",           limit: 255
     t.datetime "locked_at"
-    t.datetime "created_at",                                            null: false
-    t.datetime "updated_at",                                            null: false
-    t.integer  "company_id",                limit: 4,                   null: false
-    t.string   "mobile_number",             limit: 255
-    t.boolean  "active",                                default: true,  null: false
-    t.string   "invitation_token",          limit: 255
+    t.datetime "created_at",                                         null: false
+    t.datetime "updated_at",                                         null: false
+    t.integer  "company_id",             limit: 4,                   null: false
+    t.string   "mobile_number",          limit: 255
+    t.boolean  "active",                             default: true,  null: false
+    t.string   "invitation_token",       limit: 255
     t.datetime "invitation_created_at"
     t.datetime "invitation_sent_at"
     t.datetime "invitation_accepted_at"
-    t.integer  "invitation_limit",          limit: 4
-    t.integer  "invited_by_id",             limit: 4
-    t.string   "invited_by_type",           limit: 255
-    t.integer  "invitations_count",         limit: 4,   default: 0
-    t.string   "otp",                       limit: 255
+    t.integer  "invitation_limit",       limit: 4
+    t.integer  "invited_by_id",          limit: 4
+    t.string   "invited_by_type",        limit: 255
+    t.integer  "invitations_count",      limit: 4,   default: 0
+    t.string   "otp",                    limit: 255
     t.datetime "otp_sent_at"
     t.datetime "otp_verified_at"
-    t.boolean  "otp_verified",                          default: false, null: false
-    t.integer  "otp_count",                 limit: 4,   default: 0,     null: false
-    t.string   "first_name",                limit: 255
-    t.string   "last_name",                 limit: 255
-    t.boolean  "mobile_only_invite",                    default: false
-    t.string   "mothers_maiden_name",       limit: 255
-    t.boolean  "verified",                              default: false
-    t.integer  "otp_request_type_id",       limit: 4
-    t.boolean  "default_password",                      default: false
-    t.boolean  "point_of_contact",                      default: false
-    t.integer  "otp_attempts",              limit: 4,   default: 0
-    t.integer  "user_group_location_id",    limit: 4
-    t.integer  "user_group_department_id",  limit: 4
-    t.integer  "user_group_designation_id", limit: 4
+    t.boolean  "otp_verified",                       default: false, null: false
+    t.integer  "otp_count",              limit: 4,   default: 0,     null: false
+    t.string   "first_name",             limit: 255
+    t.string   "last_name",              limit: 255
+    t.boolean  "mobile_only_invite",                 default: false
+    t.string   "mothers_maiden_name",    limit: 255
+    t.boolean  "verified",                           default: false
+    t.integer  "otp_request_type_id",    limit: 4
+    t.boolean  "default_password",                   default: false
+    t.boolean  "point_of_contact",                   default: false
+    t.integer  "otp_attempts",           limit: 4,   default: 0
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
@@ -4058,7 +4003,6 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_foreign_key "cards", "users"
   add_foreign_key "cash_on_hands", "users"
   add_foreign_key "categories", "companies"
-  add_foreign_key "category_department_mappings", "categories"
   add_foreign_key "collect_company_details", "companies"
   add_foreign_key "company_accounts", "companies"
   add_foreign_key "company_accounts", "company_account_types"
@@ -4093,13 +4037,10 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_foreign_key "export_preferences", "export_fields"
   add_foreign_key "feedbacks", "feedback_types"
   add_foreign_key "feedbacks", "users"
-  add_foreign_key "field_category_mappings", "categories"
-  add_foreign_key "field_category_mappings", "field_configurations"
   add_foreign_key "field_configurations", "companies"
+  add_foreign_key "field_configurations", "field_parent_types"
   add_foreign_key "field_configurations", "field_types"
   add_foreign_key "field_drop_down_items", "field_configurations"
-  add_foreign_key "field_parent_type_mappings", "field_configurations"
-  add_foreign_key "field_parent_type_mappings", "field_parent_types"
   add_foreign_key "finly_transactions", "amounts"
   add_foreign_key "finly_transactions", "companies"
   add_foreign_key "finly_transactions", "payment_purposes"
@@ -4109,6 +4050,8 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
+  add_foreign_key "inventory_line_items", "categories"
+  add_foreign_key "inventory_line_items", "companies"
   add_foreign_key "invoice_attachments", "invoices"
   add_foreign_key "invoice_line_items", "categories"
   add_foreign_key "invoice_line_items", "invoices"
@@ -4121,8 +4064,6 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_foreign_key "kyc_documents", "company_kycs"
   add_foreign_key "login_agreement_mappings", "agreements"
   add_foreign_key "login_agreement_mappings", "users"
-  add_foreign_key "manager_mappings", "manager_types"
-  add_foreign_key "manager_mappings", "users"
   add_foreign_key "manager_summary_mail_configs", "periods"
   add_foreign_key "manager_summary_mail_configs", "users"
   add_foreign_key "manual_expenses", "expenses"
@@ -4169,7 +4110,6 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_configurations", "policies"
-  add_foreign_key "policy_department_mappings", "policies"
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "quickbooks_configurations", "quickbooks_payment_types"
@@ -4207,13 +4147,10 @@ ActiveRecord::Schema.define(version: 20180228053802) do
   add_foreign_key "transcribed_expenses", "users"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
-  add_foreign_key "user_group_departments", "companies"
-  add_foreign_key "user_group_designations", "companies"
   add_foreign_key "user_group_item_mappings", "user_group_items"
   add_foreign_key "user_group_item_mappings", "user_groups"
   add_foreign_key "user_group_item_mappings", "users"
   add_foreign_key "user_group_items", "user_groups"
-  add_foreign_key "user_group_locations", "companies"
   add_foreign_key "user_groups", "companies"
   add_foreign_key "user_login_tracks", "users"
   add_foreign_key "user_manager_mappings", "policies"

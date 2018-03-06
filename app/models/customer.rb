@@ -13,6 +13,7 @@
 #  gst           :string(255)
 #  pan           :string(255)
 #  created_by_id :integer
+#  active        :boolean          default(TRUE)
 #
 
 class Customer < ActiveRecord::Base
@@ -30,4 +31,7 @@ class Customer < ActiveRecord::Base
 
   validates :name, presence: true
   # validates :created_by, presence: true
+
+  scope :active, -> { where active: true }
+  scope :inactive, -> { where active: false }
 end

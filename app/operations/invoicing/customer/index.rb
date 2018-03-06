@@ -18,7 +18,7 @@ class Invoicing::Customer::Index < Invoicing::Customer::Base
   end
 
   def process
-    self.customers = self.company.customers
+    self.customers = self.company.customers.active
   end
 
   def success

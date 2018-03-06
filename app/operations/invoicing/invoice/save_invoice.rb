@@ -97,14 +97,14 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
   def invoice_params
     params.require(:invoice).permit(:gst_type_id, :tds, :tds_type_id, :category_id, :customer_id,
-                                    :tax_type_id, :date, :discount_type_id, :due_date,
+                                    :tax_type_id, :date, :discount_type_id, :due_date, :memo, :customer_memo,
                                     :invoice_number, :inclusive_of_taxes, :billing_address, :shipping_address, :override_invoice_number,
                                     :email, :mobile_number, :virtual_account_id, :roundoff_amount, :roundoff_total_enabled,
                                     original_amount_attributes: [:value, :currency_id],
                                     advance_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
                                     invoice_attachments_attributes: [:attached_file, :description],
-                                    invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax])
+                                    invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax, :inventory_line_item_id])
   end
 
   def customer_params

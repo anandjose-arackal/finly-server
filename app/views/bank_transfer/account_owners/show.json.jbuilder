@@ -27,7 +27,7 @@ json.bank_accounts do
 end
 json.transactions do
   json.array!(@result.receiving_transactions) do |payment|
-    json.extract! payment, :id, :note, :payment_mode
+    json.extract! payment, :id, :note
     json.reference_id payment.reference_resource&.bank_reference_number
     json.amount payment.amount.value
     json.date payment.date

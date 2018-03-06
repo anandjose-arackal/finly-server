@@ -489,6 +489,8 @@
 #                              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                                                 admin_users/oauth/token#create {:format=>"json"}
 #                                admin_oauth_bypass_token POST   /admin/oauth/bypass_token(.:format)                                                          admin_users/oauth/bypass_token#create {:format=>"json"}
 #                                    preview_registration POST   /welcome/preview(.:format)                                                                   registrations#preview
+#                                          welcome_signup POST   /welcome/signup(.:format)                                                                    registrations#signup
+#                                         welcome_pricing POST   /welcome/pricing(.:format)                                                                   registrations#pricing
 #                                       resources_details POST   /resources_details(.:format)                                                                 registrations#resource_requests
 #                                      resources_download GET    /download_resource(.:format)                                                                 registrations#resources_download
 #                                  policies_expense_rules GET    /policies/expense_rules(.:format)                                                            policies#expense_rules
@@ -809,6 +811,7 @@
 #                                   autocomplete_merchant GET    /autocomplete/merchant(.:format)                                                             autocomplete#merchant
 #                                       autocomplete_user GET    /autocomplete/user(.:format)                                                                 autocomplete#user
 #                                       autocomplete_card GET    /autocomplete/card(.:format)                                                                 autocomplete#card
+#                            autocomplete_inventory_items GET    /autocomplete/inventory_items(.:format)                                                      autocomplete#inventory_items
 #                                     external_url_report GET    /external/reports/:id(.:format)                                                              external_url#report
 #                              external_url_money_request GET    /external/requests/:id(.:format)                                                             external_url#money_request
 #                                 external_url_settlement GET    /external/settlements/:id(.:format)                                                          external_url#payment
@@ -1083,6 +1086,7 @@
 #                                                         PUT    /invoicing/payment_receivables/:id(.:format)                                                 invoicing/payment_receivables#update
 #                                                         DELETE /invoicing/payment_receivables/:id(.:format)                                                 invoicing/payment_receivables#destroy
 #                        invoicing_outward_invoices_count GET    /invoicing/outward_invoices/count(.:format)                                                  invoicing/outward_invoices#count
+#                              invoicing_send_to_customer PATCH  /invoicing/outward_invoices/send_to_customer(.:format)                                       invoicing/outward_invoices#send_to_customer
 #                  invoicing_outward_invoice_add_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/add_customer(.:format)                       invoicing/outward_invoices#add_customer
 #               invoicing_outward_invoice_remove_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/remove_customer(.:format)                    invoicing/outward_invoices#remove_customer
 #                invoicing_outward_invoice_update_address PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_address(.:format)                     invoicing/outward_invoices#update_address
@@ -1090,6 +1094,8 @@
 #                        invoicing_outward_invoice_cancel PATCH  /invoicing/outward_invoices/:outward_invoice_id/cancel(.:format)                             invoicing/outward_invoices#cancel
 #                          invoicing_outward_invoice_save PATCH  /invoicing/outward_invoices/:outward_invoice_id/save(.:format)                               invoicing/outward_invoices#save
 #                      invoicing_outward_invoice_download GET    /invoicing/outward_invoices/:outward_invoice_id/download_pdf(.:format)                       invoicing/outward_invoices#download
+#                invoicing_outward_invoice_mark_as_closed PATCH  /invoicing/outward_invoices/:outward_invoice_id/mark_as_closed(.:format)                     invoicing/outward_invoices#mark_as_closed
+#              invoicing_outward_invoice_send_to_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/send_to_customer(.:format)                   invoicing/outward_invoices#send_to_customer
 #                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                        invoicing/outward_invoices#index
 #                                                         POST   /invoicing/outward_invoices(.:format)                                                        invoicing/outward_invoices#create
 #                           new_invoicing_outward_invoice GET    /invoicing/outward_invoices/new(.:format)                                                    invoicing/outward_invoices#new
@@ -1141,6 +1147,26 @@
 #                                                         PATCH  /invoicing/company_configurations/:id(.:format)                                              invoicing/company_configurations#update
 #                                                         PUT    /invoicing/company_configurations/:id(.:format)                                              invoicing/company_configurations#update
 #                                                         DELETE /invoicing/company_configurations/:id(.:format)                                              invoicing/company_configurations#destroy
+#                    invoicing_inventory_line_items_count GET    /invoicing/inventory_line_items/count(.:format)                                              invoicing/inventory_line_items#count
+#                          invoicing_inventory_line_items GET    /invoicing/inventory_line_items(.:format)                                                    invoicing/inventory_line_items#index
+#                                                         POST   /invoicing/inventory_line_items(.:format)                                                    invoicing/inventory_line_items#create
+#                       new_invoicing_inventory_line_item GET    /invoicing/inventory_line_items/new(.:format)                                                invoicing/inventory_line_items#new
+#                      edit_invoicing_inventory_line_item GET    /invoicing/inventory_line_items/:id/edit(.:format)                                           invoicing/inventory_line_items#edit
+#                           invoicing_inventory_line_item GET    /invoicing/inventory_line_items/:id(.:format)                                                invoicing/inventory_line_items#show
+#                                                         PATCH  /invoicing/inventory_line_items/:id(.:format)                                                invoicing/inventory_line_items#update
+#                                                         PUT    /invoicing/inventory_line_items/:id(.:format)                                                invoicing/inventory_line_items#update
+#                                                         DELETE /invoicing/inventory_line_items/:id(.:format)                                                invoicing/inventory_line_items#destroy
+#                                 invoicing_payment_terms GET    /invoicing/payment_terms(.:format)                                                           invoicing/payment_terms#index
+#                                                         POST   /invoicing/payment_terms(.:format)                                                           invoicing/payment_terms#create
+#                              new_invoicing_payment_term GET    /invoicing/payment_terms/new(.:format)                                                       invoicing/payment_terms#new
+#                             edit_invoicing_payment_term GET    /invoicing/payment_terms/:id/edit(.:format)                                                  invoicing/payment_terms#edit
+#                                  invoicing_payment_term GET    /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#show
+#                                                         PATCH  /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#update
+#                                                         PUT    /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#update
+#                                                         DELETE /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#destroy
+#                                invoicing_withdraw_funds PATCH  /invoicing/companies/withdraw_funds(.:format)                                                invoicing/companies#withdraw_funds
+#                           invoicing_show_credit_account GET    /invoicing/companies/show_credit_account(.:format)                                           invoicing/companies#show_credit_account
+#                              invoicing_transfer_history GET    /invoicing/companies/transfer_history(.:format)                                              invoicing/companies#transfer_history
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)              admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)               admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                             admin_users/funds_load_requests#index
@@ -2088,6 +2114,8 @@ Rails.application.routes.draw do
   post 'admin/oauth/bypass_token', to: 'admin_users/oauth/bypass_token#create', defaults: {format: 'json'}
 
   post '/welcome/preview', to: 'registrations#preview', as: :preview_registration
+  post 'welcome/signup', to: 'registrations#signup', as: :welcome_signup
+  post 'welcome/pricing', to: 'registrations#pricing', as: :welcome_pricing
   post '/resources_details', to: 'registrations#resource_requests', as: :resources_details
   get 'download_resource', to: 'registrations#resources_download', as: :resources_download
 
@@ -2342,7 +2370,7 @@ Rails.application.routes.draw do
   get 'autocomplete/merchant'
   get 'autocomplete/user'
   get 'autocomplete/card', to: 'autocomplete#card'
-
+  get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
 
   # get 'features', to: 'static_pages#features'
 
@@ -2579,6 +2607,7 @@ Rails.application.routes.draw do
   namespace :invoicing do
     resources :payment_receivables
     get 'outward_invoices/count', to: 'outward_invoices#count'
+    patch 'outward_invoices/send_to_customer', to: 'outward_invoices#send_to_customer', as: :send_to_customer
     resources :outward_invoices do
       patch 'add_customer', to: 'outward_invoices#add_customer', as: :add_customer
       patch 'remove_customer', to: 'outward_invoices#remove_customer', as: :remove_customer
@@ -2587,6 +2616,8 @@ Rails.application.routes.draw do
       patch 'cancel', to: 'outward_invoices#cancel', as: :cancel
       patch 'save', to: 'outward_invoices#save', as: :save
       get 'download_pdf', to: 'outward_invoices#download', as: :download
+      patch 'mark_as_closed', to: 'outward_invoices#mark_as_closed', as: :mark_as_closed
+      patch 'send_to_customer', to: 'outward_invoices#send_to_customer', as: :send_to_customer
     end
     get 'customers/count', to: 'customers#count'
     resources :customers do
@@ -2608,6 +2639,12 @@ Rails.application.routes.draw do
       get 'show_collect_detail', to: 'company_configurations#show_collect_details'
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
     end
+    get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
+    resources :inventory_line_items
+    resources :payment_terms
+    patch 'companies/withdraw_funds', to: 'companies#withdraw_funds', as: :withdraw_funds
+    get 'companies/show_credit_account', to: 'companies#show_credit_account', as: :show_credit_account
+    get 'companies/transfer_history', to: 'companies#transfer_history', as: :transfer_history
   end
 
 

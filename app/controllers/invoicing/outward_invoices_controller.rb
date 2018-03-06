@@ -98,11 +98,30 @@ class Invoicing::OutwardInvoicesController < ApplicationController
 
   def download
     @result = Invoicing::Invoice::DownloadInvoice.(current_user, params)
+    @invoice = @result.invoice
     respond_to do |format|
       format.pdf {
           render pdf: "Invoice-#{@result.invoice.invoice_number}", layout: "pdf.html.erb", print_media_type: true
       }
       format.html {}
+    end
+  end
+
+  def mark_as_closed
+    @result = Invoicing::Invoice::MarkAsClosed.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def send_to_customer
+    @result = Invoicing::Invoice::SendToCustomer.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
     end
   end
 

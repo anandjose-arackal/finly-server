@@ -22,6 +22,6 @@ class Company::Collect::CompanyDetails::Update < Company::Base
   private
 
   def company_details_params
-    params.require(:company).permit(:gst, :pan)
+    params.require(:company).permit(:gst, :pan, :address, :pin)
   end
 end
