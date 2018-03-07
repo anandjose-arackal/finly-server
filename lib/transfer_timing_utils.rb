@@ -6,7 +6,7 @@ class TransferTimingUtils
     elsif date.class.name == String.name
       date = DateUtils.parse_date date
     end
-    if date.nil? or date <= Date.today
+    if date <= Date.today
       date = DateTime.now
     else
       date.change(hour: 8, min: 1, sec: 0)
