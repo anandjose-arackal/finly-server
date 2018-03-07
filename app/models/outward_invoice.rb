@@ -112,6 +112,43 @@ class OutwardInvoice < ActiveRecord::Base
   scope :without_id, -> (id){ where.not id: id}
   scope :with_id, -> (id) { where id: id }
 
+  scope :filter_customer_id, -> (customer_id) {
+    where customer_id: customer_id
+  }
+
+  scope :filter_search, -> (term) {
+    where('customer_memo like ? OR memo like ? OR email like ? OR mobile_number like ? OR invoice_number like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+  }
+
+  scope :filter_status, -> (status_id) {
+    where invoice_status_id: status_id
+  }
+
+  scope :filter_amount, -> (type, value) do
+    case type
+      when 'lteq'
+        joins(:total_payable).select('expenses.*').where('value <= ?', value)
+      when 'gteq'
+        joins(:total_payable).select('expenses.*').where('value >= ?', value)
+      when 'eq'
+        joins(:total_payable).select('expenses.*').where('ROUND(value, 2) = ?', precision_value(value))
+      else
+        # do nothing
+    end
+  end
+
+  scope :filter_date, ->(date_from = nil, date_to = nil) do
+    unless date_from.blank? && date_to.blank?
+      type_val = :date
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = DateUtils.local_date if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date if date_to.present?
+      expenses = arel_table
+      where(expenses[type_val].gteq(date_from).and(expenses[type_val].lteq(date_to)))
+    end
+  end
+
 
   default_scope { unscope(:where) }
 

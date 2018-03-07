@@ -34,4 +34,26 @@ class Customer < ActiveRecord::Base
 
   scope :active, -> { where active: true }
   scope :inactive, -> { where active: false }
+
+  scope :filter_search, -> (term) {
+    where('name like ? OR email like ? OR mobile_number like ? or description like ? OR gst like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+  }
+
+  scope :search_by_virtual_accounts, -> (account_number) {
+    joins(:virtual_bank_accounts).where('virtual_bank_accounts.account_number like ?', "%#{account_number}%")
+  }
+
+  scope :with_virtual_accounts, -> (account_numbers) {
+    joins(:virtual_bank_accounts).where(account_number: account_numbers)
+  }
+
+  # will most likely be a checkbox on the front end
+  scope :virtual_accounts_presence, -> (presence) {
+    if StringUtils.to_bool(presence)
+      cust_ids = pluck(:id)
+      ids = VirtualBankAccount.with_customer_id(cust_ids).pluck(:customer_id)
+      where(id: ids)
+    end
+  }
+
 end
