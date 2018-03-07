@@ -1069,6 +1069,7 @@
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                               bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                         bank_transfer/vendor_payment_wallets#transfer_options
 #                                     public_bank_account GET    /account/:account_number(.:format)                                                           invoicing/public_links#virtual_bank_account_show
+#                                          public_invoice GET    /invoice/:invoice_id(.:format)                                                               invoicing/public_links#invoice_show
 #                                               addresses GET    /addresses(.:format)                                                                         addresses#index
 #                                                         POST   /addresses(.:format)                                                                         addresses#create
 #                                             new_address GET    /addresses/new(.:format)                                                                     addresses#new
@@ -2601,6 +2602,7 @@ Rails.application.routes.draw do
 
 
   get 'account/:account_number', to: 'invoicing/public_links#virtual_bank_account_show', as: :public_bank_account
+  get 'invoice/:invoice_id', to: 'invoicing/public_links#invoice_show', as: :public_invoice
 
   resources :addresses
 
