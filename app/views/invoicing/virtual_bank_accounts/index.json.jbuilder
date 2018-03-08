@@ -1,4 +1,4 @@
-json.array!(@result.virtual_bank_accounts) do |virtual_bank_account|
+json.array!(@result.paginated_virtual_bank_accounts) do |virtual_bank_account|
   json.name virtual_bank_account.name
   json.account_number virtual_bank_account.account_number
   json.ifsc virtual_bank_account.ifsc
