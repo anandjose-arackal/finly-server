@@ -1,6 +1,6 @@
 class Invoicing::Customer::Invoices::Index < Invoicing::Customer::Base
 
-  attr_accessor :invoices_paid
+  attr_accessor :invoices_paid, :customer
 
   class Invoicing::Customer::Invoices::Index::InvoicesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
