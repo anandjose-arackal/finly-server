@@ -37,6 +37,7 @@
 #  roundoff_total_enabled  :boolean
 #  memo                    :string(255)
 #  customer_memo           :text(65535)
+#  reminders               :integer
 #
 
 require 'test_helper'

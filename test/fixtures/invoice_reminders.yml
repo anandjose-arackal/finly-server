@@ -1,0 +1,24 @@
+# == Schema Information
+#
+# Table name: invoice_reminders
+#
+#  id                  :integer          not null, primary key
+#  days                :integer
+#  reference_date_type :integer
+#  timeframe_type      :string(255)
+#  company_id          :integer
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  days: 1
+  reference_date_type: 1
+  timeframe_type: MyString
+
+two:
+  days: 1
+  reference_date_type: 1
+  timeframe_type: MyString
