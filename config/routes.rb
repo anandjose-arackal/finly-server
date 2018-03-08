@@ -1108,6 +1108,7 @@
 #                               invoicing_customers_count GET    /invoicing/customers/count(.:format)                                                         invoicing/customers#count
 #                     invoicing_customer_virtual_accounts GET    /invoicing/customers/:customer_id/virtual_accounts(.:format)                                 invoicing/customers#virtual_bank_accounts
 #               invoicing_customer_create_virtual_account POST   /invoicing/customers/:customer_id/create_virtual_account(.:format)                           invoicing/customers#create_virtual_account
+#                             invoicing_customer_payments GET    /invoicing/customers/:customer_id/payments(.:format)                                         invoicing/customers#payments
 #                                     invoicing_customers GET    /invoicing/customers(.:format)                                                               invoicing/customers#index
 #                                                         POST   /invoicing/customers(.:format)                                                               invoicing/customers#create
 #                                  new_invoicing_customer GET    /invoicing/customers/new(.:format)                                                           invoicing/customers#new
@@ -2625,6 +2626,7 @@ Rails.application.routes.draw do
     resources :customers do
       get 'virtual_accounts', to: 'customers#virtual_bank_accounts', as: :virtual_accounts
       post 'create_virtual_account', to: 'customers#create_virtual_account', as: :create_virtual_account
+      get 'payments', to: 'customers#payments', as: :payments
     end
     resources :virtual_bank_accounts do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
