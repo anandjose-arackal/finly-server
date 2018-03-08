@@ -24,6 +24,7 @@ class Customer < ActiveRecord::Base
   has_many :addresses, as: :parent
   has_many :customer_attachments
   has_many :virtual_bank_accounts
+  has_many :outward_invoices
 
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :virtual_bank_accounts

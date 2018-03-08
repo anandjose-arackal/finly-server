@@ -74,6 +74,7 @@ class OutwardInvoice < ActiveRecord::Base
   has_many :va_transactions, through: :invoice_transaction_mappings
 
   delegate :partially_paid?, :closed?, :incomplete?, :saved?, :cancelled?, to: :invoice_status
+  delegate :status_name, to: :invoice_status
 
   accepts_nested_attributes_for :customer
   accepts_nested_attributes_for :amount
@@ -106,6 +107,7 @@ class OutwardInvoice < ActiveRecord::Base
   scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
   scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:closed) }
   scope :payments_receivable, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid])) }
+  scope :processed, -> { where invoice_status_id: [OutwardInvoiceStatus.id_for(:closed), OutwardInvoiceStatus.id_for(:partially_paid)]}
 
   scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid, :closed, :cancelled]) }
   scope :invoice_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }

@@ -34,4 +34,8 @@ class OutwardInvoiceStatus < ActiveRecord::Base
   def cancelled?
     self.id == OutwardInvoiceStatus.id_for(:cancelled)
   end
+
+  def status_name
+    self.name
+  end
 end
