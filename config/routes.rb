@@ -1120,6 +1120,7 @@
 #                                                         PATCH  /invoicing/customers/:id(.:format)                                                           invoicing/customers#update
 #                                                         PUT    /invoicing/customers/:id(.:format)                                                           invoicing/customers#update
 #                                                         DELETE /invoicing/customers/:id(.:format)                                                           invoicing/customers#destroy
+#                   invoicing_virtual_bank_accounts_count GET    /invoicing/virtual_bank_accounts/count(.:format)                                             invoicing/virtual_bank_accounts#count
 #            invoicing_virtual_bank_account_show_payments GET    /invoicing/virtual_bank_accounts/:virtual_bank_account_id/transactions(.:format)             invoicing/virtual_bank_accounts#show_payments
 #                         invoicing_virtual_bank_accounts GET    /invoicing/virtual_bank_accounts(.:format)                                                   invoicing/virtual_bank_accounts#index
 #                                                         POST   /invoicing/virtual_bank_accounts(.:format)                                                   invoicing/virtual_bank_accounts#create
