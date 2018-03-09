@@ -1,6 +1,6 @@
 class Invoicing::Invoice::Create < Invoicing::Invoice::Base
 
-  attr_accessor :invoice_params, :invoice, :customer, :invoice_number
+  attr_accessor :invoice_params, :invoice, :customer, :invoice_number, :payment_term, :invoice_date, :invoice_due_date
 
   def pre_validate
     if user.blank? || params.blank?
@@ -11,6 +11,9 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
   def init
     customer_id = params[:customer_id]
     self.customer = user.company.customers.find_by(id: customer_id)
+
+    # get default payment term for the company if any
+    self.payment_term = user.company.payment_terms.where(default: true).first
   end
 
   def validate
@@ -18,11 +21,13 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
   end
 
   def pre_process
-
+    self.invoice_date = Date.today
+    calculate_due_date
   end
 
   def process
-    self.invoice = user.company.outward_invoices.build(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete), is_deleted: true)
+    # Assign default payment term as well
+    self.invoice = user.company.outward_invoices.build(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete), is_deleted: true, payment_term: payment_term, date: invoice_date, due_date: invoice_due_date)
     if self.invoice.save
       if self.customer.present?
         # call the operation that assigns a particular invoice to a customer - ideally operation should success
@@ -46,4 +51,17 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
     Invoicing::Invoice::Base::InvoicePresenter.new(user, params, messages)
   end
 
+  def calculate_due_date
+    if self.payment_term
+      if self.payment_term.days_after
+        self.invoice_due_date = self.invoice_date + payment_term.days_after.days
+      elsif payment_term.name == "15 MFI" || payment_term.name == "21 MFI"
+        day = payment_term.name.to_i
+        date_next_month = invoice_date.next_month
+        self.invoice_due_date = Date.new(date_next_month.year, date_next_month.month, day)
+      elsif payment_term.name == "EOM"
+        self.invoice_due_date = invoice_date.end_of_month
+      end
+    end
+  end
 end

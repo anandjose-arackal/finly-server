@@ -1,6 +1,6 @@
 class Invoicing::Company::PaymentTerms::Update < Invoicing::Company::PaymentTerms::Base
 
-  attr_accessor :payment_term, :payment_term_parameters
+  attr_accessor :payment_term, :payment_term_parameters, :set_default_payment_term
 
   def init
     id = params[:id] || params[:payment_term_id]
@@ -15,11 +15,32 @@ class Invoicing::Company::PaymentTerms::Update < Invoicing::Company::PaymentTerm
     end
   end
 
-  def process
-    unless self.payment_term.update(payment_term_parameters)
-      add_message :error, self.payment_term.errors.full_messages
-      return
+  def pre_process
+    self.set_default_payment_term = false
+    if !payment_term.default && payment_term_parameters[:default] == '1'
+      self.set_default_payment_term = true
     end
+
+    if payment_term_parameters[:default] == '1'
+      payment_term_parameters[:default] = true
+    else
+      payment_term_parameters[:default] = false
+    end
+
+  end
+
+  def process
+    self.payment_term.assign_attributes(payment_term_parameters)
+    if payment_term.valid?
+      if set_default_payment_term
+        user.company.payment_terms.update_all(default: false)
+      end
+
+      payment_term.save
+    else
+      add_message :error, self.payment_term.errors.full_messages
+    end
+
   end
 
   def post_process

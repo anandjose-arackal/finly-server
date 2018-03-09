@@ -18,6 +18,14 @@ json.invoice do
     json.bs_class ""
   end
 
+  if invoice.payment_term
+    json.payment_term do
+      json.extract! invoice.payment_term, :id, :name, :description, :default
+      json.days_after invoice.payment_term&.days_after
+    end
+  end
+
+
   json.invoice_amounts do
     json.item_amounts_total invoice.line_items_total
     json.item_net_amounts_total invoice.line_items_net_total
@@ -82,4 +90,10 @@ end
 json.actions do
   json.editable invoice.editable?
   json.navbar @result.navbar_actions
+end
+
+json.payment_terms do
+  json.array! @result.payment_terms do |payment_term|
+    json.extract! payment_term, :id, :name, :days_after, :description, :default
+  end
 end
