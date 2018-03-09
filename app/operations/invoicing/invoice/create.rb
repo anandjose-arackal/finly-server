@@ -13,7 +13,7 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
     self.customer = user.company.customers.find_by(id: customer_id)
 
     # get default payment term for the company if any
-    # self.payment_term = user.company.payment_terms.where(default: true).first
+    self.payment_term = user.company.payment_terms.where(default: true).first
   end
 
   def validate
@@ -21,8 +21,8 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
   end
 
   def pre_process
+    self.invoice_date = Date.today
     calculate_due_date
-
   end
 
   def process
@@ -52,25 +52,15 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
   end
 
   def calculate_due_date
-    self.invoice_date = Date.today
     if self.payment_term
       if self.payment_term.days_after
         self.invoice_due_date = self.invoice_date + payment_term.days_after.days
-      elsif payment_term.name == "15 MFI"
-        if invoice_date.day < 15
-          self.invoice_due_date = "#{15}-#{month}-#{year}"
-        else
-          new_date = invoice_date + 1.month
-          self.invoice_due_date = "#{15}-#{new_date.month}-#{new_date.year}"
-        end
+      elsif payment_term.name == "15 MFI" || payment_term.name == "21 MFI"
+        day = payment_term.name.to_i
+        date_next_month = invoice_date.next_month
+        self.invoice_due_date = Date.new(date_next_month.year, date_next_month.month, day)
       elsif payment_term.name == "EOM"
-      elsif payment_term.name == "21 MFI"
-        if invoice_date.day < 21
-          self.invoice_due_date = "#{21}-#{month}-#{year}"
-        else
-          new_date = invoice_date + 1.month
-          self.invoice_due_date = "#{21}-#{new_date.month}-#{new_date.year}"
-        end
+        self.invoice_due_date = invoice_date.end_of_month
       end
     end
   end
