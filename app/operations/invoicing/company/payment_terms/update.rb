@@ -17,14 +17,20 @@ class Invoicing::Company::PaymentTerms::Update < Invoicing::Company::PaymentTerm
 
   def pre_process
     self.set_default_payment_term = false
-    if payment_term.default == false && payment_term_parameters[:default] == '1'
+    if !payment_term.default && payment_term_parameters[:default] == '1'
       self.set_default_payment_term = true
     end
+
+    if payment_term_parameters[:default] == '1'
+      payment_term_parameters[:default] = true
+    else
+      payment_term_parameters[:default] = false
+    end
+
   end
 
   def process
     self.payment_term.assign_attributes(payment_term_parameters)
-
     if payment_term.valid?
       if set_default_payment_term
         user.company.payment_terms.update_all(default: false)

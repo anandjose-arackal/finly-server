@@ -15,7 +15,6 @@ class Invoicing::Company::PaymentTerms::Create < Invoicing::Company::PaymentTerm
 
   def process
     self.payment_term = user.company.payment_terms.build(self.payment_term_parameters)
-
     if payment_term.valid?
       if set_default_payment_term
         user.company.payment_terms.update_all(default: false)
