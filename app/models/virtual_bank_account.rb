@@ -83,6 +83,8 @@ class VirtualBankAccount < ActiveRecord::Base
     where('account_number like ? OR name like ? OR ifsc like ? OR description like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
   }
 
+  scope :filter_created_by_id, -> (created_by_id) { where initiating_user_id: created_by_id }
+
   def deactivate
     self.update(active: false)
   end

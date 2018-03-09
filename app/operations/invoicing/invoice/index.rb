@@ -14,6 +14,7 @@ class Invoicing::Invoice::Index < Invoicing::Invoice::Base
 
     def init
       self.invoices = params[:invoices]
+      self.invoices = apply_scopes(self.invoices, params)
       self.paginated_invoices = invoices.paginate(page: params[:page], per_page: params[:per_page])
     end
 
