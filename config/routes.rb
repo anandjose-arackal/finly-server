@@ -1169,6 +1169,14 @@
 #                                                         PATCH  /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#update
 #                                                         PUT    /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#update
 #                                                         DELETE /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#destroy
+#                                     invoicing_reminders GET    /invoicing/reminders(.:format)                                                               invoicing/reminders#index
+#                                                         POST   /invoicing/reminders(.:format)                                                               invoicing/reminders#create
+#                                  new_invoicing_reminder GET    /invoicing/reminders/new(.:format)                                                           invoicing/reminders#new
+#                                 edit_invoicing_reminder GET    /invoicing/reminders/:id/edit(.:format)                                                      invoicing/reminders#edit
+#                                      invoicing_reminder GET    /invoicing/reminders/:id(.:format)                                                           invoicing/reminders#show
+#                                                         PATCH  /invoicing/reminders/:id(.:format)                                                           invoicing/reminders#update
+#                                                         PUT    /invoicing/reminders/:id(.:format)                                                           invoicing/reminders#update
+#                                                         DELETE /invoicing/reminders/:id(.:format)                                                           invoicing/reminders#destroy
 #                                invoicing_withdraw_funds PATCH  /invoicing/companies/withdraw_funds(.:format)                                                invoicing/companies#withdraw_funds
 #                           invoicing_show_credit_account GET    /invoicing/companies/show_credit_account(.:format)                                           invoicing/companies#show_credit_account
 #                              invoicing_transfer_history GET    /invoicing/companies/transfer_history(.:format)                                              invoicing/companies#transfer_history
@@ -2652,6 +2660,7 @@ Rails.application.routes.draw do
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
     resources :inventory_line_items
     resources :payment_terms
+    resources :reminders
     patch 'companies/withdraw_funds', to: 'companies#withdraw_funds', as: :withdraw_funds
     get 'companies/show_credit_account', to: 'companies#show_credit_account', as: :show_credit_account
     get 'companies/transfer_history', to: 'companies#transfer_history', as: :transfer_history

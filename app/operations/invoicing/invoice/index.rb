@@ -6,6 +6,12 @@ class Invoicing::Invoice::Index < Invoicing::Invoice::Base
 
     attr_accessor :invoices, :paginated_invoices
 
+    has_scope :filter_amount, using: [:type, :value], type: :hash
+    has_scope :filter_date, using: [:date_from, :date_to], type: :hash
+    has_scope :filter_search
+    has_scope :filter_status_id
+    has_scope :filter_customer_id
+
     def init
       self.invoices = params[:invoices]
       self.paginated_invoices = invoices.paginate(page: params[:page], per_page: params[:per_page])

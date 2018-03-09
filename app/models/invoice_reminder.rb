@@ -14,10 +14,10 @@
 class InvoiceReminder < ActiveRecord::Base
 
   belongs_to :company
-  
-  REFERENCE_DATE_TYPES = ["date", "due_date"]
-  TIMEFRAME_TYPES = ["before", "after"]
 
-  validates :reference_date_type, inclusion: REFERENCE_DATE_TYPES
-  validates :timeframe_type, inclusdion: TIMEFRAME_TYPES
+  REFERENCE_DATE_TYPES = ["date", "due_date", nil]
+  TIMEFRAME_TYPES = ["before", "after", nil]
+
+  validates :reference_date_type, inclusion: { in: REFERENCE_DATE_TYPES }
+  validates :timeframe_type, inclusion: { in: TIMEFRAME_TYPES }
 end
