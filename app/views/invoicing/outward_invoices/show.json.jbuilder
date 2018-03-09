@@ -18,10 +18,13 @@ json.invoice do
     json.bs_class ""
   end
 
-  json.payment_term do
-    json.extract! invoice.payment_term, :id, :name, :description, :default
-    json.days_after invoice.payment_term&.days_after
+  if invoice.payment_term
+    json.payment_term do
+      json.extract! invoice.payment_term, :id, :name, :description, :default
+      json.days_after invoice.payment_term&.days_after
+    end
   end
+
 
   json.invoice_amounts do
     json.item_amounts_total invoice.line_items_total
