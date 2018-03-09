@@ -1,14 +1,15 @@
 class Invoicing::Invoice::Show < Invoicing::Invoice::Base
 
-  attr_accessor :invoice, :invoice_number
+  attr_accessor :invoice, :invoice_number, :payment_terms
 
   class Invoicing::Invoice::Show::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoice, :invoice_number
+    attr_accessor :invoice, :invoice_number, :payment_terms
 
     def init
       self.invoice = params[:invoice]
       self.invoice_number = params[:invoice_number]
+      self.payment_terms = params[:payment_terms]
     end
 
     def navbar_actions
@@ -76,12 +77,14 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
     if self.invoice.invoice_number.blank?
       op = Invoicing::Invoice::GenerateInvoiceNumber.(user, {invoice: self.invoice})
       self.invoice_number = op.invoice_number
+      self.payment_terms = user.company.payment_terms
     end
   end
 
   def success
     params[:invoice] = self.invoice
     params[:invoice_number] = self.invoice_number
+    params[:payment_terms] = self.payment_terms
     Invoicing::Invoice::Show::InvoicePresenter.new(user, params, messages)
   end
 end
