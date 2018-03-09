@@ -37,6 +37,7 @@
 #  roundoff_total_enabled  :boolean
 #  memo                    :string(255)
 #  customer_memo           :text(65535)
+#  reminders               :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -47,6 +48,8 @@ class OutwardInvoice < ActiveRecord::Base
   include SoftDeletable
 
   include MathUtil
+
+  serialize :reminders, as: Array
 
   belongs_to :customer
   belongs_to :company

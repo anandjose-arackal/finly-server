@@ -38,6 +38,7 @@ class Company < ActiveRecord::Base
   has_many :bank_transactions
   has_many :inventory_line_items
   has_many :payment_terms
+  has_many :invoice_reminders
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
