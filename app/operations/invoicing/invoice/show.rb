@@ -77,8 +77,8 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
     if self.invoice.invoice_number.blank?
       op = Invoicing::Invoice::GenerateInvoiceNumber.(user, {invoice: self.invoice})
       self.invoice_number = op.invoice_number
-      self.payment_terms = user.company.payment_terms
     end
+    self.payment_terms = user.company.payment_terms
   end
 
   def success
