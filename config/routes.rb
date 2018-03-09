@@ -2642,6 +2642,8 @@ Rails.application.routes.draw do
       get 'payments/count', to: 'customers#payments_count', as: :payments_count
       get 'invoices/count', to: 'customers#invoices_count', as: :invoices_count
     end
+
+    get 'virtual_bank_accounts/count', to: 'virtual_bank_accounts#count', as: 'virtual_bank_accounts_count'
     resources :virtual_bank_accounts do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
     end
