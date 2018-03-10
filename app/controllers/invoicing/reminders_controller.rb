@@ -26,7 +26,7 @@ class Invoicing::RemindersController < ApplicationController
   end
 
   def show
-    @result = Invoicing::Company::Reminders::Index.(current_user, params)
+    @result = Invoicing::Company::Reminders::Show.(current_user, params)
     respond
   end
 end
