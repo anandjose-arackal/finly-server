@@ -4,7 +4,7 @@
 #
 #  id                  :integer          not null, primary key
 #  days                :integer
-#  reference_date_type :integer
+#  reference_date_type :string(255)
 #  timeframe_type      :string(255)
 #  company_id          :integer
 #  created_at          :datetime         not null

@@ -38,6 +38,7 @@
 #  memo                    :string(255)
 #  customer_memo           :text(65535)
 #  reminders               :integer
+#  payment_term_id         :integer
 #
 
 require 'test_helper'

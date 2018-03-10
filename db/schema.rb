@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180309092644) do
+ActiveRecord::Schema.define(version: 20180310100513) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1953,6 +1953,16 @@ ActiveRecord::Schema.define(version: 20180309092644) do
     t.datetime "updated_at",                              null: false
   end
 
+  create_table "invoice_reminders", force: :cascade do |t|
+    t.integer  "days",                limit: 4
+    t.string   "reference_date_type", limit: 255
+    t.string   "timeframe_type",      limit: 255
+    t.integer  "company_id",          limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "name",                limit: 255
+  end
+
   create_table "invoice_transaction_mappings", force: :cascade do |t|
     t.integer  "invoice_id",        limit: 4
     t.integer  "va_transaction_id", limit: 4
@@ -2556,6 +2566,7 @@ ActiveRecord::Schema.define(version: 20180309092644) do
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
     t.text     "customer_memo",           limit: 65535
+    t.integer  "reminders",               limit: 4
     t.integer  "payment_term_id",         limit: 4
   end
 
