@@ -7,7 +7,7 @@ class Invoicing::Company::Reminders::Index < Invoicing::Company::Reminders::Base
     attr_accessor :reminders
 
     def init
-      self.reinders = params[:reminders]
+      self.reminders = params[:reminders]
     end
   end
 

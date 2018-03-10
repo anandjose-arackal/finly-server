@@ -1,5 +1,7 @@
 class Invoicing::RemindersController < ApplicationController
 
+  before_action -> { finly_authorize! :web }
+
   def create
     @result = Invoicing::Company::Reminders::Create.(current_user, params)
     if @result.success?
@@ -21,5 +23,10 @@ class Invoicing::RemindersController < ApplicationController
     else
       respond response: :failure, message: @result.messages[:error]
     end
+  end
+
+  def show
+    @result = Invoicing::Company::Reminders::Show.(current_user, params)
+    respond
   end
 end

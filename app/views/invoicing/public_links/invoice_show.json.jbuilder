@@ -3,6 +3,9 @@ json.company do
   json.name invoice.company.name
   json.logo invoice.company.collect_company_detail.company_logo(:url)
   json.address invoice.company.collect_company_detail.address
+  json.gst invoice.company.collect_company_detail.gst
+  json.pan invoice.company.collect_company_detail.pan
+  json.pin invoice.company.collect_company_detail.pin
 end
 
 json.customer do
@@ -66,6 +69,9 @@ json.invoice do
     json.mobile_number invoice.mobile_number
     json.address_billing invoice.billing_address
     json.address_shipping invoice.shipping_address
+    json.name invoice.customer&.name
+    json.gstin invoice.customer&.gst
+    json.pan invoice.customer&.pan
   end
 
   json.virtual_account do
