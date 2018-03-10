@@ -24,4 +24,9 @@ class Invoicing::RemindersController < ApplicationController
       respond response: :failure, message: @result.messages[:error]
     end
   end
+
+  def show
+    @result = Invoicing::Company::Reminders::Index.(current_user, params)
+    respond
+  end
 end
