@@ -30,6 +30,7 @@ lib/tasks/aws.rake
 public/system/vendor_attachments/*
 /public/common/files/temp_files/*
 /public/system/collect_company_details/*
+/public/system/outward_invoice_attachments/*
 /sample_atm_transactions.txt
 /junk_expenses.rb
 /Sample transactions
