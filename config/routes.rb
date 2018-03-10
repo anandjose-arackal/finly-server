@@ -2630,6 +2630,7 @@ Rails.application.routes.draw do
       patch 'update_virtual_account', to: 'outward_invoices#update_virtual_account', as: :update_virtual_account
       patch 'cancel', to: 'outward_invoices#cancel', as: :cancel
       patch 'save', to: 'outward_invoices#save', as: :save
+      post 'upload_attachment', to: 'outward_invoices#upload_attachment', as: :upload_attachment
       get 'download_pdf', to: 'outward_invoices#download', as: :download
       patch 'mark_as_closed', to: 'outward_invoices#mark_as_closed', as: :mark_as_closed
       patch 'send_to_customer', to: 'outward_invoices#send_to_customer', as: :send_to_customer

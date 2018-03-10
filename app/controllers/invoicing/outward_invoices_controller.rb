@@ -87,6 +87,16 @@ class Invoicing::OutwardInvoicesController < ApplicationController
     end
   end
 
+  # Upload single attachment after the file has been selected
+  def upload_attachment
+    @result = Invoicing::Invoice::UploadAttachment.(current_user, params)
+    if @result.success?
+      respond
+    else
+      respond reponse: :failure, message: @result.messages[:error]
+    end
+  end
+
   def cancel
     @result = Invoicing::Invoice::Cancel.(current_user, params)
     if @result.success?

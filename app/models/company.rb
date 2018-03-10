@@ -66,6 +66,7 @@ class Company < ActiveRecord::Base
   has_many :virtual_bank_accounts
   has_many :customers
   has_many :outward_invoices
+  has_many :outward_invoice_attachments
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
