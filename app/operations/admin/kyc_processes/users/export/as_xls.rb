@@ -61,7 +61,7 @@ class Admin::KycProcesses::Users::Export::AsXls < Admin::KycProcesses::Users::Ba
           profile.address_2,
           nil,
           nil,
-          profile.state.name,
+          profile.state&.name,
           profile.city,
           'India',
           profile.pin_code,
