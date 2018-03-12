@@ -4,12 +4,13 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
 
   class Invoicing::Invoice::Show::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoice, :invoice_number, :payment_terms
+    attr_accessor :invoice, :invoice_number, :payment_terms, :invoice_attachments
 
     def init
       self.invoice = params[:invoice]
       self.invoice_number = params[:invoice_number]
       self.payment_terms = params[:payment_terms]
+      self.invoice_attachments = self.invoice.attachments
     end
 
     def navbar_actions
