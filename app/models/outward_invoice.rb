@@ -37,6 +37,7 @@
 #  roundoff_total_enabled  :boolean
 #  memo                    :string(255)
 #  customer_memo           :text(65535)
+#  payment_term_id         :integer
 #  reminders               :integer
 #  payment_term_id         :integer
 #
@@ -76,6 +77,7 @@ class OutwardInvoice < ActiveRecord::Base
   has_many :payments, as: :parent
   has_many :invoice_transaction_mappings, foreign_key: :invoice_id
   has_many :va_transactions, through: :invoice_transaction_mappings
+  has_many :attachments, class_name: "OutwardInvoiceAttachment"
 
   delegate :partially_paid?, :closed?, :incomplete?, :saved?, :cancelled?, to: :invoice_status
   delegate :status_name, to: :invoice_status

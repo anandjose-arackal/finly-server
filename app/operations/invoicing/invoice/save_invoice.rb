@@ -1,7 +1,7 @@
 # this checks the invoice for all validations and eventually saves the invoice which can now be sent to the customer
 class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
-  attr_accessor :invoice, :invoice_parameters, :invoice_number
+  attr_accessor :invoice, :invoice_parameters, :invoice_number, :invoice_current_attachments, :invoice_old_attachments
 
   def init
     id = params[:id] || params[:outward_invoice_id]
@@ -59,6 +59,15 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     self.invoice_parameters[:prefix] = prefix
     self.invoice_parameters[:sequence_start] = sequence
 
+    # Extracting invoice attachments
+    self.invoice_current_attachments = user.company.outward_invoice_attachments.with_id(invoice_parameters[:invoice_attachments])
+
+    # Remove :invoice_attachments from parameters
+    self.invoice_parameters.delete(:invoice_attachments)
+
+    # Old Attachments
+    self.invoice_old_attachments = invoice.attachments
+
   end
 
   def process
@@ -71,6 +80,10 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       add_message :error, self.invoice.errors.full_messages
       return
     end
+
+    self.invoice_old_attachments.update_all(outward_invoice_id: nil)
+
+    self.invoice_current_attachments.update_all(outward_invoice_id: invoice.id)
 
     # checking if this particular operation has the customer's new GSTIN
     if params[:customer].present?
@@ -90,7 +103,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   end
 
   def post_process
-    add_message :success, "Invoice successfully created!"
+    add_message :success, 'Invoice successfully saved'
   end
 
   private
@@ -104,7 +117,8 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
                                     advance_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
                                     invoice_attachments_attributes: [:attached_file, :description],
-                                    invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax, :inventory_line_item_id])
+                                    invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax, :inventory_line_item_id],
+                                    invoice_attachments: [])
   end
 
   def customer_params
