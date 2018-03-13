@@ -17,6 +17,7 @@ json.invoice do
     json.name invoice.invoice_status&.name&.humanize
     json.bs_class ""
   end
+  json.company_gstin invoice&.company&.collect_company_detail&.gst
 
   if invoice.payment_term
     json.payment_term do
