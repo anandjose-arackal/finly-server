@@ -51,7 +51,7 @@ class OutwardInvoice < ActiveRecord::Base
 
   include MathUtil
 
-  serialize :reminders, as: Array
+  serialize :reminders, Array
 
   belongs_to :customer
   belongs_to :company

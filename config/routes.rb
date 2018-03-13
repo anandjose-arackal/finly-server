@@ -2668,6 +2668,8 @@ Rails.application.routes.draw do
     patch 'companies/withdraw_funds', to: 'companies#withdraw_funds', as: :withdraw_funds
     get 'companies/show_credit_account', to: 'companies#show_credit_account', as: :show_credit_account
     get 'companies/transfer_history', to: 'companies#transfer_history', as: :transfer_history
+
+    resources :analytics, only: [:index]
   end
 
 
