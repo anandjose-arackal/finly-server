@@ -19,7 +19,8 @@ class Invoicing::Analytics::Index < Invoicing::Analytics::Base
   end
 
   def process
-    self.analytics_data[:invoices] = company.outward_invoices
+    self.analytics_data[:invoices] = company.outward_invoices.with
+    self.analytics_data[:invoices][:invoices_count] = self.analytics_data[:invoices].count
   end
 
   def success

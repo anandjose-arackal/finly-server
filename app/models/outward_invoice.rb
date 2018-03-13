@@ -157,6 +157,9 @@ class OutwardInvoice < ActiveRecord::Base
     end
   end
 
+  scope :filter_date_invoice, lambda {|start_date, end_date| where("date >= ? AND date <= ?", start_date, end_date )}
+  scope :filter_date_due, lambda {|start_date, end_date| where("due_date >= ? AND due_date <= ?", start_date, end_date )}
+
 
   default_scope { unscope(:where) }
 
