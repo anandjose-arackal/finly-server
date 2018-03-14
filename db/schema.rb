@@ -1955,7 +1955,7 @@ ActiveRecord::Schema.define(version: 20180310103840) do
 
   create_table "invoice_reminders", force: :cascade do |t|
     t.integer  "days",                limit: 4
-    t.integer  "reference_date_type", limit: 4
+    t.string   "reference_date_type", limit: 255
     t.string   "timeframe_type",      limit: 255
     t.integer  "company_id",          limit: 4
     t.datetime "created_at",                      null: false
@@ -2583,8 +2583,8 @@ ActiveRecord::Schema.define(version: 20180310103840) do
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
     t.text     "customer_memo",           limit: 65535
-    t.integer  "payment_term_id",         limit: 4
     t.integer  "reminders",               limit: 4
+    t.integer  "payment_term_id",         limit: 4
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
