@@ -1,1 +1,1 @@
-json.count @result.analytics_data[:invoices].count
+json.data @result.analytics_data

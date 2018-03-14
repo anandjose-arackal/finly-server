@@ -40,6 +40,9 @@ class Customer < ActiveRecord::Base
     where('name like ? OR email like ? OR mobile_number like ? or description like ? OR gst like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
   }
 
+
+  scope :filter_created_at, lambda {|start_date, end_date| where("created_at >= ? AND created_at <= ?", start_date, end_date )}
+
   scope :search_by_virtual_accounts, -> (account_number) {
     joins(:virtual_bank_accounts).where('virtual_bank_accounts.account_number like ?', "%#{account_number}%")
   }

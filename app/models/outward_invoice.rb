@@ -111,6 +111,8 @@ class OutwardInvoice < ActiveRecord::Base
 
   scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
   scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:closed) }
+  scope :cancelled, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:cancelled) }
+  scope :partially_paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid) }
   scope :payments_receivable, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid])) }
   scope :processed, -> { where invoice_status_id: [OutwardInvoiceStatus.id_for(:closed), OutwardInvoiceStatus.id_for(:partially_paid)]}
 
@@ -156,11 +158,19 @@ class OutwardInvoice < ActiveRecord::Base
     end
   end
 
+  scope :joins_total_payable, -> { joins :total_payable }
+  scope :joins_total_paid, -> { joins :paid_amount }
+  scope :joins_total_balance_due, -> { joins :balance_due }
+
+  scope :sum_total_payable, -> { joins_total_payable.sum('amounts.value') }
+  scope :sum_total_paid, -> { joins_total_paid.sum('amounts.value') }
+  scope :sum_total_balance_due, -> { joins_total_balance_due.sum('amounts.value') }
+
   scope :filter_date_invoice, lambda {|start_date, end_date| where("date >= ? AND date <= ?", start_date, end_date )}
   scope :filter_date_due, lambda {|start_date, end_date| where("due_date >= ? AND due_date <= ?", start_date, end_date )}
 
 
-  default_scope { unscope(:where) }
+  # default_scope { unscope(:where) }
 
   def invoice_status_identifier
     self.invoice_status&.name
