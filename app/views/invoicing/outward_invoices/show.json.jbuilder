@@ -103,6 +103,7 @@ json.attachment do
     json.extract! attachment, :id, :description
     json.file_name attachment.attachment_file_name
     json.file_size (attachment.attachment_file_size / 1024).round(2).to_s + " KB"
+    json.url attachment.attachment.url
   end
 end
 
