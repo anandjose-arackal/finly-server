@@ -66,4 +66,9 @@ class Invoicing::CustomersController < ApplicationController
     respond
   end
 
+  def import
+    @result = Invoicing::Customer::Import.(current_user, params)
+    respond
+  end
+
 end

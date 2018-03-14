@@ -41,6 +41,7 @@
 
 
 
+
 class Payment < ActiveRecord::Base
   include PostOperationExecution
 
@@ -136,6 +137,10 @@ class Payment < ActiveRecord::Base
 
   scope :with_receiving_account, -> (receiving_account) {
     where receiving_account: receiving_account
+  }
+
+  scope :with_receiving_user_type, -> (type) {
+    where receiving_user_type: type
   }
 
   # Personal are card transactions from own wallet to own card

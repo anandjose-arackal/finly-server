@@ -17,12 +17,17 @@ json.invoice do
     json.name invoice.invoice_status&.name&.humanize
     json.bs_class ""
   end
+  json.company_gstin invoice&.company&.collect_company_detail&.gst
 
   if invoice.payment_term
     json.payment_term do
       json.extract! invoice.payment_term, :id, :name, :description, :default
       json.days_after invoice.payment_term&.days_after
     end
+  end
+
+  json.reminders do
+    json.array! invoice.reminders
   end
 
 
@@ -102,6 +107,7 @@ json.attachment do
     json.extract! attachment, :id, :description
     json.file_name attachment.attachment_file_name
     json.file_size (attachment.attachment_file_size / 1024).round(2).to_s + " KB"
+    json.url attachment.attachment.url
   end
 end
 

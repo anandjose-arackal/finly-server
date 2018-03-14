@@ -1094,6 +1094,7 @@
 #        invoicing_outward_invoice_update_virtual_account PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_virtual_account(.:format)             invoicing/outward_invoices#update_virtual_account
 #                        invoicing_outward_invoice_cancel PATCH  /invoicing/outward_invoices/:outward_invoice_id/cancel(.:format)                             invoicing/outward_invoices#cancel
 #                          invoicing_outward_invoice_save PATCH  /invoicing/outward_invoices/:outward_invoice_id/save(.:format)                               invoicing/outward_invoices#save
+#             invoicing_outward_invoice_upload_attachment POST   /invoicing/outward_invoices/:outward_invoice_id/upload_attachment(.:format)                  invoicing/outward_invoices#upload_attachment
 #                      invoicing_outward_invoice_download GET    /invoicing/outward_invoices/:outward_invoice_id/download_pdf(.:format)                       invoicing/outward_invoices#download
 #                invoicing_outward_invoice_mark_as_closed PATCH  /invoicing/outward_invoices/:outward_invoice_id/mark_as_closed(.:format)                     invoicing/outward_invoices#mark_as_closed
 #              invoicing_outward_invoice_send_to_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/send_to_customer(.:format)                   invoicing/outward_invoices#send_to_customer
@@ -1106,6 +1107,7 @@
 #                                                         PUT    /invoicing/outward_invoices/:id(.:format)                                                    invoicing/outward_invoices#update
 #                                                         DELETE /invoicing/outward_invoices/:id(.:format)                                                    invoicing/outward_invoices#destroy
 #                               invoicing_customers_count GET    /invoicing/customers/count(.:format)                                                         invoicing/customers#count
+#                              invoicing_customers_import POST   /invoicing/customers/import(.:format)                                                        invoicing/customers#import
 #                     invoicing_customer_virtual_accounts GET    /invoicing/customers/:customer_id/virtual_accounts(.:format)                                 invoicing/customers#virtual_bank_accounts
 #               invoicing_customer_create_virtual_account POST   /invoicing/customers/:customer_id/create_virtual_account(.:format)                           invoicing/customers#create_virtual_account
 #                             invoicing_customer_payments GET    /invoicing/customers/:customer_id/payments(.:format)                                         invoicing/customers#payments
@@ -2636,6 +2638,7 @@ Rails.application.routes.draw do
       patch 'send_to_customer', to: 'outward_invoices#send_to_customer', as: :send_to_customer
     end
     get 'customers/count', to: 'customers#count'
+    post 'customers/import', to: 'customers#import'
     resources :customers do
       get 'virtual_accounts', to: 'customers#virtual_bank_accounts', as: :virtual_accounts
       post 'create_virtual_account', to: 'customers#create_virtual_account', as: :create_virtual_account
