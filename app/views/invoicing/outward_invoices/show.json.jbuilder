@@ -26,6 +26,10 @@ json.invoice do
     end
   end
 
+  json.reminders do
+    json.array! invoice.reminders
+  end
+
 
   json.invoice_amounts do
     json.item_amounts_total invoice.line_items_total
