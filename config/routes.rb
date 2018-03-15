@@ -2398,6 +2398,7 @@ Rails.application.routes.draw do
   get 'menu_data_disburse' => 'expense_types_configuration#menu_data_disburse'
   get 'menu_data_payments' => 'expense_types_configuration#menu_data_payments'
   get 'menu_data_collect' => 'expense_types_configuration#menu_data_collect'
+  get 'menu_data_insights' => 'expense_types_configuration#menu_data_insights'
 
   # Orders
   get 'cards/orders' => 'orders/order_cards#index'
