@@ -50,6 +50,11 @@ class ExpenseTypesConfigurationController < ApplicationController
     render json: @views.as_json
   end
 
+  def menu_data_insights
+    @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/menu_data_insights.yml.erb", {current_company: current_company, current_user: current_user})
+    render json: @views.as_json
+  end
+
   def groups_teams
     @result = UserGroup::Index.(current_user, params)
     if @result&.success?
