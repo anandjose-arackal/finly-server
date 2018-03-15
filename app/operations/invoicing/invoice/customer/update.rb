@@ -10,7 +10,7 @@ class Invoicing::Invoice::Customer::Update < Invoicing::Invoice::Base
 
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:outward_invoice_id]
-    self.invoice = user.company.outward_invoices.unscoped.find invoice_id #todo without using unscoped not working
+    self.invoice = user.company.outward_invoices.find invoice_id
     # check if an existing customer is being associated, or a new customer is being added
     if params[:customer_id].present?
       customer_id = params[:customer_id]
