@@ -68,13 +68,12 @@ class Invoicing::Invoice::Customer::Update < Invoicing::Invoice::Base
       return ""
     end
     address_text = ""
-    address_text += address&.name + ",\n"
-    address_text += address&.line_1 + ",\n"
-    address_text += address&.line_2 + ",\n"
-    address_text += address&.landmark + ",\n"
-    address_text += address&.city + ",\n"
-    address_text += address&.state&.name + ",\n"
-    address_text += address&.pin_code
+    address_text += address&.name.to_s + ",\n"
+    address_text += address&.line_1.to_s + ",\n"
+    address_text += address&.line_2.to_s + ",\n"
+    address_text += address&.landmark.to_s + ",\n"
+    address_text += address&.city.to_s + ",\n"
+    address_text += address&.state&.name.to_s + ",\n"
+    address_text += address&.pin_code.to_s
   end
-
 end
