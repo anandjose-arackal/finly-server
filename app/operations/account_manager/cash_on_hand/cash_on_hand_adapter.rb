@@ -47,7 +47,11 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
   def balance(options = {})
     balance = self.account.balance_value
     if options[:display_balance]
-      expenses_against_coh_total = self.account.user.expenses.unverified.spent_from_cash_on_hand.blocked_against_cash_on_hand.joins_amount.sum(:value)
+      expenses_against_coh_total = 0
+      self.account.user.expenses.unverified.spent_from_cash_on_hand.blocked_against_cash_on_hand.each do |expense|
+        expenses_against_coh_total += expense.amount.send(expense.amount.currency.country_code.to_sym)
+      end
+      # expenses_against_coh_total = self.account.user.expenses.unverified.spent_from_cash_on_hand.blocked_against_cash_on_hand.joins_amount.sum(:value)
       (balance - expenses_against_coh_total)
     else
       balance
