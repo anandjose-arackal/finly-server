@@ -49,7 +49,9 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
     if options[:display_balance]
       expenses_against_coh_total = 0
       self.account.user.expenses.unverified.spent_from_cash_on_hand.blocked_against_cash_on_hand.each do |expense|
-        expenses_against_coh_total += expense.amount.send(expense.amount.currency.country_code.to_sym)
+        unless expense.date == DateUtils.local_date && expense.amount.currency_id != Currency.id_for(:INR)
+          expenses_against_coh_total += expense.amount.send(:INR).to_f
+        end
       end
       # expenses_against_coh_total = self.account.user.expenses.unverified.spent_from_cash_on_hand.blocked_against_cash_on_hand.joins_amount.sum(:value)
       (balance - expenses_against_coh_total)
