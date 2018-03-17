@@ -1,44 +1,45 @@
 class Invoicing::Invoice::SendToCustomer < Invoicing::Invoice::Base
 
-  attr_accessor :invoices
+  attr_accessor :invoice, :email_options
 
   def init
-    ids = params[:id] || params[:outward_invoice_ids] || params[:outward_invoice_id]
-    self.invoices = user.company.outward_invoices.with_id(ids)
-  end
+    id = params[:id] || params[:outward_invoice_ids] || params[:outward_invoice_id]
+    self.invoice = user.company.outward_invoices.find id
 
-  def validate
-    if self.invoices.empty?
+    unless self.invoice
       add_message :error, "Invoices not found"
       return
     end
 
-    spurious_ids = []
-    self.invoices.each do |invoice|
-      if invoice.incomplete?
-        spurious_ids << invoice.invoice_number
-      end
-    end
-    unless spurious_ids.empty?
-      add_message :error, "Incomplete invoices cannot be sent to customers. The following invoices are incomplete: #{spurious_ids.to_sentence}"
+    self.email_options = {}
+
+    self.email_options[:email_to] = params[:email][:to] || invoice.email
+    self.email_options[:email_bcc] = params[:email][:bcc]
+    self.email_options[:email_subject] = params[:email][:subject] || "Invoice for #{self.invoice.customer.name} - #{self.invoice.invoice_number}"
+    self.email_options[:email_body] = params[:email][:body] || ""
+
+    attachment_ids = params[:invoice][:attachments]
+
+    self.email_options[:attachments] = invoice.attachments.with_id attachment_ids
+
+
+  end
+
+  def validate
+    if invoice.incomplete?
+      add_message :error, "Incomplete invoice cannot be sent to customers. The invoice is incomplete"
       return
     end
 
-    without_email = []
-    self.invoices.each do |invoice|
-      if invoice.email.blank?
-        without_email << invoice.invoice_number
-      end
+
+    if email_options[:email_to].blank?
+      add_message :error, "The invoice doesn't have an email address associated with it."
     end
-    unless without_email.empty?
-      add_message :error, "The following invoices don't have an email address associated with them: #{without_email.to_sentence}"
-    end
+
   end
 
   def process
-    self.invoices.each do |invoice|
-      InvoiceMailer.delay.send_to_customer(invoice)
-    end
+    InvoiceMailer.delay.send_to_customer(invoice, email_options)
   end
 
   def post_process

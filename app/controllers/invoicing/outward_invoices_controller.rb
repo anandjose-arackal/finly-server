@@ -135,4 +135,13 @@ class Invoicing::OutwardInvoicesController < ApplicationController
     end
   end
 
+  def remind_customer
+    @result = Invoicing::Invoice::RemindCustomer.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
 end

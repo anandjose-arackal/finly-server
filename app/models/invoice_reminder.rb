@@ -21,4 +21,6 @@ class InvoiceReminder < ActiveRecord::Base
 
   validates :reference_date_type, inclusion: { in: REFERENCE_DATE_TYPES }
   validates :timeframe_type, inclusion: { in: TIMEFRAME_TYPES }
+
+  scope :with_id, -> (id) { where id: id }
 end

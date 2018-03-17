@@ -29,3 +29,4 @@ Crono.perform(BackupImages).every 1.day, at: {hour: 01, min: 00}
   Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: num, min: 00}
   Crono.perform(SummaryMailersProcessor).every 1.day, at: {hour: num, min: 30}
 end
+# Crono.perform(ReminderOutwardInvoices).every 1.day, at: {hour: 09, min: 30}
