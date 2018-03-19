@@ -12,14 +12,15 @@ class ReminderOutwardInvoices < ActiveJob::Base
     # CurrencyConversionRate.create(@result.currency_data)
 
     for invoice in outward_invoices
-      # params = {
-      #     outward_invoice_id: invoice.id
-      # }
+      params = {
+          outward_invoice_id: invoice.id
+      }
       # result = Event::EOutwardInvoice::Reminder(nil, params)
       reminders = InvoiceReminder.with_id invoice.reminders
       for reminder in reminders
-        if Date.today == Date.parse(get_reminder_date(reminder))
-          result = Event::EOutwardInvoice::Remind(nil, params)
+        p Date.today, get_reminder_date(invoice, reminder)
+        if Date.today == get_reminder_date(invoice, reminder)
+          result = Event::EOutwardInvoice::Remind.(nil, params)
         end
       end
     end
@@ -27,20 +28,20 @@ class ReminderOutwardInvoices < ActiveJob::Base
 
   private
 
-  def get_reminder_date(reminder)
+  def get_reminder_date(invoice, reminder)
     date = nil
     if reminder.timeframe_type == 'before'
       if reminder.reference_date_type == 'due_date'
-        date = outward_invoice.due_date - reminder.days.days
+        date = invoice.due_date - reminder.days.days
       elsif reminder.reference_date_type == 'date'
-        date = outward_invoice.date - reminder.days.days
+        date = invoice.date - reminder.days.days
       end
 
     elsif reminder.timeframe_type == 'after'
       if reminder.reference_date_type == 'due_date'
-        date = outward_invoice.due_date + reminder.days.days
+        date = invoice.due_date + reminder.days.days
       elsif reminder.reference_date_type == 'date'
-        date = outward_invoice.date + reminder.days.days
+        date = invoice.date + reminder.days.days
       end
     end
   end

@@ -26,25 +26,17 @@ class InvoiceMailer < ApplicationMailer
 
   def auto_remind_customer(invoice)
     @invoice = invoice
+    @options = {
+      email_subject: "Payment due for invoice - #{@invoice.invoice_number}",
+      email_body: "This is an system generated mail to reminder you, your payment for invoice with number #{@invoice.invoice_number} is due on #{@invoice.due_date} Please ignore if already paid."
+    }
 
     ###################### adding the generated invoice as an attachment #####################
     attachments["invoice-#{@invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
         render_to_string(pdf: "invoice-#{@invoice.invoice_number}", template: "invoicing/outward_invoices/download", layout: "pdf.html.erb", print_media_type: true)
     )
     ###########################################
-    mail to: @invoice.email, subject: "Payment due for invoice - #{@invoice.invoice_number}", template_name: 'auto_remind_customer'
-  end
-
-  def remind_customer(invoice, options)
-    @invoice = invoice
-    @data = options
-
-    ###################### adding the generated invoice as an attachment #####################
-    attachments["invoice-#{@invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
-        render_to_string(pdf: "invoice-#{@invoice.invoice_number}", template: "invoicing/outward_invoices/download", layout: "pdf.html.erb", print_media_type: true)
-    )
-    ###########################################
-    mail to: @invoice.email, subject: "#{data.subject}", template_name: 'auto_remind_customer'
+    mail to: @invoice.email, subject: @options[:email_subject], template_name: 'send_to_customer'
   end
 
 end
