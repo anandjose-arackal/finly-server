@@ -17,8 +17,17 @@ class Expense::Base < BaseOperation
   end
 
   def check_coh_availability_create(params = nil)
+
     # if the expense is from cash on hand, ensure the user has enough cash on hand to make it
     if StringUtils.to_bool(params[:from_cash_on_hand])
+
+      # first check if the expense is being created in non-INR, and if its date is today
+      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params[:amount_attributes][:currency_id]))
+        add_message :error, "Cash on hand expenses that are in a currency different from INR can only be reported on the next day"
+        return
+      end
+
+
       case params[:expense_type_id]
         when ExpenseType.id_for(:manual)
           amount = params[:amount_attributes][:value]&.to_f
@@ -39,6 +48,13 @@ class Expense::Base < BaseOperation
   def check_coh_availability_update(params = nil)
     # if the expense is being marked as from cash on hand, check if there is enough cash on hand to facilitate it
     if StringUtils.to_bool(params&.dig(:from_cash_on_hand)) or (params&.dig(:from_cash_on_hand).nil? and expense.from_cash_on_hand)
+
+      # first check if the expense is being created in non-INR, and if its date is today
+      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params[:amount_attributes][:currency_id]))
+        add_message :error, "Cash on hand expenses that are in a currency different from INR can only be reported on the next day"
+        return
+      end
+
       coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
       amount_val = (params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
       balance = coh_adapter.balance(display_balance: true)

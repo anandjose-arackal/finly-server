@@ -104,7 +104,11 @@ class Settlement::SReport::Approved < Report::Base
     end
 
     ###### Cash on Hand Deductions ###############
-    cash_on_hand_deduction = self.report.expenses.spent_from_cash_on_hand.joins_amount.sum(:value)
+    cash_on_hand_deduction = 0
+    self.report.expenses.spent_from_cash_on_hand.each do |expense|
+      cash_on_hand_deduction += expense.amount.send(:INR).to_f
+    end
+
     if cash_on_hand_deduction.present? && cash_on_hand_deduction > 0
       payment_request = PaymentRequest.(self.report.user, nil, "CashOnHand", :debit, :settlement_against_cash_on_hand)
       payment_request.add_payment_item(PaymentRequest::PaymentItem.(self.report.user, self.report.user.cash_on_hand, cash_on_hand_deduction))
