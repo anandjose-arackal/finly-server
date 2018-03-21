@@ -39,6 +39,7 @@ class AccountManager::Collect::CollectRouter < AccountManager::Collect::Base
   end
 
   def post_process
+    # AccountManager::Collect::VATransactionProcessor.call(user, virtual_account_transaction_id: virtual_account_transaction.id)
     AccountManager::Collect::VATransactionProcessor.call_async(user, virtual_account_transaction_id: virtual_account_transaction.id)
   end
 

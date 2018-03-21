@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180310103840) do
+ActiveRecord::Schema.define(version: 20180321130036) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2583,8 +2583,9 @@ ActiveRecord::Schema.define(version: 20180310103840) do
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
     t.text     "customer_memo",           limit: 65535
-    t.integer  "reminders",               limit: 4
     t.integer  "payment_term_id",         limit: 4
+    t.text     "reminders",               limit: 65535
+    t.integer  "user_id",                 limit: 4
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
@@ -2595,6 +2596,7 @@ ActiveRecord::Schema.define(version: 20180310103840) do
   add_index "outward_invoices", ["paid_amount_id"], name: "index_outward_invoices_on_paid_amount_id", using: :btree
   add_index "outward_invoices", ["payment_term_id"], name: "index_outward_invoices_on_payment_term_id", using: :btree
   add_index "outward_invoices", ["tax_amount_id"], name: "index_outward_invoices_on_tax_amount_id", using: :btree
+  add_index "outward_invoices", ["user_id"], name: "index_outward_invoices_on_user_id", using: :btree
 
   create_table "payment_file_configurations", force: :cascade do |t|
     t.string   "file_format", limit: 255
@@ -4087,6 +4089,7 @@ ActiveRecord::Schema.define(version: 20180310103840) do
   add_foreign_key "outward_invoices", "amounts"
   add_foreign_key "outward_invoices", "customers"
   add_foreign_key "outward_invoices", "payment_terms"
+  add_foreign_key "outward_invoices", "users"
   add_foreign_key "payment_file_configurations", "companies"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"

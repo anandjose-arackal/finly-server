@@ -53,6 +53,7 @@ class OutwardInvoice < ActiveRecord::Base
   serialize :reminders, Array
 
   belongs_to :customer
+  belongs_to :user
   belongs_to :company
   belongs_to :amount
   belongs_to :policy

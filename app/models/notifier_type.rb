@@ -108,7 +108,9 @@ class NotifierType < ActiveRecord::Base
              {key: :system_alert, has_push_notification: false, has_mailer: true,
               configurable_push_notification: false, configurable_mailer: false},
              {key: :payment_order_bulk_download, has_push_notification: false, has_mailer: true,
-              configurable_push_notification: false, configurable_mailer: false}
+              configurable_push_notification: false, configurable_mailer: false},
+             {key: :outward_invoice_payment, has_push_notification: true, has_mailer: true,
+              configurable_push_notification: false, configurable_mailer: true}
             ]
 
   scope :with_name, ->(name) {where name: name}

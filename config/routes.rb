@@ -2388,6 +2388,8 @@ Rails.application.routes.draw do
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
 
+  get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
+
   # get 'features', to: 'static_pages#features'
 
   get 'external/reports/:id' => 'external_url#report', as: :external_url_report

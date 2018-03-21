@@ -27,7 +27,7 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
 
   def process
     # Assign default payment term as well
-    self.invoice = user.company.outward_invoices.build(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete), is_deleted: true, payment_term: payment_term, date: invoice_date, due_date: invoice_due_date)
+    self.invoice = user.company.outward_invoices.build(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete), is_deleted: true, payment_term: payment_term, date: invoice_date, due_date: invoice_due_date, user_id: user.id)
     if self.invoice.save
       if self.customer.present?
         # call the operation that assigns a particular invoice to a customer - ideally operation should success

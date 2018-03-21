@@ -13,5 +13,4 @@ class Event::EOutwardInvoice::Remind < Event::EOutwardInvoice::Base
   def process
     InvoiceMailer.delay.auto_remind_customer(outward_invoice)
   end
-
 end

@@ -39,4 +39,15 @@ class InvoiceMailer < ApplicationMailer
     mail to: @invoice.email, subject: @options[:email_subject], template_name: 'send_to_customer'
   end
 
+  def payment_notify(presenter)
+    @options = presenter
+    @invoice = @options.outward_invoice
+
+    attachments["invoice-#{@invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
+        render_to_string(pdf: "invoice-#{@invoice.invoice_number}", template: "invoicing/outward_invoices/download", layout: "pdf.html.erb", print_media_type: true)
+    )
+    ###########################################
+    mail to: @options.email_to, subject: @options.email_subject, template_name: 'send_to_customer'
+  end
+
 end

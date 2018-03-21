@@ -11,7 +11,7 @@
     <div style="color: #757575;
       border-bottom: 1px solid #eee;
       padding-bottom: 20px;">
-      <%= @options[:email_body] %>
+      <%= @options[:email_body] rescue nil || @options.email_body rescue nil %>
     </div>
     <div style="width: 50%; display: inline-block; float: right;">
     </div>

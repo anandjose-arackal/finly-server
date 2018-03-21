@@ -1,15 +1,18 @@
 class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoice::Base
 
   attr_accessor :virtual_account, :company, :outward_invoices, :payment, :virtual_account_transaction,
-                :amount_due, :transaction_amount
+                :amount_due, :transaction_amount, :affected_outward_invoices
 
   def init
     self.virtual_account_transaction = params[:virtual_account_transaction]
     self.virtual_account = virtual_account_transaction.virtual_account
-    self.transaction_amount = self.virtual_account_transaction.transfer_amount.to_f
     self.company = virtual_account.company
     self.outward_invoices = self.virtual_account.outward_invoices.payments_receivable
+    self.transaction_amount = self.virtual_account_transaction.transfer_amount.to_f
     self.amount_due = self.outward_invoices.joins(:balance_due).sum(:value) - self.outward_invoices.joins(:paid_amount).sum(:value)
+
+    # To store all the newly credited invoices
+    self.affected_outward_invoices = []
   end
 
   def validate
@@ -32,18 +35,23 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
     self.outward_invoices.each do |invoice|
       due_amount = invoice.balance_due&.value
       if remaining_amount < due_amount
+        # When transfer amount is less than invoice's balance due
         new_paid_amount = invoice.paid_amount&.value + remaining_amount
         balance_due = invoice.balance_due&.value - remaining_amount
         invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid),
                        paid_amount_attributes: {id: invoice.paid_amount.id, value: new_paid_amount},
                        balance_due_attributes: {id: invoice.balance_due.id, value: balance_due})
+        affected_invoice_data = {invoice: invoice, amount: remaining_amount}
         remaining_amount = 0
       elsif remaining_amount >= due_amount
         invoice.paid_amount.update(value: (invoice.net_amount&.value + invoice.roundoff_amount)) # i.e. setting the paid amount as the total of what was supposed to be paid for this invoice
         invoice.balance_due.update(value: 0)
         invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:closed))
         remaining_amount = remaining_amount - due_amount
+        affected_invoice_data = {invoice: invoice, amount: due_amount}
       end
+
+      self.affected_outward_invoices << affected_invoice_data
       # associating the particular invoice and virtual account transaction ID for the mapping
       InvoiceTransactionMapping.create(invoice_id: invoice.id, va_transaction_id: self.virtual_account_transaction.id)
       last_invoice = invoice # setting this as the last invoice that was processed
@@ -51,19 +59,31 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
         break
       end
     end
-    # if there's still any amount remaining in remaining_amount, add it to the last invoice's paid amount
+    # if there's still any amount remaining in remaining_amount, add it to the last invoice's paid amount - Step 1
     if remaining_amount > 0
       paid_amount = last_invoice.paid_amount.value
       last_invoice.paid_amount.update(value: (paid_amount + remaining_amount))
       unless self.virtual_account_transaction.invoices.include?(last_invoice)
         InvoiceTransactionMapping.create(invoice_id: last_invoice.id, va_transaction_id: self.virtual_account_transaction.id)
       end
+      # todo reminaing amount is not being added to it
+      # Also update the last invoice in affected_outward_invoices, and add the remaining amount to the amount received - Step 2 & Final
+      for affected_invoice_data in affected_outward_invoices
+        if affected_invoice_data[:invoice].id == last_invoice.id
+          affected_invoice_data[:amount] + remaining_amount
+        end
+      end
     end
+
+
     # end
   end
 
   def post_process
     # mailers and shit
+    self.affected_outward_invoices.each do |invoice_data|
+      Event::EOutwardInvoice::PaymentNotify.(nil, {invoice_data: invoice_data})
+    end
   end
 
 

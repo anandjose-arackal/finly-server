@@ -1,15 +1,7 @@
-# fetches the conversion rates for all the currencies from the fixer.io API
-
 class ReminderOutwardInvoices < ActiveJob::Base
 
   def perform
     outward_invoices = OutwardInvoice.exclude_deleted.unpaid
-
-    # params = {
-    #   date: DateUtils.yesterday_local_date.strftime("%Y-%m-%d")
-    # }
-    # @result = Currency::FetchData.(nil, params)
-    # CurrencyConversionRate.create(@result.currency_data)
 
     for invoice in outward_invoices
       params = {
