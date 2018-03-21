@@ -486,6 +486,9 @@
 #                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#update
 #                                                         DELETE /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#deactivate
 #                                                invoices POST   /invoices(.:format)                                                                          api/fc/invoices/outward_invoices#create_valid
+#                                      invoices_customers POST   /invoices/customers(.:format)                                                                api/fc/invoices/customers#create
+#                                                         PATCH  /invoices/customers/:id(.:format)                                                            api/fc/invoices/customers#update
+#                                                         GET    /invoices/customers/:id(.:format)                                                            api/fc/invoices/customers#show
 #        api_vp_bank_transfer_bank_payment_request_credit PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)        api/vp/bank_transfer/bank_payment_requests#credit
 #              api_vp_bank_transfer_bank_payment_requests GET    /api/vp/bank_transfer/bank_payment_requests(.:format)                                        api/vp/bank_transfer/bank_payment_requests#index
 #                                                         POST   /api/vp/bank_transfer/bank_payment_requests(.:format)                                        api/vp/bank_transfer/bank_payment_requests#create
@@ -2079,15 +2082,18 @@ Rails.application.routes.draw do
   ######### ADMIN PANEL END ###########
 
 
-  ############# Virtual Bank Accounts API Start ######################
+  ############# Virtual Bank Accounts and Collect API Start ######################
 
   get 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#show'
   post 'virtual_accounts', to: 'api/fc/invoices/virtual_bank_accounts#create'
   patch 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#update'
   delete 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#deactivate'
   post 'invoices', to: 'api/fc/invoices/outward_invoices#create_valid'
+  post 'invoices/customers', to: 'api/fc/invoices/customers#create'
+  patch 'invoices/customers/:id', to: 'api/fc/invoices/customers#update'
+  get 'invoices/customers/:id', to: 'api/fc/invoices/customers#show'
 
-  ################### Virtual Bank Accounts End ######################
+  ############### Virtual Bank Accounts and Collect API End ######################
 
   ################### Vendor Payments APIs start #####################
 

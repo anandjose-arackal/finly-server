@@ -9,6 +9,7 @@
 #  days_after  :integer
 #  description :text(65535)
 #  company_id  :integer
+#  default     :boolean
 #
 
 class PaymentTerm < ActiveRecord::Base
