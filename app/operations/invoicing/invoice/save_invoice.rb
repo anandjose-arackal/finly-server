@@ -77,6 +77,15 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       end
     end
 
+    # check if customer id is inside the customer object, and add it to invoice if it is
+    if params.dig(:customer, :id).present?
+      customer = user.company.customers.find_by(id: params.dig(:customer, :id))
+      if customer.blank?
+        add_message :error, "This customer does not belong to your company"
+        return
+      end
+      self.invoice_parameters[:customer_id] = params.dig(:customer, :id)
+    end
   end
 
   def process
