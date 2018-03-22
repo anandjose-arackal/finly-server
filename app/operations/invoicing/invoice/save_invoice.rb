@@ -60,7 +60,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     self.invoice_parameters[:sequence_start] = sequence
 
     # creating the customer if the customer_id isn't present in the params for this request
-    if invoice_parameters[:customer_id].blank?
+    if invoice_parameters[:customer_id].blank? && params.dig(:customer, :id).blank?
       # try creating an invoice here
       cust_params = customer_params
       cust_params[:create_virtual_account] = true
