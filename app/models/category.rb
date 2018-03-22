@@ -41,5 +41,7 @@ class Category < ActiveRecord::Base
     where purpose_id: purpose_id
   }
   scope :outward_invoice_items_categories, -> { where purpose_id: Purpose.id_for(:outward_invoice_items) }
-
+  scope :expense_management_only, -> {
+    where purpose_id: Purpose.id_for(:expense_management)
+  }
 end
