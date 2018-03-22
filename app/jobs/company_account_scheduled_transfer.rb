@@ -1,41 +1,44 @@
 class CompanyAccountScheduledTransfer < ActiveJob::Base
 
   def perform
-    outward_invoices = OutwardInvoice.exclude_deleted.unpaid
+    configs = CompanyFundsAutoTransferConfig.enabled
 
-    for invoice in outward_invoices
-      params = {
-          outward_invoice_id: invoice.id
-      }
-      # result = Event::EOutwardInvoice::Reminder(nil, params)
-      reminders = InvoiceReminder.with_id invoice.reminders
-      for reminder in reminders
-        p Date.today, get_reminder_date(invoice, reminder)
-        if Date.today == get_reminder_date(invoice, reminder)
-          result = Event::EOutwardInvoice::Remind.(nil, params)
-        end
+    for config in configs
+      if transfer_today?(config)
+        params = {
+          company: config.company
+        }
+        result = Event::ECompanyFundsAutoTransfer::Transfer.(nil, params)
       end
     end
+
   end
 
   private
 
-  def get_reminder_date(invoice, reminder)
-    date = nil
-    if reminder.timeframe_type == 'before'
-      if reminder.reference_date_type == 'due_date'
-        date = invoice.due_date - reminder.days.days
-      elsif reminder.reference_date_type == 'date'
-        date = invoice.date - reminder.days.days
-      end
+  def transfer_today?(config)
+    day = config.frequency_day
+    today = Date.today
+    case conifg.frequency_name
+      when 'day'
+        return true
+      when 'week'
+        if today.wday == day.to_i
+          return true
+        end
+      when 'month'
+        if today.day == day.to_i
+          return true
+        end
 
-    elsif reminder.timeframe_type == 'after'
-      if reminder.reference_date_type == 'due_date'
-        date = invoice.due_date + reminder.days.days
-      elsif reminder.reference_date_type == 'date'
-        date = invoice.date + reminder.days.days
-      end
+        if today.end_of_month.day <= day.to_i
+          return true
+        end
+
+      else
+        false
     end
   end
+
 
 end

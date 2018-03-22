@@ -1,14 +1,5 @@
-class Invoicing::Company::FundsAutoTransferConfig::Show < Invoicing::Company::FundsAutoTransferConfig::Base
+class Invoicing::Company::FundsAutoTransferConfig::Update < Invoicing::Company::FundsAutoTransferConfig::Base
   attr_accessor :company, :auto_transfer_config, :auto_transfer_config_parameters
-
-  class Invoicing::Company::FundsAutoTransferConfig::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-
-    attr_accessor :auto_transfer_config
-
-    def init
-      self.auto_transfer_config = params[:auto_transfer_config]
-    end
-  end
 
   def init
     self.company = user.company
@@ -23,18 +14,13 @@ class Invoicing::Company::FundsAutoTransferConfig::Show < Invoicing::Company::Fu
     if auto_transfer_config
       self.auto_transfer_config.assign_attributes(auto_transfer_config_parameters)
     else
-      self.auto_transfer_config = company.collect_auto_transfer_config.new(auto_transfer_config_parameters)
+      self.auto_transfer_config = CompanyFundsAutoTransferConfig.new(auto_transfer_config_parameters)
+      self.auto_transfer_config.company = company
     end
 
     if auto_transfer_config.save
-      add_message :success, ""
+      add_message :success, "Transfer Schedule Updated"
     end
-
-
   end
 
-  def success
-    params[:auto_transfer_config] = self.auto_transfer_config
-    Invoicing::Company::FundsAutoTransferConfig::Show::ShowPresenter.new(user, params, messages)
-  end
 end
