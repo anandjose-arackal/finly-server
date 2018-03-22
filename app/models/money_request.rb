@@ -298,7 +298,7 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def create_items
-    self.user.company.active_categories.each do |category|
+    self.user.company.active_categories.expense_management_only.each do |category|
       amount = Amount.create value: 0, currency_id: Currency.first.id
       self.items.build category_id: category.id, amount_id: amount.id
     end
