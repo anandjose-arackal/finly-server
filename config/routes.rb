@@ -2667,6 +2667,10 @@ Rails.application.routes.draw do
       patch 'update_collect_logo', to: 'company_configurations#update_collect_logo'
       get 'show_collect_detail', to: 'company_configurations#show_collect_details'
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
+
+      get 'auto_transfer_config', to: 'company_configurations#funds_auto_transfer_config'
+      patch 'auto_transfer_config', to: 'company_configurations#update_auto_transfer_config'
+
     end
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
     resources :inventory_line_items

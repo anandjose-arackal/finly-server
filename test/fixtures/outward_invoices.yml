@@ -37,8 +37,9 @@
 #  roundoff_total_enabled  :boolean
 #  memo                    :string(255)
 #  customer_memo           :text(65535)
-#  reminders               :integer
 #  payment_term_id         :integer
+#  reminders               :text(65535)
+#  user_id                 :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

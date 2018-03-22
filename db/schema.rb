@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180321130036) do
+ActiveRecord::Schema.define(version: 20180322111420) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -989,6 +989,20 @@ ActiveRecord::Schema.define(version: 20180321130036) do
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
   add_index "company_configurations", ["contact_id"], name: "index_company_configurations_on_contact_id", using: :btree
+
+  create_table "company_funds_auto_transfer_configs", force: :cascade do |t|
+    t.integer  "company_id",           limit: 4
+    t.integer  "threshold_amount_id",  limit: 4
+    t.string   "frequency_name",       limit: 255
+    t.string   "frequency_day",        limit: 255
+    t.string   "amount_transfer_type", limit: 255
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+    t.boolean  "enabled",                          default: false
+  end
+
+  add_index "company_funds_auto_transfer_configs", ["company_id"], name: "index_company_funds_auto_transfer_configs_on_company_id", using: :btree
+  add_index "company_funds_auto_transfer_configs", ["threshold_amount_id"], name: "index_company_funds_auto_transfer_configs_on_threshold_amount_id", using: :btree
 
   create_table "company_funds_load_request_types", force: :cascade do |t|
     t.string "name", limit: 255
@@ -3999,6 +4013,7 @@ ActiveRecord::Schema.define(version: 20180321130036) do
   add_foreign_key "company_balance_histories", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
+  add_foreign_key "company_funds_auto_transfer_configs", "companies"
   add_foreign_key "company_funds_load_requests", "amounts"
   add_foreign_key "company_funds_load_requests", "companies"
   add_foreign_key "company_kyc_trails", "company_kycs"
