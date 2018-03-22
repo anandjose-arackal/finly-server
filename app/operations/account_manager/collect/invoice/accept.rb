@@ -70,7 +70,7 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
       # Also update the last invoice in affected_outward_invoices, and add the remaining amount to the amount received - Step 2 & Final
       for affected_invoice_data in affected_outward_invoices
         if affected_invoice_data[:invoice].id == last_invoice.id
-          affected_invoice_data[:amount] + remaining_amount
+          affected_invoice_data[:amount] = affected_invoice_data[:amount] + remaining_amount
         end
       end
     end
