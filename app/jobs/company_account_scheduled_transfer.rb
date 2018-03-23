@@ -39,6 +39,4 @@ class CompanyAccountScheduledTransfer < ActiveJob::Base
         false
     end
   end
-
-
 end
