@@ -19,4 +19,6 @@ class CompanyFundsAutoTransferConfig < ActiveRecord::Base
   belongs_to :threshold_amount, class_name: "Amount"
 
   accepts_nested_attributes_for :threshold_amount
+
+  scope :enabled, -> { where enabled: true }
 end

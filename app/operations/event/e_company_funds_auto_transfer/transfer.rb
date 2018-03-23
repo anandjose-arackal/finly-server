@@ -3,25 +3,22 @@
 # the same APIs and operation as any regular vendor payment
 class Event::ECompanyFundsAutoTransfer::Transfer < Event::ECompanyFundsAutoTransfer::Base
 
-  attr_accessor :company, :collect_credit_account, :payment_request,
-                :transferable_amount, :transfer_mode, :transfer_mode
+  attr_accessor :company, :collect_credit_account, :payment_request, :auto_transfer_config,
+                :account_balance, :transferable_amount, :transfer_mode, :transfer_mode
 
   def pre_validate
-    super
-    if params[:password].blank?
-      add_message :error, 'You need to provide your password to initiate the transfer'
-      return
-    end
-    unless user.valid_password?(params[:password])
-      add_message :error, 'Invalid Password'
-      return
-    end
   end
 
   def init
-    self.company = user.company
+    self.company = params[:company]
     self.collect_credit_account = self.company.collect_credit_account
-    self.transfer_mode = params[:transfer_mode].to_s.upcase
+    self.auto_transfer_config = company.collect_auto_transfer_config
+    self.transfer_mode = auto_transfer_config.transfer_mode.to_s.upcase
+
+    adapter = AccountManager::YesBankCompanyAccount::YesBankCompanyAccountAdapter.new(company.yes_bank_company_account)
+    self.account_balance = adapter.balance
+
+    self.transferable_amount = get_transferable_amount
   end
 
   def validate
@@ -35,6 +32,11 @@ class Event::ECompanyFundsAutoTransfer::Transfer < Event::ECompanyFundsAutoTrans
       return
     end
 
+    unless transfer_mode_valid?(transferable_amount)
+      add_message :error, "Funds transfer cannot proceed with #{transfer_mode} for amount #{transferable_amount}"
+      #todo mailer for user to let them know automatic transfer didin't go through
+    end
+
     # checking if the account number and IFSC code for the collect account are present
     unless self.collect_credit_account.account_number.present? && self.collect_credit_account.ifsc.present?
       add_message :error, "The company credit account hasn't been correctly configured"
@@ -44,11 +46,7 @@ class Event::ECompanyFundsAutoTransfer::Transfer < Event::ECompanyFundsAutoTrans
 
   def pre_process
     # set the amount to be transferred to the current account here
-    self.transferable_amount = params[:transferable_amount].to_f
-    if self.transferable_amount == 0
-      adapter = AccountManager::YesBankCompanyAccount::YesBankCompanyAccountAdapter.new(user.company.yes_bank_company_account)
-      self.transferable_amount = adapter.balance
-    end
+
   end
 
   def process
@@ -76,9 +74,35 @@ class Event::ECompanyFundsAutoTransfer::Transfer < Event::ECompanyFundsAutoTrans
   private
 
   def build_payment_request
-    payment_request = ::PaymentRequest.call(user, self.company.yes_bank_company_account, BankAccount.name, :credit, :collect_funds_withdrawal, {bank_transfer_type: self.transfer_mode, company_id: user.company_id})
-    payment_request.add_payment_item(::PaymentRequest::PaymentItem.call(user, self.collect_credit_account, self.transferable_amount))
+    #todo sreeram: instead of user nil is passed, has to be taken care of
+    payment_request = ::PaymentRequest.call(nil, self.company.yes_bank_company_account,
+                                            BankAccount.name, :credit,
+                                            :collect_funds_withdrawal,
+                                            {bank_transfer_type: self.transfer_mode,
+                                                    company_id: company.id}
+                                            )
+    #todo sreeram: instead of user nil is passed, has to be taken care of
+    payment_request.add_payment_item(::PaymentRequest::PaymentItem.call(nil, self.collect_credit_account, self.transferable_amount))
     payment_request
+  end
+
+  def get_transferable_amount
+    threshold = auto_transfer_config.threshold_amount.value
+    type = auto_transfer_config.amount_transfer_type
+
+    amount = 0
+
+    if type == 'excess'
+      amount = threshold <= account_balance ? 0 : (account_balance - threshold)
+    elsif type == 'all'
+      amount = threshold < account_balance ? 0 : account_balance
+    end
+    amount
+  end
+
+  def transfer_mode_valid?(amount)
+    #todo put logic to check against Payment mode and amount
+    true
   end
 end
 

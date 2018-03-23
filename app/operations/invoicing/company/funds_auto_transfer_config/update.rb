@@ -7,6 +7,18 @@ class Invoicing::Company::FundsAutoTransferConfig::Update < Invoicing::Company::
     self.auto_transfer_config = user.company&.collect_auto_transfer_config
   end
 
+  def pre_validate
+    if params[:password].blank?
+      add_message :error, 'You need to provide your password update the configuration'
+      return
+    end
+
+    unless user.valid_password?(params[:password])
+      add_message :error, 'Invalid Password'
+      return
+    end
+  end
+
   def validate
   end
 
