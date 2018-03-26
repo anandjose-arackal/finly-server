@@ -25,7 +25,6 @@ company:
     invoicing_system: true
     <% end %>
 
-
 user:
   name: <%= current_user.name %>
   id: <%= current_user.id %>
@@ -97,6 +96,53 @@ views:
       - name: Verify KYC
         url: '/#documents'
       <% end %>
+#      - name: Policies
+#        url: '/policies'
+  <% end %>
+  <% if current_user.finance_manager? %>
+  finance_manager:
+    menus:
+      navbar:
+      - name: <span class="superscript">Team</span><br>Export
+        url: export
+        id: export
+      - name: <span class="superscript">Team</span><br>Members
+        url: employees
+        id: employees
+      - name: <span class="superscript">Team</span><br>Settlements
+        url: settlements_dashboard
+        id: settlements_dashboard
+      - name: <span class="superscript">Team</span><br>Money Requests
+        url: requests
+        id: requests
+      - name: <span class="superscript">Team</span><br>Reports
+        url: reports
+        id: reports
+      - name: <span class="superscript">Team</span><br>Expenses
+        url: expenses
+        id: expenses
+      cog: []
+  <% end %>
+  <% if current_user.manager? %>
+  manager:
+    menus:
+      navbar:
+      - name: <span class="superscript">Team</span><br>Export
+        url: export
+        id: export
+      - name: <span class="superscript">Team</span><br>Members
+        url: employees
+        id: employees
+      - name: <span class="superscript">Team</span><br>Money Requests
+        url: requests
+        id: requests
+      - name: <span class="superscript">Team</span><br>Reports
+        url: reports
+        id: reports
+      - name: <span class="superscript">Team</span><br>Expenses
+        url: expenses
+        id: expenses
+      cog: []
   <% end %>
   <% if current_user.employee? %>
   personal:
@@ -123,8 +169,7 @@ views:
       - name: Expenses
         url: expenses
         id: expenses
-      cog:
-      - test: test
+      cog: []
   <% end %>
 
 
