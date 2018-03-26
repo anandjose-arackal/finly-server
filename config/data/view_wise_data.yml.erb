@@ -1,6 +1,7 @@
 company:
   name: <%= current_company.name %>
   id: <%= current_company.id %>
+  d_code_assigned: <%= current_company.d_code_enabled? ? 1 : 0 %>
   logo:
   <% if current_company.configuration.logo.present? %>
     url: <%= current_company.configuration.logo.url(:thumb)%>
