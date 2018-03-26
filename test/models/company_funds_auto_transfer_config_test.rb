@@ -11,6 +11,7 @@
 #  created_at           :datetime         not null
 #  updated_at           :datetime         not null
 #  enabled              :boolean          default(FALSE)
+#  transfer_mode        :string(255)
 #
 
 require 'test_helper'

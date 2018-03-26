@@ -70,6 +70,7 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :total_payable, class_name: "Amount"
   belongs_to :invoice_status, class_name: "OutwardInvoiceStatus"
   belongs_to :payment_term
+  belongs_to :outward_invoice_type
 
   # has_one :virtual_bank_account, as: :parent
   belongs_to :virtual_account, class_name: "VirtualBankAccount"
@@ -117,6 +118,7 @@ class OutwardInvoice < ActiveRecord::Base
   scope :partially_paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid) }
   scope :payments_receivable, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid])) }
   scope :processed, -> { where invoice_status_id: [OutwardInvoiceStatus.id_for(:closed), OutwardInvoiceStatus.id_for(:partially_paid)]}
+  scope :with_type, -> (type) {where outward_invoice_type_id: OutwardInvoiceType.id_for(type)}
 
   scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid, :closed, :cancelled]) }
   scope :invoice_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }

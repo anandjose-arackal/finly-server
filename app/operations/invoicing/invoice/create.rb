@@ -1,6 +1,6 @@
 class Invoicing::Invoice::Create < Invoicing::Invoice::Base
 
-  attr_accessor :invoice_params, :invoice, :customer, :invoice_number, :payment_term, :invoice_date, :invoice_due_date
+  attr_accessor :invoice_params, :invoice, :customer, :invoice_number, :payment_term, :invoice_date, :invoice_due_date, :invoice_type_id
 
   def pre_validate
     if user.blank? || params.blank?
@@ -14,6 +14,7 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
 
     # get default payment term for the company if any
     self.payment_term = user.company.payment_terms.where(default: true).first
+    self.invoice_type_id = params[:invoice_type_id]
   end
 
   def validate
@@ -27,7 +28,10 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
 
   def process
     # Assign default payment term as well
-    self.invoice = user.company.outward_invoices.build(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete), is_deleted: true, payment_term: payment_term, date: invoice_date, due_date: invoice_due_date, user_id: user.id)
+    self.invoice = user.company.outward_invoices.build(invoice_status_id: OutwardInvoiceStatus.id_for(:incomplete),
+                                                       is_deleted: true, payment_term: payment_term,
+                                                       date: invoice_date, due_date: invoice_due_date,
+                                                       user_id: user.id, outward_invoice_type_id: invoice_type_id)
     if self.invoice.save
       if self.customer.present?
         # call the operation that assigns a particular invoice to a customer - ideally operation should success

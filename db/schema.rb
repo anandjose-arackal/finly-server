@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180323090718) do
+ActiveRecord::Schema.define(version: 20180326115129) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2563,6 +2563,10 @@ ActiveRecord::Schema.define(version: 20180323090718) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "outward_invoice_types", force: :cascade do |t|
+    t.string "name", limit: 255
+  end
+
   create_table "outward_invoices", force: :cascade do |t|
     t.integer  "customer_id",             limit: 4
     t.date     "date"
@@ -2575,8 +2579,8 @@ ActiveRecord::Schema.define(version: 20180323090718) do
     t.integer  "freight_amount_id",       limit: 4
     t.integer  "balance_due_id",          limit: 4
     t.decimal  "roundoff_amount",                       precision: 10, scale: 5
-    t.datetime "created_at",                                                     null: false
-    t.datetime "updated_at",                                                     null: false
+    t.datetime "created_at",                                                                 null: false
+    t.datetime "updated_at",                                                                 null: false
     t.integer  "policy_id",               limit: 4
     t.integer  "invoice_status_id",       limit: 4
     t.integer  "company_id",              limit: 4
@@ -2601,6 +2605,7 @@ ActiveRecord::Schema.define(version: 20180323090718) do
     t.integer  "payment_term_id",         limit: 4
     t.text     "reminders",               limit: 65535
     t.integer  "user_id",                 limit: 4
+    t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
@@ -2608,6 +2613,7 @@ ActiveRecord::Schema.define(version: 20180323090718) do
   add_index "outward_invoices", ["customer_id"], name: "index_outward_invoices_on_customer_id", using: :btree
   add_index "outward_invoices", ["discount_amount_id"], name: "index_outward_invoices_on_discount_amount_id", using: :btree
   add_index "outward_invoices", ["freight_amount_id"], name: "index_outward_invoices_on_freight_amount_id", using: :btree
+  add_index "outward_invoices", ["outward_invoice_type_id"], name: "index_outward_invoices_on_outward_invoice_type_id", using: :btree
   add_index "outward_invoices", ["paid_amount_id"], name: "index_outward_invoices_on_paid_amount_id", using: :btree
   add_index "outward_invoices", ["payment_term_id"], name: "index_outward_invoices_on_payment_term_id", using: :btree
   add_index "outward_invoices", ["tax_amount_id"], name: "index_outward_invoices_on_tax_amount_id", using: :btree
@@ -4104,6 +4110,7 @@ ActiveRecord::Schema.define(version: 20180323090718) do
   add_foreign_key "outward_invoice_attachments", "users"
   add_foreign_key "outward_invoices", "amounts"
   add_foreign_key "outward_invoices", "customers"
+  add_foreign_key "outward_invoices", "outward_invoice_types"
   add_foreign_key "outward_invoices", "payment_terms"
   add_foreign_key "outward_invoices", "users"
   add_foreign_key "payment_file_configurations", "companies"

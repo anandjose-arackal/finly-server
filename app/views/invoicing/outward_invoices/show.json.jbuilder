@@ -17,6 +17,10 @@ json.invoice do
     json.name invoice.invoice_status&.name&.humanize
     json.bs_class ""
   end
+  json.invoice_type do
+    json.id invoice.outward_invoice_type.id
+    json.name invoice.outward_invoice_type.name.humanize
+  end
   json.company_gstin invoice&.company&.collect_company_detail&.gst
 
   if invoice.payment_term
