@@ -48,13 +48,13 @@ user:
     default_url: 'reports/params={"view":"finance_manager"}'
   <% end %>
   <% if current_user.manager? %>
-  - id: reviewer
-    name: 'Reviewer'
+  - id: manager
+    name: 'Manager'
     default_url: 'reports/params={"view":"manager"}'
   <% end %>
   <% if current_user.employee? %>
-  - id: initiator
-    name: 'Initiator'
+  - id: personal
+    name: 'Personal'
     default_url: 'expenses/params={"view":"personal"}'
   <% end %>
 
