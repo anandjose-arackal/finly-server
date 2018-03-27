@@ -91,10 +91,12 @@ views:
         url: '#company_statements/params={"view": "admin"}'
       <% if current_company.d_code_enabled? || current_company.bank_reimbursement_enabled? %>
       - name: Load Company Balance
+        target: true
         url: '/transfers/register'
       <% end %>
       <% unless current_company.kyc_completed? %>
       - name: Verify KYC
+        target: true
         url: '/#documents'
       <% end %>
 #      - name: Policies
@@ -191,7 +193,7 @@ views:
         url: requests
         id: requests
       - name: Settlements
-        url: settlements
+        url: settlements/<%= current_user.id %>
         id: settlements
       - name: Analytics
         url: analytics
