@@ -37,12 +37,14 @@ class Admin::Companies::Index < Admin::Companies::Base
     has_scope :filter_cards
     has_scope :filter_date_from
     has_scope :filter_date_to
+    has_scope :filter_status_id, type: :array
 
     def init
+      ScopeUtils.fix_for_scoping(params, :filter_status_id, :array)
       self.companies = params[:companies]
       self.companies = apply_scopes(companies, params)
       # self.paginated_companies = companies.paginate(page: params[:page], per_page: 30)
-      self.paginated_companies = companies
+      self.paginated_companies = companies.paginate(page: params[:page], per_page: params[:per_page])
       self.company_types = CompanyType.all
     end
   end

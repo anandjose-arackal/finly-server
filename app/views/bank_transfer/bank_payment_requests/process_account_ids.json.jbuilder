@@ -3,8 +3,10 @@ json.payment do
     json.array! @result.processed_order.each do |item|
       json.bank_account_number item[:bank_account_no]
       json.original_amount item[:original_amount]
+      json.id item[:id]
       json.ifsc item[:ifsc]
       json.name item[:name]
+      json.owner_name item[:owner_name]
       json.note item[:note]
       json.gst_type_id item[:gst_type_id]
       json.tax_amount item[:tax_amount]
@@ -24,8 +26,45 @@ json.payment do
       json.messages item[:messages]
       json.custom_fields_config item[:custom_fields]
       json.net_amount item[:net_amount]
+      json.category_id item[:category_id]
+      json.roundoff_amount item[:roundoff_amount]
+      json.balance_due item[:balance_due]
+      json.item_taxes_total item[:item_taxes_total]
+      json.item_discounts_total item[:item_discounts_total]
+      json.items_net_total item[:items_net_total]
+      json.item_amounts_total item[:item_amounts_total]
+      json.invoice_items do
+        json.array!(item[:invoice_items]) do |line_item|
+          json.discount line_item[:discount]
+          json.tax line_item[:tax]
+          json.tax_amount line_item[:tax_amount]
+          json.discount_amount line_item[:discount_amount]
+          json.description line_item[:description]
+          json.category_id line_item[:category_id]
+          json.amount line_item[:amount]
+          json.rate line_item[:rate]
+          json.quantity line_item[:quantity]
+          json.gst_type_id line_item[:item_gst_type]
+          json.total_amount line_item[:total_amount]
+          json.hsn_sac line_item[:hsn_sac]
+          json.net_total line_item[:net_total]
+        end
+      end
     end
   end
+  json.invoice_categories do
+    json.array!(current_company.categories.with_purpose(Purpose.id_for(:invoice))) do |category|
+      json.id category.id
+      json.name category.name
+    end
+  end
+  json.invoice_line_items_categories do
+    json.array!(current_company.categories.with_purpose(Purpose.id_for(:invoice_items))) do |category|
+      json.id category.id
+      json.name category.name
+    end
+  end
+
   json.errors @result.errors
   json.description @result.description
   json.payment_order_valid @result.payment_order_valid

@@ -133,7 +133,7 @@ class CompanyKyc < ActiveRecord::Base
     case self.company_type_id
       when CompanyType.id_for('Sole Proprietor')
         # nothing else, lol
-      when CompanyType.id_for('Private Ltd Company')
+      when CompanyType.id_for('Private Ltd Company'), CompanyType.id_for('Ltd Company')
         docs << "certificate_of_incorporation"
       when CompanyType.id_for('Partnership Firm')
         docs << "certificate_of_registration"
@@ -261,7 +261,7 @@ class CompanyKyc < ActiveRecord::Base
         documents << supporting_documents
 
       ## PRIVATE LIMITED COMPANY ##
-      when CompanyType.id_for('Private Ltd Company')
+      when CompanyType.id_for('Private Ltd Company'), CompanyType.id_for('Ltd Company')
 
         certificate_of_incorporation = {}
         certificate_of_incorporation[:name] = "Certificate of Incorporation"

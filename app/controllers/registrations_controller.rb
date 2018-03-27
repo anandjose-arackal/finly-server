@@ -10,6 +10,24 @@ class RegistrationsController < ApplicationController
     end
   end
 
+  def signup
+    @result = Company::Signup.(nil, params)
+    if @result.success?
+      respond response: :success, messages: @result.messages[:success]
+    else
+      respond response: :error, messages: @result.messages[:error]
+    end
+  end
+
+  def pricing
+    @result = Company::Pricing.(nil, params)
+    if @result.success?
+      respond response: :success, messages: @result.messages[:success]
+    else
+      respond response: :error, messages: @result.messages[:error]
+    end
+  end
+
   def resource_requests
     @result = ResourceRequests::Create.(nil, params)
     respond
@@ -34,6 +52,4 @@ class RegistrationsController < ApplicationController
   def resource_request_params
     params.require(:request).permit(:name, :email, :mobile_number)
   end
-
-
 end

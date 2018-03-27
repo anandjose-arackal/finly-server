@@ -13,7 +13,7 @@ class Purpose < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:expense_management, :vendor_payments]
+    [:expense_management, :vendor_payments, :invoice, :invoice_items, :outward_invoice, :outward_invoice_items]
   end
 
   def self.id_from_application_for(application)
@@ -22,6 +22,19 @@ class Purpose < ActiveRecord::Base
         return Purpose.id_for(:vendor_payments)
       when 'em', :em, :ft, 'ft'
         return Purpose.id_for(:expense_management)
+      else
+        # do nothing?
+    end
+  end
+
+  def self.category_purpose_from_application(application)
+    case application
+      when :vp, 'vp'
+        return Purpose.id_for(:invoice)
+      when 'em', :em, :ft, 'ft'
+        return Purpose.id_for(:expense_management)
+      when 'fc', :fc
+        return Purpose.id_for(:invoice_items) # because from the outward invoice system, only invoice items categories can be created
       else
         # do nothing?
     end

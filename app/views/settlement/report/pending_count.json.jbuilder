@@ -1,0 +1,1 @@
+json.count @result.reports.count

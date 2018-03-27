@@ -9,7 +9,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
                 :invoice_amount, :payment_amount, :payment,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
-                :advance_amount, :custom_fields
+                :advance_amount, :custom_fields, :policy_id
 
   def pre_validate
     super
@@ -22,8 +22,10 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
     super
     self.company_id = self.payment_order.company_id
     self.order_data = params[:payment_order]
+    self.policy_id = self.bank_payment_request.policy_id
     op = BankTransfer::PaymentRequest::Process.(user, scheduled_at: params[:scheduled_at],
-        payment_order: self.order_data)
+                                                      payment_order: self.order_data,
+                                                      policy_id: self.policy_id)
     self.processed_order_data = op.payment_order_data
     retrieve_payments_data
   end
@@ -48,10 +50,10 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
   def process
     self.payments_data.each_with_index do |data, index|
       payment = self.payment_order.payments.build(data)
+      calculate_tax_and_discounts(payment, data)
       # set custom field data
       set_custom_fields(false, payment, self.custom_fields[index])
       payment.save
-      calculate_tax_and_discounts(payment)
     end
   end
 
@@ -59,8 +61,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
     add_message :success, "Beneficiaries added!"
 
     # update the amount requested for this particular payment order
-    amount_requested = self.payment_order.request_total
-    payment_order.amount_requested&.update(value: amount_requested)
+    payment_order.update_requested_amount
 
     # todo - get back to this
     # if bank_payment_request.retracted? || bank_payment_request.rejected?
@@ -81,6 +82,22 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
     self.payments_data = []
     self.custom_fields = []
     self.processed_order_data.each do |order_details|
+      # processing the line items of this particular invoice
+      invoice_items_attributes = []
+      if order_details&.dig(:invoice_attributes, :invoice_items_attributes).present?
+        order_details[:invoice_attributes][:invoice_items_attributes].each do |line_item|
+          invoice_items_attributes << {
+              tax: line_item[:tax],
+              discount: line_item[:discount],
+              category_id: line_item[:category_id],
+              description: line_item[:description],
+              rate: line_item[:rate],
+              quantity: line_item[:quantity],
+              hsn_sac: line_item[:hsn_sac],
+              gst_type_id: line_item[:gst_type_id]
+          }
+        end
+      end
       bank_account = retrieve_bank_account order_details
       initiating_account = bank_payment_request.payment_order.initiating_account || user.bank_wallet
       self.custom_fields << order_details[:custom_fields]
@@ -91,8 +108,10 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
           initiating_user: user,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_type_id: PaymentType.id_for(:credit),
-          payment_purpose_id: PaymentPurpose.id_for(:vendor_payments),
+          payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+          application: RequestStore.store[:current_app],
           payment_mode: bank_payment_request.payment_order.payment_mode,
+          note: order_details[:note],
           amount_attributes: {
               value: order_details[:original_amount],
               currency_id: 1
@@ -107,6 +126,10 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
                   value: order_details[:freight],
                   currency_id: 1
               },
+              advance_amount_attributes: {
+                  value: order_details[:advance_amount],
+                  currency_id: 1
+              },
               invoice_number: order_details[:invoice_number],
               date: order_details[:invoice_date],
               due_date: order_details[:due_date],
@@ -117,157 +140,60 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
               discount: order_details[:discount],
               tax: order_details[:tax],
               tds: order_details[:tds],
-              advance: order_details[:advance]
+              advance: order_details[:advance],
+              invoice_items_attributes: invoice_items_attributes,
+              inclusive_of_taxes: order_details[:inclusive_of_taxes]
           }
       }
     end
   end
 
   def retrieve_bank_account(order_details)
-    ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number],
-                                         company_id: self.company_id)
-    vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
+    if order_details[:account_id].present?
+      id = order_details[:account_id]
+      ba = BankAccount.find_by(id: id)
+      return ba
+    else
+      ba = BankAccount.non_deleted.find_by(account_number: order_details[:bank_account_number],
+                                           company_id: self.company_id)
+      vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
 
-    self.unauthorized_vendors_presence = false
-    if ba.nil?
-      ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc],
-                              account_owner: vendor, company_id: self.company_id, default_account: true)
+      self.unauthorized_vendors_presence = false
+      if ba.nil?
+        ba = BankAccount.create(name: order_details[:name], account_number: order_details[:bank_account_number], ifsc: order_details[:ifsc],
+                                account_owner: vendor, company_id: self.company_id, default_account: true)
 
-      # setting unauthorized vendors as true so that after creation, the approval flow is mandated
-      self.unauthorized_vendors_presence = true
+        # setting unauthorized vendors as true so that after creation, the approval flow is mandated
+        self.unauthorized_vendors_presence = true
+      end
+      ba
     end
-    ba
   end
 
 
   def set_custom_fields(save, payment, data)
     fields = data
+    return if data.blank?
     custom_fields = {custom_fields: fields}
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
     CustomField::SetFields.(payment.invoice, FieldParentType.id_for(:invoice), custom_fields)
-    data.delete(:custom_fields) # removing the custom fields because payment creation will throw an error
-  end
-
-  def calculate_tax_and_discounts(payment)
-    self.invoice = payment.invoice
-    if payment.invoice.inclusive_of_taxes # calculate the other amounts retrospectively
-      self.after_tax_amount = self.invoice.original_amount&.value
-      # first calculate the gross amount from the
-      calculate_inclusive_taxes
-      calculate_tds
-      calculate_discount_inclusive
-      self.net_amount = self.after_tax_amount - self.tds_amount
-      self.invoice_amount = self.gross_amount + self.discount_amount
-      calculate_advance_paid
-    else # calculate proactively
-      self.invoice_amount = self.invoice.original_amount&.value
-      calculate_discount_exclusive
-      calculate_exclusive_taxes
-      calculate_tds
-      self.net_amount = self.gross_amount + self.tax_amount - self.tds_amount
-      self.invoice_amount = invoice.original_amount&.value
-      calculate_advance_paid
+    unless data[:custom_fields].blank?
+      data.delete(:custom_fields) # removing the custom fields because payment creation will throw an error
     end
-    # update the invoice with the respective calculated amounts
-    payment.invoice.update(
-        amount_attributes: {
-            value: self.invoice_amount,
-            currency_id: 1,
-            id: payment.invoice.amount&.id
-        },
-        net_amount_attributes: {
-            value: self.net_amount,
-            currency_id: 1,
-            id: payment.invoice.net_amount&.id
-        },
-        gross_amount_attributes: {
-            value: self.gross_amount,
-            currency_id: 1,
-            id: payment.invoice.gross_amount&.id
-        },
-        discount_amount_attributes: {
-            value: self.discount_amount,
-            currency_id: 1,
-            id: payment.invoice.discount_amount&.id
-        },
-        tds_amount_attributes: {
-            value: self.tds_amount,
-            currency_id: 1,
-            id: payment.invoice.tds_amount&.id
-        },
-        tax_amount_attributes: {
-            value: self.tax_amount,
-            currency_id: 1,
-            id: payment.invoice.tax_amount&.id
-        },
-        advance_amount_attributes: {
-            value: self.advance_amount,
-            currency_id: 1,
-            id: payment.invoice.advance_amount&.id
-        }
-    )
-    # also update the payment with all the respective amounts
-    payment.amount&.update(value: self.net_amount)
   end
 
-  def calculate_discount_exclusive
-    if self.invoice.discount.blank?
-      self.discount_amount = 0
-      self.gross_amount = self.invoice_amount
-      return
+  def calculate_tax_and_discounts(payment, payment_params)
+    if payment.invoice.invoice_items.present?
+      # if there are, in fact, invoice items, use the invoice items library
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)
+      payment.save
+    else
+      # if there are no invoice items, use the invoice library to calculate the amounts
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(payment_params, payment)
+      payment.save
     end
-    # because the discount rate will always be known
-    self.discount_amount = (invoice.discount*self.invoice_amount)/100
-    self.gross_amount = self.invoice_amount - self.discount_amount
-  end
-
-  def calculate_discount_inclusive
-    if self.invoice.discount.blank?
-      self.discount_amount = 0
-      self.invoice_amount = self.gross_amount
-      return
-    end
-    # because the discount is also always shown
-    self.invoice_amount = (self.gross_amount*100)/(100 - invoice.discount)
-    self.discount_amount = self.invoice_amount - self.gross_amount
-  end
-
-  def calculate_exclusive_taxes
-    if self.invoice.tax.blank?
-      self.net_amount = self.gross_amount
-      self.tax_amount = 0
-      return
-    end
-    self.net_amount = TaxCalculationUtils.exclusive_tax_amount(self.gross_amount, (self.invoice.tax))
-    self.tax_amount = self.net_amount - self.gross_amount
-  end
-
-  def calculate_inclusive_taxes
-    if self.invoice.tax.blank?
-      self.after_tax_amount = self.gross_amount
-      self.tax_amount = 0
-      return
-    end
-    self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_tax_amount, (self.invoice.tax))
-    self.tax_amount = self.after_tax_amount - self.gross_amount
-  end
-
-  def calculate_tds
-    new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, self.invoice.tds)
-    self.tds_amount = self.gross_amount - new_gross_amount
-  end
-
-  def calculate_advance_paid
-    if self.invoice.advance.blank?
-      # no change in net amount
-      self.advance_amount = 0
-      return
-    end
-    original_net_amount = self.net_amount
-    self.advance_amount = (self.invoice.advance*self.net_amount)/100
-    self.net_amount = original_net_amount - self.advance_amount
   end
 
 end

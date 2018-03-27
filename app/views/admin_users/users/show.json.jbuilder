@@ -3,7 +3,7 @@ if @result.selected_user.first_name.present?
                                      :company_name, :id, :mothers_maiden_name, :active, :employee_id, :payroll_id
 
 
-  json.date_of_birth (@result.selected_user.date_of_birth.strftime("%d-%m-%Y"))
+  json.date_of_birth (@result.selected_user.date_of_birth&.strftime("%d-%m-%Y"))
   json.gender (@result.selected_user.gender_name)
 else
   json.email @result.selected_user.email
@@ -80,6 +80,7 @@ json.subscriptions do
   json.expense_management @result.user_panel_subscription.expense_management
   json.disburse @result.user_panel_subscription.disburse
   json.yes_bank_account_transfer @result.user_panel_subscription.yes_bank_account_transfer
+  json.invoicing_system @result.user_panel_subscription.invoicing_system
 end
 
 json.individual_kyc @result.individual_kyc_data
@@ -101,6 +102,11 @@ json.roles_vp do
   json.reviewer @result.selected_user.vendor_payments_reviewer?
   json.creditor @result.selected_user.vendor_payments_creditor?
   json.initiator @result.selected_user.vendor_payments_initiator?
+end
+
+json.roles_fc do
+  json.admin @result.selected_user.finly_collect_admin?
+  json.initiator @result.selected_user.finly_collect_initiator?
 end
 
 # all mapping for this particular user

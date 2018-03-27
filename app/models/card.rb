@@ -24,6 +24,7 @@
 #  is_deleted               :boolean          default(FALSE)
 #  hotlisted                :boolean          default(FALSE)
 #  card_processor_status    :string(255)
+#  replaced_card_id         :integer
 #
 
 class Card < ActiveRecord::Base
@@ -38,6 +39,7 @@ class Card < ActiveRecord::Base
   belongs_to :card_program
   belongs_to :itz_cash_card_program
   belongs_to :card_status
+  belongs_to :replaced_card, class_name: "Card"
   has_many :transactions, class_name: 'CardTransaction'
   has_many :initiating_payments, as: :initiating_account
   has_many :initiating_payment_trails, as: :initiating_account
@@ -72,12 +74,14 @@ class Card < ActiveRecord::Base
   scope :with_non_personal_fund_transfer, -> { with_card_program(CardProgram.all.with_non_personal_fund_transfer) }
   scope :reimbursable_cards, -> { with_card_program(CardProgram.all.with_reimbursement) }
   scope :meal_cards, -> { where card_program_id: CardProgram.id_for(:meal) }
-  scope :payroll_cards, -> { where card_program_id: CardProgram.id_for(:payroll)}
+  scope :payroll_cards, -> { where card_program_id: CardProgram.id_for(:payroll) }
+  scope :sum_balance, -> { joins(:card_balance).sum('amounts.value') }
   scope :non_hotlisted, -> {
     # if applied == '1'
     where hotlisted: false
     # end
   }
+  scope :pluck_proxy, -> { pluck :proxy }
   scope :include_hotlisted, -> { unscope(where: :hotlisted) }
 
   scope :expense_cards_only, -> { where card_program_id: CardProgram.id_for(:expense) }
@@ -150,6 +154,20 @@ class Card < ActiveRecord::Base
     end
   end
 
+  # def proxy
+  #   if self.replaced_with.present?
+  #     self.replaced_with.proxy
+  #   end
+  #   super
+  # end
+
+  def api_proxy
+    if self.replaced_card.present?
+      self.replaced_card.proxy
+    else
+      self.proxy
+    end
+  end
 
   def unblockable?
     if self.active
@@ -185,8 +203,9 @@ class Card < ActiveRecord::Base
     (self.card_eligibility&.value || 0)
   end
 
+  # always use serial_id in APIs
   def serial_id
-    self.proxy
+    api_proxy
   end
 
   def inactive?
@@ -215,6 +234,14 @@ class Card < ActiveRecord::Base
 
   def upgraded?
     self.card_status_id == CardStatus.id_for(:upgraded)
+  end
+
+  def atm_allowed?
+    upgraded? and card_restriction.channel_atm
+  end
+
+  def max_eligibility
+    upgraded? ? 50000 : 20000
   end
 
   def assigned?
@@ -247,6 +274,27 @@ class Card < ActiveRecord::Base
       status = 'Locked'
     end
     status
+  end
+
+  def as_json(options={})
+    {
+        id: id,
+        user: user,
+        proxy: proxy,
+        description: description,
+        active: active,
+        hotlisted: hotlisted,
+        locked: locked?,
+        card_status: card_status,
+        card_balance: card_balance,
+        card_program: card_program,
+        card_eligibility: card_eligibility,
+        disabled: {
+            disabled_by_user: disabled_by_user,
+            disabled_by_role: disabled_by_role,
+            disable_note: disable_note
+        }
+    }
   end
 
   private

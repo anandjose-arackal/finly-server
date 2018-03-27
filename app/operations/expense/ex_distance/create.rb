@@ -17,6 +17,14 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
 
   attr_accessor :expense_params, :receipt
 
+  def personalizer
+    {
+        process: {
+            before: Personalizer::Process.new([:expense, :distance_create], :process, self)
+        }
+    }
+  end
+
   def authorized_user_types
     [:employee]
   end
@@ -76,6 +84,10 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
         messages[:error] << "Expense cannot be added to the report in this state"
       end
     end
+
+    # ensuring that a particular expense cannot be both from cash on hand and reimbursable at the same time
+    check_coh_reimbursable_exclusivity_create(expense_params)
+
   end
 
   def process
@@ -124,6 +136,18 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
         else
           expense.update_other_currencies
         end
+      end
+    end
+
+    # check if this expense's amount allows for it to be marked against COH
+    # and if it is or is not, update the flag for this expense accordingly
+    if expense.amount.present? && expense.from_cash_on_hand
+      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      if coh_adapter.balance(display_balance: true) > expense.amount_value
+        expense.update(cash_on_hand_blocked: true)
+      end
+      if coh_adapter.balance(display_balance: true) < 0
+        expense.update(cash_on_hand_blocked: false)
       end
     end
 

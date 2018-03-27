@@ -56,7 +56,9 @@ class FieldConfiguration < ActiveRecord::Base
   scope :enabled, -> { where enabled: true }
   scope :disabled, -> { where enabled: false }
   scope :filter_field_type_id, ->(type_id) { where field_type_id: type_id }
+  scope :filter_parent_type_id, -> (type_id) { where field_parent_type_id: type_id}
   scope :order_created_at_desc, -> { order(created_at: :desc) }
+  scope :with_company, -> (company_id) { where company_id: company_id}
 
   delegate :drop_down?, :text?, to: :field_type
 
@@ -156,7 +158,7 @@ class FieldConfiguration < ActiveRecord::Base
     if field_type_id == FieldType.id_for(:drop_down)
       options = drop_down_items.exclude_deleted
     elsif field_type_id == FieldType.id_for(:multiselect)
-      options = multiselect_items
+      options = multiselect_items.non_deleted
     end
     {
         id: id,

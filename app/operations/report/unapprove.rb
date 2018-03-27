@@ -76,7 +76,7 @@ class Report::Unapprove < Report::Base
     report.comments.create user: user, report_comment_action_id: ReportCommentAction.id_for(:report_unapprove)
     # Recalculate settlement when report is unapproved from an approved state
     if prev_status.approved? || prev_status.closed?
-      Settlement::Report::Unapproved.(user, report: report)
+      Settlement::SReport::Unapproved.(user, report: report)
       report.expenses.update_all(expense_status_id: ExpenseStatus.id_for(:submitted))
     end
     EmailAuthorization::Invalidate.(user, authorizable: report)

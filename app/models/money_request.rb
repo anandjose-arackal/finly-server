@@ -24,18 +24,10 @@
 #  is_deleted                         :boolean          default(FALSE), not null
 #  submitted_amount_id                :integer
 #  processed_amount_id                :integer
-#  money_request_processor_mapping_id :integer
 #  auto_approve                       :boolean
+#  money_request_processor_mapping_id :integer
 #  approved_at                        :datetime
 #
-
-
-
-
-
-
-
-
 
 
 
@@ -55,6 +47,7 @@ class MoneyRequest < ActiveRecord::Base
   belongs_to :status, class_name: 'MoneyRequestStatus'
   belongs_to :policy
   belongs_to :payment
+  belongs_to :money_request_processor_mapping
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 
@@ -90,12 +83,24 @@ class MoneyRequest < ActiveRecord::Base
   scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
   scope :with_controlling_user_id, -> (user_id) { where controlling_user_id: user_id }
   scope :with_items, -> { joins(:items) }
+  scope :include_user_accounts, -> { includes user: [:bank_accounts, :expense_cards] }
+  scope :group_user_id, -> { group :user_id }
+  scope :group_user, -> { group :user }
+  scope :sum_total, -> { joins(:items).joins({items: :amount}).sum(:value) }
+  scope :without_associated_processor, -> { where money_request_processor_mapping_id: nil }
+  scope :not_destroyable, -> { where.not status_id: MoneyRequestStatus.ids_for([:open, :rejected, :retracted]) }
+  scope :without_user, -> (user_id) { where.not user_id: user_id }
 
-  scope :awaiting_approval_of_user, ->(user_id, role_id){ where(status_id: ReportStatus.id_for(:processing)).where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
+  scope :awaiting_approval_of_user, ->(user_id, role_id) { where(status_id: MoneyRequestStatus.id_for(:processing))
+                                                               .where(controlling_user_id: user_id).where(controlling_user_role_id: role_id) }
+  scope :filter_mapping_id, -> (id) { where money_request_processor_mapping_id: id }
+  scope :pluck_mapping_id, -> { pluck :money_request_processor_mapping_id }
+
+  scope :total_value, -> { joins(items: :amount).sum(:value) }
 
   # scoping by payment type - cash or card
-  scope :via_cash_only, -> {where payment_mode_id: PaymentMode.id_for(:cash)}
-  scope :via_card_only, -> {where payment_mode_id: PaymentMode.id_for(:card)}
+  scope :via_cash_only, -> { where payment_mode_id: PaymentMode.id_for(:cash) }
+  scope :via_card_only, -> { where payment_mode_id: PaymentMode.id_for(:card) }
 
   scope :filter_status, ->(status_id) { where status_id: status_id }
   scope :filter_user_id, ->(id) { where(user_id: id) }
@@ -118,11 +123,48 @@ class MoneyRequest < ActiveRecord::Base
       where(money_requests[:created_at].gteq(date_from).and(money_requests[:created_at].lteq(date_to)))
     end
   end
+  scope :filter_submitted_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      money_requests = arel_table
+      where(money_requests[:submitted_at].gteq(date_from).and(money_requests[:submitted_at].lteq(date_to)))
+    end
+  end
+  scope :filter_approved_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      money_requests = arel_table
+      where(money_requests[:approved_at].gteq(date_from).and(money_requests[:approved_at].lteq(date_to)))
+    end
+  end
+
+  scope :filter_required_by_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      money_requests = arel_table
+      where(money_requests[:required_by_date].gteq(date_from).and(money_requests[:required_by_date].lteq(date_to)))
+    end
+  end
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
-
   scope :settlement_viewable, -> { where status_id: [MoneyRequestStatus.id_for(:approved), MoneyRequestStatus.id_for(:credited)] }
-
-  scope :sort_for_personal, -> { joins(:status).reorder('money_request_statuses.order ASC, money_requests.submitted_at DESC, money_requests.created_at DESC')}
+  scope :sort_for_personal, -> { joins(:status).reorder('money_request_statuses.order ASC, money_requests.submitted_at DESC, money_requests.created_at DESC') }
+  scope :not_settled, -> { where money_request_processor_mapping_id: nil }
+  scope :with_processor_mapping, -> (id) { where money_request_processor_mapping_id: id }
 
   accepts_nested_attributes_for :custom_fields
 
@@ -256,7 +298,7 @@ class MoneyRequest < ActiveRecord::Base
   end
 
   def create_items
-    self.user.company.active_categories.each do |category|
+    self.user.company.active_categories.expense_management_only.each do |category|
       amount = Amount.create value: 0, currency_id: Currency.first.id
       self.items.build category_id: category.id, amount_id: amount.id
     end

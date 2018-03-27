@@ -82,38 +82,11 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
     end
 
+    # checking if there is enough cash on hand to mark this expense as from cash on hand
+    check_coh_availability_update(updated_expense_params)
 
-    # if the expense is being marked as from cash on hand, check if there is enough cash on hand to facilitate it
-    if StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand)) or (updated_expense_params&.dig(:from_cash_on_hand).nil? and expense.from_cash_on_hand)
-      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
-      amount_val = (updated_expense_params&.dig(:amount_attributes, :value)&.to_f || expense.amount&.value)
-      balance = coh_adapter.balance(display_balance: true)
-      # if the expense is continuing to be from COH, and only the amount is changing
-      if expense.from_cash_on_hand && StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
-        difference = updated_expense_params&.dig(:amount_attributes, :value)&.to_f - expense.amount_value
-        unless difference <= balance
-          add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
-          return
-        end
-      # i.e. if the expense was not originally from COH, and it's currently being made into one
-      elsif !expense.from_cash_on_hand && StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
-        unless balance >= amount_val
-          add_message :error, 'You do not have enough balance in your Cash on Hand to mark this expense against it'
-          return
-        end
-      elsif expense.from_cash_on_hand && !StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
-        # nothing to do here ¯\_(ツ)_/¯
-      end
-    end
-
-    from_cash_on_hand = StringUtils.to_bool(updated_expense_params&.dig(:from_cash_on_hand))
-    from_cash_on_hand = from_cash_on_hand.nil? ? expense.from_cash_on_hand : from_cash_on_hand
-    reimbursable = StringUtils.to_bool(updated_expense_params&.dig(:reimbursable))
-    reimbursable = reimbursable.nil? ?  expense.reimbursable : reimbursable
-    if from_cash_on_hand and reimbursable
-      add_message :error, 'Expense cannot be Reimbursable and Paid from Cash on Hand'
-      return
-    end
+    # ensuring a particular expense cannot be both reimbursable and from cash on hand
+    check_coh_reimbursable_exclusivity_update(updated_expense_params)
   end
 
   def process
@@ -168,6 +141,18 @@ class Expense::Manual::Update < Expense::Manual::Base
     # checking if the expense has any receipts, and marking them all as no need to be transcribed
     if expense.receipts.present?
       expense.receipts.update_all(to_be_transcribed: false)
+    end
+
+    # check if this expense's amount allows for it to be marked against COH
+    # and if it is or is not, update the flag for this expense accordingly
+    if expense.amount.present? && expense.from_cash_on_hand
+      coh_adapter = AccountManager::CashOnHand::CashOnHandAdapter.new(user.cash_on_hand)
+      if coh_adapter.balance(display_balance: true) > expense.amount_value
+        expense.update(cash_on_hand_blocked: true)
+      end
+      if coh_adapter.balance(display_balance: true) < 0
+        expense.update(cash_on_hand_blocked: false)
+      end
     end
 
 

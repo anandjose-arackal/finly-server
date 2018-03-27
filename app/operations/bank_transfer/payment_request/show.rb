@@ -39,7 +39,8 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
 
     attr_accessor :bank_payment_request, :payment_order, :actions, :bank_wallet_balance,
                   :manager, :finance_manager, :associated_users, :payments_verified, :payments_unverified,
-                  :custom_field_config, :approvers
+                  :custom_field_config, :approvers, :invoice_categories, :invoice_line_items_categories,
+                  :invoice_custom_fields, :invoice_line_items_custom_fields
 
     def init
       self.bank_payment_request = params[:payment_request]
@@ -64,18 +65,28 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           self.payments_unverified << payment
         end
       end
-      self.custom_field_config = custom_field_configurations
+      self.custom_field_config = invoice_custom_field_configurations
       op = BankTransfer::PaymentRequest::Approvers.(bank_payment_request: self.bank_payment_request)
       if op.success?
         self.approvers = op.approvers
       else
         self.approvers = []
       end
+
+      self.invoice_custom_fields = invoice_custom_field_configurations
+      self.invoice_line_items_custom_fields = invoice_line_items_custom_field_configurations
+      self.invoice_categories = self.user.company.categories.with_purpose(Purpose.id_for(:invoice))
+      self.invoice_line_items_categories = self.user.company.categories.with_purpose(Purpose.id_for(:invoice_items))
     end
 
-    def custom_field_configurations
+    def invoice_custom_field_configurations
       configurations = user.company.field_configurations.exclude_deleted
       configurations.with_parent_type(FieldParentType.id_for(:invoice))
+    end
+
+    def invoice_line_items_custom_field_configurations
+      configurations = user.company.field_configurations.exclude_deleted
+      configurations.with_parent_type(FieldParentType.id_for(:invoice_line_item))
     end
 
     def retrieve_actions
@@ -85,7 +96,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:summary_editable] = true
           actions[:payments_editable] = true
           actions[:attachments_editable] = true
-          actions[:credit] = true
+          actions[:credit] = !bank_payment_request.credit_card?
           balance = retrieve_balance(:vendor_payment_wallet, user)
           admins = []
           user.company.users.only_vendor_payment_admins.each do |admin|
@@ -94,16 +105,26 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                 name: admin.name
             }
           end
-          actions[:credit_options] = {
-              credit: {
+          actions[:credit_options] = {}
+          unless bank_payment_request.credit_card?
+            actions[:credit_options][:credit] = {
                   url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
                   enabled: true,
                   messages: "You can directly credit this payment order from your Finly Money or Company Credits",
                   require_password: true,
                   initiating_account: true,
                   method: "patch"
-              }
+            }
+          end
+          # based on whether the configuration for payment file is enabled or not, add this block
+          actions[:credit_options][:mark_as_credited] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_mark_as_credited_path(bank_payment_request),
+              enabled: true,
+              messages: "You can mark this payment order as credited",
+              require_password: true,
+              method: "patch"
           }
+          #######################################################################################
           unless admins.empty?
             actions[:credit_options][:approve_forward] = {
                   url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
@@ -138,16 +159,20 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                 name: admin.name
             }
           end
-          actions[:credit_options] = {
-              credit: {
-                  url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
-                  enabled: true,
-                  messages: "You can directly credit this payment order from your Finly Money or Company Credits",
-                  require_password: true,
-                  initiating_account: true,
-                  method: "patch"
-              },
-              approve_forward: {
+          unless bank_payment_request.credit_card?
+            actions[:credit_options] = {
+                credit: {
+                    url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+                    enabled: true,
+                    messages: "You can directly credit this payment order from your Finly Money or Company Credits",
+                    require_password: true,
+                    initiating_account: true,
+                    method: "patch"
+                }
+            }
+          end
+          actions[:credit_options] = {} unless actions[:credit_options].present?
+          actions[:credit_options][:approve_forward] = {
                   url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request),
                   messages: "You can forward this payment request to another admin to credit it",
                   enabled: true,
@@ -157,7 +182,15 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
                   method: "patch",
                   type: 7
               }
+          # based on whether the configuration for payment file is enabled or not, add this block
+          actions[:credit_options][:mark_as_credited] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_mark_as_credited_path(bank_payment_request),
+              enabled: true,
+              messages: "You can mark this payment order as credited",
+              require_password: true,
+              method: "patch"
           }
+          #######################################################################################
         elsif bank_payment_request.credited?
           # further check if the payment order has anu failed payments
           if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?
@@ -173,7 +206,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:summary_editable] = true
           actions[:payments_editable] = true
           actions[:attachments_editable] = true
-          actions[:credit] = true
+          actions[:credit] = !bank_payment_request.credit_card?
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
           admin = false
@@ -192,16 +225,28 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           if user.vendor_payments_admin?
             admin = true
           end
-          actions[:credit_options] = {
-              credit: {
-                url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
-                enabled: enabled,
-                messages: "You can directly credit this payment order from your Finly Money",
-                require_password: true,
-                initiating_account: admin,
-                method: "patch"
-              }
+          actions[:credit_options] = {}
+          if enabled
+            actions[:credit_options] = {
+                credit: {
+                  url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+                  enabled: enabled,
+                  messages: "You can directly credit this payment order from your Finly Money",
+                  require_password: true,
+                  initiating_account: admin,
+                  method: "patch"
+                }
+            }
+          end
+          # based on whether the configuration for payment file is enabled or not, add this block
+          actions[:credit_options][:mark_as_credited] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_mark_as_credited_path(bank_payment_request),
+              enabled: true,
+              messages: "You can mark this payment order as credited",
+              require_password: true,
+              method: "patch"
           }
+          #######################################################################################
           op = User::Team::Review::NextReviewer.(bank_payment_request)
           reviewer = op.user
           if reviewer.nil?
@@ -244,11 +289,11 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:summary_editable] = true
           actions[:payments_editable] = true
           actions[:attachments_editable] = true
-          actions[:credit] = true
+          actions[:credit] = !bank_payment_request.credit_card?
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
           admin = false
-          if balance >= bank_payment_request.requested_amount_value
+          if balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval
             enabled = true
           else
             # i.e if the user is an admin, even from the creditor view, they should be able to
@@ -263,16 +308,28 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           if user.vendor_payments_admin?
             admin = true
           end
-          actions[:credit_options] = {
-              credit: {
-                url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
-                enabled: enabled,
-                messages: "You can directly credit this payment order from your Finly Money",
-                require_password: true,
-                initiating_account: admin,
-                method: "patch"
-              }
+          actions[:credit_options] = {}
+          if enabled && !bank_payment_request.credit_card?
+            actions[:credit_options] = {
+                credit: {
+                  url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+                  enabled: enabled,
+                  messages: "You can directly credit this payment order from your Finly Money",
+                  require_password: true,
+                  initiating_account: admin,
+                  method: "patch"
+                }
+            }
+          end
+          # based on whether the configuration for payment file is enabled or not, add this block
+          actions[:credit_options][:mark_as_credited] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_mark_as_credited_path(bank_payment_request),
+              enabled: true,
+              messages: "You can mark this payment order as credited",
+              require_password: true,
+              method: "patch"
           }
+          #######################################################################################
           op = User::Team::Review::NextReviewer.(bank_payment_request)
           reviewer = op.user
           if reviewer.nil?
@@ -322,25 +379,37 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           balance = retrieve_balance(:vendor_payment_wallet, user)
           credit_enabled = false
           admin = false
-          if balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval
+          if (balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval) && !bank_payment_request.credit_card?
             credit_enabled = true
-          elsif user.vendor_payments_admin?
+          elsif user.vendor_payments_admin? && !bank_payment_request.credit_card?
             credit_enabled = true
           end
           if user.vendor_payments_admin?
             admin = true
           end
           actions[:credit] = credit_enabled
-          actions[:credit_options] = {
-              credit: {
-                url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
-                enabled: credit_enabled,
-                messages: "You can directly credit this payment order from your Finly Money",
-                require_password: true,
-                initiating_account: admin,
-                method: "patch"
-              }
+          actions[:credit_options] = {}
+          if credit_enabled && !bank_payment_request.credit_card?
+            actions[:credit_options] = {
+                credit: {
+                  url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+                  enabled: credit_enabled,
+                  messages: "You can directly credit this payment order from your Finly Money",
+                  require_password: true,
+                  initiating_account: admin,
+                  method: "patch"
+                }
+            }
+          end
+          # based on whether the configuration for payment file is enabled or not, add this block
+          actions[:credit_options][:mark_as_credited] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_mark_as_credited_path(bank_payment_request),
+              enabled: true,
+              messages: "You can mark this payment order as credited",
+              require_password: true,
+              method: "patch"
           }
+          #######################################################################################
         elsif bank_payment_request.processing? && bank_payment_request.owner_id == user.id
           actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
         elsif bank_payment_request.approved? && bank_payment_request.owner_id == user.id
@@ -348,25 +417,36 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           balance = retrieve_balance(:vendor_payment_wallet, user)
           credit_enabled = false
           admin = false
-          if balance >= bank_payment_request.requested_amount_value && !bank_payment_request.require_approval
+          if balance >= bank_payment_request.requested_amount_value
             credit_enabled = true
-          elsif user.vendor_payments_admin?
+          elsif user.vendor_payments_admin? && !bank_payment_request.credit_card?
             credit_enabled = true
           end
           if user.vendor_payments_admin?
             admin = true
           end
           actions[:credit] = credit_enabled
-          actions[:credit_options] = {
-              credit: {
-                  url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
-                  enabled: credit_enabled,
-                  messages: "You can directly credit this payment order from your Finly Money",
-                  require_password: true,
-                  initiating_account: admin,
-                  method: "patch"
-              }
+          unless bank_payment_request.credit_card?
+            actions[:credit_options] = {
+                credit: {
+                    url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_credit_path(bank_payment_request),
+                    enabled: credit_enabled,
+                    messages: "You can directly credit this payment order from your Finly Money",
+                    require_password: true,
+                    initiating_account: admin,
+                    method: "patch"
+                }
+            }
+          end
+          # based on whether the configuration for payment file is enabled or not, add this block
+          actions[:credit_options][:mark_as_credited] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_mark_as_credited_path(bank_payment_request),
+              enabled: true,
+              messages: "You can mark this payment order as credited",
+              require_password: true,
+              method: "patch"
           }
+          #######################################################################################
         elsif self.bank_payment_request.credited? && self.bank_payment_request.payment_order.initiating_user_id == user.id
           # further check if the payment order has anu failed payments
           if self.bank_payment_request.payment_order.partially_completed? || self.bank_payment_request.payment_order.failed?

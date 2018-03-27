@@ -5,7 +5,7 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
   end
 
   def name
-    ["Cash On Hand", "CashOnHand"]
+    ['Cash On Hand', 'CashOnHand']
   end
 
   def credit(payment, options)
@@ -47,7 +47,13 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
   def balance(options = {})
     balance = self.account.balance_value
     if options[:display_balance]
-      expenses_against_coh_total = self.account.user.expenses.unverified.spent_from_cash_on_hand.joins_amount.sum(:value)
+      expenses_against_coh_total = 0
+      self.account.user.expenses.unverified.spent_from_cash_on_hand.blocked_against_cash_on_hand.each do |expense|
+        unless expense.date == DateUtils.local_date && expense.amount.currency_id != Currency.id_for(:INR)
+          expenses_against_coh_total += expense.amount.send(:INR).to_f
+        end
+      end
+      # expenses_against_coh_total = self.account.user.expenses.unverified.spent_from_cash_on_hand.blocked_against_cash_on_hand.joins_amount.sum(:value)
       (balance - expenses_against_coh_total)
     else
       balance
@@ -67,7 +73,22 @@ class AccountManager::CashOnHand::CashOnHandAdapter < AccountManager::BaseAdapte
   end
 
   def debitable_accounts
-    [nil]
+    [YesBankCompanyAccount]
+  end
+
+  def accept_va_transaction?
+    true
+  end
+
+  def on_va_transaction(payment, options={})
+    user = self.account.user
+    payment_request = PaymentRequest.(user, self.account, YesBankCompanyAccount.name, :credit, :cash_on_hand_return)
+    payment_request.add_payment_item(PaymentRequest::PaymentItem.(user, account.user.company.yes_bank_company_account, payment.amount.value, note: payment.note))
+    op = AccountManager::Payments::PaymentProcessor.(user, payment_request: payment_request)
+    unless op.success?
+      return false
+    end
+    true
   end
 
 end

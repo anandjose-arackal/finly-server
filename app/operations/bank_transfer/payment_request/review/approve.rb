@@ -8,6 +8,7 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
 
   def init
     super
+    self.auto_approve = params[:auto_approve]
   end
 
   def validate
@@ -17,7 +18,7 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
     end
 
     unless bank_payment_request.can_approve? || params[:auto_approve]
-      add_message :error, "Payment Order cannot be submitted in this state"
+      add_message :error, "Payment Order cannot be approved in this state"
       return
     end
   end
@@ -30,15 +31,21 @@ class BankTransfer::PaymentRequest::Review::Approve < BankTransfer::PaymentReque
     current_user_role = User::Team::Review::UserRole.(user, self.bank_payment_request)
     if next_reviewer.nil?
       payment_status = BankPaymentRequestStatus.id_for(:approved)
-      self.auto_approve = true
     else
       payment_status = BankPaymentRequestStatus.id_for(:processing)
     end
+    action_for_user_id = bank_payment_request.controlling_for_user_id
+    action_for_user_role_id = bank_payment_request.controlling_for_user_role_id
     if bank_payment_request.update status_id: payment_status,
                                    controlling_user: next_reviewer,
-                                   controlling_user_role_id: next_reviewer_role_id
+                                   controlling_user_role_id: next_reviewer_role_id,
+                                   controlling_for_user_id: nil,
+                                   controlling_for_user_role_id: nil,
+                                   auto_approved: self.auto_approve
       bank_payment_request.bank_payment_request_trails.create action_user: user,
                                                               action_user_role_id: current_user_role,
+                                                              action_for_user_id: action_for_user_id,
+                                                              action_for_user_role_id: action_for_user_role_id,
                                                               action_id: BankPaymentRequestTrailAction.id_for(:approve),
                                                               modified_user_id: next_reviewer&.id,
                                                               modified_user_role_id: next_reviewer_role_id

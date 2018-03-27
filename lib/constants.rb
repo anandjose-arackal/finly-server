@@ -4,6 +4,7 @@ module Constants
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
   VALID_GENDER = /\A[MmFf]\z/i
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
+  VALID_IFSC = /[A-Za-z]{4}[a-zA-Z0-9]{7}/i
 
   OTP_RESEND_INTERVAL = 60
 
@@ -16,11 +17,11 @@ module Constants
     YESBANK_EMAIL_ID = ['sreeram.nr@finly.io']
   end
 
-  PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io']
-  # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io']
+  PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
+  # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
 
   # RESOURCE_DOWNLOAD_EMAIL_ID = ['sreeram.nr@finly.io']
-  RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io']
+  RESOURCE_DOWNLOAD_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'kartik.k@finly.io', 'venu.reddy@finly.io']
 
   SUPERADMIN_ACCOUNTS = ['sreeram.nr@finly.io', 'vivek.a@finly.io', 'veekshith.rai@finly.io', 'balakumar.rajaram@finly.io', 'admin@finlytest.io']
 
@@ -68,7 +69,7 @@ module Constants
   #########################
 
   if Rails.env.production?
-    TRANSCRIBER_EMAILS = %w(veekshith.rai@finly.io vivek.a@finly.io anushrut.khare@finly.io abhinandanyadavg@gmail.com)
+    TRANSCRIBER_EMAILS = %w(veekshith.rai@finly.io vivek.a@finly.io anushrut.khare@finly.io venky.d@finly.io kartik.k@finly.io)
   else
     TRANSCRIBER_EMAILS = ['sreeram.nr@finly.io']
   end
@@ -277,5 +278,8 @@ module Constants
     PROCESSING_TRANSACTION_STATUSES = ["SENT_TO_BENEFICIARY", "IN-PROCESS","IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
     FAILED_TRANSACTION_STATUSES = ["FAILED", "RETURNED_FROM_BENEFICIARY"]
     SUCCESSFUL_TRANSACTION_STATUSES = ["COMPLETED"]
+
+    YES_BANK_RECEIVING_IFSC = "YESB0000022"
+    YES_BANK_COLLECT_IFSC = 'YESB0CMSNOC'
   end
 end

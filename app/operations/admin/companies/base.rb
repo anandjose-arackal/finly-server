@@ -5,7 +5,7 @@ class Admin::Companies::Base < Admin::Base
   end
 
   def company_params
-    params.require(:company).permit(:name, itz_cash_property_attributes: [:d_code], configuration_attributes: [:logo, :registered_mobile_number],
+    params.require(:company).permit(:status_id, :name, itz_cash_property_attributes: [:d_code], configuration_attributes: [:logo, :registered_mobile_number],
                                     company_kyc_attributes: [:company_type_id, :customer_type_id],
                                     feature_subscription_attributes: [
                                       :ocr_enabled,
@@ -21,7 +21,8 @@ class Admin::Companies::Base < Admin::Base
                                       :hard_copy_receipt,
                                       :yes_bank_account,
                                       :bank_account_reimbursement,
-                                      :payroll_card_enabled
+                                      :payroll_card_enabled,
+                                      :invoicing_system
                                     ])
   end
 

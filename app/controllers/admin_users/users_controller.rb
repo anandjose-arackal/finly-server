@@ -33,6 +33,11 @@ class AdminUsers::UsersController < ApplicationController
     respond
   end
 
+  def count
+    @result = Admin::Users::Count.(current_user, params)
+    render json: @result.count.as_json
+  end
+
   # returns the respective menus that a particular user has access to
   def admin_menus
     @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/menu_data_admin.yml.erb", {current_company: current_company, current_user: current_user})
@@ -105,26 +110,27 @@ class AdminUsers::UsersController < ApplicationController
   def import
     import_op = Admin::Users::Import.new(current_user, params)
     @result = import_op.run
-    if @result.success?
-      @response = {
-          success: true,
-          file_url: @result.file_url,
-          messages: {
-              error: [],
-              failure: [],
-              success: [],
-              message: [],
-              notice: []
-          }
-      }
-      respond_to do |format|
-        format.json {
-          render json: @response.as_json
-        }
-      end
-    else
-      respond response: :failure, message: @result.messages[:error]
-    end
+    # if @result.success?
+    #   @response = {
+    #       success: true,
+    #       file_url: @result.file_url,
+    #       messages: {
+    #           error: [],
+    #           failure: [],
+    #           success: [],
+    #           message: [],
+    #           notice: []
+    #       }
+    #   }
+    #   respond_to do |format|
+    #     format.json {
+    #       render json: @response.as_json
+    #     }
+    #   end
+    # else
+    #   respond response: :failure, message: @result.messages[:error]
+    # end
+    respond
   end
 
   def update_panel

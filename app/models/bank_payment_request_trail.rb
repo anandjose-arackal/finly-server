@@ -12,6 +12,8 @@
 #  action_id               :integer
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
+#  action_for_user_id      :integer
+#  action_for_user_role_id :integer
 #
 
 class BankPaymentRequestTrail < ActiveRecord::Base
@@ -25,6 +27,7 @@ class BankPaymentRequestTrail < ActiveRecord::Base
   belongs_to :modified_user_role, class_name: "UserRole"
   belongs_to :action, class_name: "BankPaymentRequestTrailAction"
 
+  scope :without_id, -> (id) { where.not id: id }
   scope :manager_role, -> { where('modified_user_role_id = ?', "#{UserRole.id_for(:manager)}") }
   scope :finance_manager_role, -> { where('modified_user_role_id = ?', "#{UserRole.id_for(:finance_manager)}") }
   scope :involving_user, -> (user_id) { where('modified_user_id = ? OR action_user_id = ?', user_id, user_id) }

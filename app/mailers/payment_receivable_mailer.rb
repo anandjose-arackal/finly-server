@@ -1,0 +1,4 @@
+class PaymentReceivableMailer < ApplicationMailer
+
+
+end

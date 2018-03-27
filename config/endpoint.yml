@@ -37,11 +37,17 @@ default: &default
     path: 'api/customer/register'
   yes_bank:
     base: 'https://uatsky.yesbank.in:444'
+#    base: 'https://uatsky.yesbank.in'
     path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
-
+  finly_collect:
+    base: 'http://localhost:3002/'
+    path: 'receivables'
 
 staging:
   <<: *default
+  finly_collect:
+    base: 'https://collect-staging.finly.io'
+    path: 'receivables'
 
 development:
   <<: *default
@@ -124,4 +130,8 @@ production:
   yes_bank:
     base: "https://sky.yesbank.in:444"
     path: "app/live/fundsTransferByCustomerService2"
+  finly_collect:
+    base: 'https://collect.finly.io'
+    path: 'receivables'
+
 

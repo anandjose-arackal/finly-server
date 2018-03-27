@@ -54,7 +54,10 @@ class FinlyTransaction < ActiveRecord::Base
     end_date = end_date.end_of_day rescue end_date
     where('finly_transactions.date >= ? AND finly_transactions.date <= ?', start_date, end_date)
   end
+  scope :on_or_after_date, -> (date) { where('finly_transactions.date >= ?', date) }
+  scope :on_or_before_date, -> (date) { where('finly_transactions.date <= ?', date) }
   scope :before_date, -> (date) { where('finly_transactions.date < ?', date) }
+  scope :after_date, -> (date) { where('finly_transactions.date > ?', date) }
   scope :sum_amounts, -> { joins(:amount).sum(:value) }
   scope :success, -> { where status_id: TransactionStatus.id_for(:success) }
   scope :with_reference_id, -> (ref_id) { where transaction_reference_id: ref_id }
@@ -67,7 +70,8 @@ class FinlyTransaction < ActiveRecord::Base
   scope :joins_amounts, -> { joins :amount }
   scope :group_by_purpose, -> { group :payment_purpose_id }
   scope :purpose_wise_amount, -> { joins_amounts.group_by_purpose.sum('amounts.value') }
-  scope :sort_date_asc, -> { unscope(:order).order(date: :asc) }
+  scope :sort_date_asc, -> { unscope(:order).order(date: :asc, id: :desc) }
+  scope :sort_date_desc, -> { unscope(:order).order(date: :desc, id: :desc) }
   scope :limit_to_one, -> { limit 1 }
 
   before_create do

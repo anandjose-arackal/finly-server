@@ -8,7 +8,7 @@ class BaseHandler
   def initialize(user, params={})
     self.timeout = false
     self.user = user
-    self.params = (params or {})
+    self.params = (ActionController::Parameters.new(params) or {})
     clear_messages
   end
 
@@ -41,8 +41,11 @@ class BaseHandler
 
   end
 
+  def header_params
+
+  end
+
   def http_request_type
-    # :get, :post, :patch, :delete, :put
     :post
   end
 
@@ -106,6 +109,7 @@ class BaseHandler
     p = self.path
     query_param = self.query_params
     body_param = self.post_params
+    header_param = self.header_params
     return unless p.present? and not has_errors?
     begin
       puts "Posting Path : #{p}"
@@ -118,6 +122,11 @@ class BaseHandler
           # self.response = self.connection.post p, body_param
           self.response = self.connection.get do |req|
             req.url p
+            if header_param.present? and header_param.is_a?(Hash)
+              header_param.each do |k, v|
+                req[k] = v
+              end
+            end
             req.params = query_param if query_param.present?
           end
         when :post
@@ -125,6 +134,11 @@ class BaseHandler
           self.response = self.connection.post do |req|
             req.url p
             req.params = query_param if query_param.present?
+            if header_param.present? and header_param.is_a?(Hash)
+              header_param.each do |k, v|
+                req[k] = v
+              end
+            end
             req.body = body_param if body_param.present?
           end
         when :patch
@@ -133,6 +147,11 @@ class BaseHandler
             req.url p
             req.params = query_param if query_param.present?
             req.body = body_param if body_param.present?
+            if header_param.present? and header_param.is_a?(Hash)
+              header_param.each do |k, v|
+                req[k] = v
+              end
+            end
           end
         when :put
           # self.response = self.connection.post p, body_param
@@ -140,12 +159,22 @@ class BaseHandler
             req.url p
             req.params = query_param if query_param.present?
             req.body = body_param if body_param.present?
+            if header_param.present? and header_param.is_a?(Hash)
+              header_param.each do |k, v|
+                req[k] = v
+              end
+            end
           end
         when :delete
           # self.response = self.connection.post p, body_param
           self.response = self.connection.delete do |req|
             req.url p
             req.params = query_param if query_param.present?
+            if header_param.present? and header_param.is_a?(Hash)
+              header_param.each do |k, v|
+                req[k] = v
+              end
+            end
           end
         else
           add_message :error, 'Invalid Request Type'
@@ -275,14 +304,22 @@ class BaseHandler
   end
 
   def load_connection(url = base_url)
+    logger = Logger.new $stderr
+    logger.level = Logger::INFO
     self.connection = Faraday.new(:url => url) do |faraday|
       # builder.use Faraday::Request::UrlEncoded
-      faraday.request :url_encoded # form-encode POST params
-      faraday.response :logger # log requests to STDOUT
-      faraday.options[:timeout] = 60 # time out is 60 seconds
-      faraday.use FaradayMiddleware::FollowRedirects, limit: 5
-      faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
+      if load_custom_connection(faraday)
+        faraday.request :url_encoded # form-encode POST params
+        faraday.response :logger, logger # log requests to STDOUT
+        faraday.options[:timeout] = 60 # time out is 60 seconds
+        faraday.use FaradayMiddleware::FollowRedirects, limit: 5
+        faraday.adapter Faraday.default_adapter # make requests with Net::HTTP
+      end
     end
+  end
+
+  def load_custom_connection(faraday)
+    true
   end
 
   def clear_messages

@@ -76,6 +76,8 @@ class Report::Violation < Report::Base
       check_non_base_currency(expense)
       check_custom_fields(expense)
       check_distance_expense(expense)
+
+      check_cash_on_hand_blocked(expense)
       # i.e. if the expense does not have a possible currency computation skip rule checking because the amount isn't clear
       if expense.amount&.currency_id != base_currency_id && expense.date == DateUtils.local_date
         next
@@ -328,6 +330,12 @@ class Report::Violation < Report::Base
     distance_expense = expense.distance_expense
     unless distance_expense&.distance.present? and distance_expense&.distance&.value > 0
       self.warning_messages[expense.id]['expense_blocking'] << {type: 'distance_expense', message: 'Distance cannot be blank'}
+    end
+  end
+
+  def check_cash_on_hand_blocked(expense)
+    if expense.from_cash_on_hand && !expense.cash_on_hand_blocked
+      self.warning_messages[expense.id]['expense_blocking'] << {type: 'cash_on_hand', message: "You do not have enough cash on hand to mark this expense against it"}
     end
   end
 

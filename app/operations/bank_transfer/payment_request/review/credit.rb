@@ -39,7 +39,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     payment_order.payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
 
     # check if the payment order can be executed at this moment, otherwise schedule it for the next working day
-    unless TransferTimingUtils.within_timeframe?(payment_order.payment_mode)
+    unless TransferTimingUtils.within_timeframe?(payment_order&.payment_mode, payment_order&.scheduled_at)
       # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
       next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_order.payment_mode)
       payment_order.update(scheduled_at: next_date)
@@ -48,14 +48,14 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
 
   def process
-
     # now pass to the Create operation
     op = BankTransfer::YesBank::Create.(user, bank_payment_request: bank_payment_request)
     if op.success?
       # update the bank_payment_request to credited
-      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil)
+      bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil,
+                                  controlling_for_user_id: nil, controlling_for_user_role_id: nil)
       # create a trail to show that the BPR was credited
-      trail = bank_payment_request.bank_payment_request_trails.create action_user: user,
+      bank_payment_request.bank_payment_request_trails.create action_user: user,
                                                               action_user_role_id: self.view_role,
                                                               action_id: BankPaymentRequestTrailAction.id_for(:credit),
                                                               modified_user_id: nil,

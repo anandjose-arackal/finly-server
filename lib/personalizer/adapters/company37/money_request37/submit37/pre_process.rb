@@ -10,7 +10,7 @@ class Personalizer::Adapters::Company37::MoneyRequest37::Submit37::PreProcess < 
       return
     end
     # Block money request's from being submitted if expenses older than 7 days are not yet submitted
-    if self.op_instance.user.expenses.unreported.date_before(7.days.ago.beginning_of_day).exists?
+    if self.op_instance.user.expenses.admin_viewable.date_before(7.days.ago.beginning_of_day).exists?
       add_message :error, 'You will have to submit your expenses before you can request for money'
       return
     end

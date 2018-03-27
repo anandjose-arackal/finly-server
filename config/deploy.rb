@@ -1,16 +1,20 @@
 # config valid only for current version of Capistrano
-lock '3.9.1'
+lock '3.10.1'
+
+if [:itzcash_production, "itzcash_production"].include?(fetch(:stage))
+  load_secure_storage((fetch(:stage)&.to_s == "itzcash_production" ? :production : :development))
+end
 
 set :application, 'finly-server'
 
-set :repo_url, 'https://vivek_a17:pw2J6u8LwW3vPpyaHrkC@bitbucket.org/finlycore/finly-server.git'
+set :repo_url, 'ssh://git@altssh.bitbucket.org:443/finlycore/finly-server.git'
 
-set :branch, ENV['BRANCH'] || :master
+set :branch, ENV['BRANCH'] || :staging
 
 case fetch(:stage)
   when :itzcash_production
     branch = fetch :branch
-    unless ['staging', 'master'].include?(branch)
+    unless ['staging', :staging].include?(branch)
       raise 'This branch cannot be deploy to production. Please select the correct branch'
     end
     set :deploy_to, '/home/viveka/app'
@@ -18,24 +22,16 @@ case fetch(:stage)
   when :itzcash
     set :deploy_to, '/usr/local/app'
     set :rails_env, 'itzcash_uat'
-  when :staging, :development
-    set :deploy_to, '/home/centos/app'
-    set :rails_env, 'staging'
-  when :local_vm
-    set :deploy_to, '/home/vivek/app'
-    set :rails_env, 'local_vm'
-  when :development
-    set :deploy_to, '/home/centos/app'
-    set :rails_env, 'staging'
-  when :combined_development
+  when :staging, :development, :combined_development, :insights
     set :deploy_to, '/home/centos/app'
     set :rails_env, 'staging'
 end
 
-set :pty, true
+set :pty, false
 set :linked_files, %w{config/database.yml config/application.yml config/data/bypass_authorized_users.yml}
 set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
 set :keep_releases, 5
+
 # set :rails_env, "staging"
 # set :rails_env, 'production'
 # set :rvm_type, :user
@@ -51,7 +47,7 @@ set :rollbar_role, Proc.new { :app }
 set :puma_rackup, -> { File.join(current_path, 'config.ru') }
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"
 set :puma_pid, "#{shared_path}/tmp/pids/puma.pid"
-set :puma_bind, "unix://#{shared_path}/tmp/sockets/puma.sock"    #accept array for multi-bind
+set :puma_bind, "unix://#{shared_path}/tmp/sockets/puma.sock" #accept array for multi-bind
 set :puma_conf, "#{shared_path}/puma.rb"
 set :puma_access_log, "#{shared_path}/log/puma_error.log"
 set :puma_error_log, "#{shared_path}/log/puma_access.log"
@@ -63,21 +59,25 @@ set :puma_worker_timeout, nil
 set :puma_init_active_record, true
 set :puma_preload_app, false
 
-after 'deploy', 'runner:restart'
+# before 'disable_secure_storage', 'runner:restart'
+#
+# # Restart runner
+# namespace :runner do
+#   task :restart do
+#     on roles(:app) do
+#       within release_path do
+#         env = fetch(:rails_env)
+#         case env
+#           when :staging, 'production'
+#             execute('sh', 'msgqueue_restart.sh', fetch(:rails_env))
+# `ssh -t viveka@finly.io -p2212 ssh viveka@192.168.5.12 'sh app/current/msgqueue_restart.sh #{fetch(:rails_env)}'`
+#         end
+#         # execute("sh app/shared/msgqueue_restart.sh production")
+#       end
+#     end
+#   end
+# end
 
-# Restart runner
-namespace :runner do
-  task :restart do
-    on roles(:app) do
-      env = fetch(:rails_env)
-      case env
-        when :staging, 'production'
-          `ssh -t viveka@finly.io -p2212 ssh viveka@192.168.5.12 'sh app/current/msgqueue_restart.sh #{fetch(:rails_env)}'`
-      end
-      # execute("sh app/shared/msgqueue_restart.sh production")
-    end
-  end
-end
 
 #
 # Example: cap staging rake:invoke task=rebuild_table_abc

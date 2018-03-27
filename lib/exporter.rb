@@ -85,10 +85,11 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
   # Usage
   # Example: Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents, filename: 'assign_card'}, messages)
   class Exporter::Spreadsheet < Exporter::BaseSuccessPresenter
-    attr_accessor :headers, :contents
+    attr_accessor :headers, :contents, :template
 
     def init
       super
+      self.template = params[:template] || xls_template
       self.headers = params[:headers]
       self.contents = params[:contents]
     end
@@ -102,21 +103,21 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
 
     # Handle XLS START
     def render_xls(controller)
-      controller.render xls_template, locals: binding_params
+      controller.render template, locals: binding_params
     end
 
     def generate_xls
       view = ActionView::Base.new(ActionController::Base.view_paths)
       view.extend ApplicationHelper
-      view.render(file: "#{xls_template}.xls.erb", locals: binding_params)
+      view.render(file: "#{self.template}.xls.erb", locals: binding_params)
     end
 
     def xls_template
-      'export_template/template'
+      params[:template] || 'export_template/template'
     end
 
     def binding_params
-      {item_headers: self.headers, item_contents: self.contents}
+      {item_headers: self.headers, item_contents: self.contents, data: self.params[:data]}
     end
 
     # Handle XLS END

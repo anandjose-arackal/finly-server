@@ -9,12 +9,8 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     self.new.perform(payment_order_id, options)
   end
 
-  def self.call_async(payment_order_id, options = {})
-    # define the operation to accordingly run the operation in the background
-    self.perform_async(payment_order_id, options)
-  end
-
-  def perform(payment_order_id, options)
+  def perform(payment_order_id, options, request_store_hash=nil)
+    load_request_store request_store_hash
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
@@ -23,7 +19,7 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     self.run
   end
 
-  def perform_async(payment_order_id, options)
+  def self.perform_async(payment_order_id, options)
     # in case the object is passed directly instead of an id
     payment_order_id = payment_order_id
     if payment_order_id.present? && payment_order_id.is_a?(PaymentOrder)
@@ -72,7 +68,7 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
     end
     payments.each do |payment|
       op = AccountManager::Payments::PaymentExecutor.(payment, options)
-      if op.success? && ((payment.payment_status_id == PaymentStatus.id_for(:completed)) || (payment.payment_status_id == PaymentStatus.id_for(:processing)))
+      if op.success? && ([PaymentStatus.id_for(:completed), PaymentStatus.id_for(:processing), PaymentStatus.id_for(:possible_failure)].include?(payment.payment_status_id))
         processed_amount += payment.amount_value
         succeeded_transactions = true
       else
@@ -107,6 +103,10 @@ class AccountManager::Payments::PaymentOrderExecutor < AccountManager::Base
 
   def post_process
 
+  end
+
+  def execute_post_operations(success)
+    self.payment_order.execute_post_operation(success)
   end
 
 end

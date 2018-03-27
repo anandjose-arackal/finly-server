@@ -20,8 +20,15 @@ class VendorPaymentWallet < ActiveRecord::Base
   has_many :initiating_payments, as: :initiating_account
   has_many :receiving_payments, as: :receiving_account
   has_many :finly_transactions, as: :finly_account
+  has_many :virtual_bank_accounts, as: :receiving_account
 
   accepts_nested_attributes_for :balance
+
+  scope :joins_balance, -> { joins :balance }
+
+  scope :having_balance_value, -> { joins_balance.where('value > 0') }
+  scope :with_user, ->(id) { where user_id: id }
+  scope :sum_balance, -> { joins_balance.sum('amounts.value') }
 
   delegate :balance_value, to: :balance
 
@@ -60,6 +67,15 @@ class VendorPaymentWallet < ActiveRecord::Base
     payment_ids = PaymentOrder.find_by(id: excluded_payment_order_id)&.payments&.pluck(:id)
     Payment.scheduled.with_initiating_account_type("VendorPaymentWallet").with_initiating_account_id(initiating_account.id).without_id(payment_ids).joins(:amount).sum(:value)
     # PaymentOrder.with_company_id(initiating_user.company_id).with_initiating_account_type("VendorPaymentWallet").with_initiating_user_id(initiating_user.id).scheduled.joins(:amount_requested).sum(:value)
+  end
+
+  def va_config
+    {
+        enabled: true,
+        purpose_id: VirtualAccountPurpose.id_for(:finly_money_reload),
+        company: user.company,
+        application: :em
+    }
   end
 
 end

@@ -20,6 +20,7 @@
 
 
 
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -97,6 +98,13 @@ class Policy < ActiveRecord::Base
 
   def per_diem_expense_enabled?
     self.per_diem_expense_config.enabled
+  end
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
   end
 
   private

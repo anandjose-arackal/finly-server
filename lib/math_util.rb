@@ -1,7 +1,7 @@
 module MathUtil
-  def precision_value(float_n)
+  def precision_value(float_n, digits = 2)
     # todo - add condition to check the number of digits before the decimal and round accordingly
-    float_n.to_d.round(2) rescue 0
+    float_n.to_d.round(digits) rescue 0
   end
 
   def set_precision(precision, scale)

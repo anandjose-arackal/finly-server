@@ -20,7 +20,7 @@ class KycDocument < ActiveRecord::Base
   belongs_to :company_kyc_document_type
   belongs_to :company_kyc
 
-  has_many :system_messages
+  has_many :system_messages, as: :messagable, dependent: :destroy
 
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png image/gif application/pdf application/rtf)}
 

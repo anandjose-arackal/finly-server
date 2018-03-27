@@ -1,5 +1,6 @@
 class BankTransfer::BankPaymentRequestsController < ApplicationController
 
+  before_action :set_tokens_in_header, only: [:download_pending_attachment, :download_selected_attachment, :download_all_attachment]
   before_action {finly_authorize! :web}
 
   def show
@@ -68,6 +69,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def mark_as_credited
+    @result = BankTransfer::PaymentRequest::Review::MarkAsCredited.(current_user, params)
+    respond
+  end
+
   def count
     @result = BankTransfer::PaymentRequest::Count.(current_user, params)
     render json: @result.as_json
@@ -94,7 +100,76 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
   end
 
   def update_payment
-    @result = BankTransfer::PaymentRequest::Update::UpdatePayment.(current_user, params)
+    @result = BankTransfer::PaymentRequest::Payment::Update.(current_user, params)
+    respond
+  end
+
+  def payment_file
+    @result = BankTransfer::PaymentRequest::GeneratePaymentFile.(current_user, params)
+    respond
+  end
+
+  def bulk_approve_validate
+    @result = BankTransfer::PaymentRequest::Review::BulkApproveValidate.(current_user, params)
+    respond
+  end
+
+  def bulk_approve
+    @result = BankTransfer::PaymentRequest::Review::BulkApprove.(current_user, params)
+    respond
+  end
+
+  def mark_all_pending
+    @result = BankTransfer::PaymentRequest::Review::ApproveAllPending.(current_user, params)
+    respond
+  end
+
+  def download_pending
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadPending.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def download_pending_attachment
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadPendingAttachment.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def download_selected
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadSelected.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def download_selected_attachment
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadSelectedAttachment.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def download_all
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadAll.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def download_all_attachment
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadAllAttachment.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def filters
+    custom_field_op = CustomField::Configuration::Index.(current_user, {filter_field_type_id: [FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)], filter_parent_type_id: [FieldParentType.id_for(:invoice)]})
+    @field_configurations = custom_field_op.field_configurations
+    @policies = current_company.vendor_payment_policies
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
+  def bulk_credit_validate
+    @result = BankTransfer::PaymentRequest::Review::BulkCreditValidate.(current_user, params)
+    respond
+  end
+
+  def bulk_credit
+    @result = BankTransfer::PaymentRequest::Review::BulkCredit.(current_user, params)
     respond
   end
 

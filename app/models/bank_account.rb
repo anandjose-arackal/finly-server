@@ -32,7 +32,7 @@ class BankAccount < ActiveRecord::Base
   has_many :finly_transactions, as: :finly_account
 
   validates :account_number, presence: true
-  validates :ifsc, presence: true
+  validates :ifsc, presence: true, format: Constants::VALID_IFSC
   validates :name, presence: true
 
   accepts_nested_attributes_for :account_owner
@@ -93,6 +93,23 @@ class BankAccount < ActiveRecord::Base
   }
 
   after_create do
-    self.update(company_id: self.account_owner.company_id)
+    if self.account_owner.is_a?(Company)
+      self.update(company_id: self.account_owner_id)
+    else
+      self.update(company_id: self.account_owner.company_id)
+    end
   end
+
+  def as_json(options={})
+    {
+        id: id,
+        account_number: account_number,
+        ifsc: ifsc,
+        name: name,
+        account_owner_type: account_owner_type,
+        account_owner: account_owner,
+        default_account: default_account
+    }
+  end
+
 end

@@ -5,7 +5,7 @@
 
 class PaymentRequest < NonPersistentModel
 
-  AVAILABLE_ACCOUNT_TYPES = [nil, ItzCashCompanyAccount.name, YesBankCompanyAccount.name, UserWallet.name, CashOnHand.name, Card.name, BankAccount.name, VendorPaymentWallet.name]
+  AVAILABLE_ACCOUNT_TYPES = [nil, ItzCashCompanyAccount.name, YesBankCompanyAccount.name, UserWallet.name, CashOnHand.name, Card.name, BankAccount.name, VendorPaymentWallet.name, VirtualBankAccount.name]
 
   attr_accessor :company_id, :scheduled_at, :background, :payment_purpose_id,
                 :payment_items,
@@ -16,7 +16,9 @@ class PaymentRequest < NonPersistentModel
                 :payment_items,
                 :payment_type_id,
                 :currency_id,
-                :bank_transfer_type
+                :bank_transfer_type,
+                :payment_order,
+                :post_operation_actions
 
   belongs_to :company
   belongs_to :initiating_resource, polymorphic: true
@@ -26,7 +28,7 @@ class PaymentRequest < NonPersistentModel
 
   validate :company_id_presence
   validates :initiating_resource, presence: true
-  validates :initiating_resource_type, inclusion: {in: [User.name, AdminUser.name]}
+  validates :initiating_resource_type, inclusion: {in: [User.name, AdminUser.name, nil]}
   validates :payment_purpose_id, presence: true
   validates :initiating_account_type, inclusion: {in: AVAILABLE_ACCOUNT_TYPES}
   validates :receiving_account_type, inclusion: {in: AVAILABLE_ACCOUNT_TYPES}
@@ -57,6 +59,12 @@ class PaymentRequest < NonPersistentModel
     self.payment_order_status_id ||= retrieve_payment_order_status
     self.payment_items ||= []
     self.background ||= false
+    self.post_operation_actions = []
+  end
+
+  def add_post_operation_action(operation, payload)
+    self.post_operation_actions = [] if self.post_operation_actions.nil?
+    self.post_operation_actions << {operation: operation, payload: payload}
   end
 
   def retrieve_payment_order_status
@@ -82,6 +90,9 @@ class PaymentRequest < NonPersistentModel
     end
     if payment_item.class.name == 'PaymentRequest::PaymentItem'
       payment_item.payment_request = self
+      if payment_order.present?
+        payment_item.build_payment(payment_order)
+      end
       self.payment_items << payment_item
     else
       return false
@@ -113,15 +124,57 @@ class PaymentRequest < NonPersistentModel
     end
   end
 
+  def build_payment_order
+    unless self.payment_order.present?
+      cc = current_company || Company.find_by(id: self.company_id)
+      self.payment_order = cc.payment_orders.build payment_order_params
+    end
+    self.payment_order
+    self.payment_items.each do |item|
+      item.build_payment(self.payment_order)
+    end
+    self.payment_order.post_operation_actions&.destroy_all
+    post_operation_actions&.each do |action_params|
+      action_params[:post_operatable] = self.payment_order
+      self.payment_order.post_operation_actions.build action_params
+    end
+    self.payment_order
+  end
+
+  def current_company
+    (RequestStore.store[:current_company] || initiating_resource&.company) rescue nil
+  end
+
+  def payment_order_params
+    {
+        payment_purpose_id: payment_purpose_id,
+        payment_order_status_id: retrieve_payment_order_status,
+        initiating_user_id: initiating_resource_id,
+        company_id: self.company_id,
+        scheduled_at: scheduled_at,
+        initiating_account_type: initiating_account_type,
+        receiving_account_type: receiving_account_type,
+        currency_id: currency_id,
+        application: RequestStore.store[:current_app],
+        payment_mode: bank_transfer_type,
+        amount_requested_attributes: {
+            value: request_total,
+            currency_id: currency_id
+        }
+    }
+  end
+
   class PaymentRequest::PaymentItem < NonPersistentModel
     attr_accessor :receiving_resource_id, :receiving_resource_type,
                   :receiving_account_id, :receiving_account_type,
                   :amount,
                   :payment_request,
                   :reference_resource,
-                  :note
+                  :note,
+                  :post_operation_actions,
+                  :payment
 
-    delegate :initiating_resource,:initiating_resource_id,:initiating_resource_type,
+    delegate :initiating_resource, :initiating_resource_id, :initiating_resource_type,
              :initiating_account, :initiating_account_id, :initiating_account_type, :scheduled_at,
              :payment_type_id, :currency_id, :payment_purpose_id, to: :payment_request, allow_nil: true
 
@@ -146,6 +199,15 @@ class PaymentRequest < NonPersistentModel
                })
     end
 
+    def post_initialize(attributes={})
+      self.post_operation_actions = []
+    end
+
+    def add_post_operation_action(operation, payload)
+      self.post_operation_actions = [] if self.post_operation_actions.nil?
+      self.post_operation_actions << {operation: operation, payload: payload}
+    end
+
     def payment_status_id
       PaymentStatus.id_for(:pending)
     end
@@ -168,6 +230,44 @@ class PaymentRequest < NonPersistentModel
     def date
       (self.payment_request&.scheduled_at or Date.today)
     end
+
+    def build_payment(payment_order)
+      unless self.payment.present?
+        self.payment = payment_order.payments.build payment_params
+      end
+      self.payment.post_operation_actions&.destroy_all
+      post_operation_actions&.each do |action_params|
+        action_params[:self.payment] = self.payment_order
+        self.payment.post_operation_actions.build action_params
+      end
+      self.payment
+    end
+
+    def payment_params
+      {
+          payment_type_id: payment_type_id,
+          application: RequestStore.store[:current_app],
+          receiving_user_id: receiving_resource_id,
+          receiving_user_type: receiving_resource_type,
+          initiating_user_id: initiating_resource_id,
+          initiating_user_type: initiating_resource_type,
+          initiating_account_id: initiating_account_id,
+          initiating_account_type: initiating_account_type,
+          receiving_account_type: receiving_account_type,
+          receiving_account_id: receiving_account_id,
+          payment_status_id: payment_status_id,
+          payment_purpose_id: payment_purpose_id,
+          payment_mode: payment_request.bank_transfer_type,
+          amount_attributes: {
+              value: amount,
+              currency_id: currency_id
+          },
+          date: date,
+          reference_resource: reference_resource,
+          note: note
+      }
+    end
+
 
   end
 

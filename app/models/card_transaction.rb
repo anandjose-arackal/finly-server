@@ -47,7 +47,7 @@ class CardTransaction < ActiveRecord::Base
   has_one :payment, as: :reference_resource
 
   # i.e. a combination of reference ID, type of details and transaction type should be unique
-  validates_uniqueness_of :reference_id, scope: [:transaction_type, :type_of_details], if: lambda { |t| t.success }
+  validates_uniqueness_of :reference_id, scope: [:transaction_type, :type_of_details], if: lambda { |t| t.success }, conditions: -> { where.not(is_deleted: true) }
 
   belongs_to :cancelled_against_expense, class_name: 'CardExpense'
   belongs_to :transaction_amount, class_name: 'Amount', dependent: :destroy
@@ -145,6 +145,10 @@ class CardTransaction < ActiveRecord::Base
 
   def expense?
     debit? and (transaction_mode == 'POS' or transaction_mode == 'ECOM')
+  end
+
+  def atm_usage_fees?
+    self.merchant_name.contains?('ATM USAGE FEES')
   end
 
   def refund?

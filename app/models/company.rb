@@ -8,12 +8,15 @@
 #  updated_at       :datetime         not null
 #  active           :boolean          default(TRUE), not null
 #  base_currency_id :integer          default(1)
+#  status_id        :integer          default(1), not null
 #
 
 class Company < ActiveRecord::Base
   include Constants
 
   belongs_to :base_currency, class_name: 'Currency'
+  belongs_to :status, class_name: 'CompanyStatus'
+
   has_many :users
   has_many :cards
   has_many :contacts, as: :contactable
@@ -33,9 +36,16 @@ class Company < ActiveRecord::Base
   has_many :all_field_configurations, class_name: 'FieldConfiguration'
   has_many :field_configurations, as: :configurable
   has_many :bank_transactions
+  has_many :inventory_line_items
+  has_many :payment_terms
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
+  has_one :payment_file_configuration
+  has_one :invoice_number_config
+
+  has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
+  has_one :collect_company_detail
 
   has_many :payment_orders
   has_many :user_groups
@@ -49,6 +59,12 @@ class Company < ActiveRecord::Base
   has_many :yes_bank_vendors
   has_many :bank_accounts
   has_many :quickbooks_departments
+  has_many :report_processor_groups
+  has_many :money_request_processors
+  has_many :payment_receivables
+  has_many :virtual_bank_accounts
+  has_many :customers
+  has_many :outward_invoices
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -80,9 +96,16 @@ class Company < ActiveRecord::Base
   }
   scope :ocr_enabled, -> { joins(:feature_subscription).select(' companies.*').where('ocr_enabled IS true') }
 
+  scope :filter_status_id, -> (status_id) { where status_id: status_id }
+
   scope :filter_search, -> (term) {
     where('name LIKE (?)', "%#{term}%")
   }
+
+  # scope :filter_active, -> (val) { where(active: true, partial_block: false, hidden: false) if val }
+  # scope :filter_deactivate, -> (val) { where(active: false) if val }
+  # scope :filter_partial_block, -> (val) { where(active: true, partial_block: true) if val }
+  # scope :filter_hidden, -> (val) { where(active: true, partial_block: true) if val }
 
   scope :created_between, -> (date_from, date_to) {
     unless date_from.blank? && date_to.blank?
@@ -121,6 +144,12 @@ class Company < ActiveRecord::Base
   scope :auto_sync_reports_enabled, -> {
     joins(:auto_sync_configs).select('companies.*').where(reports_sync: true)
   }
+
+  def vendor_payment_policies
+    ids = self.policies.with_application("vp").pluck(:id)
+    ids << self.default_policy.id
+    Policy.where(id: ids)
+  end
 
   def default_policy
     self.policies.default&.first
@@ -242,8 +271,13 @@ class Company < ActiveRecord::Base
     self.feature_subscription.yes_bank_account
   end
 
-  def yes_bank_api_enabled?
-    self.feature_subscription.yes_bank_api_enabled
+  def current_account_connected?
+    self.feature_subscription.current_account_connected
+  end
+
+
+  def invoicing_system_enabled?
+    self.feature_subscription.invoicing_system
   end
 
   def more_than_one_subscription?
@@ -313,7 +347,7 @@ class Company < ActiveRecord::Base
     self.policies.build(default: true, name: 'Company (Default)').save unless self.policies.default.present?
     ExportPreference.build_default_preferences(self)
     Constants::DEFAULT_CATEGORIES.each do |category|
-      self.categories.create(name: category)
+      self.categories.create(name: category, purpose_id: Purpose.id_for(:expense_management))
     end
 
     self.build_configuration.save if self.configuration.blank?
@@ -331,6 +365,12 @@ class Company < ActiveRecord::Base
     self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
     self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+
+    # creating the invoice numbering configuration for all companies with default values
+    self.build_invoice_number_config(sequence_start: "0000").save
+    self.build_collect_company_detail.save
+    # seeding the default payment terms for this company
+    PaymentTerm.seed_defaults(self.id)
   end
 
 end

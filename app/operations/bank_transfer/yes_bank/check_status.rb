@@ -13,7 +13,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     self.bank_transaction = bank_transaction
     self.company = bank_transaction.company
     self.payment = bank_transaction.payment
-    self.payment_order = payment&.payment_order
+    self.payment_order = self.payment&.payment_order
   end
 
   def authorized_user_types
@@ -32,7 +32,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def validate
     # confirm that the bank transaction is, in fact in processing state
-    unless bank_transaction.processing?
+    unless bank_transaction.processing? || bank_transaction.possible_failure?
       add_message :error, "This transaction is not in processing state"
       return
     end
@@ -40,35 +40,41 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def process
     params = {
-        request_reference_number: bank_transaction.unique_request_number
+        request_reference_number: bank_transaction.unique_request_number,
+        company_id: bank_transaction.company_id
     }
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?
       if Constants::YesBank::SUCCESSFUL_TRANSACTION_STATUSES.include?(op.request_status.upcase)
       # if true
+        bank_reference_number = op.bank_reference_number
+        bank_transaction.update(bank_reference_number: bank_reference_number) if bank_transaction.bank_reference_number.blank?
         handle_successful_transaction
       elsif Constants::YesBank::PROCESSING_TRANSACTION_STATUSES.include?(op.request_status.upcase)
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:processing))
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:processing))
+        # destroying previous messages first, before adding the processing message
+        self.payment.system_messages.destroy_all
+        self.payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:info),
+                                      content: "Payment processed. Awaiting credit confirmation").save
       elsif Constants::YesBank::FAILED_TRANSACTION_STATUSES.include?(op.request_status.upcase)
       # elsif true
         bank_transaction.payment.update(payment_status_id: PaymentStatus.id_for(:failed))
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
         # destroying previous messages first, before adding the failure message
-        payment.system_messages.destroy_all
+        self.payment.system_messages.destroy_all
         # adding message regarding payment refund
-        payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
+        self.payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "The amount will be refunded to your account shortly").save
         # creating a refund payment for this amount
         create_refund_payment
         # nulling reimbursements that might have happened through this
         nullify_reimbursed_reports
       else
-        # do nothing?
+        # do nothing for now, will get back to this later
       end
     end
-
   end
 
   def post_process
@@ -90,7 +96,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     end
 
     # trigger event for sending mailer to the receiver of the payment
-    if payment.completed?
+    if self.payment.completed?
       op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment)
     end
   end
@@ -99,8 +105,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def create_refund_payment
     admin_user = AdminUser.find_by(email: 'vivek.a@finly.io')
-    self.payment_request = ::PaymentRequest.(admin_user, nil, company.yes_bank_company_account.class.name, :credit, :corporate_balance_refund, company_id: self.company.id)
-    self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(nil, company.yes_bank_company_account, self.bank_transaction.amount_value))
+    original_debit_account = self.payment.initiating_account
+    self.payment_request = ::PaymentRequest.(admin_user, nil, original_debit_account.class.name, :credit, :corporate_balance_refund, company_id: self.company.id)
+    self.payment_request.add_payment_item(::PaymentRequest::PaymentItem.(nil, original_debit_account, self.bank_transaction.amount_value))
 
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     if op.success?
@@ -113,15 +120,17 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   end
 
   def handle_successful_transaction
-    if payment&.cash_on_hand_credit?
+    if self.payment&.cash_on_hand_credit?
       init_payment_request
       # now execute the payment that adds to the user's cash on hand
-      AccountManager::Payments::PaymentProcessor.(self.payment.initiating_user, {payment_request: self.payment_request})
+      op = AccountManager::Payments::PaymentProcessor.(self.payment.initiating_user, {payment_request: self.payment_request})
+      payment = op.payments.first
+      payment.update(application: "em") # because this should show up in the settlement history of this particular user
     end
     # now mark the respective bank transaction and payment as completed
     bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:completed))
     self.payment.update(payment_status_id: PaymentStatus.id_for(:completed))
-    if self.payment.note.blank? || payment.note == 'Reimbursement processed. Awaiting credit confirmation'
+    if self.payment.note.blank? || self.payment.note == 'Reimbursement processed. Awaiting credit confirmation'
       self.payment.update(note: "Payment credit confirmed")
     end
     self.payment.system_messages.destroy_all # deleting the previous system messages
@@ -137,7 +146,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
   def nullify_reimbursed_reports
     # setting their status as approved, and disassociating the reimbursement payment with these reports
-    reports = payment.reimbursed_reports
+    reports = self.payment.reimbursed_reports
     reports.each do |report|
       report.update(report_status_id: ReportStatus.id_for(:approved), reimbursement_id: nil)
     end

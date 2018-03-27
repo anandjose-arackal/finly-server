@@ -10,6 +10,10 @@ class BankTransfer::PaymentRequest::Destroy < BankTransfer::PaymentRequest::Base
   end
 
   def validate
+    if bank_payment_request.blank?
+      add_message :error, "Payment order not found"
+      return
+    end
     unless bank_payment_request.owner_id == user.id
       add_message :error, "Only owners can destroy payment orders"
       return

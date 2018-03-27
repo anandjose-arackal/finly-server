@@ -49,8 +49,10 @@ class MoneyRequest::Approve < MoneyRequest::Base
     manager = presenter.user
     to_user_role_id = presenter.role_id
     status = MoneyRequestStatus.id_for(:processing)
+    approved_at = nil
     if auto_approve or manager.blank?
       status = MoneyRequestStatus.id_for(:approved)
+      approved_at = DateTime.now
     end
     manager_id = manager.id rescue nil
     curr_user_role = User::Team::Review::UserRole.(user, self.money_request)
@@ -61,6 +63,7 @@ class MoneyRequest::Approve < MoneyRequest::Base
     update_attributes[:controlling_user_role_id] = to_user_role_id
     update_attributes[:controlling_for_user_role_id] = nil
     update_attributes[:submitted_at] = DateTime.now if auto_approve
+    update_attributes[:approved_at] = approved_at
     update_attributes[:auto_approve] = self.auto_approve
     if money_request.update_attributes update_attributes
       if auto_approve

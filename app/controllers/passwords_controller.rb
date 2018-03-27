@@ -34,13 +34,11 @@ class PasswordsController < Devise::PasswordsController
     self.resource = resource_class.reset_password_by_token(resource_params)
     yield resource if block_given?
 
-    resource.update(verified: true, default_password: false)
-
     respond_to do |format|
       format.json {
         if resource.errors.empty?
           # set the default password flag to be false
-          resource.update(default_password: false)
+          resource.update(verified: true, default_password: false)
           respond response: :success, message: "Password reset successfully"
         else
           respond response: :failure, message: resource.errors.full_messages.to_sentence

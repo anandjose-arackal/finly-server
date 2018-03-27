@@ -26,7 +26,7 @@ class AccountManager::ItzCashAccount::ItzCashCompanyAccountAdapter < AccountMana
       blocked_amount = account.blocked_amount_for_pending_payments
       return (balance - wallets_total - blocked_amount)
     else
-      self.errors << "Could not fetch company credits. Try again later"
+      self.errors << 'Could not fetch company credits. Try again later'
       return false
     end
   end

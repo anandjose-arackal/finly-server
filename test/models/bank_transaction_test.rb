@@ -15,6 +15,7 @@
 #  updated_at                  :datetime         not null
 #  bank_response               :string(255)
 #  refunded                    :boolean
+#  error_sub_code              :string(255)
 #
 
 require 'test_helper'

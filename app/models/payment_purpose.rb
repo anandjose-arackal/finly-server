@@ -33,9 +33,23 @@ class PaymentPurpose < ActiveRecord::Base
         :reissue_transfer,
         :cash_advance,
         :balance_clearance_against_cash_on_hand,
+        :settlement_against_cash_on_hand,
         :advance_against_report_unapproval,
-        :settlement_against_cash_on_hand
+        :cash_on_hand_reversal,
+        :virtual_account_credit,
+        :payment_link_credit,
+        :invoice_credit,
+        :cash_on_hand_return,
+        :payment_receivable,
+        :invoice,
+        :virtual_bank_account,
+        :finly_money_reload,
+        :corporate_account_reload,
+        :blocked_for_conflict_resolution,
+        :unblocked_after_conflict_resolution,
+        :failed_transaction_reversal,
+        :opening_balance_load,
+        :collect_funds_withdrawal
     ]
   end
-
 end

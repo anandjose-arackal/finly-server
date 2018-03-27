@@ -70,6 +70,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
           auto_approve: true,
           title: "This payment order will be auto approved as there is no reviewer assigned"
       }
+      return
     end
 
     # now extract all the users from the track
@@ -77,7 +78,7 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
     trails.each do |trail|
       self.approvers << {
           action_id: trail.action_id,
-          controlling_user: (trail.action_user_id == bank_payment_request.controlling_user_id),
+          controlling_user: false,
           action_user: {
               name: trail.action_user.name,
               email: trail.action_user.email,
@@ -109,21 +110,19 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
           }
       }
     end
-    self.reviewer = bank_payment_request.controlling_user
-    self.reviewer_role = bank_payment_request.controlling_user_role_id
+    self.reviewer = bank_payment_request.controlling_for_user || bank_payment_request.controlling_user
+    self.reviewer_role = bank_payment_request.controlling_for_user_role_id
 
     # now extracting all pending approvers (assuming there's not take control action here)
     op = User::Team::Review::NextReviewer.(bank_payment_request, controlling_user: self.reviewer, controlling_user_role_id: self.reviewer_role)
-    if op.failure? # i.e. there are no more reviewers for this baby
-      return
-    end
-    self.reviewer = op.user
-    self.reviewer_role = op.role_id
 
-    reviewer_ids = []
-    while self.reviewer.present? && !reviewer_ids.include?(self.reviewer&.id)
+    self.reviewer = op.user
+    self.reviewer_role = op.success? ? op.role_id : nil
+
+    reviewer_ids = {}
+    while self.reviewer.present? && (reviewer_ids[self.reviewer_role].blank? or !reviewer_ids[self.reviewer_role].include?(self.reviewer&.id))
       self.approvers << {
-          controlling_user: (self.reviewer.id == bank_payment_request.controlling_user_id),
+          controlling_user: (self.reviewer.id == bank_payment_request.controlling_user_id and self.reviewer_role == bank_payment_request.controlling_user_role_id),
           rejected: false,
           action_user: {
               name: self.reviewer.name,
@@ -138,8 +137,11 @@ class BankTransfer::PaymentRequest::Approvers < BankTransfer::PaymentRequest::Ba
           timestamp: (bank_payment_request.verified? ? bank_payment_request.approved_at : nil)
       }
 
+      if reviewer_ids[self.reviewer_role].nil?
+        reviewer_ids[self.reviewer_role]= []
+      end
       # adding this reviewer to the list of previous reviewers
-      reviewer_ids << self.reviewer&.id
+      reviewer_ids[self.reviewer_role] << self.reviewer&.id
       op = User::Team::Review::NextReviewer.(bank_payment_request, controlling_user: self.reviewer, controlling_user_role_id: self.reviewer_role)
       self.reviewer = op.user
       self.reviewer_role = op.role_id

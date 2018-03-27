@@ -45,6 +45,11 @@ class ExpenseTypesConfigurationController < ApplicationController
     render json: @views.as_json
   end
 
+  def menu_data_collect
+    @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/menu_data_collect.yml.erb", {current_company: current_company, current_user: current_user})
+    render json: @views.as_json
+  end
+
   def groups_teams
     @result = UserGroup::Index.(current_user, params)
     if @result&.success?
@@ -60,7 +65,7 @@ class ExpenseTypesConfigurationController < ApplicationController
       @groups = @result.user_groups
       @teams = UserTeam::Index.(current_user, params)&.user_teams
     end
-    field_configuration_result = CustomField::Configuration::Index.(current_user, filter_field_type_id: FieldType.id_for(:drop_down))
+    field_configuration_result = CustomField::Configuration::Index.(current_user, {filter_field_type_id: [FieldType.id_for(:drop_down)], filter_parent_type_id: FieldParentType.id_for(:expense)})
     if field_configuration_result.success?
       @field_configurations = field_configuration_result.field_configurations
     end

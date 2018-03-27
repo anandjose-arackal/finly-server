@@ -78,7 +78,7 @@
         </table>
       </div>
 
-      <% if @result.violations_present %>
+      <% if @result.success? && @result.violations_present %>
           <div class="col-sm-12">
             <h1 style="font-size: 15px; text-align: left;"><label>Report Violations.</label></h1>
             <div class="col-sm-12">
@@ -194,7 +194,7 @@
                 </div>
 
                 <div class="col-sm-10" style="margin-left: 5%; width: 85%; font-size: 13px;">
-                  <%=comment.generate(@current_user)%>
+                  <%=comment.generate(@curr_user)%>
                 </div>
               </div>
 

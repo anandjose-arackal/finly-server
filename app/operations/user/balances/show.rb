@@ -34,7 +34,7 @@ class User::Balances::Show < User::Base
           set_card_balances
         end
         # adding vendor payment balances in this section if it is enabled for that selected_user
-        if (selected_user.company.yes_bank_api_enabled? && selected_user.vendor_payments_enabled?) || selected_user.company.bank_reimbursement_enabled?
+        if (selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?) || selected_user.company.bank_reimbursement_enabled?
           set_yes_bank_balances
         end
         # showing cash on hand balances based on whether they have expense management enabled
@@ -42,7 +42,7 @@ class User::Balances::Show < User::Base
           set_cash_on_hand_balances
         end
       when 'vp'
-        if selected_user.company.yes_bank_api_enabled? && selected_user.vendor_payments_enabled?
+        if selected_user.company.vendor_payments_enabled? && selected_user.vendor_payments_enabled?
           set_yes_bank_balances
         end
       when 'ft'
@@ -52,6 +52,10 @@ class User::Balances::Show < User::Base
         end
         if selected_user.cards.present?
           set_card_balances
+        end
+      when 'fc'
+        if selected_user.company.invoicing_system_enabled? && selected_user.invoicing_system_enabled?
+          set_collect_balances
         end
       else
         # do nothing?
@@ -114,21 +118,25 @@ class User::Balances::Show < User::Base
     bank_wallet_adapter = retrieve_adapter user.bank_wallet
     cash_on_hand_adapter = retrieve_adapter user.cash_on_hand
 
+    self.card_info = {}
     selected_user.cards.each do |card|
       card_adapter = retrieve_adapter(card)
-      self.card_info = {
-         card.id => {
+      self.card_info[card.id] =
+         {
              balance: card_adapter.balance,
              eligibility: card_adapter.credit_eligibility
          }
-      }
+    end
+    comp_balance = itz_cash_company_adapter.balance
+    unless comp_balance
+      comp_balance = "Temporarily unavailable"
     end
     self.company_credits_info = {
         yes_bank: {
             balance: yes_bank_company_adapter.balance
         },
         itz_cash: {
-            balance: itz_cash_company_adapter.balance
+            balance: comp_balance
         }
     }
     self.wallet_info = {
@@ -179,6 +187,17 @@ class User::Balances::Show < User::Base
         type: "bank",
         balance: self.wallet_info[:yes_bank][:balance]
     }
+  end
+
+  def set_collect_balances
+    # if selected_user.collect_admin?
+      self.balances[:company_credits] = [] if self.balances[:company_credits].blank?
+      self.balances[:company_credits] << {
+          name: "Finly Collect Credits",
+          type: "bank",
+          balance: self.company_credits_info[:yes_bank][:balance]
+      }
+    # end
   end
 
   def set_card_balances

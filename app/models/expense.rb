@@ -18,12 +18,15 @@
 #  is_deleted             :boolean          default(FALSE), not null
 #  transcribed            :boolean          default(FALSE)
 #  personal               :boolean          default(FALSE)
-#  reimbursable           :boolean          default(TRUE)
+#  reimbursable           :boolean
 #  synced_with_quickbooks :boolean          default(FALSE)
 #  split_link             :string(255)
 #  deleted_to_split       :boolean          default(FALSE)
 #  from_cash_on_hand      :boolean          default(FALSE)
+#  cash_on_hand_blocked   :boolean
 #
+
+
 
 
 
@@ -129,6 +132,8 @@ class Expense < ActiveRecord::Base
 
   scope :reimbursable, -> { where reimbursable: true }
   scope :non_reimbursable, -> { where reimbursable: false }
+
+  scope :quickbooks_non_reimbursable, -> { where reimbursable: [false, nil] }
 
   scope :filter_expense_cancelled, -> (flag) {
     if flag == '1'
@@ -263,6 +268,8 @@ class Expense < ActiveRecord::Base
   scope :manual, -> { joins(:manual_expense) }
   scope :card, -> { joins(:card_expense) }
 
+  scope :group_by_category_id, -> { group :category_id }
+
   scope :only_card_expenses, -> { where(expense_type_id: ExpenseType.id_for(:card)) }
   scope :except_card_expenses, -> { where.not(expense_type_id: ExpenseType.id_for(:card)) }
   scope :only_manual_expenses, -> { where(expense_type_id: ExpenseType.id_for(:manual)) }
@@ -274,7 +281,8 @@ class Expense < ActiveRecord::Base
                                                                        ExpenseType.id_for(:time),
                                                                        ExpenseType.id_for(:per_diem)]) }
   scope :only_reimbursable_expenses, -> { where(reimbursable: true) }
-  scope :spent_from_cash_on_hand, -> { where(from_cash_on_hand: true).where(expense_type_id: ExpenseType.id_for(:manual)) }
+  scope :spent_from_cash_on_hand, -> { where(from_cash_on_hand: true) }
+  scope :blocked_against_cash_on_hand, -> { where cash_on_hand_blocked: true }
 
   scope :with_id, ->(ids) { where id: ids }
   scope :without_id, -> (id) {
@@ -308,7 +316,7 @@ class Expense < ActiveRecord::Base
   scope :unverified, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :submitted]) }
 
   scope :joins_amount, -> { joins(:amount) }
-  scope :sum_amount, -> { joins_amount.sum(:value) }
+  scope :sum_amount, -> { joins_amount.sum(:INR) }
 
   scope :joins_card_expenses, -> { only_card_expenses.joins(:card_expense) }
   scope :pluck_card_transaction_id, -> { joins_card_expenses.pluck('card_expense.card_transaction_id') }
@@ -340,6 +348,8 @@ class Expense < ActiveRecord::Base
                                         {time_expense: [custom_fields: [:field_configuration]]},
                                         {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
                                         {amount: [:currency]}, :expense_status) }
+  scope :includes_amount, -> { includes :amount }
+  scope :sum_amounts, -> { includes_amount.sum('amounts.INR') }
 
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount
@@ -466,7 +476,11 @@ class Expense < ActiveRecord::Base
         return "#{policy_name} - #{per_diem_name}"
       else
         if self.report.nil?
-          return "- -"
+          if self.distance_expense?
+            return "#{self.distance_expense.distance_value} KM"
+          elsif self.time_expense?
+            return "#{self.time_expense.time_object_value} Hours"
+          end
         else
           if self.distance_expense?
             if simple

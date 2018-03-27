@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:o="urn:schemas-microsoft-com:office:office"
+          xmlns:x="urn:schemas-microsoft-com:office:excel"
+          xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"
+          xmlns:html="http://www.w3.org/TR/REC-html40">
+  <ss:Styles>
+    <ss:Style ss:ID="header">
+      <Alignment ss:Vertical="Center" ss:Horizontal="Center"/>
+      <ss:Font ss:Bold="1"/>
+      <ss:Interior ss:Color="#a5ccb0" ss:Pattern="Solid"/>
+      <Borders>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+      </Borders>
+    </ss:Style>
+    <ss:Style ss:ID="content">
+      <Alignment ss:Vertical="Center" ss:Horizontal="Center"/>
+      <Borders>
+        <Border ss:Position="Left" ss:LineStyle="Continuous" ss:Weight="1"/>
+        <Border ss:Position="Right" ss:LineStyle="Continuous" ss:Weight="1"/>
+        <Border ss:Position="Top" ss:LineStyle="Continuous" ss:Weight="1"/>
+        <Border ss:Position="Bottom" ss:LineStyle="Continuous" ss:Weight="1"/>
+      </Borders>
+    </ss:Style>
+  </ss:Styles>
+  <Worksheet ss:Name="Sheet1">
+    <Table>
+      <Column ss:AutoFitWidth="1"/>
+      <% item_headers.each do |item| %>
+          <Row>
+            <% item.each do |sub_item| %>
+                <Cell ss:MergeAcross="<%= (sub_item[:span] - 1) %>" ss:StyleID="header">
+                  <Data ss:Type="String"><%= sub_item[:name] %></Data>
+                </Cell>
+            <% end %>
+          </Row>
+      <% end %>
+      <% item_contents.each do |item| %>
+          <Row>
+            <% item.each do |value| %>
+                <Cell  ss:StyleID="content">
+                  <Data ss:Type="String"><%= value %></Data>
+                </Cell>
+            <% end %>
+          </Row>
+      <% end %>
+    </Table>
+  </Worksheet>
+</Workbook>

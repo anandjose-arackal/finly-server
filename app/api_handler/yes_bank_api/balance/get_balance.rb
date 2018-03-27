@@ -3,14 +3,14 @@
 
 class YesBankApi::Balance::GetBalance < YesBankApi::Base
 
-  attr_accessor :account_number, :balance
+  attr_accessor :account_number, :balance, :company, :company_id
 
-  def initialize(params)
-    self.params = params
+  def initialize(company)
+    self.company = company
   end
 
-  def self.call(params)
-    self.new(params).run
+  def self.call(company)
+    self.new(company).run
   end
 
   # defines the respective action that this API handler is executing
@@ -20,16 +20,23 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def pre_validate
-    if params.blank?
+    if self.company.blank?
       add_message :error, "Invalid parameters"
       return
     end
   end
 
   def init
+    self.company_id = self.company.id
     super()
-    self.account_number = params[:account_number]
     set_xml_params
+  end
+
+  def validate
+    super
+    if self.account_number.blank?
+      add_message :error, "No account number present"
+    end
   end
 
   def success?
@@ -46,19 +53,28 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def success
-    YesBankApi::Transfer::BankTransfer::TransactionSuccessPresenter.new(balance)
+    YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter.new(balance)
   end
 
   def failure
-
+    YesBankApi::Transfer::BankTransfer::FailureBalancePresenter.new
   end
 
-  class YesBankApi::Transfer::BankTransfer::SuccessStatusPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class YesBankApi::Transfer::BankTransfer::SuccessBalancePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :balance
 
     def initialize(balance)
       self.balance = balance
+    end
+  end
+
+  class YesBankApi::Transfer::BankTransfer::FailureBalancePresenter < BaseOperation::BasePresenter::FailurePresenter
+
+    attr_accessor :balance
+
+    def initialize
+      self.balance = 0
     end
   end
 

@@ -33,8 +33,18 @@ class ItzCash::AccountDetails < ItzCash::Base
     params[:available_card_eligibility] = parsed_response[9].to_d
     params[:card_processor_status] = parsed_response[10] # This is from YSE's system to track if card is locked or not. Possible values
     params[:description] = parsed_response[12]
-    update_card
     params[:card] = card
+    # special condition because of ItzCash's drama about reissued cards
+    if card.replaced_card_id.present?
+      replaced_card = Card.unscoped.find_by(id: card.replaced_card_id)
+      op = ItzCash::AccountDetails.(replaced_card.user, card: replaced_card)
+      if op.success?
+        params[:balance] = op.balance
+        params[:available_card_eligibility] = op.available_card_eligibility
+        params[:distributor_id] = op.distributor_id
+      end
+    end
+    update_card
     ItzCash::AccountDetails::SuccessPresenter.new(self.user, self.params, self.messages)
   end
 
@@ -98,7 +108,7 @@ class ItzCash::AccountDetails < ItzCash::Base
     status = :unassigned
     if card.user_id.present?
       status = :assign_requested
-      if params[:distributor_id] == card.user.company.d_code
+      unless params[:distributor_id] == "D000000000" || params[:distributor_id] == "NA"
         status = :assigned
         balance = (params[:balance] or 0)
         eligibility = (params[:available_card_eligibility] or 0)
