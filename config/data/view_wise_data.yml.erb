@@ -100,76 +100,105 @@ views:
 #      - name: Policies
 #        url: '/policies'
   <% end %>
+  <% if current_user.admin? %>
+  auditor:
+    menus:
+      navbar:
+      - name: <span class="superscript">Company</span><br>Expenses
+        url: expenses
+        id: expenses
+      - name: <span class="superscript">Company</span><br>Reports
+        url: reports
+        id: reports
+      - name: <span class="superscript">Company</span><br>Money Requests
+        url: requests
+        id: requests
+      - name: <span class="superscript">Company</span><br>Employees
+        url: employees
+        id: employees
+      - name: <span class="superscript">Company</span><br>Settlements
+        url: settlements_dashboard
+        id: settlements_dashboard
+      - name: <span class="superscript">Company</span><br>Analytics
+        url: analytics
+        id: analytics
+      - name: <span class="superscript">Company</span><br>Export
+        url: 'export'
+        id: 'export'
+      cog:
+      - name: Company Statements
+        url: '#company_statements/params={"view": "admin"}'
+  <% end %>
   <% if current_user.finance_manager? %>
   finance_manager:
     menus:
       navbar:
-      - name: <span class="superscript">Team</span><br>Export
-        url: export
-        id: export
-      - name: <span class="superscript">Team</span><br>Members
-        url: employees
-        id: employees
-      - name: <span class="superscript">Team</span><br>Settlements
-        url: settlements_dashboard
-        id: settlements_dashboard
-      - name: <span class="superscript">Team</span><br>Money Requests
-        url: requests
-        id: requests
-      - name: <span class="superscript">Team</span><br>Reports
-        url: reports
-        id: reports
       - name: <span class="superscript">Team</span><br>Expenses
         url: expenses
         id: expenses
+      - name: <span class="superscript">Team</span><br>Reports
+        url: reports
+        id: reports
+      - name: <span class="superscript">Team</span><br>Money Requests
+        url: requests
+        id: requests
+      - name: <span class="superscript">Team</span><br>Settlements
+        url: settlements_dashboard
+        id: settlements_dashboard
+      - name: <span class="superscript">Team</span><br>Members
+        url: employees
+        id: employees
+      - name: <span class="superscript">Team</span><br>Export
+        url: export
+        id: export
       cog: []
   <% end %>
   <% if current_user.manager? %>
   manager:
     menus:
       navbar:
-      - name: <span class="superscript">Team</span><br>Export
-        url: export
-        id: export
-      - name: <span class="superscript">Team</span><br>Members
-        url: employees
-        id: employees
-      - name: <span class="superscript">Team</span><br>Money Requests
-        url: requests
-        id: requests
-      - name: <span class="superscript">Team</span><br>Reports
-        url: reports
-        id: reports
       - name: <span class="superscript">Team</span><br>Expenses
         url: expenses
         id: expenses
+      - name: <span class="superscript">Team</span><br>Reports
+        url: reports
+        id: reports
+      - name: <span class="superscript">Team</span><br>Money Requests
+        url: requests
+        id: requests
+      - name: <span class="superscript">Team</span><br>Members
+        url: employees
+        id: employees
+      - name: <span class="superscript">Team</span><br>Export
+        url: export
+        id: export
       cog: []
   <% end %>
   <% if current_user.employee? %>
   personal:
     menus:
       navbar:
-      - name: Export
-        url: export
-        id: export
-      - name: Analytics
-        url: analytics
-        id: analytics
-      - name: Settlements
-        url: settlements
-        id: settlements
-      - name: Money Requests
-        url: requests
-        id: requests
-      - name: Reports
-        url: reports
-        id: reports
-      - name: Receipts
-        url: receipts
-        id: receipts
       - name: Expenses
         url: expenses
         id: expenses
+      - name: Receipts
+        url: receipts
+        id: receipts
+      - name: Reports
+        url: reports
+        id: reports
+      - name: Money Requests
+        url: requests
+        id: requests
+      - name: Settlements
+        url: settlements
+        id: settlements
+      - name: Analytics
+        url: analytics
+        id: analytics
+      - name: Export
+        url: export
+        id: export
       cog: []
   <% end %>
 
