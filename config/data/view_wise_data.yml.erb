@@ -35,7 +35,7 @@ user:
   <% if current_user.admin? %>
   - id: admin
     name: Admin
-    default_url: 'expenses/params={"view":"expenses"}'
+    default_url: 'expenses/params={"view":"admin"}'
   <% end %>
   <% if current_user.auditor? %>
   - id: auditor
