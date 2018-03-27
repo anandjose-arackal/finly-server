@@ -24,6 +24,7 @@ class Admin::Users::Update < Admin::Users::Base
 
   def process
     if selected_user.update(user_params)
+      selected_user.confirm
       add_message :success, "User updated"
     else
       add_message :error, selected_user.errors.full_messages
