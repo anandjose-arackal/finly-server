@@ -224,10 +224,12 @@
           <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.freight_amount&.value%></td>
         </tr>
         <% end %>
+        <% if @invoice.roundoff_amount.present? %>
         <tr>
           <td>Round Off</td>
           <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.roundoff_amount%></td>
         </tr>
+        <% end %>
         <tr>
           <td>Balance Due</td>
           <td style="font-weight: bold; color: darkred;">&#8377; <%= @invoice.balance_due&.value%></td>
