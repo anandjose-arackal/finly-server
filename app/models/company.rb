@@ -15,6 +15,8 @@ class Company < ActiveRecord::Base
   include Constants
 
   belongs_to :base_currency, class_name: 'Currency'
+  belongs_to :status, class_name: 'CompanyStatus'
+
   has_many :users
   has_many :cards
   has_many :contacts, as: :contactable
@@ -34,10 +36,12 @@ class Company < ActiveRecord::Base
   has_many :all_field_configurations, class_name: 'FieldConfiguration'
   has_many :field_configurations, as: :configurable
   has_many :bank_transactions
+  has_many :inventory_line_items
+  has_many :payment_terms
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
-  has_one  :payment_file_configuration
+  has_one :payment_file_configuration
   has_one :invoice_number_config
   has_many :web_hooks
   has_many :web_hook_tracks
@@ -94,9 +98,16 @@ class Company < ActiveRecord::Base
   }
   scope :ocr_enabled, -> { joins(:feature_subscription).select(' companies.*').where('ocr_enabled IS true') }
 
+  scope :filter_status_id, -> (status_id) { where status_id: status_id }
+
   scope :filter_search, -> (term) {
     where('name LIKE (?)', "%#{term}%")
   }
+
+  # scope :filter_active, -> (val) { where(active: true, partial_block: false, hidden: false) if val }
+  # scope :filter_deactivate, -> (val) { where(active: false) if val }
+  # scope :filter_partial_block, -> (val) { where(active: true, partial_block: true) if val }
+  # scope :filter_hidden, -> (val) { where(active: true, partial_block: true) if val }
 
   scope :created_between, -> (date_from, date_to) {
     unless date_from.blank? && date_to.blank?
@@ -360,6 +371,8 @@ class Company < ActiveRecord::Base
     # creating the invoice numbering configuration for all companies with default values
     self.build_invoice_number_config(sequence_start: "0000").save
     self.build_collect_company_detail.save
+    # seeding the default payment terms for this company
+    PaymentTerm.seed_defaults(self.id)
   end
 
 end

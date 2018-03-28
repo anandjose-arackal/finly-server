@@ -31,4 +31,7 @@ class Customer < ActiveRecord::Base
 
   validates :name, presence: true
   # validates :created_by, presence: true
+
+  scope :active, -> { where active: true }
+  scope :inactive, -> { where active: false }
 end

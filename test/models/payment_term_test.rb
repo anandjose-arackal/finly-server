@@ -9,7 +9,6 @@
 #  days_after  :integer
 #  description :text(65535)
 #  company_id  :integer
-#  default     :boolean
 #
 
 require 'test_helper'

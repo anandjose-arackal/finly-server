@@ -72,7 +72,7 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         # nulling reimbursements that might have happened through this
         nullify_reimbursed_reports
       else
-        # do nothing?
+        # do nothing for now, will get back to this later
       end
     end
   end

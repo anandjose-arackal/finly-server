@@ -59,6 +59,7 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :with_user, -> (user_id) { where owner_id: user_id }
   scope :not_open, -> { where.not status_id: BankPaymentRequestStatus.id_for(:open) }
   scope :with_id, -> (id) { where id: id }
+  scope :without_id, -> (id) { where.not id: id }
   scope :approved, -> { where status_id: BankPaymentRequestStatus.id_for(:approved) }
   scope :filter_status_id, -> (status_id) {
     case status_id
@@ -103,7 +104,7 @@ class BankPaymentRequest < ActiveRecord::Base
     date_to = DateUtils.local_date_time if date_to.blank?
     date_from = date_from.to_time if date_from.present?
     date_to = date_to.to_time if date_to.present?
-    joins(:payment_order).where('payment_orders.processed_at >= ? AND processed_at <= ?', date_from, date_to)
+    joins(:payment_order).where('payment_orders.created_at >= ? AND payment_orders.created_at <= ?', date_from, date_to)
   }
 
   scope :processing, -> { where status_id: BankPaymentRequestStatus.id_for(:processing) }
@@ -139,6 +140,9 @@ class BankPaymentRequest < ActiveRecord::Base
   scope :filter_user_id, -> (owner_id) {
     where owner_id: owner_id
   }
+
+  scope :non_approved, -> { where.not(status_id: BankPaymentRequestStatus.id_for(:approved)) }
+  scope :creditable, -> { where status_id: BankPaymentRequestStatus.ids_for(:approved) }
 
   attr_accessor :cache_users
 

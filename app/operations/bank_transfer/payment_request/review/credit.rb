@@ -48,7 +48,6 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
 
   def process
-
     # now pass to the Create operation
     op = BankTransfer::YesBank::Create.(user, bank_payment_request: bank_payment_request)
     if op.success?

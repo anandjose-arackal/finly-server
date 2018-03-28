@@ -34,6 +34,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
 
   def debit(payment, options = {})
     # this will debit money from the company balance
+    self.company = self.account.company
     if self.company.current_account_connected?
       both_balances = balance
       store_transaction payment, :debit, :success, both_balances, both_balances, account.company_id
@@ -70,7 +71,10 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
       op = YesBankApi::Balance::GetBalance.(self.company)
       # return the balance given by the API
       if op.success?
-        return op.balance&.to_d
+        payment_order = options[:payment_order]
+        balance = op.balance&.to_d
+        blocked_amount_for_payments = account.blocked_amount_for_pending_payments(payment_order&.id)
+        return (balance - blocked_amount_for_payments)
       else
         return 0
       end
