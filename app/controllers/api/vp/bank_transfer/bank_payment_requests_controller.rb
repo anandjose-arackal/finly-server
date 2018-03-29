@@ -26,7 +26,7 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationControll
 
   # this action will take a particular payment ID and return the status of that particular payment
   def payment_status
-    @result = BankTransfer::PaymentRequest::GetPaymentStatus.(current_user, params)
+    @result = BankTransfer::PaymentRequest::ApiPayments::GetPaymentStatus.(current_user, params)
     respond
   end
 

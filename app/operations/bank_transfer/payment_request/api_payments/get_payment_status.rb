@@ -12,9 +12,9 @@ class BankTransfer::PaymentRequest::ApiPayments::GetPaymentStatus < BankTransfer
   end
 
   def init
-    id = params[:id]
-    payment_order_ids = PaymentOrder.with_company_id(user.company_id).pluck(:id)
-    self.payment = Payment.with_payment_order_id(payment_order_ids).find_by(id: id)
+    id = params[:id] || params[:payment_id]
+    payment_order_ids = ::PaymentOrder.with_company_id(user.company_id).pluck(:id)
+    self.payment = ::Payment.with_payment_order_id(payment_order_ids).find_by(id: id)
   end
 
   def validate
