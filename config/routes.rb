@@ -2128,6 +2128,8 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :vp do
       namespace :bank_transfer do
+        post 'initiate_payment', to: 'bank_payment_requests#initiate_payment', as: :initiate_payment
+        get 'payment_status', to: 'bank_payment_requests#payment_status', as: :payment_status
         resources :bank_payment_requests do
           patch 'credit', to: 'bank_payment_requests#credit', as: :credit
         end
