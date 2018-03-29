@@ -64,18 +64,23 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
     end
     # if there's still any amount remaining in remaining_amount, add it to the last invoice's paid amount - Step 1
     if remaining_amount > 0
-      paid_amount = last_invoice.paid_amount.value
-      last_invoice.paid_amount.update(value: (paid_amount + remaining_amount))
-      unless self.virtual_account_transaction.invoices.include?(last_invoice)
-        InvoiceTransactionMapping.create(invoice_id: last_invoice.id, va_transaction_id: self.virtual_account_transaction.id)
-      end
-      # todo reminaing amount is not being added to it
-      # Also update the last invoice in affected_outward_invoices, and add the remaining amount to the amount received - Step 2 & Final
-      for affected_invoice_data in affected_outward_invoices
-        if affected_invoice_data[:invoice].id == last_invoice.id
-          affected_invoice_data[:amount] = affected_invoice_data[:amount] + remaining_amount
-        end
-      end
+      params = {
+          virtual_account: self.virtual_account,
+          type: 'virtual_account_to_customer_account'
+      }
+      op = AccountManager::Collect::CustomerAccount::Transfer.(nil, params)
+      # paid_amount = last_invoice.paid_amount.value
+      # last_invoice.paid_amount.update(value: (paid_amount + remaining_amount))
+      # unless self.virtual_account_transaction.invoices.include?(last_invoice)
+      #   InvoiceTransactionMapping.create(invoice_id: last_invoice.id, va_transaction_id: self.virtual_account_transaction.id)
+      # end
+      # # todo reminaing amount is not being added to it
+      # # Also update the last invoice in affected_outward_invoices, and add the remaining amount to the amount received - Step 2 & Final
+      # for affected_invoice_data in affected_outward_invoices
+      #   if affected_invoice_data[:invoice].id == last_invoice.id
+      #     affected_invoice_data[:amount] = affected_invoice_data[:amount] + remaining_amount
+      #   end
+      # end
     end
 
 

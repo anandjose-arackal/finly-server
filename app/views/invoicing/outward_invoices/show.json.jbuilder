@@ -1,8 +1,19 @@
 invoice = @result.invoice
+customer = invoice.customer
+customer_account = customer.customer_account
 json.customer do
   json.id invoice.customer&.id
   json.name invoice.customer&.name
   json.gstin invoice.customer&.gst
+  json.customer_account do
+    json.balance customer_account.balance.value
+    json.currency do
+      json.id customer_account.balance.currency.id
+      json.country customer_account.balance.currency.country
+      json.country_code customer_account.balance.currency.country
+      json.symbol customer_account.balance.currency.symbol
+    end
+  end
 end
 
 json.invoice do

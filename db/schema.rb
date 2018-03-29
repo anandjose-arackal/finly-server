@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180329064541) do
+ActiveRecord::Schema.define(version: 20180329094333) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1373,17 +1373,17 @@ ActiveRecord::Schema.define(version: 20180329064541) do
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
   create_table "customer_account_transactions", force: :cascade do |t|
-    t.integer  "customer_account_id",     limit: 4
-    t.string   "transaction_type",        limit: 255
-    t.integer  "transaction_amount_id",   limit: 4
-    t.string   "note",                    limit: 255
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-    t.integer  "associated_account_id",   limit: 4
-    t.string   "associated_account_type", limit: 255
+    t.integer  "customer_account_id",    limit: 4
+    t.string   "transaction_type",       limit: 255
+    t.integer  "transaction_amount_id",  limit: 4
+    t.string   "note",                   limit: 255
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.integer  "associated_object_id",   limit: 4
+    t.string   "associated_object_type", limit: 255
   end
 
-  add_index "customer_account_transactions", ["associated_account_type", "associated_account_id"], name: "indx_cstmer_acc_tranxs_on_assoc_acc_type_and_assoc_acc_id", using: :btree
+  add_index "customer_account_transactions", ["associated_object_type", "associated_object_id"], name: "indx_cstmer_acc_tranxs_on_assoc_acc_type_and_assoc_acc_id", using: :btree
   add_index "customer_account_transactions", ["customer_account_id"], name: "index_customer_account_transactions_on_customer_account_id", using: :btree
   add_index "customer_account_transactions", ["transaction_amount_id"], name: "index_customer_account_transactions_on_transaction_amount_id", using: :btree
 
