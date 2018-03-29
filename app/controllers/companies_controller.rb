@@ -1,6 +1,5 @@
 class CompaniesController < ApplicationController
 
-
   before_action -> { finly_authorize! :web}
 
   def notify

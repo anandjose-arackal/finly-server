@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title> Invoice Mailer </title>
+</head>
+<body style="font-family: sans-serif;">
+
+<div style="margin-left: auto; margin-right: auto; width:600px;  border: 2px solid #eee; padding: 50px;">
+
+  <div style="width: 100%; height: auto; margin-bottom: 20px; overflow:hidden;">
+
+    <div style="width: 50%; display: inline-block; float: left; color: #333333;">
+
+      <div class=" company-name company-address" style="font-size: 14px;">
+        <%= @invoice.company.name %>
+      </div>
+      <div class="company-details-container" style=" font-size: 12px;">
+        <div class="company-address-line-one company-address" style="padding-right: 10px;">
+          <%= @invoice.company.collect_company_detail.address %>
+        </div>
+        <!--<div class="company-pin-code company-address">-->
+          <!--PIN :-->
+        <!--</div>-->
+        <div class="pan-no">
+          <span style="width:100px;display:inline-block;">  PAN Number :  &nbsp;  </span> <span style="font-weight: bold; color: #333333;"><%= @invoice.company.collect_company_detail.pan %></span>
+        </div>
+        <div class="gst-registered">
+          <span style="width:100px;display:inline-block;">  GSTIN :  &nbsp;  </span> <span style="font-weight: bold; color: #333333;"><%= @invoice.company.collect_company_detail.gst%> </span>
+        </div> <br>
+        <div class="address-title" style="text-align: left;font-size: 14px; font-weight: bold; margin-bottom: 10px;color: darkblue;">
+          Invoice Details  <br>
+        </div>
+        <div class="customer-block" style="float: left; font-size: 12px; color: #676767;">
+
+          <div class="invoice-number">
+            <span style="width:100px;display:inline-block;">  Invoice Number  &nbsp;  </span> <span style="font-weight: bold; color: #333333;"><%= @invoice.invoice_number %></span>
+          </div>
+          <!--<div class="invoice-number">-->
+          <!--<span style="width:100px;display:inline-block;">  Invoice Details  &nbsp;  </span> <span style="font-weight: bold; color: #333333;">KA-12368763471-1238</span>-->
+          <!--</div>-->
+          <div class="invoice-date">
+            <span style="width:100px;display:inline-block;">  Invoice Date  &nbsp;  </span> <span style="font-weight: bold; color: #333333;"><%= @invoice.date %></span>
+          </div>
+          <!--<div class="order-number">-->
+          <!--<span style="width:100px;display:inline-block;">  Order Number  &nbsp;  </span> <span style="font-weight: bold; color: #333333;">407-213879821-213</span>-->
+          <!--</div>-->
+          <!--<div class="order-date">-->
+          <!--<span style="width:100px;display:inline-block;">  Order Date  &nbsp;  </span> <span style="font-weight: bold; color: #333333;">26th March 2017</span>-->
+          <!--</div>-->
+
+        </div>
+
+
+      </div>
+
+    </div>
+    <div style="width: 50%; display: inline-block; float: right;">
+
+      <!--<div class="company-logo-container" style="text-align: left;">-->
+      <!--<img src="company_logo.png" class="company-logo" width="200px" height="auto">-->
+      <!--</div>-->
+
+    </div>
+
+  </div>
+
+  <div style="width: 100%; height: auto; overflow: hidden; margin-bottom: 20px;">
+
+
+    <div style="width: 50%; display: inline-block; float: left;">
+
+      <div class="address-title" style="font-size: 14px; font-weight: bold; margin-bottom: 10px;color: darkblue;">
+        Customer Details  <br>
+      </div>
+      <div class="customer-block" style=" font-size: 12px; color: #676767;">
+
+        <div class="invoice-care-of-name">
+          <span style="width:100px;display:inline-block;">  C/O  &nbsp; </span> <span style="font-weight: bold; color: #333333;"><%= @invoice.customer.name %></span>
+        </div>
+        <!--<div class="invoice-number">-->
+        <!--<span style="width:100px;display:inline-block;">  Invoice Number  &nbsp;  </span> <span style="font-weight: bold; color: #333333;">6589798746</span>-->
+        <!--</div>-->
+        <div class="invoice-number">
+          <span style="width:100px;display:inline-block;">  Contact Number  &nbsp;  </span> <span style="font-weight: bold; color: #333333;">+91 <%= @invoice.customer.mobile_number %></span>
+        </div>
+        <div class="invoice-number">
+          <span style="width:100px;display:inline-block;">  Customer Email  &nbsp;  </span> <span style="font-weight: bold; color: #333333;"><%= @invoice.customer.email %></span>
+        </div>
+
+      </div>
+
+    </div>
+    <div style="width: 50%; display: inline-block; float: left;">
+
+      <div class="address-title" style="font-size: 14px; font-weight: bold; margin-bottom: 10px;color: darkblue;">
+        <br>
+      </div>
+      <div class="customer-block" style=" font-size: 12px; color: #676767;">
+
+        <div class="invoice-care-of-name">
+          <span style="width:100px;display:inline-block;">  Customer GSTIN  &nbsp; </span> <span style="font-weight: bold; color: #333333;"><%= @invoice.customer.gst %></span>
+        </div>
+        <!--<div class="invoice-number">-->
+        <!--<span style="width:100px;display:inline-block;">  Invoice Number  &nbsp;  </span> <span style="font-weight: bold; color: #333333;">6589798746</span>-->
+        <!--</div>-->
+        <div class="invoice-number">
+          <span style="width:100px;display:inline-block;">  Customer PAN  &nbsp;  </span> <span style="font-weight: bold; color: #333333;"> <%= @invoice.customer.pan %></span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div style="width: 100%; height: auto; margin-bottom: 20px; overflow: hidden;">
+    <div style="width: 50%; display: inline-block; float: right;">
+
+      <div class="address-title" style="text-align: left; font-size: 14px; font-weight: bold; margin-bottom: 10px;color: darkblue;">
+        Shipping Address  <br>
+      </div>
+      <div class="shipping-details-block" style="float: left; font-size: 12px; color: #333333;">
+        <%= @invoice.shipping_address %>
+      </div>
+    </div>
+
+    <div style="width: 50%; display: inline-block; float: left;">
+
+      <div class="address-title" style="font-size: 14px; font-weight: bold; margin-bottom: 10px;color: darkblue;">
+        Billing Address  <br>
+      </div>
+      <div class="billing-details-block" style=" font-size: 12px; color: #333333;">
+        <%= @invoice.billing_address %>
+      </div>
+
+    </div>
+  </div>
+
+  <div style="width: 100%; height: auto; overflow: hidden; margin-bottom: 20px;">
+
+    <div style="width: 100%; margin-bottom: 10px; height: auto; font-size: 14px; font-weight: bold; margin-bottom: 10px;color: darkblue;">
+      Order Details
+    </div>
+    <div style="width: 100%;height: auto;">
+
+      <table class="line-items-table" style="width: 100%; border:1px solid #ddd; font-size: 10px; border-radius: 4px;background-color: white;padding: 2%; color: #333333;">
+        <thead style="text-align: center;background-color: lavender;">
+        <tr>
+          <th scope="col" style="width: 20px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">#</th>
+          <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid#ddd;">Name/Description</th>
+          <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid#ddd;">HSN/SAC</th>
+          <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">Quantity</th>
+          <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">Rate</th>
+          <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">Amount</th>
+          <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">Discount</th>
+          <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= @invoice.gst_type_id == 1 ? "IGST" : "SGST + CGST" %></th>
+          <th scope="col" colspan="2" style="border-bottom: 1px solid #ddd;">Total</th>
+        </tr>
+        </thead>
+        <tbody>
+        <% @invoice.invoice_items.each_with_index do |invoice_item, index| %>
+            <tr style="text-align: center;">
+              <td scope="row" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= index + 1 %></td>
+              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.description %></td>
+              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.hsn_sac %></td>
+              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.quantity %></td>
+              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.rate %></td>
+              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.amount&.value %></td>
+              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.discount_amount&.value %></td>
+              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.tax_amount&.value%></td>
+              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.net_amount&.value %></td>
+            </tr>
+        <% end %>
+
+        </tbody>
+      </table>
+
+    </div>
+
+  </div>
+
+  <div style="width: 100%; height: auto; overflow: hidden; ">
+
+    <div style="width: 100%;height: auto; color: #676767;">
+
+      <div style="width: 200px; float:left; overflow: hidden;">
+        <div class="invoice-notes sub-notes">
+          <label style="font-size: 14px;font-weight: bold;color:darkblue;">Memo </label> <br>
+          <div style="font-size: 12px; color: #333333;margin-top: 10px;"> <%= @invoice.customer_memo %></div>
+        </div>
+      </div>
+
+      <table class="line-items-table" style="width: 35%; font-size: 14px; float: right;">
+        <tbody style="text-align: left;">
+        <tr>
+          <td>Total</td>
+          <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.line_items_total %></td>
+        </tr>
+        <% if @invoice.discount_amount&.value > 0 %>
+        <tr>
+          <td>Discount</td>
+          <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.discount_amount&.value%></td>
+        </tr>
+        <% end %>
+        <% if @invoice.tax_amount&.value > 0 %>
+        <tr>
+          <td>Tax</td>
+          <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.tax_amount&.value%></td>
+        </tr>
+        <% end %>
+        <!--<tr>-->
+        <!--<td>TDS</td>-->
+        <!--<td style="font-weight: bold; color: #333333;">&#8377; </td>-->
+        <!--</tr>-->
+        <% if @invoice.advance_amount&.value > 0 %>
+        <tr>
+          <td>Advance Payment</td>
+          <td style="font-weight: bold; color: forestgreen;">&#8377; <%= @invoice.advance_amount&.value%></td>
+        </tr>
+        <% end %>
+        <% if @invoice.freight_amount&.value > 0 %>
+        <tr>
+          <td>Freight</td>
+          <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.freight_amount&.value%></td>
+        </tr>
+        <% end %>
+        <% if @invoice.roundoff_amount.present? %>
+        <tr>
+          <td>Round Off</td>
+          <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.roundoff_amount%></td>
+        </tr>
+        <% end %>
+        <tr>
+          <td>Balance Due</td>
+          <td style="font-weight: bold; color: darkred;">&#8377; <%= @invoice.balance_due&.value%></td>
+        </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+  </div>
+
+  <div style="width: 100%; height: auto; overflow: hidden; text-align: center; margin-top: 45px;">
+    <!--<div style="width: 100%; height: auto;margin-bottom: 30px; color: #333333; font-size: 14px;">-->
+      <!--Notice Something Wrong? Contact our <a href="">Support Team</a> & We'll Be Happy To Help You. Thank You For Your Business.-->
+    <!--</div>-->
+    <div style="width: 100%; height: auto; text-transform: uppercase; font-weight: bold; color: darkblue;letter-spacing: 2px;">
+      Thank you for being a great customer
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

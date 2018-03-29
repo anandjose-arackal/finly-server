@@ -26,4 +26,9 @@ class Invoicing::Invoice::CreateValid < Invoicing::Invoice::Base
     Invoicing::Invoice::Base::InvoicePresenter.new(user, params, messages)
   end
 
+  def post_process
+    # sending mailer to the owner of the invoice
+    InvoiceMailer.delay.send_to_customer(invoice)
+  end
+
 end

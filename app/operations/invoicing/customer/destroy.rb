@@ -8,7 +8,7 @@ class Invoicing::Customer::Destroy < Invoicing::Customer::Base
   end
 
   def process
-    unless self.customer.destroy
+    unless self.customer.update(active: false)
       add_message :error, self.customer.errors.full_messages
     end
   end

@@ -1,0 +1,22 @@
+<% content_for :body do %>
+  <h3><%= "#{@signedup_user.name}" %> self signed up with the following details: </h3>
+
+  <h4>User Name: <%= @signedup_user.name %></h4>
+  <br/>
+  <h4>User Email: <%= @signedup_user.email %></h4>
+  <br/>
+  <h4>User Mobile Number: <%= @signedup_user.mobile_number %></h4>
+  <br/>
+  <h4>Company Name: <%= @signedup_user.company_name %></h4>
+  <br/>
+  <h4>Products:</h4>
+  <ul>
+    <% products = @signedup_user.products.split(',') %>
+    <% products.each do |product| %>
+      <li><%= product.humanize %></li>
+    <% end %>
+  </ul>
+  <br/>
+<% end %>
+
+<%= render 'application_mailer/template' %>

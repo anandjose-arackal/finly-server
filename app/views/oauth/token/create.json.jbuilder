@@ -33,6 +33,7 @@ json.data do
       json.expense_management @user.user_panel_subscription.expense_management
       json.disburse @user.user_panel_subscription.disburse
       json.payments @user.user_panel_subscription.yes_bank_account_transfer
+      json.collect @user.user_panel_subscription.invoicing_system
     end
   end
 end

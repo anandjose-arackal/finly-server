@@ -37,9 +37,10 @@
 #  roundoff_total_enabled  :boolean
 #  memo                    :string(255)
 #  customer_memo           :text(65535)
-#  reminders               :text(65535)
-#  payment_term_id         :integer
 #
+
+#  gst_type_id: 1 - IGST
+#              2 - CGST + SGST
 
 class OutwardInvoice < ActiveRecord::Base
 
@@ -107,12 +108,8 @@ class OutwardInvoice < ActiveRecord::Base
   scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid, :closed, :cancelled]) }
   scope :invoice_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
   scope :without_id, -> (id){ where.not id: id}
+  scope :with_id, -> (id) { where id: id }
 
-  before_save do
-    if self.invoice_number.blank? && valid_invoice?
-      generate_invoice_number
-    end
-  end
 
   default_scope { unscope(:where) }
 
@@ -121,7 +118,7 @@ class OutwardInvoice < ActiveRecord::Base
   end
 
   def editable?
-    !(self.invoice_status_id == OutwardInvoiceStatus.id_for(:cancelled))
+    !((OutwardInvoiceStatus.ids_for(:closed, :cancelled, :partially_paid)).include?(self.invoice_status_id))
   end
 
   def line_items_total
@@ -140,18 +137,6 @@ class OutwardInvoice < ActiveRecord::Base
     !(self.invoice_status_id == OutwardInvoiceStatus.id_for(:incomplete) || self.invoice_status_id == OutwardInvoiceStatus.id_for(:cancelled))
   end
 
-  def generate_invoice_number
-    company = self.company
-    if company.blank?
-      return nil
-    else
-      number = MathUtil.generate_random_number(10)
-      while OutwardInvoice.find_by(invoice_number: number)
-        number = MathUtil.generate_random_number(10)
-      end
-    end
-    number
-  end
 
   def gst_type_selection
     if self.tax_amount&.value > 0

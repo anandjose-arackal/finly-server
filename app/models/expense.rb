@@ -30,6 +30,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -131,6 +132,8 @@ class Expense < ActiveRecord::Base
 
   scope :reimbursable, -> { where reimbursable: true }
   scope :non_reimbursable, -> { where reimbursable: false }
+
+  scope :quickbooks_non_reimbursable, -> { where reimbursable: [false, nil] }
 
   scope :filter_expense_cancelled, -> (flag) {
     if flag == '1'
