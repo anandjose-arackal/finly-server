@@ -1,9 +1,9 @@
 class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer::PaymentRequest::Base
 
   attr_accessor :payment_order, :bank_payment_request, :bank_account, :vendor,
-                :payment_mode
+                :payment_mode, :company_id
 
-  class BankTransfer::PaymentRequest::InitiatePayment::PaymentOrderPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment::PaymentOrderPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :payment_order, :bank_payment_request
 
@@ -19,7 +19,7 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
       return
     end
 
-    if param[:amount].blank?
+    if params[:amount].blank?
       add_message :error, "Amount cannot be empty"
       return
     end
@@ -81,7 +81,7 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
   def success
     params[:payment_order] = self.payment_order
     params[:bank_payment_request] = self.bank_payment_request
-    BankTransfer::PaymentRequest::InitiatePayment::PaymentOrderPresenter.new(user, params, messages)
+    BankTransfer::PaymentRequest::ApiPayments::InitiatePayment::PaymentOrderPresenter.new(user, params, messages)
   end
 
   private
@@ -92,10 +92,11 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
     self.vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: params[:name], company_id: self.company_id)
     ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
     if ba.nil?
-      self.bank_account = BankAccount.create(name: params[:name], account_number: params[:bank_account_number], ifsc: params[:ifsc],
+      ba = BankAccount.create(name: params[:name], account_number: params[:account_number], ifsc: params[:ifsc],
                               account_owner: vendor, company_id: self.company_id, default_account: true)
 
     end
+    self.bank_account = ba
   end
 
   def create_bank_payment_request
@@ -103,7 +104,7 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
       payment_type_id: PaymentType.id_for(:credit),
       application: "vp",
       receiving_user_type: self.bank_account.account_owner.class.name,
-      receiving_user_id: bank_account.account_owner_id,
+      receiving_user_id: self.bank_account.account_owner_id,
       initiating_user_type: "User",
       initiating_user_id: user.id,
       initiating_account_type: YesBankCompanyAccount.name,
@@ -121,7 +122,7 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
       date: DateUtils.local_date,
     }
     payment_order_params = {
-      initiating_user: user,
+      initiating_user_id: user.id,
       payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
       company_id: user.company_id,
       amount_requested_attributes: {
@@ -134,7 +135,7 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
       payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
       application: "vp",
       currency_id: Currency.first.id,
-      payment_attributes: [
+      payments_attributes: [
           payment_params
       ]
     }
@@ -151,7 +152,6 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
       payment_order_attributes: payment_order_params
     }
     self.bank_payment_request = BankPaymentRequest.new(payment_request_params)
-    debugger
     unless self.bank_payment_request.save
       add_message :error, self.bank_payment_request.errors.full_messages
       return

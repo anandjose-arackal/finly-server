@@ -2,7 +2,7 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationControll
 
   protect_from_forgery with: :null_session
 
-  before_action -> { finly_authorize! :web }
+  before_action -> { finly_authorize! :api }
 
   def create
     @result = BankTransfer::PaymentRequest::Create.(current_user, params)
@@ -20,7 +20,7 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationControll
   end
 
   def initiate_payment
-    @result = BankTransfer::PaymentRequest::InitiatePayment.(current_user, params)
+    @result = BankTransfer::PaymentRequest::ApiPayments::InitiatePayment.(current_user, params)
     respond
   end
 
