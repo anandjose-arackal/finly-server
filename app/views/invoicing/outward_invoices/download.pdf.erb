@@ -207,9 +207,9 @@
     </tr>
     </thead>
     <tbody>
-    <% @result.invoice.invoice_items.each do |item| %>
+    <% @result.invoice.invoice_items.each_with_index do |item, index| %>
         <tr>
-          <th style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " scope="row">2</th>
+          <th style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " scope="row"><%= (index + 1) %></th>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.description%></td>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.hsn_sac%></td>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.quantity%></td>
