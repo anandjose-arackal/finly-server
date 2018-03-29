@@ -173,6 +173,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def import_sample_file
+    @result = BankTransfer::PaymentRequest::GenerateImportSample.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type)
