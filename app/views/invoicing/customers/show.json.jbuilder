@@ -35,3 +35,7 @@ json.virtual_accounts do
     json.name virtual_account.name
   end
 end
+
+json.customer_account do
+  json.balance customer.customer_account.balance.amount_value
+end

@@ -1,3 +1,11 @@
+# == Schema Information
+#
+# Table name: outward_invoice_types
+#
+#  id   :integer          not null, primary key
+#  name :string(255)
+#
+
 class OutwardInvoiceType < ActiveRecord::Base
 
   validates :name, presence: true

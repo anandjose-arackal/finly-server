@@ -40,6 +40,7 @@
 #  payment_term_id         :integer
 #  reminders               :text(65535)
 #  user_id                 :integer
+#  outward_invoice_type_id :integer          default(1)
 #
 
 require 'test_helper'

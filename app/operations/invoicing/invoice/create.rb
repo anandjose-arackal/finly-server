@@ -14,7 +14,7 @@ class Invoicing::Invoice::Create < Invoicing::Invoice::Base
 
     # get default payment term for the company if any
     self.payment_term = user.company.payment_terms.where(default: true).first
-    self.invoice_type_id = params[:invoice_type_id]
+    self.invoice_type_id = OutwardInvoiceType.id_for(params[:invoice_type_id]) || OutwardInvoiceType.id_for(:tax_invoice)
   end
 
   def validate

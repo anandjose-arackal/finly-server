@@ -1,0 +1,29 @@
+# == Schema Information
+#
+# Table name: customer_account_transactions
+#
+#  id                             :integer          not null, primary key
+#  customer_account_id            :integer
+#  transaction_type               :string(255)
+#  virtual_account_transaction_id :integer
+#  transaction_amount_id          :integer
+#  note                           :string(255)
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  customer_account_id: 
+  transaction_type: MyString
+  virtual_account_transaction_id: 
+  transaction_amount_id: 
+  note: MyString
+
+two:
+  customer_account_id: 
+  transaction_type: MyString
+  virtual_account_transaction_id: 
+  transaction_amount_id: 
+  note: MyString

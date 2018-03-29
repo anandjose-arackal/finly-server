@@ -1,11 +1,13 @@
 class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoice::Base
 
   attr_accessor :virtual_account, :company, :outward_invoices, :payment, :virtual_account_transaction,
-                :amount_due, :transaction_amount, :affected_outward_invoices
+                :amount_due, :transaction_amount, :affected_outward_invoices, :customer, :customer_account
 
   def init
     self.virtual_account_transaction = params[:virtual_account_transaction]
     self.virtual_account = virtual_account_transaction.virtual_account
+    self.customer = virtual_account.customer
+    self.customer_account = self.customer.customer_account #todo add validations for existence
     self.company = virtual_account.company
     self.outward_invoices = self.virtual_account.outward_invoices.payments_receivable
     self.transaction_amount = self.virtual_account_transaction.transfer_amount.to_f
@@ -29,6 +31,7 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
   end
 
   def process
+    # todo-abi create invoice trail
     # FIFO for all the invoices
     remaining_amount = self.transaction_amount
     last_invoice = self.outward_invoices.first

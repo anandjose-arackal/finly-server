@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180326115129) do
+ActiveRecord::Schema.define(version: 20180329064541) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1372,6 +1372,31 @@ ActiveRecord::Schema.define(version: 20180326115129) do
   add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
+  create_table "customer_account_transactions", force: :cascade do |t|
+    t.integer  "customer_account_id",     limit: 4
+    t.string   "transaction_type",        limit: 255
+    t.integer  "transaction_amount_id",   limit: 4
+    t.string   "note",                    limit: 255
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
+    t.integer  "associated_account_id",   limit: 4
+    t.string   "associated_account_type", limit: 255
+  end
+
+  add_index "customer_account_transactions", ["associated_account_type", "associated_account_id"], name: "indx_cstmer_acc_tranxs_on_assoc_acc_type_and_assoc_acc_id", using: :btree
+  add_index "customer_account_transactions", ["customer_account_id"], name: "index_customer_account_transactions_on_customer_account_id", using: :btree
+  add_index "customer_account_transactions", ["transaction_amount_id"], name: "index_customer_account_transactions_on_transaction_amount_id", using: :btree
+
+  create_table "customer_accounts", force: :cascade do |t|
+    t.integer  "customer_id", limit: 4
+    t.integer  "balance_id",  limit: 4
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  add_index "customer_accounts", ["balance_id"], name: "index_customer_accounts_on_balance_id", using: :btree
+  add_index "customer_accounts", ["customer_id"], name: "index_customer_accounts_on_customer_id", using: :btree
+
   create_table "customer_attachments", force: :cascade do |t|
     t.string   "attached_file_file_name",    limit: 255
     t.string   "attached_file_content_type", limit: 255
@@ -2562,6 +2587,27 @@ ActiveRecord::Schema.define(version: 20180326115129) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "outward_invoice_trail_actions", force: :cascade do |t|
+    t.string "name", limit: 255
+  end
+
+  create_table "outward_invoice_trails", force: :cascade do |t|
+    t.integer  "action_id",                       limit: 4
+    t.integer  "customer_account_transaction_id", limit: 4
+    t.integer  "outward_invoice_id",              limit: 4
+    t.integer  "user_id",                         limit: 4
+    t.string   "note",                            limit: 255
+    t.integer  "amount_id",                       limit: 4
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+  end
+
+  add_index "outward_invoice_trails", ["action_id"], name: "index_outward_invoice_trails_on_action_id", using: :btree
+  add_index "outward_invoice_trails", ["amount_id"], name: "index_outward_invoice_trails_on_amount_id", using: :btree
+  add_index "outward_invoice_trails", ["customer_account_transaction_id"], name: "index_outward_invoice_trails_on_customer_account_transaction_id", using: :btree
+  add_index "outward_invoice_trails", ["outward_invoice_id"], name: "index_outward_invoice_trails_on_outward_invoice_id", using: :btree
+  add_index "outward_invoice_trails", ["user_id"], name: "index_outward_invoice_trails_on_user_id", using: :btree
 
   create_table "outward_invoice_types", force: :cascade do |t|
     t.string "name", limit: 255
@@ -4027,6 +4073,8 @@ ActiveRecord::Schema.define(version: 20180326115129) do
   add_foreign_key "company_kycs", "companies"
   add_foreign_key "company_tags", "companies"
   add_foreign_key "custom_fields", "field_configurations"
+  add_foreign_key "customer_account_transactions", "customer_accounts"
+  add_foreign_key "customer_accounts", "customers"
   add_foreign_key "customer_attachments", "customers"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
@@ -4108,6 +4156,10 @@ ActiveRecord::Schema.define(version: 20180326115129) do
   add_foreign_key "outward_invoice_attachments", "companies"
   add_foreign_key "outward_invoice_attachments", "outward_invoices"
   add_foreign_key "outward_invoice_attachments", "users"
+  add_foreign_key "outward_invoice_trails", "amounts"
+  add_foreign_key "outward_invoice_trails", "customer_account_transactions"
+  add_foreign_key "outward_invoice_trails", "outward_invoices"
+  add_foreign_key "outward_invoice_trails", "users"
   add_foreign_key "outward_invoices", "amounts"
   add_foreign_key "outward_invoices", "customers"
   add_foreign_key "outward_invoices", "outward_invoice_types"
