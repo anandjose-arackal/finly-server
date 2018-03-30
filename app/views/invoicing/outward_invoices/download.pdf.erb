@@ -195,6 +195,11 @@
     <tr>
       <th scope="col" style="width: 20px;font-weight: 300;padding: 5px; border: none !important; text-align: left; font-size: 11px; ">#</th>
       <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Name/Description</th>
+      <% if @invoice.invoice_items_custom_field_configuration_ids.present? %>
+          <% @invoice.invoice_items_custom_field_configuration_ids.each do |fc_id| %>
+              <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid#ddd;"><%= FieldConfiguration.find_by(id: fc_id)&.field_name %></th>
+          <% end %>
+      <% end %>
       <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">HSN/SAC</th>
       <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Quantity</th>
       <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Rate</th>
@@ -205,10 +210,16 @@
     </tr>
     </thead>
     <tbody>
-    <% @result.invoice.invoice_items.each_with_index do |item, index| %>
+    <% @invoice.invoice_items.each_with_index do |item, index| %>
         <tr>
           <th style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " scope="row"><%= (index + 1) %></th>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.description%></td>
+          <% if @invoice.invoice_items_custom_field_configuration_ids.present? %>
+              <% @invoice.invoice_items_custom_field_configuration_ids.each do |fc_id| %>
+                  <% debugger %>
+                  <td scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid#ddd;"><%= invoice_item.custom_fields.with_field_configuration_ids(fc_id).first&.value&.value %></td>
+              <% end %>
+          <% end %>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.hsn_sac%></td>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.quantity%></td>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; ">INR <%= item.rate %></td>

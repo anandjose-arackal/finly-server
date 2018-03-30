@@ -148,6 +148,11 @@
         <tr>
           <th scope="col" style="width: 20px; border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">#</th>
           <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid#ddd;">Name/Description</th>
+          <% if @invoice.invoice_items_custom_field_configuration_ids.present? %>
+            <% @invoice.invoice_items_custom_field_configuration_ids.each do |fc_id| %>
+              <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid#ddd;"><%= FieldConfiguration.find_by(id: fc_id)&.field_name %></th>
+            <% end %>
+          <% end %>
           <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid#ddd;">HSN/SAC</th>
           <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">Quantity</th>
           <th scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">Rate</th>
@@ -162,6 +167,12 @@
             <tr style="text-align: center;">
               <td scope="row" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= index + 1 %></td>
               <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.description %></td>
+              <% if @invoice.invoice_items_custom_field_configuration_ids.present? %>
+                  <% @invoice.invoice_items_custom_field_configuration_ids.each do |fc_id| %>
+                      <% debugger %>
+                      <td scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid#ddd;"><%= invoice_item.custom_fields.with_field_configuration_ids(fc_id).first&.value&.value %></td>
+                  <% end %>
+              <% end %>
               <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.hsn_sac %></td>
               <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.quantity %></td>
               <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.rate %></td>
