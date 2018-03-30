@@ -101,7 +101,6 @@ class CustomField::SetFields < CustomField::Base
       end
     end
 
-
     return if item.custom_fields.blank?
 
     item.custom_fields.each do |field|

@@ -162,7 +162,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   end
 
   def set_custom_fields(save, line_item, custom_fields)
-    custom_fields = custom_fields
+    custom_fields = {custom_fields: custom_fields}
     custom_fields[:user] = user
     custom_fields[:reset_fields] = true
     custom_fields[:save] = save
