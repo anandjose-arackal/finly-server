@@ -53,7 +53,7 @@ class CustomField::SetFields < CustomField::Base
         if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(parent_type_id)
           # For reports and money requests
           self.field_configurations = item.user.company.field_configurations.exclude_deleted
-        elsif [FieldParentType.id_for(:invoice)].include?(parent_type_id)
+        elsif [FieldParentType.id_for(:invoice), FieldParentType.id_for(:outward_invoice), FieldParentType.id_for(:invoice_line_item)].include?(parent_type_id)
           self.field_configurations = current_company.field_configurations.exclude_deleted
         elsif FieldParentType.expense_ids.include?(parent_type_id)
           # For expenses
@@ -85,6 +85,7 @@ class CustomField::SetFields < CustomField::Base
       existing_ids = self.item.custom_fields.pluck(:field_configuration_id)
       create_ids = required_ids - existing_ids
 
+
       if create_ids.present?
         self.field_configurations.enabled.with_id(create_ids).each do |config|
           # If value has not been set but default value is present, set the value as a deep clone of default value
@@ -99,6 +100,7 @@ class CustomField::SetFields < CustomField::Base
         end
       end
     end
+
 
     return if item.custom_fields.blank?
 

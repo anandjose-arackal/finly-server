@@ -93,6 +93,9 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     self.invoice.assign_attributes(self.invoice_parameters)
     # calculate the tax and discounts that need to be done for this particular invoice
     # and store it in the invoice object for further calculation
+    self.invoice.invoice_items.each do |invoice_item|
+      set_custom_fields(false, invoice_item)
+    end
     calculate_tax_and_discounts
     unless self.invoice.valid?
       add_message :error, self.invoice.errors.full_messages
@@ -153,6 +156,14 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   def recalculate_totals
     InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_parameters, nil, self.invoice)
     self.invoice.save
+  end
+
+  def set_custom_fields(save, line_item)
+    custom_fields = {custom_fields: params[:custom_fields]}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(line_item, FieldParentType.id_for(:invoice_line_item), custom_fields)
   end
 
 end
