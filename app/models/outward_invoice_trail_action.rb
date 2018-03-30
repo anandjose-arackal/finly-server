@@ -7,4 +7,9 @@
 #
 
 class OutwardInvoiceTrailAction < ActiveRecord::Base
+  include Seedable
+
+  def self.values
+    [:credit_virtual_account, :credit_customer_account, :credit_outside, :credit_advance ,:credit_credit_note, :debit_customer_account, :debit_outside]
+  end
 end

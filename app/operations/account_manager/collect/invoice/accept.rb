@@ -41,15 +41,35 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
         # When transfer amount is less than invoice's balance due
         new_paid_amount = invoice.paid_amount&.value + remaining_amount
         balance_due = invoice.balance_due&.value - remaining_amount
-        invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid),
+        if invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid),
                        paid_amount_attributes: {id: invoice.paid_amount.id, value: new_paid_amount},
                        balance_due_attributes: {id: invoice.balance_due.id, value: balance_due})
+          trail = invoice.invoice_trails.new({
+                                            action_id: OutwardInvoiceTrailAction.id_for(:credit_virtual_account),
+                                            associated_transaction: virtual_account_transaction,
+                                            amount_attributes: {
+                                                value: remaining_amount,
+                                                currency_id: Currency.id_for(virtual_account_transaction.transfer_currency)
+                                            }
+                                        })
+          trail.save
+        end
         affected_invoice_data = {invoice: invoice, amount: remaining_amount}
         remaining_amount = 0
       elsif remaining_amount >= due_amount
         invoice.paid_amount.update(value: (invoice.net_amount&.value + invoice.roundoff_amount)) # i.e. setting the paid amount as the total of what was supposed to be paid for this invoice
         invoice.balance_due.update(value: 0)
         invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:closed))
+        # create trail
+        trail = invoice.invoice_trails.new({
+                                            action_id: OutwardInvoiceTrailAction.id_for(:credit_virtual_account),
+                                            associated_transaction: virtual_account_transaction,
+                                            amount_attributes: {
+                                                value: due_amount,
+                                                currency_id: Currency.id_for(virtual_account_transaction.transfer_currency)
+                                            }
+                                        })
+        trail.save
         remaining_amount = remaining_amount - due_amount
         affected_invoice_data = {invoice: invoice, amount: due_amount}
       end
@@ -65,16 +85,22 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
     # if there's still any amount remaining in remaining_amount, add it to the last invoice's paid amount - Step 1
     if remaining_amount > 0
       params = {
-          virtual_account: self.virtual_account,
-          type: 'virtual_account_to_customer_account'
+          virtual_account_transaction: self.virtual_account_transaction,
+          type: 'virtual_account_to_customer_account',
+          amount: remaining_amount
       }
+      # Add Remaining amount to Customer's account
       op = AccountManager::Collect::CustomerAccount::Transfer.(nil, params)
+      if op.failure?
+        #todo uncomment it before deploy
+        # Event::EAlert::Create.(nil, title: 'Finly Collect - Failed to Add Money to Customer Account',description: "#{self.virtual_account_transaction.as_json}", subject: 'Finly Collect - Failed to Add Money to Customer Account')
+      end
+      # remove code when version invoicing version 2.1 has been deployed
       # paid_amount = last_invoice.paid_amount.value
       # last_invoice.paid_amount.update(value: (paid_amount + remaining_amount))
       # unless self.virtual_account_transaction.invoices.include?(last_invoice)
       #   InvoiceTransactionMapping.create(invoice_id: last_invoice.id, va_transaction_id: self.virtual_account_transaction.id)
       # end
-      # # todo reminaing amount is not being added to it
       # # Also update the last invoice in affected_outward_invoices, and add the remaining amount to the amount received - Step 2 & Final
       # for affected_invoice_data in affected_outward_invoices
       #   if affected_invoice_data[:invoice].id == last_invoice.id

@@ -1,17 +1,17 @@
 invoice = @result.invoice
-customer = invoice.customer
-customer_account = customer.customer_account
+customer = invoice&.customer
+customer_account = customer&.customer_account
 json.customer do
   json.id invoice.customer&.id
   json.name invoice.customer&.name
   json.gstin invoice.customer&.gst
   json.customer_account do
-    json.balance customer_account.balance.value
+    json.balance customer_account&.balance&.value
     json.currency do
-      json.id customer_account.balance.currency.id
-      json.country customer_account.balance.currency.country
-      json.country_code customer_account.balance.currency.country
-      json.symbol customer_account.balance.currency.symbol
+      json.id customer_account&.balance&.currency&.id
+      json.country customer_account&.balance&.currency&.country
+      json.country_code customer_account&.balance&.currency&.country
+      json.symbol customer_account&.balance&.currency&.symbol
     end
   end
 end
@@ -107,6 +107,27 @@ json.invoice do
   end
 end
 
+json.trail do
+  json.array! invoice.invoice_trails do |trail|
+    json.extract! trail, :note, :associated_transaction_type
+    json.action_name trail.action.name
+    if trail.user_id
+      json.user do
+        json.id trail.user.id
+        json.name trail.user.name
+        json.email trail.user.email
+        json.mobile_number trail.user.mobile_number
+      end
+    end
+    json.amount trail.amount.value
+    json.currency do
+      json.id trail.amount.currency.id
+      json.country trail.amount.currency.country
+      json.country_code trail.amount.currency.country
+      json.symbol trail.amount.currency.symbol
+    end
+  end
+end
 json.actions do
   json.editable invoice.editable?
   json.navbar @result.navbar_actions

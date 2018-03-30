@@ -18,7 +18,9 @@ class Invoicing::Invoice::SendToCustomer < Invoicing::Invoice::Base
     self.email_options[:email_subject] = params[:email][:subject] || "Invoice for #{self.invoice.customer.name} - #{self.invoice.invoice_number}"
     self.email_options[:email_body] = params[:email][:body] || ""
 
-    attachment_ids = params[:invoice][:attachments]
+    if params[:invoice]
+      attachment_ids = params[:invoice][:attachments] || []
+    end
 
     self.email_options[:attachments] = invoice.attachments.with_id attachment_ids
 

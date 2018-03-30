@@ -81,6 +81,7 @@ class OutwardInvoice < ActiveRecord::Base
   has_many :invoice_transaction_mappings, foreign_key: :invoice_id
   has_many :va_transactions, through: :invoice_transaction_mappings
   has_many :attachments, class_name: "OutwardInvoiceAttachment"
+  has_many :invoice_trails, class_name: "OutwardInvoiceTrail"
 
   delegate :partially_paid?, :closed?, :incomplete?, :saved?, :cancelled?, to: :invoice_status
   delegate :status_name, to: :invoice_status
@@ -141,11 +142,11 @@ class OutwardInvoice < ActiveRecord::Base
   scope :filter_amount, -> (type, value) do
     case type
       when 'lteq'
-        joins(:total_payable).select('expenses.*').where('value <= ?', value)
+        joins(:total_payable).select('outward_invoices.*').where('value <= ?', value)
       when 'gteq'
-        joins(:total_payable).select('expenses.*').where('value >= ?', value)
+        joins(:total_payable).select('outward_invoices.*').where('value >= ?', value)
       when 'eq'
-        joins(:total_payable).select('expenses.*').where('ROUND(value, 2) = ?', precision_value(value))
+        joins(:total_payable).select('outward_invoices.*').where('ROUND(value, 2) = ?', precision_value(value))
       else
         # do nothing
     end
@@ -211,3 +212,6 @@ class OutwardInvoice < ActiveRecord::Base
   end
 
 end
+
+
+

@@ -2640,6 +2640,7 @@ Rails.application.routes.draw do
       patch 'mark_as_closed', to: 'outward_invoices#mark_as_closed', as: :mark_as_closed
       patch 'send_to_customer', to: 'outward_invoices#send_to_customer', as: :send_to_customer
       patch 'remind_customer', to: 'outward_invoices#remind_customer', as: :remind_customer
+      patch 'record_payment', to: 'outward_invoices#record_payment', as: :record_payment
     end
     get 'customers/count', to: 'customers#count'
     post 'customers/import', to: 'customers#import'

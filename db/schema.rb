@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180329094333) do
+ActiveRecord::Schema.define(version: 20180330074930) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2593,19 +2593,23 @@ ActiveRecord::Schema.define(version: 20180329094333) do
   end
 
   create_table "outward_invoice_trails", force: :cascade do |t|
-    t.integer  "action_id",                       limit: 4
-    t.integer  "customer_account_transaction_id", limit: 4
-    t.integer  "outward_invoice_id",              limit: 4
-    t.integer  "user_id",                         limit: 4
-    t.string   "note",                            limit: 255
-    t.integer  "amount_id",                       limit: 4
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
+    t.integer  "action_id",                   limit: 4
+    t.integer  "outward_invoice_id",          limit: 4
+    t.integer  "user_id",                     limit: 4
+    t.string   "note",                        limit: 255
+    t.integer  "amount_id",                   limit: 4
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.integer  "associated_entity_id",        limit: 4
+    t.string   "associated_entity_type",      limit: 255
+    t.integer  "associated_transaction_id",   limit: 4
+    t.string   "associated_transaction_type", limit: 255
   end
 
   add_index "outward_invoice_trails", ["action_id"], name: "index_outward_invoice_trails_on_action_id", using: :btree
   add_index "outward_invoice_trails", ["amount_id"], name: "index_outward_invoice_trails_on_amount_id", using: :btree
-  add_index "outward_invoice_trails", ["customer_account_transaction_id"], name: "index_outward_invoice_trails_on_customer_account_transaction_id", using: :btree
+  add_index "outward_invoice_trails", ["associated_entity_type", "associated_entity_id"], name: "index_outward_inv_trail_on_assoc_entty_type_and_assoc_entity_id", using: :btree
+  add_index "outward_invoice_trails", ["associated_transaction_type", "associated_transaction_id"], name: "index_outward_inv_trail_on_assoc_tranx_type_and_assoc_tranx_id", using: :btree
   add_index "outward_invoice_trails", ["outward_invoice_id"], name: "index_outward_invoice_trails_on_outward_invoice_id", using: :btree
   add_index "outward_invoice_trails", ["user_id"], name: "index_outward_invoice_trails_on_user_id", using: :btree
 
@@ -4157,7 +4161,6 @@ ActiveRecord::Schema.define(version: 20180329094333) do
   add_foreign_key "outward_invoice_attachments", "outward_invoices"
   add_foreign_key "outward_invoice_attachments", "users"
   add_foreign_key "outward_invoice_trails", "amounts"
-  add_foreign_key "outward_invoice_trails", "customer_account_transactions"
   add_foreign_key "outward_invoice_trails", "outward_invoices"
   add_foreign_key "outward_invoice_trails", "users"
   add_foreign_key "outward_invoices", "amounts"

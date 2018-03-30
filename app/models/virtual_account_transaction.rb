@@ -33,6 +33,8 @@ class VirtualAccountTransaction < ActiveRecord::Base
   has_many :invoice_transaction_mappings, foreign_key: :va_transaction_id
   has_many :invoices, through: :invoice_transaction_mappings
 
+  has_many :customer_account_transactions, as: :associated_object
+
   validates :transfer_id, uniqueness: true
 
   scope :with_transfer_id, -> (transfer_id) { where transfer_id: transfer_id }
