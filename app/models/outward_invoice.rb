@@ -37,6 +37,8 @@
 #  roundoff_total_enabled  :boolean
 #  memo                    :string(255)
 #  customer_memo           :text(65535)
+#  reminders               :text(65535)
+#  payment_term_id         :integer
 #
 
 #  gst_type_id: 1 - IGST

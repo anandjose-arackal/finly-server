@@ -38,6 +38,7 @@
 #  roundoff_amount    :decimal(20, 10)
 #  balance_due_id     :integer
 #  taxable_amount_id  :integer
+#  cost_center_id     :integer
 #
 
 require 'test_helper'

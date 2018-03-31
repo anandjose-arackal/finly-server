@@ -38,6 +38,7 @@
 #  roundoff_amount    :decimal(20, 10)
 #  balance_due_id     :integer
 #  taxable_amount_id  :integer
+#  cost_center_id     :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -57,6 +58,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :balance_due, class_name: "Amount"
   belongs_to :taxable_amount, class_name: "Amount"
   belongs_to :category
+  belongs_to :cost_center
 
   # because multiple payments can be made against one invoice
   has_many :payments, as: :parent
