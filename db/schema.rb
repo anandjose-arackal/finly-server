@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180330074930) do
+ActiveRecord::Schema.define(version: 20180331120311) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2604,6 +2604,7 @@ ActiveRecord::Schema.define(version: 20180330074930) do
     t.string   "associated_entity_type",      limit: 255
     t.integer  "associated_transaction_id",   limit: 4
     t.string   "associated_transaction_type", limit: 255
+    t.date     "date"
   end
 
   add_index "outward_invoice_trails", ["action_id"], name: "index_outward_invoice_trails_on_action_id", using: :btree

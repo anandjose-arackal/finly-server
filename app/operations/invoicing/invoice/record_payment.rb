@@ -2,7 +2,7 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
 
   attr_accessor :invoice, :amount,
                 :action_name, :action_id, :customer_account_transaction,
-                :customer_account
+                :customer_account, :payment_date, :date, :note
 
   def pre_validate
     action_names = OutwardInvoiceTrailAction.all.pluck(:name)
@@ -18,6 +18,8 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
     self.amount = params[:amount].to_f
     self.action_name = params[:action_id]
     self.action_id = OutwardInvoiceTrailAction.id_for(params[:action])
+    self.payment_date = Date.parse(params[:date]) rescue nil
+    self.note = params[:note]
 
 
     case action_name
@@ -29,7 +31,6 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
         if invoice.is_a?(OutwardInvoice)
           self.customer_account = invoice.customer.customer_account
         end
-
     end
 
 
@@ -55,11 +56,20 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
         if amount > customer_account.balance.value
           add_message :error, 'Cannot credit amount greater than customer account balance'
         end
+      when 'credit_outside'
+        if amount > invoice.balance_due.value
+          add_message :error, 'Cannot credit amount greater than balance due'
+        end
       when 'debit_customer_account'
         if amount > get_amount_transferred_by_va
-          add_message :error, 'Cannot retract amount greater than what is transferred through virtual account or customer account'
+          add_message :error, 'Cannot retract amount greater than amount transferred through virtual account or customer account'
           return
         end
+      when 'debit_outside'
+        if amount > get_amount_transferred_outside_finly
+          add_message :error, 'Cannot subtract amount greater amount transferred outside finly'
+        end
+
     end
 
   end
@@ -111,7 +121,10 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
                                                    amount_attributes: {
                                                        value: self.amount,
                                                        currency_id: 1 # todo change currncy
-                                                   }
+                                                   },
+                                                   user: user,
+                                                   date: self.date,
+                                                   note: self.note
                                                })
             add_message :success, 'Successfully added payment to invoice from Customer account'
 
@@ -123,7 +136,48 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
         # credit_customer_account ends
 
       when 'credit_outside'
-        # do something
+        if self.amount < invoice.balance_due.value
+          new_paid_amount = invoice.paid_amount&.value + self.amount
+          new_balance_due = invoice.balance_due&.value - self.amount
+          invoice_status_id = OutwardInvoiceStatus.id_for(:partially_paid)
+        else
+          new_paid_amount = invoice.net_amount&.value + invoice.roundoff_amount
+          new_balance_due = 0
+          invoice_status_id = OutwardInvoiceStatus.id_for(:closed)
+        end
+        self.invoice.assign_attributes({
+                                invoice_status_id: invoice_status_id,
+                                paid_amount_attributes: {
+                                    id: invoice.paid_amount.id,
+                                    value: new_paid_amount
+                                },
+                                balance_due_attributes: {
+                                    id: invoice.balance_due.id,
+                                    value: new_balance_due
+                                }
+                            })
+        # If invoice is valid then deduct amount from Customer Account
+        if invoice.valid?
+
+          invoice.save
+
+          # creat trail from invoice
+          self.invoice.invoice_trails.create({
+                                                 action_id: OutwardInvoiceTrailAction.id_for(self.action_name),
+                                                 amount_attributes: {
+                                                     value: self.amount,
+                                                     currency_id: 1 # todo change currncy
+                                                 },
+                                                 user: user,
+                                                 date: self.date,
+                                                 note: self.note
+                                             })
+          add_message :success, 'Successfully added payment to invoice'
+
+        else
+          add_message :error, self.invoice.errors.full_messages
+        end
+        # credit_customer_account ends
       when 'debit_customer_account'
         # 1. get amount which is added from virtual account
 
@@ -176,7 +230,10 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
                                                    amount_attributes: {
                                                        value: self.amount,
                                                        currency_id: 1 # todo change currncy
-                                                   }
+                                                   },
+                                                   user: user,
+                                                   date: self.date,
+                                                   note: self.note
                                                })
             add_message :success, 'Successfully retracted money from invoice to Customer account'
           end
@@ -186,7 +243,42 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
 
         # 4. save invoice
         # 5. create trail
+      when 'debit_outside'
+        new_paid_amount = invoice.paid_amount&.value - self.amount
+        new_balance_due = invoice.balance_due&.value + self.amount
+        invoice_status_id = OutwardInvoiceStatus.id_for(:partially_paid)
+        self.invoice.assign_attributes({
+                                invoice_status_id: invoice_status_id,
+                                paid_amount_attributes: {
+                                    id: invoice.paid_amount.id,
+                                    value: new_paid_amount
+                                },
+                                balance_due_attributes: {
+                                    id: invoice.balance_due.id,
+                                    value: new_balance_due
+                                }
+                            })
+        # If invoice is valid then deduct amount from Customer Account
+        if invoice.valid?
 
+          invoice.save
+
+          # creat trail from invoice
+          self.invoice.invoice_trails.create({
+                                                 action_id: OutwardInvoiceTrailAction.id_for(self.action_name),
+                                                 amount_attributes: {
+                                                     value: self.amount,
+                                                     currency_id: 1 # todo change currncy
+                                                 },
+                                                 user: user,
+                                                 date: self.date,
+                                                 note: self.note
+                                             })
+          add_message :success, 'Successfully added payment to invoice'
+
+        else
+          add_message :error, self.invoice.errors.full_messages
+        end
     end
   end
 
@@ -211,8 +303,26 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
       end
     end
 
+
     amount
 
+  end
+
+  def get_amount_transferred_outside_finly
+    trails = self.invoice.invoice_trails
+    amount = 0
+
+    for trail in trails
+      credit_action_ids = [OutwardInvoiceTrailAction.id_for('credit_outside')]
+      debit_action_ids = [OutwardInvoiceTrailAction.id_for('debit_outside')]
+      if credit_action_ids.include?(trail.action.id)
+        amount += trail.amount.value
+      elsif debit_action_ids.include?(trail.action.id)
+        amount -= trail.amount.value
+      end
+    end
+
+    amount
   end
 
 

@@ -111,6 +111,7 @@ json.trail do
   json.array! invoice.invoice_trails do |trail|
     json.extract! trail, :note, :associated_transaction_type
     json.action_name trail.action.name
+    json.action_type !!trail.action.name.index('credit')? 'credit' : 'debit'
     if trail.user_id
       json.user do
         json.id trail.user.id
