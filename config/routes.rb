@@ -959,6 +959,14 @@
 #                                                         PATCH  /bank_accounts/:id(.:format)                                                                 bank_accounts#update
 #                                                         PUT    /bank_accounts/:id(.:format)                                                                 bank_accounts#update
 #                                                         DELETE /bank_accounts/:id(.:format)                                                                 bank_accounts#destroy
+#                                            cost_centers GET    /cost_centers(.:format)                                                                      cost_centers#index
+#                                                         POST   /cost_centers(.:format)                                                                      cost_centers#create
+#                                         new_cost_center GET    /cost_centers/new(.:format)                                                                  cost_centers#new
+#                                        edit_cost_center GET    /cost_centers/:id/edit(.:format)                                                             cost_centers#edit
+#                                             cost_center GET    /cost_centers/:id(.:format)                                                                  cost_centers#show
+#                                                         PATCH  /cost_centers/:id(.:format)                                                                  cost_centers#update
+#                                                         PUT    /cost_centers/:id(.:format)                                                                  cost_centers#update
+#                                                         DELETE /cost_centers/:id(.:format)                                                                  cost_centers#destroy
 #                            company_add_balance_payments POST   /payments/companies/:company_id/add_balance(.:format)                                        companies#add_balance
 #                                                         GET    /payments/companies(.:format)                                                                companies#index
 #                                                         POST   /payments/companies(.:format)                                                                companies#create
@@ -2525,6 +2533,9 @@ Rails.application.routes.draw do
   resources :bank_accounts
 
   # ROUTES FOR VENDOR PAYMENTS
+  resources :cost_centers
+
+
   scope :payments do
     resources :companies do
       post 'add_balance', to: 'companies#add_balance', as: :add_balance_payments

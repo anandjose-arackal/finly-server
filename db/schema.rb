@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180331080720) do
+ActiveRecord::Schema.define(version: 20180331120920) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1153,6 +1153,7 @@ ActiveRecord::Schema.define(version: 20180331080720) do
     t.integer  "company_id",  limit: 4
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
+    t.boolean  "is_deleted"
   end
 
   add_index "cost_centers", ["company_id"], name: "index_cost_centers_on_company_id", using: :btree
