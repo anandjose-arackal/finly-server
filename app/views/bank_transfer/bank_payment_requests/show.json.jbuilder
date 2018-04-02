@@ -40,6 +40,20 @@ json.invoice_line_items_categories do
   end
 end
 
+json.cost_centers do
+  json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
+    json.id cost_center.id
+    json.name cost_center.name
+  end
+end
+json.tds_slabs do
+  json.array!(current_company.tds_slabs) do |tds_slab|
+    json.id tds_slab.id
+    json.name tds_slab.name
+    json.tds tds_slab.tds
+  end
+end
+
 json.invoice_custom_fields @result.invoice_custom_fields
 
 json.invoice_line_items_custom_fields @result.invoice_line_items_custom_fields
@@ -119,6 +133,9 @@ json.payments do
         end
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
+
+        json.cost_center_id invoice.cost_center_id
+        json.cost_center_name invoice.cost_center&.name
 
         # invoice amounts total
         json.item_amounts_total invoice.item_amounts_total
@@ -224,6 +241,9 @@ json.payments_verified do
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
 
+        json.cost_center_id invoice.cost_center_id
+        json.cost_center_name invoice.cost_center&.name
+
         # invoice amounts total
         json.item_amounts_total invoice.item_amounts_total
 
@@ -327,6 +347,9 @@ json.payments_unverified do
         end
         json.category_id invoice.category_id
         json.category_name invoice.category&.name
+
+        json.cost_center_id invoice.cost_center_id
+        json.cost_center_name invoice.cost_center&.name
 
         # invoice amounts total
         json.item_amounts_total invoice.item_amounts_total

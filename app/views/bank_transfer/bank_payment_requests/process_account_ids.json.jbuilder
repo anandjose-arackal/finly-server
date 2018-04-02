@@ -64,7 +64,19 @@ json.payment do
       json.name category.name
     end
   end
-
+  json.cost_centers do
+    json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
+      json.id cost_center.id
+      json.name cost_center.name
+    end
+  end
+  json.tds_slabs do
+    json.array!(current_company.tds_slabs) do |tds_slab|
+      json.id tds_slab.id
+      json.name tds_slab.name
+      json.tds tds_slab.tds
+    end
+  end
   json.errors @result.errors
   json.description @result.description
   json.payment_order_valid @result.payment_order_valid
