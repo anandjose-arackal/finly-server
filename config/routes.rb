@@ -967,6 +967,14 @@
 #                                                         PATCH  /cost_centers/:id(.:format)                                                                  cost_centers#update
 #                                                         PUT    /cost_centers/:id(.:format)                                                                  cost_centers#update
 #                                                         DELETE /cost_centers/:id(.:format)                                                                  cost_centers#destroy
+#                                               tds_slabs GET    /tds_slabs(.:format)                                                                         tds_slabs#index
+#                                                         POST   /tds_slabs(.:format)                                                                         tds_slabs#create
+#                                            new_tds_slab GET    /tds_slabs/new(.:format)                                                                     tds_slabs#new
+#                                           edit_tds_slab GET    /tds_slabs/:id/edit(.:format)                                                                tds_slabs#edit
+#                                                tds_slab GET    /tds_slabs/:id(.:format)                                                                     tds_slabs#show
+#                                                         PATCH  /tds_slabs/:id(.:format)                                                                     tds_slabs#update
+#                                                         PUT    /tds_slabs/:id(.:format)                                                                     tds_slabs#update
+#                                                         DELETE /tds_slabs/:id(.:format)                                                                     tds_slabs#destroy
 #                            company_add_balance_payments POST   /payments/companies/:company_id/add_balance(.:format)                                        companies#add_balance
 #                                                         GET    /payments/companies(.:format)                                                                companies#index
 #                                                         POST   /payments/companies(.:format)                                                                companies#create
@@ -2534,7 +2542,7 @@ Rails.application.routes.draw do
 
   # ROUTES FOR VENDOR PAYMENTS
   resources :cost_centers
-
+  resources :tds_slabs
 
   scope :payments do
     resources :companies do

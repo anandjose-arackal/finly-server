@@ -1,4 +1,4 @@
-class TdsSlabs::Create < CostCenter::Base
+class TdsSlabs::Create < TdsSlabs::Base
 
   attr_accessor :tds_slab, :tds_slab_parameters
 
