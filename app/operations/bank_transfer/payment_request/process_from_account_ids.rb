@@ -38,7 +38,7 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
     self.amounts = retrieve_data(:original_amount)
     self.notes = retrieve_data(:note)
     [:tax_amount, :tds_amount, :gst_type_id, :discount_amount, :discount, :tax, :tds, :advance_amount, :advance, :freight, :invoice_date, :invoice_number, :due_date,
-     :category_id, :cost_center_id, :custom_fields, :inclusive_of_taxes, :roundoff_amount, :balance_due, :item_amounts_total, :item_discounts_total, :item_taxes_total].each do |attr|
+     :category_id, :cost_center_id, :tds_slab_id, :custom_fields, :inclusive_of_taxes, :roundoff_amount, :balance_due, :item_amounts_total, :item_discounts_total, :item_taxes_total].each do |attr|
       self.class.send(:attr_accessor, attr)
       instance_variable_set("@#{attr}", retrieve_data(attr))
     end
@@ -115,7 +115,8 @@ class BankTransfer::PaymentRequest::ProcessFromAccountIds < BankTransfer::Paymen
           balance_due: self.balance_due[index],
           item_discounts_total: self.item_discounts_total[index],
           item_taxes_total: self.item_taxes_total[index],
-          item_amounts_total: self.item_amounts_total[index]
+          item_amounts_total: self.item_amounts_total[index],
+          tds_slab_id: self.tds_slab_id[index]
       }
     end
     data
