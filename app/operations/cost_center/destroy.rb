@@ -5,7 +5,6 @@ class CostCenter::Destroy < CostCenter::Base
   def init
     id = params[:id] || params[:cost_center_id]
     self.cost_center = user.company.cost_centers.find_by(id: id)
-    self.cost_center_parameters = cost_center_params
   end
 
   def validate

@@ -4,7 +4,7 @@ class TdsSlabs::Index < TdsSlabs::Base
 
   class TdsSlabs::Index::TdsSlabsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :tds_slab
+    attr_accessor :tds_slabs
 
     def init
       self.tds_slabs = params[:tds_slabs]
