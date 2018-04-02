@@ -139,6 +139,7 @@ json.payments do
 
         json.tds_slab_id invoice.tds_slab_id
         json.tds_slab_name invoice.tds_slab&.name
+        json.tds_rate invoice.tds
 
         # invoice amounts total
         json.item_amounts_total invoice.item_amounts_total
@@ -249,6 +250,7 @@ json.payments_verified do
 
         json.tds_slab_id invoice.tds_slab_id
         json.tds_slab_name invoice.tds_slab&.name
+        json.tds_rate invoice.tds
 
         # invoice amounts total
         json.item_amounts_total invoice.item_amounts_total
@@ -359,6 +361,7 @@ json.payments_unverified do
 
         json.tds_slab_id invoice.tds_slab_id
         json.tds_slab_name invoice.tds_slab&.name
+        json.tds_rate invoice.tds
 
         # invoice amounts total
         json.item_amounts_total invoice.item_amounts_total
