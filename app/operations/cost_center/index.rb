@@ -14,4 +14,9 @@ class CostCenter::Index < CostCenter::Base
   def init
     self.cost_centers = user.company.cost_centers
   end
+
+  def success
+    params[:cost_centers] = self.cost_centers
+    CostCenter::Index::CostCenterPresenter.new(user, params, messages)
+  end
 end
