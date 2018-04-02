@@ -371,11 +371,11 @@ class Company < ActiveRecord::Base
 
     # creating the invoice numbering configuration for all companies with default values
     # self.build_invoice_number_config(sequence_start: "0000").save
-    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), config_type_id: InvoiceNumberConfigType.id_for(:tax_invoice)}).save
-    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), config_type_id: InvoiceNumberConfigType.id_for(:advance)}).save
-    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), config_type_id: InvoiceNumberConfigType.id_for(:credit_note)}).save
-    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
-    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:vendor_payments), config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:tax_invoice)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:advance)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:credit_note)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:vendor_payments), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
 
 
     self.build_collect_company_detail.save
