@@ -14,6 +14,7 @@
 #  associated_entity_type      :string(255)
 #  associated_transaction_id   :integer
 #  associated_transaction_type :string(255)
+#  date                        :date
 #
 
 require 'test_helper'

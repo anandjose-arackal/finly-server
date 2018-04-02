@@ -26,9 +26,7 @@ class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
       return
     end
 
-    debugger
     self.invoice_number_config = user.company.invoice_number_configs.with_purpose_id(purpose_id).with_config_type_id(invoice_number_config_type_id).first
-
   end
 
   def validate
