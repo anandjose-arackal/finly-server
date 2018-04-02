@@ -1,6 +1,6 @@
 class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
 
-  attr_accessor :invoice_number_config, :invoice_number, :invoice
+  attr_accessor :invoice_number_config, :invoice_number, :invoice, :purpose_id, :invoice_number_config_type_id
 
   class Invoicing::Invoice::GenerateInvoiceNumber::InvoiceNumberPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -13,8 +13,22 @@ class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
   end
 
   def init
-    self.invoice_number_config = user.company.invoice_number_config
     self.invoice = params[:invoice]
+    if self.invoice.is_a?(OutwardInvoice)
+      self.purpose_id = Purpose.id_for(:collect)
+      invoice_type = invoice.outward_invoice_type.name
+      self.invoice_number_config_type_id = InvoiceNumberConfigType.id_for(invoice_type)
+    elsif self.invoice.is_a?(Invoice)
+      self.purpose_id = Purpose.id_for(:vendor_payments)
+      #todo do the same for inward invoice
+    else
+      add_message :error, "Invalid purpose passed"
+      return
+    end
+
+    debugger
+    self.invoice_number_config = user.company.invoice_number_configs.with_purpose_id(purpose_id).with_config_type_id(invoice_number_config_type_id).first
+
   end
 
   def validate

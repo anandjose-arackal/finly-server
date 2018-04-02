@@ -39,11 +39,11 @@ class Company < ActiveRecord::Base
   has_many :inventory_line_items
   has_many :payment_terms
   has_many :invoice_reminders
+  has_many :invoice_number_configs
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
   has_one :payment_file_configuration
-  has_one :invoice_number_config
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
@@ -370,7 +370,14 @@ class Company < ActiveRecord::Base
     self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
 
     # creating the invoice numbering configuration for all companies with default values
-    self.build_invoice_number_config(sequence_start: "0000").save
+    # self.build_invoice_number_config(sequence_start: "0000").save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), config_type_id: InvoiceNumberConfigType.id_for(:tax_invoice)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), config_type_id: InvoiceNumberConfigType.id_for(:advance)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), config_type_id: InvoiceNumberConfigType.id_for(:credit_note)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:vendor_payments), config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
+
+
     self.build_collect_company_detail.save
     # seeding the default payment terms for this company
     PaymentTerm.seed_defaults(self.id)

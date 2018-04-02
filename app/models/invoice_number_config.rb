@@ -13,4 +13,8 @@
 class InvoiceNumberConfig < ActiveRecord::Base
 
   belongs_to :company
+  belongs_to :config_type_id, class_name: 'InvoiceNumberConfigType'
+
+  scope :with_purpose_id, -> (ids) { where purpose_id: ids }
+  scope :with_config_type_id, -> (ids) { where config_type_id: ids }
 end
