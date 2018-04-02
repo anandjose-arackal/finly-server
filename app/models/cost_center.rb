@@ -20,4 +20,5 @@ class CostCenter < ActiveRecord::Base
   scope :with_application, -> (app) {
     where application: app
   }
+
 end

@@ -39,6 +39,7 @@ class Company < ActiveRecord::Base
   has_many :bank_transactions
   has_many :inventory_line_items
   has_many :payment_terms
+  has_many :tds_slabs, class_name: "TdsRatesList"
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
@@ -372,6 +373,7 @@ class Company < ActiveRecord::Base
     self.build_collect_company_detail.save
     # seeding the default payment terms for this company
     PaymentTerm.seed_defaults(self.id)
+    TdsRatesList.seed_data(self.id)
   end
 
 end
