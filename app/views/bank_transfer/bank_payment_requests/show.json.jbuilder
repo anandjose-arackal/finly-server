@@ -137,6 +137,9 @@ json.payments do
         json.cost_center_id invoice.cost_center_id
         json.cost_center_name invoice.cost_center&.name
 
+        json.tds_slab_id invoice.tds_slab_id
+        json.tds_slab_name invoice.tds_slab&.name
+
         # invoice amounts total
         json.item_amounts_total invoice.item_amounts_total
 
@@ -244,6 +247,9 @@ json.payments_verified do
         json.cost_center_id invoice.cost_center_id
         json.cost_center_name invoice.cost_center&.name
 
+        json.tds_slab_id invoice.tds_slab_id
+        json.tds_slab_name invoice.tds_slab&.name
+
         # invoice amounts total
         json.item_amounts_total invoice.item_amounts_total
 
@@ -350,6 +356,9 @@ json.payments_unverified do
 
         json.cost_center_id invoice.cost_center_id
         json.cost_center_name invoice.cost_center&.name
+
+        json.tds_slab_id invoice.tds_slab_id
+        json.tds_slab_name invoice.tds_slab&.name
 
         # invoice amounts total
         json.item_amounts_total invoice.item_amounts_total

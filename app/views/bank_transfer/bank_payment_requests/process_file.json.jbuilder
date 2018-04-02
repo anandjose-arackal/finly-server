@@ -27,6 +27,7 @@ json.payment do
       json.net_amount item[:net_amount]
       json.category_id item[:category_id]
       json.cost_center_id item[:cost_center_id]
+      json.tds_slab_id item[:tds_slab_id]
       json.roundoff_amount item[:roundoff_amount]
       json.balance_due item[:balance_due]
       json.item_taxes_total item[:item_taxes_total]
