@@ -4,8 +4,7 @@ class TdsSlabs::Destroy < TdsSlabs::Base
 
   def init
     id = params[:id] || params[:tds_slab_id]
-    self.tds_slab = user.company.tds_slab.find_by(id: id)
-    self.tds_slab_parameters = tds_slab_params
+    self.tds_slab = user.company.tds_slabs.find_by(id: id)
   end
 
   def validate
