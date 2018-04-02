@@ -21,6 +21,7 @@ class Company < ActiveRecord::Base
   has_many :cards
   has_many :contacts, as: :contactable
   has_many :categories, dependent: :destroy
+  has_many :cost_centers, dependent: :destroy
   has_many :tags, class_name: 'CompanyTag', dependent: :destroy
   has_one :configuration, class_name: 'CompanyConfiguration', dependent: :destroy
   has_many :policies, dependent: :destroy
