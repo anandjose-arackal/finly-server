@@ -1,12 +1,15 @@
 # this checks the invoice for all validations and eventually saves the invoice which can now be sent to the customer
 class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
-  attr_accessor :invoice, :invoice_parameters, :invoice_number, :invoice_current_attachments, :invoice_old_attachments
+  attr_accessor :invoice, :invoice_parameters, :invoice_number, :invoice_current_attachments, :invoice_old_attachments, :invoice_type
 
   def init
     id = params[:id] || params[:outward_invoice_id]
     self.invoice = user.company.outward_invoices.find_by(id: id)
     self.invoice_parameters = invoice_params
+    if invoice
+      self.invoice_type = invoice.outward_invoice_type.name
+    end
   end
 
   def validate
@@ -54,7 +57,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     end
 
     # adding the prefix and sequence to the invoice
-    prefix = user.company.invoice_number_config.prefix
+    prefix = user.company.invoice_number_configs.with_purpose_id(Purpose.id_for(:collect)).with_config_type_id(InvoiceNumberConfigType.id_for(self.invoice_type)).first.prefix
     sequence = self.invoice_number&.gsub(prefix, '')
     self.invoice_parameters[:prefix] = prefix
     self.invoice_parameters[:sequence_start] = sequence
