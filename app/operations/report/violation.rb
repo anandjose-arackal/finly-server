@@ -202,16 +202,46 @@ class Report::Violation < Report::Base
     total_expenses = 0
     # all user reports with the associated budget
     user.reports.processed.with_policy_id(rule.policy_id).where.not(id: report.id).each do |budget_report|
+      expenses = budget_report.expenses
+      case rule.expense_type_id
+        when 1
+          expenses = expenses.only_manual_expenses
+        when 2
+          expenses = expenses.only_card_expenses
+        when 3
+          expenses = expenses.only_distance_expenses
+        when 4
+          expenses = expenses.only_time_expenses
+        when 5
+          expenses = expenses.only_per_diem_expenses
+        else
+          # do nothing
+      end
       if rule.include_reimbursable_expenses?
-        total_expenses += number_with_precision(budget_report.expenses.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
+        total_expenses += number_with_precision(expenses.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
       else
-        total_expenses += number_with_precision(budget_report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
+        total_expenses += number_with_precision(expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
       end
     end
+    expenses = report.expenses
+    case rule.expense_type_id
+      when 1
+        expenses = expenses.only_manual_expenses
+      when 2
+        expenses = expenses.only_card_expenses
+      when 3
+        expenses = expenses.only_distance_expenses
+      when 4
+        expenses = expenses.only_time_expenses
+      when 5
+        expenses = expenses.only_per_diem_expenses
+      else
+        # do nothing
+    end
     if rule.include_reimbursable_expenses?
-      total_expenses += number_with_precision(report.expenses.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
+      total_expenses += number_with_precision(expenses.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
     else
-      total_expenses += number_with_precision(report.expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
+      total_expenses += number_with_precision(expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
     end
     if total_expenses > rule.amount.send(base_currency_code.to_sym)
       return true
@@ -250,20 +280,48 @@ class Report::Violation < Report::Base
         end
         if budget_violation?(expense, rule, start_date, end_date, category)
           if rule.type == 'Warning'
+            case rule.expense_type_id
+              when 1
+                type = "of Cash"
+              when 2
+                type = "of Card"
+              when 3
+                type = "of Distance"
+              when 4
+                type = "of Time"
+              when 5
+                type = "of Per Diem"
+              else
+                type = ""
+            end
             if category
-              message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
+              message = "Total #{type} expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_warning'] << {type: 'category', message: message}
             else
-              message = "Total expenses #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
+              message = "Total #{type} expenses #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_warning'] << {type: 'total', message: message}
             end
             return
           elsif rule.type == 'Blocking'
+            case rule.expense_type_id
+              when 1
+                type = "of Cash"
+              when 2
+                type = "of Card"
+              when 3
+                type = "of Distance"
+              when 4
+                type = "of Time"
+              when 5
+                type = "of Per Diem"
+              else
+                type = ""
+            end
             if category
-              message = "Total expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
+              message = "Total #{type} expenses under category #{category.name} #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_blocking'] << {type: 'category', message: message}
             else
-              message = "Total expenses #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
+              message = "Total #{type} expenses #{budget_message} have exceeded #{rule.amount.currency.symbol}#{rule.amount_value.to_s} #{rule.amount.currency.country_code}"
               self.warning_messages[expense.id]['budget_blocking'] << {type: 'total', message: message}
             end
             return

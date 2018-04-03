@@ -58,7 +58,21 @@ class BudgetRule < ActiveRecord::Base
   end
 
   def rule_in_words
-    rule_in_words = "Total Expenses"
+    case self.expense_type_id
+      when 1
+        type = "of Cash"
+      when 2
+        type = "of Card"
+      when 3
+        type = "of Distance"
+      when 4
+        type = "of Time"
+      when 5
+        type = "of Per Diem"
+      else
+        type = ""
+    end
+    rule_in_words = "Total #{type} Expenses"
     if self.period_id
       case self.period_id
         when 1
@@ -69,6 +83,8 @@ class BudgetRule < ActiveRecord::Base
           period = "month"
         when 4
           period = "year"
+        else
+          period = ""
       end
       rule_in_words += " per " + period
     end
