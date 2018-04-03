@@ -19,7 +19,7 @@ class WebHook < ActiveRecord::Base
   belongs_to :company
 
   validates :created_by_user_id, presence: true
-  validates :url, presence: true, uniqueness: {scope: :company_id, case_sensitive: false}, format: {:with => Constants::VALID_DOMAIN}
+  # validates :url, presence: true, uniqueness: {scope: :company_id, case_sensitive: false}, format: {:with => Constants::VALID_DOMAIN}
   validates :secret, uniqueness: {allow_nil: true, scope: :company_id, case_sensitive: false}
 
   has_many :web_hook_event_mappings, dependent: :destroy
