@@ -136,7 +136,7 @@ class BaseHandler
             req.params = query_param if query_param.present?
             if header_param.present? and header_param.is_a?(Hash)
               header_param.each do |k, v|
-                req[k] = v
+                req.headers[k] = v
               end
             end
             req.body = body_param if body_param.present?
