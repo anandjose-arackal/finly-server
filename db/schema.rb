@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180402163517) do
+ActiveRecord::Schema.define(version: 20180403050152) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -566,6 +566,7 @@ ActiveRecord::Schema.define(version: 20180402163517) do
     t.integer  "rule_type_id",         limit: 4
     t.boolean  "include_reimbursable",           default: true
     t.boolean  "is_deleted",                     default: false
+    t.integer  "expense_type_id",      limit: 4
   end
 
   add_index "budget_rules", ["amount_id"], name: "index_budget_rules_on_amount_id", using: :btree
