@@ -4,13 +4,17 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
 
   class Invoicing::Invoice::Show::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoice, :invoice_number, :payment_terms, :invoice_attachments
+    attr_accessor :invoice, :invoice_number, :payment_terms, :invoice_attachments, :paid_amounts
 
     def init
       self.invoice = params[:invoice]
       self.invoice_number = params[:invoice_number]
       self.payment_terms = params[:payment_terms]
       self.invoice_attachments = self.invoice.attachments
+      self.paid_amounts = {
+        through_outside_finly: get_outside_finly_amount,
+        through_va_ca: get_va_ca_balance
+      }
     end
 
     def navbar_actions
@@ -59,6 +63,44 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
         end
       end
       actions
+    end
+
+    def get_outside_finly_amount
+      # Total of payments added outside finly
+      trails = self.invoice.invoice_trails
+      amount = 0
+
+      for trail in trails
+        credit_action_ids = [OutwardInvoiceTrailAction.id_for('credit_outside')]
+        debit_action_ids = [OutwardInvoiceTrailAction.id_for('debit_outside')]
+        if credit_action_ids.include?(trail.action.id)
+          amount += trail.amount.value
+        elsif debit_action_ids.include?(trail.action.id)
+          amount -= trail.amount.value
+        end
+      end
+
+      amount
+    end
+
+    def get_va_ca_balance
+      # Total of payments from Virtual Bank Account or Customer's Account
+      trails = self.invoice.invoice_trails
+      amount = 0
+
+      for trail in trails
+        credit_action_ids = [OutwardInvoiceTrailAction.id_for('credit_virtual_account'), OutwardInvoiceTrailAction.id_for('credit_customer_account')]
+        debit_action_ids = [OutwardInvoiceTrailAction.id_for('debit_customer_account')]
+        if credit_action_ids.include?(trail.action.id)
+          amount += trail.amount.value
+        elsif debit_action_ids.include?(trail.action.id)
+          amount -= trail.amount.value
+        end
+      end
+
+
+      amount
+
     end
   end
 

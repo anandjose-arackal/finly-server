@@ -61,6 +61,7 @@ json.invoice do
     json.paid_amount invoice.paid_amount&.value
     json.total_payable invoice.total_payable&.value
     json.roundoff_total_enabled invoice.roundoff_total_enabled
+    json.paid_amounts @result.paid_amounts
   end
 
   json.invoice_items do
@@ -121,6 +122,7 @@ json.trail do
       end
     end
     json.amount trail.amount.value
+    json.date trail.date&.strftime("%d-%b-%Y")
     json.currency do
       json.id trail.amount.currency.id
       json.country trail.amount.currency.country

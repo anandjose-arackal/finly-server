@@ -2,7 +2,7 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
 
   attr_accessor :invoice, :amount,
                 :action_name, :action_id, :customer_account_transaction,
-                :customer_account, :payment_date, :date, :note
+                :customer_account, :payment_date, :note
 
   def pre_validate
     action_names = OutwardInvoiceTrailAction.all.pluck(:name)
@@ -32,8 +32,6 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
           self.customer_account = invoice.customer.customer_account
         end
     end
-
-
   end
 
   def validate
@@ -87,6 +85,10 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
           new_balance_due = 0
           invoice_status_id = OutwardInvoiceStatus.id_for(:closed)
         end
+
+        if mark_as_closed
+          invoice_status_id =
+        end
         self.invoice.assign_attributes({
                                 invoice_status_id: invoice_status_id,
                                 paid_amount_attributes: {
@@ -123,7 +125,7 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
                                                        currency_id: 1 # todo change currncy
                                                    },
                                                    user: user,
-                                                   date: self.date,
+                                                   date: self.payment_date,
                                                    note: self.note
                                                })
             add_message :success, 'Successfully added payment to invoice from Customer account'
@@ -169,7 +171,7 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
                                                      currency_id: 1 # todo change currncy
                                                  },
                                                  user: user,
-                                                 date: self.date,
+                                                 date: self.payment_date,
                                                  note: self.note
                                              })
           add_message :success, 'Successfully added payment to invoice'
@@ -232,7 +234,7 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
                                                        currency_id: 1 # todo change currncy
                                                    },
                                                    user: user,
-                                                   date: self.date,
+                                                   date: self.payment_date,
                                                    note: self.note
                                                })
             add_message :success, 'Successfully retracted money from invoice to Customer account'
