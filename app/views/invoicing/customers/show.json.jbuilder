@@ -48,7 +48,12 @@ json.customer_account do
   customer_account_transactions = customer.customer_account.customer_account_transactions
   json.transactions do
     json.array! customer_account_transactions do |cat|
-      json.extract! cat, :id, :transaction_type, :associated_object_id, :associated_object_type
+      json.extract! cat, :id, :transaction_type, :associated_object_type
+      if cat.associated_object_type == 'OutwardInvoice'
+        json.associated_object_id cat.associated_object_id
+      elsif cat.associated_object_type == 'VirtualAccountTransaction'
+        json.associated_object_id cat.associated_object.virtual_account.id
+      end
       json.time cat.created_at.strftime("%I:%M %p")
       json.date cat.created_at.strftime("%d %b %Y")
       json.amount cat.transaction_amount.value

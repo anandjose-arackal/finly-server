@@ -177,6 +177,7 @@ class OutwardInvoice < ActiveRecord::Base
 
 
   default_scope { unscope(:where) }
+  scope :desc_created, -> { order(created_at: :desc) }
 
   def invoice_status_identifier
     self.invoice_status&.name

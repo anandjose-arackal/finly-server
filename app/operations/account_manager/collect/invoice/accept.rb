@@ -9,7 +9,7 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
     self.customer = virtual_account.customer
     self.customer_account = self.customer.customer_account #todo add validations for existence
     self.company = virtual_account.company
-    self.outward_invoices = self.virtual_account.outward_invoices.payments_receivable
+    self.outward_invoices = self.virtual_account.outward_invoices.payments_receivable.reorder(created_at: :asc)
     self.transaction_amount = self.virtual_account_transaction.transfer_amount.to_f
     self.amount_due = self.outward_invoices.joins(:balance_due).sum(:value) - self.outward_invoices.joins(:paid_amount).sum(:value)
 
