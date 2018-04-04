@@ -102,7 +102,7 @@ views:
 #      - name: Policies
 #        url: '/policies'
   <% end %>
-  <% if current_user.admin? %>
+  <% if current_user.auditor? %>
   auditor:
     menus:
       navbar:
@@ -128,8 +128,10 @@ views:
         url: 'export'
         id: 'export'
       cog:
+      - name: Organization Account
+        url: '#organization_account/params={"view":"auditor"}'
       - name: Company Statements
-        url: '#company_statements/params={"view": "admin"}'
+        url: '#company_statements/params={"view": "auditor"}'
   <% end %>
   <% if current_user.finance_manager? %>
   finance_manager:
