@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180403131923) do
+ActiveRecord::Schema.define(version: 20180305152435) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -566,6 +566,7 @@ ActiveRecord::Schema.define(version: 20180403131923) do
     t.integer  "rule_type_id",         limit: 4
     t.boolean  "include_reimbursable",           default: true
     t.boolean  "is_deleted",                     default: false
+    t.integer  "expense_type_id",      limit: 4
   end
 
   add_index "budget_rules", ["amount_id"], name: "index_budget_rules_on_amount_id", using: :btree
@@ -2035,6 +2036,26 @@ ActiveRecord::Schema.define(version: 20180403131923) do
   add_index "invoice_transaction_mappings", ["invoice_id"], name: "index_invoice_transaction_mappings_on_invoice_id", using: :btree
   add_index "invoice_transaction_mappings", ["va_transaction_id"], name: "index_invoice_transaction_mappings_on_va_transaction_id", using: :btree
 
+  create_table "invoice_reminders", force: :cascade do |t|
+    t.integer  "days",                limit: 4
+    t.string   "reference_date_type", limit: 255
+    t.string   "timeframe_type",      limit: 255
+    t.integer  "company_id",          limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "name",                limit: 255
+  end
+
+  create_table "invoice_transaction_mappings", force: :cascade do |t|
+    t.integer  "invoice_id",        limit: 4
+    t.integer  "va_transaction_id", limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "invoice_transaction_mappings", ["invoice_id"], name: "index_invoice_transaction_mappings_on_invoice_id", using: :btree
+  add_index "invoice_transaction_mappings", ["va_transaction_id"], name: "index_invoice_transaction_mappings_on_va_transaction_id", using: :btree
+
   create_table "invoices", force: :cascade do |t|
     t.integer  "address_id",         limit: 4
     t.date     "date"
@@ -2677,6 +2698,8 @@ ActiveRecord::Schema.define(version: 20180403131923) do
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
     t.text     "customer_memo",           limit: 65535
+    t.text     "reminders",               limit: 65535
+    t.integer  "payment_term_id",         limit: 4
     t.integer  "payment_term_id",         limit: 4
     t.text     "reminders",               limit: 65535
     t.integer  "user_id",                 limit: 4
@@ -4196,11 +4219,15 @@ ActiveRecord::Schema.define(version: 20180403131923) do
   add_foreign_key "outward_invoice_attachments", "companies"
   add_foreign_key "outward_invoice_attachments", "outward_invoices"
   add_foreign_key "outward_invoice_attachments", "users"
+  add_foreign_key "outward_invoice_attachments", "companies"
+  add_foreign_key "outward_invoice_attachments", "outward_invoices"
+  add_foreign_key "outward_invoice_attachments", "users"
   add_foreign_key "outward_invoice_trails", "amounts"
   add_foreign_key "outward_invoice_trails", "outward_invoices"
   add_foreign_key "outward_invoice_trails", "users"
   add_foreign_key "outward_invoices", "amounts"
   add_foreign_key "outward_invoices", "customers"
+  add_foreign_key "outward_invoices", "payment_terms"
   add_foreign_key "outward_invoices", "outward_invoice_types"
   add_foreign_key "outward_invoices", "payment_terms"
   add_foreign_key "outward_invoices", "users"

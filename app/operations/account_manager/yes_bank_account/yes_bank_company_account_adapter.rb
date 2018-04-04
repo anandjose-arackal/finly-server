@@ -34,6 +34,7 @@ class AccountManager::YesBankAccount::YesBankCompanyAccountAdapter < AccountMana
 
   def debit(payment, options = {})
     # this will debit money from the company balance
+    self.company = self.account.company
     if self.company.current_account_connected?
       both_balances = balance
       store_transaction payment, :debit, :success, both_balances, both_balances, account.company_id

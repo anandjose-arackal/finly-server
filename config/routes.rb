@@ -959,6 +959,22 @@
 #                                                         PATCH  /bank_accounts/:id(.:format)                                                                 bank_accounts#update
 #                                                         PUT    /bank_accounts/:id(.:format)                                                                 bank_accounts#update
 #                                                         DELETE /bank_accounts/:id(.:format)                                                                 bank_accounts#destroy
+#                                            cost_centers GET    /cost_centers(.:format)                                                                      cost_centers#index
+#                                                         POST   /cost_centers(.:format)                                                                      cost_centers#create
+#                                         new_cost_center GET    /cost_centers/new(.:format)                                                                  cost_centers#new
+#                                        edit_cost_center GET    /cost_centers/:id/edit(.:format)                                                             cost_centers#edit
+#                                             cost_center GET    /cost_centers/:id(.:format)                                                                  cost_centers#show
+#                                                         PATCH  /cost_centers/:id(.:format)                                                                  cost_centers#update
+#                                                         PUT    /cost_centers/:id(.:format)                                                                  cost_centers#update
+#                                                         DELETE /cost_centers/:id(.:format)                                                                  cost_centers#destroy
+#                                               tds_slabs GET    /tds_slabs(.:format)                                                                         tds_slabs#index
+#                                                         POST   /tds_slabs(.:format)                                                                         tds_slabs#create
+#                                            new_tds_slab GET    /tds_slabs/new(.:format)                                                                     tds_slabs#new
+#                                           edit_tds_slab GET    /tds_slabs/:id/edit(.:format)                                                                tds_slabs#edit
+#                                                tds_slab GET    /tds_slabs/:id(.:format)                                                                     tds_slabs#show
+#                                                         PATCH  /tds_slabs/:id(.:format)                                                                     tds_slabs#update
+#                                                         PUT    /tds_slabs/:id(.:format)                                                                     tds_slabs#update
+#                                                         DELETE /tds_slabs/:id(.:format)                                                                     tds_slabs#destroy
 #                            company_add_balance_payments POST   /payments/companies/:company_id/add_balance(.:format)                                        companies#add_balance
 #                                                         GET    /payments/companies(.:format)                                                                companies#index
 #                                                         POST   /payments/companies(.:format)                                                                companies#create
@@ -998,6 +1014,7 @@
 #                   bank_transfer_download_all_attachment GET    /bank_transfer/download_all_attachment(.:format)                                             bank_transfer/bank_payment_requests#download_all_attachment
 #                      bank_transfer_bulk_credit_validate PATCH  /bank_transfer/bulk_credit_validate(.:format)                                                bank_transfer/bank_payment_requests#bulk_credit_validate
 #                               bank_transfer_bulk_credit PATCH  /bank_transfer/bulk_credit(.:format)                                                         bank_transfer/bank_payment_requests#bulk_credit
+#                        bank_transfer_sample_import_file GET    /bank_transfer/sample_import_format(.:format)                                                bank_transfer/bank_payment_requests#sample_import_file
 #              bank_transfer_bank_payment_request_comment POST   /bank_transfer/bank_payment_requests/:bank_payment_request_id/comment(.:format)              bank_transfer/bank_payment_requests#comment
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)               bank_transfer/bank_payment_requests#review
 #               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)               bank_transfer/bank_payment_requests#credit
@@ -2543,6 +2560,9 @@ Rails.application.routes.draw do
   resources :bank_accounts
 
   # ROUTES FOR VENDOR PAYMENTS
+  resources :cost_centers
+  resources :tds_slabs
+
   scope :payments do
     resources :companies do
       post 'add_balance', to: 'companies#add_balance', as: :add_balance_payments
@@ -2575,6 +2595,7 @@ Rails.application.routes.draw do
     get 'download_all_attachment', to: 'bank_payment_requests#download_all_attachment', as: :download_all_attachment
     patch 'bulk_credit_validate', to: 'bank_payment_requests#bulk_credit_validate', as: :bulk_credit_validate
     patch 'bulk_credit', to: 'bank_payment_requests#bulk_credit', as: :bulk_credit
+    get 'sample_import_format', to: 'bank_payment_requests#sample_import_file', as: :sample_import_file
     # patch 'bulk_credit_validate', to: 'bank_payment_requests#bulk_approve_validate', as: :bulk_credit_validate
 
     resources :bank_payment_requests do
