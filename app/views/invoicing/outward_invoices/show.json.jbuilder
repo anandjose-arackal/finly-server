@@ -10,7 +10,7 @@ json.customer do
     json.currency do
       json.id customer_account&.balance&.currency&.id
       json.country customer_account&.balance&.currency&.country
-      json.country_code customer_account&.balance&.currency&.country
+      json.country_code customer_account&.balance&.currency&.country_code
       json.symbol customer_account&.balance&.currency&.symbol
     end
   end

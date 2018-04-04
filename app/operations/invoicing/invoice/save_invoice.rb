@@ -18,7 +18,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       return
     end
 
-    if self.invoice.cancelled? || self.invoice.partially_paid? || self.invoice.closed?
+    if self.invoice.cancelled? || self.invoice.partially_paid? || self.invoice.paid?
       add_message :error, "Invoice cannot be edited in this state"
       return
     end

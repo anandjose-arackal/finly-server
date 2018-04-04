@@ -83,7 +83,7 @@ class OutwardInvoice < ActiveRecord::Base
   has_many :attachments, class_name: "OutwardInvoiceAttachment"
   has_many :invoice_trails, class_name: "OutwardInvoiceTrail"
 
-  delegate :partially_paid?, :closed?, :incomplete?, :saved?, :cancelled?, to: :invoice_status
+  delegate :partially_paid?, :paid?, :incomplete?, :saved?, :cancelled?, to: :invoice_status
   delegate :status_name, to: :invoice_status
 
   accepts_nested_attributes_for :customer
@@ -115,14 +115,14 @@ class OutwardInvoice < ActiveRecord::Base
   validate :gst_type_selection, if: :valid_invoice?
 
   scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
-  scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:closed) }
+  scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:paid) }
   scope :cancelled, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:cancelled) }
   scope :partially_paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid) }
   scope :payments_receivable, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid])) }
-  scope :processed, -> { where invoice_status_id: [OutwardInvoiceStatus.id_for(:closed), OutwardInvoiceStatus.id_for(:partially_paid)]}
+  scope :processed, -> { where invoice_status_id: [OutwardInvoiceStatus.id_for(:paid), OutwardInvoiceStatus.id_for(:partially_paid)]}
   scope :with_type, -> (type) {where outward_invoice_type_id: OutwardInvoiceType.id_for(type)}
 
-  scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid, :closed, :cancelled]) }
+  scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid, :paid, :cancelled]) }
   scope :invoice_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
   scope :without_id, -> (id){ where.not id: id}
   scope :with_id, -> (id) { where id: id }
@@ -183,7 +183,7 @@ class OutwardInvoice < ActiveRecord::Base
   end
 
   def editable?
-    !((OutwardInvoiceStatus.ids_for(:closed, :cancelled, :partially_paid)).include?(self.invoice_status_id))
+    !((OutwardInvoiceStatus.ids_for(:paid, :cancelled, :partially_paid)).include?(self.invoice_status_id))
   end
 
   def line_items_total

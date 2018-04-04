@@ -24,4 +24,6 @@ class CustomerAccountTransaction < ActiveRecord::Base
   has_one :outward_invoice_trail, as: :associated_transaction
 
   accepts_nested_attributes_for :transaction_amount
+
+  default_scope { order(created_at: :desc) }
 end

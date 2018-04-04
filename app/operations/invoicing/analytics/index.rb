@@ -21,7 +21,7 @@ class Invoicing::Analytics::Index < Invoicing::Analytics::Base
   def process
     # self.analytics_data[:invoices] = company.outward_invoices.with
     self.analytics_data[:invoices_count] = invoices.count
-    self.analytics_data[:closed_invoices_count] = invoices.paid.count
+    self.analytics_data[:paid_invoices_count] = invoices.paid.count
     self.analytics_data[:unpaid_invoices_count] = invoices.unpaid.count
     self.analytics_data[:cancelled_invoices_count] = invoices.cancelled.count
     self.analytics_data[:paritally_paid_invoices_count] = invoices.partially_paid.count

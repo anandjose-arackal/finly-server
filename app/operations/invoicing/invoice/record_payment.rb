@@ -83,12 +83,9 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
         else
           new_paid_amount = invoice.net_amount&.value + invoice.roundoff_amount
           new_balance_due = 0
-          invoice_status_id = OutwardInvoiceStatus.id_for(:closed)
+          invoice_status_id = OutwardInvoiceStatus.id_for(:paid)
         end
 
-        if mark_as_closed
-          invoice_status_id =
-        end
         self.invoice.assign_attributes({
                                 invoice_status_id: invoice_status_id,
                                 paid_amount_attributes: {
@@ -145,7 +142,7 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
         else
           new_paid_amount = invoice.net_amount&.value + invoice.roundoff_amount
           new_balance_due = 0
-          invoice_status_id = OutwardInvoiceStatus.id_for(:closed)
+          invoice_status_id = OutwardInvoiceStatus.id_for(:paid)
         end
         self.invoice.assign_attributes({
                                 invoice_status_id: invoice_status_id,
@@ -192,7 +189,7 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
         # else
         #   new_paid_amount = invoice.net_amount&.value + invoice.roundoff_amount
         #   new_balance_due = 0
-        #   invoice_status_id = OutwardInvoiceStatus.id_for(:closed)
+        #   invoice_status_id = OutwardInvoiceStatus.id_for(:paid)
         # end
 
 
@@ -273,7 +270,7 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
                                                      currency_id: 1 # todo change currncy
                                                  },
                                                  user: user,
-                                                 date: self.date,
+                                                 date: self.payment_date,
                                                  note: self.note
                                              })
           add_message :success, 'Successfully added payment to invoice'

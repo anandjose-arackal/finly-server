@@ -36,13 +36,13 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
             id: "cancel_invoice",
             btn_class: "danger"
         }
-        actions << {
-            url: Rails.application.routes.url_helpers.invoicing_outward_invoice_mark_as_closed_path(self.invoice),
-            name: "Mark as Closed",
-            method: "patch",
-            id: "mark_as_closed",
-            btn_class: "info"
-        }
+        # actions << {
+        #     url: Rails.application.routes.url_helpers.invoicing_outward_invoice_mark_as_closed_path(self.invoice),
+        #     name: "Mark as Paid",
+        #     method: "patch",
+        #     id: "mark_as_closed",
+        #     btn_class: "info"
+        # }
       end
       unless self.invoice.incomplete?
         actions << {
@@ -52,7 +52,7 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
             id: "download_invoice",
             btn_class: "info"
         }
-        unless self.invoice.cancelled? || self.invoice.closed?
+        unless self.invoice.cancelled? || self.invoice.paid?
           actions << {
               url: Rails.application.routes.url_helpers.invoicing_outward_invoice_send_to_customer_path(self.invoice),
               name: "Send to Customer",

@@ -28,4 +28,6 @@ class OutwardInvoiceTrail < ActiveRecord::Base
   belongs_to :associated_transaction, polymorphic: true
 
   accepts_nested_attributes_for :amount
+
+  default_scope { order(created_at: :desc) }
 end

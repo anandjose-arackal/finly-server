@@ -117,14 +117,14 @@ class Invoicing::OutwardInvoicesController < ApplicationController
     end
   end
 
-  def mark_as_closed
-    @result = Invoicing::Invoice::MarkAsClosed.(current_user, params)
-    if @result.success?
-      respond response: :success, message: @result.messages[:success]
-    else
-      respond response: :failure, message: @result.messages[:error]
-    end
-  end
+  # def mark_as_closed
+  #   @result = Invoicing::Invoice::MarkAsClosed.(current_user, params)
+  #   if @result.success?
+  #     respond response: :success, message: @result.messages[:success]
+  #   else
+  #     respond response: :failure, message: @result.messages[:error]
+  #   end
+  # end
 
   def record_payment
     @result = Invoicing::Invoice::RecordPayment.(current_user, params)
