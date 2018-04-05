@@ -69,14 +69,16 @@ class Policy::Mappings::Show < Policy::Base
 
   def success
     params[:map] = self.map
+    params[:policy] = self.policy
     return Policy::Mappings::Show::Presenter.new(user, params, messages)
   end
 
   class Policy::Mappings::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :map
+    attr_accessor :map, :policy
 
     def init
       self.map = params[:map]
+      self.policy = params[:policy]
     end
 
     def company_default?

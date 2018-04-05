@@ -54,3 +54,15 @@ json.members do
     end
   end
 end
+
+json.users do
+  json.array!(@result.users) do |user|
+    json.email user.email
+    json.name user.name
+    json.mobile_number user.mobile_number
+    json.manager user.team_mapping.policy(@result.policy).manager.first&.email
+    json.finance_manager user.team_mapping.policy(@result.policy).finance_manager.first&.email
+    json.approves_to user.team_mapping.policy(@result.policy).approves_to.first&.email
+    json.approves_finance_to user.team_mapping.policy(@result.policy).approves_finance_to.first&.email
+  end
+end
