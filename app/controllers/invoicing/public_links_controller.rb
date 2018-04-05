@@ -10,4 +10,9 @@ class Invoicing::PublicLinksController < ApplicationController
     @result = Invoicing::VirtualBankAccount::Public::Show.(current_user, params)
     respond
   end
+
+  def invoice_show
+    @result = Invoicing::Invoice::Public::Show.(current_user, params)
+    respond
+  end
 end

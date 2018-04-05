@@ -23,4 +23,6 @@ class Invoicing::CompaniesController < ApplicationController
     respond
   end
 
+
+
 end

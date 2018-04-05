@@ -8,6 +8,17 @@
 <div style="margin-left: auto; margin-right: auto; width:600px;  border: 2px solid #eee; padding: 50px;">
 
   <div style="width: 100%; height: auto; margin-bottom: 20px; overflow:hidden;">
+    <div style="color: #757575;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 20px;">
+      <%= @options[:email_body] rescue nil || @options.email_body rescue nil %>
+    </div>
+    <div style="width: 50%; display: inline-block; float: right;">
+    </div>
+  </div>
+
+
+  <div style="width: 100%; height: auto; margin-bottom: 20px; overflow:hidden;">
 
     <div style="width: 50%; display: inline-block; float: left; color: #333333;">
 

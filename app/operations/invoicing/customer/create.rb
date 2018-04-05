@@ -47,6 +47,7 @@ class Invoicing::Customer::Create < Invoicing::Customer::Base
     self.customer = self.company.customers.build(self.customer_params)
     if self.customer.save
       if self.create_virtual_account
+
         # create the virtual accounts that were required by this particular customer
         self.virtual_account_details.each do |details|
           op = FinlyCollect::Create.(user, {})
@@ -70,6 +71,8 @@ class Invoicing::Customer::Create < Invoicing::Customer::Base
           end
         end
       end
+      # create customer account
+      op_customer_account_create = Invoicing::Customer::CustomerAccount::Create.(user, {customer_id: customer.id})
     else
       add_message :error, self.customer.errors.full_messages
     end

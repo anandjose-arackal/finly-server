@@ -36,6 +36,26 @@ class Invoicing::CustomersController < ApplicationController
     respond
   end
 
+  def payments
+    @result = Invoicing::Customer::Payments::Index.(current_user, params)
+    respond
+  end
+
+  def payments_count
+    @result = Invoicing::Customer::Payments::Count.(current_user, params)
+    render json: @result.count.as_json
+  end
+
+  def invoices
+    @result = Invoicing::Customer::Invoices::Index.(current_user, params)
+    respond
+  end
+
+  def invoices_count
+    @result = Invoicing::Customer::Invoices::Count.(current_user, params)
+    render json: @result.count.as_json
+  end
+
   def virtual_bank_accounts
     @result = Invoicing::Customer::VirtualBankAccounts::Index.(current_user, params)
     respond
@@ -43,6 +63,11 @@ class Invoicing::CustomersController < ApplicationController
 
   def create_virtual_account
     @result = Invoicing::Customer::VirtualBankAccounts::Create.(current_user, params)
+    respond
+  end
+
+  def import
+    @result = Invoicing::Customer::Import.(current_user, params)
     respond
   end
 

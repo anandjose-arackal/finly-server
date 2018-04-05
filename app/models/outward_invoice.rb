@@ -37,7 +37,10 @@
 #  roundoff_total_enabled  :boolean
 #  memo                    :string(255)
 #  customer_memo           :text(65535)
+#  payment_term_id         :integer
 #  reminders               :text(65535)
+#  user_id                 :integer
+#  outward_invoice_type_id :integer          default(1)
 #  payment_term_id         :integer
 #
 
@@ -50,7 +53,10 @@ class OutwardInvoice < ActiveRecord::Base
 
   include MathUtil
 
+  serialize :reminders, Array
+
   belongs_to :customer
+  belongs_to :user
   belongs_to :company
   belongs_to :amount
   belongs_to :policy
@@ -66,14 +72,20 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :total_payable, class_name: "Amount"
   belongs_to :invoice_status, class_name: "OutwardInvoiceStatus"
   belongs_to :payment_term
+  belongs_to :outward_invoice_type
 
   # has_one :virtual_bank_account, as: :parent
   belongs_to :virtual_account, class_name: "VirtualBankAccount"
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :payments, as: :parent
+  has_many :invoice_transaction_mappings, foreign_key: :invoice_id
+  has_many :va_transactions, through: :invoice_transaction_mappings
+  has_many :attachments, class_name: "OutwardInvoiceAttachment"
+  has_many :invoice_trails, class_name: "OutwardInvoiceTrail"
 
-  delegate :partially_paid?, :closed?, :incomplete?, :saved?, :cancelled?, to: :invoice_status
+  delegate :partially_paid?, :paid?, :incomplete?, :saved?, :cancelled?, to: :invoice_status
+  delegate :status_name, to: :invoice_status
 
   accepts_nested_attributes_for :customer
   accepts_nested_attributes_for :amount
@@ -104,23 +116,76 @@ class OutwardInvoice < ActiveRecord::Base
   validate :gst_type_selection, if: :valid_invoice?
 
   scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
-  scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:closed) }
+  scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:paid) }
+  scope :cancelled, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:cancelled) }
+  scope :partially_paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid) }
   scope :payments_receivable, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid])) }
+  scope :processed, -> { where invoice_status_id: [OutwardInvoiceStatus.id_for(:paid), OutwardInvoiceStatus.id_for(:partially_paid)]}
+  scope :with_type, -> (type) {where outward_invoice_type_id: OutwardInvoiceType.id_for(type)}
 
-  scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid, :closed, :cancelled]) }
+  scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid, :paid, :cancelled]) }
   scope :invoice_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
   scope :without_id, -> (id){ where.not id: id}
   scope :with_id, -> (id) { where id: id }
 
+  scope :filter_customer_id, -> (customer_id) {
+    where customer_id: customer_id
+  }
+
+  scope :filter_search, -> (term) {
+    where('customer_memo like ? OR memo like ? OR email like ? OR mobile_number like ? OR invoice_number like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+  }
+
+  scope :filter_status, -> (status_id) {
+    where invoice_status_id: status_id
+  }
+
+  scope :filter_amount, -> (type, value) do
+    case type
+      when 'lteq'
+        joins(:total_payable).select('outward_invoices.*').where('value <= ?', value)
+      when 'gteq'
+        joins(:total_payable).select('outward_invoices.*').where('value >= ?', value)
+      when 'eq'
+        joins(:total_payable).select('outward_invoices.*').where('ROUND(value, 2) = ?', precision_value(value))
+      else
+        # do nothing
+    end
+  end
+
+  scope :filter_date, ->(date_from = nil, date_to = nil) do
+    unless date_from.blank? && date_to.blank?
+      type_val = :date
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = DateUtils.local_date if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date if date_to.present?
+      expenses = arel_table
+      where(expenses[type_val].gteq(date_from).and(expenses[type_val].lteq(date_to)))
+    end
+  end
+
+  scope :joins_total_payable, -> { joins :total_payable }
+  scope :joins_total_paid, -> { joins :paid_amount }
+  scope :joins_total_balance_due, -> { joins :balance_due }
+
+  scope :sum_total_payable, -> { joins_total_payable.sum('amounts.value') }
+  scope :sum_total_paid, -> { joins_total_paid.sum('amounts.value') }
+  scope :sum_total_balance_due, -> { joins_total_balance_due.sum('amounts.value') }
+
+  scope :filter_date_invoice, lambda {|start_date, end_date| where("date >= ? AND date <= ?", start_date, end_date )}
+  scope :filter_date_due, lambda {|start_date, end_date| where("due_date >= ? AND due_date <= ?", start_date, end_date )}
+
 
   default_scope { unscope(:where) }
+  scope :desc_created, -> { order(created_at: :desc) }
 
   def invoice_status_identifier
     self.invoice_status&.name
   end
 
   def editable?
-    !((OutwardInvoiceStatus.ids_for(:closed, :cancelled, :partially_paid)).include?(self.invoice_status_id))
+    !((OutwardInvoiceStatus.ids_for(:paid, :cancelled, :partially_paid)).include?(self.invoice_status_id))
   end
 
   def line_items_total

@@ -87,6 +87,16 @@ class Invoicing::OutwardInvoicesController < ApplicationController
     end
   end
 
+  # Upload single attachment after the file has been selected
+  def upload_attachment
+    @result = Invoicing::Invoice::UploadAttachment.(current_user, params)
+    if @result.success?
+      respond
+    else
+      respond reponse: :failure, message: @result.messages[:error]
+    end
+  end
+
   def cancel
     @result = Invoicing::Invoice::Cancel.(current_user, params)
     if @result.success?
@@ -107,8 +117,17 @@ class Invoicing::OutwardInvoicesController < ApplicationController
     end
   end
 
-  def mark_as_closed
-    @result = Invoicing::Invoice::MarkAsClosed.(current_user, params)
+  # def mark_as_closed
+  #   @result = Invoicing::Invoice::MarkAsClosed.(current_user, params)
+  #   if @result.success?
+  #     respond response: :success, message: @result.messages[:success]
+  #   else
+  #     respond response: :failure, message: @result.messages[:error]
+  #   end
+  # end
+
+  def record_payment
+    @result = Invoicing::Invoice::RecordPayment.(current_user, params)
     if @result.success?
       respond response: :success, message: @result.messages[:success]
     else
@@ -118,6 +137,15 @@ class Invoicing::OutwardInvoicesController < ApplicationController
 
   def send_to_customer
     @result = Invoicing::Invoice::SendToCustomer.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def remind_customer
+    @result = Invoicing::Invoice::RemindCustomer.(current_user, params)
     if @result.success?
       respond response: :success, message: @result.messages[:success]
     else

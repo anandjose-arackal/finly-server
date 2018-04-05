@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180403050152) do
+ActiveRecord::Schema.define(version: 20180305152435) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -991,6 +991,21 @@ ActiveRecord::Schema.define(version: 20180403050152) do
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
   add_index "company_configurations", ["contact_id"], name: "index_company_configurations_on_contact_id", using: :btree
 
+  create_table "company_funds_auto_transfer_configs", force: :cascade do |t|
+    t.integer  "company_id",           limit: 4
+    t.integer  "threshold_amount_id",  limit: 4
+    t.string   "frequency_name",       limit: 255
+    t.string   "frequency_day",        limit: 255
+    t.string   "amount_transfer_type", limit: 255
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+    t.boolean  "enabled",                          default: false
+    t.string   "transfer_mode",        limit: 255
+  end
+
+  add_index "company_funds_auto_transfer_configs", ["company_id"], name: "index_company_funds_auto_transfer_configs_on_company_id", using: :btree
+  add_index "company_funds_auto_transfer_configs", ["threshold_amount_id"], name: "index_company_funds_auto_transfer_configs_on_threshold_amount_id", using: :btree
+
   create_table "company_funds_load_request_types", force: :cascade do |t|
     t.string "name", limit: 255
   end
@@ -1368,6 +1383,31 @@ ActiveRecord::Schema.define(version: 20180403050152) do
   add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
   add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
+
+  create_table "customer_account_transactions", force: :cascade do |t|
+    t.integer  "customer_account_id",    limit: 4
+    t.string   "transaction_type",       limit: 255
+    t.integer  "transaction_amount_id",  limit: 4
+    t.string   "note",                   limit: 255
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.integer  "associated_object_id",   limit: 4
+    t.string   "associated_object_type", limit: 255
+  end
+
+  add_index "customer_account_transactions", ["associated_object_type", "associated_object_id"], name: "indx_cstmer_acc_tranxs_on_assoc_acc_type_and_assoc_acc_id", using: :btree
+  add_index "customer_account_transactions", ["customer_account_id"], name: "index_customer_account_transactions_on_customer_account_id", using: :btree
+  add_index "customer_account_transactions", ["transaction_amount_id"], name: "index_customer_account_transactions_on_transaction_amount_id", using: :btree
+
+  create_table "customer_accounts", force: :cascade do |t|
+    t.integer  "customer_id", limit: 4
+    t.integer  "balance_id",  limit: 4
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  add_index "customer_accounts", ["balance_id"], name: "index_customer_accounts_on_balance_id", using: :btree
+  add_index "customer_accounts", ["customer_id"], name: "index_customer_accounts_on_customer_id", using: :btree
 
   create_table "customer_attachments", force: :cascade do |t|
     t.string   "attached_file_file_name",    limit: 255
@@ -1957,13 +1997,44 @@ ActiveRecord::Schema.define(version: 20180403050152) do
   add_index "invoice_line_items", ["invoice_id"], name: "index_invoice_line_items_on_invoice_id", using: :btree
   add_index "invoice_line_items", ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id", using: :btree
 
-  create_table "invoice_number_configs", force: :cascade do |t|
-    t.string   "prefix",         limit: 255, default: ""
-    t.string   "sequence_start", limit: 255
-    t.integer  "company_id",     limit: 4
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
+  create_table "invoice_number_config_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
+
+  create_table "invoice_number_configs", force: :cascade do |t|
+    t.string   "prefix",                        limit: 255, default: ""
+    t.string   "sequence_start",                limit: 255
+    t.integer  "company_id",                    limit: 4
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.integer  "invoice_number_config_type_id", limit: 4
+    t.integer  "purpose_id",                    limit: 4
+  end
+
+  add_index "invoice_number_configs", ["invoice_number_config_type_id"], name: "index_invoice_number_configs_on_invoice_number_config_type_id", using: :btree
+  add_index "invoice_number_configs", ["purpose_id"], name: "index_invoice_number_configs_on_purpose_id", using: :btree
+
+  create_table "invoice_reminders", force: :cascade do |t|
+    t.integer  "days",                limit: 4
+    t.string   "reference_date_type", limit: 255
+    t.string   "timeframe_type",      limit: 255
+    t.integer  "company_id",          limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "name",                limit: 255
+  end
+
+  create_table "invoice_transaction_mappings", force: :cascade do |t|
+    t.integer  "invoice_id",        limit: 4
+    t.integer  "va_transaction_id", limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "invoice_transaction_mappings", ["invoice_id"], name: "index_invoice_transaction_mappings_on_invoice_id", using: :btree
+  add_index "invoice_transaction_mappings", ["va_transaction_id"], name: "index_invoice_transaction_mappings_on_va_transaction_id", using: :btree
 
   create_table "invoice_reminders", force: :cascade do |t|
     t.integer  "days",                limit: 4
@@ -2562,6 +2633,36 @@ ActiveRecord::Schema.define(version: 20180403050152) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "outward_invoice_trail_actions", force: :cascade do |t|
+    t.string "name", limit: 255
+  end
+
+  create_table "outward_invoice_trails", force: :cascade do |t|
+    t.integer  "action_id",                   limit: 4
+    t.integer  "outward_invoice_id",          limit: 4
+    t.integer  "user_id",                     limit: 4
+    t.string   "note",                        limit: 255
+    t.integer  "amount_id",                   limit: 4
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.integer  "associated_entity_id",        limit: 4
+    t.string   "associated_entity_type",      limit: 255
+    t.integer  "associated_transaction_id",   limit: 4
+    t.string   "associated_transaction_type", limit: 255
+    t.date     "date"
+  end
+
+  add_index "outward_invoice_trails", ["action_id"], name: "index_outward_invoice_trails_on_action_id", using: :btree
+  add_index "outward_invoice_trails", ["amount_id"], name: "index_outward_invoice_trails_on_amount_id", using: :btree
+  add_index "outward_invoice_trails", ["associated_entity_type", "associated_entity_id"], name: "index_outward_inv_trail_on_assoc_entty_type_and_assoc_entity_id", using: :btree
+  add_index "outward_invoice_trails", ["associated_transaction_type", "associated_transaction_id"], name: "index_outward_inv_trail_on_assoc_tranx_type_and_assoc_tranx_id", using: :btree
+  add_index "outward_invoice_trails", ["outward_invoice_id"], name: "index_outward_invoice_trails_on_outward_invoice_id", using: :btree
+  add_index "outward_invoice_trails", ["user_id"], name: "index_outward_invoice_trails_on_user_id", using: :btree
+
+  create_table "outward_invoice_types", force: :cascade do |t|
+    t.string "name", limit: 255
+  end
+
   create_table "outward_invoices", force: :cascade do |t|
     t.integer  "customer_id",             limit: 4
     t.date     "date"
@@ -2574,8 +2675,8 @@ ActiveRecord::Schema.define(version: 20180403050152) do
     t.integer  "freight_amount_id",       limit: 4
     t.integer  "balance_due_id",          limit: 4
     t.decimal  "roundoff_amount",                       precision: 10, scale: 5
-    t.datetime "created_at",                                                     null: false
-    t.datetime "updated_at",                                                     null: false
+    t.datetime "created_at",                                                                 null: false
+    t.datetime "updated_at",                                                                 null: false
     t.integer  "policy_id",               limit: 4
     t.integer  "invoice_status_id",       limit: 4
     t.integer  "company_id",              limit: 4
@@ -2599,6 +2700,10 @@ ActiveRecord::Schema.define(version: 20180403050152) do
     t.text     "customer_memo",           limit: 65535
     t.text     "reminders",               limit: 65535
     t.integer  "payment_term_id",         limit: 4
+    t.integer  "payment_term_id",         limit: 4
+    t.text     "reminders",               limit: 65535
+    t.integer  "user_id",                 limit: 4
+    t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
@@ -2606,9 +2711,11 @@ ActiveRecord::Schema.define(version: 20180403050152) do
   add_index "outward_invoices", ["customer_id"], name: "index_outward_invoices_on_customer_id", using: :btree
   add_index "outward_invoices", ["discount_amount_id"], name: "index_outward_invoices_on_discount_amount_id", using: :btree
   add_index "outward_invoices", ["freight_amount_id"], name: "index_outward_invoices_on_freight_amount_id", using: :btree
+  add_index "outward_invoices", ["outward_invoice_type_id"], name: "index_outward_invoices_on_outward_invoice_type_id", using: :btree
   add_index "outward_invoices", ["paid_amount_id"], name: "index_outward_invoices_on_paid_amount_id", using: :btree
   add_index "outward_invoices", ["payment_term_id"], name: "index_outward_invoices_on_payment_term_id", using: :btree
   add_index "outward_invoices", ["tax_amount_id"], name: "index_outward_invoices_on_tax_amount_id", using: :btree
+  add_index "outward_invoices", ["user_id"], name: "index_outward_invoices_on_user_id", using: :btree
 
   create_table "payment_file_configurations", force: :cascade do |t|
     t.string   "file_format", limit: 255
@@ -3912,61 +4019,6 @@ ActiveRecord::Schema.define(version: 20180403050152) do
     t.boolean  "default_account"
   end
 
-  create_table "web_hook_event_mappings", force: :cascade do |t|
-    t.integer  "web_hook_id",       limit: 4,                 null: false
-    t.integer  "web_hook_event_id", limit: 4,                 null: false
-    t.boolean  "is_deleted",                  default: false
-    t.datetime "created_at",                                  null: false
-    t.datetime "updated_at",                                  null: false
-  end
-
-  add_index "web_hook_event_mappings", ["is_deleted"], name: "index_web_hook_event_mappings_on_is_deleted", using: :btree
-  add_index "web_hook_event_mappings", ["web_hook_event_id"], name: "index_web_hook_event_mappings_on_web_hook_event_id", using: :btree
-  add_index "web_hook_event_mappings", ["web_hook_id"], name: "index_web_hook_event_mappings_on_web_hook_id", using: :btree
-
-  create_table "web_hook_events", force: :cascade do |t|
-    t.string   "name",       limit: 255, null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "web_hook_events", ["name"], name: "index_web_hook_events_on_name", using: :btree
-
-  create_table "web_hook_tracks", force: :cascade do |t|
-    t.integer  "web_hook_id",       limit: 4
-    t.integer  "web_hook_event_id", limit: 4
-    t.integer  "company_id",        limit: 4
-    t.text     "url",               limit: 65535
-    t.text     "request_body",      limit: 65535
-    t.text     "request_header",    limit: 65535
-    t.decimal  "response_time",                   precision: 10
-    t.text     "response_body",     limit: 65535
-    t.integer  "response_status",   limit: 4
-    t.integer  "attempt",           limit: 4
-    t.datetime "last_attempted_at"
-    t.boolean  "attempt_success"
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-  end
-
-  add_index "web_hook_tracks", ["company_id"], name: "index_web_hook_tracks_on_company_id", using: :btree
-  add_index "web_hook_tracks", ["web_hook_event_id"], name: "index_web_hook_tracks_on_web_hook_event_id", using: :btree
-  add_index "web_hook_tracks", ["web_hook_id"], name: "index_web_hook_tracks_on_web_hook_id", using: :btree
-
-  create_table "web_hooks", force: :cascade do |t|
-    t.text     "url",                limit: 65535,                 null: false
-    t.string   "secret",             limit: 255
-    t.integer  "created_by_user_id", limit: 4,                     null: false
-    t.integer  "company_id",         limit: 4,                     null: false
-    t.boolean  "is_deleted",                       default: false
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
-  end
-
-  add_index "web_hooks", ["company_id"], name: "index_web_hooks_on_company_id", using: :btree
-  add_index "web_hooks", ["created_by_user_id"], name: "index_web_hooks_on_created_by_user_id", using: :btree
-  add_index "web_hooks", ["is_deleted"], name: "index_web_hooks_on_is_deleted", using: :btree
-
   create_table "whitelisted_ip_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -4074,6 +4126,7 @@ ActiveRecord::Schema.define(version: 20180403050152) do
   add_foreign_key "company_balance_histories", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
+  add_foreign_key "company_funds_auto_transfer_configs", "companies"
   add_foreign_key "company_funds_load_requests", "amounts"
   add_foreign_key "company_funds_load_requests", "companies"
   add_foreign_key "company_kyc_trails", "company_kycs"
@@ -4081,6 +4134,8 @@ ActiveRecord::Schema.define(version: 20180403050152) do
   add_foreign_key "company_tags", "companies"
   add_foreign_key "cost_centers", "companies"
   add_foreign_key "custom_fields", "field_configurations"
+  add_foreign_key "customer_account_transactions", "customer_accounts"
+  add_foreign_key "customer_accounts", "customers"
   add_foreign_key "customer_attachments", "customers"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
@@ -4119,6 +4174,8 @@ ActiveRecord::Schema.define(version: 20180403050152) do
   add_foreign_key "invoice_attachments", "invoices"
   add_foreign_key "invoice_line_items", "categories"
   add_foreign_key "invoice_line_items", "invoices"
+  add_foreign_key "invoice_number_configs", "invoice_number_config_types"
+  add_foreign_key "invoice_number_configs", "purposes"
   add_foreign_key "invoices", "addresses"
   add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
@@ -4162,9 +4219,18 @@ ActiveRecord::Schema.define(version: 20180403050152) do
   add_foreign_key "outward_invoice_attachments", "companies"
   add_foreign_key "outward_invoice_attachments", "outward_invoices"
   add_foreign_key "outward_invoice_attachments", "users"
+  add_foreign_key "outward_invoice_attachments", "companies"
+  add_foreign_key "outward_invoice_attachments", "outward_invoices"
+  add_foreign_key "outward_invoice_attachments", "users"
+  add_foreign_key "outward_invoice_trails", "amounts"
+  add_foreign_key "outward_invoice_trails", "outward_invoices"
+  add_foreign_key "outward_invoice_trails", "users"
   add_foreign_key "outward_invoices", "amounts"
   add_foreign_key "outward_invoices", "customers"
   add_foreign_key "outward_invoices", "payment_terms"
+  add_foreign_key "outward_invoices", "outward_invoice_types"
+  add_foreign_key "outward_invoices", "payment_terms"
+  add_foreign_key "outward_invoices", "users"
   add_foreign_key "payment_file_configurations", "companies"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
@@ -4240,11 +4306,6 @@ ActiveRecord::Schema.define(version: 20180403050152) do
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
   add_foreign_key "vendor_payment_wallets", "users"
-  add_foreign_key "web_hook_event_mappings", "web_hook_events"
-  add_foreign_key "web_hook_event_mappings", "web_hooks"
-  add_foreign_key "web_hook_tracks", "companies"
-  add_foreign_key "web_hook_tracks", "web_hook_events"
-  add_foreign_key "web_hook_tracks", "web_hooks"
   add_foreign_key "whitelisted_ips", "companies"
   add_foreign_key "yes_bank_company_accounts", "companies"
   add_foreign_key "yes_bank_vendors", "companies"

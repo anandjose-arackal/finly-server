@@ -1086,6 +1086,7 @@
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                               bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                         bank_transfer/vendor_payment_wallets#transfer_options
 #                                     public_bank_account GET    /account/:account_number(.:format)                                                           invoicing/public_links#virtual_bank_account_show
+#                                          public_invoice GET    /invoice/:invoice_id(.:format)                                                               invoicing/public_links#invoice_show
 #                                               addresses GET    /addresses(.:format)                                                                         addresses#index
 #                                                         POST   /addresses(.:format)                                                                         addresses#create
 #                                             new_address GET    /addresses/new(.:format)                                                                     addresses#new
@@ -1110,6 +1111,7 @@
 #        invoicing_outward_invoice_update_virtual_account PATCH  /invoicing/outward_invoices/:outward_invoice_id/update_virtual_account(.:format)             invoicing/outward_invoices#update_virtual_account
 #                        invoicing_outward_invoice_cancel PATCH  /invoicing/outward_invoices/:outward_invoice_id/cancel(.:format)                             invoicing/outward_invoices#cancel
 #                          invoicing_outward_invoice_save PATCH  /invoicing/outward_invoices/:outward_invoice_id/save(.:format)                               invoicing/outward_invoices#save
+#             invoicing_outward_invoice_upload_attachment POST   /invoicing/outward_invoices/:outward_invoice_id/upload_attachment(.:format)                  invoicing/outward_invoices#upload_attachment
 #                      invoicing_outward_invoice_download GET    /invoicing/outward_invoices/:outward_invoice_id/download_pdf(.:format)                       invoicing/outward_invoices#download
 #                invoicing_outward_invoice_mark_as_closed PATCH  /invoicing/outward_invoices/:outward_invoice_id/mark_as_closed(.:format)                     invoicing/outward_invoices#mark_as_closed
 #              invoicing_outward_invoice_send_to_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/send_to_customer(.:format)                   invoicing/outward_invoices#send_to_customer
@@ -1122,8 +1124,13 @@
 #                                                         PUT    /invoicing/outward_invoices/:id(.:format)                                                    invoicing/outward_invoices#update
 #                                                         DELETE /invoicing/outward_invoices/:id(.:format)                                                    invoicing/outward_invoices#destroy
 #                               invoicing_customers_count GET    /invoicing/customers/count(.:format)                                                         invoicing/customers#count
+#                              invoicing_customers_import POST   /invoicing/customers/import(.:format)                                                        invoicing/customers#import
 #                     invoicing_customer_virtual_accounts GET    /invoicing/customers/:customer_id/virtual_accounts(.:format)                                 invoicing/customers#virtual_bank_accounts
 #               invoicing_customer_create_virtual_account POST   /invoicing/customers/:customer_id/create_virtual_account(.:format)                           invoicing/customers#create_virtual_account
+#                             invoicing_customer_payments GET    /invoicing/customers/:customer_id/payments(.:format)                                         invoicing/customers#payments
+#                             invoicing_customer_invoices GET    /invoicing/customers/:customer_id/invoices(.:format)                                         invoicing/customers#invoices
+#                       invoicing_customer_payments_count GET    /invoicing/customers/:customer_id/payments/count(.:format)                                   invoicing/customers#payments_count
+#                       invoicing_customer_invoices_count GET    /invoicing/customers/:customer_id/invoices/count(.:format)                                   invoicing/customers#invoices_count
 #                                     invoicing_customers GET    /invoicing/customers(.:format)                                                               invoicing/customers#index
 #                                                         POST   /invoicing/customers(.:format)                                                               invoicing/customers#create
 #                                  new_invoicing_customer GET    /invoicing/customers/new(.:format)                                                           invoicing/customers#new
@@ -1132,6 +1139,7 @@
 #                                                         PATCH  /invoicing/customers/:id(.:format)                                                           invoicing/customers#update
 #                                                         PUT    /invoicing/customers/:id(.:format)                                                           invoicing/customers#update
 #                                                         DELETE /invoicing/customers/:id(.:format)                                                           invoicing/customers#destroy
+#                   invoicing_virtual_bank_accounts_count GET    /invoicing/virtual_bank_accounts/count(.:format)                                             invoicing/virtual_bank_accounts#count
 #            invoicing_virtual_bank_account_show_payments GET    /invoicing/virtual_bank_accounts/:virtual_bank_account_id/transactions(.:format)             invoicing/virtual_bank_accounts#show_payments
 #                         invoicing_virtual_bank_accounts GET    /invoicing/virtual_bank_accounts(.:format)                                                   invoicing/virtual_bank_accounts#index
 #                                                         POST   /invoicing/virtual_bank_accounts(.:format)                                                   invoicing/virtual_bank_accounts#create
@@ -1181,6 +1189,14 @@
 #                                                         PATCH  /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#update
 #                                                         PUT    /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#update
 #                                                         DELETE /invoicing/payment_terms/:id(.:format)                                                       invoicing/payment_terms#destroy
+#                                     invoicing_reminders GET    /invoicing/reminders(.:format)                                                               invoicing/reminders#index
+#                                                         POST   /invoicing/reminders(.:format)                                                               invoicing/reminders#create
+#                                  new_invoicing_reminder GET    /invoicing/reminders/new(.:format)                                                           invoicing/reminders#new
+#                                 edit_invoicing_reminder GET    /invoicing/reminders/:id/edit(.:format)                                                      invoicing/reminders#edit
+#                                      invoicing_reminder GET    /invoicing/reminders/:id(.:format)                                                           invoicing/reminders#show
+#                                                         PATCH  /invoicing/reminders/:id(.:format)                                                           invoicing/reminders#update
+#                                                         PUT    /invoicing/reminders/:id(.:format)                                                           invoicing/reminders#update
+#                                                         DELETE /invoicing/reminders/:id(.:format)                                                           invoicing/reminders#destroy
 #                                invoicing_withdraw_funds PATCH  /invoicing/companies/withdraw_funds(.:format)                                                invoicing/companies#withdraw_funds
 #                           invoicing_show_credit_account GET    /invoicing/companies/show_credit_account(.:format)                                           invoicing/companies#show_credit_account
 #                              invoicing_transfer_history GET    /invoicing/companies/transfer_history(.:format)                                              invoicing/companies#transfer_history
@@ -2389,6 +2405,8 @@ Rails.application.routes.draw do
   get 'autocomplete/card', to: 'autocomplete#card'
   get 'autocomplete/inventory_items', to: 'autocomplete#inventory_items'
 
+  get 'autocomplete/customers', to: 'invoicing/autocomplete#customer'
+
   # get 'features', to: 'static_pages#features'
 
   get 'external/reports/:id' => 'external_url#report', as: :external_url_report
@@ -2416,6 +2434,7 @@ Rails.application.routes.draw do
   get 'menu_data_disburse' => 'expense_types_configuration#menu_data_disburse'
   get 'menu_data_payments' => 'expense_types_configuration#menu_data_payments'
   get 'menu_data_collect' => 'expense_types_configuration#menu_data_collect'
+  get 'menu_data_insights' => 'expense_types_configuration#menu_data_insights'
 
   # Orders
   get 'cards/orders' => 'orders/order_cards#index'
@@ -2622,6 +2641,7 @@ Rails.application.routes.draw do
 
 
   get 'account/:account_number', to: 'invoicing/public_links#virtual_bank_account_show', as: :public_bank_account
+  get 'invoice/:invoice_id', to: 'invoicing/public_links#invoice_show', as: :public_invoice
 
   resources :addresses
 
@@ -2636,15 +2656,25 @@ Rails.application.routes.draw do
       patch 'update_virtual_account', to: 'outward_invoices#update_virtual_account', as: :update_virtual_account
       patch 'cancel', to: 'outward_invoices#cancel', as: :cancel
       patch 'save', to: 'outward_invoices#save', as: :save
+      post 'upload_attachment', to: 'outward_invoices#upload_attachment', as: :upload_attachment
       get 'download_pdf', to: 'outward_invoices#download', as: :download
       patch 'mark_as_closed', to: 'outward_invoices#mark_as_closed', as: :mark_as_closed
       patch 'send_to_customer', to: 'outward_invoices#send_to_customer', as: :send_to_customer
+      patch 'remind_customer', to: 'outward_invoices#remind_customer', as: :remind_customer
+      patch 'record_payment', to: 'outward_invoices#record_payment', as: :record_payment
     end
     get 'customers/count', to: 'customers#count'
+    post 'customers/import', to: 'customers#import'
     resources :customers do
       get 'virtual_accounts', to: 'customers#virtual_bank_accounts', as: :virtual_accounts
       post 'create_virtual_account', to: 'customers#create_virtual_account', as: :create_virtual_account
+      get 'payments', to: 'customers#payments', as: :payments
+      get 'invoices', to: 'customers#invoices', as: :invoices
+      get 'payments/count', to: 'customers#payments_count', as: :payments_count
+      get 'invoices/count', to: 'customers#invoices_count', as: :invoices_count
     end
+
+    get 'virtual_bank_accounts/count', to: 'virtual_bank_accounts#count', as: 'virtual_bank_accounts_count'
     resources :virtual_bank_accounts do
       get 'transactions', to: 'virtual_bank_accounts#show_payments', as: :show_payments
     end
@@ -2653,19 +2683,27 @@ Rails.application.routes.draw do
     get 'categories/invoice_line_items', to: 'categories#invoice_items_categories'
 
     resources :invoice_number_configs
+    get 'company_configurations/auto_transfer_config', to: 'company_configurations#funds_auto_transfer_config'
+    patch 'company_configurations/auto_transfer_config', to: 'company_configurations#update_auto_transfer_config'
     resources :company_configurations do
       patch 'update_credit_account', to: 'company_configurations#update_credit_account'
       patch 'update_collect_details', to: 'company_configurations#update_collect_details'
       patch 'update_collect_logo', to: 'company_configurations#update_collect_logo'
       get 'show_collect_detail', to: 'company_configurations#show_collect_details'
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
+
+
+
     end
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
     resources :inventory_line_items
     resources :payment_terms
+    resources :reminders
     patch 'companies/withdraw_funds', to: 'companies#withdraw_funds', as: :withdraw_funds
     get 'companies/show_credit_account', to: 'companies#show_credit_account', as: :show_credit_account
     get 'companies/transfer_history', to: 'companies#transfer_history', as: :transfer_history
+
+    resources :analytics, only: [:index]
   end
 
 

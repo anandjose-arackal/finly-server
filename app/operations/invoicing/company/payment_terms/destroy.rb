@@ -12,6 +12,11 @@ class Invoicing::Company::PaymentTerms::Destroy < Invoicing::Company::PaymentTer
       add_message :error, "Payment term not found"
       return
     end
+
+    if self.payment_term.default
+      add_message :error, "Cannot delete default payment term"
+      return
+    end
   end
 
   def process

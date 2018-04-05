@@ -1,14 +1,20 @@
 class Invoicing::Invoice::Show < Invoicing::Invoice::Base
 
-  attr_accessor :invoice, :invoice_number
+  attr_accessor :invoice, :invoice_number, :payment_terms
 
   class Invoicing::Invoice::Show::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoice, :invoice_number
+    attr_accessor :invoice, :invoice_number, :payment_terms, :invoice_attachments, :paid_amounts
 
     def init
       self.invoice = params[:invoice]
       self.invoice_number = params[:invoice_number]
+      self.payment_terms = params[:payment_terms]
+      self.invoice_attachments = self.invoice.attachments
+      self.paid_amounts = {
+        through_outside_finly: get_outside_finly_amount,
+        through_va_ca: get_va_ca_balance
+      }
     end
 
     def navbar_actions
@@ -30,13 +36,13 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
             id: "cancel_invoice",
             btn_class: "danger"
         }
-        actions << {
-            url: Rails.application.routes.url_helpers.invoicing_outward_invoice_mark_as_closed_path(self.invoice),
-            name: "Mark as Closed",
-            method: "patch",
-            id: "mark_as_closed",
-            btn_class: "info"
-        }
+        # actions << {
+        #     url: Rails.application.routes.url_helpers.invoicing_outward_invoice_mark_as_closed_path(self.invoice),
+        #     name: "Mark as Paid",
+        #     method: "patch",
+        #     id: "mark_as_closed",
+        #     btn_class: "info"
+        # }
       end
       unless self.invoice.incomplete?
         actions << {
@@ -46,7 +52,7 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
             id: "download_invoice",
             btn_class: "info"
         }
-        unless self.invoice.cancelled? || self.invoice.closed?
+        unless self.invoice.cancelled? || self.invoice.paid?
           actions << {
               url: Rails.application.routes.url_helpers.invoicing_outward_invoice_send_to_customer_path(self.invoice),
               name: "Send to Customer",
@@ -57,6 +63,44 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
         end
       end
       actions
+    end
+
+    def get_outside_finly_amount
+      # Total of payments added outside finly
+      trails = self.invoice.invoice_trails
+      amount = 0
+
+      for trail in trails
+        credit_action_ids = [OutwardInvoiceTrailAction.id_for('credit_outside')]
+        debit_action_ids = [OutwardInvoiceTrailAction.id_for('debit_outside')]
+        if credit_action_ids.include?(trail.action.id)
+          amount += trail.amount.value
+        elsif debit_action_ids.include?(trail.action.id)
+          amount -= trail.amount.value
+        end
+      end
+
+      amount
+    end
+
+    def get_va_ca_balance
+      # Total of payments from Virtual Bank Account or Customer's Account
+      trails = self.invoice.invoice_trails
+      amount = 0
+
+      for trail in trails
+        credit_action_ids = [OutwardInvoiceTrailAction.id_for('credit_virtual_account'), OutwardInvoiceTrailAction.id_for('credit_customer_account')]
+        debit_action_ids = [OutwardInvoiceTrailAction.id_for('debit_customer_account')]
+        if credit_action_ids.include?(trail.action.id)
+          amount += trail.amount.value
+        elsif debit_action_ids.include?(trail.action.id)
+          amount -= trail.amount.value
+        end
+      end
+
+
+      amount
+
     end
   end
 
@@ -77,11 +121,13 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
       op = Invoicing::Invoice::GenerateInvoiceNumber.(user, {invoice: self.invoice})
       self.invoice_number = op.invoice_number
     end
+    self.payment_terms = user.company.payment_terms
   end
 
   def success
     params[:invoice] = self.invoice
     params[:invoice_number] = self.invoice_number
+    params[:payment_terms] = self.payment_terms
     Invoicing::Invoice::Show::InvoicePresenter.new(user, params, messages)
   end
 end

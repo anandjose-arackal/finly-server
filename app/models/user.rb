@@ -54,6 +54,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -154,6 +155,10 @@ class User < ActiveRecord::Base
   has_many :manager_payment_requests, -> { distinct }, source: :bank_payment_request, through: :manager_payment_request_trails
   has_many :finance_payment_request_trails, -> { finance_manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
   has_many :finance_payment_requests, -> { distinct }, source: :bank_payment_request, through: :finance_payment_request_trails
+
+  # Outward invoice
+  has_many :outward_invoices
+  has_many :outward_invoice_attachments
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
