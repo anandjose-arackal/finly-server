@@ -1,5 +1,5 @@
 class Policy::Show < Policy::Base
-  attr_accessor :policy, :user, :mappings, :policy_users
+  attr_accessor :policy, :users, :mappings, :policy_users
 
   class Policy::Show::ShowPresenter < Policy::Base::PolicyPresenter
     attr_accessor :policy, :users, :policy_users
@@ -85,6 +85,7 @@ class Policy::Show < Policy::Base
   end
 
   def success
+    debugger
     params[:policy] = self.policy
     params[:users] = self.users
     params[:policy_users] = self.policy_users

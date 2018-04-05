@@ -56,7 +56,8 @@ json.members do
 end
 
 json.users do
-  json.array!(@result.users) do |user|
+  json.array!(@result.policy_users) do |user|
+    debugger
     json.email user.email
     json.name user.name
     json.mobile_number user.mobile_number
