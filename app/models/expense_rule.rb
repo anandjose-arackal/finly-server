@@ -48,6 +48,14 @@ class ExpenseRule < ActiveRecord::Base
 
   has_paper_trail
 
+  scope :warning_rules, -> {
+    where rule_type_id: RuleType.warning_rule_id
+  }
+
+  scope :blocking_rules, -> {
+    where rule_type_id: RuleType.blocking_rule_id
+  }
+
   def rule_in_words
     rule_in_words = "Expenses"
     if self.category_id

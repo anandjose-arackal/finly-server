@@ -53,6 +53,14 @@ class BudgetRule < ActiveRecord::Base
 
   has_paper_trail
 
+  scope :warning_rules, -> {
+    where rule_type_id: RuleType.warning_rule_id
+  }
+
+  scope :blocking_rules, -> {
+    where rule_type_id: RuleType.blocking_rule_id
+  }
+
   def include_reimbursable_expenses?
     self.include_reimbursable
   end
