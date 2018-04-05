@@ -5,7 +5,9 @@ class Company::Collect::InvoiceNumberConfiguration::Update < Company::Base
   attr_accessor :config, :config_params
 
   def init
-    self.config = user.company.invoice_number_config
+    purpose_id = Purpose.id_for(:collect) #being picked directly as the operation is scoped
+    config_type_id = InvoiceNumberConfigType.id_for(params[:invoice_type])
+    self.config = user.company.invoice_number_configs.with_purpose_id(purpose_id).with_config_type_id(config_type_id).first
     self.config_params = invoice_number_configuration_params
   end
 

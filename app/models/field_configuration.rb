@@ -59,6 +59,9 @@ class FieldConfiguration < ActiveRecord::Base
   scope :filter_parent_type_id, -> (type_id) { where field_parent_type_id: type_id}
   scope :order_created_at_desc, -> { order(created_at: :desc) }
   scope :with_company, -> (company_id) { where company_id: company_id}
+  scope :with_field_parent_type, -> (parent_type_id) {
+    where field_parent_type_id: parent_type_id
+  }
 
   delegate :drop_down?, :text?, to: :field_type
 

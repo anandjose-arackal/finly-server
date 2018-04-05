@@ -1,6 +1,7 @@
 class Invoicing::Invoice::MarkAsClosed < Invoicing::Invoice::Base
 
   attr_accessor :invoice, :paid_amount
+  # not being used
 
   def init
     id = params[:id] || params[:outward_invoice_id]
@@ -21,7 +22,7 @@ class Invoicing::Invoice::MarkAsClosed < Invoicing::Invoice::Base
   end
 
   def process
-    if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:closed))
+    if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:paid))
       balance_due = (self.invoice.total_payable&.value - self.paid_amount.to_f) > 0 ? (self.invoice.total_payable&.value - self.paid_amount.to_f) : 0
       self.invoice.balance_due.update(value: balance_due)
       self.invoice.paid_amount.update(value: self.paid_amount)
@@ -31,7 +32,7 @@ class Invoicing::Invoice::MarkAsClosed < Invoicing::Invoice::Base
   end
 
   def post_process
-    add_message :success, "Invoice marked as closed"
+    add_message :success, "Invoice marked as paid"
   end
 
 end

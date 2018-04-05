@@ -6,8 +6,13 @@ class Invoicing::Customer::Index < Invoicing::Customer::Base
 
     attr_accessor :customers, :paginated_customers
 
+    has_scope :filter_search
+    has_scope :search_by_virtual_accounts
+    has_scope :virtual_accounts_presence
+
     def init
       self.customers = params[:customers]
+      self.customers = apply_scopes(self.customers, params)
       self.paginated_customers = customers.paginate(page: params[:page], per_page: params[:per_page])
     end
 

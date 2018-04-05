@@ -1,0 +1,22 @@
+class TdsSlabs::Index < TdsSlabs::Base
+
+  attr_accessor :tds_slabs
+
+  class TdsSlabs::Index::TdsSlabsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :tds_slabs
+
+    def init
+      self.tds_slabs = params[:tds_slabs]
+    end
+  end
+
+  def init
+    self.tds_slabs = user.company.tds_slabs
+  end
+
+  def success
+    params[:tds_slabs] = self.tds_slabs
+    TdsSlabs::Index::TdsSlabsPresenter.new(user, params, messages)
+  end
+end

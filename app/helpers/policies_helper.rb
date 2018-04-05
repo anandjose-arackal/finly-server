@@ -24,7 +24,21 @@ module PoliciesHelper
             rule_in_words += " require receipt hard copy."
         end
     elsif rule.is_a?(BudgetRule)
-        rule_in_words = "Total Expenses"
+      case rule.expense_type_id
+        when 1
+          type = "Cash"
+        when 2
+          type = "Card"
+        when 3
+          type = "Distance"
+        when 4
+          type = "Time"
+        when 5
+          type = "Per Diem"
+        else
+          type = ""
+      end
+        rule_in_words = "Total #{type} Expenses"
         if rule.period_id
           case rule.period_id
             when 1

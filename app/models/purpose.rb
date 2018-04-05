@@ -13,7 +13,7 @@ class Purpose < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:expense_management, :vendor_payments, :invoice, :invoice_items, :outward_invoice, :outward_invoice_items]
+    [:expense_management, :vendor_payments, :invoice, :invoice_items, :outward_invoice, :outward_invoice_items, :collect]
   end
 
   def self.id_from_application_for(application)

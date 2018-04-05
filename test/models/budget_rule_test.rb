@@ -12,6 +12,7 @@
 #  rule_type_id         :integer
 #  include_reimbursable :boolean          default(TRUE)
 #  is_deleted           :boolean          default(FALSE)
+#  expense_type_id      :integer
 #
 
 require 'test_helper'

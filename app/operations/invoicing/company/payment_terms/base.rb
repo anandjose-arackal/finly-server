@@ -7,6 +7,6 @@ class Invoicing::Company::PaymentTerms::Base < Invoicing::Company::Base
   end
 
   def payment_term_params
-    params.require(:payment_term).permit(:name, :days_after, :description)
+    params.require(:payment_term).permit(:name, :days_after, :description, :default)
   end
 end

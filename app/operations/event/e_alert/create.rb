@@ -8,7 +8,11 @@ class Event::EAlert::Create < Event::EAlert::Base
   end
 
   def affected_users
-    emails = %w(vivek.a@finly.io sreeram.nr@finly.io)
+    if Rails.env.production?
+      emails = %w(vivek.a@finly.io sreeram.nr@finly.io)
+    else
+      emails = %w(sreeram.nr@finly.io)
+    end
     User.with_email(emails)
   end
 
