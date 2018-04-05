@@ -39,6 +39,7 @@ class PoliciesController < ApplicationController
     @result = Policy::Show.(current_user, params)
     respond_to do |format|
       format.html { render partial: 'expense_rules' }
+      format.json {}
     end
   end
 
@@ -46,6 +47,7 @@ class PoliciesController < ApplicationController
     @result = Policy::Show.(current_user, params)
     respond_to do |format|
       format.html { render partial: 'budget_rules' }
+      format.json {}
     end
   end
 
