@@ -85,7 +85,6 @@ class Policy::Show < Policy::Base
   end
 
   def success
-    debugger
     params[:policy] = self.policy
     params[:users] = self.users
     params[:policy_users] = self.policy_users
