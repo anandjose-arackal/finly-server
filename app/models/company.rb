@@ -379,6 +379,9 @@ class Company < ActiveRecord::Base
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
     self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:vendor_payments), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
 
+    # Create Invoicing System Auto transfer config (enabled: false)
+    self.build_collect_auto_transfer_config.save
+
 
     self.build_collect_company_detail.save
     # seeding the default payment terms for this company
