@@ -10,8 +10,8 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
   def init
     super
     # here we need all categories, not just inactive ones
-    self.category = user.company.categories.with_name(category_params[:name]).first rescue nil
     self.purpose_id = category_params[:purpose_id] || Purpose.id_from_application_for(RequestStore.store[:current_app])
+    self.category = user.company.categories.with_purpose(self.purpose_id).with_name(category_params[:name]).first rescue nil
   end
 
   def process
