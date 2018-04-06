@@ -117,13 +117,14 @@ class OutwardInvoice < ActiveRecord::Base
 
   scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
   scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:paid) }
+  scope :saved, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:saved)}
   scope :cancelled, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:cancelled) }
   scope :partially_paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:partially_paid) }
-  scope :payments_receivable, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid])) }
+  scope :payments_receivable, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :unpaid, :partially_paid])) }
   scope :processed, -> { where invoice_status_id: [OutwardInvoiceStatus.id_for(:paid), OutwardInvoiceStatus.id_for(:partially_paid)]}
   scope :with_type, -> (type) {where outward_invoice_type_id: OutwardInvoiceType.id_for(type)}
 
-  scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :partially_paid, :paid, :cancelled]) }
+  scope :valid, -> { where invoice_status_id: OutwardInvoiceStatus.ids_for([:saved, :unpaid, :partially_paid, :paid, :cancelled]) }
   scope :invoice_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
   scope :without_id, -> (id){ where.not id: id}
   scope :with_id, -> (id) { where id: id }

@@ -95,7 +95,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       end
     end
 
-    if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved), is_deleted: false)
+    if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:unpaid), is_deleted: false)
       recalculate_totals
       self.invoice.update(paid_amount: Amount.create(value: 0, currency_id: 1)) # setting the paid amount as 0 at the time of saving
       self.invoice.virtual_account&.update(purpose_id: VirtualAccountPurpose.id_for(:invoice))
