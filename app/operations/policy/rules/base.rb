@@ -25,7 +25,8 @@ class Policy::Rules::Base < Policy::Base
   end
 
   def init
-    self.policy = Policy::Index.(user, params).policies.find_by(id: (params[:policy_id] or params[:id]))
+    op = Policy::Index.(user, params)
+    self.policy = op.policies.find_by(id: (params[:policy_id] or params[:id]))
   end
 
   def authorize

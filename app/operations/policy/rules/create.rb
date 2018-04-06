@@ -20,7 +20,8 @@
 class Policy::Rules::Create < Policy::Rules::Base
 
   def init
-    super()
+    op = Policy::Index.(user, params)
+    self.policy = op.policies.find_by(id: (params[:policy_id] or params[:id]))
     self.rule_params = rule_parameters
   end
 
@@ -40,24 +41,24 @@ class Policy::Rules::Create < Policy::Rules::Base
     # choosing the currency for the rule based on the currency of the respective policy
     # for budget rule
     if rule_params[:amount_attributes].present?
-      rule_params[:amount_attributes][:currency_id] = policy.base_currency_id
+      rule_params[:amount_attributes][:currency_id] = self.policy.base_currency_id
     end
 
     # for expense rule
     if rule_params[:greater_than_amount_attributes].present?
-      rule_params[:greater_than_amount_attributes][:currency_id] = policy.base_currency_id
+      rule_params[:greater_than_amount_attributes][:currency_id] = self.policy.base_currency_id
     end
   end
 
   def process
     if params[:expense_rule]
-      self.rule = policy.expense_rules.create(rule_params)
+      self.rule = self.policy.expense_rules.create(rule_params)
       unless ExpenseRule.exists?(rule.id)
         messages[:error] = rule.errors.full_messages
         return false
       end
     else
-      self.rule = policy.budget_rules.create(rule_params)
+      self.rule = self.policy.budget_rules.create(rule_params)
       unless BudgetRule.exists?(rule.id)
         messages[:error] = rule.errors.full_messages
         return false
