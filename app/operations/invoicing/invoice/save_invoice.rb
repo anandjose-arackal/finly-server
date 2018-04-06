@@ -94,7 +94,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
         self.invoice.customer.gst = customer_params[:gst]
       end
     end
-    invoice_status_id = OutwardInvoiceType.id_for(:saved)
+    invoice_status_id = OutwardInvoiceStatus.id_for(:saved)
     if self.invoice.tax_invoice?
       invoice_status_id = OutwardInvoiceStatus.id_for(:unpaid)
     end

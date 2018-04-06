@@ -23,6 +23,10 @@ class OutwardInvoiceStatus < ActiveRecord::Base
     self.id == OutwardInvoiceStatus.id_for(:paid)
   end
 
+  def unpaid?
+    self.id == OutwardInvoiceStatus.id_for(:unpaid)
+  end
+
   def incomplete?
     self.id == OutwardInvoiceStatus.id_for(:incomplete)
   end
