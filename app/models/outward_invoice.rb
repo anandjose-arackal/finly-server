@@ -84,8 +84,9 @@ class OutwardInvoice < ActiveRecord::Base
   has_many :attachments, class_name: "OutwardInvoiceAttachment"
   has_many :invoice_trails, class_name: "OutwardInvoiceTrail"
 
-  delegate :partially_paid?, :paid?, :incomplete?, :saved?, :cancelled?, to: :invoice_status
+  delegate :partially_paid?, :paid?, :incomplete?, :saved?, :cancelled?, :unpaid?, to: :invoice_status
   delegate :status_name, to: :invoice_status
+  delegate :tax_invoice?, :credit_note?, :debit_note?, :advance?, to: :outward_invoice_type
 
   accepts_nested_attributes_for :customer
   accepts_nested_attributes_for :amount
