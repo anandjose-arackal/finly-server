@@ -229,13 +229,13 @@ class InvoiceCalculationUtils
   end
 
   def calculate_tds
-    if invoice.tds_slab_id.present?
-      tds = invoice.tds_slab.tds
-      invoice.tds = tds # setting the TDS for this invoice as well
-    else
-      tds = invoice.tds
-    end
     if self.invoice.is_a?(Invoice)
+      if invoice.tds_slab_id.present?
+        tds = invoice.tds_slab.tds
+        invoice.tds = tds # setting the TDS for this invoice as well
+      else
+        tds = invoice.tds
+      end
       new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, tds)
       self.tds_amount = self.gross_amount - new_gross_amount
     else
