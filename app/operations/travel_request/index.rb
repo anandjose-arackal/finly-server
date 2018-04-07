@@ -1,0 +1,98 @@
+class TravelRequest::Index < BaseOperation
+  attr_accessor :travel_requests, :role_id
+
+  def authorized_user_types
+    [:employee, :manager, :finance_manager, :admin, :auditor]
+  end
+
+  def init
+    self.role_id = params[:role_id]
+    if self.role_id.blank? and params[:view].present?
+      self.role_id = UserRole::VALUES[params[:view].to_sym]
+      params[:role_id] = self.role_id
+    end
+  end
+
+  def authorize
+    if self.role_id.present?
+      raise_unauthorized_exception if not user.has_role?(self.role_id) and not (role_id == UserRole.id_for(:admin) and user.policy_admin?)
+    elsif not user.employee?
+      raise_unauthorized_exception
+    end
+  end
+
+  def process
+    case self.role_id
+      when UserRole.id_for(:admin), UserRole.id_for(:auditor)
+        user_ids = User::Team::Index.(user, params).pluck(:id)
+        if self.user.company_admin? || user.auditor?
+          self.travel_requests = TravelRequest.not_open.with_user(user_ids)
+        elsif user.policy_admin?
+          policy_ids = user.admin_policies.pluck(:id)
+          self.travel_requests = TravelRequest.not_open.with_user(user_ids).with_policy(policy_ids)
+        end
+        unless user.admin? || user.auditor?
+          messages[:error] << 'User is not an admin'
+          return false
+        end
+      # when UserRole.id_for(:manager)
+      #   team_ids = User::Team::Index.(user, params)&.pluck(:id)
+      #   controlling_travel_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager)).with_user(team_ids)
+      #   interacted_travel_requests_query= user.manager_money_requests
+      #   sql = MoneyRequest.connection.unprepared_statement {
+      #     "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
+      #   }
+      #   self.money_requests = MoneyRequest.from(sql)
+      # when UserRole.id_for(:finance_manager)
+      #   team_ids = User::Team::Index.(user, params)&.pluck(:id)
+      #   controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:finance_manager)).with_user(team_ids)
+      #   interacted_money_requests_query = user.finance_money_requests
+      #   sql = MoneyRequest.connection.unprepared_statement {
+      #     "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
+      #   }
+      #   self.money_requests = MoneyRequest.from(sql)
+      # when UserRole.id_for(:auditor)
+      #   # todo auditor
+      else
+        self.travel_requests = user.travel_requests.sort_for_personal
+    end
+    self.travel_requests = self.travel_requests.exclude_deleted if self.travel_requests.present?
+  end
+
+  def success
+    params[:travel_requests] = travel_requests
+    TravelRequest::Index::Presenter.new(user, params, self.messages)
+  end
+
+  class TravelRequest::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :travel_requests, :counts, :paginated_travel_requests
+
+    # has_scope :filter_search
+    # has_scope :filter_status
+    # has_scope :filter_user_id
+    # has_scope :filter_date, using: [:from, :to], type: :hash
+    # has_scope :filter_submitted_date, using: [:from, :to], type: :hash
+    # has_scope :filter_approved_date, using: [:from, :to], type: :hash
+    # has_scope :filter_policy
+    # has_scope :filter_required_by_date
+
+    def init
+      self.travel_requests = params[:travel_requests]
+      if self.travel_requests.present?
+        self.travel_requests = apply_scopes(self.travel_requests, params)
+        self.paginated_travel_requests = self.travel_requests.paginate(page: params[:page], per_page: 30)
+      end
+    end
+
+    def status_name(travel_request)
+      return nil if travel_request.blank?
+      if travel_request.processing? and travel_request.controlling_user?(self.user)
+        'Awaiting Approval'
+      else
+        travel_request.status_name
+      end
+    end
+
+  end
+
+end

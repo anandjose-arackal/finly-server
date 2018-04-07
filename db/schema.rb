@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180407091132) do
+ActiveRecord::Schema.define(version: 20180407104458) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -628,9 +628,10 @@ ActiveRecord::Schema.define(version: 20180407091132) do
   add_index "booking_hotels", ["booking_type_id"], name: "index_booking_hotels_on_booking_type_id", using: :btree
 
   create_table "booking_requests", force: :cascade do |t|
-    t.integer  "booking_status_id", limit: 4
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.integer  "booking_status_id",             limit: 4
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.integer  "travel_request_destination_id", limit: 4
   end
 
   add_index "booking_requests", ["booking_status_id"], name: "index_booking_requests_on_booking_status_id", using: :btree
@@ -3729,6 +3730,46 @@ ActiveRecord::Schema.define(version: 20180407091132) do
   add_index "transcribed_expenses", ["receipt_id"], name: "index_transcribed_expenses_on_receipt_id", using: :btree
   add_index "transcribed_expenses", ["user_id"], name: "index_transcribed_expenses_on_user_id", using: :btree
 
+  create_table "travel_request_destinations", force: :cascade do |t|
+    t.string   "name",              limit: 255
+    t.string   "source",            limit: 255
+    t.integer  "travel_request_id", limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "travel_request_destinations", ["travel_request_id"], name: "index_travel_request_destinations_on_travel_request_id", using: :btree
+
+  create_table "travel_request_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "travel_requests", force: :cascade do |t|
+    t.integer  "user_id",                      limit: 4
+    t.integer  "policy_id",                    limit: 4
+    t.string   "name",                         limit: 255
+    t.date     "required_by_date"
+    t.text     "note",                         limit: 65535
+    t.integer  "status_id",                    limit: 4,                   null: false
+    t.integer  "controlling_user_id",          limit: 4
+    t.integer  "controlling_user_role_id",     limit: 4
+    t.integer  "controlling_for_user_id",      limit: 4
+    t.integer  "controlling_for_user_role_id", limit: 4
+    t.datetime "submitted_at",                               precision: 6
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+  end
+
+  add_index "travel_requests", ["controlling_for_user_id"], name: "index_travel_requests_on_controlling_for_user_id", using: :btree
+  add_index "travel_requests", ["controlling_for_user_role_id"], name: "index_travel_requests_on_controlling_for_user_role_id", using: :btree
+  add_index "travel_requests", ["controlling_user_id"], name: "index_travel_requests_on_controlling_user_id", using: :btree
+  add_index "travel_requests", ["controlling_user_role_id"], name: "index_travel_requests_on_controlling_user_role_id", using: :btree
+  add_index "travel_requests", ["policy_id"], name: "index_travel_requests_on_policy_id", using: :btree
+  add_index "travel_requests", ["status_id"], name: "index_travel_requests_on_status_id", using: :btree
+  add_index "travel_requests", ["user_id"], name: "index_travel_requests_on_user_id", using: :btree
+
   create_table "user_balance_histories", force: :cascade do |t|
     t.date     "date"
     t.integer  "user_id",                    limit: 4
@@ -4409,6 +4450,9 @@ ActiveRecord::Schema.define(version: 20180407091132) do
   add_foreign_key "transcribed_expenses", "expenses"
   add_foreign_key "transcribed_expenses", "receipts"
   add_foreign_key "transcribed_expenses", "users"
+  add_foreign_key "travel_request_destinations", "travel_requests"
+  add_foreign_key "travel_requests", "policies"
+  add_foreign_key "travel_requests", "users"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
   add_foreign_key "user_group_item_mappings", "user_group_items"
