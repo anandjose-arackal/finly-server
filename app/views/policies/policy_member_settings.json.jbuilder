@@ -54,3 +54,21 @@ end
     end
   end
 end
+
+json.managers do
+  json.array!(current_company.users.only_managers) do |user|
+    json.id user.id
+    json.name user.name
+    json.email user.email
+    json.mobile_number user.mobile_number
+  end
+end
+
+json.finance_managers do
+  json.array!(current_company.users.only_finance_managers) do |user|
+    json.id user.id
+    json.name user.name
+    json.email user.email
+    json.mobile_number user.mobile_number
+  end
+end
