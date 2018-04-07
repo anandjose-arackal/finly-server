@@ -93,6 +93,7 @@ class PoliciesController < ApplicationController
     @managers = User::Team::GetManagers.(current_user, params)
     respond_to do |format|
       format.html { render partial: 'policy_member_settings' }
+      format.json {}
     end
   end
 
