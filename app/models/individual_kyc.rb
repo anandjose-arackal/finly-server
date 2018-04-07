@@ -170,7 +170,7 @@ class IndividualKyc < ActiveRecord::Base
   end
 
   def require_photo?
-    [nil, 'HDFC'].include?(self.user.company.configuration.bank_type)
+    [nil, 'HDFC'].include?(self.user.company.configuration.bank_type)&.upcase
   end
 
 end
