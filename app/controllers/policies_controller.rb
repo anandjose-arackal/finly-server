@@ -88,9 +88,9 @@ class PoliciesController < ApplicationController
   end
 
   def policy_member_settings
-    @target_user = User.find(params[:user_id])
+    @target_user = User.find_by(id: params[:user_id])
     @result = Policy::Mappings::Show.(current_user, params)
-    @managers = User::Team::GetManagers.(current_user, params)
+    @mappings_policy = [@result.map]
     respond_to do |format|
       format.html { render partial: 'policy_member_settings' }
       format.json {}
