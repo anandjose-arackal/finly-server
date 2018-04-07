@@ -1,6 +1,8 @@
 mapping = @result.map
 json.user_name @target_user&.name
-json.policy_admin current_user.policy_admin?(@result.policy)
+json.email @target_user&.email
+json.mobile_number @target_user&.mobile_number
+json.policy_admin @target_user&.policy_admin?(@result.policy)
 json.company_default mapping[:company_default]
 if mapping[:policy]
   json.policy do
