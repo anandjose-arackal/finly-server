@@ -95,6 +95,7 @@ class PoliciesController < ApplicationController
       format.html { render partial: 'policy_member_settings' }
       format.json {}
     end
+
   end
 
 
