@@ -1,3 +1,5 @@
+json.verified @pending_user.otp_verified
+json.id @pending_user.id
 json.mobile_number @pending_user.mobile_number
 json.company_name @pending_user.company.name
 json.states do

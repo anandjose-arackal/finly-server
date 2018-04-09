@@ -89,6 +89,7 @@ class PendingInvitesController < ApplicationController
     @states = State.all
     @pending_user = User.find(params[:user_id])
 
+
     if @pending_user.otp_verified?
       respond_to do |format|
         format.html {render partial: 'activate_employee'}
