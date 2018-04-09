@@ -7,6 +7,19 @@ json.user do
   json.id @target_user.id
 end
 
+json.role do
+  json.admin @result.roles[:admin]
+  json.manager @result.roles[:manager]
+  json.finance_manager @result.roles[:finance_manager]
+  json.auditor @result.roles[:auditor]
+  json.editable do
+    admin = (@result.user.company_admin? and params[:view] == 'admin')
+    json.admin (admin and not @result.selected_user == @result.user)
+    json.manager (admin or (@result.user.manager? and params[:view] == 'manager'))
+    json.finance_manager (admin or (@result.user.finance_manager? and params[:view] == 'finance_manager'))
+  end
+end
+
 json.mappings @mappings_policy.each do |mapping|
   json.company_default mapping[:company_default]
   if mapping[:policy]
