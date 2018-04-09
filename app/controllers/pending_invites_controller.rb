@@ -6,9 +6,15 @@ class PendingInvitesController < ApplicationController
     @pending_user = User.find_by_invitation_token(params[:invitation_token], true)
     @states = State.all
     if @pending_user
-      render partial: 'edit_invite'
+      respond_to do |format|
+        format.html {render partial: 'edit_invite'}
+        format.json {}
+      end
     else
-      render partial: 'edit_invite_not_found'
+      respond_to do |format|
+        format.html {render partial: 'edit_invite_not_found'}
+        format.json {}
+      end
     end
   end
 
@@ -63,6 +69,7 @@ class PendingInvitesController < ApplicationController
     @pending_user = User.find(params[:user_id])
     respond_to do |format|
       format.html {render partial: 'verify_mobile'}
+      format.json {}
     end
   end
 
@@ -85,6 +92,7 @@ class PendingInvitesController < ApplicationController
     if @pending_user.otp_verified?
       respond_to do |format|
         format.html {render partial: 'activate_employee'}
+        format.json {}
       end
     else
       # calling the initiate activation method
