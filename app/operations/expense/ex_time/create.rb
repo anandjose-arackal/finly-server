@@ -20,6 +20,9 @@ class Expense::ExTime::Create < Expense::ExTime::Base
     {
         pre_validate: {
             before: Personalizer::Process.new([:expense, :time_create], :pre_validate, self)
+        },
+        pre_process: {
+            before: Personalizer::Process.new([:expense, :time_create], :pre_process, self)
         }
     }
   end

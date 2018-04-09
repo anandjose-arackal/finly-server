@@ -6,6 +6,9 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
     {
         pre_validate: {
             before: Personalizer::Process.new([:expense, :per_diem_create], :pre_validate, self)
+        },
+        pre_process: {
+            before: Personalizer::Process.new([:expense, :per_diem_create], :pre_process, self)
         }
     }
   end
