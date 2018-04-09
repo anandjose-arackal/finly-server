@@ -1,12 +1,13 @@
 class Policy::Show < Policy::Base
-  attr_accessor :policy, :users
+  attr_accessor :policy, :users, :mappings, :policy_users
 
   class Policy::Show::ShowPresenter < Policy::Base::PolicyPresenter
-    attr_accessor :policy, :users
+    attr_accessor :policy, :users, :policy_users
 
     def init
       self.policy = params[:policy]
       self.users = params[:users]
+      self.policy_users = params[:policy_users]
     end
 
     def company_managers
@@ -43,6 +44,8 @@ class Policy::Show < Policy::Base
   def init
     id = (params[:policy_id] or params[:id])
     self.policy = Policy::Index.(user, params).policies.with_id(id).first rescue nil
+    self.mappings = []
+    self.policy_users = self.policy&.users || []
   end
 
   def authorize
@@ -78,10 +81,14 @@ class Policy::Show < Policy::Base
                 conditional_finance: conditional_finance, conditional_approves_to: conditional_approves_to,
                 conditional_approves_finance_to: conditional_approves_finance_to}
     end
+
   end
 
   def success
-    Policy::Show::ShowPresenter.new(user, {policy: policy, users: users}, messages)
+    params[:policy] = self.policy
+    params[:users] = self.users
+    params[:policy_users] = self.policy_users
+    Policy::Show::ShowPresenter.new(user, params, messages)
   end
 
 

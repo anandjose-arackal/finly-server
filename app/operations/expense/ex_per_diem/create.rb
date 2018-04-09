@@ -2,6 +2,14 @@ class Expense::ExPerDiem::Create < Expense::ExPerDiem::Base
 
   attr_accessor :expense_params, :receipt, :per_diem
 
+  def personalizer
+    {
+        pre_validate: {
+            before: Personalizer::Process.new([:expense, :per_diem_create], :pre_validate, self)
+        }
+    }
+  end
+
   def authorized_user_types
     [:employee]
   end

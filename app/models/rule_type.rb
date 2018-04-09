@@ -16,4 +16,12 @@ class RuleType < ActiveRecord::Base
   def type
     self.name
   end
+
+  def self.warning_rule_id
+    1
+  end
+
+  def self.blocking_rule_id
+    2
+  end
 end
