@@ -4,6 +4,7 @@ json.user do
   json.email @target_user&.email
   json.mobile_number @target_user&.mobile_number
   json.policy_admin @target_user&.policy_admin?(@result.policy)
+  json.id @target_user.id
 end
 
 json.mappings @mappings_policy.each do |mapping|
