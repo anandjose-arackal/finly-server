@@ -3,6 +3,15 @@ class Expense::ExPerDiem::Multiple::Create < Expense::ExPerDiem::Multiple::Base
   attr_accessor :valid, :errors_by_expenses, :multiple_expense_params, :multiple_expenses,
                 :total_amount_from_coh
 
+
+  def personalizer
+    {
+        pre_process: {
+            before: Personalizer::Process.new([:expense, :per_diem_multiple_create], :pre_process, self)
+        }
+    }
+  end
+
   def authorized_user_types
     [:employee]
   end
