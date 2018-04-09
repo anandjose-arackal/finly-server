@@ -3,6 +3,14 @@ class Expense::ExTime::Update < Expense::ExTime::Base
   attr_accessor :updated_expense_params
   attr_accessor :editable_attrs, :receipt, :old_receipt, :destroy_receipts
 
+  def personalizer
+    {
+        pre_validate: {
+            before: Personalizer::Process.new([:expense, :time_create], :pre_validate, self)
+        }
+    }
+  end
+
   def pre_validate
     if params.blank? or user.blank?
       messages[:error] << "Parameters or user not found"

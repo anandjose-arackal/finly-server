@@ -16,6 +16,15 @@ class Expense::ExTime::Create < Expense::ExTime::Base
 
   attr_accessor :expense_params, :receipt
 
+  def personalizer
+    {
+        pre_validate: {
+            before: Personalizer::Process.new([:expense, :time_create], :pre_validate, self)
+        }
+    }
+  end
+
+
   def authorized_user_types
     [:employee]
   end

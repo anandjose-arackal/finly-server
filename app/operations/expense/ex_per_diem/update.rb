@@ -3,6 +3,14 @@ class Expense::ExPerDiem::Update < Expense::ExPerDiem::Base
   attr_accessor :updated_expense_params
   attr_accessor :editable_attrs, :receipt, :old_receipt, :per_diem, :destroy_receipts
 
+  def personalizer
+    {
+        pre_validate: {
+            before: Personalizer::Process.new([:expense, :per_diem_update], :pre_validate, self)
+        }
+    }
+  end
+
   def pre_validate
     if params.blank? or user.blank?
       add_message :error, 'Parameters or user not found'
