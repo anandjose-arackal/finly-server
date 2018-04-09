@@ -12,7 +12,7 @@ class Company::Collect::InvoiceNumberConfiguration::Show < Company::Base
   end
 
   def init
-    self.configs = user.company.invoice_number_configs
+    self.configs = user.company.invoice_number_configs.with_purpose_id(Purpose.id_for(:collect))
   end
 
   def success

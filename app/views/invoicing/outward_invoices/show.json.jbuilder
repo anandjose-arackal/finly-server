@@ -26,6 +26,7 @@ json.invoice do
   json.status do
     json.id invoice.invoice_status&.id
     json.name invoice.invoice_status&.name&.humanize
+    json.id_name invoice.invoice_status&.name
     json.bs_class ""
   end
   json.invoice_type do
