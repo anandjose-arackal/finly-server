@@ -128,7 +128,7 @@ class Event::EMoneyRequest::Approve < Event::EMoneyRequest::Base
           message = "Congratulations! Your Money Request #{money_request.name} has been approved"
         end
       else
-        message = "#{user.name} has approved the Money Request '#{self.money_request.name}' and is currently waiting for your approval"
+        message = "#{approving_user.name} has approved the Money Request '#{self.money_request.name}' and is currently waiting for your approval"
       end
     end
     message
