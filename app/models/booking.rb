@@ -12,6 +12,7 @@
 class Booking < ActiveRecord::Base
   belongs_to :booking_request
   belongs_to :booking_status
+  has_many :travel_members
 
   has_one :booking_car_rental
   has_one :booking_bus

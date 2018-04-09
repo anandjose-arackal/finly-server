@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180407104458) do
+ActiveRecord::Schema.define(version: 20180409082442) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3730,6 +3730,24 @@ ActiveRecord::Schema.define(version: 20180407104458) do
   add_index "transcribed_expenses", ["receipt_id"], name: "index_transcribed_expenses_on_receipt_id", using: :btree
   add_index "transcribed_expenses", ["user_id"], name: "index_transcribed_expenses_on_user_id", using: :btree
 
+  create_table "travel_members", force: :cascade do |t|
+    t.string   "title",              limit: 255
+    t.string   "first_name",         limit: 255
+    t.string   "middle_name",        limit: 255
+    t.string   "last_name",          limit: 255
+    t.boolean  "child"
+    t.integer  "age",                limit: 4
+    t.string   "email",              limit: 255
+    t.string   "mobile_number",      limit: 255
+    t.integer  "booking_id",         limit: 4
+    t.integer  "booking_request_id", limit: 4
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+  end
+
+  add_index "travel_members", ["booking_id"], name: "index_travel_members_on_booking_id", using: :btree
+  add_index "travel_members", ["booking_request_id"], name: "index_travel_members_on_booking_request_id", using: :btree
+
   create_table "travel_request_destinations", force: :cascade do |t|
     t.string   "name",              limit: 255
     t.string   "source",            limit: 255
@@ -4450,6 +4468,8 @@ ActiveRecord::Schema.define(version: 20180407104458) do
   add_foreign_key "transcribed_expenses", "expenses"
   add_foreign_key "transcribed_expenses", "receipts"
   add_foreign_key "transcribed_expenses", "users"
+  add_foreign_key "travel_members", "booking_requests"
+  add_foreign_key "travel_members", "bookings"
   add_foreign_key "travel_request_destinations", "travel_requests"
   add_foreign_key "travel_requests", "policies"
   add_foreign_key "travel_requests", "users"

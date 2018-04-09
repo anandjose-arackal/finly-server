@@ -2246,6 +2246,11 @@ Rails.application.routes.draw do
   end
 
 
+  resources :travel_requests do
+
+  end
+
+
   post 'expenses/split', to: 'expenses#split_existing'
   post 'expenses/export', to: 'expenses#export'
   delete 'expenses', to: 'expenses#destroy'

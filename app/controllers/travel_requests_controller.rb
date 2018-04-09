@@ -9,6 +9,7 @@ class TravelRequestsController < ApplicationController
 
   def create
     @result = TravelRequest::Create.(current_user, params)
+    respond
   end
 
   def update
