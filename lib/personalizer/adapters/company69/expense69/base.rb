@@ -3,21 +3,23 @@ class Personalizer::Adapters::Company69::Expense69::Base < Personalizer::Adapter
 
   # this will be executed after the particular expense has been created in Finly
   def post_process
-    expense = self.op_instance.expense
-    case expense.expense_type_id
-      when ExpenseType.id_for(:manual)
-        id = 149 # todo - change this before deploy
-      when ExpenseType.id_for(:distance)
-        id
-      when ExpenseType.id_for(:time)
-        id
-      when ExpenseType.id_for(:per_diem)
-        id
-      else
-        id = nil
+    if self.op_instance.class.name.include?('Manual')
+      id = 149 # todo - change this before deploy
+    elsif self.op_instance.class.name.include?('Time')
+      id = 150
+    elsif self.op_instance.class.name.include?('Distance')
+      id = 151
+    elsif self.op_instance.class.name.include?('PerDiem')
+      id = 152
+    else
+      id = nil
     end
     fc = self.op_instance.user.company.field_configurations.find_by(id: id)
-    expense.manual_expense.custom_fields.create(field_configuration_id: fc.id, value_attributes: {value: employee_location_mapping[expense.user_id]})
+    unless fc.blank?
+      op_params = self.op_instance.params
+      op_params&.dig(:custom_fields)[fc.id] = employee_location_mapping[self.op_instance.user.id]
+      self.op_instance.params = op_params
+    end
   end
 
   def employee_location_mapping
