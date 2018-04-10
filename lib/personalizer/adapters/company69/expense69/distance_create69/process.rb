@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company69::Expense69::DistanceCreate69::Process < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company69::Expense69::DistanceCreate69::Process < Personalizer::Adapters::Company69::Expense69::Base
 
   def validate
     expense_attributes = op_instance.expense_params
