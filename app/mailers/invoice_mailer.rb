@@ -9,7 +9,7 @@ class InvoiceMailer < ApplicationMailer
     )
 
     for attachment in options[:attachments]
-      url = "#{Rails.root}/public" + attachment.attachment.url('original', timestamp: false)
+      url = "#{Rails.root}" + attachment.attachment.url('original', timestamp: false)
       attachments[attachment.attachment_file_name] = {
           content: open(url).read
       }
