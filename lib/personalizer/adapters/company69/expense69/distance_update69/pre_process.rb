@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company69::Expense69::DistanceCreate69::PreProcess < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company69::Expense69::DistanceCreate69::PreProcess < Personalizer::Adapters::Company69::Expense69::Base
 
   def pre_process
     expense_params = self.op_instance.expense_params
