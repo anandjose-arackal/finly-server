@@ -4,13 +4,13 @@ class Personalizer::Adapters::Company69::Expense69::Base < Personalizer::Adapter
   # this will be executed after the particular expense has been created in Finly
   def post_process
     if self.op_instance.class.name.include?('Manual')
-      id = 149 # todo - change this before deploy
+      id = 160 # todo - change this before deploy
     elsif self.op_instance.class.name.include?('Time')
-      id = 150
+      id = 161
     elsif self.op_instance.class.name.include?('Distance')
-      id = 151
+      id = 162
     elsif self.op_instance.class.name.include?('PerDiem')
-      id = 152
+      id = 163
     else
       id = nil
     end
