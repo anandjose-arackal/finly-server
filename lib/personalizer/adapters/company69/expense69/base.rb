@@ -177,6 +177,8 @@ class Personalizer::Adapters::Company69::Expense69::Base < Personalizer::Adapter
         9681=>"Hyderabad",
         9682=>"Bangalore",
         9630=>"Bangalore",
-        9683=>"Mumbai"}
+        9683=>"Mumbai",
+        8120 => "Bangalore"
+        }
   end
 end
