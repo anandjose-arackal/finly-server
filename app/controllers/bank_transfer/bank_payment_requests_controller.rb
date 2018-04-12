@@ -1,5 +1,6 @@
 class BankTransfer::BankPaymentRequestsController < ApplicationController
 
+  before_action :set_tokens_in_header, only: [:download_pending_attachment, :download_selected_attachment, :download_all_attachment]
   before_action {finly_authorize! :web}
 
   def show
@@ -125,17 +126,32 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
 
   def download_pending
     @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadPending.(current_user, params)
-    respond
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def download_pending_attachment
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadPendingAttachment.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def download_selected
     @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadSelected.(current_user, params)
-    respond
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def download_selected_attachment
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadSelectedAttachment.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def download_all
     @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadAll.(current_user, params)
-    respond
+    respond response: (@result&.success? ? :success : :failure)
+  end
+
+  def download_all_attachment
+    @result = BankTransfer::PaymentRequest::Spreadsheet::DownloadAllAttachment.(current_user, params)
+    respond response: (@result&.success? ? :success : :failure)
   end
 
   def filters
@@ -145,6 +161,21 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond_to do |format|
       format.json {}
     end
+  end
+
+  def bulk_credit_validate
+    @result = BankTransfer::PaymentRequest::Review::BulkCreditValidate.(current_user, params)
+    respond
+  end
+
+  def bulk_credit
+    @result = BankTransfer::PaymentRequest::Review::BulkCredit.(current_user, params)
+    respond
+  end
+
+  def sample_import_file
+    @result = BankTransfer::PaymentRequest::GenerateImportSample.(current_user, params)
+    respond
   end
 
   private

@@ -4,10 +4,15 @@ class Invoicing::VirtualBankAccount::Index < Invoicing::VirtualBankAccount::Base
 
   class Invoicing::VirtualBankAccount::Index::AccountsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :virtual_bank_accounts
+    attr_accessor :virtual_bank_accounts, :paginated_virtual_bank_accounts
+
+    has_scope :filter_search
+    has_scope :filter_created_by_id
 
     def init
       self.virtual_bank_accounts = params[:virtual_bank_accounts]
+      self.virtual_bank_accounts = apply_scopes(self.virtual_bank_accounts, params)
+      self.paginated_virtual_bank_accounts = virtual_bank_accounts.paginate(page: params[:page], per_page: params[:per_page])
     end
   end
 

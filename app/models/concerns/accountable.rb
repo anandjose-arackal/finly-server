@@ -29,48 +29,67 @@ module Accountable
   def opening_balance(date)
     return 0 if date.blank?
     date = date.beginning_of_day
-    balance = finly_transactions.before_date(date).limit_to_one&.first&.closing_balance&.value
+    # balance = finly_transactions.before_date(date).limit_to_one&.first&.closing_balance&.value
+
+    # As company balance load's do not have opening or closing balance, this is to handle cases which do not have opening or closing balance
+    # In case opening balance is required where company balance load was the first transaction performed, then fetch the previous day's last transactions closing balance as the day's closing balance
+    transaction = finly_transactions.on_or_after_date(date)&.sort_date_asc&.limit_to_one&.first
+    if transaction&.opening_balance_id.present?
+      balance = transaction&.opening_balance&.value
+    else
+      balance = finly_transactions.before_date(date)&.sort_date_desc&.limit_to_one&.first&.closing_balance&.value
+    end
     return balance unless balance.nil?
 
     # todo Jugaad to access historical data
     from = (date - 1.day)
     case self.class.name
       when Card.name
-        self.user.user_balance_histories.with_date(from)&.first&.card_balance&.value || 0
+        return self.user.user_balance_histories.with_date(from)&.first&.card_balance&.value || 0
       when ItzCashCompanyAccount.name
-        self.company.company_balance_histories.with_date(from)&.first&.company_balance&.value || 0
+        return self.company.company_balance_histories.with_date(from)&.first&.company_balance&.value || 0
       when UserWallet.name
-        self.user.user_balance_histories.with_date(from)&.first&.finly_money_balance&.value || 0
+        return self.user.user_balance_histories.with_date(from)&.first&.finly_money_balance&.value || 0
       when CashOnHand.name
-        self.user.user_balance_histories.with_date(from)&.first&.cash_on_hand_balance&.value || 0
+        return self.user.user_balance_histories.with_date(from)&.first&.cash_on_hand_balance&.value || 0
       when YesBankCompanyAccount.name
-        0
+        return 0
     end
-    0
+    return 0
   end
 
   def closing_balance(date)
     return 0 if date.blank?
-    date = date + 1
-    date = date.beginning_of_day
-    balance = finly_transactions.before_date(date).limit_to_one&.first&.closing_balance&.value
+    # date = date + 1
+    date = date.end_of_day
+    # balance = finly_transactions.on_or_before_date(date)&.sort_date_desc&.limit_to_one&.first&.closing_balance&.value
+
+    # As company balance load's do not have opening or closing balance, this is to handle cases which do not have opening or closing balance
+    # In case opening balance is required where company balance load was the last transaction performed, then fetch the next day's first transactions opening balance as the day's closing balance
+    transaction = finly_transactions.on_or_before_date(date)&.sort_date_desc&.limit_to_one&.first
+    if transaction&.closing_balance_id.present?
+      balance = transaction&.closing_balance&.value
+    else
+      balance = finly_transactions.after_date(date)&.sort_date_asc&.limit_to_one&.first&.opening_balance&.value
+    end
+
     return balance unless balance.nil?
 
     # todo Jugaad to access historical data
     to = date
     case self.class.name
       when Card.name
-        self.user.user_balance_histories.with_date(to)&.first&.card_balance&.value || 0
+        return self.user.user_balance_histories.with_date(to)&.first&.card_balance&.value || 0
       when ItzCashCompanyAccount.name
-        self.company.company_balance_histories.with_date(to)&.first&.company_balance&.value || 0
+        return self.company.company_balance_histories.with_date(to)&.first&.company_balance&.value || 0
       when UserWallet.name
-        self.user.user_balance_histories.with_date(to)&.first&.finly_money_balance&.value || 0
+        return self.user.user_balance_histories.with_date(to)&.first&.finly_money_balance&.value || 0
       when CashOnHand.name
-        self.user.user_balance_histories.with_date(to)&.first&.cash_on_hand_balance&.value || 0
+        return self.user.user_balance_histories.with_date(to)&.first&.cash_on_hand_balance&.value || 0
       when YesBankCompanyAccount.name
-        0
+        return 0
     end
-    0
+    return 0
   end
 
 end

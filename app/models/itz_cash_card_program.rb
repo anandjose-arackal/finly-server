@@ -38,6 +38,11 @@ class ItzCashCardProgram < ActiveRecord::Base
           name: "RBL Expense (Visa)",
           bank: "RBL",
           product_code: "RBLFIN"
+      },
+      {
+          name: "HDFC (PIN at POS)",
+          bank: "HDFC",
+          product_code: "HDFFPD"
       }
   ]
 

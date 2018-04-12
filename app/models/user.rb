@@ -46,7 +46,10 @@
 #  otp_request_type_id    :integer
 #  default_password       :boolean          default(FALSE)
 #  point_of_contact       :boolean          default(FALSE)
+#  otp_attempts           :integer          default(0)
 #
+
+
 
 
 
@@ -109,9 +112,15 @@ class User < ActiveRecord::Base
   has_many :payment_receivables, foreign_key: :initiating_user_id
 
 
-  has_many :bank_accounts, as: :account_owner
+  has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :authentications
   has_many :cards, dependent: :destroy
+  has_many :payroll_cards, -> { where(card_program_id: CardProgram.id_for(:payroll)) }, class_name: 'Card'
+  has_many :reimbursement_cards, -> { where(card_program_id: CardProgram.id_for(:reimbursement)) }, class_name: 'Card'
+  has_many :reimbursement_payroll_cards, -> { where(card_program_id: [CardProgram.id_for(:reimbursement), CardProgram.id_for(:payroll)]) }, class_name: 'Card'
+  has_many :meal_cards, -> { where(card_program_id: CardProgram.id_for(:meal)) }, class_name: 'Card'
+  has_many :medical_cards, -> { where(card_program_id: CardProgram.id_for(:medical)) }, class_name: 'Card'
+  has_many :expense_cards, -> { where(card_program_id: CardProgram.id_for(:expense)) }, class_name: 'Card'
   has_many :card_transactions, dependent: :destroy
   has_many :money_requests
   has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
@@ -146,6 +155,10 @@ class User < ActiveRecord::Base
   has_many :manager_payment_requests, -> { distinct }, source: :bank_payment_request, through: :manager_payment_request_trails
   has_many :finance_payment_request_trails, -> { finance_manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
   has_many :finance_payment_requests, -> { distinct }, source: :bank_payment_request, through: :finance_payment_request_trails
+
+  # Outward invoice
+  has_many :outward_invoices
+  has_many :outward_invoice_attachments
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
@@ -195,10 +208,13 @@ class User < ActiveRecord::Base
   scope :only_auditors, -> { with_roles.where('user_role_mappings.user_role_id = ?', UserRole.id_for(:auditor)) }
   scope :sort_by_name, -> { order(first_name: :asc, last_name: :asc) }
   scope :active, -> { where active: true }
+  scope :inactive, -> { filter_state(3) }
+  scope :pending, -> { filter_state(2) }
   scope :invited_by, ->(id) { where invited_by_id: id }
   scope :with_vendor_payments_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
   scope :with_expense_management_enabled, -> { joins(:user_panel_subscription).where('user_panel_subscriptions.yes_bank_account_transfer = ?', true) }
   scope :include_all_accounts_with_balance, -> { includes(cards: [:card_balance], wallet: [:balance], cash_on_hand: [:balance], bank_wallet: [:balance]) }
+  scope :include_reimbursable_accounts, -> { includes :bank_accounts, :reimbursement_cards }
   scope :with_email, ->(email) { where email: email }
 
   # Users having cards assigned with the given program
@@ -254,7 +270,7 @@ class User < ActiveRecord::Base
   # scope :filter_search, -> (term) { where("first_name like ? OR last_name like ? OR email like ?", "%#{term}%", "%#{term}%","%#{term}%","%#{term}%") }
   scope :filter_search, ->(term) do
     ids = self.where("first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ? or mobile_number like ?",
-                      "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+                     "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
     ids += self.joins(:cards).where('proxy like ?', "%#{term}%")
     ids.uniq!
     self.where(id: ids)
@@ -508,7 +524,7 @@ class User < ActiveRecord::Base
     self.role_mapping.vendor_payments.manager.present?
   end
 
-  alias_method :vendor_payments_manager? , :vendor_payment_manager?
+  alias_method :vendor_payments_manager?, :vendor_payment_manager?
 
   alias_method :vendor_payment_reviewer?, :vendor_payment_manager?
   alias_method :vendor_payments_reviewer?, :vendor_payment_manager?
@@ -525,7 +541,7 @@ class User < ActiveRecord::Base
     self.role_mapping.vendor_payments.admin.present?
   end
 
-  alias_method :vendor_payments_admin? , :vendor_payment_admin?
+  alias_method :vendor_payments_admin?, :vendor_payment_admin?
 
   def vendor_payment_initiator?
     self.role_mapping.vendor_payments.initiator.present?
@@ -625,9 +641,12 @@ class User < ActiveRecord::Base
   alias_method :finance?, :finance_manager?
 
   def as_json(options = {})
-    json = super(options)
-    json[:name] = self.name
-    json
+    {
+        id: id,
+        name: name,
+        email: email,
+        mobile_number: mobile_number
+    }
   end
 
   # overriding devise's default method so that it compares against both email and phone number to authenticate
@@ -753,6 +772,10 @@ class User < ActiveRecord::Base
 
   def bank_transfer_enabled?
     (self.vendor_payments_enabled? && self.bank_accounts.present?) || (self.company.bank_reimbursement_enabled?)
+  end
+
+  def initials
+    self.name.split(' ').first[0] + ((self.name.split(' ')[1][0] rescue nil) or self.name.split(' ').first[1])
   end
 
   # method that determines whether a particular user has

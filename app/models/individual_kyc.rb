@@ -42,10 +42,30 @@
 #  admin_note                 :text(65535)
 #  submitted_on               :datetime
 #  upgraded_on                :datetime
+#  aadhar_front_file_name     :string(255)
+#  aadhar_front_content_type  :string(255)
+#  aadhar_front_file_size     :integer
+#  aadhar_front_updated_at    :datetime
+#  aadhar_back_file_name      :string(255)
+#  aadhar_back_content_type   :string(255)
+#  aadhar_back_file_size      :integer
+#  aadhar_back_updated_at     :datetime
+#  photo_file_name            :string(255)
+#  photo_content_type         :string(255)
+#  photo_file_size            :integer
+#  photo_updated_at           :datetime
+#  signature_file_name        :string(255)
+#  signature_content_type     :string(255)
+#  signature_file_size        :integer
+#  signature_updated_at       :datetime
+#  combined_kyc_file_name     :string(255)
+#  combined_kyc_content_type  :string(255)
+#  combined_kyc_file_size     :integer
+#  combined_kyc_updated_at    :datetime
 #
-
+require 'fileutils'
 class IndividualKyc < ActiveRecord::Base
-  include Attachable
+  include Attachable, Magick
 
   belongs_to :user
   belongs_to :kyc_status
@@ -73,20 +93,47 @@ class IndividualKyc < ActiveRecord::Base
 
   has_attached_file :address_proof, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :address_proof, content_type: CONTENT_TYPES
-  ## DEPRICATED END ##
 
   has_attached_file :kyc_file_1, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :kyc_file_1, content_type: CONTENT_TYPES
 
   has_attached_file :kyc_file_2, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
   validates_attachment :kyc_file_2, content_type: CONTENT_TYPES
+  ## DEPRICATED END ##
+
+  has_attached_file :aadhar_front, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :aadhar_front, content_type: CONTENT_TYPES
+
+  has_attached_file :aadhar_back, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :aadhar_back, content_type: CONTENT_TYPES
+
+  has_attached_file :photo, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :photo, content_type: CONTENT_TYPES
+
+  has_attached_file :signature, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :signature, content_type: CONTENT_TYPES
+
+  has_attached_file :combined_kyc, styles: IMAGE_STYLE, default_url: '/assets/:style/missing.png'
+  validates_attachment :combined_kyc, content_type: CONTENT_TYPES
 
   def processing?
     KycStatus.ids_for([:processing, :submitted]).include?(self.kyc_status_id)
   end
 
+  def incomplete?
+    KycStatus.id_for(:incomplete) == self.kyc_status_id
+  end
+
+  def retracted?
+    KycStatus.id_for(:retracted) == self.kyc_status_id
+  end
+
+  def rejected?
+    KycStatus.id_for(:rejected) == self.kyc_status_id
+  end
+
   def completed?
-    KycStatus.id_for(:completed).include?(self.kyc_status_id)
+    KycStatus.id_for(:completed) == self.kyc_status_id
   end
 
   def editable?
@@ -95,6 +142,35 @@ class IndividualKyc < ActiveRecord::Base
 
   def retractable?
     [KycStatus.id_for(:submitted)].include?(kyc_status_id)
+  end
+
+  def generate_single_kyc
+    return false unless (self.aadhar_front.present? and self.aadhar_back.present? and
+        self.signature.present?)
+    view = ActionView::Base.new(ActionController::Base.view_paths)
+    view.extend ApplicationHelper
+    html_string = view.render(file: 'kyc/user/kyc_template.html.erb', locals: {kyc: self})
+
+    FileUtils::mkdir_p "#{Rails.root}/tmp/images"
+    image_tmp_path = "#{Rails.root}/tmp/images/#{id}_combined_kyc.jpg"
+    converter = ReceiptProcessor::HTMLConverter.new
+    self.combined_kyc = converter.convert(html_string, image_tmp_path)&.first
+    self.save
+  end
+
+  def can_submit?
+    if require_photo?
+      photo_check = self.photo.present?
+    else
+      photo_check = true
+    end
+    (self.kyc_file_1.present? or (self.aadhar_front.present? and self.aadhar_back.present? and
+        photo_check and self.signature.present?)) and
+        self.kyc_number.present?
+  end
+
+  def require_photo?
+    [nil, 'HDFC'].include?(self.user.company.configuration.bank_type&.upcase)
   end
 
 end

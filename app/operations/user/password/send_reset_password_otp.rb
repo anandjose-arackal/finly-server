@@ -21,7 +21,7 @@ class User::Password::SendResetPasswordOtp < BaseOperation
     response = OtpVerification::Create.(selected_user, mobile_number: selected_user.mobile_number)
     if response.success?
       otp = response.otp
-      selected_user.update_attributes(otp: otp, otp_sent_at: DateTime.now, otp_count: (selected_user.otp_count+1))
+      selected_user.update_attributes(otp: otp, otp_sent_at: DateTime.now, otp_count: (selected_user.otp_count+1), otp_attempts: 0)
     else
       messages[:error] = response.messages[:error]
     end

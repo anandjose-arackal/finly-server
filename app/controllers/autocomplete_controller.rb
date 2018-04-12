@@ -20,7 +20,12 @@ class AutocompleteController < ApplicationController
   end
 
   def beneficiaries
-    @result = Autocomplete::Beneficiaries.(urrent_user, params)
+    @result = Autocomplete::Beneficiaries.(current_user, params)
+    respond
+  end
+
+  def inventory_items
+    @result = Invoicing::InventoryLineItem::Search.(current_user, params)
     respond
   end
 end

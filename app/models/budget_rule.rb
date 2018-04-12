@@ -12,6 +12,7 @@
 #  rule_type_id         :integer
 #  include_reimbursable :boolean          default(TRUE)
 #  is_deleted           :boolean          default(FALSE)
+#  expense_type_id      :integer
 #
 
 
@@ -19,7 +20,9 @@
 
 
 
-
+# expense_type_id: contains details about whether the budget is scoped to a particular
+# type of expense or not
+# 1 - Manual, 2 - Card, 3 - Distance, 4 - Time, 5 - Per Diem
 
 class BudgetRule < ActiveRecord::Base
   include SoftDeletable
@@ -50,12 +53,34 @@ class BudgetRule < ActiveRecord::Base
 
   has_paper_trail
 
+  scope :warning_rules, -> {
+    where rule_type_id: RuleType.warning_rule_id
+  }
+
+  scope :blocking_rules, -> {
+    where rule_type_id: RuleType.blocking_rule_id
+  }
+
   def include_reimbursable_expenses?
     self.include_reimbursable
   end
 
   def rule_in_words
-    rule_in_words = "Total Expenses"
+    case self.expense_type_id
+      when 1
+        type = "of Cash"
+      when 2
+        type = "of Card"
+      when 3
+        type = "of Distance"
+      when 4
+        type = "of Time"
+      when 5
+        type = "of Per Diem"
+      else
+        type = ""
+    end
+    rule_in_words = "Total #{type} Expenses"
     if self.period_id
       case self.period_id
         when 1
@@ -66,6 +91,8 @@ class BudgetRule < ActiveRecord::Base
           period = "month"
         when 4
           period = "year"
+        else
+          period = ""
       end
       rule_in_words += " per " + period
     end

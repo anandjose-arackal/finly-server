@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180129115019) do
+ActiveRecord::Schema.define(version: 20180411143939) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -29,15 +29,20 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_index "active_admin_comments", ["resource_type", "resource_id"], name: "index_active_admin_comments_on_resource_type_and_resource_id", using: :btree
 
   create_table "addresses", force: :cascade do |t|
-    t.text     "line_1",     limit: 65535
-    t.text     "line_2",     limit: 65535
-    t.text     "line_3",     limit: 65535
-    t.string   "city",       limit: 255
-    t.integer  "state_id",   limit: 4
-    t.string   "name",       limit: 255
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-    t.string   "pin_code",   limit: 255
+    t.text     "line_1",       limit: 65535
+    t.text     "line_2",       limit: 65535
+    t.text     "line_3",       limit: 65535
+    t.string   "city",         limit: 255
+    t.integer  "state_id",     limit: 4
+    t.string   "name",         limit: 255
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.string   "pin_code",     limit: 255
+    t.boolean  "default"
+    t.string   "parent_type",  limit: 255
+    t.integer  "parent_id",    limit: 4
+    t.string   "address_name", limit: 255
+    t.text     "landmark",     limit: 65535
   end
 
   add_index "addresses", ["state_id"], name: "fk_rails_2d87b6c11e", using: :btree
@@ -561,6 +566,7 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.integer  "rule_type_id",         limit: 4
     t.boolean  "include_reimbursable",           default: true
     t.boolean  "is_deleted",                     default: false
+    t.integer  "expense_type_id",      limit: 4
   end
 
   add_index "budget_rules", ["amount_id"], name: "index_budget_rules_on_amount_id", using: :btree
@@ -847,6 +853,22 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "collect_company_details", force: :cascade do |t|
+    t.string   "gst",                       limit: 255
+    t.string   "pan",                       limit: 255
+    t.integer  "company_id",                limit: 4
+    t.string   "company_logo_file_name",    limit: 255
+    t.string   "company_logo_content_type", limit: 255
+    t.integer  "company_logo_file_size",    limit: 4
+    t.datetime "company_logo_updated_at"
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.text     "address",                   limit: 65535
+    t.text     "pin",                       limit: 65535
+  end
+
+  add_index "collect_company_details", ["company_id"], name: "index_collect_company_details_on_company_id", using: :btree
+
   create_table "collect_transaction_purposes", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -866,6 +888,7 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.datetime "updated_at",                                  null: false
     t.boolean  "active",                       default: true, null: false
     t.integer  "base_currency_id", limit: 4,   default: 1
+    t.integer  "status_id",        limit: 4,   default: 1,    null: false
   end
 
   create_table "company_account_types", force: :cascade do |t|
@@ -967,6 +990,21 @@ ActiveRecord::Schema.define(version: 20180129115019) do
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
   add_index "company_configurations", ["contact_id"], name: "index_company_configurations_on_contact_id", using: :btree
+
+  create_table "company_funds_auto_transfer_configs", force: :cascade do |t|
+    t.integer  "company_id",           limit: 4
+    t.integer  "threshold_amount_id",  limit: 4
+    t.string   "frequency_name",       limit: 255
+    t.string   "frequency_day",        limit: 255
+    t.string   "amount_transfer_type", limit: 255
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+    t.boolean  "enabled",                          default: false
+    t.string   "transfer_mode",        limit: 255
+  end
+
+  add_index "company_funds_auto_transfer_configs", ["company_id"], name: "index_company_funds_auto_transfer_configs_on_company_id", using: :btree
+  add_index "company_funds_auto_transfer_configs", ["threshold_amount_id"], name: "index_company_funds_auto_transfer_configs_on_threshold_amount_id", using: :btree
 
   create_table "company_funds_load_request_types", force: :cascade do |t|
     t.string "name", limit: 255
@@ -1070,6 +1108,14 @@ ActiveRecord::Schema.define(version: 20180129115019) do
 
   add_index "company_kycs", ["company_id"], name: "index_company_kycs_on_company_id", using: :btree
 
+  create_table "company_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "company_statuses", ["name"], name: "index_company_statuses_on_name", using: :btree
+
   create_table "company_tags", force: :cascade do |t|
     t.integer  "company_id", limit: 4,                  null: false
     t.string   "name",       limit: 255,                null: false
@@ -1116,6 +1162,17 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.string   "contactable_type", limit: 255
     t.string   "designation",      limit: 255
   end
+
+  create_table "cost_centers", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.string   "application", limit: 255
+    t.integer  "company_id",  limit: 4
+    t.datetime "created_at",              null: false
+    t.datetime "updated_at",              null: false
+    t.boolean  "is_deleted"
+  end
+
+  add_index "cost_centers", ["company_id"], name: "index_cost_centers_on_company_id", using: :btree
 
   create_table "crono_jobs", force: :cascade do |t|
     t.string   "job_id",            limit: 255,      null: false
@@ -1327,14 +1384,56 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_index "custom_fields", ["parent_id"], name: "index_custom_fields_on_parent_id", using: :btree
   add_index "custom_fields", ["parent_type"], name: "index_custom_fields_on_parent_type", using: :btree
 
+  create_table "customer_account_transactions", force: :cascade do |t|
+    t.integer  "customer_account_id",    limit: 4
+    t.string   "transaction_type",       limit: 255
+    t.integer  "transaction_amount_id",  limit: 4
+    t.string   "note",                   limit: 255
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.integer  "associated_object_id",   limit: 4
+    t.string   "associated_object_type", limit: 255
+  end
+
+  add_index "customer_account_transactions", ["associated_object_type", "associated_object_id"], name: "indx_cstmer_acc_tranxs_on_assoc_acc_type_and_assoc_acc_id", using: :btree
+  add_index "customer_account_transactions", ["customer_account_id"], name: "index_customer_account_transactions_on_customer_account_id", using: :btree
+  add_index "customer_account_transactions", ["transaction_amount_id"], name: "index_customer_account_transactions_on_transaction_amount_id", using: :btree
+
+  create_table "customer_accounts", force: :cascade do |t|
+    t.integer  "customer_id", limit: 4
+    t.integer  "balance_id",  limit: 4
+    t.datetime "created_at",            null: false
+    t.datetime "updated_at",            null: false
+  end
+
+  add_index "customer_accounts", ["balance_id"], name: "index_customer_accounts_on_balance_id", using: :btree
+  add_index "customer_accounts", ["customer_id"], name: "index_customer_accounts_on_customer_id", using: :btree
+
+  create_table "customer_attachments", force: :cascade do |t|
+    t.string   "attached_file_file_name",    limit: 255
+    t.string   "attached_file_content_type", limit: 255
+    t.integer  "attached_file_file_size",    limit: 4
+    t.datetime "attached_file_updated_at"
+    t.integer  "customer_id",                limit: 4
+    t.text     "note",                       limit: 65535
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+  end
+
+  add_index "customer_attachments", ["customer_id"], name: "index_customer_attachments_on_customer_id", using: :btree
+
   create_table "customers", force: :cascade do |t|
     t.string   "name",          limit: 255
     t.string   "email",         limit: 255
     t.string   "mobile_number", limit: 255
     t.text     "description",   limit: 65535
     t.integer  "company_id",    limit: 4
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+    t.string   "gst",           limit: 255
+    t.string   "pan",           limit: 255
+    t.integer  "created_by_id", limit: 4
+    t.boolean  "active",                      default: true
   end
 
   create_table "desktop_users", force: :cascade do |t|
@@ -1664,6 +1763,7 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.datetime "created_at",                         null: false
     t.datetime "updated_at",                         null: false
     t.integer  "field_configuration_id", limit: 4
+    t.boolean  "is_deleted"
   end
 
   create_table "field_multiselect_selection_items", force: :cascade do |t|
@@ -1813,11 +1913,48 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.text     "admin_note",                 limit: 65535
     t.datetime "submitted_on"
     t.datetime "upgraded_on"
+    t.string   "aadhar_front_file_name",     limit: 255
+    t.string   "aadhar_front_content_type",  limit: 255
+    t.integer  "aadhar_front_file_size",     limit: 4
+    t.datetime "aadhar_front_updated_at"
+    t.string   "aadhar_back_file_name",      limit: 255
+    t.string   "aadhar_back_content_type",   limit: 255
+    t.integer  "aadhar_back_file_size",      limit: 4
+    t.datetime "aadhar_back_updated_at"
+    t.string   "photo_file_name",            limit: 255
+    t.string   "photo_content_type",         limit: 255
+    t.integer  "photo_file_size",            limit: 4
+    t.datetime "photo_updated_at"
+    t.string   "signature_file_name",        limit: 255
+    t.string   "signature_content_type",     limit: 255
+    t.integer  "signature_file_size",        limit: 4
+    t.datetime "signature_updated_at"
+    t.string   "combined_kyc_file_name",     limit: 255
+    t.string   "combined_kyc_content_type",  limit: 255
+    t.integer  "combined_kyc_file_size",     limit: 4
+    t.datetime "combined_kyc_updated_at"
   end
 
   add_index "individual_kycs", ["admin_review_workflow_id"], name: "index_individual_kycs_on_admin_review_workflow_id", using: :btree
   add_index "individual_kycs", ["company_id"], name: "index_individual_kycs_on_company_id", using: :btree
   add_index "individual_kycs", ["user_id"], name: "index_individual_kycs_on_user_id", using: :btree
+
+  create_table "inventory_line_items", force: :cascade do |t|
+    t.decimal  "tax",                       precision: 20, scale: 10
+    t.decimal  "discount",                  precision: 20, scale: 10
+    t.string   "hsn_sac",     limit: 255
+    t.integer  "company_id",  limit: 4
+    t.string   "sku",         limit: 255
+    t.decimal  "rate",                      precision: 20, scale: 10
+    t.text     "description", limit: 65535
+    t.integer  "category_id", limit: 4
+    t.datetime "created_at",                                          null: false
+    t.datetime "updated_at",                                          null: false
+    t.text     "note",        limit: 65535
+  end
+
+  add_index "inventory_line_items", ["category_id"], name: "index_inventory_line_items_on_category_id", using: :btree
+  add_index "inventory_line_items", ["company_id"], name: "index_inventory_line_items_on_company_id", using: :btree
 
   create_table "invoice_attachments", force: :cascade do |t|
     t.string   "attached_file_file_name",    limit: 255
@@ -1833,22 +1970,25 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_index "invoice_attachments", ["invoice_id"], name: "index_invoice_attachments_on_invoice_id", using: :btree
 
   create_table "invoice_line_items", force: :cascade do |t|
-    t.integer  "invoice_id",         limit: 4
-    t.string   "description",        limit: 255
-    t.integer  "quantity",           limit: 4
-    t.decimal  "rate",                           precision: 20, scale: 10
-    t.decimal  "tax",                            precision: 20, scale: 10
-    t.decimal  "discount",                       precision: 20, scale: 10
-    t.integer  "category_id",        limit: 4
-    t.integer  "gst_type_id",        limit: 4
-    t.integer  "tax_amount_id",      limit: 4
-    t.integer  "discount_amount_id", limit: 4
-    t.integer  "amount_id",          limit: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
-    t.integer  "net_amount_id",      limit: 4
-    t.string   "hsn_sac",            limit: 255
-    t.integer  "taxable_amount_id",  limit: 4
+    t.integer  "invoice_id",             limit: 4
+    t.string   "description",            limit: 255
+    t.integer  "quantity",               limit: 4
+    t.decimal  "rate",                               precision: 20, scale: 10
+    t.decimal  "tax",                                precision: 20, scale: 10
+    t.decimal  "discount",                           precision: 20, scale: 10
+    t.integer  "category_id",            limit: 4
+    t.integer  "gst_type_id",            limit: 4
+    t.integer  "tax_amount_id",          limit: 4
+    t.integer  "discount_amount_id",     limit: 4
+    t.integer  "amount_id",              limit: 4
+    t.datetime "created_at",                                                   null: false
+    t.datetime "updated_at",                                                   null: false
+    t.integer  "net_amount_id",          limit: 4
+    t.string   "hsn_sac",                limit: 255
+    t.integer  "taxable_amount_id",      limit: 4
+    t.string   "parent_type",            limit: 255
+    t.string   "parent_id",              limit: 255
+    t.integer  "inventory_line_item_id", limit: 4
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -1856,6 +1996,45 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_index "invoice_line_items", ["gst_type_id"], name: "index_invoice_line_items_on_gst_type_id", using: :btree
   add_index "invoice_line_items", ["invoice_id"], name: "index_invoice_line_items_on_invoice_id", using: :btree
   add_index "invoice_line_items", ["tax_amount_id"], name: "index_invoice_line_items_on_tax_amount_id", using: :btree
+
+  create_table "invoice_number_config_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "invoice_number_configs", force: :cascade do |t|
+    t.string   "prefix",                        limit: 255, default: ""
+    t.string   "sequence_start",                limit: 255
+    t.integer  "company_id",                    limit: 4
+    t.datetime "created_at",                                             null: false
+    t.datetime "updated_at",                                             null: false
+    t.integer  "invoice_number_config_type_id", limit: 4
+    t.integer  "purpose_id",                    limit: 4
+  end
+
+  add_index "invoice_number_configs", ["invoice_number_config_type_id"], name: "index_invoice_number_configs_on_invoice_number_config_type_id", using: :btree
+  add_index "invoice_number_configs", ["purpose_id"], name: "index_invoice_number_configs_on_purpose_id", using: :btree
+
+  create_table "invoice_reminders", force: :cascade do |t|
+    t.integer  "days",                limit: 4
+    t.string   "reference_date_type", limit: 255
+    t.string   "timeframe_type",      limit: 255
+    t.integer  "company_id",          limit: 4
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.string   "name",                limit: 255
+  end
+
+  create_table "invoice_transaction_mappings", force: :cascade do |t|
+    t.integer  "invoice_id",        limit: 4
+    t.integer  "va_transaction_id", limit: 4
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "invoice_transaction_mappings", ["invoice_id"], name: "index_invoice_transaction_mappings_on_invoice_id", using: :btree
+  add_index "invoice_transaction_mappings", ["va_transaction_id"], name: "index_invoice_transaction_mappings_on_va_transaction_id", using: :btree
 
   create_table "invoices", force: :cascade do |t|
     t.integer  "address_id",         limit: 4
@@ -1893,6 +2072,8 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.decimal  "roundoff_amount",                precision: 20, scale: 10
     t.integer  "balance_due_id",     limit: 4
     t.integer  "taxable_amount_id",  limit: 4
+    t.integer  "cost_center_id",     limit: 4
+    t.integer  "tds_slab_id",        limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -2118,6 +2299,68 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_index "money_request_items", ["category_id"], name: "index_money_request_items_on_category_id", using: :btree
   add_index "money_request_items", ["money_request_id"], name: "index_money_request_items_on_money_request_id", using: :btree
 
+  create_table "money_request_processor_mappings", force: :cascade do |t|
+    t.integer  "processor_id",               limit: 4,                     null: false
+    t.integer  "user_id",                    limit: 4,                     null: false
+    t.integer  "processor_accountable_id",   limit: 4
+    t.string   "processor_accountable_type", limit: 255
+    t.integer  "amount_id",                  limit: 4,                     null: false
+    t.datetime "completed_at"
+    t.boolean  "marked_as_completed",                      default: false
+    t.integer  "status_id",                  limit: 4,                     null: false
+    t.integer  "payment_id",                 limit: 4
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+    t.text     "note",                       limit: 65535
+  end
+
+  add_index "money_request_processor_mappings", ["amount_id"], name: "index_money_request_processor_mappings_on_amount_id", using: :btree
+  add_index "money_request_processor_mappings", ["payment_id"], name: "index_money_request_processor_mappings_on_payment_id", using: :btree
+  add_index "money_request_processor_mappings", ["processor_id"], name: "index_money_request_processor_mappings_on_processor_id", using: :btree
+  add_index "money_request_processor_mappings", ["status_id"], name: "index_money_request_processor_mappings_on_status_id", using: :btree
+  add_index "money_request_processor_mappings", ["user_id"], name: "index_money_request_processor_mappings_on_user_id", using: :btree
+
+  create_table "money_request_processor_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "money_request_processor_statuses", ["name"], name: "index_money_request_processor_statuses_on_name", using: :btree
+
+  create_table "money_request_processors", force: :cascade do |t|
+    t.integer  "status_id",                 limit: 4,                   null: false
+    t.boolean  "is_deleted",                            default: false
+    t.boolean  "payment_file_generated",                default: false
+    t.datetime "payment_file_generated_at"
+    t.date     "scheduled_at"
+    t.datetime "completed_at"
+    t.integer  "total_amount_id",           limit: 4,                   null: false
+    t.integer  "processed_amount_id",       limit: 4
+    t.integer  "created_by_user_id",        limit: 4
+    t.integer  "created_by_user_role_id",   limit: 4
+    t.integer  "source_account_id",         limit: 4
+    t.string   "source_account_type",       limit: 255
+    t.boolean  "marked_as_completed",                   default: false
+    t.string   "payment_type",              limit: 255
+    t.string   "payment_mode",              limit: 255
+    t.integer  "company_id",                limit: 4,                   null: false
+    t.integer  "payment_order_id",          limit: 4
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+  end
+
+  add_index "money_request_processors", ["company_id"], name: "index_money_request_processors_on_company_id", using: :btree
+  add_index "money_request_processors", ["created_by_user_id"], name: "index_money_request_processors_on_created_by_user_id", using: :btree
+  add_index "money_request_processors", ["created_by_user_role_id"], name: "index_money_request_processors_on_created_by_user_role_id", using: :btree
+  add_index "money_request_processors", ["payment_order_id"], name: "index_money_request_processors_on_payment_order_id", using: :btree
+  add_index "money_request_processors", ["processed_amount_id"], name: "index_money_request_processors_on_processed_amount_id", using: :btree
+  add_index "money_request_processors", ["scheduled_at"], name: "index_money_request_processors_on_scheduled_at", using: :btree
+  add_index "money_request_processors", ["source_account_id"], name: "index_money_request_processors_on_source_account_id", using: :btree
+  add_index "money_request_processors", ["source_account_type"], name: "index_money_request_processors_on_source_account_type", using: :btree
+  add_index "money_request_processors", ["status_id"], name: "index_money_request_processors_on_status_id", using: :btree
+  add_index "money_request_processors", ["total_amount_id"], name: "index_money_request_processors_on_total_amount_id", using: :btree
+
   create_table "money_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",                         null: false
@@ -2155,28 +2398,30 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_index "money_request_tracks", ["status_id"], name: "index_money_request_tracks_on_status_id", using: :btree
 
   create_table "money_requests", force: :cascade do |t|
-    t.string   "name",                         limit: 255
-    t.integer  "user_id",                      limit: 4,                                 null: false
-    t.integer  "policy_id",                    limit: 4,                                 null: false
-    t.integer  "payment_mode_id",              limit: 4,                                 null: false
-    t.integer  "payment_id",                   limit: 4
+    t.string   "name",                               limit: 255
+    t.integer  "user_id",                            limit: 4,                                 null: false
+    t.integer  "policy_id",                          limit: 4,                                 null: false
+    t.integer  "payment_mode_id",                    limit: 4,                                 null: false
+    t.integer  "payment_id",                         limit: 4
     t.date     "required_by_date"
-    t.integer  "status_id",                    limit: 4,                                 null: false
-    t.integer  "controlling_user_id",          limit: 4
-    t.integer  "controlling_user_role_id",     limit: 4
-    t.integer  "controlling_for_user_id",      limit: 4
-    t.integer  "controlling_for_user_role_id", limit: 4
-    t.integer  "loaded_by",                    limit: 4
+    t.integer  "status_id",                          limit: 4,                                 null: false
+    t.integer  "controlling_user_id",                limit: 4
+    t.integer  "controlling_user_role_id",           limit: 4
+    t.integer  "controlling_for_user_id",            limit: 4
+    t.integer  "controlling_for_user_role_id",       limit: 4
+    t.integer  "loaded_by",                          limit: 4
     t.datetime "loaded_at"
-    t.datetime "submitted_at",                             precision: 6
-    t.string   "memo",                         limit: 255
-    t.boolean  "accounted",                                              default: false, null: false
-    t.datetime "created_at",                                                             null: false
-    t.datetime "updated_at",                                                             null: false
-    t.boolean  "is_deleted",                                             default: false, null: false
-    t.integer  "submitted_amount_id",          limit: 4
-    t.integer  "processed_amount_id",          limit: 4
+    t.datetime "submitted_at",                                   precision: 6
+    t.string   "memo",                               limit: 255
+    t.boolean  "accounted",                                                    default: false, null: false
+    t.datetime "created_at",                                                                   null: false
+    t.datetime "updated_at",                                                                   null: false
+    t.boolean  "is_deleted",                                                   default: false, null: false
+    t.integer  "submitted_amount_id",                limit: 4
+    t.integer  "processed_amount_id",                limit: 4
     t.boolean  "auto_approve"
+    t.integer  "money_request_processor_mapping_id", limit: 4
+    t.datetime "approved_at"
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -2345,6 +2590,111 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "outward_invoice_attachments", force: :cascade do |t|
+    t.string   "attachment_file_name",    limit: 255
+    t.string   "attachment_content_type", limit: 255
+    t.integer  "attachment_file_size",    limit: 4
+    t.datetime "attachment_updated_at"
+    t.integer  "outward_invoice_id",      limit: 4
+    t.text     "description",             limit: 65535
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "company_id",              limit: 4
+    t.integer  "user_id",                 limit: 4
+  end
+
+  add_index "outward_invoice_attachments", ["company_id"], name: "index_outward_invoice_attachments_on_company_id", using: :btree
+  add_index "outward_invoice_attachments", ["outward_invoice_id"], name: "index_outward_invoice_attachments_on_outward_invoice_id", using: :btree
+  add_index "outward_invoice_attachments", ["user_id"], name: "index_outward_invoice_attachments_on_user_id", using: :btree
+
+  create_table "outward_invoice_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "outward_invoice_trail_actions", force: :cascade do |t|
+    t.string "name", limit: 255
+  end
+
+  create_table "outward_invoice_trails", force: :cascade do |t|
+    t.integer  "action_id",                   limit: 4
+    t.integer  "outward_invoice_id",          limit: 4
+    t.integer  "user_id",                     limit: 4
+    t.string   "note",                        limit: 255
+    t.integer  "amount_id",                   limit: 4
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+    t.integer  "associated_entity_id",        limit: 4
+    t.string   "associated_entity_type",      limit: 255
+    t.integer  "associated_transaction_id",   limit: 4
+    t.string   "associated_transaction_type", limit: 255
+    t.date     "date"
+  end
+
+  add_index "outward_invoice_trails", ["action_id"], name: "index_outward_invoice_trails_on_action_id", using: :btree
+  add_index "outward_invoice_trails", ["amount_id"], name: "index_outward_invoice_trails_on_amount_id", using: :btree
+  add_index "outward_invoice_trails", ["associated_entity_type", "associated_entity_id"], name: "index_outward_inv_trail_on_assoc_entty_type_and_assoc_entity_id", using: :btree
+  add_index "outward_invoice_trails", ["associated_transaction_type", "associated_transaction_id"], name: "index_outward_inv_trail_on_assoc_tranx_type_and_assoc_tranx_id", using: :btree
+  add_index "outward_invoice_trails", ["outward_invoice_id"], name: "index_outward_invoice_trails_on_outward_invoice_id", using: :btree
+  add_index "outward_invoice_trails", ["user_id"], name: "index_outward_invoice_trails_on_user_id", using: :btree
+
+  create_table "outward_invoice_types", force: :cascade do |t|
+    t.string "name", limit: 255
+  end
+
+  create_table "outward_invoices", force: :cascade do |t|
+    t.integer  "customer_id",             limit: 4
+    t.date     "date"
+    t.date     "due_date"
+    t.integer  "amount_id",               limit: 4
+    t.integer  "discount_amount_id",      limit: 4
+    t.integer  "tax_amount_id",           limit: 4
+    t.integer  "paid_amount_id",          limit: 4
+    t.decimal  "advance",                               precision: 10, scale: 5
+    t.integer  "freight_amount_id",       limit: 4
+    t.integer  "balance_due_id",          limit: 4
+    t.decimal  "roundoff_amount",                       precision: 10, scale: 5
+    t.datetime "created_at",                                                                 null: false
+    t.datetime "updated_at",                                                                 null: false
+    t.integer  "policy_id",               limit: 4
+    t.integer  "invoice_status_id",       limit: 4
+    t.integer  "company_id",              limit: 4
+    t.string   "invoice_number",          limit: 255
+    t.integer  "gst_type_id",             limit: 4
+    t.boolean  "inclusive_of_taxes"
+    t.integer  "advance_amount_id",       limit: 4
+    t.integer  "net_amount_id",           limit: 4
+    t.integer  "virtual_account_id",      limit: 4
+    t.text     "billing_address",         limit: 65535
+    t.text     "shipping_address",        limit: 65535
+    t.string   "email",                   limit: 255
+    t.string   "mobile_number",           limit: 255
+    t.boolean  "override_invoice_number"
+    t.boolean  "is_deleted"
+    t.string   "sequence_start",          limit: 255
+    t.string   "prefix",                  limit: 255
+    t.integer  "total_payable_id",        limit: 4
+    t.boolean  "roundoff_total_enabled"
+    t.string   "memo",                    limit: 255
+    t.text     "customer_memo",           limit: 65535
+    t.text     "reminders",               limit: 65535
+    t.integer  "payment_term_id",         limit: 4
+    t.integer  "user_id",                 limit: 4
+    t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
+  end
+
+  add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
+  add_index "outward_invoices", ["balance_due_id"], name: "index_outward_invoices_on_balance_due_id", using: :btree
+  add_index "outward_invoices", ["customer_id"], name: "index_outward_invoices_on_customer_id", using: :btree
+  add_index "outward_invoices", ["discount_amount_id"], name: "index_outward_invoices_on_discount_amount_id", using: :btree
+  add_index "outward_invoices", ["freight_amount_id"], name: "index_outward_invoices_on_freight_amount_id", using: :btree
+  add_index "outward_invoices", ["outward_invoice_type_id"], name: "index_outward_invoices_on_outward_invoice_type_id", using: :btree
+  add_index "outward_invoices", ["paid_amount_id"], name: "index_outward_invoices_on_paid_amount_id", using: :btree
+  add_index "outward_invoices", ["payment_term_id"], name: "index_outward_invoices_on_payment_term_id", using: :btree
+  add_index "outward_invoices", ["tax_amount_id"], name: "index_outward_invoices_on_tax_amount_id", using: :btree
+  add_index "outward_invoices", ["user_id"], name: "index_outward_invoices_on_user_id", using: :btree
+
   create_table "payment_file_configurations", force: :cascade do |t|
     t.string   "file_format", limit: 255
     t.integer  "company_id",  limit: 4,     null: false
@@ -2406,6 +2756,8 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.integer  "currency_id",               limit: 4,     null: false
     t.string   "application",               limit: 255
     t.string   "payment_mode",              limit: 255
+    t.text     "post_operation",            limit: 65535
+    t.text     "post_operation_payload",    limit: 65535
   end
 
   add_index "payment_orders", ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id", using: :btree
@@ -2463,6 +2815,16 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "payment_terms", force: :cascade do |t|
+    t.text     "name",        limit: 65535
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+    t.integer  "days_after",  limit: 4
+    t.text     "description", limit: 65535
+    t.integer  "company_id",  limit: 4
+    t.boolean  "default"
+  end
+
   create_table "payment_trails", force: :cascade do |t|
     t.date     "date"
     t.integer  "initiating_account_id",   limit: 4
@@ -2513,6 +2875,10 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.string   "reference_id",            limit: 255,               null: false
     t.integer  "retry_count",             limit: 4,     default: 0
     t.integer  "invoice_id",              limit: 4
+    t.string   "parent_type",             limit: 255
+    t.integer  "parent_id",               limit: 4
+    t.text     "post_operation",          limit: 65535
+    t.text     "post_operation_payload",  limit: 65535
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -2616,6 +2982,19 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
   add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
 
+  create_table "post_operation_actions", force: :cascade do |t|
+    t.string   "operation",            limit: 255,   null: false
+    t.text     "payload",              limit: 65535
+    t.integer  "post_operatable_id",   limit: 4,     null: false
+    t.string   "post_operatable_type", limit: 255,   null: false
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "post_operation_actions", ["operation"], name: "index_post_operation_actions_on_operation", using: :btree
+  add_index "post_operation_actions", ["post_operatable_id"], name: "index_post_operation_actions_on_post_operatable_id", using: :btree
+  add_index "post_operation_actions", ["post_operatable_type"], name: "index_post_operation_actions_on_post_operatable_type", using: :btree
+
   create_table "preview_registrations", force: :cascade do |t|
     t.string   "email",              limit: 255
     t.text     "company",            limit: 65535
@@ -2631,6 +3010,20 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "product_pricing_queries", force: :cascade do |t|
+    t.string   "name",                 limit: 255
+    t.string   "mobile_number",        limit: 255
+    t.string   "email",                limit: 255
+    t.string   "employees",            limit: 255
+    t.string   "accounting_system",    limit: 255
+    t.string   "monthly_transactions", limit: 255
+    t.string   "monthly_invoices",     limit: 255
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.string   "product",              limit: 255
+    t.string   "prepaid_cards",        limit: 255
   end
 
   create_table "purposes", force: :cascade do |t|
@@ -2893,6 +3286,70 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_index "report_comments", ["report_id"], name: "index_report_comments_on_report_id", using: :btree
   add_index "report_comments", ["user_id"], name: "index_report_comments_on_user_id", using: :btree
 
+  create_table "report_processor_group_mappings", force: :cascade do |t|
+    t.integer  "processor_group_id",         limit: 4,                     null: false
+    t.integer  "user_id",                    limit: 4,                     null: false
+    t.integer  "processor_accountable_id",   limit: 4
+    t.string   "processor_accountable_type", limit: 255
+    t.integer  "amount_id",                  limit: 4,                     null: false
+    t.datetime "completed_at"
+    t.boolean  "marked_as_completed",                      default: false
+    t.integer  "status_id",                  limit: 4,                     null: false
+    t.integer  "payment_id",                 limit: 4
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+    t.text     "note",                       limit: 65535
+    t.boolean  "marked_as_closed"
+  end
+
+  add_index "report_processor_group_mappings", ["amount_id"], name: "index_report_processor_group_mappings_on_amount_id", using: :btree
+  add_index "report_processor_group_mappings", ["payment_id"], name: "index_report_processor_group_mappings_on_payment_id", using: :btree
+  add_index "report_processor_group_mappings", ["processor_group_id"], name: "index_report_processor_group_mappings_on_processor_group_id", using: :btree
+  add_index "report_processor_group_mappings", ["status_id"], name: "index_report_processor_group_mappings_on_status_id", using: :btree
+  add_index "report_processor_group_mappings", ["user_id"], name: "index_report_processor_group_mappings_on_user_id", using: :btree
+
+  create_table "report_processor_group_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "report_processor_group_statuses", ["name"], name: "index_report_processor_group_statuses_on_name", using: :btree
+
+  create_table "report_processor_groups", force: :cascade do |t|
+    t.integer  "status_id",                 limit: 4,                   null: false
+    t.boolean  "is_deleted",                            default: false
+    t.boolean  "payment_file_generated",                default: false
+    t.datetime "payment_file_generated_at"
+    t.date     "scheduled_at"
+    t.datetime "completed_at"
+    t.integer  "total_amount_id",           limit: 4,                   null: false
+    t.integer  "processed_amount_id",       limit: 4
+    t.integer  "created_by_user_id",        limit: 4
+    t.integer  "created_by_user_role_id",   limit: 4
+    t.integer  "source_account_id",         limit: 4
+    t.string   "source_account_type",       limit: 255
+    t.boolean  "marked_as_completed",                   default: false
+    t.string   "payment_type",              limit: 255
+    t.string   "payment_mode",              limit: 255
+    t.integer  "company_id",                limit: 4,                   null: false
+    t.integer  "payment_order_id",          limit: 4
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.boolean  "marked_as_closed"
+  end
+
+  add_index "report_processor_groups", ["company_id"], name: "index_report_processor_groups_on_company_id", using: :btree
+  add_index "report_processor_groups", ["created_by_user_id"], name: "index_report_processor_groups_on_created_by_user_id", using: :btree
+  add_index "report_processor_groups", ["created_by_user_role_id"], name: "index_report_processor_groups_on_created_by_user_role_id", using: :btree
+  add_index "report_processor_groups", ["payment_order_id"], name: "index_report_processor_groups_on_payment_order_id", using: :btree
+  add_index "report_processor_groups", ["processed_amount_id"], name: "index_report_processor_groups_on_processed_amount_id", using: :btree
+  add_index "report_processor_groups", ["scheduled_at"], name: "index_report_processor_groups_on_scheduled_at", using: :btree
+  add_index "report_processor_groups", ["source_account_id"], name: "index_report_processor_groups_on_source_account_id", using: :btree
+  add_index "report_processor_groups", ["source_account_type"], name: "index_report_processor_groups_on_source_account_type", using: :btree
+  add_index "report_processor_groups", ["status_id"], name: "index_report_processor_groups_on_status_id", using: :btree
+  add_index "report_processor_groups", ["total_amount_id"], name: "index_report_processor_groups_on_total_amount_id", using: :btree
+
   create_table "report_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.integer  "order",      limit: 4
@@ -2970,6 +3427,7 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.integer  "non_reimbursable_expenses_total_id", limit: 4
     t.integer  "sync_status_id",                     limit: 4
     t.integer  "sync_type_id",                       limit: 4
+    t.integer  "report_processor_group_mapping_id",  limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -2978,6 +3436,7 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_index "reports", ["controlling_user_role_id"], name: "index_reports_on_controlling_user_role_id", using: :btree
   add_index "reports", ["name"], name: "index_reports_on_name", using: :btree
   add_index "reports", ["policy_id"], name: "index_reports_on_policy_id", using: :btree
+  add_index "reports", ["report_processor_group_mapping_id"], name: "index_reports_on_report_processor_group_mapping_id", using: :btree
   add_index "reports", ["report_status_id"], name: "index_reports_on_report_status_id", using: :btree
   add_index "reports", ["user_id"], name: "index_reports_on_user_id", using: :btree
 
@@ -2994,6 +3453,17 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "signedup_users", force: :cascade do |t|
+    t.string   "name",               limit: 255
+    t.string   "mobile_number",      limit: 255
+    t.string   "email",              limit: 255
+    t.string   "encrypted_password", limit: 255
+    t.string   "products",           limit: 255
+    t.datetime "created_at",                     null: false
+    t.datetime "updated_at",                     null: false
+    t.string   "company_name",       limit: 255
   end
 
   create_table "states", force: :cascade do |t|
@@ -3036,14 +3506,35 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
 
   create_table "tally_configurations", force: :cascade do |t|
-    t.integer  "company_id",   limit: 4,   null: false
-    t.string   "company_name", limit: 255
+    t.integer  "company_id",           limit: 4,   null: false
+    t.string   "company_name",         limit: 255
     t.boolean  "active"
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.string   "voucher_expense_date", limit: 255
   end
 
   add_index "tally_configurations", ["company_id"], name: "index_tally_configurations_on_company_id", using: :btree
+
+  create_table "tds_rates_lists", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.decimal  "tds",                    precision: 10, scale: 5
+    t.datetime "created_at",                                      null: false
+    t.datetime "updated_at",                                      null: false
+    t.integer  "company_id", limit: 4
+  end
+
+  create_table "temporary_files", force: :cascade do |t|
+    t.string   "file_file_name",    limit: 255
+    t.string   "file_content_type", limit: 255
+    t.integer  "file_file_size",    limit: 8
+    t.datetime "file_updated_at"
+    t.datetime "expires_on"
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "temporary_files", ["expires_on"], name: "index_temporary_files_on_expires_on", using: :btree
 
   create_table "time_expense_configs", force: :cascade do |t|
     t.datetime "created_at",                    null: false
@@ -3240,7 +3731,7 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
     t.date     "date_of_birth"
-    t.string   "gender",              limit: 255, null: false
+    t.string   "gender",              limit: 255
     t.string   "address_1",           limit: 255
     t.string   "address_2",           limit: 255
     t.string   "city",                limit: 255
@@ -3377,6 +3868,7 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.integer  "otp_request_type_id",    limit: 4
     t.boolean  "default_password",                   default: false
     t.boolean  "point_of_contact",                   default: false
+    t.integer  "otp_attempts",           limit: 4,   default: 0
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
@@ -3501,7 +3993,64 @@ ActiveRecord::Schema.define(version: 20180129115019) do
     t.integer  "maximum_amount_id",             limit: 4
     t.integer  "exact_transaction_amount_id",   limit: 4
     t.string   "application",                   limit: 255,                   null: false
+    t.integer  "customer_id",                   limit: 4
+    t.boolean  "default_account"
   end
+
+  create_table "web_hook_event_mappings", force: :cascade do |t|
+    t.integer  "web_hook_id",       limit: 4,                 null: false
+    t.integer  "web_hook_event_id", limit: 4,                 null: false
+    t.boolean  "is_deleted",                  default: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+  end
+
+  add_index "web_hook_event_mappings", ["is_deleted"], name: "index_web_hook_event_mappings_on_is_deleted", using: :btree
+  add_index "web_hook_event_mappings", ["web_hook_event_id"], name: "index_web_hook_event_mappings_on_web_hook_event_id", using: :btree
+  add_index "web_hook_event_mappings", ["web_hook_id"], name: "index_web_hook_event_mappings_on_web_hook_id", using: :btree
+
+  create_table "web_hook_events", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "web_hook_events", ["name"], name: "index_web_hook_events_on_name", using: :btree
+
+  create_table "web_hook_tracks", force: :cascade do |t|
+    t.integer  "web_hook_id",       limit: 4
+    t.integer  "web_hook_event_id", limit: 4
+    t.integer  "company_id",        limit: 4
+    t.text     "url",               limit: 65535
+    t.text     "request_body",      limit: 65535
+    t.text     "request_header",    limit: 65535
+    t.decimal  "response_time",                   precision: 10
+    t.text     "response_body",     limit: 65535
+    t.integer  "response_status",   limit: 4
+    t.integer  "attempt",           limit: 4
+    t.datetime "last_attempted_at"
+    t.boolean  "attempt_success"
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+  end
+
+  add_index "web_hook_tracks", ["company_id"], name: "index_web_hook_tracks_on_company_id", using: :btree
+  add_index "web_hook_tracks", ["web_hook_event_id"], name: "index_web_hook_tracks_on_web_hook_event_id", using: :btree
+  add_index "web_hook_tracks", ["web_hook_id"], name: "index_web_hook_tracks_on_web_hook_id", using: :btree
+
+  create_table "web_hooks", force: :cascade do |t|
+    t.text     "url",                limit: 65535,                 null: false
+    t.string   "secret",             limit: 255
+    t.integer  "created_by_user_id", limit: 4,                     null: false
+    t.integer  "company_id",         limit: 4,                     null: false
+    t.boolean  "is_deleted",                       default: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
+  add_index "web_hooks", ["company_id"], name: "index_web_hooks_on_company_id", using: :btree
+  add_index "web_hooks", ["created_by_user_id"], name: "index_web_hooks_on_created_by_user_id", using: :btree
+  add_index "web_hooks", ["is_deleted"], name: "index_web_hooks_on_is_deleted", using: :btree
 
   create_table "whitelisted_ip_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -3602,6 +4151,7 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_foreign_key "cards", "users"
   add_foreign_key "cash_on_hands", "users"
   add_foreign_key "categories", "companies"
+  add_foreign_key "collect_company_details", "companies"
   add_foreign_key "company_accounts", "companies"
   add_foreign_key "company_accounts", "company_account_types"
   add_foreign_key "company_agreement_tracks", "agreements"
@@ -3609,12 +4159,17 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_foreign_key "company_balance_histories", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
+  add_foreign_key "company_funds_auto_transfer_configs", "companies"
   add_foreign_key "company_funds_load_requests", "amounts"
   add_foreign_key "company_funds_load_requests", "companies"
   add_foreign_key "company_kyc_trails", "company_kycs"
   add_foreign_key "company_kycs", "companies"
   add_foreign_key "company_tags", "companies"
+  add_foreign_key "cost_centers", "companies"
   add_foreign_key "custom_fields", "field_configurations"
+  add_foreign_key "customer_account_transactions", "customer_accounts"
+  add_foreign_key "customer_accounts", "customers"
+  add_foreign_key "customer_attachments", "customers"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
   add_foreign_key "email_authorizations", "users"
@@ -3647,9 +4202,13 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_foreign_key "individual_kycs", "admin_review_workflows"
   add_foreign_key "individual_kycs", "companies"
   add_foreign_key "individual_kycs", "users"
+  add_foreign_key "inventory_line_items", "categories"
+  add_foreign_key "inventory_line_items", "companies"
   add_foreign_key "invoice_attachments", "invoices"
   add_foreign_key "invoice_line_items", "categories"
   add_foreign_key "invoice_line_items", "invoices"
+  add_foreign_key "invoice_number_configs", "invoice_number_config_types"
+  add_foreign_key "invoice_number_configs", "purposes"
   add_foreign_key "invoices", "addresses"
   add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
@@ -3670,6 +4229,11 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_foreign_key "money_request_items", "amounts"
   add_foreign_key "money_request_items", "categories"
   add_foreign_key "money_request_items", "money_requests"
+  add_foreign_key "money_request_processor_mappings", "amounts"
+  add_foreign_key "money_request_processor_mappings", "payments"
+  add_foreign_key "money_request_processor_mappings", "users"
+  add_foreign_key "money_request_processors", "companies"
+  add_foreign_key "money_request_processors", "payment_orders"
   add_foreign_key "money_request_tracks", "money_request_tracking_actions"
   add_foreign_key "money_request_tracks", "money_requests"
   add_foreign_key "money_request_tracks", "payments"
@@ -3685,6 +4249,17 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_foreign_key "notifier_type_configurations", "users"
   add_foreign_key "oauth_access_grants", "oauth_applications", column: "application_id"
   add_foreign_key "oauth_access_tokens", "oauth_applications", column: "application_id"
+  add_foreign_key "outward_invoice_attachments", "companies"
+  add_foreign_key "outward_invoice_attachments", "outward_invoices"
+  add_foreign_key "outward_invoice_attachments", "users"
+  add_foreign_key "outward_invoice_trails", "amounts"
+  add_foreign_key "outward_invoice_trails", "outward_invoices"
+  add_foreign_key "outward_invoice_trails", "users"
+  add_foreign_key "outward_invoices", "amounts"
+  add_foreign_key "outward_invoices", "customers"
+  add_foreign_key "outward_invoices", "outward_invoice_types"
+  add_foreign_key "outward_invoices", "payment_terms"
+  add_foreign_key "outward_invoices", "users"
   add_foreign_key "payment_file_configurations", "companies"
   add_foreign_key "payment_orders", "companies"
   add_foreign_key "payment_orders", "payment_order_statuses"
@@ -3714,10 +4289,16 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_foreign_key "report_comments", "report_comment_actions"
   add_foreign_key "report_comments", "reports"
   add_foreign_key "report_comments", "users"
+  add_foreign_key "report_processor_group_mappings", "amounts"
+  add_foreign_key "report_processor_group_mappings", "payments"
+  add_foreign_key "report_processor_group_mappings", "users"
+  add_foreign_key "report_processor_groups", "companies"
+  add_foreign_key "report_processor_groups", "payment_orders"
   add_foreign_key "report_tracks", "report_statuses"
   add_foreign_key "report_tracks", "report_tracking_actions"
   add_foreign_key "report_tracks", "reports"
   add_foreign_key "reports", "policies"
+  add_foreign_key "reports", "report_processor_group_mappings"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
   add_foreign_key "tally_configurations", "companies"
@@ -3754,6 +4335,11 @@ ActiveRecord::Schema.define(version: 20180129115019) do
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
   add_foreign_key "vendor_payment_wallets", "users"
+  add_foreign_key "web_hook_event_mappings", "web_hook_events"
+  add_foreign_key "web_hook_event_mappings", "web_hooks"
+  add_foreign_key "web_hook_tracks", "companies"
+  add_foreign_key "web_hook_tracks", "web_hook_events"
+  add_foreign_key "web_hook_tracks", "web_hooks"
   add_foreign_key "whitelisted_ips", "companies"
   add_foreign_key "yes_bank_company_accounts", "companies"
   add_foreign_key "yes_bank_vendors", "companies"

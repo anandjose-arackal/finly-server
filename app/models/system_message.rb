@@ -19,12 +19,6 @@ class SystemMessage < ActiveRecord::Base
   belongs_to :system_message_type
   belongs_to :messagable, polymorphic: true
 
-  def as_json(options={})
-    {type: {id: system_message_type.id,
-            name: system_message_type.name},
-     content: content}
-  end
-
   scope :errors, -> {where system_message_type_id: SystemMessageType.id_for(:error)}
   scope :info, -> {where system_message_type_id: SystemMessageType.id_for(:info)}
 
@@ -43,5 +37,11 @@ class SystemMessage < ActiveRecord::Base
   scope :partnership_deed_messages, -> {where message_type: "partnership_deed"}
   scope :trust_deed_messages, -> {where message_type: "trust_deed"}
   scope :list_of_trustees_karta_messages, -> {where message_type: "list_of_trustees_karta"}
+
+  def as_json(options={})
+    {type: {id: system_message_type.id,
+            name: system_message_type.name},
+     content: content}
+  end
 
 end

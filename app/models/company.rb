@@ -8,16 +8,20 @@
 #  updated_at       :datetime         not null
 #  active           :boolean          default(TRUE), not null
 #  base_currency_id :integer          default(1)
+#  status_id        :integer          default(1), not null
 #
 
 class Company < ActiveRecord::Base
   include Constants
 
   belongs_to :base_currency, class_name: 'Currency'
+  belongs_to :status, class_name: 'CompanyStatus'
+
   has_many :users
   has_many :cards
   has_many :contacts, as: :contactable
   has_many :categories, dependent: :destroy
+  has_many :cost_centers, dependent: :destroy
   has_many :tags, class_name: 'CompanyTag', dependent: :destroy
   has_one :configuration, class_name: 'CompanyConfiguration', dependent: :destroy
   has_many :policies, dependent: :destroy
@@ -33,10 +37,19 @@ class Company < ActiveRecord::Base
   has_many :all_field_configurations, class_name: 'FieldConfiguration'
   has_many :field_configurations, as: :configurable
   has_many :bank_transactions
+  has_many :inventory_line_items
+  has_many :payment_terms
+  has_many :tds_slabs, class_name: "TdsRatesList"
+  has_many :invoice_reminders
+  has_many :invoice_number_configs
   has_one :feature_subscription, as: :subscribable
   has_one :itz_cash_company_account
   has_one :yes_bank_company_account
-  has_one  :payment_file_configuration
+  has_one :payment_file_configuration
+  has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
+
+  has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
+  has_one :collect_company_detail
 
   has_many :payment_orders
   has_many :user_groups
@@ -50,9 +63,13 @@ class Company < ActiveRecord::Base
   has_many :yes_bank_vendors
   has_many :bank_accounts
   has_many :quickbooks_departments
+  has_many :report_processor_groups
+  has_many :money_request_processors
   has_many :payment_receivables
   has_many :virtual_bank_accounts
   has_many :customers
+  has_many :outward_invoices
+  has_many :outward_invoice_attachments
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
@@ -84,9 +101,16 @@ class Company < ActiveRecord::Base
   }
   scope :ocr_enabled, -> { joins(:feature_subscription).select(' companies.*').where('ocr_enabled IS true') }
 
+  scope :filter_status_id, -> (status_id) { where status_id: status_id }
+
   scope :filter_search, -> (term) {
     where('name LIKE (?)', "%#{term}%")
   }
+
+  # scope :filter_active, -> (val) { where(active: true, partial_block: false, hidden: false) if val }
+  # scope :filter_deactivate, -> (val) { where(active: false) if val }
+  # scope :filter_partial_block, -> (val) { where(active: true, partial_block: true) if val }
+  # scope :filter_hidden, -> (val) { where(active: true, partial_block: true) if val }
 
   scope :created_between, -> (date_from, date_to) {
     unless date_from.blank? && date_to.blank?
@@ -346,6 +370,23 @@ class Company < ActiveRecord::Base
     self.build_company_kyc(kyc_status_id: KycStatus.id_for(:incomplete)).save if self.company_kyc.blank?
     self.build_itz_cash_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
     self.build_yes_bank_company_account(balance_attributes: {value: 0, currency_id: Currency.first.id}).save
+
+    # creating the invoice numbering configuration for all companies with default values
+    # self.build_invoice_number_config(sequence_start: "0000").save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:tax_invoice)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:advance)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:credit_note)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:collect), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
+    self.invoice_number_configs.build({sequence_start: "0000", purpose_id: Purpose.id_for(:vendor_payments), invoice_number_config_type_id: InvoiceNumberConfigType.id_for(:debit_note)}).save
+
+    # Create Invoicing System Auto transfer config (enabled: false)
+    self.build_collect_auto_transfer_config.save
+
+
+    self.build_collect_company_detail.save
+    # seeding the default payment terms for this company
+    PaymentTerm.seed_defaults(self.id)
+    TdsRatesList.seed_data(self.id)
   end
 
 end

@@ -27,15 +27,15 @@ class Report::Index < Report::Base
     case self.role_id
       when UserRole.id_for(:admin), UserRole.id_for(:auditor)
         if self.user.company_admin? || self.user.auditor?
-          team_ids = User::Team::Index.(user, params)&.pluck(:id)
+          team_ids = User::Team::Index.(user, {view: params[:view]})&.pluck(:id)
           self.reports = Report.not_open.with_user(team_ids)
         elsif user.policy_admin?
-          team_ids = User::Team::Index.(user, params)&.pluck(:id)
+          team_ids = User::Team::Index.(user, {view: params[:view]})&.pluck(:id)
           policy_ids = user.admin_policies.pluck(:id)
           self.reports = Report.not_open.with_user(team_ids).with_policy(policy_ids)
         end
       when UserRole.id_for(:manager)
-        team_ids = User::Team::Index.(user, params)&.pluck(:id)
+        team_ids = User::Team::Index.(user, {view: params[:view]})&.pluck(:id)
         controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.manager_id).with_user(team_ids)
         interacted_reports_query= user.manager_reports
         sql = Report.connection.unprepared_statement {
@@ -43,7 +43,7 @@ class Report::Index < Report::Base
         }
         self.reports = Report.from([Arel.sql(sql)])
       when UserRole.id_for(:finance_manager)
-        team_ids = User::Team::Index.(user, params)&.pluck(:id)
+        team_ids = User::Team::Index.(user, {view: params[:view]})&.pluck(:id)
         controlling_report_query = user.controlling_reports.non_owner(user.id).with_controlling_user_role(UserRole.finance_manager_id).with_user(team_ids)
         interacted_reports_query = user.finance_reports
         sql = Report.connection.unprepared_statement {
@@ -78,6 +78,8 @@ class Report::Index < Report::Base
     has_scope :filter_status
     has_scope :filter_user_id
     has_scope :filter_date, using: [:from, :to], type: :hash
+    has_scope :filter_submitted_date, using: [:from, :to], type: :hash
+    has_scope :filter_approved_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
 
     def init

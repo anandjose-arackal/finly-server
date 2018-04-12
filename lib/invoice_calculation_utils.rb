@@ -23,20 +23,22 @@ class InvoiceCalculationUtils
     calculate_advance_paid
     calculate_freight_charges
     self.roundoff_amount = self.invoice.roundoff_amount.to_f # even if it's nil, it gets converted to 0
+
     if self.roundoff_amount != 0
       self.balance_due_amount = precision_value (self.net_amount + self.roundoff_amount), 0
     else
       self.balance_due_amount = precision_value self.net_amount, 0
     end
 
-    # assign TDS amount
-    if self.invoice&.tds_amount.present?
-      self.invoice.tds_amount.value = self.tds_amount
-    else
-      self.invoice.tds_amount = Amount.new(value: self.tds_amount, currency_id: 1)
+    # assign TDS and advance amount - only applicable for inward invoices
+    if self.invoice.is_a?(Invoice)
+      if self.invoice&.tds_amount.present?
+        self.invoice.tds_amount.value = self.tds_amount
+      else
+        self.invoice.tds_amount = Amount.new(value: self.tds_amount, currency_id: 1)
+      end
     end
 
-    # assign advance amount
     if self.invoice&.advance_amount.present?
       self.invoice.advance_amount.value = self.advance_amount
     else
@@ -55,6 +57,15 @@ class InvoiceCalculationUtils
       self.invoice.balance_due.value = self.balance_due_amount
     else
       self.invoice.balance_due = Amount.new(value: self.balance_due_amount, currency_id: 1)
+    end
+
+    # set total payable if it's an outward invoice
+    if self.invoice.is_a?(OutwardInvoice)
+      if self.invoice.total_payable.present?
+        self.invoice.total_payable.value = self.balance_due_amount
+      else
+        self.invoice.total_payable = Amount.new(value: self.balance_due_amount, currency_id: 1)
+      end
     end
 
     # now calculating the final amount to be paid
@@ -218,8 +229,18 @@ class InvoiceCalculationUtils
   end
 
   def calculate_tds
-    new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, self.invoice.tds)
-    self.tds_amount = self.gross_amount - new_gross_amount
+    if self.invoice.is_a?(Invoice)
+      if invoice.tds_slab_id.present?
+        tds = invoice.tds_slab.tds
+        invoice.tds = tds # setting the TDS for this invoice as well
+      else
+        tds = invoice.tds
+      end
+      new_gross_amount = TaxCalculationUtils.tds_amount(self.gross_amount, tds)
+      self.tds_amount = self.gross_amount - new_gross_amount
+    else
+      self.tds_amount = 0
+    end
   end
 
   def calculate_advance_paid
@@ -240,7 +261,7 @@ class InvoiceCalculationUtils
       return
     end
     original_net_amount = self.net_amount
-    self.freight_amount = self.invoice.freight_amount&.value
+    self.freight_amount = self.invoice.freight_amount&.value.to_f
     self.net_amount = original_net_amount + self.freight_amount
   end
 

@@ -28,16 +28,17 @@ company:
 
 user:
   name: <%= current_user.name %>
+  initals: <%= current_user.initials %>
   id: <%= current_user.id %>
   email: <%= current_user.email %>
   mobile_number: <%= current_user.mobile_number %>
   roles:
   - id: admin
     name: Admin
-    default_url: 'payment_links'
+    default_url: 'customers'
   - id: initiator
     name: Initiator
-    default_url: 'payment_links'
+    default_url: 'customers'
 
 views:
   admin:
@@ -49,17 +50,31 @@ views:
 #      - name: Invoices
 #        url: invoices
 #        id: invoices
-      - name: Payment Links
-        url: payment_links
-        id: payment_links
+      # - name: Payment Links
+      #   url: payment_links
+      #   id: payment_links
+      - name: Customers
+        url: customers
+        id: customers
+      - name: Inventory
+        url: inventory
+        id: inventory
+      - name: Invoices
+        url: invoices
+        id: invoices
       - name: Virtual Accounts
         url: virtual_accounts
         id: virtual_accounts
       cog:
+      - name: Analytics
+        url: '#dashboard'
+        id: 'dashboard'
       - name: Organization Account
         url: '#organization_account'
         id: 'organization_account'
-      - name: Expense Management
+      - name: Transfer Credits
+        url: '#transfer_credits'
+        id: 'transfer_credits'
 
   auditor:
     menus:
@@ -70,16 +85,31 @@ views:
 #      - name: Invoices
 #        url: invoices
 #        id: invoices
-      - name: Payment Links
-        url: payment_links
-        id: payment_links
+      # - name: Payment Links
+      #   url: payment_links
+      #   id: payment_links
+      - name: Customers
+        url: customers
+        id: customers
+      - name: Inventory
+        url: inventory
+        id: inventory
+      - name: Invoices
+        url: invoices
+        id: invoices
       - name: Virtual Accounts
         url: virtual_accounts
         id: virtual_accounts
       cog:
+      - name: Analytics
+        url: '#dashboard'
+        id: 'dashboard'
       - name: Organization Account
         url: '#organization_account'
         id: 'organization_account'
+      - name: Transfer Credits
+        url: '#transfer_credits'
+        id: 'transfer_credits'
 
   initiator:
     menus:
@@ -87,9 +117,18 @@ views:
 #      - name: Invoices
 #        url: invoices
 #        id: invoices
-      - name: Payment Links
-        url: payment_links
-        id: payment_links
+      # - name: Payment Links
+      #   url: payment_links
+      #   id: payment_links
+      - name: Customers
+        url: customers
+        id: customers
+      - name: Inventory
+        url: inventory
+        id: inventory
+      - name: Invoices
+        url: invoices
+        id: invoices
       - name: Virtual Accounts
         url: virtual_accounts
         id: virtual_accounts

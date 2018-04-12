@@ -1,0 +1,21 @@
+# == Schema Information
+#
+# Table name: payment_terms
+#
+#  id          :integer          not null, primary key
+#  name        :text(65535)
+#  created_at  :datetime         not null
+#  updated_at  :datetime         not null
+#  days_after  :integer
+#  description :text(65535)
+#  company_id  :integer
+#  default     :boolean
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyText
+
+two:
+  name: MyText

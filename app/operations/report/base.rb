@@ -27,10 +27,10 @@ class Report::Base < BaseOperation
     # self.report = Report.find_by(id: params[:report_id])
   end
 
-
   def authorize
     unless report
-      raise_unauthorized_exception
+      add_message :error, 'Report not found'
+      return
     end
   end
 

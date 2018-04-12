@@ -30,6 +30,7 @@
 #  non_reimbursable_expenses_total_id :integer
 #  sync_status_id                     :integer
 #  sync_type_id                       :integer
+#  report_processor_group_mapping_id  :integer
 #
 
 
@@ -60,6 +61,8 @@ class Report < ActiveRecord::Base
   belongs_to :card_expenses_total, class_name: 'Amount'
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
+  belongs_to :sync_status, class_name: "ReportSyncStatus"
+  belongs_to :report_processor_group_mapping
   belongs_to :sync_status, class_name: 'ReportSyncStatus'
   belongs_to :sync_type, class_name: 'ReportSyncType'
 
@@ -93,7 +96,7 @@ class Report < ActiveRecord::Base
   scope :with_reimbursable_expenses_total, -> { joins :reimbursable_expenses_total }
   scope :with_non_reimbursable_expenses_total, -> { joins :non_reimbursable_expenses_total }
   scope :with_card_expenses_total, -> { joins :card_expenses_total }
-  scope :with_status_id, ->(id) {where report_status_id: id}
+  scope :with_status_id, ->(id) { where report_status_id: id }
   scope :open, -> { where report_status_id: ReportStatus.open_id }
   scope :approved, -> { where report_status_id: ReportStatus.approved_id }
   scope :closed, -> { where report_status_id: ReportStatus.closed_id }
@@ -102,6 +105,7 @@ class Report < ActiveRecord::Base
   scope :settlement_confirmed, -> { where report_status_id: ReportStatus.settlement_confirmed_id }
   scope :processing, -> { where report_status_id: ReportStatus.processing_id }
   scope :processed, -> { where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id] }
+  scope :completed, -> { where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id] }
   scope :accounted, -> { where accounted: true }
   scope :owner, ->(user_id) { where user_id: user_id }
   scope :non_owner, ->(user_id) { where.not user_id: user_id }
@@ -111,6 +115,17 @@ class Report < ActiveRecord::Base
   scope :without_payment, -> { where reimbursement_id: nil }
   scope :pending_settlement, -> { where(report_status_id: ReportStatus.approved_id).where(accounted: false) }
   scope :with_controlling_user_id, ->(user_id) { where controlling_user_id: user_id }
+
+  # todo - having issues, where amounts are not matching actual expense amounts
+  scope :expenses_total, -> { joins(expenses: :amount).sum(:INR) }
+  # todo - having issues, where amounts are not matching actual reimbursements amounts
+  scope :expenses_reimbursable_total, -> { joins(expenses: :amount).where('expenses.reimbursable = true').sum('amounts.INR') }
+  scope :group_user_id, -> { group 'reports.user_id' }
+  scope :group_user, -> { group :user }
+  scope :joins_user, -> { joins  :user }
+  scope :include_reimbursable_user_accounts, -> { includes user: [:bank_accounts, :reimbursement_cards] }
+  scope :sort_by_updated_at, -> { unscope(:order).order(updated_at: :desc) }
+  scope :without_associated_processor, -> { where report_processor_group_mapping_id: nil }
 
   scope :unsubmitted, -> { where(report_status_id: [ReportStatus.id_for(:open), ReportStatus.id_for(:retracted), ReportStatus.id_for(:retracted)] ) }
 
@@ -131,6 +146,8 @@ class Report < ActiveRecord::Base
     reports = arel_table
     where(reports[:name].matches("%#{value}%").or(reports[:id].eq(value)))
   end
+  scope :filter_mapping_id, -> (id) { where report_processor_group_mapping_id: id }
+  scope :pluck_mapping_id, -> { pluck :report_processor_group_mapping_id }
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
     unless date_from.blank? && date_to.blank?
@@ -141,6 +158,30 @@ class Report < ActiveRecord::Base
       # date_to = DateUtils.local_date if date_to.blank?
       reports = arel_table
       where(reports[:created_at].gteq(date_from).and(reports[:created_at].lteq(date_to)))
+    end
+  end
+  scope :filter_submitted_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      reports = arel_table
+      where(reports[:submitted_at].gteq(date_from).and(reports[:submitted_at].lteq(date_to)))
+    end
+  end
+  scope :filter_approved_date, ->(date_from = nil, date_to = nil) do
+    # sample params: filter_date[expense, 2016-03-01, 2016-03-20]
+    unless date_from.blank? && date_to.blank?
+      date_from = "1990-01-01" if date_from.blank?
+      date_to = "2100-01-01" if date_to.blank?
+      date_from = date_from.to_date if date_from.present?
+      date_to = date_to.to_date + 1 if date_to.present?
+      # date_to = DateUtils.local_date if date_to.blank?
+      reports = arel_table
+      where(reports[:approved_at].gteq(date_from).and(reports[:approved_at].lteq(date_to)))
     end
   end
   scope :filter_policy, -> (policy_id) { where(policy_id: policy_id) }
@@ -158,6 +199,11 @@ class Report < ActiveRecord::Base
                                                {time_expense: [custom_fields: [:field_configuration]]},
                                                {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
                                                {amount: [:currency]}, :expense_status]}, :status, policy: [distance_expense_config: [:rate]]) }
+
+  scope :includes_user, -> { includes :user }
+  scope :includes_tracks, -> { includes :tracks }
+  scope :not_settled, -> { where report_processor_group_mapping_id: nil }
+  scope :with_processor_group_mapping, -> (id) { where report_processor_group_mapping_id: id }
 
   delegate :status_name, to: :status
 

@@ -10,6 +10,10 @@
 #  company_id    :integer
 #  created_at    :datetime         not null
 #  updated_at    :datetime         not null
+#  gst           :string(255)
+#  pan           :string(255)
+#  created_by_id :integer
+#  active        :boolean          default(TRUE)
 #
 
 require 'test_helper'

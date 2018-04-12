@@ -14,10 +14,11 @@
 
 
 
+
 class State < ActiveRecord::Base
   include Seedable
 
-  VALUES = [{:code => 'S00', :name => 'Outside India'}, {:code => 'S01', :name => 'Maharashtra'}, {:code => 'S02', :name => 'Gujarat'}, {:code => 'S03', :name => 'Andhra Pradesh'},
+  STATES = [{:code => 'S00', :name => 'Outside India'}, {:code => 'S01', :name => 'Maharashtra'}, {:code => 'S02', :name => 'Gujarat'}, {:code => 'S03', :name => 'Andhra Pradesh'},
             {:code => 'S04', :name => 'Arunachal Pradesh'}, {:code => 'S05', :name => 'Assam'}, {:code => 'S06', :name => 'Bihar'}, {:code => 'S07', :name => 'Chattisgarh'},
             {:code => 'S08', :name => 'Andaman and Nicobar Islands'}, {:code => 'S09', :name => 'Chandigarh'}, {:code => 'S10', :name => 'Dadra and Nagar Haveli'},
             {:code => 'S11', :name => 'Daman and Diu'}, {:code => 'S12', :name => 'Delhi'}, {:code => 'S13', :name => 'Goa'}, {:code => 'S14', :name => 'Haryana'},
@@ -32,7 +33,7 @@ class State < ActiveRecord::Base
 
   def self.name_for(state_id)
     return nil if state_id.blank?
-    VALUES.each do |map|
+    STATES.each do |map|
       if map[:code] == state_id
         return map[:name]
       end
@@ -42,7 +43,7 @@ class State < ActiveRecord::Base
 
   def self.name_from_id(id)
     return nil if id.blank?
-    VALUES[id-1][:name] rescue nil
+    STATES[id-1][:name] rescue nil
   end
 
 end

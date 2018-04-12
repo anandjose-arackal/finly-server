@@ -33,6 +33,8 @@
 #  maximum_amount_id             :integer
 #  exact_transaction_amount_id   :integer
 #  application                   :string(255)      not null
+#  customer_id                   :integer
+#  default_account               :boolean
 #
 
 # parent here will be either the payment receivable, or user, or whatever
@@ -43,11 +45,14 @@ class VirtualBankAccount < ActiveRecord::Base
   belongs_to :purpose, class_name: "VirtualAccountPurpose"
   belongs_to :company
   belongs_to :initiating_user, class_name: "User"
+  belongs_to :customer
   belongs_to :receiving_account, polymorphic: true
   belongs_to :maximum_transaction_amount, class_name: "Amount"
   belongs_to :minimum_transaction_amount, class_name: "Amount"
   belongs_to :maximum_amount, class_name: "Amount"
   belongs_to :exact_transaction_amount, class_name: "Amount"
+
+  has_many :outward_invoices, foreign_key: :virtual_account_id
 
   has_many :initiating_payments, as: :initiating_account, class_name: "Payment"
 
@@ -69,6 +74,16 @@ class VirtualBankAccount < ActiveRecord::Base
   scope :payment_receivables, -> { where purpose_id: VirtualAccountPurpose.id_for(:payment_receivable) }
   scope :virtual_bank_accounts, -> { where purpose_id: VirtualAccountPurpose.id_for(:virtual_bank_account) }
   scope :invoices, -> { where purpose_id: VirtualAccountPurpose.id_for(:invoice) }
+
+  scope :with_customer_id, -> (customer_id) {
+    where(customer_id: customer_id)
+  }
+
+  scope :filter_search, -> (term) {
+    where('account_number like ? OR name like ? OR ifsc like ? OR description like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+  }
+
+  scope :filter_created_by_id, -> (created_by_id) { where initiating_user_id: created_by_id }
 
   def deactivate
     self.update(active: false)

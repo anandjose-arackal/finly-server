@@ -41,7 +41,6 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   def init
     self.company_id = self.payment.payment_order.company_id
     super()
-    self.account_number = YAML.load_file(config_path)[Rails.env][self.configuration]['account_number']
     self.account = payment.receiving_account
     set_xml_params
   end
@@ -53,7 +52,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
   def post_process
     # handle the various error cases here
-    # case 200
+    # case 500
     case self.response.status
       when 404
         add_message :error, "The service is temporarily down. Please try again later"
@@ -185,7 +184,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         'BENEFICIARY_NAME' => beneficiary_name,
         'BENEFICIARY_ACCOUNT_NUMBER' => transfer_request.beneficiary_account_number,
         'BENEFICIARY_IFSC' => transfer_request.ifsc,
-        'TRANSFER_TYPE' => transfer_request.transfer_type.upcase,
+        'TRANSFER_TYPE' => transfer_request.transfer_type&.upcase,
         'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,
         'TRANSFER_AMOUNT' => transfer_request.transfer_amount
     )

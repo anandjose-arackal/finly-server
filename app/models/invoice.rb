@@ -38,6 +38,8 @@
 #  roundoff_amount    :decimal(20, 10)
 #  balance_due_id     :integer
 #  taxable_amount_id  :integer
+#  cost_center_id     :integer
+#  tds_slab_id        :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -57,11 +59,13 @@ class Invoice < ActiveRecord::Base
   belongs_to :balance_due, class_name: "Amount"
   belongs_to :taxable_amount, class_name: "Amount"
   belongs_to :category
+  belongs_to :cost_center
+  belongs_to :tds_slab, class_name: TdsRatesList
 
   # because multiple payments can be made against one invoice
-  has_many :payments
+  has_many :payments, as: :parent
 
-  has_many :invoice_items, class_name: "InvoiceLineItem"
+  has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :invoice_attachments
   has_many :custom_fields, as: :parent, dependent: :destroy
 

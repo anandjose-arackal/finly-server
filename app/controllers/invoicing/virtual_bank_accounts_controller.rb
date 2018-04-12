@@ -1,5 +1,7 @@
 class Invoicing::VirtualBankAccountsController < ApplicationController
 
+  before_action -> { finly_authorize! :web }
+
   def create
     @result = Invoicing::VirtualBankAccount::Create.(current_user, params)
     respond
@@ -8,6 +10,11 @@ class Invoicing::VirtualBankAccountsController < ApplicationController
   def index
     @result = Invoicing::VirtualBankAccount::Index.(current_user, params)
     respond
+  end
+
+  def count
+    @result = Invoicing::VirtualBankAccount::Count.(current_user, params)
+    render json: @result.count.as_json
   end
 
   def update

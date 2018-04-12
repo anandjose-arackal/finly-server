@@ -25,6 +25,7 @@ class UserWallet < ActiveRecord::Base
 
   scope :having_balance_value, -> { joins_balance.where('value > 0') }
   scope :with_user, ->(id) { where user_id: id }
+  scope :sum_balance, -> { joins_balance.sum('amounts.value') }
 
   accepts_nested_attributes_for :balance
 

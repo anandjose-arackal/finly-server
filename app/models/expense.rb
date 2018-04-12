@@ -28,6 +28,9 @@
 
 
 
+
+
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -129,6 +132,8 @@ class Expense < ActiveRecord::Base
 
   scope :reimbursable, -> { where reimbursable: true }
   scope :non_reimbursable, -> { where reimbursable: false }
+
+  scope :quickbooks_non_reimbursable, -> { where reimbursable: [false, nil] }
 
   scope :filter_expense_cancelled, -> (flag) {
     if flag == '1'
@@ -311,7 +316,7 @@ class Expense < ActiveRecord::Base
   scope :unverified, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :submitted]) }
 
   scope :joins_amount, -> { joins(:amount) }
-  scope :sum_amount, -> { joins_amount.sum(:value) }
+  scope :sum_amount, -> { joins_amount.sum(:INR) }
 
   scope :joins_card_expenses, -> { only_card_expenses.joins(:card_expense) }
   scope :pluck_card_transaction_id, -> { joins_card_expenses.pluck('card_expense.card_transaction_id') }
@@ -343,6 +348,8 @@ class Expense < ActiveRecord::Base
                                         {time_expense: [custom_fields: [:field_configuration]]},
                                         {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
                                         {amount: [:currency]}, :expense_status) }
+  scope :includes_amount, -> { includes :amount }
+  scope :sum_amounts, -> { includes_amount.sum('amounts.INR') }
 
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount

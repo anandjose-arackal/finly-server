@@ -33,7 +33,6 @@ class ItzCash::AccountDetails < ItzCash::Base
     params[:available_card_eligibility] = parsed_response[9].to_d
     params[:card_processor_status] = parsed_response[10] # This is from YSE's system to track if card is locked or not. Possible values
     params[:description] = parsed_response[12]
-    update_card
     params[:card] = card
     # special condition because of ItzCash's drama about reissued cards
     if card.replaced_card_id.present?
@@ -42,8 +41,10 @@ class ItzCash::AccountDetails < ItzCash::Base
       if op.success?
         params[:balance] = op.balance
         params[:available_card_eligibility] = op.available_card_eligibility
+        params[:distributor_id] = op.distributor_id
       end
     end
+    update_card
     ItzCash::AccountDetails::SuccessPresenter.new(self.user, self.params, self.messages)
   end
 
@@ -122,7 +123,7 @@ class ItzCash::AccountDetails < ItzCash::Base
     unless card.card_status_id == status_id
       card.update(card_status_id: status_id)
     end
-    if status == :upgraded and card.user.individual_kyc.kyc_status_id != KycStatus.id_for(:completed)
+    if status == :upgraded and card.user.individual_kyc.kyc_status_id != KycStatus.id_for(:completed) and !(Constants::MIGRATING_COMPANIES.include?(card.user.company_id))
       card.user.individual_kyc.update(kyc_status_id: KycStatus.id_for(:completed), review_position: nil)
     end
 

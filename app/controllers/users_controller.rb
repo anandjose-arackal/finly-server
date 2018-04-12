@@ -40,6 +40,7 @@ class UsersController < ApplicationController
     @result = User::Profile.(current_user, params)
     respond_to do |format|
       format.html { render partial: 'my_profile'}
+      format.json {}
     end
   end
 
@@ -132,7 +133,9 @@ class UsersController < ApplicationController
 
   def menu_data
     # Helps the front end app to get user specific yaml data from view_wise_data.yml
-    render partial: 'menu_data'
+    # render partial: 'menu_data'
+    @views = YamlUtils.load_yaml_erb("#{Rails.root}/config/data/view_wise_data.yml.erb", {current_company: current_company, current_user: current_user})
+    render json: @views.as_json
   end
 
   def available_expense_types

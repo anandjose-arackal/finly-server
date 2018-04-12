@@ -14,9 +14,10 @@ class Oauth::TokenController < Doorkeeper::TokensController
       @auth_grant = response
       @token = response.token
       @user = current_user(response&.token)
-      User::Track::Login.(@user, params)
-
-      on_create_success(response)
+      if verify_company_status(@user)
+        User::Track::Login.(@user, params)
+        on_create_success(response)
+      end
     else
       self.response_body = response.body.to_json
     end
@@ -25,6 +26,33 @@ class Oauth::TokenController < Doorkeeper::TokensController
   end
 
   protected
+  def verify_company_status(user)
+    company = user&.company rescue nil
+    if company.present?
+      case company.status_id
+        when CompanyStatus.id_for(:active)
+        when CompanyStatus.id_for(:partial_block)
+          if @user.admin? or @user.manager? or @user.finance_manager?
+            json_string = {error: 'invalid_grant', error_description: 'Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved'}
+            render json: json_string.to_json, status: 401
+            return false
+          end
+        when CompanyStatus.id_for(:deactivated)
+          if @user.admin? or @user.manager? or @user.finance_manager?
+            json_string = {error: 'invalid_grant', error_description: 'Your company account has been disabled due to billing issue. Please contact Finly Team to have this resolved'}
+            render json: json_string.to_json, status: 401
+            return false
+          else
+            json_string = {error: 'invalid_grant', error_description: 'Your account has been disabled. Please contact your admin to login'}
+            render json: json_string.to_json, status: 401
+            return false
+          end
+        when CompanyStatus.id_for(:hidden)
+      end
+    end
+    true
+  end
+
   def pre_process
     ### todo TEMP WORKAROUND - MAKE ALL CLIENTS SEND USERNAME AND REMOVE THIS JUGAAD
     if params.dig(:email).present? and params.dig(:username).blank?

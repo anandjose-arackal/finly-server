@@ -113,11 +113,11 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
     end
 
     def xls_template
-      'export_template/template'
+      params[:template] || 'export_template/template'
     end
 
     def binding_params
-      {item_headers: self.headers, item_contents: self.contents}
+      {item_headers: self.headers, item_contents: self.contents, data: self.params[:data]}
     end
 
     # Handle XLS END

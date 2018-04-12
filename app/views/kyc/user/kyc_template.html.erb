@@ -1,0 +1,31 @@
+<style>
+  .text {
+    font-size: 40px;
+  }
+</style>
+<table style="min-width: 2300px;">
+  <tbody>
+  <tr>
+    <td class="text">First Name: <%= kyc.user.first_name %></td>
+    <td class="text">Last Name: <%= kyc.user.last_name %></td>
+    <td class="text">Mothers Maiden Name: <%= kyc.user.mothers_maiden_name %></td>
+  </tr>
+  <tr>
+    <td class="text">Mobile Number: <%= kyc.user.mobile_number %></td>
+    <td class="text">Card Serial No: <%= kyc.user.cards.pluck_proxy.join(', ') %></td>
+    <td class="text">&nbsp;</td>
+  </tr>
+  </tbody>
+</table>
+<table>
+  <tbody>
+  <tr>
+    <td><img src="<%= kyc.aadhar_front.path(:original) %>" style="max-width: 1000px;"/></td>
+    <td><img src="<%= kyc.photo.path(:original) %>" style="max-width: 350px; margin-left: 100px"/></td>
+  </tr>
+  <tr>
+    <td><img src="<%= kyc.aadhar_back.path(:original) %>" style="max-width: 1000px;"/></td>
+    <td><img src="<%= kyc.signature.path(:original) %>" style="max-height: 500px;"/></td>
+  </tr>
+  </tbody>
+</table>

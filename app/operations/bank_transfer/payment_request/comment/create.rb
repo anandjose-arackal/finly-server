@@ -26,6 +26,8 @@ class BankTransfer::PaymentRequest::Comment::Create < BankTransfer::PaymentReque
 
   def post_process
     add_message :success, "Comment added!"
+
+    Event::EBankPaymentRequest::EComment::Create.(user, bank_payment_request: self.payment_request)
   end
 
   private
