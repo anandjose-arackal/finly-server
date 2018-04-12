@@ -774,6 +774,10 @@ class User < ActiveRecord::Base
     (self.vendor_payments_enabled? && self.bank_accounts.present?) || (self.company.bank_reimbursement_enabled?)
   end
 
+  def initials
+    self.name.split(' ').first[0] + ((self.name.split(' ')[1][0] rescue nil) or self.name.split(' ').first[1])
+  end
+
   # method that determines whether a particular user has
   # cash on hand payments that are pending confirmation
   # from the bank - eg. NEFT transfers
