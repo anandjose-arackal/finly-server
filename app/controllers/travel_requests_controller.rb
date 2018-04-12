@@ -28,4 +28,11 @@ class TravelRequestsController < ApplicationController
     end
   end
 
+  def booking_types
+    @booking_types = BookingType.all
+    respond_to do |format|
+      format.json {}
+    end
+  end
+
 end

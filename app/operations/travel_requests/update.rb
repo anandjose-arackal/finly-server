@@ -29,5 +29,4 @@ class TravelRequests::Update < TravelRequests::Base
       add_message :error, self.travel_request.errors.full_messages
     end
   end
-
 end

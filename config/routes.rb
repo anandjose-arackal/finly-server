@@ -2250,6 +2250,8 @@ Rails.application.routes.draw do
 
   end
 
+  get 'booking_types', to: 'travel_requests#booking_types'
+
 
   post 'expenses/split', to: 'expenses#split_existing'
   post 'expenses/export', to: 'expenses#export'

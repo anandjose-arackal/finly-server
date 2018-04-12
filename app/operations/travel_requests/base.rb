@@ -3,7 +3,7 @@ class TravelRequests::Base < BaseOperation
   def travel_request_params
     params.require(:travel_request).permit(:name, :policy_id,
                                            destinations_attributes: [
-                                               :name, :source,
+                                               :id, :name, :source,
                                                booking_requests_attributes: [
                                                    :booking_type_id,
                                                    booking_flight_attributes: [
