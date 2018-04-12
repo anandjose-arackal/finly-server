@@ -1,12 +1,15 @@
 # this checks the invoice for all validations and eventually saves the invoice which can now be sent to the customer
 class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
-  attr_accessor :invoice, :invoice_parameters, :invoice_number
+  attr_accessor :invoice, :invoice_parameters, :invoice_number, :invoice_current_attachments, :invoice_old_attachments, :invoice_type
 
   def init
     id = params[:id] || params[:outward_invoice_id]
     self.invoice = user.company.outward_invoices.find_by(id: id)
     self.invoice_parameters = invoice_params
+    if invoice
+      self.invoice_type = invoice.outward_invoice_type.name
+    end
   end
 
   def validate
@@ -15,7 +18,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       return
     end
 
-    if self.invoice.cancelled? || self.invoice.partially_paid? || self.invoice.closed?
+    if self.invoice.cancelled? || self.invoice.partially_paid? || self.invoice.paid?
       add_message :error, "Invoice cannot be edited in this state"
       return
     end
@@ -54,10 +57,19 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     end
 
     # adding the prefix and sequence to the invoice
-    prefix = user.company.invoice_number_config.prefix
+    prefix = user.company.invoice_number_configs.with_purpose_id(Purpose.id_for(:collect)).with_config_type_id(InvoiceNumberConfigType.id_for(self.invoice_type)).first.prefix
     sequence = self.invoice_number&.gsub(prefix, '')
     self.invoice_parameters[:prefix] = prefix
     self.invoice_parameters[:sequence_start] = sequence
+
+    # Extracting invoice attachments
+    self.invoice_current_attachments = user.company.outward_invoice_attachments.with_id(invoice_parameters[:invoice_attachments])
+
+    # Remove :invoice_attachments from parameters
+    self.invoice_parameters.delete(:invoice_attachments)
+
+    # Old Attachments
+    self.invoice_old_attachments = invoice.attachments
 
     # creating the customer if the customer_id isn't present in the params for this request
     if invoice_parameters[:customer_id].blank? && params.dig(:customer, :id).blank?
@@ -99,14 +111,21 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
       return
     end
 
+    self.invoice_old_attachments.update_all(outward_invoice_id: nil)
+
+    self.invoice_current_attachments.update_all(outward_invoice_id: invoice.id)
+
     # checking if this particular operation has the customer's new GSTIN
     if params[:customer].present?
       if customer_params.present?
         self.invoice.customer.gst = customer_params[:gst]
       end
     end
-
-    if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved), is_deleted: false)
+    invoice_status_id = OutwardInvoiceStatus.id_for(:saved)
+    if self.invoice.tax_invoice?
+      invoice_status_id = OutwardInvoiceStatus.id_for(:unpaid)
+    end
+    if self.invoice.update(invoice_status_id: invoice_status_id, is_deleted: false)
       recalculate_totals
       self.invoice.update(paid_amount: Amount.create(value: 0, currency_id: 1)) # setting the paid amount as 0 at the time of saving
       self.invoice.virtual_account&.update(purpose_id: VirtualAccountPurpose.id_for(:invoice))
@@ -117,7 +136,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   end
 
   def post_process
-    add_message :success, "Invoice successfully created!"
+    add_message :success, 'Invoice successfully saved'
   end
 
   def success
@@ -129,14 +148,16 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
 
   def invoice_params
     params.require(:invoice).permit(:gst_type_id, :tds, :tds_type_id, :category_id, :customer_id,
-                                    :tax_type_id, :date, :discount_type_id, :due_date, :memo, :customer_memo,
+                                    :tax_type_id, :date, :discount_type_id, :due_date, :memo, :customer_memo, :payment_term_id,
                                     :invoice_number, :inclusive_of_taxes, :billing_address, :shipping_address, :override_invoice_number,
                                     :email, :mobile_number, :virtual_account_id, :roundoff_amount, :roundoff_total_enabled,
                                     original_amount_attributes: [:value, :currency_id],
                                     advance_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
                                     invoice_attachments_attributes: [:attached_file, :description],
-                                    invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax, :inventory_line_item_id])
+                                    invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax, :inventory_line_item_id],
+                                    invoice_attachments: [],
+                                    reminders: [])
   end
 
   def customer_params

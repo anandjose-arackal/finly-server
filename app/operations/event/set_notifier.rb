@@ -41,7 +41,6 @@ class Event::SetNotifier < Event::Base
 
   def process
     # todo - have to ensure *_affected_users always returns an array of users
-
     # sending mailers
     users = mailer_affected_users
     if users.present?

@@ -1,22 +1,22 @@
 class Company::Collect::InvoiceNumberConfiguration::Show < Company::Base
 
-  attr_accessor :config
+  attr_accessor :configs
 
   class Company::Collect::InvoiceNumberConfiguration::Show::ConfigPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :config
+    attr_accessor :configs
 
     def init
-      self.config = params[:config]
+      self.configs = params[:configs]
     end
   end
 
   def init
-    self.config = user.company.invoice_number_config
+    self.configs = user.company.invoice_number_configs.with_purpose_id(Purpose.id_for(:collect))
   end
 
   def success
-    params[:config] = self.config
+    params[:configs] = self.configs
     Company::Collect::InvoiceNumberConfiguration::Show::ConfigPresenter.new(user, params, messages)
   end
 end

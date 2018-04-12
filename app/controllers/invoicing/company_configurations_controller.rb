@@ -38,4 +38,15 @@ class Invoicing::CompanyConfigurationsController < ApplicationController
     @result = Company::Collect::CompanyDetails::Show.(current_user, params)
     respond
   end
+
+
+  def funds_auto_transfer_config
+    @result = Invoicing::Company::FundsAutoTransferConfig::Show.(current_user, params)
+    respond
+  end
+
+  def update_auto_transfer_config
+    @result = Invoicing::Company::FundsAutoTransferConfig::Update.(current_user, params)
+    respond
+  end
 end

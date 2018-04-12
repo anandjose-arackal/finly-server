@@ -41,7 +41,7 @@ class BankPaymentRequestTrail < ActiveRecord::Base
     if latest_submit_trail.present?
       ids = where('id >= ?', latest_submit_trail).pluck(:id)
     else
-      ids = []
+      ids = self.pluck(:id)
     end
     where(id: ids)
   }

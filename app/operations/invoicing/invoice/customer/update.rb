@@ -10,7 +10,7 @@ class Invoicing::Invoice::Customer::Update < Invoicing::Invoice::Base
 
   def init
     invoice_id = params[:id] || params[:invoice_id] || params[:outward_invoice_id]
-    self.invoice = user.company.outward_invoices.find_by(id: invoice_id)
+    self.invoice = user.company.outward_invoices.find invoice_id
     # check if an existing customer is being associated, or a new customer is being added
     if params[:customer_id].present?
       customer_id = params[:customer_id]
@@ -40,23 +40,11 @@ class Invoicing::Invoice::Customer::Update < Invoicing::Invoice::Base
     if self.customer.present?
       # setting the shipping and billing address of this invoice as the default address of the customer
       default_address_id = nil
-      if self.customer.addresses.default.present?
-        default_address_id = self.customer.addresses.default.first.id
-      end
-      unless self.invoice.update(customer_id: self.customer.id, billing_address_id: default_address_id, shipping_address_id: default_address_id)
-        add_message :error, self.invoice.errors.full_messages
-        return
-      end
-    else
-      self.customer = user.company.customers.build(self.customer_params)
-      if self.customer.save
-        # setting the shipping and billing address of this invoice as the default address of the customer
-        default_address_id = nil
-        if self.customer.addresses.default.present?
-          default_address_id = self.customer.addresses.default.first.id
-        end
-        self.invoice.update(customer_id: self.customer.id, billing_address_id: default_address_id, shipping_address_id: default_address_id)
-      else
+      address = self.customer.addresses.default.first || self.customer.addresses.first
+      full_address = get_full_address(address)
+
+
+      unless self.invoice.update(customer_id: self.customer.id, billing_address: full_address, shipping_address: full_address)
         add_message :error, self.invoice.errors.full_messages
         return
       end
@@ -75,4 +63,17 @@ class Invoicing::Invoice::Customer::Update < Invoicing::Invoice::Base
                                      addresses_attributes: [:line_1, :line_2, :city, :state_id, :name, :pin_code, :id, :default])
   end
 
+  def get_full_address(address)
+    unless address
+      return ""
+    end
+    address_text = ""
+    address_text += address&.name.to_s + ",\n"
+    address_text += address&.line_1.to_s + ",\n"
+    address_text += address&.line_2.to_s + ",\n"
+    address_text += address&.landmark.to_s + ",\n"
+    address_text += address&.city.to_s + ",\n"
+    address_text += address&.state&.name.to_s + ",\n"
+    address_text += address&.pin_code.to_s
+  end
 end

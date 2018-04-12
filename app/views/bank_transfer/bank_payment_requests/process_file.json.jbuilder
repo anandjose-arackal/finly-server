@@ -26,6 +26,8 @@ json.payment do
       json.custom_fields_config item[:custom_fields]
       json.net_amount item[:net_amount]
       json.category_id item[:category_id]
+      json.cost_center_id item[:cost_center_id]
+      json.tds_slab_id item[:tds_slab_id]
       json.roundoff_amount item[:roundoff_amount]
       json.balance_due item[:balance_due]
       json.item_taxes_total item[:item_taxes_total]
@@ -60,6 +62,19 @@ json.payment do
     json.array!(current_company.categories.with_purpose(Purpose.id_for(:invoice_items))) do |category|
       json.id category.id
       json.name category.name
+    end
+  end
+  json.cost_centers do
+    json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
+      json.id cost_center.id
+      json.name cost_center.name
+    end
+  end
+  json.tds_slabs do
+    json.array!(current_company.tds_slabs) do |tds_slab|
+      json.id tds_slab.id
+      json.name "#{tds_slab.name} - #{tds_slab.tds}"
+      json.tds tds_slab.tds
     end
   end
   json.errors @result.errors

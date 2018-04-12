@@ -35,3 +35,35 @@ json.virtual_accounts do
     json.name virtual_account.name
   end
 end
+
+json.customer_account do
+  json.balance customer.customer_account.balance.amount_value
+  json.currency do
+    json.id customer.customer_account&.balance&.currency&.id
+    json.country customer.customer_account&.balance&.currency&.country
+    json.country_code customer.customer_account&.balance&.currency&.country_code
+    json.symbol customer.customer_account&.balance&.currency&.symbol
+  end
+
+  customer_account_transactions = customer.customer_account.customer_account_transactions
+  json.transactions do
+    json.array! customer_account_transactions do |cat|
+      json.extract! cat, :id, :transaction_type, :associated_object_type
+      if cat.associated_object_type == 'OutwardInvoice'
+        json.associated_object_id cat.associated_object_id
+      elsif cat.associated_object_type == 'VirtualAccountTransaction'
+        json.associated_object_id cat.associated_object.virtual_account.id
+      end
+      json.time cat.created_at.strftime("%I:%M %p")
+      json.date cat.created_at.strftime("%d %b %Y")
+      json.amount cat.transaction_amount.value
+      currency = cat.transaction_amount.currency
+      json.currency do
+        json.id currency&.id
+        json.country currency&.country
+        json.country_code currency&.country_code
+        json.symbol currency&.symbol
+      end
+    end
+  end
+end

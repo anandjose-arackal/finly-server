@@ -69,14 +69,29 @@ class Policy::Mappings::Show < Policy::Base
 
   def success
     params[:map] = self.map
+    params[:policy] = self.policy
+    params[:selected_user] = self.updating_user
     return Policy::Mappings::Show::Presenter.new(user, params, messages)
   end
 
   class Policy::Mappings::Show::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :map
+    attr_accessor :map, :policy, :selected_user, :roles
 
     def init
       self.map = params[:map]
+      self.policy = params[:policy]
+      self.selected_user = params[:selected_user]
+      case current_app
+        when :em, "em"
+          self.roles = {admin: self.selected_user.company_admin?, manager: self.selected_user.manager?,
+                        finance_manager: self.selected_user.finance_manager?, auditor: self.selected_user.auditor?}
+        when :vp, "vp"
+          self.roles = {admin: self.selected_user.vendor_payments_admin?, manager: self.selected_user.vendor_payments_reviewer?,
+                        finance_manager: self.selected_user.vendor_payments_creditor?, auditor: self.selected_user.auditor?}
+        else
+          self.roles = []
+      end
+
     end
 
     def company_default?

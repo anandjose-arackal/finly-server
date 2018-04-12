@@ -24,7 +24,7 @@ namespace :balance_poller do
       pid_file = fetch(:balance_poller_pid)
       args = "#{fetch(:balance_poller_runner)} >> #{fetch(:balance_poller_log)} 2>&1 & echo $! > #{fetch(:balance_poller_pid)}"
       within release_path do
-        with rack_env: fetch(:transaction_poller_env) do
+        with rack_env: fetch(:balance_poller_env) do
           execute(:rails, :runner, args) unless process_exists?(pid_file)
         end
       end

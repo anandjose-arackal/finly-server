@@ -12,6 +12,11 @@ class Invoicing::VirtualBankAccountsController < ApplicationController
     respond
   end
 
+  def count
+    @result = Invoicing::VirtualBankAccount::Count.(current_user, params)
+    render json: @result.count.as_json
+  end
+
   def update
     @result = Invoicing::VirtualBankAccount::Update.(current_user, params)
     if @result.success?

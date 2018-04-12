@@ -75,6 +75,16 @@ class VirtualBankAccount < ActiveRecord::Base
   scope :virtual_bank_accounts, -> { where purpose_id: VirtualAccountPurpose.id_for(:virtual_bank_account) }
   scope :invoices, -> { where purpose_id: VirtualAccountPurpose.id_for(:invoice) }
 
+  scope :with_customer_id, -> (customer_id) {
+    where(customer_id: customer_id)
+  }
+
+  scope :filter_search, -> (term) {
+    where('account_number like ? OR name like ? OR ifsc like ? OR description like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+  }
+
+  scope :filter_created_by_id, -> (created_by_id) { where initiating_user_id: created_by_id }
+
   def deactivate
     self.update(active: false)
   end

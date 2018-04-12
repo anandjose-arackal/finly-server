@@ -1,22 +1,51 @@
 invoice = @result.invoice
+customer = invoice&.customer
+customer_account = customer&.customer_account
 json.customer do
   json.id invoice.customer&.id
   json.name invoice.customer&.name
   json.gstin invoice.customer&.gst
+  json.customer_account do
+    json.balance customer_account&.balance&.value
+    json.currency do
+      json.id customer_account&.balance&.currency&.id
+      json.country customer_account&.balance&.currency&.country
+      json.country_code customer_account&.balance&.currency&.country_code
+      json.symbol customer_account&.balance&.currency&.symbol
+    end
+  end
 end
 
 json.invoice do
   json.invoice_number invoice.invoice_number || @result.invoice_number
   json.created_at invoice.created_at
-  json.date invoice.date
-  json.due_date invoice.due_date
+  json.date invoice.date&.strftime("%d-%b-%Y")
+  json.due_date invoice.due_date&.strftime("%d-%b-%Y")
   json.memo invoice.memo
   json.customer_memo invoice.customer_memo
   json.status do
     json.id invoice.invoice_status&.id
     json.name invoice.invoice_status&.name&.humanize
+    json.id_name invoice.invoice_status&.name
     json.bs_class ""
   end
+  json.invoice_type do
+    json.id invoice.outward_invoice_type.id
+    json.name invoice.outward_invoice_type.name.humanize
+  end
+  json.company_gstin invoice&.company&.collect_company_detail&.gst
+
+  if invoice.payment_term
+    json.payment_term do
+      json.extract! invoice.payment_term, :id, :name, :description, :default
+      json.days_after invoice.payment_term&.days_after
+    end
+  end
+
+  json.reminders do
+    json.array! invoice.reminders
+  end
+
 
   json.invoice_amounts do
     json.item_amounts_total invoice.line_items_total
@@ -33,6 +62,7 @@ json.invoice do
     json.paid_amount invoice.paid_amount&.value
     json.total_payable invoice.total_payable&.value
     json.roundoff_total_enabled invoice.roundoff_total_enabled
+    json.paid_amounts @result.paid_amounts
   end
 
   json.invoice_items do
@@ -79,7 +109,45 @@ json.invoice do
   end
 end
 
+json.trail do
+  json.array! invoice.invoice_trails do |trail|
+    json.extract! trail, :note, :associated_transaction_type
+    json.action_name trail.action.name
+    json.action_type !!trail.action.name.index('credit')? 'credit' : 'debit'
+    if trail.user_id
+      json.user do
+        json.id trail.user.id
+        json.name trail.user.name
+        json.email trail.user.email
+        json.mobile_number trail.user.mobile_number
+      end
+    end
+    json.amount trail.amount.value
+    json.date trail.date&.strftime("%d-%b-%Y")
+    json.currency do
+      json.id trail.amount.currency.id
+      json.country trail.amount.currency.country
+      json.country_code trail.amount.currency.country
+      json.symbol trail.amount.currency.symbol
+    end
+  end
+end
 json.actions do
   json.editable invoice.editable?
   json.navbar @result.navbar_actions
 end
+
+json.payment_terms do
+  json.array! @result.payment_terms do |payment_term|
+    json.extract! payment_term, :id, :name, :days_after, :description, :default
+  end
+end
+json.attachment do
+  json.array! @result.invoice_attachments do |attachment|
+    json.extract! attachment, :id, :description
+    json.file_name attachment.attachment_file_name
+    json.file_size (attachment.attachment_file_size / 1024).round(2).to_s + " KB"
+    json.url attachment.attachment.url
+  end
+end
+
