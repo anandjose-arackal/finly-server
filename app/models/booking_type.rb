@@ -12,7 +12,31 @@ class BookingType < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:booking, :booking_request]
+    [:flight, :car_rental, :bus, :train, :hotel, :restaurant]
+  end
+
+  def flight?
+    self.id == BookingType.id_for(:flight)
+  end
+
+  def train?
+    self.id == BookingType.id_for(:train)
+  end
+
+  def bus?
+    self.id == BookingType.id_for(:bus)
+  end
+
+  def car_rental?
+    self.id == BookingType.id_for(:car_rental)
+  end
+
+  def hotel?
+    self.id == BookingType.id_for(:hotel)
+  end
+
+  def restaurant?
+    self.id == BookingType.id_for(:restaurant)
   end
 
 end

@@ -1,4 +1,4 @@
-class TravelRequest::Index < BaseOperation
+class TravelRequests::Index < TravelRequests::Base
   attr_accessor :travel_requests, :role_id
 
   def authorized_user_types
@@ -61,10 +61,10 @@ class TravelRequest::Index < BaseOperation
 
   def success
     params[:travel_requests] = travel_requests
-    TravelRequest::Index::Presenter.new(user, params, self.messages)
+    TravelRequests::Index::Presenter.new(user, params, self.messages)
   end
 
-  class TravelRequest::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
+  class TravelRequests::Index::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :travel_requests, :counts, :paginated_travel_requests
 
     # has_scope :filter_search

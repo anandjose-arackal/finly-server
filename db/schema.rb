@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180409082442) do
+ActiveRecord::Schema.define(version: 20180411142315) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -561,16 +561,13 @@ ActiveRecord::Schema.define(version: 20180409082442) do
     t.string   "journey_destination", limit: 255
     t.date     "journey_date"
     t.string   "departure_time",      limit: 255
-    t.integer  "booking_id",          limit: 4
-    t.integer  "booking_request_id",  limit: 4
-    t.integer  "booking_type_id",     limit: 4
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
   end
 
-  add_index "booking_buses", ["booking_id"], name: "index_booking_buses_on_booking_id", using: :btree
-  add_index "booking_buses", ["booking_request_id"], name: "index_booking_buses_on_booking_request_id", using: :btree
-  add_index "booking_buses", ["booking_type_id"], name: "index_booking_buses_on_booking_type_id", using: :btree
+  add_index "booking_buses", ["parent_type", "parent_id"], name: "index_booking_buses_on_parent_type_and_parent_id", using: :btree
 
   create_table "booking_car_rentals", force: :cascade do |t|
     t.string   "journey_source",         limit: 255
@@ -582,16 +579,13 @@ ActiveRecord::Schema.define(version: 20180409082442) do
     t.date     "reservation_end_date"
     t.string   "car_type",               limit: 255
     t.string   "car_number",             limit: 255
-    t.integer  "booking_id",             limit: 4
-    t.integer  "booking_request_id",     limit: 4
-    t.integer  "booking_type_id",        limit: 4
     t.datetime "created_at",                           null: false
     t.datetime "updated_at",                           null: false
+    t.integer  "parent_id",              limit: 4
+    t.string   "parent_type",            limit: 255
   end
 
-  add_index "booking_car_rentals", ["booking_id"], name: "index_booking_car_rentals_on_booking_id", using: :btree
-  add_index "booking_car_rentals", ["booking_request_id"], name: "index_booking_car_rentals_on_booking_request_id", using: :btree
-  add_index "booking_car_rentals", ["booking_type_id"], name: "index_booking_car_rentals_on_booking_type_id", using: :btree
+  add_index "booking_car_rentals", ["parent_type", "parent_id"], name: "index_booking_car_rentals_on_parent_type_and_parent_id", using: :btree
 
   create_table "booking_flights", force: :cascade do |t|
     t.date     "departure_date"
@@ -599,16 +593,13 @@ ActiveRecord::Schema.define(version: 20180409082442) do
     t.string   "airline",             limit: 255
     t.string   "journey_destination", limit: 255
     t.string   "journey_source",      limit: 255
-    t.integer  "booking_id",          limit: 4
-    t.integer  "booking_request_id",  limit: 4
-    t.integer  "booking_type_id",     limit: 4
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
   end
 
-  add_index "booking_flights", ["booking_id"], name: "index_booking_flights_on_booking_id", using: :btree
-  add_index "booking_flights", ["booking_request_id"], name: "index_booking_flights_on_booking_request_id", using: :btree
-  add_index "booking_flights", ["booking_type_id"], name: "index_booking_flights_on_booking_type_id", using: :btree
+  add_index "booking_flights", ["parent_type", "parent_id"], name: "index_booking_flights_on_parent_type_and_parent_id", using: :btree
 
   create_table "booking_hotels", force: :cascade do |t|
     t.string   "reservation_destination", limit: 255
@@ -616,41 +607,37 @@ ActiveRecord::Schema.define(version: 20180409082442) do
     t.string   "reservation_time",        limit: 255
     t.date     "reservation_end_date"
     t.string   "hotel_name",              limit: 255
-    t.integer  "booking_id",              limit: 4
-    t.integer  "booking_request_id",      limit: 4
-    t.integer  "booking_type_id",         limit: 4
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
+    t.integer  "parent_id",               limit: 4
+    t.string   "parent_type",             limit: 255
   end
 
-  add_index "booking_hotels", ["booking_id"], name: "index_booking_hotels_on_booking_id", using: :btree
-  add_index "booking_hotels", ["booking_request_id"], name: "index_booking_hotels_on_booking_request_id", using: :btree
-  add_index "booking_hotels", ["booking_type_id"], name: "index_booking_hotels_on_booking_type_id", using: :btree
+  add_index "booking_hotels", ["parent_type", "parent_id"], name: "index_booking_hotels_on_parent_type_and_parent_id", using: :btree
 
   create_table "booking_requests", force: :cascade do |t|
     t.integer  "booking_status_id",             limit: 4
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
     t.integer  "travel_request_destination_id", limit: 4
+    t.integer  "booking_type_id",               limit: 4
   end
 
   add_index "booking_requests", ["booking_status_id"], name: "index_booking_requests_on_booking_status_id", using: :btree
+  add_index "booking_requests", ["booking_type_id"], name: "index_booking_requests_on_booking_type_id", using: :btree
 
   create_table "booking_restaurants", force: :cascade do |t|
     t.string   "reservation_destination", limit: 255
     t.date     "reservation_date"
     t.string   "reservation_time",        limit: 255
     t.string   "restaurant_name",         limit: 255
-    t.integer  "booking_id",              limit: 4
-    t.integer  "booking_request_id",      limit: 4
-    t.integer  "booking_type_id",         limit: 4
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
+    t.integer  "parent_id",               limit: 4
+    t.string   "parent_type",             limit: 255
   end
 
-  add_index "booking_restaurants", ["booking_id"], name: "index_booking_restaurants_on_booking_id", using: :btree
-  add_index "booking_restaurants", ["booking_request_id"], name: "index_booking_restaurants_on_booking_request_id", using: :btree
-  add_index "booking_restaurants", ["booking_type_id"], name: "index_booking_restaurants_on_booking_type_id", using: :btree
+  add_index "booking_restaurants", ["parent_type", "parent_id"], name: "index_booking_restaurants_on_parent_type_and_parent_id", using: :btree
 
   create_table "booking_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -665,16 +652,13 @@ ActiveRecord::Schema.define(version: 20180409082442) do
     t.string   "departure_time",      limit: 255
     t.string   "train_number",        limit: 255
     t.string   "pnr",                 limit: 255
-    t.integer  "booking_id",          limit: 4
-    t.integer  "booking_request_id",  limit: 4
-    t.integer  "booking_type_id",     limit: 4
     t.datetime "created_at",                      null: false
     t.datetime "updated_at",                      null: false
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
   end
 
-  add_index "booking_trains", ["booking_id"], name: "index_booking_trains_on_booking_id", using: :btree
-  add_index "booking_trains", ["booking_request_id"], name: "index_booking_trains_on_booking_request_id", using: :btree
-  add_index "booking_trains", ["booking_type_id"], name: "index_booking_trains_on_booking_type_id", using: :btree
+  add_index "booking_trains", ["parent_type", "parent_id"], name: "index_booking_trains_on_parent_type_and_parent_id", using: :btree
 
   create_table "booking_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -687,10 +671,12 @@ ActiveRecord::Schema.define(version: 20180409082442) do
     t.integer  "booking_status_id",  limit: 4
     t.datetime "created_at",                   null: false
     t.datetime "updated_at",                   null: false
+    t.integer  "booking_type_id",    limit: 4
   end
 
   add_index "bookings", ["booking_request_id"], name: "index_bookings_on_booking_request_id", using: :btree
   add_index "bookings", ["booking_status_id"], name: "index_bookings_on_booking_status_id", using: :btree
+  add_index "bookings", ["booking_type_id"], name: "index_bookings_on_booking_type_id", using: :btree
 
   create_table "budget_rules", force: :cascade do |t|
     t.integer  "category_id",          limit: 4
@@ -4266,27 +4252,11 @@ ActiveRecord::Schema.define(version: 20180409082442) do
   add_foreign_key "bank_payment_request_trails", "bank_payment_requests"
   add_foreign_key "bank_transactions", "amounts"
   add_foreign_key "bank_transactions", "companies"
-  add_foreign_key "booking_buses", "booking_requests"
-  add_foreign_key "booking_buses", "booking_types"
-  add_foreign_key "booking_buses", "bookings"
-  add_foreign_key "booking_car_rentals", "booking_requests"
-  add_foreign_key "booking_car_rentals", "booking_types"
-  add_foreign_key "booking_car_rentals", "bookings"
-  add_foreign_key "booking_flights", "booking_requests"
-  add_foreign_key "booking_flights", "booking_types"
-  add_foreign_key "booking_flights", "bookings"
-  add_foreign_key "booking_hotels", "booking_requests"
-  add_foreign_key "booking_hotels", "booking_types"
-  add_foreign_key "booking_hotels", "bookings"
   add_foreign_key "booking_requests", "booking_statuses"
-  add_foreign_key "booking_restaurants", "booking_requests"
-  add_foreign_key "booking_restaurants", "booking_types"
-  add_foreign_key "booking_restaurants", "bookings"
-  add_foreign_key "booking_trains", "booking_requests"
-  add_foreign_key "booking_trains", "booking_types"
-  add_foreign_key "booking_trains", "bookings"
+  add_foreign_key "booking_requests", "booking_types"
   add_foreign_key "bookings", "booking_requests"
   add_foreign_key "bookings", "booking_statuses"
+  add_foreign_key "bookings", "booking_types"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "categories"
   add_foreign_key "budget_rules", "periods"

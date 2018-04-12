@@ -21,6 +21,12 @@
 class TravelRequest < ActiveRecord::Base
   belongs_to :user
   belongs_to :policy
+  belongs_to :status, class_name: "TravelRequestStatus"
+
+  belongs_to :controlling_user, class_name: 'User'
+  belongs_to :controlling_user_role, class_name: 'UserRole'
+  belongs_to :controlling_for_user, class_name: 'User'
+  belongs_to :controlling_for_user_role, class_name: 'UserRole'
 
   has_many :destinations, class_name: "TravelRequestDestination"
 

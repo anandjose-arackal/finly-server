@@ -3,17 +3,29 @@ class TravelRequestsController < ApplicationController
   before_action -> { finly_authorize! :web}
 
   def index
-    @result = TravelRequest::Index.(current_user, params)
+    @result = TravelRequests::Index.(current_user, params)
     respond
   end
 
+  def show
+    @result = TravelRequests::Show.(current_user, params)
+    respond
+  end
+
+
+
   def create
-    @result = TravelRequest::Create.(current_user, params)
+    @result = TravelRequests::Create.(current_user, params)
     respond
   end
 
   def update
-    @result = TravelRequest::Update.(current_user, params)
+    @result = TravelRequests::Update.(current_user, params)
+    if @result.success?
+      respond response: :success, messages: @result.messages[:success]
+    else
+      respond response: :error, messages: @result.messages
+    end
   end
 
 end

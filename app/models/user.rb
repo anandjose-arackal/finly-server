@@ -55,6 +55,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -123,6 +124,7 @@ class User < ActiveRecord::Base
   has_many :expense_cards, -> { where(card_program_id: CardProgram.id_for(:expense)) }, class_name: 'Card'
   has_many :card_transactions, dependent: :destroy
   has_many :money_requests
+  has_many :travel_requests
   has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
   has_many :money_request_tracks, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
   has_many :interacted_money_requests, -> { distinct }, source: :money_request, through: :money_request_tracks
