@@ -28,6 +28,19 @@ class TravelRequestsController < ApplicationController
     end
   end
 
+  def add_booking
+    # @result = TravelRequest::
+
+  end
+
+  def update_booking
+
+  end
+
+  def delete_booking
+
+  end
+
   def booking_types
     @booking_types = BookingType.all
     respond_to do |format|
