@@ -49,7 +49,7 @@ json.comments @result.comments do |comment|
   if comment.user.respond_to?(:id, :name)
     comment_u_id = comment.user.id
     comment_u_name = comment.user.name
-    comment_initials = comment.user.name.split(' ').first[0] + ((comment.user.name.split(' ')[1][0] rescue nil) or comment.user.name.split(' ').first[1])
+    comment_initials = comment.user.initials
   end
   json.comment_user_id comment_u_id
   json.comment_user_name comment_u_name
