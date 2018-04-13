@@ -29,6 +29,9 @@ class TravelRequests::Base < BaseOperation
                                                    booking_restaurant_attributes: [
                                                        :id,
                                                        :reservation_destination, :reservation_time, :reservation_date, :restaurant_name
+                                                   ],
+                                                   travel_members_attributes: [
+                                                       :id, :title, :first_name, :middle_name, :last_name, :child, :age, :email, :mobile_number
                                                    ]
                                                ]
                                            ]

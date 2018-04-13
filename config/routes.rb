@@ -2250,6 +2250,16 @@ Rails.application.routes.draw do
 
   end
 
+  post 'bookings/upload_attachment', to: 'bookings#upload_attachment'
+
+  scope :travel_requests do
+    resources :bookings do
+    end
+  end
+
+
+  resources :booking_attachments, only: [:create]
+
   get 'booking_types', to: 'travel_requests#booking_types'
 
 

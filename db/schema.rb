@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180411142315) do
+ActiveRecord::Schema.define(version: 20180413082522) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -555,6 +555,23 @@ ActiveRecord::Schema.define(version: 20180411142315) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
+
+  create_table "booking_attachments", force: :cascade do |t|
+    t.string   "attachment_file_name",    limit: 255
+    t.string   "attachment_content_type", limit: 255
+    t.integer  "attachment_file_size",    limit: 4
+    t.datetime "attachment_updated_at"
+    t.integer  "booking_id",              limit: 4
+    t.integer  "user_id",                 limit: 4
+    t.integer  "company_id",              limit: 4
+    t.text     "description",             limit: 65535
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "booking_attachments", ["booking_id"], name: "index_booking_attachments_on_booking_id", using: :btree
+  add_index "booking_attachments", ["company_id"], name: "index_booking_attachments_on_company_id", using: :btree
+  add_index "booking_attachments", ["user_id"], name: "index_booking_attachments_on_user_id", using: :btree
 
   create_table "booking_buses", force: :cascade do |t|
     t.string   "journey_source",      limit: 255
@@ -4252,6 +4269,9 @@ ActiveRecord::Schema.define(version: 20180411142315) do
   add_foreign_key "bank_payment_request_trails", "bank_payment_requests"
   add_foreign_key "bank_transactions", "amounts"
   add_foreign_key "bank_transactions", "companies"
+  add_foreign_key "booking_attachments", "bookings"
+  add_foreign_key "booking_attachments", "companies"
+  add_foreign_key "booking_attachments", "users"
   add_foreign_key "booking_requests", "booking_statuses"
   add_foreign_key "booking_requests", "booking_types"
   add_foreign_key "bookings", "booking_requests"

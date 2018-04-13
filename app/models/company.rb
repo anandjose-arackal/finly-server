@@ -71,6 +71,9 @@ class Company < ActiveRecord::Base
   has_many :outward_invoices
   has_many :outward_invoice_attachments
 
+
+  has_many :booking_attachments
+
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
   accepts_nested_attributes_for :feature_subscription
