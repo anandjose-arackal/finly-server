@@ -23,10 +23,11 @@ class WebHookApi::Post < BaseHandler
   end
 
   def post_params
-    {token: self.web_hook_track.request_header, event: web_hook_track.web_hook_event.name, body: self.web_hook_track.request_body}
+    {token: self.web_hook_track.request_header, event: web_hook_track.web_hook_event.name, body: self.web_hook_track.request_body}.to_json
   end
 
   def header_params
+    { "Content-Type" => "application/json" }
   end
 
   def pre_process

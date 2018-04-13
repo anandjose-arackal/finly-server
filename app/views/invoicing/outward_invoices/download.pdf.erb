@@ -186,25 +186,35 @@
 
   <div class="item-details-table" style="overflow-x: auto; margin: 10px; width: calc(100% - 20px); margin-top: 0;">
 
-    <table class="line-items-table" style="width: 100%;border-collapse: collapse;margin: 1% auto;margin-bottom: 1%;">
-      <thead style="background-color: rgba(201,209,226,1); color: rgba(25,51,113,1); color: black;">
-      <tr>
-        <th scope="col" style="width: 20px;font-weight: 300;padding: 5px; border: none !important; text-align: left; font-size: 11px; ">#</th>
-        <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Name/Description</th>
-        <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">HSN/SAC</th>
-        <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Quantity</th>
-        <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Rate</th>
-        <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Amount</th>
-        <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Discount</th>
-        <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; "><%= @invoice.gst_type_id == 1 ? "IGST" : "CGST + SGST" %></th>
-        <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; " colspan="2">Total</th>
-      </tr>
-      </thead>
-      <tbody>
-      <% @invoice.invoice_items.each_with_index do |item, index| %>
+  <table class="line-items-table" style="width: 100%;border-collapse: collapse;margin: 1% auto;margin-bottom: 1%;">
+    <thead style="background-color: rgba(201,209,226,1); color: rgba(25,51,113,1); color: black;">
+    <tr>
+      <th scope="col" style="width: 20px;font-weight: 300;padding: 5px; border: none !important; text-align: left; font-size: 11px; ">#</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Name/Description</th>
+      <% if @invoice.invoice_items_custom_field_configuration_ids.present? %>
+          <% @invoice.invoice_items_custom_field_configuration_ids.each do |fc_id| %>
+              <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; "><%= FieldConfiguration.find_by(id: fc_id)&.field_name %></th>
+          <% end %>
+      <% end %>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">HSN/SAC</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Quantity</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Rate</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Amount</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; ">Discount</th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; "><%= @invoice.gst_type_id == 1 ? "IGST" : "CGST + SGST" %></th>
+      <th scope="col" style="padding: 5px;font-weight: 300; border: none !important; text-align: left; font-size: 11px; " colspan="2">Total</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @invoice.invoice_items.each_with_index do |item, index| %>
         <tr>
-          <th style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " scope="row"><%= index + 1 %></th>
+          <th style="padding: 5px; border: none !important; text-align: left; font-size: 11px; " scope="row"><%= (index + 1) %></th>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.description%></td>
+          <% if @invoice.invoice_items_custom_field_configuration_ids.present? %>
+              <% @invoice.invoice_items_custom_field_configuration_ids.each do |fc_id| %>
+                  <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.custom_fields.with_field_configuration_ids(fc_id).first&.value&.value %></td>
+              <% end %>
+          <% end %>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.hsn_sac%></td>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; "><%= item.quantity%></td>
           <td style="padding: 5px; border: none !important; text-align: left; font-size: 11px; ">INR <%= item.rate %></td>

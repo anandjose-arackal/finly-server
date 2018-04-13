@@ -489,6 +489,8 @@
 #                                      invoices_customers POST   /invoices/customers(.:format)                                                                api/fc/invoices/customers#create
 #                                                         PATCH  /invoices/customers/:id(.:format)                                                            api/fc/invoices/customers#update
 #                                                         GET    /invoices/customers/:id(.:format)                                                            api/fc/invoices/customers#show
+#                   api_vp_bank_transfer_initiate_payment POST   /api/vp/bank_transfer/initiate_payment(.:format)                                             api/vp/bank_transfer/bank_payment_requests#initiate_payment
+#                     api_vp_bank_transfer_payment_status GET    /api/vp/bank_transfer/payment_status/:id(.:format)                                           api/vp/bank_transfer/bank_payment_requests#payment_status
 #        api_vp_bank_transfer_bank_payment_request_credit PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)        api/vp/bank_transfer/bank_payment_requests#credit
 #              api_vp_bank_transfer_bank_payment_requests GET    /api/vp/bank_transfer/bank_payment_requests(.:format)                                        api/vp/bank_transfer/bank_payment_requests#index
 #                                                         POST   /api/vp/bank_transfer/bank_payment_requests(.:format)                                        api/vp/bank_transfer/bank_payment_requests#create
@@ -2161,6 +2163,8 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :vp do
       namespace :bank_transfer do
+        post 'initiate_payment', to: 'bank_payment_requests#initiate_payment', as: :initiate_payment
+        get 'payment_status/:id', to: 'bank_payment_requests#payment_status', as: :payment_status
         resources :bank_payment_requests do
           patch 'credit', to: 'bank_payment_requests#credit', as: :credit
         end

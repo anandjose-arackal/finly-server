@@ -105,6 +105,12 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     self.invoice.assign_attributes(self.invoice_parameters)
     # calculate the tax and discounts that need to be done for this particular invoice
     # and store it in the invoice object for further calculation
+    self.invoice.invoice_items.each_with_index do |invoice_item, index|
+      custom_fields = params&.dig(:invoice, :invoice_items_attributes)[index][:custom_fields]
+      if custom_fields.present?
+        set_custom_fields(false, invoice_item, custom_fields)
+      end
+    end
     calculate_tax_and_discounts
     unless self.invoice.valid?
       add_message :error, self.invoice.errors.full_messages
@@ -155,7 +161,7 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
                                     advance_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
                                     invoice_attachments_attributes: [:attached_file, :description],
-                                    invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax, :inventory_line_item_id],
+                                    invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax, :inventory_line_item_id, custom_fields: []],
                                     invoice_attachments: [],
                                     reminders: [])
   end
@@ -174,6 +180,14 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   def recalculate_totals
     InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_parameters, nil, self.invoice)
     self.invoice.save
+  end
+
+  def set_custom_fields(save, line_item, custom_fields)
+    custom_fields = {custom_fields: custom_fields}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(line_item, FieldParentType.id_for(:invoice_line_item), custom_fields)
   end
 
 end
