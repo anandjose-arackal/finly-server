@@ -1,0 +1,2 @@
+class Retract
+end
