@@ -42,7 +42,7 @@ class TravelRequests::Bookings::Update < TravelRequests::Bookings::Base
     self.booking.created_by_user = user
     if self.booking.valid?
       self.booking.save
-      add_message :success, 'Successfully Added Booking'
+      add_message :success, 'Successfully Updated Booking'
 
       booking_old_attachments.update_all(booking_id: nil)
       booking_attachments.update_all(booking_id: self.booking.id)
