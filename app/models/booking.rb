@@ -9,6 +9,7 @@
 #  updated_at         :datetime         not null
 #  booking_type_id    :integer
 #  note               :text(65535)
+#  created_by_user_id :integer
 #
 
 class Booking < ActiveRecord::Base
@@ -17,6 +18,9 @@ class Booking < ActiveRecord::Base
   belongs_to :booking_type
   belongs_to :booking_request
   belongs_to :booking_status
+  belongs_to :created_by_user, class_name: 'User'
+
+
   has_many :travel_members
 
   has_many :attachments, class_name: 'BookingAttachment'
