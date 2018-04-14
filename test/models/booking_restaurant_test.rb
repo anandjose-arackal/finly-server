@@ -11,6 +11,7 @@
 #  updated_at              :datetime         not null
 #  parent_id               :integer
 #  parent_type             :string(255)
+#  restaurant_rating       :string(255)
 #
 
 require 'test_helper'

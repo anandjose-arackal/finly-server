@@ -12,6 +12,10 @@
 #  updated_at          :datetime         not null
 #  parent_id           :integer
 #  parent_type         :string(255)
+#  journey_date        :date
+#  booking_class       :string(255)
+#  stops               :string(255)
+#  ticket_number       :string(255)
 #
 
 class BookingFlight < ActiveRecord::Base

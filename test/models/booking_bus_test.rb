@@ -11,6 +11,8 @@
 #  updated_at          :datetime         not null
 #  parent_id           :integer
 #  parent_type         :string(255)
+#  boarding_point      :string(255)
+#  booking_class       :string(255)
 #
 
 require 'test_helper'

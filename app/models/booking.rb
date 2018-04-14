@@ -8,6 +8,7 @@
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
 #  booking_type_id    :integer
+#  note               :text(65535)
 #
 
 class Booking < ActiveRecord::Base
@@ -26,6 +27,7 @@ class Booking < ActiveRecord::Base
   has_one :booking_hotel, as: :parent
   has_one :booking_restaurant, as: :parent
   has_one :booking_train, as: :parent
+  has_one :booking_custom, as: :parent
 
   accepts_nested_attributes_for :booking_car_rental
   accepts_nested_attributes_for :booking_bus
@@ -33,6 +35,7 @@ class Booking < ActiveRecord::Base
   accepts_nested_attributes_for :booking_hotel
   accepts_nested_attributes_for :booking_restaurant
   accepts_nested_attributes_for :booking_train
+  accepts_nested_attributes_for :booking_custom
   accepts_nested_attributes_for :travel_members
 
 
