@@ -52,7 +52,7 @@ json.destinations do
                           :reservation_time, :restaurant_name
           end
         end
-        json.travel_memebers do
+        json.travel_members do
           json.array! booking_request.travel_members do |travel_member|
             json.extract! travel_member,:id, :title, :first_name, :middle_name, :last_name,
                           :child, :age, :email, :mobile_number
@@ -112,7 +112,7 @@ json.destinations do
               end
             end
 
-            json.travel_memebers do
+            json.travel_members do
               json.array! booking.travel_members do |travel_member|
                 json.extract! travel_member,:id, :title, :first_name, :middle_name, :last_name,
                               :child, :age, :email, :mobile_number
