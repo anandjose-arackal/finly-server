@@ -15,6 +15,7 @@
 #  booking_request_id :integer
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  gender             :string(255)
 #
 
 require 'test_helper'

@@ -15,9 +15,16 @@
 #  booking_request_id :integer
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  gender             :string(255)
 #
 
 class TravelMember < ActiveRecord::Base
+
+  validates :first_name, presence: true
+  validates :last_name, presence: true
+  validates :age, presence: true
+  validates :mobile_number, presence: true
+
   belongs_to :booking
   belongs_to :booking_request
 end

@@ -19,6 +19,7 @@ class TravelRequests::Create < TravelRequests::Base
 
   def process
     self.travel_request = user.travel_requests.build(travel_request_parameters)
+    self.travel_request.company_id = user.company.id
     if travel_request.save
       add_message :success, 'Successfully saved travel request'
     else

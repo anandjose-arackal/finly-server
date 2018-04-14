@@ -11,6 +11,10 @@
 #
 
 class TravelRequestDestination < ActiveRecord::Base
+  validates :name, presence: true
+  validates :source, presence: true
+  validates :travel_request_id, presence: true
+
   belongs_to :travel_request
 
   has_many :booking_requests

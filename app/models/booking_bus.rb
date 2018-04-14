@@ -11,9 +11,14 @@
 #  updated_at          :datetime         not null
 #  parent_id           :integer
 #  parent_type         :string(255)
+#  boarding_point      :string(255)
+#  booking_class       :string(255)
 #
 
 class BookingBus < ActiveRecord::Base
+  validates :journey_source, presence: true
+  validates :journey_destination, presence: true
+  validates :journey_date, presence: true
 
   belongs_to :parent, polymorphic: true
 end

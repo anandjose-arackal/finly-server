@@ -12,8 +12,13 @@
 #  updated_at              :datetime         not null
 #  parent_id               :integer
 #  parent_type             :string(255)
+#  hotel_rating            :string(255)
 #
 
 class BookingHotel < ActiveRecord::Base
+  validates :reservation_destination, presence: true
+  validates :reservation_start_date, presence: true
+  validates :reservation_start_end, presence: true
+
   belongs_to :parent, polymorphic: true
 end

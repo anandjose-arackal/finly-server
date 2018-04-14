@@ -8,10 +8,13 @@
 #  updated_at                    :datetime         not null
 #  travel_request_destination_id :integer
 #  booking_type_id               :integer
+#  note                          :text(65535)
 #
 
 class BookingRequest < ActiveRecord::Base
   validates :booking_type_id, presence: true
+
+  validates :travel_request_destination_id, presence: true
 
   belongs_to :booking_type
   belongs_to :booking_status
@@ -25,6 +28,7 @@ class BookingRequest < ActiveRecord::Base
   has_one :booking_hotel, as: :parent
   has_one :booking_restaurant, as: :parent
   has_one :booking_train, as: :parent
+  has_one :booking_custom, as: :parent
 
   accepts_nested_attributes_for :booking_car_rental
   accepts_nested_attributes_for :booking_bus
@@ -32,6 +36,8 @@ class BookingRequest < ActiveRecord::Base
   accepts_nested_attributes_for :booking_hotel
   accepts_nested_attributes_for :booking_restaurant
   accepts_nested_attributes_for :booking_train
+  accepts_nested_attributes_for :booking_custom
+
   accepts_nested_attributes_for :travel_members
 
   delegate :flight?, :train?, :bus?, :car_rental?, :hotel?, :restaurant?, to: :booking_type

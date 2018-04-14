@@ -19,6 +19,7 @@
 #
 
 class TravelRequest < ActiveRecord::Base
+
   belongs_to :user
   belongs_to :policy
   belongs_to :status, class_name: "TravelRequestStatus"

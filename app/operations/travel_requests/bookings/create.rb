@@ -29,6 +29,7 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
 
   def process
     self.booking = booking_request.bookings.build(booking_parameters)
+    self.booking.created_by_user = user
     if self.booking.valid?
       self.booking.save
       add_message :success, 'Successfully Added Booking'
