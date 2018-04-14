@@ -14,6 +14,7 @@
 
 class Booking < ActiveRecord::Base
   validates :booking_type_id, presence: true
+  validates :booking_request_id, presence: true
 
   belongs_to :booking_type
   belongs_to :booking_request

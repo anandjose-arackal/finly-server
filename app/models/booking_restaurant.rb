@@ -15,5 +15,8 @@
 #
 
 class BookingRestaurant < ActiveRecord::Base
+  validates :reservation_destination, presence: true
+  validates :reservation_date, presence: true
+
   belongs_to :parent, polymorphic: true
 end

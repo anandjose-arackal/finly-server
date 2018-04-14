@@ -14,6 +14,8 @@
 class BookingRequest < ActiveRecord::Base
   validates :booking_type_id, presence: true
 
+  validates :travel_request_destination_id, presence: true
+
   belongs_to :booking_type
   belongs_to :booking_status
   belongs_to :travel_request_destination
