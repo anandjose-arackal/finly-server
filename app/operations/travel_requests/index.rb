@@ -24,7 +24,7 @@ class TravelRequests::Index < TravelRequests::Base
   def process
     case self.role_id
       when UserRole.id_for(:admin), UserRole.id_for(:auditor)
-        user_ids = User::Team::Index.(user, params).pluck(:id)
+        user_ids = user.company.users.pluck(:id)
         if self.user.company_admin? || user.auditor?
           self.travel_requests = TravelRequest.not_open.with_user(user_ids)
         elsif user.policy_admin?
@@ -54,7 +54,7 @@ class TravelRequests::Index < TravelRequests::Base
       # when UserRole.id_for(:auditor)
       #   # todo auditor
       else
-        self.travel_requests = user.travel_requests.sort_for_personal
+        self.travel_requests = user.travel_requests
     end
     self.travel_requests = self.travel_requests.exclude_deleted if self.travel_requests.present?
   end
