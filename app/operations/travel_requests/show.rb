@@ -31,7 +31,7 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def actions
-      actions = []
+      actions = {}
       if travel_request.open? && travel_request.user_id == user.id
         actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       elsif travel_request.processing?
@@ -44,9 +44,10 @@ class TravelRequests::Show < TravelRequests::Base
       elsif travel_request.approved?
         # todo - add travel request actions
         if travel_request.controlling_user_id == user.id && user.travel_manager?
-          
+
         end
       end
+      actions
     end
   end
 

@@ -133,3 +133,5 @@ json.booking_types do
   end
 end
 
+json.actions @result.actions
+

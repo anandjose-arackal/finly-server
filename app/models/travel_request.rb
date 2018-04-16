@@ -33,4 +33,10 @@ class TravelRequest < ActiveRecord::Base
   has_many :destinations, class_name: "TravelRequestDestination"
 
   accepts_nested_attributes_for :destinations
+
+  delegate :open?, :processing?, :approved?, to: :status
+
+  validates :status_id, presence: true
+  validates :user_id, presence: true
+  validates :name, presence: true
 end

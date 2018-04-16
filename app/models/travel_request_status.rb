@@ -15,4 +15,20 @@ class TravelRequestStatus < ActiveRecord::Base
   def self.values
     [:open, :processing, :retracted, :rejected, :booked, :cancelled, :booking_pending, :change_requested, :completed] #todo populate statuses and seed
   end
+
+  def open?
+    self.id == TravelRequestStatus.id_for(:open)
+  end
+
+  def processing?
+    self.id == TravelRequestStatus.id_for(:processing)
+  end
+
+  def approved?
+    self.id == TravelRequestStatus.id_for(:approved)
+  end
+
+  def booked?
+    self.id == TravelRequestStatus.id_for(:booked)
+  end
 end
