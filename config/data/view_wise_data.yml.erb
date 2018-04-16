@@ -98,8 +98,10 @@ views:
         url: '#organization_account/params={"view":"admin"}'
       - name: Company Statements
         url: '#company_statements/params={"view": "admin"}'
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
       - name: Travel Requests
         url: '#travel_requests/params={"view": "admin"}'
+      <% end %>
       <% if current_company.d_code_enabled? || current_company.bank_reimbursement_enabled? %>
       - name: Load Company Balance
         target: true
@@ -146,8 +148,10 @@ views:
         url: '#organization_account/params={"view":"auditor"}'
       - name: Company Statements
         url: '#company_statements/params={"view": "auditor"}'
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
       - name: Travel Requests
         url: '#travel_requests/params={"view": "auditor"}'
+      <% end %>
   <% end %>
   <% if current_user.travel_manager? %>
   travel_manager:
@@ -156,8 +160,10 @@ views:
 #      - name: <span class="superscript">Team</span><br>Travel Requests
 #        url: travel_requests
 #        id: travel_requests
+       <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
        - name: Travel Requests
         url: '#travel_requests/params={"view": "travel_manager"}'
+       <% end %>
       cog: []
   <% end %>
   <% if current_user.finance_manager? %>
@@ -186,8 +192,10 @@ views:
         url: export
         id: export
       cog:
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
       - name: Travel Requests
         url: '#travel_requests/params={"view": "finance_manager"}'
+      <% end %>
   <% end %>
   <% if current_user.manager? %>
   manager:
@@ -212,8 +220,10 @@ views:
         url: export
         id: export
       cog:
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
       - name: Travel Requests
         url: '#travel_requests/params={"view": "manager"}'
+      <% end %>
   <% end %>
   <% if current_user.employee? %>
   personal:
@@ -244,8 +254,10 @@ views:
         url: export
         id: export
       cog:
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
       - name: Travel Requests
         url: '#travel_requests/params={"view": "personal"}'
+      <% end %>
   <% end %>
 
 

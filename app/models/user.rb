@@ -597,6 +597,10 @@ class User < ActiveRecord::Base
     self.user_panel_subscription.invoicing_system
   end
 
+  def travel_desk_enabled?
+    self.user_panel_subscription.travel_request
+  end
+
   def has_role?(role_id)
     return false unless role_id.present?
     mapping = role_mapping

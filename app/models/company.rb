@@ -283,9 +283,12 @@ class Company < ActiveRecord::Base
     self.feature_subscription.current_account_connected
   end
 
-
   def invoicing_system_enabled?
     self.feature_subscription.invoicing_system
+  end
+
+  def travel_desk_enabled?
+    self.feature_subscription.travel_request
   end
 
   def more_than_one_subscription?
