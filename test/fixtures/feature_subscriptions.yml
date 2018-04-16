@@ -23,6 +23,7 @@
 #  payroll_card_enabled       :boolean          default(FALSE)
 #  current_account_connected  :boolean
 #  invoicing_system           :boolean          default(FALSE)
+#  travel_request             :boolean          default(FALSE)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180416162237) do
+ActiveRecord::Schema.define(version: 20180416164403) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1824,6 +1824,7 @@ ActiveRecord::Schema.define(version: 20180416162237) do
     t.boolean  "payroll_card_enabled",                   default: false
     t.boolean  "current_account_connected"
     t.boolean  "invoicing_system",                       default: false
+    t.boolean  "travel_request",                         default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -3957,6 +3958,7 @@ ActiveRecord::Schema.define(version: 20180416162237) do
     t.datetime "updated_at",                                          null: false
     t.boolean  "yes_bank_account_transfer"
     t.boolean  "invoicing_system",                    default: false
+    t.boolean  "travel_request",                      default: false
   end
 
   add_index "user_panel_subscriptions", ["user_id"], name: "index_user_panel_subscriptions_on_user_id", using: :btree

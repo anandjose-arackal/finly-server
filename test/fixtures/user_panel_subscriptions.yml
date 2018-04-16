@@ -10,6 +10,7 @@
 #  updated_at                :datetime         not null
 #  yes_bank_account_transfer :boolean
 #  invoicing_system          :boolean          default(FALSE)
+#  travel_request            :boolean          default(FALSE)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

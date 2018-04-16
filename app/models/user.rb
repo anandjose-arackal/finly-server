@@ -531,6 +531,11 @@ class User < ActiveRecord::Base
     mapping.auditor.present?
   end
 
+  def travel_manager?
+    mapping = role_mapping
+    mapping.expense_management.travel_manager.present?
+  end
+
   def vendor_payment_manager?
     self.role_mapping.vendor_payments.manager.present?
   end

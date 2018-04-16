@@ -27,6 +27,7 @@ class UserRoleMapping < ActiveRecord::Base
   scope :admin, -> { where(user_role_id: UserRole.id_for(:admin)) }
   scope :finance_manager, -> { where(user_role_id: UserRole.id_for(:finance_manager)) }
   scope :manager, -> { where(user_role_id: UserRole.manager_id) }
+  scope :travel_manager, -> { where user_role_id: UserRole.id_for(:travel_manager) }
   scope :initiator, -> {where user_role_id: UserRole.id_for(:initiator)}
   scope :auditor, -> { where(user_role_id: UserRole.id_for(:auditor)) }
   scope :employee, -> { where(user_role_id: UserRole.id_for(:employee)) }
