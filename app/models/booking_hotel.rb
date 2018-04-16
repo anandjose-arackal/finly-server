@@ -18,7 +18,7 @@
 class BookingHotel < ActiveRecord::Base
   validates :reservation_destination, presence: true
   validates :reservation_start_date, presence: true
-  validates :reservation_start_end, presence: true
+  validates :reservation_end_date, presence: true
 
   belongs_to :parent, polymorphic: true
 end

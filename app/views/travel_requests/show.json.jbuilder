@@ -16,19 +16,19 @@ json.destinations do
         json.booking_type_name booking_request.booking_type.name
         if booking_request.flight?
           json.booking_flight do
-            json.extract! booking_request.booking_flight, :id, :departure_date, :journey_destination, :journey_source
+            json.extract! booking_request.booking_flight, :id, :journey_date, :journey_destination, :journey_source, :booking_class, :stops
           end
         end
 
         if booking_request.bus?
           json.booking_bus do
-            json.extract! booking_request.booking_bus, :id, :journey_source, :journey_destination, :journey_date
+            json.extract! booking_request.booking_bus, :id, :journey_source, :journey_destination, :journey_date, :booking_class
           end
         end
 
         if booking_request.train?
           json.booking_train do
-            json.extract! booking_request.booking_train, :id, :journey_source, :journey_destination, :journey_date
+            json.extract! booking_request.booking_train, :id, :journey_source, :journey_destination, :journey_date, :booking_class
           end
         end
 
@@ -42,14 +42,14 @@ json.destinations do
         if booking_request.hotel?
           json.booking_hotel do
             json.extract! booking_request.booking_hotel, :id, :reservation_destination,
-                          :reservation_start_date, :reservation_end_date, :hotel_name
+                          :reservation_start_date, :reservation_end_date, :hotel_name, :hotel_rating
           end
         end
 
         if booking_request.restaurant?
           json.booking_restaurant do
             json.extract! booking_request.booking_restaurant, :id, :reservation_destination, :reservation_date,
-                          :reservation_time, :restaurant_name
+                          :reservation_time, :restaurant_name, :restaurant_rating
           end
         end
         json.travel_members do
@@ -66,19 +66,21 @@ json.destinations do
 
             if booking.flight?
               json.booking_flight do
-                json.extract! booking.booking_flight, :id, :departure_date, :journey_destination, :journey_source
+                json.extract! booking.booking_flight, :id, :departure_date, :journey_destination,
+                :journey_source, :journey_date, :booking_class, :stops, :ticket_number
               end
             end
 
             if booking.bus?
               json.booking_bus do
-                json.extract! booking.booking_bus, :id, :journey_source, :journey_destination, :journey_date
+                json.extract! booking.booking_bus, :id, :journey_source, :journey_destination, :journey_date, :booking_class, :boarding_point
               end
             end
 
             if booking.train?
               json.booking_train do
-                json.extract! booking.booking_train, :id, :journey_source, :journey_destination, :journey_date
+                json.extract! booking.booking_train, :id, :journey_source, :journey_destination, :journey_date,
+                :booking_class, :boarding_station_name
               end
             end
 
@@ -92,14 +94,14 @@ json.destinations do
             if booking.hotel?
               json.booking_hotel do
                 json.extract! booking.booking_hotel, :id, :reservation_destination,
-                              :reservation_start_date, :reservation_end_date, :hotel_name, :reservation_time
+                              :reservation_start_date, :reservation_end_date, :hotel_name, :reservation_time, :hotel_rating
               end
             end
 
             if booking.restaurant?
               json.booking_restaurant do
                 json.extract! booking.booking_restaurant, :id, :reservation_destination, :reservation_date,
-                              :reservation_time, :restaurant_name
+                              :reservation_time, :restaurant_name, :restaurant_rating
               end
             end
 
