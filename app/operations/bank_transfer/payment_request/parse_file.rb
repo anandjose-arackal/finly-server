@@ -23,6 +23,12 @@ class BankTransfer::PaymentRequest::ParseFile < BankTransfer::PaymentRequest::Ba
   def validate
     if parsed_data.blank?
       add_message :error, 'Nothing to process'
+      return
+    end
+
+    if self.parsed_data.count > 30
+      add_message :error, "Bulk payment processing is limited to 30 at a time"
+      return
     end
   end
 

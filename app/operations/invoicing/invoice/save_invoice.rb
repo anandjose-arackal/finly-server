@@ -94,8 +94,11 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
         self.invoice.customer.gst = customer_params[:gst]
       end
     end
-
-    if self.invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:saved), is_deleted: false)
+    invoice_status_id = OutwardInvoiceStatus.id_for(:saved)
+    if self.invoice.tax_invoice?
+      invoice_status_id = OutwardInvoiceStatus.id_for(:unpaid)
+    end
+    if self.invoice.update(invoice_status_id: invoice_status_id, is_deleted: false)
       recalculate_totals
       self.invoice.update(paid_amount: Amount.create(value: 0, currency_id: 1)) # setting the paid amount as 0 at the time of saving
       self.invoice.virtual_account&.update(purpose_id: VirtualAccountPurpose.id_for(:invoice))

@@ -1,6 +1,6 @@
 class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
 
-  attr_accessor :invoice_number_config, :invoice_number, :invoice, :purpose_id, :invoice_number_config_type_id
+  attr_accessor :invoice_number_config, :invoice_number, :invoice, :purpose_id, :invoice_number_config_type_id, :invoice_type
 
   class Invoicing::Invoice::GenerateInvoiceNumber::InvoiceNumberPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -16,8 +16,8 @@ class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
     self.invoice = params[:invoice]
     if self.invoice.is_a?(OutwardInvoice)
       self.purpose_id = Purpose.id_for(:collect)
-      invoice_type = invoice.outward_invoice_type.name
-      self.invoice_number_config_type_id = InvoiceNumberConfigType.id_for(invoice_type)
+      self.invoice_type = invoice.outward_invoice_type.name
+      self.invoice_number_config_type_id = InvoiceNumberConfigType.id_for(self.invoice_type)
     elsif self.invoice.is_a?(Invoice)
       self.purpose_id = Purpose.id_for(:vendor_payments)
       #todo do the same for inward invoice
@@ -44,7 +44,7 @@ class Invoicing::Invoice::GenerateInvoiceNumber < Invoicing::Invoice::Base
         self.invoice_number = self.invoice_number_config.prefix
       end
       if self.invoice_number_config.sequence_start.present?
-        last_invoice = user.company.outward_invoices.invoice_number_generated_in_finly.valid.reorder(created_at: :desc).first
+        last_invoice = user.company.outward_invoices.with_type(invoice_type).invoice_number_generated_in_finly.valid.reorder(created_at: :desc).first
         if last_invoice.present? && last_invoice.created_at > self.invoice_number_config.updated_at
           prefix = last_invoice.prefix || self.invoice_number_config.prefix
           numeric_section = last_invoice.invoice_number.gsub(prefix, '')

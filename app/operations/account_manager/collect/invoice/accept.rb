@@ -47,6 +47,7 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
           trail = invoice.invoice_trails.new({
                                             action_id: OutwardInvoiceTrailAction.id_for(:credit_virtual_account),
                                             associated_transaction: virtual_account_transaction,
+                                            date: virtual_account_transaction.created_at.strftime("%d-%b-%Y"),
                                             amount_attributes: {
                                                 value: remaining_amount,
                                                 currency_id: Currency.id_for(virtual_account_transaction.transfer_currency)
@@ -59,11 +60,12 @@ class AccountManager::Collect::Invoice::Accept < AccountManager::Collect::Invoic
       elsif remaining_amount >= due_amount
         invoice.paid_amount.update(value: (invoice.net_amount&.value + invoice.roundoff_amount)) # i.e. setting the paid amount as the total of what was supposed to be paid for this invoice
         invoice.balance_due.update(value: 0)
-        invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:closed))
+        invoice.update(invoice_status_id: OutwardInvoiceStatus.id_for(:paid))
         # create trail
         trail = invoice.invoice_trails.new({
                                             action_id: OutwardInvoiceTrailAction.id_for(:credit_virtual_account),
                                             associated_transaction: virtual_account_transaction,
+                                            date: virtual_account_transaction.created_at.strftime("%d-%b-%Y"),
                                             amount_attributes: {
                                                 value: due_amount,
                                                 currency_id: Currency.id_for(virtual_account_transaction.transfer_currency)

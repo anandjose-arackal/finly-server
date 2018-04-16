@@ -21,6 +21,9 @@ class Expense::ExDistance::Create < Expense::ExDistance::Base
     {
         process: {
             before: Personalizer::Process.new([:expense, :distance_create], :process, self)
+        },
+        pre_process: {
+            before: Personalizer::Process.new([:expense, :distance_create], :pre_process, self)
         }
     }
   end
