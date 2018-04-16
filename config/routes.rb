@@ -634,6 +634,7 @@
 #                                                         PATCH  /money_request/:id(.:format)                                                                 money_request#update
 #                                                         PUT    /money_request/:id(.:format)                                                                 money_request#update
 #                                                         DELETE /money_request/:id(.:format)                                                                 money_request#destroy
+#                                   travel_request_review PATCH  /travel_requests/:travel_request_id/review(.:format)                                         travel_requests#review
 #                                         travel_requests GET    /travel_requests(.:format)                                                                   travel_requests#index
 #                                                         POST   /travel_requests(.:format)                                                                   travel_requests#create
 #                                      new_travel_request GET    /travel_requests/new(.:format)                                                               travel_requests#new
@@ -2275,7 +2276,7 @@ Rails.application.routes.draw do
   ######################### TRAVEL REQUESTS API START ##########################
 
   resources :travel_requests do
-
+    patch 'review', to: 'travel_requests#review', as: :review
   end
   post 'bookings/upload_attachment', to: 'bookings#upload_attachment'
 

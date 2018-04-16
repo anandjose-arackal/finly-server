@@ -29,6 +29,25 @@ class TravelRequests::Show < TravelRequests::Base
       self.destinations = travel_request.destinations
       self.booking_types = params[:booking_types]
     end
+
+    def actions
+      actions = []
+      if travel_request.open? && travel_request.user_id == user.id
+        actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+      elsif travel_request.processing?
+        if travel_request.controlling_user_id == user.id && user.manager?
+          actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+          actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+        elsif user.company_admin?
+          actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+        end
+      elsif travel_request.approved?
+        # todo - add travel request actions
+        if travel_request.controlling_user_id == user.id && user.travel_manager?
+          
+        end
+      end
+    end
   end
 
 end
