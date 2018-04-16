@@ -86,7 +86,7 @@ json.destinations do
 
             if booking.car_rental?
               json.booking_car_rental do
-                json.extract! booking.car_rental, :id, :journey_source, :journey_destination, :journey_date,
+                json.extract! booking.booking_car_rental, :id, :journey_source, :journey_destination, :journey_date,
                               :pickup_address, :pickup_time, :reservation_start_date, :reservation_end_date, :car_type, :car_number
               end
             end
