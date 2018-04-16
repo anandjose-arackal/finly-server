@@ -2,6 +2,14 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
   attr_accessor :valid, :errors_by_expenses, :multiple_expenses_params, :multiple_expenses,
                 :total_amount_from_coh
 
+  def personalizer
+    {
+        pre_process: {
+            before: Personalizer::Process.new([:expense, :manual_multiple_create], :pre_process, self)
+        }
+    }
+  end
+
   def pre_validate
     if user.blank?
       messages[:error] << 'User not found'
@@ -50,7 +58,7 @@ class Expense::Manual::Multiple::Create < Expense::Manual::Multiple::Base
       end
 
       # if the current expense is from cash on hand, mark it as non-reimbursable by default
-      if ['1', 1].include?(current_expense_params[:from_cash_on_hand])
+      if StringUtils.to_bool (current_expense_params[:from_cash_on_hand])
         current_expense_params[:reimbursable] = false
       end
 

@@ -67,4 +67,19 @@ class UserProfile < ActiveRecord::Base
     end
   end
 
+  def full_address
+    address = ""
+    address += self.address_1 ? self.address_1 : ''
+
+    address += self.address_2 ? (", " + self.address_2) : ''
+    address += self.city ? (", " + self.city) : ''
+    address += self.state&.name ? (", " + self.state&.name) : ''
+    address += self.pin_code ? (", " + self.pin_code) : ''
+    # address += ", " + (self.city || "")
+    # address += ", " + (self.state&.name || "")
+    # address += ", " + (self.pin_code || "")
+
+    address
+  end
+
 end

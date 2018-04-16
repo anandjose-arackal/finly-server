@@ -17,6 +17,14 @@ class Expense::ExDistance::Multiple::Create < Expense::ExDistance::Multiple::Bas
 
   attr_accessor :valid, :errors_by_expenses, :multiple_expense_params, :multiple_expenses
 
+  def personalizer
+    {
+        pre_process: {
+            before: Personalizer::Process.new([:expense, :distance_multiple_create], :pre_process, self)
+        }
+    }
+  end
+
   def authorized_user_types
     [:employee]
   end

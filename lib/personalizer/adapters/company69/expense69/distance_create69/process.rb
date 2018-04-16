@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company69::Expense69::DistanceCreate69::Process < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company69::Expense69::DistanceCreate69::Process < Personalizer::Adapters::Company69::Expense69::Base
 
   def validate
     expense_attributes = op_instance.expense_params
@@ -19,6 +19,12 @@ class Personalizer::Adapters::Company69::Expense69::DistanceCreate69::Process < 
       add_message :error, 'Reported distance cannot be -3 KMS from Maps Distance'
       return
     end
+  end
+
+  def pre_process
+    expense_params = self.op_instance.expense_params
+    expense_params[:reimbursable] = false
+    self.op_instance.expense_params = expense_params
   end
 
 end
