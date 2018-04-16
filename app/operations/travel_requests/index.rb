@@ -37,12 +37,12 @@ class TravelRequests::Index < TravelRequests::Base
         end
       # when UserRole.id_for(:manager)
       #   team_ids = User::Team::Index.(user, params)&.pluck(:id)
-      #   controlling_travel_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager)).with_user(team_ids)
-      #   interacted_travel_requests_query= user.manager_money_requests
+      #   controlling_travel_request_query = user.controlling_travel_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:manager)).with_user(team_ids)
+      #   interacted_travel_requests_query= user.manager_travel_requests
       #   sql = MoneyRequest.connection.unprepared_statement {
-      #     "((#{controlling_money_request_query.to_sql}) UNION (#{interacted_money_requests_query.to_sql})) AS money_requests"
+      #     "((#{controlling_travel_request_query.to_sql}) UNION (#{interacted_travel_requests_query.to_sql})) AS money_requests"
       #   }
-      #   self.money_requests = MoneyRequest.from(sql)
+      #   self.travel_requests = TravelRequest.from(sql)
       # when UserRole.id_for(:finance_manager)
       #   team_ids = User::Team::Index.(user, params)&.pluck(:id)
       #   controlling_money_request_query = user.controlling_money_requests.non_owner(user.id).with_controlling_user_role_id(UserRole.id_for(:finance_manager)).with_user(team_ids)

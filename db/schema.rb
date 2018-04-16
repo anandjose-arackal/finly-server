@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180416144357) do
+ActiveRecord::Schema.define(version: 20180416153600) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3827,15 +3827,16 @@ ActiveRecord::Schema.define(version: 20180416144357) do
     t.string   "name",                         limit: 255
     t.date     "required_by_date"
     t.text     "note",                         limit: 65535
-    t.integer  "status_id",                    limit: 4,                   null: false
+    t.integer  "status_id",                    limit: 4,                                   null: false
     t.integer  "controlling_user_id",          limit: 4
     t.integer  "controlling_user_role_id",     limit: 4
     t.integer  "controlling_for_user_id",      limit: 4
     t.integer  "controlling_for_user_role_id", limit: 4
     t.datetime "submitted_at",                               precision: 6
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
+    t.datetime "created_at",                                                               null: false
+    t.datetime "updated_at",                                                               null: false
     t.integer  "company_id",                   limit: 4
+    t.boolean  "is_deleted",                                               default: false
   end
 
   add_index "travel_requests", ["company_id"], name: "index_travel_requests_on_company_id", using: :btree

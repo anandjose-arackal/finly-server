@@ -21,6 +21,8 @@
 
 class TravelRequest < ActiveRecord::Base
 
+  include SoftDeletable
+
   belongs_to :user
   belongs_to :policy
   belongs_to :status, class_name: "TravelRequestStatus"
@@ -36,9 +38,9 @@ class TravelRequest < ActiveRecord::Base
 
   delegate :open?, :processing?, :approved?, to: :status
 
-  validates :status_id, presence: true
-  validates :user_id, presence: true
-  validates :name, presence: true
+  validates :status_id, presence: true, unless: :open?
+  validates :user_id, presence: true, unless: :open?
+  validates :name, presence: true, unless: :open?
 
 
   scope :not_open, -> {
@@ -57,5 +59,14 @@ class TravelRequest < ActiveRecord::Base
     where(status_id: TravelRequestStatus.id_for(:processing))
   }
 
-  
+  scope :with_user, -> (user_id) {
+    where user_id: user_id
+  }
+
+  scope :with_policy, -> (policy_id) {
+    where policy_id: policy_id
+  }
+
+  private
+
 end
