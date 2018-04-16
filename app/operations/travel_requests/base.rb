@@ -20,7 +20,7 @@ class TravelRequests::Base < BaseOperation
                                                    ],
                                                    booking_bus_attributes: [
                                                        :id, :booking_class,
-                                                       :journey_date, :journey_destination, :journey_date
+                                                       :journey_source, :journey_destination, :journey_date
                                                    ],
                                                    booking_hotel_attributes: [
                                                        :id, :hotel_rating,
