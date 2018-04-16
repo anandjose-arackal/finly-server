@@ -40,6 +40,8 @@ class TravelRequests::Show < TravelRequests::Base
           actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         elsif user.company_admin?
           actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+        elsif travel_request.controlling_user_id == user.id && user.employee?
+          actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
       elsif travel_request.approved?
         # todo - add travel request actions

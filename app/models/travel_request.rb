@@ -39,4 +39,23 @@ class TravelRequest < ActiveRecord::Base
   validates :status_id, presence: true
   validates :user_id, presence: true
   validates :name, presence: true
+
+
+  scope :not_open, -> {
+    where.not(status_id: TravelRequestStatus.id_for(:open))
+  }
+
+  scope :open, -> {
+    where(status_id: TravelRequestStatus.id_for(:open))
+  }
+
+  scope :approved, -> {
+    where(status_id: TravelRequestStatus.id_for(:approved))
+  }
+
+  scope :processing, -> {
+    where(status_id: TravelRequestStatus.id_for(:processing))
+  }
+
+  
 end
