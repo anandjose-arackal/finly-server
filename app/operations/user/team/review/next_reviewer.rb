@@ -25,6 +25,8 @@ class User::Team::Review::NextReviewer < BaseOperation
       next_reviewer(:report, obj)
     elsif obj.is_a?(BankPaymentRequest)
       next_reviewer(:payment_request, obj)
+    elsif obj.is_a?(TravelRequest)
+      next_reviewer(:travel_request, obj)
     elsif obj.is_a?(Hash)
       user = obj[:user]
       if user.blank?

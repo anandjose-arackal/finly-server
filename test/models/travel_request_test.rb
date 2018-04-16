@@ -17,6 +17,7 @@
 #  created_at                   :datetime         not null
 #  updated_at                   :datetime         not null
 #  company_id                   :integer
+#  is_deleted                   :boolean          default(FALSE)
 #
 
 require 'test_helper'

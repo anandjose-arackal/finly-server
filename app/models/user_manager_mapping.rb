@@ -14,6 +14,7 @@
 #  updated_at             :datetime         not null
 #  policy_id              :integer          not null
 #  purpose_id             :integer
+#  travel_manager_id      :integer
 #
 
 
