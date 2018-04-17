@@ -37,7 +37,7 @@ class TravelRequest < ActiveRecord::Base
   has_many :destinations, class_name: "TravelRequestDestination"
   has_many :travel_request_trails
 
-  accepts_nested_attributes_for :destinations
+  accepts_nested_attributes_for :destinations, allow_destroy: true
 
   delegate :open?, :processing?, :approved?, to: :status
 
@@ -45,7 +45,7 @@ class TravelRequest < ActiveRecord::Base
   validates :user_id, presence: true, unless: :open?
   validates :name, presence: true, unless: :open?
 
-
+  scope :with_id, ->(id) { where id: id }
   scope :not_open, -> {
     where.not(status_id: TravelRequestStatus.id_for(:open))
   }
@@ -92,6 +92,11 @@ class TravelRequest < ActiveRecord::Base
 
   def can_finish_booking?
     approved? or booking_pending?
+  end
+
+  def can_destroy?
+    # (open? or retracted? or rejected?)
+    (open?) #todo sreeram
   end
 
   private
