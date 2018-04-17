@@ -67,7 +67,7 @@ json.destinations do
             if booking.flight?
               json.booking_flight do
                 json.extract! booking.booking_flight, :id, :departure_date, :journey_destination,
-                :journey_source, :journey_date, :booking_class, :stops, :ticket_number
+                :journey_source, :journey_date, :booking_class, :stops, :ticket_number, :pnr, :airline
               end
             end
 
@@ -80,7 +80,7 @@ json.destinations do
             if booking.train?
               json.booking_train do
                 json.extract! booking.booking_train, :id, :journey_source, :journey_destination, :journey_date,
-                :booking_class, :boarding_station_name
+                :booking_class, :boarding_station_name, :pnr
               end
             end
 
