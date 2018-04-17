@@ -59,6 +59,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -128,8 +129,6 @@ class User < ActiveRecord::Base
   has_many :card_transactions, dependent: :destroy
   has_many :money_requests
 
-
-  has_many :travel_requests
   has_many :booking_attachments
 
 
@@ -165,6 +164,16 @@ class User < ActiveRecord::Base
   has_many :manager_payment_requests, -> { distinct }, source: :bank_payment_request, through: :manager_payment_request_trails
   has_many :finance_payment_request_trails, -> { finance_manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
   has_many :finance_payment_requests, -> { distinct }, source: :bank_payment_request, through: :finance_payment_request_trails
+
+  # adding associations for the user manager mapping of travel requests
+  has_many :travel_requests
+  has_many :travel_request_trails, class_name: "TravelRequestTrail", foreign_key: :action_user_id
+  has_many :controlling_travel_requests, class_name: "TravelRequest", foreign_key: :controlling_user_id
+  has_many :interacted_travel_requests, -> { distinct }, source: :travel_requests, through: :travel_request_trails
+  has_many :manager_travel_request_trails, -> { manager_role }, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
+  has_many :manager_travel_requests, -> { distinct }, source: :travel_request, through: :manager_travel_request_trails
+  has_many :travel_manager_travel_request_trails, -> { travel_manager_role }, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
+  has_many :travel_manager_travel_requests, -> { distinct }, source: :travel_request, through: :travel_manager_travel_request_trails
 
   # Outward invoice
   has_many :outward_invoices

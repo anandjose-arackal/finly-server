@@ -1,4 +1,4 @@
-class TravelRequest::Review::RetractBooking < TravelRequest::Review::Base
+class TravelRequests::Review::RetractBooking < TravelRequests::Review::Base
 
 
 end

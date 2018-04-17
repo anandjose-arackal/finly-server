@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180417082929) do
+ActiveRecord::Schema.define(version: 20180417122501) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3778,6 +3778,28 @@ ActiveRecord::Schema.define(version: 20180417082929) do
   add_index "travel_members", ["booking_id"], name: "index_travel_members_on_booking_id", using: :btree
   add_index "travel_members", ["booking_request_id"], name: "index_travel_members_on_booking_request_id", using: :btree
 
+  create_table "travel_request_comment_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "travel_request_comments", force: :cascade do |t|
+    t.integer  "travel_request_id", limit: 4
+    t.text     "content",           limit: 65535
+    t.integer  "user_id",           limit: 4
+    t.text     "note",              limit: 65535
+    t.text     "previous_value",    limit: 65535
+    t.text     "new_value",         limit: 65535
+    t.text     "edited_field",      limit: 65535
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "action_id",         limit: 4
+  end
+
+  add_index "travel_request_comments", ["travel_request_id"], name: "index_travel_request_comments_on_travel_request_id", using: :btree
+  add_index "travel_request_comments", ["user_id"], name: "index_travel_request_comments_on_user_id", using: :btree
+
   create_table "travel_request_destinations", force: :cascade do |t|
     t.string   "name",              limit: 255
     t.string   "source",            limit: 255
@@ -4576,6 +4598,8 @@ ActiveRecord::Schema.define(version: 20180417082929) do
   add_foreign_key "transcribed_expenses", "users"
   add_foreign_key "travel_members", "booking_requests"
   add_foreign_key "travel_members", "bookings"
+  add_foreign_key "travel_request_comments", "travel_requests"
+  add_foreign_key "travel_request_comments", "users"
   add_foreign_key "travel_request_destinations", "travel_requests"
   add_foreign_key "travel_request_trails", "travel_requests"
   add_foreign_key "travel_requests", "policies"
