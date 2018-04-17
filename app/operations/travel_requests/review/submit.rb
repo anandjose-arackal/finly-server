@@ -1,21 +1,22 @@
 class TravelRequests::Review::Submit < TravelRequests::Review::Base
 
+  def authorized_user_types
+    [:employee]
+  end
+
+
   def validate
     unless travel_request.present?
-      add_message :error, "Payment Order not found"
+      add_message :error, "Travel Request not found"
       return
     end
 
     unless travel_request.can_submit?
-      add_message :error, "Payment Order cannot be submitted at this time"
+      add_message :error, "Travel Request cannot be submitted at this time"
       return
     end
 
-    unless travel_request.payment_order.payments.present?
-      add_message :error, "Cannot submit an empty payment order"
-    end
-
-    unless travel_request.owner_id == user.id
+    unless travel_request.user_id == user.id
       add_message :error, "Only owner can submit a Payment order"
       return false
     end

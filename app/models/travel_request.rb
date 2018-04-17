@@ -68,6 +68,26 @@ class TravelRequest < ActiveRecord::Base
     where policy_id: policy_id
   }
 
+  def can_submit?
+    open? || retracted? || rejected?
+  end
+
+  def can_approve?
+    processing?
+  end
+
+  def can_reject?
+    processing?
+  end
+
+  def can_retract?
+    processing? || auto_approved?
+  end
+
+  def can_take_control?
+    processing?
+  end
+
   private
 
 end

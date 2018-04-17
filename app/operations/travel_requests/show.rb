@@ -46,7 +46,7 @@ class TravelRequests::Show < TravelRequests::Base
       elsif travel_request.approved?
         # todo - add travel request actions
         if travel_request.controlling_user_id == user.id && user.travel_manager?
-
+          actions[:finish_booking] = {method: "patch", type: 7, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
       end
       actions

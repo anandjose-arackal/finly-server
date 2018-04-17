@@ -67,7 +67,7 @@ class TravelRequestsController < ApplicationController
         operation = TravelRequest::Review::TakeControl.new(current_user, params)
       when 7, '7'
         # approve and forward
-        operation = TravelRequest::Review::ApproveAndForward.new(current_user, params)
+        operation = TravelRequest::Review::FinishBooking.new(current_user, params)
       else
         # do nothing?
     end
