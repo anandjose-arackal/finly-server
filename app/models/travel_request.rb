@@ -35,7 +35,7 @@ class TravelRequest < ActiveRecord::Base
 
   has_many :destinations, class_name: "TravelRequestDestination"
 
-  accepts_nested_attributes_for :destinations
+  accepts_nested_attributes_for :destinations, allow_destroy: true
 
   delegate :open?, :processing?, :approved?, to: :status
 
@@ -86,6 +86,11 @@ class TravelRequest < ActiveRecord::Base
 
   def can_take_control?
     processing?
+  end
+
+  def can_destroy?
+    # (open? or retracted? or rejected?)
+    (open?) #todo sreeram
   end
 
   private

@@ -27,6 +27,15 @@ class TravelRequestsController < ApplicationController
     end
   end
 
+  def destroy
+    @result = TravelRequests::Destroy.(current_user, params)
+    if @result.success?
+      respond response: :success, messages: @result.messages[:success]
+    else
+      respond response: :error, messages: @result.messages
+    end
+  end
+
   def review
     review_handler(params[:type])
   end

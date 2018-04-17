@@ -3,9 +3,9 @@ class TravelRequests::Base < BaseOperation
   def travel_request_params
     params.require(:travel_request).permit(:name, :policy_id,
                                            destinations_attributes: [
-                                               :id, :name, :source,
+                                               :id, :name, :source, :_destroy,
                                                booking_requests_attributes: [
-                                                   :id, :booking_type_id,
+                                                   :id, :booking_type_id, :_destroy,
                                                    booking_flight_attributes: [
                                                        :id, :journey_date, :journey_source, :journey_destination, :booking_class, :stops
                                                    ],
@@ -34,7 +34,7 @@ class TravelRequests::Base < BaseOperation
                                                        :id, :journey_source, :journey_destination, :journey_date
                                                    ],
                                                    travel_members_attributes: [
-                                                       :id, :title, :first_name, :middle_name, :last_name, :child, :age, :email, :mobile_number
+                                                       :id, :title, :first_name, :middle_name, :last_name, :child, :age, :email, :mobile_number, :_destroy
                                                    ]
                                                ]
                                            ]

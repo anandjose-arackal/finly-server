@@ -12,7 +12,7 @@ class TravelRequests::Bookings::Update < TravelRequests::Bookings::Base
       add_message :error, 'Booking Request not found'
       return
     end
-    self.booking = booking_request.bookings.find_by(booking_parameters[:id])
+    self.booking = booking_request.bookings.find_by(id: booking_parameters[:id])
 
   end
 
