@@ -10,7 +10,7 @@ class TravelRequests::Bookings::Base < TravelRequests::Base
         ],
         booking_train_attributes: [
             :id, :booking_class, :boarding_station_name, :prn,
-            :journey_source, :journey_destination, :journey_date, :departure_time, :train_number, :_destroy
+            :journey_source, :journey_destination, :journey_date, :departure_time, :train_number, :pnr, :_destroy
         ],
         booking_bus_attributes: [
             :id, :journey_source, :journey_destination, :journey_date, :departure_time, :boarding_point, :booking_class, :_destroy
@@ -29,7 +29,7 @@ class TravelRequests::Bookings::Base < TravelRequests::Base
             :id, :journey_date, :journey_destination, :journey_source, :_destroy
         ],
         travel_members_attributes: [
-            :id, :title, :first_name, :middle_name, :last_name, :child, :age, :email, :mobile_number, :_destroy
+            :id, :title, :first_name, :middle_name, :last_name, :child, :age, :email, :mobile_number, :gender, :_destroy
         ]
     )
 
