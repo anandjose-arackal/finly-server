@@ -60,7 +60,7 @@ json.destinations do
         json.travel_members do
           json.array! booking_request.travel_members do |travel_member|
             json.extract! travel_member,:id, :title, :first_name, :middle_name, :last_name,
-                          :child, :age, :email, :mobile_number
+                          :child, :age, :email, :mobile_number, :gender
           end
         end
         json.bookings do
@@ -85,10 +85,9 @@ json.destinations do
             if booking.train?
               json.booking_train do
                 json.extract! booking.booking_train, :id, :journey_source, :journey_destination, :journey_date,
-                :booking_class, :boarding_station_name, :pnr
+                :booking_class, :boarding_station_name, :pnr, :train_number
               end
             end
-
             if booking.car_rental?
               json.booking_car_rental do
                 json.extract! booking.booking_car_rental, :id, :journey_source, :journey_destination, :journey_date,
@@ -122,7 +121,7 @@ json.destinations do
             json.travel_members do
               json.array! booking.travel_members do |travel_member|
                 json.extract! travel_member,:id, :title, :first_name, :middle_name, :last_name,
-                              :child, :age, :email, :mobile_number
+                              :child, :age, :email, :mobile_number, :gender
               end
             end
           end
@@ -137,6 +136,7 @@ json.booking_types do
     json.extract! booking_type, :id, :name
   end
 end
+
 
 json.actions @result.actions
 

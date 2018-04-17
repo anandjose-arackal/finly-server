@@ -34,7 +34,7 @@ class TravelRequests::Base < BaseOperation
                                                        :id, :journey_source, :journey_destination, :journey_date
                                                    ],
                                                    travel_members_attributes: [
-                                                       :id, :title, :first_name, :middle_name, :last_name, :child, :age, :email, :mobile_number, :_destroy
+                                                       :id, :title, :first_name, :middle_name, :last_name, :child, :age, :email, :mobile_number, :gender, :_destroy
                                                    ]
                                                ]
                                            ]
