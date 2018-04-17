@@ -1,4 +1,4 @@
-class TravelRequests::Update < TravelRequests::Base
+class TravelRequests::Destroy < TravelRequests::Base
   attr_accessor :travel_requests
 
   def pre_validate
@@ -11,17 +11,17 @@ class TravelRequests::Update < TravelRequests::Base
   def init
     travel_request_id = params[:id] || params[:travel_request_id]
 
-    self.travel_requests = TravelRequests::Index.(user, params)&.travel_requests&.find_by(id: travel_request_id)
+    self.travel_requests = TravelRequests::Index.(user, params)&.travel_requests&.with_id(travel_request_id)
   end
 
   def validate
-    if travel_request.blank?
+    if travel_requests.blank?
       add_message :error, 'Travel Request not found'
     end
 
     self.travel_requests.each do |tr|
       unless tr.can_destroy?
-        add_message :error, "Travel request can only be deleted once it's retracted or rejected."
+        add_message :error, "Travel request with #{tr.id} can only be deleted once it's retracted or rejected."
         return
       end
     end
@@ -34,6 +34,7 @@ class TravelRequests::Update < TravelRequests::Base
     self.travel_requests.each do |tr|
       unless tr.destroy
         add_message :error, tr.errors.full_messages
+        return
       end
     end
   end

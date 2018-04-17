@@ -43,7 +43,7 @@ class TravelRequest < ActiveRecord::Base
   validates :user_id, presence: true, unless: :open?
   validates :name, presence: true, unless: :open?
 
-
+  scope :with_id, ->(id) { where id: id }
   scope :not_open, -> {
     where.not(status_id: TravelRequestStatus.id_for(:open))
   }
