@@ -135,3 +135,4 @@ end
 
 json.actions @result.actions
 
+json.policies current_company.policies

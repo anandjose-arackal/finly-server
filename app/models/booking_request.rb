@@ -13,8 +13,6 @@
 
 class BookingRequest < ActiveRecord::Base
 
-  # validates :travel_request_destination_id, presence: true
-
   belongs_to :booking_type
   belongs_to :booking_status
   belongs_to :travel_request_destination
@@ -41,8 +39,9 @@ class BookingRequest < ActiveRecord::Base
 
   delegate :flight?, :train?, :bus?, :car_rental?, :hotel?, :restaurant?, to: :booking_type
 
-  validates :booking_type_id, presence: true
-  validates :booking_status_id, presence: true
+  # validates :booking_type_id, presence: true
+  # validates :booking_status_id, presence: true
+  # validates :travel_request_destination_id, presence: true
   validate :at_least_one_type
 
   private
@@ -54,19 +53,19 @@ class BookingRequest < ActiveRecord::Base
           errors.add(:booking_request, "needs to have an associated flight booking")
         end
       when BookingType.id_for(:hotel)
-        if self.booking_flight.nil?
+        if self.booking_hotel.nil?
           errors.add(:booking_request, "needs to have an associated hotel booking")
         end
       when BookingType.id_for(:restaurant)
-        if self.booking_flight.nil?
+        if self.booking_restaurant.nil?
           errors.add(:booking_request, "needs to have an associated restaurant booking")
         end
       when BookingType.id_for(:bus)
-        if self.booking_flight.nil?
+        if self.booking_bus.nil?
           errors.add(:booking_request, "needs to have an associated bus booking")
         end
-      when BookingType.id_for(:trail)
-        if self.booking_flight.nil?
+      when BookingType.id_for(:train)
+        if self.booking_train.nil?
           errors.add(:booking_request, "needs to have an associated trail booking")
         end
       when BookingType.id_for(:car_rental)
@@ -74,7 +73,7 @@ class BookingRequest < ActiveRecord::Base
           errors.add(:booking_request, "needs to have an associated car rental booking")
         end
       when BookingType.id_for(:custom)
-        if self.booking_flight.nil?
+        if self.booking_custom.nil?
           errors.add(:booking_request, "needs to have an associated custom booking")
         end
       else

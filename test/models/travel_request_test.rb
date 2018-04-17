@@ -19,6 +19,7 @@
 #  company_id                   :integer
 #  is_deleted                   :boolean          default(FALSE)
 #  rejection_note               :text(65535)
+#  auto_approved                :boolean
 #
 
 require 'test_helper'
