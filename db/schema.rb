@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180416164403) do
+ActiveRecord::Schema.define(version: 20180417135912) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2564,24 +2564,24 @@ ActiveRecord::Schema.define(version: 20180416164403) do
 
   create_table "money_requests", force: :cascade do |t|
     t.string   "name",                               limit: 255
-    t.integer  "user_id",                            limit: 4,                                 null: false
-    t.integer  "policy_id",                          limit: 4,                                 null: false
-    t.integer  "payment_mode_id",                    limit: 4,                                 null: false
+    t.integer  "user_id",                            limit: 4,                                   null: false
+    t.integer  "policy_id",                          limit: 4,                                   null: false
+    t.integer  "payment_mode_id",                    limit: 4,                                   null: false
     t.integer  "payment_id",                         limit: 4
     t.date     "required_by_date"
-    t.integer  "status_id",                          limit: 4,                                 null: false
+    t.integer  "status_id",                          limit: 4,                                   null: false
     t.integer  "controlling_user_id",                limit: 4
     t.integer  "controlling_user_role_id",           limit: 4
     t.integer  "controlling_for_user_id",            limit: 4
     t.integer  "controlling_for_user_role_id",       limit: 4
     t.integer  "loaded_by",                          limit: 4
     t.datetime "loaded_at"
-    t.datetime "submitted_at",                                   precision: 6
-    t.string   "memo",                               limit: 255
-    t.boolean  "accounted",                                                    default: false, null: false
-    t.datetime "created_at",                                                                   null: false
-    t.datetime "updated_at",                                                                   null: false
-    t.boolean  "is_deleted",                                                   default: false, null: false
+    t.datetime "submitted_at",                                     precision: 6
+    t.text     "memo",                               limit: 65535
+    t.boolean  "accounted",                                                      default: false, null: false
+    t.datetime "created_at",                                                                     null: false
+    t.datetime "updated_at",                                                                     null: false
+    t.boolean  "is_deleted",                                                     default: false, null: false
     t.integer  "submitted_amount_id",                limit: 4
     t.integer  "processed_amount_id",                limit: 4
     t.boolean  "auto_approve"
@@ -2843,8 +2843,8 @@ ActiveRecord::Schema.define(version: 20180416164403) do
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
     t.text     "customer_memo",           limit: 65535
-    t.integer  "payment_term_id",         limit: 4
     t.text     "reminders",               limit: 65535
+    t.integer  "payment_term_id",         limit: 4
     t.integer  "user_id",                 limit: 4
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
   end
@@ -3778,6 +3778,28 @@ ActiveRecord::Schema.define(version: 20180416164403) do
   add_index "travel_members", ["booking_id"], name: "index_travel_members_on_booking_id", using: :btree
   add_index "travel_members", ["booking_request_id"], name: "index_travel_members_on_booking_request_id", using: :btree
 
+  create_table "travel_request_comment_actions", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "travel_request_comments", force: :cascade do |t|
+    t.integer  "travel_request_id", limit: 4
+    t.text     "content",           limit: 65535
+    t.integer  "user_id",           limit: 4
+    t.text     "note",              limit: 65535
+    t.text     "previous_value",    limit: 65535
+    t.text     "new_value",         limit: 65535
+    t.text     "edited_field",      limit: 65535
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "action_id",         limit: 4
+  end
+
+  add_index "travel_request_comments", ["travel_request_id"], name: "index_travel_request_comments_on_travel_request_id", using: :btree
+  add_index "travel_request_comments", ["user_id"], name: "index_travel_request_comments_on_user_id", using: :btree
+
   create_table "travel_request_destinations", force: :cascade do |t|
     t.string   "name",              limit: 255
     t.string   "source",            limit: 255
@@ -3838,6 +3860,8 @@ ActiveRecord::Schema.define(version: 20180416164403) do
     t.datetime "updated_at",                                                               null: false
     t.integer  "company_id",                   limit: 4
     t.boolean  "is_deleted",                                               default: false
+    t.text     "rejection_note",               limit: 65535
+    t.boolean  "auto_approved"
   end
 
   add_index "travel_requests", ["company_id"], name: "index_travel_requests_on_company_id", using: :btree
@@ -4254,6 +4278,61 @@ ActiveRecord::Schema.define(version: 20180416164403) do
     t.boolean  "default_account"
   end
 
+  create_table "web_hook_event_mappings", force: :cascade do |t|
+    t.integer  "web_hook_id",       limit: 4,                 null: false
+    t.integer  "web_hook_event_id", limit: 4,                 null: false
+    t.boolean  "is_deleted",                  default: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+  end
+
+  add_index "web_hook_event_mappings", ["is_deleted"], name: "index_web_hook_event_mappings_on_is_deleted", using: :btree
+  add_index "web_hook_event_mappings", ["web_hook_event_id"], name: "index_web_hook_event_mappings_on_web_hook_event_id", using: :btree
+  add_index "web_hook_event_mappings", ["web_hook_id"], name: "index_web_hook_event_mappings_on_web_hook_id", using: :btree
+
+  create_table "web_hook_events", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "web_hook_events", ["name"], name: "index_web_hook_events_on_name", using: :btree
+
+  create_table "web_hook_tracks", force: :cascade do |t|
+    t.integer  "web_hook_id",       limit: 4
+    t.integer  "web_hook_event_id", limit: 4
+    t.integer  "company_id",        limit: 4
+    t.text     "url",               limit: 65535
+    t.text     "request_body",      limit: 65535
+    t.text     "request_header",    limit: 65535
+    t.decimal  "response_time",                   precision: 10
+    t.text     "response_body",     limit: 65535
+    t.integer  "response_status",   limit: 4
+    t.integer  "attempt",           limit: 4
+    t.datetime "last_attempted_at"
+    t.boolean  "attempt_success"
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+  end
+
+  add_index "web_hook_tracks", ["company_id"], name: "index_web_hook_tracks_on_company_id", using: :btree
+  add_index "web_hook_tracks", ["web_hook_event_id"], name: "index_web_hook_tracks_on_web_hook_event_id", using: :btree
+  add_index "web_hook_tracks", ["web_hook_id"], name: "index_web_hook_tracks_on_web_hook_id", using: :btree
+
+  create_table "web_hooks", force: :cascade do |t|
+    t.text     "url",                limit: 65535,                 null: false
+    t.string   "secret",             limit: 255
+    t.integer  "created_by_user_id", limit: 4,                     null: false
+    t.integer  "company_id",         limit: 4,                     null: false
+    t.boolean  "is_deleted",                       default: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+  end
+
+  add_index "web_hooks", ["company_id"], name: "index_web_hooks_on_company_id", using: :btree
+  add_index "web_hooks", ["created_by_user_id"], name: "index_web_hooks_on_created_by_user_id", using: :btree
+  add_index "web_hooks", ["is_deleted"], name: "index_web_hooks_on_is_deleted", using: :btree
+
   create_table "whitelisted_ip_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -4520,6 +4599,8 @@ ActiveRecord::Schema.define(version: 20180416164403) do
   add_foreign_key "transcribed_expenses", "users"
   add_foreign_key "travel_members", "booking_requests"
   add_foreign_key "travel_members", "bookings"
+  add_foreign_key "travel_request_comments", "travel_requests"
+  add_foreign_key "travel_request_comments", "users"
   add_foreign_key "travel_request_destinations", "travel_requests"
   add_foreign_key "travel_request_trails", "travel_requests"
   add_foreign_key "travel_requests", "policies"
@@ -4551,6 +4632,11 @@ ActiveRecord::Schema.define(version: 20180416164403) do
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
   add_foreign_key "vendor_payment_wallets", "users"
+  add_foreign_key "web_hook_event_mappings", "web_hook_events"
+  add_foreign_key "web_hook_event_mappings", "web_hooks"
+  add_foreign_key "web_hook_tracks", "companies"
+  add_foreign_key "web_hook_tracks", "web_hook_events"
+  add_foreign_key "web_hook_tracks", "web_hooks"
   add_foreign_key "whitelisted_ips", "companies"
   add_foreign_key "yes_bank_company_accounts", "companies"
   add_foreign_key "yes_bank_vendors", "companies"

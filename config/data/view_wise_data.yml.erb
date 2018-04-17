@@ -160,10 +160,10 @@ views:
 #      - name: <span class="superscript">Team</span><br>Travel Requests
 #        url: travel_requests
 #        id: travel_requests
-       <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-       - name: Travel Requests
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      - name: Travel Requests
         url: '#travel_requests/params={"view": "travel_manager"}'
-       <% end %>
+      <% end %>
       cog: []
   <% end %>
   <% if current_user.finance_manager? %>

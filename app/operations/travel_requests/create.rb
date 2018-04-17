@@ -11,6 +11,7 @@ class TravelRequests::Create < TravelRequests::Base
     self.travel_request_parameters[:status_id] = TravelRequestStatus.id_for(:open)
     self.travel_request_parameters[:controlling_user] = user
     self.travel_request_parameters[:controlling_user_role_id] = UserRole.id_for(:employee)
+    self.travel_request_parameters[:policy_id] = current_company.policies.default.first.id
   end
 
   def validate

@@ -4,8 +4,6 @@ class TravelRequests::Update < TravelRequests::Base
   def init
     self.travel_request = TravelRequest.find(params[:id] || params[:travel_request_id])
     self.travel_request_parameters = travel_request_params
-
-
   end
 
   def validate

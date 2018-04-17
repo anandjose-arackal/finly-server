@@ -58,25 +58,25 @@ class TravelRequestsController < ApplicationController
     case type
       when 1, '1'
         # i.e. approve
-        operation = TravelRequest::Review::Approve.new(current_user, params)
+        operation = TravelRequests::Review::Approve.new(current_user, params)
       when 2, '2'
         # i.e. submit
-        operation = TravelRequest::Review::Submit.new(current_user, params)
+        operation = TravelRequests::Review::Submit.new(current_user, params)
       when 3, '3'
         # i.e. retract
-        operation = TravelRequest::Review::Retract.new(current_user, params)
+        operation = TravelRequests::Review::Retract.new(current_user, params)
       when 4, '4'
         # i.e. reject
-        operation = TravelRequest::Review::Reject.new(current_user, params)
+        operation = TravelRequests::Review::Reject.new(current_user, params)
       when 5, '5'
         # i.e. unapprove
-        operation = TravelRequest::Review::Unapprove.new(current_user, params)
+        operation = TravelRequests::Review::Unapprove.new(current_user, params)
       when 6, '6'
         # i.e. take control
-        operation = TravelRequest::Review::TakeControl.new(current_user, params)
+        operation = TravelRequests::Review::TakeControl.new(current_user, params)
       when 7, '7'
         # approve and forward
-        operation = TravelRequest::Review::FinishBooking.new(current_user, params)
+        operation = TravelRequests::Review::FinishBooking.new(current_user, params)
       else
         # do nothing?
     end

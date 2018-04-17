@@ -35,10 +35,10 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
       # i.e. if there is no manager, the payment request directly goes to approved state
       # create a submit trail for the payment request
       travel_request.travel_request_trails.create action_user: user,
-                                                              action_user_role_id: UserRole.id_for(:employee),
-                                                              action_id: TravelRequestTrailAction.id_for(:submit),
-                                                              modified_user_id: manager&.id,
-                                                              modified_user_role_id: manager_role_id
+                                                  action_user_role_id: UserRole.id_for(:employee),
+                                                  action_id: TravelRequestTrailAction.id_for(:submit),
+                                                  modified_user_id: manager&.id,
+                                                  modified_user_role_id: manager_role_id
       approve_op = TravelRequests::Review::Approve.(user, id: travel_request.id, auto_approve: true)
       unless approve_op.success?
         add_message :error, approve_op.messages[:error]

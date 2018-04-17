@@ -30,18 +30,18 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
     # this returns the role under which this particular user is viewing the payment request
     current_user_role = User::Team::Review::UserRole.(user, self.travel_request)
     if next_reviewer.nil?
-      payment_status = TravelRequestStatus.id_for(:approved)
+      travel_request_status = TravelRequestStatus.id_for(:approved)
     else
-      payment_status = TravelRequestStatus.id_for(:processing)
+      travel_request_status = TravelRequestStatus.id_for(:processing)
     end
     action_for_user_id = travel_request.controlling_for_user_id
     action_for_user_role_id = travel_request.controlling_for_user_role_id
-    if travel_request.update status_id: payment_status,
-                                   controlling_user: next_reviewer,
-                                   controlling_user_role_id: next_reviewer_role_id,
-                                   controlling_for_user_id: nil,
-                                   controlling_for_user_role_id: nil,
-                                   auto_approved: self.auto_approve
+    if travel_request.update status_id: travel_request_status,
+                             controlling_user: next_reviewer,
+                             controlling_user_role_id: next_reviewer_role_id,
+                             controlling_for_user_id: nil,
+                             controlling_for_user_role_id: nil,
+                             auto_approved: self.auto_approve
       travel_request.travel_request_trails.create action_user: user,
                                                               action_user_role_id: current_user_role,
                                                               action_for_user_id: action_for_user_id,

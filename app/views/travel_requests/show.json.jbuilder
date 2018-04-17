@@ -3,6 +3,11 @@ json.extract! @result.travel_request, :id, :name, :policy_id, :required_by_date,
               :user_id, :controlling_user_id,
               :controlling_for_user_id, :controlling_user_role, :controlling_for_user_role,
               :submitted_at, :created_at, :updated_at
+
+json.policy do
+  json.id @result.travel_request.policy_id
+  json.name @result.travel_request.policy&.name
+end
 json.status do
   json.extract! @result.travel_request.status, :id, :name
 end
@@ -135,3 +140,4 @@ end
 
 json.actions @result.actions
 
+json.policies current_company.policies
