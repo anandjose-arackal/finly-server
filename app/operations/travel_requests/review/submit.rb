@@ -28,7 +28,6 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
 
   def process
     presenter = User::Team::Review::NextReviewer.(travel_request)
-    debugger
     manager = presenter.user
     manager_role_id = presenter.role_id
     #######################################
