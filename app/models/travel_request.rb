@@ -18,6 +18,7 @@
 #  updated_at                   :datetime         not null
 #  company_id                   :integer
 #  is_deleted                   :boolean          default(FALSE)
+#  rejection_note               :text(65535)
 #
 
 class TravelRequest < ActiveRecord::Base
@@ -34,6 +35,7 @@ class TravelRequest < ActiveRecord::Base
   belongs_to :controlling_for_user_role, class_name: 'UserRole'
 
   has_many :destinations, class_name: "TravelRequestDestination"
+  has_many :travel_request_trails
 
   accepts_nested_attributes_for :destinations
 
@@ -86,6 +88,10 @@ class TravelRequest < ActiveRecord::Base
 
   def can_take_control?
     processing?
+  end
+
+  def can_finish_booking?
+    approved? or booking_pending?
   end
 
   private

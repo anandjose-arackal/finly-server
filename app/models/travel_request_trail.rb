@@ -17,4 +17,13 @@
 
 class TravelRequestTrail < ActiveRecord::Base
   belongs_to :travel_request
+  belongs_to :action_id, class_name: "TravelRequestTrailAction"
+  belongs_to :action_user, class_name: "User"
+  belongs_to :modified_user, class_name: "User"
+  belongs_to :action_for_user, class_name: "User"
+
+  belongs_to :action_user_role, class_name: "UserRole"
+  belongs_to :modified_user_role, class_name: "UserRole"
+  belongs_to :modified_user_role, class_name: "UserRole"
+  
 end

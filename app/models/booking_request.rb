@@ -12,7 +12,6 @@
 #
 
 class BookingRequest < ActiveRecord::Base
-  validates :booking_type_id, presence: true
 
   # validates :travel_request_destination_id, presence: true
 
@@ -41,4 +40,7 @@ class BookingRequest < ActiveRecord::Base
   accepts_nested_attributes_for :travel_members
 
   delegate :flight?, :train?, :bus?, :car_rental?, :hotel?, :restaurant?, to: :booking_type
+
+  validates :booking_type_id, presence: true
+  validates :booking_status_id, presence: true
 end
