@@ -2,7 +2,7 @@ class TravelRequests::Index < TravelRequests::Base
   attr_accessor :travel_requests, :role_id
 
   def authorized_user_types
-    [:employee, :manager, :finance_manager, :admin, :auditor]
+    [:employee, :manager, :finance_manager, :admin, :auditor, :travel_manager]
   end
 
   def init

@@ -81,7 +81,7 @@ class User::Team::Review::NextReviewer < BaseOperation
           arg_hash[:type] = :travel_manager
           self.response = User::Team::Approver.(user, arg_hash)
           if self.response.present?
-            self.role_id = UserRole.id_for(:finance_manager)
+            self.role_id = UserRole.id_for(:travel_manager)
           end
           return
         # i.e. if it's not a travel request, the next approver / action taker is the travel manager
@@ -106,12 +106,21 @@ class User::Team::Review::NextReviewer < BaseOperation
       arg_hash[:type] = :approves_to
       manager = User::Team::Approver.(user, arg_hash)
       if manager.nil?
-        arg_hash[:type] = :finance_manager
-        self.response = User::Team::Approver.(obj.user, arg_hash)
-        if self.response.present?
-          self.role_id = UserRole.id_for(:finance_manager)
+        if obj.is_a?(TravelRequest)
+          arg_hash[:type] = :travel_manager
+          self.response = User::Team::Approver.(obj.user, arg_hash)
+          if self.response.present?
+            self.role_id = UserRole.id_for(:travel_manager)
+          end
+          return
+        else
+          arg_hash[:type] = :finance_manager
+          self.response = User::Team::Approver.(obj.user, arg_hash)
+          if self.response.present?
+            self.role_id = UserRole.id_for(:finance_manager)
+          end
+          return
         end
-        return
       else
         self.response = manager
         if self.response.present?

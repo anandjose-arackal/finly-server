@@ -51,6 +51,8 @@ class TravelRequest < ActiveRecord::Base
     where.not(status_id: TravelRequestStatus.id_for(:open))
   }
 
+  scope :non_owner, -> (user_id) { where.not user_id: user_id }
+
   scope :open, -> {
     where(status_id: TravelRequestStatus.id_for(:open))
   }
@@ -70,6 +72,14 @@ class TravelRequest < ActiveRecord::Base
   scope :with_policy, -> (policy_id) {
     where policy_id: policy_id
   }
+
+  scope :with_controlling_user_role_id, -> (role_id) {
+    where controlling_user_role_id: role_id
+  }
+  scope :with_controlling_user_id, -> (user_id) {
+    where controlling_user_id: user_id
+  }
+
 
   def can_submit?
     open? || retracted? || rejected?
