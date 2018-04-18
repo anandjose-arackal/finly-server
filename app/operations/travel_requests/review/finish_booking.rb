@@ -1,7 +1,21 @@
 class TravelRequests::Review::FinishBooking < TravelRequests::Review::Base
 
+  attr_accessor :role_id
+
   def authorized_user_types
     [:company_admin, :travel_manager]
+  end
+
+  def pre_validate
+    super
+    if params[:view].blank?
+      add_message :error, "Invalid request, try again"
+    end
+  end
+
+  def init
+    super
+    self.role_id = UserRole.id_for(params[:view].to_s)
   end
 
   def validate
@@ -27,10 +41,26 @@ class TravelRequests::Review::FinishBooking < TravelRequests::Review::Base
   end
 
   def process
-
+    if travel_request.update status_id: TravelRequestStatus.id_for(:booked),
+                             controlling_user: travel_request.user,
+                             controlling_user_role_id: UserRole.id_for(:employee),
+                             controlling_for_user_id: nil,
+                             controlling_for_user_role_id: nil
+      travel_request.travel_request_trails.create action_user: user,
+                                                  action_user_role_id: self.role_id,
+                                                  action_for_user_id: nil,
+                                                  action_for_user_role_id: nil,
+                                                  action_id: TravelRequestTrailAction.id_for(:book),
+                                                  modified_user_id: travel_request.user_id,
+                                                  modified_user_role_id: UserRole.id_for(:employee)
+    else
+      add_message :error, self.travel_request.errors.full_messages
+    end
   end
 
   def post_process
+    add_message :success, "Travel request booked"
 
+    # add comments and trigger mailer
   end
 end

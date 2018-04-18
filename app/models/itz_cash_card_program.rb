@@ -16,7 +16,7 @@ class ItzCashCardProgram < ActiveRecord::Base
 
   scope :with_product_code, -> (product_code) { where product_code: product_code }
 
-  BANKS = {hdfc: 1, rbl: 2, kotak: 3, rbl_visa: 16}
+  BANKS = {hdfc: 1, rbl: 2, kotak: 3, rbl_visa: 16, hdfc_pin_at_pos: 17}
 
   PROGRAM_DETAILS = [
       {

@@ -40,7 +40,7 @@ class TravelRequest < ActiveRecord::Base
 
   accepts_nested_attributes_for :destinations, allow_destroy: true
 
-  delegate :open?, :processing?, :approved?, to: :status
+  delegate :open?, :processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?, to: :status
 
   validates :status_id, presence: true, unless: :open?
   validates :user_id, presence: true, unless: :open?
@@ -105,9 +105,12 @@ class TravelRequest < ActiveRecord::Base
     approved? or booking_pending?
   end
 
+  def can_retract_booking?
+    booked?
+  end
+
   def can_destroy?
-    # (open? or retracted? or rejected?)
-    (open?) #todo sreeram
+    open? or retracted? or rejected?
   end
 
   private

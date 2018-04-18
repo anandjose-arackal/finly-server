@@ -31,4 +31,20 @@ class TravelRequestStatus < ActiveRecord::Base
   def booked?
     self.id == TravelRequestStatus.id_for(:booked)
   end
+
+  def booking_pending?
+    self.id == TravelRequestStatus.id_for(:booking_pending)
+  end
+
+  def rejected?
+    self.id == TravelRequestStatus.id_for(:rejected)
+  end
+
+  def retracted?
+    self.id == TravelRequestStatus.id_for(:retracted)
+  end
+
+  def completed?
+    self.id == TravelRequestStatus.id_for(:completed)
+  end
 end
