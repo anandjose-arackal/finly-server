@@ -88,6 +88,7 @@ class UserManagerMapping < ActiveRecord::Base
   scope :has_approves_finance_to, ->(manager_id) { where approves_finance_to_id: manager_id }
   scope :has_manager, ->(manager_id) { where manager_id: manager_id }
   scope :has_approves_to, ->(manager_id) { where approves_to_id: manager_id }
+  scope :has_travel_manager, -> (travel_manager_id) { where travel_manager_id: travel_manager_id}
 
   scope :with_details, -> { includes :user, :manager, :finance_manager, :approves_to, :approves_finance_to, :greater_than_amount }
 

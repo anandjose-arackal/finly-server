@@ -29,7 +29,7 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
     next_reviewer_role_id = presenter.role_id
     # this returns the role under which this particular user is viewing the payment request
     current_user_role = User::Team::Review::UserRole.(user, self.travel_request)
-    if next_reviewer.nil?
+    if next_reviewer.nil? || next_reviewer.travel_manager?
       travel_request_status = TravelRequestStatus.id_for(:approved)
     else
       travel_request_status = TravelRequestStatus.id_for(:processing)
