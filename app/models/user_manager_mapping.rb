@@ -14,10 +14,8 @@
 #  updated_at             :datetime         not null
 #  policy_id              :integer          not null
 #  purpose_id             :integer
+#  travel_manager_id      :integer
 #
-
-
-
 
 
 
@@ -31,6 +29,7 @@ class UserManagerMapping < ActiveRecord::Base
   belongs_to :finance_manager, class_name: 'User'
   belongs_to :approves_to, class_name: 'User'
   belongs_to :approves_finance_to, class_name: 'User'
+  belongs_to :travel_manager, class_name: "User"
   belongs_to :greater_than_amount, class_name: 'Amount'
   belongs_to :policy
   belongs_to :purpose, class_name: "Purpose"
@@ -61,6 +60,7 @@ class UserManagerMapping < ActiveRecord::Base
   scope :finance_manager, -> { where 'finance_manager_id IS NOT NULL' }
   scope :approves_to, -> { where 'approves_to_id IS NOT NULL' }
   scope :approves_finance_to, -> { where 'approves_finance_to_id IS NOT NULL' }
+  scope :travel_manager, -> { where 'travel_manager_id IS NOT NULL' }
   scope :with_purpose, -> (purpose_id) {where purpose_id: purpose_id}
   scope :expense_management, -> { where purpose_id: Purpose.id_for(:expense_management)}
   scope :vendor_payments, -> {where purpose_id: Purpose.id_for(:vendor_payments)}
@@ -89,6 +89,7 @@ class UserManagerMapping < ActiveRecord::Base
   scope :has_approves_finance_to, ->(manager_id) { where approves_finance_to_id: manager_id }
   scope :has_manager, ->(manager_id) { where manager_id: manager_id }
   scope :has_approves_to, ->(manager_id) { where approves_to_id: manager_id }
+  scope :has_travel_manager, -> (travel_manager_id) { where travel_manager_id: travel_manager_id}
 
   scope :with_details, -> { includes :user, :manager, :finance_manager, :approves_to, :approves_finance_to, :greater_than_amount }
 

@@ -18,6 +18,7 @@
 
 
 
+
 class ExpenseRule < ActiveRecord::Base
   include SoftDeletable
 
