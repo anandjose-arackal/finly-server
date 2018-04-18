@@ -16,7 +16,7 @@ class TravelRequests::Bookings::Base < TravelRequests::Base
             :id, :journey_source, :journey_destination, :journey_date, :departure_time, :boarding_point, :booking_class, :_destroy
         ],
         booking_car_rental_attributes: [
-            :id, :journey_source, :journey_destination, :journey_date, :pickup_time, :reservation_start_date, :reservation_end_date,
+            :id, :journey_source, :journey_destination, :journey_date, :pickup_time, :pickup_address, :reservation_start_date, :reservation_end_date,
             :car_type, :car_number, :_destroy
         ],
         booking_hotel_attributes: [
