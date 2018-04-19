@@ -12,6 +12,10 @@ json.status do
   json.extract! @result.travel_request.status, :id, :name
 end
 
+json.editable @result.editable
+
+json.destroyable @result.destroyable
+
 json.destinations do
   json.array! @result.destinations do |destination|
     json.extract! destination, :id, :name, :source

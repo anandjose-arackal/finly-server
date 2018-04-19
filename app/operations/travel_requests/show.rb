@@ -32,25 +32,48 @@ class TravelRequests::Show < TravelRequests::Base
 
     def actions
       actions = {}
+      # todo associated_users
       if travel_request.open? && travel_request.user_id == user.id
         actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       elsif travel_request.processing?
-        if travel_request.controlling_user_id == user.id && user.manager?
+        if travel_request.controlling_user_id == user.id && (manager_view? && user.manager?)
           actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
-        elsif user.company_admin?
+        elsif user.company_admin? && admin_view?
           actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         elsif travel_request.controlling_user_id == user.id && user.employee?
           actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
       elsif travel_request.approved?
-        # todo - add travel request actions
         if travel_request.controlling_user_id == user.id && user.travel_manager?
           actions[:finish_booking] = {method: "patch", type: 7, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
+        end
+      elsif travel_request.booked?
+        if travel_request.controlling_user_id == user.id && user.travel_manager?
+          actions[:retract_booking] = {method: "patch", type: 8, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
       end
       actions
     end
+
+    def editable
+      if self.travel_request.open? || self.travel_request.processing?
+        if self.travel_request.controlling_user_id == self.user.id
+          return true
+        end
+      end
+      false
+    end
+
+    def destroyable
+      if TravelRequestStatus.ids_for(:open, :retracted, :rejected)
+        if self.travel_request.controlling_user_id == self.user.id
+          return true
+        end
+      end
+      false
+    end
+
   end
 
 end

@@ -12,7 +12,7 @@ class TravelRequests::Base < BaseOperation
                                                    booking_car_rental_attributes: [
                                                        :id, :journey_source, :journey_destination, :journey_date,
                                                        :pickup_time, :reservation_start_date, :reservation_end_date,
-                                                       :car_type, :pickup_time
+                                                       :car_type, :pickup_time, :pickup_address
                                                    ],
                                                    booking_train_attributes: [
                                                        :id, :booking_class,
