@@ -28,7 +28,7 @@ class TravelRequests::Review::RetractBooking < TravelRequests::Review::Base
     end
 
     # checking if the travel request can be confirmed as boked
-    unless self.travel_request.can_retract_booking?
+    unless self.travel_request.can_retract_botraveloking?
       add_message :error, "Travel request cannot be marked as finished in this state"
       return
     end
