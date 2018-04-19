@@ -207,11 +207,11 @@ views:
       - name: Requests
         type: group
         items:
-        - name: Team Money Requests
+        - name: <span class="superscript">Team</span> Money Requests
           url: requests
           id: requests
         <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-        - name: Team Travel Requests
+        - name: <span class="superscript">Team</span> Travel Requests
           url: travel_requests
           id: travel_requests
         <% end %>
@@ -249,11 +249,11 @@ views:
       - name: Requests
         type: group
         items:
-        - name: Team Money Requests
+        - name: <span class="superscript">Team</span> Money Requests
           url: requests
           id: requests
         <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-        - name: Team Travel Requests
+        - name: <span class="superscript">Team</span> Travel Requests
           url: travel_requests
           id: travel_requests
         <% end %>
@@ -268,6 +268,20 @@ views:
       # - name: Travel Requests
       #   url: '#travel_requests/params={"view": "manager"}'
       <%# end %>
+  <% end %>
+  <% if current_user.travel_manager? %>
+  manager:
+    menus:
+      navbar:
+      - name: Requests
+        type: group
+        items:
+        <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+        - name: <span class="superscript">Team</span> Travel Requests
+          url: travel_requests
+          id: travel_requests
+        <% end %>
+      cog:
   <% end %>
   <% if current_user.employee? %>
   personal:
