@@ -287,6 +287,10 @@ class BaseOperation
       is_view?(:initiator)
     end
 
+    def travel_manager_view?
+      is_view?(:travel_manager)
+    end
+
     def is_view?(type)
       type.present? and params.present? and params[:view].present? and (params[:view] == type.to_s or params[:view] == type.to_sym)
     end
