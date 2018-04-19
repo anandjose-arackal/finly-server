@@ -94,6 +94,8 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       cost_center_id = item[:cost_center_id]
       tds_slab_id = item[:tds_slab_id]
 
+      debugger
+
       # deciding tax based on whether invoice items were entered or not
       tax_amount = discount_amount = amount = sub_total = items_net_amount = 0
       if item[:invoice_items_attributes].present?

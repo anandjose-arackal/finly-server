@@ -361,7 +361,7 @@ class Company < ActiveRecord::Base
       self.categories.create(name: category, purpose_id: Purpose.id_for(:expense_management))
     end
 
-    self.build_configuration.save if self.configuration.blank?
+    self.build_configuration(bank_type: "HDFC").save if self.configuration.blank?
     self.build_account.save if self.account.blank?
 
     if self.feature_subscription.blank?
