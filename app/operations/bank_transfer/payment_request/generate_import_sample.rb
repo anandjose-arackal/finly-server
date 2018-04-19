@@ -3,7 +3,7 @@
 class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::PaymentRequest::Base
 
   attr_accessor :company, :payment_order_custom_fields, :sample_type,
-                :headers, :content
+                :headers, :content, :sheets
 
   def init
     self.company = user.company
@@ -14,15 +14,27 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
   def process
     self.headers = default_headers
     self.content = []
-    if self.payment_order_custom_fields.empty?
-      return
-    else
-      self.headers += self.payment_order_custom_fields.pluck(:field_name)
+    self.sheets = [
+        {
+            item_headers: self.headers,
+            item_contents: []
+        }
+    ]
+    tds_headers = ["ID", "TDS Slab Name", "TDS Rate"]
+    tds_contents = []
+    current_company.tds_slabs.each do |tds_slab|
+      tds_contents << [tds_slab.id, tds_slab.name, tds_slab.tds]
     end
+    self.sheets << {
+        item_headers: tds_headers,
+        item_contents: tds_contents,
+        name: "TDS Slabs"
+    }
+    # TODO - add custom fields in separate sheets / same sheet with different headers
   end
 
   def success
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content}}, messages)
+    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
   end
 
   private
@@ -35,15 +47,16 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
        "Sub Total",
        "Inclusive of Taxes? (Y/N)",
        "GST Type (1 - IGST ; 2 - CGST/SGST)",
-       "Tax Type (1 - Rate ; 2 - Absolute)",
-       "Tax",
-       "Discount Type (1 - Rate ; 2 - Absolute)",
-       "Discount",
-       "TDS Type (1 - Rate ; 2 - Absolute)",
-       "TDS",
+       "Tax Rate",
+       "Discount Rate",
+       "TDS Slab ID",
        "Invoice Number",
        "Invoice Date (dd-mm-yyyy)",
        "Due Date (dd-mm-yyyy)"
     ]
+  end
+
+  def tds_slabs
+
   end
 end

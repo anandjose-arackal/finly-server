@@ -10,24 +10,55 @@
       <ss:Interior ss:Color="#a5ccb0" ss:Pattern="Solid"/>
     </ss:Style>
   </ss:Styles>
-  <ss:Worksheet ss:Name="Sheet1">
-    <ss:Table>
-      <ss:Row>
-        <% item_headers&.each do |item| %>
-            <Cell ss:StyleID="header">
-              <Data ss:Type="String"><%= item %></Data>
-            </Cell>
-        <% end %>
-      </ss:Row>
-      <% item_contents&.each do |item| %>
-          <Row>
-            <% item.each do |value| %>
-                <Cell>
-                  <Data ss:Type="String"><%= value %></Data>
-                </Cell>
-            <% end %>
-          </Row>
+  <% if sheets.present? %>
+    <% sheets.each_with_index do |sheet, index| %>
+      <% item_headers = sheet[:item_headers] %>
+      <% item_contents = sheet[:item_contents] %>
+      <% if sheet[:name].present? %>
+        <ss:Worksheet ss:Name="<%= sheet[:name] %>">
+      <% else %>
+        <ss:Worksheet ss:Name="Sheet<%=index%>">
       <% end %>
-    </ss:Table>
-  </ss:Worksheet>
+          <ss:Table>
+            <ss:Row>
+              <% item_headers&.each do |item| %>
+                  <Cell ss:StyleID="header">
+                    <Data ss:Type="String"><%= item %></Data>
+                  </Cell>
+              <% end %>
+            </ss:Row>
+            <% item_contents&.each do |item| %>
+                <Row>
+                  <% item.each do |value| %>
+                      <Cell>
+                        <Data ss:Type="String"><%= value %></Data>
+                      </Cell>
+                  <% end %>
+                </Row>
+            <% end %>
+          </ss:Table>
+        </ss:Worksheet>
+    <% end %>
+  <% else %>
+    <ss:Worksheet ss:Name="Sheet<%=index%>">
+      <ss:Table>
+        <ss:Row>
+          <% item_headers&.each do |item| %>
+              <Cell ss:StyleID="header">
+                <Data ss:Type="String"><%= item %></Data>
+              </Cell>
+          <% end %>
+        </ss:Row>
+        <% item_contents&.each do |item| %>
+            <Row>
+              <% item.each do |value| %>
+                  <Cell>
+                    <Data ss:Type="String"><%= value %></Data>
+                  </Cell>
+              <% end %>
+            </Row>
+        <% end %>
+      </ss:Table>
+    </ss:Worksheet>
+  <% end %>
 </Workbook>

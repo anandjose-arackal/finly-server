@@ -84,14 +84,32 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
   # NOTE: THIS CAN BE USED INDEPENDENTLY. I.E THIS CAN BE INSTANTIATED AND USED like in the example below
   # Usage
   # Example: Exporter::Spreadsheet.new(user, {headers: self.headers, contents: self.contents, filename: 'assign_card'}, messages)
+  # Additionally if multiple sheets are to be generated, pass the headers and contents of each sheet as an array of hashes
+  # format:
+  # sheets: [
+  #   {
+  #     item_headers: [],
+  #     item_contents: []
+  #   },
+  #   {
+  #     item_headers: [],
+  #     item_contents: []
+  #   }
+  #   .
+  #   .
+  #   .
+  #   .
+  #
+  # ]
   class Exporter::Spreadsheet < Exporter::BaseSuccessPresenter
-    attr_accessor :headers, :contents, :template
+    attr_accessor :headers, :contents, :template, :sheets
 
     def init
       super
       self.template = params[:template] || xls_template
       self.headers = params[:headers]
       self.contents = params[:contents]
+      self.sheets = params[:sheets]
     end
 
     def render(controller)
@@ -117,7 +135,12 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
     end
 
     def binding_params
-      {item_headers: self.headers, item_contents: self.contents, data: self.params[:data]}
+      # if sheets.present?
+      #   sheets
+      # else
+      #   [{item_headers: self.headers, item_contents: self.contents, data: self.params[:data]}]
+      # end
+      {item_headers: self.headers, item_contents: self.contents, data: self.params[:data], sheets: self.sheets}
     end
 
     # Handle XLS END
