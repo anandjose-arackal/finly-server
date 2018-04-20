@@ -45,7 +45,7 @@ class Agreements::Validate < Agreements::Base
 
   def success
     params[:agreed] = true # because everything is hard copy now
-    params[:kyc_required] = true # because everything is hard copy now
+    params[:kyc_required] = false # because everything is hard copy now
     params[:point_of_contact] = self.point_of_contact
     Agreements::Validate::Presenter.new(user, params, messages)
   end
