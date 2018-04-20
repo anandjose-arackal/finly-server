@@ -92,6 +92,7 @@ class PaymentOrder < ActiveRecord::Base
   scope :with_status, ->(status_id) { where payment_order_status_id: status_id }
   scope :scheduled, -> { with_status(PaymentOrderStatus.id_for(:scheduled)) }
   scope :scheduled_on_or_before, -> (date) { where('scheduled_at <= ?', date).where(payment_order_status_id: PaymentOrderStatus.id_for(:scheduled)) }
+  scope :completed, -> { where payment_order_status_id: PaymentOrderStatus.id_for(:completed)}
   scope :joins_amount_requested, -> { joins :amount_requested }
   scope :total_amount_requested, -> { joins_amount_requested.sum(:value) }
   scope :with_company_id, ->(company_id) { where company_id: company_id }
