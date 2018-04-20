@@ -2,7 +2,7 @@ class TravelRequests::Bookings::Base < TravelRequests::Base
 
   def booking_params
     params.require(:booking).permit(
-        :id, :booking_type_id, booking_attachments: [],
+        :id, :note, :booking_type_id, booking_attachments: [],
         booking_flight_attributes: [
             :id, :journey_date, :booking_class, :stops, :ticket_number,
             :departure_date, :pnr, :airline, :journey_destination,
