@@ -157,10 +157,10 @@ class BankTransfer::PaymentRequest::BulkProcessFromFile < BankTransfer::PaymentR
       payment_order_custom_fields = current_company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
       payment_order_custom_fields.each_with_index do |field_config, index|
         case field_config.field_type_id
-          when FieldType.id_for(:drop_down)
-            custom_fields[field_config.id] = item[field_config.field_name.gsub(" ", "_").underscore]
           when FieldType.id_for(:multiselect)
             custom_fields[field_config.id] = [item[field_config.field_name.gsub(" ", "_").underscore]]
+          else
+            custom_fields[field_config.id] = item[field_config.field_name.gsub(" ", "_").underscore]
         end
       end
 

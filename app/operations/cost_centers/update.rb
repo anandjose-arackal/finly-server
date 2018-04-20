@@ -1,4 +1,4 @@
-class CostCenter::Update < CostCenter::Base
+class CostCenters::Update < CostCenters::Base
 
   attr_accessor :cost_center
 

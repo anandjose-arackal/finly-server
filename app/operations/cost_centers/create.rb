@@ -1,4 +1,4 @@
-class CostCenter::Create < CostCenter::Base
+class CostCenters::Create < CostCenters::Base
 
   attr_accessor :cost_center, :cost_center_parameters
 

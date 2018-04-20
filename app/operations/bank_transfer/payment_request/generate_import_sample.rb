@@ -28,6 +28,7 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
             item_contents: []
         }
     ]
+    # adding TDS slabs to the excel sheet
     tds_headers = ["ID", "TDS Slab Name", "TDS Rate"]
     tds_contents = []
     current_company.tds_slabs.each do |tds_slab|
@@ -38,6 +39,30 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
         item_contents: tds_contents,
         name: "TDS Slabs"
     }
+
+    # adding Categories to the Excel sheet
+    category_headers = ["ID", "Category Name"]
+    category_contents = []
+    current_company.categories.invoices_only.each do |category|
+      category_contents << [category.id, category.name]
+    end
+    self.sheets << {
+        item_headers: category_headers,
+        item_contents: category_contents,
+        name: "Categories"
+    }
+    # adding Cost Centers to the excel sheet
+    cost_center_headers = ["ID", "Cost Center Name"]
+    cost_center_contents = []
+    current_company.cost_centers.vendor_payments_only.each do |cost_center|
+      cost_center_contents << [cost_center.id, cost_center.name]
+    end
+    self.sheets << {
+        item_headers: cost_center_headers,
+        item_contents: cost_center_contents,
+        name: "Cost Centers"
+    }
+    # adding custom fields to the excel sheet
     self.payment_order_custom_fields.with_field_type([FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)]).each do |custom_field_config|
       custom_field_headers = ["#{custom_field_config.field_name} ID", "#{custom_field_config.field_name} Name"]
       case custom_field_config.field_type_id
@@ -77,6 +102,8 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
        "Tax Rate",
        "Discount Rate",
        "TDS Slab ID",
+       "Category ID",
+       "Cost Center ID",
        "Invoice Number",
        "Invoice Date (dd-mm-yyyy)",
        "Due Date (dd-mm-yyyy)"

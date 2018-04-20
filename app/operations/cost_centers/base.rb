@@ -1,4 +1,4 @@
-class CostCenter::Base < BaseOperation
+class CostCenters::Base < BaseOperation
 
   def pre_validate
     if user.blank? && params.blank?

@@ -21,4 +21,8 @@ class CostCenter < ActiveRecord::Base
     where application: app
   }
 
+  scope :vendor_payments_only, -> {
+    where application: "vp"
+  }
+
 end
