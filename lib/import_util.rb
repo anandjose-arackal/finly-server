@@ -42,8 +42,8 @@ class ImportUtil
         val = cleanup_email(val)
         map[key] = val
       end
+      add_line = false
       if options.present? and options[:skip_empty_lines]
-        add_line = false
         map.each do |key, val|
           if val.present?
             add_line = true
