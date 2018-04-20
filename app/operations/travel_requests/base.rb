@@ -5,7 +5,7 @@ class TravelRequests::Base < BaseOperation
                                            destinations_attributes: [
                                                :id, :name, :source, :_destroy,
                                                booking_requests_attributes: [
-                                                   :id, :booking_type_id, :_destroy,
+                                                   :id, :booking_type_id, :note, :_destroy,
                                                    booking_flight_attributes: [
                                                        :id, :journey_date, :journey_source, :journey_destination, :booking_class, :stops
                                                    ],

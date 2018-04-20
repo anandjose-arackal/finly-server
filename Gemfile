@@ -16,7 +16,7 @@ gem 'stomp', '1.4.3'
 gem 'mocha', '1.2.1'
 
 # gem for crash reports
-gem 'rollbar'
+gem 'rollbar', '2.15.5'
 gem 'oj', '~> 2.18.1'
 
 # gem for admin panel

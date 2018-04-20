@@ -21,7 +21,7 @@ json.destinations do
     json.extract! destination, :id, :name, :source
     json.booking_requests do
       json.array! destination.booking_requests do |booking_request|
-        json.extract! booking_request, :id, :booking_type_id
+        json.extract! booking_request, :id, :booking_type_id, :note
         json.booking_type_name booking_request.booking_type.name
         if booking_request.flight?
           json.booking_flight do
@@ -69,7 +69,7 @@ json.destinations do
         end
         json.bookings do
           json.array! booking_request.bookings do |booking|
-            json.extract! booking, :id, :booking_type_id
+            json.extract! booking, :id, :booking_type_id, :note
             json.booking_type_name booking.booking_type.name
             # json.booking_status booking&.booking_status.name&.humanize
 
