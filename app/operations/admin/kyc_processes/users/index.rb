@@ -42,7 +42,7 @@ class Admin::KycProcesses::Users::Index < Admin::KycProcesses::Users::Base
 
     def init
       self.individual_kycs = params[:individual_kycs]
-      self.individual_kycs = apply_scopes(self.individual_kycs).paginate(page: params[:page], per_page: 30) if self.individual_kycs.present?
+      self.individual_kycs = apply_scopes(self.individual_kycs)#.paginate(page: params[:page], per_page: 30) if self.individual_kycs.present?
     end
 
     def company_for(individual_kyc)
