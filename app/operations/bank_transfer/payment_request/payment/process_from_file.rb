@@ -1,4 +1,4 @@
-class BankTransfer::PaymentRequest::ProcessFromFile < BankTransfer::PaymentRequest::Base
+class BankTransfer::PaymentRequest::BulkProcessFromFile < BankTransfer::PaymentRequest::Base
 
   attr_accessor :payment_order_data, :processed_order, :requested_amount, :processable_amount, :policy_id,
                 :errors, :payment_order_valid, :scheduled_at, :description, :valid, :error_messages
@@ -152,13 +152,21 @@ class BankTransfer::PaymentRequest::ProcessFromFile < BankTransfer::PaymentReque
         self.valid = false
         self.error_messages << "Invalid advance entered"
       end
-
+      custom_fields = {}
       # adding custom field values here for assigning to the invoice
-
+      payment_order_custom_fields = current_company.field_configurations.non_deleted.with_field_parent_type(FieldParentType.id_for(:invoice))
+      payment_order_custom_fields.each_with_index do |field_config, index|
+        case field_config.field_type_id
+          when FieldType.id_for(:drop_down)
+            custom_fields[field_config.id] = item[field_config.field_name.gsub(" ", "_").underscore]
+          when FieldType.id_for(:multiselect)
+            custom_fields[field_config.id] = [item[field_config.field_name.gsub(" ", "_").underscore]]
+        end
+      end
 
       # adding the custom fields for the particular invoice, using a ghost invoice
       self.ghost_invoice = Invoice.new
-      custom_fields = {custom_fields: item[:custom_fields]} || {}
+      custom_fields = {custom_fields: custom_fields} || {}
       custom_fields[:user] = user
       custom_fields[:reset_fields] = true
       custom_fields[:save] = false

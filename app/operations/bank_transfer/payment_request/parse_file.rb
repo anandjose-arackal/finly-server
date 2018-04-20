@@ -39,7 +39,7 @@ class BankTransfer::PaymentRequest::ParseFile < BankTransfer::PaymentRequest::Ba
 
   def process
     params[:payment_order] = self.parsed_data
-    self.response_presenter = BankTransfer::PaymentRequest::ProcessFromFile.(user, params)
+    self.response_presenter = BankTransfer::PaymentRequest::BulkProcessFromFile.(user, params)
   end
 
   def success
