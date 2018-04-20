@@ -14,6 +14,14 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
   def process
     self.headers = default_headers
     self.content = []
+    self.payment_order_custom_fields.each do |custom_field_config|
+      case custom_field_config.field_type_id
+        when FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)
+          self.headers << "#{custom_field_config.field_name} ID"
+        else
+          self.headers << "#{custom_field_config.field_name}"
+      end
+    end
     self.sheets = [
         {
             item_headers: self.headers,
@@ -30,7 +38,26 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
         item_contents: tds_contents,
         name: "TDS Slabs"
     }
-    # TODO - add custom fields in separate sheets / same sheet with different headers
+    self.payment_order_custom_fields.with_field_type([FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)]).each do |custom_field_config|
+      custom_field_headers = ["#{custom_field_config.field_name} ID", "#{custom_field_config.field_name} Name"]
+      case custom_field_config.field_type_id
+        when FieldType.id_for(:drop_down)
+          selection_items = custom_field_config.drop_down_items
+        when FieldType.id_for(:multiselect)
+          selection_items = custom_field_config.multiselect_items
+        else
+          selection_items = []
+      end
+      custom_field_contents = []
+      selection_items.each do |content|
+        custom_field_contents << [content.id, content.name]
+      end
+      self.sheets << {
+          item_headers: custom_field_headers,
+          item_contents: custom_field_contents,
+          name: custom_field_config.field_name
+      }
+    end
   end
 
   def success
