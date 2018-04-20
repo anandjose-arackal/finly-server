@@ -1,4 +1,4 @@
-class CostCenter::Destroy < CostCenter::Base
+class CostCenters::Destroy < CostCenters::Base
 
   attr_accessor :cost_center
 

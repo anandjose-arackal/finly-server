@@ -45,4 +45,10 @@ class Category < ActiveRecord::Base
   scope :expense_management_only, -> {
     where purpose_id: Purpose.id_for(:expense_management)
   }
+  scope :vendor_payments_only, -> {
+    where purpose_id: Purpose.id_for(:vendor_payments)
+  }
+  scope :invoices_only, -> {
+    where purpose_id: Purpose.id_for(:invoice)
+  }
 end

@@ -62,6 +62,7 @@ class FieldConfiguration < ActiveRecord::Base
   scope :with_field_parent_type, -> (parent_type_id) {
     where field_parent_type_id: parent_type_id
   }
+  scope :with_field_type, -> (field_type_id) { where field_type_id: field_type_id }
 
   delegate :drop_down?, :text?, to: :field_type
 

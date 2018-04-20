@@ -1,8 +1,8 @@
-class CostCenter::Index < CostCenter::Base
+class CostCenters::Index < CostCenters::Base
 
   attr_accessor :cost_centers
 
-  class CostCenter::Index::CostCenterPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class CostCenters::Index::CostCenterPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :cost_centers
 
@@ -17,6 +17,6 @@ class CostCenter::Index < CostCenter::Base
 
   def success
     params[:cost_centers] = self.cost_centers
-    CostCenter::Index::CostCenterPresenter.new(user, params, messages)
+    CostCenters::Index::CostCenterPresenter.new(user, params, messages)
   end
 end
