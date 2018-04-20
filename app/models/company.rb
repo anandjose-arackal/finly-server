@@ -71,6 +71,9 @@ class Company < ActiveRecord::Base
   has_many :outward_invoices
   has_many :outward_invoice_attachments
 
+
+  has_many :booking_attachments
+
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
   accepts_nested_attributes_for :feature_subscription
@@ -280,9 +283,12 @@ class Company < ActiveRecord::Base
     self.feature_subscription.current_account_connected
   end
 
-
   def invoicing_system_enabled?
     self.feature_subscription.invoicing_system
+  end
+
+  def travel_desk_enabled?
+    self.feature_subscription.travel_request
   end
 
   def more_than_one_subscription?
@@ -355,7 +361,7 @@ class Company < ActiveRecord::Base
       self.categories.create(name: category, purpose_id: Purpose.id_for(:expense_management))
     end
 
-    self.build_configuration.save if self.configuration.blank?
+    self.build_configuration(bank_type: "HDFC").save if self.configuration.blank?
     self.build_account.save if self.account.blank?
 
     if self.feature_subscription.blank?

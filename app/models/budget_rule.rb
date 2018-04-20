@@ -20,6 +20,7 @@
 
 
 
+
 # expense_type_id: contains details about whether the budget is scoped to a particular
 # type of expense or not
 # 1 - Manual, 2 - Card, 3 - Distance, 4 - Time, 5 - Per Diem
@@ -52,6 +53,14 @@ class BudgetRule < ActiveRecord::Base
   before_destroy :update_parent_version
 
   has_paper_trail
+
+  scope :warning_rules, -> {
+    where rule_type_id: RuleType.warning_rule_id
+  }
+
+  scope :blocking_rules, -> {
+    where rule_type_id: RuleType.blocking_rule_id
+  }
 
   def include_reimbursable_expenses?
     self.include_reimbursable

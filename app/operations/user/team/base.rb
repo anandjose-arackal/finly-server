@@ -1,6 +1,6 @@
 class User::Team::Base < BaseOperation
   attr_accessor :currency_id, :amount_value, :mappings, :policy_id, :money_request, :report,
-                :payment_request, :purpose_id
+                :payment_request, :travel_request, :purpose_id
 
   def init_values
     return if params.blank?
@@ -21,6 +21,8 @@ class User::Team::Base < BaseOperation
       load_money_request
     elsif params[:payment_request].present?
       load_payment_request
+    elsif params[:travel_request].present?
+      load_travel_request
     end
   end
 
@@ -75,6 +77,13 @@ class User::Team::Base < BaseOperation
     self.policy_id = self.payment_request.policy_id
     self.currency_id = 1
     self.amount_value = payment_request.requested_amount_value
+  end
+
+  def load_travel_request
+    self.travel_request = params[:travel_request]
+    # use the default company policy for retrieving the reviewers
+    self.policy_id = self.travel_request.policy_id
+    self.currency_id = 1
   end
 
   class User::Team::Base::TeamPresenter < BaseOperation::BasePresenter::SuccessPresenter

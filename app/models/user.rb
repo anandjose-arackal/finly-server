@@ -55,6 +55,11 @@
 
 
 
+
+
+
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -123,6 +128,10 @@ class User < ActiveRecord::Base
   has_many :expense_cards, -> { where(card_program_id: CardProgram.id_for(:expense)) }, class_name: 'Card'
   has_many :card_transactions, dependent: :destroy
   has_many :money_requests
+
+  has_many :booking_attachments
+
+
   has_many :controlling_money_requests, class_name: 'MoneyRequest', foreign_key: :controlling_user_id
   has_many :money_request_tracks, class_name: 'MoneyRequestTrack', foreign_key: :action_user_id
   has_many :interacted_money_requests, -> { distinct }, source: :money_request, through: :money_request_tracks
@@ -156,9 +165,21 @@ class User < ActiveRecord::Base
   has_many :finance_payment_request_trails, -> { finance_manager_role }, class_name: 'BankPaymentRequestTrail', foreign_key: :modified_user_id
   has_many :finance_payment_requests, -> { distinct }, source: :bank_payment_request, through: :finance_payment_request_trails
 
+  # adding associations for the user manager mapping of travel requests
+  has_many :travel_requests
+  has_many :travel_request_trails, class_name: "TravelRequestTrail", foreign_key: :action_user_id
+  has_many :controlling_travel_requests, class_name: "TravelRequest", foreign_key: :controlling_user_id
+  has_many :interacted_travel_requests, -> { distinct }, source: :travel_requests, through: :travel_request_trails
+  has_many :manager_travel_request_trails, -> { manager_role }, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
+  has_many :manager_travel_requests, -> { distinct }, source: :travel_request, through: :manager_travel_request_trails
+  has_many :travel_manager_travel_request_trails, -> { travel_manager_role }, class_name: 'TravelRequestTrail', foreign_key: :modified_user_id
+  has_many :travel_manager_travel_requests, -> { distinct }, source: :travel_request, through: :travel_manager_travel_request_trails
+
   # Outward invoice
   has_many :outward_invoices
   has_many :outward_invoice_attachments
+
+
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender
@@ -520,6 +541,11 @@ class User < ActiveRecord::Base
     mapping.auditor.present?
   end
 
+  def travel_manager?
+    mapping = role_mapping
+    mapping.expense_management.travel_manager.present?
+  end
+
   def vendor_payment_manager?
     self.role_mapping.vendor_payments.manager.present?
   end
@@ -579,6 +605,10 @@ class User < ActiveRecord::Base
 
   def invoicing_system_enabled?
     self.user_panel_subscription.invoicing_system
+  end
+
+  def travel_desk_enabled?
+    self.user_panel_subscription.travel_request
   end
 
   def has_role?(role_id)
@@ -772,6 +802,10 @@ class User < ActiveRecord::Base
 
   def bank_transfer_enabled?
     (self.vendor_payments_enabled? && self.bank_accounts.present?) || (self.company.bank_reimbursement_enabled?)
+  end
+
+  def initials
+    self.name.split(' ').first[0] + ((self.name.split(' ')[1][0] rescue nil) or self.name.split(' ').first[1])
   end
 
   # method that determines whether a particular user has

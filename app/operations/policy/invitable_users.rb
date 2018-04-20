@@ -11,7 +11,7 @@ class Policy::InvitableUsers < Policy::Base
 
     def init
       self.invitable_users = apply_scopes(params[:invitable_users], params)
-      self.policy = Policy::Index.(user, view: params[:view]).policies.find_by(id: params[:policy_id] || params[:id])
+      self.policy = params[:policy]
     end
 
     def users_with_manager_email
@@ -61,6 +61,7 @@ class Policy::InvitableUsers < Policy::Base
 
   def success
     params[:invitable_users] = invitable_users
+    params[:policy] = self.policy
     Policy::InvitableUsers::InvitableUsersPresenter.new(user, params, messages)
   end
 

@@ -28,6 +28,7 @@ company:
 
 user:
   name: <%= current_user.name %>
+  initials: <%= current_user.initials %>
   id: <%= current_user.id %>
   email: <%= current_user.email %>
   mobile_number: <%= current_user.mobile_number %>
@@ -52,6 +53,11 @@ user:
     name: 'Manager'
     default_url: 'reports/params={"view":"manager"}'
   <% end %>
+  <% if current_user.travel_manager? %>
+  - id: travel_manager
+    name: 'Travel Manager'
+    default_url: 'travel_requests/params={"view":"travel_manager"}'
+  <% end %>
   <% if current_user.employee? %>
   - id: personal
     name: 'Personal'
@@ -63,25 +69,39 @@ views:
   admin:
     menus:
       navbar:
-      - name: <span class="superscript">Company</span><br>Expenses
+      - name: <span class="superscript">Company</span> Expenses
         url: expenses
         id: expenses
-      - name: <span class="superscript">Company</span><br>Reports
+      - name: <span class="superscript">Company</span> Reports
         url: reports
         id: reports
-      - name: <span class="superscript">Company</span><br>Money Requests
-        url: requests
-        id: requests
-      - name: <span class="superscript">Company</span><br>Employees
+      # - name: <span class="superscript">Company</span> Money Requests
+      #   url: requests
+      #   id: requests
+      - name: Requests
+        type: group
+        items:
+        - name: <span class="superscript">Company</span> Money Requests
+          url: requests
+          id: requests
+        <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+        - name: <span class="superscript">Company</span> Travel Requests
+          url: travel_requests
+          id: travel_requests
+        <% end %>
+#      - name: <span class="superscript">Company</span> Travel Requests
+#        url: travel_requests
+#        id: travel_requests
+      - name: <span class="superscript">Company</span> Employees
         url: employees
         id: employees
-      - name: <span class="superscript">Company</span><br>Settlements
+      - name: <span class="superscript">Company</span> Settlements
         url: settlements_dashboard
         id: settlements_dashboard
-      - name: <span class="superscript">Company</span><br>Analytics
+      - name: <span class="superscript">Company</span> Analytics
         url: analytics
         id: analytics
-      - name: <span class="superscript">Company</span><br>Export
+      - name: <span class="superscript">Company</span> Export
         url: 'export'
         id: 'export'
       cog:
@@ -89,15 +109,19 @@ views:
         url: '#organization_account/params={"view":"admin"}'
       - name: Company Statements
         url: '#company_statements/params={"view": "admin"}'
+      <%# if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      # - name: Travel Requests
+      #   url: '#travel_requests/params={"view": "admin"}'
+      <%# end %>
       <% if current_company.d_code_enabled? || current_company.bank_reimbursement_enabled? %>
       - name: Load Company Balance
         target: true
         url: '/transfers/register'
       <% end %>
       <% unless current_company.kyc_completed? %>
-      - name: Verify KYC
-        target: true
-        url: '/#documents'
+#      - name: Verify KYC
+#        target: true
+#        url: '/#documents'
       <% end %>
 #      - name: Policies
 #        url: '/policies'
@@ -106,25 +130,39 @@ views:
   auditor:
     menus:
       navbar:
-      - name: <span class="superscript">Company</span><br>Expenses
+      - name: <span class="superscript">Company</span> Expenses
         url: expenses
         id: expenses
-      - name: <span class="superscript">Company</span><br>Reports
+      - name: <span class="superscript">Company</span> Reports
         url: reports
         id: reports
-      - name: <span class="superscript">Company</span><br>Money Requests
-        url: requests
-        id: requests
-      - name: <span class="superscript">Company</span><br>Employees
+      # - name: <span class="superscript">Company</span> Money Requests
+      #   url: requests
+      #   id: requests
+#      - name: <span class="superscript">Company</span> Travel Requests
+#        url: travel_requests
+#        id: travel_requests
+      - name: Requests
+        type: group
+        items:
+        - name: <span class="superscript">Company</span> Money Requests
+          url: requests
+          id: requests
+        <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+        - name: <span class="superscript">Company</span> Travel Requests
+          url: travel_requests
+          id: travel_requests
+        <% end %>
+      - name: <span class="superscript">Company</span> Employees
         url: employees
         id: employees
-      - name: <span class="superscript">Company</span><br>Settlements
+      - name: <span class="superscript">Company</span> Settlements
         url: settlements_dashboard
         id: settlements_dashboard
-      - name: <span class="superscript">Company</span><br>Analytics
+      - name: <span class="superscript">Company</span> Analytics
         url: analytics
         id: analytics
-      - name: <span class="superscript">Company</span><br>Export
+      - name: <span class="superscript">Company</span> Export
         url: 'export'
         id: 'export'
       cog:
@@ -132,51 +170,118 @@ views:
         url: '#organization_account/params={"view":"auditor"}'
       - name: Company Statements
         url: '#company_statements/params={"view": "auditor"}'
+      <%# if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      # - name: Travel Requests
+      #   url: '#travel_requests/params={"view": "auditor"}'
+      <%# end %>
+  <% end %>
+  <% if current_user.travel_manager? %>
+  travel_manager:
+    menus:
+      navbar:
+#      - name: <span class="superscript">Team</span> Travel Requests
+#        url: travel_requests
+#        id: travel_requests
+      <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      - name: Travel Requests
+        url: '#travel_requests/params={"view": "travel_manager"}'
+      <% end %>
+      cog: []
   <% end %>
   <% if current_user.finance_manager? %>
   finance_manager:
     menus:
       navbar:
-      - name: <span class="superscript">Team</span><br>Expenses
+      - name: <span class="superscript">Team</span> Expenses
         url: expenses
         id: expenses
-      - name: <span class="superscript">Team</span><br>Reports
+      - name: <span class="superscript">Team</span> Reports
         url: reports
         id: reports
-      - name: <span class="superscript">Team</span><br>Money Requests
-        url: requests
-        id: requests
-      - name: <span class="superscript">Team</span><br>Settlements
+      # - name: <span class="superscript">Team</span> Money Requests
+      #   url: requests
+      #   id: requests
+#      - name: <span class="superscript">Team</span> Travel Requests
+#        url: travel_requests
+#        id: travel_requests
+      - name: Requests
+        type: group
+        items:
+        - name: <span class="superscript">Team</span> Money Requests
+          url: requests
+          id: requests
+        <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+        - name: <span class="superscript">Team</span> Travel Requests
+          url: travel_requests
+          id: travel_requests
+        <% end %>
+      - name: <span class="superscript">Team</span> Settlements
         url: settlements_dashboard
         id: settlements_dashboard
-      - name: <span class="superscript">Team</span><br>Members
+      - name: <span class="superscript">Team</span> Members
         url: employees
         id: employees
-      - name: <span class="superscript">Team</span><br>Export
+      - name: <span class="superscript">Team</span> Export
         url: export
         id: export
-      cog: []
+      cog:
+      <%# if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      # - name: Travel Requests
+      #   url: '#travel_requests/params={"view": "finance_manager"}'
+      <%# end %>
   <% end %>
   <% if current_user.manager? %>
   manager:
     menus:
       navbar:
-      - name: <span class="superscript">Team</span><br>Expenses
+      - name: <span class="superscript">Team</span> Expenses
         url: expenses
         id: expenses
-      - name: <span class="superscript">Team</span><br>Reports
+      - name: <span class="superscript">Team</span> Reports
         url: reports
         id: reports
-      - name: <span class="superscript">Team</span><br>Money Requests
-        url: requests
-        id: requests
-      - name: <span class="superscript">Team</span><br>Members
+      # - name: <span class="superscript">Team</span> Money Requests
+      #   url: requests
+      #   id: requests
+#      - name: <span class="superscript">Team</span> Travel Requests
+#        url: travel_requests
+#        id: travel_requests
+      - name: Requests
+        type: group
+        items:
+        - name: <span class="superscript">Team</span> Money Requests
+          url: requests
+          id: requests
+        <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+        - name: <span class="superscript">Team</span> Travel Requests
+          url: travel_requests
+          id: travel_requests
+        <% end %>
+      - name: <span class="superscript">Team</span> Members
         url: employees
         id: employees
-      - name: <span class="superscript">Team</span><br>Export
+      - name: <span class="superscript">Team</span> Export
         url: export
         id: export
-      cog: []
+      cog:
+      <%# if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      # - name: Travel Requests
+      #   url: '#travel_requests/params={"view": "manager"}'
+      <%# end %>
+  <% end %>
+  <% if current_user.travel_manager? %>
+  travel_manager:
+    menus:
+      navbar:
+      - name: Requests
+        type: group
+        items:
+        <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+        - name: <span class="superscript">Team</span> Travel Requests
+          url: travel_requests
+          id: travel_requests
+        <% end %>
+      cog:
   <% end %>
   <% if current_user.employee? %>
   personal:
@@ -191,9 +296,23 @@ views:
       - name: Reports
         url: reports
         id: reports
-      - name: Money Requests
-        url: requests
-        id: requests
+      # - name: Money Requests
+      #   url: requests
+      #   id: requests
+      # - name: Travel Requests
+      #   url: travel_requests
+      #   id: travel_requests
+      - name: Requests
+        type: group
+        items:
+        - name: Money Requests
+          url: requests
+          id: requests
+        <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+        - name: Travel Requests
+          url: travel_requests
+          id: travel_requests
+        <% end %>
       - name: Settlements
         url: settlements/<%= current_user.id %>
         id: settlements
@@ -203,7 +322,11 @@ views:
       - name: Export
         url: export
         id: export
-      cog: []
+      cog:
+      <%# if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
+      # - name: Travel Requests
+      #   url: '#travel_requests/params={"view": "personal"}'
+      <%# end %>
   <% end %>
 
 

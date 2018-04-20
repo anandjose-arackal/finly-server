@@ -40,6 +40,7 @@ class UsersController < ApplicationController
     @result = User::Profile.(current_user, params)
     respond_to do |format|
       format.html { render partial: 'my_profile'}
+      format.json {}
     end
   end
 

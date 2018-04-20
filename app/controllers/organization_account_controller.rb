@@ -7,6 +7,7 @@ class OrganizationAccountController < ApplicationController
     @result = Company::Configuration::Show.(current_user, params)
     respond_to do |format|
       format.html {render partial: 'policy_list'}
+      format.json {}
     end
   end
 
@@ -19,6 +20,7 @@ class OrganizationAccountController < ApplicationController
     @result = Company::Configuration::Show.(current_user, params)
     respond_to do |format|
       format.html {render partial: 'export_preferences'}
+      format.json {}
     end
   end
 

@@ -28,7 +28,7 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
             btn_class: "danger"
         }
       end
-      if self.invoice.saved?
+      if self.invoice.saved? || self.invoice.unpaid?
         actions << {
             url: Rails.application.routes.url_helpers.invoicing_outward_invoice_cancel_path(self.invoice),
             name: "Cancel Invoice",

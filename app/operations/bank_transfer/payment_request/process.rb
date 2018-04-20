@@ -94,6 +94,7 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       cost_center_id = item[:cost_center_id]
       tds_slab_id = item[:tds_slab_id]
 
+
       # deciding tax based on whether invoice items were entered or not
       tax_amount = discount_amount = amount = sub_total = items_net_amount = 0
       if item[:invoice_items_attributes].present?
@@ -112,8 +113,12 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       else
         tax_amount = item[:tax_amount].to_f
         discount_amount = item[:discount_amount].to_f
-        amount += item[:original_amount].to_f
-        net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        amount = item[:original_amount].to_f
+        if inclusive_of_taxes
+          net_amount = amount.to_f - discount_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        else
+          net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        end
       end
 
       # calculate balance due with roundoff amount
