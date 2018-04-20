@@ -113,8 +113,12 @@ class BankTransfer::PaymentRequest::Process < BankTransfer::PaymentRequest::Base
       else
         tax_amount = item[:tax_amount].to_f
         discount_amount = item[:discount_amount].to_f
-        amount += item[:original_amount].to_f
-        net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        amount = item[:original_amount].to_f
+        if inclusive_of_taxes
+          net_amount = amount.to_f - discount_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        else
+          net_amount = amount.to_f - discount_amount.to_f + tax_amount.to_f - tds_amount.to_f - advance_amount.to_f + freight.to_f
+        end
       end
 
       # calculate balance due with roundoff amount
