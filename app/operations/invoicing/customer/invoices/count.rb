@@ -13,7 +13,7 @@ class Invoicing::Customer::Invoices::Count < Invoicing::Customer::Base
 
   def init
     op = Invoicing::Customer::Invoices::Index.(user, params)
-    self.count = op.payments_received.count
+    self.count = op.invoices_paid.count
   end
 
   def success
