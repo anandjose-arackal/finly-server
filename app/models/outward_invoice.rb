@@ -138,7 +138,7 @@ class OutwardInvoice < ActiveRecord::Base
                             outward_invoices.mobile_number like ? OR outward_invoices.invoice_number like ? OR customers.name like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
   }
 
-  scope :filter_status, -> (status_id) {
+  scope :filter_status_id, -> (status_id) {
     where invoice_status_id: status_id
   }
 
