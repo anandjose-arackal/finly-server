@@ -134,10 +134,11 @@ class OutwardInvoice < ActiveRecord::Base
   }
 
   scope :filter_search, -> (term) {
-    where('customer_memo like ? OR memo like ? OR email like ? OR mobile_number like ? OR invoice_number like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+    joins(:customer).where('outward_invoices.customer_memo like ? OR outward_invoices.memo like ? OR outward_invoices.email like ? OR
+                            outward_invoices.mobile_number like ? OR outward_invoices.invoice_number like ? OR customers.name like ?', "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
   }
 
-  scope :filter_status, -> (status_id) {
+  scope :filter_status_id, -> (status_id) {
     where invoice_status_id: status_id
   }
 
@@ -156,15 +157,17 @@ class OutwardInvoice < ActiveRecord::Base
 
   scope :filter_date, ->(date_from = nil, date_to = nil) do
     unless date_from.blank? && date_to.blank?
-      type_val = :date
-      date_from = "1990-01-01" if date_from.blank?
+      date_from = Date.parse("1990-01-01" )if date_from.blank?
       date_to = DateUtils.local_date if date_to.blank?
       date_from = date_from.to_date if date_from.present?
       date_to = date_to.to_date if date_to.present?
-      expenses = arel_table
-      where(expenses[type_val].gteq(date_from).and(expenses[type_val].lteq(date_to)))
+      where('date >= ? AND date <= ?', date_from, date_to)
     end
   end
+
+  scope :filter_invoice_number, -> (number) {
+    where('invoice_number like ?', "%#{number}%")
+  }
 
   scope :joins_total_payable, -> { joins :total_payable }
   scope :joins_total_paid, -> { joins :paid_amount }
