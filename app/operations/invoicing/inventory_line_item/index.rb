@@ -10,7 +10,7 @@ class Invoicing::InventoryLineItem::Index < Invoicing::InventoryLineItem::Base
     has_scope :filter_category_id
 
     def init
-      self.inventory_line_items = params[:inventory_line_items]
+      self.inventory_line_items = apply_scopes(params[:inventory_line_items], params)
       self.paginated_line_items = self.inventory_line_items.paginate(page: params[:page], per_page: 30)
     end
   end

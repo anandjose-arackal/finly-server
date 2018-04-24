@@ -9,12 +9,12 @@ class BankTransfer::PaymentRequest::Review::Reject < BankTransfer::PaymentReques
 
   def validate
     unless bank_payment_request.can_reject?
-      add_message :error, "Report cannot be rejected at this state"
+      add_message :error, "Payment Order cannot be rejected at this state"
       return
     end
 
     unless bank_payment_request.controlling_user_id == user.id
-      add_message :error, "You cannot reject this report"
+      add_message :error, "You cannot reject this payment Order"
       return
     end
   end

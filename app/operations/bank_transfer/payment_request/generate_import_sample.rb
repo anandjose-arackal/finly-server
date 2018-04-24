@@ -3,7 +3,7 @@
 class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::PaymentRequest::Base
 
   attr_accessor :company, :payment_order_custom_fields, :sample_type,
-                :headers, :content
+                :headers, :content, :sheets
 
   def init
     self.company = user.company
@@ -14,15 +14,79 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
   def process
     self.headers = default_headers
     self.content = []
-    if self.payment_order_custom_fields.empty?
-      return
-    else
-      self.headers += self.payment_order_custom_fields.pluck(:field_name)
+    self.payment_order_custom_fields.each do |custom_field_config|
+      case custom_field_config.field_type_id
+        when FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)
+          self.headers << "#{custom_field_config.field_name} ID"
+        else
+          self.headers << "#{custom_field_config.field_name}"
+      end
+    end
+    self.sheets = [
+        {
+            item_headers: self.headers,
+            item_contents: []
+        }
+    ]
+    # adding TDS slabs to the excel sheet
+    tds_headers = ["ID", "TDS Slab Name", "TDS Rate"]
+    tds_contents = []
+    current_company.tds_slabs.each do |tds_slab|
+      tds_contents << [tds_slab.id, tds_slab.name, tds_slab.tds]
+    end
+    self.sheets << {
+        item_headers: tds_headers,
+        item_contents: tds_contents,
+        name: "TDS Slabs"
+    }
+
+    # adding Categories to the Excel sheet
+    category_headers = ["ID", "Category Name"]
+    category_contents = []
+    current_company.categories.invoices_only.each do |category|
+      category_contents << [category.id, category.name]
+    end
+    self.sheets << {
+        item_headers: category_headers,
+        item_contents: category_contents,
+        name: "Categories"
+    }
+    # adding Cost Centers to the excel sheet
+    cost_center_headers = ["ID", "Cost Center Name"]
+    cost_center_contents = []
+    current_company.cost_centers.vendor_payments_only.each do |cost_center|
+      cost_center_contents << [cost_center.id, cost_center.name]
+    end
+    self.sheets << {
+        item_headers: cost_center_headers,
+        item_contents: cost_center_contents,
+        name: "Cost Centers"
+    }
+    # adding custom fields to the excel sheet
+    self.payment_order_custom_fields.with_field_type([FieldType.id_for(:drop_down), FieldType.id_for(:multiselect)]).each do |custom_field_config|
+      custom_field_headers = ["#{custom_field_config.field_name} ID", "#{custom_field_config.field_name} Name"]
+      case custom_field_config.field_type_id
+        when FieldType.id_for(:drop_down)
+          selection_items = custom_field_config.drop_down_items
+        when FieldType.id_for(:multiselect)
+          selection_items = custom_field_config.multiselect_items
+        else
+          selection_items = []
+      end
+      custom_field_contents = []
+      selection_items.each do |content|
+        custom_field_contents << [content.id, content.name]
+      end
+      self.sheets << {
+          item_headers: custom_field_headers,
+          item_contents: custom_field_contents,
+          name: custom_field_config.field_name
+      }
     end
   end
 
   def success
-    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content}}, messages)
+    self.response = Exporter.new(user, {spreadsheet: {headers: self.headers, contents: self.content, sheets: self.sheets}}, messages)
   end
 
   private
@@ -35,15 +99,18 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
        "Sub Total",
        "Inclusive of Taxes? (Y/N)",
        "GST Type (1 - IGST ; 2 - CGST/SGST)",
-       "Tax Type (1 - Rate ; 2 - Absolute)",
-       "Tax",
-       "Discount Type (1 - Rate ; 2 - Absolute)",
-       "Discount",
-       "TDS Type (1 - Rate ; 2 - Absolute)",
-       "TDS",
+       "Tax Rate",
+       "Discount Rate",
+       "TDS Slab ID",
+       "Category ID",
+       "Cost Center ID",
        "Invoice Number",
        "Invoice Date (dd-mm-yyyy)",
        "Due Date (dd-mm-yyyy)"
     ]
+  end
+
+  def tds_slabs
+
   end
 end

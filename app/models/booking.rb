@@ -1,0 +1,50 @@
+# == Schema Information
+#
+# Table name: bookings
+#
+#  id                 :integer          not null, primary key
+#  booking_request_id :integer
+#  booking_status_id  :integer
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  booking_type_id    :integer
+#  note               :text(65535)
+#  created_by_user_id :integer
+#
+
+class Booking < ActiveRecord::Base
+  validates :booking_type_id, presence: true
+  validates :booking_request_id, presence: true
+
+  belongs_to :booking_type
+  belongs_to :booking_request
+  belongs_to :booking_status
+  belongs_to :created_by_user, class_name: 'User'
+
+
+  has_many :travel_members, dependent: :destroy
+
+  has_many :attachments, class_name: 'BookingAttachment', dependent: :destroy
+
+  has_one :booking_car_rental, as: :parent, dependent: :destroy
+  has_one :booking_bus, as: :parent, dependent: :destroy
+  has_one :booking_flight, as: :parent, dependent: :destroy
+  has_one :booking_hotel, as: :parent, dependent: :destroy
+  has_one :booking_restaurant, as: :parent, dependent: :destroy
+  has_one :booking_train, as: :parent, dependent: :destroy
+  has_one :booking_custom, as: :parent, dependent: :destroy
+
+  accepts_nested_attributes_for :booking_car_rental, allow_destroy: true
+  accepts_nested_attributes_for :booking_bus, allow_destroy: true
+  accepts_nested_attributes_for :booking_flight, allow_destroy: true
+  accepts_nested_attributes_for :booking_hotel, allow_destroy: true
+  accepts_nested_attributes_for :booking_restaurant, allow_destroy: true
+  accepts_nested_attributes_for :booking_train, allow_destroy: true
+  accepts_nested_attributes_for :booking_custom, allow_destroy: true
+  accepts_nested_attributes_for :travel_members, allow_destroy: true
+
+
+  delegate :flight?, :train?, :bus?, :car_rental?, :hotel?, :restaurant?, to: :booking_type
+
+  accepts_nested_attributes_for :travel_members, allow_destroy: true
+end

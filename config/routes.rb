@@ -650,6 +650,26 @@
 #                                                         PATCH  /money_request/:id(.:format)                                                                 money_request#update
 #                                                         PUT    /money_request/:id(.:format)                                                                 money_request#update
 #                                                         DELETE /money_request/:id(.:format)                                                                 money_request#destroy
+#                                   travel_request_review PATCH  /travel_requests/:travel_request_id/review(.:format)                                         travel_requests#review
+#                                         travel_requests GET    /travel_requests(.:format)                                                                   travel_requests#index
+#                                                         POST   /travel_requests(.:format)                                                                   travel_requests#create
+#                                      new_travel_request GET    /travel_requests/new(.:format)                                                               travel_requests#new
+#                                     edit_travel_request GET    /travel_requests/:id/edit(.:format)                                                          travel_requests#edit
+#                                          travel_request GET    /travel_requests/:id(.:format)                                                               travel_requests#show
+#                                                         PATCH  /travel_requests/:id(.:format)                                                               travel_requests#update
+#                                                         PUT    /travel_requests/:id(.:format)                                                               travel_requests#update
+#                                                         DELETE /travel_requests/:id(.:format)                                                               travel_requests#destroy
+#                              bookings_upload_attachment POST   /bookings/upload_attachment(.:format)                                                        bookings#upload_attachment
+#                                                bookings GET    /travel_requests/bookings(.:format)                                                          bookings#index
+#                                                         POST   /travel_requests/bookings(.:format)                                                          bookings#create
+#                                             new_booking GET    /travel_requests/bookings/new(.:format)                                                      bookings#new
+#                                            edit_booking GET    /travel_requests/bookings/:id/edit(.:format)                                                 bookings#edit
+#                                                 booking GET    /travel_requests/bookings/:id(.:format)                                                      bookings#show
+#                                                         PATCH  /travel_requests/bookings/:id(.:format)                                                      bookings#update
+#                                                         PUT    /travel_requests/bookings/:id(.:format)                                                      bookings#update
+#                                                         DELETE /travel_requests/bookings/:id(.:format)                                                      bookings#destroy
+#                                     booking_attachments POST   /booking_attachments(.:format)                                                               booking_attachments#create
+#                                           booking_types GET    /booking_types(.:format)                                                                     travel_requests#booking_types
 #                                          expenses_split POST   /expenses/split(.:format)                                                                    expenses#split_existing
 #                                         expenses_export POST   /expenses/export(.:format)                                                                   expenses#export
 #                                                expenses DELETE /expenses(.:format)                                                                          expenses#destroy
@@ -828,6 +848,7 @@
 #                                       autocomplete_user GET    /autocomplete/user(.:format)                                                                 autocomplete#user
 #                                       autocomplete_card GET    /autocomplete/card(.:format)                                                                 autocomplete#card
 #                            autocomplete_inventory_items GET    /autocomplete/inventory_items(.:format)                                                      autocomplete#inventory_items
+#                                  autocomplete_customers GET    /autocomplete/customers(.:format)                                                            invoicing/autocomplete#customer
 #                                     external_url_report GET    /external/reports/:id(.:format)                                                              external_url#report
 #                              external_url_money_request GET    /external/requests/:id(.:format)                                                             external_url#money_request
 #                                 external_url_settlement GET    /external/settlements/:id(.:format)                                                          external_url#payment
@@ -843,6 +864,7 @@
 #                                      menu_data_disburse GET    /menu_data_disburse(.:format)                                                                expense_types_configuration#menu_data_disburse
 #                                      menu_data_payments GET    /menu_data_payments(.:format)                                                                expense_types_configuration#menu_data_payments
 #                                       menu_data_collect GET    /menu_data_collect(.:format)                                                                 expense_types_configuration#menu_data_collect
+#                                      menu_data_insights GET    /menu_data_insights(.:format)                                                                expense_types_configuration#menu_data_insights
 #                                            cards_orders GET    /cards/orders(.:format)                                                                      orders/order_cards#index
 #                                                         GET    /cards/orders/:id(.:format)                                                                  orders/order_cards#show
 #                                                         DELETE /cards/orders/:id(.:format)                                                                  orders/order_cards#destroy
@@ -1131,6 +1153,8 @@
 #                      invoicing_outward_invoice_download GET    /invoicing/outward_invoices/:outward_invoice_id/download_pdf(.:format)                       invoicing/outward_invoices#download
 #                invoicing_outward_invoice_mark_as_closed PATCH  /invoicing/outward_invoices/:outward_invoice_id/mark_as_closed(.:format)                     invoicing/outward_invoices#mark_as_closed
 #              invoicing_outward_invoice_send_to_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/send_to_customer(.:format)                   invoicing/outward_invoices#send_to_customer
+#               invoicing_outward_invoice_remind_customer PATCH  /invoicing/outward_invoices/:outward_invoice_id/remind_customer(.:format)                    invoicing/outward_invoices#remind_customer
+#                invoicing_outward_invoice_record_payment PATCH  /invoicing/outward_invoices/:outward_invoice_id/record_payment(.:format)                     invoicing/outward_invoices#record_payment
 #                              invoicing_outward_invoices GET    /invoicing/outward_invoices(.:format)                                                        invoicing/outward_invoices#index
 #                                                         POST   /invoicing/outward_invoices(.:format)                                                        invoicing/outward_invoices#create
 #                           new_invoicing_outward_invoice GET    /invoicing/outward_invoices/new(.:format)                                                    invoicing/outward_invoices#new
@@ -1175,6 +1199,8 @@
 #                                                         PATCH  /invoicing/invoice_number_configs/:id(.:format)                                              invoicing/invoice_number_configs#update
 #                                                         PUT    /invoicing/invoice_number_configs/:id(.:format)                                              invoicing/invoice_number_configs#update
 #                                                         DELETE /invoicing/invoice_number_configs/:id(.:format)                                              invoicing/invoice_number_configs#destroy
+#   invoicing_company_configurations_auto_transfer_config GET    /invoicing/company_configurations/auto_transfer_config(.:format)                             invoicing/company_configurations#funds_auto_transfer_config
+#                                                         PATCH  /invoicing/company_configurations/auto_transfer_config(.:format)                             invoicing/company_configurations#update_auto_transfer_config
 #   invoicing_company_configuration_update_credit_account PATCH  /invoicing/company_configurations/:company_configuration_id/update_credit_account(.:format)  invoicing/company_configurations#update_credit_account
 #  invoicing_company_configuration_update_collect_details PATCH  /invoicing/company_configurations/:company_configuration_id/update_collect_details(.:format) invoicing/company_configurations#update_collect_details
 #     invoicing_company_configuration_update_collect_logo PATCH  /invoicing/company_configurations/:company_configuration_id/update_collect_logo(.:format)    invoicing/company_configurations#update_collect_logo
@@ -1216,6 +1242,7 @@
 #                                invoicing_withdraw_funds PATCH  /invoicing/companies/withdraw_funds(.:format)                                                invoicing/companies#withdraw_funds
 #                           invoicing_show_credit_account GET    /invoicing/companies/show_credit_account(.:format)                                           invoicing/companies#show_credit_account
 #                              invoicing_transfer_history GET    /invoicing/companies/transfer_history(.:format)                                              invoicing/companies#transfer_history
+#                                     invoicing_analytics GET    /invoicing/analytics(.:format)                                                               invoicing/analytics#index
 #                  admin_users_funds_load_request_approve PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/approve(.:format)              admin_users/funds_load_requests#approve
 #                   admin_users_funds_load_request_reject PATCH  /admin/admin_users/funds_load_requests/:funds_load_request_id/reject(.:format)               admin_users/funds_load_requests#reject
 #                         admin_users_funds_load_requests GET    /admin/admin_users/funds_load_requests(.:format)                                             admin_users/funds_load_requests#index
@@ -2281,6 +2308,25 @@ Rails.application.routes.draw do
     post 'comment' => 'money_request#comment', as: :comment
   end
 
+
+  ######################### TRAVEL REQUESTS API START ##########################
+
+  resources :travel_requests do
+    patch 'review', to: 'travel_requests#review', as: :review
+  end
+  post 'bookings/upload_attachment', to: 'bookings#upload_attachment'
+
+  scope :travel_requests do
+    resources :bookings do
+    end
+  end
+
+
+  resources :booking_attachments, only: [:create]
+
+  get 'booking_types', to: 'travel_requests#booking_types'
+
+  ######################### TRAVEL REQUESTS API END ##########################
 
   post 'expenses/split', to: 'expenses#split_existing'
   post 'expenses/export', to: 'expenses#export'

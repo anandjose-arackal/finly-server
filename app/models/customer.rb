@@ -59,6 +59,11 @@ class Customer < ActiveRecord::Base
       cust_ids = pluck(:id)
       ids = VirtualBankAccount.with_customer_id(cust_ids).pluck(:customer_id)
       where(id: ids)
+    else
+      cust_ids = pluck(:id)
+      ids = VirtualBankAccount.with_customer_id(cust_ids).pluck(:customer_id)
+      customers_without_virtual_account_ids = cust_ids - ids
+      where(id: customers_without_virtual_account_ids)
     end
   }
 

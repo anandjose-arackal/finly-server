@@ -17,9 +17,12 @@ class YesBankApi::Base < BaseHandler
     # unless config_path.present?
     #   add_message :error, "Server error, try again later"
     # end
-    # values = Finly::SecureStorage::Connector.read('core/yes_bank')
-    path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
-    values = YAML.load_file(path)
+    if Rails.env.production?
+      values = Finly::SecureStorage::Connector.read('core/yes_bank')
+    else
+      path = "#{Dir.home}/app/shared/config/yes_bank_config.yml"
+      values = YAML.load_file(path)
+    end
 
     # checking of there's a custom configuration for a particular company - stored in a variable called configuration
     type = (values[self.company_id.to_s]).present? ? self.company_id.to_s : 'default' # i.e. if the configuration associated with this particular company's id doesn't exist, use default

@@ -1,7 +1,7 @@
 module Constants
   VALID_EMAIL_FORMAT = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
-  VALID_MOBILE_NUMBER = /\A(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[789]\d{9}\z/i
   VALID_DOMAIN = /\A(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z0-9]{1,5}(.[a-z0-9]{1,5})?(:[0-9]{1,5})?(\/.*)?$\z/i
+  VALID_MOBILE_NUMBER = /\A(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}\z/i
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
   VALID_GENDER = /\A[MmFf]\z/i
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
@@ -19,7 +19,7 @@ module Constants
   end
 
   # todo - to be removed once companies are done mirating from HDFC to RBL
-  MIGRATING_COMPANIES = [37, 19]
+  MIGRATING_COMPANIES = [37, 5]
 
   PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']

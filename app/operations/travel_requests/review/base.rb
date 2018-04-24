@@ -1,0 +1,36 @@
+class TravelRequests::Review::Base < TravelRequests::Base
+  attr_accessor :travel_request
+
+  def pre_validate
+    if user.blank? || params.blank?
+      add_message :error, "Invalid parameters, try again"
+      return
+    end
+  end
+
+  def init
+    id = params[:id] || params[:travel_request_id]
+    self.travel_request = TravelRequests::Index.(user, params).travel_requests.find_by(id: id) rescue nil
+  end
+
+  def validate
+    if travel_request.blank?
+      add_message :error, "Travel Request not found"
+      return
+    end
+  end
+
+  def success
+    params[:travel_request] = self.travel_request
+    TravelRequests::Review::Base::RequestPresenter.new(user, params, messages)
+  end
+
+  class TravelRequests::Review::Base::RequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :travel_request
+
+    def init
+      self.travel_request  = params[:travel_request]
+    end
+  end
+end
