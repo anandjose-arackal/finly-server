@@ -2194,6 +2194,7 @@ Rails.application.routes.draw do
         get 'payment_status/:id', to: 'bank_payment_requests#payment_status', as: :payment_status
         resources :bank_payment_requests do
           patch 'credit', to: 'bank_payment_requests#credit', as: :credit
+          patch 'review', to: 'bank_payment_requests#review', as: :review
         end
       end
     end
