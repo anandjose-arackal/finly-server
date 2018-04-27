@@ -167,6 +167,11 @@ json.payments do
     else
       json.raw_amount precision_value payment.amount_value
       json.original_amount precision_value payment.amount_value
+      json.invoice do
+        json.net_amount precision_value payment.amount&.value
+        json.roundoff_amount 0
+        json.balance_due payment.amount&.value
+      end
     end
   end
 end
@@ -277,6 +282,11 @@ json.payments_verified do
     else
       json.raw_amount precision_value payment.amount_value
       json.original_amount precision_value payment.amount_value
+      json.invoice do
+        json.net_amount precision_value payment.amount&.value
+        json.roundoff_amount 0
+        json.balance_due payment.amount&.value
+      end
     end
   end
 end
@@ -388,6 +398,11 @@ json.payments_unverified do
     else
       json.raw_amount precision_value payment.amount_value
       json.original_amount precision_value payment.amount_value
+      json.invoice do
+        json.net_amount precision_value payment.amount&.value
+        json.roundoff_amount 0
+        json.balance_due payment.amount&.value
+      end
     end
   end
 end
