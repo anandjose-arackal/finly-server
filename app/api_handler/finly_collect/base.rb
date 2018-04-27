@@ -16,8 +16,12 @@ class FinlyCollect::Base < BaseHandler
   end
 
   def load_custom_connection(faraday)
-    # config = Finly::SecureStorage::Connector.read('core/finly_collect')&.dig('outgoing')
-    faraday&.basic_auth('finly','2dd8284e013bf29c')
+    if Rails.env.production?
+      config = Finly::SecureStorage::Connector.read('core/finly_collect')&.dig('outgoing')
+      faraday&.basic_auth(config[:username], config[:password])
+    else
+      faraday&.basic_auth('finly','2dd8284e013bf29c')
+    end
   end
 
   def expect_receivable?
