@@ -35,6 +35,8 @@ class InvoiceLineItem < ActiveRecord::Base
   belongs_to :taxable_amount, class_name: "Amount"
   belongs_to :inventory_line_item
 
+  has_many :custom_fields, as: :parent, dependent: :destroy
+
   accepts_nested_attributes_for :discount_amount
   accepts_nested_attributes_for :tax_amount
   accepts_nested_attributes_for :amount

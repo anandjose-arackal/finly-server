@@ -200,6 +200,18 @@ class OutwardInvoice < ActiveRecord::Base
     self.invoice_items.joins(:net_amount).sum(:value)
   end
 
+  def invoice_items_custom_field_configuration_names
+    names = FieldConfiguration.with_id(invoice_items_custom_field_configuration_ids).pluck(:field_name)
+  end
+
+  def invoice_items_custom_field_configuration_ids
+    ids = []
+    self.invoice_items.each do |item|
+      ids += item.custom_fields.pluck(:field_configuration_id)
+    end
+    ids.uniq!
+  end
+
   private
 
   # as in, an invoice that has been saved and is payable by

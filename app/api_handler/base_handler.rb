@@ -110,7 +110,7 @@ class BaseHandler
     query_param = self.query_params
     body_param = self.post_params
     header_param = self.header_params
-    return unless p.present? and not has_errors?
+    return if p.nil? or has_errors?
     begin
       puts "Posting Path : #{p}"
       puts "Post Params: #{body_param}"
