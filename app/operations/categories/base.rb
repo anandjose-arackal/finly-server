@@ -1,8 +1,12 @@
-class Category::Base < BaseOperation
+class Categories::Base < BaseOperation
 
   attr_accessor :categories, :purpose_id, :company, :parent_type_id, :custom_fields
 
-  class Category::Base::CategoriesPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  def authorized_user_types
+    [:employee, :manager, :finance_manager, :company_admin, :auditor]
+  end
+
+  class Categories::Base::CategoriesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :categories, :custom_fields
 
@@ -20,7 +24,7 @@ class Category::Base < BaseOperation
   def success
     params[:categories] = self.categories
     params[:custom_fields] = self.custom_fields
-    Category::Base::CategoriesPresenter.new(user, params, messages)
+    Categories::Base::CategoriesPresenter.new(user, params, messages)
   end
 
 end

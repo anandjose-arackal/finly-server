@@ -1,4 +1,4 @@
-class Category::Invoices::Index < Category::Base
+class Categories::Invoices::Index < Categories::Base
 
 
   def init

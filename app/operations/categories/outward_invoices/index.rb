@@ -1,4 +1,4 @@
-class Category::OutwardInvoices::Index < Category::Base
+class Categories::OutwardInvoices::Index < Categories::Base
 
   def init
     self.company = user.company

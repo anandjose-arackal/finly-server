@@ -47,8 +47,8 @@ class Category < ActiveRecord::Base
   scope :with_id, ->(id) { where id: id }
   scope :with_name, ->(name) { where name: name }
   scope :others, -> { where name: 'Other' }
-  scope :with_purpose, -> (purpose_id) {
-    where purpose_id: purpose_id
+  scope :with_purpose, -> (purpose) {
+    where(purpose.to_sym => true)
   }
   scope :outward_invoice_items_categories, -> { where purpose_id: Purpose.id_for(:outward_invoice_items) }
   scope :expense_management_only, -> {
@@ -57,7 +57,19 @@ class Category < ActiveRecord::Base
   scope :vendor_payments_only, -> {
     where purpose_id: Purpose.id_for(:vendor_payments)
   }
-  scope :invoices_only, -> {
-    where purpose_id: Purpose.id_for(:invoice)
+  scope :outward_invoices_only, -> {
+    where purpose_id: Purpose.id_for(:outward_invoices)
+  }
+  scope :inward_invoice_items_only, -> {
+    where inward_invoice_line_items: true
+  }
+  scope :outward_invoice_items_only, -> {
+    where outward_invoice_line_items: true
+  }
+
+  scope :from_application, -> (application) {
+    if Category.column_names.include?(application)
+      where(application.to_sym => true)
+    end
   }
 end
