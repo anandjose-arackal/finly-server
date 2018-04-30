@@ -7,7 +7,6 @@ class Categories::Index < Categories::Base
   end
 
   def process
-    self.purpose = params[:purpose]
     self.categories = user.company.categories.active.with_purpose(self.purpose)
   end
 

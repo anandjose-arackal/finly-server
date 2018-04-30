@@ -35,6 +35,7 @@ class Category < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :name, presence: true, uniqueness: {scope: :company_id}
+  validate :at_least_one_application
 
   default_scope { order(name: :asc) }
 

@@ -1,6 +1,6 @@
 class Categories::Base < BaseOperation
 
-  attr_accessor :categories, :purpose_id, :company, :parent_type_id, :custom_fields
+  attr_accessor :categories, :purpose, :company, :parent_type_id, :custom_fields
 
   def authorized_user_types
     [:employee, :manager, :finance_manager, :company_admin, :auditor]
@@ -17,7 +17,7 @@ class Categories::Base < BaseOperation
   end
 
   def process
-    self.categories = self.company.categories.with_purpose(self.purpose_id)
+    self.categories = self.company.categories.with_purpose(self.purpose)
     self.custom_fields = self.company.field_configurations.with_parent_type(self.parent_type_id)
   end
 
