@@ -35,6 +35,8 @@ class Api::V1::ReportsController < Api::V1::BaseApiController
         @result = Report::Retract.(current_user, params)
       when :approve
         @result = Report::Approve.(current_user, params)
+      when :take_control
+        @result = Report::TakeControl.(current_user, params)
       when :reject
         @result = Report::Reject.(current_user, params)
       when :unapprove
