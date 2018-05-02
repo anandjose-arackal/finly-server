@@ -35,7 +35,7 @@ class Category < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :name, presence: true, uniqueness: {scope: :company_id}
-  validate :at_least_one_application
+  # validate :at_least_one_application
 
   default_scope { order(name: :asc) }
 
@@ -76,9 +76,9 @@ class Category < ActiveRecord::Base
 
   private
 
-  def at_least_one_application
-    if !self.expense_management && !self.vendor_payments && !self.outward_invoices && !self.outward_invoice_line_items && !self.inward_invoice_line_items
-      errors.add(:category, "must belong to at least one application")
-    end
-  end
+  # def at_least_one_application
+  #   if !self.expense_management && !self.vendor_payments && !self.outward_invoices && !self.outward_invoice_line_items && !self.inward_invoice_line_items
+  #     errors.add(:category, "must belong to at least one application")
+  #   end
+  # end
 end
