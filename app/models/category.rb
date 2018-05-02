@@ -73,4 +73,12 @@ class Category < ActiveRecord::Base
       where(application.to_sym => true)
     end
   }
+
+  private
+
+  def at_least_one_application
+    if self.expense_management.false? && self.vendor_payments.false? && self.outward_invoices.false? && self.outward_invoice_line_items.false? && self.inward_invoice_line_items.false?
+      errors.add(:category, "must belong to at least one application")
+    end
+  end
 end
