@@ -1,5 +1,5 @@
 class Categories::Create < Categories::Base
-  attr_accessor :category, :purpose_id
+  attr_accessor :category
 
   def pre_validate
     if user.blank? || params.blank?
