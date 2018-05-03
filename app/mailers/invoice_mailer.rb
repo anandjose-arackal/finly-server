@@ -5,7 +5,9 @@ class InvoiceMailer < ApplicationMailer
     @options = options
     ###################### adding the generated invoice as an attachment #####################
     attachments["invoice-#{@invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
-        render_to_string(pdf: "invoice-#{@invoice.invoice_number}", template: "invoicing/outward_invoices/download", layout: "pdf.html.erb", print_media_type: true)
+        render_to_string(pdf: "invoice-#{@invoice.invoice_number}", template: "invoicing/outward_invoices/download", layout: "pdf.html.erb", print_media_type: true,
+                 margin: { :bottom => 5 },
+                 footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }})
     )
 
     for attachment in options[:attachments]
@@ -22,7 +24,7 @@ class InvoiceMailer < ApplicationMailer
     # }
     # ###########################################
 
-    mail to: options[:email_to], bcc: options[:email_bcc], subject: options[:email_subject], template_name: 'send_to_customer'
+    mail from: "#{@invoice.company.name} <noreply@finly.io>", :reply_to => "#{@invoice.user.email}", to: options[:email_to], bcc: options[:email_bcc], subject: options[:email_subject], template_name: 'send_to_customer'
   end
 
   def auto_remind_customer(invoice)
@@ -34,10 +36,12 @@ class InvoiceMailer < ApplicationMailer
 
     ###################### adding the generated invoice as an attachment #####################
     attachments["invoice-#{@invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
-        render_to_string(pdf: "invoice-#{@invoice.invoice_number}", template: "invoicing/outward_invoices/download", layout: "pdf.html.erb", print_media_type: true)
+        render_to_string(pdf: "invoice-#{@invoice.invoice_number}", template: "invoicing/outward_invoices/download", layout: "pdf.html.erb", print_media_type: true,
+                 margin: { :bottom => 5 },
+                 footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }})
     )
     ###########################################
-    mail to: @invoice.email, subject: @options[:email_subject], template_name: 'send_to_customer'
+    mail from: "#{@invoice.company.name} <noreply@finly.io>", :reply_to => "#{@invoice.user.email}", to: @invoice.email, subject: @options[:email_subject], template_name: 'send_to_customer'
   end
 
   def payment_notify(presenter)
@@ -45,10 +49,12 @@ class InvoiceMailer < ApplicationMailer
     @invoice = @options.outward_invoice
 
     attachments["invoice-#{@invoice.invoice_number}.pdf"] = WickedPdf.new.pdf_from_string(
-        render_to_string(pdf: "invoice-#{@invoice.invoice_number}", template: "invoicing/outward_invoices/download", layout: "pdf.html.erb", print_media_type: true)
+        render_to_string(pdf: "invoice-#{@invoice.invoice_number}", template: "invoicing/outward_invoices/download", layout: "pdf.html.erb", print_media_type: true,
+                 margin: { :bottom => 5 },
+                 footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }})
     )
     ###########################################
-    mail to: @options.email_to, subject: @options.email_subject, template_name: 'send_to_customer'
+    mail from: "#{@invoice.company.name} <noreply@finly.io>", :reply_to => "#{@invoice.user.email}", to: @options.email_to, subject: @options.email_subject, template_name: 'send_to_customer'
   end
 
 end
