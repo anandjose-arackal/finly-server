@@ -1,5 +1,14 @@
 class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentRequest::Review::Base
 
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:bank_payment_requests, :submit], :validate, self)
+        }
+    }
+  end
+
+
   def validate
     unless bank_payment_request.present?
       add_message :error, "Payment Order not found"
