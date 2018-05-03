@@ -3,7 +3,7 @@ class BankTransfer::PaymentRequest::Review::Submit < BankTransfer::PaymentReques
   def personalizer
     {
         validate: {
-            after: Personalizer::Process.new([:bank_payment_requests, :submit], :validate, self)
+            before: Personalizer::Process.new([:bank_payment_requests, :submit], :validate, self)
         }
     }
   end

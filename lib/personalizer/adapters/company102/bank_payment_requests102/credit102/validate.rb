@@ -1,4 +1,4 @@
-class Personalizer::Adapters::Company102::BankPaymentRequests102::Submit102::Validate < Personalizer::Adapters::Base
+class Personalizer::Adapters::Company102::BankPaymentRequests102::Credit102::Validate < Personalizer::Adapters::Base
 
   attr_accessor :bank_payment_request
 
@@ -21,6 +21,14 @@ class Personalizer::Adapters::Company102::BankPaymentRequests102::Submit102::Val
       invoice = payment.invoice
       if invoice.cost_center_id.blank?
         add_message :error, "All payments must have an associated cost center"
+        return
+      end
+    end
+
+    # checking to make sure there are no payments with 0 value
+    self.bank_payment_request.payment_order.payments.each do |payment|
+      if payment.amount_value <= 0
+        add_message :error, "Payment amount cannot be 0"
         return
       end
     end
