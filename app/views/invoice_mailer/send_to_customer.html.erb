@@ -5,7 +5,7 @@
 </head>
 <body style="font-family: sans-serif;">
 
-<div style="margin-left: auto; margin-right: auto; width:600px;  border: 2px solid #eee; padding: 50px;">
+<div style="margin-left: auto; margin-right: auto; width:600px;  border: 2px solid #eee; padding: 50px; display: none;">
 
   <div style="width: 100%; height: auto; margin-bottom: 20px; overflow:hidden;">
     <div style="color: #757575;
@@ -30,7 +30,7 @@
           <%= @invoice.company.collect_company_detail.address %>
         </div>
         <!--<div class="company-pin-code company-address">-->
-          <!--PIN :-->
+        <!--PIN :-->
         <!--</div>-->
         <div class="pan-no">
           <span style="width:100px;display:inline-block;">  PAN Number :  &nbsp;  </span> <span style="font-weight: bold; color: #333333;"><%= @invoice.company.collect_company_detail.pan %></span>
@@ -175,22 +175,22 @@
         </thead>
         <tbody>
         <% @invoice.invoice_items.each_with_index do |invoice_item, index| %>
-            <tr style="text-align: center;">
-              <td scope="row" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= index + 1 %></td>
-              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.description %></td>
-              <% if @invoice.invoice_items_custom_field_configuration_ids.present? %>
-                  <% @invoice.invoice_items_custom_field_configuration_ids.each do |fc_id| %>
-                      <td scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid#ddd;"><%= invoice_item.custom_fields.with_field_configuration_ids(fc_id).first&.value&.value %></td>
-                  <% end %>
+          <tr style="text-align: center;">
+            <td scope="row" style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= index + 1 %></td>
+            <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.description %></td>
+            <% if @invoice.invoice_items_custom_field_configuration_ids.present? %>
+              <% @invoice.invoice_items_custom_field_configuration_ids.each do |fc_id| %>
+                <td scope="col" style="border-right: 1px solid #ddd; border-bottom: 1px solid#ddd;"><%= invoice_item.custom_fields.with_field_configuration_ids(fc_id).first&.value&.value %></td>
               <% end %>
-              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.hsn_sac %></td>
-              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.quantity %></td>
-              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.rate %></td>
-              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.amount&.value %></td>
-              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.discount_amount&.value %></td>
-              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.tax_amount&.value%></td>
-              <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.net_amount&.value %></td>
-            </tr>
+            <% end %>
+            <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.hsn_sac %></td>
+            <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;"><%= invoice_item.quantity %></td>
+            <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.rate %></td>
+            <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.amount&.value %></td>
+            <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.discount_amount&.value %></td>
+            <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.tax_amount&.value%></td>
+            <td style="border-right: 1px solid #ddd; border-bottom: 1px solid #ddd;">&#8377; <%= invoice_item.net_amount&.value %></td>
+          </tr>
         <% end %>
 
         </tbody>
@@ -218,38 +218,38 @@
           <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.line_items_total %></td>
         </tr>
         <% if @invoice.discount_amount&.value > 0 %>
-        <tr>
-          <td>Discount</td>
-          <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.discount_amount&.value%></td>
-        </tr>
+          <tr>
+            <td>Discount</td>
+            <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.discount_amount&.value%></td>
+          </tr>
         <% end %>
         <% if @invoice.tax_amount&.value > 0 %>
-        <tr>
-          <td>Tax</td>
-          <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.tax_amount&.value%></td>
-        </tr>
+          <tr>
+            <td>Tax</td>
+            <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.tax_amount&.value%></td>
+          </tr>
         <% end %>
         <!--<tr>-->
         <!--<td>TDS</td>-->
         <!--<td style="font-weight: bold; color: #333333;">&#8377; </td>-->
         <!--</tr>-->
         <% if @invoice.advance_amount&.value > 0 %>
-        <tr>
-          <td>Advance Payment</td>
-          <td style="font-weight: bold; color: forestgreen;">&#8377; <%= @invoice.advance_amount&.value%></td>
-        </tr>
+          <tr>
+            <td>Advance Payment</td>
+            <td style="font-weight: bold; color: forestgreen;">&#8377; <%= @invoice.advance_amount&.value%></td>
+          </tr>
         <% end %>
         <% if @invoice.freight_amount&.value > 0 %>
-        <tr>
-          <td>Freight</td>
-          <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.freight_amount&.value%></td>
-        </tr>
+          <tr>
+            <td>Freight</td>
+            <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.freight_amount&.value%></td>
+          </tr>
         <% end %>
         <% if @invoice.roundoff_amount.present? %>
-        <tr>
-          <td>Round Off</td>
-          <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.roundoff_amount%></td>
-        </tr>
+          <tr>
+            <td>Round Off</td>
+            <td style="font-weight: bold; color: #333333;">&#8377; <%= @invoice.roundoff_amount%></td>
+          </tr>
         <% end %>
         <tr>
           <td>Balance Due</td>
@@ -264,10 +264,99 @@
 
   <div style="width: 100%; height: auto; overflow: hidden; text-align: center; margin-top: 45px;">
     <!--<div style="width: 100%; height: auto;margin-bottom: 30px; color: #333333; font-size: 14px;">-->
-      <!--Notice Something Wrong? Contact our <a href="">Support Team</a> & We'll Be Happy To Help You. Thank You For Your Business.-->
+    <!--Notice Something Wrong? Contact our <a href="">Support Team</a> & We'll Be Happy To Help You. Thank You For Your Business.-->
     <!--</div>-->
     <div style="width: 100%; height: auto; text-transform: uppercase; font-weight: bold; color: darkblue;letter-spacing: 2px;">
       Thank you for being a great customer
+    </div>
+  </div>
+
+</div>
+
+
+<div style="width: 550px; height: auto; overflow: hidden; margin-left: auto; margin-right: auto; padding-top: 10px; padding-bottom: 10px;">
+  <div style="width: 50%; height: auto; overflow: hidden; float:left;">
+    <img src="https://www.finly.io/api/common/images/logos/logo_md.png" style="float: left;" class="company-logo" width="75" height="auto">
+  </div>
+  <div style="width: 50%; height: auto; overflow: hidden; float:left;">
+    <span style="display: block; float: right; font-weight: 300; font-family: sans-serif; font-size: 16px; text-transform: capitalize; line-height: 1.5; color: #7b7b7b;"><%= @invoice.date.strftime("%a, %d-%b-%Y") %></span>
+  </div>
+</div>
+<div style="width: 550px; height: auto; margin-left: auto; margin-right: auto; overflow: hidden; background-color: white !important;border:1px solid #c4c4c4; box-shadow: 0 10px 10px #c4c4c4;">
+  <div style="width: 100%; height: 10px; background-color: #233e72; border: 1px solid #233e72;"></div>
+  <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 10px; border-bottom: 1px solid #c4c4c4;">
+    <img src="<%= @invoice.company.collect_company_detail&.company_logo&.path %>" style="float: left;" class="company-logo" width="100" height="auto">
+    <span style="display: block; float: right; font-weight: bold; font-family: sans-serif; font-size: 19px; color: #233e72;"><%= @invoice.company.name %></span>
+  </div>
+  <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 20px; border-bottom: 1px solid #c4c4c4; font-family: sans-serif; font-weight: 300;">
+    <div style="width:33%; height: auto; overflow: hidden; float: left; text-align: center;">
+      <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 12px; color: #7b7b7b;"> Invoice Number </span> <br>
+      <span style="display: block; font-weight: bold; font-size: 16px; color: #5d5d5d;"> <%= @invoice.invoice_number %> </span>
+    </div>
+    <div style="width: 0.31%; height: 54px; background-color: #c4c4c4; float: left;"></div>
+    <div style="width:33%; height: auto; overflow: hidden; float: left; text-align: center;">
+      <% if @invoice.due_date.present? %>
+        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 12px; color: #7b7b7b;"> Due Date </span> <br>
+        <span style="display: block; font-weight: bold; font-size: 16px; color: #5d5d5d;"> <%= @invoice.due_date&.strftime("%a, %d-%b-%Y") %> </span>
+      <% else %>
+        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 12px; color: #7b7b7b;"> Invoice Date </span> <br>
+        <span style="display: block; font-weight: bold; font-size: 16px; color: #5d5d5d;"> <%= @invoice.date&.strftime("%a, %d-%b-%Y") %> </span>
+      <% end %>
+    </div>
+    <div style="width: 0.33%; height: 54px; background-color: #c4c4c4; float: left"></div>
+    <div style="width:33.33%; height: auto; overflow: hidden; float: left; text-align: center;">
+      <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 12px; color: #7b7b7b;"> Balance Due </span> <br>
+      <span style="display: block; font-weight: bold; font-size: 16px; color: #5d5d5d;"> <%= @invoice.balance_due.currency.symbol %><%= @invoice.balance_due.value %></span>
+    </div>
+    <div style="width: 33.33%; margin-top: 20px; height: auto; overflow: hidden; float: right; display: none;">
+      <button style="background-color: #233e72; cursor: pointer; color: white; width: 80%; margin-left:10%; box-shadow: 0 0 15px #7b7b7b; padding: 5px; border:none;">View Invoice</button>
+    </div>
+  </div>
+  <div style="width: 100%; height: auto; overflow: hidden; min-height: 300px;">
+    <div style="width: 90%; margin-left: 5%; margin-right: 5%; height: auto; overflow: hidden; padding-top: 25px; color: #454545; font-size: 13px; margin-bottom:20px;">
+      <%= simple_format @options[:email_body] %>
+    </div>
+
+  </div>
+  <div style="width: 100%; height: 10px; background-color: #233e72; border: 1px solid #233e72;"></div>
+</div>
+<div style="width:550px; margin-top: 10px; height: auto; overflow: hidden; margin-left: auto; margin-right: auto ">
+  <div style="overflow: hidden; height: auto; padding-top: 10px; padding-bottom: 10px; color: #7b7b7b;">
+    <div style="width: 50%; height: auto; overflow: hidden; float: left; text-align: left; ">
+      <ul style="list-style-type: none; padding-left: 0; display: inline-flex; margin:0;">
+        <!--<li style="text-decoration: none; margin-right: 10px; cursor: pointer;">-->
+          <!--<img src="google-plus-2.png" width="25" height="auto">-->
+        <!--</li>-->
+        <!--<li style="text-decoration: none; cursor: pointer;">-->
+          <!--<img src="youtube-2.png" width="25" style="margin-right: 10px;" height="auto">-->
+        <!--</li>-->
+        <!--<li style="text-decoration: none;  cursor: pointer;">-->
+          <!--<img src="linkedin-2.png" width="25" style="margin-right: 10px;" height="auto">-->
+        <!--</li>-->
+        <!--<li style="text-decoration: none; cursor: pointer;">-->
+          <!--<img src="facebook-2.png" width="25" style="margin-right: 10px;" height="auto">-->
+        <!--</li>-->
+        <!--<li style="text-decoration: none;  cursor: pointer;">-->
+          <!--<img src="twitter-2.png" width="25" style="margin-right: 10px;" height="auto">-->
+        <!--</li>-->
+        <!--<li style="text-decoration: none; cursor: pointer;">-->
+          <!--<img src="instagram-2.png" width="25" style="margin-right: 10px;" height="auto">-->
+        <!--</li>-->
+      </ul>
+    </div>
+    <div style="width: 50%; height: auto; overflow: hidden; float: left; text-align: right;">
+      <ul style="list-style-type: none; padding-left: 0; display: inline-flex; margin:0;">
+        <li style="text-decoration: none; margin-right: 10px; cursor: pointer;">
+          <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp">
+            <img src="https://www.finly.io/common/images/playstore.png" width="90" height="auto">
+          </a>
+        </li>
+        <li style="text-decoration: none; cursor: pointer;">
+          <a href="https://itunes.apple.com/us/app/finly/id1219281468">
+            <img src="https://www.finly.io/common/images/appstore.png" width=90 style="margin-right: 10px;" height="auto">
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
 
