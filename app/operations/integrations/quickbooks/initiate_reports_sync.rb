@@ -21,10 +21,6 @@ class Integrations::Quickbooks::InitiateReportsSync < Integrations::Quickbooks::
     end
   end
 
-  def authorized_user_types
-    [:company_admin, :finance_manager]
-  end
-
   def init
     user_ids = user.company.users.pluck(:id)
     ids = params[:report_ids] || params[:report_id]

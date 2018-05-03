@@ -89,12 +89,14 @@ json.roles do
   json.admin @result.selected_user.admin?
   json.finance_manager @result.selected_user.finance_manager?
   json.manager @result.selected_user.manager?
+  json.auditor @result.selected_user.auditor?
 end
 
 json.roles_em do
   json.admin @result.selected_user.admin?
   json.finance_manager @result.selected_user.finance_manager?
   json.manager @result.selected_user.manager?
+  json.auditor @result.selected_user.auditor?
 end
 
 json.roles_vp do
@@ -102,6 +104,7 @@ json.roles_vp do
   json.reviewer @result.selected_user.vendor_payments_reviewer?
   json.creditor @result.selected_user.vendor_payments_creditor?
   json.initiator @result.selected_user.vendor_payments_initiator?
+  json.auditor @result.selected_user.auditor?
 end
 
 json.roles_fc do
