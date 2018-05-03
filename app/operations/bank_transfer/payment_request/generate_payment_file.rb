@@ -47,7 +47,7 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
         }
       end
     end
-    self.response = PaymentFiles::Generate.(user, {payment_file: data})
+    self.response =   PaymentFiles::Generate.(user, {payment_file: data})
   end
 
   def post_process
