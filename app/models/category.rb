@@ -49,7 +49,9 @@ class Category < ActiveRecord::Base
   scope :with_name, ->(name) { where name: name }
   scope :others, -> { where name: 'Other' }
   scope :with_purpose, -> (purpose) {
-    where(purpose.to_sym => true)
+    if purpose.present?
+      where(purpose.to_sym => true)
+    end
   }
   scope :outward_invoice_items_categories, -> { where purpose_id: Purpose.id_for(:outward_invoice_items) }
   scope :expense_management_only, -> {
