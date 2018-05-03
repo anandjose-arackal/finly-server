@@ -101,11 +101,21 @@ class BankPaymentRequest < ActiveRecord::Base
 
   scope :filter_date, -> (date_from, date_to) {
     date_from = "1990-01-01" if date_from.blank?
-    date_to = DateUtils.local_date_time if date_to.blank?
-    date_from = date_from.to_time if date_from.present?
-    date_to = date_to.to_time if date_to.present?
+    date_to = DateUtils.local_date.strftime("%d-%m-%Y") if date_to.blank?
+    date_from = DateTime.parse(date_from).beginning_of_day unless date_from.is_a?(Date)
+    date_to = DateTime.parse(date_to).end_of_day unless date_to.is_a?(Date)
     joins(:payment_order).where('payment_orders.created_at >= ? AND payment_orders.created_at <= ?', date_from, date_to)
   }
+
+  scope :filter_scheduled_date, -> (date_from, date_to) {
+    date_from = "1990-01-01" if date_from.blank?
+    date_to = DateUtils.local_date.strftime("%d-%m-%Y") if date_to.blank?
+    date_from = DateTime.parse(date_from).beginning_of_day unless date_from.is_a?(Date)
+    date_to = DateTime.parse(date_to).end_of_day unless date_to.is_a?(Date)
+    joins(:payment_order).where('payment_orders.scheduled_at >= ? AND payment_orders.scheduled_at <= ?', date_from, date_to)
+  }
+
+  scope :filter_controlling_user, -> (user_id) { where controlling_user_id: user_id }
 
   scope :processing, -> { where status_id: BankPaymentRequestStatus.id_for(:processing) }
 
@@ -122,9 +132,6 @@ class BankPaymentRequest < ActiveRecord::Base
     invoice_ids = CustomField.with_drop_down_selection(drop_down_selection_ids).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
     invoice_ids += CustomField.with_multi_select_selection(multiselect_item_ids).with_parent(raw_invoice_ids, "Invoice").pluck(:parent_id)
     po_ids = Payment.where(invoice_id: invoice_ids).pluck(:payment_order_id)
-    # payment_ids = Payment.where(invoice_id: invoice_ids)
-    # payment_ids = Invoice.where(id: invoice_ids).pluck(:payment_id)
-    # po_ids = Payment.where(id: payment_ids).pluck(:payment_order_id)
     bpr_ids = BankPaymentRequest.where(payment_order_id: po_ids).pluck(:id)
     where(id: bpr_ids)
   }
