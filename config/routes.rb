@@ -548,6 +548,7 @@
 #                                                         PATCH  /user_permissions/:id(.:format)                                                              user_permissions#update
 #                                                         PUT    /user_permissions/:id(.:format)                                                              user_permissions#update
 #                                                         DELETE /user_permissions/:id(.:format)                                                              user_permissions#destroy
+#                                 category_sub_categories GET    /categories/:category_id/sub_categories(.:format)                                            categories#sub_categories
 #                                              categories GET    /categories(.:format)                                                                        categories#index
 #                                                         POST   /categories(.:format)                                                                        categories#create
 #                                            new_category GET    /categories/new(.:format)                                                                    categories#new
@@ -2242,7 +2243,9 @@ Rails.application.routes.draw do
     post 'check_permissions', to: 'user_permissions#check_permissions', as: :check_permissions
   end
 
-  resources :categories
+  resources :categories do
+    get 'sub_categories', to: 'categories#sub_categories', as: :sub_categories
+  end
 
   resources :export_preferences
 

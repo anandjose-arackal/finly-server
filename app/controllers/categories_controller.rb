@@ -33,4 +33,9 @@ class CategoriesController < ApplicationController
     @result = Categories::Index.(current_user, params)
     respond
   end
+
+  def sub_categories
+    @result = Categories::SubCategory::Index.(current_user, params)
+    respond
+  end
 end
