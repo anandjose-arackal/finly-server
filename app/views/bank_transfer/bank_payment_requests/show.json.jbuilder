@@ -24,6 +24,7 @@ json.summary do
   json.beneficiary_type @result.bank_payment_request.beneficiary_type
   json.approvers @result.approvers
   json.name @result.bank_payment_request.name
+  json.show_payment_file_download current_company.payment_file_configuration.present?
 end
 
 json.invoice_categories do
