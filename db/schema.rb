@@ -739,29 +739,6 @@ ActiveRecord::Schema.define(version: 20180503114215) do
   add_index "budget_rules", ["policy_id"], name: "index_budget_rules_on_policy_id", using: :btree
   add_index "budget_rules", ["rule_type_id"], name: "index_budget_rules_on_rule_type_id", using: :btree
 
-  create_table "budgets", force: :cascade do |t|
-    t.string   "name",             limit: 255
-    t.integer  "period_id",        limit: 4
-    t.date     "start_date"
-    t.date     "end_date"
-    t.integer  "budget_amount_id", limit: 4
-    t.integer  "spent_amount_id",  limit: 4
-    t.integer  "budgetable_id",    limit: 4,                   null: false
-    t.string   "budgetable_type",  limit: 255,                 null: false
-    t.boolean  "is_deleted",                   default: false
-    t.datetime "created_at",                                   null: false
-    t.datetime "updated_at",                                   null: false
-    t.integer  "user_id",          limit: 4
-    t.integer  "company_id",       limit: 4
-  end
-
-  add_index "budgets", ["budget_amount_id"], name: "index_budgets_on_budget_amount_id", using: :btree
-  add_index "budgets", ["budgetable_type", "budgetable_id"], name: "index_budgets_on_budgetable_type_and_budgetable_id", using: :btree
-  add_index "budgets", ["company_id"], name: "index_budgets_on_company_id", using: :btree
-  add_index "budgets", ["period_id"], name: "index_budgets_on_period_id", using: :btree
-  add_index "budgets", ["spent_amount_id"], name: "index_budgets_on_spent_amount_id", using: :btree
-  add_index "budgets", ["user_id"], name: "index_budgets_on_user_id", using: :btree
-
   create_table "card_assign_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -1016,16 +993,23 @@ ActiveRecord::Schema.define(version: 20180503114215) do
   add_index "cash_on_hands", ["user_id"], name: "index_cash_on_hands_on_user_id", using: :btree
 
   create_table "categories", force: :cascade do |t|
-    t.integer  "company_id",   limit: 4,                  null: false
-    t.string   "name",         limit: 255,                null: false
-    t.string   "gl_code",      limit: 255
-    t.string   "payroll_code", limit: 255
-    t.boolean  "active",                   default: true, null: false
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-    t.integer  "purpose_id",   limit: 4
+    t.integer  "company_id",                 limit: 4,                  null: false
+    t.string   "name",                       limit: 255,                null: false
+    t.string   "gl_code",                    limit: 255
+    t.string   "payroll_code",               limit: 255
+    t.boolean  "active",                                 default: true, null: false
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.integer  "purpose_id",                 limit: 4
+    t.boolean  "expense_management"
+    t.boolean  "vendor_payments"
+    t.boolean  "outward_invoices"
+    t.boolean  "inward_invoice_line_items"
+    t.string   "ancestry",                   limit: 255
+    t.boolean  "outward_invoice_line_items"
   end
 
+  add_index "categories", ["ancestry"], name: "index_categories_on_ancestry", using: :btree
   add_index "categories", ["company_id"], name: "index_categories_on_company_id", using: :btree
 
   create_table "channel_types", force: :cascade do |t|
@@ -2867,8 +2851,8 @@ ActiveRecord::Schema.define(version: 20180503114215) do
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
     t.text     "customer_memo",           limit: 65535
-    t.integer  "payment_term_id",         limit: 4
     t.text     "reminders",               limit: 65535
+    t.integer  "payment_term_id",         limit: 4
     t.integer  "user_id",                 limit: 4
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
     t.text     "terms",                   limit: 65535
@@ -4446,9 +4430,6 @@ ActiveRecord::Schema.define(version: 20180503114215) do
   add_foreign_key "budget_rules", "periods"
   add_foreign_key "budget_rules", "policies"
   add_foreign_key "budget_rules", "rule_types"
-  add_foreign_key "budgets", "companies"
-  add_foreign_key "budgets", "periods"
-  add_foreign_key "budgets", "users"
   add_foreign_key "card_assign_request_tracks", "card_assign_requests"
   add_foreign_key "card_assign_requests", "admin_review_workflows"
   add_foreign_key "card_assign_requests", "card_programs"
