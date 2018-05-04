@@ -23,6 +23,7 @@ json.invoice do
   json.due_date invoice.due_date&.strftime("%d-%b-%Y")
   json.memo invoice.memo
   json.customer_memo invoice.customer_memo
+  json.terms invoice.terms
   json.status do
     json.id invoice.invoice_status&.id
     json.name invoice.invoice_status&.name&.humanize
