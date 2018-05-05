@@ -3,14 +3,16 @@ json.categories do
     json.id category.id
     json.name category.name
     if category.children.present?
-      json.array!(category.children) do |sub_category|
-        json.id sub_category.id
-        json.name sub_category.name
-        json.expense_management sub_category.expense_management
-        json.vendor_payments sub_category.vendor_payments
-        json.inward_invoice_line_items sub_category.inward_invoice_line_items
-        json.outward_invoices sub_category.outward_invoices
-        json.outward_invoice_line_items sub_category.outward_invoice_line_items
+      json.sub_categories do
+        json.array!(category.children) do |sub_category|
+          json.id sub_category.id
+          json.name sub_category.name
+          json.expense_management sub_category.expense_management
+          json.vendor_payments sub_category.vendor_payments
+          json.inward_invoice_line_items sub_category.inward_invoice_line_items
+          json.outward_invoices sub_category.outward_invoices
+          json.outward_invoice_line_items sub_category.outward_invoice_line_items
+        end
       end
     else
       json.expense_management category.expense_management
