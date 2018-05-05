@@ -50,7 +50,7 @@ class Report::Base < BaseOperation
   class Report::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :report, :categories, :expenses, :manager, :finance_manager, :status, :total, #:report_currency,
                   :dates, :comments, :actions, :policies, :selected_policy, :violations, :result, :violations_present,
-                  :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total
+                  :reimbursable_expenses_total, :non_reimbursable_expenses_total, :card_expenses_total, :budgets
 
     def init
       self.report = params[:report]
@@ -72,6 +72,7 @@ class Report::Base < BaseOperation
       self.non_reimbursable_expenses_total = non_reimbursable_expenses
       self.card_expenses_total = report.total_amount(:only_card_expenses)
       self.budgets = Report::Budgets.(user, report: self.report)
+      debugger
     end
 
     def retrieve_policies

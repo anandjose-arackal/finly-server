@@ -351,6 +351,18 @@ class Expense < ActiveRecord::Base
   scope :includes_amount, -> { includes :amount }
   scope :sum_amounts, -> { includes_amount.sum('amounts.INR') }
 
+
+  scope :user_budget_expenses, -> (from, to) {
+    from = Date.parse(from) rescue Date.today
+    to = Date.parse(to) rescue Date.today
+    where('(expenses.expense_status_id IN (?) AND expenses.report_id IS NOT NULL) OR (expenses.expense_status_id = ? AND expenses.expense_type_id = ?)', [ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:submitted), ExpenseStatus.id_for(:verified)], ExpenseStatus.id_for(:unreported), ExpenseType.id_for(:card)).
+        where('expenses.date >= ? AND expenses.date <= ?', from, to)
+  }
+
+  # scope :category_budget_expenses, -> {
+  #   where('expenses.category_id = ?')
+  # }
+
   delegate :category_name, to: :category
   delegate :amount_with_currency, to: :amount
 
