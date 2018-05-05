@@ -11,7 +11,7 @@ class Categories::Destroy < Categories::Base
   def init
     super
     id = (params[:id] or params[:category_id])
-    self.category = self.categories.with_id(id).first rescue nil if id.present?
+    self.category = self.user.company.categories.with_id(id).first
   end
 
   def validate
@@ -22,6 +22,11 @@ class Categories::Destroy < Categories::Base
     if category.name == "Other"
       messages[:error] << "Cannot remove 'Other' category"
       return false
+    end
+
+    if self.category.children.present?
+      add_message :error, "This category has sub-categories associated with it. Delete all sub-categories and try again"
+      return
     end
   end
 

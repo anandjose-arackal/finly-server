@@ -14,6 +14,22 @@ class Categories::Update < Categories::Base
     self.category = user.company.categories.active.find_by(id: id)
   end
 
+  def validate
+    parent = user.company.categories.active.find_by(id: category_params[:parent_id])
+    if parent.present?
+      if parent.id == self.category.id
+        add_message :error, "#{self.category.name} cannot be a sub-category of itself"
+        return
+      end
+
+      # checking if the current category is already a parent
+      if self.category.children.present?
+        add_message :error, "This category already has sub-categories associated with it"
+        return
+      end
+    end
+  end
+
   def process
     unless category.update(category_params)
       messages[:error] = category.errors.full_messages
