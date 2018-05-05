@@ -1,6 +1,6 @@
 class Categories::Update < Categories::Base
 
-  attr_accessor :category
+  attr_accessor :category, :category_parameters
 
   def pre_validate
     if user.blank? || params.blank?
@@ -12,10 +12,11 @@ class Categories::Update < Categories::Base
     super
     id = params[:id] || params[:category_id]
     self.category = user.company.categories.active.find_by(id: id)
+    self.category_parameters = category_params
   end
 
   def validate
-    parent = user.company.categories.active.find_by(id: category_params[:parent_id])
+    parent = user.company.categories.active.find_by(id: category_parameters[:parent_id])
     if parent.present?
       if parent.id == self.category.id
         add_message :error, "#{self.category.name} cannot be a sub-category of itself"
@@ -30,8 +31,26 @@ class Categories::Update < Categories::Base
     end
   end
 
+  def pre_process
+    [:expense_management, :vendor_payments, :outward_invoices, :inward_invoice_line_items, :outward_invoice_line_items].each do |app|
+      if self.category_parameters&.dig(app).blank?
+        self.category_parameters[app] = false
+      end
+    end
+  end
+
   def process
-    unless category.update(category_params)
+    if category.update(category_parameters)
+      # i.e. if there is a parent and the child's subscriptions have been updated
+      # the parent's subscription should also be updated accordingly
+      if self.category.parent.present?
+        [:expense_management, :vendor_payments, :outward_invoices, :inward_invoice_line_items, :outward_invoice_line_items].each do |app|
+          unless self.category.parent.send(app)
+            self.category.parent.update(app => self.category.send(app))
+          end
+        end
+      end
+    else
       messages[:error] = category.errors.full_messages
       return
     end

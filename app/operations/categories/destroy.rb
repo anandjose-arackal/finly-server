@@ -24,7 +24,7 @@ class Categories::Destroy < Categories::Base
       return false
     end
 
-    if self.category.children.present?
+    if self.category.children.active.present?
       add_message :error, "This category has sub-categories associated with it. Delete all sub-categories and try again"
       return
     end
