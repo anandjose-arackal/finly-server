@@ -32,6 +32,10 @@
     </div>
   </div><!--
   --><div class="company-address"  style="display: inline-block; width: 50%; text-align: right; vertical-align: top; font-size: 13px; margin: 0; margin-top: 10px;">
+  <% if @invoice.company.collect_company_detail.gst.present? %>
+    GSTIN: <%= @invoice.company.collect_company_detail.gst %>
+  <% end %><br />
+  <%= @invoice.company.name %>
   <%= simple_format @invoice.company.collect_company_detail.address, {}, wrapper_tag: "div" %>
 </div>
 </div>
@@ -49,9 +53,11 @@
       <!--<div class="invoice-number">-->
       <!--<span> <b> Invoice Number : &nbsp; </b> </span> <span>6589798746</span>-->
       <!--</div>-->
+      <% if @invoice.mobile_number.present? %>
       <div class="invoice-number">
         <span class="fixed-span">  Mobile  &nbsp;  </span> <span><b><%= @invoice.mobile_number%></b></span>
       </div>
+      <% end %>
       <div class="invoice-number">
         <span class="fixed-span">  Invoice Date  &nbsp;  </span> <span><b><%= @invoice.date %></b></span>
       </div>
@@ -116,6 +122,13 @@
 
 </div>
 
+<% show_hsn_sac = false %>
+<% @invoice.invoice_items.each do |item| %>
+  <% if item.hsn_sac.present? %>
+    <% show_hsn_sac = true; break; %>
+  <% end %>
+<% end %>
+
 
 <% if @invoice.inclusive_of_taxes %>
   <div style="width: calc(100% - 10px); height: auto; overflow: hidden;font-size: 12px; color: #7b7b7b; font-weight: 300; margin-top: 10px; margin-left: 10px; ">
@@ -135,7 +148,9 @@
           <th scope="col" style="text-align: left; "><%= FieldConfiguration.find_by(id: fc_id)&.field_name %></th>
         <% end %>
       <% end %>
-      <th scope="col" style="text-align: left; ">HSN/SAC</th>
+      <% if show_hsn_sac %>
+        <th scope="col" style="text-align: left; ">HSN/SAC</th>
+      <% end %>
       <th scope="col" style="text-align: center; ">Quantity</th>
       <th scope="col" style="text-align: right; ">Rate</th>
       <th scope="col" style="text-align: right; ">Amount</th>
@@ -148,69 +163,99 @@
     <% @invoice.invoice_items.each_with_index do |item, index| %>
       <tr>
         <td style="padding: 5px; text-align: left; font-size: 11px; " scope="row"><%= (index + 1) %></td>
-        <td style="padding: 5px; text-align: left; font-size: 11px; "><%= item.description%></td>
+        <td style="padding: 5px; text-align: left; font-size: 11px; "><%= item.description %><br/><span style="color: #787878;"><%= item.item_info %></span></td>
         <% if @invoice.invoice_items_custom_field_configuration_ids.present? %>
           <% @invoice.invoice_items_custom_field_configuration_ids.each do |fc_id| %>
             <td style="padding: 5px; text-align: left; font-size: 11px; "><%= item.custom_fields.with_field_configuration_ids(fc_id).first&.value&.value %></td>
           <% end %>
         <% end %>
-        <td style="padding: 5px; text-align: left; font-size: 11px; "><%= item.hsn_sac%></td>
+        <% if show_hsn_sac %>
+          <td style="padding: 5px; text-align: left; font-size: 11px; "><%= item.hsn_sac%></td>
+        <% end %>
         <td style="padding: 5px; text-align: center; font-size: 11px; "><%= item.quantity%></td>
-        <td style="padding: 5px; text-align: right; font-size: 11px; ">INR <%= item.rate %></td>
-        <td style="padding: 5px; text-align: right; font-size: 11px; ">INR <%= item.amount&.value%></td>
-        <td style="padding: 5px; text-align: right; font-size: 11px; ">INR <%= item.discount_amount&.value %></td>
-        <td style="padding: 5px; text-align: right; font-size: 11px; ">INR <%= item.tax_amount&.value %></td>
-        <td style="padding: 5px; text-align: right; font-size: 11px; ">INR <%= item.net_amount&.value%></td>
+        <td style="padding: 5px; text-align: right; font-size: 11px; ">INR<%= item.rate %></td>
+        <td style="padding: 5px; text-align: right; font-size: 11px; ">INR<%= item.amount&.value%></td>
+        <td style="padding: 5px; text-align: right; font-size: 11px; "><%= item.discount %>%</td>
+        <td style="padding: 5px; text-align: right; font-size: 11px; "><%= item.tax %>%</td>
+        <td style="padding: 5px; text-align: right; font-size: 11px; ">INR<%= item.net_amount&.value%></td>
       </tr>
     <% end %>
     <tr>
-      <td colspan="6" style="border: none;"></td>
+      <% if show_hsn_sac %>
+        <td colspan="6" style="border: none;"></td>
+      <% else %>
+        <td colspan="5" style="border: none;"></td>
+      <% end %>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 12px; " class="line-items-title" colspan="2">Total </td>
-      <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-total" colspan="1">INR <%= @invoice.line_items_net_total%></td>
+      <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-total" colspan="1">INR<%= @invoice.line_items_net_total.to_f.round(2) %></td>
     </tr>
     <% if @invoice.discount_amount&.value > 0 %>
       <tr>
-        <td colspan="6" style="border: none;"></td>
+        <% if show_hsn_sac %>
+          <td colspan="6" style="border: none;"></td>
+        <% else %>
+          <td colspan="5" style="border: none;"></td>
+        <% end %>
         <td style="padding: 5px; border: none !important; text-align: right; font-size: 12px; " class="line-items-title" colspan="2">Discount </td>
-        <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-discount" colspan="1">INR <%= @invoice.discount_amount&.value%></td>
+        <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-discount" colspan="1">INR<%= @invoice.discount_amount&.value.to_f.round(2) %></td>
       </tr>
     <% end %>
     <% if @invoice.tax_amount&.value > 0 %>
       <tr>
-        <td colspan="6" style="border: none;"></td>
+        <% if show_hsn_sac %>
+          <td colspan="6" style="border: none;"></td>
+        <% else %>
+          <td colspan="5" style="border: none;"></td>
+        <% end %>
         <td style="padding: 5px; border: none !important; text-align: right; font-size: 12px; " class=" line-items-title" colspan="2">Tax </td>
-        <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-tax" colspan="1">INR <%= @invoice.tax_amount&.value%></td>
+        <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-tax" colspan="1">INR<%= @invoice.tax_amount&.value.to_f.round(2) %></td>
       </tr>
     <% end %>
     <!--<tr>-->
     <!--<th class="plain" colspan="6"></th>-->
     <!--<td style="padding: 5px; border: none !important; text-align: right;; font-size: 11px; " class="plain line-items-title" colspan="2">TDS :</td>-->
-    <!--<td style="padding: 5px; border: none !important; text-align: right;; font-size: 11px; " class="plain line-items-data line-items-tds" colspan="2">INR 67</td>-->
+    <!--<td style="padding: 5px; border: none !important; text-align: right;; font-size: 11px; " class="plain line-items-data line-items-tds" colspan="2">INR67</td>-->
     <!--</tr>-->
     <% if @invoice.advance_amount&.value > 0 %>
       <tr>
-        <td colspan="6" style="border: none;"></td>
+        <% if show_hsn_sac %>
+          <td colspan="6" style="border: none;"></td>
+        <% else %>
+          <td colspan="5" style="border: none;"></td>
+        <% end %>
         <td style="padding: 5px; border: none !important; text-align: right; font-size: 12px; " class=" line-items-title" colspan="2">Advance Payment </td>
-        <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-advance-payment" colspan="1">INR <%= @invoice.advance_amount&.value%></td>
+        <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-advance-payment" colspan="1">INR<%= @invoice.advance_amount&.value.to_f.round(2) %></td>
       </tr>
     <% end %>
     <% if @invoice.freight_amount&.value > 0 %>
       <tr>
-        <td colspan="6" style="border: none;"></td>
+        <% if show_hsn_sac %>
+          <td colspan="6" style="border: none;"></td>
+        <% else %>
+          <td colspan="5" style="border: none;"></td>
+        <% end %>
         <td style="padding: 5px; border: none !important; text-align: right; font-size: 12px; " class="line-items-title" colspan="2">Freight </td>
-        <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-freight" colspan="1">INR <%= @invoice.freight_amount&.value %></td>
+        <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-freight" colspan="1">INR<%= @invoice.freight_amount&.value.to_f.round(2) %></td>
       </tr>
     <% end %>
     <tr>
-      <td colspan="6" style="border: none;"></td>
+      <% if show_hsn_sac %>
+        <td colspan="6" style="border: none;"></td>
+      <% else %>
+        <td colspan="5" style="border: none;"></td>
+      <% end %>
       <td style="padding: 5px; border: none !important; text-align: right; font-size: 12px; " class="line-items-title" colspan="2">Roundoff </td>
-      <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-roundoff" colspan="1">INR <%= @invoice.roundoff_amount%></td>
+      <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-roundoff" colspan="1">INR<%= @invoice.roundoff_amount.to_f.round(2) %></td>
     </tr>
     <% if @invoice.partially_paid? || @invoice.paid? || @invoice.saved? || @invoice.unpaid? %>
       <tr>
-        <td colspan="6" style="border: none;" ></td>
+        <% if show_hsn_sac %>
+          <td colspan="6" style="border: none;"></td>
+        <% else %>
+          <td colspan="5" style="border: none;"></td>
+        <% end %>
         <td style="padding: 5px; border: none !important; text-align: right; font-size: 12px; " class="line-items-title" colspan="2">Balance Due </td>
-        <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-balance-due" colspan="1">INR <%= @invoice.balance_due&.value %></td>
+        <td style="padding: 5px; border: none !important; text-align: right;; font-size: 12px; " class="line-items-data line-items-balance-due" colspan="1">INR<%= @invoice.balance_due&.value.to_f.round(2) %></td>
       </tr>
     <% end %>
     </tbody>
@@ -235,20 +280,23 @@
   </div>
 <% end %>
 
-
+<% if @invoice.customer_memo.present? %>
 <div class="customer-notes" style="margin-top: 20px;">
   <div class="address-title" style="color: #5f5f5f;">
     Notes: <br>
   </div>
   <%= simple_format @invoice.customer_memo, {}, wrapper_tag: "p" %>
 </div>
+<% end %>
 
+<% if @invoice.terms.present? %>
 <div class="invoice-terms" style="margin-top: 15px;">
   <div class="address-title">
     Terms &amp; Conditions: <br>
   </div>
   <%= simple_format @invoice.terms, {}, wrapper_tag: "p" %>
 </div>
+<% end %>
 
 <!-- <div class="legal-statement" id="legalcopy">
   <p class="legal">Designed By <span style="font-weight: bold;">Finly</span>, With  <span style="color: red; font-weight: bold; font-size: 18px;"> &hearts;</span>  In <span style="font-weight: bold;">Bangalore, India.</span>
