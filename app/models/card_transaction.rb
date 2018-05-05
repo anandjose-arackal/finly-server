@@ -80,6 +80,7 @@ class CardTransaction < ActiveRecord::Base
   scope :with_transaction_timestamp_range, -> (start_time, end_time) { where('transaction_timestamp >= ? AND transaction_timestamp <= ?', start_time, end_time) }
 
 
+  scope :except_manual_credits_debits, -> { where.not(transaction_mode: nil) }
   scope :atm_withdrawals, -> { where transaction_mode: "ATM" }
   scope :with_user, -> (user_id) { where user_id: user_id }
   scope :pos_expenses, -> { where transaction_mode: "POS" }
@@ -154,6 +155,13 @@ class CardTransaction < ActiveRecord::Base
   def refund?
     if CardTransaction.refunds.include?(self)
       if self.transaction_type == 'Credit'
+        return true
+      end
+    end
+    self.card.transactions.credits.except_manual_credits_debits.each do |transaction|
+      # i.e. if the transaction is a credit, and has the same reference id as a previous transaction that
+      # is a debit, it should be refund more often than not
+      if self.card.transactions.debits.find_by(reference_id: transaction.reference_id)
         return true
       end
     end

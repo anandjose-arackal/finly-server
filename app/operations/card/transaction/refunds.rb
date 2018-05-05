@@ -24,9 +24,19 @@ class Card::Transaction::Refunds < BaseOperation
   end
 
   def process
-    ids = self.card.transactions.refunds
-    
+    ids = self.card.transactions.refunds.pluck(:id)
+    self.card.transactions.credits.except_manual_credits_debits.each do |transaction|
+      # i.e. if the transaction is a credit, and has the same reference id as a previous transaction that
+      # is a debit, it should be refund more often than not
+      if self.card.transactions.debits.find_by(reference_id: transaction.reference_id)
+        ids << transaction.id
+      end
+    end
+    self.transactions = self.card.transactions.with_id(ids)
   end
 
-
+  def success
+    params[:transactions] = self.transactions
+    Card::Transaction::Refunds::RefundsPresenter.new(user, params, messages)
+  end
 end
