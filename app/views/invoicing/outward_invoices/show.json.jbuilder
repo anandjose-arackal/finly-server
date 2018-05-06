@@ -79,6 +79,7 @@ json.invoice do
       json.category_name item.category&.name
       json.id item.id
       json.description item.description
+      json.item_info item.item_info
       json.total_amount precision_value item.net_amount&.value
       json.hsn_sac item.hsn_sac
       json.inventory_item_id item.inventory_line_item_id
