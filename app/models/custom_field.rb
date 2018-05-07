@@ -38,6 +38,11 @@ class CustomField < ActiveRecord::Base
     ids = CustomField.where(value_id: multi_select_ids, value_type: "FieldMultiselectSelection").pluck(:id)
     where(id: ids)
   }
+  scope :with_root_field_configurations, -> {
+    field_config_ids = self.pluck(:field_configuration_id)
+    root_field_config_ids = FieldConfiguration.where(id: field_config_ids, root_field: true).pluck(:id)
+    where(field_configuration_id: root_field_config_ids)
+  }
 
   def set_value(value, save = true)
     if value.blank?
