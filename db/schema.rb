@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180427131742) do
+ActiveRecord::Schema.define(version: 20180505070904) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -993,16 +993,23 @@ ActiveRecord::Schema.define(version: 20180427131742) do
   add_index "cash_on_hands", ["user_id"], name: "index_cash_on_hands_on_user_id", using: :btree
 
   create_table "categories", force: :cascade do |t|
-    t.integer  "company_id",   limit: 4,                  null: false
-    t.string   "name",         limit: 255,                null: false
-    t.string   "gl_code",      limit: 255
-    t.string   "payroll_code", limit: 255
-    t.boolean  "active",                   default: true, null: false
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-    t.integer  "purpose_id",   limit: 4
+    t.integer  "company_id",                 limit: 4,                  null: false
+    t.string   "name",                       limit: 255,                null: false
+    t.string   "gl_code",                    limit: 255
+    t.string   "payroll_code",               limit: 255
+    t.boolean  "active",                                 default: true, null: false
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.integer  "purpose_id",                 limit: 4
+    t.boolean  "expense_management"
+    t.boolean  "vendor_payments"
+    t.boolean  "outward_invoices"
+    t.boolean  "inward_invoice_line_items"
+    t.string   "ancestry",                   limit: 255
+    t.boolean  "outward_invoice_line_items"
   end
 
+  add_index "categories", ["ancestry"], name: "index_categories_on_ancestry", using: :btree
   add_index "categories", ["company_id"], name: "index_categories_on_company_id", using: :btree
 
   create_table "channel_types", force: :cascade do |t|
@@ -2139,22 +2146,23 @@ ActiveRecord::Schema.define(version: 20180427131742) do
     t.integer  "invoice_id",             limit: 4
     t.string   "description",            limit: 255
     t.integer  "quantity",               limit: 4
-    t.decimal  "rate",                               precision: 20, scale: 10
-    t.decimal  "tax",                                precision: 20, scale: 10
-    t.decimal  "discount",                           precision: 20, scale: 10
+    t.decimal  "rate",                                 precision: 20, scale: 10
+    t.decimal  "tax",                                  precision: 20, scale: 10
+    t.decimal  "discount",                             precision: 20, scale: 10
     t.integer  "category_id",            limit: 4
     t.integer  "gst_type_id",            limit: 4
     t.integer  "tax_amount_id",          limit: 4
     t.integer  "discount_amount_id",     limit: 4
     t.integer  "amount_id",              limit: 4
-    t.datetime "created_at",                                                   null: false
-    t.datetime "updated_at",                                                   null: false
+    t.datetime "created_at",                                                     null: false
+    t.datetime "updated_at",                                                     null: false
     t.integer  "net_amount_id",          limit: 4
     t.string   "hsn_sac",                limit: 255
     t.integer  "taxable_amount_id",      limit: 4
     t.string   "parent_type",            limit: 255
     t.string   "parent_id",              limit: 255
     t.integer  "inventory_line_item_id", limit: 4
+    t.text     "item_info",              limit: 65535
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -2848,6 +2856,7 @@ ActiveRecord::Schema.define(version: 20180427131742) do
     t.integer  "payment_term_id",         limit: 4
     t.integer  "user_id",                 limit: 4
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
+    t.text     "terms",                   limit: 65535
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
