@@ -169,7 +169,7 @@ class FieldConfiguration < ActiveRecord::Base
     elsif field_type_id == FieldType.id_for(:multiselect)
       options = multiselect_items.non_deleted
     end
-    {
+    result = {
         id: id,
         label: field_name,
         field_type: {id: field_type.id,
@@ -179,6 +179,15 @@ class FieldConfiguration < ActiveRecord::Base
         value: self.default_value,
         options: options
     }
+    if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
+      self.drop_down_items.each do |drop_down|
+        if drop_down.dependent_field_configuration.present?
+          result[:has_dependent_cf] = true
+          break
+        end
+      end
+    end
+    return result
   end
 
 end

@@ -4,7 +4,7 @@ class CustomFieldsController < ApplicationController
 
   def create
     @result = CustomField::Configuration::Create.(current_user, params)
-      respond response: @result&.success? ? :success : :failure
+    respond response: @result&.success? ? :success : :failure
   end
 
   def index

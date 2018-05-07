@@ -26,7 +26,11 @@ class FieldDropDownItem < ActiveRecord::Base
   default_scope { unscope(:where) }
 
   def as_json(options={})
-    {id: id, name: name}
+    result = {id: id, name: name}
+    if self.dependent_field_configuration.present?
+      result[:dependant_cf_present] = true
+    end
+    return result
   end
 
 end
