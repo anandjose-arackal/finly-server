@@ -19,6 +19,8 @@
 #  global                  :boolean          default(TRUE)
 #  external_reference_type :string(255)
 #  external_reference_id   :integer
+#  parent_id               :integer
+#  parent_type             :integer
 #
 
 class FieldConfiguration < ActiveRecord::Base
@@ -36,6 +38,7 @@ class FieldConfiguration < ActiveRecord::Base
   has_many :custom_fields
   belongs_to :default_value, polymorphic: true
   belongs_to :external_reference, polymorphic: true
+  belongs_to :parent, polymorphic: true
 
   validates :field_name, presence: true
   validates :enabled, presence: true

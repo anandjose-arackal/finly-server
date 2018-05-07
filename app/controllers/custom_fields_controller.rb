@@ -37,4 +37,9 @@ class CustomFieldsController < ApplicationController
     respond response: @result&.success? ? :success : :failure
   end
 
+  def dependent_custom_fields
+    @result = CustomField::FieldConfigurations::DependentIndex.(current_user, params)
+    respond
+  end
+
 end

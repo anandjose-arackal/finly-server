@@ -14,10 +14,14 @@ class FieldDropDownItem < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :field_configuration
+  has_one :dependent_field_configuration, class_name: "FieldConfiguration", as: :parent
 
   validates :name, presence: true
 
   scope :with_id, -> (id){ where id: id }
+  scope :with_field_configuration_id, -> (id) {
+    where field_configuration_id: id
+  }
 
   default_scope { unscope(:where) }
 

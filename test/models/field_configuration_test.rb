@@ -19,6 +19,8 @@
 #  global                  :boolean          default(TRUE)
 #  external_reference_type :string(255)
 #  external_reference_id   :integer
+#  parent_id               :integer
+#  parent_type             :integer
 #
 
 require 'test_helper'
