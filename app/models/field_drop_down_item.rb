@@ -28,7 +28,7 @@ class FieldDropDownItem < ActiveRecord::Base
   def as_json(options={})
     result = {id: id, name: name}
     if self.dependent_field_configuration.present?
-      result[:dependant_cf_present] = true
+      result[:dependent_cf_present] = true
     end
     return result
   end
