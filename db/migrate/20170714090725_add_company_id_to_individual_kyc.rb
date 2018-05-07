@@ -4,6 +4,6 @@ class AddCompanyIdToIndividualKyc < ActiveRecord::Migration
     # IndividualKyc.all.each do |kyc|
     #   kyc.update(company_id: kyc.user.company_id)
     # end
-    change_column_null :individual_kycs, :company_id, false
+    # change_column_null :individual_kycs, :company_id, false
   end
 end
