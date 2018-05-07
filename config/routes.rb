@@ -842,7 +842,7 @@
 #                                                         PATCH  /custom_fields/:id(.:format)                                                                 custom_fields#update
 #                                                         PUT    /custom_fields/:id(.:format)                                                                 custom_fields#update
 #                                                         DELETE /custom_fields/:id(.:format)                                                                 custom_fields#destroy
-#                                 dependent_custom_fields GET    /custom_fields/:drop_down_id/dependent_custom_fields(.:format)                               custom_fields#dependent_custom_ffields
+#                                 dependent_custom_fields GET    /custom_fields/:drop_down_id/dependent_custom_fields(.:format)                               custom_fields#dependent_custom_fields
 #                                                    root GET    /                                                                                            home#index
 #                                                 welcome GET    /welcome(.:format)                                                                           home#welcome
 #                                                   about GET    /about(.:format)                                                                             home#about
@@ -2478,7 +2478,7 @@ Rails.application.routes.draw do
   post 'custom_fields/:field_configuration_id/drop_down_items', to: 'custom_fields#dropdownitem_create'
   delete 'custom_fields/:field_configuration_id/drop_down_items/:drop_down_item_id', to: 'custom_fields#dropdownitem_destroy'
   resources :custom_fields, only: [:create, :index, :show, :update, :destroy]
-  get 'custom_fields/:drop_down_id/dependent_custom_fields', to: 'custom_fields#dependent_custom_ffields', as: :dependent_custom_fields
+  get 'custom_fields/:drop_down_id/dependent_custom_fields', to: 'custom_fields#dependent_custom_fields', as: :dependent_custom_fields
 
   # get 'settlements/summary' => 'settlements#summary'
 

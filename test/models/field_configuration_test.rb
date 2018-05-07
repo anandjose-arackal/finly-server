@@ -21,6 +21,7 @@
 #  external_reference_id   :integer
 #  parent_id               :integer
 #  parent_type             :integer
+#  root_field              :boolean          default(TRUE)
 #
 
 require 'test_helper'

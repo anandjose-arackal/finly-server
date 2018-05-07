@@ -21,6 +21,7 @@
 #  external_reference_id   :integer
 #  parent_id               :integer
 #  parent_type             :integer
+#  root_field              :boolean          default(TRUE)
 #
 
 class FieldConfiguration < ActiveRecord::Base
@@ -66,6 +67,7 @@ class FieldConfiguration < ActiveRecord::Base
     where field_parent_type_id: parent_type_id
   }
   scope :with_field_type, -> (field_type_id) { where field_type_id: field_type_id }
+  scope :root_fields, -> { where root_field: true}
 
   delegate :drop_down?, :text?, to: :field_type
 
