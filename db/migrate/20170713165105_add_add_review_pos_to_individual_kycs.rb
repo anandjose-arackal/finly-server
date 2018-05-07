@@ -8,7 +8,7 @@ class AddAddReviewPosToIndividualKycs < ActiveRecord::Migration
     #   AdminReviewWorkflow.seed_data
     #   IndividualKyc.all.update_all(admin_review_workflow_id: AdminReviewWorkflow.workflow_for(:kyc_update).id)
     # end
-    change_column_null :individual_kycs, :admin_review_workflow_id, false
+    # change_column_null :individual_kycs, :admin_review_workflow_id, false
     add_attachment :individual_kycs, :proof_file_1
     add_column :individual_kycs, :proof_file_1, :string
     add_attachment :individual_kycs, :proof_file_2
