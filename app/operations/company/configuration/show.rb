@@ -17,7 +17,6 @@ class Company::Configuration::Show < Company::Base
 
     def init
       self.purpose_id = params[:purpose_id]
-      self.categories = user.company.categories.with_purpose(self.purpose_id).active
       self.export_fields = ExportField.all
       self.export_preferences = user.company.export_preferences
       self.policies = Policy::Index.(user, params).policies rescue nil

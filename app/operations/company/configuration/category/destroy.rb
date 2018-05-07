@@ -1,3 +1,4 @@
+# with unified categories, this will now only remove the category from the respective application that
 class Company::Configuration::Category::Destroy < Company::Configuration::Category::Base
   attr_accessor :category
 
@@ -19,7 +20,7 @@ class Company::Configuration::Category::Destroy < Company::Configuration::Catego
       return false
     end
     if category.name == "Other"
-      messages[:error] << "Cannot remove 'Other' categories"
+      messages[:error] << "Cannot remove 'Other' category"
       return false
     end
   end

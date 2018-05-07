@@ -151,6 +151,7 @@ gem 'bullet', '5.4.2', :group => 'development'
 
 gem 'logstasher', '1.2.2'
 
+gem 'ancestry', '3.0.2'
 
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print', '1.7.0'
