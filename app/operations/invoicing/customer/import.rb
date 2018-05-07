@@ -30,7 +30,7 @@ class Invoicing::Customer::Import < Invoicing::Customer::Base
     self.customers_data.each do |data|
       content = data.values
       retrieve_addresses_data(data)
-      customer = ::Customer.new(data)
+      customer = user.company.customers.build(data)
       if customer.save
         content << "Successfully imported!"
       else
