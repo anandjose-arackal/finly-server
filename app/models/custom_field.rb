@@ -151,7 +151,9 @@ class CustomField < ActiveRecord::Base
             field_type: {id: field_configuration.field_type.id,
                          name: field_configuration.field_type.name},
             mandatory: field_configuration.mandatory,
-            options: options}
+            options: options,
+            root_field: self.field_configuration.root_field
+            }
     case self.field_configuration.field_type_id
       when FieldType.id_for(:multiselect)
         ids = []
