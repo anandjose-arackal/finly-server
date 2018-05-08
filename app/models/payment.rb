@@ -247,6 +247,20 @@ class Payment < ActiveRecord::Base
 
   scope :pending, -> { where payment_status_id: [PaymentStatus.id_for(:pending), PaymentStatus.id_for(:scheduled)] }
 
+  scope :budget_payments, -> (from, to) {
+    if from.is_a? Date
+      from = from
+    else
+      from = Date.parse(from.to_s) rescue Date.parse("1993-04-13")
+    end
+    if to.is_a? Date
+      to = to
+    else
+      to = Date.parse(to.to_s) rescue Date.today
+    end
+    where("payments.payment_status_id NOT IN (?)", [PaymentStatus.id_for(:failed), PaymentStatus.id_for(:cancelled)]).where("payments.date >= ? AND payments.date <= ?", from, to)
+  }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   # validates :initiating_user_id, presence: true
