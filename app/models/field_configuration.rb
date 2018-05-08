@@ -177,7 +177,8 @@ class FieldConfiguration < ActiveRecord::Base
         mandatory: mandatory,
         global: self.global,
         value: self.default_value,
-        options: options
+        options: options,
+        root_field: self.root_field
     }
     if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
       self.drop_down_items.each do |drop_down|
