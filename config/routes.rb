@@ -2818,6 +2818,11 @@ Rails.application.routes.draw do
 
   get 'ping', to: 'ping#ping'
 
+  ## Budget apis start ##
+  resources :budgets
+
+  ## Budget apis end ##
+
 
 
   # The priority is based upon order of creation: first created -> highest priority.
