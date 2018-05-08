@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180505070904) do
+ActiveRecord::Schema.define(version: 20180508014208) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -993,16 +993,23 @@ ActiveRecord::Schema.define(version: 20180505070904) do
   add_index "cash_on_hands", ["user_id"], name: "index_cash_on_hands_on_user_id", using: :btree
 
   create_table "categories", force: :cascade do |t|
-    t.integer  "company_id",   limit: 4,                  null: false
-    t.string   "name",         limit: 255,                null: false
-    t.string   "gl_code",      limit: 255
-    t.string   "payroll_code", limit: 255
-    t.boolean  "active",                   default: true, null: false
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-    t.integer  "purpose_id",   limit: 4
+    t.integer  "company_id",                 limit: 4,                  null: false
+    t.string   "name",                       limit: 255,                null: false
+    t.string   "gl_code",                    limit: 255
+    t.string   "payroll_code",               limit: 255
+    t.boolean  "active",                                 default: true, null: false
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.integer  "purpose_id",                 limit: 4
+    t.boolean  "expense_management"
+    t.boolean  "vendor_payments"
+    t.boolean  "outward_invoices"
+    t.boolean  "inward_invoice_line_items"
+    t.string   "ancestry",                   limit: 255
+    t.boolean  "outward_invoice_line_items"
   end
 
+  add_index "categories", ["ancestry"], name: "index_categories_on_ancestry", using: :btree
   add_index "categories", ["company_id"], name: "index_categories_on_company_id", using: :btree
 
   create_table "channel_types", force: :cascade do |t|
@@ -1880,6 +1887,9 @@ ActiveRecord::Schema.define(version: 20180505070904) do
     t.boolean  "global",                              default: true
     t.string   "external_reference_type", limit: 255
     t.integer  "external_reference_id",   limit: 4
+    t.integer  "parent_id",               limit: 4
+    t.integer  "parent_type",             limit: 4
+    t.boolean  "root_field",                          default: true
   end
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
