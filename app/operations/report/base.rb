@@ -71,8 +71,8 @@ class Report::Base < BaseOperation
       self.reimbursable_expenses_total = reimbursable_expenses
       self.non_reimbursable_expenses_total = non_reimbursable_expenses
       self.card_expenses_total = report.total_amount(:only_card_expenses)
-      self.budgets = Report::Budgets.(user, report: self.report)
-      debugger
+      budgets_op = Report::Budgets.(user, report: self.report)
+      self.budgets = budgets_op.budgets
     end
 
     def retrieve_policies

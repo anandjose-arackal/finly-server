@@ -18,15 +18,29 @@ class Report::Budgets < BaseOperation
   def process
     budgets.each do |budget|
       if budget.budgetable_type == 'User'
-        result = ::Budgets::Calculate::User.(user, {budget: budget})
+        op = ::Budgets::Calculate::User.(user, {budget: budget})
       elsif budget.budgetable_type == 'Category'
-        result = ::Budgets::Calculate::Category.(user, {budget: budget})
+        op = ::Budgets::Calculate::Category.(user, {budget: budget})
       # elsif budget.budgetable_type == 'Vendor'
       #   result = ::Budgets::Calculate::Vendor.(user, {budget: budget})
       end
 
-      self.budget_details.push(result)
+      self.budget_details.push(op.result)
 
+    end
+  end
+
+  def success
+    params[:budget_details] = self.budget_details
+    Report::Budgets::BudgetsPresenter.new(user, params, messages)
+  end
+
+
+  class Report::Budgets::BudgetsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :budgets
+
+    def init
+      self.budgets = params[:budget_details]
     end
   end
 end
