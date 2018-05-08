@@ -146,7 +146,7 @@ class CustomField < ActiveRecord::Base
       dependent_field_configuration_ids = []
       options.each do |option|
         if option.dependent_field_configuration.present?
-          dependent_field_configuration_ids << option.dependent_field_confguration.id
+          dependent_field_configuration_ids << option.dependent_field_configuration.id
         end
       end
     elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)
