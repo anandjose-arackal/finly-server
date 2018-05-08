@@ -77,6 +77,10 @@ class Category < ActiveRecord::Base
     end
   }
 
+  scope :filter_search, -> (term) {
+    where('name like ?', "%#{term}%")
+  }
+
   private
 
   # def at_least_one_application
