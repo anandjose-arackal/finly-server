@@ -32,7 +32,7 @@ class BankTransfer::PaymentRequest::ParseFile < BankTransfer::PaymentRequest::Ba
     end
 
     if self.parsed_data.count > 30
-      add_message :error, "Bulk payment processing is limited to 30 at a time"
+      add_message :error, "Bulk payments processing is limited to 30 at a time"
       return
     end
   end

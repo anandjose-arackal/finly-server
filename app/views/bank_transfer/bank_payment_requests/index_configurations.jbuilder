@@ -21,3 +21,5 @@ json.policies do
     json.name policy.name
   end
 end
+
+json.show_payment_file_download current_company.payment_file_configuration.present?

@@ -111,7 +111,11 @@ class Invoicing::OutwardInvoicesController < ApplicationController
     @invoice = @result.invoice
     respond_to do |format|
       format.pdf {
-          render pdf: "Invoice-#{@result.invoice.invoice_number}", layout: "pdf.html.erb", print_media_type: true
+          render pdf: "Invoice-#{@result.invoice.invoice_number}",
+                 layout: "pdf.html.erb",
+                 print_media_type: true,
+                 margin: { :bottom => 5 },
+                 footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }}
       }
       format.html {}
     end

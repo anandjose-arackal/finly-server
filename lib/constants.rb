@@ -1,5 +1,6 @@
 module Constants
   VALID_EMAIL_FORMAT = /\A[\w+\-.]+@[a-z\d\-.]+\.[a-z]+\z/i
+  VALID_DOMAIN = /\A(http|https):\/\/[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z0-9]{1,5}(.[a-z0-9]{1,5})?(:[0-9]{1,5})?(\/.*)?$\z/i
   VALID_MOBILE_NUMBER = /\A(?:(?:\+|0{0,2})91(\s*[\-]\s*)?|[0]?)?[6789]\d{9}\z/i
   VALID_PIN_CODE = /\A[1-9][0-9]{5}\z/i
   VALID_GENDER = /\A[MmFf]\z/i
