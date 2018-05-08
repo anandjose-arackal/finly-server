@@ -18,7 +18,7 @@ class Categories::Index < Categories::Base
   end
 
   def process
-    self.categories = user.company.categories.active.with_purpose(self.purpose)
+    self.categories = user.company.categories.active
   end
 
   def success
