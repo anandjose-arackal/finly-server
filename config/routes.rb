@@ -1263,6 +1263,14 @@
 #                          summary_configurations_manager POST   /summary/configurations/manager(.:format)                                                    summary/configuration#manager_create
 #                                                         DELETE /summary/configurations/manager/:id(.:format)                                                summary/configuration#manager_destroy
 #                                                    ping GET    /ping(.:format)                                                                              ping#ping
+#                                                 budgets GET    /budgets(.:format)                                                                           budgets#index
+#                                                         POST   /budgets(.:format)                                                                           budgets#create
+#                                              new_budget GET    /budgets/new(.:format)                                                                       budgets#new
+#                                             edit_budget GET    /budgets/:id/edit(.:format)                                                                  budgets#edit
+#                                                  budget GET    /budgets/:id(.:format)                                                                       budgets#show
+#                                                         PATCH  /budgets/:id(.:format)                                                                       budgets#update
+#                                                         PUT    /budgets/:id(.:format)                                                                       budgets#update
+#                                                         DELETE /budgets/:id(.:format)                                                                       budgets#destroy
 #
 
 #                               crono_web        /crono                                                      Crono::Web

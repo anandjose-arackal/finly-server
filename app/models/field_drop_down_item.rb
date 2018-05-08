@@ -29,7 +29,9 @@ class FieldDropDownItem < ActiveRecord::Base
     result = {id: id, name: name}
     if self.dependent_field_configuration.present?
       result[:dependent_cf_present] = true
-      result[:dependent_field_configuration_id] = self.dependent_field_configuration.id
+      # temporarily making the below key an array because we plan on supporting
+      # multiple dependent drop downs in the future
+      result[:dependent_field_configuration_ids] = [self.dependent_field_configuration.id]
     end
     return result
   end
