@@ -12,10 +12,10 @@ class BudgetsProcessor::Calculate::Base < BaseOperation
   def success
     params[:budget] = self.budget
     params[:spent_amount] = self.spent_amount
-    Budgets::Calculate::Base::BasePresenter.new(user, params, messages)
+    BudgetsProcessor::Calculate::Base::BasePresenter.new(user, params, messages)
   end
 
-  class Budgets::Calculate::Base::BasePresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BudgetsProcessor::Calculate::Base::BasePresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :result, :budget
 
     def init
