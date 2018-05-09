@@ -76,7 +76,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
       self.invoice_custom_fields = invoice_custom_field_configurations
       self.invoice_line_items_custom_fields = invoice_line_items_custom_field_configurations
       self.invoice_categories = self.user.company.categories.vendor_payments_only
-      self.invoice_line_items_categories = self.user.company.categories.with_purpose(Purpose.id_for(:invoice_items))
+      self.invoice_line_items_categories = self.user.company.inward_invoice_items_only
     end
 
     def invoice_custom_field_configurations
