@@ -10,6 +10,15 @@ json.budget_amount do
   json.extract! @result.budget.budget_amount, :id, :value, :currency_id
 end
 
+json.spent_amount 0
+json.associated_item do
+  json.id @result.budget.budgetable_id
+  json.type @result.budget.budgetable_type
+  json.item @result.budget.budgetable
+end
+
 json.user do
   json.extract! @result.budget.user, :id, :mobile_number, :email
 end
+
+
