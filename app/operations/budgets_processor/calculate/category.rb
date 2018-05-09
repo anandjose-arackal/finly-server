@@ -1,4 +1,4 @@
-class Budgets::Calculate::Category < Budgets::Calculate::Base
+class BudgetsProcessor::Calculate::Category < BudgetsProcessor::Calculate::Base
   attr_accessor :category_id
 
   def init
