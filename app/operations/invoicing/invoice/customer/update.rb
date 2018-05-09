@@ -42,9 +42,16 @@ class Invoicing::Invoice::Customer::Update < Invoicing::Invoice::Base
       default_address_id = nil
       address = self.customer.addresses.default.first || self.customer.addresses.first
       full_address = get_full_address(address)
+      email = self.customer.email
+      mobile_number = self.customer.mobile_number
+      virtual_bank_accounts = self.customer.virtual_bank_accounts
+
+      if virtual_bank_accounts.size == 1
+        virtual_account_id = virtual_bank_accounts.first.id
+      end
 
 
-      unless self.invoice.update(customer_id: self.customer.id, billing_address: full_address, shipping_address: full_address)
+      unless self.invoice.update(customer_id: self.customer.id, billing_address: full_address, shipping_address: full_address, email: email, mobile_number: mobile_number, virtual_account_id: virtual_account_id)
         add_message :error, self.invoice.errors.full_messages
         return
       end

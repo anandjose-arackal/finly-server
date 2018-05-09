@@ -76,7 +76,8 @@ class Expense::ExCard::Create < Expense::ExCard::Base
     end
 
     # todo - temporary, category will be extracted from the mcc-category mapping henceforth
-    params[:category_id] = user.company.categories.find_by(name: 'Other').id
+    # for now extracting it from the default mapped expense category defined in company configuration
+    params[:category_id] = user.company.configuration.default_card_expense_category_id || user.company.categories.find_by(name: 'Other').id
     #######################################################################################
     params.permit(:expense_type_id, :expense_status_id, :note, :category_id, :date, :reimbursable,
                   amount_attributes: [:value, :currency_id],

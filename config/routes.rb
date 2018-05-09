@@ -6,6 +6,7 @@
 #                         qukickbooks_configurations_show GET    /qukickbooks_configurations/show(.:format)                                                   qukickbooks_configurations#show
 #                                           accept_invite GET    /users/invitation/accept(.:format)                                                           pending_invites#edit
 #                                          collect_notify POST   /collect/notify(.:format)                                                                    finly_collect#notify
+#                                collect_test_transaction POST   /collect/test_transaction(.:format)                                                          finly_collect#notify
 #                                               crono_web        /crono                                                                                       Crono::Web
 #                                  new_admin_user_session GET    /admin_users/sign_in(.:format)                                                               admin_users/sessions#new
 #                                      admin_user_session POST   /admin_users/sign_in(.:format)                                                               admin_users/sessions#create
@@ -484,6 +485,22 @@
 #                                        virtual_accounts POST   /virtual_accounts(.:format)                                                                  api/fc/invoices/virtual_bank_accounts#create
 #                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#update
 #                                                         DELETE /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#deactivate
+#                                                invoices POST   /invoices(.:format)                                                                          api/fc/invoices/outward_invoices#create_valid
+#                                      invoices_customers POST   /invoices/customers(.:format)                                                                api/fc/invoices/customers#create
+#                                                         PATCH  /invoices/customers/:id(.:format)                                                            api/fc/invoices/customers#update
+#                                                         GET    /invoices/customers/:id(.:format)                                                            api/fc/invoices/customers#show
+#                   api_vp_bank_transfer_initiate_payment POST   /api/vp/bank_transfer/initiate_payment(.:format)                                             api/vp/bank_transfer/bank_payment_requests#initiate_payment
+#                     api_vp_bank_transfer_payment_status GET    /api/vp/bank_transfer/payment_status/:id(.:format)                                           api/vp/bank_transfer/bank_payment_requests#payment_status
+#        api_vp_bank_transfer_bank_payment_request_credit PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)        api/vp/bank_transfer/bank_payment_requests#credit
+#        api_vp_bank_transfer_bank_payment_request_review PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)        api/vp/bank_transfer/bank_payment_requests#review
+#              api_vp_bank_transfer_bank_payment_requests GET    /api/vp/bank_transfer/bank_payment_requests(.:format)                                        api/vp/bank_transfer/bank_payment_requests#index
+#                                                         POST   /api/vp/bank_transfer/bank_payment_requests(.:format)                                        api/vp/bank_transfer/bank_payment_requests#create
+#           new_api_vp_bank_transfer_bank_payment_request GET    /api/vp/bank_transfer/bank_payment_requests/new(.:format)                                    api/vp/bank_transfer/bank_payment_requests#new
+#          edit_api_vp_bank_transfer_bank_payment_request GET    /api/vp/bank_transfer/bank_payment_requests/:id/edit(.:format)                               api/vp/bank_transfer/bank_payment_requests#edit
+#               api_vp_bank_transfer_bank_payment_request GET    /api/vp/bank_transfer/bank_payment_requests/:id(.:format)                                    api/vp/bank_transfer/bank_payment_requests#show
+#                                                         PATCH  /api/vp/bank_transfer/bank_payment_requests/:id(.:format)                                    api/vp/bank_transfer/bank_payment_requests#update
+#                                                         PUT    /api/vp/bank_transfer/bank_payment_requests/:id(.:format)                                    api/vp/bank_transfer/bank_payment_requests#update
+#                                                         DELETE /api/vp/bank_transfer/bank_payment_requests/:id(.:format)                                    api/vp/bank_transfer/bank_payment_requests#destroy
 #                                               junk_show GET    /junk/show(.:format)                                                                         junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                         users#menu_data
 #                              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                                                 admin_users/oauth/token#create {:format=>"json"}
@@ -1006,7 +1023,8 @@
 #                                                         PATCH  /payments/companies/:id(.:format)                                                            companies#update
 #                                                         PUT    /payments/companies/:id(.:format)                                                            companies#update
 #                                                         DELETE /payments/companies/:id(.:format)                                                            companies#destroy
-#                                         request_filters GET    /payment_request_filters(.:format)                                                           bank_transfer/bank_payment_requests#filters
+#                                   request_index_configs GET    /payment_request_configs(.:format)                                                           bank_transfer/bank_payment_requests#index_configurations
+#                                         request_filters GET    /payment_request_filters(.:format)                                                           bank_transfer/bank_payment_requests#index_configurations
 #                      bank_transfer_payment_orders_count GET    /bank_transfer/payment_orders/count(.:format)                                                bank_transfer/payment_orders#count
 #                    bank_transfer_payment_orders_balance GET    /bank_transfer/payment_orders/balance(.:format)                                              bank_transfer/payment_orders#balance
 #                            bank_transfer_payment_orders GET    /bank_transfer/payment_orders(.:format)                                                      bank_transfer/payment_orders#index
@@ -1832,7 +1850,8 @@ Rails.application.routes.draw do
   get '/users/invitation/accept', to: 'pending_invites#edit', as: :accept_invite
 
   ######### FINLY COLLECT START ###########
-    post 'collect/notify', to: 'finly_collect#notify'
+  post 'collect/notify', to: 'finly_collect#notify'
+  post 'collect/test_transaction', to: 'finly_collect#notify'
   ######### FINLY COLLECT END ###########
 
   ######### GEMS SPECIFIC START ###########
@@ -2155,15 +2174,35 @@ Rails.application.routes.draw do
   ######### ADMIN PANEL END ###########
 
 
-  ############# Virtual Bank Accounts API Start ######################
+  ############# Virtual Bank Accounts and Collect API Start ######################
 
   get 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#show'
   post 'virtual_accounts', to: 'api/fc/invoices/virtual_bank_accounts#create'
   patch 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#update'
   delete 'virtual_accounts/:account_number', to: 'api/fc/invoices/virtual_bank_accounts#deactivate'
+  post 'invoices', to: 'api/fc/invoices/outward_invoices#create_valid'
+  post 'invoices/customers', to: 'api/fc/invoices/customers#create'
+  patch 'invoices/customers/:id', to: 'api/fc/invoices/customers#update'
+  get 'invoices/customers/:id', to: 'api/fc/invoices/customers#show'
 
-  ################### Virtual Bank Accounts End ######################
+  ############### Virtual Bank Accounts and Collect API End ######################
 
+  ################### Vendor Payments APIs start #####################
+
+  namespace :api do
+    namespace :vp do
+      namespace :bank_transfer do
+        post 'initiate_payment', to: 'bank_payment_requests#initiate_payment', as: :initiate_payment
+        get 'payment_status/:id', to: 'bank_payment_requests#payment_status', as: :payment_status
+        resources :bank_payment_requests do
+          patch 'credit', to: 'bank_payment_requests#credit', as: :credit
+          patch 'review', to: 'bank_payment_requests#review', as: :review
+        end
+      end
+    end
+  end
+
+  ################### Vendor Payments APIs end ########################
 
   get 'junk/show', to: 'junk#show'
 
@@ -2216,7 +2255,7 @@ Rails.application.routes.draw do
   end
 
   # get 'organization_account' => 'organization_account#show'
-  get 'organization_account/policies_list' => 'organization_account#policies_list' #todo
+  get 'organization_account/policies_list' => 'organization_account#policies_list'
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
   get 'state_codes', to: 'organization_account#gst_state_codes', as: :state_codes
@@ -2615,7 +2654,8 @@ Rails.application.routes.draw do
     end
   end
 
-  get 'payment_request_filters', to: 'bank_transfer/bank_payment_requests#filters', as: :request_filters
+  get 'payment_request_configs', to: 'bank_transfer/bank_payment_requests#index_configurations', as: :request_index_configs
+  get 'payment_request_filters', to: 'bank_transfer/bank_payment_requests#index_configurations', as: :request_filters
   namespace :bank_transfer do
     get 'payment_orders/count', to: 'payment_orders#count'
     get 'payment_orders/balance', to: 'payment_orders#balance'

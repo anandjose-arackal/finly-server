@@ -47,6 +47,8 @@ class Company < ActiveRecord::Base
   has_one :yes_bank_company_account
   has_one :payment_file_configuration
   has_one :collect_auto_transfer_config, class_name: "CompanyFundsAutoTransferConfig"
+  has_many :web_hooks
+  has_many :web_hook_tracks
 
   has_one :collect_credit_account, class_name: "BankAccount", as: :account_owner
   has_one :collect_company_detail

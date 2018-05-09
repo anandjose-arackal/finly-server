@@ -2,7 +2,7 @@ json.export_preferences do
   json.array!(@result.export_preferences) do |export_preference|
     json.id export_preference.id
     json.export_field_id export_preference.export_field_id
-    json.export_field_name export_preference.export_field&.name
+    json.export_field_name export_preference.name
   end
 end
 

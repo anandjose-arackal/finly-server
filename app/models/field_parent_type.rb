@@ -20,7 +20,8 @@ class FieldParentType < ActiveRecord::Base
       card_expense: 7,
       invoice: 8,
       invoice_line_item: 9,
-      outward_invoice: 10
+      outward_invoice: 10,
+      outward_invoice_line_item: 11
   }
 
   def self.id_for(sym)

@@ -140,7 +140,7 @@ class Invoicing::Invoice::RecordPayment < Invoicing::Invoice::Base
           new_balance_due = invoice.balance_due&.value - self.amount
           invoice_status_id = OutwardInvoiceStatus.id_for(:partially_paid)
         else
-          new_paid_amount = invoice.net_amount&.value + invoice.roundoff_amount
+          new_paid_amount = invoice.net_amount&.value.to_f + invoice.roundoff_amount.to_f
           new_balance_due = 0
           invoice_status_id = OutwardInvoiceStatus.id_for(:paid)
         end

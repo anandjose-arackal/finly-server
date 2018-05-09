@@ -7,4 +7,5 @@ json.array!(@result.paginated_customers) do |customer|
     json.name customer.company.name
   end
   json.description customer.description
+  json.virtual_accounts customer.virtual_bank_accounts.pluck(:account_number)
 end
