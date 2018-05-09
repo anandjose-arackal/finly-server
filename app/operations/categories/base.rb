@@ -10,8 +10,10 @@ class Categories::Base < BaseOperation
 
     attr_accessor :categories, :custom_fields
 
+    has_scope :filter_search
+
     def init
-      self.categories = params[:categories]
+      self.categories = apply_scopes(params[:categories], params)
       self.custom_fields = params[:custom_fields]
     end
   end
