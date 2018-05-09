@@ -9,6 +9,7 @@ class Budgets::Calculate::YesBankVendor < Budgets::Calculate::Base
 
   def process
     self.spent_amount = self.user.expenses.user_budget_expenses(budget.start_date, budget.end_date).with_amount.sum(:value)
+
   end
 
 end

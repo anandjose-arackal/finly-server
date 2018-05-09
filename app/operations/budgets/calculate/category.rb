@@ -8,6 +8,7 @@ class Budgets::Calculate::Category < Budgets::Calculate::Base
   end
 
   def process
-    self.spent_amount = Expense.user_budget_expenses(budget.start_date, budget.end_date).with_category(self.category_id).with_amount.sum(:value)
+    self.spent_amount += Expense.user_budget_expenses(budget.start_date, budget.end_date).with_category(self.category_id).with_amount.sum(:value)
+    self.spend_amount += Payment.budget_payments(budget.start_date, budget.end_date).with_category(self.category_id).with_amount.sum(:value)
   end
 end
