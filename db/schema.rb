@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180505070904) do
+ActiveRecord::Schema.define(version: 20180509100635) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -739,6 +739,29 @@ ActiveRecord::Schema.define(version: 20180505070904) do
   add_index "budget_rules", ["policy_id"], name: "index_budget_rules_on_policy_id", using: :btree
   add_index "budget_rules", ["rule_type_id"], name: "index_budget_rules_on_rule_type_id", using: :btree
 
+  create_table "budgets", force: :cascade do |t|
+    t.string   "name",             limit: 255
+    t.integer  "period_id",        limit: 4
+    t.date     "start_date"
+    t.date     "end_date"
+    t.integer  "budget_amount_id", limit: 4
+    t.integer  "spent_amount_id",  limit: 4
+    t.integer  "budgetable_id",    limit: 4,                   null: false
+    t.string   "budgetable_type",  limit: 255,                 null: false
+    t.boolean  "is_deleted",                   default: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.integer  "user_id",          limit: 4
+    t.integer  "company_id",       limit: 4
+  end
+
+  add_index "budgets", ["budget_amount_id"], name: "index_budgets_on_budget_amount_id", using: :btree
+  add_index "budgets", ["budgetable_type", "budgetable_id"], name: "index_budgets_on_budgetable_type_and_budgetable_id", using: :btree
+  add_index "budgets", ["company_id"], name: "index_budgets_on_company_id", using: :btree
+  add_index "budgets", ["period_id"], name: "index_budgets_on_period_id", using: :btree
+  add_index "budgets", ["spent_amount_id"], name: "index_budgets_on_spent_amount_id", using: :btree
+  add_index "budgets", ["user_id"], name: "index_budgets_on_user_id", using: :btree
+
   create_table "card_assign_request_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -993,16 +1016,23 @@ ActiveRecord::Schema.define(version: 20180505070904) do
   add_index "cash_on_hands", ["user_id"], name: "index_cash_on_hands_on_user_id", using: :btree
 
   create_table "categories", force: :cascade do |t|
-    t.integer  "company_id",   limit: 4,                  null: false
-    t.string   "name",         limit: 255,                null: false
-    t.string   "gl_code",      limit: 255
-    t.string   "payroll_code", limit: 255
-    t.boolean  "active",                   default: true, null: false
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-    t.integer  "purpose_id",   limit: 4
+    t.integer  "company_id",                 limit: 4,                  null: false
+    t.string   "name",                       limit: 255,                null: false
+    t.string   "gl_code",                    limit: 255
+    t.string   "payroll_code",               limit: 255
+    t.boolean  "active",                                 default: true, null: false
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
+    t.integer  "purpose_id",                 limit: 4
+    t.boolean  "expense_management"
+    t.boolean  "vendor_payments"
+    t.boolean  "outward_invoices"
+    t.boolean  "inward_invoice_line_items"
+    t.string   "ancestry",                   limit: 255
+    t.boolean  "outward_invoice_line_items"
   end
 
+  add_index "categories", ["ancestry"], name: "index_categories_on_ancestry", using: :btree
   add_index "categories", ["company_id"], name: "index_categories_on_company_id", using: :btree
 
   create_table "channel_types", force: :cascade do |t|
@@ -1880,6 +1910,9 @@ ActiveRecord::Schema.define(version: 20180505070904) do
     t.boolean  "global",                              default: true
     t.string   "external_reference_type", limit: 255
     t.integer  "external_reference_id",   limit: 4
+    t.integer  "parent_id",               limit: 4
+    t.integer  "parent_type",             limit: 4
+    t.boolean  "root_field",                          default: true
   end
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
@@ -4162,6 +4195,30 @@ ActiveRecord::Schema.define(version: 20180505070904) do
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
+  create_table "vendor_account_transactions", force: :cascade do |t|
+    t.integer  "vendor_account_id",   limit: 4
+    t.integer  "transaction_type_id", limit: 4
+    t.integer  "amount_id",           limit: 4
+    t.integer  "payment_id",          limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "vendor_account_transactions", ["amount_id"], name: "index_vendor_account_transactions_on_amount_id", using: :btree
+  add_index "vendor_account_transactions", ["payment_id"], name: "index_vendor_account_transactions_on_payment_id", using: :btree
+  add_index "vendor_account_transactions", ["transaction_type_id"], name: "index_vendor_account_transactions_on_transaction_type_id", using: :btree
+  add_index "vendor_account_transactions", ["vendor_account_id"], name: "index_vendor_account_transactions_on_vendor_account_id", using: :btree
+
+  create_table "vendor_accounts", force: :cascade do |t|
+    t.integer  "balance_id", limit: 4
+    t.integer  "vendor_id",  limit: 4
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "vendor_accounts", ["balance_id"], name: "index_vendor_accounts_on_balance_id", using: :btree
+  add_index "vendor_accounts", ["vendor_id"], name: "index_vendor_accounts_on_vendor_id", using: :btree
+
   create_table "vendor_attachments", force: :cascade do |t|
     t.string   "attached_file_file_name",    limit: 255
     t.string   "attached_file_content_type", limit: 255
@@ -4424,6 +4481,9 @@ ActiveRecord::Schema.define(version: 20180505070904) do
   add_foreign_key "budget_rules", "periods"
   add_foreign_key "budget_rules", "policies"
   add_foreign_key "budget_rules", "rule_types"
+  add_foreign_key "budgets", "companies"
+  add_foreign_key "budgets", "periods"
+  add_foreign_key "budgets", "users"
   add_foreign_key "card_assign_request_tracks", "card_assign_requests"
   add_foreign_key "card_assign_requests", "admin_review_workflows"
   add_foreign_key "card_assign_requests", "card_programs"
@@ -4634,6 +4694,9 @@ ActiveRecord::Schema.define(version: 20180505070904) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
+  add_foreign_key "vendor_account_transactions", "amounts"
+  add_foreign_key "vendor_account_transactions", "payments"
+  add_foreign_key "vendor_account_transactions", "vendor_accounts"
   add_foreign_key "vendor_payment_wallets", "users"
   add_foreign_key "web_hook_event_mappings", "web_hook_events"
   add_foreign_key "web_hook_event_mappings", "web_hooks"
