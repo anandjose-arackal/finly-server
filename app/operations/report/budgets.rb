@@ -18,11 +18,11 @@ class Report::Budgets < BaseOperation
   def process
     budgets.each do |budget|
       if budget.budgetable_type == 'User'
-        op = ::Budgets::Calculate::User.(user, {budget: budget})
+        op = ::BudgetsProcessor::Calculate::User.(user, {budget: budget})
       elsif budget.budgetable_type == 'Category'
-        op = ::Budgets::Calculate::Category.(user, {budget: budget})
+        op = ::BudgetsProcessor::Calculate::Category.(user, {budget: budget})
       # elsif budget.budgetable_type == 'Vendor'
-      #   result = ::Budgets::Calculate::Vendor.(user, {budget: budget})
+      #   result = ::BudgetsProcessor::Calculate::Vendor.(user, {budget: budget})
       end
 
       self.budget_details.push(op.result)
