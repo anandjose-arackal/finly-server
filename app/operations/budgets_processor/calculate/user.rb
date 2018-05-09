@@ -1,4 +1,4 @@
-class Budgets::Calculate::User < Budgets::Calculate::Base
+class BudgetsProcessor::Calculate::User < BudgetsProcessor::Calculate::Base
   attr_accessor :budget_user
 
   def init
