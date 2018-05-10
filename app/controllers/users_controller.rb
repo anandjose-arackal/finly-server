@@ -144,6 +144,20 @@ class UsersController < ApplicationController
     respond
   end
 
+  def company_users
+    @result = current_company.users.active
+    respond
+  end
+
+  def set_delegate
+    @result = User::Delegate::Update.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
 
   private
 

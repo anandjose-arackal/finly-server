@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180510073102) do
+ActiveRecord::Schema.define(version: 20180510093050) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -4187,6 +4187,7 @@ ActiveRecord::Schema.define(version: 20180510073102) do
     t.boolean  "point_of_contact",                   default: false
     t.integer  "otp_attempts",           limit: 4,   default: 0
     t.integer  "user_delegate_id",       limit: 4
+    t.boolean  "delegation_enabled"
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
