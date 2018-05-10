@@ -47,7 +47,9 @@
 #  default_password       :boolean          default(FALSE)
 #  point_of_contact       :boolean          default(FALSE)
 #  otp_attempts           :integer          default(0)
+#  user_delegate_id       :integer
 #
+
 
 
 
@@ -75,6 +77,7 @@ class User < ActiveRecord::Base
 
   belongs_to :company
   belongs_to :otp_request_type
+  belongs_to :user_delegate, class_name: "User"
 
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy

@@ -47,6 +47,7 @@
 #  default_password       :boolean          default(FALSE)
 #  point_of_contact       :boolean          default(FALSE)
 #  otp_attempts           :integer          default(0)
+#  user_delegate_id       :integer
 #
 
 require 'test_helper'
