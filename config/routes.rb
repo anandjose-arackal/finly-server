@@ -597,7 +597,6 @@
 #                                    update_mobile_number POST   /otp/update(.:format)                                                                        otp#update
 #                                              verify_otp POST   /otp/verify(.:format)                                                                        otp#verify
 #                                              resend_otp POST   /otp/resend(.:format)                                                                        otp#resend
-#                                           company_users GET    /company_users(.:format)                                                                     users#company_users
 #                                            card_details POST   /cards/details(.:format)                                                                     cards#details
 #                                          update_balance POST   /cards/update_balance(.:format)                                                              cards#update_balance
 #                                      update_card_status POST   /cards/update_status(.:format)                                                               cards#update_status
@@ -734,6 +733,7 @@
 #                                                         PATCH  /users/:id(.:format)                                                                         users#update
 #                                                         PUT    /users/:id(.:format)                                                                         users#update
 #                                                         DELETE /users/:id(.:format)                                                                         users#destroy
+#                                           company_users GET    /company_users(.:format)                                                                     users#company_users
 #                                 available_expense_types GET    /available_expense_types(.:format)                                                           users#available_expense_types
 #                                             user_import POST   /import(.:format)                                                                            users#import
 #                                       superadmin_import POST   /superadmin_import(.:format)                                                                 admin/companies#import
@@ -2276,8 +2276,6 @@ Rails.application.routes.draw do
   post 'otp/verify' => 'otp#verify', as: :verify_otp
   post 'otp/resend' => 'otp#resend', as: :resend_otp
 
-  get 'company_users', to: 'users#company_users', as: :company_users
-
   post 'cards/details' => 'cards#details', as: :card_details
   post 'cards/update_balance' => 'cards#update_balance', as: :update_balance
   post 'cards/update_status' => 'cards#update_status', as: :update_card_status
@@ -2384,6 +2382,7 @@ Rails.application.routes.draw do
     get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
     patch 'set_delegate', to: 'users#set_delegate', as: :set_delegate
   end
+  get 'company_users', to: 'users#company_users', as: :company_users
   get 'available_expense_types', to: 'users#available_expense_types', as: :available_expense_types
 
   # routes for testing import

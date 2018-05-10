@@ -63,6 +63,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -302,6 +303,15 @@ class User < ActiveRecord::Base
     ids.uniq!
     self.where(id: ids)
   end
+
+  scope :user_search, -> (term) {
+    if term.present?
+      ids = self.where("first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ? or mobile_number like ?",
+                       "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+      ids.uniq!
+      self.where(id: ids)
+    end
+  }
 
   scope :filter_state, -> (state) do
     if state.blank?
