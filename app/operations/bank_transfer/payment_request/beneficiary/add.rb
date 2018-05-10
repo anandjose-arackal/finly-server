@@ -112,6 +112,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
           application: RequestStore.store[:current_app],
           payment_mode: bank_payment_request.payment_order.payment_mode,
           note: order_details[:note],
+          category_id: order_details[:category_id],
           amount_attributes: {
               value: order_details[:original_amount],
               currency_id: 1
