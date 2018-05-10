@@ -130,6 +130,8 @@ class OutwardInvoice < ActiveRecord::Base
   scope :without_id, -> (id){ where.not id: id}
   scope :with_id, -> (id) { where id: id }
 
+  scope :tax_invoices, -> { where outward_invoice_type_id: OutwardInvoiceType.id_for(:tax_invoice) }
+
   scope :filter_customer_id, -> (customer_id) {
     where customer_id: customer_id
   }
