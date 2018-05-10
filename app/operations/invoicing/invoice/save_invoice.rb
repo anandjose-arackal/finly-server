@@ -71,6 +71,33 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     # Old Attachments
     self.invoice_old_attachments = invoice.attachments
 
+    # creating the customer if the customer_id isn't present in the params for this request
+    if invoice_parameters[:customer_id].blank? && params.dig(:customer, :id).blank?
+      # try creating an invoice here
+      cust_params = customer_params
+      cust_params[:create_virtual_account] = true
+      cust_params[:virtual_bank_accounts_attributes] = [{name: "#{customer_params[:name]}'s Virtual Account"}]
+      cust_params = {customer: cust_params}
+      op = Invoicing::Customer::Create.(user, cust_params)
+      if op.success?
+        self.invoice_parameters[:customer_id] = op.customer.id
+        # add attributes of the customer to the invoice
+        self.invoice_parameters[:virtual_account_id] = op.customer.virtual_bank_accounts.first&.id
+      else
+        add_message :error, op.messages[:error]
+        return
+      end
+    end
+
+    # check if customer id is inside the customer object, and add it to invoice if it is
+    if params.dig(:customer, :id).present?
+      customer = user.company.customers.find_by(id: params.dig(:customer, :id))
+      if customer.blank?
+        add_message :error, "This customer does not belong to your company"
+        return
+      end
+      self.invoice_parameters[:customer_id] = params.dig(:customer, :id)
+    end
   end
 
   def process
@@ -78,6 +105,12 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     self.invoice.assign_attributes(self.invoice_parameters)
     # calculate the tax and discounts that need to be done for this particular invoice
     # and store it in the invoice object for further calculation
+    self.invoice.invoice_items.each_with_index do |invoice_item, index|
+      custom_fields = params&.dig(:invoice, :invoice_items_attributes)[index][:custom_fields]
+      if custom_fields.present?
+        set_custom_fields(false, invoice_item, custom_fields)
+      end
+    end
     calculate_tax_and_discounts
     unless self.invoice.valid?
       add_message :error, self.invoice.errors.full_messages
@@ -112,24 +145,32 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
     add_message :success, 'Invoice successfully saved'
   end
 
+  def success
+    params[:invoice] = self.invoice
+    Invoicing::Invoice::Base::InvoicePresenter.new(user, params, messages)
+  end
+
   private
 
   def invoice_params
     params.require(:invoice).permit(:gst_type_id, :tds, :tds_type_id, :category_id, :customer_id,
-                                    :tax_type_id, :date, :discount_type_id, :due_date, :memo, :customer_memo, :payment_term_id,
+                                    :tax_type_id, :date, :discount_type_id, :due_date, :memo, :customer_memo, :terms, :payment_term_id,
                                     :invoice_number, :inclusive_of_taxes, :billing_address, :shipping_address, :override_invoice_number,
                                     :email, :mobile_number, :virtual_account_id, :roundoff_amount, :roundoff_total_enabled,
                                     original_amount_attributes: [:value, :currency_id],
                                     advance_amount_attributes: [:value, :currency_id],
                                     freight_amount_attributes: [:value, :currency_id],
                                     invoice_attachments_attributes: [:attached_file, :description],
-                                    invoice_items_attributes: [:id, :remove_line_item, :description, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax, :inventory_line_item_id],
+                                    invoice_items_attributes: [:id, :remove_line_item, :description, :item_info, :category_id, :hsn_sac, :quantity, :rate, :discount, :tax, :inventory_line_item_id, custom_fields: []],
                                     invoice_attachments: [],
                                     reminders: [])
   end
 
   def customer_params
-    params.require(:customer).permit(:gst)
+    params.require(:customer).permit(:name, :email, :mobile_number, :description, :gst, :pan, :create_virtual_account,
+                                     addresses_attributes: [:line_1, :line_2, :city, :state_id, :name, :pin_code, :id, :default, :address_name],
+                                     virtual_bank_accounts_attributes: [:default_account, :name],
+                                     customer_attachments_attributes: [:attached_file, :note])
   end
 
   def calculate_tax_and_discounts
@@ -139,6 +180,14 @@ class Invoicing::Invoice::SaveInvoice < Invoicing::Invoice::Base
   def recalculate_totals
     InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_parameters, nil, self.invoice)
     self.invoice.save
+  end
+
+  def set_custom_fields(save, line_item, custom_fields)
+    custom_fields = {custom_fields: custom_fields}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(line_item, FieldParentType.id_for(:invoice_line_item), custom_fields)
   end
 
 end

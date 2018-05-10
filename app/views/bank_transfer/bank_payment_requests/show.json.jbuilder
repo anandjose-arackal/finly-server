@@ -24,6 +24,7 @@ json.summary do
   json.beneficiary_type @result.bank_payment_request.beneficiary_type
   json.approvers @result.approvers
   json.name @result.bank_payment_request.name
+  json.show_payment_file_download current_company.payment_file_configuration.present?
 end
 
 json.invoice_categories do
@@ -167,6 +168,11 @@ json.payments do
     else
       json.raw_amount precision_value payment.amount_value
       json.original_amount precision_value payment.amount_value
+      json.invoice do
+        json.net_amount precision_value payment.amount&.value
+        json.roundoff_amount 0
+        json.balance_due payment.amount&.value
+      end
     end
   end
 end
@@ -277,6 +283,11 @@ json.payments_verified do
     else
       json.raw_amount precision_value payment.amount_value
       json.original_amount precision_value payment.amount_value
+      json.invoice do
+        json.net_amount precision_value payment.amount&.value
+        json.roundoff_amount 0
+        json.balance_due payment.amount&.value
+      end
     end
   end
 end
@@ -388,6 +399,11 @@ json.payments_unverified do
     else
       json.raw_amount precision_value payment.amount_value
       json.original_amount precision_value payment.amount_value
+      json.invoice do
+        json.net_amount precision_value payment.amount&.value
+        json.roundoff_amount 0
+        json.balance_due payment.amount&.value
+      end
     end
   end
 end

@@ -5,6 +5,14 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
 
   attr_accessor :initiating_account, :initiating_account_adapter, :view_role
 
+  def personalizer
+    {
+        validate: {
+            before: Personalizer::Process.new([:bank_payment_requests, :credit], :validate, self)
+        }
+    }
+  end
+
   def pre_validate
     super
     if params[:password].blank?

@@ -206,11 +206,17 @@ class Statements::Show < Statements::Base
               if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
                 merchant += "#{finly_transaction.payment.receiving_account&.user&.name}'s "
               end
+              if [BankAccount].include? finly_transaction.payment.receiving_account.class
+                merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
+              end
               merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.receiving_account)}"
             elsif finly_transaction.payment.receiving_account == finly_transaction.finly_account and finly_transaction.payment.initiating_account.present?
               merchant = prefix
               if [UserWallet, Card].include? finly_transaction.payment.initiating_account.class
                 merchant += "#{finly_transaction.payment.initiating_account&.user&.name}'s "
+              end
+              if [BankAccount].include? finly_transaction.payment.receiving_account.class
+                merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
               end
               merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.initiating_account)}"
             end

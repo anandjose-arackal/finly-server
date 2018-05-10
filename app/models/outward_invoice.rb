@@ -37,10 +37,11 @@
 #  roundoff_total_enabled  :boolean
 #  memo                    :string(255)
 #  customer_memo           :text(65535)
-#  payment_term_id         :integer
 #  reminders               :text(65535)
+#  payment_term_id         :integer
 #  user_id                 :integer
 #  outward_invoice_type_id :integer          default(1)
+#  terms                   :text(65535)
 #
 
 #  gst_type_id: 1 - IGST
@@ -198,6 +199,18 @@ class OutwardInvoice < ActiveRecord::Base
 
   def line_items_net_total
     self.invoice_items.joins(:net_amount).sum(:value)
+  end
+
+  def invoice_items_custom_field_configuration_names
+    names = FieldConfiguration.with_id(invoice_items_custom_field_configuration_ids).pluck(:field_name)
+  end
+
+  def invoice_items_custom_field_configuration_ids
+    ids = []
+    self.invoice_items.each do |item|
+      ids += item.custom_fields.pluck(:field_configuration_id)
+    end
+    ids.uniq!
   end
 
   private
