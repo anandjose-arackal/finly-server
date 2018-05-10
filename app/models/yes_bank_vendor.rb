@@ -30,6 +30,9 @@ class YesBankVendor < ActiveRecord::Base
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
 
+
+  has_many :budgets, as: :budgetable
+
   accepts_nested_attributes_for :bank_accounts
   accepts_nested_attributes_for :vendor_attachments, allow_destroy: true
 

@@ -15,6 +15,8 @@ class FieldDropDownItem < ActiveRecord::Base
 
   belongs_to :field_configuration
 
+  has_many :budgets, as: :budgetable
+
   validates :name, presence: true
 
   scope :with_id, -> (id){ where id: id }

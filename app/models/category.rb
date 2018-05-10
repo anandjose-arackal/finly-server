@@ -25,6 +25,8 @@ class Category < ActiveRecord::Base
 
   has_one :quickbooks_category, dependent: :destroy
 
+  has_many :budgets, as: :budgetable
+
   validates :company_id, presence: true
   validates :name, presence: true, uniqueness: {scope: :company_id}
 

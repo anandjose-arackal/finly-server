@@ -64,6 +64,8 @@ class FieldConfiguration < ActiveRecord::Base
   }
   scope :with_field_type, -> (field_type_id) { where field_type_id: field_type_id }
 
+  scope :filter_dropdowns, -> {where field_type_id: FieldType.id_for(:drop_down)}
+
   delegate :drop_down?, :text?, to: :field_type
 
   default_scope { unscope(:where) }

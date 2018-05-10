@@ -43,6 +43,4 @@ class Budget < ActiveRecord::Base
   scope :with_budgetable_user_id, -> (ids) {where budgetable_id: ids, budgetable_type: "User"}
   scope :with_budgetable_category_id, -> (ids) {where budgetable_id: ids, budgetable_type: "Category"}
   scope :with_budgetable_vendor_id, -> (ids) {where budgetable_id: ids, budgetable_type: "YesBankVendor"}
-
-
 end
