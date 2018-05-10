@@ -22,6 +22,13 @@ json.user do
   end
   json.bank_transfer_enabled @result.selected_user.bank_transfer_enabled?
 end
+
+json.user_delegate do
+  json.user_delegate_id @result.selected_user.user_delegate&.id
+  json.user_delegate_name @result.selected_user.user_delegate&.name
+  json.delegation_enabled @result.selected_user.delegation_enabled
+end
+
 json.subscriptions do
   json.show_config @result.selected_user.company.more_than_one_subscription?
   json.expense_management @result.user_panel_subscription.expense_management
