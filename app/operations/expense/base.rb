@@ -50,7 +50,7 @@ class Expense::Base < BaseOperation
     if StringUtils.to_bool(params&.dig(:from_cash_on_hand)) or (params&.dig(:from_cash_on_hand).nil? and expense.from_cash_on_hand)
 
       # first check if the expense is being created in non-INR, and if its date is today
-      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params[:amount_attributes][:currency_id]))
+      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
         add_message :error, "Cash on hand expenses that are in a currency different from INR can only be reported on the next day"
         return
       end
