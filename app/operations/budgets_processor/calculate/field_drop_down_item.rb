@@ -8,7 +8,23 @@ class BudgetsProcessor::Calculate::FieldDropDownItem < BudgetsProcessor::Calcula
   end
 
   def process
-    self.spent_amount += Expense.user_budget_expenses(budget.start_date, budget.end_date).with_category(self.category_id).with_amount.sum(:value)
-    self.spend_amount += Payment.budget_payments(budget.start_date, budget.end_date).with_category(self.category_id).with_amount.sum(:value)
+    field_drop_down_selections = FieldDropDownSelection.with_value(field_drop_down_item_id)
+
+    field_drop_down_selection_ids = field_drop_down_selections.pluck(:id)
+
+    custom_fields = CustomField.with_drop_down_selection(field_drop_down_selection_ids).expenses
+
+    # Since custom fields can be associated only to a particular type of expense, all the custom fields will be
+    #   belonging to one expense type
+    expense_type_name = custom_fields[0].parent_type
+
+    # Manual Expense, Card Expense, Distance & PerDiem ids
+    expense_w_type_ids = custom_fields.pluck(:parent_id)
+
+    # Expense ids
+    expense_ids = expense_type_name.constantize.with_id(expense_w_type_ids).pluck(:expense_id)
+
+    self.spent_amount = Expense.with_id(expense_ids).user_budget_expenses(budget.start_date, budget.end_date).joins(:amount).sum(:value)
+    debugger
   end
 end

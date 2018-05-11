@@ -12,4 +12,6 @@ class BudgetsProcessor::Calculate::YesBankVendor < BudgetsProcessor::Calculate::
 
   end
 
+
+
 end
