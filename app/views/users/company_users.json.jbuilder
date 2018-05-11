@@ -1,4 +1,4 @@
-json.array!(@result) do |user|
+json.array!(@result.users) do |user|
   json.id user.id
   json.name user.name
   json.label user.name
@@ -6,4 +6,3 @@ json.array!(@result) do |user|
   json.email user.email
   json.mobile_number user.mobile_number
 end
-

@@ -145,7 +145,7 @@ class UsersController < ApplicationController
   end
 
   def company_users
-    @result = current_company.users.active.user_search(params[:filter_search])
+    @result = Company::Users.(current_user, params)
     respond
   end
 
