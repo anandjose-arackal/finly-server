@@ -72,7 +72,8 @@ class Invoicing::Customer::Create < Invoicing::Customer::Base
         end
       end
       # create customer account
-      op_customer_account_create = Invoicing::Customer::CustomerAccount::Create.(user, {customer_id: customer.id})
+      # Has been moved to model :after_create
+      # op_customer_account_create = Invoicing::Customer::CustomerAccount::Create.(user, {customer_id: customer.id})
     else
       add_message :error, self.customer.errors.full_messages
     end
