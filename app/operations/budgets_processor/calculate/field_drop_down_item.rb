@@ -2,8 +2,7 @@ class BudgetsProcessor::Calculate::FieldDropDownItem < BudgetsProcessor::Calcula
   attr_accessor :field_drop_down_item_id, :field_configuration_id
 
   def init
-    self.budget = params[:budget]
-    self.spent_amount = 0
+    super
     self.field_drop_down_item_id = budget.budgetable_id
   end
 
@@ -24,7 +23,13 @@ class BudgetsProcessor::Calculate::FieldDropDownItem < BudgetsProcessor::Calcula
     # Expense ids
     expense_ids = expense_type_name.constantize.with_id(expense_w_type_ids).pluck(:expense_id)
 
-    self.spent_amount = Expense.with_id(expense_ids).user_budget_expenses(budget.start_date, budget.end_date).joins(:amount).sum(:value)
-    debugger
+    if items_requested
+      expenses = Expense.with_id(expense_ids).user_budget_expenses(budget.start_date, budget.end_date).joins(:amount)
+      self.spent_amount += expenses.sum(:value)
+      self.budget_trail_items += expenses
+    else
+      self.spent_amount = Expense.with_id(expense_ids).user_budget_expenses(budget.start_date, budget.end_date).joins(:amount).sum(:value)
+    end
+
   end
 end

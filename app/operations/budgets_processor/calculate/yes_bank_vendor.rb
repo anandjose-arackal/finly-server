@@ -2,16 +2,19 @@ class BudgetsProcessor::Calculate::YesBankVendor < BudgetsProcessor::Calculate::
   attr_accessor :yes_bank_vendor
 
   def init
-    self.budget = params[:budget]
-    self.spent_amount = 0
+    super
     self.yes_bank_vendor = YesBankVendor.find_by id: budget.budgetable_id
   end
 
   def process
-    self.spent_amount = self.user.expenses.user_budget_expenses(budget.start_date, budget.end_date).with_amount.sum(:value)
-
+    #todo calculate vendor payments
+    if items_requested
+      payments = Payment.budget_payments(budget.start_date, budget.end_date).with_category(self.category_id).with_amount.sum(:value)
+      self.spent_amount += payments.sum(:value)
+      self.budget_trail_items += payments
+    else
+      self.spent_amount = self.user.expenses.user_budget_expenses(budget.start_date, budget.end_date).with_amount.sum(:value)
+    end
   end
-
-
 
 end
