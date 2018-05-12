@@ -17,7 +17,6 @@
 #
 
 class Customer < ActiveRecord::Base
-
   belongs_to :company
   belongs_to :created_by, class_name: "User"
 
@@ -27,6 +26,8 @@ class Customer < ActiveRecord::Base
   has_many :outward_invoices
 
   has_one :customer_account
+
+  after_create :customer_config
 
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :virtual_bank_accounts
@@ -67,4 +68,13 @@ class Customer < ActiveRecord::Base
     end
   }
 
+  private
+
+  def customer_config
+    self.build_customer_account({
+                                     balance_attributes: {
+                                         value: 0, currency_id: 1 # Dynamic currency id from customer
+                                     }
+                                 }).save
+  end
 end
