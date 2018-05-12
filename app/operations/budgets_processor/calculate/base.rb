@@ -37,7 +37,7 @@ class BudgetsProcessor::Calculate::Base < BaseOperation
 
       if params[:get_items]
         budget_trail_items = params[:budget_trail_items]
-        self.result[:budget_trail_items] = budget_trail_items.sort_by {|item| item[:date]}
+        self.result[:budget_trail_items] = budget_trail_items.sort_by {|item| item[:date]}.reverse!
       end
     end
 

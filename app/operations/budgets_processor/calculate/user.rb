@@ -10,7 +10,7 @@ class BudgetsProcessor::Calculate::User < BudgetsProcessor::Calculate::Base
     #todo add payment by the user??
 
     if items_requested
-      expenses = self.spent_amount = self.budget_user.expenses.user_budget_expenses(budget.start_date, budget.end_date).with_amount
+      expenses = self.budget_user.expenses.user_budget_expenses(budget.start_date, budget.end_date).with_amount
       self.spent_amount += expenses.sum(:value)
       self.budget_trail_items += expenses
     else
