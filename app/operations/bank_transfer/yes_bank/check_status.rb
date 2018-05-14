@@ -63,7 +63,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
         bank_transaction.update(transfer_status_id: BankTransferStatus.id_for(:failed))
 
         # destroying previous messages first, before adding the failure message
-        self.payment.system_messages.destroy_all
+        # self.payment.system_messages.destroy_all # probably not a good idea to destroy previous messages because they contain data about why a particular payment failed
+
         # adding message regarding payment refund
         self.payment.system_messages.build(system_message_type_id: SystemMessageType.id_for(:error),
                                       content: "The amount will be refunded to your account shortly").save
@@ -117,6 +118,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
       # op.payment_order.destroy
       add_message :error, op.messages[:error]
     end
+
+    # also update the status of the payment order from here
+    self.payment.payment_order.update_order_status
   end
 
   def handle_successful_transaction
