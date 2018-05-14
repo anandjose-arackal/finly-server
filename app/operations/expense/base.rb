@@ -22,7 +22,7 @@ class Expense::Base < BaseOperation
     if StringUtils.to_bool(params[:from_cash_on_hand])
 
       # first check if the expense is being created in non-INR, and if its date is today
-      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params[:amount_attributes][:currency_id]))
+      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
         add_message :error, "Cash on hand expenses that are in a currency different from INR can only be reported on the next day"
         return
       end
@@ -50,7 +50,7 @@ class Expense::Base < BaseOperation
     if StringUtils.to_bool(params&.dig(:from_cash_on_hand)) or (params&.dig(:from_cash_on_hand).nil? and expense.from_cash_on_hand)
 
       # first check if the expense is being created in non-INR, and if its date is today
-      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params[:amount_attributes][:currency_id]))
+      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
         add_message :error, "Cash on hand expenses that are in a currency different from INR can only be reported on the next day"
         return
       end
@@ -136,8 +136,8 @@ class Expense::Base < BaseOperation
         items = violations[expense.id]
         # constructing the violation hash as required
         violations = {}
-        violations[:blocking_present] = (items[:expense_warning].present? or items[:budget_warning].present? or items['expense_warning'].present? or items['budget_warning'].present?)
-        violations[:warning_present] = (items[:expense_blocking].present? or items[:budget_blocking].present? or items['expense_blocking'].present? or items['budget_blocking'].present?)
+        violations[:blocking_present] = (items&.dig(:expense_warning).present? or items&.dig(:budget_warning).present? or items&.dig('expense_warning').present? or items&.dig('budget_warning').present?)
+        violations[:warning_present] = (items&dig(:expense_blocking).present? or items&.dig(:budget_blocking).present? or items&.dig('expense_blocking').present? or items&.dig('budget_blocking').present?)
         violations[:items] = items
       end
       violations
