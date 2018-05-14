@@ -137,7 +137,7 @@ class Expense::Base < BaseOperation
         # constructing the violation hash as required
         violations = {}
         violations[:blocking_present] = (items&.dig(:expense_warning).present? or items&.dig(:budget_warning).present? or items&.dig('expense_warning').present? or items&.dig('budget_warning').present?)
-        violations[:warning_present] = (items&dig(:expense_blocking).present? or items&.dig(:budget_blocking).present? or items&.dig('expense_blocking').present? or items&.dig('budget_blocking').present?)
+        violations[:warning_present] = (items&.dig(:expense_blocking).present? or items&.dig(:budget_blocking).present? or items&.dig('expense_blocking').present? or items&.dig('budget_blocking').present?)
         violations[:items] = items
       end
       violations
