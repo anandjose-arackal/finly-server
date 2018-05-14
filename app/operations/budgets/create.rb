@@ -20,7 +20,7 @@ class Budgets::Create < Budgets::Base
       return
     end
 
-    budgetable = budgetable_type.constantize.with_id budget_params[:budgetable_id]
+    budgetable = budgetable_type.constantize.find_by id: budget_params[:budgetable_id]
     unless budgetable.present?
       add_message :error, "#{budgetable_type} not found"
     end
