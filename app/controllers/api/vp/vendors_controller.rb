@@ -6,7 +6,16 @@ class Api::Vp::VendorsController < ApplicationController
 
   def create
     @result = BankTransfer::Vendors::Create.(current_user, params)
-    respond_success_failure
+    respond
+  end
+
+  def index
+    @result = BankTransfer::Vendors::Index.(current_user, params)
+    respond
+  end
+
+  def destroy
+
   end
 
 end
