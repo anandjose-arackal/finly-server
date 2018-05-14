@@ -44,6 +44,18 @@ class CustomField < ActiveRecord::Base
     where(field_configuration_id: root_field_config_ids)
   }
 
+  scope :only_non_root_field_configs, -> {
+    field_config_ids = self.pluck(:field_configuration_id)
+    non_root_field_config_ids = FieldConfiguration.where(id: field_config_ids, root_field: false).pluck(:id)
+    where(field_configuration_id: non_root_field_config_ids)
+  }
+
+  scope :drop_down_custom_fields_only, -> {
+    field_config_ids = self.pluck(:field_configuration_id)
+    drop_down_field_config_ids = FieldConfiguration.where(id: field_config_ids, field_type_id: FieldType.id_for(:drop_down)).pluck(:id)
+    where(field_configuration_id: drop_down_field_config_ids)
+  }
+
   def set_value(value, save = true)
     if value.blank?
       if self.value.present?

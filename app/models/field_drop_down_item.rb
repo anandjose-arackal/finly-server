@@ -14,7 +14,7 @@ class FieldDropDownItem < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :field_configuration
-  has_one :dependent_field_configuration, class_name: "FieldConfiguration", as: :parent
+  has_many :dependent_field_configuration, class_name: "FieldConfiguration", as: :parent
 
   validates :name, presence: true
 

@@ -50,6 +50,7 @@ class FieldConfiguration < ActiveRecord::Base
   validates :configurable_type, presence: true, :inclusion => {:in => ['Policy', 'Company']} #, 'User']}
   validates :default_value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiSelectSelection']}
   validate :validate_config
+  validate :validate_parent
 
   accepts_nested_attributes_for :drop_down_items
   accepts_nested_attributes_for :custom_fields
@@ -68,6 +69,7 @@ class FieldConfiguration < ActiveRecord::Base
   }
   scope :with_field_type, -> (field_type_id) { where field_type_id: field_type_id }
   scope :root_fields, -> { where root_field: true}
+  scope :non_root_fields, -> { where.not(root_field: true) }
 
   delegate :drop_down?, :text?, to: :field_type
 
@@ -189,6 +191,12 @@ class FieldConfiguration < ActiveRecord::Base
       end
     end
     return result
+  end
+
+  def validate_parent
+    if !self.root_field && self.parent.blank?
+      add_message :error, "You cannot set a non-root custom field without a parent"
+    end
   end
 
 end

@@ -5,7 +5,7 @@
 
 class Expense::Manual::Update < Expense::Manual::Base
   attr_accessor :updated_expense_params
-  attr_accessor :editable_attrs, :receipt, :old_receipt, :destroy_receipts
+  attr_accessor :editable_attrs, :receipt, :old_receipt, :destroy_receipts, :stored_custom_fields
   attr_accessor :original_attributes
 
   def personalizer
@@ -92,10 +92,16 @@ class Expense::Manual::Update < Expense::Manual::Base
     check_coh_reimbursable_exclusivity_update(updated_expense_params)
   end
 
+  def pre_process
+    # storing the custom fields here for the expense
+    # store_custom_fields(self.expense.manual_expense)
+  end
+
   def process
     # Set custom fields
     custom_fields = {custom_fields: params[:custom_fields]}
     custom_fields[:save] = false
+    # custom_fields[:reset_fields] = true
     set_fields = CustomField::SetFields.(self.expense.manual_expense, FieldParentType.id_for(:manual_expense), custom_fields)
     unless set_fields.success?
       add_message :error, set_fields.messages[:error]
