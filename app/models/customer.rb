@@ -31,6 +31,8 @@ class Customer < ActiveRecord::Base
 
   has_one :customer_account
 
+  after_create :customer_config
+
   accepts_nested_attributes_for :addresses
   accepts_nested_attributes_for :virtual_bank_accounts
   accepts_nested_attributes_for :customer_attachments
@@ -70,4 +72,13 @@ class Customer < ActiveRecord::Base
     end
   }
 
+  private
+
+  def customer_config
+    self.build_customer_account({
+                                     balance_attributes: {
+                                         value: 0, currency_id: 1 # Dynamic currency id from customer
+                                     }
+                                 }).save
+  end
 end
