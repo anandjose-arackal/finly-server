@@ -60,6 +60,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -180,6 +181,11 @@ class User < ActiveRecord::Base
   # Outward invoice
   has_many :outward_invoices
   has_many :outward_invoice_attachments
+
+  #Budgets
+  has_many :owned_budgets, class_name: 'Budget'
+  has_many :budgets, as: :budgetable
+  # has_many :budgets, as: :budgetable
 
 
 

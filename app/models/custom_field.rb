@@ -38,6 +38,11 @@ class CustomField < ActiveRecord::Base
     ids = CustomField.where(value_id: multi_select_ids, value_type: "FieldMultiselectSelection").pluck(:id)
     where(id: ids)
   }
+  scope :with_root_field_configurations, -> {
+    field_config_ids = self.pluck(:field_configuration_id)
+    root_field_config_ids = FieldConfiguration.where(id: field_config_ids, root_field: true).pluck(:id)
+    where(field_configuration_id: root_field_config_ids)
+  }
 
   def set_value(value, save = true)
     if value.blank?
@@ -138,6 +143,12 @@ class CustomField < ActiveRecord::Base
     options = []
     if field_configuration.field_type_id == FieldType.id_for(:drop_down)
       options = field_configuration.drop_down_items
+      dependent_field_configuration_ids = []
+      options.each do |option|
+        if option.dependent_field_configuration.present?
+          dependent_field_configuration_ids << option.dependent_field_configuration.id
+        end
+      end
     elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)
       options = field_configuration.multiselect_items
     end
@@ -146,7 +157,10 @@ class CustomField < ActiveRecord::Base
             field_type: {id: field_configuration.field_type.id,
                          name: field_configuration.field_type.name},
             mandatory: field_configuration.mandatory,
-            options: options}
+            options: options,
+            root_field: self.field_configuration.root_field,
+            dependent_field_configuration_ids: dependent_field_configuration_ids
+            }
     case self.field_configuration.field_type_id
       when FieldType.id_for(:multiselect)
         ids = []

@@ -19,6 +19,9 @@
 #  global                  :boolean          default(TRUE)
 #  external_reference_type :string(255)
 #  external_reference_id   :integer
+#  parent_id               :integer
+#  parent_type             :integer
+#  root_field              :boolean          default(TRUE)
 #
 
 class FieldConfiguration < ActiveRecord::Base
@@ -36,6 +39,7 @@ class FieldConfiguration < ActiveRecord::Base
   has_many :custom_fields
   belongs_to :default_value, polymorphic: true
   belongs_to :external_reference, polymorphic: true
+  belongs_to :parent, polymorphic: true
 
   validates :field_name, presence: true
   validates :enabled, presence: true
@@ -63,6 +67,7 @@ class FieldConfiguration < ActiveRecord::Base
     where field_parent_type_id: parent_type_id
   }
   scope :with_field_type, -> (field_type_id) { where field_type_id: field_type_id }
+  scope :root_fields, -> { where root_field: true}
 
   delegate :drop_down?, :text?, to: :field_type
 
@@ -164,7 +169,7 @@ class FieldConfiguration < ActiveRecord::Base
     elsif field_type_id == FieldType.id_for(:multiselect)
       options = multiselect_items.non_deleted
     end
-    {
+    result = {
         id: id,
         label: field_name,
         field_type: {id: field_type.id,
@@ -172,8 +177,18 @@ class FieldConfiguration < ActiveRecord::Base
         mandatory: mandatory,
         global: self.global,
         value: self.default_value,
-        options: options
+        options: options,
+        root_field: self.root_field
     }
+    if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
+      self.drop_down_items.each do |drop_down|
+        if drop_down.dependent_field_configuration.present?
+          result[:has_dependent_cf] = true
+          break
+        end
+      end
+    end
+    return result
   end
 
 end

@@ -245,6 +245,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
               currency_id: Currency.first.id
           },
           note: order_details[:note],
+          category_id: order_details[:category_id],
           date: DateUtils.local_date,
           invoice_attributes: {
               invoice_number: order_details[:invoice_number],

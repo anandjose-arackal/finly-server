@@ -1,14 +1,13 @@
-class Category::Invoices::Index < Category::Base
-
+class Categories::VendorPayments::Index < Categories::Index
 
   def init
     self.company = user.company
-    self.purpose_id = Purpose.id_for(:invoice)
+    self.purpose = "vendor_payments"
     self.parent_type_id = FieldParentType.id_for(:invoice)
   end
 
   def validate
-    if self.purpose_id.blank?
+    if self.purpose.blank?
       add_message :error, "Purpose cannot be blank"
     end
   end
