@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180509100635) do
+ActiveRecord::Schema.define(version: 20180514123640) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1623,12 +1623,13 @@ ActiveRecord::Schema.define(version: 20180509100635) do
     t.string   "mobile_number", limit: 255
     t.text     "description",   limit: 65535
     t.integer  "company_id",    limit: 4
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
     t.string   "gst",           limit: 255
     t.string   "pan",           limit: 255
     t.integer  "created_by_id", limit: 4
     t.boolean  "active",                      default: true
+    t.boolean  "is_deleted",                  default: false
   end
 
   create_table "desktop_users", force: :cascade do |t|
@@ -3080,9 +3081,11 @@ ActiveRecord::Schema.define(version: 20180509100635) do
     t.integer  "parent_id",               limit: 4
     t.text     "post_operation",          limit: 65535
     t.text     "post_operation_payload",  limit: 65535
+    t.integer  "category_id",             limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
+  add_index "payments", ["category_id"], name: "index_payments_on_category_id", using: :btree
   add_index "payments", ["initiating_user_id"], name: "index_payments_on_initiating_user_id", using: :btree
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
@@ -4186,6 +4189,8 @@ ActiveRecord::Schema.define(version: 20180509100635) do
     t.boolean  "default_password",                   default: false
     t.boolean  "point_of_contact",                   default: false
     t.integer  "otp_attempts",           limit: 4,   default: 0
+    t.integer  "user_delegate_id",       limit: 4
+    t.boolean  "delegation_enabled"
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
@@ -4620,6 +4625,7 @@ ActiveRecord::Schema.define(version: 20180509100635) do
   add_foreign_key "payment_receivables", "customers"
   add_foreign_key "payment_receivables", "payment_receivable_statuses"
   add_foreign_key "payments", "amounts"
+  add_foreign_key "payments", "categories"
   add_foreign_key "payments", "payment_types"
   add_foreign_key "per_diem_expenses", "expenses"
   add_foreign_key "per_diem_expenses", "per_diems"
