@@ -1,4 +1,4 @@
-class Api::Vp::VendorController < ApplicationController
+class Api::Vp::VendorsController < ApplicationController
 
   protect_from_forgery with: :null_session
 
