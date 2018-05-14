@@ -10,28 +10,30 @@ class Company::Configuration::Category::Create < Company::Configuration::Categor
   def init
     super
     # here we need all categories, not just inactive ones
-    self.purpose_id = category_params[:purpose_id] || Purpose.id_from_application_for(RequestStore.store[:current_app])
-    self.category = user.company.categories.with_purpose(self.purpose_id).with_name(category_params[:name]).first rescue nil
+    # self.purpose_id = category_params[:purpose_id] || Purpose.id_from_application_for(RequestStore.store[:current_app])
+    self.category = user.company.categories.with_name(category_params[:name]).first rescue nil
   end
 
   def process
     if self.category.present?
-      self.category.active = true
+      self.category.assign_attributes(category_params)
+      self.category.update(active: true)
     else
-      self.category = self.categories.build(company_id: user.company_id, name: category_params[:name], purpose_id: self.purpose_id)
+      self.category = user.company.categories.build(category_params)
     end
     unless category.save
       messages[:error] = category.errors.full_messages
+      return
     end
   end
 
   def post_process
-    messages[:success] << "Category added"
+    add_message :success, "Category added"
   end
 
   private
 
   def category_params
-    params.require(:category).permit(:name, :purpose_id)
+    params.require(:category).permit(:name, :expense_management, :vendor_payments, :outward_invoices, :inward_invoice_line_items, :outward_invoice_line_items, :parent_id)
   end
 end

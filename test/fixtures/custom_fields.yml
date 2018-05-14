@@ -10,6 +10,8 @@
 #  updated_at             :datetime         not null
 #  value_id               :integer
 #  value_type             :string(255)
+#  dependent_parent_id    :integer
+#  dependent_parent_type  :string(255)
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

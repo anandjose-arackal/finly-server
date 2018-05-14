@@ -37,6 +37,7 @@ class YesBankVendor < ActiveRecord::Base
   scope :non_deleted, -> { where is_deleted: [false, nil]}
   scope :authorized, -> { where authorized: true}
 
+
   def as_json(options={})
     {
         name: name,

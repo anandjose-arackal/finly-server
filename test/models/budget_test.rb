@@ -1,0 +1,27 @@
+# == Schema Information
+#
+# Table name: budgets
+#
+#  id               :integer          not null, primary key
+#  name             :string(255)
+#  period_id        :integer
+#  start_date       :date
+#  end_date         :date
+#  budget_amount_id :integer
+#  spent_amount_id  :integer
+#  budgetable_id    :integer          not null
+#  budgetable_type  :string(255)      not null
+#  is_deleted       :boolean          default(FALSE)
+#  created_at       :datetime         not null
+#  updated_at       :datetime         not null
+#  user_id          :integer
+#  company_id       :integer
+#
+
+require 'test_helper'
+
+class BudgetTest < ActiveSupport::TestCase
+  # test "the truth" do
+  #   assert true
+  # end
+end

@@ -548,6 +548,7 @@
 #                                                         PATCH  /user_permissions/:id(.:format)                                                              user_permissions#update
 #                                                         PUT    /user_permissions/:id(.:format)                                                              user_permissions#update
 #                                                         DELETE /user_permissions/:id(.:format)                                                              user_permissions#destroy
+#                                 category_sub_categories GET    /categories/:category_id/sub_categories(.:format)                                            categories#sub_categories
 #                                              categories GET    /categories(.:format)                                                                        categories#index
 #                                                         POST   /categories(.:format)                                                                        categories#create
 #                                            new_category GET    /categories/new(.:format)                                                                    categories#new
@@ -841,6 +842,7 @@
 #                                                         PATCH  /custom_fields/:id(.:format)                                                                 custom_fields#update
 #                                                         PUT    /custom_fields/:id(.:format)                                                                 custom_fields#update
 #                                                         DELETE /custom_fields/:id(.:format)                                                                 custom_fields#destroy
+#                                 dependent_custom_fields GET    /custom_fields/:drop_down_id/dependent_custom_fields(.:format)                               custom_fields#dependent_custom_fields
 #                                                    root GET    /                                                                                            home#index
 #                                                 welcome GET    /welcome(.:format)                                                                           home#welcome
 #                                                   about GET    /about(.:format)                                                                             home#about
@@ -1261,6 +1263,14 @@
 #                          summary_configurations_manager POST   /summary/configurations/manager(.:format)                                                    summary/configuration#manager_create
 #                                                         DELETE /summary/configurations/manager/:id(.:format)                                                summary/configuration#manager_destroy
 #                                                    ping GET    /ping(.:format)                                                                              ping#ping
+#                                                 budgets GET    /budgets(.:format)                                                                           budgets#index
+#                                                         POST   /budgets(.:format)                                                                           budgets#create
+#                                              new_budget GET    /budgets/new(.:format)                                                                       budgets#new
+#                                             edit_budget GET    /budgets/:id/edit(.:format)                                                                  budgets#edit
+#                                                  budget GET    /budgets/:id(.:format)                                                                       budgets#show
+#                                                         PATCH  /budgets/:id(.:format)                                                                       budgets#update
+#                                                         PUT    /budgets/:id(.:format)                                                                       budgets#update
+#                                                         DELETE /budgets/:id(.:format)                                                                       budgets#destroy
 #
 
 #                               crono_web        /crono                                                      Crono::Web
@@ -2242,7 +2252,9 @@ Rails.application.routes.draw do
     post 'check_permissions', to: 'user_permissions#check_permissions', as: :check_permissions
   end
 
-  resources :categories
+  resources :categories do
+    get 'sub_categories', to: 'categories#sub_categories', as: :sub_categories
+  end
 
   resources :export_preferences
 
@@ -2474,6 +2486,7 @@ Rails.application.routes.draw do
   post 'custom_fields/:field_configuration_id/drop_down_items', to: 'custom_fields#dropdownitem_create'
   delete 'custom_fields/:field_configuration_id/drop_down_items/:drop_down_item_id', to: 'custom_fields#dropdownitem_destroy'
   resources :custom_fields, only: [:create, :index, :show, :update, :destroy]
+  get 'custom_fields/:drop_down_id/dependent_custom_fields', to: 'custom_fields#dependent_custom_fields', as: :dependent_custom_fields
 
   # get 'settlements/summary' => 'settlements#summary'
 
@@ -2812,6 +2825,11 @@ Rails.application.routes.draw do
   end
 
   get 'ping', to: 'ping#ping'
+
+  ## Budget apis start ##
+  resources :budgets
+
+  ## Budget apis end ##
 
 
 
