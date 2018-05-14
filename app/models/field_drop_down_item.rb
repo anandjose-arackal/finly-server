@@ -14,7 +14,7 @@ class FieldDropDownItem < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :field_configuration
-  has_many :dependent_field_configuration, class_name: "FieldConfiguration", as: :parent
+  has_many :dependent_field_configurations, class_name: "FieldConfiguration", as: :parent
 
   validates :name, presence: true
 
@@ -27,7 +27,7 @@ class FieldDropDownItem < ActiveRecord::Base
 
   def as_json(options={})
     result = {id: id, name: name}
-    if self.dependent_field_configuration.present?
+    if self.dependent_field_configurations.present?
       result[:dependent_cf_present] = true
     end
     return result

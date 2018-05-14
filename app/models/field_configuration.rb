@@ -184,7 +184,7 @@ class FieldConfiguration < ActiveRecord::Base
     }
     if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
       self.drop_down_items.each do |drop_down|
-        if drop_down.dependent_field_configuration.present?
+        if drop_down.dependent_field_configurations.present?
           result[:has_dependent_cf] = true
           break
         end

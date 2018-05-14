@@ -10,6 +10,8 @@
 #  updated_at             :datetime         not null
 #  value_id               :integer
 #  value_type             :string(255)
+#  dependent_parent_id    :integer
+#  dependent_parent_type  :string(255)
 #
 
 class CustomField < ActiveRecord::Base
@@ -157,8 +159,8 @@ class CustomField < ActiveRecord::Base
       options = field_configuration.drop_down_items
       dependent_field_configuration_ids = []
       options.each do |option|
-        if option.dependent_field_configuration.present?
-          dependent_field_configuration_ids << option.dependent_field_configuration.id
+        if option.dependent_field_configurations.present?
+          dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
         end
       end
     elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)

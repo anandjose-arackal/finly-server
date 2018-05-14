@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180510093050) do
+ActiveRecord::Schema.define(version: 20180514184726) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1573,6 +1573,8 @@ ActiveRecord::Schema.define(version: 20180510093050) do
     t.datetime "updated_at",                         null: false
     t.integer  "value_id",               limit: 4
     t.string   "value_type",             limit: 255
+    t.integer  "dependent_parent_id",    limit: 4
+    t.string   "dependent_parent_type",  limit: 255
   end
 
   add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
@@ -1623,12 +1625,13 @@ ActiveRecord::Schema.define(version: 20180510093050) do
     t.string   "mobile_number", limit: 255
     t.text     "description",   limit: 65535
     t.integer  "company_id",    limit: 4
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
     t.string   "gst",           limit: 255
     t.string   "pan",           limit: 255
     t.integer  "created_by_id", limit: 4
     t.boolean  "active",                      default: true
+    t.boolean  "is_deleted",                  default: false
   end
 
   create_table "desktop_users", force: :cascade do |t|
