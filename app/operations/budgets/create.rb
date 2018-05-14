@@ -4,7 +4,7 @@ class Budgets::Create < Budgets::Base
   def init
     self.budget_params = create_budget_params
 
-    self.budgetable_types = %w( User Vendor Category FieldDropDownItem )
+    self.budgetable_types = %w( User YesBankVendor Category FieldDropDownItem )
 
   end
 
