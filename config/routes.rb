@@ -2199,6 +2199,9 @@ Rails.application.routes.draw do
           patch 'review', to: 'bank_payment_requests#review', as: :review
         end
       end
+      namespace :vendors do
+        post ''
+      end
     end
   end
 
