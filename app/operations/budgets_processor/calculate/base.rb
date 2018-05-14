@@ -42,7 +42,7 @@ class BudgetsProcessor::Calculate::Base < BaseOperation
     end
 
     def get_associated_item
-      item = budget.budgetable_type.constantize.with_id(self.budget.budgetable_id).first
+      item = budget.budgetable_type.constantize.find_by(id: self.budget.budgetable_id)
 
       item_details = {
           type: self.budget.budgetable_type,

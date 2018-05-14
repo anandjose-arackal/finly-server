@@ -9,11 +9,12 @@ class BudgetsProcessor::Calculate::YesBankVendor < BudgetsProcessor::Calculate::
   def process
     #todo calculate vendor payments
     if items_requested
-      payments = Payment.budget_payments(budget.start_date, budget.end_date).with_category(self.category_id).with_amount.sum(:value)
+      payments = Payment.budget_payments(budget.start_date, budget.end_date).with_amount
       self.spent_amount += payments.sum(:value)
       self.budget_trail_items += payments
     else
-      self.spent_amount = self.user.expenses.user_budget_expenses(budget.start_date, budget.end_date).with_amount.sum(:value)
+      # payments = Payment.budget_payments(budget.start_date, budget.end_date).with_category(self.category_id).with_amount.sum(:value)
+      payments = Payment.budget_payments(budget.start_date, budget.end_date).with_amount.sum(:value)
     end
   end
 
