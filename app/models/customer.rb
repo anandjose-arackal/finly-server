@@ -14,9 +14,13 @@
 #  pan           :string(255)
 #  created_by_id :integer
 #  active        :boolean          default(TRUE)
+#  is_deleted    :boolean          default(FALSE)
 #
 
 class Customer < ActiveRecord::Base
+
+  include SoftDeletable
+
   belongs_to :company
   belongs_to :created_by, class_name: "User"
 
