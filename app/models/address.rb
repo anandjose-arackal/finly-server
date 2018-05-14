@@ -23,8 +23,8 @@ class Address < ActiveRecord::Base
   belongs_to :state, class_name: "GstStateCode"
   belongs_to :parent, polymorphic: true
 
-  validates :pin_code, presence: true
-  validates :name, presence: true
+  # validates :pin_code, presence: true
+  # validates :name, presence: true
   validates :address_name, presence: true
   validates :city, presence: true
 
