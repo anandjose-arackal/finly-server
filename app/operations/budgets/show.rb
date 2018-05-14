@@ -39,6 +39,8 @@ class Budgets::Show < Budgets::Base
         op = ::BudgetsProcessor::Calculate::User.(user, {budget: budget, get_items: true})
       elsif budget.budgetable_type == 'Category'
         op = ::BudgetsProcessor::Calculate::Category.(user, {budget: budget, get_items: true})
+      elsif budget.budgetable_type == 'YesBankVendor'
+        op = ::BudgetsProcessor::Calculate::YesBankVendor.(user, {budget: budget, get_items: true})
       elsif budget.budgetable_type == 'FieldDropDownItem'
         op = ::BudgetsProcessor::Calculate::FieldDropDownItem.(user, {budget: budget, get_items: true})
       end
