@@ -30,11 +30,11 @@ class Purpose < ActiveRecord::Base
   def self.category_purpose_from_application(application)
     case application
       when :vp, 'vp'
-        return :invoice
+        return [:vendor_payments, :inward_invoice_line_items]
       when 'em', :em, :ft, 'ft'
         return :expense_management
       when 'fc', :fc
-        return :invoice_items # because from the outward invoice system, only invoice items categories can be created
+        return :outward_invoice_line_items # because from the outward invoice system, only invoice items categories can be created
       else
         # do nothing?
     end

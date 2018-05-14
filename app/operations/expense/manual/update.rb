@@ -94,7 +94,7 @@ class Expense::Manual::Update < Expense::Manual::Base
 
   def pre_process
     # storing the custom fields here for the expense
-    
+
   end
 
   def process
