@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180514184726) do
+ActiveRecord::Schema.define(version: 20180514205329) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1914,7 +1914,7 @@ ActiveRecord::Schema.define(version: 20180514184726) do
     t.string   "external_reference_type", limit: 255
     t.integer  "external_reference_id",   limit: 4
     t.integer  "parent_id",               limit: 4
-    t.integer  "parent_type",             limit: 4
+    t.string   "parent_type",             limit: 255
     t.boolean  "root_field",                          default: true
   end
 
