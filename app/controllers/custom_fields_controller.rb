@@ -4,7 +4,7 @@ class CustomFieldsController < ApplicationController
 
   def create
     @result = CustomField::Configuration::Create.(current_user, params)
-      respond response: @result&.success? ? :success : :failure
+    respond response: @result&.success? ? :success : :failure
   end
 
   def index
@@ -35,6 +35,11 @@ class CustomFieldsController < ApplicationController
   def dropdownitem_destroy
     @result = CustomField::Configuration::DropDownItem::Remove.(current_user, params)
     respond response: @result&.success? ? :success : :failure
+  end
+
+  def dependent_custom_fields
+    @result = CustomField::FieldConfigurations::DependentIndex.(current_user, params)
+    respond
   end
 
 end

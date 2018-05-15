@@ -104,7 +104,7 @@ class User::AvailableExpenseTypes::Show < User::Base
   end
 
   def load_custom_fields_config
-    configurations = user.company.field_configurations.exclude_deleted
+    configurations = user.company.field_configurations.exclude_deleted.root_fields.order_created_at_desc
     self.custom_fields_config = {}
     self.custom_fields_config[:manual_expense] = configurations.with_parent_type(FieldParentType.id_for(:manual_expense))
     self.custom_fields_config[:card_expense] = configurations.with_parent_type(FieldParentType.id_for(:card_expense))

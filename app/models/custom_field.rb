@@ -10,6 +10,8 @@
 #  updated_at             :datetime         not null
 #  value_id               :integer
 #  value_type             :string(255)
+#  dependent_parent_id    :integer
+#  dependent_parent_type  :string(255)
 #
 
 class CustomField < ActiveRecord::Base
@@ -42,6 +44,18 @@ class CustomField < ActiveRecord::Base
     field_config_ids = self.pluck(:field_configuration_id)
     root_field_config_ids = FieldConfiguration.where(id: field_config_ids, root_field: true).pluck(:id)
     where(field_configuration_id: root_field_config_ids)
+  }
+
+  scope :only_non_root_field_configs, -> {
+    field_config_ids = self.pluck(:field_configuration_id)
+    non_root_field_config_ids = FieldConfiguration.where(id: field_config_ids, root_field: false).pluck(:id)
+    where(field_configuration_id: non_root_field_config_ids)
+  }
+
+  scope :drop_down_custom_fields_only, -> {
+    field_config_ids = self.pluck(:field_configuration_id)
+    drop_down_field_config_ids = FieldConfiguration.where(id: field_config_ids, field_type_id: FieldType.id_for(:drop_down)).pluck(:id)
+    where(field_configuration_id: drop_down_field_config_ids)
   }
 
   def set_value(value, save = true)
@@ -143,6 +157,12 @@ class CustomField < ActiveRecord::Base
     options = []
     if field_configuration.field_type_id == FieldType.id_for(:drop_down)
       options = field_configuration.drop_down_items
+      dependent_field_configuration_ids = []
+      options.each do |option|
+        if option.dependent_field_configurations.present?
+          dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
+        end
+      end
     elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)
       options = field_configuration.multiselect_items
     end
@@ -151,7 +171,10 @@ class CustomField < ActiveRecord::Base
             field_type: {id: field_configuration.field_type.id,
                          name: field_configuration.field_type.name},
             mandatory: field_configuration.mandatory,
-            options: options}
+            options: options,
+            root_field: self.field_configuration.root_field,
+            dependent_field_configuration_ids: dependent_field_configuration_ids
+            }
     case self.field_configuration.field_type_id
       when FieldType.id_for(:multiselect)
         ids = []

@@ -31,7 +31,9 @@
 #  parent_id               :integer
 #  post_operation          :text(65535)
 #  post_operation_payload  :text(65535)
+#  category_id             :integer
 #
+
 
 
 
@@ -112,6 +114,7 @@ class Payment < ActiveRecord::Base
                                                              PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:reimbursement_outside_finly),
                                                              PaymentPurpose.id_for(:atm_withdrawal)] }
   scope :with_amount, -> { joins :amount }
+  scope :with_category, -> (ids) {where category_id: ids}
   scope :sum_amounts, -> { with_amount.sum(:value) }
   scope :joins_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }
@@ -246,6 +249,20 @@ class Payment < ActiveRecord::Base
   }
 
   scope :pending, -> { where payment_status_id: [PaymentStatus.id_for(:pending), PaymentStatus.id_for(:scheduled)] }
+
+  scope :budget_payments, -> (from, to) {
+    if from.is_a? Date
+      from = from
+    else
+      from = Date.parse(from.to_s) rescue Date.parse("1993-04-13")
+    end
+    if to.is_a? Date
+      to = to
+    else
+      to = Date.parse(to.to_s) rescue Date.today
+    end
+    where("payments.payment_status_id NOT IN (?)", [PaymentStatus.id_for(:failed), PaymentStatus.id_for(:cancelled)]).where("payments.date >= ? AND payments.date <= ?", from, to)
+  }
 
   # validates :amount_id, presence: true
   validates :date, presence: true

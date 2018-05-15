@@ -31,6 +31,7 @@
 #  parent_id               :integer
 #  post_operation          :text(65535)
 #  post_operation_payload  :text(65535)
+#  category_id             :integer
 #
 
 

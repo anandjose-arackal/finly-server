@@ -14,15 +14,24 @@ class FieldDropDownItem < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :field_configuration
+  has_many :dependent_field_configurations, class_name: "FieldConfiguration", as: :parent
 
   validates :name, presence: true
 
   scope :with_id, -> (id){ where id: id }
+  scope :with_field_configuration_id, -> (id) {
+    where field_configuration_id: id
+  }
 
   default_scope { unscope(:where) }
 
   def as_json(options={})
-    {id: id, name: name}
+    {
+        id: id,
+        name: name,
+        dependent_field_configurations: dependent_field_configurations,
+        dependent_cf_present: self.dependent_field_configurations.present?
+    }
   end
 
 end

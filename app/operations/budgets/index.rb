@@ -1,0 +1,24 @@
+class Budgets::Index < Budgets::Base
+  attr_accessor :budgets
+
+  def pre_validate
+
+  end
+
+  def init
+    self.budgets = user.company.budgets
+  end
+
+  def success
+    params[:budgets] = budgets
+    Budgets::Index::IndexPresenter.new(user, params, messages)
+  end
+
+  class Budgets::Index::IndexPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :budgets
+
+    def init
+      self.budgets = params[:budgets]
+    end
+  end
+end

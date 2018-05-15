@@ -1,10 +1,18 @@
 class CategoriesController < ApplicationController
 
-
   before_action -> { finly_authorize! :web}
 
   def create
-    @result = Company::Configuration::Category::Create.(current_user, params)
+    @result = Categories::Create.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
+  end
+
+  def update
+    @result = Categories::Update.(current_user, params)
     if @result.success?
       respond response: :success, message: @result.messages[:success]
     else
@@ -13,7 +21,7 @@ class CategoriesController < ApplicationController
   end
 
   def destroy
-    @result = Company::Configuration::Category::Destroy.(current_user, params)
+    @result = Categories::Destroy.(current_user, params)
     if @result.success?
       respond response: :success, message: @result.messages[:success]
     else
@@ -22,9 +30,12 @@ class CategoriesController < ApplicationController
   end
 
   def index
-    @result = Company::Configuration::Category::Index.(current_user, params)
-    respond_to do |format|
-      format.json {render json: @result.categories.as_json(:only => [:id, :name])}
-    end
+    @result = Categories::Index.(current_user, params)
+    respond
+  end
+
+  def sub_categories
+    @result = Categories::SubCategories::Index.(current_user, params)
+    respond
   end
 end

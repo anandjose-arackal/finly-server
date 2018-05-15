@@ -31,7 +31,8 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
       when UserRole.id_for(:finance_manager)
         self.payment_orders = user.payment_orders
       else
-        # do nothing?
+        # by default it just returns payment orders initiated by this user
+        self.payment_orders = user.payment_orders
     end
   end
 
@@ -41,7 +42,7 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
   end
 
   class Orders::OrderCards::Index::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :payment_orders
+    attr_accessor :payment_orders, :paginated_payment_orders
 
     include HasScope
 
@@ -49,7 +50,8 @@ class Orders::OrderCards::Index < Orders::OrderCards::Base
 
     def init
       self.payment_orders = params[:payment_orders]
-      self.payment_orders = apply_scopes(payment_orders, params)&.paginate(page: params[:page], per_page: 30)
+      self.payment_orders = apply_scopes(payment_orders, params)
+      self.paginated_payment_orders = self.payment_orders&.paginate(page: params[:page], per_page: 30)
     end
   end
 end

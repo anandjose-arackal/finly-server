@@ -12,7 +12,7 @@ class OrganizationAccountController < ApplicationController
   end
 
   def categories
-    @result = Company::Configuration::Show.(current_user, params)
+    @result = Categories::Index.(current_user, params)
     respond
   end
 
