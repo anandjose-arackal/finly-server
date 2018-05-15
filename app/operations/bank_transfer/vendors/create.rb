@@ -1,5 +1,14 @@
 class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
 
+  class BankTransfer::Vendors::Create::SuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :vendor
+
+    def init
+      self.vendor = params[:vendor]
+    end
+
+  end
+
   attr_accessor :vendor_parameters, :vendor, :account_owner_type
 
   def personalizer
@@ -74,6 +83,11 @@ class BankTransfer::Vendors::Create < BankTransfer::Vendors::Base
 
   def post_process
     add_message :success, "Vendor added"
+  end
+
+  def success
+    params[:vendor] = self.vendor
+    BankTransfer::Vendors::Create::SuccessPresenter.new(user, params, messages)
   end
 
 end

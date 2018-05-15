@@ -30,4 +30,8 @@ class InventoryLineItem < ActiveRecord::Base
   scope :filter_category_id, -> (category_id) {
     where category_id: category_id
   }
+
+  def as_json
+    
+  end
 end

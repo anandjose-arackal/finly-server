@@ -37,22 +37,31 @@ class YesBankVendor < ActiveRecord::Base
   scope :non_deleted, -> { where is_deleted: [false, nil]}
   scope :authorized, -> { where authorized: true}
 
-
-  def as_json(options={})
-    {
-        name: name,
-        email: email,
-        mobile_number: mobile_number,
-        description: description
-    }
-  end
-
-
-  scope :filter_search, -> (term) {
+  scope :filter_search, -> (term) do
     vendor_ids = where("name like ? OR email like ? OR mobile_number like ? OR description like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     bank_account_ids = BankAccount.where("account_number like ? OR ifsc like ? OR name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
-  }
+  end
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name,
+        created_at: created_at,
+        email: email,
+        mobile_number: mobile_number,
+        authorized: authorized,
+        description: description,
+        is_deleted: is_deleted,
+        pan: pan,
+        tin: tin,
+        gst: gst,
+        gst_registered: gst_registered,
+        state: state,
+        state_code_id: state_code_id,
+        bank_accounts: bank_accounts
+    }
+  end
 
 end
