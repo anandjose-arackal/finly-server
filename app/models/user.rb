@@ -79,6 +79,7 @@ class User < ActiveRecord::Base
 
   belongs_to :company
   belongs_to :otp_request_type
+  belongs_to :user_delegate, class_name: "User"
 
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
@@ -307,6 +308,15 @@ class User < ActiveRecord::Base
     ids.uniq!
     self.where(id: ids)
   end
+
+  scope :user_search, -> (term) {
+    if term.present?
+      ids = self.where("first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ? or mobile_number like ?",
+                       "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+      ids.uniq!
+      self.where(id: ids)
+    end
+  }
 
   scope :filter_state, -> (state) do
     if state.blank?
