@@ -195,7 +195,7 @@ class FieldConfiguration < ActiveRecord::Base
 
   def validate_parent
     if !self.root_field && self.parent.blank?
-      add_message :error, "You cannot set a non-root custom field without a parent"
+      errors.add(:field_configuration, "cannot set a non-root custom field without a parent")
     end
   end
 
