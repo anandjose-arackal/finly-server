@@ -34,12 +34,12 @@
   --><div class="company-address"  style="display: inline-block; width: 50%; text-align: right; vertical-align: top; font-size: 13px; margin: 0; margin-top: 10px;">
   <% if @invoice.company_branch.present? %>
     <% if @invoice.company_branch.gst.present? %>
-      GSTIN: <%= @invoice.company.collect_company_detail.gst %>
+      GSTIN: <%= @invoice.company.collect_company_detail.gst %><br />
     <% end %>
   <% else %>
     <% if @invoice.company.collect_company_detail.gst.present? %>
-      GSTIN: <%= @invoice.company.collect_company_detail.gst %>
-    <% end %><br />
+      GSTIN: <%= @invoice.company.collect_company_detail.gst %><br />
+    <% end %>
   <% end %>
   <%= @invoice.company.name %>
   <% if @invoice.company_branch.present? %>
