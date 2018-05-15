@@ -88,6 +88,10 @@ class ApplicationController < ActionController::Base
   end
 
   protected
+  def respond_success_failure
+    respond response: (@result.success? ? :success : :failure)
+  end
+
   def respond(type=nil)
     if type.present?
       if type[:response] == :success

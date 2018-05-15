@@ -501,6 +501,15 @@
 #                                                         PATCH  /api/vp/bank_transfer/bank_payment_requests/:id(.:format)                                       api/vp/bank_transfer/bank_payment_requests#update
 #                                                         PUT    /api/vp/bank_transfer/bank_payment_requests/:id(.:format)                                       api/vp/bank_transfer/bank_payment_requests#update
 #                                                         DELETE /api/vp/bank_transfer/bank_payment_requests/:id(.:format)                                       api/vp/bank_transfer/bank_payment_requests#destroy
+#                          api_vp_v1_inventory_line_items GET    /api/vp/v1/inventory_line_items(.:format)                                                       api/vp/v1/inventory_line_items#index
+#                                                         POST   /api/vp/v1/inventory_line_items(.:format)                                                       api/vp/v1/inventory_line_items#create
+#                       new_api_vp_v1_inventory_line_item GET    /api/vp/v1/inventory_line_items/new(.:format)                                                   api/vp/v1/inventory_line_items#new
+#                      edit_api_vp_v1_inventory_line_item GET    /api/vp/v1/inventory_line_items/:id/edit(.:format)                                              api/vp/v1/inventory_line_items#edit
+#                           api_vp_v1_inventory_line_item GET    /api/vp/v1/inventory_line_items/:id(.:format)                                                   api/vp/v1/inventory_line_items#show
+#                                                         PATCH  /api/vp/v1/inventory_line_items/:id(.:format)                                                   api/vp/v1/inventory_line_items#update
+#                                                         PUT    /api/vp/v1/inventory_line_items/:id(.:format)                                                   api/vp/v1/inventory_line_items#update
+#                                                         DELETE /api/vp/v1/inventory_line_items/:id(.:format)                                                   api/vp/v1/inventory_line_items#destroy
+#                                                  api_vp POST   /api/vp/vendors(.:format)                                                                       api/vp/vendors#create
 #                                               junk_show GET    /junk/show(.:format)                                                                            junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                            users#menu_data
 #                              admin_oauth_token_generate POST   /admin/oauth/token(.:format)                                                                    admin_users/oauth/token#create {:format=>"json"}
@@ -2216,6 +2225,12 @@ Rails.application.routes.draw do
           patch 'credit', to: 'bank_payment_requests#credit', as: :credit
           patch 'review', to: 'bank_payment_requests#review', as: :review
         end
+      end
+      namespace :v1 do
+        resources :inventory_line_items
+      end
+      scope :vendors do
+        post '', to: 'vendors#create'
       end
     end
   end

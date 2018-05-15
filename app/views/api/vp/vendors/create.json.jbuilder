@@ -1,0 +1,1 @@
+json.vendor @result.vendor
