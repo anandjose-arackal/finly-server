@@ -43,6 +43,12 @@ json.invoice do
     end
   end
 
+  if invoice.company_branch
+    json.company_branch do
+      json.extract! invoice.company_branch, :id, :name, :gst, :pan, :address
+    end
+  end
+
   json.reminders do
     json.array! invoice.reminders
   end
@@ -142,6 +148,12 @@ end
 json.payment_terms do
   json.array! @result.payment_terms do |payment_term|
     json.extract! payment_term, :id, :name, :days_after, :description, :default
+  end
+end
+
+json.company_branches do
+  json.array! @result.company_branches do |cb|
+    json.extract! cb, :id, :name, :address, :gst, :pan
   end
 end
 json.attachment do
