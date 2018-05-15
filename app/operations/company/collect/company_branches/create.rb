@@ -7,7 +7,6 @@ class Company::Collect::CompanyBranches::Create < Company::Collect::CompanyBranc
   end
 
   def process
-    debugger
     self.company_branch = self.company_detail.company_branches.build(company_branch_parameters)
 
     if self.company_branch.save
