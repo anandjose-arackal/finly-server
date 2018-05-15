@@ -30,6 +30,12 @@ class User::Team::Approver < User::Team::Base
   def process
     obj = self.mappings.send(params[:type]).policy(self.policy_id).with_purpose(self.purpose_id).amount(self.currency_id, self.amount_value).first.send(params[:type]) rescue nil
     return nil unless obj.present?
+    # first checking if this user has a delegated user
+    # if so, return delegate, otherwise return regular
+    if obj.is_a?(User) && obj.user_delegate.present? && obj.delegation_enabled
+      self.response = obj.user_delegate
+      return
+    end
     self.response = obj
   end
 

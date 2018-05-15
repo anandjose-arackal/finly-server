@@ -1,7 +1,7 @@
 class User::Delegate::Update < User::Base
 
   attr_accessor :delegated_user, :selected_user, :role_id,
-                :delegation_enabled
+                :delegation_enabled, :purpose_id
 
   def authorized_user_types
     [:company_admin, :employee]
