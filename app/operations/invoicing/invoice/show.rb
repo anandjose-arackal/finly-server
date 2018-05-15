@@ -1,15 +1,16 @@
 class Invoicing::Invoice::Show < Invoicing::Invoice::Base
 
-  attr_accessor :invoice, :invoice_number, :payment_terms
+  attr_accessor :invoice, :invoice_number, :payment_terms, :company_branches
 
   class Invoicing::Invoice::Show::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoice, :invoice_number, :payment_terms, :invoice_attachments, :paid_amounts
+    attr_accessor :invoice, :invoice_number, :payment_terms, :invoice_attachments, :paid_amounts, :company_branches
 
     def init
       self.invoice = params[:invoice]
       self.invoice_number = params[:invoice_number]
       self.payment_terms = params[:payment_terms]
+      self.company_branches = params[:company_branches]
       self.invoice_attachments = self.invoice.attachments
       self.paid_amounts = {
         through_outside_finly: get_outside_finly_amount,
@@ -122,12 +123,14 @@ class Invoicing::Invoice::Show < Invoicing::Invoice::Base
       self.invoice_number = op.invoice_number
     end
     self.payment_terms = user.company.payment_terms
+    self.company_branches = user.company.collect_company_detail.company_branches
   end
 
   def success
     params[:invoice] = self.invoice
     params[:invoice_number] = self.invoice_number
     params[:payment_terms] = self.payment_terms
+    params[:company_branches] = self.company_branches
     Invoicing::Invoice::Show::InvoicePresenter.new(user, params, messages)
   end
 end
