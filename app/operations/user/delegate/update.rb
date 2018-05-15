@@ -18,7 +18,7 @@ class User::Delegate::Update < User::Base
       when UserRole.id_for(:employee)
         self.selected_user = user
       else
-        # do nothing?
+        self.selected_user = user
     end
     self.purpose_id = Purpose.id_from_application_for(RequestStoreUtil.current_app)
     self.delegation_enabled = StringUtils.to_bool(params[:delegation_enabled])
