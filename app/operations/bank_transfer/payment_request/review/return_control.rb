@@ -54,7 +54,7 @@ class BankTransfer::PaymentRequest::Review::ReturnControl < BankTransfer::Paymen
                                          action_id: BankPaymentRequestCommentAction.id_for(:return_control),
                                          note: self.return_control_note
 
-    Event::EBankPaymentRequest::ReturnControl.(user, bank_payment_request: bank_payment_request)
+    # Event::EBankPaymentRequest::ReturnControl.(user, bank_payment_request: bank_payment_request)
 
     add_message :success, "Payment Order control returned successfully"
   end
