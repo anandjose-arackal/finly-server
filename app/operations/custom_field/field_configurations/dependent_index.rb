@@ -27,7 +27,7 @@ class CustomField::FieldConfigurations::DependentIndex < CustomField::FieldConfi
   def process
     # todo - for now only supporting single dependent custom fields, once multiple are supported,
     # the below variable will be an array by default
-    self.dependent_field_configurations = [self.drop_down_parent.dependent_field_configuration]
+    self.dependent_field_configurations = self.drop_down_parent.dependent_field_configurations
   end
 
   def success

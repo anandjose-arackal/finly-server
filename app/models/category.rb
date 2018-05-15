@@ -11,6 +11,8 @@
 #  created_at                 :datetime         not null
 #  updated_at                 :datetime         not null
 #  purpose_id                 :integer
+#  parent_id                  :integer
+#  account_code               :string(255)
 #  expense_management         :boolean
 #  vendor_payments            :boolean
 #  outward_invoices           :boolean
@@ -18,6 +20,7 @@
 #  ancestry                   :string(255)
 #  outward_invoice_line_items :boolean
 #
+
 
 
 
@@ -49,31 +52,57 @@ class Category < ActiveRecord::Base
   scope :with_id, ->(id) { where id: id }
   scope :with_name, ->(name) { where name: name }
   scope :others, -> { where name: 'Other' }
-  scope :with_purpose, -> (purpose) {
-    if purpose.present?
-      where(purpose.to_sym => true)
+  scope :with_purpose, -> (purposes) {
+    if Category.column_names.include?(purposes)
+      if purposes.is_a?(Array)
+        ids = []
+        purposes.each do |purpose|
+          ids += where(purpose.to_sym => true).pluck(:id)
+        end
+        where id: ids
+      else
+        where(purposes.to_sym => true)
+      end
     end
   }
   scope :outward_invoice_items_categories, -> { where purpose_id: Purpose.id_for(:outward_invoice_items) }
   scope :expense_management_only, -> {
-    where purpose_id: Purpose.id_for(:expense_management)
+    where expense_management: true
   }
   scope :vendor_payments_only, -> {
-    where purpose_id: Purpose.id_for(:vendor_payments)
+    ids = where(vendor_payments: true).pluck(:id)
+    ids += where(inward_invoice_line_items: true).pluck(:id)
+    where id: ids
   }
+
   scope :outward_invoices_only, -> {
     where purpose_id: Purpose.id_for(:outward_invoices)
   }
   scope :inward_invoice_items_only, -> {
     where inward_invoice_line_items: true
   }
+  scope :inward_invoice_line_items_only, -> {
+    where inward_invoice_line_items: true
+  }
+
   scope :outward_invoice_items_only, -> {
+    where outward_invoice_line_items: true
+  }
+  scope :outward_invoice_line_items_only, -> {
     where outward_invoice_line_items: true
   }
 
   scope :from_application, -> (application) {
     if Category.column_names.include?(application)
-      where(application.to_sym => true)
+      if application.is_a?(Array)
+        ids = []
+        application.each do |app|
+          ids += where(app.to_sym => true).pluck(:id)
+        end
+        where id: ids
+      else
+        where(application.to_sym => true)
+      end
     end
   }
 

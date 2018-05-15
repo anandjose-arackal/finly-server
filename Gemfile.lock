@@ -81,7 +81,7 @@ GEM
     autoprefixer-rails (6.5.0.1)
       execjs
     awesome_print (1.7.0)
-    aws-partitions (1.83.0)
+    aws-partitions (1.86.0)
     aws-sdk-core (3.20.2)
       aws-partitions (~> 1.0)
       aws-sigv4 (~> 1.0)
@@ -110,7 +110,7 @@ GEM
       uniform_notifier (~> 1.10.0)
     byebug (9.0.6)
     callsite (0.0.11)
-    capistrano (3.10.1)
+    capistrano (3.10.2)
       airbrussh (>= 1.0.0)
       i18n
       rake (>= 10.0.0)
@@ -447,7 +447,7 @@ DEPENDENCIES
   bootstrap-will_paginate (= 0.0.10)
   bullet (= 5.4.2)
   byebug (= 9.0.6)
-  capistrano (= 3.10.1)
+  capistrano (= 3.10.2)
   capistrano-bundler (= 1.2.0)
   capistrano-crono (= 0.1.2)
   capistrano-rails (= 1.2.2)

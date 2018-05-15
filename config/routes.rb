@@ -2794,6 +2794,8 @@ Rails.application.routes.draw do
       get 'show_collect_detail', to: 'company_configurations#show_collect_details'
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
 
+      resources :company_branches
+
 
 
     end

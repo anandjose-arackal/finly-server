@@ -1,4 +1,4 @@
-json.array! @result.payment_orders.each do |item|
+json.array! @result.paginated_payment_orders.each do |item|
   json.id item.id
   scheduled_at = item.scheduled_at
   if scheduled_at.present?

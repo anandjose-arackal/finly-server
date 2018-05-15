@@ -7,7 +7,6 @@
 #  field_type_id           :integer          not null
 #  mandatory               :boolean          default(FALSE), not null
 #  company_id              :integer          not null
-#  field_parent_type_id    :integer          not null
 #  configurable_id         :integer          not null
 #  configurable_type       :string(255)      not null
 #  created_at              :datetime         not null
@@ -19,8 +18,9 @@
 #  global                  :boolean          default(TRUE)
 #  external_reference_type :string(255)
 #  external_reference_id   :integer
+#  field_parent_type_id    :integer          not null
 #  parent_id               :integer
-#  parent_type             :integer
+#  parent_type             :string(255)
 #  root_field              :boolean          default(TRUE)
 #
 
@@ -50,6 +50,7 @@ class FieldConfiguration < ActiveRecord::Base
   validates :configurable_type, presence: true, :inclusion => {:in => ['Policy', 'Company']} #, 'User']}
   validates :default_value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiSelectSelection']}
   validate :validate_config
+  validate :validate_parent
 
   accepts_nested_attributes_for :drop_down_items
   accepts_nested_attributes_for :custom_fields
@@ -68,6 +69,7 @@ class FieldConfiguration < ActiveRecord::Base
   }
   scope :with_field_type, -> (field_type_id) { where field_type_id: field_type_id }
   scope :root_fields, -> { where root_field: true}
+  scope :non_root_fields, -> { where.not(root_field: true) }
 
   delegate :drop_down?, :text?, to: :field_type
 
@@ -182,13 +184,19 @@ class FieldConfiguration < ActiveRecord::Base
     }
     if [FieldType.id_for(:drop_down)].include?(self.field_type_id)
       self.drop_down_items.each do |drop_down|
-        if drop_down.dependent_field_configuration.present?
+        if drop_down.dependent_field_configurations.present?
           result[:has_dependent_cf] = true
           break
         end
       end
     end
     return result
+  end
+
+  def validate_parent
+    if !self.root_field && self.parent.blank?
+      errors.add(:field_configuration, "cannot set a non-root custom field without a parent")
+    end
   end
 
 end
