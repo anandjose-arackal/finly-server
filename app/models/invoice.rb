@@ -40,6 +40,7 @@
 #  taxable_amount_id  :integer
 #  cost_center_id     :integer
 #  tds_slab_id        :integer
+#  invoice_status_id  :integer
 #
 
 #  gst_type_id: 1 - IGST
