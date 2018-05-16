@@ -41,6 +41,8 @@
 #  cost_center_id     :integer
 #  tds_slab_id        :integer
 #  invoice_status_id  :integer
+#  company_id         :integer
+#  created_by_user_id :integer
 #
 
 require 'test_helper'

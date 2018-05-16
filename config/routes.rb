@@ -1138,6 +1138,14 @@
 #                                                         DELETE /bank_transfer/users/:id(.:format)                                                              bank_transfer/users#destroy
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                                  bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                            bank_transfer/vendor_payment_wallets#transfer_options
+#                           bank_transfer_inward_invoices GET    /bank_transfer/inward_invoices(.:format)                                                        bank_transfer/inward_invoices#index
+#                                                         POST   /bank_transfer/inward_invoices(.:format)                                                        bank_transfer/inward_invoices#create
+#                        new_bank_transfer_inward_invoice GET    /bank_transfer/inward_invoices/new(.:format)                                                    bank_transfer/inward_invoices#new
+#                       edit_bank_transfer_inward_invoice GET    /bank_transfer/inward_invoices/:id/edit(.:format)                                               bank_transfer/inward_invoices#edit
+#                            bank_transfer_inward_invoice GET    /bank_transfer/inward_invoices/:id(.:format)                                                    bank_transfer/inward_invoices#show
+#                                                         PATCH  /bank_transfer/inward_invoices/:id(.:format)                                                    bank_transfer/inward_invoices#update
+#                                                         PUT    /bank_transfer/inward_invoices/:id(.:format)                                                    bank_transfer/inward_invoices#update
+#                                                         DELETE /bank_transfer/inward_invoices/:id(.:format)                                                    bank_transfer/inward_invoices#destroy
 #                                     public_bank_account GET    /account/:account_number(.:format)                                                              invoicing/public_links#virtual_bank_account_show
 #                                          public_invoice GET    /invoice/:invoice_id(.:format)                                                                  invoicing/public_links#invoice_show
 #                                               addresses GET    /addresses(.:format)                                                                            addresses#index
@@ -2763,6 +2771,8 @@ Rails.application.routes.draw do
     end
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
+
+    resources :inward_invoices
   end
 
 

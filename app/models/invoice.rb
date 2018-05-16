@@ -41,6 +41,8 @@
 #  cost_center_id     :integer
 #  tds_slab_id        :integer
 #  invoice_status_id  :integer
+#  company_id         :integer
+#  created_by_user_id :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -62,6 +64,8 @@ class Invoice < ActiveRecord::Base
   belongs_to :category
   belongs_to :cost_center
   belongs_to :tds_slab, class_name: TdsRatesList
+  belongs_to :created_by, class_name: "User"
+  belongs_to :company
 
   # because multiple payments can be made against one invoice
   has_many :payments, as: :parent
@@ -92,9 +96,14 @@ class Invoice < ActiveRecord::Base
   delegate :gross_amount_value, to: :gross_amount
 
 
-  # validates :gross_amount, presence: true
-  # validates :net_amount, presence: true
-  # validates :amount, presence: true
+  validates :gross_amount, presence: true
+  validates :net_amount, presence: true
+  validates :amount, presence: true
+
+  scope :with_id, -> { where id: id}
+  scope :with_status_id, -> (status_id) {
+    where invoice_status_id: status_id
+  }
 
   def policy
     self.payment&.payment_order&.bank_payment_request&.policy
@@ -132,8 +141,5 @@ class Invoice < ActiveRecord::Base
       return 0
     end
   end
-
-  private
-
 
 end
