@@ -64,6 +64,8 @@ class BankPaymentRequestComment < ActiveRecord::Base
         comment_content += " unapproved the Payment Order"
       when BankPaymentRequestCommentAction.id_for(:take_control)
         comment_content += " taken control of the Payment Order"
+      when BankPaymentRequestCommentAction.id_for(:return_control)
+        comment_content += " returned control of the Payment Order"
       when BankPaymentRequestCommentAction.id_for(:cancel)
         comment_content += " cancelled the Payment Order"
       when BankPaymentRequestCommentAction.id_for(:add_beneficiary)

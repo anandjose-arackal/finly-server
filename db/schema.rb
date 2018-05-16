@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180509100635) do
+ActiveRecord::Schema.define(version: 20180515081209) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1166,6 +1166,18 @@ ActiveRecord::Schema.define(version: 20180509100635) do
   add_index "company_balance_histories", ["wallet_withdrawal_to_virtual_account_id"], name: "index_wal_2_va_on_company_history", using: :btree
   add_index "company_balance_histories", ["wallet_withdrawal_to_wallet_id"], name: "index_wal_2_wal_on_company_history", using: :btree
 
+  create_table "company_branches", force: :cascade do |t|
+    t.integer  "collect_company_detail_id", limit: 4
+    t.string   "name",                      limit: 255
+    t.text     "address",                   limit: 65535
+    t.string   "pan",                       limit: 255
+    t.string   "gst",                       limit: 255
+    t.datetime "created_at",                              null: false
+    t.datetime "updated_at",                              null: false
+  end
+
+  add_index "company_branches", ["collect_company_detail_id"], name: "index_company_branches_on_collect_company_detail_id", using: :btree
+
   create_table "company_configurations", force: :cascade do |t|
     t.integer  "company_id",                       limit: 4,                     null: false
     t.integer  "contact_id",                       limit: 4
@@ -1573,6 +1585,8 @@ ActiveRecord::Schema.define(version: 20180509100635) do
     t.datetime "updated_at",                         null: false
     t.integer  "value_id",               limit: 4
     t.string   "value_type",             limit: 255
+    t.integer  "dependent_parent_id",    limit: 4
+    t.string   "dependent_parent_type",  limit: 255
   end
 
   add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
@@ -1623,12 +1637,13 @@ ActiveRecord::Schema.define(version: 20180509100635) do
     t.string   "mobile_number", limit: 255
     t.text     "description",   limit: 65535
     t.integer  "company_id",    limit: 4
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
     t.string   "gst",           limit: 255
     t.string   "pan",           limit: 255
     t.integer  "created_by_id", limit: 4
     t.boolean  "active",                      default: true
+    t.boolean  "is_deleted",                  default: false
   end
 
   create_table "desktop_users", force: :cascade do |t|
@@ -1911,7 +1926,7 @@ ActiveRecord::Schema.define(version: 20180509100635) do
     t.string   "external_reference_type", limit: 255
     t.integer  "external_reference_id",   limit: 4
     t.integer  "parent_id",               limit: 4
-    t.integer  "parent_type",             limit: 4
+    t.string   "parent_type",             limit: 255
     t.boolean  "root_field",                          default: true
   end
 
@@ -2883,10 +2898,12 @@ ActiveRecord::Schema.define(version: 20180509100635) do
     t.integer  "user_id",                 limit: 4
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
     t.text     "terms",                   limit: 65535
+    t.integer  "company_branch_id",       limit: 4
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
   add_index "outward_invoices", ["balance_due_id"], name: "index_outward_invoices_on_balance_due_id", using: :btree
+  add_index "outward_invoices", ["company_branch_id"], name: "index_outward_invoices_on_company_branch_id", using: :btree
   add_index "outward_invoices", ["customer_id"], name: "index_outward_invoices_on_customer_id", using: :btree
   add_index "outward_invoices", ["discount_amount_id"], name: "index_outward_invoices_on_discount_amount_id", using: :btree
   add_index "outward_invoices", ["freight_amount_id"], name: "index_outward_invoices_on_freight_amount_id", using: :btree
@@ -3080,9 +3097,11 @@ ActiveRecord::Schema.define(version: 20180509100635) do
     t.integer  "parent_id",               limit: 4
     t.text     "post_operation",          limit: 65535
     t.text     "post_operation_payload",  limit: 65535
+    t.integer  "category_id",             limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
+  add_index "payments", ["category_id"], name: "index_payments_on_category_id", using: :btree
   add_index "payments", ["initiating_user_id"], name: "index_payments_on_initiating_user_id", using: :btree
   add_index "payments", ["payment_type_id"], name: "index_payments_on_payment_type_id", using: :btree
   add_index "payments", ["receiving_user_id"], name: "index_payments_on_receiving_user_id", using: :btree
@@ -4186,6 +4205,8 @@ ActiveRecord::Schema.define(version: 20180509100635) do
     t.boolean  "default_password",                   default: false
     t.boolean  "point_of_contact",                   default: false
     t.integer  "otp_attempts",           limit: 4,   default: 0
+    t.integer  "user_delegate_id",       limit: 4
+    t.boolean  "delegation_enabled"
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
@@ -4509,6 +4530,7 @@ ActiveRecord::Schema.define(version: 20180509100635) do
   add_foreign_key "company_agreement_tracks", "agreements"
   add_foreign_key "company_agreement_tracks", "users"
   add_foreign_key "company_balance_histories", "companies"
+  add_foreign_key "company_branches", "collect_company_details"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
   add_foreign_key "company_funds_auto_transfer_configs", "companies"
@@ -4608,6 +4630,7 @@ ActiveRecord::Schema.define(version: 20180509100635) do
   add_foreign_key "outward_invoice_trails", "outward_invoices"
   add_foreign_key "outward_invoice_trails", "users"
   add_foreign_key "outward_invoices", "amounts"
+  add_foreign_key "outward_invoices", "company_branches"
   add_foreign_key "outward_invoices", "customers"
   add_foreign_key "outward_invoices", "outward_invoice_types"
   add_foreign_key "outward_invoices", "payment_terms"
@@ -4620,6 +4643,7 @@ ActiveRecord::Schema.define(version: 20180509100635) do
   add_foreign_key "payment_receivables", "customers"
   add_foreign_key "payment_receivables", "payment_receivable_statuses"
   add_foreign_key "payments", "amounts"
+  add_foreign_key "payments", "categories"
   add_foreign_key "payments", "payment_types"
   add_foreign_key "per_diem_expenses", "expenses"
   add_foreign_key "per_diem_expenses", "per_diems"

@@ -240,6 +240,9 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
       when 7, '7'
         # approve and forward
         operation = BankTransfer::PaymentRequest::Review::ApproveAndForward.new(current_user, params)
+      when 8, '8'
+        # approve and forward
+        operation = BankTransfer::PaymentRequest::Review::ReturnControl.new(current_user, params)
       else
         # do nothing?
     end

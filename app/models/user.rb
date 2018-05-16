@@ -47,7 +47,11 @@
 #  default_password       :boolean          default(FALSE)
 #  point_of_contact       :boolean          default(FALSE)
 #  otp_attempts           :integer          default(0)
+#  user_delegate_id       :integer
+#  delegation_enabled     :boolean
 #
+
+
 
 
 
@@ -75,6 +79,7 @@ class User < ActiveRecord::Base
 
   belongs_to :company
   belongs_to :otp_request_type
+  belongs_to :user_delegate, class_name: "User"
 
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
@@ -180,6 +185,11 @@ class User < ActiveRecord::Base
   # Outward invoice
   has_many :outward_invoices
   has_many :outward_invoice_attachments
+
+  #Budgets
+  has_many :owned_budgets, class_name: 'Budget'
+  has_many :budgets, as: :budgetable
+  # has_many :budgets, as: :budgetable
 
 
 
@@ -298,6 +308,15 @@ class User < ActiveRecord::Base
     ids.uniq!
     self.where(id: ids)
   end
+
+  scope :user_search, -> (term) {
+    if term.present?
+      ids = self.where("first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ? or mobile_number like ?",
+                       "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+      ids.uniq!
+      self.where(id: ids)
+    end
+  }
 
   scope :filter_state, -> (state) do
     if state.blank?

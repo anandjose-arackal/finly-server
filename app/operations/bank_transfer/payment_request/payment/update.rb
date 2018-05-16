@@ -109,6 +109,10 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     if self.payment_params&.dig(:invoice_attributes)
       self.payment_params[:invoice_attributes][:inclusive_of_taxes] = !!self.payment_params[:invoice_attributes][:inclusive_of_taxes]
     end
+
+    if self.payment_params&.dig(:invoice_attributes, :category_id)
+      self.payment_params[:category_id] = payment_params[:invoice_attributes][:category_id]
+    end
   end
 
   def process
