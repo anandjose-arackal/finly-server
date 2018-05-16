@@ -4,7 +4,8 @@ class BudgetsProcessor::PaymentRequest < BudgetsProcessor::Base
     super
     self.payment_request = params[:payment_request]
 
-    self.budgets += Budget.with_budgetable_user_id(self.payment_request.owner_id)
+    # It shouldn't show user related budgets
+    # self.budgets += Budget.with_budgetable_user_id(self.payment_request.owner_id)
 
     payments = self.payment_request.payment_order.payments
 
