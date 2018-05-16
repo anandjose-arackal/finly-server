@@ -151,6 +151,7 @@ gem 'bullet', '5.4.2', :group => 'development'
 
 gem 'logstasher', '1.2.2'
 
+gem 'ancestry', '3.0.2'
 
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print', '1.7.0'
@@ -158,7 +159,7 @@ gem 'awesome_print', '1.7.0'
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', '9.0.6'
-  gem 'capistrano', '3.10.1'
+  gem 'capistrano', '3.10.2'
   gem 'capistrano3-puma', '1.2.1'
   gem 'capistrano-rails', '1.2.2', require: false
   gem 'capistrano-bundler', '1.2.0', require: false

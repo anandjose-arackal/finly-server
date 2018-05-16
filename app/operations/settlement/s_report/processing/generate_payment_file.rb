@@ -2,7 +2,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
   attr_accessor :report_processor_group, :group_mappings
 
   def authorized_user_types
-    [:company_admin, :finance_manager]
+    [:company_admin, :finance_manager, :vendor_payments_creditor]
   end
 
   def pre_validate

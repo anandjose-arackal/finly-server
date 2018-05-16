@@ -22,7 +22,7 @@ class Expense::Base < BaseOperation
     if StringUtils.to_bool(params[:from_cash_on_hand])
 
       # first check if the expense is being created in non-INR, and if its date is today
-      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params[:amount_attributes][:currency_id]))
+      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
         add_message :error, "Cash on hand expenses that are in a currency different from INR can only be reported on the next day"
         return
       end
@@ -50,7 +50,7 @@ class Expense::Base < BaseOperation
     if StringUtils.to_bool(params&.dig(:from_cash_on_hand)) or (params&.dig(:from_cash_on_hand).nil? and expense.from_cash_on_hand)
 
       # first check if the expense is being created in non-INR, and if its date is today
-      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params[:amount_attributes][:currency_id]))
+      if params[:date].present? && (Date.parse(params[:date]) == DateUtils.local_date) && !([1, '1'].include?(params&.dig(:amount_attributes, :currency_id)))
         add_message :error, "Cash on hand expenses that are in a currency different from INR can only be reported on the next day"
         return
       end
@@ -101,6 +101,29 @@ class Expense::Base < BaseOperation
     Expense::Base::Presenter.new(user, {expense: self.expense, view: params[:view]}, self.messages)
   end
 
+  # def destroy_irrelevant_dependent_cf(expense_obj, field_configuration = nil)
+  #   if field_configuration.blank?
+  #     return
+  #   end
+  #   # basically loop through the custom field dropdown items and see if there is
+  #   # a dependent custom field, and if there isn't destroy the associated custom fields
+  #   # associated with expense_obj
+  #   drop_down_ids = []
+  #   expense_obj.custom_fields.drop_down_custom_fields_only.only_non_root_field_configs.each do |cf|
+  #     drop_down_ids << cf.value.value.id # i.e. the cf -> field drop down selection -> field drop down item -> id
+  #   end
+  #   field_config_ids = expense_obj.custom_fields.only_non_root_field_configs.pluck(:field_configuration_id)
+  #   field_configs = current_company.field_configurations.with_id(field_config_ids).order(id: :asc)
+  #   field_configs.each do |field_config|
+  #     # i.e. this particular field configuration's parent id is not in the list of
+  #     # drop down ids that are associated with this expense
+  #     if !field_config.root_field && !drop_down_ids.include?(field_config.parent_id)
+  #       cf = expense_obj.custom_fields.with_field_configuration_ids(field_config.id).first
+  #       cf.destroy
+  #     end
+  #   end
+  # end
+
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted, :conversion_rate
 
@@ -136,8 +159,8 @@ class Expense::Base < BaseOperation
         items = violations[expense.id]
         # constructing the violation hash as required
         violations = {}
-        violations[:blocking_present] = (items[:expense_warning].present? or items[:budget_warning].present? or items['expense_warning'].present? or items['budget_warning'].present?)
-        violations[:warning_present] = (items[:expense_blocking].present? or items[:budget_blocking].present? or items['expense_blocking'].present? or items['budget_blocking'].present?)
+        violations[:blocking_present] = (items&.dig(:expense_warning).present? or items&.dig(:budget_warning).present? or items&.dig('expense_warning').present? or items&.dig('budget_warning').present?)
+        violations[:warning_present] = (items&.dig(:expense_blocking).present? or items&.dig(:budget_blocking).present? or items&.dig('expense_blocking').present? or items&.dig('budget_blocking').present?)
         violations[:items] = items
       end
       violations

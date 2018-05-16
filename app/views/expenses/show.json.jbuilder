@@ -1,6 +1,11 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :category_name, :category_id, :expense_type_id,
                                     :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks
 
+if @result.expense.category.parent.present?
+  json.parent_category_name @result.expense.category.parent.name
+  json.parent_category_id @result.expense.category.parent.id
+end
+
 if @result.expense.report.present?
   json.report_id @result.expense.report_id
 end

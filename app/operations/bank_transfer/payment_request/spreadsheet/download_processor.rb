@@ -108,7 +108,8 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
                "Payment Mode",
                "Initiated By",
                "Initiator Email",
-               "Status",
+               "Payment Order Status",
+               "Payment Order Schedule Date",
                "Awaiting Action From",
                "Invoice Number",
                "Invoice Due Date",
@@ -121,7 +122,9 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
                 "Advance",
                 "Net Amount",
                 "Bank Reference Number",
-                "Note"]
+                "Note",
+                "Payment Status",
+                "Error Message"]
   end
 
   def retrieve_data
@@ -141,6 +144,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             payment.initiating_user.name,
             payment.initiating_user.email,
             payment.payment_order.bank_payment_request.status&.name&.humanize,
+            payment.payment_order.scheduled_at&.strftime("%d-%m-%Y"),
             payment.payment_order.bank_payment_request.controlling_user&.name,
             payment.invoice&.invoice_number,
             payment.invoice&.due_date&.strftime("%d-%m-%Y"),
@@ -155,7 +159,9 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             (payment.invoice&.advance_amount&.value || 0),
             (payment.amount&.value || 0),
             (payment.reference_resource&.bank_reference_number),
-            payment.note
+            payment.note,
+            payment.payment_status&.name&.humanize,
+            (payment.system_messages.pluck(:content)&.to_sentence)
         ]
         content << payment_details
       end
