@@ -183,6 +183,10 @@ class BankPaymentRequest < ActiveRecord::Base
     processing?
   end
 
+  def can_return_control?
+    processing?
+  end
+
   def credit_pending?
     approved? && !credited?
   end

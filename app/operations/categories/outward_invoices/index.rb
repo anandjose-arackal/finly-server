@@ -12,4 +12,9 @@ class Categories::OutwardInvoices::Index < Categories::Index
     end
   end
 
+  def process
+    self.categories = self.company.categories.with_purpose(self.purpose)
+    self.custom_fields = self.company.field_configurations.with_parent_type(self.parent_type_id)
+  end
+
 end
