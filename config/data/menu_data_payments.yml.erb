@@ -24,6 +24,9 @@ company:
     <% if current_company.feature_subscription.invoicing_system && current_user.user_panel_subscription.invoicing_system %>
     invoicing_system: true
     <% end %>
+    <% if current_company.feature_subscription.budgeting_system && current_user.vendor_payments_admin? %>
+    insights: true
+    <% end %>
 
 
 user:

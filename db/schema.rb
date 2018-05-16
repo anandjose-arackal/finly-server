@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180515081209) do
+ActiveRecord::Schema.define(version: 20180516092511) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -719,6 +719,12 @@ ActiveRecord::Schema.define(version: 20180515081209) do
   add_index "bookings", ["booking_request_id"], name: "index_bookings_on_booking_request_id", using: :btree
   add_index "bookings", ["booking_status_id"], name: "index_bookings_on_booking_status_id", using: :btree
   add_index "bookings", ["booking_type_id"], name: "index_bookings_on_booking_type_id", using: :btree
+
+  create_table "budget_periods", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "budget_rules", force: :cascade do |t|
     t.integer  "category_id",          limit: 4
@@ -1871,6 +1877,7 @@ ActiveRecord::Schema.define(version: 20180515081209) do
     t.boolean  "current_account_connected"
     t.boolean  "invoicing_system",                       default: false
     t.boolean  "travel_request",                         default: false
+    t.boolean  "budgeting_system",                       default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -2893,8 +2900,8 @@ ActiveRecord::Schema.define(version: 20180515081209) do
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
     t.text     "customer_memo",           limit: 65535
-    t.text     "reminders",               limit: 65535
     t.integer  "payment_term_id",         limit: 4
+    t.text     "reminders",               limit: 65535
     t.integer  "user_id",                 limit: 4
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
     t.text     "terms",                   limit: 65535
@@ -4216,30 +4223,6 @@ ActiveRecord::Schema.define(version: 20180515081209) do
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
-  create_table "vendor_account_transactions", force: :cascade do |t|
-    t.integer  "vendor_account_id",   limit: 4
-    t.integer  "transaction_type_id", limit: 4
-    t.integer  "amount_id",           limit: 4
-    t.integer  "payment_id",          limit: 4
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
-  end
-
-  add_index "vendor_account_transactions", ["amount_id"], name: "index_vendor_account_transactions_on_amount_id", using: :btree
-  add_index "vendor_account_transactions", ["payment_id"], name: "index_vendor_account_transactions_on_payment_id", using: :btree
-  add_index "vendor_account_transactions", ["transaction_type_id"], name: "index_vendor_account_transactions_on_transaction_type_id", using: :btree
-  add_index "vendor_account_transactions", ["vendor_account_id"], name: "index_vendor_account_transactions_on_vendor_account_id", using: :btree
-
-  create_table "vendor_accounts", force: :cascade do |t|
-    t.integer  "balance_id", limit: 4
-    t.integer  "vendor_id",  limit: 4
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
-  end
-
-  add_index "vendor_accounts", ["balance_id"], name: "index_vendor_accounts_on_balance_id", using: :btree
-  add_index "vendor_accounts", ["vendor_id"], name: "index_vendor_accounts_on_vendor_id", using: :btree
-
   create_table "vendor_attachments", force: :cascade do |t|
     t.string   "attached_file_file_name",    limit: 255
     t.string   "attached_file_content_type", limit: 255
@@ -4718,9 +4701,6 @@ ActiveRecord::Schema.define(version: 20180515081209) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
-  add_foreign_key "vendor_account_transactions", "amounts"
-  add_foreign_key "vendor_account_transactions", "payments"
-  add_foreign_key "vendor_account_transactions", "vendor_accounts"
   add_foreign_key "vendor_payment_wallets", "users"
   add_foreign_key "web_hook_event_mappings", "web_hook_events"
   add_foreign_key "web_hook_event_mappings", "web_hooks"

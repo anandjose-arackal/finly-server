@@ -36,7 +36,7 @@ class Budget < ActiveRecord::Base
   validates :end_date, presence: true
   validates :budgetable_id, presence: true
   validates :budgetable_type, presence: true
-  validates :period_id, presence: true
+  # validates :period_id, presence: true
 
   scope :with_id, -> (ids) {where id: ids}
 
