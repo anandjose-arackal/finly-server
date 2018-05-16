@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180516083933) do
+ActiveRecord::Schema.define(version: 20180516131736) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -529,6 +529,12 @@ ActiveRecord::Schema.define(version: 20180516083933) do
   add_index "bank_payment_requests", ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id", using: :btree
   add_index "bank_payment_requests", ["status_id"], name: "index_bank_payment_requests_on_status_id", using: :btree
 
+  create_table "bank_transaction_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "bank_transactions", force: :cascade do |t|
     t.string   "unique_request_number",       limit: 255
     t.string   "transfer_type",               limit: 255
@@ -543,6 +549,7 @@ ActiveRecord::Schema.define(version: 20180516083933) do
     t.string   "bank_response",               limit: 255
     t.boolean  "refunded"
     t.string   "error_sub_code",              limit: 255
+    t.integer  "bank_transaction_type_id",    limit: 4
   end
 
   add_index "bank_transactions", ["amount_id"], name: "index_bank_transactions_on_amount_id", using: :btree
@@ -3107,6 +3114,7 @@ ActiveRecord::Schema.define(version: 20180516083933) do
     t.text     "post_operation",          limit: 65535
     t.text     "post_operation_payload",  limit: 65535
     t.integer  "category_id",             limit: 4
+    t.date     "scheduled_at"
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree

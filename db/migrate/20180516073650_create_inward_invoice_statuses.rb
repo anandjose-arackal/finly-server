@@ -5,5 +5,7 @@ class CreateInwardInvoiceStatuses < ActiveRecord::Migration
 
       t.timestamps null: false
     end
+
+    InwardInvoiceStatus.seed_data
   end
 end

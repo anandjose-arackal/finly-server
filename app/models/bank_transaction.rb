@@ -16,6 +16,7 @@
 #  bank_response               :string(255)
 #  refunded                    :boolean
 #  error_sub_code              :string(255)
+#  bank_transaction_type_id    :integer
 #
 
 class BankTransaction < ActiveRecord::Base
@@ -32,7 +33,7 @@ class BankTransaction < ActiveRecord::Base
   validates :transfer_status_id, presence: true
   validates :amount, presence: true
   validates :company, presence: true
-  validates :transfer_type, presence: true
+  validates :transfer_type, presence: true, unless: :outside_finly?
 
   accepts_nested_attributes_for :amount
 
@@ -49,6 +50,10 @@ class BankTransaction < ActiveRecord::Base
 
   def successful?
     [BankTransferStatus.id_for(:completed), BankTransferStatus.id_for(:processing)].include?(self.transfer_status_id)
+  end
+
+  def outside_finly?
+    self.outside_finly
   end
 
 end

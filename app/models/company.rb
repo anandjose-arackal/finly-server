@@ -72,6 +72,7 @@ class Company < ActiveRecord::Base
   has_many :customers
   has_many :outward_invoices
   has_many :outward_invoice_attachments
+  has_many :inward_invoices, class_name: "Invoice"
 
   has_many :budgets
 

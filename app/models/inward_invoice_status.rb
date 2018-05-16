@@ -9,4 +9,9 @@
 #
 
 class InwardInvoiceStatus < ActiveRecord::Base
+  include Seedable
+
+  def self.values
+    [:unpaid, :partially_paid, :paid]
+  end
 end
