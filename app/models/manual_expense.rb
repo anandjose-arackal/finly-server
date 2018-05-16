@@ -15,6 +15,7 @@
 
 
 
+
 class ManualExpense < ActiveRecord::Base
   include SoftDeletable
 
