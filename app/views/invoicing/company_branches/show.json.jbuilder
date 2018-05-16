@@ -1,1 +1,0 @@
-json.extract! @result.company_branch, :id, :name, :address, :gst, :pan

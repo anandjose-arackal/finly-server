@@ -13,5 +13,5 @@
 #
 
 class CompanyBranch < ActiveRecord::Base
-  belongs_to :collect_company_detail
+  belongs_to :company
 end
