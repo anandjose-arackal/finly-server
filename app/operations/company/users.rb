@@ -15,7 +15,7 @@ class Company::Users < Company::Base
   end
 
   def init
-    self.users = user.company.users.active
+    self.users = user.company.users.with_subscription(RequestStoreUtil.current_app).active
   end
 
   def success

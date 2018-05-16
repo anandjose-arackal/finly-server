@@ -1,8 +1,8 @@
 json.array! @result.budgets do |budget|
   json.extract! budget, :id, :name
-  json.period do
-    json.extract! budget.period, :id, :name
-  end
+  # json.period do
+  #   json.extract! budget.period, :id, :name
+  # end
 
   json.start_date budget.start_date&.strftime("%d-%b-%y")
   json.end_date budget.end_date&.strftime("%d-%b-%y")

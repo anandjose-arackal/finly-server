@@ -36,13 +36,12 @@ class Budget < ActiveRecord::Base
   validates :end_date, presence: true
   validates :budgetable_id, presence: true
   validates :budgetable_type, presence: true
-  validates :period_id, presence: true
+  # validates :period_id, presence: true
 
   scope :with_id, -> (ids) {where id: ids}
 
   scope :with_budgetable_user_id, -> (ids) {where budgetable_id: ids, budgetable_type: "User"}
   scope :with_budgetable_category_id, -> (ids) {where budgetable_id: ids, budgetable_type: "Category"}
-  scope :with_budgetable_vendor_id, -> (ids) {where budgetable_id: ids, budgetable_type: "YesBankVendor"}
-
-
+  scope :with_budgetable_yes_bank_vendor_id, -> (ids) {where budgetable_id: ids, budgetable_type: "YesBankVendor"}
+  scope :with_budgetable_field_drop_down_item, -> (ids)  { where budgetable_type: "FieldDropDownItem", budgetable_id: ids }
 end

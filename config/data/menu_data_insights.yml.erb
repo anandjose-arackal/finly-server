@@ -35,7 +35,7 @@ user:
   roles:
   - id: admin
     name: Admin
-    default_url: 'dashboard'
+    default_url: 'budgets'
 
 views:
   admin:
@@ -50,22 +50,25 @@ views:
       # - name: Payment Links
       #   url: payment_links
       #   id: payment_links
-      - name: Dashboard
-        url: dashboard
-        id: dashboard
-      - name: Expense Management
-        url: products/expense-management
-        id: em
-      - name: Vendor Payments
-        url: products/vendor-payments
-        id: vp
-      - name: Business Invoicing
-        url: products/business-invoicing
-        id: bi
+#      - name: Dashboard
+#        url: dashboard
+#        id: dashboard
+#      - name: Expense Management
+#        url: products/expense-management
+#        id: em
+#      - name: Vendor Payments
+#        url: products/vendor-payments
+#        id: vp
+#      - name: Business Invoicing
+#        url: products/business-invoicing
+#        id: bi
+      - name: Budgets
+        url: budgets
+        id: budgets
       cog:
-      - name: Organization Account
-        url: '#organization_account'
-        id: 'organization_account'
-      - name: Transfer Credits
-        url: '#transfer_credits'
-        id: 'transfer_credits'
+#      - name: Organization Account
+#        url: '#organization_account'
+#        id: 'organization_account'
+#      - name: Transfer Credits
+#        url: '#transfer_credits'
+#        id: 'transfer_credits'

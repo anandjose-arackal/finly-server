@@ -264,6 +264,8 @@ class Payment < ActiveRecord::Base
     where("payments.payment_status_id NOT IN (?)", [PaymentStatus.id_for(:failed), PaymentStatus.id_for(:cancelled)]).where("payments.date >= ? AND payments.date <= ?", from, to)
   }
 
+  scope :vendor_payments_only, -> { where receiving_user_type: 'YesBankVendor' }
+
   # validates :amount_id, presence: true
   validates :date, presence: true
   # validates :initiating_user_id, presence: true

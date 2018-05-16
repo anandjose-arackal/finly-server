@@ -71,6 +71,8 @@ class FieldConfiguration < ActiveRecord::Base
   scope :root_fields, -> { where root_field: true}
   scope :non_root_fields, -> { where.not(root_field: true) }
 
+  scope :filter_dropdowns, -> {where field_type_id: FieldType.id_for(:drop_down)}
+
   delegate :drop_down?, :text?, to: :field_type
 
   default_scope { unscope(:where) }

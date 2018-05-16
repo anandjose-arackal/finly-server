@@ -434,3 +434,16 @@ json.comments do
 end
 
 json.actions @result.actions
+
+json.budgets do
+  json.array! @result.budgets do |item|
+    json.extract! item[:budget], :id, :start_date, :end_date, :name
+    json.created_at item[:budget].created_at.strftime("%d %b %Y")
+    # json.period item[:budget].period.name
+
+    json.budget_amount item[:budget_amount]
+    json.spent_amount item[:spent_amount]
+    json.associated_item item[:associated_item]
+  end
+
+end

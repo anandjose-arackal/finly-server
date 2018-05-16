@@ -24,6 +24,7 @@ class ManualExpense < ActiveRecord::Base
 
   validates :merchant, presence: true
 
+  scope :with_id, -> (ids) {where id: ids}
   scope :merchant_like, -> (merchant, expense_ids) do
     where(expense_id: expense_ids).where('lower(merchant) LIKE ?', "%#{merchant.downcase}%").pluck(:merchant)
   end
