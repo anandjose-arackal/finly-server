@@ -5,5 +5,7 @@ class CreateBankTransactionTypes < ActiveRecord::Migration
 
       t.timestamps null: false
     end
+
+    BankTransactionType.seed_data
   end
 end

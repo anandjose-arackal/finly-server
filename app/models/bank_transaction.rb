@@ -24,6 +24,7 @@ class BankTransaction < ActiveRecord::Base
   belongs_to :company
   belongs_to :beneficiary_bank_account, class_name: "BankAccount"
   belongs_to :transfer_status, class_name: "BankTransferStatus"
+  belongs_to :bank_transaction_type
 
   has_one :payment, as: :reference_resource
 
