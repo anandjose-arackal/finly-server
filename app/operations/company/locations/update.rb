@@ -1,0 +1,28 @@
+class Company::Locations::Update < Company::Locations::Base
+
+  def init
+    super
+    self.location = user.company.locations.find_by id: params[:id]
+
+
+    self.location_parameters = location_params
+  end
+
+  def validate
+    unless self.location.present?
+      add_message :error, "Cannnot find Location"
+    end
+  end
+
+  def process
+    self.location.assign_attributes(location_parameters)
+
+    if self.location.valid?
+      self.location.save
+      add_message :success, "Successfully Updated Location"
+    else
+      add_message :error, self.location.errors.full_messages
+    end
+  end
+
+end

@@ -77,6 +77,7 @@ class Company < ActiveRecord::Base
 
 
   has_many :booking_attachments
+  has_many :locations, class_name: "BranchLocation"
 
   accepts_nested_attributes_for :configuration
   accepts_nested_attributes_for :itz_cash_property
