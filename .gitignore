@@ -55,3 +55,5 @@ dump.rdb
 .idea/
 config/secure_storage_config.yml
 config/deploy/config/*
+
+public/tmp

@@ -29,6 +29,7 @@ class CustomField < ActiveRecord::Base
   validates :parent_type, :inclusion => {:in => ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense', 'Report', 'MoneyRequest', 'Invoice', 'InvoiceLineItem']}
   validates :value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiselectSelection']}
 
+  scope :only_drop_downs, -> { where value_type: "FieldDropDownSelection" }
   scope :with_field_configuration_ids, ->(ids) { where field_configuration_id: ids }
   scope :includes_parent, -> { includes :parent }
   scope :expenses, -> { where parent_type: ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense'] }
@@ -155,12 +156,14 @@ class CustomField < ActiveRecord::Base
 
   def as_json(options = {})
     options = []
+    dependent_field_configuration_ids = []
+    has_dependent_cf = false
     if field_configuration.field_type_id == FieldType.id_for(:drop_down)
       options = field_configuration.drop_down_items
-      dependent_field_configuration_ids = []
       options.each do |option|
         if option.dependent_field_configurations.present?
           dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
+          has_dependent_cf = true
         end
       end
     elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)
@@ -173,7 +176,8 @@ class CustomField < ActiveRecord::Base
             mandatory: field_configuration.mandatory,
             options: options,
             root_field: self.field_configuration.root_field,
-            dependent_field_configuration_ids: dependent_field_configuration_ids
+            dependent_field_configuration_ids: dependent_field_configuration_ids,
+            has_dependent_cf: has_dependent_cf
             }
     case self.field_configuration.field_type_id
       when FieldType.id_for(:multiselect)

@@ -4,7 +4,7 @@ class Budgets::Create < Budgets::Base
   def init
     self.budget_params = create_budget_params
 
-    self.budgetable_types = %w( User Vendor Category )
+    self.budgetable_types = %w( User YesBankVendor Category FieldDropDownItem )
 
   end
 
@@ -20,7 +20,7 @@ class Budgets::Create < Budgets::Base
       return
     end
 
-    budgetable = budgetable_type.constantize.with_id budget_params[:budgetable_id]
+    budgetable = budgetable_type.constantize.find_by id: budget_params[:budgetable_id]
     unless budgetable.present?
       add_message :error, "#{budgetable_type} not found"
     end
