@@ -21,7 +21,7 @@ class BankTransfer::PaymentRequest::AccountDetails < BankTransfer::PaymentReques
 
   def process
     self.bank_accounts = user.company.bank_accounts.with_owner_ids(params[:account_owner_type], account_ids)
-    self.invoice_categories = current_company.categories.vendor_payments_only
+    self.invoice_categories = current_company.categories.inward_invoices_only
     self.invoice_item_categories = current_company.categories.inward_invoice_items_only
   end
 

@@ -43,7 +43,7 @@ class BankTransfer::PaymentRequest::GenerateImportSample < BankTransfer::Payment
     # adding Categories to the Excel sheet
     category_headers = ["ID", "Category Name"]
     category_contents = []
-    current_company.categories.invoices_only.each do |category|
+    current_company.categories.inward_invoices_only.each do |category|
       category_contents << [category.id, category.name]
     end
     self.sheets << {
