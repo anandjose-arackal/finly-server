@@ -156,12 +156,14 @@ class CustomField < ActiveRecord::Base
 
   def as_json(options = {})
     options = []
+    dependent_field_configuration_ids = []
+    has_dependent_cf = false
     if field_configuration.field_type_id == FieldType.id_for(:drop_down)
       options = field_configuration.drop_down_items
-      dependent_field_configuration_ids = []
       options.each do |option|
         if option.dependent_field_configurations.present?
           dependent_field_configuration_ids += option.dependent_field_configurations.pluck(:id)
+          has_dependent_cf = true
         end
       end
     elsif field_configuration.field_type_id == FieldType.id_for(:multiselect)
@@ -174,17 +176,10 @@ class CustomField < ActiveRecord::Base
             mandatory: field_configuration.mandatory,
             options: options,
             root_field: self.field_configuration.root_field,
-            dependent_field_configuration_ids: dependent_field_configuration_ids
+            dependent_field_configuration_ids: dependent_field_configuration_ids,
+            has_dependent_cf: has_dependent_cf
             }
-    # adding any custom flags / data required for that particular custom field type
     case self.field_configuration.field_type_id
-      when FieldType.id_for(:drop_down)
-        options.each do |drop_down|
-          if drop_down.dependent_field_configurations.present?
-            json[:has_dependent_cf] = true
-            break
-          end
-        end
       when FieldType.id_for(:multiselect)
         ids = []
         names = []
