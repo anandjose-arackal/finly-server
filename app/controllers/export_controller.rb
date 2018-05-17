@@ -2,7 +2,7 @@ class ExportController < ApplicationController
   include MathUtil
 
   before_action :set_tokens_in_header
-  #
+
   before_action -> { finly_authorize! :web}
 
   def report
@@ -17,8 +17,10 @@ class ExportController < ApplicationController
         @data = @report.data
       }
       format.pdf {
-        @result = Report::Show.(current_user, params)
+        @result = Report::Exporter.(current_user, params)
         @report = @result.report
+        @skip_receipts = StringUtils.to_bool params[:skip_receipts]
+        @receipts = @result.receipts unless @skip_receipts
         @curr_user = current_user
         @include_comments = true
         render pdf: "report-#{@report.name}", layout: "pdf.html.erb", print_media_type: true
