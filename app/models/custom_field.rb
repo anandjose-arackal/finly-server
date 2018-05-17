@@ -176,7 +176,15 @@ class CustomField < ActiveRecord::Base
             root_field: self.field_configuration.root_field,
             dependent_field_configuration_ids: dependent_field_configuration_ids
             }
+    # adding any custom flags / data required for that particular custom field type
     case self.field_configuration.field_type_id
+      when FieldType.id_for(:drop_down)
+        options.each do |drop_down|
+          if drop_down.dependent_field_configurations.present?
+            json[:has_dependent_cf] = true
+            break
+          end
+        end
       when FieldType.id_for(:multiselect)
         ids = []
         names = []
