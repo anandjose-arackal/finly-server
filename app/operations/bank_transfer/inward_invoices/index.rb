@@ -18,7 +18,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
   end
 
   def success
-    params[:invoice] = self.invoices
+    params[:invoices] = self.invoices
     BankTransfer::InwardInvoices::Index::InwardInvoicesPresenter.new(user, params, messages)
   end
 

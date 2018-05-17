@@ -727,6 +727,24 @@ ActiveRecord::Schema.define(version: 20180516164751) do
   add_index "bookings", ["booking_status_id"], name: "index_bookings_on_booking_status_id", using: :btree
   add_index "bookings", ["booking_type_id"], name: "index_bookings_on_booking_type_id", using: :btree
 
+  create_table "branch_locations", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.string   "gstin",      limit: 255
+    t.string   "pan",        limit: 255
+    t.integer  "company_id", limit: 4
+    t.string   "address_1",  limit: 255
+    t.string   "address_2",  limit: 255
+    t.string   "city",       limit: 255
+    t.integer  "state_id",   limit: 4
+    t.string   "country",    limit: 255
+    t.string   "pin",        limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "branch_locations", ["company_id"], name: "index_branch_locations_on_company_id", using: :btree
+  add_index "branch_locations", ["state_id"], name: "index_branch_locations_on_state_id", using: :btree
+
   create_table "budget_rules", force: :cascade do |t|
     t.integer  "category_id",          limit: 4
     t.integer  "amount_id",            limit: 4
@@ -1176,14 +1194,21 @@ ActiveRecord::Schema.define(version: 20180516164751) do
   create_table "company_branches", force: :cascade do |t|
     t.integer  "collect_company_detail_id", limit: 4
     t.string   "name",                      limit: 255
-    t.text     "address",                   limit: 65535
     t.string   "pan",                       limit: 255
     t.string   "gst",                       limit: 255
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "company_id",                limit: 4
+    t.string   "address_1",                 limit: 255
+    t.string   "address_2",                 limit: 255
+    t.string   "city",                      limit: 255
+    t.integer  "state_id",                  limit: 4
+    t.string   "country",                   limit: 255
+    t.string   "pin",                       limit: 255
   end
 
   add_index "company_branches", ["collect_company_detail_id"], name: "index_company_branches_on_collect_company_detail_id", using: :btree
+  add_index "company_branches", ["company_id"], name: "index_company_branches_on_company_id", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
     t.integer  "company_id",                       limit: 4,                     null: false
@@ -2915,15 +2940,15 @@ ActiveRecord::Schema.define(version: 20180516164751) do
     t.integer  "user_id",                 limit: 4
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
     t.text     "terms",                   limit: 65535
-    t.integer  "company_branch_id",       limit: 4
+    t.integer  "location_id",             limit: 4
   end
 
   add_index "outward_invoices", ["amount_id"], name: "index_outward_invoices_on_amount_id", using: :btree
   add_index "outward_invoices", ["balance_due_id"], name: "index_outward_invoices_on_balance_due_id", using: :btree
-  add_index "outward_invoices", ["company_branch_id"], name: "index_outward_invoices_on_company_branch_id", using: :btree
   add_index "outward_invoices", ["customer_id"], name: "index_outward_invoices_on_customer_id", using: :btree
   add_index "outward_invoices", ["discount_amount_id"], name: "index_outward_invoices_on_discount_amount_id", using: :btree
   add_index "outward_invoices", ["freight_amount_id"], name: "index_outward_invoices_on_freight_amount_id", using: :btree
+  add_index "outward_invoices", ["location_id"], name: "index_outward_invoices_on_location_id", using: :btree
   add_index "outward_invoices", ["outward_invoice_type_id"], name: "index_outward_invoices_on_outward_invoice_type_id", using: :btree
   add_index "outward_invoices", ["paid_amount_id"], name: "index_outward_invoices_on_paid_amount_id", using: :btree
   add_index "outward_invoices", ["payment_term_id"], name: "index_outward_invoices_on_payment_term_id", using: :btree
@@ -4515,6 +4540,8 @@ ActiveRecord::Schema.define(version: 20180516164751) do
   add_foreign_key "bookings", "booking_requests"
   add_foreign_key "bookings", "booking_statuses"
   add_foreign_key "bookings", "booking_types"
+  add_foreign_key "branch_locations", "companies"
+  add_foreign_key "branch_locations", "states"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "categories"
   add_foreign_key "budget_rules", "periods"
@@ -4549,6 +4576,7 @@ ActiveRecord::Schema.define(version: 20180516164751) do
   add_foreign_key "company_agreement_tracks", "users"
   add_foreign_key "company_balance_histories", "companies"
   add_foreign_key "company_branches", "collect_company_details"
+  add_foreign_key "company_branches", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
   add_foreign_key "company_funds_auto_transfer_configs", "companies"
@@ -4648,8 +4676,8 @@ ActiveRecord::Schema.define(version: 20180516164751) do
   add_foreign_key "outward_invoice_trails", "outward_invoices"
   add_foreign_key "outward_invoice_trails", "users"
   add_foreign_key "outward_invoices", "amounts"
-  add_foreign_key "outward_invoices", "company_branches"
   add_foreign_key "outward_invoices", "customers"
+  add_foreign_key "outward_invoices", "locations"
   add_foreign_key "outward_invoices", "outward_invoice_types"
   add_foreign_key "outward_invoices", "payment_terms"
   add_foreign_key "outward_invoices", "users"
