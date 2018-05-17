@@ -74,7 +74,7 @@ class OutwardInvoice < ActiveRecord::Base
   belongs_to :invoice_status, class_name: "OutwardInvoiceStatus"
   belongs_to :payment_term
   belongs_to :outward_invoice_type
-  belongs_to :company_branch
+  belongs_to :location, class_name: "BranchLocation"
 
   # has_one :virtual_bank_account, as: :parent
   belongs_to :virtual_account, class_name: "VirtualBankAccount"

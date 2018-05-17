@@ -2297,6 +2297,7 @@ Rails.application.routes.draw do
   get 'companies/load_options', to: 'companies#load_options', as: :load_options
   resources :companies do
     post 'add_balance', to: 'companies#add_balance', as: :add_balance
+    resources :locations
   end
 
   # get 'organization_account' => 'organization_account#show'
@@ -2828,7 +2829,7 @@ Rails.application.routes.draw do
       get 'show_collect_detail', to: 'company_configurations#show_collect_details'
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
 
-      resources :company_branches
+      # resources :company_branches
 
 
 

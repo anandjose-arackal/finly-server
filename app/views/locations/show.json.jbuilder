@@ -1,0 +1,4 @@
+json.extract! @result.location, :id, :name, :gstin, :pan, :address_1, :address_2, :city, :state_id, :pin, :country
+json.states do
+  json.array! @result.states, :id, :name
+end

@@ -43,9 +43,9 @@ json.invoice do
     end
   end
 
-  if invoice.company_branch
-    json.company_branch do
-      json.extract! invoice.company_branch, :id, :name, :gst, :pan, :address
+  if invoice.location
+    json.location do
+      json.extract! invoice.location, :id, :name, :gstin, :pan
     end
   end
 
@@ -151,9 +151,9 @@ json.payment_terms do
   end
 end
 
-json.company_branches do
-  json.array! @result.company_branches do |cb|
-    json.extract! cb, :id, :name, :address, :gst, :pan
+json.locations do
+  json.array! @result.locations do |location|
+    json.extract! location, :id, :name, :gstin, :pan
   end
 end
 json.attachment do
