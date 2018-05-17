@@ -7,6 +7,8 @@ json.array!(@result.invoices) do |invoice|
     json.original_amount precision_value invoice.original_amount&.value
   end
   json.invoice do
+    json.status_id invoice.invoice_status_id
+    json.status_name invoice.invoice_status&.name&.humanize
     json.advance invoice.advance
     json.advance_amount precision_value invoice.advance_amount&.value
     json.tax_amount precision_value invoice.tax_amount&.value

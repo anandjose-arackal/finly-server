@@ -43,6 +43,7 @@
 #  invoice_status_id  :integer
 #  company_id         :integer
 #  created_by_user_id :integer
+#  paid_amount_id     :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

@@ -43,6 +43,7 @@
 #  invoice_status_id  :integer
 #  company_id         :integer
 #  created_by_user_id :integer
+#  paid_amount_id     :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -94,6 +95,7 @@ class Invoice < ActiveRecord::Base
   delegate :discount_amount_value, to: :discount_amount
   delegate :net_amount_value, to: :net_amount
   delegate :gross_amount_value, to: :gross_amount
+  delegate :paid_amount, to: :paid_amount
 
 
   validates :gross_amount, presence: true
@@ -104,6 +106,9 @@ class Invoice < ActiveRecord::Base
   scope :with_status_id, -> (status_id) {
     where invoice_status_id: status_id
   }
+
+
+  after_create :set_defaults
 
   def policy
     self.payment&.payment_order&.bank_payment_request&.policy
@@ -140,6 +145,12 @@ class Invoice < ActiveRecord::Base
     else
       return 0
     end
+  end
+
+  private
+
+  def set_defaults
+
   end
 
 end
