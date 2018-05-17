@@ -18,6 +18,7 @@
 
 
 
+
 class UserRoleMapping < ActiveRecord::Base
 
   belongs_to :user
@@ -38,6 +39,7 @@ class UserRoleMapping < ActiveRecord::Base
   scope :expense_management, -> { where purpose_id: Purpose.id_for(:expense_management)}
   scope :invoicing, -> { where purpose_id: Purpose.id_for(:invoice)}
   scope :with_purpose, -> (purpose_id) { where purpose_id: purpose_id}
+  scope :reviewer_mappings_only, -> { where user_role_id: [UserRole.id_for(:manager), UserRole.id_for(:finance_manager), UserRole.id_for(:reviewer), UserRole.id_for(:creditor)] }
 
   before_destroy do
     employee_role_presence

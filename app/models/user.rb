@@ -79,6 +79,7 @@ class User < ActiveRecord::Base
 
   belongs_to :company
   belongs_to :otp_request_type
+  belongs_to :user_delegate, class_name: "User"
 
   has_one :profile, class_name: 'UserProfile', dependent: :destroy
   has_one :wallet, class_name: 'UserWallet', foreign_key: :user_id, dependent: :destroy
@@ -248,6 +249,24 @@ class User < ActiveRecord::Base
   scope :include_all_accounts_with_balance, -> { includes(cards: [:card_balance], wallet: [:balance], cash_on_hand: [:balance], bank_wallet: [:balance]) }
   scope :include_reimbursable_accounts, -> { includes :bank_accounts, :reimbursement_cards }
   scope :with_email, ->(email) { where email: email }
+  scope :with_subscription, -> (application) {
+    ids = self.pluck(:id)
+    app = nil
+    case application
+      when 'vp', :vp
+        app = 'yes_bank_account_transfer'
+      when 'em', 'ft', :em, :ft
+        app = 'expense_management'
+      when 'fc', :fc
+        app = 'invoicing_system'
+      else
+        # do nothing?
+    end
+    if app.present?
+      relevant_user_ids = UserPanelSubscription.where(user_id: ids).where(app.to_sym => true).pluck(:user_id)
+      where(id: relevant_user_ids)
+    end
+  }
 
   # Users having cards assigned with the given program
   scope :with_cards_having_card_program, ->(id) do
@@ -307,6 +326,15 @@ class User < ActiveRecord::Base
     ids.uniq!
     self.where(id: ids)
   end
+
+  scope :user_search, -> (term) {
+    if term.present?
+      ids = self.where("first_name like ? or last_name like ? or concat(first_name, ' ', last_name) like ? or concat(first_name, ' ', last_name) like ? or email like ? or mobile_number like ?",
+                       "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%")
+      ids.uniq!
+      self.where(id: ids)
+    end
+  }
 
   scope :filter_state, -> (state) do
     if state.blank?

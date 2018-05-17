@@ -7,6 +7,7 @@
 #  field_type_id           :integer          not null
 #  mandatory               :boolean          default(FALSE), not null
 #  company_id              :integer          not null
+#  field_parent_type_id    :integer          not null
 #  configurable_id         :integer          not null
 #  configurable_type       :string(255)      not null
 #  created_at              :datetime         not null
@@ -18,7 +19,6 @@
 #  global                  :boolean          default(TRUE)
 #  external_reference_type :string(255)
 #  external_reference_id   :integer
-#  field_parent_type_id    :integer          not null
 #  parent_id               :integer
 #  parent_type             :string(255)
 #  root_field              :boolean          default(TRUE)
@@ -70,6 +70,8 @@ class FieldConfiguration < ActiveRecord::Base
   scope :with_field_type, -> (field_type_id) { where field_type_id: field_type_id }
   scope :root_fields, -> { where root_field: true}
   scope :non_root_fields, -> { where.not(root_field: true) }
+
+  scope :filter_dropdowns, -> {where field_type_id: FieldType.id_for(:drop_down)}
 
   delegate :drop_down?, :text?, to: :field_type
 

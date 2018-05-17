@@ -1,5 +1,5 @@
 class Budgets::Destroy < Budgets::Base
-  attr_accessor :budget
+  attr_accessor :budget, :budgets
 
   def pre_validate
     if user.blank? or params.blank?

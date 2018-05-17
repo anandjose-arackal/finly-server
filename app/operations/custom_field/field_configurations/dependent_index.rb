@@ -14,7 +14,7 @@ class CustomField::FieldConfigurations::DependentIndex < CustomField::FieldConfi
 
   def init
     id = params[:id] || params[:drop_down_id]
-    field_configurations = user.company.field_configurations
+    field_configurations = user.company.all_field_configurations
     self.drop_down_parent = FieldDropDownItem.with_field_configuration_id(field_configurations.pluck(:id)).find_by(id: id)
   end
 

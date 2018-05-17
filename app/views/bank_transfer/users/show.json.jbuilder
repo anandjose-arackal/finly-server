@@ -7,6 +7,14 @@ json.user do
   json.gender @result.selected_user.profile&.gender
 end
 
+json.user_delegate do
+  json.user_delegate_id @result.selected_user.user_delegate&.id
+  json.user_delegate_name @result.selected_user.user_delegate&.name
+  json.delegation_enabled @result.selected_user.delegation_enabled
+  json.user_delegate_email @result.selected_user.user_delegate&.email
+  json.user_delegate_email @result.selected_user.user_delegate&.mobile_number
+end
+
 json.actions @result.actions
 
 json.permissions do

@@ -32,9 +32,9 @@
     </div>
   </div><!--
   --><div class="company-address"  style="display: inline-block; width: 50%; text-align: right; vertical-align: top; font-size: 13px; margin: 0; margin-top: 10px;">
-  <% if @invoice.company_branch.present? %>
-    <% if @invoice.company_branch.gst.present? %>
-      GSTIN: <%= @invoice.company.collect_company_detail.gst %><br />
+  <% if @invoice.location.present? %>
+    <% if @invoice.location.gstin.present? %>
+      GSTIN: <%= @invoice.location.gstin %><br />
     <% end %>
   <% else %>
     <% if @invoice.company.collect_company_detail.gst.present? %>
@@ -42,8 +42,8 @@
     <% end %>
   <% end %>
   <%= @invoice.company.name %>
-  <% if @invoice.company_branch.present? %>
-    <%= simple_format @invoice.company_branch.address, {}, wrapper_tag: "div" %>
+  <% if @invoice.location.present? %>
+    <%= simple_format @invoice.location.address, {}, wrapper_tag: "div" %>
   <% else %>
     <%= simple_format @invoice.company.collect_company_detail.address, {}, wrapper_tag: "div" %>
   <% end %>

@@ -36,6 +36,8 @@ class Category < ActiveRecord::Base
 
   has_one :quickbooks_category, dependent: :destroy
 
+  has_many :budgets, as: :budgetable
+
   validates :company_id, presence: true
   validates :name, presence: true, uniqueness: {scope: :company_id}
   # validate :at_least_one_application
@@ -69,9 +71,11 @@ class Category < ActiveRecord::Base
     where expense_management: true
   }
   scope :vendor_payments_only, -> {
-    ids = where(vendor_payments: true).pluck(:id)
-    ids += where(inward_invoice_line_items: true).pluck(:id)
-    where id: ids
+    where(vendor_payments: true)
+  }
+
+  scope :inward_invoices_only, -> {
+    where vendor_payments: true
   }
 
   scope :outward_invoices_only, -> {

@@ -734,6 +734,7 @@
 #                                            user_balance GET    /users/:user_id/balance(.:format)                                                               users#balance
 #                                           user_balances GET    /users/:user_id/balances(.:format)                                                              users#balances
 #                          user_verify_reset_password_otp GET    /users/:user_id/verify_reset_otp(.:format)                                                      users#verify_reset_password_otp
+#                                       user_set_delegate PATCH  /users/:user_id/set_delegate(.:format)                                                          users#set_delegate
 #                                                         GET    /users(.:format)                                                                                users#index
 #                                                         POST   /users(.:format)                                                                                users#create
 #                                                new_user GET    /users/new(.:format)                                                                            users#new
@@ -742,6 +743,7 @@
 #                                                         PATCH  /users/:id(.:format)                                                                            users#update
 #                                                         PUT    /users/:id(.:format)                                                                            users#update
 #                                                         DELETE /users/:id(.:format)                                                                            users#destroy
+#                                           company_users GET    /company_users(.:format)                                                                        users#company_users
 #                                 available_expense_types GET    /available_expense_types(.:format)                                                              users#available_expense_types
 #                                             user_import POST   /import(.:format)                                                                               users#import
 #                                       superadmin_import POST   /superadmin_import(.:format)                                                                    admin/companies#import
@@ -2287,6 +2289,7 @@ Rails.application.routes.draw do
   get 'companies/load_options', to: 'companies#load_options', as: :load_options
   resources :companies do
     post 'add_balance', to: 'companies#add_balance', as: :add_balance
+    resources :locations
   end
 
   # get 'organization_account' => 'organization_account#show'
@@ -2413,7 +2416,9 @@ Rails.application.routes.draw do
     get 'balance', to: 'users#balance', as: :balance
     get 'balances', to: 'users#balances', as: :balances
     get 'verify_reset_otp', to: 'users#verify_reset_password_otp', as: :verify_reset_password_otp
+    patch 'set_delegate', to: 'users#set_delegate', as: :set_delegate
   end
+  get 'company_users', to: 'users#company_users', as: :company_users
   get 'available_expense_types', to: 'users#available_expense_types', as: :available_expense_types
 
   # routes for testing import
@@ -2814,7 +2819,7 @@ Rails.application.routes.draw do
       get 'show_collect_detail', to: 'company_configurations#show_collect_details'
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
 
-      resources :company_branches
+      # resources :company_branches
 
 
 
