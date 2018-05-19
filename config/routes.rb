@@ -2862,6 +2862,20 @@ Rails.application.routes.draw do
   ## Budget apis end ##
 
 
+  ## Procurement APIs start ##########################################
+  namespace :procure do
+    resources :procurements do
+    end
+
+    resources :purchase_orders do
+
+    end
+  end
+
+
+  ## Procurement APIs end   ##########################################
+
+
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

@@ -64,6 +64,8 @@
 
 
 
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -190,6 +192,7 @@ class User < ActiveRecord::Base
   has_many :owned_budgets, class_name: 'Budget'
   has_many :budgets, as: :budgetable
   # has_many :budgets, as: :budgetable
+  has_many :procurements
 
 
 
