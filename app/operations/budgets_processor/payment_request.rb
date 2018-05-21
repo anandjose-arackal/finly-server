@@ -21,7 +21,8 @@ class BudgetsProcessor::PaymentRequest < BudgetsProcessor::Base
     cf_budgets = []
     budget_ids = []
     payments.each do |payment|
-      payment.invoice.custom_fields.only_drop_downs.each do |cf|
+      next if payment.invoice.blank?
+      payment.invoice&.custom_fields&.only_drop_downs&.each do |cf|
         field_drop_down_item_id = cf.value.value_id
         if budget_ids.include?(field_drop_down_item_id)
           next
