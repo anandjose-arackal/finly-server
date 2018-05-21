@@ -1,6 +1,6 @@
 # this operation will create a payment from an existing invoice
 # which will be wrapped within a payment order and can be processed separately
-class BankTransfer::InwardInvoice::Payments::Create < BankTransfer::InwardInvoices::Base
+class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoices::Base
 
   attr_accessor :inward_invoice
 
