@@ -7,4 +7,19 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
   end
 
+  def validate
+    if self.inward_invoice.blank?
+      add_message :error, "Invoice not found"
+      return
+    end
+  end
+
+  def process
+
+  end
+
+  def post_process
+
+  end
+
 end
