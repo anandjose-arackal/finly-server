@@ -67,6 +67,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :tds_slab, class_name: TdsRatesList
   belongs_to :created_by, class_name: "User"
   belongs_to :company
+  belongs_to :invoice_status, class_name: "InwardInvoiceStatus"
 
   # because multiple payments can be made against one invoice
   has_many :payments, as: :parent
