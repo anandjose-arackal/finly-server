@@ -118,7 +118,7 @@ class OutwardInvoice < ActiveRecord::Base
   validates :net_amount, presence: true, if: :valid_invoice?
   validate :gst_type_selection, if: :valid_invoice?
 
-  scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
+  scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid]))}
   scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:paid) }
   scope :saved, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:saved)}
   scope :cancelled, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:cancelled) }
