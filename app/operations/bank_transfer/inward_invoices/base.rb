@@ -12,4 +12,28 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                      invoice_items_attributes: [:quantity, :rate, :tax, :discount, :category_id, :description, :id, :remove_line_item, :hsn_sac])
   end
 
+  def calculate_tax_and_discounts(invoice, invoice_params)
+    if invoice.blank?
+      return
+    end
+    if invoice.invoice_items.present?
+      # if there are no invoice items, use the invoice library to calculate the amounts
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(invoice_params, nil, invoice)
+    else
+      # if there are, in fact, invoice items, use the invoice items library
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(invoice_params, nil, invoice)
+    end
+    return
+  end
+
+  def recalculate_totals(invoice, invoice_params)
+    if invoice.invoice_items.present?
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(invoice_params, nil, invoice)
+    else
+      # if there are, in fact, invoice items, use the invoice items library
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(invoice_params, nil, invoice)
+    end
+    invoice.save
+  end
+
 end

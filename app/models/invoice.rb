@@ -44,6 +44,7 @@
 #  company_id         :integer
 #  created_by_user_id :integer
 #  paid_amount_id     :integer
+#  vendor_id          :integer
 #
 
 #  gst_type_id: 1 - IGST
