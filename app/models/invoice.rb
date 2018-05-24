@@ -107,7 +107,7 @@ class Invoice < ActiveRecord::Base
   # validates :net_amount, presence: true
   # validates :amount, presence: true
 
-  scope :with_id, -> { where id: id}
+  scope :with_id, -> (id) { where id: id}
   scope :with_status_id, -> (status_id) {
     where invoice_status_id: status_id
   }

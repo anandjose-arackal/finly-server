@@ -24,4 +24,9 @@ class BankTransfer::Vendors::BankAccounts < BankTransfer::Vendors::Base
     end
   end
 
+  def success
+    params[:bank_accounts] = self.bank_accounts
+    BankTransfer::Vendors::BankAccounts::BankAccountsPresenter.new(user, params, messages)
+  end
+
 end
