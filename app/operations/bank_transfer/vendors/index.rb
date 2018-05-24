@@ -2,7 +2,7 @@ class BankTransfer::Vendors::Index < BankTransfer::Vendors::Base
 
   attr_accessor :vendors
 
-  class BankTransfer::Vendors::Index < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::Vendors::Index::VendorsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :vendors
 
@@ -20,7 +20,7 @@ class BankTransfer::Vendors::Index < BankTransfer::Vendors::Base
 
   def success
     params[:vendors] = self.vendors
-    BankTransfer::Vendors::Index.new(user, params, messages)
+    BankTransfer::Vendors::Index::VendorsPresenter.new(user, params, messages)
   end
 
 end

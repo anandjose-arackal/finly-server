@@ -1,8 +1,8 @@
-class BankTransfer::Vendors::Transfers::BankAccounts < BankTransfer::Vendors::Base
+class BankTransfer::Vendors::BankAccounts < BankTransfer::Vendors::Base
 
   attr_accessor :bank_accounts, :vendor
 
-  class BankTransfer::Vendors::Transfers::BankAccounts < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::Vendors::BankAccounts::BankAccountsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :bank_accounts
 
@@ -23,6 +23,5 @@ class BankTransfer::Vendors::Transfers::BankAccounts < BankTransfer::Vendors::Ba
       return
     end
   end
-
 
 end
