@@ -1,29 +1,24 @@
 invoice = @result.invoice
-json.raw_amount precision_value invoice&.amount&.value
 # conditionally set the original amount as invoice amount is there are line items
-if invoice&.invoice_items.present?
-  json.original_amount precision_value invoice.amount&.value
-else
-  json.original_amount precision_value invoice.original_amount&.value
-end
 json.invoice do
   json.id invoice.id
-  json.advance invoice.advance
+  if invoice&.invoice_items.present?
+    json.original_amount precision_value invoice.amount&.value
+  else
+    json.original_amount precision_value invoice.original_amount&.value
+  end
+  json.raw_amount precision_value invoice&.amount&.value
   json.advance_amount precision_value invoice.advance_amount&.value
   json.tax_amount precision_value invoice.tax_amount&.value
   json.tds_amount precision_value invoice.tds_amount&.value
   json.tax precision_value invoice.tax
   json.tds precision_value invoice.tds
   json.gst_type_id invoice.gst_type
-  json.tax_type_id invoice.tax_type_id
-  json.tds_type_id invoice.tds_type_id
   json.discount_amount precision_value invoice.discount_amount&.value
   json.discount precision_value invoice.discount
-  json.advance_type_id invoice.advance_type_id
   json.advance invoice.advance
   json.freight_amount invoice.freight_amount&.value
   json.date invoice.date
-  json.discount_type_id invoice.discount_type_id
   json.due_date invoice.due_date
   json.invoice_number invoice.invoice_number
   json.inclusive_of_taxes invoice.inclusive_of_taxes
@@ -79,5 +74,31 @@ json.invoice do
       json.hsn_sac item.hsn_sac
       json.taxable_amount precision_value item.taxable_amount&.value
     end
+  end
+end
+
+json.invoice_categories do
+  json.array!(@result.invoice_categories) do |category|
+    json.id category.id
+    json.name category.name
+  end
+end
+json.invoice_item_categories do
+  json.array!(@result.invoice_item_categories) do |category|
+    json.id category.id
+    json.name category.name
+  end
+end
+json.cost_centers do
+  json.array!(current_company.cost_centers.with_application(RequestStoreUtil.current_app)) do |cost_center|
+    json.id cost_center.id
+    json.name cost_center.name
+  end
+end
+json.tds_slabs do
+  json.array!(current_company.tds_slabs) do |tds_slab|
+    json.id tds_slab.id
+    json.name "#{tds_slab.tds}% - #{tds_slab.name} "
+    json.tds tds_slab.tds
   end
 end

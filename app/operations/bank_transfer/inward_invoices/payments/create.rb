@@ -10,4 +10,5 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
   end
 
 
+
 end
