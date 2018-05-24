@@ -6,7 +6,7 @@ class BankTransfer::Vendors::Index < BankTransfer::Vendors::Base
 
     attr_accessor :vendors
 
-    has_scope :filter_search
+    has_scope :filter_name_search
 
     def init
       self.vendors = params[:vendors]
