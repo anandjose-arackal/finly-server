@@ -1,4 +1,4 @@
-class BankTransfer::Payments::ApiPayments::GetPaymentStatus < BankTransfer::PaymentRequest::Base
+class BankTransfer::Payments::ApiPayments::GetPaymentStatus < BankTransfer::Payments::Base
 
   attr_accessor :payment
 

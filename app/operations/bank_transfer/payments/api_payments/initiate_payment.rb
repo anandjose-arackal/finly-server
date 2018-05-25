@@ -1,4 +1,4 @@
-class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::PaymentRequest::Base
+class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payments::Base
 
   attr_accessor :payment_order, :bank_payment_request, :bank_account, :vendor,
                 :payment_mode, :company_id
