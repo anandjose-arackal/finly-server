@@ -1086,6 +1086,7 @@
 #     bank_transfer_bank_payment_request_within_timeframe GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/within_timeframe(.:format)     bank_transfer/bank_payment_requests#within_timeframe
 #       bank_transfer_bank_payment_request_update_payment PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/update_payment(.:format)       bank_transfer/bank_payment_requests#update_payment
 #         bank_transfer_bank_payment_request_payments_lst GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments(.:format)             bank_transfer/bank_payment_requests#payments_list
+#       bank_transfer_bank_payment_request_payments_count GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments_count(.:format)       bank_transfer/bank_payment_requests#payments_count
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                               bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                               bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                                           bank_transfer/bank_payment_requests#new
@@ -2746,6 +2747,7 @@ Rails.application.routes.draw do
       get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
       patch 'update_payment', to: 'bank_payment_requests#update_payment'
       get 'payments', to: 'bank_payment_requests#payments_list', as: :payments_lst
+      get 'payments_count', to: 'bank_payment_requests#payments_count'
     end
 
     get 'transfer_timings', to: 'bank_payment_requests#within_timeframe'
