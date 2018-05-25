@@ -4,6 +4,8 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
 
   class BankTransfer::PaymentRequest::Payments::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
+    require 'will_paginate/array'
+    
     attr_accessor :payments, :payments_verified, :payments_unverified, :paginated_payments, :ordered_payments
 
     def init
