@@ -1,6 +1,6 @@
 class BankTransfer::PaymentRequest::PaymentsCount < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :payments_count
+  attr_accessor :payments_count, :bank_payment_request
 
   class BankTransfer::PaymentRequest::PaymentsCount::PaymentsCountPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -13,12 +13,19 @@ class BankTransfer::PaymentRequest::PaymentsCount < BankTransfer::PaymentRequest
   end
 
   def init
-    op = BankTransfer::PaymentRequest::Payments.(user, params)
-    if op.success?
-      self.payments_count = op.payments.count
-    else
-      self.payments_count = 0
+    id = params[:id] || params[:bank_payment_request_id]
+    self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
+  end
+
+  def validate
+    if self.bank_payment_request.blank?
+      add_message :error, "Bank Payment request not found"
+      return
     end
+  end
+
+  def process
+    self.payments_count = self.bank_payment_request.payment_order.payments.count
   end
 
   def success
