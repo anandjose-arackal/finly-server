@@ -3,6 +3,9 @@ json.extract! @result.procurement, :id
 json.purchase_order do
   json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
                 :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount
+  json.vendor do
+    json.extract! @result.purchase_order.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
+  end
   json.total_before_tax do
     json.id @result.purchase_order.total_before_tax&.id
     json.value @result.purchase_order.total_before_tax&.value
@@ -56,6 +59,13 @@ json.inward_documents do
   json.array! @result.inward_documents do |document|
     json.extract! document, :id, :doc_number, :delivery_date
 
+    if document.vendor.present?
+      json.vendor do
+        json.extract! document.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
+      end
+    end
+
+
     json.items do
       json.array! document.items do |item|
         json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :quantity, :delivered, :accepted, :rejected
@@ -66,3 +76,14 @@ json.inward_documents do
   end
 end
 
+json.trail do
+  json.array! @result.procurement_trail do |item|
+    json.extract! item, :id
+    json.created_at item.created_at.strftime("%b %d, %Y")
+    json.type item.class.name
+    json.user do
+      json.id item.user&.id
+      json.name item.user&.name
+    end
+  end
+end

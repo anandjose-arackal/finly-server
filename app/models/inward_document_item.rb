@@ -17,4 +17,5 @@
 #
 
 class InwardDocumentItem < ActiveRecord::Base
+  belongs_to :inward_document
 end

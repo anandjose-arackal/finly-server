@@ -14,7 +14,8 @@
 #
 
 class Procurement < ActiveRecord::Base
-  #todo migration for company_id
+  belongs_to :user
+  belongs_to :company
   belongs_to :procurement_track
   belongs_to :procurement_status
   belongs_to :vendor, class_name: "YesBankVendor"

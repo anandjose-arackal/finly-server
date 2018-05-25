@@ -35,6 +35,7 @@
 
 class PurchaseOrder < ActiveRecord::Base
   belongs_to :company
+  belongs_to :user
   belongs_to :procurement
   belongs_to :location, class_name: "BranchLocation"
   belongs_to :delivery_location, class_name: "BranchLocation"
