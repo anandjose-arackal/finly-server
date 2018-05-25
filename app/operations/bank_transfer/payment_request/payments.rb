@@ -22,7 +22,7 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
       self.ordered_payments = self.payments_verified + self.payments_unverified
       self.paginated_payments = self.ordered_payments.paginate(page: params[:page], per_page: 30)
     end
-    
+
   end
 
   def init
