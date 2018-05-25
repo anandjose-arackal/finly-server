@@ -4,7 +4,7 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
 
   class BankTransfer::PaymentRequest::Payments::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :payments, :payments_verified, :payments_unverified
+    attr_accessor :payments, :payments_verified, :payments_unverified, :paginated_payments, :ordered_payments
 
     def init
       self.payments = params[:payments]
@@ -19,8 +19,10 @@ class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Bas
           self.payments_unverified << payment
         end
       end
+      self.ordered_payments = self.payments_verified + self.payments_unverified
+      self.paginated_payments = self.ordered_payments.paginate(page: params[:page], per_page: 30)
     end
-
+    
   end
 
   def init
