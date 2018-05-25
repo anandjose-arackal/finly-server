@@ -1,0 +1,46 @@
+class BankTransfer::PaymentRequest::Payments < BankTransfer::PaymentRequest::Base
+
+  attr_accessor :payments, :bank_payment_request
+
+  class BankTransfer::PaymentRequest::Payments::PaymentsPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :payments, :payments_verified, :payments_unverified
+
+    def init
+      self.payments = params[:payments]
+
+      self.payments_unverified = []
+      self.payments_verified = []
+      # separating the verified and unverified payments
+      self.payments.each do |payment|
+        if payment.receiving_user.is_a?(User) || payment.receiving_user.authorized
+          self.payments_verified << payment
+        else
+          self.payments_unverified << payment
+        end
+      end
+    end
+
+  end
+
+  def init
+    id = params[:id] || params[:bank_payment_request_id]
+    self.bank_payment_request = BankTransfer::PaymentRequest::Index.(user, params).payment_requests.find_by(id: id)
+  end
+
+  def validate
+    if self.bank_payment_request.blank?
+      add_message :error, "Payment ticket not found"
+      return
+    end
+  end
+
+  def process
+    self.payments = self.bank_payment_request.payment_order.payments
+  end
+
+  def success
+    params[:payments] = self.payments
+    BankTransfer::PaymentRequest::Payments::PaymentsPresenter.new(user, params, messages)
+  end
+end

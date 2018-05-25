@@ -178,6 +178,11 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def payments_list
+    @result = BankTransfer::PaymentRequest::Payments.(current_user, params)
+    respond
+  end
+
   private
 
   def update_handler(type)
