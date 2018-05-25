@@ -14,8 +14,8 @@ class Invoicing::Invoice::Cancel < Invoicing::Invoice::Base
       return
     end
 
-    unless self.invoice.saved? || self.invoice.sent_to_customer?
-      add_message :error, "Only saved invoices can be cancelled"
+    unless self.invoice.unpaid? || self.invoice.saved?
+      add_message :error, "Only unpaid or saved invoices can be cancelled"
       return
     end
   end
