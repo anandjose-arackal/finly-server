@@ -1,4 +1,4 @@
-class PurchaseOrdersController < ApplicationController
+class Procure::PurchaseOrdersController < ApplicationController
   before_action -> { finly_authorize! :web }
 
   def show

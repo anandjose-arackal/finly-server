@@ -62,6 +62,8 @@ class Invoice < ActiveRecord::Base
   belongs_to :cost_center
   belongs_to :tds_slab, class_name: TdsRatesList
 
+  belongs_to :procurement
+
   # because multiple payments can be made against one invoice
   has_many :payments, as: :parent
 

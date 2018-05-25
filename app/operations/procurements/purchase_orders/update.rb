@@ -4,7 +4,8 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   def init
     self.purchase_order_params = purchase_order_parameters
     # self.procurement = user.company.procurements.find_by params[:procurement_id]
-    self.purchase_order = PurchaseOrder.find_by params[:id] || params[:purchase_order_id]
+    purchase_order_id = params[:id] || params[:purchase_order_id]
+    self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
   end
 
   def validate

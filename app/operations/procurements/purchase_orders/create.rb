@@ -3,7 +3,7 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
 
   def init
     self.purchase_order_params = purchase_order_parameters
-    self.procurement = user.company.procurements.find_by params[:procurement_id]
+    self.procurement = user.company.procurements.find_by id: params[:procurement_id]
   end
 
   def validate
@@ -13,10 +13,14 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
   end
 
   def process
-    self.purchase_order = procurement.build_purchse_order(purchase_order_params)
+    self.purchase_order = procurement.build_purchase_order(purchase_order_params)
+    self.purchase_order.purchase_order_status_id = PurchaseOrderStatus.id_for(:saved)
+    debugger
     if purchase_order.valid?
       purchase_order.save
       add_message :success, 'Successfully created purchase order'
+    else
+      add_message :error, purchase_order.errors.full_messages
     end
   end
 end

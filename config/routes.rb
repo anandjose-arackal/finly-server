@@ -2870,6 +2870,10 @@ Rails.application.routes.draw do
     resources :purchase_orders do
 
     end
+
+    resources :inward_documents do
+
+    end
   end
 
 

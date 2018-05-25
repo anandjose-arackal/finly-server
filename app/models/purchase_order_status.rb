@@ -9,4 +9,9 @@
 #
 
 class PurchaseOrderStatus < ActiveRecord::Base
+  include Seedable
+  def self.values
+    %w( saved released invoice_created received change_order cancelled closed )
+  end
+
 end

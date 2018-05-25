@@ -12,7 +12,7 @@ class Procurements::Base < BaseOperation
       self.procurement = params[:procurement]
       self.purchase_order = procurement.purchase_order
       self.inward_documents = procurement.inward_documents
-      self.invoices = procurement.invoices
+      # self.invoices = procurement.invoices
     end
 
   end
