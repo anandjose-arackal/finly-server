@@ -1,9 +1,9 @@
-class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer::PaymentRequest::Base
+class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::PaymentRequest::Base
 
   attr_accessor :payment_order, :bank_payment_request, :bank_account, :vendor,
                 :payment_mode, :company_id
 
-  class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment::PaymentOrderPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::Payments::ApiPayments::InitiatePayment::PaymentOrderPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :payment_order, :bank_payment_request
 
@@ -81,7 +81,7 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
   def success
     params[:payment_order] = self.payment_order
     params[:bank_payment_request] = self.bank_payment_request
-    BankTransfer::PaymentRequest::ApiPayments::InitiatePayment::PaymentOrderPresenter.new(user, params, messages)
+    BankTransfer::Payments::ApiPayments::InitiatePayment::PaymentOrderPresenter.new(user, params, messages)
   end
 
   private

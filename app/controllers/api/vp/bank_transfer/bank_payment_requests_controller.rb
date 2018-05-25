@@ -20,13 +20,13 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationControll
   end
 
   def initiate_payment
-    @result = BankTransfer::PaymentRequest::ApiPayments::InitiatePayment.(current_user, params)
+    @result = BankTransfer::Payments::ApiPayments::InitiatePayment.(current_user, params)
     respond
   end
 
   # this action will take a particular payment ID and return the status of that particular payment
   def payment_status
-    @result = BankTransfer::PaymentRequest::ApiPayments::GetPaymentStatus.(current_user, params)
+    @result = BankTransfer::Payments::ApiPayments::GetPaymentStatus.(current_user, params)
     respond
   end
 

@@ -1,8 +1,8 @@
-class BankTransfer::PaymentRequest::ApiPayments::GetPaymentStatus < BankTransfer::PaymentRequest::Base
+class BankTransfer::Payments::ApiPayments::GetPaymentStatus < BankTransfer::PaymentRequest::Base
 
   attr_accessor :payment
 
-  class BankTransfer::PaymentRequest::ApiPayments::GetPaymentStatus::PaymentPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::Payments::ApiPayments::GetPaymentStatus::PaymentPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :payment
 
@@ -26,6 +26,6 @@ class BankTransfer::PaymentRequest::ApiPayments::GetPaymentStatus < BankTransfer
 
   def success
     params[:payment] = self.payment
-    BankTransfer::PaymentRequest::ApiPayments::GetPaymentStatus::PaymentPresenter.new(user, params, messages)
+    BankTransfer::Payments::ApiPayments::GetPaymentStatus::PaymentPresenter.new(user, params, messages)
   end
 end
