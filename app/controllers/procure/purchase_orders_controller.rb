@@ -19,4 +19,9 @@ class Procure::PurchaseOrdersController < ApplicationController
     @result = Procurements::PurchaseOrders::Destroy.(current_user, params)
     respond
   end
+
+  def send_mail
+    @result = Procurements::PurchaseOrders::SendMail.(current_user, params)
+    respond
+  end
 end

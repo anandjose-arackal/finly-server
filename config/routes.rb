@@ -2868,6 +2868,7 @@ Rails.application.routes.draw do
     end
 
     resources :purchase_orders do
+      post 'send_mail', to: 'purchase_orders#send_mail'
 
     end
 

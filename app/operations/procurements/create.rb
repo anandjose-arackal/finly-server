@@ -33,7 +33,5 @@ class Procurements::Create < Procurements::Base
     if op.success?
       add_message :success, 'Successfully created new procurement'
     end
-
-
   end
 end

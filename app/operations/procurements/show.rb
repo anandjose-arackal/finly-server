@@ -15,7 +15,8 @@ class Procurements::Show < Procurements::Base
   end
 
   class Procurements::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :procurement, :purchase_order, :invoices, :inward_documents, :procurement_trail, :locations
+    attr_accessor :procurement, :purchase_order, :invoices, :inward_documents, :procurement_trail, :locations,
+                  :payment_terms
 
     def init
       self.procurement = params[:procurement]
@@ -24,6 +25,7 @@ class Procurements::Show < Procurements::Base
       self.inward_documents = self.procurement.inward_documents
       self.procurement_trail = get_procurement_trail
       self.locations = user.company.locations
+      self.payment_terms = user.company.payment_terms
     end
 
     def get_procurement_trail

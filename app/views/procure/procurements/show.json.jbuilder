@@ -94,3 +94,7 @@ json.locations do
     json.address location.address
   end
 end
+
+json.payment_terms do
+  json.array! @result.payment_terms, :id, :name, :days_after, :description, :default
+end
