@@ -72,6 +72,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :created_by, class_name: "User"
   belongs_to :company
   belongs_to :invoice_status, class_name: "InwardInvoiceStatus"
+  belongs_to :receiving_account, polymorphic: true
 
   # because multiple payments can be made against one invoice
   has_many :payments, as: :parent
@@ -150,6 +151,13 @@ class Invoice < ActiveRecord::Base
     else
       return 0
     end
+  end
+
+  def bank_account
+    if self.receiving_account_type == "BankAccount"
+      return self.receiving_account
+    end
+    nil
   end
 
   private
