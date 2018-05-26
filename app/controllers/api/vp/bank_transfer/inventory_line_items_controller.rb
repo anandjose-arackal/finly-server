@@ -1,5 +1,11 @@
 class Api::Vp::BankTransfer::InventoryItemsController < ApplicationController
 
+
+  protect_from_forgery with: :null_session
+
+  before_action -> { finly_authorize! :api }
+
+
   def index
     @result = Invoicing::InventoryLineItem::Index.(current_user, params)
     respond
