@@ -2905,6 +2905,8 @@ Rails.application.routes.draw do
     resources :inward_documents do
 
     end
+
+    resources :inward_invoices
   end
 
 
