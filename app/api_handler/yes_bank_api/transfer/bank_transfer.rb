@@ -182,8 +182,8 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         'CUSTOMER_ID' => customer_id,
         'ACCOUNT_NUMBER' => account_number,
         'BENEFICIARY_NAME' => beneficiary_name,
-        'BENEFICIARY_ACCOUNT_NUMBER' => transfer_request.beneficiary_account_number,
-        'BENEFICIARY_IFSC' => transfer_request.ifsc,
+        'BENEFICIARY_ACCOUNT_NUMBER' => transfer_request.beneficiary_account_number.strip,
+        'BENEFICIARY_IFSC' => transfer_request.ifsc.strip,
         'TRANSFER_TYPE' => transfer_request.transfer_type&.upcase,
         'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,
         'TRANSFER_AMOUNT' => transfer_request.transfer_amount
