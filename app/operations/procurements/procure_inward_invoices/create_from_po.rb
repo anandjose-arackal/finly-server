@@ -1,6 +1,6 @@
-class Procurements::InwardInvoices::CreateFromPO < Procurements::InwardInvoices::Base
+class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureInwardInvoices::Base
 
-  attr_accessor :procurement, :purchase_order, :invoice_params
+  attr_accessor :procurement, :purchase_order, :invoice_params, :invoice
 
   def init
     id = params[:id] || params[:procurement_id]
@@ -29,6 +29,7 @@ class Procurements::InwardInvoices::CreateFromPO < Procurements::InwardInvoices:
     self.invoice = self.procurement.invoices.build(self.invoice_params)
     if self.invoice.save
       InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
+      self.invoice.vendor_id = self.procurement.vendor_id
       self.invoice.save
     else
       add_message :error, self.invoice.errors.full_messages
@@ -45,7 +46,7 @@ class Procurements::InwardInvoices::CreateFromPO < Procurements::InwardInvoices:
     if self.procurement.blank? || self.purchase_order.blank?
       return nil
     end
-    receiving_account = self.purchase_order.vendor&.bank_accounts&.first&.id # todo - change this later to the one selected at the time of initiating payment
+    receiving_account = self.purchase_order.vendor&.bank_accounts&.first # todo - change this later to the one selected at the time of initiating payment
     invoice_items_attributes = []
     self.purchase_order.items.each do |item|
       invoice_items_attributes << {
@@ -59,7 +60,6 @@ class Procurements::InwardInvoices::CreateFromPO < Procurements::InwardInvoices:
       }
     end
     invoice_params = {
-      vendor_id: self.purchase_order.vendor_id,
       receiving_account: receiving_account,
       gst_type_id: self.purchase_order.gst_type_id,
       invoice_items_attributes: invoice_items_attributes

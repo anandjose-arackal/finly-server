@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180526041147) do
+ActiveRecord::Schema.define(version: 20180526162250) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2329,8 +2329,9 @@ ActiveRecord::Schema.define(version: 20180526041147) do
     t.integer  "paid_amount_id",         limit: 4
     t.integer  "vendor_id",              limit: 4
     t.integer  "receiving_account_id",   limit: 4
-    t.integer  "receiving_account_type", limit: 4
+    t.string   "receiving_account_type", limit: 255
     t.text     "note",                   limit: 65535
+    t.integer  "procurement_id",         limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -3396,21 +3397,21 @@ ActiveRecord::Schema.define(version: 20180526041147) do
     t.string   "description",            limit: 255
     t.string   "hsn_sac",                limit: 255
     t.integer  "quantity",               limit: 4
-    t.decimal  "rate",                               precision: 10
-    t.decimal  "tax",                                precision: 10
-    t.decimal  "tds",                                precision: 10
-    t.decimal  "discount",                           precision: 10
+    t.decimal  "rate",                               precision: 10, scale: 5
+    t.decimal  "tax",                                precision: 10, scale: 5
+    t.decimal  "tds",                                precision: 10, scale: 5
+    t.decimal  "discount",                           precision: 10, scale: 5
     t.integer  "tax_amount_id",          limit: 4
     t.integer  "tds_amount_id",          limit: 4
     t.integer  "discount_amount_id",     limit: 4
     t.integer  "total_amount_id",        limit: 4
     t.date     "delivery_date"
     t.string   "comment",                limit: 255
-    t.datetime "created_at",                                                    null: false
-    t.datetime "updated_at",                                                    null: false
-    t.integer  "delivered",              limit: 4,                  default: 0
-    t.integer  "accepted",               limit: 4,                  default: 0
-    t.integer  "rejected",               limit: 4,                  default: 0
+    t.datetime "created_at",                                                              null: false
+    t.datetime "updated_at",                                                              null: false
+    t.integer  "delivered",              limit: 4,                            default: 0
+    t.integer  "accepted",               limit: 4,                            default: 0
+    t.integer  "rejected",               limit: 4,                            default: 0
   end
 
   add_index "purchase_order_items", ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id", using: :btree

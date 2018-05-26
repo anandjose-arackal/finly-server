@@ -4,8 +4,12 @@ class Procure::InwardInvoicesController < ApplicationController
 
   # this action is to create one from a purchase order
   def create_from_po
-    @result = Procurements::InwardInvoices::CreateFromPO.(current_user, params)
-    respond_success_failure
+    @result = Procurements::ProcureInwardInvoices::CreateFromPO.(current_user, params)
+    if @result.success?
+      respond response: :success, message: @result.messages[:success]
+    else
+      respond response: :failure, message: @result.messages[:error]
+    end
   end
 
   # this action is to create one from scratch

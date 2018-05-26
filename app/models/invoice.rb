@@ -48,6 +48,7 @@
 #  receiving_account_id   :integer
 #  receiving_account_type :string(255)
 #  note                   :text(65535)
+#  procurement_id         :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -74,7 +75,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :invoice_status, class_name: "InwardInvoiceStatus"
   belongs_to :receiving_account, polymorphic: true
 
-  belongs_to :procurement
+  belongs_to :procurement, class_name: "Procurement"
 
   # because multiple payments can be made against one invoice
   has_many :payments, as: :parent
