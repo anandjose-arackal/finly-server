@@ -32,6 +32,13 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
   def process
     self.inward_document.assign_attributes(inward_document_params)
     if inward_document.valid?
+      # Keep track of delivered items in procurement items
+      inward_document.items.each do |item|
+        update_purchase_order_item(item)
+      end
+
+      # purchase_order.save
+
       inward_document.save
     else
       add_message :error, inward_document.errors.full_messages
@@ -55,6 +62,20 @@ class Procurements::InwardDocuments::Update < Procurements::InwardDocuments::Bas
                                             items_attributes: [:id, :delivered, :accepted, :rejected],
                                             attachments: []
     )
+
+  end
+
+  def update_purchase_order_item(item)
+    purchase_order_item = self.purchase_order.items.find_by id: item.purchase_order_item_id
+
+    po_item_params = {
+      accepted: purchase_order_item.accepted + item.accepted,
+      rejected: purchase_order_item.rejected + item.rejected,
+      delivered: purchase_order_item.delivered + item.delivered
+    }
+
+    purchase_order_item.assign_attributes(po_item_params)
+    purchase_order_item.save
 
   end
 
