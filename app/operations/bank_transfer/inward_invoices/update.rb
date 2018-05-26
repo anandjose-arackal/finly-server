@@ -68,6 +68,11 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
         end
       end
     end
+
+    # if the vendor receiving account is not set here, set it explicitly as bank account
+    if self.inward_invoice.receiving_account_type.blank?
+      self.inward_invoice_params[:receiving_account_type] = BankAccount.name
+    end
   end
 
   def process

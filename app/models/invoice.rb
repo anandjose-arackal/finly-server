@@ -46,7 +46,7 @@
 #  paid_amount_id         :integer
 #  vendor_id              :integer
 #  receiving_account_id   :integer
-#  receiving_account_type :integer
+#  receiving_account_type :string(255)
 #  note                   :text(65535)
 #
 
@@ -73,6 +73,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :company
   belongs_to :invoice_status, class_name: "InwardInvoiceStatus"
   belongs_to :receiving_account, polymorphic: true
+  belongs_to :vendor, class_name: "YesBankVendor"
 
   # because multiple payments can be made against one invoice
   has_many :payments, as: :parent
