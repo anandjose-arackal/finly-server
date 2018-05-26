@@ -1,8 +1,8 @@
 class Procurements::Create < Procurements::Base
-  attr_accessor :procurement
+  attr_accessor :procurement, :procurement_params
 
   def init
-
+    self.procurement_params = procurement_parameters
   end
 
   def validate
@@ -12,7 +12,8 @@ class Procurements::Create < Procurements::Base
   end
 
   def process
-    self.procurement = user.procurements.build({company_id: user.company.id})
+    self.procurement = user.procurements.build(procurement_params)
+    self.procurement.company = user.company
 
     self.procurement.procurement_status_id = ProcurementStatus.id_for(:draft)
 
@@ -33,5 +34,11 @@ class Procurements::Create < Procurements::Base
     if op.success?
       add_message :success, 'Successfully created new procurement'
     end
+  end
+
+  private
+
+  def procurement_parameters
+    params.require(:procurement).permit(:name, :note, :vendor_id)
   end
 end

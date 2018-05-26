@@ -3,6 +3,7 @@ class ProcurementMailer < ApplicationMailer
     @purchase_order = purchase_order
     @options = options
 
+    #todo create download file
     # attachments["purchase-order-#{@purchase_order.po_number}.pdf"] = WickedPdf.new.pdf_from_string(
     #     render_to_string(pdf: "purchase-order-#{@purchase_order.po_number}.pdf", template: "procure/purchase_orders/download", layout: 'pdf.html.erb', print_media_type: true,
     #                      margin: {:bottom => 5},

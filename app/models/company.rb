@@ -75,6 +75,7 @@ class Company < ActiveRecord::Base
 
   has_many :budgets
   has_many :procurements
+  has_many :procurement_attachments
 
 
   has_many :booking_attachments

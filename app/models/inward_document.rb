@@ -23,5 +23,7 @@ class InwardDocument < ActiveRecord::Base
   belongs_to :vendor, class_name: "YesBankVendor"
   has_many :items, class_name: "InwardDocumentItem"
 
+  has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
+
   accepts_nested_attributes_for :items
 end

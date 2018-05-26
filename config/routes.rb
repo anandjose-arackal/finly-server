@@ -2875,6 +2875,8 @@ Rails.application.routes.draw do
     resources :inward_documents do
 
     end
+
+    resources :attachments, only: [:create]
   end
 
 

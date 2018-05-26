@@ -21,6 +21,9 @@
 #  comment                :string(255)
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  delivered              :integer          default(0)
+#  accepted               :integer          default(0)
+#  rejected               :integer          default(0)
 #
 
 class PurchaseOrderItem < ActiveRecord::Base

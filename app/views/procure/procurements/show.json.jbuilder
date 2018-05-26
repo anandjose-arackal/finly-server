@@ -53,6 +53,14 @@ json.purchase_order do
       end
     end
   end
+  json.attachments do
+    json.array! @result.purchase_order.attachments do |attachment|
+      json.extract! attachment, :id, :description
+      json.file_name attachment.file_file_name
+      json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
+      json.url attachment.file.url
+    end
+  end
 end
 
 json.inward_documents do
@@ -72,6 +80,14 @@ json.inward_documents do
       end
     end
 
+    json.attachments do
+      json.array! document.attachments do |attachment|
+        json.extract! attachment, :id, :description
+        json.file_name attachment.file_file_name
+        json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
+        json.url attachment.file.url
+      end
+    end
 
   end
 end
