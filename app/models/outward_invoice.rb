@@ -37,12 +37,12 @@
 #  roundoff_total_enabled  :boolean
 #  memo                    :string(255)
 #  customer_memo           :text(65535)
-#  payment_term_id         :integer
 #  reminders               :text(65535)
+#  payment_term_id         :integer
 #  user_id                 :integer
 #  outward_invoice_type_id :integer          default(1)
 #  terms                   :text(65535)
-#  company_branch_id       :integer
+#  location_id             :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -118,7 +118,7 @@ class OutwardInvoice < ActiveRecord::Base
   validates :net_amount, presence: true, if: :valid_invoice?
   validate :gst_type_selection, if: :valid_invoice?
 
-  scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid, :sent_to_customer]))}
+  scope :unpaid, -> { where(invoice_status_id: OutwardInvoiceStatus.ids_for([:unpaid, :saved, :partially_paid]))}
   scope :paid, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:paid) }
   scope :saved, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:saved)}
   scope :cancelled, -> { where invoice_status_id: OutwardInvoiceStatus.id_for(:cancelled) }
