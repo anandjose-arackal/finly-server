@@ -73,7 +73,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   def process
     self.inward_invoice.assign_attributes(self.inward_invoice_params)
     calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_params)
-    if self.invoice.save
+    if self.inward_invoice.save
       recalculate_totals(self.inward_invoice, self.inward_invoice_params)
     else
       add_message :error, self.inward_invoice.errors.full_messages
