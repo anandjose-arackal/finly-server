@@ -1301,6 +1301,31 @@
 #                                                         PATCH  /budgets/:id(.:format)                                                                       budgets#update
 #                                                         PUT    /budgets/:id(.:format)                                                                       budgets#update
 #                                                         DELETE /budgets/:id(.:format)                                                                       budgets#destroy
+#                                    procure_procurements GET    /procure/procurements(.:format)                                                              procure/procurements#index
+#                                                         POST   /procure/procurements(.:format)                                                              procure/procurements#create
+#                                 new_procure_procurement GET    /procure/procurements/new(.:format)                                                          procure/procurements#new
+#                                edit_procure_procurement GET    /procure/procurements/:id/edit(.:format)                                                     procure/procurements#edit
+#                                     procure_procurement GET    /procure/procurements/:id(.:format)                                                          procure/procurements#show
+#                                                         PATCH  /procure/procurements/:id(.:format)                                                          procure/procurements#update
+#                                                         PUT    /procure/procurements/:id(.:format)                                                          procure/procurements#update
+#                                                         DELETE /procure/procurements/:id(.:format)                                                          procure/procurements#destroy
+#                        procure_purchase_order_send_mail POST   /procure/purchase_orders/:purchase_order_id/send_mail(.:format)                              procure/purchase_orders#send_mail
+#                                 procure_purchase_orders GET    /procure/purchase_orders(.:format)                                                           procure/purchase_orders#index
+#                                                         POST   /procure/purchase_orders(.:format)                                                           procure/purchase_orders#create
+#                              new_procure_purchase_order GET    /procure/purchase_orders/new(.:format)                                                       procure/purchase_orders#new
+#                             edit_procure_purchase_order GET    /procure/purchase_orders/:id/edit(.:format)                                                  procure/purchase_orders#edit
+#                                  procure_purchase_order GET    /procure/purchase_orders/:id(.:format)                                                       procure/purchase_orders#show
+#                                                         PATCH  /procure/purchase_orders/:id(.:format)                                                       procure/purchase_orders#update
+#                                                         PUT    /procure/purchase_orders/:id(.:format)                                                       procure/purchase_orders#update
+#                                                         DELETE /procure/purchase_orders/:id(.:format)                                                       procure/purchase_orders#destroy
+#                                procure_inward_documents GET    /procure/inward_documents(.:format)                                                          procure/inward_documents#index
+#                                                         POST   /procure/inward_documents(.:format)                                                          procure/inward_documents#create
+#                             new_procure_inward_document GET    /procure/inward_documents/new(.:format)                                                      procure/inward_documents#new
+#                            edit_procure_inward_document GET    /procure/inward_documents/:id/edit(.:format)                                                 procure/inward_documents#edit
+#                                 procure_inward_document GET    /procure/inward_documents/:id(.:format)                                                      procure/inward_documents#show
+#                                                         PATCH  /procure/inward_documents/:id(.:format)                                                      procure/inward_documents#update
+#                                                         PUT    /procure/inward_documents/:id(.:format)                                                      procure/inward_documents#update
+#                                                         DELETE /procure/inward_documents/:id(.:format)                                                      procure/inward_documents#destroy
 #
 
 #                               crono_web        /crono                                                      Crono::Web
