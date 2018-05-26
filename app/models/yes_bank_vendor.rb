@@ -30,7 +30,6 @@ class YesBankVendor < ActiveRecord::Base
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
 
-
   has_many :budgets, as: :budgetable
 
   accepts_nested_attributes_for :bank_accounts
@@ -41,11 +40,18 @@ class YesBankVendor < ActiveRecord::Base
   scope :authorized, -> { where authorized: true}
 
   scope :filter_search, -> (term) do
-    vendor_ids = where("name like ? OR email like ? OR mobile_number like ? OR description like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    ids = self.pluck(:id)
+    vendor_ids = where(id: ids).where("name like ? OR email like ? OR mobile_number like ? OR description like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     bank_account_ids = BankAccount.where("account_number like ? OR ifsc like ? OR name like ?", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     vendor_ids += BankAccount.where(account_owner_type: "YesBankVendor").where(id: bank_account_ids).pluck(:account_owner_id)
     where(id: vendor_ids)
   end
+
+  scope :filter_name_search, -> (name) {
+    ids = self.pluck(:id)
+    vendor_ids = where(id: ids).where("name like ? OR email like ? OR mobile_number like ? OR description like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    where(id: vendor_ids)
+  }
 
   def as_json(options={})
     {

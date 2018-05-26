@@ -64,8 +64,6 @@
 
 
 
-
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:

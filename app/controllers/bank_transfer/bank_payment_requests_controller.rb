@@ -178,6 +178,16 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     respond
   end
 
+  def payments_list
+    @result = BankTransfer::PaymentRequest::Payments.(current_user, params)
+    respond
+  end
+
+  def payments_count
+    @result = BankTransfer::PaymentRequest::PaymentsCount.(current_user, params)
+    render json: @result.as_json
+  end
+
   private
 
   def update_handler(type)

@@ -16,6 +16,7 @@
 #  bank_response               :string(255)
 #  refunded                    :boolean
 #  error_sub_code              :string(255)
+#  bank_transaction_type_id    :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
