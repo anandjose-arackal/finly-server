@@ -52,10 +52,10 @@ class PurchaseOrder < ActiveRecord::Base
 
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 
-  has_many :items, class_name: "PurchaseOrderItem"
+  has_many :items, class_name: "PurchaseOrderItem", dependent: :destroy
   has_many :extra_charges, class_name: "ProcurementCharge", as: "Chargable"
 
-  accepts_nested_attributes_for :items
+  accepts_nested_attributes_for :items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax,
                                 :discount_amount, :balance_amount
 

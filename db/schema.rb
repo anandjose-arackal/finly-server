@@ -529,6 +529,12 @@ ActiveRecord::Schema.define(version: 20180526162250) do
   add_index "bank_payment_requests", ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id", using: :btree
   add_index "bank_payment_requests", ["status_id"], name: "index_bank_payment_requests_on_status_id", using: :btree
 
+  create_table "bank_transaction_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
   create_table "bank_transactions", force: :cascade do |t|
     t.string   "unique_request_number",       limit: 255
     t.string   "transfer_type",               limit: 255
@@ -543,6 +549,7 @@ ActiveRecord::Schema.define(version: 20180526162250) do
     t.string   "bank_response",               limit: 255
     t.boolean  "refunded"
     t.string   "error_sub_code",              limit: 255
+    t.integer  "bank_transaction_type_id",    limit: 4
   end
 
   add_index "bank_transactions", ["amount_id"], name: "index_bank_transactions_on_amount_id", using: :btree
@@ -2282,45 +2289,18 @@ ActiveRecord::Schema.define(version: 20180526162250) do
   add_index "invoice_transaction_mappings", ["va_transaction_id"], name: "index_invoice_transaction_mappings_on_va_transaction_id", using: :btree
 
   create_table "invoices", force: :cascade do |t|
-    t.integer  "address_id",         limit: 4
+    t.integer  "address_id",             limit: 4
     t.date     "date"
     t.date     "due_date"
-    t.string   "invoice_number",     limit: 255
-    t.integer  "tax_type_id",        limit: 4
-    t.decimal  "discount",                       precision: 64, scale: 12
-    t.integer  "discount_type_id",   limit: 4
-    t.datetime "created_at",                                               null: false
-    t.datetime "updated_at",                                               null: false
-    t.integer  "gross_amount_id",    limit: 4
-    t.integer  "net_amount_id",      limit: 4
+    t.string   "invoice_number",         limit: 255
+    t.integer  "tax_type_id",            limit: 4
+    t.decimal  "discount",                             precision: 64, scale: 12
+    t.integer  "discount_type_id",       limit: 4
+    t.datetime "created_at",                                                     null: false
+    t.datetime "updated_at",                                                     null: false
+    t.integer  "gross_amount_id",        limit: 4
+    t.integer  "net_amount_id",          limit: 4
     t.boolean  "inclusive_of_taxes"
-<<<<<<< HEAD
-    t.integer  "amount_id",          limit: 4
-    t.decimal  "tds",                            precision: 64, scale: 12
-    t.integer  "tds_type_id",        limit: 4
-    t.integer  "gst_type_id",        limit: 4
-    t.integer  "payment_id",         limit: 4
-    t.integer  "discount_amount_id", limit: 4
-    t.integer  "sgst_amount_id",     limit: 4
-    t.integer  "csgt_amount_id",     limit: 4
-    t.integer  "igst_amount_id",     limit: 4
-    t.integer  "tds_amount_id",      limit: 4
-    t.integer  "tax_amount_id",      limit: 4
-    t.decimal  "tax",                            precision: 64, scale: 12
-    t.integer  "category_id",        limit: 4
-    t.integer  "original_amount_id", limit: 4
-    t.integer  "advance_amount_id",  limit: 4
-    t.integer  "advance_type_id",    limit: 4
-    t.decimal  "advance",                        precision: 20, scale: 10
-    t.integer  "freight_amount_id",  limit: 4
-    t.integer  "freight_type_id",    limit: 4
-    t.decimal  "freight",                        precision: 20, scale: 10
-    t.decimal  "roundoff_amount",                precision: 20, scale: 10
-    t.integer  "balance_due_id",     limit: 4
-    t.integer  "taxable_amount_id",  limit: 4
-    t.integer  "cost_center_id",     limit: 4
-    t.integer  "tds_slab_id",        limit: 4
-=======
     t.integer  "amount_id",              limit: 4
     t.decimal  "tds",                                  precision: 64, scale: 12
     t.integer  "tds_type_id",            limit: 4
@@ -2352,10 +2332,9 @@ ActiveRecord::Schema.define(version: 20180526162250) do
     t.integer  "paid_amount_id",         limit: 4
     t.integer  "vendor_id",              limit: 4
     t.integer  "receiving_account_id",   limit: 4
-    t.string   "receiving_account_type", limit: 255
+    t.integer  "receiving_account_type", limit: 4
     t.text     "note",                   limit: 65535
     t.integer  "procurement_id",         limit: 4
->>>>>>> dev-transaction-invoice-merge
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -2398,6 +2377,12 @@ ActiveRecord::Schema.define(version: 20180526162250) do
   add_index "inward_documents", ["company_id"], name: "index_inward_documents_on_company_id", using: :btree
   add_index "inward_documents", ["procurement_id"], name: "index_inward_documents_on_procurement_id", using: :btree
   add_index "inward_documents", ["vendor_id"], name: "index_inward_documents_on_vendor_id", using: :btree
+
+  create_table "inward_invoice_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
 
   create_table "itz_cash_card_programs", force: :cascade do |t|
     t.string   "product_code", limit: 255
@@ -3202,6 +3187,7 @@ ActiveRecord::Schema.define(version: 20180526162250) do
     t.text     "post_operation",          limit: 65535
     t.text     "post_operation_payload",  limit: 65535
     t.integer  "category_id",             limit: 4
+    t.date     "scheduled_at"
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -4476,6 +4462,30 @@ ActiveRecord::Schema.define(version: 20180526162250) do
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
+  create_table "vendor_account_transactions", force: :cascade do |t|
+    t.integer  "vendor_account_id",   limit: 4
+    t.integer  "transaction_type_id", limit: 4
+    t.integer  "amount_id",           limit: 4
+    t.integer  "payment_id",          limit: 4
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+  end
+
+  add_index "vendor_account_transactions", ["amount_id"], name: "index_vendor_account_transactions_on_amount_id", using: :btree
+  add_index "vendor_account_transactions", ["payment_id"], name: "index_vendor_account_transactions_on_payment_id", using: :btree
+  add_index "vendor_account_transactions", ["transaction_type_id"], name: "index_vendor_account_transactions_on_transaction_type_id", using: :btree
+  add_index "vendor_account_transactions", ["vendor_account_id"], name: "index_vendor_account_transactions_on_vendor_account_id", using: :btree
+
+  create_table "vendor_accounts", force: :cascade do |t|
+    t.integer  "balance_id", limit: 4
+    t.integer  "vendor_id",  limit: 4
+    t.datetime "created_at",           null: false
+    t.datetime "updated_at",           null: false
+  end
+
+  add_index "vendor_accounts", ["balance_id"], name: "index_vendor_accounts_on_balance_id", using: :btree
+  add_index "vendor_accounts", ["vendor_id"], name: "index_vendor_accounts_on_vendor_id", using: :btree
+
   create_table "vendor_attachments", force: :cascade do |t|
     t.string   "attached_file_file_name",    limit: 255
     t.string   "attached_file_content_type", limit: 255
@@ -4974,6 +4984,9 @@ ActiveRecord::Schema.define(version: 20180526162250) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
+  add_foreign_key "vendor_account_transactions", "amounts"
+  add_foreign_key "vendor_account_transactions", "payments"
+  add_foreign_key "vendor_account_transactions", "vendor_accounts"
   add_foreign_key "vendor_payment_wallets", "users"
   add_foreign_key "web_hook_event_mappings", "web_hook_events"
   add_foreign_key "web_hook_event_mappings", "web_hooks"

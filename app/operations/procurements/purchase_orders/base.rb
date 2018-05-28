@@ -12,7 +12,7 @@ class Procurements::PurchaseOrders::Base < BaseOperation
         :procurement_term_id, :indent_number, :indent_date, :override_po_number, :po_number,
         :delivery_date, :gst_type_id, :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount,
         items_attributes: [
-            :id, :product_id, :description, :hsn_sac, :quantity, :rate, :tax, :tds, :discount, :delivery_date, :comment,
+            :id, :_destroy, :product_id, :description, :hsn_sac, :quantity, :rate, :tax, :tds, :discount, :delivery_date, :comment,
             :inventory_line_item_id, tax_amount_attributes: [:value, :currency_id],
             tds_amount_attributes: [:value, :currency_id], discount_amount_attributes: [:value, :currency_id],
             total_amount_attributes: [:value, :currency_id]
