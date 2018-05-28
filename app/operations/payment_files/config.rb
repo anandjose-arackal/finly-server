@@ -10,10 +10,11 @@ class PaymentFiles::Config
 
   def self.available_adapters
     [
+        {name: 'HDFC Bank', key: :hdfc_bank, operation: PaymentFiles::Formats::HdfcBank::Process, validator: PaymentFiles::Formats::HdfcBank::ValidateConfig},
         {name: 'Yes Bank', key: :yes_bank, operation: PaymentFiles::Formats::YesBank::Process, validator: PaymentFiles::Formats::YesBank::ValidateConfig},
         {name: 'ICICI Bank', key: :icici_bank, operation: PaymentFiles::Formats::IciciBank::Process, validator: PaymentFiles::Formats::IciciBank::ValidateConfig},
         {name: 'Karnataka Bank', key: :karnataka_bank, operation: PaymentFiles::Formats::KarnatakaBank::Process, validator: PaymentFiles::Formats::KarnatakaBank::ValidateConfig},
-        {name: 'Korak Mahindra Bank', key: :kotak_mahindra_bank, operation: PaymentFiles::Formats::KotakMahindraBank::Process, validator: PaymentFiles::Formats::KotakMahindraBank::ValidateConfig},
+        {name: 'Kotak Mahindra Bank', key: :kotak_mahindra_bank, operation: PaymentFiles::Formats::KotakMahindraBank::Process, validator: PaymentFiles::Formats::KotakMahindraBank::ValidateConfig},
     ]
   end
 
