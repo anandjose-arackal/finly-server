@@ -299,6 +299,7 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           actions[:summary_editable] = true
           actions[:payments_editable] = true
           actions[:attachments_editable] = true
+          actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           actions[:credit] = !bank_payment_request.credit_card?
           balance = retrieve_balance(:vendor_payment_wallet, user)
           enabled = false
@@ -354,7 +355,6 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           else
             button_type = "button"
             admins = []
-            actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
           end
           if reviewer.nil? && !admins.empty?
             actions[:credit_options][:approve_forward] = {
