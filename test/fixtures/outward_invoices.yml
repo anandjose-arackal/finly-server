@@ -37,8 +37,8 @@
 #  roundoff_total_enabled  :boolean
 #  memo                    :string(255)
 #  customer_memo           :text(65535)
-#  payment_term_id         :integer
 #  reminders               :text(65535)
+#  payment_term_id         :integer
 #  user_id                 :integer
 #  outward_invoice_type_id :integer          default(1)
 #  terms                   :text(65535)

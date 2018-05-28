@@ -1085,6 +1085,8 @@
 #                bank_transfer_bank_payment_request_retry PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/retry(.:format)                bank_transfer/bank_payment_requests#retry
 #     bank_transfer_bank_payment_request_within_timeframe GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/within_timeframe(.:format)     bank_transfer/bank_payment_requests#within_timeframe
 #       bank_transfer_bank_payment_request_update_payment PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/update_payment(.:format)       bank_transfer/bank_payment_requests#update_payment
+#         bank_transfer_bank_payment_request_payments_lst GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments(.:format)             bank_transfer/bank_payment_requests#payments_list
+#       bank_transfer_bank_payment_request_payments_count GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments_count(.:format)       bank_transfer/bank_payment_requests#payments_count
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                               bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                               bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                                           bank_transfer/bank_payment_requests#new
@@ -1105,6 +1107,7 @@
 #                                                         DELETE /bank_transfer/account_owners/:id(.:format)                                                  bank_transfer/account_owners#destroy
 #                                    bank_transfer_import POST   /bank_transfer/vendors/import(.:format)                                                      bank_transfer/vendors#import
 #                     bank_transfer_vendor_show_transfers GET    /bank_transfer/vendors/:vendor_id/show_transfers(.:format)                                   bank_transfer/vendors#show_transfers
+#                      bank_transfer_vendor_bank_accounts GET    /bank_transfer/vendors/:vendor_id/bank_accounts(.:format)                                    bank_transfer/vendors#bank_accounts
 #                                   bank_transfer_vendors GET    /bank_transfer/vendors(.:format)                                                             bank_transfer/vendors#index
 #                                                         POST   /bank_transfer/vendors(.:format)                                                             bank_transfer/vendors#create
 #                                new_bank_transfer_vendor GET    /bank_transfer/vendors/new(.:format)                                                         bank_transfer/vendors#new
@@ -1146,6 +1149,14 @@
 #                                                         DELETE /bank_transfer/users/:id(.:format)                                                           bank_transfer/users#destroy
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                               bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                         bank_transfer/vendor_payment_wallets#transfer_options
+#                           bank_transfer_inward_invoices GET    /bank_transfer/inward_invoices(.:format)                                                     bank_transfer/inward_invoices#index
+#                                                         POST   /bank_transfer/inward_invoices(.:format)                                                     bank_transfer/inward_invoices#create
+#                        new_bank_transfer_inward_invoice GET    /bank_transfer/inward_invoices/new(.:format)                                                 bank_transfer/inward_invoices#new
+#                       edit_bank_transfer_inward_invoice GET    /bank_transfer/inward_invoices/:id/edit(.:format)                                            bank_transfer/inward_invoices#edit
+#                            bank_transfer_inward_invoice GET    /bank_transfer/inward_invoices/:id(.:format)                                                 bank_transfer/inward_invoices#show
+#                                                         PATCH  /bank_transfer/inward_invoices/:id(.:format)                                                 bank_transfer/inward_invoices#update
+#                                                         PUT    /bank_transfer/inward_invoices/:id(.:format)                                                 bank_transfer/inward_invoices#update
+#                                                         DELETE /bank_transfer/inward_invoices/:id(.:format)                                                 bank_transfer/inward_invoices#destroy
 #                                     public_bank_account GET    /account/:account_number(.:format)                                                           invoicing/public_links#virtual_bank_account_show
 #                                          public_invoice GET    /invoice/:invoice_id(.:format)                                                               invoicing/public_links#invoice_show
 #                                               addresses GET    /addresses(.:format)                                                                         addresses#index
@@ -1315,6 +1326,15 @@
 #                                                         PATCH  /procure/inward_documents/:id(.:format)                                                      procure/inward_documents#update
 #                                                         PUT    /procure/inward_documents/:id(.:format)                                                      procure/inward_documents#update
 #                                                         DELETE /procure/inward_documents/:id(.:format)                                                      procure/inward_documents#destroy
+#                                  procure_create_from_po POST   /procure/inward_invoices/create_from_po(.:format)                                            procure/inward_invoices#create_from_po
+#                                 procure_inward_invoices GET    /procure/inward_invoices(.:format)                                                           procure/inward_invoices#index
+#                                                         POST   /procure/inward_invoices(.:format)                                                           procure/inward_invoices#create
+#                              new_procure_inward_invoice GET    /procure/inward_invoices/new(.:format)                                                       procure/inward_invoices#new
+#                             edit_procure_inward_invoice GET    /procure/inward_invoices/:id/edit(.:format)                                                  procure/inward_invoices#edit
+#                                  procure_inward_invoice GET    /procure/inward_invoices/:id(.:format)                                                       procure/inward_invoices#show
+#                                                         PATCH  /procure/inward_invoices/:id(.:format)                                                       procure/inward_invoices#update
+#                                                         PUT    /procure/inward_invoices/:id(.:format)                                                       procure/inward_invoices#update
+#                                                         DELETE /procure/inward_invoices/:id(.:format)                                                       procure/inward_invoices#destroy
 #
 
 #                               crono_web        /crono                                                      Crono::Web
@@ -2760,6 +2780,8 @@ Rails.application.routes.draw do
       patch 'retry', to: 'bank_payment_requests#retry', as: :retry
       get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
       patch 'update_payment', to: 'bank_payment_requests#update_payment'
+      get 'payments', to: 'bank_payment_requests#payments_list', as: :payments_lst
+      get 'payments_count', to: 'bank_payment_requests#payments_count'
     end
 
     get 'transfer_timings', to: 'bank_payment_requests#within_timeframe'
@@ -2770,6 +2792,7 @@ Rails.application.routes.draw do
     post 'vendors/import', to: 'vendors#import', as: :import
     resources :vendors do
       get 'show_transfers', to: 'vendors#show_transfers'
+      get 'bank_accounts', to: 'vendors#bank_accounts'
     end
 
     get 'bank_accounts/count', to: 'bank_accounts#count'
@@ -2789,6 +2812,8 @@ Rails.application.routes.draw do
     end
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
+
+    resources :inward_invoices
   end
 
 
@@ -2902,6 +2927,8 @@ Rails.application.routes.draw do
     end
 
     resources :attachments, only: [:create]
+    post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
+    resources :inward_invoices
   end
 
 

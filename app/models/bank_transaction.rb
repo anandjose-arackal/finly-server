@@ -24,6 +24,7 @@ class BankTransaction < ActiveRecord::Base
   belongs_to :company
   belongs_to :beneficiary_bank_account, class_name: "BankAccount"
   belongs_to :transfer_status, class_name: "BankTransferStatus"
+  belongs_to :bank_transaction_type
 
   has_one :payment, as: :reference_resource
 
@@ -33,7 +34,7 @@ class BankTransaction < ActiveRecord::Base
   validates :transfer_status_id, presence: true
   validates :amount, presence: true
   validates :company, presence: true
-  validates :transfer_type, presence: true
+  validates :transfer_type, presence: true, unless: :outside_finly?
 
   accepts_nested_attributes_for :amount
 
@@ -50,6 +51,10 @@ class BankTransaction < ActiveRecord::Base
 
   def successful?
     [BankTransferStatus.id_for(:completed), BankTransferStatus.id_for(:processing)].include?(self.transfer_status_id)
+  end
+
+  def outside_finly?
+    self.outside_finly
   end
 
 end

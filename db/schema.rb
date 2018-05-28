@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180526141826) do
+ActiveRecord::Schema.define(version: 20180526162250) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2294,6 +2294,7 @@ ActiveRecord::Schema.define(version: 20180526141826) do
     t.integer  "gross_amount_id",    limit: 4
     t.integer  "net_amount_id",      limit: 4
     t.boolean  "inclusive_of_taxes"
+<<<<<<< HEAD
     t.integer  "amount_id",          limit: 4
     t.decimal  "tds",                            precision: 64, scale: 12
     t.integer  "tds_type_id",        limit: 4
@@ -2319,6 +2320,42 @@ ActiveRecord::Schema.define(version: 20180526141826) do
     t.integer  "taxable_amount_id",  limit: 4
     t.integer  "cost_center_id",     limit: 4
     t.integer  "tds_slab_id",        limit: 4
+=======
+    t.integer  "amount_id",              limit: 4
+    t.decimal  "tds",                                  precision: 64, scale: 12
+    t.integer  "tds_type_id",            limit: 4
+    t.integer  "gst_type_id",            limit: 4
+    t.integer  "payment_id",             limit: 4
+    t.integer  "discount_amount_id",     limit: 4
+    t.integer  "sgst_amount_id",         limit: 4
+    t.integer  "csgt_amount_id",         limit: 4
+    t.integer  "igst_amount_id",         limit: 4
+    t.integer  "tds_amount_id",          limit: 4
+    t.integer  "tax_amount_id",          limit: 4
+    t.decimal  "tax",                                  precision: 64, scale: 12
+    t.integer  "category_id",            limit: 4
+    t.integer  "original_amount_id",     limit: 4
+    t.integer  "advance_amount_id",      limit: 4
+    t.integer  "advance_type_id",        limit: 4
+    t.decimal  "advance",                              precision: 20, scale: 10
+    t.integer  "freight_amount_id",      limit: 4
+    t.integer  "freight_type_id",        limit: 4
+    t.decimal  "freight",                              precision: 20, scale: 10
+    t.decimal  "roundoff_amount",                      precision: 20, scale: 10
+    t.integer  "balance_due_id",         limit: 4
+    t.integer  "taxable_amount_id",      limit: 4
+    t.integer  "cost_center_id",         limit: 4
+    t.integer  "tds_slab_id",            limit: 4
+    t.integer  "invoice_status_id",      limit: 4
+    t.integer  "company_id",             limit: 4
+    t.integer  "created_by_user_id",     limit: 4
+    t.integer  "paid_amount_id",         limit: 4
+    t.integer  "vendor_id",              limit: 4
+    t.integer  "receiving_account_id",   limit: 4
+    t.string   "receiving_account_type", limit: 255
+    t.text     "note",                   limit: 65535
+    t.integer  "procurement_id",         limit: 4
+>>>>>>> dev-transaction-invoice-merge
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree

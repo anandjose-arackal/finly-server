@@ -48,6 +48,7 @@
 #  receiving_account_id   :integer
 #  receiving_account_type :string(255)
 #  note                   :text(65535)
+#  procurement_id         :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -69,8 +70,12 @@ class Invoice < ActiveRecord::Base
   belongs_to :category
   belongs_to :cost_center
   belongs_to :tds_slab, class_name: TdsRatesList
+  belongs_to :created_by, class_name: "User"
+  belongs_to :company
+  belongs_to :invoice_status, class_name: "InwardInvoiceStatus"
+  belongs_to :receiving_account, polymorphic: true
 
-  belongs_to :procurement
+  belongs_to :procurement, class_name: "Procurement"
 
   # because multiple payments can be made against one invoice
   has_many :payments, as: :parent
@@ -99,11 +104,20 @@ class Invoice < ActiveRecord::Base
   delegate :discount_amount_value, to: :discount_amount
   delegate :net_amount_value, to: :net_amount
   delegate :gross_amount_value, to: :gross_amount
+  delegate :paid_amount, to: :paid_amount
 
 
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true
   # validates :amount, presence: true
+
+  scope :with_id, -> (id) { where id: id}
+  scope :with_status_id, -> (status_id) {
+    where invoice_status_id: status_id
+  }
+
+
+  after_create :set_defaults
 
   def policy
     self.payment&.payment_order&.bank_payment_request&.policy
@@ -142,7 +156,17 @@ class Invoice < ActiveRecord::Base
     end
   end
 
+  def bank_account
+    if self.receiving_account_type == "BankAccount"
+      return self.receiving_account
+    end
+    nil
+  end
+
   private
 
+  def set_defaults
+
+  end
 
 end
