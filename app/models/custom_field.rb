@@ -33,6 +33,7 @@ class CustomField < ActiveRecord::Base
   scope :with_field_configuration_ids, ->(ids) { where field_configuration_id: ids }
   scope :includes_parent, -> { includes :parent }
   scope :expenses, -> { where parent_type: ['ManualExpense', 'CardExpense', 'TimeExpense', 'PerDiemExpense', 'DistanceExpense'] }
+  scope :with_parent_report, -> { where parent_type: ['Report'] }
   scope :with_drop_down_selection, -> (drop_down_selection_id) { where value_type: 'FieldDropDownSelection', value_id: drop_down_selection_id }
   scope :with_parent, -> (parent_id, parent_type) { where parent_id: parent_id, parent_type: parent_type}
   scope :with_multi_select_selection, -> (multiselect_selection_id) {
