@@ -74,6 +74,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :company
   belongs_to :invoice_status, class_name: "InwardInvoiceStatus"
   belongs_to :receiving_account, polymorphic: true
+  belongs_to :vendor, class_name: "YesBankVendor"
 
   belongs_to :procurement, class_name: "Procurement"
 

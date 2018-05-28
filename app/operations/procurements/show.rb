@@ -37,9 +37,9 @@ class Procurements::Show < Procurements::Base
       end
 
       documents += self.inward_documents
-      #todo add invoices as well
-      documents.sort_by!{ |doc| doc.created_at}.reverse!
+      documents += self.invoices
 
+      documents.sort_by!{ |doc| doc.created_at}.reverse!
       documents
     end
   end
