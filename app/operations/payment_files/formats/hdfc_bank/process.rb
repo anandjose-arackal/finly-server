@@ -1,6 +1,6 @@
 class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseFormat
 
-  attr_accessor :payment_requests
+  attr_accessor :payment_requests, :customer_reference_number
 
   def pre_validate
     return if has_errors?
@@ -9,37 +9,49 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
   def init
     super
     self.payment_requests = params[:bank_payment_requests]
+    self.customer_reference_number = self.options[:customer_reference_number]
   end
 
   def validate
-    result = PaymentFiles::Formats::HdfcBank::ValidateConfig.(user, {options: self.options, config: self.config})
+    result = PaymentFiles::Formats::HdfcBank::ValidateConfig.(user, {options: self.options, config: self.config, payment_file: params[:payment_file]})
     unless result.success?
       add_message :error, result.messages[:error]
-      return
     end
   end
 
   def process
-    headers = retrieve_kotak_headers
+    headers = retrieve_hdfc_headers
     content = []
-    sl_no = 0
     self.payment_file_data.each do |payment|
-      sl_no += 1
       content << [
-          self.client_code,
-          self.product_code,
-          payment[:payment_mode],
-          "",
-          Date.parse(payment[:date]).strftime("%d-%m-%Y"),
-          self.debit_account_number,
-          payment[:amount],
-          "",
-          payment[:receiving_user_name],
-          payment[:beneficiary_ifsc],
+          'N',
+          '',
           payment[:beneficiary_account_number],
-          payment[:receiving_user_email],
-          payment[:receiving_mobile_number],
-          payment[:note]
+          sprintf('%.2f',payment[:amount]),
+          payment[:receiving_user_name],
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          self.customer_reference_number,
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          '',
+          payment[:date].strftime('%d/%m/%Y'),
+          '',
+          payment[:beneficiary_ifsc],
+          payment[:beneficiary_account_name],
+          '',
+          payment[:receiving_user_email]
       ]
     end
     self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
@@ -47,7 +59,34 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
 
   def retrieve_hdfc_headers
     [
-        
+        'Transaction Type',
+        'Beneficiary Code',
+        'Beneficiary Account Number',
+        'Transaction Amount',
+        'Beneficiary Name',
+        'Drawee Location in case of Demand Draft',
+        'DD Printing Location',
+        'Beneficiary Address 1',
+        'Beneficiary Address 2',
+        'Beneficiary Address 3',
+        'Beneficiary Address 4',
+        'Beneficiary Address 5',
+        'Instruction Reference Number',
+        'Customer Reference Number',
+        'Payment details 1',
+        'Payment details 2',
+        'Payment details 3',
+        'Payment details 4',
+        'Payment details 5',
+        'Payment details 6',
+        'Payment details 7',
+        'Cheque Number',
+        'Chq / Trn Date',
+        'MICR Number',
+        'IFC Code',
+        'Beneficery Bank Name',
+        'Beneficiary Bank Branch Name',
+        'Beneficiary email id'
     ]
   end
 end
