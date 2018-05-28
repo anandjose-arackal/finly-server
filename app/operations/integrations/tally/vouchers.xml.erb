@@ -20,7 +20,7 @@
                   <NARRATION><%= html_escape "#{expense.merchant_name(simple: true)} - #{expense.user.name}" %></NARRATION>
                   <EFFECTIVEDATE><%= configuration.date_for(expense) %></EFFECTIVEDATE>
                   <ALLLEDGERENTRIES.LIST>
-                     <LEDGERNAME><%= html_escape expense.category.name %></LEDGERNAME>
+                     <LEDGERNAME><%= html_escape expense.category.gl_name %></LEDGERNAME>
                      <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
                      <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
                      <LEDGERFROMITEM>No</LEDGERFROMITEM>

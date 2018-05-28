@@ -54,3 +54,5 @@ class Integrations::Tally::Vouchers < Integrations::Tally::Base
   # end
 
 end
+
+
