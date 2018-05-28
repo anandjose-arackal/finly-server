@@ -1,8 +1,8 @@
-# this oepration adds an invoice to a payment order and picks up details
+# this operation adds an invoice to a payment order and picks up details
 # for the payment from there
 class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :inward_invoices
+  attr_accessor :inward_invoices, :payments, :bank_payment_request
 
   def init
     ids = params[:invoice_ids]
@@ -24,5 +24,53 @@ class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRe
       add_message :error, "Nothing to add"
       return
     end
+
+    # todo - add conditions to select how much of the invoice will be paid int his payment
+  end
+
+  def pre_process
+    initialize_payment_objects
+  end
+
+  def process
+    payment_order = self.bank_payment_request.payment_order
+    self.payments.each do |payment|
+      payment.update(payment_order_id: payment_order.id)
+    end
+  end
+
+  def post_process
+    add_message :success, "Successfully added invoices to the Order"
+  end
+
+  private
+
+  def initialize_payment_objects
+    payment_params = []
+    self.inward_invoices.each do |invoice|
+      payment_params << {
+          payment_type_id: PaymentType.id_for(:credit),
+          application: RequestStore.store[:current_app],
+          receiving_user_type: invoice.bank_account&.account_owner&.class&.name,
+          receiving_user_id: invoice.bank_account&.account_owner_id,
+          initiating_user_type: "User",
+          initiating_user_id: user.id,
+          initiating_account_type: user.company.yes_bank_company_account&.class&.name,
+          initiating_account_id: user.company.yes_bank_company_account&.id,
+          receiving_account_type: "BankAccount",
+          receiving_account_id: invoice.bank_account&.id,
+          payment_status_id: PaymentStatus.id_for(:pending_approval),
+          payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
+          payment_mode: self.bank_payment_request.payment_mode, # todo - default is NEFT for now, can be changed to something else later
+          amount_attributes: {
+              value: invoice.balance_due&.value,
+              currency_id: Currency.first.id
+          },
+          note: invoice.note,
+          category_id: invoice.category_id,
+          date: DateUtils.local_date
+      }
+    end
+    self.payments = self.bank_payment_request.payment_order.build(payment_params)
   end
 end

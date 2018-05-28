@@ -42,7 +42,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         payment_mode: self.payment_mode, # todo - default is NEFT for now, can be changed to something else later
         amount_attributes: {
-            value: self.invoice.balance_due&.value,
+            value: self.inward_invoice.balance_due&.value,
             currency_id: Currency.first.id
         },
         note: self.inward_invoice.note,
@@ -54,7 +54,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
         company_id: user.company_id,
         amount_requested_attributes: {
-            value: self.invoice.balance_due&.value,
+            value: self.inward_invoice.balance_due&.value,
             current_id: 1
         },
         payment_mode: "NEFT",
@@ -71,7 +71,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         status_id: BankPaymentRequestStatus.id_for(:open),
         controlling_user_id: user.id,
         requested_amount_attributes: {
-            value: self.invoice.balance_due&.value,
+            value: self.inward_invoice.balance_due&.value,
             currency_id: 1
         },
         description: self.description,

@@ -1080,6 +1080,7 @@
 #               bank_transfer_bank_payment_request_review PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)               bank_transfer/bank_payment_requests#review
 #               bank_transfer_bank_payment_request_credit PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)               bank_transfer/bank_payment_requests#credit
 #      bank_transfer_bank_payment_request_add_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/add_beneficiary(.:format)      bank_transfer/bank_payment_requests#add_beneficiary
+#          bank_transfer_bank_payment_request_add_invoice PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/add_invoice(.:format)          bank_transfer/bank_payment_requests#add_invoice
 #   bank_transfer_bank_payment_request_remove_beneficiary PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/remove_beneficiary(.:format)   bank_transfer/bank_payment_requests#remove_beneficiary
 #     bank_transfer_bank_payment_request_mark_as_credited PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/mark_as_credited(.:format)     bank_transfer/bank_payment_requests#mark_as_credited
 #                bank_transfer_bank_payment_request_retry PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/retry(.:format)                bank_transfer/bank_payment_requests#retry
@@ -2741,6 +2742,7 @@ Rails.application.routes.draw do
       patch 'review', to: 'bank_payment_requests#review', as: :review
       patch 'credit', to: 'bank_payment_requests#credit', as: :credit
       patch 'add_beneficiary', to: 'bank_payment_requests#add_beneficiary', as: :add_beneficiary
+      patch 'add_invoice', to: 'bank_payment_requests#add_invoice', as: :add_invoice
       patch 'remove_beneficiary', to: 'bank_payment_requests#remove_beneficiary', as: :remove_beneficiary
       patch 'mark_as_credited', to: 'bank_payment_requests#mark_as_credited', as: :mark_as_credited
       patch 'retry', to: 'bank_payment_requests#retry', as: :retry
