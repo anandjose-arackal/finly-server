@@ -6,7 +6,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
                 :description, :bank_payment_request
 
   def init
-    id = params[:id] || params[:invoice_id]
+    id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
@@ -21,6 +21,10 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
 
   def process
 
+  end
+
+  def post_process
+    add_message :success, "Payment order created"
   end
 
 

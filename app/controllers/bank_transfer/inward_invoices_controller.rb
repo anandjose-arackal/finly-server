@@ -26,4 +26,9 @@ class BankTransfer::InwardInvoicesController < ApplicationController
     @result = BankTransfer::InwardInvoices::Destroy.(current_user, params)
     respond_success_failure
   end
+
+  def create_payment
+    @result = BankTransfer::InwardInvoices::Payments::Create.(current_user, params)
+    respond
+  end
 end
