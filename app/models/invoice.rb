@@ -46,9 +46,8 @@
 #  paid_amount_id         :integer
 #  vendor_id              :integer
 #  receiving_account_id   :integer
-#  receiving_account_type :string(255)
+#  receiving_account_type :integer
 #  note                   :text(65535)
-#  procurement_id         :integer
 #
 
 #  gst_type_id: 1 - IGST

@@ -509,14 +509,6 @@
 #                                                         PATCH  /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#update
 #                                                         PUT    /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#update
 #                                                         DELETE /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#destroy
-#                    api_vp_v1_inward_invoice_attachments GET    /api/vp/v1/inward_invoice_attachments(.:format)                                              api/vp/v1/inward_invoice_attachments#index
-#                                                         POST   /api/vp/v1/inward_invoice_attachments(.:format)                                              api/vp/v1/inward_invoice_attachments#create
-#                 new_api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/new(.:format)                                          api/vp/v1/inward_invoice_attachments#new
-#                edit_api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/:id/edit(.:format)                                     api/vp/v1/inward_invoice_attachments#edit
-#                     api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#show
-#                                                         PATCH  /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#update
-#                                                         PUT    /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#update
-#                                                         DELETE /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#destroy
 #                                                  api_vp POST   /api/vp/vendors(.:format)                                                                    api/vp/vendors#create
 #                                               junk_show GET    /junk/show(.:format)                                                                         junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                         users#menu_data
@@ -1093,6 +1085,8 @@
 #                bank_transfer_bank_payment_request_retry PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/retry(.:format)                bank_transfer/bank_payment_requests#retry
 #     bank_transfer_bank_payment_request_within_timeframe GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/within_timeframe(.:format)     bank_transfer/bank_payment_requests#within_timeframe
 #       bank_transfer_bank_payment_request_update_payment PATCH  /bank_transfer/bank_payment_requests/:bank_payment_request_id/update_payment(.:format)       bank_transfer/bank_payment_requests#update_payment
+#         bank_transfer_bank_payment_request_payments_lst GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments(.:format)             bank_transfer/bank_payment_requests#payments_list
+#       bank_transfer_bank_payment_request_payments_count GET    /bank_transfer/bank_payment_requests/:bank_payment_request_id/payments_count(.:format)       bank_transfer/bank_payment_requests#payments_count
 #                     bank_transfer_bank_payment_requests GET    /bank_transfer/bank_payment_requests(.:format)                                               bank_transfer/bank_payment_requests#index
 #                                                         POST   /bank_transfer/bank_payment_requests(.:format)                                               bank_transfer/bank_payment_requests#create
 #                  new_bank_transfer_bank_payment_request GET    /bank_transfer/bank_payment_requests/new(.:format)                                           bank_transfer/bank_payment_requests#new
@@ -2744,6 +2738,8 @@ Rails.application.routes.draw do
       patch 'retry', to: 'bank_payment_requests#retry', as: :retry
       get 'within_timeframe', to: 'bank_payment_requests#within_timeframe'
       patch 'update_payment', to: 'bank_payment_requests#update_payment'
+      get 'payments', to: 'bank_payment_requests#payments_list', as: :payments_lst
+      get 'payments_count', to: 'bank_payment_requests#payments_count'
     end
 
     get 'transfer_timings', to: 'bank_payment_requests#within_timeframe'
