@@ -45,7 +45,7 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
     self.response = Exporter.new(user, {spreadsheet: {headers: headers, contents: content}}, messages)
   end
 
-  def retrieve_kotak_headers
+  def retrieve_hdfc_headers
     [
         
     ]
