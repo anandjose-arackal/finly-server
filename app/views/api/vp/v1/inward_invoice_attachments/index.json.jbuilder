@@ -1,4 +1,5 @@
 json.array!(@result.invoice_attachments) do |invoice_attachment|
+  json.id invoice_attachment.id
   json.description invoice_attachment.description
 
   json.url invoice_attachment.attached_file&.url

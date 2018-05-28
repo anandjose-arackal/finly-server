@@ -6,7 +6,7 @@ class Api::Vp::V1::InwardInvoiceAttachmentsController < ApplicationController
 
   def create
     @result = BankTransfer::InvoiceAttachments::Create.(current_user, params)
-    respond_success_failure
+    respond
   end
 
   def index

@@ -12,7 +12,7 @@ class BankTransfer::InvoiceAttachments::Create < BankTransfer::InvoiceAttachment
   end
 
   def init
-    self.attachment_parameters = attachment_params
+    self.attachment_parameters = invoice_attachment_params
   end
 
   def process
@@ -24,5 +24,10 @@ class BankTransfer::InvoiceAttachments::Create < BankTransfer::InvoiceAttachment
 
   def post_process
     add_message :success, "Attachment created!"
+  end
+
+  def success
+    params[:invoice_attachment] = self.invoice_attachment
+    BankTransfer::InvoiceAttachments::Create::AttachmentPresenter.new(user, params, messages)
   end
 end

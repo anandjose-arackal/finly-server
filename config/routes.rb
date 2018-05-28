@@ -509,6 +509,14 @@
 #                                                         PATCH  /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#update
 #                                                         PUT    /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#update
 #                                                         DELETE /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#destroy
+#                    api_vp_v1_inward_invoice_attachments GET    /api/vp/v1/inward_invoice_attachments(.:format)                                              api/vp/v1/inward_invoice_attachments#index
+#                                                         POST   /api/vp/v1/inward_invoice_attachments(.:format)                                              api/vp/v1/inward_invoice_attachments#create
+#                 new_api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/new(.:format)                                          api/vp/v1/inward_invoice_attachments#new
+#                edit_api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/:id/edit(.:format)                                     api/vp/v1/inward_invoice_attachments#edit
+#                     api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#show
+#                                                         PATCH  /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#update
+#                                                         PUT    /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#update
+#                                                         DELETE /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#destroy
 #                                                  api_vp POST   /api/vp/vendors(.:format)                                                                    api/vp/vendors#create
 #                                               junk_show GET    /junk/show(.:format)                                                                         junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                         users#menu_data
@@ -2230,6 +2238,7 @@ Rails.application.routes.draw do
       end
       namespace :v1 do
         resources :inventory_line_items
+        resources :inward_invoice_attachments
       end
       scope :vendors do
         post '', to: 'vendors#create'
