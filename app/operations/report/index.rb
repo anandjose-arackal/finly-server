@@ -81,8 +81,10 @@ class Report::Index < Report::Base
     has_scope :filter_submitted_date, using: [:from, :to], type: :hash
     has_scope :filter_approved_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
+    has_scope :filter_custom_drop_down_selection, type: :array
 
     def init
+      ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)
       self.reports = params[:reports]
       get_counts
       if self.reports.present?
