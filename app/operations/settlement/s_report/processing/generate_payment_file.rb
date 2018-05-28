@@ -43,6 +43,7 @@ class Settlement::SReport::Processing::GeneratePaymentFile < Settlement::SReport
     payment_params = []
     self.group_mappings.include_for_payment_file&.each do |mapping|
       payment_params << {
+          beneficiary_account_name: mapping.processor_accountable.name,
           beneficiary_account_number: mapping.processor_accountable.account_number,
           receiving_user_name: mapping.user.name,
           amount: mapping.amount.value,
