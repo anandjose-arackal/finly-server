@@ -1,11 +1,5 @@
 json.array!(@result.invoices) do |invoice|
-  json.raw_amount precision_value invoice&.amount&.value
-  # conditionally set the original amount as invoice amount is there are line items
-  if invoice&.invoice_items.present?
-    json.original_amount precision_value invoice.amount&.value
-  else
-    json.original_amount precision_value invoice.original_amount&.value
-  end
+  json.id invoice.id
   json.invoice do
     json.id invoice.id
     json.status_id invoice.invoice_status_id
@@ -62,6 +56,14 @@ json.array!(@result.invoices) do |invoice|
 
     # invoice amounts total
     json.item_amounts_total invoice.item_amounts_total
+
+    json.raw_amount precision_value invoice&.amount&.value
+    # conditionally set the original amount as invoice amount is there are line items
+    if invoice&.invoice_items.present?
+      json.original_amount precision_value invoice.amount&.value
+    else
+      json.original_amount precision_value invoice.original_amount&.value
+    end
 
     # invoice items
     json.invoice_items do
