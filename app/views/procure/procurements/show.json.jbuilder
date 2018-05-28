@@ -1,4 +1,18 @@
-json.extract! @result.procurement, :id
+json.extract! @result.procurement, :id, :name, :note
+
+if @result.procurement.vendor.present?
+  json.vendor do
+    json.extract! @result.procurement.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
+  end
+end
+
+json.procurement_status do
+
+  json.name @result.procurement&.procurement_status&.name
+  json.id @result.procurement&.procurement_status&.id
+end
+
+json.created_at @result.procurement.created_at.strftime("%d %b %Y")
 
 json.purchase_order do
   json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
