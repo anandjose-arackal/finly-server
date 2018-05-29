@@ -26,7 +26,7 @@ json.forwardable_users do
         user = item[:approver]
         json.id user.id
         json.name user.name
-        eyxpenses = []
+        expenses = []
         json.email user.email
       end
       json.user_role do
