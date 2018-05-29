@@ -205,6 +205,12 @@ class Report < ActiveRecord::Base
   scope :not_settled, -> { where report_processor_group_mapping_id: nil }
   scope :with_processor_group_mapping, -> (id) { where report_processor_group_mapping_id: id }
 
+  scope :filter_custom_drop_down_selection, ->(drop_down_item_id) do
+    drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
+    configs = CustomField.with_drop_down_selection(drop_down_selection_ids).includes_parent.with_parent_report
+    report_ids = configs.map { |item| item.parent&.id }
+    with_id(report_ids)
+  end
   delegate :status_name, to: :status
 
   delegate :submitted_amount_value, to: :submitted_amount

@@ -70,7 +70,22 @@ class ExpenseTypesConfigurationController < ApplicationController
       @groups = @result.user_groups
       @teams = UserTeam::Index.(current_user, params)&.user_teams
     end
-    field_configuration_result = CustomField::Configuration::Index.(current_user, {filter_field_type_id: [FieldType.id_for(:drop_down)], filter_parent_type_id: FieldParentType.id_for(:expense)})
+    field_parent_type_ids = [FieldParentType.id_for(:manual_expense), FieldParentType.id_for(:time_expense),FieldParentType.id_for(:distance_expense),FieldParentType.id_for(:per_diem_expense),FieldParentType.id_for(:card_expense)]
+
+    field_configuration_result = CustomField::Configuration::Index.(current_user, {filter_field_type_id: [FieldType.id_for(:drop_down)], filter_parent_type_id: field_parent_type_ids})
+    if field_configuration_result.success?
+      @field_configurations = field_configuration_result.field_configurations
+    end
+    respond
+  end
+
+  def report_filters
+    @result = UserGroup::Index.(current_user, params)
+    if @result&.success?
+      @groups = @result.user_groups
+      @teams = UserTeam::Index.(current_user, params)&.user_teams
+    end
+    field_configuration_result = CustomField::Configuration::Index.(current_user, {filter_field_type_id: [FieldType.id_for(:drop_down)], filter_parent_type_id: [FieldParentType.id_for(:report)]})
     if field_configuration_result.success?
       @field_configurations = field_configuration_result.field_configurations
     end
