@@ -17,9 +17,9 @@ class Procurements::PurchaseOrders::Base < BaseOperation
             tds_amount_attributes: [:value, :currency_id], discount_amount_attributes: [:value, :currency_id],
             total_amount_attributes: [:value, :currency_id]
         ],
-        total_before_tax_amount_attributes: [:value, :currency_id], tax_amount_attributes: [:value, :currency_id],
-        total_after_tax_amount_attributes: [:value, :currency_id], discount_amount_attributes: [:value, :currency_id],
-        balance_amount_id: [:value, :currency_id],
+        total_before_tax_attributes: [:value, :currency_id], tax_amount_attributes: [:value, :currency_id],
+        total_after_tax_attributes: [:value, :currency_id], discount_amount_attributes: [:value, :currency_id],
+        balance_amount_attributes: [:value, :currency_id],
         attachments: []
         # tax_amount_attributes: [:value, :currency_id]
     )

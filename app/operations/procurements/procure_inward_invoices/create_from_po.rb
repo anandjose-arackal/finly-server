@@ -40,6 +40,19 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
     add_message :success, "Invoice created successfully"
   end
 
+  def success
+    params[:invoice] = self.invoice
+    Procurements::ProcureInwardInvoices::CreateFromPO::ShowPresenter.new(user, params, messages)
+  end
+
+  class Procurements::ProcureInwardInvoices::CreateFromPO::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :invoice
+
+    def init
+      self.invoice = params[:invoice]
+    end
+  end
+
   private
 
   def set_invoice_parameters
