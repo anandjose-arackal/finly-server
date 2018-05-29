@@ -1,6 +1,6 @@
 class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseFormat
 
-  attr_accessor :payment_requests, :customer_reference_number
+  attr_accessor :payment_requests#, :customer_reference_number
 
   def pre_validate
     return if has_errors?
@@ -9,7 +9,7 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
   def init
     super
     self.payment_requests = params[:bank_payment_requests]
-    self.customer_reference_number = self.options[:customer_reference_number]
+    # self.customer_reference_number = self.options[:customer_reference_number]
   end
 
   def validate
@@ -37,7 +37,7 @@ class PaymentFiles::Formats::HdfcBank::Process < PaymentFiles::Formats::BaseForm
           '',
           '',
           '',
-          self.customer_reference_number,
+          '',
           '',
           '',
           '',
