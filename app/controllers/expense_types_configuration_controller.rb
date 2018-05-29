@@ -82,6 +82,7 @@ class ExpenseTypesConfigurationController < ApplicationController
   def report_filters
     @result = UserGroup::Index.(current_user, params)
     if @result&.success?
+      @policies = Policy::Index.(current_user, view: params[:view])
       @groups = @result.user_groups
       @teams = UserTeam::Index.(current_user, params)&.user_teams
     end

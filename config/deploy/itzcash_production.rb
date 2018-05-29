@@ -15,7 +15,7 @@ set :rbenv_ruby, '2.3.1' # Edit this if you are using MRI Ruby
 
 # For tunneling through load balancer
 require 'net/ssh/proxy/command'
-ssh_command = "ssh viveka@180.179.138.155 -p2212 -W %h:%p"
+ssh_command = "ssh -t viveka@180.179.138.155 -p2212 -W %h:%p"
 set :ssh_options, proxy: Net::SSH::Proxy::Command.new(ssh_command), keepalive: true, compression: false
 
 # role-based syntax

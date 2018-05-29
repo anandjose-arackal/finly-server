@@ -15,21 +15,27 @@ class BudgetsProcessor::Calculate::FieldDropDownItem < BudgetsProcessor::Calcula
 
     # Since custom fields can be associated only to a particular type of expense, all the custom fields will be
     #   belonging to one expense type
-    expense_type_name = custom_fields[0].parent_type
+    if custom_fields.present?
 
-    # Manual Expense, Card Expense, Distance & PerDiem ids
-    expense_w_type_ids = custom_fields.pluck(:parent_id)
+      expense_type_name = custom_fields[0].parent_type
 
-    # Expense ids
-    expense_ids = expense_type_name.constantize.with_id(expense_w_type_ids).pluck(:expense_id)
+      # Manual Expense, Card Expense, Distance & PerDiem ids
+      expense_w_type_ids = custom_fields.pluck(:parent_id)
 
-    if items_requested
-      expenses = Expense.with_id(expense_ids).user_budget_expenses(budget.start_date, budget.end_date).joins(:amount)
-      self.spent_amount += expenses.sum(:value)
-      self.budget_trail_items += expenses
+      # Expense ids
+      expense_ids = expense_type_name.constantize.with_id(expense_w_type_ids).pluck(:expense_id)
+
+      if items_requested
+        expenses = Expense.with_id(expense_ids).user_budget_expenses(budget.start_date, budget.end_date).joins(:amount)
+        self.spent_amount += expenses.sum(:value)
+        self.budget_trail_items += expenses
+      else
+        self.spent_amount = Expense.with_id(expense_ids).user_budget_expenses(budget.start_date, budget.end_date).joins(:amount).sum(:value)
+      end
     else
-      self.spent_amount = Expense.with_id(expense_ids).user_budget_expenses(budget.start_date, budget.end_date).joins(:amount).sum(:value)
+      self.spent_amount += 0
     end
+
 
   end
 end

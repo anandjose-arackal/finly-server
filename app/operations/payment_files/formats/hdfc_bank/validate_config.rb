@@ -1,6 +1,6 @@
 class PaymentFiles::Formats::HdfcBank::ValidateConfig < PaymentFiles::Formats::BaseFormat
 
-  attr_accessor :config, :options
+  # attr_accessor :config, :options
 
   def pre_validate
     unless user.present?
@@ -10,15 +10,15 @@ class PaymentFiles::Formats::HdfcBank::ValidateConfig < PaymentFiles::Formats::B
   end
 
   def init
-    self.config = (params[:config] or user.company.payment_file_configuration)
-    self.options = (params[:options] or config.options)
+    # self.config = (params[:config] or user.company.payment_file_configuration)
+    # self.options = (params[:options] or config.options)
   end
 
   def validate
-    unless config.present? and options&.dig(:customer_reference_number).present?
-      add_message :error, 'Payment File has not been configured correctly in the system'
-      return
-    end
+    # unless config.present? and options&.dig(:customer_reference_number).present?
+    #   add_message :error, 'Payment File has not been configured correctly in the system'
+    #   return
+    # end
   end
 
 end
