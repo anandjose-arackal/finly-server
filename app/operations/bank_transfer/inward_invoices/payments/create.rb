@@ -67,7 +67,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         company_id: user.company_id,
         amount_requested_attributes: {
             value: self.inward_invoice.balance_due&.value,
-            current_id: 1
+            currency_id: 1
         },
         payment_mode: "NEFT",
         initiating_account_type: user.company.yes_bank_company_account&.class&.name,

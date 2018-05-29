@@ -33,7 +33,7 @@ class BankTransfer::InwardInvoicesController < ApplicationController
   end
 
   def show_payments
-    @result = BankTransfer::InwardInvoices::Payments::Create.(current_user, params)
+    @result = BankTransfer::InwardInvoices::Payments::Index.(current_user, params)
     respond
   end
 
