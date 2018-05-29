@@ -16,5 +16,5 @@ namespace :monit do
 
 end
 
-before 'deploy', 'monit:unmonitor'
-after 'deploy', 'monit:monitor'
+# before 'deploy', 'monit:unmonitor'
+# after 'deploy', 'monit:monitor'

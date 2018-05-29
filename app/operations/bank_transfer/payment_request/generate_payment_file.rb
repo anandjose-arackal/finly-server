@@ -32,6 +32,7 @@ class BankTransfer::PaymentRequest::GeneratePaymentFile < BankTransfer::PaymentR
     bank_payment_requests.each do |request|
       request.payment_order.payments.each do |payment|
         data << {
+            beneficiary_account_name: payment.receiving_account.name,
             beneficiary_account_number: payment.receiving_account.account_number,
             beneficiary_ifsc: payment.receiving_account.ifsc,
             initiating_user_name: payment.initiating_user&.name,
