@@ -7,6 +7,9 @@ json.groups do
     end
   end
 end
+json.policies do
+  json.array! @policies.policies, :id, :name
+end
 json.teams do
   json.array! @teams, :id, :name
 end
