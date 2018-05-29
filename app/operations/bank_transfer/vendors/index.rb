@@ -10,6 +10,7 @@ class BankTransfer::Vendors::Index < BankTransfer::Vendors::Base
 
     def init
       self.vendors = params[:vendors]
+      self.vendors = apply_scopes(self.vendors, params)
     end
 
   end

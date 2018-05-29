@@ -13,6 +13,7 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
   def pre_process
     # setting the receiving_account type as 'BankAccount' for now, can support other oprtions later
     self.inward_invoice_parameters[:receiving_account_type] = "BankAccount"
+    self.inward_invoice_parameters[:invoice_status_id] = InwardInvoiceStatus.id_for(:unpaid)
   end
 
   def process

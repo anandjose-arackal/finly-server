@@ -2788,6 +2788,7 @@ Rails.application.routes.draw do
 
     resources :inward_invoices do
       post 'create_payment', to: 'inward_invoices#create_payment', as: :create_payment
+      get 'show_payments', to: 'inward_invoices#show_payments', as: :show_payments
     end
   end
 

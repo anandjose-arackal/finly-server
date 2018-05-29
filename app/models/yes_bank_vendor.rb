@@ -47,7 +47,7 @@ class YesBankVendor < ActiveRecord::Base
     where(id: vendor_ids)
   end
 
-  scope :filter_name_search, -> (name) {
+  scope :filter_name_search, -> (term) {
     ids = self.pluck(:id)
     vendor_ids = where(id: ids).where("name like ? OR email like ? OR mobile_number like ? OR description like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     where(id: vendor_ids)

@@ -54,6 +54,8 @@ json.array!(@result.invoices) do |invoice|
     json.tds_slab_name invoice.tds_slab&.name
     json.tds_rate invoice.tds
 
+    json.note invoice.note
+
     # invoice amounts total
     json.item_amounts_total invoice.item_amounts_total
 

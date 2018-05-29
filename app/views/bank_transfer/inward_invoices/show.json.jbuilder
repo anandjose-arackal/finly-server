@@ -53,6 +53,11 @@ json.invoice do
   json.tds_slab_name invoice.tds_slab&.name
   json.tds_rate invoice.tds
 
+  json.note invoice.note
+
+  json.invoice_status_id invoice.invoice_status_id
+  json.invoice_status_name invoice.invoice_status&.name&.humanize
+
   # invoice amounts total
   json.item_amounts_total invoice.item_amounts_total
 

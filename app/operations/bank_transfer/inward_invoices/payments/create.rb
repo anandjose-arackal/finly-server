@@ -3,7 +3,8 @@
 class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoices::Base
 
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
-                :description, :bank_payment_request
+                :description, :bank_payment_request, :payable_amount,
+                :payment_request_params
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
@@ -11,6 +12,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
     self.policy_id = params[:policy_id]
+    self.payable_amount = params[:payable_amount]
   end
 
   def validate
@@ -20,7 +22,13 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
   end
 
   def process
-
+    self.payment_request_params = bank_payment_request_params
+    self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
+    if self.bank_payment_request.save
+      # any changes to be made here? #todo
+    else
+      add_message :error, self.bank_payment_request.errors.full_messages
+    end
   end
 
   def post_process
@@ -30,7 +38,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
 
   private
 
-  def create_payment_request
+  def bank_payment_request_params
     payment_params = [{
         payment_type_id: PaymentType.id_for(:credit),
         application: RequestStore.store[:current_app],
@@ -46,7 +54,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         payment_mode: self.payment_mode, # todo - default is NEFT for now, can be changed to something else later
         amount_attributes: {
-            value: self.inward_invoice.balance_due&.value,
+            value: self.payable_amount,
             currency_id: Currency.first.id
         },
         note: self.inward_invoice.note,
