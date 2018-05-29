@@ -491,6 +491,7 @@
 #                                                         GET    /invoices/customers/:id(.:format)                                                            api/fc/invoices/customers#show
 #                   api_vp_bank_transfer_initiate_payment POST   /api/vp/bank_transfer/initiate_payment(.:format)                                             api/vp/bank_transfer/bank_payment_requests#initiate_payment
 #                     api_vp_bank_transfer_payment_status GET    /api/vp/bank_transfer/payment_status/:id(.:format)                                           api/vp/bank_transfer/bank_payment_requests#payment_status
+#              api_vp_bank_transfer_bulk_initiate_payment POST   /api/vp/bank_transfer/bulk_initiate_payment(.:format)                                        api/vp/bank_transfer/bank_payment_requests#bulk_initiate_payment
 #        api_vp_bank_transfer_bank_payment_request_credit PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)        api/vp/bank_transfer/bank_payment_requests#credit
 #        api_vp_bank_transfer_bank_payment_request_review PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)        api/vp/bank_transfer/bank_payment_requests#review
 #              api_vp_bank_transfer_bank_payment_requests GET    /api/vp/bank_transfer/bank_payment_requests(.:format)                                        api/vp/bank_transfer/bank_payment_requests#index
@@ -509,6 +510,14 @@
 #                                                         PATCH  /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#update
 #                                                         PUT    /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#update
 #                                                         DELETE /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#destroy
+#                    api_vp_v1_inward_invoice_attachments GET    /api/vp/v1/inward_invoice_attachments(.:format)                                              api/vp/v1/inward_invoice_attachments#index
+#                                                         POST   /api/vp/v1/inward_invoice_attachments(.:format)                                              api/vp/v1/inward_invoice_attachments#create
+#                 new_api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/new(.:format)                                          api/vp/v1/inward_invoice_attachments#new
+#                edit_api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/:id/edit(.:format)                                     api/vp/v1/inward_invoice_attachments#edit
+#                     api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#show
+#                                                         PATCH  /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#update
+#                                                         PUT    /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#update
+#                                                         DELETE /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#destroy
 #                                                  api_vp POST   /api/vp/vendors(.:format)                                                                    api/vp/vendors#create
 #                                               junk_show GET    /junk/show(.:format)                                                                         junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                         users#menu_data
@@ -2225,6 +2234,7 @@ Rails.application.routes.draw do
       namespace :bank_transfer do
         post 'initiate_payment', to: 'bank_payment_requests#initiate_payment', as: :initiate_payment
         get 'payment_status/:id', to: 'bank_payment_requests#payment_status', as: :payment_status
+        post 'bulk_initiate_payment', to: 'bank_payment_requests#bulk_initiate_payment', as: :bulk_initiate_payment
         resources :bank_payment_requests do
           patch 'credit', to: 'bank_payment_requests#credit', as: :credit
           patch 'review', to: 'bank_payment_requests#review', as: :review
