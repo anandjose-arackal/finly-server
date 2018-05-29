@@ -31,4 +31,10 @@ class BankTransfer::InwardInvoicesController < ApplicationController
     @result = BankTransfer::InwardInvoices::Payments::Create.(current_user, params)
     respond
   end
+
+  def show_payments
+    @result = BankTransfer::InwardInvoices::Payments::Create.(current_user, params)
+    respond
+  end
+
 end

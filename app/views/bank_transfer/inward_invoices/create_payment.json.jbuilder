@@ -1,2 +1,1 @@
-json.id 47
-# json.id @result.bank_payment_request.id
+json.id @result.bank_payment_request.id

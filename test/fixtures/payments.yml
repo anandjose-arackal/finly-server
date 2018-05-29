@@ -33,6 +33,7 @@
 #  post_operation_payload  :text(65535)
 #  category_id             :integer
 #  scheduled_at            :date
+#  api_initiated           :boolean          default(FALSE)
 #
 
 

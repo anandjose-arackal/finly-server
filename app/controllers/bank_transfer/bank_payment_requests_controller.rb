@@ -188,11 +188,6 @@ class BankTransfer::BankPaymentRequestsController < ApplicationController
     render json: @result.as_json
   end
 
-  def create_payment
-    @result = BankTransfer::InwardInvoices::Payments::Create.(current_user, params)
-    respond_success_failure
-  end
-
   def add_invoice
     @result = BankTransfer::PaymentRequest::InwardInvoice::Add.(current_user, params)
     respond_success_failure
