@@ -22,6 +22,7 @@
 #  policy_id                    :integer
 #  payment_file_downloaded      :boolean          default(FALSE)
 #  auto_approved                :boolean
+#  api_initiated                :boolean          default(FALSE)
 #
 
 require 'test_helper'

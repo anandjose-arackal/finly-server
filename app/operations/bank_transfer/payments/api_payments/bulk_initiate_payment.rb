@@ -3,7 +3,7 @@
 class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::Payments::Base
 
   attr_accessor :payment_request_params, :errors, :payments_attributes, :errors_result,
-                :total_amount_requested, :bank_payment_request
+                :total_amount_requested, :bank_payment_request, :company_id, :payment_mode
 
   class BankTransfer::Payments::ApiPayments::BulkInitiatePayment::BulkSuccessPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -60,7 +60,18 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
         payment[:errors] << "Amount cannot be blank"
         errors_found = true
       end
+      if payment[:name].blank?
+        payment[:errors] << "Name cannot be blank"
+        errors_found = true
+      end
+
+      # if no errors are found add a message saying n errors found
+      unless errors_found
+        payment[:errors] << "No errors found"
+      end
+
       self.total_amount_requested += payment[:amount].to_f
+
     end
     if errors_found
       self.errors_result = self.payments_attributes
@@ -82,7 +93,8 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
         receiving_account_type: BankAccount.name,
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         application: "vp",
-        currency_id: Currency.first.id
+        currency_id: Currency.first.id,
+        api_initiated: true
     }
     bpr_attributes = {
         owner_id: user.id,
@@ -94,13 +106,14 @@ class BankTransfer::Payments::ApiPayments::BulkInitiatePayment < BankTransfer::P
         },
         beneficiary_type_id: 2,
         policy_id: user.company.policies.default.first.id,
-        payment_order_attributes: payment_order_attributes
+        payment_order_attributes: payment_order_attributes,
+        api_initiated: true
     }
     self.bank_payment_request = BankPaymentRequest.create(bpr_attributes)
 
     # now pass this bank payment request object as well as the payments attributes data to
     # the background operation so that they can be run asynchronously
-    op = BankTransfer::Payments::ApiPayments::InitiatePaymentBackground.call_async(user, {bank_payment_request: self.bank_payment_request, payments_attributes: self.payments_attributes})
+    op = BankTransfer::Payments::ApiPayments::InitiatePaymentBackground.call_async(user, {bank_payment_request_id: self.bank_payment_request.id, payments_attributes: self.payments_attributes})
     # op = BankTransfer::Payments::ApiPayments::InitiatePaymentBackground.(user, {bank_payment_request: self.bank_payment_request, payments_attributes: self.payments_attributes})
   end
 

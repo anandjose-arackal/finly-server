@@ -33,6 +33,7 @@
 #  post_operation_payload  :text(65535)
 #  category_id             :integer
 #  scheduled_at            :date
+#  api_initiated           :boolean          default(FALSE)
 #
 
 
@@ -276,7 +277,7 @@ class Payment < ActiveRecord::Base
   validate :initiating_account_presence
   validate :receiving_account_presence
 
-  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, to: :payment_status
+  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, :possible_failure?, to: :payment_status
 
   before_create do
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)

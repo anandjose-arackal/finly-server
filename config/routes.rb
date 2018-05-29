@@ -799,6 +799,7 @@
 #                       expense_type_configuration_update PATCH  /expense_type_configurations(.:format)                                                       expense_types_configuration#update
 #                                            groups_teams GET    /groups_teams(.:format)                                                                      expense_types_configuration#groups_teams
 #                                         expense_filters GET    /expense_filters(.:format)                                                                   expense_types_configuration#expense_filters
+#                                          report_filters GET    /report_filters(.:format)                                                                    expense_types_configuration#report_filters
 #                                                 pending GET    /settlements/reports/pending(.:format)                                                       settlement/report#pending_index
 #                                           pending_count GET    /settlements/reports/pending/count(.:format)                                                 settlement/report#pending_count
 #                                                         GET    /settlements/reports/processing(.:format)                                                    settlement/report#processing_index

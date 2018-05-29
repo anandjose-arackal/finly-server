@@ -32,7 +32,7 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationControll
       end
     else
       respond_to do |format|
-        format.json { render 'bulk_initiate_failure'}
+        format.json { render 'bulk_initiate_failures'}
       end
     end
   end

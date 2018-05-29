@@ -72,6 +72,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       end
       return
     end
+
   end
 
   def post_process
@@ -120,6 +121,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       },
       note: params[:note],
       date: DateUtils.local_date,
+      api_initiated: true
     }
     payment_order_params = {
       initiating_user_id: user.id,
@@ -135,6 +137,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
       application: "vp",
       currency_id: Currency.first.id,
+      api_initiated: true,
       payments_attributes: [
           payment_params
       ]
@@ -149,6 +152,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       },
       beneficiary_type_id: 2,
       policy_id: user.company.policies.default.first.id,
+      api_initiated: true,
       payment_order_attributes: payment_order_params
     }
     self.bank_payment_request = BankPaymentRequest.new(payment_request_params)
