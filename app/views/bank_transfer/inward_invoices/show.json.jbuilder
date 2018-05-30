@@ -61,6 +61,8 @@ json.invoice do
   # invoice amounts total
   json.item_amounts_total invoice.item_amounts_total
 
+  json.paid_amount invoice.payments.joins(:amount).sum(:value)
+
   # invoice items
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|

@@ -59,6 +59,9 @@ json.array!(@result.invoices) do |invoice|
     # invoice amounts total
     json.item_amounts_total invoice.item_amounts_total
 
+    # paid amount for this invoice
+    json.paid_amount invoice.payments.joins(:amount).sum(:value)
+
     json.raw_amount precision_value invoice&.amount&.value
     # conditionally set the original amount as invoice amount is there are line items
     if invoice&.invoice_items.present?
