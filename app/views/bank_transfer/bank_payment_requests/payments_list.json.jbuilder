@@ -5,6 +5,7 @@ json.payments do
     json.account_number payment.receiving_account.account_number
     json.ifsc payment.receiving_account.ifsc
     json.amount precision_value payment.amount_value
+    json.payment_amount payment.amount_value
     json.net_amount precision_value payment.amount_value
     json.invoice_amount precision_value payment.invoice_amount
     json.status payment.payment_status_name

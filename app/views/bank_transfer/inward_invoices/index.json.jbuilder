@@ -61,6 +61,7 @@ json.array!(@result.invoices) do |invoice|
 
     # paid amount for this invoice
     json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
+    json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
     json.raw_amount precision_value invoice&.amount&.value
     # conditionally set the original amount as invoice amount is there are line items

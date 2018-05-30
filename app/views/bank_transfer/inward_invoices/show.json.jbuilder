@@ -62,6 +62,7 @@ json.invoice do
   json.item_amounts_total invoice.item_amounts_total
 
   json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
+  json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
   # invoice items
   json.invoice_items do
