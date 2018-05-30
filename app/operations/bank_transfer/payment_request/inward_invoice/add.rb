@@ -2,12 +2,21 @@
 # for the payment from there
 class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :inward_invoices, :payments, :bank_payment_request
+  attr_accessor :inward_invoices, :payments, :bank_payment_request, :payable_amounts
+
+  def pre_validate
+    if user.blank? || params.blank?
+      add_message :error, "Invalid parameters, try again"
+      return
+    end
+  end
 
   def init
-    ids = params[:invoice_ids]
-    unless ids.is_a?(Array)
-      ids = params[:invoice_ids].split(",")
+    self.payable_amounts = {}
+    ids = []
+    params.each do |param|
+      ids << param[:invoice_id]
+      self.payable_amounts[param[:invoice_id]] = param[:payable_amount]
     end
     self.inward_invoices = user.company.inward_invoices.with_id(ids)
     bank_payment_request_id = params[:id] || params[:bank_payment_request_id]
@@ -26,6 +35,12 @@ class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRe
     end
 
     # todo - add conditions to select how much of the invoice will be paid int his payment
+    self.payable_amounts.each do |invoice_id, payable_amount|
+      invoice = self.inward_invoices.find_by(id: invoice_id)
+      if payable_amount > invoice.remaining_amount&.value.to_f
+        add_message :error, "You cannot pay more than the remaining amount in an invoice"
+      end
+    end
   end
 
   def pre_process
@@ -61,14 +76,15 @@ class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRe
           receiving_account_id: invoice.bank_account&.id,
           payment_status_id: PaymentStatus.id_for(:pending_approval),
           payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
-          payment_mode: self.bank_payment_request.payment_mode, # todo - default is NEFT for now, can be changed to something else later
+          payment_mode: self.bank_payment_request.payment_mode,
           amount_attributes: {
-              value: invoice.balance_due&.value,
+              value: self.payable_amounts[invoice.id],
               currency_id: Currency.first.id
           },
           note: invoice.note,
           category_id: invoice.category_id,
-          date: DateUtils.local_date
+          date: DateUtils.local_date,
+          invoice_id: invoice.id
       }
     end
     self.payments = self.bank_payment_request.payment_order.build(payment_params)
