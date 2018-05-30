@@ -1,0 +1,1 @@
+json.array! @result.vendor_types, :id, :name, :description

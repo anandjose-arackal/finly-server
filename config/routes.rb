@@ -2692,6 +2692,8 @@ Rails.application.routes.draw do
   resources :cost_centers
   resources :tds_slabs
 
+
+
   scope :payments do
     resources :companies do
       post 'add_balance', to: 'companies#add_balance', as: :add_balance_payments
@@ -2748,6 +2750,7 @@ Rails.application.routes.draw do
     resources :account_owners
 
     post 'vendors/import', to: 'vendors#import', as: :import
+    get 'vendors/new_vendor_config', to: 'vendors#new_vendor_config', as: :new_vendor_config
     resources :vendors do
       get 'show_transfers', to: 'vendors#show_transfers'
     end
@@ -2769,6 +2772,8 @@ Rails.application.routes.draw do
     end
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
+
+    resources :vendor_types
   end
 
 
