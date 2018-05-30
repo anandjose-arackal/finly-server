@@ -63,6 +63,7 @@ class Company < ActiveRecord::Base
   has_many :card_upgrade_requests
   has_many :individual_kycs
   has_many :yes_bank_vendors
+  has_many :vendor_types
   has_many :bank_accounts
   has_many :quickbooks_departments
   has_many :report_processor_groups
