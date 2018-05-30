@@ -10,6 +10,7 @@
 #  is_deleted         :boolean          default(FALSE)
 #  created_at         :datetime         not null
 #  updated_at         :datetime         not null
+#  headers            :text(65535)
 #
 
 class WebHook < ActiveRecord::Base
@@ -17,6 +18,8 @@ class WebHook < ActiveRecord::Base
 
   belongs_to :created_by_user, class_name: 'User'
   belongs_to :company
+
+  serialize :headers, Hash
 
   validates :created_by_user_id, presence: true
   # validates :url, presence: true, uniqueness: {scope: :company_id, case_sensitive: false}, format: {:with => Constants::VALID_DOMAIN}

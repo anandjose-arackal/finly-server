@@ -81,7 +81,28 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     payment = options[:payment]
     if payment.completed?
       op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: payment)
+      # trigger the webhook callback for this particular payment's credit confirmation
+      # setting the parameters for the callback method and executing it
+      execute_callback(payment)
     end
+  end
+
+  def execute_callback(payment)
+    post_params = {
+        payment_id: payment.id,
+        payment_amount: payment.amount_value,
+        note: payment.note,
+        status: payment.payment_status&.name,
+        receiving_account: {
+            receiving_account_type: "BankAccount",
+            receiving_account_id: payment.receiving_account&.id,
+            receiving_account_number: payment.receiving_account&.account_number,
+            receiving_account_ifsc: payment.receiving_account&.ifsc
+        }
+    }
+    # this particular type of payment will always have an initiating user because it is a vendor payment / reimbursement payment
+    company = payment.initiating_user&.company
+    op = Webhook::Process.(nil, {company: company, body: post_params, web_hook_event_id: WebHookEvent.id_for('vendor_payments.credit_confirmation')})
   end
 
   private
