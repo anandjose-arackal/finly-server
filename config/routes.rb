@@ -2917,6 +2917,8 @@ Rails.application.routes.draw do
     resources :procurements do
     end
 
+
+
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
 
@@ -2929,6 +2931,11 @@ Rails.application.routes.draw do
     resources :attachments, only: [:create]
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
     resources :inward_invoices
+
+    # Organization Account Settings for procurements
+    namespace :configs do
+      resources :terms
+    end
   end
 
 

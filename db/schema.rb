@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180526162250) do
+ActiveRecord::Schema.define(version: 20180530085726) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3361,7 +3361,10 @@ ActiveRecord::Schema.define(version: 20180526162250) do
     t.text     "description", limit: 65535
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.integer  "company_id",  limit: 4
   end
+
+  add_index "procurement_terms", ["company_id"], name: "index_procurement_terms_on_company_id", using: :btree
 
   create_table "procurement_tracks", force: :cascade do |t|
     t.string   "name",        limit: 255
@@ -4905,6 +4908,7 @@ ActiveRecord::Schema.define(version: 20180526162250) do
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "procurement_charges", "amounts"
+  add_foreign_key "procurement_terms", "companies"
   add_foreign_key "procurements", "companies"
   add_foreign_key "procurements", "procurement_statuses"
   add_foreign_key "procurements", "procurement_tracks"
