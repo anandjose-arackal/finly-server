@@ -12,6 +12,7 @@ json.array! @result.paginated_payments.each do |payment|
   json.account_number payment.receiving_account.account_number
   json.ifsc payment.receiving_account.ifsc
   json.net_amount precision_value payment.amount_value
+  json.payable_amount payment.amount_value
   json.invoice_amount precision_value payment.invoice_amount
   json.status payment.payment_status_name
   json.id payment.id
