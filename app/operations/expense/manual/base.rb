@@ -14,6 +14,8 @@ class Expense::Manual::Base < Expense::Base
     receipts = params[:expense][:receipts_attributes] if params[:expense].present?
     p = params.require(:expense).permit(:expense_type_id, :expense_status_id, :note, :receipt,
                                         :receipt_id, :report_id, :category_id, :date, :reimbursable, :from_cash_on_hand,
+                                        :expense_tax_type_id, :gst_percentage, :tds_percentage,
+                                        reimbursable_amount_attributes: [:value, :currency_id],
                                         amount_attributes: [:value, :currency_id],
                                         manual_expense_attributes: [:merchant],
                                         receipts_attributes: [:image, :user_id, :id],
