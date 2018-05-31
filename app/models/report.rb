@@ -211,6 +211,12 @@ class Report < ActiveRecord::Base
     report_ids = configs.map { |item| item.parent&.id }
     with_id(report_ids)
   end
+
+  scope :filter_category, -> (category_id) {
+    ids = self.pluck(:id)
+    report_ids = Expense.with_report_id(ids).where(category_id: category_id).pluck(:report_id)
+    where(id: report_ids)
+  }
   delegate :status_name, to: :status
 
   delegate :submitted_amount_value, to: :submitted_amount

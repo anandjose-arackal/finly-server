@@ -2,11 +2,12 @@ class User::AvailableExpenseTypes::Show < User::Base
 
   attr_accessor :distance_config, :time_config, :per_diem_config,
                 :policy, :report, :company, :custom_fields_config,
-                :cash_on_hand
+                :cash_on_hand, :em_tax_tracking, :tds_slabs
 
   class User::AvailableExpenseTypes::Show::ExpenseTypesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :custom_fields_config, :currencies, :cash_on_hand
+    attr_accessor :distance_config, :time_config, :per_diem_config, :categories, :custom_fields_config, :currencies, :cash_on_hand,
+                  :em_tax_tracking, :tds_slabs
 
     def init
       self.distance_config = params[:distance_config]
@@ -16,6 +17,8 @@ class User::AvailableExpenseTypes::Show < User::Base
       self.custom_fields_config = params[:custom_fields_config]
       self.cash_on_hand = params[:cash_on_hand]
       self.currencies = Currency.all
+      self.em_tax_tracking = params[:em_tax_tracking]
+      self.tds_slabs = params[:tds_slabs]
     end
 
   end
@@ -35,6 +38,11 @@ class User::AvailableExpenseTypes::Show < User::Base
     self.report = user.reports.find_by(id: params[:report_id])
     self.policy = report.policy if report.present?
     self.cash_on_hand = AccountManager::CashOnHand::CashOnHandAdapter.new(self.user.cash_on_hand).balance(display_balance: true)
+    self.em_tax_tracking = user.company.feature_subscription.em_tax_tracking
+    if self.em_tax_tracking
+      op_tds_slabs_index = TdsSlabs::Index.(user, params)
+      self.tds_slabs = op_tds_slabs_index.tds_slabs
+    end
   end
 
   def validate
@@ -120,6 +128,8 @@ class User::AvailableExpenseTypes::Show < User::Base
     params[:custom_fields_config] = self.custom_fields_config
     params[:categories] = self.user.company.categories.active
     params[:cash_on_hand] = self.cash_on_hand
+    params[:em_tax_tracking] = self.em_tax_tracking
+    params[:tds_slabs] = self.tds_slabs
     User::AvailableExpenseTypes::Show::ExpenseTypesPresenter.new(user, params, messages)
   end
 end

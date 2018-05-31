@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180530113831) do
+ActiveRecord::Schema.define(version: 20180531073134) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1908,6 +1908,7 @@ ActiveRecord::Schema.define(version: 20180530113831) do
     t.boolean  "invoicing_system",                       default: false
     t.boolean  "travel_request",                         default: false
     t.boolean  "budgeting_system",                       default: false
+    t.boolean  "em_tax_tracking",                        default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree

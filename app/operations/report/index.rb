@@ -82,6 +82,7 @@ class Report::Index < Report::Base
     has_scope :filter_approved_date, using: [:from, :to], type: :hash
     has_scope :filter_policy
     has_scope :filter_custom_drop_down_selection, type: :array
+    has_scope :filter_category
 
     def init
       ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)
