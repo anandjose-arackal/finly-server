@@ -2764,6 +2764,7 @@ Rails.application.routes.draw do
     resources :account_owners
 
     post 'vendors/import', to: 'vendors#import', as: :import
+    get 'vendors/new_vendor_config', to: 'vendors#new_vendor_config', as: :new_vendor_config
     resources :vendors do
       get 'show_transfers', to: 'vendors#show_transfers'
       get 'bank_accounts', to: 'vendors#bank_accounts'
@@ -2791,6 +2792,8 @@ Rails.application.routes.draw do
       post 'create_payment', to: 'inward_invoices#create_payment', as: :create_payment
       get 'show_payments', to: 'inward_invoices#show_payments', as: :show_payments
     end
+
+    resources :vendor_types
   end
 
 

@@ -107,6 +107,10 @@ class Category < ActiveRecord::Base
     where('name like ?', "%#{term}%")
   }
 
+  def gl_name
+    gl_code || name
+  end
+
   private
 
   # def at_least_one_application

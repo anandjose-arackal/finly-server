@@ -3,7 +3,9 @@ json.array!(@result.paginated_account_owners) do |account_owner|
 
   if account_owner.is_a?(YesBankVendor)
     json.description account_owner.description
+    json.beneficiary_type 2
     json.created_by account_owner.created_by&.name
+    json.vendor_type_name account_owner.vendor_type&.name
   end
 
   json.bank_accounts do
