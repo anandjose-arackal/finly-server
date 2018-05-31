@@ -276,6 +276,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
                   currency_id: 1
               },
               roundoff_amount: order_details[:roundoff_amount],
+              invoice_status_id: InwardInvoiceStatus.id_for(:unpaid),
               invoice_items_attributes: invoice_items_attributes
           }
       }

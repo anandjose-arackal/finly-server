@@ -183,7 +183,10 @@ class Invoice < ActiveRecord::Base
   private
 
   def set_defaults
-
+    if self.invoice_status.blank?
+      self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
+      self.update_invoice_status
+    end
   end
 
 end
