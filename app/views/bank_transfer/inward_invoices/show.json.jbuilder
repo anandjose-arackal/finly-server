@@ -1,6 +1,11 @@
 invoice = @result.invoice
-# conditionally set the original amount as invoice amount is there are line items
+
+json.actions do
+  json.editable invoice.unpaid?
+end
+
 json.invoice do
+  # conditionally set the original amount as invoice amount is there are line items
   json.id invoice.id
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
