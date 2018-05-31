@@ -481,6 +481,8 @@
 #                   admin_users_card_assign_requests_edit GET    /admin_users/card_assign_requests/edit(.:format)                                             admin_users/card_assign_requests#edit
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                    admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                       admin_users/users#admin_menus
+#                           api_successful_vendor_payment POST   /api/callbacks/successful_vendor_payment(.:format)                                           api/callbacks#successful_vendor_payment
+#                            api_invoice_payment_received POST   /api/callbacks/invoice_payment_received(.:format)                                            api/callbacks#invoice_payment_received
 #                                                         GET    /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#show
 #                                        virtual_accounts POST   /virtual_accounts(.:format)                                                                  api/fc/invoices/virtual_bank_accounts#create
 #                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#update
@@ -2214,6 +2216,12 @@ Rails.application.routes.draw do
 
   ######### ADMIN PANEL END ###########
 
+  ################### API Callbacks tester ######################
+
+  namespace :api do
+    post 'callbacks/successful_vendor_payment', to: 'callbacks#successful_vendor_payment', as: :successful_vendor_payment
+    post 'callbacks/invoice_payment_received', to: 'callbacks#invoice_payment_received', as: :invoice_payment_received
+end
 
   ############# Virtual Bank Accounts and Collect API Start ######################
 
