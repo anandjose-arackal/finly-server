@@ -163,6 +163,21 @@ class Invoice < ActiveRecord::Base
     nil
   end
 
+  # this method updates the invoice status based on the associated
+  # payments made against this particular invoice
+  def update_invoice_status
+    balance_due = self.balance_due&.value.to_f
+    paid_amount = self.payments.successful.joins(:amount).sum(:value)
+
+    if paid_amount == 0
+      self.update(invoice_status_id: InwardInvoiceStatus.id_for(:unpaid))
+    elsif paid_amount >= balance_due
+      self.update(invoice_status_id: InwardInvoiceStatus.id_for(:paid))
+    elsif paid_amount <= balance_due
+      self.update(invoice_status_id: InwardInvoiceStatus.id_for(:partially_paid))
+    end
+  end
+
   private
 
   def set_defaults

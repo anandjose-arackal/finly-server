@@ -1109,6 +1109,7 @@
 #                                                         PUT    /bank_transfer/account_owners/:id(.:format)                                                  bank_transfer/account_owners#update
 #                                                         DELETE /bank_transfer/account_owners/:id(.:format)                                                  bank_transfer/account_owners#destroy
 #                                    bank_transfer_import POST   /bank_transfer/vendors/import(.:format)                                                      bank_transfer/vendors#import
+#                         bank_transfer_new_vendor_config GET    /bank_transfer/vendors/new_vendor_config(.:format)                                           bank_transfer/vendors#new_vendor_config
 #                     bank_transfer_vendor_show_transfers GET    /bank_transfer/vendors/:vendor_id/show_transfers(.:format)                                   bank_transfer/vendors#show_transfers
 #                      bank_transfer_vendor_bank_accounts GET    /bank_transfer/vendors/:vendor_id/bank_accounts(.:format)                                    bank_transfer/vendors#bank_accounts
 #                                   bank_transfer_vendors GET    /bank_transfer/vendors(.:format)                                                             bank_transfer/vendors#index
@@ -1162,6 +1163,14 @@
 #                                                         PATCH  /bank_transfer/inward_invoices/:id(.:format)                                                 bank_transfer/inward_invoices#update
 #                                                         PUT    /bank_transfer/inward_invoices/:id(.:format)                                                 bank_transfer/inward_invoices#update
 #                                                         DELETE /bank_transfer/inward_invoices/:id(.:format)                                                 bank_transfer/inward_invoices#destroy
+#                              bank_transfer_vendor_types GET    /bank_transfer/vendor_types(.:format)                                                        bank_transfer/vendor_types#index
+#                                                         POST   /bank_transfer/vendor_types(.:format)                                                        bank_transfer/vendor_types#create
+#                           new_bank_transfer_vendor_type GET    /bank_transfer/vendor_types/new(.:format)                                                    bank_transfer/vendor_types#new
+#                          edit_bank_transfer_vendor_type GET    /bank_transfer/vendor_types/:id/edit(.:format)                                               bank_transfer/vendor_types#edit
+#                               bank_transfer_vendor_type GET    /bank_transfer/vendor_types/:id(.:format)                                                    bank_transfer/vendor_types#show
+#                                                         PATCH  /bank_transfer/vendor_types/:id(.:format)                                                    bank_transfer/vendor_types#update
+#                                                         PUT    /bank_transfer/vendor_types/:id(.:format)                                                    bank_transfer/vendor_types#update
+#                                                         DELETE /bank_transfer/vendor_types/:id(.:format)                                                    bank_transfer/vendor_types#destroy
 #                                     public_bank_account GET    /account/:account_number(.:format)                                                           invoicing/public_links#virtual_bank_account_show
 #                                          public_invoice GET    /invoice/:invoice_id(.:format)                                                               invoicing/public_links#invoice_show
 #                                               addresses GET    /addresses(.:format)                                                                         addresses#index

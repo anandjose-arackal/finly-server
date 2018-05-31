@@ -34,7 +34,7 @@ class BankTransaction < ActiveRecord::Base
   validates :transfer_status_id, presence: true
   validates :amount, presence: true
   validates :company, presence: true
-  validates :transfer_type, presence: true, unless: :outside_finly?
+  validates :transfer_type, presence: true
 
   accepts_nested_attributes_for :amount
 
@@ -53,8 +53,8 @@ class BankTransaction < ActiveRecord::Base
     [BankTransferStatus.id_for(:completed), BankTransferStatus.id_for(:processing)].include?(self.transfer_status_id)
   end
 
-  def outside_finly?
-    self.outside_finly
-  end
+  # def outside_finly?
+  #   self.outside_finly
+  # end
 
 end

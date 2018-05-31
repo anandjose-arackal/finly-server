@@ -81,6 +81,10 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     payment = options[:payment]
     if payment.completed?
       op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: payment)
+      # if the payment happens to also have an invoice, update the invoice status accordingly
+      if payment.invoice.present?
+        payment.invoice.update_invoice_status
+      end
     end
   end
 

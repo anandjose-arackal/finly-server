@@ -4495,6 +4495,16 @@ ActiveRecord::Schema.define(version: 20180530160642) do
   add_index "vendor_payment_wallets", ["balance_id"], name: "index_vendor_payment_wallets_on_balance_id", using: :btree
   add_index "vendor_payment_wallets", ["user_id"], name: "index_vendor_payment_wallets_on_user_id", using: :btree
 
+  create_table "vendor_types", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.text     "description", limit: 65535
+    t.integer  "company_id",  limit: 4
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  add_index "vendor_types", ["company_id"], name: "index_vendor_types_on_company_id", using: :btree
+
   create_table "version_associations", force: :cascade do |t|
     t.integer "version_id",       limit: 4
     t.string  "foreign_key_name", limit: 255, null: false
@@ -4699,9 +4709,11 @@ ActiveRecord::Schema.define(version: 20180530160642) do
     t.string   "state",          limit: 255
     t.integer  "state_code_id",  limit: 4
     t.integer  "created_by_id",  limit: 4
+    t.integer  "vendor_type_id", limit: 4
   end
 
   add_index "yes_bank_vendors", ["company_id"], name: "index_yes_bank_vendors_on_company_id", using: :btree
+  add_index "yes_bank_vendors", ["vendor_type_id"], name: "index_yes_bank_vendors_on_vendor_type_id", using: :btree
 
   add_foreign_key "addresses", "states"
   add_foreign_key "admin_review_workflow_levels", "admin_review_workflows"
@@ -4976,6 +4988,7 @@ ActiveRecord::Schema.define(version: 20180530160642) do
   add_foreign_key "vendor_account_transactions", "payments"
   add_foreign_key "vendor_account_transactions", "vendor_accounts"
   add_foreign_key "vendor_payment_wallets", "users"
+  add_foreign_key "vendor_types", "companies"
   add_foreign_key "web_hook_event_mappings", "web_hook_events"
   add_foreign_key "web_hook_event_mappings", "web_hooks"
   add_foreign_key "web_hook_tracks", "companies"
@@ -4984,4 +4997,5 @@ ActiveRecord::Schema.define(version: 20180530160642) do
   add_foreign_key "whitelisted_ips", "companies"
   add_foreign_key "yes_bank_company_accounts", "companies"
   add_foreign_key "yes_bank_vendors", "companies"
+  add_foreign_key "yes_bank_vendors", "vendor_types"
 end
