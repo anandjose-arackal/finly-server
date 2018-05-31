@@ -44,6 +44,8 @@ class Expense < ActiveRecord::Base
   belongs_to :report
   belongs_to :rejecting_manager, class_name: 'User'
   belongs_to :surcharge, class_name: 'Amount'
+  belongs_to :reimbursable_amount, class_name: 'Amount'
+  belongs_to :expense_tax_type
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy

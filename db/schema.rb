@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180531112817) do
+ActiveRecord::Schema.define(version: 20180531175008) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1820,6 +1820,14 @@ ActiveRecord::Schema.define(version: 20180531112817) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "expense_tax_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "expense_tax_types", ["name"], name: "index_expense_tax_types_on_name", using: :btree
+
   create_table "expense_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -1833,26 +1841,31 @@ ActiveRecord::Schema.define(version: 20180531112817) do
     t.date     "date"
     t.integer  "user_id",                limit: 4
     t.integer  "expense_type_id",        limit: 4
-    t.datetime "created_at",                                           null: false
-    t.datetime "updated_at",                                           null: false
+    t.datetime "created_at",                                                          null: false
+    t.datetime "updated_at",                                                          null: false
     t.text     "manager_memo",           limit: 65535
     t.integer  "rejecting_manager_id",   limit: 4
     t.integer  "report_id",              limit: 4
     t.integer  "category_id",            limit: 4
-    t.boolean  "is_deleted",                           default: false, null: false
-    t.boolean  "transcribed",                          default: false
-    t.boolean  "personal",                             default: false
+    t.boolean  "is_deleted",                                          default: false, null: false
+    t.boolean  "transcribed",                                         default: false
+    t.boolean  "personal",                                            default: false
     t.boolean  "reimbursable"
-    t.boolean  "synced_with_quickbooks",               default: false
+    t.boolean  "synced_with_quickbooks",                              default: false
     t.string   "split_link",             limit: 255
-    t.boolean  "deleted_to_split",                     default: false
-    t.boolean  "from_cash_on_hand",                    default: false
+    t.boolean  "deleted_to_split",                                    default: false
+    t.boolean  "from_cash_on_hand",                                   default: false
     t.boolean  "cash_on_hand_blocked"
+    t.integer  "expense_tax_type_id",    limit: 4
+    t.decimal  "gst_percentage",                       precision: 10
+    t.decimal  "tds_percentage",                       precision: 10
+    t.integer  "reimbursable_amount_id", limit: 4
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
   add_index "expenses", ["category_id"], name: "index_expenses_on_category_id", using: :btree
   add_index "expenses", ["expense_status_id"], name: "index_expenses_on_expense_status_id", using: :btree
+  add_index "expenses", ["expense_tax_type_id"], name: "index_expenses_on_expense_tax_type_id", using: :btree
   add_index "expenses", ["expense_type_id"], name: "index_expenses_on_expense_type_id", using: :btree
   add_index "expenses", ["report_id"], name: "index_expenses_on_report_id", using: :btree
   add_index "expenses", ["user_id"], name: "index_expenses_on_user_id", using: :btree
@@ -1897,6 +1910,7 @@ ActiveRecord::Schema.define(version: 20180531112817) do
     t.boolean  "invoicing_system",                       default: false
     t.boolean  "travel_request",                         default: false
     t.boolean  "budgeting_system",                       default: false
+    t.boolean  "em_tax_tracking",                        default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -4583,6 +4597,7 @@ ActiveRecord::Schema.define(version: 20180531112817) do
   add_foreign_key "expenses", "amounts"
   add_foreign_key "expenses", "categories"
   add_foreign_key "expenses", "expense_statuses"
+  add_foreign_key "expenses", "expense_tax_types"
   add_foreign_key "expenses", "expense_types"
   add_foreign_key "expenses", "reports"
   add_foreign_key "expenses", "users"
