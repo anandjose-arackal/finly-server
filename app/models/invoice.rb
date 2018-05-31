@@ -106,6 +106,8 @@ class Invoice < ActiveRecord::Base
   delegate :gross_amount_value, to: :gross_amount
   delegate :paid_amount, to: :paid_amount
 
+  delegate :unpaid?, :partially_paid?, :paid?, to: :invoice_status
+
 
   # validates :gross_amount, presence: true
   # validates :net_amount, presence: true

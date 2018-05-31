@@ -14,4 +14,17 @@ class InwardInvoiceStatus < ActiveRecord::Base
   def self.values
     [:unpaid, :partially_paid, :paid]
   end
+
+  def unpaid?
+    self.id == InwardInvoiceStatus.id_for(:unpaid)
+  end
+
+  def partially_paid?
+    self.id == InwardInvoiceStatus.id_for(:partially_paid)
+  end
+
+  def paid?
+    self.id == InwardInvoiceStatus.id_for(:paid)
+  end
+
 end
