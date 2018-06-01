@@ -2,6 +2,7 @@ invoice = @result.invoice
 
 json.actions do
   json.editable invoice.unpaid?
+  json.destroyable invoice.unpaid?
 end
 
 json.invoice do
