@@ -12,6 +12,7 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     def init
       self.invoices = params[:invoices]
+      self.invoices = apply_scopes(self.invoices, params)
       self.paginated_invoices = self.invoices.paginate(page: params[:page], per_page: (params[:per_page] || 30))
     end
   end
