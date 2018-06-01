@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180530160642) do
+ActiveRecord::Schema.define(version: 20180601064854) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2305,9 +2305,6 @@ ActiveRecord::Schema.define(version: 20180530160642) do
     t.integer  "gst_type_id",            limit: 4
     t.integer  "payment_id",             limit: 4
     t.integer  "discount_amount_id",     limit: 4
-    t.integer  "sgst_amount_id",         limit: 4
-    t.integer  "csgt_amount_id",         limit: 4
-    t.integer  "igst_amount_id",         limit: 4
     t.integer  "tds_amount_id",          limit: 4
     t.integer  "tax_amount_id",          limit: 4
     t.decimal  "tax",                                  precision: 64, scale: 12

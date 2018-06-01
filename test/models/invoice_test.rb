@@ -21,9 +21,6 @@
 #  gst_type_id            :integer
 #  payment_id             :integer
 #  discount_amount_id     :integer
-#  sgst_amount_id         :integer
-#  csgt_amount_id         :integer
-#  igst_amount_id         :integer
 #  tds_amount_id          :integer
 #  tax_amount_id          :integer
 #  tax                    :decimal(64, 12)
