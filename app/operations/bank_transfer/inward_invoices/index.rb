@@ -7,6 +7,8 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
     attr_accessor :invoices, :paginated_invoices
 
     has_scope :filter_payable_invoices
+    has_scope :invoice_date, using: [:from, :to], type: :hash
+    has_scope :due_date, using: [:from, :to], type: :hash
 
     def init
       self.invoices = params[:invoices]

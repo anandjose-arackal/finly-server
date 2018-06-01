@@ -1153,6 +1153,7 @@
 #                                                         DELETE /bank_transfer/users/:id(.:format)                                                           bank_transfer/users#destroy
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                               bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                         bank_transfer/vendor_payment_wallets#transfer_options
+#                             bank_transfer_invoice_count GET    /bank_transfer/inward_invoices/count(.:format)                                               bank_transfer/inward_invoices#count
 #             bank_transfer_inward_invoice_create_payment POST   /bank_transfer/inward_invoices/:inward_invoice_id/create_payment(.:format)                   bank_transfer/inward_invoices#create_payment
 #              bank_transfer_inward_invoice_show_payments GET    /bank_transfer/inward_invoices/:inward_invoice_id/show_payments(.:format)                    bank_transfer/inward_invoices#show_payments
 #                           bank_transfer_inward_invoices GET    /bank_transfer/inward_invoices(.:format)                                                     bank_transfer/inward_invoices#index
@@ -2797,6 +2798,7 @@ Rails.application.routes.draw do
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
 
+    get 'inward_invoices/count', to: "inward_invoices#count", as: :invoice_count
     resources :inward_invoices do
       post 'create_payment', to: 'inward_invoices#create_payment', as: :create_payment
       get 'show_payments', to: 'inward_invoices#show_payments', as: :show_payments

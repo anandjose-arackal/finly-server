@@ -121,6 +121,14 @@ class Invoice < ActiveRecord::Base
     end
   }
 
+  scope :invoice_date, -> (from, to) {
+    where('date >= ? && date <= ?', Date.parse(from), Date.parse(to))
+  }
+
+  scope :due_date, -> (from, to) {
+    where('due_date >= ? && due_date <= ?', Date.parse(from), Date.parse(to))
+  }
+
   scope :created_at_desc, -> { order(created_at: :desc) }
   scope :created_at_asc, -> { order(created_at: :asc) }
 
