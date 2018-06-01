@@ -2,19 +2,25 @@
 # for the payment from there
 class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRequest::Base
 
-  attr_accessor :inward_invoices, :payments, :bank_payment_request, :payable_amounts
+  attr_accessor :inward_invoices, :payments, :bank_payment_request, :payable_amounts,
+                :invoices_params
 
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters, try again"
       return
     end
+
+    if params[:invoices].blank?
+      add_message :error, "Invoices params not present"
+    end
   end
 
   def init
     self.payable_amounts = {}
     ids = []
-    params.each do |param|
+    self.invoices_params = params[:invoices]
+    self.invoices_params.each do |param|
       ids << param[:invoice_id]
       self.payable_amounts[param[:invoice_id]] = param[:payable_amount]
     end

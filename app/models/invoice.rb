@@ -115,6 +115,11 @@ class Invoice < ActiveRecord::Base
     where invoice_status_id: status_id
   }
 
+  scope :filter_payable_invoices, -> (enabled) {
+    if StringUtils.to_bool(enabled)
+      where(invoice_status_id: InwardInvoiceStatus.ids_for[:unpaid, :partially_paid])
+    end
+  }
 
   after_create :set_defaults
 

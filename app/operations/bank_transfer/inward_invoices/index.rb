@@ -6,6 +6,8 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
     attr_accessor :invoices
 
+    has_scope :filter_payable_invoices
+
     def init
       self.invoices = params[:invoices]
     end
