@@ -122,10 +122,14 @@ class Invoice < ActiveRecord::Base
   }
 
   scope :invoice_date, -> (from, to) {
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.today if to.blank?
     where('date >= ? && date <= ?', Date.parse(from), Date.parse(to))
   }
 
   scope :due_date, -> (from, to) {
+    from = Date.parse('01-01-1990') if from.blank?
+    to = Date.today if to.blank?
     where('due_date >= ? && due_date <= ?', Date.parse(from), Date.parse(to))
   }
 
