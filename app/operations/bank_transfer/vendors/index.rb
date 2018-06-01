@@ -16,7 +16,7 @@ class BankTransfer::Vendors::Index < BankTransfer::Vendors::Base
   end
 
   def init
-    self.vendors = user.company.yes_bank_vendors
+    self.vendors = user.company.yes_bank_vendors.includes_bank_accounts
   end
 
   def success

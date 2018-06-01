@@ -4,19 +4,20 @@ class BankTransfer::InwardInvoices::Index < BankTransfer::InwardInvoices::Base
 
   class BankTransfer::InwardInvoices::Index::InwardInvoicesPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
-    attr_accessor :invoices
+    attr_accessor :invoices, :paginated_invoices
 
     has_scope :filter_payable_invoices
 
     def init
       self.invoices = params[:invoices]
+      self.paginated_invoices = self.invoices.paginate(page: params[:page], per_page: (params[:per_page] || 30))
     end
   end
 
   attr_accessor :invoices
 
   def init
-    self.invoices = user.company.inward_invoices
+    self.invoices = user.company.inward_invoices.created_at_asc
   end
 
   def success

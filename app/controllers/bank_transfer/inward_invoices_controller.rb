@@ -37,4 +37,9 @@ class BankTransfer::InwardInvoicesController < ApplicationController
     respond
   end
 
+  def count
+    @result = BankTransfer::InwardInvoices::Count.(current_user, params)
+    render json: @result.as_json
+  end
+
 end

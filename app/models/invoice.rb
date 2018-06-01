@@ -121,6 +121,9 @@ class Invoice < ActiveRecord::Base
     end
   }
 
+  scope :created_at_desc, -> { order(created_at: :desc) }
+  scope :created_at_asc, -> { order(created_at: :asc) }
+
   after_create :set_defaults
 
   def policy

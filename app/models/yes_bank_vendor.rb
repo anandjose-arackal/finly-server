@@ -51,8 +51,12 @@ class YesBankVendor < ActiveRecord::Base
 
   scope :filter_name_search, -> (term) {
     ids = self.pluck(:id)
-    vendor_ids = where(id: ids).where("name like ? OR email like ? OR mobile_number like ? OR description like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
+    vendor_ids = where(id: ids).where("yes_bank_vendors.name like ? OR yes_bank_vendors.email like ? OR yes_bank_vendors.mobile_number like ? OR yes_bank_vendors.description like ?", "%#{term}%", "%#{term}%", "%#{term}%", "%#{term}%").pluck(:id)
     where(id: vendor_ids)
+  }
+
+  scope :includes_bank_accounts, -> {
+    includes(:bank_accounts)
   }
 
   def as_json(options={})

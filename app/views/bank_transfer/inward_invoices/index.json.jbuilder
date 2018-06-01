@@ -1,4 +1,4 @@
-json.array!(@result.invoices) do |invoice|
+json.array!(@result.paginated_invoices) do |invoice|
   json.id invoice.id
   json.invoice do
     json.id invoice.id
