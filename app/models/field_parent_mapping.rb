@@ -5,6 +5,6 @@ class FieldParentMapping < ActiveRecord::Base
   scope :pluck_field_parent_type_id, -> { pluck :field_parent_type_id }
 
   validates :field_parent_type_id, presence: true
-  validates :field_configuration_id, presence: true
+  # validates :field_configuration, presence: true
 
 end
