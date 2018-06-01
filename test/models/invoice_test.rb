@@ -48,6 +48,7 @@
 #  receiving_account_id   :integer
 #  receiving_account_type :integer
 #  note                   :text(65535)
+#  procurement_id         :integer
 #
 
 require 'test_helper'

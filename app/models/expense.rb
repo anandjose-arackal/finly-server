@@ -24,7 +24,12 @@
 #  deleted_to_split       :boolean          default(FALSE)
 #  from_cash_on_hand      :boolean          default(FALSE)
 #  cash_on_hand_blocked   :boolean
+#  expense_tax_type_id    :integer
+#  gst_percentage         :decimal(10, )
+#  tds_percentage         :decimal(10, )
+#  reimbursable_amount_id :integer
 #
+
 
 
 
@@ -71,6 +76,7 @@ class Expense < ActiveRecord::Base
   accepts_nested_attributes_for :time_expense
   accepts_nested_attributes_for :per_diem_expense
   accepts_nested_attributes_for :receipt_email
+  accepts_nested_attributes_for :reimbursable_amount
 
 
   # delegating to associated classes the dependent attribute calls
@@ -413,6 +419,10 @@ class Expense < ActiveRecord::Base
       else
         return nil
     end
+  end
+
+  def reimbursable_amount_value
+    precision_value self.reimbursable_amount&.value
   end
 
 

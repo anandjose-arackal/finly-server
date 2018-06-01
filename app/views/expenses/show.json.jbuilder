@@ -1,5 +1,6 @@
 json.extract! @result.expense, :id, :note, :merchant_name, :user_id, :user_name, :category_name, :category_id, :expense_type_id,
-                                    :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks
+                                    :transcribed, :reimbursable, :report_status, :split_link, :from_cash_on_hand, :synced_with_quickbooks,
+                                    :expense_tax_type_id, :gst_type_id, :gst_percentage, :tds_slab_id
 
 if @result.expense.category.parent.present?
   json.parent_category_name @result.expense.category.parent.name
@@ -39,6 +40,9 @@ json.formatted_date @result.expense.date.strftime("%Y-%m-%d")
 
 json.amount do
   json.partial! 'shared/amount', amount: @result.expense.original_amount
+end
+json.reimbursable_amount do
+  json.partial! 'shared/amount', amount: @result.expense&.reimbursable_amount
 end
 
 json.converted_amount do
