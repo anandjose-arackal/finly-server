@@ -1,21 +1,22 @@
 class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
 
-  attr_accessor :payment_order, :options, :retry_attempt
+  attr_accessor :crediting_payments, :options, :retry_attempt, :payment_order
 
-  def self.call(payment_order, options = {})
+  def self.call(payment_order, crediting_payment_ids, options = {})
     payment_order_id = payment_order
     if payment_order_id.present? and payment_order_id.is_a?(PaymentOrder)
       payment_order_id = payment_order_id.id
     end
-    self.new.perform(payment_order_id, options)
+    self.new.perform(payment_order_id, crediting_payment_ids, options)
   end
 
-  def perform(payment_order_id, options, request_store_hash=nil)
+  def perform(payment_order_id, crediting_payment_ids, options, request_store_hash=nil)
     load_request_store request_store_hash
     if options.present? and options.is_a?(Hash)
       options = options.with_indifferent_access
     end
     self.payment_order = PaymentOrder.unscoped.find_by_id(payment_order_id)
+    self.crediting_payments = self.payment_order.payments.with_id(crediting_payment_ids)
     self.options = options
     self.run
   end
@@ -36,17 +37,19 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
   end
 
   def pre_validate
-    if self.payment_order.blank?
-      add_message :error, 'Payment Order not found'
+    if self.crediting_payments.empty?
+      add_message :error, 'No payments to process'
       return
     end
-    if payment_order.completed?
-      add_message :error, "This Payment order has already been processed"
-      return
-    end
+
+    # ideally all payments that are reaching this state should be processible
+    # the check for that happens before the payment reaches this state
+
   end
 
   def pre_process
+    # in progress because technically even though only some payments are being processed in this order,
+    # the order is still in progress
     payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:in_progress))
   end
 
@@ -64,11 +67,10 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
 
     # now scope the payments to just the failed ones if it's a retry, otherwise, execute normally
     if self.retry_attempt
-      payments = self.payment_order.payments.failed
-    else
-      payments = self.payment_order.payments
+      self.crediting_payments = self.crediting_payments.failed
     end
-    payments.each do |payment|
+
+    self.crediting_payments.each do |payment|
       op = AccountManager::Payments::PaymentExecutor.(payment, options)
       if op.success? && ([PaymentStatus.id_for(:completed)].include?(payment.payment_status_id))
         processed_amount += payment.amount_value
@@ -99,7 +101,12 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
       if processing_transactions
         payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
       else
-        payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+        # here check if all the payments have been processed, if they are, mark as completed, otherwise mark as partially credited
+        if self.crediting_payments.count == self.payment_order.payments.count
+          payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:completed))
+        else
+          payment_order.update(payment_order_status_id: PaymentOrderStatus.id_for(:partially_completed))
+        end
       end
       add_message :success, 'Funds transferred successfully'
     else
