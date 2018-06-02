@@ -42,7 +42,7 @@ class AccountManager::Payments::BulkPaymentExecutor < AccountManager::Base
       return
     end
 
-    # ideally all payments that are reaching this state should be processible
+    # ideally all payments that are reaching this state should be processable
     # the check for that happens before the payment reaches this state
 
   end

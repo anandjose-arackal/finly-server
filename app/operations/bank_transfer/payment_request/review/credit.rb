@@ -5,7 +5,7 @@
 class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentRequest::Review::Base
 
   attr_accessor :initiating_account, :initiating_account_adapter, :view_role,
-                :crediting_payments
+                :crediting_payments, :bank_transfer_type
 
   def personalizer
     {
@@ -34,9 +34,15 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     self.view_role = UserRole.id_for(params[:view].to_sym)
     payment_ids = params[:payment_ids]
     self.crediting_payments = self.bank_payment_request.payments.with_id(payment_ids)
+    self.bank_transfer_type = self.bank_payment_request&.payment_order&.bank_transfer_type
   end
 
   def validate
+    if self.bank_payment_request.blank?
+      add_message :error, "Payment order not found"
+      return
+    end
+
     # check whether the respective account has enough balance for this transaction
     requested_amount = self.crediting_payments.joins_amount.sum(:value)
     if requested_amount > initiating_account_adapter.balance
@@ -56,12 +62,16 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
       next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_order.payment_mode)
       self.crediting_payments.update(scheduled_at: next_date)
     end
+
+    # if the payment order is being credited, we have to mark it as approved as well first
+
   end
 
 
   def process
     # now pass these payments to the PaymentProcessor operation so that it can process the credit for all of them
-    op = BankTransfer::YesBank::Create.(user, bank_payment_request: bank_payment_request)
+    # op = BankTransfer::YesBank::Create.(user, bank_payment_request: bank_payment_request)
+    op = AccountManager::Payments::PaymentProcessor.(user, {crediting_payments: self.crediting_payments, bank_transfer_type: self.bank_transfer_type, background: true})
     if op.success?
       # update the bank_payment_request to credited
       bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil,
