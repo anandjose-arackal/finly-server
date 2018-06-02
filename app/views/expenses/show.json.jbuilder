@@ -45,6 +45,12 @@ json.reimbursable_amount do
   json.partial! 'shared/amount', amount: @result.expense&.reimbursable_amount
 end
 
+json.tds_slab do
+  json.id @result.expense.tds_slab&.id
+  json.name @result.expense.tds_slab&.name
+  json.tds @result.expense.tds_slab&.tds
+end
+
 json.converted_amount do
   json.partial! 'shared/amount', amount: @result.expense.base_amount
 end
@@ -141,6 +147,10 @@ json.split_count @result.expense.split_count
 
 # Tax Tracking Configuration
 
+em_tax_tracking = @result.expense.user.company.feature_subscription.em_tax_tracking
 json.config do
-  json.em_tax_tracking @result.expense.user.company.feature_subscription.em_tax_tracking
+  json.em_tax_tracking em_tax_tracking
 end
+
+
+

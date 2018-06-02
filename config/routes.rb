@@ -2375,6 +2375,8 @@ Rails.application.routes.draw do
   post 'expenses/split', to: 'expenses#split_existing'
   post 'expenses/export', to: 'expenses#export'
   delete 'expenses', to: 'expenses#destroy'
+
+  get 'expenses/edit_config', to: 'expenses#expense_edit_config'
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'
     post 'detach_receipt', to: 'expenses#detach_receipt'
