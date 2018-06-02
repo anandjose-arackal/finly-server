@@ -82,6 +82,9 @@ class Expense::Manual::Create < Expense::Manual::Base
     validate_custom_fields
     return if has_errors?
 
+    # Set the reimbursable amount if "reimbursable" flag is set and the tax type has TDS included
+    self.expense.compute_reimbursable_amount
+
     if self.expense.save
       # Attach an existing receipt to the expense
       if self.receipt.present?
@@ -134,7 +137,6 @@ class Expense::Manual::Create < Expense::Manual::Base
   end
 
   protected
-
   def validate_custom_fields
     if self.expense.valid?
       set_fields = set_custom_fields false

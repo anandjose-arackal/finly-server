@@ -74,8 +74,7 @@ class CustomField::Configuration::Create < CustomField::Configuration::Base
   protected
   def config_strong_params
     params.require(:field_configuration).permit(:field_name, :enabled, :field_type_id,
-                                                :mandatory, #:field_parent_type_id,
-                                                :configurable, :configurable_id,
+                                                :mandatory, :configurable, :configurable_id,
                                                 :configurable_type, :global,
                                                 field_parent_mappings_attributes: [:field_parent_type_id],
                                                 drop_down_items_attributes: [:name])

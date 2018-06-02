@@ -164,6 +164,7 @@ class Expense::Manual::Update < Expense::Manual::Base
       end
     end
 
+    expense.compute_reimbursable_amount
 
     if expense.date == DateUtils.local_date
       if expense.report.present? && expense.amount.currency_id != expense.report.base_currency_id
