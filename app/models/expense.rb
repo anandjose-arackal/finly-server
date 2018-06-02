@@ -45,7 +45,7 @@ class Expense < ActiveRecord::Base
   belongs_to :report
   belongs_to :rejecting_manager, class_name: 'User'
   belongs_to :surcharge, class_name: 'Amount'
-  belongs_to :reimbursable_amount, class_name: 'Amount'
+  belongs_to :tds_amount, class_name: 'Amount'
   belongs_to :expense_tax_type
   belongs_to :tds_slab, class_name: 'TdsRatesList'
 
@@ -73,7 +73,7 @@ class Expense < ActiveRecord::Base
   accepts_nested_attributes_for :time_expense
   accepts_nested_attributes_for :per_diem_expense
   accepts_nested_attributes_for :receipt_email
-  accepts_nested_attributes_for :reimbursable_amount
+  accepts_nested_attributes_for :tds_amount
 
 
   # delegating to associated classes the dependent attribute calls
@@ -108,6 +108,7 @@ class Expense < ActiveRecord::Base
         self.expense_status_id = ExpenseStatus.unsubmitted_id
       end
     end
+    compute_tds_amount
   end
 
   default_scope {order('expenses.created_at DESC')}
@@ -356,6 +357,13 @@ class Expense < ActiveRecord::Base
                                        {amount: [:currency]}, :expense_status)}
   scope :includes_amount, -> {includes :amount}
   scope :sum_amounts, -> {includes_amount.sum('amounts.INR')}
+  scope :includes_tds_amount, -> {includes :tds_amount}
+  scope :sum_tds_amounts, -> do
+    amount_ids = pluck(:tds_amount_id)
+    Amount.with_id(amount_ids).sum_INR
+  end
+  scope :sum_reimbursements, -> { reimbursable.sum_amounts - reimbursable.sum_tds_amounts }
+  scope :with_expense_tax_type_id, -> (id){ where expense_tax_type_id: id }
 
 
   scope :user_budget_expenses, -> (from, to) {
@@ -416,10 +424,6 @@ class Expense < ActiveRecord::Base
     else
       return nil
     end
-  end
-
-  def reimbursable_amount_value
-    precision_value self.reimbursable_amount&.value
   end
 
 
@@ -877,33 +881,47 @@ class Expense < ActiveRecord::Base
     self.sub_expense&.incomplete?
   end
 
+  def has_tds?
+    ExpenseTaxType.ids_for(:gst_tds, :tds).include?(expense_tax_type_id)
+  end
+
+  def reimbursable_amount_value
+    return 0 unless reimbursable
+    return amount.value unless has_tds?
+    return amount.value unless tds_amount.present?
+    precision_value(amount.value - tds_amount.value)
+  end
+  alias_method :reimbursable_amount, :reimbursable_amount_value
+
   # Set the reimbursable amount if "reimbursable" flag is set and the tax type has TDS included
-  def compute_reimbursable_amount
-    return unless reimbursable
-    return unless manual_expense?
-    return if expense_tax_type_id.blank?
-    reimbursable_amount_value = nil
-    return unless ExpenseTaxType.ids_for(:gst_tds, :tds).include?(expense_tax_type_id)
+  def compute_tds_amount
+    return unless has_tds?
+
+    tds_amount_value = nil
     tax_amount = 0
-    if self.gst_percentage.present? and self.gst_percentage > 0
-      tax_amount = self.amount.value * self.gst_percentage/100
+    if ExpenseTaxType.id_for(:gst_tds) == expense_tax_type_id and self.gst_percentage.present? and self.gst_percentage > 0
+      tax_amount = self.amount.value * self.gst_percentage / 100
     end
     tds_percentage = self.tds_slab&.tds
     if tds_percentage.present?
-      reimbursable_amount_value = (self.amount.value - tax_amount) * (100 - tds_percentage) / 100
+      tds_amount_value = (self.amount.value - tax_amount) * (tds_percentage) / 100
     end
-    if reimbursable_amount_value.nil?
-      if self.reimbursable_amount.present?
-        self.reimbursable_amount.destroy
+
+    set_tds_amount(tds_amount_value)
+  end
+
+  def set_tds_amount(value)
+    if value.nil?
+      if self.tds_amount.present?
+        self.tds_amount.destroy
       end
     else
-      if self.reimbursable_amount.present?
-        self.reimbursable_amount.value = reimbursable_amount_value
+      if self.tds_amount.present?
+        self.tds_amount.value = value
       else
-        self.build_reimbursable_amount(value: reimbursable_amount_value, currency_id: Currency.id_for(:INR))
+        self.build_tds_amount(value: value, currency_id: Currency.id_for(:INR))
       end
     end
-    debugger
   end
 
   private

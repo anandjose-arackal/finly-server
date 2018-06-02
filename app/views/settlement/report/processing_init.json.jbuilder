@@ -28,7 +28,7 @@ json.details do
           json.mobile_number final_approver&.mobile_number
         end
         json.expenses_total report.total_amount
-        json.reimbursement_total report.total_amount([:reimbursable])
+        json.reimbursement_total report.reimbursable_expenses
       end
     end
     json.bank_accounts detail[:bank_accounts]
