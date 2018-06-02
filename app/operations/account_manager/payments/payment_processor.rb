@@ -6,7 +6,7 @@
 class AccountManager::Payments::PaymentProcessor < AccountManager::Base
 
   attr_accessor :payment_order_params, :payment_order, :payment_request, :company, :company_id, :options,
-                :background
+                :background, :crediting_operations
 
   def pre_validate
     if params&.dig(:payment_request).blank? && params&.dig(:payment_order).blank?

@@ -1,9 +1,11 @@
- # Once approved, this operation will take the payment order and perform a credit for it
+# Once approved, this operation will take the payment order and perform a credit for
+# the payments that are passed int he request
 # the initiating account can be changed at this stage as well
 
 class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentRequest::Review::Base
 
-  attr_accessor :initiating_account, :initiating_account_adapter, :view_role
+  attr_accessor :initiating_account, :initiating_account_adapter, :view_role,
+                :crediting_payments
 
   def personalizer
     {
@@ -30,11 +32,13 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     self.initiating_account = retrieve_initiating_account
     self.initiating_account_adapter = retrieve_initiating_account_adapter
     self.view_role = UserRole.id_for(params[:view].to_sym)
+    payment_ids = params[:payment_ids]
+    self.crediting_payments = self.bank_payment_request.payments.with_id(payment_ids)
   end
 
   def validate
     # check whether the respective account has enough balance for this transaction
-    requested_amount = payment_order.amount_requested.value
+    requested_amount = self.crediting_payments.joins_amount.sum(:value)
     if requested_amount > initiating_account_adapter.balance
       add_message :error, "You do not have enough money in your account for this transaction"
       return
@@ -42,21 +46,21 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   end
 
   def pre_process
-    # updating the initiating account for the payment order and payments
-    payment_order.update(initiating_account_type: initiating_account.class.name)
-    payment_order.payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
+    # updating the initiating account for the payments
+    # payment_order.update(initiating_account_type: initiating_account.class.name) # this probably doesn't make sense here because each individual payment now can be initiated from anywhere
+    self.crediting_payments.update_all(initiating_account_id: initiating_account.id, initiating_account_type: initiating_account.class.name)
 
     # check if the payment order can be executed at this moment, otherwise schedule it for the next working day
     unless TransferTimingUtils.within_timeframe?(payment_order&.payment_mode, payment_order&.scheduled_at)
       # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
       next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_order.payment_mode)
-      payment_order.update(scheduled_at: next_date)
+      self.crediting_payments.update(scheduled_at: next_date)
     end
   end
 
 
   def process
-    # now pass to the Create operation
+    # now pass these payments to the PaymentProcessor operation so that it can process the credit for all of them
     op = BankTransfer::YesBank::Create.(user, bank_payment_request: bank_payment_request)
     if op.success?
       # update the bank_payment_request to credited
