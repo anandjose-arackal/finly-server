@@ -138,3 +138,9 @@ end
 
 json.is_split @result.expense.is_split?
 json.split_count @result.expense.split_count
+
+# Tax Tracking Configuration
+
+json.config do
+  json.em_tax_tracking @result.expense.user.company.feature_subscription.em_tax_tracking
+end
