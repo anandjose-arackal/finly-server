@@ -24,11 +24,13 @@
 #  deleted_to_split       :boolean          default(FALSE)
 #  from_cash_on_hand      :boolean          default(FALSE)
 #  cash_on_hand_blocked   :boolean
+#  expense_tax_type_id    :integer
+#  gst_percentage         :decimal(10, )
+#  tds_percentage         :decimal(10, )
+#  tds_amount_id          :integer
+#  gst_type_id            :integer
+#  tds_slab_id            :integer
 #
-
-
-
-
 
 
 
@@ -44,6 +46,9 @@ class Expense < ActiveRecord::Base
   belongs_to :report
   belongs_to :rejecting_manager, class_name: 'User'
   belongs_to :surcharge, class_name: 'Amount'
+  belongs_to :tds_amount, class_name: 'Amount'
+  belongs_to :expense_tax_type
+  belongs_to :tds_slab, class_name: 'TdsRatesList'
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy
@@ -69,6 +74,7 @@ class Expense < ActiveRecord::Base
   accepts_nested_attributes_for :time_expense
   accepts_nested_attributes_for :per_diem_expense
   accepts_nested_attributes_for :receipt_email
+  accepts_nested_attributes_for :tds_amount
 
 
   # delegating to associated classes the dependent attribute calls
@@ -103,11 +109,12 @@ class Expense < ActiveRecord::Base
         self.expense_status_id = ExpenseStatus.unsubmitted_id
       end
     end
+    compute_tds_amount
   end
 
-  default_scope { order('expenses.created_at DESC') }
+  default_scope {order('expenses.created_at DESC')}
 
-  scope :with_id, -> (ids) { where id: ids }
+  scope :with_id, -> (ids) {where id: ids}
 
   scope :non_personal, -> {
     where(personal: false)
@@ -131,10 +138,10 @@ class Expense < ActiveRecord::Base
     with_id(cancelled_expense_ids)
   }
 
-  scope :reimbursable, -> { where reimbursable: true }
-  scope :non_reimbursable, -> { where reimbursable: false }
+  scope :reimbursable, -> {where reimbursable: true}
+  scope :non_reimbursable, -> {where reimbursable: false}
 
-  scope :quickbooks_non_reimbursable, -> { where reimbursable: [false, nil] }
+  scope :quickbooks_non_reimbursable, -> {where reimbursable: [false, nil]}
 
   scope :filter_expense_cancelled, -> (flag) {
     if flag == '1'
@@ -155,26 +162,26 @@ class Expense < ActiveRecord::Base
 
   scope :filter_field_configuration, ->(config_id) do
     configs = CustomField.with_field_configuration_ids(config_id).includes_parent.expenses
-    expense_ids = configs.map { |item| item.parent&.expense_id }
+    expense_ids = configs.map {|item| item.parent&.expense_id}
     with_id(expense_ids)
   end
 
   scope :filter_custom_drop_down_selection, ->(drop_down_item_id) do
     drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
     configs = CustomField.with_drop_down_selection(drop_down_selection_ids).includes_parent.expenses
-    expense_ids = configs.map { |item| item.parent&.expense_id }
+    expense_ids = configs.map {|item| item.parent&.expense_id}
     with_id(expense_ids)
   end
 
-  scope :with_amount, -> { joins :amount }
-  scope :joins_amount, -> { joins :amount }
-  scope :having_amount_currency, -> (amount, currency_id) { with_amount.where('amounts.value IN (?) AND amounts.currency_id IN (?)', amount, currency_id) }
-  scope :with_report, ->(report_id) { where report_id: report_id }
-  scope :with_report_id, ->(report_id) { where report_id: report_id }
-  scope :with_user, ->(user_id) { where user_id: user_id }
-  scope :with_user_id, ->(user_id) { where user_id: user_id }
-  scope :with_user_or_report, ->(user_id, report_id) { where 'user_id IN (?) OR report_id IN (?)', user_id, report_id }
-  scope :date_before, -> (date) { where 'date < ?', date }
+  scope :with_amount, -> {joins :amount}
+  scope :joins_amount, -> {joins :amount}
+  scope :having_amount_currency, -> (amount, currency_id) {with_amount.where('amounts.value IN (?) AND amounts.currency_id IN (?)', amount, currency_id)}
+  scope :with_report, ->(report_id) {where report_id: report_id}
+  scope :with_report_id, ->(report_id) {where report_id: report_id}
+  scope :with_user, ->(user_id) {where user_id: user_id}
+  scope :with_user_id, ->(user_id) {where user_id: user_id}
+  scope :with_user_or_report, ->(user_id, report_id) {where 'user_id IN (?) OR report_id IN (?)', user_id, report_id}
+  scope :date_before, -> (date) {where 'date < ?', date}
   # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
   scope :filter_expense_type_id, ->(type_id) do
     type_id = [type_id] unless type_id.is_a?(Array)
@@ -196,14 +203,14 @@ class Expense < ActiveRecord::Base
   # scopes for the filters
   scope :filter_amount, -> (type, value) do
     case type
-      when 'lteq'
-        joins(:amount).select('expenses.*').where('value <= ?', value)
-      when 'gteq'
-        joins(:amount).select('expenses.*').where('value >= ?', value)
-      when 'eq'
-        joins(:amount).select('expenses.*').where('ROUND(value, 2) = ?', precision_value(value))
-      else
-        # do nothing
+    when 'lteq'
+      joins(:amount).select('expenses.*').where('value <= ?', value)
+    when 'gteq'
+      joins(:amount).select('expenses.*').where('value >= ?', value)
+    when 'eq'
+      joins(:amount).select('expenses.*').where('ROUND(value, 2) = ?', precision_value(value))
+    else
+      # do nothing
     end
   end
 
@@ -243,7 +250,7 @@ class Expense < ActiveRecord::Base
   #   joins(:manual_expense, :card_expense).select('expenses.*').where('lower(merchant) like ? OR lower(editable_merchant) like ?', "%#{merchant_name}%", "%#{merchant_name}%")
   # }
 
-  scope :filter_status_id, -> (status_id) { where expense_status_id: status_id }
+  scope :filter_status_id, -> (status_id) {where expense_status_id: status_id}
   scope :filter_search, -> (value) do
     expense_ids = ManualExpense.where('merchant like ?', "%#{value}%").pluck(:expense_id)
     expense_ids += CardExpense.where('editable_merchant like ?', "%#{value}%").pluck(:expense_id)
@@ -259,68 +266,68 @@ class Expense < ActiveRecord::Base
   scope :filter_receipt, -> (value) do
     expense_ids = Receipt.where(parent_type: Expense).uniq.pluck(:parent_id)
     case value
-      when 'present'
-        where(id: expense_ids)
-      when 'absent'
-        where.not(id: expense_ids)
+    when 'present'
+      where(id: expense_ids)
+    when 'absent'
+      where.not(id: expense_ids)
     end
   end
 
-  scope :manual, -> { joins(:manual_expense) }
-  scope :card, -> { joins(:card_expense) }
+  scope :manual, -> {joins(:manual_expense)}
+  scope :card, -> {joins(:card_expense)}
 
-  scope :group_by_category_id, -> { group :category_id }
+  scope :group_by_category_id, -> {group :category_id}
 
-  scope :only_card_expenses, -> { where(expense_type_id: ExpenseType.id_for(:card)) }
-  scope :except_card_expenses, -> { where.not(expense_type_id: ExpenseType.id_for(:card)) }
-  scope :only_manual_expenses, -> { where(expense_type_id: ExpenseType.id_for(:manual)) }
-  scope :only_distance_expenses, -> { where(expense_type_id: ExpenseType.id_for(:distance)) }
-  scope :only_time_expenses, -> { where(expense_type_id: ExpenseType.id_for(:time)) }
-  scope :only_per_diem_expenses, -> { where(expense_type_id: ExpenseType.id_for(:per_diem)) }
-  scope :only_reimbursable_expense_types, -> { where(expense_type_id: [ExpenseType.id_for(:manual),
-                                                                       ExpenseType.id_for(:distance),
-                                                                       ExpenseType.id_for(:time),
-                                                                       ExpenseType.id_for(:per_diem)]) }
-  scope :only_reimbursable_expenses, -> { where(reimbursable: true) }
-  scope :spent_from_cash_on_hand, -> { where(from_cash_on_hand: true) }
-  scope :blocked_against_cash_on_hand, -> { where cash_on_hand_blocked: true }
+  scope :only_card_expenses, -> {where(expense_type_id: ExpenseType.id_for(:card))}
+  scope :except_card_expenses, -> {where.not(expense_type_id: ExpenseType.id_for(:card))}
+  scope :only_manual_expenses, -> {where(expense_type_id: ExpenseType.id_for(:manual))}
+  scope :only_distance_expenses, -> {where(expense_type_id: ExpenseType.id_for(:distance))}
+  scope :only_time_expenses, -> {where(expense_type_id: ExpenseType.id_for(:time))}
+  scope :only_per_diem_expenses, -> {where(expense_type_id: ExpenseType.id_for(:per_diem))}
+  scope :only_reimbursable_expense_types, -> {where(expense_type_id: [ExpenseType.id_for(:manual),
+                                                                      ExpenseType.id_for(:distance),
+                                                                      ExpenseType.id_for(:time),
+                                                                      ExpenseType.id_for(:per_diem)])}
+  scope :only_reimbursable_expenses, -> {where(reimbursable: true)}
+  scope :spent_from_cash_on_hand, -> {where(from_cash_on_hand: true)}
+  scope :blocked_against_cash_on_hand, -> {where cash_on_hand_blocked: true}
 
-  scope :with_id, ->(ids) { where id: ids }
+  scope :with_id, ->(ids) {where id: ids}
   scope :without_id, -> (id) {
     if id.present?
       where.not(id: id)
     end
   }
-  scope :with_date, ->(dates) { where date: dates }
-  scope :with_date_range, -> (start_date, end_date) { where('date >= ? AND date <= ?', start_date, end_date) }
-  scope :with_amount, -> { joins(:amount).select('expenses.*, amounts.*') }
-  scope :unreported_and_rejected, -> { where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id] }
-  scope :submitted, -> { where expense_status_id: ExpenseStatus.submitted_id }
-  scope :unreported, -> { where expense_status_id: ExpenseStatus.unreported_id }
-  scope :rejected, -> { where expense_status_id: ExpenseStatus.rejected_id }
-  scope :unsubmitted, -> { where expense_status_id: ExpenseStatus.unsubmitted_id }
-  scope :admin_viewable, -> { where expense_status_id: [ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:rejected), ExpenseStatus.id_for(:unreported)] }
-  scope :sort_date_desc, -> { order 'date DESC' }
-  scope :sort_date_asc, -> { order 'date ASC' }
-  scope :with_category, ->(category_id) { where category_id: category_id }
-  scope :include_manual_expense, -> { joins :manual_expense }
-  scope :filter_user_id, ->(id) { where user_id: id }
-  scope :with_status_id, -> (id) { where status_id: id }
+  scope :with_date, ->(dates) {where date: dates}
+  scope :with_date_range, -> (start_date, end_date) {where('date >= ? AND date <= ?', start_date, end_date)}
+  scope :with_amount, -> {joins(:amount).select('expenses.*, amounts.*')}
+  scope :unreported_and_rejected, -> {where expense_status_id: [ExpenseStatus.unreported_id, ExpenseStatus.rejected_id]}
+  scope :submitted, -> {where expense_status_id: ExpenseStatus.submitted_id}
+  scope :unreported, -> {where expense_status_id: ExpenseStatus.unreported_id}
+  scope :rejected, -> {where expense_status_id: ExpenseStatus.rejected_id}
+  scope :unsubmitted, -> {where expense_status_id: ExpenseStatus.unsubmitted_id}
+  scope :admin_viewable, -> {where expense_status_id: [ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:rejected), ExpenseStatus.id_for(:unreported)]}
+  scope :sort_date_desc, -> {order 'date DESC'}
+  scope :sort_date_asc, -> {order 'date ASC'}
+  scope :with_category, ->(category_id) {where category_id: category_id}
+  scope :include_manual_expense, -> {joins :manual_expense}
+  scope :filter_user_id, ->(id) {where user_id: id}
+  scope :with_status_id, -> (id) {where status_id: id}
 
-  scope :transcribed, -> { where transcribed: true }
-  scope :untranscribed, -> { where transcribed: false }
-  scope :limit_to, ->(count) { limit count }
+  scope :transcribed, -> {where transcribed: true}
+  scope :untranscribed, -> {where transcribed: false}
+  scope :limit_to, ->(count) {limit count}
 
-  scope :verified, -> { where expense_status_id: ExpenseStatus.id_for(:verified) }
-  scope :unreported, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected]) }
-  scope :reported, -> { where expense_status_id: ExpenseStatus.ids_for([:submitted, :verified]) }
-  scope :unverified, -> { where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :submitted]) }
+  scope :verified, -> {where expense_status_id: ExpenseStatus.id_for(:verified)}
+  scope :unreported, -> {where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected])}
+  scope :reported, -> {where expense_status_id: ExpenseStatus.ids_for([:submitted, :verified])}
+  scope :unverified, -> {where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :submitted])}
 
-  scope :joins_amount, -> { joins(:amount) }
-  scope :sum_amount, -> { joins_amount.sum(:INR) }
+  scope :joins_amount, -> {joins(:amount)}
+  scope :sum_amount, -> {joins_amount.sum(:INR)}
 
-  scope :joins_card_expenses, -> { only_card_expenses.joins(:card_expense) }
-  scope :pluck_card_transaction_id, -> { joins_card_expenses.pluck('card_expense.card_transaction_id') }
+  scope :joins_card_expenses, -> {only_card_expenses.joins(:card_expense)}
+  scope :pluck_card_transaction_id, -> {joins_card_expenses.pluck('card_expense.card_transaction_id')}
   scope :filter_report_status_id, -> (status) {
     filter_status = []
     status = [status] unless status.is_a?(Array)
@@ -338,19 +345,26 @@ class Expense < ActiveRecord::Base
     end
     where expense_status_id: filter_status
   }
-  scope :not_synced_with_quickbooks, -> { where synced_with_quickbooks: [false, nil] }
-  scope :synced_with_quickbooks, -> { where synced_with_quickbooks: true }
-  scope :with_split_link, -> (split_link) { where split_link: split_link }
-  scope :filter_split_link, -> (split_link) { where split_link: split_link }
-  scope :includes_export, -> { includes(:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
-                                        :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
-                                        {card_expense: [custom_fields: [:field_configuration]]},
-                                        {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},
-                                        {time_expense: [custom_fields: [:field_configuration]]},
-                                        {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
-                                        {amount: [:currency]}, :expense_status) }
-  scope :includes_amount, -> { includes :amount }
-  scope :sum_amounts, -> { includes_amount.sum('amounts.INR') }
+  scope :not_synced_with_quickbooks, -> {where synced_with_quickbooks: [false, nil]}
+  scope :synced_with_quickbooks, -> {where synced_with_quickbooks: true}
+  scope :with_split_link, -> (split_link) {where split_link: split_link}
+  scope :filter_split_link, -> (split_link) {where split_link: split_link}
+  scope :includes_export, -> {includes(:category, :user, {report: [:status, policy: [distance_expense_config: [:rate]]]},
+                                       :expense_type, {manual_expense: [custom_fields: [:field_configuration, :value]]},
+                                       {card_expense: [custom_fields: [:field_configuration]]},
+                                       {distance_expense: [{distance: [:physical_unit]}, {maps_distance: [:physical_unit]}, :locations, custom_fields: [:field_configuration]]},
+                                       {time_expense: [custom_fields: [:field_configuration]]},
+                                       {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
+                                       {amount: [:currency]}, :expense_status)}
+  scope :includes_amount, -> {includes :amount}
+  scope :sum_amounts, -> {includes_amount.sum('amounts.INR')}
+  scope :includes_tds_amount, -> {includes :tds_amount}
+  scope :sum_tds_amounts, -> do
+    amount_ids = pluck(:tds_amount_id)
+    Amount.with_id(amount_ids).sum_INR
+  end
+  scope :sum_reimbursements, -> { reimbursable.sum_amounts - reimbursable.sum_tds_amounts }
+  scope :with_expense_tax_type_id, -> (id){ where expense_tax_type_id: id }
 
 
   scope :user_budget_expenses, -> (from, to) {
@@ -390,26 +404,26 @@ class Expense < ActiveRecord::Base
   # this method is to purely show the amount values for the carious expenses
   def amount_value
     case self.expense_type_id
-      when ExpenseType.id_for(:manual), ExpenseType.id_for(:card)
-        if self.report_id.blank? || self.report.blank?
+    when ExpenseType.id_for(:manual), ExpenseType.id_for(:card)
+      if self.report_id.blank? || self.report.blank?
+        return precision_value self.amount.value
+      else
+        base_currency_code = self.report.base_currency_code
+        return precision_value self.amount.send(base_currency_code.to_sym)
+      end
+    when ExpenseType.id_for(:distance), ExpenseType.id_for(:time), ExpenseType.id_for(:per_diem)
+      if self.amount.blank?
+        return nil
+      else
+        if self.report_id.blank?
           return precision_value self.amount.value
         else
           base_currency_code = self.report.base_currency_code
           return precision_value self.amount.send(base_currency_code.to_sym)
         end
-      when ExpenseType.id_for(:distance), ExpenseType.id_for(:time), ExpenseType.id_for(:per_diem)
-        if self.amount.blank?
-          return nil
-        else
-          if self.report_id.blank?
-            return precision_value self.amount.value
-          else
-            base_currency_code = self.report.base_currency_code
-            return precision_value self.amount.send(base_currency_code.to_sym)
-          end
-        end
-      else
-        return nil
+      end
+    else
+      return nil
     end
   end
 
@@ -431,7 +445,7 @@ class Expense < ActiveRecord::Base
     converted_amount = amount_value
     original_amount = original_amount_value
     return nil unless converted_amount.present? and converted_amount > 0 and original_amount.present? and original_amount > 0
-    precision_value converted_amount/original_amount
+    precision_value converted_amount / original_amount
   end
 
   def converted?
@@ -445,91 +459,91 @@ class Expense < ActiveRecord::Base
   # this method is to calculate the amount values for the various time/distance/per diem expenses
   def calculate_amount_value(policy)
     case self.expense_type_id
-      when ExpenseType.id_for(:manual)
-        return self.amount.value
-      when ExpenseType.id_for(:card)
-        return self.amount.value
-      when ExpenseType.id_for(:distance)
-        if distance_expense&.distance.present?
-          rate = policy.distance_expense_config.rate_value rescue nil
-          amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
-          return amount
-        end
-      when ExpenseType.id_for(:time)
-        rate = policy.time_expense_config.rate_value rescue nil
-        amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
+    when ExpenseType.id_for(:manual)
+      return self.amount.value
+    when ExpenseType.id_for(:card)
+      return self.amount.value
+    when ExpenseType.id_for(:distance)
+      if distance_expense&.distance.present?
+        rate = policy.distance_expense_config.rate_value rescue nil
+        amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
         return amount
-      when ExpenseType.id_for(:per_diem)
-        per_diem = self.per_diem_expense.per_diem
-        if policy.per_diems.include?(per_diem)
-          rate = self.per_diem_expense.per_diem.rate_value rescue nil
-          amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
-          return amount
-        else
-          return 0
-        end
+      end
+    when ExpenseType.id_for(:time)
+      rate = policy.time_expense_config.rate_value rescue nil
+      amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
+      return amount
+    when ExpenseType.id_for(:per_diem)
+      per_diem = self.per_diem_expense.per_diem
+      if policy.per_diems.include?(per_diem)
+        rate = self.per_diem_expense.per_diem.rate_value rescue nil
+        amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
+        return amount
       else
         return 0
+      end
+    else
+      return 0
     end
   end
 
 
-  def merchant_name(options={})
+  def merchant_name(options = {})
     simple = !!options&.dig(:simple)
     case self.expense_type_id
-      when ExpenseType.id_for(:manual)
-        # this will handle cases for deleted expenses as well.
-        merchant = self.manual_expense.merchant rescue nil
-        if merchant.nil?
-          merchant = ManualExpense.unscoped.find_by(expense_id: self.id).merchant rescue ""
+    when ExpenseType.id_for(:manual)
+      # this will handle cases for deleted expenses as well.
+      merchant = self.manual_expense.merchant rescue nil
+      if merchant.nil?
+        merchant = ManualExpense.unscoped.find_by(expense_id: self.id).merchant rescue ""
+      end
+      return merchant
+    when ExpenseType.id_for(:card)
+      # this will handle cases for deleted expenses as well.
+      return "" if self.card_expense.nil?
+      return self.card_expense.editable_merchant
+    when ExpenseType.id_for(:per_diem)
+      # un-scoping here for cases when the per diem gets destroyed
+      policy_name = self.per_diem_expense.per_diem&.configurable&.name
+      if policy_name.nil?
+        policy_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.configurable&.name
+      end
+      per_diem_name = self.per_diem_expense&.per_diem_name rescue nil
+      if per_diem_name.nil?
+        per_diem_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.name
+      end
+      return "#{policy_name} - #{per_diem_name}"
+    else
+      if self.report.nil?
+        if self.distance_expense?
+          return "#{self.distance_expense.distance_value} KM"
+        elsif self.time_expense?
+          return "#{self.time_expense.time_object_value} Hours"
         end
-        return merchant
-      when ExpenseType.id_for(:card)
-        # this will handle cases for deleted expenses as well.
-        return "" if self.card_expense.nil?
-        return self.card_expense.editable_merchant
-      when ExpenseType.id_for(:per_diem)
-        # un-scoping here for cases when the per diem gets destroyed
-        policy_name = self.per_diem_expense.per_diem&.configurable&.name
-        if policy_name.nil?
-          policy_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.configurable&.name
-        end
-        per_diem_name = self.per_diem_expense&.per_diem_name rescue nil
-        if per_diem_name.nil?
-          per_diem_name = PerDiem.unscoped.find_by(id: self.per_diem_expense.per_diem_id)&.name
-        end
-        return "#{policy_name} - #{per_diem_name}"
       else
-        if self.report.nil?
-          if self.distance_expense?
-            return "#{self.distance_expense.distance_value} KM"
-          elsif self.time_expense?
-            return "#{self.time_expense.time_object_value} Hours"
+        if self.distance_expense?
+          if simple
+            return "#{self.distance_expense.distance_value} KM at INR#{report.policy.distance_expense_config.rate_value} per KM"
+          else
+            return "#{self.distance_expense.distance_value} KM @ ₹#{report.policy.distance_expense_config.rate_value} per KM"
           end
-        else
-          if self.distance_expense?
-            if simple
-              return "#{self.distance_expense.distance_value} KM at INR#{report.policy.distance_expense_config.rate_value} per KM"
-            else
-              return "#{self.distance_expense.distance_value} KM @ ₹#{report.policy.distance_expense_config.rate_value} per KM"
-            end
-          elsif self.time_expense?
-            if simple
-              return "#{self.time_expense.time_object_value} Hours @ ₹#{report.policy.time_expense_config.rate_value} per Hour"
-            else
-              return "#{self.time_expense.time_object_value} Hours at INR#{report.policy.time_expense_config.rate_value} per Hour"
-            end
+        elsif self.time_expense?
+          if simple
+            return "#{self.time_expense.time_object_value} Hours @ ₹#{report.policy.time_expense_config.rate_value} per Hour"
+          else
+            return "#{self.time_expense.time_object_value} Hours at INR#{report.policy.time_expense_config.rate_value} per Hour"
           end
         end
+      end
     end
   end
 
   def surcharge_value
     case self.expense_type_id
-      when ExpenseType.id_for(:manual)
-        return 0
-      when ExpenseType.id_for(:card)
-        return self.card_expense.surcharge_amount
+    when ExpenseType.id_for(:manual)
+      return 0
+    when ExpenseType.id_for(:card)
+      return self.card_expense.surcharge_amount
     end
   end
 
@@ -647,52 +661,52 @@ class Expense < ActiveRecord::Base
 
   def custom_field_names
     case self.expense_type_id
-      when ExpenseType.id_for(:manual)
-        return self.manual_expense.custom_field_names
-      when ExpenseType.id_for(:distance)
-        return self.distance_expense.custom_field_names
-      when ExpenseType.id_for(:time)
-        return self.time_expense.custom_field_names
-      when ExpenseType.id_for(:per_diem)
-        return self.per_diem_expense.custom_field_names
-      when ExpenseType.id_for(:card)
-        return self.card_expense.custom_fields
-      else
-        return []
+    when ExpenseType.id_for(:manual)
+      return self.manual_expense.custom_field_names
+    when ExpenseType.id_for(:distance)
+      return self.distance_expense.custom_field_names
+    when ExpenseType.id_for(:time)
+      return self.time_expense.custom_field_names
+    when ExpenseType.id_for(:per_diem)
+      return self.per_diem_expense.custom_field_names
+    when ExpenseType.id_for(:card)
+      return self.card_expense.custom_fields
+    else
+      return []
     end
   end
 
   def custom_field_values
     case self.expense_type_id
-      when ExpenseType.id_for(:manual)
-        return self.manual_expense.custom_field_values
-      when ExpenseType.id_for(:distance)
-        return self.distance_expense.custom_field_values
-      when ExpenseType.id_for(:time)
-        return self.time_expense.custom_field_values
-      when ExpenseType.id_for(:per_diem)
-        return self.per_diem_expense.custom_field_values
-      when ExpenseType.id_for(:card)
-        return self.card_expense.custom_fields
-      else
-        return []
+    when ExpenseType.id_for(:manual)
+      return self.manual_expense.custom_field_values
+    when ExpenseType.id_for(:distance)
+      return self.distance_expense.custom_field_values
+    when ExpenseType.id_for(:time)
+      return self.time_expense.custom_field_values
+    when ExpenseType.id_for(:per_diem)
+      return self.per_diem_expense.custom_field_values
+    when ExpenseType.id_for(:card)
+      return self.card_expense.custom_fields
+    else
+      return []
     end
   end
 
   def custom_field_value_by_name(name)
     case self.expense_type_id
-      when ExpenseType.id_for(:manual)
-        return self.manual_expense.custom_field_value_by_name(name)
-      when ExpenseType.id_for(:distance)
-        return self.distance_expense.custom_field_value_by_name(name)
-      when ExpenseType.id_for(:time)
-        return self.time_expense.custom_field_value_by_name(name)
-      when ExpenseType.id_for(:per_diem)
-        return self.per_diem_expense.custom_field_value_by_name(name)
-      when ExpenseType.id_for(:card)
-        return self.card_expense.custom_fields
-      else
-        return []
+    when ExpenseType.id_for(:manual)
+      return self.manual_expense.custom_field_value_by_name(name)
+    when ExpenseType.id_for(:distance)
+      return self.distance_expense.custom_field_value_by_name(name)
+    when ExpenseType.id_for(:time)
+      return self.time_expense.custom_field_value_by_name(name)
+    when ExpenseType.id_for(:per_diem)
+      return self.per_diem_expense.custom_field_value_by_name(name)
+    when ExpenseType.id_for(:card)
+      return self.card_expense.custom_fields
+    else
+      return []
     end
   end
 
@@ -831,27 +845,27 @@ class Expense < ActiveRecord::Base
 
   def sub_expense
     case self.expense_type_id
-      when ExpenseType.id_for(:manual)
-        self.manual_expense
-      when ExpenseType.id_for(:card)
-        self.card_expense
-      when ExpenseType.id_for(:distance)
-        self.distance_expense
-      when ExpenseType.id_for(:time)
-        self.time_expense
-      when ExpenseType.id_for(:per_diem)
-        self.per_diem_expense
+    when ExpenseType.id_for(:manual)
+      self.manual_expense
+    when ExpenseType.id_for(:card)
+      self.card_expense
+    when ExpenseType.id_for(:distance)
+      self.distance_expense
+    when ExpenseType.id_for(:time)
+      self.time_expense
+    when ExpenseType.id_for(:per_diem)
+      self.per_diem_expense
     end
   end
 
   def report_status
     case expense_status_id
-      when ExpenseStatus.id_for(:unreported), ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:rejected)
-        'Unreported'
-      when ExpenseStatus.id_for(:submitted)
-        'Submitted'
-      when ExpenseStatus.id_for(:verified)
-        'Verified'
+    when ExpenseStatus.id_for(:unreported), ExpenseStatus.id_for(:unsubmitted), ExpenseStatus.id_for(:rejected)
+      'Unreported'
+    when ExpenseStatus.id_for(:submitted)
+      'Submitted'
+    when ExpenseStatus.id_for(:verified)
+      'Verified'
     end
   end
 
@@ -868,6 +882,49 @@ class Expense < ActiveRecord::Base
     self.sub_expense&.incomplete?
   end
 
+  def has_tds?
+    ExpenseTaxType.ids_for(:gst_tds, :tds).include?(expense_tax_type_id)
+  end
+
+  def reimbursable_amount_value
+    return 0 unless reimbursable
+    return amount.value unless has_tds?
+    return amount.value unless tds_amount.present?
+    precision_value(amount.value - tds_amount.value)
+  end
+  alias_method :reimbursable_amount, :reimbursable_amount_value
+
+  # Set the reimbursable amount if "reimbursable" flag is set and the tax type has TDS included
+  def compute_tds_amount
+    return unless has_tds?
+
+    tds_amount_value = nil
+    tax_amount = 0
+    if ExpenseTaxType.id_for(:gst_tds) == expense_tax_type_id and self.gst_percentage.present? and self.gst_percentage > 0
+      tax_amount = self.amount.value * self.gst_percentage / 100
+    end
+    tds_percentage = self.tds_slab&.tds
+    if tds_percentage.present?
+      tds_amount_value = (self.amount.value - tax_amount) * (tds_percentage) / 100
+    end
+
+    set_tds_amount(tds_amount_value)
+  end
+
+  def set_tds_amount(value)
+    if value.nil?
+      if self.tds_amount.present?
+        self.tds_amount.destroy
+      end
+    else
+      if self.tds_amount.present?
+        self.tds_amount.value = value
+      else
+        self.build_tds_amount(value: value, currency_id: Currency.id_for(:INR))
+      end
+    end
+  end
+
   private
 
   # cannot add an expense with future date
@@ -879,56 +936,56 @@ class Expense < ActiveRecord::Base
 
   def at_least_one_type
     case self.expense_type_id
-      when ExpenseType.id_for(:manual)
-        if self.manual_expense.nil?
-          errors.add(:expense, "needs to have an associated manual expense")
-        end
-      when ExpenseType.id_for(:card)
-        if self.card_expense.nil?
-          errors.add(:expense, "needs to have an associated card expense")
-        end
-      when ExpenseType.distance_expense_id
-        if self.distance_expense.blank?
-          errors.add(:expense, "needs to have an associated distance expense")
-        end
-      when ExpenseType.time_expense_id
-        if self.time_expense.blank?
-          errors.add(:expense, "needs to have an associated time expense")
-        end
-      when ExpenseType.per_diem_expense_id
-        if self.per_diem_expense.blank?
-          errors.add(:expense, "needs to have an associated per diem expense")
-        end
-      else
-        errors.add(:expense, "type is invalid")
+    when ExpenseType.id_for(:manual)
+      if self.manual_expense.nil?
+        errors.add(:expense, "needs to have an associated manual expense")
+      end
+    when ExpenseType.id_for(:card)
+      if self.card_expense.nil?
+        errors.add(:expense, "needs to have an associated card expense")
+      end
+    when ExpenseType.distance_expense_id
+      if self.distance_expense.blank?
+        errors.add(:expense, "needs to have an associated distance expense")
+      end
+    when ExpenseType.time_expense_id
+      if self.time_expense.blank?
+        errors.add(:expense, "needs to have an associated time expense")
+      end
+    when ExpenseType.per_diem_expense_id
+      if self.per_diem_expense.blank?
+        errors.add(:expense, "needs to have an associated per diem expense")
+      end
+    else
+      errors.add(:expense, "type is invalid")
     end
   end
 
 
   def valid_expense_type
     case expense_type_id
-      when ExpenseType.manual_expense_id
-        if self.manual_expense.blank?
-          errors.add(:merchant, "can't be blank")
-        end
-      when ExpenseType.card_expense_id
-        if self.card_expense.blank?
-          errors.add(:card, 'expense details not found')
-        end
-      when ExpenseType.distance_expense_id
-        if self.distance_expense.blank?
-          errors.add(:distance, "expense cannot be blank")
-        end
-      when ExpenseType.time_expense_id
-        if self.time_expense.blank?
-          errors.add(:time, "expense cannot be blank")
-        end
-      when ExpenseType.per_diem_expense_id
-        if self.per_diem_expense.blank?
-          errors.add(:per_diem, "expense cannot be blank")
-        end
-      else
-        errors.add(:expense, 'type not allowed')
+    when ExpenseType.manual_expense_id
+      if self.manual_expense.blank?
+        errors.add(:merchant, "can't be blank")
+      end
+    when ExpenseType.card_expense_id
+      if self.card_expense.blank?
+        errors.add(:card, 'expense details not found')
+      end
+    when ExpenseType.distance_expense_id
+      if self.distance_expense.blank?
+        errors.add(:distance, "expense cannot be blank")
+      end
+    when ExpenseType.time_expense_id
+      if self.time_expense.blank?
+        errors.add(:time, "expense cannot be blank")
+      end
+    when ExpenseType.per_diem_expense_id
+      if self.per_diem_expense.blank?
+        errors.add(:per_diem, "expense cannot be blank")
+      end
+    else
+      errors.add(:expense, 'type not allowed')
     end
   end
 

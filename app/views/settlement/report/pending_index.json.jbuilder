@@ -7,7 +7,7 @@ json.array! @result.paginated_reports do |report|
   json.final_approver report.final_approver
   currency = Currency.first
   json.reimbursable_amount do
-    json.partial! 'shared/amount', amount: Amount.new(value: report.total_amount([:reimbursable]), currency: currency)
+    json.partial! 'shared/amount', amount: Amount.new(value: report.reimbursable_expenses, currency: currency)
   end
   json.total_amount do
     json.partial! 'shared/amount', amount: Amount.new(value: report.total_amount, currency: currency)

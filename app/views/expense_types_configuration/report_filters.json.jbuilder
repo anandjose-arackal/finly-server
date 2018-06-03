@@ -16,3 +16,7 @@ end
 json.custom_fields do
   json.array! @field_configurations, :field_name, :id, :field_type, :drop_down_items
 end
+
+json.categories do
+  json.array! @categories, :id, :name
+end

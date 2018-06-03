@@ -32,3 +32,11 @@ json.categories do
     json.extract! category, :id, :name
   end
 end
+
+json.config do
+  json.em_tax_tracking @result.em_tax_tracking
+end
+
+json.tds_slabs do
+  json.array! @result.tds_slabs, :id, :name, :tds
+end
