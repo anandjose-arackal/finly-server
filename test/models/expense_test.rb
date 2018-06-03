@@ -27,7 +27,7 @@
 #  expense_tax_type_id    :integer
 #  gst_percentage         :decimal(10, )
 #  tds_percentage         :decimal(10, )
-#  reimbursable_amount_id :integer
+#  tds_amount_id          :integer
 #  gst_type_id            :integer
 #  tds_slab_id            :integer
 #
