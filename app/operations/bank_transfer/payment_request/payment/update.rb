@@ -11,7 +11,6 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
     self.payment = self.payment_order.payments.find_by(id: id)
     self.payment_params = payment_attributes
     self.payment_amount = self.payment_params&.dig(:amount_attributes, :value).to_f
-    debugger
   end
 
   def validate
