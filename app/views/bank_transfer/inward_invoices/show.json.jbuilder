@@ -89,6 +89,8 @@ json.invoice do
       json.taxable_amount precision_value item.taxable_amount&.value
     end
   end
+  
+  json.custom_fields invoice.custom_fields
 
   json.vendor do
     json.name invoice.vendor&.name
