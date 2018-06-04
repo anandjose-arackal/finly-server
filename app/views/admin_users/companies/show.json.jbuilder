@@ -11,6 +11,7 @@ json.fuel_card_enabled @result.company.fuel_card_enabled?
 json.medical_card_enabled @result.company.medical_card_enabled?
 json.expense_card_enabled @result.company.expense_card_enabled?
 json.reimbursement_card_enabled @result.company.reimbursement_card_enabled?
+json.em_tax_tracking @result.company.em_tax_tracking_enabled?
 json.itz_cash_company_balance @result.itz_cash_company_balance
 json.hard_copy_receipt @result.company.hard_copy_receipt_enabled?
 json.encrypted_params @result.company.configuration.encrypted_easy_login_params

@@ -49,7 +49,9 @@
 #  otp_attempts           :integer          default(0)
 #  user_delegate_id       :integer
 #  delegation_enabled     :boolean
+#  gl_config              :text(65535)
 #
+
 
 
 
@@ -77,6 +79,8 @@ class User < ActiveRecord::Base
 
   attr_accessor :view, :invitation_note
   attr_reader :raw_invitation_token
+
+  serialize :gl_config
 
   belongs_to :company
   belongs_to :otp_request_type

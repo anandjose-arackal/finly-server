@@ -40,4 +40,12 @@ class OrganizationAccountController < ApplicationController
     end
   end
 
+  def sidebar_menu_config
+    @feature_subscriptions = current_user.company.feature_subscription
+    respond_to do |format|
+      #todo vivek : Add feature subscription for expense tds / tax
+      format.json {}
+    end
+  end
+
 end

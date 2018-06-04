@@ -197,6 +197,21 @@ class Invoice < ActiveRecord::Base
     end
   end
 
+  def unpaid?
+    return nil if self.invoice_status.blank?
+    return (self.invoice_status_id == InwardInvoiceStatus.id_for(:unpaid))
+  end
+
+  def paid?
+    return nil if self.invoice_status.blank?
+    return (self.invoice_status_id == InwardInvoiceStatus.id_for(:paid))
+  end
+
+  def partially_paid?
+    return nil if self.invoice_status.blank?
+    return (self.invoice_status_id == InwardInvoiceStatus.id_for(:partially_paid))
+  end
+
   private
 
   def set_defaults
