@@ -1,9 +1,10 @@
 class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
 
-  attr_accessor :inward_invoice, :inward_invoice_parameters
+  attr_accessor :inward_invoice, :inward_invoice_parameters, :custom_fields
 
   def init
     self.inward_invoice_parameters = invoice_attributes
+    self.custom_fields = params&.dig(:invoice, :custom_fields)
   end
 
   def validate
@@ -21,9 +22,8 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
     # assign the attributes to the invoice and calculate the various amounts
     calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_parameters)
 
-    unless validate_custom_fields_invoice
-      return
-    end
+    validate_custom_fields_invoice
+    return if has_errors?
     unless self.inward_invoice.save
       add_message :error, self.inward_invoice.errors.full_messages
     end
@@ -33,10 +33,15 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
     add_message :success, "Invoice successfully created"
   end
 
+  def success
+    params[:inward_invoice] = self.inward_invoice
+    BankTransfer::InwardInvoices::Show::InvoicePresenter.new(user, params, messages)
+  end
+
   private
 
   def validate_custom_fields_invoice
-    set_fields = set_custom_fields_invoice self.inward_invoice, self.inward_invoice_parameters[:custom_fields], false
+    set_fields = set_custom_fields_invoice self.inward_invoice, self.custom_fields, false
     unless set_fields.success?
       add_message :error, set_fields.messages[:error]
       return

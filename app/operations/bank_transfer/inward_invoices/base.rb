@@ -1,6 +1,17 @@
 class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
 
+
+  class BankTransfer::InwardInvoices::Show::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :invoice
+
+    def init
+      self.invoice = params[:inward_invoice]
+    end
+
+  end
+
   def pre_validate
     if user.blank? || params.blank?
       add_message :error, "Invalid parameters"
@@ -15,7 +26,8 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
                                      freight_amount_attributes: [:value, :currency_id],
                                      advance_amount_attributes: [:value, :currency_id],
                                      invoice_attachments_attributes: [:attached_file, :description, :remove_file],
-                                     invoice_items_attributes: [:quantity, :rate, :tax, :discount, :category_id, :description, :id, :remove_line_item, :hsn_sac])
+                                     invoice_items_attributes: [:quantity, :rate, :tax, :discount, :category_id, :description, :id, :remove_line_item, :hsn_sac],
+                                     custom_fields: [])
   end
 
   def calculate_tax_and_discounts(invoice, invoice_params)
