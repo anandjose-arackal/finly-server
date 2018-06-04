@@ -888,9 +888,9 @@ class Expense < ActiveRecord::Base
 
   def reimbursable_amount_value
     return 0 unless reimbursable
-    return amount.value unless has_tds?
-    return amount.value unless tds_amount.present?
-    precision_value(amount.value - tds_amount.value)
+    return amount&.value.to_f unless has_tds?
+    return amount&.value.to_f unless tds_amount.present?
+    precision_value(amount&.value.to_f - tds_amount&.value.to_f)
   end
   # alias_method :reimbursable_amount, :reimbursable_amount_value
 
