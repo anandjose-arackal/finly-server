@@ -892,7 +892,14 @@ class Expense < ActiveRecord::Base
     return amount.value unless tds_amount.present?
     precision_value(amount.value - tds_amount.value)
   end
-  alias_method :reimbursable_amount, :reimbursable_amount_value
+  # alias_method :reimbursable_amount, :reimbursable_amount_value
+
+  def reimbursable_amount
+    return Amount.new(value: 0, currency_id: amount.currency_id) unless reimbursable
+    return amount unless has_tds?
+    return amount unless tds_amount.present?
+    return Amount.new(value: (precision_value(amount.value - tds_amount.value)), currency_id: amount.currency_id)
+  end
 
   # Set the reimbursable amount if "reimbursable" flag is set and the tax type has TDS included
   def compute_tds_amount
