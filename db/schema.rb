@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180601153107) do
+ActiveRecord::Schema.define(version: 20180603120103) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1828,6 +1828,14 @@ ActiveRecord::Schema.define(version: 20180601153107) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "expense_tax_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "expense_tax_types", ["name"], name: "index_expense_tax_types_on_name", using: :btree
+
   create_table "expense_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -1841,26 +1849,33 @@ ActiveRecord::Schema.define(version: 20180601153107) do
     t.date     "date"
     t.integer  "user_id",                limit: 4
     t.integer  "expense_type_id",        limit: 4
-    t.datetime "created_at",                                           null: false
-    t.datetime "updated_at",                                           null: false
+    t.datetime "created_at",                                                          null: false
+    t.datetime "updated_at",                                                          null: false
     t.text     "manager_memo",           limit: 65535
     t.integer  "rejecting_manager_id",   limit: 4
     t.integer  "report_id",              limit: 4
     t.integer  "category_id",            limit: 4
-    t.boolean  "is_deleted",                           default: false, null: false
-    t.boolean  "transcribed",                          default: false
-    t.boolean  "personal",                             default: false
+    t.boolean  "is_deleted",                                          default: false, null: false
+    t.boolean  "transcribed",                                         default: false
+    t.boolean  "personal",                                            default: false
     t.boolean  "reimbursable"
-    t.boolean  "synced_with_quickbooks",               default: false
+    t.boolean  "synced_with_quickbooks",                              default: false
     t.string   "split_link",             limit: 255
-    t.boolean  "deleted_to_split",                     default: false
-    t.boolean  "from_cash_on_hand",                    default: false
+    t.boolean  "deleted_to_split",                                    default: false
+    t.boolean  "from_cash_on_hand",                                   default: false
     t.boolean  "cash_on_hand_blocked"
+    t.integer  "expense_tax_type_id",    limit: 4
+    t.decimal  "gst_percentage",                       precision: 10
+    t.decimal  "tds_percentage",                       precision: 10
+    t.integer  "tds_amount_id",          limit: 4
+    t.integer  "gst_type_id",            limit: 4
+    t.integer  "tds_slab_id",            limit: 4
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
   add_index "expenses", ["category_id"], name: "index_expenses_on_category_id", using: :btree
   add_index "expenses", ["expense_status_id"], name: "index_expenses_on_expense_status_id", using: :btree
+  add_index "expenses", ["expense_tax_type_id"], name: "index_expenses_on_expense_tax_type_id", using: :btree
   add_index "expenses", ["expense_type_id"], name: "index_expenses_on_expense_type_id", using: :btree
   add_index "expenses", ["report_id"], name: "index_expenses_on_report_id", using: :btree
   add_index "expenses", ["user_id"], name: "index_expenses_on_user_id", using: :btree
@@ -1905,6 +1920,7 @@ ActiveRecord::Schema.define(version: 20180601153107) do
     t.boolean  "invoicing_system",                       default: false
     t.boolean  "travel_request",                         default: false
     t.boolean  "budgeting_system",                       default: false
+    t.boolean  "em_tax_tracking",                        default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -1947,7 +1963,6 @@ ActiveRecord::Schema.define(version: 20180601153107) do
     t.integer  "field_type_id",           limit: 4,                   null: false
     t.boolean  "mandatory",                           default: false, null: false
     t.integer  "company_id",              limit: 4,                   null: false
-    t.integer  "field_parent_type_id",    limit: 4,                   null: false
     t.integer  "configurable_id",         limit: 4,                   null: false
     t.string   "configurable_type",       limit: 255,                 null: false
     t.datetime "created_at",                                          null: false
@@ -1967,7 +1982,6 @@ ActiveRecord::Schema.define(version: 20180601153107) do
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
   add_index "field_configurations", ["configurable_id"], name: "index_field_configurations_on_configurable_id", using: :btree
   add_index "field_configurations", ["configurable_type"], name: "index_field_configurations_on_configurable_type", using: :btree
-  add_index "field_configurations", ["field_parent_type_id"], name: "index_field_configurations_on_field_parent_type_id", using: :btree
   add_index "field_configurations", ["field_type_id"], name: "index_field_configurations_on_field_type_id", using: :btree
 
   create_table "field_date_times", force: :cascade do |t|
@@ -2033,6 +2047,16 @@ ActiveRecord::Schema.define(version: 20180601153107) do
     t.datetime "created_at",               null: false
     t.datetime "updated_at",               null: false
   end
+
+  create_table "field_parent_mappings", force: :cascade do |t|
+    t.integer  "field_configuration_id", limit: 4, null: false
+    t.integer  "field_parent_type_id",   limit: 4, null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+  end
+
+  add_index "field_parent_mappings", ["field_configuration_id"], name: "index_field_parent_mappings_on_field_configuration_id", using: :btree
+  add_index "field_parent_mappings", ["field_parent_type_id"], name: "index_field_parent_mappings_on_field_parent_type_id", using: :btree
 
   create_table "field_parent_types", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -3955,12 +3979,13 @@ ActiveRecord::Schema.define(version: 20180601153107) do
   add_index "system_messages", ["system_message_type_id"], name: "index_system_messages_on_system_message_type_id", using: :btree
 
   create_table "tally_configurations", force: :cascade do |t|
-    t.integer  "company_id",           limit: 4,   null: false
+    t.integer  "company_id",           limit: 4,                   null: false
     t.string   "company_name",         limit: 255
     t.boolean  "active"
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
     t.string   "voucher_expense_date", limit: 255
+    t.boolean  "custom_voucher",                   default: false
   end
 
   add_index "tally_configurations", ["company_id"], name: "index_tally_configurations_on_company_id", using: :btree
@@ -4390,12 +4415,12 @@ ActiveRecord::Schema.define(version: 20180601153107) do
   add_index "user_wallets", ["user_id"], name: "index_user_wallets_on_user_id", using: :btree
 
   create_table "users", force: :cascade do |t|
-    t.string   "email",                  limit: 255, default: ""
-    t.string   "encrypted_password",     limit: 255, default: "",    null: false
+    t.string   "email",                  limit: 255,   default: ""
+    t.string   "encrypted_password",     limit: 255,   default: "",    null: false
     t.string   "reset_password_token",   limit: 255
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
-    t.integer  "sign_in_count",          limit: 4,   default: 0,     null: false
+    t.integer  "sign_in_count",          limit: 4,     default: 0,     null: false
     t.datetime "current_sign_in_at"
     t.datetime "last_sign_in_at"
     t.string   "current_sign_in_ip",     limit: 255
@@ -4404,14 +4429,14 @@ ActiveRecord::Schema.define(version: 20180601153107) do
     t.datetime "confirmed_at"
     t.datetime "confirmation_sent_at"
     t.string   "unconfirmed_email",      limit: 255
-    t.integer  "failed_attempts",        limit: 4,   default: 0,     null: false
+    t.integer  "failed_attempts",        limit: 4,     default: 0,     null: false
     t.string   "unlock_token",           limit: 255
     t.datetime "locked_at"
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
-    t.integer  "company_id",             limit: 4,                   null: false
+    t.datetime "created_at",                                           null: false
+    t.datetime "updated_at",                                           null: false
+    t.integer  "company_id",             limit: 4,                     null: false
     t.string   "mobile_number",          limit: 255
-    t.boolean  "active",                             default: true,  null: false
+    t.boolean  "active",                               default: true,  null: false
     t.string   "invitation_token",       limit: 255
     t.datetime "invitation_created_at"
     t.datetime "invitation_sent_at"
@@ -4419,23 +4444,24 @@ ActiveRecord::Schema.define(version: 20180601153107) do
     t.integer  "invitation_limit",       limit: 4
     t.integer  "invited_by_id",          limit: 4
     t.string   "invited_by_type",        limit: 255
-    t.integer  "invitations_count",      limit: 4,   default: 0
+    t.integer  "invitations_count",      limit: 4,     default: 0
     t.string   "otp",                    limit: 255
     t.datetime "otp_sent_at"
     t.datetime "otp_verified_at"
-    t.boolean  "otp_verified",                       default: false, null: false
-    t.integer  "otp_count",              limit: 4,   default: 0,     null: false
+    t.boolean  "otp_verified",                         default: false, null: false
+    t.integer  "otp_count",              limit: 4,     default: 0,     null: false
     t.string   "first_name",             limit: 255
     t.string   "last_name",              limit: 255
-    t.boolean  "mobile_only_invite",                 default: false
+    t.boolean  "mobile_only_invite",                   default: false
     t.string   "mothers_maiden_name",    limit: 255
-    t.boolean  "verified",                           default: false
+    t.boolean  "verified",                             default: false
     t.integer  "otp_request_type_id",    limit: 4
-    t.boolean  "default_password",                   default: false
-    t.boolean  "point_of_contact",                   default: false
-    t.integer  "otp_attempts",           limit: 4,   default: 0
+    t.boolean  "default_password",                     default: false
+    t.boolean  "point_of_contact",                     default: false
+    t.integer  "otp_attempts",           limit: 4,     default: 0
     t.integer  "user_delegate_id",       limit: 4
     t.boolean  "delegation_enabled"
+    t.text     "gl_config",              limit: 65535
   end
 
   add_index "users", ["company_id"], name: "index_users_on_company_id", using: :btree
@@ -4801,6 +4827,7 @@ ActiveRecord::Schema.define(version: 20180601153107) do
   add_foreign_key "expenses", "amounts"
   add_foreign_key "expenses", "categories"
   add_foreign_key "expenses", "expense_statuses"
+  add_foreign_key "expenses", "expense_tax_types"
   add_foreign_key "expenses", "expense_types"
   add_foreign_key "expenses", "reports"
   add_foreign_key "expenses", "users"
@@ -4809,9 +4836,10 @@ ActiveRecord::Schema.define(version: 20180601153107) do
   add_foreign_key "feedbacks", "feedback_types"
   add_foreign_key "feedbacks", "users"
   add_foreign_key "field_configurations", "companies"
-  add_foreign_key "field_configurations", "field_parent_types"
   add_foreign_key "field_configurations", "field_types"
   add_foreign_key "field_drop_down_items", "field_configurations"
+  add_foreign_key "field_parent_mappings", "field_configurations"
+  add_foreign_key "field_parent_mappings", "field_parent_types"
   add_foreign_key "finly_transactions", "amounts"
   add_foreign_key "finly_transactions", "companies"
   add_foreign_key "finly_transactions", "payment_purposes"

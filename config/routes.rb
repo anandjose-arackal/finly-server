@@ -602,6 +602,7 @@
 #                                                         PATCH  /companies/:id(.:format)                                                                     companies#update
 #                                                         PUT    /companies/:id(.:format)                                                                     companies#update
 #                                                         DELETE /companies/:id(.:format)                                                                     companies#destroy
+#                organization_account_sidebar_menu_config GET    /organization_account/sidebar_menu_config(.:format)                                          organization_account#sidebar_menu_config
 #                      organization_account_policies_list GET    /organization_account/policies_list(.:format)                                                organization_account#policies_list
 #                         organization_account_categories GET    /organization_account/categories(.:format)                                                   organization_account#categories
 #                 organization_account_export_preferences GET    /organization_account/export_preferences(.:format)                                           organization_account#export_preferences
@@ -693,6 +694,7 @@
 #                                          expenses_split POST   /expenses/split(.:format)                                                                    expenses#split_existing
 #                                         expenses_export POST   /expenses/export(.:format)                                                                   expenses#export
 #                                                expenses DELETE /expenses(.:format)                                                                          expenses#destroy
+#                                    expenses_edit_config GET    /expenses/edit_config(.:format)                                                              expenses#expense_edit_config
 #                                  expense_attach_receipt POST   /expenses/:expense_id/attach_receipt(.:format)                                               expenses#attach_receipt
 #                                  expense_detach_receipt POST   /expenses/:expense_id/detach_receipt(.:format)                                               expenses#detach_receipt
 #                                     expense_add_receipt POST   /expenses/:expense_id/add_receipt(.:format)                                                  expenses#add_receipt
