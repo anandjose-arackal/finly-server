@@ -60,6 +60,7 @@ json.payments do
         json.roundoff_amount invoice.roundoff_amount
         json.balance_due invoice.balance_due&.value
         json.taxable_amount precision_value invoice.gross_amount&.value
+        json.editable invoice.unpaid?
         # adding the respective rates
         json.tax_rate precision_value invoice.tax_rate
         json.tds_rate precision_value invoice.tds_rate

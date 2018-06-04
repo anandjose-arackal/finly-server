@@ -3,13 +3,15 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   attr_accessor :payment, :payment_request, :payment_params, :invoice_amount, :payment_amount,
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
-                :advance, :advance_amount, :payment_order
+                :advance, :advance_amount, :payment_order, :payment_amount
 
   def init
     super
     id = params[:payment_id] || params[:payment][:id]
     self.payment = self.payment_order.payments.find_by(id: id)
     self.payment_params = payment_attributes
+    self.payment_amount = self.payment_params&.dig(:amount_attributes, :value).to_f
+    debugger
   end
 
   def validate
@@ -169,20 +171,20 @@ class BankTransfer::PaymentRequest::Payment::Update < BankTransfer::PaymentReque
   def calculate_tax_and_discounts
     if self.payment.invoice.invoice_items.present?
       # if there are no invoice items, use the invoice library to calculate the amounts
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
     else
       # if there are, in fact, invoice items, use the invoice items library
-      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
     end
     return
   end
 
   def recalculate_totals
     if payment.invoice.invoice_items.present?
-      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)
+      InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
     else
       # if there are, in fact, invoice items, use the invoice items library
-      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment)
+      InvoiceCalculationUtils.new.calculate_tax_and_discounts(self.payment_params, self.payment, nil, self.payment_amount)
     end
     self.payment.save
   end

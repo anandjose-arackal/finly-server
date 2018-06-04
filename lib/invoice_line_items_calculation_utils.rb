@@ -6,11 +6,11 @@ class InvoiceLineItemsCalculationUtils
   attr_accessor :invoice_item_amount, :payment_amount, :after_discount_amount,
                 :gross_amount, :net_amount, :invoice, :item_taxable_amount, :taxable_amount,
                 :discount_amount, :tax_amount, :after_tax_amount,
-                :invoice_total, :roundoff_amount, :total_discount, :total_tax
+                :invoice_total, :roundoff_amount, :total_discount, :total_tax, :payment_amount
 
   # this method should take the invoice, payment object and the params object and
   # assign the respective calculated amounts to the params object for direct assign
-  def calculate_tax_and_discounts(params, payment = nil, invoice = nil)
+  def calculate_tax_and_discounts(params, payment = nil, invoice = nil, payment_amount = nil)
     invoice = invoice || payment&.invoice
     if invoice.blank?
       return
@@ -102,7 +102,7 @@ class InvoiceLineItemsCalculationUtils
     end
 
     # now calculate the TDS and the advance amount of this particular invoice, and return the store the new payment params here
-    InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, self.invoice_total, payment, invoice)
+    InvoiceCalculationUtils.new.calculate_tds_and_advance(params, self.taxable_amount, self.invoice_total, payment, invoice, payment_amount)
     params
   end
 
