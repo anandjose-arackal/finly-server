@@ -22,7 +22,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRe
     self.invoices_params = params[:invoices]
     self.invoices_params.each do |param|
       ids << param[:invoice_id]
-      self.payable_amounts[param[:invoice_id]] = param[:payable_amount]
+      self.payable_amounts[param[:invoice_id]] = param[:payable_amount].to_f
     end
     self.inward_invoices = user.company.inward_invoices.with_id(ids)
     bank_payment_request_id = params[:id] || params[:bank_payment_request_id]
