@@ -22,4 +22,4 @@ json.cost_centers do
   end
 end
 
-json.field_configurations current_company.field_configurations
+json.custom_field_configurations current_company.field_configurations
