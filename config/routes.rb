@@ -2320,6 +2320,7 @@ Rails.application.routes.draw do
   end
 
   # get 'organization_account' => 'organization_account#show'
+  get 'organization_account/sidebar_menu_config' => 'organization_account#sidebar_menu_config'
   get 'organization_account/policies_list' => 'organization_account#policies_list'
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
@@ -2399,6 +2400,8 @@ Rails.application.routes.draw do
   post 'expenses/split', to: 'expenses#split_existing'
   post 'expenses/export', to: 'expenses#export'
   delete 'expenses', to: 'expenses#destroy'
+
+  get 'expenses/edit_config', to: 'expenses#expense_edit_config'
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'
     post 'detach_receipt', to: 'expenses#detach_receipt'

@@ -7,7 +7,6 @@
 #  field_type_id           :integer          not null
 #  mandatory               :boolean          default(FALSE), not null
 #  company_id              :integer          not null
-#  field_parent_type_id    :integer          not null
 #  configurable_id         :integer          not null
 #  configurable_type       :string(255)      not null
 #  created_at              :datetime         not null
@@ -31,7 +30,9 @@ class FieldConfiguration < ActiveRecord::Base
 
   belongs_to :field_type
   belongs_to :company
-  belongs_to :field_parent_type
+  has_many :field_parent_mappings
+  has_many :field_parent_types, through: :field_parent_mappings
+  # belongs_to :field_parent_type
   # Applicable for User, Policy, Company
   belongs_to :configurable, polymorphic: true
   has_many :drop_down_items, class_name: 'FieldDropDownItem'
@@ -45,7 +46,7 @@ class FieldConfiguration < ActiveRecord::Base
   validates :enabled, presence: true
   validates :field_type_id, presence: true
   validates :company_id, presence: true
-  validates :field_parent_type_id, presence: true
+  # validates :field_parent_type_id, presence: true
   validates :configurable_id, presence: true
   validates :configurable_type, presence: true, :inclusion => {:in => ['Policy', 'Company']} #, 'User']}
   validates :default_value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiSelectSelection']}
@@ -55,51 +56,58 @@ class FieldConfiguration < ActiveRecord::Base
   accepts_nested_attributes_for :drop_down_items
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :multiselect_items
+  accepts_nested_attributes_for :field_parent_mappings
 
-  scope :with_id, -> (id) { where id: id }
-  scope :with_parent_type, ->(type_id) { where field_parent_type_id: type_id }
-  scope :enabled, -> { where enabled: true }
-  scope :disabled, -> { where enabled: false }
-  scope :filter_field_type_id, ->(type_id) { where field_type_id: type_id }
-  scope :filter_parent_type_id, -> (type_id) { where field_parent_type_id: type_id}
-  scope :order_created_at_desc, -> { order(created_at: :desc) }
-  scope :with_company, -> (company_id) { where company_id: company_id}
-  scope :with_field_parent_type, -> (parent_type_id) {
-    where field_parent_type_id: parent_type_id
-  }
-  scope :with_field_type, -> (field_type_id) { where field_type_id: field_type_id }
-  scope :root_fields, -> { where root_field: true}
-  scope :non_root_fields, -> { where.not(root_field: true) }
+  scope :with_id, -> (id) {where id: id}
+  # scope :with_parent_type, ->(type_id) { where field_parent_type_id: type_id }
+  scope :with_parent_type, ->(type_id) {includes(:field_parent_mappings).where(field_parent_mappings: {field_parent_type_id: type_id})}
+  scope :enabled, -> {where enabled: true}
+  scope :disabled, -> {where enabled: false}
+  scope :filter_field_type_id, ->(type_id) {where field_type_id: type_id}
+  scope :filter_parent_type_id, -> (type_id) {with_parent_type type_id}
+  scope :order_created_at_desc, -> {order(created_at: :desc)}
+  scope :with_company, -> (company_id) {where company_id: company_id}
+  scope :with_field_parent_type, -> (parent_type_id) {with_parent_type parent_type_id}
+  scope :with_field_type, -> (field_type_id) {where field_type_id: field_type_id}
+  scope :root_fields, -> {where root_field: true}
+  scope :non_root_fields, -> {where.not(root_field: true)}
 
   scope :filter_dropdowns, -> {where field_type_id: FieldType.id_for(:drop_down)}
 
-  delegate :drop_down?, :text?, to: :field_type
+  delegate :drop_down?, to: :field_type
+  delegate :text?, to: :field_type
 
-  default_scope { unscope(:where) }
+  default_scope {unscope(:where)}
 
   def validate_config
     case field_type_id
-      when FieldType.id_for(:drop_down)
-        if drop_down_items.blank?
-          self.errors.add(:drop_down, 'cannot be empty')
-        end
-      when FieldType.id_for(:multiselect)
-        if multiselect_items.blank?
-          self.errors.add(:multiselect, 'items cannot be empty')
-        end
+    when FieldType.id_for(:drop_down)
+      if drop_down_items.blank?
+        self.errors.add(:drop_down, 'cannot be empty')
+      end
+    when FieldType.id_for(:multiselect)
+      if multiselect_items.blank?
+        self.errors.add(:multiselect, 'items cannot be empty')
+      end
     end
     if default_value.present? and not default_value.valid?
       self.errors.add :invalid, 'input format for "default value"'
     end
 
     # IMP CONDITION - Expense Custom Field Configurations are always defined inside a policy while Expense Field Configuration are always defined inside Company
-    if FieldParentType.expense_ids.include?(self.field_parent_type_id) and configurable_type != 'Company'
-      self.errors.add :invalid, 'config. Custom Expense Field can only be configured at an organisation level'
+    parent_type_ids = self.field_parent_mappings.pluck_field_parent_type_id
+
+    parent_type_ids.each do |id|
+      if FieldParentType.expense_ids.include?(id) and configurable_type != 'Company'
+        self.errors.add :invalid, 'config. Custom Expense Field can only be configured at an organisation level'
+      end
     end
 
     # IMP CONDITION - Report and Money Request Field Configurations are always defined inside a policy while Expense Field Configuration are always defined inside Company
-    if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(self.field_parent_type_id) and configurable_type != 'Policy'
-      self.errors.add :invalid, 'config. Custom Fields for Reports and Money Requests can only be configured at policy level'
+    parent_type_ids.each do |id|
+      if [FieldParentType.id_for(:report), FieldParentType.id_for(:money_request)].include?(id) and configurable_type != 'Policy'
+        self.errors.add :invalid, 'config. Custom Fields for Reports and Money Requests can only be configured at policy level'
+      end
     end
   end
 
@@ -114,53 +122,53 @@ class FieldConfiguration < ActiveRecord::Base
     end
 
     case field_type_id
-      when FieldType.id_for(:text)
-        if default_value.blank?
-          self.default_value = FieldText.new
-        end
-        self.default_value.value = value
-      when FieldType.id_for(:number)
-        if default_value.blank?
-          self.default_value = FieldNumber.new
-        end
-        self.default_value.value = value
-      when FieldType.id_for(:decimal)
-        if default_value.blank?
-          self.default_value = FieldDecimal.new
-        end
-        self.default_value.value = value
-      when FieldType.id_for(:boolean)
-        if default_value.blank?
-          self.default_value = FieldBoolean.new
-        end
-        self.default_value.value = value
-      when FieldType.id_for(:drop_down)
-        if default_value.blank?
-          self.default_value = FieldDropDownSelection.new
-        end
-        self.default_value.value_id = value if self.drop_down_items.with_id(value).present?
-      when FieldType.id_for(:date)
-        if default_value.blank?
-          self.default_value = FieldDate.new
-        end
-        self.default_value.value = DateUtils.datetime_in_ist(value)
-      when FieldType.id_for(:datetime)
-        if default_value.blank?
-          self.default_value = FieldDateTime.new
-        end
-        self.default_value.value = DateUtils.datetime_in_ist(value)
-      when FieldType.id_for(:amount)
-        if default_value.blank?
-          self.default_value = FieldAmount.new
-        end
-        if self.default_value.value_id.blank?
-          # default_value.value is Amount
-          self.default_value.value = Amount.new
-        end
-        # value.value is Amount, so setting Amounts value becomes default_value(CustomField.value).value(FieldAmount.value).value(Amount.value)
-        self.default_value.value.value = value
-        # value.value is Amount, so setting Amounts currency_id becomes default_value(CustomField.value).value(FieldAmount.value).currency_id(Amount.currency_id)
-        self.default_value.value.currency_id = 1
+    when FieldType.id_for(:text)
+      if default_value.blank?
+        self.default_value = FieldText.new
+      end
+      self.default_value.value = value
+    when FieldType.id_for(:number)
+      if default_value.blank?
+        self.default_value = FieldNumber.new
+      end
+      self.default_value.value = value
+    when FieldType.id_for(:decimal)
+      if default_value.blank?
+        self.default_value = FieldDecimal.new
+      end
+      self.default_value.value = value
+    when FieldType.id_for(:boolean)
+      if default_value.blank?
+        self.default_value = FieldBoolean.new
+      end
+      self.default_value.value = value
+    when FieldType.id_for(:drop_down)
+      if default_value.blank?
+        self.default_value = FieldDropDownSelection.new
+      end
+      self.default_value.value_id = value if self.drop_down_items.with_id(value).present?
+    when FieldType.id_for(:date)
+      if default_value.blank?
+        self.default_value = FieldDate.new
+      end
+      self.default_value.value = DateUtils.datetime_in_ist(value)
+    when FieldType.id_for(:datetime)
+      if default_value.blank?
+        self.default_value = FieldDateTime.new
+      end
+      self.default_value.value = DateUtils.datetime_in_ist(value)
+    when FieldType.id_for(:amount)
+      if default_value.blank?
+        self.default_value = FieldAmount.new
+      end
+      if self.default_value.value_id.blank?
+        # default_value.value is Amount
+        self.default_value.value = Amount.new
+      end
+      # value.value is Amount, so setting Amounts value becomes default_value(CustomField.value).value(FieldAmount.value).value(Amount.value)
+      self.default_value.value.value = value
+      # value.value is Amount, so setting Amounts currency_id becomes default_value(CustomField.value).value(FieldAmount.value).currency_id(Amount.currency_id)
+      self.default_value.value.currency_id = 1
     end
     self.default_value.save if self.default_value.present?
   end

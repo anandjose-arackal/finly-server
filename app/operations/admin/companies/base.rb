@@ -22,7 +22,8 @@ class Admin::Companies::Base < Admin::Base
                                       :yes_bank_account,
                                       :bank_account_reimbursement,
                                       :payroll_card_enabled,
-                                      :invoicing_system
+                                      :invoicing_system,
+                                      :em_tax_tracking
                                     ])
   end
 

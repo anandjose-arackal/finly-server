@@ -263,6 +263,7 @@ class Amount < ActiveRecord::Base
 
 
   scope :with_id, -> (id) { where id: id }
+  scope :sum_INR, -> { sum(:INR) }
 
   before_save do
     set_base_currency_value

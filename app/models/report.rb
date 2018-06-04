@@ -120,7 +120,11 @@ class Report < ActiveRecord::Base
   # todo - having issues, where amounts are not matching actual expense amounts
   scope :expenses_total, -> { joins(expenses: :amount).sum(:INR) }
   # todo - having issues, where amounts are not matching actual reimbursements amounts
-  scope :expenses_reimbursable_total, -> { joins(expenses: :amount).where('expenses.reimbursable = true').sum('amounts.INR') }
+  scope :expenses_reimbursable_total, -> do
+    # joins(expenses: :amount).where('expenses.reimbursable = true').sum('amounts.INR')
+    ids = pluck(:id)
+    Expense.with_report_id(ids).reimbursable.sum_reimbursements
+  end
   scope :group_user_id, -> { group 'reports.user_id' }
   scope :group_user, -> { group :user }
   scope :joins_user, -> { joins  :user }
@@ -212,6 +216,12 @@ class Report < ActiveRecord::Base
     report_ids = configs.map { |item| item.parent&.id }
     with_id(report_ids)
   end
+
+  scope :filter_category, -> (category_id) {
+    ids = self.pluck(:id)
+    report_ids = Expense.with_report_id(ids).where(category_id: category_id).pluck(:report_id)
+    where(id: report_ids)
+  }
   delegate :status_name, to: :status
 
   delegate :submitted_amount_value, to: :submitted_amount
@@ -317,7 +327,6 @@ class Report < ActiveRecord::Base
     name[0].upcase + name[1..name.length]
   end
 
-
   def total_amount(options=[])
     return 0 unless self.expenses.present?
     temp_expenses = self.expenses
@@ -330,6 +339,18 @@ class Report < ActiveRecord::Base
       end
     end
     precision_value(temp_expenses.with_amount.sum(self.base_currency_code.to_sym))
+  end
+
+  def reimbursable_expenses
+    total_amount([:reimbursable]) - total_tds_amount
+  end
+
+  def non_reimbursable_expenses
+    total_amount(:non_reimbursable)
+  end
+
+  def total_tds_amount
+    self.expenses.with_expense_tax_type_id(ExpenseTaxType.ids_for(:gst_tds, :tds)).sum_tds_amounts
   end
 
   def controlling_user?(user)

@@ -266,6 +266,10 @@ class Company < ActiveRecord::Base
     self.feature_subscription.reimbursement_card_enabled
   end
 
+  def em_tax_tracking_enabled?
+    self.feature_subscription.em_tax_tracking
+  end
+
   def payroll_card_enabled?
     self.feature_subscription.payroll_card_enabled
   end
