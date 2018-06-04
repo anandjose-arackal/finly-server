@@ -20,6 +20,10 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
     self.inward_invoice = user.company.inward_invoices.build(self.inward_invoice_parameters)
     # assign the attributes to the invoice and calculate the various amounts
     calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_parameters)
+    op = validate_custom_fields_invoice
+    unless op.success?
+      add_message :error, op.messages[:error]
+    end
     unless self.inward_invoice.save
       add_message :error, self.inward_invoice.errors.full_messages
     end
@@ -27,5 +31,28 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
 
   def post_process
     add_message :success, "Invoice successfully created"
+  end
+
+  private
+
+  def validate_custom_fields_invoice
+    set_fields = set_custom_fields_invoice self.inward_invoice, self.inward_invoice_parameters[:custom_fields], false
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(self.bank_payment_request)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
+    end
+  end
+
+  def set_custom_fields_invoice(invoice, data, save)
+    custom_fields = {custom_fields: data}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
 end
