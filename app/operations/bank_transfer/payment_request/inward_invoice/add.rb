@@ -22,7 +22,7 @@ class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRe
     self.invoices_params = params[:invoices]
     self.invoices_params.each do |param|
       ids << param[:invoice_id]
-      self.payable_amounts[param[:invoice_id]] = param[:payable_amount].to_f
+      self.payable_amounts[param[:invoice_id]&.to_i] = param[:payable_amount].to_f
     end
     self.inward_invoices = user.company.inward_invoices.with_id(ids)
     bank_payment_request_id = params[:id] || params[:bank_payment_request_id]
@@ -43,6 +43,9 @@ class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRe
     # todo - add conditions to select how much of the invoice will be paid int his payment
     self.payable_amounts.each do |invoice_id, payable_amount|
       invoice = self.inward_invoices.find_by(id: invoice_id)
+      if invoice.remaining_amount.blank?
+        next
+      end
       if payable_amount > invoice.remaining_amount&.value.to_f
         add_message :error, "You cannot pay more than the remaining amount in an invoice"
       end
@@ -93,6 +96,6 @@ class BankTransfer::PaymentRequest::InwardInvoice::Add < BankTransfer::PaymentRe
           invoice_id: invoice.id
       }
     end
-    self.payments = self.bank_payment_request.payment_order.build(payment_params)
+    self.payments = self.bank_payment_request.payment_order.payments.build(payment_params)
   end
 end
