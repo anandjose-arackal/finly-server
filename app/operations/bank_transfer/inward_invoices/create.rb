@@ -41,7 +41,7 @@ class BankTransfer::InwardInvoices::Create < BankTransfer::InwardInvoices::Base
       add_message :error, set_fields.messages[:error]
       return
     end
-    valid = CustomField::Validate.(self.bank_payment_request)
+    valid = CustomField::Validate.(self.inward_invoice)
     unless valid.success?
       add_message :error, valid.messages[:error]
       return
