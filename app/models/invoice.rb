@@ -76,7 +76,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :remaining_amount, class_name: "Amount"
 
   # because multiple payments can be made against one invoice
-  has_many :payments, as: :parent
+  has_many :payments
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :invoice_attachments
