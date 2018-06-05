@@ -94,11 +94,11 @@ class Report::Base < BaseOperation
     end
 
     def reimbursable_expenses
-      report.total_amount([:reimbursable])
+      report.reimbursable_expenses
     end
 
     def non_reimbursable_expenses
-      report.total_amount(:non_reimbursable)
+      report.non_reimbursable_expenses
     end
 
     def has_custom_fields?

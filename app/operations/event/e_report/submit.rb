@@ -5,7 +5,7 @@ class Event::EReport::Submit < Event::EReport::Base
   end
 
   def action_name
-    "Report Submitted"
+    'Report Submitted'
   end
 
   def affected_users
@@ -14,8 +14,7 @@ class Event::EReport::Submit < Event::EReport::Base
 
   def get_token(user)
     email_authorization = params[:email_authorization]
-    token = email_authorization.token
-    token
+    email_authorization.token
   end
 
   def notification_affected_users

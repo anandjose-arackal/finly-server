@@ -46,7 +46,6 @@
 
 
 
-
 class Payment < ActiveRecord::Base
   include PostOperationExecution
 
