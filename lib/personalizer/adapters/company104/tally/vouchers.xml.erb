@@ -37,26 +37,6 @@
                     <AMOUNT><%= expense.amount.value %></AMOUNT>
                  </ALLLEDGERENTRIES.LIST>
               </VOUCHER>
-              <VOUCHER VCHTYPE="Payment" ACTION="Create">
-                <VOUCHERTYPENAME>Payment</VOUCHERTYPENAME>
-                <DATE><%= configuration.date_for(expense) %></DATE>
-                <NARRATION><%= html_escape "#{expense.merchant_name(simple: true)} - #{expense.user.name}" %></NARRATION>
-                <EFFECTIVEDATE><%= configuration.date_for(expense) %></EFFECTIVEDATE>
-                <ALLLEDGERENTRIES.LIST>
-                   <LEDGERNAME><%= html_escape expense.user.gl_config[:name] %></LEDGERNAME>
-                   <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                   <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-                   <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                   <AMOUNT>-<%= expense.amount.value %></AMOUNT>
-                </ALLLEDGERENTRIES.LIST>
-                <ALLLEDGERENTRIES.LIST>
-                   <LEDGERNAME><%= html_escape expense.category.gl_name %> - HDFC BANK LTD (CC A/C. 02272790000303)</LEDGERNAME>
-                   <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                   <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-                   <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                   <AMOUNT><%= expense.amount.value %></AMOUNT>
-                </ALLLEDGERENTRIES.LIST>
-              </VOUCHER>
             <% end %>
             </TALLYMESSAGE>
          </REQUESTDATA>
