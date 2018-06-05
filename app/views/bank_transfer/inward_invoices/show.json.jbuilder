@@ -90,6 +90,8 @@ json.invoice do
     end
   end
 
+  json.custom_fields invoice.custom_fields
+
   json.vendor do
     json.name invoice.vendor&.name
     json.email invoice.vendor&.email

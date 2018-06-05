@@ -73,9 +73,10 @@ class Invoice < ActiveRecord::Base
   belongs_to :invoice_status, class_name: "InwardInvoiceStatus"
   belongs_to :receiving_account, polymorphic: true
   belongs_to :vendor, class_name: "YesBankVendor"
+  belongs_to :remaining_amount, class_name: "Amount"
 
   # because multiple payments can be made against one invoice
-  has_many :payments, as: :parent
+  has_many :payments
 
   has_many :invoice_items, class_name: "InvoiceLineItem", as: :parent
   has_many :invoice_attachments
@@ -117,7 +118,7 @@ class Invoice < ActiveRecord::Base
 
   scope :filter_payable_invoices, -> (enabled) {
     if StringUtils.to_bool(enabled)
-      where(invoice_status_id: InwardInvoiceStatus.ids_for[:unpaid, :partially_paid])
+      where(invoice_status_id: InwardInvoiceStatus.ids_for([:unpaid, :partially_paid]))
     end
   }
 

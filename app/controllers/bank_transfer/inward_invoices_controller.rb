@@ -14,7 +14,7 @@ class BankTransfer::InwardInvoicesController < ApplicationController
 
   def create
     @result = BankTransfer::InwardInvoices::Create.(current_user, params)
-    respond_success_failure
+    respond
   end
 
   def update
