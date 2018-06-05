@@ -25,6 +25,7 @@ json.array!(@result.paginated_invoices) do |invoice|
     json.inclusive_of_taxes invoice.inclusive_of_taxes
     json.freight_amount invoice.freight_amount&.value
     json.roundoff_amount invoice.roundoff_amount
+    json.net_payable_amount invoice.balance_due&.value
     json.balance_due invoice.balance_due&.value
     json.taxable_amount precision_value invoice.gross_amount&.value
     # adding the respective rates
