@@ -1,6 +1,6 @@
 class BankTransfer::InwardInvoices::Base < BankTransfer::Base
 
-
+  attr_accessor :inward_invoice
 
   class BankTransfer::InwardInvoices::Show::InvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
@@ -52,6 +52,27 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
       InvoiceCalculationUtils.new.calculate_tax_and_discounts(invoice_params, nil, invoice)
     end
     invoice.save
+  end
+
+  def validate_custom_fields_invoice
+    set_fields = set_custom_fields_invoice self.inward_invoice, self.custom_fields, false
+    unless set_fields.success?
+      add_message :error, set_fields.messages[:error]
+      return
+    end
+    valid = CustomField::Validate.(self.inward_invoice)
+    unless valid.success?
+      add_message :error, valid.messages[:error]
+      return
+    end
+  end
+
+  def set_custom_fields_invoice(invoice, data, save)
+    custom_fields = {custom_fields: data}
+    custom_fields[:user] = user
+    custom_fields[:reset_fields] = true
+    custom_fields[:save] = save
+    CustomField::SetFields.(invoice, FieldParentType.id_for(:invoice), custom_fields)
   end
 
 end
