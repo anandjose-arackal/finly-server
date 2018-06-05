@@ -1,11 +1,12 @@
 class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
 
-  attr_accessor :inward_invoice, :inward_invoice_params
+  attr_accessor :inward_invoice, :inward_invoice_params, :custom_fields
 
   def init
     id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
     self.inward_invoice_params = invoice_attributes
+    self.custom_fields = params&.dig(:invoice, :custom_fields)
   end
 
   def validate
@@ -78,6 +79,10 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
   def process
     self.inward_invoice.assign_attributes(self.inward_invoice_params)
     calculate_tax_and_discounts(self.inward_invoice, self.inward_invoice_params)
+
+    validate_custom_fields_invoice
+    return if has_errors?
+
     if self.inward_invoice.save
       recalculate_totals(self.inward_invoice, self.inward_invoice_params)
     else
