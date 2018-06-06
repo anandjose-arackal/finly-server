@@ -29,7 +29,7 @@ class BankTransaction < ActiveRecord::Base
   has_one :payment, as: :reference_resource
 
   validates :bank_reference_number, presence: true, if: :successful?
-  validates :unique_request_number, presence: true
+  validates :unique_request_number, presence: true, if: :through_finly?
   validates :beneficiary_bank_account_id, presence: true
   validates :transfer_status_id, presence: true
   validates :amount, presence: true
@@ -53,8 +53,8 @@ class BankTransaction < ActiveRecord::Base
     [BankTransferStatus.id_for(:completed), BankTransferStatus.id_for(:processing)].include?(self.transfer_status_id)
   end
 
-  # def outside_finly?
-  #   self.outside_finly
-  # end
+  def through_finly?
+    self.bank_transaction_type_id == BankTransactionType.id_for(:yes_bank)
+  end
 
 end

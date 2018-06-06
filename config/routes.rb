@@ -1101,6 +1101,7 @@
 #                                                         PUT    /bank_transfer/bank_payment_requests/:id(.:format)                                           bank_transfer/bank_payment_requests#update
 #                                                         DELETE /bank_transfer/bank_payment_requests/:id(.:format)                                           bank_transfer/bank_payment_requests#destroy
 #                          bank_transfer_transfer_timings GET    /bank_transfer/transfer_timings(.:format)                                                    bank_transfer/bank_payment_requests#within_timeframe
+#                                    bank_transfer_search GET    /bank_transfer/account_owners/search(.:format)                                               bank_transfer/account_owners#search
 #                      bank_transfer_account_owners_count GET    /bank_transfer/account_owners/count(.:format)                                                bank_transfer/account_owners#count
 #                            bank_transfer_account_owners GET    /bank_transfer/account_owners(.:format)                                                      bank_transfer/account_owners#index
 #                                                         POST   /bank_transfer/account_owners(.:format)                                                      bank_transfer/account_owners#create
@@ -1131,6 +1132,7 @@
 #                                                         PATCH  /bank_transfer/bank_accounts/:id(.:format)                                                   bank_transfer/bank_accounts#update
 #                                                         PUT    /bank_transfer/bank_accounts/:id(.:format)                                                   bank_transfer/bank_accounts#update
 #                                                         DELETE /bank_transfer/bank_accounts/:id(.:format)                                                   bank_transfer/bank_accounts#destroy
+#                           bank_transfer_bulk_upload_utr POST   /bank_transfer/payments/bulk_upload_utr(.:format)                                            bank_transfer/payments#bulk_upload_utr
 #                            bank_transfer_payments_count GET    /bank_transfer/payments/count(.:format)                                                      bank_transfer/payments#count
 #                             bank_transfer_payment_retry PATCH  /bank_transfer/payments/:payment_id/retry(.:format)                                          bank_transfer/payments#retry
 #                                  bank_transfer_payments GET    /bank_transfer/payments(.:format)                                                            bank_transfer/payments#index
@@ -2775,6 +2777,7 @@ Rails.application.routes.draw do
 
     get 'transfer_timings', to: 'bank_payment_requests#within_timeframe'
 
+    get 'account_owners/search', to: 'account_owners#search', as: :search
     get 'account_owners/count', to: 'account_owners#count'
     resources :account_owners
 
@@ -2788,6 +2791,7 @@ Rails.application.routes.draw do
     get 'bank_accounts/count', to: 'bank_accounts#count'
     resources :bank_accounts
 
+    post 'payments/bulk_upload_utr', to: 'payments#bulk_upload_utr', as: :bulk_upload_utr
     get 'payments/count', to: 'payments#count'
     resources :payments do
       patch 'retry', to: 'payments#retry', as: :retry
