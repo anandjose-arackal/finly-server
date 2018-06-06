@@ -6,7 +6,7 @@ json.array!(@result.paginated_payments) do |payment|
     json.ifsc payment.receiving_account&.ifsc
   end
   json.payment_mode payment.payment_mode
-  json.schedule_at payment.schedule_at
+  json.schedule_at payment.scheduled_at
   json.processed_at payment.processed_at
   json.status payment.payment_status_name
   json.amount payment.amount_value
