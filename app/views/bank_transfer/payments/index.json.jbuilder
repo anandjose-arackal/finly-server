@@ -8,7 +8,7 @@ json.array!(@result.paginated_payments) do |payment|
   json.payment_mode payment.payment_mode
   json.schedule_at payment.scheduled_at
   json.processed_at payment.processed_at
-  json.status payment.payment_status_name
+  json.status payment.payment_status_name&.downcase
   json.amount payment.amount_value
   if payment.completed? || payment.processing?
     json.utr payment.reference_resource&.bank_reference_number
