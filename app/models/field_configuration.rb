@@ -59,6 +59,7 @@ class FieldConfiguration < ActiveRecord::Base
   accepts_nested_attributes_for :field_parent_mappings
 
   scope :with_id, -> (id) {where id: id}
+
   # scope :with_parent_type, ->(type_id) { where field_parent_type_id: type_id }
   scope :with_parent_type, ->(type_id) {includes(:field_parent_mappings).where(field_parent_mappings: {field_parent_type_id: type_id})}
   scope :enabled, -> {where enabled: true}
