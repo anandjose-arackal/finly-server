@@ -223,6 +223,17 @@ class Payment < ActiveRecord::Base
             OR (receiving_user_type = 'User' AND receiving_user_id IN (?))", bank_account_ids, vendor_ids, user_ids)
   }
 
+  scope :filter_search_index, -> (beneficiary_type, receiving_user_id) {
+    case beneficiary_type
+      when 1, '1'
+        where(receiving_user_type: "User", receiving_user_id: receiving_user_id)
+      when 2, '2'
+        where(receiving_user_type: "YesBankVendor", receiving_user_id: receiving_user_id)
+      else
+        where(receiving_user_type: "YesBankVendor", receiving_user_id: receiving_user_id)
+    end
+  }
+
   scope :filter_user_id, -> (user_id) {
     if user_id.present?
       where('initiating_user_id = ? OR receiving_user_id = ?', user_id, user_id)
