@@ -2338,6 +2338,7 @@ Rails.application.routes.draw do
   end
 
   # get 'organization_account' => 'organization_account#show'
+  get 'organization_account/sidebar_menu_config' => 'organization_account#sidebar_menu_config'
   get 'organization_account/policies_list' => 'organization_account#policies_list'
   get 'organization_account/categories' => 'organization_account#categories'
   get 'organization_account/export_preferences' => 'organization_account#export_preferences'
@@ -2417,6 +2418,8 @@ Rails.application.routes.draw do
   post 'expenses/split', to: 'expenses#split_existing'
   post 'expenses/export', to: 'expenses#export'
   delete 'expenses', to: 'expenses#destroy'
+
+  get 'expenses/edit_config', to: 'expenses#expense_edit_config'
   resources :expenses do
     post 'attach_receipt', to: 'expenses#attach_receipt'
     post 'detach_receipt', to: 'expenses#detach_receipt'
@@ -2493,6 +2496,7 @@ Rails.application.routes.draw do
   patch 'expense_type_configurations', to: 'expense_types_configuration#update', as: :expense_type_configuration_update
   get 'groups_teams', to: 'expense_types_configuration#groups_teams'
   get 'expense_filters', to: 'expense_types_configuration#expense_filters'
+  get 'report_filters', to: 'expense_types_configuration#report_filters'
 
   scope :settlements do
     scope :reports do
@@ -2717,6 +2721,7 @@ Rails.application.routes.draw do
   namespace :integration do
     get 'tally/check', to: 'tally#check'
     get 'tally/vouchers', to: 'tally#vouchers'
+    get 'tally/reimbursements', to: 'tally#reimbursements'
     post 'tally/configuration', to: 'tally#set_configuration'
   end
 
@@ -2733,6 +2738,8 @@ Rails.application.routes.draw do
   # ROUTES FOR VENDOR PAYMENTS
   resources :cost_centers
   resources :tds_slabs
+
+
 
   scope :payments do
     resources :companies do
@@ -2790,6 +2797,7 @@ Rails.application.routes.draw do
     resources :account_owners
 
     post 'vendors/import', to: 'vendors#import', as: :import
+    get 'vendors/new_vendor_config', to: 'vendors#new_vendor_config', as: :new_vendor_config
     resources :vendors do
       get 'show_transfers', to: 'vendors#show_transfers'
       get 'bank_accounts', to: 'vendors#bank_accounts'
@@ -2812,6 +2820,8 @@ Rails.application.routes.draw do
     end
     post 'vendor_payment_wallets/update_balance', to: 'vendor_payment_wallets#update_balance', as: :update_balance
     get 'vendor_payment_wallets/transfer_options/:id', to: 'vendor_payment_wallets#transfer_options', as: :transfer_options
+
+    resources :vendor_types
 
     resources :inward_invoices
   end

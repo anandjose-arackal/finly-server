@@ -45,4 +45,10 @@ if @result.account_owner.is_a?(YesBankVendor)
     json.thumb @result.account_owner.vendor_attachments.first&.attached_file&.url(:thumb)
     json.file_type @result.account_owner.vendor_attachments.first&.attached_file_content_type
   end
+
+  json.vendor_type do
+    json.id @result.account_owner.vendor_type&.id
+    json.name @result.account_owner.vendor_type&.name
+  end
 end
+

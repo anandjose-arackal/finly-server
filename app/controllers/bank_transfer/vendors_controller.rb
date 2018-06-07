@@ -47,4 +47,9 @@ class BankTransfer::VendorsController < ApplicationController
     respond
   end
 
+  def new_vendor_config
+    @result = BankTransfer::Vendors::NewVendorConfig.(current_user, params)
+    respond
+  end
+
 end

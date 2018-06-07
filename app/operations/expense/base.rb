@@ -125,7 +125,7 @@ class Expense::Base < BaseOperation
   # end
 
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted, :conversion_rate
+    attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted, :conversion_rate, :em_tax_tracking, :tds_slabs
 
     def init
       self.expense = params[:expense]

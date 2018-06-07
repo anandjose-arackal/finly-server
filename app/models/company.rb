@@ -63,6 +63,7 @@ class Company < ActiveRecord::Base
   has_many :card_upgrade_requests
   has_many :individual_kycs
   has_many :yes_bank_vendors
+  has_many :vendor_types
   has_many :bank_accounts
   has_many :quickbooks_departments
   has_many :report_processor_groups
@@ -266,6 +267,10 @@ class Company < ActiveRecord::Base
 
   def reimbursement_card_enabled?
     self.feature_subscription.reimbursement_card_enabled
+  end
+
+  def em_tax_tracking_enabled?
+    self.feature_subscription.em_tax_tracking
   end
 
   def payroll_card_enabled?

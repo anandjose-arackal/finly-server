@@ -78,6 +78,8 @@ class User < ActiveRecord::Base
   attr_accessor :view, :invitation_note
   attr_reader :raw_invitation_token
 
+  serialize :gl_config
+
   belongs_to :company
   belongs_to :otp_request_type
   belongs_to :user_delegate, class_name: "User"
