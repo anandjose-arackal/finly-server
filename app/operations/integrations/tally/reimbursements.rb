@@ -1,5 +1,5 @@
 class Integrations::Tally::Reimbursements < Integrations::Tally::Base
-  attr_accessor :processor_group_mappings, :report_processor_groups
+  attr_accessor :report_processor_groups
 
   def pre_validate
     unless user.present?
@@ -30,15 +30,13 @@ class Integrations::Tally::Reimbursements < Integrations::Tally::Base
       id = id.split(',')
       self.report_processor_groups = self.report_processor_groups.with_id(id)
     end
-    ids = report_processor_groups.pluck(:id)
-    self.processor_group_mappings = ReportProcessorGroupMapping.with_processor_group_id(ids)
     if user.company.tally_configuration.custom_voucher
       template = "#{Rails.root}/lib/personalizer/adapters/company#{user.company_id}/tally/reimbursements.xml"
     else
       current_class_path = self.method(:success).source_location.first.gsub('/reimbursements.rb', '')
       template = "#{current_class_path}/reimbursements.xml"
     end
-    self.response = Exporter.new(user, {xml: {template: template, local_variables: {processor_group_mappings: self.processor_group_mappings, configuration: current_company.tally_configuration}}}, messages)
+    self.response = Exporter.new(user, {xml: {template: template, local_variables: {report_processor_groups: self.report_processor_groups, configuration: current_company.tally_configuration}}}, messages)
   end
 
   def post_process
