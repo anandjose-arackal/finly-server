@@ -10,6 +10,7 @@ json.array! @result.paginated_report_processor_groups do |group|
   json.source_account_type group.source_account_type
   json.payment_type group.payment_type
   json.payment_mode group.payment_mode
+  json.tally_exported group.tally_exported
   user_count = 0
   report_count = 0
   json.items do
