@@ -28,7 +28,7 @@ class BankTransfer::Payments::BulkUploadUtr < BankTransfer::Payments::Base
 
   def process
     self.payments_data.each_with_index do |payment_data, index|
-      self.result_array << payment_data
+      self.result_array << payment_data.values
       id = payment_data[:payment_id]
       utr = payment_data[:utr]
       payment_order_ids = user.company.payment_orders.with_purpose_id(PaymentPurpose.id_for(:vendor_payment)).pluck(:id)
