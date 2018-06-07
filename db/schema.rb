@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180603120103) do
+ActiveRecord::Schema.define(version: 20180607112108) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3607,6 +3607,7 @@ ActiveRecord::Schema.define(version: 20180603120103) do
     t.datetime "created_at",                                            null: false
     t.datetime "updated_at",                                            null: false
     t.boolean  "marked_as_closed"
+    t.boolean  "tally_exported",                        default: false
   end
 
   add_index "report_processor_groups", ["company_id"], name: "index_report_processor_groups_on_company_id", using: :btree
