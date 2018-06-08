@@ -49,6 +49,7 @@
 #  otp_attempts           :integer          default(0)
 #  user_delegate_id       :integer
 #  delegation_enabled     :boolean
+#  gl_config              :text(65535)
 #
 
 require 'test_helper'

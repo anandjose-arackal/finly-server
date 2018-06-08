@@ -601,6 +601,7 @@
 #                                                         PATCH  /companies/:id(.:format)                                                                     companies#update
 #                                                         PUT    /companies/:id(.:format)                                                                     companies#update
 #                                                         DELETE /companies/:id(.:format)                                                                     companies#destroy
+#                organization_account_sidebar_menu_config GET    /organization_account/sidebar_menu_config(.:format)                                          organization_account#sidebar_menu_config
 #                      organization_account_policies_list GET    /organization_account/policies_list(.:format)                                                organization_account#policies_list
 #                         organization_account_categories GET    /organization_account/categories(.:format)                                                   organization_account#categories
 #                 organization_account_export_preferences GET    /organization_account/export_preferences(.:format)                                           organization_account#export_preferences
@@ -692,6 +693,7 @@
 #                                          expenses_split POST   /expenses/split(.:format)                                                                    expenses#split_existing
 #                                         expenses_export POST   /expenses/export(.:format)                                                                   expenses#export
 #                                                expenses DELETE /expenses(.:format)                                                                          expenses#destroy
+#                                    expenses_edit_config GET    /expenses/edit_config(.:format)                                                              expenses#expense_edit_config
 #                                  expense_attach_receipt POST   /expenses/:expense_id/attach_receipt(.:format)                                               expenses#attach_receipt
 #                                  expense_detach_receipt POST   /expenses/:expense_id/detach_receipt(.:format)                                               expenses#detach_receipt
 #                                     expense_add_receipt POST   /expenses/:expense_id/add_receipt(.:format)                                                  expenses#add_receipt
@@ -790,6 +792,7 @@
 #                       expense_type_configuration_update PATCH  /expense_type_configurations(.:format)                                                       expense_types_configuration#update
 #                                            groups_teams GET    /groups_teams(.:format)                                                                      expense_types_configuration#groups_teams
 #                                         expense_filters GET    /expense_filters(.:format)                                                                   expense_types_configuration#expense_filters
+#                                          report_filters GET    /report_filters(.:format)                                                                    expense_types_configuration#report_filters
 #                                                 pending GET    /settlements/reports/pending(.:format)                                                       settlement/report#pending_index
 #                                           pending_count GET    /settlements/reports/pending/count(.:format)                                                 settlement/report#pending_count
 #                                                         GET    /settlements/reports/processing(.:format)                                                    settlement/report#processing_index
@@ -1006,6 +1009,7 @@
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                                                 quickbooks#show
 #                                 integration_tally_check GET    /integration/tally/check(.:format)                                                           integration/tally#check
 #                              integration_tally_vouchers GET    /integration/tally/vouchers(.:format)                                                        integration/tally#vouchers
+#                        integration_tally_reimbursements GET    /integration/tally/reimbursements(.:format)                                                  integration/tally#reimbursements
 #                         integration_tally_configuration POST   /integration/tally/configuration(.:format)                                                   integration/tally#set_configuration
 #                                                     tos GET    /tos(.:format)                                                                               static_pages#tos
 #                                                 privacy GET    /privacy(.:format)                                                                           static_pages#privacy
@@ -1106,6 +1110,7 @@
 #                                                         PUT    /bank_transfer/account_owners/:id(.:format)                                                  bank_transfer/account_owners#update
 #                                                         DELETE /bank_transfer/account_owners/:id(.:format)                                                  bank_transfer/account_owners#destroy
 #                                    bank_transfer_import POST   /bank_transfer/vendors/import(.:format)                                                      bank_transfer/vendors#import
+#                         bank_transfer_new_vendor_config GET    /bank_transfer/vendors/new_vendor_config(.:format)                                           bank_transfer/vendors#new_vendor_config
 #                     bank_transfer_vendor_show_transfers GET    /bank_transfer/vendors/:vendor_id/show_transfers(.:format)                                   bank_transfer/vendors#show_transfers
 #                                   bank_transfer_vendors GET    /bank_transfer/vendors(.:format)                                                             bank_transfer/vendors#index
 #                                                         POST   /bank_transfer/vendors(.:format)                                                             bank_transfer/vendors#create
@@ -1148,6 +1153,14 @@
 #                                                         DELETE /bank_transfer/users/:id(.:format)                                                           bank_transfer/users#destroy
 #                            bank_transfer_update_balance POST   /bank_transfer/vendor_payment_wallets/update_balance(.:format)                               bank_transfer/vendor_payment_wallets#update_balance
 #                          bank_transfer_transfer_options GET    /bank_transfer/vendor_payment_wallets/transfer_options/:id(.:format)                         bank_transfer/vendor_payment_wallets#transfer_options
+#                              bank_transfer_vendor_types GET    /bank_transfer/vendor_types(.:format)                                                        bank_transfer/vendor_types#index
+#                                                         POST   /bank_transfer/vendor_types(.:format)                                                        bank_transfer/vendor_types#create
+#                           new_bank_transfer_vendor_type GET    /bank_transfer/vendor_types/new(.:format)                                                    bank_transfer/vendor_types#new
+#                          edit_bank_transfer_vendor_type GET    /bank_transfer/vendor_types/:id/edit(.:format)                                               bank_transfer/vendor_types#edit
+#                               bank_transfer_vendor_type GET    /bank_transfer/vendor_types/:id(.:format)                                                    bank_transfer/vendor_types#show
+#                                                         PATCH  /bank_transfer/vendor_types/:id(.:format)                                                    bank_transfer/vendor_types#update
+#                                                         PUT    /bank_transfer/vendor_types/:id(.:format)                                                    bank_transfer/vendor_types#update
+#                                                         DELETE /bank_transfer/vendor_types/:id(.:format)                                                    bank_transfer/vendor_types#destroy
 #                                     public_bank_account GET    /account/:account_number(.:format)                                                           invoicing/public_links#virtual_bank_account_show
 #                                          public_invoice GET    /invoice/:invoice_id(.:format)                                                               invoicing/public_links#invoice_show
 #                                               addresses GET    /addresses(.:format)                                                                         addresses#index
