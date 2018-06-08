@@ -10,6 +10,7 @@ json.array!(@result.paginated_payments) do |payment|
   json.processed_at payment.processed_at
   json.status payment.payment_status_name&.downcase
   json.amount payment.amount_value
+  json.initiated_by payment.initiating_user&.name
   if payment.completed? || payment.processing?
     json.utr payment.reference_resource&.bank_reference_number
   end
