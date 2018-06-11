@@ -20,13 +20,26 @@ class Api::Vp::BankTransfer::BankPaymentRequestsController < ApplicationControll
   end
 
   def initiate_payment
-    @result = BankTransfer::PaymentRequest::ApiPayments::InitiatePayment.(current_user, params)
+    @result = BankTransfer::Payments::ApiPayments::InitiatePayment.(current_user, params)
     respond
+  end
+
+  def bulk_initiate_payment
+    @result = BankTransfer::Payments::ApiPayments::BulkInitiatePayment.(current_user, params)
+    if @result.success?
+      respond_to do |format|
+        format.json { render 'bulk_initiate_success'}
+      end
+    else
+      respond_to do |format|
+        format.json { render 'bulk_initiate_failures'}
+      end
+    end
   end
 
   # this action will take a particular payment ID and return the status of that particular payment
   def payment_status
-    @result = BankTransfer::PaymentRequest::ApiPayments::GetPaymentStatus.(current_user, params)
+    @result = BankTransfer::Payments::ApiPayments::GetPaymentStatus.(current_user, params)
     respond
   end
 
