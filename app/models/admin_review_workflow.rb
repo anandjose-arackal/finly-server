@@ -57,7 +57,6 @@ class AdminReviewWorkflow < ActiveRecord::Base
                   {user: 'veekshith.rai@finly.io', trigger_email: true, reviewer: true},
                   {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true},
                   {user: 'kartik.k@finly.io', trigger_email: true, reviewer: true},
-                  {user: 'shiva.shankar@finly.io', trigger_email: true, reviewer: true},
                   {user: 'sreeram.nr@finly.io', trigger_email: false, reviewer: true}
               ],
               '1': [
@@ -83,8 +82,10 @@ class AdminReviewWorkflow < ActiveRecord::Base
                   {user: 'veekshith.rai@finly.io', trigger_email: true, reviewer: true},
                   {user: 'anushrut.khare@finly.io', trigger_email: true, reviewer: true},
                   {user: 'kartik.k@finly.io', trigger_email: true, reviewer: true},
-                  {user: 'shiva.shankar@finly.io', trigger_email: true, reviewer: true},
-                  {user: 'sreeram.nr@finly.io', trigger_email: false, reviewer: true}
+                  {user: 'sreeram.nr@finly.io', trigger_email: false, reviewer: true},
+                  {
+
+                  }
               ],
               '1': [
                   {user: 'itzfinlycust@itzcash.com', trigger_email: true, reviewer: false},
