@@ -26,6 +26,9 @@ class Procurements::Create < Procurements::Base
     case params[:document_type]
       when 'purchase_order'
         op = Procurements::PurchaseOrders::Create.(user, params)
+      when 'tax_invoice', 'proforma_invoice'
+        # do nothing!
+        # tax invoice / proforma invoice will be created
       else
         add_message :error, 'Invalid document type provided'
         return
