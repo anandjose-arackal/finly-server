@@ -4,7 +4,7 @@ class Budgets::Create < Budgets::Base
   def init
     self.budget_params = create_budget_params
 
-    self.budgetable_types = %w( User YesBankVendor Category FieldDropDownItem )
+    self.budgetable_types = %w( User YesBankVendor Category FieldDropDownItem CostCenter)
 
   end
 
@@ -42,5 +42,4 @@ class Budgets::Create < Budgets::Base
   def post_process
     add_message :success, 'Successfully created budget'
   end
-
 end

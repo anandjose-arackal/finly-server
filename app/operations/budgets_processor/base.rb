@@ -17,6 +17,8 @@ class BudgetsProcessor::Base < BaseOperation
         op = ::BudgetsProcessor::Calculate::YesBankVendor.(user, {budget: budget})
       elsif budget.budgetable_type == 'FieldDropDownItem'
         op = ::BudgetsProcessor::Calculate::FieldDropDownItem.(user, {budget: budget})
+      elsif budget.budgetable_type == 'CostCenter'
+        op = ::BudgetsProcessor::Calculate::CostCenter.(user, {budget: budget})
       end
 
       self.budget_details.push(op.result)

@@ -16,6 +16,7 @@ class CostCenter < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :company
+  has_many :budgets, as: :budgetable
 
   scope :with_application, -> (app) {
     where application: app

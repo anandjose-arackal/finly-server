@@ -95,6 +95,9 @@ class Invoice < ActiveRecord::Base
   # validates :net_amount, presence: true
   # validates :amount, presence: true
 
+  scope :with_id, -> (id) {where id: id}
+  scope :with_cost_center_id, -> (id) {where cost_center_id: id}
+
   def policy
     self.payment&.payment_order&.bank_payment_request&.policy
   end
