@@ -83,16 +83,18 @@ module FinlyIntegrations
           initialize_service(purchase_service)
           created_purchase = purchase_service.create(finly_purchase)
           qb_report.expenses.update_all(synced_with_quickbooks: true)
+
+          puts "Created Report in Quickbooks!"
+
+          return true
         rescue => error
           @error_logger.error("Sync of report: #{qb_report.report.name} because of the following error: #{error.message}")
           error.backtrace.each do |line|
             @error_logger.error "\t #{line}"
           end
+          return "Sync with Quickbooks failed. Please contact your account manager for further assistance"
         end
 
-        puts "Created Report in Quickbooks!"
-        # puts created_purchase
-        return true
       end
 
       def accounts(updated_at = nil)

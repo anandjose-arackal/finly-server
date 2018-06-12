@@ -16,7 +16,6 @@
 #  bank_response               :string(255)
 #  refunded                    :boolean
 #  error_sub_code              :string(255)
-#  bank_transaction_type_id    :integer
 #
 
 require 'test_helper'
