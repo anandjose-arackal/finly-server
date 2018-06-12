@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180607112108) do
+ActiveRecord::Schema.define(version: 20180612113701) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -4429,14 +4429,14 @@ ActiveRecord::Schema.define(version: 20180607112108) do
     t.text     "url",               limit: 65535
     t.text     "request_body",      limit: 65535
     t.text     "request_header",    limit: 65535
-    t.decimal  "response_time",                   precision: 10
-    t.text     "response_body",     limit: 65535
+    t.decimal  "response_time",                      precision: 10
+    t.text     "response_body",     limit: 16777215
     t.integer  "response_status",   limit: 4
     t.integer  "attempt",           limit: 4
     t.datetime "last_attempted_at"
     t.boolean  "attempt_success"
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
   end
 
   add_index "web_hook_tracks", ["company_id"], name: "index_web_hook_tracks_on_company_id", using: :btree
