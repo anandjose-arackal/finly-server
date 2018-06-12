@@ -9,6 +9,8 @@ class BudgetsProcessor::Base < BaseOperation
 
   def process
     budgets.each do |budget|
+      next if Date.today < budget.start_date || Date.today > budget.end_date
+
       if budget.budgetable_type == 'User'
         op = ::BudgetsProcessor::Calculate::User.(user, {budget: budget})
       elsif budget.budgetable_type == 'Category'
