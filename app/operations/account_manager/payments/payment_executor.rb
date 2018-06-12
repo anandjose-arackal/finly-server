@@ -79,9 +79,15 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
       end
     end
 
-    unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
-      add_message :error, "Payment cannot be processed in this state"
-      # add system message
+    if self.payment.api_initiated
+      if self.payment.completed? || self.payment.possible_failure? || self.payment.in_progress?
+        return
+      end
+    else
+      unless [PaymentStatus.id_for(:scheduled), PaymentStatus.id_for(:pending)].include?(payment.payment_status_id)
+        add_message :error, "Payment cannot be processed in this state"
+        # add system message
+      end
     end
   end
 

@@ -22,8 +22,16 @@ class BankTransfer::YesBank::Execute < BankTransfer::YesBank::Base
       add_message :error, 'Order not found'
       return
     end
-    unless self.payment_order.scheduled? || self.payment_order.pending? # because now this operation can be called by the bulk credit operation as well
-      add_message :error, "Cannot be processed yet"
+    # because now this operation can be called by the bulk credit operation as well
+    if self.payment_order.api_initiated
+      # ensure that the payment order is not already executed by any chance
+      if self.payment_order.completed? || self.payment_order.partially_completed? || self.payment_order.in_progress?
+        return
+      end
+    else
+      unless self.payment_order.scheduled? || self.payment_order.pending?
+        add_message :error, "Cannot be processed yet"
+      end
     end
   end
 

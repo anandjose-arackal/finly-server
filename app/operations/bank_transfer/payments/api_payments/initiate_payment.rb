@@ -1,9 +1,9 @@
-class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer::PaymentRequest::Base
+class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payments::Base
 
   attr_accessor :payment_order, :bank_payment_request, :bank_account, :vendor,
                 :payment_mode, :company_id
 
-  class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment::PaymentOrderPresenter < BaseOperation::BasePresenter::SuccessPresenter
+  class BankTransfer::Payments::ApiPayments::InitiatePayment::PaymentOrderPresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :payment_order, :bank_payment_request
 
@@ -72,6 +72,7 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
       end
       return
     end
+
   end
 
   def post_process
@@ -81,7 +82,7 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
   def success
     params[:payment_order] = self.payment_order
     params[:bank_payment_request] = self.bank_payment_request
-    BankTransfer::PaymentRequest::ApiPayments::InitiatePayment::PaymentOrderPresenter.new(user, params, messages)
+    BankTransfer::Payments::ApiPayments::InitiatePayment::PaymentOrderPresenter.new(user, params, messages)
   end
 
   private
@@ -120,6 +121,7 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
       },
       note: params[:note],
       date: DateUtils.local_date,
+      api_initiated: true
     }
     payment_order_params = {
       initiating_user_id: user.id,
@@ -135,6 +137,7 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
       payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
       application: "vp",
       currency_id: Currency.first.id,
+      api_initiated: true,
       payments_attributes: [
           payment_params
       ]
@@ -149,6 +152,7 @@ class BankTransfer::PaymentRequest::ApiPayments::InitiatePayment < BankTransfer:
       },
       beneficiary_type_id: 2,
       policy_id: user.company.policies.default.first.id,
+      api_initiated: true,
       payment_order_attributes: payment_order_params
     }
     self.bank_payment_request = BankPaymentRequest.new(payment_request_params)
