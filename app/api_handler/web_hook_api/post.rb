@@ -28,8 +28,10 @@ class WebHookApi::Post < BaseHandler
 
   def header_params
     params = { "Content-Type" => "application/json" }
-    headers = self.web_hook_track.web_hook.headers
-    params = params.merge(headers)
+    if self.web_hook_track.web_hook.headers.present?
+      headers = self.web_hook_track.web_hook.headers
+      params = params.merge(headers)
+    end
     return params
   end
 
