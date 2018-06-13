@@ -13,10 +13,50 @@
          </REQUESTDESC>
          <REQUESTDATA>
             <TALLYMESSAGE xmlns:UDF="TallyUDF">
+            <% reports = {} %>
+            <% expenses.each do |expense| %>
+              <% if expense.user.gl_config&.dig(:name).blank? %>
+                <% raise 'GL Config is not configured for the user' %>
+              <% end %>
+              <% reports[expense.report_id] = {} if reports[expense.report_id].nil? %>
+              <% if reports[expense.report_id][expense.user.gl_config[:name]].nil? %>
+                <% reports[expense.report_id][expense.user.gl_config[:name]] = {amount: 0, date: configuration.date_for(expense), user: html_escape(expense.user.gl_config[:name])} %>
+              <% end %>
+              <% reports[expense.report_id][expense.user.gl_config[:name]][:amount] += expense.amount.INR %>
+            <% end %>
+            <% if travelling_tour.present? %>
+              <% travelling_tour.each do |user_id, details| %>
+              <VOUCHER VCHTYPE="Journal" ACTION="Create">
+                 <VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>
+                 <DATE><%= details[:date] %></DATE>
+                 <NARRATION></NARRATION>
+                 <EFFECTIVEDATE><%= details[:date] %></EFFECTIVEDATE>
+                 <ALLLEDGERENTRIES.LIST>
+                    <LEDGERNAME><%= html_escape 'TRAVELLING TOUR [FOOD & BEVERAGE]' %></LEDGERNAME>
+                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                    <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                    <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                    <AMOUNT>-<%= details[:amount] %></AMOUNT>
+                 </ALLLEDGERENTRIES.LIST>
+                 <ALLLEDGERENTRIES.LIST>
+                    <LEDGERNAME><%= details[:user_gl_name] %></LEDGERNAME>
+                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
+                    <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
+                    <LEDGERFROMITEM>No</LEDGERFROMITEM>
+                    <AMOUNT><%= details[:amount] %></AMOUNT>
+                 </ALLLEDGERENTRIES.LIST>
+              </VOUCHER>
+              <% end %>
+            <% end %>
+
+
+
+
+
             <% travelling_tour = {} %>
             <% expenses.each do |expense| %>
               <% if expense.user.gl_config&.dig(:name).blank? %>
-                <% raise "GL Config is not configured for the user" %>
+                <% raise 'GL Config is not configured for the user' %>
               <% end %>
               <% if expense.category.gl_code == 'TRAVELLING TOUR [FOOD & BEVERAGE]' %>
                 <% if travelling_tour[expense.user_id].nil? %>
