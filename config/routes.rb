@@ -2945,6 +2945,7 @@ Rails.application.routes.draw do
     # Organization Account Settings for procurements
     namespace :configs do
       resources :terms
+      resources :doc_number_configs, only: [:index, :update]
     end
   end
 

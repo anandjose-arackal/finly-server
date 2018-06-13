@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180607112108) do
+ActiveRecord::Schema.define(version: 20180613071519) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -522,6 +522,7 @@ ActiveRecord::Schema.define(version: 20180607112108) do
     t.integer  "policy_id",                    limit: 4
     t.boolean  "payment_file_downloaded",                    default: false
     t.boolean  "auto_approved"
+    t.boolean  "api_initiated",                              default: false
   end
 
   add_index "bank_payment_requests", ["controlling_user_id"], name: "index_bank_payment_requests_on_controlling_user_id", using: :btree
@@ -1732,6 +1733,27 @@ ActiveRecord::Schema.define(version: 20180607112108) do
 
   add_index "distances", ["physical_unit_id"], name: "index_distances_on_physical_unit_id", using: :btree
 
+  create_table "document_number_config_types", force: :cascade do |t|
+    t.string   "name",        limit: 255
+    t.text     "description", limit: 65535
+    t.datetime "created_at",                null: false
+    t.datetime "updated_at",                null: false
+  end
+
+  create_table "document_number_configs", force: :cascade do |t|
+    t.string   "prefix",                         limit: 255
+    t.string   "sequence_start",                 limit: 255
+    t.integer  "company_id",                     limit: 4
+    t.integer  "document_number_config_type_id", limit: 4
+    t.integer  "purpose_id",                     limit: 4
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
+  end
+
+  add_index "document_number_configs", ["company_id"], name: "index_document_number_configs_on_company_id", using: :btree
+  add_index "document_number_configs", ["document_number_config_type_id"], name: "index_document_number_configs_on_document_number_config_type_id", using: :btree
+  add_index "document_number_configs", ["purpose_id"], name: "index_document_number_configs_on_purpose_id", using: :btree
+
   create_table "duplicate_expense_mappings", force: :cascade do |t|
     t.integer  "expense_id",           limit: 4, null: false
     t.integer  "duplicate_expense_id", limit: 4, null: false
@@ -2240,6 +2262,7 @@ ActiveRecord::Schema.define(version: 20180607112108) do
     t.text     "description",                limit: 65535
     t.datetime "created_at",                               null: false
     t.datetime "updated_at",                               null: false
+    t.integer  "company_id",                 limit: 4
   end
 
   add_index "invoice_attachments", ["invoice_id"], name: "index_invoice_attachments_on_invoice_id", using: :btree
@@ -3069,26 +3092,27 @@ ActiveRecord::Schema.define(version: 20180607112108) do
   create_table "payment_orders", force: :cascade do |t|
     t.date     "scheduled_at"
     t.datetime "processed_at"
-    t.integer  "initiating_user_id",        limit: 4,     null: false
-    t.integer  "payment_order_status_id",   limit: 4,     null: false
+    t.integer  "initiating_user_id",        limit: 4,                     null: false
+    t.integer  "payment_order_status_id",   limit: 4,                     null: false
     t.string   "payment_file_file_name",    limit: 255
     t.string   "payment_file_content_type", limit: 255
     t.integer  "payment_file_file_size",    limit: 4
     t.datetime "payment_file_updated_at"
-    t.integer  "company_id",                limit: 4,     null: false
+    t.integer  "company_id",                limit: 4,                     null: false
     t.integer  "amount_requested_id",       limit: 4
     t.integer  "amount_processed_id",       limit: 4
     t.text     "note",                      limit: 65535
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
+    t.datetime "created_at",                                              null: false
+    t.datetime "updated_at",                                              null: false
     t.string   "initiating_account_type",   limit: 255
     t.string   "receiving_account_type",    limit: 255
-    t.integer  "payment_purpose_id",        limit: 4,     null: false
-    t.integer  "currency_id",               limit: 4,     null: false
+    t.integer  "payment_purpose_id",        limit: 4,                     null: false
+    t.integer  "currency_id",               limit: 4,                     null: false
     t.string   "application",               limit: 255
     t.string   "payment_mode",              limit: 255
     t.text     "post_operation",            limit: 65535
     t.text     "post_operation_payload",    limit: 65535
+    t.boolean  "api_initiated",                           default: false
   end
 
   add_index "payment_orders", ["amount_processed_id"], name: "index_payment_orders_on_amount_processed_id", using: :btree
@@ -3182,20 +3206,20 @@ ActiveRecord::Schema.define(version: 20180607112108) do
   end
 
   create_table "payments", force: :cascade do |t|
-    t.integer  "amount_id",               limit: 4,                 null: false
-    t.date     "date",                                              null: false
-    t.integer  "payment_type_id",         limit: 4,                 null: false
+    t.integer  "amount_id",               limit: 4,                     null: false
+    t.date     "date",                                                  null: false
+    t.integer  "payment_type_id",         limit: 4,                     null: false
     t.integer  "initiating_user_id",      limit: 4
     t.integer  "receiving_user_id",       limit: 4
     t.text     "note",                    limit: 65535
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
+    t.datetime "created_at",                                            null: false
+    t.datetime "updated_at",                                            null: false
     t.integer  "initiating_account_id",   limit: 4
     t.string   "initiating_account_type", limit: 255
     t.integer  "receiving_account_id",    limit: 4
     t.string   "receiving_account_type",  limit: 255
     t.integer  "payment_order_id",        limit: 4
-    t.integer  "payment_status_id",       limit: 4,                 null: false
+    t.integer  "payment_status_id",       limit: 4,                     null: false
     t.string   "initiating_user_type",    limit: 255
     t.string   "receiving_user_type",     limit: 255
     t.integer  "payment_purpose_id",      limit: 4
@@ -3203,7 +3227,7 @@ ActiveRecord::Schema.define(version: 20180607112108) do
     t.string   "reference_resource_type", limit: 255
     t.string   "application",             limit: 255
     t.string   "payment_mode",            limit: 255
-    t.string   "reference_id",            limit: 255,               null: false
+    t.string   "reference_id",            limit: 255,                   null: false
     t.integer  "retry_count",             limit: 4,     default: 0
     t.integer  "invoice_id",              limit: 4
     t.string   "parent_type",             limit: 255
@@ -3212,6 +3236,7 @@ ActiveRecord::Schema.define(version: 20180607112108) do
     t.text     "post_operation_payload",  limit: 65535
     t.integer  "category_id",             limit: 4
     t.date     "scheduled_at"
+    t.boolean  "api_initiated",                         default: false
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -4694,6 +4719,7 @@ ActiveRecord::Schema.define(version: 20180607112108) do
     t.boolean  "is_deleted",                       default: false
     t.datetime "created_at",                                       null: false
     t.datetime "updated_at",                                       null: false
+    t.text     "headers",            limit: 65535
   end
 
   add_index "web_hooks", ["company_id"], name: "index_web_hooks_on_company_id", using: :btree
@@ -4836,6 +4862,9 @@ ActiveRecord::Schema.define(version: 20180607112108) do
   add_foreign_key "customer_attachments", "customers"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
+  add_foreign_key "document_number_configs", "companies"
+  add_foreign_key "document_number_configs", "document_number_config_types"
+  add_foreign_key "document_number_configs", "purposes"
   add_foreign_key "email_authorizations", "users"
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"
