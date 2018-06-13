@@ -184,6 +184,7 @@ class BaseHandler
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
       self.timeout = true
       messages[:error] << 'Request timed out. Please try again'
+
     end
   end
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180607112108) do
+ActiveRecord::Schema.define(version: 20180612113701) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -530,12 +530,6 @@ ActiveRecord::Schema.define(version: 20180607112108) do
   add_index "bank_payment_requests", ["requested_amount_id"], name: "index_bank_payment_requests_on_requested_amount_id", using: :btree
   add_index "bank_payment_requests", ["status_id"], name: "index_bank_payment_requests_on_status_id", using: :btree
 
-  create_table "bank_transaction_types", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
   create_table "bank_transactions", force: :cascade do |t|
     t.string   "unique_request_number",       limit: 255
     t.string   "transfer_type",               limit: 255
@@ -550,7 +544,6 @@ ActiveRecord::Schema.define(version: 20180607112108) do
     t.string   "bank_response",               limit: 255
     t.boolean  "refunded"
     t.string   "error_sub_code",              limit: 255
-    t.integer  "bank_transaction_type_id",    limit: 4
   end
 
   add_index "bank_transactions", ["amount_id"], name: "index_bank_transactions_on_amount_id", using: :btree
@@ -2311,98 +2304,48 @@ ActiveRecord::Schema.define(version: 20180607112108) do
   add_index "invoice_transaction_mappings", ["va_transaction_id"], name: "index_invoice_transaction_mappings_on_va_transaction_id", using: :btree
 
   create_table "invoices", force: :cascade do |t|
-    t.integer  "address_id",             limit: 4
+    t.integer  "address_id",         limit: 4
     t.date     "date"
     t.date     "due_date"
-    t.string   "invoice_number",         limit: 255
-    t.integer  "tax_type_id",            limit: 4
-    t.decimal  "discount",                             precision: 64, scale: 12
-    t.integer  "discount_type_id",       limit: 4
-    t.datetime "created_at",                                                     null: false
-    t.datetime "updated_at",                                                     null: false
-    t.integer  "gross_amount_id",        limit: 4
-    t.integer  "net_amount_id",          limit: 4
+    t.string   "invoice_number",     limit: 255
+    t.integer  "tax_type_id",        limit: 4
+    t.decimal  "discount",                       precision: 64, scale: 12
+    t.integer  "discount_type_id",   limit: 4
+    t.datetime "created_at",                                               null: false
+    t.datetime "updated_at",                                               null: false
+    t.integer  "gross_amount_id",    limit: 4
+    t.integer  "net_amount_id",      limit: 4
     t.boolean  "inclusive_of_taxes"
-    t.integer  "amount_id",              limit: 4
-    t.decimal  "tds",                                  precision: 64, scale: 12
-    t.integer  "tds_type_id",            limit: 4
-    t.integer  "gst_type_id",            limit: 4
-    t.integer  "payment_id",             limit: 4
-    t.integer  "discount_amount_id",     limit: 4
-    t.integer  "tds_amount_id",          limit: 4
-    t.integer  "tax_amount_id",          limit: 4
-    t.decimal  "tax",                                  precision: 64, scale: 12
-    t.integer  "category_id",            limit: 4
-    t.integer  "original_amount_id",     limit: 4
-    t.integer  "advance_amount_id",      limit: 4
-    t.integer  "advance_type_id",        limit: 4
-    t.decimal  "advance",                              precision: 20, scale: 10
-    t.integer  "freight_amount_id",      limit: 4
-    t.integer  "freight_type_id",        limit: 4
-    t.decimal  "freight",                              precision: 20, scale: 10
-    t.decimal  "roundoff_amount",                      precision: 20, scale: 10
-    t.integer  "balance_due_id",         limit: 4
-    t.integer  "taxable_amount_id",      limit: 4
-    t.integer  "cost_center_id",         limit: 4
-    t.integer  "tds_slab_id",            limit: 4
-    t.integer  "invoice_status_id",      limit: 4
-    t.integer  "company_id",             limit: 4
-    t.integer  "created_by_user_id",     limit: 4
-    t.integer  "paid_amount_id",         limit: 4
-    t.integer  "vendor_id",              limit: 4
-    t.integer  "receiving_account_id",   limit: 4
-    t.string   "receiving_account_type", limit: 255
-    t.text     "note",                   limit: 65535
-    t.integer  "procurement_id",         limit: 4
-    t.integer  "remaining_amount_id",    limit: 4
+    t.integer  "amount_id",          limit: 4
+    t.decimal  "tds",                            precision: 64, scale: 12
+    t.integer  "tds_type_id",        limit: 4
+    t.integer  "gst_type_id",        limit: 4
+    t.integer  "payment_id",         limit: 4
+    t.integer  "discount_amount_id", limit: 4
+    t.integer  "sgst_amount_id",     limit: 4
+    t.integer  "csgt_amount_id",     limit: 4
+    t.integer  "igst_amount_id",     limit: 4
+    t.integer  "tds_amount_id",      limit: 4
+    t.integer  "tax_amount_id",      limit: 4
+    t.decimal  "tax",                            precision: 64, scale: 12
+    t.integer  "category_id",        limit: 4
+    t.integer  "original_amount_id", limit: 4
+    t.integer  "advance_amount_id",  limit: 4
+    t.integer  "advance_type_id",    limit: 4
+    t.decimal  "advance",                        precision: 20, scale: 10
+    t.integer  "freight_amount_id",  limit: 4
+    t.integer  "freight_type_id",    limit: 4
+    t.decimal  "freight",                        precision: 20, scale: 10
+    t.decimal  "roundoff_amount",                precision: 20, scale: 10
+    t.integer  "balance_due_id",     limit: 4
+    t.integer  "taxable_amount_id",  limit: 4
+    t.integer  "cost_center_id",     limit: 4
+    t.integer  "tds_slab_id",        limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
   add_index "invoices", ["discount_type_id"], name: "index_invoices_on_discount_type_id", using: :btree
   add_index "invoices", ["tax_type_id"], name: "index_invoices_on_tax_type_id", using: :btree
-
-  create_table "inward_document_items", force: :cascade do |t|
-    t.integer  "purchase_order_item_id", limit: 4
-    t.integer  "inward_document_id",     limit: 4
-    t.integer  "inventory_line_item_id", limit: 4
-    t.string   "product_id",             limit: 255
-    t.string   "description",            limit: 255
-    t.decimal  "quantity",                           precision: 10
-    t.decimal  "delivered",                          precision: 10
-    t.decimal  "accepted",                           precision: 10
-    t.decimal  "rejected",                           precision: 10
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
-  end
-
-  add_index "inward_document_items", ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id", using: :btree
-  add_index "inward_document_items", ["inward_document_id"], name: "index_inward_document_items_on_inward_document_id", using: :btree
-  add_index "inward_document_items", ["purchase_order_item_id"], name: "index_inward_document_items_on_purchase_order_item_id", using: :btree
-
-  create_table "inward_documents", force: :cascade do |t|
-    t.integer  "company_id",                  limit: 4
-    t.integer  "procurement_id",              limit: 4
-    t.integer  "vendor_id",                   limit: 4
-    t.string   "doc_number",                  limit: 255
-    t.string   "override_doc_number",         limit: 255
-    t.string   "prefix",                      limit: 255
-    t.date     "delivery_date"
-    t.string   "transported_name",            limit: 255
-    t.string   "transporter_document_number", limit: 255
-    t.string   "vehicle_number",              limit: 255
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-  end
-
-  add_index "inward_documents", ["company_id"], name: "index_inward_documents_on_company_id", using: :btree
-  add_index "inward_documents", ["procurement_id"], name: "index_inward_documents_on_procurement_id", using: :btree
-  add_index "inward_documents", ["vendor_id"], name: "index_inward_documents_on_vendor_id", using: :btree
-
-  create_table "inward_invoice_statuses", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
 
   create_table "itz_cash_card_programs", force: :cascade do |t|
     t.string   "product_code", limit: 255
@@ -3208,9 +3151,7 @@ ActiveRecord::Schema.define(version: 20180607112108) do
     t.text     "post_operation",          limit: 65535
     t.text     "post_operation_payload",  limit: 65535
     t.integer  "category_id",             limit: 4
-    t.date     "scheduled_at"
     t.boolean  "api_initiated",                         default: false
-    t.date     "processed_at"
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -3339,63 +3280,6 @@ ActiveRecord::Schema.define(version: 20180607112108) do
     t.text     "source_description", limit: 65535
   end
 
-  create_table "procurement_charges", force: :cascade do |t|
-    t.integer  "charge_type",     limit: 4
-    t.string   "description",     limit: 255
-    t.integer  "amount_id",       limit: 4
-    t.boolean  "taxable"
-    t.decimal  "tax",                         precision: 10
-    t.integer  "tax_amount_id",   limit: 4
-    t.integer  "total_amount_id", limit: 4
-    t.integer  "chargable_id",    limit: 4
-    t.string   "chargable_type",  limit: 255
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
-  end
-
-  add_index "procurement_charges", ["amount_id"], name: "index_procurement_charges_on_amount_id", using: :btree
-  add_index "procurement_charges", ["chargable_type", "chargable_id"], name: "index_procurement_charges_on_chargable_type_and_chargable_id", using: :btree
-  add_index "procurement_charges", ["tax_amount_id"], name: "index_procurement_charges_on_tax_amount_id", using: :btree
-  add_index "procurement_charges", ["total_amount_id"], name: "index_procurement_charges_on_total_amount_id", using: :btree
-
-  create_table "procurement_statuses", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.text     "description", limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  create_table "procurement_terms", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.text     "description", limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  create_table "procurement_tracks", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.text     "description", limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  create_table "procurements", force: :cascade do |t|
-    t.string   "name",                  limit: 255
-    t.integer  "procurement_track_id",  limit: 4
-    t.integer  "procurement_status_id", limit: 4
-    t.integer  "vendor_id",             limit: 4
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-    t.integer  "user_id",               limit: 4
-    t.integer  "company_id",            limit: 4
-  end
-
-  add_index "procurements", ["company_id"], name: "index_procurements_on_company_id", using: :btree
-  add_index "procurements", ["procurement_status_id"], name: "index_procurements_on_procurement_status_id", using: :btree
-  add_index "procurements", ["procurement_track_id"], name: "index_procurements_on_procurement_track_id", using: :btree
-  add_index "procurements", ["user_id"], name: "index_procurements_on_user_id", using: :btree
-  add_index "procurements", ["vendor_id"], name: "index_procurements_on_vendor_id", using: :btree
-
   create_table "product_combinations", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -3415,90 +3299,6 @@ ActiveRecord::Schema.define(version: 20180607112108) do
     t.string   "product",              limit: 255
     t.string   "prepaid_cards",        limit: 255
   end
-
-  create_table "purchase_order_items", force: :cascade do |t|
-    t.integer  "purchase_order_id",      limit: 4
-    t.integer  "inventory_line_item_id", limit: 4
-    t.string   "product_id",             limit: 255
-    t.string   "description",            limit: 255
-    t.string   "hsn_sac",                limit: 255
-    t.integer  "quantity",               limit: 4
-    t.decimal  "rate",                               precision: 10, scale: 5
-    t.decimal  "tax",                                precision: 10, scale: 5
-    t.decimal  "tds",                                precision: 10, scale: 5
-    t.decimal  "discount",                           precision: 10, scale: 5
-    t.integer  "tax_amount_id",          limit: 4
-    t.integer  "tds_amount_id",          limit: 4
-    t.integer  "discount_amount_id",     limit: 4
-    t.integer  "total_amount_id",        limit: 4
-    t.date     "delivery_date"
-    t.string   "comment",                limit: 255
-    t.datetime "created_at",                                                              null: false
-    t.datetime "updated_at",                                                              null: false
-    t.integer  "delivered",              limit: 4,                            default: 0
-    t.integer  "accepted",               limit: 4,                            default: 0
-    t.integer  "rejected",               limit: 4,                            default: 0
-  end
-
-  add_index "purchase_order_items", ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id", using: :btree
-  add_index "purchase_order_items", ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id", using: :btree
-  add_index "purchase_order_items", ["purchase_order_id"], name: "index_purchase_order_items_on_purchase_order_id", using: :btree
-  add_index "purchase_order_items", ["tax_amount_id"], name: "index_purchase_order_items_on_tax_amount_id", using: :btree
-  add_index "purchase_order_items", ["tds_amount_id"], name: "index_purchase_order_items_on_tds_amount_id", using: :btree
-  add_index "purchase_order_items", ["total_amount_id"], name: "index_purchase_order_items_on_total_amount_id", using: :btree
-
-  create_table "purchase_order_statuses", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "purchase_orders", force: :cascade do |t|
-    t.integer  "company_id",               limit: 4
-    t.integer  "procurement_id",           limit: 4
-    t.integer  "location_id",              limit: 4
-    t.integer  "delivery_location_id",     limit: 4
-    t.integer  "vendor_id",                limit: 4
-    t.integer  "payment_term_id",          limit: 4
-    t.integer  "procurement_term_id",      limit: 4
-    t.integer  "purchase_order_status_id", limit: 4
-    t.string   "indent_number",            limit: 255
-    t.date     "indent_date"
-    t.string   "po_number",                limit: 255
-    t.boolean  "override_po_number"
-    t.string   "prefix",                   limit: 255
-    t.string   "sequence_start",           limit: 255
-    t.date     "delivery_date"
-    t.integer  "gst_type_id",              limit: 4
-    t.boolean  "inclusive_of_taxes"
-    t.boolean  "roundoff_total_enabled"
-    t.decimal  "roundoff_amount",                      precision: 10, scale: 5
-    t.integer  "transaction_amount_id",    limit: 4
-    t.integer  "total_before_tax_id",      limit: 4
-    t.integer  "tax_amount_id",            limit: 4
-    t.integer  "total_after_tax_id",       limit: 4
-    t.integer  "discount_amount_id",       limit: 4
-    t.integer  "balance_amount_id",        limit: 4
-    t.datetime "created_at",                                                    null: false
-    t.datetime "updated_at",                                                    null: false
-    t.integer  "user_id",                  limit: 4
-  end
-
-  add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
-  add_index "purchase_orders", ["company_id"], name: "index_purchase_orders_on_company_id", using: :btree
-  add_index "purchase_orders", ["delivery_location_id"], name: "index_purchase_orders_on_delivery_location_id", using: :btree
-  add_index "purchase_orders", ["discount_amount_id"], name: "index_purchase_orders_on_discount_amount_id", using: :btree
-  add_index "purchase_orders", ["location_id"], name: "index_purchase_orders_on_location_id", using: :btree
-  add_index "purchase_orders", ["payment_term_id"], name: "index_purchase_orders_on_payment_term_id", using: :btree
-  add_index "purchase_orders", ["procurement_id"], name: "index_purchase_orders_on_procurement_id", using: :btree
-  add_index "purchase_orders", ["procurement_term_id"], name: "index_purchase_orders_on_procurement_term_id", using: :btree
-  add_index "purchase_orders", ["purchase_order_status_id"], name: "index_purchase_orders_on_purchase_order_status_id", using: :btree
-  add_index "purchase_orders", ["tax_amount_id"], name: "index_purchase_orders_on_tax_amount_id", using: :btree
-  add_index "purchase_orders", ["total_after_tax_id"], name: "index_purchase_orders_on_total_after_tax_id", using: :btree
-  add_index "purchase_orders", ["total_before_tax_id"], name: "index_purchase_orders_on_total_before_tax_id", using: :btree
-  add_index "purchase_orders", ["transaction_amount_id"], name: "index_purchase_orders_on_transaction_amount_id", using: :btree
-  add_index "purchase_orders", ["user_id"], name: "index_purchase_orders_on_user_id", using: :btree
-  add_index "purchase_orders", ["vendor_id"], name: "index_purchase_orders_on_vendor_id", using: :btree
 
   create_table "purposes", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -4473,30 +4273,6 @@ ActiveRecord::Schema.define(version: 20180607112108) do
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
-  create_table "vendor_account_transactions", force: :cascade do |t|
-    t.integer  "vendor_account_id",   limit: 4
-    t.integer  "transaction_type_id", limit: 4
-    t.integer  "amount_id",           limit: 4
-    t.integer  "payment_id",          limit: 4
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
-  end
-
-  add_index "vendor_account_transactions", ["amount_id"], name: "index_vendor_account_transactions_on_amount_id", using: :btree
-  add_index "vendor_account_transactions", ["payment_id"], name: "index_vendor_account_transactions_on_payment_id", using: :btree
-  add_index "vendor_account_transactions", ["transaction_type_id"], name: "index_vendor_account_transactions_on_transaction_type_id", using: :btree
-  add_index "vendor_account_transactions", ["vendor_account_id"], name: "index_vendor_account_transactions_on_vendor_account_id", using: :btree
-
-  create_table "vendor_accounts", force: :cascade do |t|
-    t.integer  "balance_id", limit: 4
-    t.integer  "vendor_id",  limit: 4
-    t.datetime "created_at",           null: false
-    t.datetime "updated_at",           null: false
-  end
-
-  add_index "vendor_accounts", ["balance_id"], name: "index_vendor_accounts_on_balance_id", using: :btree
-  add_index "vendor_accounts", ["vendor_id"], name: "index_vendor_accounts_on_vendor_id", using: :btree
-
   create_table "vendor_attachments", force: :cascade do |t|
     t.string   "attached_file_file_name",    limit: 255
     t.string   "attached_file_content_type", limit: 255
@@ -4653,14 +4429,14 @@ ActiveRecord::Schema.define(version: 20180607112108) do
     t.text     "url",               limit: 65535
     t.text     "request_body",      limit: 65535
     t.text     "request_header",    limit: 65535
-    t.decimal  "response_time",                   precision: 10
-    t.text     "response_body",     limit: 65535
+    t.decimal  "response_time",                      precision: 10
+    t.text     "response_body",     limit: 16777215
     t.integer  "response_status",   limit: 4
     t.integer  "attempt",           limit: 4
     t.datetime "last_attempted_at"
     t.boolean  "attempt_success"
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
+    t.datetime "created_at",                                        null: false
+    t.datetime "updated_at",                                        null: false
   end
 
   add_index "web_hook_tracks", ["company_id"], name: "index_web_hook_tracks_on_company_id", using: :btree
@@ -4859,11 +4635,6 @@ ActiveRecord::Schema.define(version: 20180607112108) do
   add_foreign_key "invoice_number_configs", "invoice_number_config_types"
   add_foreign_key "invoice_number_configs", "purposes"
   add_foreign_key "invoices", "addresses"
-  add_foreign_key "inward_document_items", "inventory_line_items"
-  add_foreign_key "inward_document_items", "inward_documents"
-  add_foreign_key "inward_document_items", "purchase_order_items"
-  add_foreign_key "inward_documents", "companies"
-  add_foreign_key "inward_documents", "procurements"
   add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
   add_foreign_key "itz_cash_dmt_senders", "users"
@@ -4931,19 +4702,6 @@ ActiveRecord::Schema.define(version: 20180607112108) do
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
-  add_foreign_key "procurement_charges", "amounts"
-  add_foreign_key "procurements", "companies"
-  add_foreign_key "procurements", "procurement_statuses"
-  add_foreign_key "procurements", "procurement_tracks"
-  add_foreign_key "procurements", "users"
-  add_foreign_key "purchase_order_items", "inventory_line_items"
-  add_foreign_key "purchase_order_items", "purchase_orders"
-  add_foreign_key "purchase_orders", "companies"
-  add_foreign_key "purchase_orders", "payment_terms"
-  add_foreign_key "purchase_orders", "procurement_terms"
-  add_foreign_key "purchase_orders", "procurements"
-  add_foreign_key "purchase_orders", "purchase_order_statuses"
-  add_foreign_key "purchase_orders", "users"
   add_foreign_key "quickbooks_configurations", "quickbooks_payment_types"
   add_foreign_key "quickbooks_configurations", "users"
   add_foreign_key "quickbooks_departments", "companies"
@@ -5011,9 +4769,6 @@ ActiveRecord::Schema.define(version: 20180607112108) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
-  add_foreign_key "vendor_account_transactions", "amounts"
-  add_foreign_key "vendor_account_transactions", "payments"
-  add_foreign_key "vendor_account_transactions", "vendor_accounts"
   add_foreign_key "vendor_payment_wallets", "users"
   add_foreign_key "vendor_types", "companies"
   add_foreign_key "web_hook_event_mappings", "web_hook_events"

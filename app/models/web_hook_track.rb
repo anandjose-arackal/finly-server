@@ -10,7 +10,7 @@
 #  request_body      :text(65535)
 #  request_header    :text(65535)
 #  response_time     :decimal(10, )
-#  response_body     :text(65535)
+#  response_body     :text(16777215)
 #  response_status   :integer
 #  attempt           :integer
 #  last_attempted_at :datetime

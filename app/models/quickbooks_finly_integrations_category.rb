@@ -34,7 +34,7 @@ class QuickbooksFinlyIntegrationsCategory
             category_params[:category_attributes][:active] = self.active
             category_params[:quickbooks_additional_information] = self.quickbooks_additional_information
             category_params[:quickbooks_category_type] = self.category_sub_type unless is_payment? additional_information_json
-            category_params[:category_attributes][:purpose_id] = Purpose.id_for(:expense_management)
+            category_params[:category_attributes][:expense_management] = true
             finly_integrations_category.update(category_params)
           elsif finly_integrations_category.is_a?(QuickbooksPaymentType)
             finly_integrations_category.name = self.name
