@@ -117,6 +117,7 @@ class Payment < ActiveRecord::Base
                                                              PaymentPurpose.id_for(:atm_withdrawal)] }
   scope :with_amount, -> { joins :amount }
   scope :with_category, -> (ids) {where category_id: ids}
+  scope :with_invoice, -> (ids) { where invoice_id: ids }
   scope :sum_amounts, -> { with_amount.sum(:value) }
   scope :joins_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }
