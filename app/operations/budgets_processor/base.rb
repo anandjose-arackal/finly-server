@@ -9,6 +9,7 @@ class BudgetsProcessor::Base < BaseOperation
 
   def process
     budgets.each do |budget|
+      # todo Discuss with sreeram
       next if Date.today < budget.start_date || Date.today > budget.end_date
 
       if budget.budgetable_type == 'User'
