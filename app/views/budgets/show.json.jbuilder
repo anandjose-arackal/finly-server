@@ -39,12 +39,16 @@ json.budget_trail_items do
     elsif item.class.name == 'Payment'
       json.status item.payment_status.name.humanize
       json.type "payment"
-      json.vendor do
-        json.extract! item.receiving_user, :id, :name, :email, :mobile_number
+      if item.receiving_user.present?
+        json.vendor do
+          json.extract! item.receiving_user, :id, :name, :email, :mobile_number
+        end
       end
 
-      json.initiating_user do
-        json.extract! item.initiating_user, :id, :name, :email, :mobile_number
+      if item.initiating_user.present?
+        json.initiating_user do
+          json.extract! item.initiating_user, :id, :name, :email, :mobile_number
+        end
       end
 
     end
