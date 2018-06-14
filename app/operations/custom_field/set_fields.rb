@@ -105,7 +105,7 @@ class CustomField::SetFields < CustomField::Base
       # from the field configurations set
       required_ids = self.field_configurations.pluck(:id)
       existing_ids = self.item.custom_fields.pluck(:field_configuration_id)
-      configs_to_create = FieldConfiguration.with_id(required_ids - existing_ids)
+      configs_to_create = process_custom_field_changes&.first # because configs to create will be returned by the method that calculates what all need to be created
       config_ids_to_destroy = existing_ids - required_ids
     else
       configs_to_create, config_ids_to_destroy = process_custom_field_changes
