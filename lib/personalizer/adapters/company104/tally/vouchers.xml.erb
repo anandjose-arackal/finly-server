@@ -14,7 +14,7 @@
          <REQUESTDATA>
             <TALLYMESSAGE xmlns:UDF="TallyUDF">
             <% reports = {} %>
-            <% expenses.each do |expense| %>
+            <% expenses.reimbursable.each do |expense| %>
               <% if expense.user.gl_config&.dig(:name).blank? %>
                 <% raise 'GL Config is not configured for the user' %>
               <% end %>
