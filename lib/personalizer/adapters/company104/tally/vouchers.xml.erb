@@ -18,97 +18,39 @@
               <% if expense.user.gl_config&.dig(:name).blank? %>
                 <% raise 'GL Config is not configured for the user' %>
               <% end %>
-              <% reports[expense.report_id] = {} if reports[expense.report_id].nil? %>
-              <% if reports[expense.report_id][expense.user.gl_config[:name]].nil? %>
-                <% reports[expense.report_id][expense.user.gl_config[:name]] = {amount: 0, date: configuration.date_for(expense), user: html_escape(expense.user.gl_config[:name])} %>
+              <% expense_gl_code = html_escape expense.category.gl_name %>
+              <% reports[expense.report_id] = {date: configuration.date_for(expense), user: html_escape(expense.user.gl_config[:name]), ledgers: {}, total_amount: 0} if reports[expense.report_id].nil? %>
+              <% if reports[expense.report_id][:ledgers][expense_gl_code].nil? %>
+                <% reports[expense.report_id][:ledgers][expense_gl_code] = {amount: 0} %>
               <% end %>
-              <% reports[expense.report_id][expense.user.gl_config[:name]][:amount] += expense.amount.INR %>
+              <% reports[expense.report_id][:ledgers][expense_gl_code][:amount] += expense.amount.INR %>
+              <% reports[expense.report_id][:total_amount] += expense.amount.INR %>
             <% end %>
-            <% if travelling_tour.present? %>
-              <% travelling_tour.each do |user_id, details| %>
+            <% if reports.present? %>
+            <% reports.each do |report_id, details| %>
               <VOUCHER VCHTYPE="Journal" ACTION="Create">
                  <VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>
                  <DATE><%= details[:date] %></DATE>
                  <NARRATION></NARRATION>
                  <EFFECTIVEDATE><%= details[:date] %></EFFECTIVEDATE>
+            <% details[:ledgers].each do |name, ledger| %>
                  <ALLLEDGERENTRIES.LIST>
-                    <LEDGERNAME><%= html_escape 'TRAVELLING TOUR [FOOD & BEVERAGE]' %></LEDGERNAME>
+                    <LEDGERNAME><%= html_escape name %></LEDGERNAME>
                     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
                     <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
                     <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                    <AMOUNT>-<%= details[:amount] %></AMOUNT>
+                    <AMOUNT>-<%= ledger[:amount] %></AMOUNT>
                  </ALLLEDGERENTRIES.LIST>
-                 <ALLLEDGERENTRIES.LIST>
-                    <LEDGERNAME><%= details[:user_gl_name] %></LEDGERNAME>
-                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                    <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-                    <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                    <AMOUNT><%= details[:amount] %></AMOUNT>
-                 </ALLLEDGERENTRIES.LIST>
-              </VOUCHER>
-              <% end %>
             <% end %>
-
-
-
-
-
-            <% travelling_tour = {} %>
-            <% expenses.each do |expense| %>
-              <% if expense.user.gl_config&.dig(:name).blank? %>
-                <% raise 'GL Config is not configured for the user' %>
-              <% end %>
-              <% if expense.category.gl_code == 'TRAVELLING TOUR [FOOD & BEVERAGE]' %>
-                <% if travelling_tour[expense.user_id].nil? %>
-                  <% travelling_tour[expense.user_id] = {amount: 0, user_gl_name: html_escape(expense.user.gl_config[:name]), date: configuration.date_for(expense)} %>
-                <% end %>
-                <% travelling_tour[expense.user_id][:amount] += expense.amount.INR %>
-                <% next %>
-              <% end %>
-               <VOUCHER VCHTYPE="Journal" ACTION="Create">
-                 <VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>
-                 <DATE><%= configuration.date_for(expense) %></DATE>
-                 <NARRATION><%= html_escape "#{expense.merchant_name(simple: true)} - #{expense.user.name}" %></NARRATION>
-                 <EFFECTIVEDATE><%= configuration.date_for(expense) %></EFFECTIVEDATE>
                  <ALLLEDGERENTRIES.LIST>
-                    <LEDGERNAME><%= html_escape expense.category.gl_name %></LEDGERNAME>
-                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                    <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-                    <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                    <AMOUNT>-<%= expense.amount.INR %></AMOUNT>
-                 </ALLLEDGERENTRIES.LIST>
-                 <ALLLEDGERENTRIES.LIST>
-                    <LEDGERNAME><%= html_escape expense.user.gl_config[:name] %></LEDGERNAME>
+                    <LEDGERNAME><%= details[:user] %></LEDGERNAME>
                     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
                     <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
                     <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                    <AMOUNT><%= expense.amount.INR %></AMOUNT>
+                    <AMOUNT><%= details[:total_amount] %></AMOUNT>
                  </ALLLEDGERENTRIES.LIST>
               </VOUCHER>
             <% end %>
-            <% if travelling_tour.present? %>
-              <% travelling_tour.each do |user_id, details| %>
-              <VOUCHER VCHTYPE="Journal" ACTION="Create">
-                 <VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>
-                 <DATE><%= details[:date] %></DATE>
-                 <NARRATION></NARRATION>
-                 <EFFECTIVEDATE><%= details[:date] %></EFFECTIVEDATE>
-                 <ALLLEDGERENTRIES.LIST>
-                    <LEDGERNAME><%= html_escape 'TRAVELLING TOUR [FOOD & BEVERAGE]' %></LEDGERNAME>
-                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                    <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
-                    <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                    <AMOUNT>-<%= details[:amount] %></AMOUNT>
-                 </ALLLEDGERENTRIES.LIST>
-                 <ALLLEDGERENTRIES.LIST>
-                    <LEDGERNAME><%= details[:user_gl_name] %></LEDGERNAME>
-                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                    <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-                    <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                    <AMOUNT><%= details[:amount] %></AMOUNT>
-                 </ALLLEDGERENTRIES.LIST>
-              </VOUCHER>
-              <% end %>
             <% end %>
             </TALLYMESSAGE>
          </REQUESTDATA>
