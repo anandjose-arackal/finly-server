@@ -481,6 +481,8 @@
 #                   admin_users_card_assign_requests_edit GET    /admin_users/card_assign_requests/edit(.:format)                                             admin_users/card_assign_requests#edit
 #                                      admin_users_search POST   /admin_users/call_center/search(.:format)                                                    admin_users/call_center/users#search
 #                                              admin_menu GET    /admin_menus(.:format)                                                                       admin_users/users#admin_menus
+#                           api_successful_vendor_payment POST   /api/callbacks/successful_vendor_payment(.:format)                                           api/callbacks#successful_vendor_payment
+#                            api_invoice_payment_received POST   /api/callbacks/invoice_payment_received(.:format)                                            api/callbacks#invoice_payment_received
 #                                                         GET    /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#show
 #                                        virtual_accounts POST   /virtual_accounts(.:format)                                                                  api/fc/invoices/virtual_bank_accounts#create
 #                                                         PATCH  /virtual_accounts/:account_number(.:format)                                                  api/fc/invoices/virtual_bank_accounts#update
@@ -491,6 +493,7 @@
 #                                                         GET    /invoices/customers/:id(.:format)                                                            api/fc/invoices/customers#show
 #                   api_vp_bank_transfer_initiate_payment POST   /api/vp/bank_transfer/initiate_payment(.:format)                                             api/vp/bank_transfer/bank_payment_requests#initiate_payment
 #                     api_vp_bank_transfer_payment_status GET    /api/vp/bank_transfer/payment_status/:id(.:format)                                           api/vp/bank_transfer/bank_payment_requests#payment_status
+#              api_vp_bank_transfer_bulk_initiate_payment POST   /api/vp/bank_transfer/bulk_initiate_payment(.:format)                                        api/vp/bank_transfer/bank_payment_requests#bulk_initiate_payment
 #        api_vp_bank_transfer_bank_payment_request_credit PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/credit(.:format)        api/vp/bank_transfer/bank_payment_requests#credit
 #        api_vp_bank_transfer_bank_payment_request_review PATCH  /api/vp/bank_transfer/bank_payment_requests/:bank_payment_request_id/review(.:format)        api/vp/bank_transfer/bank_payment_requests#review
 #              api_vp_bank_transfer_bank_payment_requests GET    /api/vp/bank_transfer/bank_payment_requests(.:format)                                        api/vp/bank_transfer/bank_payment_requests#index
@@ -509,6 +512,14 @@
 #                                                         PATCH  /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#update
 #                                                         PUT    /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#update
 #                                                         DELETE /api/vp/v1/inventory_line_items/:id(.:format)                                                api/vp/v1/inventory_line_items#destroy
+#                    api_vp_v1_inward_invoice_attachments GET    /api/vp/v1/inward_invoice_attachments(.:format)                                              api/vp/v1/inward_invoice_attachments#index
+#                                                         POST   /api/vp/v1/inward_invoice_attachments(.:format)                                              api/vp/v1/inward_invoice_attachments#create
+#                 new_api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/new(.:format)                                          api/vp/v1/inward_invoice_attachments#new
+#                edit_api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/:id/edit(.:format)                                     api/vp/v1/inward_invoice_attachments#edit
+#                     api_vp_v1_inward_invoice_attachment GET    /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#show
+#                                                         PATCH  /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#update
+#                                                         PUT    /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#update
+#                                                         DELETE /api/vp/v1/inward_invoice_attachments/:id(.:format)                                          api/vp/v1/inward_invoice_attachments#destroy
 #                                                  api_vp POST   /api/vp/vendors(.:format)                                                                    api/vp/vendors#create
 #                                               junk_show GET    /junk/show(.:format)                                                                         junk#show
 #                                               menu_data GET    /menu_data(.:format)                                                                         users#menu_data
@@ -1010,6 +1021,7 @@
 #                                       quickbooks_config GET    /quickbooks/config(.:format)                                                                 quickbooks#show
 #                                 integration_tally_check GET    /integration/tally/check(.:format)                                                           integration/tally#check
 #                              integration_tally_vouchers GET    /integration/tally/vouchers(.:format)                                                        integration/tally#vouchers
+#                        integration_tally_reimbursements GET    /integration/tally/reimbursements(.:format)                                                  integration/tally#reimbursements
 #                         integration_tally_configuration POST   /integration/tally/configuration(.:format)                                                   integration/tally#set_configuration
 #                                                     tos GET    /tos(.:format)                                                                               static_pages#tos
 #                                                 privacy GET    /privacy(.:format)                                                                           static_pages#privacy
@@ -2232,6 +2244,12 @@ Rails.application.routes.draw do
 
   ######### ADMIN PANEL END ###########
 
+  ################### API Callbacks tester ######################
+
+  namespace :api do
+    post 'callbacks/successful_vendor_payment', to: 'callbacks#successful_vendor_payment', as: :successful_vendor_payment
+    post 'callbacks/invoice_payment_received', to: 'callbacks#invoice_payment_received', as: :invoice_payment_received
+end
 
   ############# Virtual Bank Accounts and Collect API Start ######################
 
@@ -2253,6 +2271,7 @@ Rails.application.routes.draw do
       namespace :bank_transfer do
         post 'initiate_payment', to: 'bank_payment_requests#initiate_payment', as: :initiate_payment
         get 'payment_status/:id', to: 'bank_payment_requests#payment_status', as: :payment_status
+        post 'bulk_initiate_payment', to: 'bank_payment_requests#bulk_initiate_payment', as: :bulk_initiate_payment
         resources :bank_payment_requests do
           patch 'credit', to: 'bank_payment_requests#credit', as: :credit
           patch 'review', to: 'bank_payment_requests#review', as: :review
@@ -2260,6 +2279,7 @@ Rails.application.routes.draw do
       end
       namespace :v1 do
         resources :inventory_line_items
+        resources :inward_invoice_attachments
       end
       scope :vendors do
         post '', to: 'vendors#create'
@@ -2707,6 +2727,7 @@ Rails.application.routes.draw do
   namespace :integration do
     get 'tally/check', to: 'tally#check'
     get 'tally/vouchers', to: 'tally#vouchers'
+    get 'tally/reimbursements', to: 'tally#reimbursements'
     post 'tally/configuration', to: 'tally#set_configuration'
   end
 

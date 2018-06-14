@@ -43,6 +43,8 @@ class Budgets::Show < Budgets::Base
         op = ::BudgetsProcessor::Calculate::YesBankVendor.(user, {budget: budget, get_items: true})
       elsif budget.budgetable_type == 'FieldDropDownItem'
         op = ::BudgetsProcessor::Calculate::FieldDropDownItem.(user, {budget: budget, get_items: true})
+      elsif budget.budgetable_type == 'CostCenter'
+        op = ::BudgetsProcessor::Calculate::CostCenter.(user, {budget: budget, get_items: true})
       end
       self.spent_amount = op.result[:spent_amount]
       self.budget_trail_items = op.result[:budget_trail_items] rescue []

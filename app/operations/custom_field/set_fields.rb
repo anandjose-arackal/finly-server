@@ -77,7 +77,40 @@ class CustomField::SetFields < CustomField::Base
 
   def process
 
-    configs_to_create, config_ids_to_destroy = process_custom_field_changes
+    # if self.reset
+    #   item.custom_fields.destroy_all if item.custom_fields.present?
+    #
+    #   required_ids = self.field_configurations.pluck(:id)
+    #   existing_ids = self.item.custom_fields.pluck(:field_configuration_id)
+    #   create_ids = required_ids - existing_ids
+    #
+    #
+    #   if create_ids.present?
+    #     self.field_configurations.enabled.with_id(create_ids).each do |config|
+    #       # If value has not been set but default value is present, set the value as a deep clone of default value
+    #       default_value = nil
+    #       if config.default_value.present?
+    #         default_value =config.default_value.deep_clone
+    #       end
+    #       field = item.custom_fields.build(field_configuration: config, value: default_value)
+    #       if self.save
+    #         field.save
+    #       end
+    #     end
+    #   end
+    # end
+
+    if self.reset
+      # in this case we can reset the custom fields by destroying all existing custom fields and recreating them
+      # from the field configurations set
+      required_ids = self.field_configurations.pluck(:id)
+      existing_ids = self.item.custom_fields.pluck(:field_configuration_id)
+      configs_to_create = process_custom_field_changes&.first # because configs to create will be returned by the method that calculates what all need to be created
+      config_ids_to_destroy = existing_ids - required_ids
+    else
+      configs_to_create, config_ids_to_destroy = process_custom_field_changes
+    end
+
 
     configs_to_create.each do |config|
       default_value = nil
@@ -91,6 +124,7 @@ class CustomField::SetFields < CustomField::Base
     end
 
     item.custom_fields.with_field_configuration_ids(config_ids_to_destroy).destroy_all
+
 
     return if item.custom_fields.blank?
 
@@ -140,8 +174,11 @@ class CustomField::SetFields < CustomField::Base
         end
       end
 
+
       if required
-        unless current_ids.include?(config.id)
+        if current_ids.include?(config.id)
+          # do nothing?
+        else
           # Create
           configs_to_create << config
         end

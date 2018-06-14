@@ -23,6 +23,7 @@
 #  created_at                :datetime         not null
 #  updated_at                :datetime         not null
 #  marked_as_closed          :boolean
+#  tally_exported            :boolean          default(FALSE)
 #
 
 require 'test_helper'

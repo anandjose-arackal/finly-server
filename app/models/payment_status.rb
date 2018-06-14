@@ -51,4 +51,8 @@ class PaymentStatus < ActiveRecord::Base
     self.id == PaymentStatus.id_for(:processing)
   end
 
+  def possible_failure?
+    self.id == PaymentStatus.id_for(:possible_failure)
+  end
+
 end

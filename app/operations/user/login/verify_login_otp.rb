@@ -29,7 +29,8 @@ class User::Login::VerifyLoginOtp < BaseOperation
     end
     # adding validation to check if the OTP has been checked more than 3 times since being sent
     if selected_user.otp_attempts >= 6
-      add_message :error, "You have reached the maximum number of attempts for OTP Verification. Please reset the OTP and try again"
+      # add_message :error, "You have reached the maximum number of attempts for OTP Verification. Please reset the OTP and try again"
+      add_message :error, "Invalid OTP"
       return
     end
     unless selected_user.otp == params[:otp]

@@ -12,7 +12,7 @@ class WebHookEvent < ActiveRecord::Base
   include Seedable
 
   def self.values
-    %w(collect.transaction)
+    %w(collect.transaction, vendor_payments.credit_confirmation)
   end
 
 end
