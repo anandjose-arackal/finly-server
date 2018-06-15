@@ -14,7 +14,7 @@ class TravelRequests::Update < TravelRequests::Base
 
   def pre_process
     self.associated_report = self.travel_request.report
-    self.associated_money_request = self.travel_request.money_request
+    self.associated_money_request = self.travel_request.report&.money_request
     self.new_associated_report_id = travel_request_parameters[:report_id].to_i
     self.new_associated_money_request_id = travel_request_parameters[:money_request_id].to_i
     travel_request_parameters.delete(:report_id)

@@ -152,8 +152,8 @@ json.linked_report do
 end
 
 json.linked_money_request do
-  json.id @result.travel_request.money_request&.id
-  json.name @result.travel_request.money_request&.name
+  json.id @result.travel_request&.report&.money_request&.id
+  json.name @result.travel_request&.report&.money_request&.name
 end
 
 json.actions @result.actions
