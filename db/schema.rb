@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180615085626) do
+ActiveRecord::Schema.define(version: 20180615125616) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3739,6 +3739,8 @@ ActiveRecord::Schema.define(version: 20180615085626) do
     t.integer  "sync_status_id",                     limit: 4
     t.integer  "sync_type_id",                       limit: 4
     t.integer  "report_processor_group_mapping_id",  limit: 4
+    t.integer  "travel_request_id",                  limit: 4
+    t.integer  "money_request_id",                   limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree

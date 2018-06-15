@@ -18,6 +18,19 @@ json.enforce_policy_enabled @result.money_request.user.enforce_policy_enabled?
 
 json.card @result.card
 
+json.user_reports current_user.reports
+json.user_money_requests current_user.money_requests
+
+json.linked_report do
+  json.id @result.money_request.report&.id
+  json.name @result.money_request.report&.name
+end
+
+json.linked_travel_request do
+  json.id @result.money_request.travel_request&.id
+  json.name @result.money_request.travel_request&.name
+end
+
 json.forwardable_users do
   forwardable_users = @result.forwardable_users
   if forwardable_users.present?
