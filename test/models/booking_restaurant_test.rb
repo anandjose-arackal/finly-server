@@ -12,6 +12,8 @@
 #  parent_id               :integer
 #  parent_type             :string(255)
 #  restaurant_rating       :string(255)
+#  start_time              :text(65535)
+#  end_time                :text(65535)
 #
 
 require 'test_helper'

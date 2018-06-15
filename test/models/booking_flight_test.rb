@@ -16,6 +16,8 @@
 #  booking_class       :string(255)
 #  stops               :string(255)
 #  ticket_number       :string(255)
+#  start_time          :text(65535)
+#  end_time            :text(65535)
 #
 
 require 'test_helper'
