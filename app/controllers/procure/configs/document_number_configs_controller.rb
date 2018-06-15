@@ -1,6 +1,8 @@
 class Procure::Configs::DocNumberConfigsController < ApplicationController
 
   def index
+    @result = Procurements::Configs::DocumentNumberConfig::Index.(current_user, params)
+    respond
 
   end
 
