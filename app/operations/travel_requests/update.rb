@@ -45,6 +45,7 @@ class TravelRequests::Update < TravelRequests::Base
           self.associated_report.update(money_request_id: nil)
         end
       end
+      # updating the associated money request and report for the old
       add_message :success, 'Successfully updated travel request'
     else
       add_message :error, self.travel_request.errors.full_messages

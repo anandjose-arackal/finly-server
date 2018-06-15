@@ -75,6 +75,7 @@ class MoneyRequest::Update < MoneyRequest::Base
       if params[:custom_fields].present? or original_policy_id != updated_policy_id
         CustomField::SetFields.(money_request, FieldParentType.id_for(:money_request), custom_fields: params[:custom_fields], save: true, reset_fields: true)
       end
+      
     else
       messages[:error] = money_request.errors.full_messages
     end

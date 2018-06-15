@@ -19,7 +19,7 @@ json.enforce_policy_enabled @result.money_request.user.enforce_policy_enabled?
 json.card @result.card
 
 json.user_reports current_user.reports
-json.user_money_requests current_user.money_requests
+json.user_travel_requests current_user.travel_requests
 
 json.linked_report do
   json.id @result.money_request.report&.id
@@ -27,8 +27,8 @@ json.linked_report do
 end
 
 json.linked_travel_request do
-  json.id @result.money_request.travel_request&.id
-  json.name @result.money_request.travel_request&.name
+  json.id @result.money_request.report&.travel_request&.id
+  json.name @result.money_request.report&.travel_request&.name
 end
 
 json.forwardable_users do

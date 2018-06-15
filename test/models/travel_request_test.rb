@@ -22,8 +22,6 @@
 #  auto_approved                :boolean
 #  report_id                    :integer
 #  money_request_id             :integer
-#  booking_id                   :integer
-#  booking_request_id           :integer
 #
 
 require 'test_helper'

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180615125616) do
+ActiveRecord::Schema.define(version: 20180615132651) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3934,16 +3934,18 @@ ActiveRecord::Schema.define(version: 20180615125616) do
   end
 
   create_table "travel_request_comments", force: :cascade do |t|
-    t.integer  "travel_request_id", limit: 4
-    t.text     "content",           limit: 65535
-    t.integer  "user_id",           limit: 4
-    t.text     "note",              limit: 65535
-    t.text     "previous_value",    limit: 65535
-    t.text     "new_value",         limit: 65535
-    t.text     "edited_field",      limit: 65535
-    t.datetime "created_at",                      null: false
-    t.datetime "updated_at",                      null: false
-    t.integer  "action_id",         limit: 4
+    t.integer  "travel_request_id",  limit: 4
+    t.text     "content",            limit: 65535
+    t.integer  "user_id",            limit: 4
+    t.text     "note",               limit: 65535
+    t.text     "previous_value",     limit: 65535
+    t.text     "new_value",          limit: 65535
+    t.text     "edited_field",       limit: 65535
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.integer  "action_id",          limit: 4
+    t.integer  "booking_id",         limit: 4
+    t.integer  "booking_request_id", limit: 4
   end
 
   add_index "travel_request_comments", ["travel_request_id"], name: "index_travel_request_comments_on_travel_request_id", using: :btree
@@ -4013,8 +4015,6 @@ ActiveRecord::Schema.define(version: 20180615125616) do
     t.boolean  "auto_approved"
     t.integer  "report_id",                    limit: 4
     t.integer  "money_request_id",             limit: 4
-    t.integer  "booking_id",                   limit: 4
-    t.integer  "booking_request_id",           limit: 4
   end
 
   add_index "travel_requests", ["company_id"], name: "index_travel_requests_on_company_id", using: :btree

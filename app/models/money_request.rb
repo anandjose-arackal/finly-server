@@ -32,6 +32,7 @@
 
 
 
+
 class MoneyRequest < ActiveRecord::Base
   include OperationCallbacks, MathUtil, SoftDeletable
 
@@ -57,7 +58,6 @@ class MoneyRequest < ActiveRecord::Base
   has_many :items, class_name: 'MoneyRequestItem', foreign_key: :money_request_id, dependent: :destroy
 
   has_one :report
-  has_one :travel_request
 
   # submission amount for determining the approving manager and finance manager
   belongs_to :submitted_amount, class_name: "Amount"
