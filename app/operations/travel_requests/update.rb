@@ -37,12 +37,12 @@ class TravelRequests::Update < TravelRequests::Base
       if report.present?
         if self.associated_report&.id != self.new_associated_report_id
           report&.update(travel_request_id: self.travel_request.id)
-          self.associated_report.update(travel_request_id: nil)
+          self.associated_report&.update(travel_request_id: nil)
         end
         if self.associated_money_request&.id != self.new_associated_money_request_id
           money_request = user.money_requests.find_by(id: self.new_associated_money_request_id)
           report&.update(money_request_id: money_request.id)
-          self.associated_report.update(money_request_id: nil)
+          self.associated_report&.update(money_request_id: nil)
         end
       end
       # updating the associated money request and report for the old
