@@ -22,12 +22,15 @@ class TravelRequests::Show < TravelRequests::Base
   end
 
   class TravelRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :travel_request, :destinations, :booking_types
+    attr_accessor :travel_request, :destinations, :booking_types,
+                  :manager, :travel_manager
 
     def init
       self.travel_request = params[:travel_request]
       self.destinations = travel_request.destinations
       self.booking_types = params[:booking_types]
+      self.manager = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :manager)
+      self.travel_manager = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :travel_manager)
     end
 
     def actions
