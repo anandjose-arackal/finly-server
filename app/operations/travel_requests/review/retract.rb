@@ -5,7 +5,7 @@ class TravelRequests::Review::Retract < TravelRequests::Review::Base
   end
 
   def validate
-    unless travel_request.owner_id == user.id
+    unless travel_request.user_id == user.id
       add_message :error, "Only Owners can retract their report"
       return
     end
