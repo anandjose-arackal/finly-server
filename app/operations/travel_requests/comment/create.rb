@@ -1,4 +1,4 @@
-class TravelRequests::Comment::Create < TravelRequest::Comment::Base
+class TravelRequests::Comment::Create < TravelRequests::Comment::Base
 
   attr_accessor :comment
   attr_accessor :travel_request, :booking_types
