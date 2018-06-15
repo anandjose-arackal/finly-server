@@ -36,7 +36,7 @@ class TravelRequests::Show < TravelRequests::Base
     def actions
       actions = {}
       # todo associated_users
-      if travel_request.open? && travel_request.user_id == user.id
+      if (travel_request.open? || travel_request.retracted?) && travel_request.user_id == user.id
         actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       elsif travel_request.processing?
         if travel_request.controlling_user_id == user.id && (manager_view? && user.manager?)
@@ -44,7 +44,7 @@ class TravelRequests::Show < TravelRequests::Base
           actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         elsif user.company_admin? && admin_view?
           actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
-        elsif travel_request.controlling_user_id == user.id && user.employee?
+        elsif user.employee? && self.travel_request.user_id == user.id
           actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
       elsif travel_request.approved?

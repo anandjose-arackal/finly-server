@@ -158,7 +158,7 @@ end
 
 json.actions @result.actions
 
-json.policies current_company.policies
+json.policies current_user.policies
 
 json.comments do
   json.array!(@result.travel_request.comments) do |comment|
