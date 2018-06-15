@@ -14,7 +14,7 @@ class TravelRequests::Update < TravelRequests::Base
     policy_id = travel_request_params[:policy_id]
     if policy_id.present? and user.policies.with_id(policy_id).blank?
       add_message :error, 'User does not belong to the selected policy'
-      raise_unauthorized_exception
+      return
     end
   end
 

@@ -15,6 +15,8 @@
 #  parent_type           :string(255)
 #  booking_class         :string(255)
 #  boarding_station_name :string(255)
+#  start_time            :text(65535)
+#  end_time              :text(65535)
 #
 
 require 'test_helper'
