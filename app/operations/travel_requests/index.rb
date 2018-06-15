@@ -50,7 +50,7 @@ class TravelRequests::Index < TravelRequests::Base
         sql = TravelRequest.connection.unprepared_statement {
           "((#{controlling_travel_request_query.to_sql}) UNION (#{interacted_travel_requests_query.to_sql})) AS travel_requests"
         }
-        self.money_requests = TravelRequest.from(sql)
+        self.travel_requests = TravelRequest.from(sql)
       else
         self.travel_requests = user.travel_requests
     end
