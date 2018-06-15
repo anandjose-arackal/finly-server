@@ -141,7 +141,28 @@ json.booking_types do
   end
 end
 
+json.user_reports current_user.reports
+json.user_money_requests current_user.money_requests
+
+json.linked_report do
+  json.id @result.travel_request.report&.id
+  json.name @result.travel_request.report&.name
+end
+
+json.linked_money_request do
+  json.id @result.travel_request.money_request&.id
+  json.name @result.travel_request.money_request&.name
+end
 
 json.actions @result.actions
 
 json.policies current_company.policies
+
+json.comments do
+  json.array!(@result.travel_request.comments) do |comment|
+    json.content comment.retrieve_content(current_user)
+    json.user_name comment.user&.name
+    json.timestamp comment.created_at.strftime('%d %b %Y')
+    json.initials comment.user&.initials
+  end
+end

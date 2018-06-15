@@ -55,13 +55,13 @@ class TravelRequests::Review::Approve < TravelRequests::Review::Base
   end
 
   def post_process
-    # if self.auto_approve
-    #   action_id = TravelRequestCommentAction.id_for(:auto_approve)
-    # else
-    #   action_id = TravelRequestCommentAction.id_for(:approve)
-    # end
-    # travel_request.comments.create user_id: user.id,
-    #                                      action_id: action_id
+    if self.auto_approve
+      action_id = TravelRequestCommentAction.id_for(:auto_approve)
+    else
+      action_id = TravelRequestCommentAction.id_for(:approve)
+    end
+    self.travel_request.comments.create user_id: user.id,
+                                         action_id: action_id
     #
     # Event::EBankPaymentRequest::Approve.(user, travel_request: travel_request)
 

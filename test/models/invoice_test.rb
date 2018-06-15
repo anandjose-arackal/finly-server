@@ -2,44 +2,50 @@
 #
 # Table name: invoices
 #
-#  id                 :integer          not null, primary key
-#  address_id         :integer
-#  date               :date
-#  due_date           :date
-#  invoice_number     :string(255)
-#  tax_type_id        :integer
-#  discount           :decimal(64, 12)
-#  discount_type_id   :integer
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  gross_amount_id    :integer
-#  net_amount_id      :integer
-#  inclusive_of_taxes :boolean
-#  amount_id          :integer
-#  tds                :decimal(64, 12)
-#  tds_type_id        :integer
-#  gst_type_id        :integer
-#  payment_id         :integer
-#  discount_amount_id :integer
-#  sgst_amount_id     :integer
-#  csgt_amount_id     :integer
-#  igst_amount_id     :integer
-#  tds_amount_id      :integer
-#  tax_amount_id      :integer
-#  tax                :decimal(64, 12)
-#  category_id        :integer
-#  original_amount_id :integer
-#  advance_amount_id  :integer
-#  advance_type_id    :integer
-#  advance            :decimal(20, 10)
-#  freight_amount_id  :integer
-#  freight_type_id    :integer
-#  freight            :decimal(20, 10)
-#  roundoff_amount    :decimal(20, 10)
-#  balance_due_id     :integer
-#  taxable_amount_id  :integer
-#  cost_center_id     :integer
-#  tds_slab_id        :integer
+#  id                     :integer          not null, primary key
+#  address_id             :integer
+#  date                   :date
+#  due_date               :date
+#  invoice_number         :string(255)
+#  tax_type_id            :integer
+#  discount               :decimal(64, 12)
+#  discount_type_id       :integer
+#  created_at             :datetime         not null
+#  updated_at             :datetime         not null
+#  gross_amount_id        :integer
+#  net_amount_id          :integer
+#  inclusive_of_taxes     :boolean
+#  amount_id              :integer
+#  tds                    :decimal(64, 12)
+#  tds_type_id            :integer
+#  gst_type_id            :integer
+#  payment_id             :integer
+#  discount_amount_id     :integer
+#  tds_amount_id          :integer
+#  tax_amount_id          :integer
+#  tax                    :decimal(64, 12)
+#  category_id            :integer
+#  original_amount_id     :integer
+#  advance_amount_id      :integer
+#  advance_type_id        :integer
+#  advance                :decimal(20, 10)
+#  freight_amount_id      :integer
+#  freight_type_id        :integer
+#  freight                :decimal(20, 10)
+#  roundoff_amount        :decimal(20, 10)
+#  balance_due_id         :integer
+#  taxable_amount_id      :integer
+#  cost_center_id         :integer
+#  tds_slab_id            :integer
+#  invoice_status_id      :integer
+#  company_id             :integer
+#  created_by_user_id     :integer
+#  paid_amount_id         :integer
+#  vendor_id              :integer
+#  receiving_account_id   :integer
+#  receiving_account_type :string(255)
+#  note                   :text(65535)
+#  remaining_amount_id    :integer
 #
 
 require 'test_helper'
