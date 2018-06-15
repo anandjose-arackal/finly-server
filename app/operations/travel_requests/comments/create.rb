@@ -1,11 +1,11 @@
-class TravelRequest::Comments::Create < TravelRequest::Comments::Base
+class TravelRequests::Comments::Create < TravelRequests::Comments::Base
 
   attr_accessor :comment
   attr_accessor :travel_request, :booking_types
 
   def init
     def init
-      self.travel_request = TravelRequest.find(params[:id]) #todo Scope to company
+      self.travel_request = ::TravelRequest.find(params[:id]) #todo Scope to company
       self.booking_types = BookingType.all
     end
   end
