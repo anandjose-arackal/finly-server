@@ -22,8 +22,6 @@
 #  auto_approved                :boolean
 #  report_id                    :integer
 #  money_request_id             :integer
-#  booking_id                   :integer
-#  booking_request_id           :integer
 #
 
 class TravelRequest < ActiveRecord::Base
@@ -33,8 +31,7 @@ class TravelRequest < ActiveRecord::Base
   belongs_to :user
   belongs_to :policy
   belongs_to :status, class_name: "TravelRequestStatus"
-  belongs_to :report
-  belongs_to :money_request
+  has_one :report
 
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_user_role, class_name: 'UserRole'
