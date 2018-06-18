@@ -4,9 +4,10 @@ json.extract! @result.travel_request, :id, :name, :policy_id, :required_by_date,
               :controlling_for_user_id, :controlling_user_role, :controlling_for_user_role,
               :submitted_at, :created_at, :updated_at
 
-json.manager @result.manager&.name
-json.travel_manager @result.travel_manager&.name
-json.controlling_user @result.travel_request&.controlling_user&.name
+json.manager_name @result.manager&.name
+json.travel_manager_name @result.travel_manager&.name
+json.controlling_user_name @result.travel_request&.controlling_user&.name
+json.user_name @result.travel_request&.user&.name
 
 json.policy do
   json.id @result.travel_request.policy_id
