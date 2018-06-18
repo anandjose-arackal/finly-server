@@ -10,6 +10,8 @@
 #  parent_type         :string(255)
 #  created_at          :datetime         not null
 #  updated_at          :datetime         not null
+#  start_time          :text(65535)
+#  end_time            :text(65535)
 #
 
 class BookingCustom < ActiveRecord::Base

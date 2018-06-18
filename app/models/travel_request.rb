@@ -20,6 +20,8 @@
 #  is_deleted                   :boolean          default(FALSE)
 #  rejection_note               :text(65535)
 #  auto_approved                :boolean
+#  report_id                    :integer
+#  money_request_id             :integer
 #
 
 class TravelRequest < ActiveRecord::Base
@@ -29,6 +31,7 @@ class TravelRequest < ActiveRecord::Base
   belongs_to :user
   belongs_to :policy
   belongs_to :status, class_name: "TravelRequestStatus"
+  has_one :report
 
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_user_role, class_name: 'UserRole'
@@ -37,6 +40,7 @@ class TravelRequest < ActiveRecord::Base
 
   has_many :destinations, class_name: "TravelRequestDestination"
   has_many :travel_request_trails
+  has_many :comments, class_name: "TravelRequestComment"
 
   accepts_nested_attributes_for :destinations, allow_destroy: true
 

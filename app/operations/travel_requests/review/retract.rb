@@ -5,7 +5,7 @@ class TravelRequests::Review::Retract < TravelRequests::Review::Base
   end
 
   def validate
-    unless travel_request.owner_id == user.id
+    unless travel_request.user_id == user.id
       add_message :error, "Only Owners can retract their report"
       return
     end
@@ -33,9 +33,9 @@ class TravelRequests::Review::Retract < TravelRequests::Review::Base
 
   def post_process
     # add comments
-    # travel_request.comments.create user_id: user.id,
-    #                                      action_id: BankPaymentRequestCommentAction.id_for(:retract)
-    #
+    self.travel_request.comments.create user_id: user.id,
+                                         action_id: TravelRequestCommentAction.id_for(:retract)
+
     #
     # Event::EBankPaymentRequest::Retract.(user, travel_request: travel_request)
     add_message :success, "Travel Request retracted successfully"

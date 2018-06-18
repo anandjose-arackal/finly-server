@@ -22,26 +22,29 @@ class TravelRequests::Show < TravelRequests::Base
   end
 
   class TravelRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :travel_request, :destinations, :booking_types
+    attr_accessor :travel_request, :destinations, :booking_types,
+                  :manager, :travel_manager
 
     def init
       self.travel_request = params[:travel_request]
       self.destinations = travel_request.destinations
       self.booking_types = params[:booking_types]
+      self.manager = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :manager)
+      self.travel_manager = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :travel_manager)
     end
 
     def actions
       actions = {}
       # todo associated_users
-      if travel_request.open? && travel_request.user_id == user.id
+      if (travel_request.open? || travel_request.retracted? || travel_request.rejected?) && travel_request.user_id == user.id
         actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
       elsif travel_request.processing?
-        if travel_request.controlling_user_id == user.id && (manager_view? && user.manager?)
+        if travel_request.controlling_user_id == user.id && (user.manager?)
           actions[:approve] = {method: "patch", type: 1, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
           actions[:reject] = {method: "patch", type: 4, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         elsif user.company_admin? && admin_view?
           actions[:take_control] = {method: "patch", type: 6, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
-        elsif travel_request.controlling_user_id == user.id && user.employee?
+        elsif user.employee? && self.travel_request.user_id == user.id
           actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}
         end
       elsif travel_request.approved?

@@ -16,6 +16,8 @@
 #  updated_at             :datetime         not null
 #  parent_id              :integer
 #  parent_type            :string(255)
+#  start_time             :text(65535)
+#  end_time               :text(65535)
 #
 
 class BookingCarRental < ActiveRecord::Base

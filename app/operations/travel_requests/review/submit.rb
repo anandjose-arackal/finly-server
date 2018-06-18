@@ -66,9 +66,8 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
 
   def post_process
     # add comment
-    # travel_request.comments.create user_id: user.id,
-    #                                      action_id: BankPaymentRequestCommentAction.id_for(:submit)
-    #
+    travel_request.comments.create user_id: user.id,
+                                         action_id: BankPaymentRequestCommentAction.id_for(:submit)
     # Event::EBankPaymentRequest::Submit.(user, travel_request: travel_request)
     add_message :success, "Travel request successfully submitted!"
   end

@@ -16,7 +16,7 @@ class Report::Update < Report::Base
   def init
     super
     self.update_param = {}
-    self.update_param = self.params.permit(:name, :policy_id, :memo)
+    self.update_param = self.params.permit(:name, :policy_id, :memo, :money_request_id, :travel_request_id)
     if self.update_param[:policy_id].present? and ([0, '0', 'nil'].include?(self.update_param[:policy_id]))
       self.update_param[:policy_id] = nil
     end
