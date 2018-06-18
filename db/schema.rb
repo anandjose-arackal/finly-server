@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180615134113) do
+ActiveRecord::Schema.define(version: 20180618071431) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2329,7 +2329,7 @@ ActiveRecord::Schema.define(version: 20180615134113) do
     t.integer  "address_id",             limit: 4
     t.date     "date"
     t.date     "due_date"
-    t.string   "invoice_number",         limit: 255
+    t.text     "invoice_number",         limit: 65535
     t.integer  "tax_type_id",            limit: 4
     t.decimal  "discount",                             precision: 64, scale: 12
     t.integer  "discount_type_id",       limit: 4
