@@ -2942,6 +2942,11 @@ Rails.application.routes.draw do
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
     resources :inward_invoices
 
+    resources :delivery_challans
+    resources :e_way_bills
+    resources :bill_of_supplies
+
+
     # Organization Account Settings for procurements
     namespace :configs do
       resources :terms
