@@ -6,7 +6,7 @@
 #  address_id             :integer
 #  date                   :date
 #  due_date               :date
-#  invoice_number         :string(255)
+#  invoice_number         :text(65535)
 #  tax_type_id            :integer
 #  discount               :decimal(64, 12)
 #  discount_type_id       :integer
