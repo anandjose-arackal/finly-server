@@ -83,6 +83,7 @@ class Report::Index < Report::Base
     has_scope :filter_policy
     has_scope :filter_custom_drop_down_selection, type: :array
     has_scope :filter_category
+    has_scope :filter_group, type: :array
 
     def init
       ScopeUtils.fix_for_scoping(params, :filter_custom_drop_down_selection, :array)
