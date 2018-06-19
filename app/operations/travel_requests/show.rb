@@ -60,8 +60,12 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def editable
-      if self.travel_request.open? || self.travel_request.processing?
-        if self.travel_request.controlling_user_id == self.user.id
+      if self.travel_request.open? || self.travel_request.rejected? || self.travel_request.retracted?
+        if self.travel_request.user_id == self.user.id
+          return true
+        end
+      elsif self.travel_request.processing?
+        if self.travel_request.controlling_user_id == user.id
           return true
         end
       end
