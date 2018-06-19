@@ -137,6 +137,7 @@ class BankTransfer::PaymentRequest::Beneficiary::Add < BankTransfer::PaymentRequ
               tax_type_id: order_details[:tax_type_id],
               discount_type_id: order_details[:discount_type_id],
               tds_type_id: order_details[:tds_type_id],
+              invoice_type_id: order_details[:invoice_type_id],
               gst_type_id: order_details[:gst_type_id],
               discount: order_details[:discount],
               tax: order_details[:tax],

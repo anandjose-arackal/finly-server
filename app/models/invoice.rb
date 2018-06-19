@@ -46,6 +46,7 @@
 #  receiving_account_type :string(255)
 #  note                   :text(65535)
 #  remaining_amount_id    :integer
+#  invoice_type_id        :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -73,6 +74,7 @@ class Invoice < ActiveRecord::Base
   belongs_to :receiving_account, polymorphic: true
   belongs_to :vendor, class_name: "YesBankVendor"
   belongs_to :remaining_amount, class_name: "Amount"
+  belongs_to :invoice_type, class_name: "InwardInvoiceType"
 
   # because multiple payments can be made against one invoice
   has_many :payments
@@ -104,6 +106,7 @@ class Invoice < ActiveRecord::Base
   delegate :paid_amount, to: :paid_amount
 
   delegate :unpaid?, :partially_paid?, :paid?, to: :invoice_status
+  delegate :payment?, :advance?, to: :invoice_type
 
 
   # validates :gross_amount, presence: true
