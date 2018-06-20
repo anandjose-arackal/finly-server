@@ -1,6 +1,5 @@
 class Procurements::ProcureInwardInvoices::Base < Procurements::Base
 
-
   class Procurements::ProcureInwardInvoices::InwardInvoicePresenter < BaseOperation::BasePresenter::SuccessPresenter
 
     attr_accessor :invoice

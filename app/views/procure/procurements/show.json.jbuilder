@@ -16,34 +16,6 @@ json.created_at @result.procurement.created_at.strftime("%d %b %Y")
 
 
 
-json.inward_documents do
-  json.array! @result.inward_documents do |document|
-    json.extract! document, :id, :doc_number, :delivery_date
-
-    if document.vendor.present?
-      json.vendor do
-        json.extract! document.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
-      end
-    end
-
-
-    json.items do
-      json.array! document.items do |item|
-        json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :quantity, :delivered, :accepted, :rejected
-      end
-    end
-
-    json.attachments do
-      json.array! document.attachments do |attachment|
-        json.extract! attachment, :id, :description
-        json.file_name attachment.file_file_name
-        json.file_size (attachment.file_file_size / 1024).round(2).to_s + " KB"
-        json.url attachment.file.url
-      end
-    end
-
-  end
-end
 
 # json.invoices do
 #   json.array! @result.invoices do |invoice|
