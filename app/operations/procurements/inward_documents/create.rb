@@ -10,12 +10,11 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
   def validate
     unless self.purchase_order.present?
       add_message :error, 'Purchase Order not found for this procurement, cannot create inward document'
-      return
     end
   end
 
   def process
-    self.inward_document = self.procurement.inward_documents.build()
+    self.inward_document = self.procurement.inward_documents.build
     inward_document.save
 
     for item in purchase_order.items

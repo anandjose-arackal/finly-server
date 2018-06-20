@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  inventory_line_item_id: 
+  description: MyString
+  hsn_sac: MyString
+  quantity: 9.99
+
+two:
+  inventory_line_item_id: 
+  description: MyString
+  hsn_sac: MyString
+  quantity: 9.99

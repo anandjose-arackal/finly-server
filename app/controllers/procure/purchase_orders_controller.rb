@@ -2,7 +2,8 @@ class Procure::PurchaseOrdersController < ApplicationController
   before_action -> { finly_authorize! :web }
 
   def show
-
+    @result = Procurements::PurchaseOrders::Show.(current_user, params)
+    respond
   end
 
   def create

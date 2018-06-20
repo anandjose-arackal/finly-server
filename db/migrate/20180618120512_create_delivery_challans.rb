@@ -14,6 +14,7 @@ class CreateDeliveryChallans < ActiveRecord::Migration
       t.boolean :override_doc_number
       t.string :prefix
       t.string :sequence_start
+      t.date :date
       t.date :challan_date
       t.date :due_date
       t.boolean :roundoff_total_enabled

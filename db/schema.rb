@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180618120512) do
+ActiveRecord::Schema.define(version: 20180620073749) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -578,6 +578,7 @@ ActiveRecord::Schema.define(version: 20180618120512) do
     t.boolean  "override_doc_number"
     t.string   "prefix",                 limit: 255
     t.string   "sequence_start",         limit: 255
+    t.date     "date"
     t.date     "bill_date"
     t.date     "transaction_date"
     t.date     "due_date"
@@ -1756,6 +1757,7 @@ ActiveRecord::Schema.define(version: 20180618120512) do
     t.boolean  "override_doc_number"
     t.string   "prefix",                 limit: 255
     t.string   "sequence_start",         limit: 255
+    t.date     "date"
     t.date     "challan_date"
     t.date     "due_date"
     t.boolean  "roundoff_total_enabled"
@@ -1835,6 +1837,34 @@ ActiveRecord::Schema.define(version: 20180618120512) do
   end
 
   add_index "distances", ["physical_unit_id"], name: "index_distances_on_physical_unit_id", using: :btree
+
+  create_table "document_items", force: :cascade do |t|
+    t.integer  "parent_document_id",     limit: 4,                                          null: false
+    t.string   "parent_document_type",   limit: 255,                                        null: false
+    t.integer  "inventory_line_item_id", limit: 4
+    t.string   "description",            limit: 255
+    t.string   "hsn_sac",                limit: 255
+    t.decimal  "quantity",                           precision: 10, scale: 5
+    t.decimal  "rate",                               precision: 10, scale: 5
+    t.decimal  "tax",                                precision: 10, scale: 5, default: 0.0
+    t.decimal  "tds",                                precision: 10, scale: 5, default: 0.0
+    t.decimal  "disount",                            precision: 10, scale: 5, default: 0.0
+    t.integer  "tax_amount_id",          limit: 4
+    t.integer  "tds_amount_id",          limit: 4
+    t.integer  "discount_amount_id",     limit: 4
+    t.integer  "total_amount_id",        limit: 4
+    t.date     "delivery_date"
+    t.string   "comment",                limit: 255
+    t.datetime "created_at",                                                                null: false
+    t.datetime "updated_at",                                                                null: false
+  end
+
+  add_index "document_items", ["discount_amount_id"], name: "index_document_items_on_discount_amount_id", using: :btree
+  add_index "document_items", ["inventory_line_item_id"], name: "index_document_items_on_inventory_line_item_id", using: :btree
+  add_index "document_items", ["parent_document_type", "parent_document_id"], name: "indx_doc_items_on_parent_doc_type_and_parent_doc_id", using: :btree
+  add_index "document_items", ["tax_amount_id"], name: "index_document_items_on_tax_amount_id", using: :btree
+  add_index "document_items", ["tds_amount_id"], name: "index_document_items_on_tds_amount_id", using: :btree
+  add_index "document_items", ["total_amount_id"], name: "index_document_items_on_total_amount_id", using: :btree
 
   create_table "document_number_config_types", force: :cascade do |t|
     t.string   "name",        limit: 255
@@ -4989,6 +5019,7 @@ ActiveRecord::Schema.define(version: 20180618120512) do
   add_foreign_key "delivery_challans", "users"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
+  add_foreign_key "document_items", "inventory_line_items"
   add_foreign_key "document_number_configs", "companies"
   add_foreign_key "document_number_configs", "document_number_config_types"
   add_foreign_key "document_number_configs", "purposes"

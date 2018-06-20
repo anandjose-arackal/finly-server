@@ -24,4 +24,6 @@ class Procurement < ActiveRecord::Base
   has_one :purchase_order
   has_many :inward_documents
   has_many :invoices
+  has_many :bill_of_supplies
+  has_many :delivery_challans
 end

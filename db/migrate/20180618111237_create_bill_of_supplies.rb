@@ -14,6 +14,7 @@ class CreateBillOfSupplies < ActiveRecord::Migration
       t.boolean :override_doc_number
       t.string :prefix
       t.string :sequence_start
+      t.date :date
       t.date :bill_date
       t.date :transaction_date
       t.date :due_date

@@ -1,9 +1,14 @@
 class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
+  attr_accessor :purchase_order
   def init
-    self.purchase_order = PurchaseOrder.find_by params[:id] || params[:purchase_order_params]
+    purchase_order_id = params[:id] || params[:purchase_order_params]
+    self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
   end
 
   def validate
+    unless self.purchase_order.present?
+      add_message :error, 'Purchase Order not Found'
+    end
 
   end
 

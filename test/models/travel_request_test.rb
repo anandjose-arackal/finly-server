@@ -20,6 +20,8 @@
 #  is_deleted                   :boolean          default(FALSE)
 #  rejection_note               :text(65535)
 #  auto_approved                :boolean
+#  report_id                    :integer
+#  money_request_id             :integer
 #
 
 require 'test_helper'
