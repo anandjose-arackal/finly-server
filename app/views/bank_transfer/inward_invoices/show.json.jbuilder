@@ -1,6 +1,12 @@
 invoice = @result.invoice
-# conditionally set the original amount as invoice amount is there are line items
+
+json.actions do
+  json.editable invoice.unpaid?
+  json.destroyable invoice.unpaid?
+end
+
 json.invoice do
+  # conditionally set the original amount as invoice amount is there are line items
   json.id invoice.id
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
@@ -53,8 +59,17 @@ json.invoice do
   json.tds_slab_name invoice.tds_slab&.name
   json.tds_rate invoice.tds
 
+  json.note invoice.note
+
+  json.invoice_status_id invoice.invoice_status_id
+  json.invoice_status_name invoice.invoice_status&.name&.humanize
+
   # invoice amounts total
   json.item_amounts_total invoice.item_amounts_total
+
+  json.net_payable_amount invoice.balance_due&.value
+  json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
+  json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
 
   # invoice items
   json.invoice_items do
@@ -73,6 +88,32 @@ json.invoice do
       json.total_amount precision_value item.net_amount&.value
       json.hsn_sac item.hsn_sac
       json.taxable_amount precision_value item.taxable_amount&.value
+    end
+  end
+
+  json.custom_fields invoice.custom_fields
+
+  json.vendor do
+    json.name invoice.vendor&.name
+    json.email invoice.vendor&.email
+    json.id invoice.vendor&.id
+
+    json.selected_bank_account do
+      json.account_number invoice.receiving_account&.account_number
+      json.ifsc invoice.receiving_account&.ifsc
+      json.name invoice.receiving_account&.name
+      json.id invoice.receiving_account&.id
+    end
+
+    if invoice.vendor&.bank_accounts.present?
+      json.bank_accounts do
+        json.array!(invoice.vendor&.bank_accounts) do |bank_account|
+          json.id bank_account.id
+          json.name bank_account.name
+          json.account_number bank_account.account_number
+          json.ifsc bank_account.ifsc
+        end
+      end
     end
   end
 end

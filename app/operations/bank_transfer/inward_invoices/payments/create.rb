@@ -3,30 +3,62 @@
 class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoices::Base
 
   attr_accessor :inward_invoice, :scheduled_at, :payment_mode, :policy_id,
-                :description, :bank_payment_request
+                :description, :bank_payment_request, :payable_amount,
+                :payment_request_params
+
+  class BankTransfer::InwardInvoices::Payments::Create::BankPaymentRequestPresenter < BaseOperation::BasePresenter::SuccessPresenter
+
+    attr_accessor :bank_payment_request
+
+    def init
+      self.bank_payment_request = params[:bank_payment_request]
+    end
+
+  end
 
   def init
-    id = params[:id] || params[:invoice_id]
+    id = params[:id] || params[:invoice_id] || params[:inward_invoice_id]
     self.inward_invoice = user.company.inward_invoices.find_by(id: id)
     self.scheduled_at = params[:scheduled_at]
     self.payment_mode = params[:payment_mode]
     self.policy_id = params[:policy_id]
+    self.payable_amount = params[:payable_amount]
   end
 
   def validate
     if self.inward_invoice.blank?
       add_message :error, "Invoice not found"
     end
+
+    if self.payable_amount.blank?
+      add_message :error, "You need to enter a payable amount to create an order"
+      return
+    end
   end
 
   def process
+    self.payment_request_params = bank_payment_request_params
+    self.bank_payment_request = user.bank_payment_requests.build(self.payment_request_params)
+    if self.bank_payment_request.save
+      # any changes to be made here? #todo
+    else
+      add_message :error, self.bank_payment_request.errors.full_messages
+    end
+  end
 
+  def post_process
+    add_message :success, "Payment order created"
+  end
+
+  def success
+    params[:bank_payment_request] = self.bank_payment_request
+    BankTransfer::InwardInvoices::Payments::Create::BankPaymentRequestPresenter.new(user, params, messages)
   end
 
 
   private
 
-  def create_payment_request
+  def bank_payment_request_params
     payment_params = [{
         payment_type_id: PaymentType.id_for(:credit),
         application: RequestStore.store[:current_app],
@@ -42,20 +74,21 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         payment_purpose_id: PaymentPurpose.id_for(:vendor_payment),
         payment_mode: self.payment_mode, # todo - default is NEFT for now, can be changed to something else later
         amount_attributes: {
-            value: self.invoice.balance_due&.value,
+            value: self.payable_amount,
             currency_id: Currency.first.id
         },
         note: self.inward_invoice.note,
         category_id: self.inward_invoice.category_id,
-        date: DateUtils.local_date
+        date: DateUtils.local_date,
+        invoice_id: self.inward_invoice.id
     }]
     payment_order_params = {
         initiating_user: user,
         payment_order_status_id: PaymentOrderStatus.id_for(:pending_approval),
         company_id: user.company_id,
         amount_requested_attributes: {
-            value: self.invoice.balance_due&.value,
-            current_id: 1
+            value: self.payable_amount,
+            currency_id: 1
         },
         payment_mode: "NEFT",
         initiating_account_type: user.company.yes_bank_company_account&.class&.name,
@@ -71,7 +104,7 @@ class BankTransfer::InwardInvoices::Payments::Create < BankTransfer::InwardInvoi
         status_id: BankPaymentRequestStatus.id_for(:open),
         controlling_user_id: user.id,
         requested_amount_attributes: {
-            value: self.invoice.balance_due&.value,
+            value: self.payable_amount,
             currency_id: 1
         },
         description: self.description,

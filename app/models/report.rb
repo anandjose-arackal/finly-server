@@ -42,6 +42,7 @@
 
 
 
+
 class Report < ActiveRecord::Base
   include MathUtil
   include SoftDeletable
@@ -227,6 +228,14 @@ class Report < ActiveRecord::Base
     ids = self.pluck(:id)
     report_ids = Expense.with_report_id(ids).where(category_id: category_id).pluck(:report_id)
     where(id: report_ids)
+  }
+
+  scope :filter_group, -> (group_ids) {
+    user_group_item_ids = group_ids
+    original_report_ids = self.pluck(:id)
+    user_ids = UserGroupItemMapping.where(user_group_item_id: user_group_item_ids).pluck(:user_id)
+    ids = Report.where(id: original_report_ids, user_id: user_ids).pluck(:id)
+    where(id: ids)
   }
   delegate :status_name, to: :status
 

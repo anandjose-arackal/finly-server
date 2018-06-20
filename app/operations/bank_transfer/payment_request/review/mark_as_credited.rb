@@ -49,6 +49,15 @@ class BankTransfer::PaymentRequest::Review::MarkAsCredited < BankTransfer::Payme
                                                           action_id: BankPaymentRequestTrailAction.id_for(:mark_as_credited),
                                                           modified_user_id: nil,
                                                           modified_user_role_id: nil
+
+        # if the payment has an associated invoice, update the status of the invoice
+        payments = payment_request.payment_order.payments
+        payments.each do |payment|
+          invoice = payment.invoice
+          if invoice.present?
+            invoice.update_invoice_status
+          end
+        end
       else
         add_message :error, bank_payment_request.errors.full_messages
       end

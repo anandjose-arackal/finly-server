@@ -32,10 +32,10 @@
 #  post_operation          :text(65535)
 #  post_operation_payload  :text(65535)
 #  category_id             :integer
+#  scheduled_at            :date
+#  api_initiated           :boolean          default(FALSE)
+#  processed_at            :date
 #
-
-
-
 
 
 
@@ -225,6 +225,17 @@ class Payment < ActiveRecord::Base
 
     where("(receiving_account_type = 'BankAccount' AND receiving_account_id IN (?)) OR (receiving_user_type = 'YesBankVendor' AND receiving_user_id IN (?))
             OR (receiving_user_type = 'User' AND receiving_user_id IN (?))", bank_account_ids, vendor_ids, user_ids)
+  }
+
+  scope :filter_search_index, -> (beneficiary_type, receiving_user_id) {
+    case beneficiary_type
+      when 1, '1'
+        where(receiving_user_type: "User", receiving_user_id: receiving_user_id)
+      when 2, '2'
+        where(receiving_user_type: "YesBankVendor", receiving_user_id: receiving_user_id)
+      else
+        where(receiving_user_type: "YesBankVendor", receiving_user_id: receiving_user_id)
+    end
   }
 
   scope :filter_user_id, -> (user_id) {

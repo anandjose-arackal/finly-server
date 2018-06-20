@@ -16,6 +16,7 @@
 #  override_doc_number    :boolean
 #  prefix                 :string(255)
 #  sequence_start         :string(255)
+#  date                   :date
 #  challan_date           :date
 #  due_date               :date
 #  roundoff_total_enabled :boolean

@@ -7,10 +7,10 @@ class InvoiceCalculationUtils
                 :gross_amount, :net_amount, :invoice,
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_discount_amount,
                 :advance, :advance_amount, :invoice_total, :freight_amount,
-                :roundoff_amount, :balance_due_amount
+                :roundoff_amount, :balance_due_amount, :payment_amount
 
   # don't go by the name - this calculates the Freight paid as well
-  def calculate_tds_and_advance(params, taxable_amount, invoice_amount, payment = nil, invoice = nil)
+  def calculate_tds_and_advance(params, taxable_amount, invoice_amount, payment = nil, invoice = nil, payment_amount = nil)
     self.invoice = invoice || payment&.invoice
     if self.invoice.blank?
       return
@@ -70,11 +70,12 @@ class InvoiceCalculationUtils
 
     # now calculating the final amount to be paid
     # assigning the final amount to the payment
+    self.payment_amount = payment_amount || self.balance_due_amount
     if payment.present?
       if payment.amount.present?
-        payment.amount.value = self.balance_due_amount
+        payment.amount.value = self.payment_amount
       else
-        payment.amount = Amount.new(value: self.balance_due_amount, currency_id: 1)
+        payment.amount = Amount.new(value: self.payment_amount, currency_id: 1)
       end
     end
     params
@@ -83,7 +84,7 @@ class InvoiceCalculationUtils
 
   # this method should take the invoice, payment object and the params object and
   # assign the respective calculated amounts to the invoice object that is passed
-  def calculate_tax_and_discounts(params, payment = nil, invoice = nil)
+  def calculate_tax_and_discounts(params, payment = nil, invoice = nil, payment_amount = 0)
     self.invoice = invoice || payment&.invoice
     if self.invoice.blank?
       return
@@ -175,11 +176,13 @@ class InvoiceCalculationUtils
     end
 
     # adding the payment amount to the params if  the object is present
+    self.payment_amount = payment_amount || self.balance_due_amount
+
     if payment.present?
       if payment.amount.present?
-        payment.amount.value = self.balance_due_amount
+        payment.amount.value = self.payment_amount
       else
-        payment.amount = Amount.new(value: self.balance_due_amount, currency_id: 1)
+        payment.amount = Amount.new(value: self.payment_amount, currency_id: 1)
       end
     end
     params

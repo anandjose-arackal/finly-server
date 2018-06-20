@@ -1,11 +1,5 @@
-json.array!(@result.invoices) do |invoice|
-  json.raw_amount precision_value invoice&.amount&.value
-  # conditionally set the original amount as invoice amount is there are line items
-  if invoice&.invoice_items.present?
-    json.original_amount precision_value invoice.amount&.value
-  else
-    json.original_amount precision_value invoice.original_amount&.value
-  end
+json.array!(@result.paginated_invoices) do |invoice|
+  json.id invoice.id
   json.invoice do
     json.id invoice.id
     json.status_id invoice.invoice_status_id
@@ -31,6 +25,7 @@ json.array!(@result.invoices) do |invoice|
     json.inclusive_of_taxes invoice.inclusive_of_taxes
     json.freight_amount invoice.freight_amount&.value
     json.roundoff_amount invoice.roundoff_amount
+    json.net_payable_amount invoice.balance_due&.value
     json.balance_due invoice.balance_due&.value
     json.taxable_amount precision_value invoice.gross_amount&.value
     # adding the respective rates
@@ -60,8 +55,22 @@ json.array!(@result.invoices) do |invoice|
     json.tds_slab_name invoice.tds_slab&.name
     json.tds_rate invoice.tds
 
+    json.note invoice.note
+
     # invoice amounts total
     json.item_amounts_total invoice.item_amounts_total
+
+    # paid amount for this invoice
+    json.paid_amount invoice.payments.successful.joins(:amount).sum(:value)
+    json.remaining_amount (invoice.balance_due&.value.to_f - invoice.payments.successful.joins(:amount).sum(:value))
+
+    json.raw_amount precision_value invoice&.amount&.value
+    # conditionally set the original amount as invoice amount is there are line items
+    if invoice&.invoice_items.present?
+      json.original_amount precision_value invoice.amount&.value
+    else
+      json.original_amount precision_value invoice.original_amount&.value
+    end
 
     # invoice items
     json.invoice_items do
@@ -80,6 +89,34 @@ json.array!(@result.invoices) do |invoice|
         json.total_amount precision_value item.net_amount&.value
         json.hsn_sac item.hsn_sac
         json.taxable_amount precision_value item.taxable_amount&.value
+      end
+    end
+
+    if invoice.vendor.present?
+      json.vendor do
+        json.name invoice.vendor&.name
+        json.email invoice.vendor&.email
+        json.id invoice.vendor&.id
+        json.gst invoice.vendor&.gst
+        json.pan invoice.vendor&.pan
+
+        json.selected_bank_account do
+          json.account_number invoice.receiving_account&.account_number
+          json.ifsc invoice.receiving_account&.ifsc
+          json.name invoice.receiving_account&.name
+          json.id invoice.receiving_account&.id
+        end
+
+        if invoice.vendor&.bank_accounts.present?
+          json.bank_accounts do
+            json.array!(invoice.vendor&.bank_accounts) do |bank_account|
+              json.id bank_account.id
+              json.name bank_account.name
+              json.account_number bank_account.account_number
+              json.ifsc bank_account.ifsc
+            end
+          end
+        end
       end
     end
   end
