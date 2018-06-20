@@ -26,11 +26,12 @@ class YesBankVendor < ActiveRecord::Base
   belongs_to :company
   belongs_to :state_code, class_name: "GstStateCode"
   belongs_to :created_by, class_name: "User"
-  belongs_to :vendor_type
+  # belongs_to :vendor_type
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
+  has_one :vendor_account, foreign_key: :vendor_id
 
   has_many :budgets, as: :budgetable
 
@@ -58,6 +59,12 @@ class YesBankVendor < ActiveRecord::Base
   scope :includes_bank_accounts, -> {
     includes(:bank_accounts)
   }
+
+  after_create do
+    if self.vendor_account.blank?
+      self.build_vendor_account(balance_attributes: {value: 0, currency_id: 1}).save
+    end
+  end
 
   def as_json(options={})
     {

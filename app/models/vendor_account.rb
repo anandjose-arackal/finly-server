@@ -14,5 +14,7 @@ class VendorAccount < ActiveRecord::Base
   belongs_to :balance, class_name: "Amount"
   belongs_to :vendor, class_name: "YesBankVendor"
 
+  has_many :finly_transactions, as: :finly_account
+
   accepts_nested_attributes_for :balance
 end

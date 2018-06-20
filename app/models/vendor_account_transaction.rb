@@ -18,4 +18,11 @@ class VendorAccountTransaction < ActiveRecord::Base
   belongs_to :transaction_type
 
   accepts_nested_attributes_for :amount
+
+  delegate :credit, :debit, to: :transaction_type
+
+  validates :vendor_account_id, presence: true
+  validates :transaction_type_id, presence: true
+  validates :amount_id, presence: true
+
 end
