@@ -17,4 +17,9 @@ class Procure::InwardInvoicesController < ApplicationController
 
   end
 
+  def show
+    @result = Procurements::ProcureInwardInvoices::Show.(current_user, params)
+    respond
+  end
+
 end

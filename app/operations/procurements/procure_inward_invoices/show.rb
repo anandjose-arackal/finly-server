@@ -12,6 +12,11 @@ class Procurements::ProcureInwardInvoices::Show < Procurements::ProcureInwardInv
     end
   end
 
+  def success
+    params[:invoice] = self.invoice
+    Procurements::ProcureInwardInvoices::Show::ShowPresenter.new(user, params, messages)
+  end
+
   class Procurements::ProcureInwardInvoices::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :invoice
 
