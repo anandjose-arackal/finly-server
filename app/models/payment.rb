@@ -32,9 +32,14 @@
 #  post_operation          :text(65535)
 #  post_operation_payload  :text(65535)
 #  category_id             :integer
-#  scheduled_at            :date
-#  api_initiated           :boolean          default(FALSE)
 #
+
+
+
+
+
+
+
 
 
 
@@ -110,6 +115,7 @@ class Payment < ActiveRecord::Base
                                                              PaymentPurpose.id_for(:atm_withdrawal)] }
   scope :with_amount, -> { joins :amount }
   scope :with_category, -> (ids) {where category_id: ids}
+  scope :with_invoice, -> (ids) { where invoice_id: ids }
   scope :sum_amounts, -> { with_amount.sum(:value) }
   scope :joins_amount, -> { joins :amount }
   scope :made_before, ->(date) { where 'date <= ?', date }
@@ -270,7 +276,7 @@ class Payment < ActiveRecord::Base
   validate :initiating_account_presence
   validate :receiving_account_presence
 
-  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, to: :payment_status
+  delegate :completed?, :failed?, :pending?, :in_progress?, :processing?, :scheduled?, :possible_failure?, to: :payment_status
 
   before_create do
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)

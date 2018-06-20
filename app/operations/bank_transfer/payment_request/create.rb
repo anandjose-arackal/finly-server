@@ -10,7 +10,8 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
                 :discount_amount, :tds_amount, :tax_amount, :original_amount, :after_tax_amount,
                 :advance_amount,
                 :policy_id,
-                :account_owner_type
+                :account_owner_type,
+                :invoice_attachments
 
   def pre_validate
     super
@@ -68,6 +69,7 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     # receiving accounts
     self.request_params = payment_request_params
     self.invoice_parameters = invoice_params
+    self.invoice_attachments = []
   end
 
   def validate
@@ -81,6 +83,20 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
       return
     end
 
+  end
+
+  def pre_process
+    # attaching invoice attachments to the invoices of this payment order if they
+    # are passed inside the request
+    processed_order_data.each do |order_details|
+      invoice_attachment_ids = order_details[:invoice_attachment_ids]
+      inv_attachment = user.company.invoice_attachments.find_by(id: invoice_attachment_ids)
+      if inv_attachment.present?
+        self.invoice_attachments << inv_attachment
+      else
+        self.invoice_attachments << ""
+      end
+    end
   end
 
   def process
@@ -97,6 +113,10 @@ class BankTransfer::PaymentRequest::Create < BankTransfer::PaymentRequest::Base
     self.bank_payment_request.payment_order.payments.each_with_index do |payment, index|
       payment_params = request_params[:payment_order_attributes][:payments_attributes][index]
       calculate_tax_and_discounts(payment_params, payment)
+      if self.invoice_attachments[index].present? && payment.invoice.present?
+        inv_attachment = self.invoice_attachments[index]
+        inv_attachment.update(invoice_id: payment.invoice.id)
+      end
     end
   end
 

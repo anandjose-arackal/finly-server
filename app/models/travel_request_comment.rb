@@ -21,4 +21,51 @@ class TravelRequestComment < ActiveRecord::Base
   belongs_to :travel_request
   belongs_to :user
   belongs_to :action, class_name: "TravelRequestCommentAction"
+  belongs_to :booking
+  belongs_to :booking_request
+
+  def retrieve_content(user)
+    comment_content = ""
+
+    if user.id == self.user_id
+      comment_content += "You have"
+    else
+      comment_content += "#{self.user&.name} has"
+    end
+
+    case self.action_id
+      when TravelRequestCommentAction.id_for(:comment)
+        return "#{self.user&.name} commented: #{self.content}"
+      when TravelRequestCommentAction.id_for(:submit)
+        comment_content += " submitted the Travel Request"
+      when TravelRequestCommentAction.id_for(:approve)
+        comment_content += " approved the Travel Request"
+      when TravelRequestCommentAction.id_for(:retract)
+        comment_content += " retracted the Travel Request"
+      when TravelRequestCommentAction.id_for(:reject)
+        comment_content += " rejected the Travel Request"
+      when TravelRequestCommentAction.id_for(:auto_approve)
+        comment_content = "Payment Order has been auto approved as there is no reviewer assigned"
+      when TravelRequestCommentAction.id_for(:unapprove)
+        comment_content += " unapproved the Travel Request"
+      when TravelRequestCommentAction.id_for(:take_control)
+        comment_content += " taken control of the Travel Request"
+      when TravelRequestCommentAction.id_for(:return_control)
+        comment_content += " returned control of the Travel Request"
+      when TravelRequestCommentAction.id_for(:add_booking)
+        comment_content += " added a booking"
+      when TravelRequestCommentAction.id_for(:remove_booking)
+        comment_content += " removed a booking"
+      when TravelRequestCommentAction.id_for(:reject_booking_request)
+        comment_content += " rejected a booking request"
+      else
+        return nil
+    end
+
+    if self.note.present?
+      comment_content += " with a note: #{self.note}"
+    end
+
+    comment_content
+  end
 end
