@@ -45,6 +45,10 @@ class FinlyTransaction < ActiveRecord::Base
   validates :payment_purpose_id, presence: true
   validates :date, presence: true
 
+  default_scope { order(id: :desc) }
+
+  delegate :credit?, :debit?, to: :transaction_type
+
   scope :with_account, -> (account) { where finly_account: account }
   scope :credits, -> { where transaction_type_id: TransactionType.id_for(:credit) }
   scope :debits, -> { where transaction_type_id: TransactionType.id_for(:debit) }
@@ -81,9 +85,5 @@ class FinlyTransaction < ActiveRecord::Base
     end
     self.transaction_reference_id = ref_id
   end
-
-  default_scope { order(id: :desc) }
-
-  delegate :credit?, :debit?, to: :transaction_type
 
 end
