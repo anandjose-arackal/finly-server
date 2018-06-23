@@ -82,3 +82,7 @@ end
 json.procurement_terms do
   json.array! @result.procurement_terms, :id, :name, :description
 end
+
+json.policies do
+  json.array! @result.policies, :id, :name
+end

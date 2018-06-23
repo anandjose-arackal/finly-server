@@ -59,3 +59,9 @@ json.attachments do
     json.url attachment.file.url
   end
 end
+
+json.procurement_term do
+  json.id @result.purchase_order.procurement_term&.id
+  json.name @result.purchase_order.procurement_term&.name
+  json.description @result.purchase_order.procurement_term&.description
+end
