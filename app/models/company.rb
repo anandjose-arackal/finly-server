@@ -80,6 +80,9 @@ class Company < ActiveRecord::Base
   has_many :procurements
   has_many :procurement_terms
   has_many :procurement_attachments
+  has_many :document_number_configs
+  has_many :purchase_orders
+  has_many :inward_documents # purchase order inward documents
 
 
   has_many :booking_attachments

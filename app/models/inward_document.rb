@@ -20,10 +20,14 @@
 class InwardDocument < ActiveRecord::Base
   belongs_to :procurement
   belongs_to :user
+  belongs_to :company
   belongs_to :vendor, class_name: "YesBankVendor"
   has_many :items, class_name: "InwardDocumentItem"
 
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 
   accepts_nested_attributes_for :items
+
+
+  scope :document_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
 end

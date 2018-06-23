@@ -51,6 +51,10 @@ class Procurements::Show < Procurements::Base
 
       documents += self.inward_documents
       documents += self.invoices
+
+      self.invoices.each do |invoice|
+        documents += invoice.payments
+      end
       documents += self.bill_of_supplies
       documents += self.delivery_challans
 

@@ -26,4 +26,6 @@ class Procurement < ActiveRecord::Base
   has_many :invoices
   has_many :bill_of_supplies
   has_many :delivery_challans
+
+  default_scope { order(updated_at: :desc) }
 end

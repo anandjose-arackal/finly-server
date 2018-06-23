@@ -7,15 +7,11 @@ if @result.procurement.vendor.present?
 end
 
 json.procurement_status do
-
   json.name @result.procurement&.procurement_status&.name
   json.id @result.procurement&.procurement_status&.id
 end
 
 json.created_at @result.procurement.created_at.strftime("%d %b %Y")
-
-
-
 
 # json.invoices do
 #   json.array! @result.invoices do |invoice|
@@ -60,6 +56,8 @@ json.trail do
       if item.is_a?(Invoice)
         json.id item&.created_by&.id
         json.name item&.created_by&.name
+      elsif item.is_a?(Payment)
+
       else
         json.id item&.user&.id
         json.name item&.user&.name
@@ -67,6 +65,7 @@ json.trail do
     end
   end
 end
+
 
 json.locations do
   json.array! @result.locations do |location|

@@ -19,4 +19,5 @@ class DocumentNumberConfig < ActiveRecord::Base
 
   scope :with_purpose_id, -> (ids) { where purpose_id: ids }
   scope :with_config_type_id, -> (ids) { where document_number_config_type_id: ids }
+  scope :with_company_id, -> (ids) {where company_id: ids}
 end

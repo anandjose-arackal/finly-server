@@ -62,5 +62,6 @@ class PurchaseOrder < ActiveRecord::Base
 
   validates :purchase_order_status, presence: true
   # validates :items, presence: true
+  scope :document_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
 
 end
