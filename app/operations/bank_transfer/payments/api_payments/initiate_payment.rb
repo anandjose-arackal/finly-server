@@ -24,8 +24,19 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
       return
     end
 
-    if params[:account_number].blank? || params[:ifsc].blank?
-      add_message :error, "Invalid bank account details"
+    if params[:account_number].blank?
+      add_message :error, "Account number cannot be blank"
+      return
+    end
+
+    if params[:ifsc].blank?
+      add_message :error, "IFSC cannot be blank"
+      return
+    end
+
+    pattern = Regexp.new(Constants::VALID_IFSC)
+    unless params[:ifsc] =~ pattern
+      add_message :error, "Invaid IFSC"
       return
     end
 
