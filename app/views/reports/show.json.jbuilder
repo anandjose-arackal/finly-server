@@ -120,6 +120,11 @@ json.expense_sections sorted_expenses do |category|
         end
       end
     end
+
+    json.tds_slab do
+      json.id expense.tds_slab&.id
+      json.tds expense.tds_slab&.tds
+    end
   end
 end
 
