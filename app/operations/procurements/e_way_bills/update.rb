@@ -52,6 +52,7 @@ class Procurements::EWayBills::Update < Procurements::EWayBills::Base
 
   def e_way_bill_parameters
     params.require(:e_way_bill).permit(:id, :doc_number, :date, :generated_by, :valid_from, :valid_to, :ref_doc_name, :ref_doc_date,
+                                       :location_id, :delivery_location_id,
                                        :hsn_code, :reason_for_transportation, :mode, :vehicle_number,
                                        amount_attributes: [:value, :currency_id],
                                        items_attributes: [:id, :description, :hsn_sac, :quantity, :rate, :tax, :discount,

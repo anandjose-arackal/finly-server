@@ -33,6 +33,8 @@ class EWayBill < ActiveRecord::Base
   belongs_to :procurement
   belongs_to :amount
 
+  belongs_to :vendor, class_name: 'YesBankVendor'
+
   has_many :items, class_name: "DocumentItem", as: :parent_document
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 
