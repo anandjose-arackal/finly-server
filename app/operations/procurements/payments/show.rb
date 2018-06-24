@@ -7,7 +7,7 @@ class Procurements::Payments::Show < Procurements::Payments::Base
     def init
       self.payment = params[:payment]
       self.bank_payment_request = payment&.payment_order&.bank_payment_request
-      self.vendor = bank_payment_request.vendor
+      self.vendor = bank_payment_request.receiving_user
     end
   end
 
