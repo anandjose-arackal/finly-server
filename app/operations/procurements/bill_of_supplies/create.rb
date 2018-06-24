@@ -20,16 +20,20 @@ class Procurements::BillOfSupplies::Create < Procurements::BillOfSupplies::Base
   end
 
   def process
-    self.bill_of_supply = self.procurement.bill_of_supplies.build
+    self.bill_of_supply = self.procurement.bill_of_supplies.build({
+        user_id: user.id,
+        company_id: user.company.id,
+        location_id: self.purchase_order&.location_id,
+        delivery_location_id: self.purchase_order&.delivery_location_id,
+        vendor_id: self.purchase_order&.vendor_id
+                                                                  })
 
-    self.bill_of_supply.user = user
-    self.bill_of_supply.company = user.company
 
-    if bill_of_supply.valid?
-      purchase_order.save
+    if self.bill_of_supply.valid?
+      self.bill_of_supply.save
 
       purchase_order.items.each do |item|
-        bill_of_supply_item_params = bill_of_supply_item_params(item)
+        bill_of_supply_item_params = bill_of_supply_item_parameters(item)
         bill_of_supply_item = bill_of_supply.items.build(bill_of_supply_item_params)
         bill_of_supply_item.save
       end
@@ -55,7 +59,7 @@ class Procurements::BillOfSupplies::Create < Procurements::BillOfSupplies::Base
 
   end
 
-  def bill_of_supply_item_params(po_item)
+  def bill_of_supply_item_parameters(po_item)
     inward_item_params = {
         purchase_order_item_id: po_item.id,
         inventory_line_item_id: po_item.inventory_line_item_id,
