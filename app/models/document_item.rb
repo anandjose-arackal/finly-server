@@ -27,6 +27,11 @@ class DocumentItem < ActiveRecord::Base
   belongs_to :inventory_line_item
   belongs_to :parent_document, polymorphic: true
 
+  belongs_to :tax_amount, class_name: 'Amount'
+  belongs_to :tds_amount, class_name: 'Amount'
+  belongs_to :discount_amount, class_name: 'Amount'
+  belongs_to :total_amount, class_name: 'Amount'
+
   accepts_nested_attributes_for :tax_amount, :tds_amount, :discount_amount,
                                 :total_amount
 end
