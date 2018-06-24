@@ -41,7 +41,7 @@ class BillOfSupply < ActiveRecord::Base
   belongs_to :procurement_term
   belongs_to :document_status
 
-  has_many :items, class_name: "InwardDocumentItem"
+  has_many :items, class_name: "DocumentItem", as: :parent_document
 
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 

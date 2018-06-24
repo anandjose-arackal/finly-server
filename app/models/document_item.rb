@@ -25,4 +25,5 @@
 
 class DocumentItem < ActiveRecord::Base
   belongs_to :inventory_line_item
+  belongs_to :parent_document, polymorphic: true
 end
