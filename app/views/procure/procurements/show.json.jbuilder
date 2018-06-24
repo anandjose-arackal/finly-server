@@ -51,6 +51,7 @@ json.trail do
   json.array! @result.procurement_trail do |item|
     json.extract! item, :id
     json.created_at item.created_at.strftime("%b %d, %Y")
+    json.created_at_time item.created_at.strftime("%I:%M%p")
     json.type item.class.name
     json.user do
       if item.is_a?(Invoice)
@@ -62,6 +63,54 @@ json.trail do
         json.id item&.user&.id
         json.name item&.user&.name
       end
+    end
+
+    if item.is_a?(Invoice)
+      json.invoice_details do
+        json.amount item.balance_due.value
+        json.status do
+          json.id item.invoice_status&.id
+          json.name item.invoice_status&.name
+        end
+
+        json.due_date item.due_date&.strftime("%b %d, %Y")
+      end
+
+    elsif item.is_a?(PurchaseOrder)
+      json.purchase_order_details do
+        json.status do
+          json.id item.purchase_order_status&.id
+          json.name item.purchase_order_status&.name
+        end
+
+        json.po_number item.po_number
+        json.delivery_date item.delivery_date&.strftime("%b %d, %Y")
+        json.amount item.balance_amount.value
+        json.items_count item.items.count
+      end
+    elsif item.is_a?(InwardDocument)
+      json.inward_document_details do
+        json.items_count item.items.count
+        json.doc_number item.doc_number
+      end
+    elsif item.is_a?(Payment)
+      json.payment_details do
+        json.payment_mode item.payment_mode
+        json.bank_payment_order_id item&.payment_order&.bank_payment_request&.id
+        json.status do
+          json.id item.payment_status&.id
+          json.name item.payment_status&.name
+        end
+        json.initiating_user do
+          json.id item.initiating_user.id
+          json.name item.initiating_user.name
+          json.email item.initiating_user.email
+          json.mobile_number item.initiating_user.mobile_number
+        end
+        json.amount item.amount.value
+      end
+    elsif item.is_a?(BillOfSupply)
+    elsif item.is_a?(DeliveryChallan)
     end
   end
 end
