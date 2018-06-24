@@ -67,7 +67,7 @@ json.trail do
 
     if item.is_a?(Invoice)
       json.invoice_details do
-        json.amount item.balance_due.value
+        json.amount item.balance_due&.value
         json.status do
           json.id item.invoice_status&.id
           json.name item.invoice_status&.name
@@ -85,7 +85,7 @@ json.trail do
 
         json.po_number item.po_number
         json.delivery_date item.delivery_date&.strftime("%b %d, %Y")
-        json.amount item.balance_amount.value
+        json.amount item&.balance_amount&.value
         json.items_count item.items.count
       end
     elsif item.is_a?(InwardDocument)
@@ -107,7 +107,7 @@ json.trail do
           json.email item.initiating_user.email
           json.mobile_number item.initiating_user.mobile_number
         end
-        json.amount item.amount.value
+        json.amount item.amount&.value
       end
     elsif item.is_a?(BillOfSupply)
     elsif item.is_a?(DeliveryChallan)
