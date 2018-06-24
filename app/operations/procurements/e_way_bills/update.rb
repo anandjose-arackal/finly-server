@@ -45,7 +45,7 @@ class Procurements::EWayBills::Update < Procurements::EWayBills::Base
   end
 
   def post_process
-    add_message :success, 'Successfully updated Inward Document'
+    add_message :success, 'Successfully updated E Way Bill'
   end
 
   private

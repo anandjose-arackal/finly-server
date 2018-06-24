@@ -110,6 +110,34 @@ json.trail do
         json.amount item.amount&.value
       end
     elsif item.is_a?(BillOfSupply)
+      json.bill_of_supply_details do
+        json.doc_number item.doc_number
+        json.date item.date&.strftime("%b %d, %Y")
+        json.bill_date item.bill_date&.strftime("%b %d, %Y")
+        json.transaction_date item.transaction_date&.strftime("%b %d, %Y")
+        json.due_date item.due_date&.strftime("%b %d, %Y")
+
+        json.amount item.balance_amount&.value
+        json.status do
+          json.id item.document_status&.id
+          json.name item.document_status&.name
+        end
+      end
+
+    elsif item.is_a?(EWayBill)
+      json.e_way_bill_details do
+        json.doc_number item.doc_number
+        json.date item.date&.strftime("%b %d, %Y")
+        json.valid_from item.valid_from&.strftime("%b %d, %Y")
+        json.valid_to item.valid_to&.strftime("%b %d, %Y")
+        json.amount item.amount&.value
+
+        json.hsn_code item.hsn_code
+        json.mode item.mode
+        json.vehicle_number item.vehicle_number
+
+
+      end
     elsif item.is_a?(DeliveryChallan)
     end
   end

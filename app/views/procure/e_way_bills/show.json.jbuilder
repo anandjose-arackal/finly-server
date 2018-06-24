@@ -2,6 +2,8 @@ json.extract! @result.e_way_bill, :id, :payment_term_id, :procurement_term_id, :
               :generated_by, :valid_from, :valid_to, :ref_doc_name, :ref_doc_date, :hsn_code, :reason_for_transportation, :mode, :vehicle_number,
               :location_id, :delivery_location_id
               # :inclusive_of_taxes, #todo add inclusive of tax to table
+json.valid_from @result.e_way_bill.valid_from&.strftime("%d-%b-%Y")
+json.valid_to @result.e_way_bill.valid_to&.strftime("%d-%b-%Y")
 if @result.e_way_bill.vendor.present?
   json.vendor do
     json.extract! @result.e_way_bill.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
