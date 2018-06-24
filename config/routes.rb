@@ -3027,6 +3027,8 @@ end
 
     end
 
+    resources :payments, only: [:show]
+
     resources :attachments, only: [:create]
     post 'inward_invoices/create_from_po', to: 'inward_invoices#create_from_po', as: :create_from_po
     resources :inward_invoices
