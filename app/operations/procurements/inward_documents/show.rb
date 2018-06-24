@@ -2,7 +2,7 @@ class Procurements::InwardDocuments::Show < Procurements::InwardDocuments::Base
   attr_accessor :inward_document
   def init
     inward_document_id = params[:id] || params[:inward_document_id]
-    self.inward_document = InwardDocuments.find_by id: inward_document_id
+    self.inward_document = InwardDocument.find_by id: inward_document_id
   end
 
   def validate
