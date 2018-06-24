@@ -51,9 +51,9 @@ class Procurements::EWayBills::Create < Procurements::EWayBills::Base
   def e_way_bill_item_parameters(po_item)
     #params
     e_way_bill_item_params = {
-        # purchase_order_item_id: po_item.id,
+        purchase_order_item_id: po_item.id,
         inventory_line_item_id: po_item.inventory_line_item_id,
-        # product_id: po_item.product_id,
+        product_id: po_item.product_id,
         description: po_item.description,
         quantity: po_item.quantity,
         rate: po_item.rate,

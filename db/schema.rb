@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180620073749) do
+ActiveRecord::Schema.define(version: 20180624161122) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1848,7 +1848,7 @@ ActiveRecord::Schema.define(version: 20180620073749) do
     t.decimal  "rate",                               precision: 10, scale: 5
     t.decimal  "tax",                                precision: 10, scale: 5, default: 0.0
     t.decimal  "tds",                                precision: 10, scale: 5, default: 0.0
-    t.decimal  "disount",                            precision: 10, scale: 5, default: 0.0
+    t.decimal  "discount",                           precision: 10, scale: 5, default: 0.0
     t.integer  "tax_amount_id",          limit: 4
     t.integer  "tds_amount_id",          limit: 4
     t.integer  "discount_amount_id",     limit: 4
@@ -1857,11 +1857,14 @@ ActiveRecord::Schema.define(version: 20180620073749) do
     t.string   "comment",                limit: 255
     t.datetime "created_at",                                                                null: false
     t.datetime "updated_at",                                                                null: false
+    t.integer  "purchase_order_item_id", limit: 4
+    t.string   "product_id",             limit: 255
   end
 
   add_index "document_items", ["discount_amount_id"], name: "index_document_items_on_discount_amount_id", using: :btree
   add_index "document_items", ["inventory_line_item_id"], name: "index_document_items_on_inventory_line_item_id", using: :btree
   add_index "document_items", ["parent_document_type", "parent_document_id"], name: "indx_doc_items_on_parent_doc_type_and_parent_doc_id", using: :btree
+  add_index "document_items", ["purchase_order_item_id"], name: "index_document_items_on_purchase_order_item_id", using: :btree
   add_index "document_items", ["tax_amount_id"], name: "index_document_items_on_tax_amount_id", using: :btree
   add_index "document_items", ["tds_amount_id"], name: "index_document_items_on_tds_amount_id", using: :btree
   add_index "document_items", ["total_amount_id"], name: "index_document_items_on_total_amount_id", using: :btree
@@ -1901,6 +1904,41 @@ ActiveRecord::Schema.define(version: 20180620073749) do
   end
 
   add_index "duplicate_expense_mappings", ["expense_id"], name: "index_duplicate_expense_mappings_on_expense_id", using: :btree
+
+  create_table "e_way_bills", force: :cascade do |t|
+    t.integer  "company_id",                limit: 4
+    t.integer  "user_id",                   limit: 4
+    t.integer  "procurement_id",            limit: 4
+    t.integer  "location_id",               limit: 4
+    t.integer  "delivery_location_id",      limit: 4
+    t.integer  "vendor_id",                 limit: 4
+    t.integer  "payment_term_id",           limit: 4
+    t.integer  "procurement_term_id",       limit: 4
+    t.string   "doc_number",                limit: 255
+    t.date     "date"
+    t.string   "generated_by",              limit: 255
+    t.datetime "valid_from"
+    t.datetime "valid_to"
+    t.string   "ref_doc_name",              limit: 255
+    t.string   "ref_doc_date",              limit: 255
+    t.integer  "amount_id",                 limit: 4
+    t.string   "hsn_code",                  limit: 255
+    t.string   "reason_for_transportation", limit: 255
+    t.string   "mode",                      limit: 255
+    t.string   "vehicle_number",            limit: 255
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+  end
+
+  add_index "e_way_bills", ["amount_id"], name: "index_e_way_bills_on_amount_id", using: :btree
+  add_index "e_way_bills", ["company_id"], name: "index_e_way_bills_on_company_id", using: :btree
+  add_index "e_way_bills", ["delivery_location_id"], name: "index_e_way_bills_on_delivery_location_id", using: :btree
+  add_index "e_way_bills", ["location_id"], name: "index_e_way_bills_on_location_id", using: :btree
+  add_index "e_way_bills", ["payment_term_id"], name: "index_e_way_bills_on_payment_term_id", using: :btree
+  add_index "e_way_bills", ["procurement_id"], name: "index_e_way_bills_on_procurement_id", using: :btree
+  add_index "e_way_bills", ["procurement_term_id"], name: "index_e_way_bills_on_procurement_term_id", using: :btree
+  add_index "e_way_bills", ["user_id"], name: "index_e_way_bills_on_user_id", using: :btree
+  add_index "e_way_bills", ["vendor_id"], name: "index_e_way_bills_on_vendor_id", using: :btree
 
   create_table "email_authorizations", force: :cascade do |t|
     t.integer "user_id",           limit: 4
@@ -5026,9 +5064,16 @@ ActiveRecord::Schema.define(version: 20180620073749) do
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
   add_foreign_key "document_items", "inventory_line_items"
+  add_foreign_key "document_items", "purchase_order_items"
   add_foreign_key "document_number_configs", "companies"
   add_foreign_key "document_number_configs", "document_number_config_types"
   add_foreign_key "document_number_configs", "purposes"
+  add_foreign_key "e_way_bills", "amounts"
+  add_foreign_key "e_way_bills", "companies"
+  add_foreign_key "e_way_bills", "payment_terms"
+  add_foreign_key "e_way_bills", "procurement_terms"
+  add_foreign_key "e_way_bills", "procurements"
+  add_foreign_key "e_way_bills", "users"
   add_foreign_key "email_authorizations", "users"
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"

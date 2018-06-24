@@ -6,6 +6,11 @@
 #  company_id                :integer
 #  user_id                   :integer
 #  procurement_id            :integer
+#  location_id               :integer
+#  delivery_location_id      :integer
+#  vendor_id                 :integer
+#  payment_term_id           :integer
+#  procurement_term_id       :integer
 #  doc_number                :string(255)
 #  date                      :date
 #  generated_by              :string(255)

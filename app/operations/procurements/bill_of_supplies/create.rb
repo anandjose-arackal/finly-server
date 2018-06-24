@@ -62,9 +62,21 @@ class Procurements::BillOfSupplies::Create < Procurements::BillOfSupplies::Base
         product_id: po_item.product_id,
         description: po_item.description,
         quantity: po_item.quantity,
-        delivered: po_item.delivered,
-        accepted: po_item.accepted,
-        rejected: po_item.rejected
+        rate: po_item.rate,
+        tax: po_item.tax,
+        discount: po_item.discount,
+        tax_amount_attributes: {
+            value: po_item.tax_amount&.value,
+            currency_id: po_item.tax_amount&.currency_id
+        },
+        discount_amount_attributes: {
+            value: po_item.discount_amount&.value,
+            currency_id: po_item.discount_amount&.currency_id
+        },
+        total_amount_attributes: {
+            value: po_item.total_amount&.value,
+            currency_id: po_item.total_amount&.currency_id
+        }
     }
   end
 end

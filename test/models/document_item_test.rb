@@ -12,7 +12,7 @@
 #  rate                   :decimal(10, 5)
 #  tax                    :decimal(10, 5)   default(0.0)
 #  tds                    :decimal(10, 5)   default(0.0)
-#  disount                :decimal(10, 5)   default(0.0)
+#  discount               :decimal(10, 5)   default(0.0)
 #  tax_amount_id          :integer
 #  tds_amount_id          :integer
 #  discount_amount_id     :integer
@@ -21,6 +21,8 @@
 #  comment                :string(255)
 #  created_at             :datetime         not null
 #  updated_at             :datetime         not null
+#  purchase_order_item_id :integer
+#  product_id             :string(255)
 #
 
 require 'test_helper'
