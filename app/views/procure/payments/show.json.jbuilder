@@ -125,3 +125,11 @@ else
     json.balance_due payment.amount&.value
   end
 end
+
+json.payment_payment_request_id @result.bank_payment_request&.id
+
+if @result.vendor.present?
+  json.vendor do
+    json.extract! @result.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
+  end
+end

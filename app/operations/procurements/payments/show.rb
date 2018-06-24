@@ -2,10 +2,12 @@ class Procurements::Payments::Show < Procurements::Payments::Base
   attr_accessor :payment, :company
 
   class Procurements::Payments::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :payment
+    attr_accessor :payment, :vendor, :bank_payment_request
 
     def init
       self.payment = params[:payment]
+      self.bank_payment_order = payment&.payment_order&.bank_payment_request
+      self.vendor = bank_payment_request.vendor
     end
   end
 
