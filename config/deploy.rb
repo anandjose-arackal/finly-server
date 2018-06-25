@@ -19,6 +19,10 @@ case fetch(:stage)
     end
     set :deploy_to, '/home/viveka/app'
     set :rails_env, 'production'
+  # todo - configure this for production once everything is set up
+  when :aws_production
+    set :deploy_to, '/home/centos/app'
+    set :rails_env, 'staging'
   when :itzcash
     set :deploy_to, '/usr/local/app'
     set :rails_env, 'itzcash_uat'
