@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180615134113) do
+ActiveRecord::Schema.define(version: 20180620100853) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1634,6 +1634,7 @@ ActiveRecord::Schema.define(version: 20180615134113) do
     t.string   "value_type",             limit: 255
     t.integer  "dependent_parent_id",    limit: 4
     t.string   "dependent_parent_type",  limit: 255
+    t.string   "field_key",              limit: 255
   end
 
   add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
@@ -1884,6 +1885,7 @@ ActiveRecord::Schema.define(version: 20180615134113) do
     t.integer  "tds_amount_id",          limit: 4
     t.integer  "gst_type_id",            limit: 4
     t.integer  "tds_slab_id",            limit: 4
+    t.integer  "gst_amount_id",          limit: 4
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -1891,6 +1893,7 @@ ActiveRecord::Schema.define(version: 20180615134113) do
   add_index "expenses", ["expense_status_id"], name: "index_expenses_on_expense_status_id", using: :btree
   add_index "expenses", ["expense_tax_type_id"], name: "index_expenses_on_expense_tax_type_id", using: :btree
   add_index "expenses", ["expense_type_id"], name: "index_expenses_on_expense_type_id", using: :btree
+  add_index "expenses", ["gst_type_id"], name: "index_expenses_on_gst_type_id", using: :btree
   add_index "expenses", ["report_id"], name: "index_expenses_on_report_id", using: :btree
   add_index "expenses", ["user_id"], name: "index_expenses_on_user_id", using: :btree
 
@@ -1935,7 +1938,6 @@ ActiveRecord::Schema.define(version: 20180615134113) do
     t.boolean  "travel_request",                         default: false
     t.boolean  "budgeting_system",                       default: false
     t.boolean  "em_tax_tracking",                        default: false
-    t.boolean  "two_factor_authentication",              default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -1992,6 +1994,7 @@ ActiveRecord::Schema.define(version: 20180615134113) do
     t.integer  "parent_id",               limit: 4
     t.string   "parent_type",             limit: 255
     t.boolean  "root_field",                          default: true
+    t.string   "field_key",               limit: 255
   end
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
@@ -2130,6 +2133,14 @@ ActiveRecord::Schema.define(version: 20180615134113) do
     t.datetime "updated_at",             null: false
     t.string   "state_code", limit: 255
   end
+
+  create_table "gst_types", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "gst_types", ["name"], name: "index_gst_types_on_name", using: :btree
 
   create_table "individual_kyc_track_actions", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -3185,9 +3196,9 @@ ActiveRecord::Schema.define(version: 20180615134113) do
     t.text     "post_operation",          limit: 65535
     t.text     "post_operation_payload",  limit: 65535
     t.integer  "category_id",             limit: 4
-    t.boolean  "api_initiated",                         default: false
     t.date     "scheduled_at"
     t.date     "processed_at"
+    t.boolean  "api_initiated",                         default: false
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
