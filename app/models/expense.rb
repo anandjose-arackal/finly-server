@@ -30,10 +30,8 @@
 #  tds_amount_id          :integer
 #  gst_type_id            :integer
 #  tds_slab_id            :integer
+#  gst_amount_id          :integer
 #
-
-
-
 
 class Expense < ActiveRecord::Base
   include SoftDeletable
@@ -48,7 +46,9 @@ class Expense < ActiveRecord::Base
   belongs_to :rejecting_manager, class_name: 'User'
   belongs_to :surcharge, class_name: 'Amount'
   belongs_to :tds_amount, class_name: 'Amount'
+  belongs_to :gst_amount, class_name: 'Amount'
   belongs_to :expense_tax_type
+  belongs_to :gst_type
   belongs_to :tds_slab, class_name: 'TdsRatesList'
 
   has_many :receipts, as: :parent
@@ -110,6 +110,7 @@ class Expense < ActiveRecord::Base
         self.expense_status_id = ExpenseStatus.unsubmitted_id
       end
     end
+    compute_gst_amount
     compute_tds_amount
   end
 
@@ -887,6 +888,10 @@ class Expense < ActiveRecord::Base
     ExpenseTaxType.ids_for(:gst_tds, :tds).include?(expense_tax_type_id)
   end
 
+  def has_gst?
+    ExpenseTaxType.ids_for(:gst_tds, :gst).include?(expense_tax_type_id)
+  end
+
   def reimbursable_amount_value
     return 0 unless reimbursable
     return amount&.value.to_f unless has_tds?
@@ -900,6 +905,27 @@ class Expense < ActiveRecord::Base
     return amount unless has_tds?
     return amount unless tds_amount.present?
     return Amount.new(value: (precision_value(amount.value - tds_amount.value)), currency_id: amount.currency_id)
+  end
+
+  def compute_gst_amount
+    return unless has_gst?
+
+    gst_amount_value = self.amount.value * self.gst_percentage / 100
+    set_gst_amount(gst_amount_value)
+  end
+
+  def set_gst_amount(value)
+    if value.nil?
+      if self.gst_amount.present?
+        self.gst_amount.destroy
+      end
+    else
+      if self.gst_amount.present?
+        self.gst_amount.value = value
+      else
+        self.build_gst_amount(value: value, currency_id: Currency.id_for(:INR))
+      end
+    end
   end
 
   # Set the reimbursable amount if "reimbursable" flag is set and the tax type has TDS included
