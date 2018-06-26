@@ -22,6 +22,7 @@
                  <VOUCHERTYPENAME><%= name %></VOUCHERTYPENAME>
                  <DATE><%= details[:date] %></DATE>
                  <NARRATION></NARRATION>
+                 <COSTCENTRENAME><%= details[:cost_center] %></COSTCENTRENAME>
                  <EFFECTIVEDATE><%= details[:date] %></EFFECTIVEDATE>
               <% details[:transactions].each do |ledger_name, amount| %>
                  <ALLLEDGERENTRIES.LIST>

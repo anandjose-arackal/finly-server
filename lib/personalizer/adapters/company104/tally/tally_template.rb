@@ -58,8 +58,10 @@ class Personalizer::Adapters::Company104::Tally::TallyTemplate
     request = {}
     expenses.reimbursable.each do |expense|
       if request[expense.report_id].blank?
-        request[expense.report_id] = {}
+        cost_center = expense.report.custom_fields.with_field_key('tally_cost_center')&.first&.value&.value
+        request[expense.report_id] = {cost_center: cost_center}
       end
+
 
       date = ERB::Util.html_escape(configuration.date_for(expense))
       user = ERB::Util.html_escape(expense.user.gl_config[:name])
