@@ -10,19 +10,12 @@
 #  purpose_id   :integer
 #
 
-
-
-
-
-
-
-
-
-
 class UserRoleMapping < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :user_role
+  belongs_to :company_department
+  belongs_to :branch_location
   belongs_to :purpose, class_name: "Purpose"
 
   scope :role, ->(role_id) { where user_role_id: role_id }

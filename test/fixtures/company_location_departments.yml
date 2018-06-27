@@ -1,0 +1,9 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  branch_location_id: 
+  company_department_id: 
+
+two:
+  branch_location_id: 
+  company_department_id: 
