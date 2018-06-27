@@ -6,6 +6,14 @@
 class Report::Approve < Report::Base
   attr_accessor :auto_approve, :auto_submit
 
+  def personalizer
+    {
+        pre_process: {
+            before: Personalizer::Process.new([:report, :approve], :pre_process, self)
+        }
+    }
+  end
+
   def authorized_user_types
     return nil if params.present? and (params[:auto_approve] or params[:auto_submit] )
     [:manager, :finance_manager, :admin]
