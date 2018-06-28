@@ -33,6 +33,7 @@
 #  gst_amount_id          :integer
 #
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
