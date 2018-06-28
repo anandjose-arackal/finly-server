@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180618071431) do
+ActiveRecord::Schema.define(version: 20180620100853) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1634,6 +1634,7 @@ ActiveRecord::Schema.define(version: 20180618071431) do
     t.string   "value_type",             limit: 255
     t.integer  "dependent_parent_id",    limit: 4
     t.string   "dependent_parent_type",  limit: 255
+    t.string   "field_key",              limit: 255
   end
 
   add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
@@ -1884,6 +1885,7 @@ ActiveRecord::Schema.define(version: 20180618071431) do
     t.integer  "tds_amount_id",          limit: 4
     t.integer  "gst_type_id",            limit: 4
     t.integer  "tds_slab_id",            limit: 4
+    t.integer  "gst_amount_id",          limit: 4
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -1992,6 +1994,7 @@ ActiveRecord::Schema.define(version: 20180618071431) do
     t.integer  "parent_id",               limit: 4
     t.string   "parent_type",             limit: 255
     t.boolean  "root_field",                          default: true
+    t.string   "field_key",               limit: 255
   end
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
@@ -2130,6 +2133,14 @@ ActiveRecord::Schema.define(version: 20180618071431) do
     t.datetime "updated_at",             null: false
     t.string   "state_code", limit: 255
   end
+
+  create_table "gst_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "gst_types", ["name"], name: "index_gst_types_on_name", using: :btree
 
   create_table "individual_kyc_track_actions", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -2369,6 +2380,7 @@ ActiveRecord::Schema.define(version: 20180618071431) do
     t.string   "receiving_account_type", limit: 255
     t.text     "note",                   limit: 65535
     t.integer  "remaining_amount_id",    limit: 4
+    t.integer  "invoice_type_id",        limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -2376,6 +2388,12 @@ ActiveRecord::Schema.define(version: 20180618071431) do
   add_index "invoices", ["tax_type_id"], name: "index_invoices_on_tax_type_id", using: :btree
 
   create_table "inward_invoice_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "inward_invoice_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
@@ -3005,6 +3023,7 @@ ActiveRecord::Schema.define(version: 20180618071431) do
     t.text     "options",     limit: 65535
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.boolean  "default"
   end
 
   add_index "payment_file_configurations", ["company_id"], name: "index_payment_file_configurations_on_company_id", using: :btree
