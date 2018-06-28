@@ -2,7 +2,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
   attr_accessor :account_number, :transaction_result, :error_message, :transfer_request,
                 :error_code, :transfer_status_id, :company, :bank_transaction, :payment,
-                :account
+                :account, :beneficiary_mobile_number, :beneficiary_email
 
   # in this context, success would imply one of these transactions
   SUCCESS_RESPONSE_CODES = ["COMPLETED", "SENT_TO_BENEFICIARY", "IN_PROCESS", "SCHEDULED_FOR_NEXT_WORKDAY"]
@@ -42,6 +42,9 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
     self.company_id = self.payment.payment_order.company_id
     super()
     self.account = payment.receiving_account
+    # extracting contact email and mobile number
+    self.beneficiary_email = self.account.account_owner.email
+    self.beneficiary_mobile_number = self.account.account_owner.mobile_number
     set_xml_params
   end
 
@@ -186,7 +189,9 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
         'BENEFICIARY_IFSC' => transfer_request.ifsc&.strip,
         'TRANSFER_TYPE' => transfer_request.transfer_type&.strip&.upcase,
         'TRANSFER_CURRENCY_CODE' => transfer_request.transfer_currency_code,
-        'TRANSFER_AMOUNT' => transfer_request.transfer_amount
+        'TRANSFER_AMOUNT' => transfer_request.transfer_amount,
+        'BENEFICIARY_EMAIL' => (self.beneficiary_email || "noreply@finly.io"),
+        'BENEFICIARY_MOBILE_NUMBER' => (self.beneficiary_mobile_number || "7975520468")
     )
   end
 

@@ -30,6 +30,7 @@
 #  tds_amount_id          :integer
 #  gst_type_id            :integer
 #  tds_slab_id            :integer
+#  gst_amount_id          :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

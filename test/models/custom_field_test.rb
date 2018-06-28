@@ -12,6 +12,7 @@
 #  value_type             :string(255)
 #  dependent_parent_id    :integer
 #  dependent_parent_type  :string(255)
+#  field_key              :string(255)
 #
 
 require 'test_helper'

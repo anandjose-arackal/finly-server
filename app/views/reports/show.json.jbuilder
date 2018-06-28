@@ -21,6 +21,8 @@ json.synced_with_quickbooks !!@result.report.synced_with_quickbooks?
 json.show_sync_button (@result.report.processed? && is_admin_view)
 json.controlling_user @result.report.controlling_user&.name
 
+json.travel_request_enabled (current_company.feature_subscription.travel_request && current_user.user_panel_subscription.travel_request)
+
 policy_id = nil
 policy_name = nil
 if @result.report.policy
@@ -119,6 +121,11 @@ json.expense_sections sorted_expenses do |category|
           json.thumb receipt.image.url(:thumb)
         end
       end
+    end
+
+    json.tds_slab do
+      json.id expense.tds_slab&.id
+      json.tds expense.tds_slab&.tds
     end
   end
 end
