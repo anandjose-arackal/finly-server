@@ -87,7 +87,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
     end
   end
 
-  def on_failure
+  def on_failure(options)
     # trigger the webhook callback for failed payments
     payment = options[:payment]
     if payment&.failed?
@@ -109,7 +109,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
         }
     }
     if payment.failed?
-      post_params[:errors] = payment.system_messages.errors.to_sentence
+      post_params[:errors] = payment.system_messages.errors.pluck(:content).to_sentence
     end
     # this particular type of payment will always have an initiating user because it is a vendor payment / reimbursement payment
     company = payment.initiating_user&.company
