@@ -46,6 +46,7 @@
 #  receiving_account_type :string(255)
 #  note                   :text(65535)
 #  remaining_amount_id    :integer
+#  invoice_type_id        :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -66,7 +67,8 @@ class Invoice < ActiveRecord::Base
   belongs_to :taxable_amount, class_name: "Amount"
   belongs_to :category
   belongs_to :cost_center
-  belongs_to :tds_slab, class_name: TdsRatesList
+  belongs_to :gst_type
+  belongs_to :tds_slab, class_name: 'TdsRatesList'
 
   # because multiple payments can be made against one invoice
   has_many :payments, as: :parent
@@ -128,11 +130,7 @@ class Invoice < ActiveRecord::Base
   def discount_rate
     self.discount
   end
-
-  def gst_type
-    self.gst_type_id
-  end
-
+  
   def item_amounts_total
     if self.invoice_items.present?
       return self.invoice_items.joins(:amount).sum(:value)
