@@ -155,13 +155,15 @@ class BankTransfer::PaymentRequest::Show < BankTransfer::PaymentRequest::Base
           }
         end
         ############## Payment file start based on whether it's configured for this company ########
-        actions[:credit_options][:mark_as_credited] = {
-            url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_mark_as_credited_path(bank_payment_request),
-            enabled: true,
-            messages: "You can mark this payment order as credited",
-            require_password: true,
-            method: "patch"
-        }
+        if user.vendor_payments_admin?
+          actions[:credit_options][:mark_as_credited] = {
+              url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_mark_as_credited_path(bank_payment_request),
+              enabled: true,
+              messages: "You can mark this payment order as credited",
+              require_password: true,
+              method: "patch"
+          }
+        end
         ##################### Payment File end ############################
       elsif bank_payment_request.processing? && bank_payment_request.owner_id == user.id
         actions[:retract] = {method: "patch", type: 3, url: Rails.application.routes.url_helpers.bank_transfer_bank_payment_request_review_path(bank_payment_request)}
