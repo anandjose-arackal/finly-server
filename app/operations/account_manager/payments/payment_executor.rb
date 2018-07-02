@@ -122,6 +122,7 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         payment.system_messages.build(content: content,
                                       system_message_type_id: SystemMessageType.id_for(:error)).save
       end
+      debit_adapter.on_failure(payment: self.payment)
       return
     end
 
@@ -137,6 +138,9 @@ class AccountManager::Payments::PaymentExecutor < AccountManager::Base
         end
         # Reverse credit
         debit_adapter.credit(payment, options)
+
+        # execute the on_failure method for failed payments
+        credit_adapter.on_failure(payment: self.payment)
       return
     end
 
