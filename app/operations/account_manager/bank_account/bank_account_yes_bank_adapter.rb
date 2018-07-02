@@ -79,7 +79,7 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
 
   def on_completion(options)
     payment = options[:payment]
-    if payment.completed?
+    if payment&.completed?
       op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: payment)
       # trigger the webhook callback for this particular payment's credit confirmation
       # setting the parameters for the callback method and executing it
@@ -88,6 +88,14 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
       if payment.invoice.present?
         payment.invoice.update_invoice_status
       end
+    end
+  end
+
+  def on_failure(options)
+    # trigger the webhook callback for failed payments
+    payment = options[:payment]
+    if payment&.failed?
+      execute_callback(payment)
     end
   end
 
@@ -104,6 +112,9 @@ class AccountManager::BankAccount::BankAccountYesBankAdapter < AccountManager::B
             receiving_account_ifsc: payment.receiving_account&.ifsc
         }
     }
+    if payment.failed?
+      post_params[:errors] = payment.system_messages.errors.pluck(:content).to_sentence
+    end
     # this particular type of payment will always have an initiating user because it is a vendor payment / reimbursement payment
     company = payment.initiating_user&.company
     op = Webhook::Process.(nil, {company: company, body: post_params, web_hook_event_id: WebHookEvent.id_for('vendor_payments.credit_confirmation')})
