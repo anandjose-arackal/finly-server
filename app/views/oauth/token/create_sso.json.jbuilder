@@ -9,7 +9,7 @@ json.data do
   # json.refresh_token @token.refresh_token
   json.refresh_token 'asdfsdfasdfasdfsadfsda' #todo - junk for testing
   # json.expires_in @token.expires_in
-  json.expires_in @token.expires_in #todo - junk for testing
+  # json.expires_in @token.expires_in #todo - junk for testing
   json.user do
     json.extract! @user, :id, :name, :email, :mobile_number
     json.roles @user.user_roles, :id, :name

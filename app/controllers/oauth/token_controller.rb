@@ -27,7 +27,10 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   # this method will handle the SSO Token decryption method of login and return the same tokens that the create action returns
   def create_sso
-
+    @user = User.find 18
+    binding_params = {user: @user, auth_grant: @auth_grant, token: @token}
+    view = ActionView::Base.new(ActionController::Base.view_paths, binding_params)
+    render json: JSON.parse(view.render(file: 'oauth/token/create_sso.json.jbuilder')), status: 200
   end
 
   protected
