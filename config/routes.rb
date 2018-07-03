@@ -2386,7 +2386,7 @@ end
   end
 
   ############ SSO LOGIN APIs START ####################
-  post 'oauth/sso_login', to: 'token#create_sso', as: :create_sso
+  post 'oauth/sso_login', to: 'oauth/token#create_sso', as: :create_sso
   ######################################################
 
 
