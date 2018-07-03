@@ -55,7 +55,7 @@ class PurchaseOrder < ActiveRecord::Base
   has_many :items, class_name: "PurchaseOrderItem", dependent: :destroy
   has_many :extra_charges, class_name: "ProcurementCharge", as: "Chargable"
 
-  has_many :comments, as: :parent_commentable
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   accepts_nested_attributes_for :items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax,

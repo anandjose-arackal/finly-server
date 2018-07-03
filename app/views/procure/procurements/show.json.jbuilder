@@ -65,6 +65,10 @@ json.trail do
       end
     end
 
+    json.comments do
+      json.array! item.comments, :id, :body
+    end
+
     if item.is_a?(Invoice)
       json.invoice_details do
         json.amount item.balance_due&.value

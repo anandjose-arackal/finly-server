@@ -67,7 +67,7 @@ class Payment < ActiveRecord::Base
   has_many :finly_transactions
 
   # From Procurement Workflow
-  has_many :comments, as: :parent_commentable
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   has_one :payment, as: :reference_resource
 

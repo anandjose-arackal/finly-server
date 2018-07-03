@@ -48,7 +48,7 @@ class BillOfSupply < ActiveRecord::Base
   belongs_to :balance_amount, class_name: "Amount"
 
   has_many :items, class_name: "DocumentItem", as: :parent_document
-  has_many :comments, as: :parent_commentable
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 

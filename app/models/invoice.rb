@@ -87,7 +87,7 @@ class Invoice < ActiveRecord::Base
   has_many :custom_fields, as: :parent, dependent: :destroy
 
   # From Procurement workflow
-  has_many :comments, as: :parent_commentable
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   accepts_nested_attributes_for :address
   accepts_nested_attributes_for :invoice_attachments, allow_destroy: true

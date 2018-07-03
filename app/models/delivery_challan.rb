@@ -41,5 +41,5 @@ class DeliveryChallan < ActiveRecord::Base
   belongs_to :document_status
 
 
-  has_many :comments, as: :parent_commentable
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 end
