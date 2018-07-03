@@ -2384,7 +2384,11 @@ end
     post 'comment' => 'money_request#comment', as: :comment
   end
 
+  ############ SSO LOGIN APIs START ####################
+  post 'oauth/sso_login', to: 'token#create_sso', as: :create_sso
+  ######################################################
 
+  
   ######################### TRAVEL REQUESTS API START ##########################
 
   resources :travel_requests do
@@ -2866,9 +2870,6 @@ end
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
 
       # resources :company_branches
-
-
-
     end
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
     resources :inventory_line_items
