@@ -126,7 +126,7 @@ else
   end
 end
 
-json.payment_payment_request_id @result.bank_payment_request&.id
+json.bank_payment_request_id @result.bank_payment_request&.id
 
 if @result.vendor.present?
   if @result.vendor.is_a?(YesBankVendor)

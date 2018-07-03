@@ -39,4 +39,7 @@ class DeliveryChallan < ActiveRecord::Base
   belongs_to :payment_term
   belongs_to :procurement_term
   belongs_to :document_status
+
+
+  has_many :comments, as: :parent_commentable
 end

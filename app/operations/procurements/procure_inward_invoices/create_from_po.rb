@@ -78,7 +78,5 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
       gst_type_id: self.purchase_order.gst_type_id,
       invoice_items_attributes: invoice_items_attributes
     }
-    invoice_params
   end
-
 end

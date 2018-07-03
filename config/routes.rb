@@ -3043,6 +3043,8 @@ end
       resources :terms
       resources :doc_number_configs, only: [:index, :update]
     end
+
+    resources :comments, only: [:create]
   end
 
 

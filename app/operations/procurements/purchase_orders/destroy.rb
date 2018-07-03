@@ -3,5 +3,6 @@ class Procurements::PurchaseOrders::Destroy < Procurements::PurchaseOrders::Base
 
   def init
     # Should be deleteing the transaction
+
   end
 end

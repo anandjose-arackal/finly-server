@@ -1,0 +1,47 @@
+class Procurements::Comments::Create < Procurements::Comments::Base
+  attr_accessor :comment, :comment_params, :document
+
+  def init
+    self.comment_params = comment_parameters
+    expense_type_name.constantize.with_id(expense_w_type_ids).pluck(:expense_id)
+
+    document_types = %w( procurement purchase_order bill_of_supply delivery_challan e_way_bill inward_document payment invoice )
+
+    document_type = comment_params[:parent_commentable_type]
+    document_id = comment_params[:parent_commentable_id]
+    if document_types.include?(document_type)
+      self.document = document_type.constantize.find_by id: document_id
+    else
+      add_message :error, 'Invalid Document Type Provided'
+    end
+
+    comment_params.delete(:parent_commentable_type)
+    comment_params.delete(:parent_commentable_id)
+  end
+
+  def validate
+    if self.document.present?
+      add_message :error, 'Document not found'
+    end
+  end
+
+  def process
+    self.comment = document.comments.new comment_params
+
+    if self.comment.valid?
+      self.comment.save
+      add_message :success, 'Added Comment'
+    end
+
+  end
+
+  def post_process
+    # Notify users involved in comment
+  end
+
+  private
+
+  def comment_parameters
+    params.require(:comment).permit(:body, :parent_commentable_id, :parent_commentable_type)
+  end
+end
