@@ -28,6 +28,7 @@ class Procurements::Comments::Create < Procurements::Comments::Base
 
   def process
     self.comment = document.comments.new comment_params
+    self.comment.user = user
 
     if self.comment.valid?
       self.comment.save
