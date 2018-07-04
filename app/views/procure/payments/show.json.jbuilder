@@ -136,3 +136,16 @@ if @result.vendor.present?
   end
 
 end
+
+json.comments do
+  json.array! payment.comments do |comment|
+    json.extract! comment, :id, :body
+    json.created_at comment.created_at.strftime("%b %d, %y")
+    json.created_at_time comment.created_at.strftime("%i:%m%p")
+    json.user do
+      json.name comment.user&.name
+
+      json.id comment.user&.id
+    end
+  end
+end

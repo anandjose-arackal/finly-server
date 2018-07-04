@@ -65,3 +65,16 @@ json.procurement_term do
   json.name @result.purchase_order.procurement_term&.name
   json.description @result.purchase_order.procurement_term&.description
 end
+
+json.comments do
+  json.array! @result.purchase_order.comments do |comment|
+    json.extract! comment, :id, :body
+    json.created_at comment.created_at.strftime("%b %d, %y")
+    json.created_at_time comment.created_at.strftime("%i:%m%p")
+    json.user do
+      json.name comment.user&.name
+
+      json.id comment.user&.id
+    end
+  end
+end

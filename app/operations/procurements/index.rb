@@ -19,7 +19,5 @@ class Procurements::Index < Procurements::Base
     def init
       self.procurements = params[:procurements]
     end
-
-
   end
 end

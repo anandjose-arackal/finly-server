@@ -28,5 +28,7 @@ class Procurement < ActiveRecord::Base
   has_many :delivery_challans
   has_many :e_way_bills
 
+  has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+
   default_scope { order(updated_at: :desc) }
 end

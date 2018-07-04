@@ -26,11 +26,16 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_order
+    attr_accessor :purchase_order, :actions
 
     def init
       self.purchase_order = params[:purchase_order]
+      self.actions = get_actions
+    end
+
+    def get_actions
+      actions = {}
+      actions[:send_mail] = {}
     end
   end
-
 end
