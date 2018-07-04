@@ -3,14 +3,15 @@ class Procurements::Comments::Create < Procurements::Comments::Base
 
   def init
     self.comment_params = comment_parameters
-    expense_type_name.constantize.with_id(expense_w_type_ids).pluck(:expense_id)
 
     document_types = %w( procurement purchase_order bill_of_supply delivery_challan e_way_bill inward_document payment invoice )
 
     document_type = comment_params[:parent_commentable_type]
     document_id = comment_params[:parent_commentable_id]
+
+
     if document_types.include?(document_type)
-      self.document = document_type.constantize.find_by id: document_id
+      self.document = document_type.classify.constantize.find_by id: document_id
     else
       add_message :error, 'Invalid Document Type Provided'
     end
@@ -20,7 +21,7 @@ class Procurements::Comments::Create < Procurements::Comments::Base
   end
 
   def validate
-    if self.document.present?
+    unless self.document.present?
       add_message :error, 'Document not found'
     end
   end
