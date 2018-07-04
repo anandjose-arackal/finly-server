@@ -83,6 +83,22 @@ module Constants
   ###################################################
 
 
+  ################ XOR and Ecnryption Keys for Darwin Box ###########
+  if Rails.env.production?
+    XOR_KEY = ''
+  else
+    XOR_KEY = '666666'
+  end
+
+  if Rails.env.production?
+    SHA512_KEY = ''
+  else
+    SHA512_KEY = 'cfd7586120ddbcc9ffdcd24123a59720'
+  end
+
+  ##################### END OF Darwin Box ############################
+
+
   if Rails.env.development?
     # url = "http://192.168.81.157:3000/#"
     url = "http://localhost/#"
