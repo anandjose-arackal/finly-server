@@ -33,7 +33,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
       self.company = Company.find_by(id: company_id)
       self.options = {}
       self.options[:bank_transfer_type] = params[:bank_transfer_type]
-      self.background = payment_request.background
+      self.background = params[:background]
     end
 
     # setting the company id based on whether it's a user or an AdminUser
@@ -94,7 +94,7 @@ class AccountManager::Payments::PaymentProcessor < AccountManager::Base
     # synchronous or a background operation
     if self.crediting_payments.present?
       if self.background
-        op = AccountManager::Payments::BulkPaymentExecutor.(nil, self.crediting_payments.pluck(:id), options)
+        op = AccountManager::Payments::BulkPaymentExecutor.(self.payment_order, self.crediting_payments.pluck(:id), options)
         add_message :success, 'Payments have been scheduled, you can check their status from the order screen'
       end
     else

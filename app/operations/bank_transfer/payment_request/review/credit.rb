@@ -33,6 +33,9 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     self.initiating_account_adapter = retrieve_initiating_account_adapter
     self.view_role = UserRole.id_for(params[:view].to_sym)
     payment_ids = params[:payment_ids]
+    unless payment_ids.is_a?(Array)
+      payment_ids = [payment_ids]
+    end
     self.crediting_payments = self.bank_payment_request.payments.with_id(payment_ids)
     self.bank_transfer_type = self.bank_payment_request&.payment_order&.bank_transfer_type
   end
@@ -60,7 +63,7 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
     unless TransferTimingUtils.within_timeframe?(payment_order&.payment_mode, payment_order&.scheduled_at)
       # retrieve the next kosher date for the transfer, and update the scheduled at date to that one
       next_date = TransferTimingUtils.next_valid_date(DateUtils.local_date_time, payment_order.payment_mode)
-      self.crediting_payments.update(scheduled_at: next_date)
+      self.crediting_payments.update_all(scheduled_at: next_date)
     end
 
     # if the payment order is being credited, we have to mark it as approved as well first
@@ -71,7 +74,8 @@ class BankTransfer::PaymentRequest::Review::Credit < BankTransfer::PaymentReques
   def process
     # now pass these payments to the PaymentProcessor operation so that it can process the credit for all of them
     # op = BankTransfer::YesBank::Create.(user, bank_payment_request: bank_payment_request)
-    op = AccountManager::Payments::PaymentProcessor.(user, {crediting_payments: self.crediting_payments, bank_transfer_type: self.bank_transfer_type, background: true})
+    op = AccountManager::Payments::PaymentProcessor.(user, {crediting_payments: self.crediting_payments, bank_transfer_type: self.bank_transfer_type,
+                                                            background: true, payment_order: self.payment_order})
     if op.success?
       # update the bank_payment_request to credited
       bank_payment_request.update(status_id: BankPaymentRequestStatus.id_for(:credited), controlling_user: nil, controlling_user_role_id: nil,

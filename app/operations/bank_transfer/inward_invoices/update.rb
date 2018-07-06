@@ -27,7 +27,7 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     if inward_invoice_params&.dig(:advance_amount_attributes).present?
       inward_invoice_params[:advance_amount_attributes][:id] = self.inward_invoice&.advance_amount&.id
     end
-    
+
     # setting the inclusive of taxes explicitly here because if unchecked it doesn't send anything from the frontend
     if self.inward_invoice_params[:inclusive_of_taxes].blank?
       self.inward_invoice_params[:inclusive_of_taxes] = false
