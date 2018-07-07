@@ -153,7 +153,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   def sha512_encrypted_email(email, timestamp)
     key = Constants::SHA512_KEY # extracting the encryption key for this particular company
-    concatenated_string = email + key + timestamp
+    concatenated_string = email.to_s + key.to_s + timestamp.to_s
     encrypted_string = Digest::SHA512.hexdigest(concatenated_string)
   end
 
