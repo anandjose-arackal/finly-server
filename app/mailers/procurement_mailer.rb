@@ -15,4 +15,9 @@ class ProcurementMailer < ApplicationMailer
          bcc: @options[:email_bcc], subject: @options[:email_subject], template_name: 'mail_purchase_order'
 
   end
+
+
+  def send_inward_document
+
+  end
 end

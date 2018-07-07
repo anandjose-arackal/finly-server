@@ -8,11 +8,11 @@
 #  inventory_line_item_id :integer
 #  description            :string(255)
 #  hsn_sac                :string(255)
-#  quantity               :decimal(10, 5)
-#  rate                   :decimal(10, 5)
-#  tax                    :decimal(10, 5)   default(0.0)
-#  tds                    :decimal(10, 5)   default(0.0)
-#  discount               :decimal(10, 5)   default(0.0)
+#  quantity               :decimal(20, 5)
+#  rate                   :decimal(20, 5)
+#  tax                    :decimal(20, 5)   default(0.0)
+#  tds                    :decimal(20, 5)   default(0.0)
+#  discount               :decimal(20, 5)   default(0.0)
 #  tax_amount_id          :integer
 #  tds_amount_id          :integer
 #  discount_amount_id     :integer

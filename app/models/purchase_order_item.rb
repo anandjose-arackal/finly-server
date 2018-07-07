@@ -9,10 +9,10 @@
 #  description            :string(255)
 #  hsn_sac                :string(255)
 #  quantity               :integer
-#  rate                   :decimal(10, 5)
-#  tax                    :decimal(10, 5)
-#  tds                    :decimal(10, 5)
-#  discount               :decimal(10, 5)
+#  rate                   :decimal(20, 5)
+#  tax                    :decimal(20, 5)
+#  tds                    :decimal(20, 5)
+#  discount               :decimal(20, 5)
 #  tax_amount_id          :integer
 #  tds_amount_id          :integer
 #  discount_amount_id     :integer

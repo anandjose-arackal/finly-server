@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180630063436) do
+ActiveRecord::Schema.define(version: 20180706074258) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1684,6 +1684,7 @@ ActiveRecord::Schema.define(version: 20180630063436) do
     t.string   "value_type",             limit: 255
     t.integer  "dependent_parent_id",    limit: 4
     t.string   "dependent_parent_type",  limit: 255
+    t.string   "field_key",              limit: 255
   end
 
   add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
@@ -1844,11 +1845,11 @@ ActiveRecord::Schema.define(version: 20180630063436) do
     t.integer  "inventory_line_item_id", limit: 4
     t.string   "description",            limit: 255
     t.string   "hsn_sac",                limit: 255
-    t.decimal  "quantity",                           precision: 10, scale: 5
-    t.decimal  "rate",                               precision: 10, scale: 5
-    t.decimal  "tax",                                precision: 10, scale: 5, default: 0.0
-    t.decimal  "tds",                                precision: 10, scale: 5, default: 0.0
-    t.decimal  "discount",                           precision: 10, scale: 5, default: 0.0
+    t.decimal  "quantity",                           precision: 20, scale: 5
+    t.decimal  "rate",                               precision: 20, scale: 5
+    t.decimal  "tax",                                precision: 20, scale: 5, default: 0.0
+    t.decimal  "tds",                                precision: 20, scale: 5, default: 0.0
+    t.decimal  "discount",                           precision: 20, scale: 5, default: 0.0
     t.integer  "tax_amount_id",          limit: 4
     t.integer  "tds_amount_id",          limit: 4
     t.integer  "discount_amount_id",     limit: 4
@@ -2072,6 +2073,7 @@ ActiveRecord::Schema.define(version: 20180630063436) do
     t.integer  "tds_amount_id",          limit: 4
     t.integer  "gst_type_id",            limit: 4
     t.integer  "tds_slab_id",            limit: 4
+    t.integer  "gst_amount_id",          limit: 4
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -2179,6 +2181,7 @@ ActiveRecord::Schema.define(version: 20180630063436) do
     t.integer  "parent_id",               limit: 4
     t.string   "parent_type",             limit: 255
     t.boolean  "root_field",                          default: true
+    t.string   "field_key",               limit: 255
   end
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
@@ -2317,6 +2320,14 @@ ActiveRecord::Schema.define(version: 20180630063436) do
     t.datetime "updated_at",             null: false
     t.string   "state_code", limit: 255
   end
+
+  create_table "gst_types", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "gst_types", ["name"], name: "index_gst_types_on_name", using: :btree
 
   create_table "individual_kyc_track_actions", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -3662,10 +3673,10 @@ ActiveRecord::Schema.define(version: 20180630063436) do
     t.string   "description",            limit: 255
     t.string   "hsn_sac",                limit: 255
     t.integer  "quantity",               limit: 4
-    t.decimal  "rate",                               precision: 10, scale: 5
-    t.decimal  "tax",                                precision: 10, scale: 5
-    t.decimal  "tds",                                precision: 10, scale: 5
-    t.decimal  "discount",                           precision: 10, scale: 5
+    t.decimal  "rate",                               precision: 20, scale: 5
+    t.decimal  "tax",                                precision: 20, scale: 5
+    t.decimal  "tds",                                precision: 20, scale: 5
+    t.decimal  "discount",                           precision: 20, scale: 5
     t.integer  "tax_amount_id",          limit: 4
     t.integer  "tds_amount_id",          limit: 4
     t.integer  "discount_amount_id",     limit: 4

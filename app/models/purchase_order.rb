@@ -66,4 +66,97 @@ class PurchaseOrder < ActiveRecord::Base
   # validates :items, presence: true
   scope :document_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
 
+
+  before_save :calculate_line_items
+
+  private
+
+  def calculate_line_items
+    total_before_tax_amount = 0
+    total_after_tax_amount = 0
+    tax_amount = 0
+    discount_amount = 0
+    balance_amount = 0
+    total_amount = 0
+    persisted = false
+
+    self.items.each do |item|
+      if item.persisted?
+        item.reload
+        persisted = true
+      end
+      if item.is_a?(PurchaseOrderItem)
+        item_quantity = (item.quantity || 0).to_f
+        item_rate = (item.rate || 0).to_f
+        item_tax = (item.tax || 0).to_f
+        item_discount = (item.discount || 0).to_f
+
+        # Exclusive of tax
+        item_amount = (item_quantity * item_rate)
+        item_discount_amount = item_amount * item_discount / 100
+        item_taxable_amount =  item_amount - item_discount_amount
+        item_tax_amount = item_taxable_amount * item_tax / 100
+        item_total_amount = item_taxable_amount - item_tax_amount
+
+        # Add to parent's amounts
+        tax_amount += item_tax_amount
+        discount_amount += item_discount_amount
+        total_before_tax_amount += item_taxable_amount
+        total_after_tax_amount += item_total_amount
+        total_amount += item_total_amount
+
+        # if persisted
+        if item.tax_amount.present?
+          item.tax_amount.value = item_tax_amount
+        else
+          item.tax_amount = Amount.new(value: item_tax_amount, currency_id: 1)
+        end
+
+        if item.discount_amount.present?
+          item.discount_amount.value = item_discount_amount
+        else
+          item.discount_amount = Amount.new(value: item_discount_amount, currency_id: 1)
+        end
+
+        if item.total_amount.present?
+          item.total_amount.value = item_total_amount
+        else
+          item.total_amount = Amount.new(value: item_total_amount, currency_id: 1)
+        end
+
+
+        # end
+
+      end
+    end
+
+    if self.total_before_tax.present?
+      self.total_before_tax.value = total_before_tax_amount
+    else
+      self.total_before_tax = Amount.new(value: total_before_tax_amount, currency_id: 1)
+    end
+
+    if self.total_after_tax.present?
+      self.total_after_tax.value = total_after_tax_amount
+    else
+      self.total_after_tax = Amount.new(value: total_after_tax_amount, currency_id: 1)
+    end
+
+    # if self.total_amount.present?
+    #   self.total_amount.value = total_amount
+    # else
+    #   self.total_amount = Amount.new(value: total_amount, currency_id: 1)
+    # end
+    if self.discount_amount.present?
+      self.discount_amount.value = discount_amount
+    else
+      self.discount_amount = Amount.new(value: discount_amount, currency_id: 1)
+    end
+
+    if self.balance_amount.present?
+      self.balance_amount.value = total_amount
+    else
+      self.balance_amount = Amount.new(value: total_amount, currency_id: 1)
+    end
+  end
 end

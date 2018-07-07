@@ -13,13 +13,8 @@ class Procurements::PurchaseOrders::Base < BaseOperation
         :delivery_date, :gst_type_id, :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount,
         items_attributes: [
             :id, :_destroy, :product_id, :description, :hsn_sac, :quantity, :rate, :tax, :tds, :discount, :delivery_date, :comment,
-            :inventory_line_item_id, tax_amount_attributes: [:value, :currency_id],
-            tds_amount_attributes: [:value, :currency_id], discount_amount_attributes: [:value, :currency_id],
-            total_amount_attributes: [:value, :currency_id]
+            :inventory_line_item_id
         ],
-        total_before_tax_attributes: [:value, :currency_id], tax_amount_attributes: [:value, :currency_id],
-        total_after_tax_attributes: [:value, :currency_id], discount_amount_attributes: [:value, :currency_id],
-        balance_amount_attributes: [:value, :currency_id],
         attachments: []
         # tax_amount_attributes: [:value, :currency_id]
     )
