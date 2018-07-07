@@ -18,11 +18,12 @@
             <% if request.present? %>
             <% request.each do |report_id, vouchers| %>
             <% vouchers.each do |name, details| %>
+              <% next if name == :cost_center %>
               <VOUCHER VCHTYPE="<%= name %>" ACTION="Create">
                  <VOUCHERTYPENAME><%= name %></VOUCHERTYPENAME>
                  <DATE><%= details[:date] %></DATE>
                  <NARRATION></NARRATION>
-                 <COSTCENTRENAME><%= details[:cost_center] %></COSTCENTRENAME>
+                 <COSTCENTRENAME><%= vouchers[:cost_center] %></COSTCENTRENAME>
                  <EFFECTIVEDATE><%= details[:date] %></EFFECTIVEDATE>
               <% details[:transactions].each do |ledger_name, amount| %>
                  <ALLLEDGERENTRIES.LIST>
