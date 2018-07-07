@@ -7,8 +7,10 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '13.232.42.127', user: 'centos', roles: %w{web app db}, port: 22
-server '35.154.172.193', user: 'centos', roles: %w{web app db}, port: 22
+server '13.127.123.168', user: 'centos', roles: %w{web app db}
+server '13.127.232.50', user: 'centos', roles: %w{web app}
+server '13.126.56.205', user: 'centos', roles: %w{web app}
+server '13.126.17.227', user: 'centos', roles: %w{sidekiq_app}
 set :stage, 'staging'
 set :use_sudo, false
 set :rbenv_type, :user

@@ -22,7 +22,7 @@ case fetch(:stage)
   # todo - configure this for production once everything is set up
   when :aws_production
     set :deploy_to, '/home/centos/app'
-    set :rails_env, 'staging'
+    set :rails_env, 'production'
   when :itzcash
     set :deploy_to, '/usr/local/app'
     set :rails_env, 'itzcash_uat'
