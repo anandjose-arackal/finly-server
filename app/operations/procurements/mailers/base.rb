@@ -3,8 +3,8 @@ class Procurements::Mailers::Base < BaseOperation
 
   def init
     document_types = %w( purchase_order bill_of_supply delivery_challan e_way_bill inward_document payment invoice )
-    document_type = comment_params[:document_type]
-    document_id = comment_params[:document_id]
+    document_type = params[:document_type]
+    document_id = params[:document_id]
 
     if document_types.include?(document_type)
       self.document = document_type.classify.constantize.find_by id: document_id
@@ -17,8 +17,8 @@ class Procurements::Mailers::Base < BaseOperation
     self.email_options[:email_to] = params[:email_to]
     self.email_options[:email_bcc_to] = params[:email_bcc_to]
 
-    self.email_subject[:email_subject] = params[:email_subject]
-    self.email_body[:email_body] = params[:email_body]
+    self.email_options[:email_subject] = params[:subject]
+    self.email_options[:email_body] = params[:body]
   end
 
   def validate
@@ -36,11 +36,14 @@ class Procurements::Mailers::Base < BaseOperation
   end
 
   def process
-    ProcurementMailer.delay.send_mail(purchase_order, email_options)
+    ProcurementMailer.delay.send_mail(document, email_options, user)
+  end
+
+  def post_process
+    add_message :success, 'Successfully sent mail'
   end
 
   def success
-    params[:mailer] = mailer
     Procurements::Mailers::Base::MailerPresenter.new(user, params, messages)
   end
 

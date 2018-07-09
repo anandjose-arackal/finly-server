@@ -17,13 +17,13 @@
 <div style="width: 550px; height: auto; margin-left: auto; margin-right: auto; overflow: hidden; background-color: white !important;border:1px solid #c4c4c4; box-shadow: 0 10px 10px #c4c4c4;">
   <div style="width: 100%; height: 10px; background-color: #233e72; border: 1px solid #233e72;"></div>
   <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 10px; border-bottom: 1px solid #c4c4c4;">
-    <img src="https://www.finly.io/<%= @purchase_order.company.configuration.logo&.path %>" style="float: left;" class="company-logo" width="100" height="auto">
-    <span style="display: block; float: right; font-weight: bold; font-family: sans-serif; font-size: 19px; color: #233e72;"><%= @purchase_order.company.name %></span>
+    <img src="https://www.finly.io/<%= @user.company.configuration.logo&.path %>" style="float: left;" class="company-logo" width="100" height="auto">
+    <span style="display: block; float: right; font-weight: bold; font-family: sans-serif; font-size: 19px; color: #233e72;"><%= @user.company.name %></span>
   </div>
   <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 20px; border-bottom: 1px solid #c4c4c4; font-family: sans-serif; font-weight: 300;">
     <div style="width:33%; height: auto; overflow: hidden; float: left; text-align: center;">
-      <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 12px; color: #7b7b7b;"> PO Number </span> <br>
-      <span style="display: block; font-weight: bold; font-size: 16px; color: #5d5d5d;"> <%= @purchase_order.po_number %> </span>
+      <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 12px; color: #7b7b7b;"> Document Number </span> <br>
+      <span style="display: block; font-weight: bold; font-size: 16px; color: #5d5d5d;"> <%= @document.po_number %> </span>
     </div>
     <div style="width: 0.31%; height: 54px; background-color: #c4c4c4; float: left;"></div>
     <div style="width: 0.33%; height: 54px; background-color: #c4c4c4; float: left"></div>
