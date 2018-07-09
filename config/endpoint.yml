@@ -1,7 +1,9 @@
 default: &default
   base_url: "https://staging.itzcash.com"
+#  base_url: "http://localhost/itz_cash_api"
   itzcash_account_details:
     base: "https://staging.itzcash.com"
+#    base: "http://localhost/itz_cash_api"
     path: "myaccount/servlet/ItzCashAccountDetailsServlet"
   itzcash_account_details_yse:
     path: "user/servlet/NaradaAccountDetailsServlet"
@@ -36,8 +38,8 @@ default: &default
     base: 'http://staging.itzcash.com'
     path: 'api/customer/register'
   yes_bank:
-    base: 'https://uatsky.yesbank.in:444'
-#    base: 'https://uatsky.yesbank.in'
+#    base: 'https://uatsky.yesbank.in:444'
+    base: 'http://localhost/yes_bank_api'
     path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
   finly_collect:
     base: 'http://localhost:3002/'
