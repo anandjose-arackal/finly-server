@@ -3042,9 +3042,11 @@ end
     namespace :configs do
       resources :terms
       resources :doc_number_configs, only: [:index, :update]
+      post 'send_mail', to: 'mailer#send_mail'
     end
 
     resources :comments, only: [:create]
+
   end
 
 

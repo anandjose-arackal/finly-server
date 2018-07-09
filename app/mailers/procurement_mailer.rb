@@ -17,7 +17,13 @@ class ProcurementMailer < ApplicationMailer
   end
 
 
-  def send_inward_document
+  def send_mail(document, options, user)
+    @document = document
+    @options = options
+    @user = user
+
+    mail from: "#{@user.company.name} <noreply@finly.io>", :reply_to => "#{@user.email}", to: @options[:email_to],
+         bcc: @options[:email_bcc_to], subject: @options[:email_subject], template_name: 'mail_procurement'
 
   end
 end

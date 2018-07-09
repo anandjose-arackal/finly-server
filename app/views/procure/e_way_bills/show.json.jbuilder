@@ -47,7 +47,7 @@ json.attachments do
 end
 
 json.comments do
-  json.array! @result.bill_of_supply.comments do |comment|
+  json.array! @result.e_way_bill.comments do |comment|
     json.extract! comment, :id, :body
     json.created_at comment.created_at.strftime("%b %d, %Y")
     json.created_at_time comment.created_at.strftime("%I:%M%p")
