@@ -7,13 +7,17 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-server '13.232.42.127', user: 'centos', roles: %w{web app db}, port: 22
-server '35.154.172.193', user: 'centos', roles: %w{web app db}, port: 22
-set :stage, 'staging'
+server '35.154.174.176', user: 'centos', roles: %w{web app db}
+server '13.126.1.248', user: 'centos', roles: %w{web app}
+server '13.232.130.44', user: 'centos', roles: %w{web app}
+server '13.232.176.84', user: 'centos', roles: %w{sidekiq_app crono_role}
+set :stage, 'production'
 set :use_sudo, false
 set :rbenv_type, :user
 set :rbenv_ruby, '2.3.1' # Edit this if you are using MRI Ruby
 
+set :sidekiq_role, :sidekiq_app
+set :crono_role, :crono_role
 # role-based syntax
 # ==================
 
