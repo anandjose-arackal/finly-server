@@ -4,9 +4,9 @@ class TransactionsMsgQueuePusher
 
     config_file = File.join(Rails.root, 'config', 'msg_queue.yml')
     details = YAML.load(File.open(config_file))
-    region_name = details&.dig(:aws, :region_name)
-    access_key_id = details&.dig(:aws, :access_key_id)
-    secret_access_key = details&.dig(:aws, :secret_access_key)
+    region_name = ENV["region_name"]
+    access_key_id = ENV["access_key_id"]
+    secret_access_key = ENV["secret_access_key"]
     username = details&.dig(:itzcash, :MSG_QUEUE_USERNAME)
     password = details&.dig(:itzcash, :MSG_QUEUE_PASSWORD)
 
@@ -28,7 +28,8 @@ class TransactionsMsgQueuePusher
 
     puts "Subscribed!"
 
-    queue_url = details&.dig(:aws, :queue_url)
+    queue_name = "TransactionMessageQueue"
+    queue_url = ENV[:queue_url_base] + queue_name
 
     sqs_client = Aws::SQS::Client.new(region: region_name, access_key_id: access_key_id, secret_access_key: secret_access_key)
 
@@ -37,7 +38,7 @@ class TransactionsMsgQueuePusher
 
       puts message.body
 
-      data = message.body.split(delimiter)
+      data = message.body
 
       ############## NOW PUSHING THIS DATA INTO THE AWS MESSAGE QUEUE ##########################
       send_message_result = sqs_client.send_message({

@@ -1,0 +1,4 @@
+access_key_id: 'AKIAIIGMDMIVVJVRIGQQ'
+secret_access_key: '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'
+region_name: 'ap-south-1'
+queue_url_base: 'https://sqs.ap-south-1.amazonaws.com/749499857229/'

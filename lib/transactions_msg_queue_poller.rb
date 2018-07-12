@@ -6,9 +6,9 @@ class TransactionsMsgQueuePoller
     ####################### Initializing the client and other details for pulling messages from AWS Queue #########
     config_file = File.join(Rails.root, 'config', 'msg_queue.yml')
     details = YAML.load(File.open(config_file))
-    region_name = details&.dig(:aws, :region_name)
-    access_key_id = details&.dig(:aws, :access_key_id)
-    secret_access_key = details&.dig(:aws, :secret_access_key)
+    region_name = ENV["region_name"]
+    access_key_id = ENV["access_key_id"]
+    secret_access_key = ENV["secret_access_key"]
 
     sqs_client = Aws::SQS::Client.new(region: region_name, access_key_id: access_key_id, secret_access_key: secret_access_key)
     queue_url = sqs_client.list_queues.queue_urls.first # this will be the url of the message queue we are using
