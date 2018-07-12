@@ -4,8 +4,6 @@ class TransactionsMsgQueuePoller
 
 
     ####################### Initializing the client and other details for pulling messages from AWS Queue #########
-    config_file = File.join(Rails.root, 'config', 'msg_queue.yml')
-    details = YAML.load(File.open(config_file))
     region_name = ENV["region_name"]
     access_key_id = ENV["access_key_id"]
     secret_access_key = ENV["secret_access_key"]
