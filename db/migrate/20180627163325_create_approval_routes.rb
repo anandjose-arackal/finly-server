@@ -6,6 +6,8 @@ class CreateApprovalRoutes < ActiveRecord::Migration
       t.integer :reviewer_id, references: 'User', index: true, foreign_key: true, null: false
       t.integer :threshold, index: true, default: 0, null: false
       t.integer :created_by_user_id, references: 'User', index: true, foreign_key: true, null: false
+      t.references :user, index: true, foreign_key: true
+      t.references :policy, index: true, foreign_key: true, null: false
 
       t.timestamps null: false
     end
