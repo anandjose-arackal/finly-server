@@ -909,7 +909,7 @@ class Expense < ActiveRecord::Base
   end
 
   def compute_gst_amount
-    return unless has_gst?
+    return unless has_gst? and self.gst_percentage.present?
 
     gst_amount_value = self.amount.value * self.gst_percentage / 100
     set_gst_amount(gst_amount_value)
