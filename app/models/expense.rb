@@ -904,10 +904,8 @@ class Expense < ActiveRecord::Base
   # alias_method :reimbursable_amount, :reimbursable_amount_value
 
   def reimbursable_amount
-    return Amount.new(value: 0, currency_id: amount.currency_id) unless reimbursable
-    return amount unless has_tds?
-    return amount unless tds_amount.present?
-    return Amount.new(value: (precision_value(amount.value - tds_amount.value)), currency_id: amount.currency_id)
+    value = reimbursable ? reimbursable_amount_value : 0
+    return Amount.new(value: value, currency_id: amount.currency_id)
   end
 
   def compute_gst_amount
