@@ -905,7 +905,7 @@ class Expense < ActiveRecord::Base
 
   def reimbursable_amount
     value = reimbursable ? reimbursable_amount_value : 0
-    return Amount.new(value: value, currency_id: amount.currency_id)
+    Amount.new(value: value, currency_id: amount.currency_id)
   end
 
   def compute_gst_amount
