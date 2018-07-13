@@ -42,8 +42,8 @@ class Report::Update < Report::Base
   end
 
   def validate
-    unless report.retracted? or report.open? or report.rejected?
-      messages[:error] << 'Cannot update report unless retracted'
+    unless report.retracted? or report.open? or report.rejected? or report.processing?
+      messages[:error] << 'You cannot edit the report at this stage'
     end
   end
 
