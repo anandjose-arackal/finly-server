@@ -27,12 +27,12 @@ class Report::Update < Report::Base
   end
 
   def authorize
-    unless user == report.user
-      messages[:error] << 'Only report owners can update report'
-      raise_unauthorized_exception
-    end
+    # unless user == report.user
+    #   messages[:error] << 'Only report owners can update report'
+    #   raise_unauthorized_exception
+    # end
     unless user == report.controlling_user
-      messages[:error] << 'Only report owners can update report'
+      messages[:error] << 'You cannot edit the report at this stage'
       raise_unauthorized_exception
     end
   end
