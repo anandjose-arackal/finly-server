@@ -27,11 +27,16 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
 
   def process
     self.invoice = self.procurement.invoices.build(self.invoice_params)
+
+
     self.invoice.company_id = user.company.id
     if self.invoice.save
       InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
       self.invoice.vendor_id = self.procurement.vendor_id
       self.invoice.save
+
+      status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_received))
+      procurement.status_tags << status_tag
     else
       add_message :error, self.invoice.errors.full_messages
     end

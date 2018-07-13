@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180706074258) do
+ActiveRecord::Schema.define(version: 20180713131633) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3604,6 +3604,16 @@ ActiveRecord::Schema.define(version: 20180706074258) do
   add_index "procurement_comments", ["parent_commentable_type", "parent_commentable_id"], name: "indx_prcurmnt_cmments_on_prnt_cmmentble_typ_n_prnt_cmmentble_id", using: :btree
   add_index "procurement_comments", ["user_id"], name: "index_procurement_comments_on_user_id", using: :btree
 
+  create_table "procurement_status_taggables", force: :cascade do |t|
+    t.integer  "procurement_id", limit: 4
+    t.integer  "status_tag_id",  limit: 4
+    t.datetime "created_at",               null: false
+    t.datetime "updated_at",               null: false
+  end
+
+  add_index "procurement_status_taggables", ["procurement_id"], name: "index_procurement_status_taggables_on_procurement_id", using: :btree
+  add_index "procurement_status_taggables", ["status_tag_id"], name: "index_procurement_status_taggables_on_status_tag_id", using: :btree
+
   create_table "procurement_statuses", force: :cascade do |t|
     t.string   "name",        limit: 255
     t.text     "description", limit: 65535
@@ -3722,16 +3732,17 @@ ActiveRecord::Schema.define(version: 20180706074258) do
     t.integer  "gst_type_id",              limit: 4
     t.boolean  "inclusive_of_taxes"
     t.boolean  "roundoff_total_enabled"
-    t.decimal  "roundoff_amount",                      precision: 10, scale: 5
+    t.decimal  "roundoff_amount",                        precision: 10, scale: 5
     t.integer  "transaction_amount_id",    limit: 4
     t.integer  "total_before_tax_id",      limit: 4
     t.integer  "tax_amount_id",            limit: 4
     t.integer  "total_after_tax_id",       limit: 4
     t.integer  "discount_amount_id",       limit: 4
     t.integer  "balance_amount_id",        limit: 4
-    t.datetime "created_at",                                                    null: false
-    t.datetime "updated_at",                                                    null: false
+    t.datetime "created_at",                                                      null: false
+    t.datetime "updated_at",                                                      null: false
     t.integer  "user_id",                  limit: 4
+    t.text     "procurement_term_text",    limit: 65535
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
@@ -4198,6 +4209,17 @@ ActiveRecord::Schema.define(version: 20180706074258) do
     t.string   "code",       limit: 255, null: false
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
+  end
+
+  create_table "status_tags", force: :cascade do |t|
+    t.string   "name",            limit: 255
+    t.string   "display_name",    limit: 255
+    t.string   "description",     limit: 255
+    t.string   "font_icon",       limit: 255
+    t.string   "font_icon_color", limit: 255
+    t.string   "icon_path",       limit: 255
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
   end
 
   create_table "system_logs", force: :cascade do |t|
@@ -5211,6 +5233,8 @@ ActiveRecord::Schema.define(version: 20180706074258) do
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "procurement_charges", "amounts"
   add_foreign_key "procurement_comments", "users"
+  add_foreign_key "procurement_status_taggables", "procurements"
+  add_foreign_key "procurement_status_taggables", "status_tags"
   add_foreign_key "procurement_terms", "companies"
   add_foreign_key "procurements", "companies"
   add_foreign_key "procurements", "procurement_statuses"

@@ -17,7 +17,7 @@ class Procurements::Show < Procurements::Base
   class Procurements::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :procurement, :purchase_order, :invoices, :inward_documents, :procurement_trail, :locations,
                   :payment_terms, :bill_of_supplies, :delivery_challans,
-                  :procurement_terms, :policies, :e_way_bills
+                  :procurement_terms, :policies, :e_way_bills, :status_tags
 
     def init
       self.procurement = params[:procurement]
@@ -34,7 +34,7 @@ class Procurements::Show < Procurements::Base
       self.locations = user.company.locations
       self.payment_terms = user.company.payment_terms
       self.procurement_terms = user.company.procurement_terms
-
+      self.status_tags = self.procurement.status_tags
 
       policies_op = Policy::Index.(user, view: params[:view])
       if policies_op.success?

@@ -30,6 +30,7 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
       purchase_order.save
+      purchase_order.save
       add_message :success, 'Successfully updated purchase order'
     else
       add_message :error, purchase_order.errors.full_messages

@@ -1,6 +1,6 @@
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
-              :payment_term_id
+              :payment_term_id, :procurement_term_text
 json.vendor do
   json.extract! @result.purchase_order.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
 end
@@ -60,11 +60,6 @@ json.attachments do
   end
 end
 
-json.procurement_term do
-  json.id @result.purchase_order.procurement_term&.id
-  json.name @result.purchase_order.procurement_term&.name
-  json.description @result.purchase_order.procurement_term&.description
-end
 
 json.comments do
   json.array! @result.purchase_order.comments do |comment|

@@ -27,10 +27,16 @@
 #
 
 class PurchaseOrderItem < ActiveRecord::Base
+
+  validates :inventory_line_item_id, presence: true
+  validates :purchase_order_id, presence: true
+
   belongs_to :purchase_order
   belongs_to :tax_amount, class_name: "Amount"
   belongs_to :discount_amount, class_name: "Amount"
   belongs_to :total_amount, class_name: "Amount"
+
+
 
   accepts_nested_attributes_for :tax_amount, :discount_amount,
                                 :total_amount

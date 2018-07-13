@@ -31,6 +31,7 @@
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
 #  user_id                  :integer
+#  procurement_term_text    :text(65535)
 #
 
 class PurchaseOrder < ActiveRecord::Base
@@ -47,8 +48,8 @@ class PurchaseOrder < ActiveRecord::Base
   belongs_to :total_before_tax, class_name: "Amount"
   belongs_to :tax_amount, class_name: "Amount"
   belongs_to :total_after_tax, class_name: "Amount"
-  belongs_to :discount_amount, class_name: "Amount"
-  belongs_to :balance_amount, class_name: "Amount"
+  belongs_to :discount_amount, class_name: "Amount", autosave: true
+  belongs_to :balance_amount, class_name: "Amount", autosave: true
 
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 
@@ -58,8 +59,7 @@ class PurchaseOrder < ActiveRecord::Base
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   accepts_nested_attributes_for :items, allow_destroy: true
-  accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax,
-                                :discount_amount, :balance_amount
+  accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount
 
 
   validates :purchase_order_status, presence: true
@@ -68,6 +68,7 @@ class PurchaseOrder < ActiveRecord::Base
 
 
   before_save :calculate_line_items
+
 
   private
 
@@ -82,7 +83,7 @@ class PurchaseOrder < ActiveRecord::Base
 
     self.items.each do |item|
       if item.persisted?
-        item.reload
+        # item.reload # todo has be reloaded
         persisted = true
       end
       if item.is_a?(PurchaseOrderItem)
@@ -96,7 +97,7 @@ class PurchaseOrder < ActiveRecord::Base
         item_discount_amount = item_amount * item_discount / 100
         item_taxable_amount =  item_amount - item_discount_amount
         item_tax_amount = item_taxable_amount * item_tax / 100
-        item_total_amount = item_taxable_amount - item_tax_amount
+        item_total_amount = item_taxable_amount + item_tax_amount
 
         # Add to parent's amounts
         tax_amount += item_tax_amount
@@ -150,13 +151,15 @@ class PurchaseOrder < ActiveRecord::Base
     if self.discount_amount.present?
       self.discount_amount.value = discount_amount
     else
-      self.discount_amount = Amount.new(value: discount_amount, currency_id: 1)
+      self.build_discount_amount(value: discount_amount, currency_id: 1)
     end
 
     if self.balance_amount.present?
       self.balance_amount.value = total_amount
     else
-      self.balance_amount = Amount.new(value: total_amount, currency_id: 1)
+      self.build_balance_amount(value: total_amount, currency_id: 1)
     end
+
+    # self.save
   end
 end

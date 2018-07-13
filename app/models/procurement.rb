@@ -27,8 +27,11 @@ class Procurement < ActiveRecord::Base
   has_many :bill_of_supplies
   has_many :delivery_challans
   has_many :e_way_bills
+  has_many :procurement_status_taggables
 
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+
+  has_many :status_tags, through: :procurement_status_taggables
 
   default_scope { order(updated_at: :desc) }
 end

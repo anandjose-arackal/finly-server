@@ -177,6 +177,14 @@ json.policies do
   json.array! @result.policies, :id, :name
 end
 
+json.status_tags do
+  json.array! @result.status_tags do |status_tag|
+    json.extract! status_tag, :id, :name, :display_name, :description, :font_icon, :font_icon_color, :icon_path
+    json.created_at status_tag.created_at.strftime("%b %d, %y")
+    json.created_at_time status_tag.created_at.strftime("%i:%m%p")
+  end
+end
+
 json.comments do
   json.array! @result.procurement.comments do |comment|
     json.extract! comment, :id, :body
