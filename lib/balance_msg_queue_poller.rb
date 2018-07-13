@@ -3,12 +3,16 @@ class BalanceMsgQueuePoller
   def self.run
     
     ####################### Initializing the client and other details for pulling messages from AWS Queue #########
-    region_name = ENV["region_name"]
-    access_key_id = ENV["access_key_id"]
-    secret_access_key = ENV["secret_access_key"]
+    region_name = ENV["aws_region_name"]
+    access_key_id = ENV["aws_access_key_id"]
+    secret_access_key = ENV["aws_secret_access_key"]
 
     sqs_client = Aws::SQS::Client.new(region: region_name, access_key_id: access_key_id, secret_access_key: secret_access_key)
-    queue_url = sqs_client.list_queues.queue_urls.first # this will be the url of the message queue we are using
+
+    queue_url_base = ENV["sqs_queue_url_base"]
+    queue_name = "BalanceMessageQueue"
+
+    queue_url = queue_url_base + queue_name
 
     delimiter = ','
 
