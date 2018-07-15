@@ -11,7 +11,7 @@ class TransactionsMsgQueuePoller
     sqs_client = Aws::SQS::Client.new(region: region_name, access_key_id: access_key_id, secret_access_key: secret_access_key)
 
     queue_url_base = ENV["sqs_queue_url_base"]
-    queue_name = "TransacionMessageQueue"
+    queue_name = "TransactionMessageQueue"
 
     queue_url = queue_url_base + queue_name
     delimiter = '$'
