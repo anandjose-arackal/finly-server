@@ -113,9 +113,11 @@ itzcash_uat:
     path: 'app/uat/ssl/fundsTransferByCustomerSevice2'
 
 production:
-  base_url: "http://naradaapp.itzcash.com:8280"
+#  base_url: "http://naradaapp.itzcash.com:8280"
+  base_url: "https://www.finly.io/itz_cash_api"
   itzcash_account_details:
-    base: "http://cvms1.itzcash.com:8080"
+#    base: "http://cvms1.itzcash.com:8080"
+    base: "https://www.finly.io/itz_cash_api"
     path: "myaccount/servlet/ItzCashAccountDetailsServlet"
   itzcash_account_details_yse:
     path: "itzgift/servlet/NaradaAccountDetailsServlet"
