@@ -63,16 +63,16 @@ class Report < ActiveRecord::Base
   belongs_to :report_status
   belongs_to :reimbursement, class_name: 'Payment'
   belongs_to :reimbursable_expenses_total, class_name: 'Amount'
-  belongs_to :non_reimbursable_expenses_total, class_name: "Amount"
+  belongs_to :non_reimbursable_expenses_total, class_name: 'Amount'
   belongs_to :card_expenses_total, class_name: 'Amount'
   belongs_to :cash_in_hand_deduction, class_name: 'Payment'
   belongs_to :cash_in_hand_deduction_amount, class_name: 'Amount'
-  belongs_to :sync_status, class_name: "ReportSyncStatus"
+  belongs_to :sync_status, class_name: 'ReportSyncStatus'
   belongs_to :report_processor_group_mapping
   belongs_to :sync_status, class_name: 'ReportSyncStatus'
   belongs_to :sync_type, class_name: 'ReportSyncType'
   belongs_to :travel_request
-  belongs_to :money_request
+  # belongs_to :money_request
 
   has_many :custom_fields, as: :parent, dependent: :destroy
 

@@ -30,21 +30,22 @@ class TravelRequest < ActiveRecord::Base
 
   belongs_to :user
   belongs_to :policy
-  belongs_to :status, class_name: "TravelRequestStatus"
-  has_one :report
+  belongs_to :status, class_name: 'TravelRequestStatus'
+  has_many :reports
+  has_many :money_requests
 
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_user_role, class_name: 'UserRole'
   belongs_to :controlling_for_user, class_name: 'User'
   belongs_to :controlling_for_user_role, class_name: 'UserRole'
 
-  has_many :destinations, class_name: "TravelRequestDestination"
+  has_many :destinations, class_name: 'TravelRequestDestination'
   has_many :travel_request_trails
-  has_many :comments, class_name: "TravelRequestComment"
+  has_many :comments, class_name: 'TravelRequestComment'
 
   accepts_nested_attributes_for :destinations, allow_destroy: true
 
-  delegate :open?, :processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?, to: :status
+  delegate :open?,:processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?, to: :status
 
   validates :status_id, presence: true, unless: :open?
   validates :user_id, presence: true, unless: :open?
