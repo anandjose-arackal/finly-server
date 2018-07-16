@@ -8,6 +8,7 @@
 #  options     :text(65535)
 #  created_at  :datetime         not null
 #  updated_at  :datetime         not null
+#  default     :boolean
 #
 
 require 'test_helper'
