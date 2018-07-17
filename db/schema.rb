@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180712065603) do
+ActiveRecord::Schema.define(version: 20180716134623) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -327,6 +327,26 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   end
 
   add_index "amounts", ["currency_id"], name: "index_amounts_on_currency_id", using: :btree
+
+  create_table "approval_routes", force: :cascade do |t|
+    t.integer  "purpose_id",         limit: 4,             null: false
+    t.integer  "level",              limit: 4,             null: false
+    t.integer  "reviewer_id",        limit: 4,             null: false
+    t.integer  "threshold",          limit: 4, default: 0, null: false
+    t.integer  "created_by_user_id", limit: 4,             null: false
+    t.integer  "user_id",            limit: 4
+    t.integer  "policy_id",          limit: 4,             null: false
+    t.datetime "created_at",                               null: false
+    t.datetime "updated_at",                               null: false
+  end
+
+  add_index "approval_routes", ["created_by_user_id"], name: "index_approval_routes_on_created_by_user_id", using: :btree
+  add_index "approval_routes", ["level"], name: "index_approval_routes_on_level", using: :btree
+  add_index "approval_routes", ["policy_id"], name: "index_approval_routes_on_policy_id", using: :btree
+  add_index "approval_routes", ["purpose_id"], name: "index_approval_routes_on_purpose_id", using: :btree
+  add_index "approval_routes", ["reviewer_id"], name: "index_approval_routes_on_reviewer_id", using: :btree
+  add_index "approval_routes", ["threshold"], name: "index_approval_routes_on_threshold", using: :btree
+  add_index "approval_routes", ["user_id"], name: "index_approval_routes_on_user_id", using: :btree
 
   create_table "authentications", force: :cascade do |t|
     t.integer  "user_id",          limit: 4
@@ -1245,6 +1265,22 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
   add_index "company_configurations", ["contact_id"], name: "index_company_configurations_on_contact_id", using: :btree
 
+  create_table "company_departments", force: :cascade do |t|
+    t.string   "name",               limit: 255,                 null: false
+    t.integer  "company_id",         limit: 4,                   null: false
+    t.boolean  "active",                         default: true
+    t.boolean  "is_deleted",                     default: false
+    t.integer  "created_by_user_id", limit: 4,                   null: false
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+  end
+
+  add_index "company_departments", ["active"], name: "index_company_departments_on_active", using: :btree
+  add_index "company_departments", ["company_id"], name: "index_company_departments_on_company_id", using: :btree
+  add_index "company_departments", ["created_by_user_id"], name: "index_company_departments_on_created_by_user_id", using: :btree
+  add_index "company_departments", ["is_deleted"], name: "index_company_departments_on_is_deleted", using: :btree
+  add_index "company_departments", ["name"], name: "index_company_departments_on_name", using: :btree
+
   create_table "company_funds_auto_transfer_configs", force: :cascade do |t|
     t.integer  "company_id",           limit: 4
     t.integer  "threshold_amount_id",  limit: 4
@@ -1361,6 +1397,16 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   end
 
   add_index "company_kycs", ["company_id"], name: "index_company_kycs_on_company_id", using: :btree
+
+  create_table "company_location_departments", force: :cascade do |t|
+    t.integer  "branch_location_id",    limit: 4, null: false
+    t.integer  "company_department_id", limit: 4, null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+  end
+
+  add_index "company_location_departments", ["branch_location_id"], name: "index_company_location_departments_on_branch_location_id", using: :btree
+  add_index "company_location_departments", ["company_department_id"], name: "index_company_location_departments_on_company_department_id", using: :btree
 
   create_table "company_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -2734,6 +2780,7 @@ ActiveRecord::Schema.define(version: 20180712065603) do
     t.boolean  "auto_approve"
     t.integer  "money_request_processor_mapping_id", limit: 4
     t.datetime "approved_at"
+    t.integer  "travel_request_id",                  limit: 4
   end
 
   add_index "money_requests", ["controlling_for_user_id"], name: "index_money_requests_on_controlling_for_user_id", using: :btree
@@ -2746,6 +2793,7 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   add_index "money_requests", ["payment_mode_id"], name: "index_money_requests_on_payment_mode_id", using: :btree
   add_index "money_requests", ["policy_id"], name: "index_money_requests_on_policy_id", using: :btree
   add_index "money_requests", ["status_id"], name: "index_money_requests_on_status_id", using: :btree
+  add_index "money_requests", ["travel_request_id"], name: "index_money_requests_on_travel_request_id", using: :btree
   add_index "money_requests", ["user_id"], name: "index_money_requests_on_user_id", using: :btree
 
   create_table "new_card_requests", force: :cascade do |t|
@@ -3303,6 +3351,18 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   add_index "policy_user_mappings", ["policy_id"], name: "index_policy_user_mappings_on_policy_id", using: :btree
   add_index "policy_user_mappings", ["user_id"], name: "index_policy_user_mappings_on_user_id", using: :btree
 
+  create_table "policy_user_roles", force: :cascade do |t|
+    t.integer  "policy_id",    limit: 4
+    t.integer  "user_id",      limit: 4
+    t.integer  "user_role_id", limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "policy_user_roles", ["policy_id"], name: "index_policy_user_roles_on_policy_id", using: :btree
+  add_index "policy_user_roles", ["user_id"], name: "index_policy_user_roles_on_user_id", using: :btree
+  add_index "policy_user_roles", ["user_role_id"], name: "index_policy_user_roles_on_user_role_id", using: :btree
+
   create_table "post_operation_actions", force: :cascade do |t|
     t.string   "operation",            limit: 255,   null: false
     t.text     "payload",              limit: 65535
@@ -3751,7 +3811,6 @@ ActiveRecord::Schema.define(version: 20180712065603) do
     t.integer  "sync_type_id",                       limit: 4
     t.integer  "report_processor_group_mapping_id",  limit: 4
     t.integer  "travel_request_id",                  limit: 4
-    t.integer  "money_request_id",                   limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -4010,7 +4069,6 @@ ActiveRecord::Schema.define(version: 20180712065603) do
     t.integer  "user_id",                      limit: 4
     t.integer  "policy_id",                    limit: 4
     t.string   "name",                         limit: 255
-    t.date     "required_by_date"
     t.text     "note",                         limit: 65535
     t.integer  "status_id",                    limit: 4,                                   null: false
     t.integer  "controlling_user_id",          limit: 4
@@ -4024,8 +4082,9 @@ ActiveRecord::Schema.define(version: 20180712065603) do
     t.boolean  "is_deleted",                                               default: false
     t.text     "rejection_note",               limit: 65535
     t.boolean  "auto_approved"
-    t.integer  "report_id",                    limit: 4
-    t.integer  "money_request_id",             limit: 4
+    t.text     "memo",                         limit: 65535
+    t.date     "from_date"
+    t.date     "to_date"
   end
 
   add_index "travel_requests", ["company_id"], name: "index_travel_requests_on_company_id", using: :btree
@@ -4189,11 +4248,13 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   add_index "user_profiles", ["user_id"], name: "index_user_profiles_on_user_id", using: :btree
 
   create_table "user_role_mappings", force: :cascade do |t|
-    t.integer  "user_id",      limit: 4, null: false
-    t.integer  "user_role_id", limit: 4, null: false
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.integer  "purpose_id",   limit: 4
+    t.integer  "user_id",               limit: 4, null: false
+    t.integer  "user_role_id",          limit: 4, null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "purpose_id",            limit: 4
+    t.integer  "company_department_id", limit: 4
+    t.integer  "branch_location_id",    limit: 4
   end
 
   add_index "user_role_mappings", ["user_id"], name: "index_user_role_mappings_on_user_id", using: :btree
@@ -4601,6 +4662,9 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   add_foreign_key "admin_user_role_mappings", "admin_users"
   add_foreign_key "agreements", "agreement_types"
   add_foreign_key "amounts", "currencies"
+  add_foreign_key "approval_routes", "policies"
+  add_foreign_key "approval_routes", "purposes"
+  add_foreign_key "approval_routes", "users"
   add_foreign_key "authentications", "users"
   add_foreign_key "auto_submit_configs", "periods"
   add_foreign_key "auto_sync_configs", "auto_sync_config_types"
@@ -4659,11 +4723,14 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   add_foreign_key "company_branches", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
+  add_foreign_key "company_departments", "companies"
   add_foreign_key "company_funds_auto_transfer_configs", "companies"
   add_foreign_key "company_funds_load_requests", "amounts"
   add_foreign_key "company_funds_load_requests", "companies"
   add_foreign_key "company_kyc_trails", "company_kycs"
   add_foreign_key "company_kycs", "companies"
+  add_foreign_key "company_location_departments", "branch_locations"
+  add_foreign_key "company_location_departments", "company_departments"
   add_foreign_key "company_tags", "companies"
   add_foreign_key "cost_centers", "companies"
   add_foreign_key "custom_fields", "field_configurations"
@@ -4742,6 +4809,7 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   add_foreign_key "money_requests", "payment_modes"
   add_foreign_key "money_requests", "payments"
   add_foreign_key "money_requests", "policies"
+  add_foreign_key "money_requests", "travel_requests"
   add_foreign_key "money_requests", "users"
   add_foreign_key "new_card_requests", "card_types"
   add_foreign_key "new_card_requests", "companies"
@@ -4779,6 +4847,9 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
+  add_foreign_key "policy_user_roles", "policies"
+  add_foreign_key "policy_user_roles", "user_roles"
+  add_foreign_key "policy_user_roles", "users"
   add_foreign_key "quickbooks_configurations", "quickbooks_payment_types"
   add_foreign_key "quickbooks_configurations", "users"
   add_foreign_key "quickbooks_departments", "companies"

@@ -6,7 +6,6 @@
 #  user_id                      :integer
 #  policy_id                    :integer
 #  name                         :string(255)
-#  required_by_date             :date
 #  note                         :text(65535)
 #  status_id                    :integer          not null
 #  controlling_user_id          :integer
@@ -20,8 +19,9 @@
 #  is_deleted                   :boolean          default(FALSE)
 #  rejection_note               :text(65535)
 #  auto_approved                :boolean
-#  report_id                    :integer
-#  money_request_id             :integer
+#  memo                         :text(65535)
+#  from_date                    :date
+#  to_date                      :date
 #
 
 require 'test_helper'

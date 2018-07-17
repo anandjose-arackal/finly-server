@@ -20,4 +20,12 @@ class TravelRequestDestination < ActiveRecord::Base
   has_many :booking_requests
 
   accepts_nested_attributes_for :booking_requests, allow_destroy: true
+
+  def as_json(options={})
+    {
+        name: name,
+        source: source
+    }
+  end
+
 end

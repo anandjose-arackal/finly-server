@@ -35,7 +35,7 @@ class TravelRequests::Create < TravelRequests::Base
   end
 
   def post_process
-    add_message :success, 'Successfully saved travel request'
+    add_message :success, 'New trip created'
   end
 
   def success

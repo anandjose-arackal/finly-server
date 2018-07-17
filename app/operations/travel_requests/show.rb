@@ -1,18 +1,19 @@
 class TravelRequests::Show < TravelRequests::Base
-  attr_accessor :travel_request, :booking_types
+  attr_accessor :travel_request
 
   def init
-    self.travel_request = TravelRequest.find(params[:id]) #todo Scope to company
-    self.booking_types = BookingType.all
+    requests_presenter = TravelRequests::Index.(user, params)
+    unless requests_presenter.success?
+      add_message :error, requests_presenter.messages[:error]
+      return
+    end
+    self.travel_request = requests_presenter.travel_requests.find_by(id: (params[:id] || params[:travel_request_id]))
   end
 
   def validate
     if travel_request.blank?
       add_message :error, 'Travel Request not found'
     end
-  end
-
-  def process
   end
 
   def success
@@ -22,15 +23,32 @@ class TravelRequests::Show < TravelRequests::Base
   end
 
   class TravelRequests::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :travel_request, :destinations, :booking_types,
-                  :manager, :travel_manager
+    attr_accessor :travel_request, :manager_user, :travel_manager_user
 
     def init
       self.travel_request = params[:travel_request]
-      self.destinations = travel_request.destinations
-      self.booking_types = params[:booking_types]
-      self.manager = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :manager)
-      self.travel_manager = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :travel_manager)
+    end
+
+    def booking_types
+      BookingType.all
+    end
+
+    def destinations
+      travel_request.destinations
+    end
+
+    def manager
+      if self.manager_user.blank?
+        self.manager_user = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :manager)
+      end
+      self.manager_user
+    end
+
+    def travel_manager
+      if self.travel_manager_user.blank?
+        self.travel_manager_user = User::Team::Approver.(self.travel_request.user, travel_request: self.travel_request, type: :travel_manager)
+      end
+      self.travel_manager_user
     end
 
     def actions
