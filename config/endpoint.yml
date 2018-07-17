@@ -118,21 +118,29 @@ production:
   itzcash_account_details:
 #    base: "http://cvms1.itzcash.com:8080"
     base: "https://www.finly.io/itz_cash_api"
-    path: "myaccount/servlet/ItzCashAccountDetailsServlet"
+#    path: "myaccount/servlet/ItzCashAccountDetailsServlet"
+    path: "account_details"
   itzcash_account_details_yse:
-    path: "itzgift/servlet/NaradaAccountDetailsServlet"
+#    path: "itzgift/servlet/NaradaAccountDetailsServlet"
+    path: "account_details"
   itzcash_credit_debit:
-    path: "itzgift/servlet/NaradaCreditDebitServlet"
+#    path: "itzgift/servlet/NaradaCreditDebitServlet"
+    path: "credit_debit"
   itzcash_block_unblock:
-    path: "itzgift/servlet/NaradaBlockUnblockServlet"
+#    path: "itzgift/servlet/NaradaBlockUnblockServlet"
+    path: "card_block_unblock"
   itzcash_corporate_balance:
-    path: "itzgift/servlet/CorporateBalanceServlet"
+#    path: "itzgift/servlet/CorporateBalanceServlet"
+    path: "corporate_balance"
   itzcash_card_restriction:
-    path: "itzgift/servlet/NaradaSetTransactionLimitsServlet"
+#    path: "itzgift/servlet/NaradaSetTransactionLimitsServlet"
+    path: "card_restriction"
   itzcash_mcc_group_restriction:
-    path: "itzgift/servlet/NaradaSetAdditionalRestrictionsServlet"
+#    path: "itzgift/servlet/NaradaSetAdditionalRestrictionsServlet"
+    path: "mcc_group_restriction"
   itzcash_company_statement_by_date:
-    path: "itzgift/servlet/CorporateTransactionStatementByDateRangeServlet"
+#    path: "itzgift/servlet/CorporateTransactionStatementByDateRangeServlet"
+    path: "company_statement_by_date"
   msg91_generate_otp:
     base: "https://sendotp.msg91.com"
     path: "api/generateOTP"
