@@ -22,6 +22,8 @@
 #  memo                         :text(65535)
 #  from_date                    :date
 #  to_date                      :date
+#  trip_id                      :string(255)
+#  purpose_of_travel            :text(65535)
 #
 
 class TravelRequest < ActiveRecord::Base
@@ -45,20 +47,20 @@ class TravelRequest < ActiveRecord::Base
 
   accepts_nested_attributes_for :destinations, allow_destroy: true
 
-  delegate :open?,:processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?, to: :status
+  delegate :open?, :processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?, to: :status
 
   validates :status_id, presence: true, unless: :open?
   validates :user_id, presence: true, unless: :open?
   validates :name, presence: true, unless: :open?
 
-  default_scope { order(created_at: :desc) }
+  default_scope {order(created_at: :desc)}
 
-  scope :with_id, ->(id) { where id: id }
+  scope :with_id, ->(id) {where id: id}
   scope :not_open, -> {
     where.not(status_id: TravelRequestStatus.id_for(:open))
   }
 
-  scope :non_owner, -> (user_id) { where.not user_id: user_id }
+  scope :non_owner, -> (user_id) {where.not user_id: user_id}
 
   scope :open, -> {
     where(status_id: TravelRequestStatus.id_for(:open))
@@ -118,6 +120,23 @@ class TravelRequest < ActiveRecord::Base
 
   def can_destroy?
     open? or retracted? or rejected?
+  end
+
+  def as_json(options = {})
+    {
+        id: id,
+        trip_id: trip_id,
+        name: name,
+        purpose_of_travel: purpose_of_travel,
+        status: status,
+        user: user,
+        controlling_user: controlling_user,
+        dates: {
+            from: DateUtils.date_formatted(from_date),
+            to: DateUtils.date_formatted(to_date)
+        },
+        destinations: destinations
+    }
   end
 
   private

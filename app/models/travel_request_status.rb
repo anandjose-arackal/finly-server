@@ -47,4 +47,12 @@ class TravelRequestStatus < ActiveRecord::Base
   def completed?
     self.id == TravelRequestStatus.id_for(:completed)
   end
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end

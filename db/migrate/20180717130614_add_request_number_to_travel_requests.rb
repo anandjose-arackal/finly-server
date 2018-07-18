@@ -1,5 +1,6 @@
 class AddRequestNumberToTravelRequests < ActiveRecord::Migration
   def change
-    add_column :travel_requests, :request_number, :string
+    add_column :travel_requests, :trip_id, :string
+    add_column :travel_requests, :purpose_of_travel, :text
   end
 end

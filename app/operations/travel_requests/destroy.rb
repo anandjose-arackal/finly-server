@@ -10,8 +10,12 @@ class TravelRequests::Destroy < TravelRequests::Base
 
   def init
     travel_request_id = params[:id] || params[:travel_request_id]
-
-    self.travel_requests = TravelRequests::Index.(user, params)&.travel_requests&.with_id(travel_request_id)
+    index_result = TravelRequests::Show.(user, params)
+    unless index_result.success?
+      add_message :error, index_result.messages[:error]
+      return
+    end
+    self.travel_requests = index_result&.travel_requests&.with_id(travel_request_id)
   end
 
   def validate

@@ -22,6 +22,8 @@
 #  memo                         :text(65535)
 #  from_date                    :date
 #  to_date                      :date
+#  trip_id                      :string(255)
+#  purpose_of_travel            :text(65535)
 #
 
 require 'test_helper'

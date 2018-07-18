@@ -2389,6 +2389,8 @@ end
 
   resources :travel_requests do
     patch 'review', to: 'travel_requests#review', as: :review
+
+    resources :destinations, controller: 'travel_request_destinations', only: [:create, :update, :destroy]
   end
   post 'bookings/upload_attachment', to: 'bookings#upload_attachment'
 

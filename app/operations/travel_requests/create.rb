@@ -45,7 +45,7 @@ class TravelRequests::Create < TravelRequests::Base
 
   protected
   def strong_params
-    params.permit(:name, :policy_id, :purpose, :memo)
+    params.permit(:name, :policy_id, :purpose_of_travel, :memo, :from_date, :to_date)
   end
 
   class TravelRequests::Create::CreatePresenter < BaseOperation::BasePresenter::SuccessPresenter

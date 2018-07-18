@@ -18,7 +18,6 @@ class TravelRequests::Show < TravelRequests::Base
 
   def success
     params[:travel_request] = self.travel_request
-    params[:booking_types] = self.booking_types
     TravelRequests::Show::ShowPresenter.new(user, params, messages)
   end
 
