@@ -32,7 +32,6 @@ set :crono_role, :crono_role
 # role :db,  %w{deploy@example.com}
 
 
-
 # Configuration
 # =============
 # You can set any configuration variable like in config/deploy.rb
