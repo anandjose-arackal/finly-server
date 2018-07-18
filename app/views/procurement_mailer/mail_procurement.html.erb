@@ -1,87 +1,135 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title> Purchase Order </title>
+  <title><%= @document.class.name %></title>
 </head>
-<body style="font-family: sans-serif;">
+<body style="margin:0;">
 
-
-<div style="width: 550px; height: auto; overflow: hidden; margin-left: auto; margin-right: auto; padding-top: 10px; padding-bottom: 10px;">
-  <div style="width: 50%; height: auto; overflow: hidden; float:left;">
-    <img src="https://www.finly.io/api/common/images/logos/logo_md.png" style="float: left;" class="company-logo" width="75" height="auto">
+<div style="font-family: sans-serif; background-color: #eee; padding-top: 40px; padding-bottom: 40px; border-radius: 4px; width: 100%; overflow: hidden;">
+  <div style="width: 550px; height: auto; overflow: hidden; margin-left: auto; margin-right: auto; padding-top: 10px; padding-bottom: 10px;">
+    <div style="width: 50%; height: auto; overflow: hidden; float:left;">
+      <img src="company_logo.png" style="float: left;" class="company-logo" width="75" height="auto">
+    </div>
+    <div style="width: 50%; height: auto; overflow: hidden; float:left;">
+      <span style="display: block; float: right; font-weight: 300; font-family: sans-serif; font-size: 16px; text-transform: capitalize; line-height: 1.5; color: #7b7b7b;">Thrusday, 12th Feb 2018</span>
+    </div>
   </div>
-  <div style="width: 50%; height: auto; overflow: hidden; float:left;">
-    <span style="display: block; float: right; font-weight: 300; font-family: sans-serif; font-size: 16px; text-transform: capitalize; line-height: 1.5; color: #7b7b7b;"><%#= @purchase_order&.date&.strftime("%a, %d-%b-%Y") %></span>
+  <div style="width: 550px; height: auto; margin-left: auto; margin-right: auto; overflow: hidden; background-color: white !important;border:1px solid #c4c4c4; box-shadow: 0 10px 10px #c4c4c4;">
+    <div style="width: 100%; height: 25px; background-color: #233e7285;"></div>
+    <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 10px; border-bottom: 1px solid #c4c4c4;">
+      <img src="vendor-logo-flipkart.png" style="float: left;" class="company-logo" width="100" height="auto">
+      <span style="display: block; float: right; font-weight: bold; font-family: sans-serif; font-size: 22px; text-transform: capitalize; color: lightslategray;">Pseudo Inc. Ventures <br> <span style="font-size: 14px !important; font-weight: 300 !important; float: right; padding-right: 10px; color: #7b7b7b !important;">Bangalore,  India</span></span>
+    </div>
+
+    <!-- START -->
+    <!-- SHOW THIS ONLY IF THE DOCUMENT TYPE IS 'E-WAY-BILL' -->
+    <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 20px; border-bottom: 1px solid #c4c4c4; font-family: sans-serif; font-weight: 300;">
+      <div style="width:33%; height: auto; overflow: hidden; float: left; text-align: center;">
+        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Document Number </span> <br>
+        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> AXNGSUNA71 </span>
+      </div>
+      <div style="width: 0.31%; height: 54px; background-color: #c4c4c4; float: left;"></div>
+      <div style="width:33%; height: auto; overflow: hidden; float: left; text-align: center;">
+        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Due Date </span> <br>
+        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> 9th July 2018 </span>
+      </div>
+      <div style="width: 0.33%; height: 54px; background-color: #c4c4c4; float: left"></div>
+      <div style="width:33.33%; height: auto; overflow: hidden; float: left; text-align: center;">
+        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Balance Due </span> <br>
+        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> &#8377; 10,872 </span>
+      </div>
+    </div>
+    <!-- SHOW THIS ONLY IF THE DOCUMENT TYPE IS 'E-WAY-BILL' -->
+    <!-- END -->
+
+    <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 20px; border-bottom: 1px solid #c4c4c4; font-family: sans-serif; font-weight: 300;">
+      <div style="width:33%; height: auto; overflow: hidden; float: left; text-align: center;">
+        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Transportion Mode </span> <br>
+        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> Flight </span>
+      </div>
+      <div style="width: 0.31%; height: 54px; background-color: #c4c4c4; float: left;"></div>
+      <div style="width:33%; height: auto; overflow: hidden; float: left; text-align: center;">
+        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Transport Date </span> <br>
+        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;"> 9th July 2018 </span>
+      </div>
+      <div style="width: 0.33%; height: 54px; background-color: #c4c4c4; float: left"></div>
+      <div style="width:33.33%; height: auto; overflow: hidden; float: left; text-align: center;">
+        <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 10px; color: lightslategray;"> Transporter ID </span> <br>
+        <span style="display: block; font-weight: bold; font-size: 16px; color: lightslategray;">213808HD9829</span>
+      </div>
+    </div>
+    <div style="width: 100%; height: auto; overflow: hidden; min-height: 300px;">
+      <div style="width: 90%; margin-left: 5%; margin-right: 5%; height: auto; overflow: hidden; padding-top: 25px; color: #7b7b7b; font-size: 14px; margin-bottom:20px;">
+        Dear VCOMMISSION MEDIA PRIVATE LIMITED, <br> <br>
+
+        The Invoice for Replacement of cards is generated. <br><br>
+
+        You can do a direct transfer to the account number below. <br><br>
+
+        <span style="display: block; width: 100px; float: left;">Account No. :</span> &nbsp; 2225550898035761 <br>
+        <span style="display: block; width: 100px; float: left;">IFSC :</span> &nbsp; YESB0CMSNOC <br>
+        <span style="display: block; width: 100px; float: left;">Name :</span> &nbsp; JOUSKA TECH PRIVATE LIMITED <br>  <br>
+
+        Regards, <br>
+        Finly Team, <br>
+        Bangalore.
+      </div>
+
+    </div>
+  </div>
+  <div style="width:550px; margin-top: 10px; height: auto; overflow: hidden; margin-left: auto; margin-right: auto ">
+    <div style="overflow: hidden; height: auto; padding-top: 10px; padding-bottom: 10px; color: #7b7b7b;">
+      <div style="width: 50%; height: auto; overflow: hidden; float: left; text-align: left; ">
+        <ul style="list-style-type: none; padding-left: 0; display: inline-flex; margin:0;">
+          <!-- <li style="text-decoration: none; margin-right: 10px; cursor: pointer;">
+            <a href="">
+              <img src="google-plus-2.png" width="25" height="auto">
+            </a>
+          </li> -->
+          <li style="text-decoration: none; cursor: pointer;">
+            <a href="https://www.youtube.com/channel/UC2J-uWlhID1lt6b0D5B6mhA" target="_blank">
+              <img src="youtube-2.png" width="25" style="margin-right: 10px;" height="auto">
+            </a>
+          </li>
+          <li style="text-decoration: none;  cursor: pointer;">
+            <a href="https://www.linkedin.com/company/finly.io/?originalSubdomain=in" target="_blank">
+              <img src="linkedin-2.png" width="25" style="margin-right: 10px;" height="auto">
+            </a>
+          </li>
+          <li style="text-decoration: none; cursor: pointer;">
+            <a href="https://www.facebook.com/finly.io/" target="_blank">
+              <img src="facebook-2.png" width="25" style="margin-right: 10px;" height="auto">
+            </a>
+          </li>
+          <li style="text-decoration: none;  cursor: pointer;">
+            <a href="https://twitter.com/finly_io?lang=en" target="_blank">
+              <img src="twitter-2.png" width="25" style="margin-right: 10px;" height="auto">
+            </a>
+          </li>
+          <li style="text-decoration: none; cursor: pointer;">
+            <a href="https://www.instagram.com/finly.io/" target="_blank">
+              <img src="instagram-2.png" width="25" style="margin-right: 10px;" height="auto">
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div style="width: 50%; height: auto; overflow: hidden; float: left; text-align: right;">
+        <ul style="list-style-type: none; padding-left: 0; display: inline-flex; margin:0;">
+          <li style="text-decoration: none; margin-right: 10px; cursor: pointer;">
+            <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp&hl=en" target="_blank">
+              <img src="playstore.png" width="90" height="auto">
+            </a>
+          </li>
+          <li style="text-decoration: none; cursor: pointer;">
+            <a href="https://itunes.apple.com/us/app/finly/id1219281468?mt=8" target="_blank">
+              <img src="appstore.png" width=90 style="margin-right: 10px;" height="auto">
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
 </div>
-<div style="width: 550px; height: auto; margin-left: auto; margin-right: auto; overflow: hidden; background-color: white !important;border:1px solid #c4c4c4; box-shadow: 0 10px 10px #c4c4c4;">
-  <div style="width: 100%; height: 10px; background-color: #233e72; border: 1px solid #233e72;"></div>
-  <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 10px; border-bottom: 1px solid #c4c4c4;">
-    <img src="https://www.finly.io/<%= @user.company.configuration.logo&.path %>" style="float: left;" class="company-logo" width="100" height="auto">
-    <span style="display: block; float: right; font-weight: bold; font-family: sans-serif; font-size: 19px; color: #233e72;"><%= @user.company.name %></span>
-  </div>
-  <div style="height: auto; overflow: hidden; background-color: #f9f9f9 !important; padding: 20px; border-bottom: 1px solid #c4c4c4; font-family: sans-serif; font-weight: 300;">
-    <div style="width:33%; height: auto; overflow: hidden; float: left; text-align: center;">
-      <span style="display: block; text-transform: uppercase; font-weight: 300; font-size: 12px; color: #7b7b7b;"> Document Number </span> <br>
-      <span style="display: block; font-weight: bold; font-size: 16px; color: #5d5d5d;"> <%= @document.po_number %> </span>
-    </div>
-    <div style="width: 0.31%; height: 54px; background-color: #c4c4c4; float: left;"></div>
-    <div style="width: 0.33%; height: 54px; background-color: #c4c4c4; float: left"></div>
-    <div style="width:33.33%; height: auto; overflow: hidden; float: left; text-align: center;">
-    </div>
-    <div style="width: 33.33%; margin-top: 20px; height: auto; overflow: hidden; float: right; display: none;">
-      <button style="background-color: #233e72; cursor: pointer; color: white; width: 80%; margin-left:10%; box-shadow: 0 0 15px #7b7b7b; padding: 5px; border:none;">View Purchae Order</button>
-    </div>
-  </div>
-  <div style="width: 100%; height: auto; overflow: hidden; min-height: 300px;">
-    <div style="width: 90%; margin-left: 5%; margin-right: 5%; height: auto; overflow: hidden; padding-top: 25px; color: #454545; font-size: 13px; margin-bottom:20px;">
-      <% email_body = @options[:email_body] rescue nil || @options.email_body rescue nil %>
-      <%= simple_format email_body %>
-    </div>
 
-  </div>
-  <div style="width: 100%; height: 10px; background-color: #233e72; border: 1px solid #233e72;"></div>
-</div>
-<div style="width:550px; margin-top: 10px; height: auto; overflow: hidden; margin-left: auto; margin-right: auto ">
-  <div style="overflow: hidden; height: auto; padding-top: 10px; padding-bottom: 10px; color: #7b7b7b;">
-    <div style="width: 50%; height: auto; overflow: hidden; float: left; text-align: left; ">
-      <ul style="list-style-type: none; padding-left: 0; display: inline-flex; margin:0;">
-        <!--<li style="text-decoration: none; margin-right: 10px; cursor: pointer;">-->
-        <!--<img src="google-plus-2.png" width="25" height="auto">-->
-        <!--</li>-->
-        <!--<li style="text-decoration: none; cursor: pointer;">-->
-        <!--<img src="youtube-2.png" width="25" style="margin-right: 10px;" height="auto">-->
-        <!--</li>-->
-        <!--<li style="text-decoration: none;  cursor: pointer;">-->
-        <!--<img src="linkedin-2.png" width="25" style="margin-right: 10px;" height="auto">-->
-        <!--</li>-->
-        <!--<li style="text-decoration: none; cursor: pointer;">-->
-        <!--<img src="facebook-2.png" width="25" style="margin-right: 10px;" height="auto">-->
-        <!--</li>-->
-        <!--<li style="text-decoration: none;  cursor: pointer;">-->
-        <!--<img src="twitter-2.png" width="25" style="margin-right: 10px;" height="auto">-->
-        <!--</li>-->
-        <!--<li style="text-decoration: none; cursor: pointer;">-->
-        <!--<img src="instagram-2.png" width="25" style="margin-right: 10px;" height="auto">-->
-        <!--</li>-->
-      </ul>
-    </div>
-    <div style="width: 50%; height: auto; overflow: hidden; float: left; text-align: right;">
-      <ul style="list-style-type: none; padding-left: 0; display: inline-flex; margin:0;">
-        <li style="text-decoration: none; margin-right: 10px; cursor: pointer;">
-          <a href="https://play.google.com/store/apps/details?id=io.finly.finlyapp">
-            <img src="https://www.finly.io/api/common/images/playstore.png" width="90" height="auto">
-          </a>
-        </li>
-        <li style="text-decoration: none; cursor: pointer;">
-          <a href="https://itunes.apple.com/us/app/finly/id1219281468">
-            <img src="https://www.finly.io/api/common/images/appstore.png" width=90 style="margin-right: 10px;" height="auto">
-          </a>
-        </li>
-      </ul>
-    </div>
-  </div>
-
-</div>
 </body>
 </html>
