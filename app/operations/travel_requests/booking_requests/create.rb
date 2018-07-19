@@ -36,7 +36,7 @@ class TravelRequests::BookingRequests::Create < TravelRequests::BookingRequests:
 
   def strong_params
     params.require(:booking_request).permit(
-        :id, :booking_type_id, :note, :_destroy,
+        :booking_type_id, :note,
         booking_flight_attributes: [
             :id, :journey_date, :journey_source, :journey_destination,
             :booking_class, :start_time, :end_time, :stops
