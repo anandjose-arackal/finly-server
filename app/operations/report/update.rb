@@ -20,7 +20,7 @@ class Report::Update < Report::Base
       self.report = user.controlling_reports.with_id(id).first rescue nil
     end
     self.update_param = {}
-    self.update_param = self.params.permit(:name, :policy_id, :memo, :money_request_id, :travel_request_id)
+    self.update_param = self.params.permit(:name, :policy_id, :memo)
     if self.update_param[:policy_id].present? and ([0, '0', 'nil'].include?(self.update_param[:policy_id]))
       self.update_param[:policy_id] = nil
     end
