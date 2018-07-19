@@ -38,14 +38,25 @@ class AccountManagerUtils
       class_string = account.class.name
     end
     account_name = nil
-    ACCOUNTS.each do |account|
-      if account[:class].to_s == class_string
-        account_name = account[:name]
+    ACCOUNTS.each do |finly_account|
+      if finly_account[:class].to_s == class_string
+        account_owner = nil
+        if account.is_a?(Object)
+          case account.class.name
+            when UserWallet.name, VendorPaymentWallet.name, CashOnHand.name, Card.name
+              account_owner = account.user.name
+            when BankAccount.name
+               account_owner = account.account_owner.name
+            else
+              account_owner = nil
+          end
+        end
+        account_name = "#{account_owner.to_s}'s " + finly_account[:name]
         break
       end
     end
     if account_name == 'Card' and account.class.name == Card.name
-      account_name = "#{account.card_program.name.humanize} Card"
+      account_name = "#{account.user.name}'s #{account.card_program.name.humanize} Card"
     end
     account_name
   end
