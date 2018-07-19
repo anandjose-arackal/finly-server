@@ -51,7 +51,11 @@ class AccountManagerUtils
               account_owner = nil
           end
         end
-        account_name = "#{account_owner.to_s}'s " + finly_account[:name]
+        if account_owner.present?
+          account_name = "#{account_owner.to_s}'s " + finly_account[:name]
+        else
+          account_name = finly_account[:name]
+        end
         break
       end
     end
