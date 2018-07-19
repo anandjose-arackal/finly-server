@@ -128,6 +128,7 @@ class TravelRequest < ActiveRecord::Base
         trip_id: trip_id,
         name: name,
         purpose_of_travel: purpose_of_travel,
+        policy: policy,
         status: status,
         user: user,
         controlling_user: controlling_user,
