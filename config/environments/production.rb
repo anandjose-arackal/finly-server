@@ -75,7 +75,7 @@ Rails.application.configure do
   config.action_mailer.smtp_settings = {
       address:              'smtp.sendgrid.net',
       port:                 587,
-      domain:               'localhost',
+      domain:               'www.finly.io',
       user_name:            'vivekagb',
       password:             'idAr5APhk61X',
       # ssl:                  true,
