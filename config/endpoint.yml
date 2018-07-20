@@ -114,10 +114,10 @@ itzcash_uat:
 
 production:
 #  base_url: "http://naradaapp.itzcash.com:8280"
-  base_url: "https://www.finly.io/itz_cash_api"
+  base_url: "https://middleman.finly.io/itz_cash_api"
   itzcash_account_details:
 #    base: "http://cvms1.itzcash.com:8080"
-    base: "https://www.finly.io/itz_cash_api"
+    base: "https://middleman.finly.io/itz_cash_api"
 #    path: "myaccount/servlet/ItzCashAccountDetailsServlet"
     path: "account_details"
   itzcash_account_details_yse:
