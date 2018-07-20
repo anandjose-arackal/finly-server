@@ -21,10 +21,9 @@
 #
 
 class BookingFlight < ActiveRecord::Base
-  validates :journey_source, presence: true
-  validates :journey_destination, presence: true
-  validates :journey_date, presence: true
-
   belongs_to :parent, polymorphic: true
 
+  validates :from, presence: true
+  validates :to, presence: true
+  validates :departure_datetime, presence: true
 end

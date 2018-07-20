@@ -44,6 +44,23 @@ class BookingRequest < ActiveRecord::Base
   # validates :travel_request_destination_id, presence: true
   validate :at_least_one_type
 
+  def as_json(options={})
+    {
+        id: id,
+        booking_type: booking_type,
+        note: note,
+        booking_status: booking_status,
+        travel_members: travel_members,
+        booking_car_rental: booking_car_rental,
+        booking_bus: booking_bus,
+        booking_flight: booking_flight,
+        booking_hotel: booking_hotel,
+        booking_restaurant: booking_restaurant,
+        booking_train: booking_train,
+        booking_custom: booking_custom,
+    }
+  end
+
   private
 
   def at_least_one_type

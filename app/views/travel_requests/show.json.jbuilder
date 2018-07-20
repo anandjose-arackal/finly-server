@@ -5,9 +5,11 @@ json.travel_manager_name @result.travel_manager&.name
 json.controlling_user_name @result.travel_request&.controlling_user&.name
 json.user_name @result.travel_request&.user&.name
 
-json.current_user current_user
-json.editable @result.editable
-json.destroyable @result.destroyable
+# json.current_user current_user
+json.actions do
+  json.editable @result.editable
+  json.destroyable @result.destroyable
+end
 
 json.destinations do
   json.array! @result.destinations do |destination|
