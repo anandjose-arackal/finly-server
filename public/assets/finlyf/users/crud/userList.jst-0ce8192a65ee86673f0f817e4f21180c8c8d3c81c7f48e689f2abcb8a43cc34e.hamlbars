@@ -1,9 +1,0 @@
-<div class="col-sm-12 no-padding user-name" data-item-id="{{item.id}}">
-  {{#if item.name}}
-    {{item.name}}
-  {{else if item.email}}
-    {{item.email}}
-  {{else}}
-    {{item.mobile_number}}
-  {{/if}}  
-</div>
