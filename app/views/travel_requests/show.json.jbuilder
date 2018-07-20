@@ -1,40 +1,21 @@
-json.extract! @result.travel_request, :id, :name, :policy_id, :required_by_date,
-              :note,
-              :user_id, :controlling_user_id,
-              :controlling_for_user_id, :controlling_user_role, :controlling_for_user_role,
-              :submitted_at, :created_at, :updated_at
+json.extract! @result.travel_request, :id, :name, :memo, :submitted_at, :status, :policy
 
 json.manager_name @result.manager&.name
 json.travel_manager_name @result.travel_manager&.name
 json.controlling_user_name @result.travel_request&.controlling_user&.name
 json.user_name @result.travel_request&.user&.name
 
-json.policy do
-  json.id @result.travel_request.policy_id
-  json.name @result.travel_request.policy&.name
-end
-json.status do
-  json.extract! @result.travel_request.status, :id, :name
-end
-
-json.current_user do
-  json.first_name current_user.first_name
-  json.last_name current_user.last_name
-  json.mobile_number current_user.mobile_number
-  json.email current_user.email
-end
-
+json.current_user current_user
 json.editable @result.editable
-
 json.destroyable @result.destroyable
 
 json.destinations do
   json.array! @result.destinations do |destination|
-    json.extract! destination, :id, :name, :source
+    json.extract! destination
     json.booking_requests do
       json.array! destination.booking_requests do |booking_request|
         json.extract! booking_request, :id, :booking_type_id, :note
-        json.booking_type_name booking_request.booking_type.name
+        json.booking_type booking_request.booking_type
         if booking_request.flight?
           json.booking_flight do
             json.extract! booking_request.booking_flight, :id, :journey_date, :journey_destination, :journey_source, :booking_class, :stops, :start_time, :end_time

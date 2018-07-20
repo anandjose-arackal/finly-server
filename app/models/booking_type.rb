@@ -39,4 +39,11 @@ class BookingType < ActiveRecord::Base
     self.id == BookingType.id_for(:restaurant)
   end
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
 end

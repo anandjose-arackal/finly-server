@@ -15,7 +15,7 @@ class TravelRequests::BookingRequests::Create < TravelRequests::BookingRequests:
       add_message :error, destination_presenter.messages[:error]
       return
     end
-    self.destination = destination_presenter.travel_request
+    self.destination = destination_presenter.destination
 
     self.booking_request = self.destination.booking_requests.build strong_params
   end
