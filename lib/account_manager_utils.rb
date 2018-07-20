@@ -60,7 +60,7 @@ class AccountManagerUtils
       end
     end
     if account_name == 'Card' and account.class.name == Card.name
-      account_name = "#{account.user.name}'s #{account.card_program.name.humanize} Card"
+      account_name = "#{account.card_program.name.humanize} Card"
     end
     account_name
   end
