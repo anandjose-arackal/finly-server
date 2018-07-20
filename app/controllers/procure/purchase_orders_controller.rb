@@ -25,4 +25,9 @@ class Procure::PurchaseOrdersController < ApplicationController
     @result = Procurements::PurchaseOrders::SendMail.(current_user, params)
     respond
   end
+
+  def submit
+    @result = Procurements::PurchaseOrders::Submit.(current_user, params)
+    respond
+  end
 end

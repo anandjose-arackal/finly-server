@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180713131633) do
+ActiveRecord::Schema.define(version: 20180719105712) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3714,35 +3714,39 @@ ActiveRecord::Schema.define(version: 20180713131633) do
   end
 
   create_table "purchase_orders", force: :cascade do |t|
-    t.integer  "company_id",               limit: 4
-    t.integer  "procurement_id",           limit: 4
-    t.integer  "location_id",              limit: 4
-    t.integer  "delivery_location_id",     limit: 4
-    t.integer  "vendor_id",                limit: 4
-    t.integer  "payment_term_id",          limit: 4
-    t.integer  "procurement_term_id",      limit: 4
-    t.integer  "purchase_order_status_id", limit: 4
-    t.string   "indent_number",            limit: 255
+    t.integer  "company_id",                   limit: 4
+    t.integer  "procurement_id",               limit: 4
+    t.integer  "location_id",                  limit: 4
+    t.integer  "delivery_location_id",         limit: 4
+    t.integer  "vendor_id",                    limit: 4
+    t.integer  "payment_term_id",              limit: 4
+    t.integer  "procurement_term_id",          limit: 4
+    t.integer  "purchase_order_status_id",     limit: 4
+    t.string   "indent_number",                limit: 255
     t.date     "indent_date"
-    t.string   "po_number",                limit: 255
+    t.string   "po_number",                    limit: 255
     t.boolean  "override_po_number"
-    t.string   "prefix",                   limit: 255
-    t.string   "sequence_start",           limit: 255
+    t.string   "prefix",                       limit: 255
+    t.string   "sequence_start",               limit: 255
     t.date     "delivery_date"
-    t.integer  "gst_type_id",              limit: 4
+    t.integer  "gst_type_id",                  limit: 4
     t.boolean  "inclusive_of_taxes"
     t.boolean  "roundoff_total_enabled"
-    t.decimal  "roundoff_amount",                        precision: 10, scale: 5
-    t.integer  "transaction_amount_id",    limit: 4
-    t.integer  "total_before_tax_id",      limit: 4
-    t.integer  "tax_amount_id",            limit: 4
-    t.integer  "total_after_tax_id",       limit: 4
-    t.integer  "discount_amount_id",       limit: 4
-    t.integer  "balance_amount_id",        limit: 4
-    t.datetime "created_at",                                                      null: false
-    t.datetime "updated_at",                                                      null: false
-    t.integer  "user_id",                  limit: 4
-    t.text     "procurement_term_text",    limit: 65535
+    t.decimal  "roundoff_amount",                            precision: 10, scale: 5
+    t.integer  "transaction_amount_id",        limit: 4
+    t.integer  "total_before_tax_id",          limit: 4
+    t.integer  "tax_amount_id",                limit: 4
+    t.integer  "total_after_tax_id",           limit: 4
+    t.integer  "discount_amount_id",           limit: 4
+    t.integer  "balance_amount_id",            limit: 4
+    t.datetime "created_at",                                                          null: false
+    t.datetime "updated_at",                                                          null: false
+    t.integer  "user_id",                      limit: 4
+    t.text     "procurement_term_text",        limit: 65535
+    t.integer  "controlling_user_id",          limit: 4
+    t.integer  "controlling_user_role_id",     limit: 4
+    t.integer  "controlling_for_user_id",      limit: 4
+    t.integer  "controlling_for_user_role_id", limit: 4
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree

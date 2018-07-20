@@ -153,6 +153,8 @@ gem 'logstasher', '1.2.2'
 
 gem 'ancestry', '3.0.2'
 
+gem 'aasm', '4.12.3'
+
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print', '1.7.0'
 

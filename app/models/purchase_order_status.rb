@@ -11,7 +11,6 @@
 class PurchaseOrderStatus < ActiveRecord::Base
   include Seedable
   def self.values
-    %w( saved released invoice_created received change_order cancelled closed )
+    %w( open retracted processing approved rejected auto_approved sent_to_vendor closed )
   end
-
 end

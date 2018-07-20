@@ -3020,6 +3020,7 @@ end
 
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
+      put 'submit', to: 'purchase_orders#submit'
 
     end
 

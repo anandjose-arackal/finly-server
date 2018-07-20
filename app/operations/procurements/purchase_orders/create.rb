@@ -14,9 +14,15 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
 
   def process
     self.purchase_order = procurement.build_purchase_order(purchase_order_params)
-    self.purchase_order.purchase_order_status_id = PurchaseOrderStatus.id_for(:saved)
+    self.purchase_order.purchase_order_status_id = PurchaseOrderStatus.id_for(:open)
     self.purchase_order.user = user
     self.purchase_order.company = user.company
+
+    self.purchase_order.controlling_user = user
+
+    role_id = UserRole.id_for(:initiator)
+    self.purchase_order.controlling_user_role_id = role_id
+
     if purchase_order.valid?
       purchase_order.save
       add_message :success, 'Successfully created purchase order'

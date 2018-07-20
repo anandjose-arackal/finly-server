@@ -93,8 +93,8 @@ json.trail do
     elsif item.is_a?(PurchaseOrder)
       json.purchase_order_details do
         json.status do
-          json.id item.purchase_order_status&.id
-          json.name item.purchase_order_status&.name
+          json.id item.status&.id
+          json.name item.status&.name
         end
 
         json.po_number item.po_number

@@ -43,7 +43,12 @@ class PurchaseOrder < ActiveRecord::Base
   belongs_to :vendor, class_name: "YesBankVendor"
   belongs_to :payment_term
   belongs_to :procurement_term
-  belongs_to :purchase_order_status
+  belongs_to :status, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
+
+  belongs_to :controlling_user, class_name: 'User'
+  belongs_to :controlling_for_user, class_name: 'User'
+  belongs_to :controlling_user_role, class_name: 'UserRole'
+  belongs_to :controlling_for_user_role, class_name: 'UserRole'
 
   belongs_to :total_before_tax, class_name: "Amount"
   belongs_to :tax_amount, class_name: "Amount"
@@ -62,7 +67,7 @@ class PurchaseOrder < ActiveRecord::Base
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount
 
 
-  validates :purchase_order_status, presence: true
+  validates :purchase_order_status_id, presence: true
   # validates :items, presence: true
   scope :document_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
 
@@ -83,7 +88,6 @@ class PurchaseOrder < ActiveRecord::Base
 
     self.items.each do |item|
       if item.persisted?
-        # item.reload # todo has be reloaded
         persisted = true
       end
       if item.is_a?(PurchaseOrderItem)
@@ -125,9 +129,7 @@ class PurchaseOrder < ActiveRecord::Base
           item.total_amount = Amount.new(value: item_total_amount, currency_id: 1)
         end
 
-
         # end
-
       end
     end
 
