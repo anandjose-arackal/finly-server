@@ -1,8 +1,8 @@
 # config valid only for current version of Capistrano
 lock '3.10.2'
 
-if ['itzcash_production', 'aws_production'].include?(fetch(:stage)&.to_s)
-  load_secure_storage((['itzcash_production', 'aws_production'].include?(fetch(:stage)&.to_s) ? :production : :development))
+if ['itzcash_production', 'aws_production', 'background_production'].include?(fetch(:stage)&.to_s)
+  load_secure_storage(:production)
 end
 
 set :application, 'finly-server'
@@ -20,7 +20,7 @@ when :itzcash_production
   set :deploy_to, '/home/viveka/app'
   set :rails_env, 'production'
   # todo - configure this for production once everything is set up
-when :aws_production
+when :aws_production, :background_production
   set :deploy_to, '/home/centos/app'
   set :rails_env, 'production'
 when :itzcash
