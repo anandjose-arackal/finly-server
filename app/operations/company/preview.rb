@@ -35,7 +35,11 @@ class Company::Preview < BaseOperation
 
     if referrer == 'techombay'
       ['chetan.r@techombay.com', 'contactus@techombay.com'].each do |recipient_email|
-      # ['abinash.b2@gmail.com', 'kumar.abinash@finly.io'].each do |recipient_email|
+        DemoMailer.delay.notify_preview(preview_company, recipient_email)
+      end
+    elsif referrer == 'finly'
+      # For testing purpose
+      ['abinash.b2@gmail.com', 'aditya.s@finly.io'].each do |recipient_email|
         DemoMailer.delay.notify_preview(preview_company, recipient_email)
       end
     end
