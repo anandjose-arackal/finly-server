@@ -21,6 +21,7 @@
 #  parent_id               :integer
 #  parent_type             :string(255)
 #  root_field              :boolean          default(TRUE)
+#  field_key               :string(255)
 #
 
 require 'test_helper'

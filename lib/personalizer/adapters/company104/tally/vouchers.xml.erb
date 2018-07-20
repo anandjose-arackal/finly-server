@@ -13,45 +13,33 @@
          </REQUESTDESC>
          <REQUESTDATA>
             <TALLYMESSAGE xmlns:UDF="TallyUDF">
-            <% reports = {} %>
-            <% expenses.reimbursable.each do |expense| %>
-              <% if expense.user.gl_config&.dig(:name).blank? %>
-                <% raise 'GL Config is not configured for the user' %>
-              <% end %>
-              <% expense_gl_code = html_escape expense.category.gl_name %>
-              <% reports[expense.report_id] = {date: configuration.date_for(expense), user: html_escape(expense.user.gl_config[:name]), ledgers: {}, total_amount: 0} if reports[expense.report_id].nil? %>
-              <% if reports[expense.report_id][:ledgers][expense_gl_code].nil? %>
-                <% reports[expense.report_id][:ledgers][expense_gl_code] = {amount: 0} %>
-              <% end %>
-              <% reports[expense.report_id][:ledgers][expense_gl_code][:amount] += expense.amount.INR %>
-              <% reports[expense.report_id][:total_amount] += expense.amount.INR %>
-            <% end %>
-            <% if reports.present? %>
-            <% reports.each do |report_id, details| %>
-              <VOUCHER VCHTYPE="Journal" ACTION="Create">
-                 <VOUCHERTYPENAME>Journal</VOUCHERTYPENAME>
+            <% Personalizer::Adapters::Company104::Tally::TallyTemplate.validate expenses %>
+            <% request = Personalizer::Adapters::Company104::Tally::TallyTemplate.generate_request_for expenses,configuration %>
+            <% if request.present? %>
+            <% request.each do |report_id, vouchers| %>
+            <% vouchers.each do |name, details| %>
+              <% next if name == :cost_center %>
+              <VOUCHER VCHTYPE="<%= name %>" ACTION="Create">
+                 <VOUCHERTYPENAME><%= name %></VOUCHERTYPENAME>
                  <DATE><%= details[:date] %></DATE>
                  <NARRATION></NARRATION>
+                 <COSTCENTRENAME><%= vouchers[:cost_center] %></COSTCENTRENAME>
                  <EFFECTIVEDATE><%= details[:date] %></EFFECTIVEDATE>
-            <% details[:ledgers].each do |name, ledger| %>
+              <% details[:transactions].each do |ledger_name, amount| %>
                  <ALLLEDGERENTRIES.LIST>
-                    <LEDGERNAME><%= html_escape name %></LEDGERNAME>
+                    <LEDGERNAME><%= html_escape ledger_name %></LEDGERNAME>
                     <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                    <ISDEEMEDPOSITIVE>Yes</ISDEEMEDPOSITIVE>
+                    <ISDEEMEDPOSITIVE><%= amount >= 0 ? 'No' : 'Yes' %></ISDEEMEDPOSITIVE>
                     <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                    <AMOUNT>-<%= ledger[:amount] %></AMOUNT>
+                    <AMOUNT><%= amount %></AMOUNT>
                  </ALLLEDGERENTRIES.LIST>
-            <% end %>
-                 <ALLLEDGERENTRIES.LIST>
-                    <LEDGERNAME><%= details[:user] %></LEDGERNAME>
-                    <REMOVEZEROENTRIES>No</REMOVEZEROENTRIES>
-                    <ISDEEMEDPOSITIVE>No</ISDEEMEDPOSITIVE>
-                    <LEDGERFROMITEM>No</LEDGERFROMITEM>
-                    <AMOUNT><%= details[:total_amount] %></AMOUNT>
-                 </ALLLEDGERENTRIES.LIST>
+              <% end %>
               </VOUCHER>
             <% end %>
             <% end %>
+            <% end %>
+
+
             </TALLYMESSAGE>
          </REQUESTDATA>
       </IMPORTDATA>

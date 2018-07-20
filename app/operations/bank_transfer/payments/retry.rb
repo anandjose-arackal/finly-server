@@ -18,6 +18,11 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
   end
 
   def validate
+    if self.payment.blank?
+      add_message :error, "Payment not found"
+      return
+    end
+
     unless payment.failed?
       add_message :error, "Only failed payments can be retried"
       return

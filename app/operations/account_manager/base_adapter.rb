@@ -50,6 +50,10 @@ class AccountManager::BaseAdapter
 
   end
 
+  def on_failure(options)
+
+  end
+
   def creditable_account?(account_type)
     if account_type.present? and not account_type.is_a?(String)
       account_type = account_type&.class.name
