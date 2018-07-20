@@ -1,0 +1,31 @@
+<div class="col-sm-2 no-padding">{{item.name}}</div>
+<div class="col-sm-2">
+  {{#if item.final_approver}}
+    {{item.final_approver}}
+  {{else}}
+    Auto-Approved
+  {{/if}}
+</div>
+<div class="col-sm-1 no-padding">
+  {{#switch item.payment_mode}}
+    {{#case 'cash'}}<i class='fa fa-money'></i>&nbsp; Cash{{/case}}
+    {{#case 'card'}}<i class='fa fa-cc-visa'></i>&nbsp; Card{{/case}}
+  {{/switch}}
+</div>
+<div class="col-sm-1">
+  {{#switch item.status}}
+    {{#case 'Approved'}}<span class="label label-success">{{item.status}}</span>{{/case}}
+    {{#case 'Credited'}}<span class="label label-success"><i class="fa fa-check-circle"></i>&nbsp;{{item.status}}</span>{{/case}}
+  {{/switch}}
+</div>
+<div class="col-sm-2 no-padding text-center">
+  {{#if item.credited_date}}
+    Credited: {{item.credited_date}}
+  {{else if item.required_by_date}}
+    Required By: {{item.required_by_date}}
+  {{else}}
+    Required By: --
+  {{/if}}
+</div>
+<div class="col-sm-3">{{#if item.memo}}{{item.memo}}{{else}}--{{/if}}</div>
+<div class="col-sm-1 text-right no-padding">&#8377; {{item.request_amount}}</div>

@@ -1,0 +1,47 @@
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  <h4 class="modal-title">{{item.modal_title}}</h4>
+</div>
+<div class="modal-body">
+
+  <label style="margin-top: 8px">Amount</label>
+  <input name="payment[amount]" id="settlementAmount" class="form-control" style="margin-top: 4px; border-radius: 1px" type="text">
+  <label style="margin-top: 8px">Date</label>
+
+  <input name="payment[date]" id="settlementDate" class="form-control datepicker" min="'2000-01-01'" max="'2020-01-01'" style="margin-top: 4px;border-radius: 1px" type="text">
+  <label style="margin-top: 8px">Note</label>
+
+  <textarea id="settlementNote" name="payment[note]" class="form-control" placeholder="Write a note..." style="margin-top: 4px; border-radius: 1px;resize: vertical; margin-bottom: 10px;"></textarea>
+
+
+  <input name="payment_type" value="{{item.payment_type}}" type="hidden" />
+
+  {{#if_eq item.payment_type 1}}
+    <label class="control-label">
+      <input type="radio" name="payment[mode_type]" value="1">&nbsp; <i class="fa fa-money"></i> Cash
+    </label>&nbsp;&nbsp;&nbsp;
+
+    <label class="control-label">
+      <input type="radio" name="payment[mode_type]" value="2">&nbsp; <i class="fa fa-cc-visa"></i> Card
+    </label>
+
+  {{/if_eq}}
+  {{!-- <label class="radio-inline" style="">
+    <input name="payment_type" value="1" type="radio" checked="checked">Cash Advance
+  </label>
+
+  <label class="radio-inline">
+    <input name="payment_type" value="2" type="radio">Debt Clearance
+  </label> --}}
+  <br />
+
+  <label style="margin-top: 8px">Password</label>
+
+  <input name="password" class="form-control" style="margin-top: 4px;border-radius: 1px" type="password">
+  <br />
+
+  <button class="green-button btn-add-payment" style="margin-top: 28px;margin-top: 28px;
+      background-color: #465c8b;padding: 10px;
+      width: 180px;" type="submit">{{item.button_title}}
+  </button>
+</div>
