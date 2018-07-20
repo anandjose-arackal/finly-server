@@ -152,12 +152,14 @@ class Report::Base < BaseOperation
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
           actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
           actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}
+          actions[:manager_editable] = {value: true}
         end
       elsif finance_view? or manager_view?
         if self.report.processing? and self.report.controlling_user?(user)
           actions[:approve] = {url: Rails.application.routes.url_helpers.report_approve_path(report_id: report.id, view: params[:view])}
           actions[:reject] = {url: Rails.application.routes.url_helpers.report_reject_path(report_id: report.id, view: params[:view])}
           actions[:editable_receipts] = {url: Rails.application.routes.url_helpers.report_toggle_receipt_hardcopy_path(report_id: report.id, view: params[:view])}
+          actions[:manager_editable] = {value: true}
         elsif (self.report.can_unapprove?) and Report::AssociatedUsers.(self.user, report: self.report, user_before: self.report.controlling_user).include?(user)
           actions[:unapprove] = {url: Rails.application.routes.url_helpers.report_unapprove_path(report_id: report.id, view: params[:view])}
         end
