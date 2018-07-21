@@ -2,9 +2,9 @@
 
 class AccountManager::Payments::RetryPaymentBackground < AccountManager::Base
 
-  attr_accessor :payment, :payment_order, :payment_mode
+  attr_accessor :payment, :payment_order, :payment_mode, :options
 
-  def initialize(payment, options)
+  def initialize
     # self.payment = payment
     # self.payment_mode = options[:payment_mode]
   end
