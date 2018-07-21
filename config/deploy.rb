@@ -1,7 +1,7 @@
 # config valid only for current version of Capistrano
 lock '3.10.2'
 
-if ['itzcash_production', 'aws_production', 'background_production'].include?(fetch(:stage)&.to_s)
+if ['aws_production', 'background_production'].include?(fetch(:stage)&.to_s)
   load_secure_storage(:production)
 end
 
