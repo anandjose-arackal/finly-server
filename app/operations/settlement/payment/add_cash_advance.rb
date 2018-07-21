@@ -73,12 +73,26 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
 
   def process
     # now calling the payment processor with the payment request parameter so that it handles the payment for us
-    # if it's a bank transfer, it will first be executed, and then the user's cash on hand will be added
+    # if it's a bank transfer, it will passed to the background (and in the same operation the user's cash on hand will be added
     # else it directly adds to the user's cash on hand and returns
+    if self.payment_purpose == :advance_outside_finly
+      op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_param[:payment_mode]&.upcase})
+      if op.success?
+        add_message :success, "Added cash on hand"
+      else
+        add_message :error, op.messages[:error]
+      end
+    else
+      op = Settlement::Payment::AddCashAdvanceBackground.call_async(user.id, params)
+      add_message :success, "Cash on hand credit has been initiated. Please check back in some time for the money to reflect"
+      return
+    end
+
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_param[:payment_mode]&.upcase})
     if op.success?
       self.payment = op.payments.first
       bank_transaction = self.payment.reload.reference_resource
+      debugger
       # only if the bank transaction has been completed, will the cash on hand be added to the user's account
       # if the payment was done through a bank transfer, create a payment request for crediting the user's cash on hand
       if self.payment_purpose == :cash_advance && bank_transaction&.completed?
@@ -96,20 +110,20 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
   end
 
   def post_process
-    add_message :success, 'Added cash on hand'
+    if self.payment_purpose == :advance_outside_finly
+      Event::ESettlement::AddCashAdvance.(user, payment: self.payment)
 
-    Event::ESettlement::AddCashAdvance.(user, payment: self.payment)
-
-    # recalculating user balance history for the respective day the cash was added
-    unless Date.parse(payment_param[:date]) == Date.today
-      balance_history = to_user.user_balance_histories.find_by(date: payment_param[:date].to_date)
-      unless balance_history.blank?
-        cash_on_hand_value = balance_history.cash_on_hand_balance.value
-        cash_on_hand_load = balance_history.cash_on_hand_load.value
-        cash_on_hand_value += payment_param[:amount].to_f
-        cash_on_hand_load += payment_param[:amount].to_f
-        balance_history.update_attributes(cash_on_hand_balance_attributes: {value: cash_on_hand_value, id: balance_history.cash_on_hand_balance.id},
-                                          cash_on_hand_load_attributes: {value: cash_on_hand_load, id: balance_history.cash_on_hand_load.id})
+      # recalculating user balance history for the respective day the cash was added
+      unless Date.parse(payment_param[:date]) == Date.today
+        balance_history = to_user.user_balance_histories.find_by(date: payment_param[:date].to_date)
+        unless balance_history.blank?
+          cash_on_hand_value = balance_history.cash_on_hand_balance.value
+          cash_on_hand_load = balance_history.cash_on_hand_load.value
+          cash_on_hand_value += payment_param[:amount].to_f
+          cash_on_hand_load += payment_param[:amount].to_f
+          balance_history.update_attributes(cash_on_hand_balance_attributes: {value: cash_on_hand_value, id: balance_history.cash_on_hand_balance.id},
+                                            cash_on_hand_load_attributes: {value: cash_on_hand_load, id: balance_history.cash_on_hand_load.id})
+        end
       end
     end
   end
