@@ -204,7 +204,8 @@ class Statements::Show < Statements::Base
             if finly_transaction.payment.initiating_account == finly_transaction.finly_account and finly_transaction.payment.receiving_account.present?
               merchant = prefix
               if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
-                merchant += "#{finly_transaction.payment.receiving_account&.user&.name}'s "
+                # merchant += "#{finly_transaction.payment.receiving_account&.user&.name}'s "
+                merchant = ""
               end
               if [BankAccount].include? finly_transaction.payment.receiving_account.class
                 merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
@@ -213,7 +214,8 @@ class Statements::Show < Statements::Base
             elsif finly_transaction.payment.receiving_account == finly_transaction.finly_account and finly_transaction.payment.initiating_account.present?
               merchant = prefix
               if [UserWallet, Card].include? finly_transaction.payment.initiating_account.class
-                merchant += "#{finly_transaction.payment.initiating_account&.user&.name}'s "
+                # merchant += "#{finly_transaction.payment.initiating_account&.user&.name}'s "
+                merchant = ""
               end
               if [BankAccount].include? finly_transaction.payment.receiving_account.class
                 merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
@@ -221,6 +223,12 @@ class Statements::Show < Statements::Base
               merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.initiating_account)}"
             end
           end
+        when PaymentPurpose.id_for(:corporate_account_reload), PaymentPurpose.id_for(:payment_receivable), PaymentPurpose.id_for(:invoice), PaymentPurpose.id_for(:finly_money_reload)
+          merchant = "Virtual Account: "
+          if finly_transaction.associated_transaction&.virtual_account&.name.present?
+            merchant += "#{finly_transaction.associated_transaction&.virtual_account&.name} - "
+          end
+          merchant += finly_transaction.associated_transaction&.virtual_account&.account_number
       end
       merchant
     end
