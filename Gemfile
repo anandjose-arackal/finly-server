@@ -153,6 +153,9 @@ gem 'logstasher', '1.2.2'
 
 gem 'ancestry', '3.0.2'
 
+# adding aws-sdk gem for using their API enabled services
+gem 'aws-sdk'
+
 # todo - temporary, will be removed during final deployment.
 gem 'awesome_print', '1.7.0'
 
