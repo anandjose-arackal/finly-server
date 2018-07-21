@@ -92,9 +92,9 @@ class YesBankApi::Base < BaseHandler
         self.payment.update(reference_resource: self.bank_transaction)
       end
     # temporary - rescue SSL error to simulate various cases
-    rescue Faraday::SSLError
+    # rescue Faraday::SSLError
     #   # simulating different cases
-      puts "WE GOT HERE EVERYBODY! LOOKS LIKE THIS IS GONNA BE A GOOD RIDE!"
+    #   puts "WE GOT HERE EVERYBODY! LOOKS LIKE THIS IS GONNA BE A GOOD RIDE!"
       # self.response.status_code = 500
       # self.parsed_response = {
       #     "Envelope" => {
@@ -149,29 +149,29 @@ class YesBankApi::Base < BaseHandler
       #     }
       # }
 
-      self.parsed_response = {
-          "Envelope" => {
-              "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
-              "Body" => {
-                  "transferResponse" => {
-                      "xmlns:io" => "http://www.quantiguous.com/services",
-                      "version" => "2.0",
-                      "uniqueResponseNo" => "f7ae85caea2111e7b84a0a0047340000",
-                      "attemptNo" => "1",
-                      "transferType" => "IMPS",
-                      "lowBalanceAlert" => "false",
-                      "transactionStatus" => {
-                          "statusCode" => "COMPLETED",
-                          "subStatusCode" => "0",
-                          "bankReferenceNo" => "736015422593",
-                          "beneficiaryReferenceNo" => nil
-                      },
-                      "nameWithBeneficiaryBank" => "GURUKRIPA MILK SUPPL",
-                      "requestReferenceNo" => "FINLYIMPS71012974914"
-                  }
-              }
-          }
-      }
+      # self.parsed_response = {
+      #     "Envelope" => {
+      #         "xmlns:soapenv" => "http://www.w3.org/2003/05/soap-envelope",
+      #         "Body" => {
+      #             "transferResponse" => {
+      #                 "xmlns:io" => "http://www.quantiguous.com/services",
+      #                 "version" => "2.0",
+      #                 "uniqueResponseNo" => "f7ae85caea2111e7b84a0a0047340000",
+      #                 "attemptNo" => "1",
+      #                 "transferType" => "IMPS",
+      #                 "lowBalanceAlert" => "false",
+      #                 "transactionStatus" => {
+      #                     "statusCode" => "COMPLETED",
+      #                     "subStatusCode" => "0",
+      #                     "bankReferenceNo" => "736015422593",
+      #                     "beneficiaryReferenceNo" => nil
+      #                 },
+      #                 "nameWithBeneficiaryBank" => "GURUKRIPA MILK SUPPL",
+      #                 "requestReferenceNo" => "FINLYIMPS71012974914"
+      #             }
+      #         }
+      #     }
+      # }
       #
       # self.parsed_response = {
       #     "Envelope" => {
