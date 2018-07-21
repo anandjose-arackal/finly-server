@@ -69,6 +69,9 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
+
   ################### SETTINGS FOR SENDGRID ##########################
   config.action_mailer.default_url_options = { host: 'www.finly.io' }
   config.action_mailer.delivery_method = :smtp
@@ -84,7 +87,8 @@ Rails.application.configure do
       enable_starttls_auto: true,
       :openssl_verify_mode  => 'none'
   }
-#   config.action_mailer.delivery_method = :smtp
+
+  #   config.action_mailer.delivery_method = :smtp
 #   config.action_mailer.smtp_settings = {
 #     address:              'mail2.itzcash.com',
 #     port:                 25,
