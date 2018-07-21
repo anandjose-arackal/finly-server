@@ -1,6 +1,6 @@
 class Company::Preview < BaseOperation
 
-  attr_accessor :preview_company, :preview_parameters
+  attr_accessor :preview_company, :preview_parameters, :referrer
 
   def pre_validate
     if params.blank?
@@ -10,6 +10,7 @@ class Company::Preview < BaseOperation
 
   def init
     self.preview_parameters = preview_params
+    self.referrer = preview_parameters[:referrer]
   end
 
   def pre_process
@@ -31,6 +32,17 @@ class Company::Preview < BaseOperation
     Constants::PRODUCT_DEMO_EMAIL_ID.each do |recipient_email|
       DemoMailer.delay.notify_preview(preview_company, recipient_email)
     end
+
+    if referrer == 'techombay'
+      ['chetan.r@techombay.com', 'contactus@techombay.com'].each do |recipient_email|
+        DemoMailer.delay.notify_preview(preview_company, recipient_email)
+      end
+    elsif referrer == 'finly'
+      # For testing purpose
+      ['abinash.b2@gmail.com', 'aditya.s@finly.io'].each do |recipient_email|
+        DemoMailer.delay.notify_preview(preview_company, recipient_email)
+      end
+    end
   end
 
   def success
@@ -40,6 +52,6 @@ class Company::Preview < BaseOperation
   private
 
   def preview_params
-    params.require(:preview).permit(:name, :phone_number, :email, :company, :source, :source_description)
+    params.require(:preview).permit(:name, :phone_number, :email, :company, :source, :source_description, :referrer)
   end
 end
