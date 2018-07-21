@@ -41,9 +41,6 @@ class BankTransfer::Payments::Retry < BankTransfer::Payments::Base
   def process
     # simple call the retry operation in Account Manager and wait for the result
     op = AccountManager::Payments::RetryPaymentBackground.call_async(self.payment.id, params)
-    unless op.success?
-      add_message :error, op.messages[:error]
-    end
   end
 
   def post_process
