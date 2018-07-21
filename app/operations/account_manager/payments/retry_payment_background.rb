@@ -10,7 +10,7 @@ class AccountManager::Payments::RetryPaymentBackground < AccountManager::Base
   end
 
   def self.call(payment, options)
-    payment_id = payment_order
+    payment_id = payment
     if payment_id.present? and payment_id.is_a?(Payment)
       payment_id = payment_id.id
     end
