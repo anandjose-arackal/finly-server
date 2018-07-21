@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180712065603) do
+ActiveRecord::Schema.define(version: 20180720124958) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1893,7 +1893,6 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   add_index "expenses", ["expense_status_id"], name: "index_expenses_on_expense_status_id", using: :btree
   add_index "expenses", ["expense_tax_type_id"], name: "index_expenses_on_expense_tax_type_id", using: :btree
   add_index "expenses", ["expense_type_id"], name: "index_expenses_on_expense_type_id", using: :btree
-  add_index "expenses", ["gst_type_id"], name: "index_expenses_on_gst_type_id", using: :btree
   add_index "expenses", ["report_id"], name: "index_expenses_on_report_id", using: :btree
   add_index "expenses", ["user_id"], name: "index_expenses_on_user_id", using: :btree
 
@@ -1938,6 +1937,7 @@ ActiveRecord::Schema.define(version: 20180712065603) do
     t.boolean  "travel_request",                         default: false
     t.boolean  "budgeting_system",                       default: false
     t.boolean  "em_tax_tracking",                        default: false
+    t.boolean  "two_factor_authentication",              default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -2135,7 +2135,7 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   end
 
   create_table "gst_types", force: :cascade do |t|
-    t.string   "name",       limit: 255, null: false
+    t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
@@ -2380,6 +2380,7 @@ ActiveRecord::Schema.define(version: 20180712065603) do
     t.string   "receiving_account_type", limit: 255
     t.text     "note",                   limit: 65535
     t.integer  "remaining_amount_id",    limit: 4
+    t.integer  "invoice_type_id",        limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -2387,6 +2388,12 @@ ActiveRecord::Schema.define(version: 20180712065603) do
   add_index "invoices", ["tax_type_id"], name: "index_invoices_on_tax_type_id", using: :btree
 
   create_table "inward_invoice_statuses", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  create_table "inward_invoice_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
@@ -3016,6 +3023,7 @@ ActiveRecord::Schema.define(version: 20180712065603) do
     t.text     "options",     limit: 65535
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.boolean  "default"
   end
 
   add_index "payment_file_configurations", ["company_id"], name: "index_payment_file_configurations_on_company_id", using: :btree
@@ -3196,9 +3204,9 @@ ActiveRecord::Schema.define(version: 20180712065603) do
     t.text     "post_operation",          limit: 65535
     t.text     "post_operation_payload",  limit: 65535
     t.integer  "category_id",             limit: 4
+    t.boolean  "api_initiated",                         default: false
     t.date     "scheduled_at"
     t.date     "processed_at"
-    t.boolean  "api_initiated",                         default: false
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -3325,6 +3333,7 @@ ActiveRecord::Schema.define(version: 20180712065603) do
     t.datetime "updated_at",                       null: false
     t.text     "source",             limit: 65535
     t.text     "source_description", limit: 65535
+    t.string   "referrer",           limit: 255
   end
 
   create_table "product_combinations", force: :cascade do |t|
