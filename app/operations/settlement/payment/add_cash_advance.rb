@@ -87,26 +87,6 @@ class Settlement::Payment::AddCashAdvance < Settlement::Payment::Base
       add_message :success, "Cash on hand credit has been initiated. Please check back in some time for the money to reflect"
       return
     end
-
-    op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request, bank_transfer_type: payment_param[:payment_mode]&.upcase})
-    if op.success?
-      self.payment = op.payments.first
-      bank_transaction = self.payment.reload.reference_resource
-      debugger
-      # only if the bank transaction has been completed, will the cash on hand be added to the user's account
-      # if the payment was done through a bank transfer, create a payment request for crediting the user's cash on hand
-      if self.payment_purpose == :cash_advance && bank_transaction&.completed?
-        init_payment_request(:credit, :advance, {amount: amount, initiating_account: nil, receiving_account: to_user.cash_on_hand})
-        # now payment request will have the new details of money to be added - so add it to the cash on hand
-        op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
-        payment = op.payments.first
-        # setting the reference resource for the cash on hand payment as the bank transfer payment
-        payment.update(reference_resource: self.payment)
-      end
-      return true
-    end
-    add_message :error, op.messages[:error]
-    false
   end
 
   def post_process
