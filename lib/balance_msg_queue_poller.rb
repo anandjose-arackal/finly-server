@@ -1,30 +1,29 @@
 class BalanceMsgQueuePoller
 
   def self.run
-    username = ENV["MSG_QUEUE_USERNAME"]
-    password = ENV["MSG_QUEUE_PASSWORD"]
-    if Rails.env == 'production'
-      mq_server_address = ENV["MSG_QUEUE_ADDRESS_PRODUCTION"]
-    elsif Rails.env == 'itzcash_uat'
-      mq_server_address = ENV["MSG_QUEUE_ADDRESS_UAT"]
-    else
-      mq_server_address = ENV["MSG_QUEUE_ADDRESS_TESTING"]
-    end
+    
+    ####################### Initializing the client and other details for pulling messages from AWS Queue #########
+    region_name = ENV["aws_region_name"]
+    access_key_id = ENV["aws_access_key_id"]
+    secret_access_key = ENV["aws_secret_access_key"]
 
+    sqs_client = Aws::SQS::Client.new(region: region_name, access_key_id: access_key_id, secret_access_key: secret_access_key)
+
+    queue_url_base = ENV["sqs_queue_url_base"]
+    queue_name = "BalanceMessageQueue"
+
+    queue_url = queue_url_base + queue_name
+
+    delimiter = ','
+
+    # initializing the log file that will hold the errors if necessary
     error_logger = Logger.new("#{Rails.root}/log/balance_msg_queue_errors.log")
+    poller = Aws::SQS::QueuePoller.new(queue_url, {client: sqs_client})
 
-    client = Stomp::Connection.new(username, password, mq_server_address, 61613, true)
-    client.subscribe("/queue/FinlyBalanceQueue")
+    ######################## AWS Code to extract the messages from the queue ###################
 
-    puts "Subscribed!"
-
-    loop do
-
-      message = client.receive
-
+    poller.poll do |message|
       puts message.body
-
-      delimiter = ","
 
       data = message.body.split(delimiter)
 
@@ -45,10 +44,7 @@ class BalanceMsgQueuePoller
       if @result&.failure? || @result.balance_history.nil?
         error_logger.error("Following history entry : #{message.body} couldn't be created because the operation failed due to the following errors: #{@result.messages[:error]}")
       end
-
     end
-
-    client.disconnect
   end
 
 
