@@ -13,12 +13,14 @@ set :branch, ENV['BRANCH'] || :staging
 
 case fetch(:stage)
 when :itzcash_production
-  branch = fetch :branch
-  unless ['staging', :staging].include?(branch)
-    raise 'This branch cannot be deploy to production. Please select the correct branch'
-  end
-  set :deploy_to, '/home/viveka/app'
-  set :rails_env, 'production'
+  raise 'Cannot deploy this to itzcash. Deploy it to AWS instead'
+
+  # branch = fetch :branch
+  # unless ['staging', :staging].include?(branch)
+  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
+  # end
+  # set :deploy_to, '/home/viveka/app'
+  # set :rails_env, 'production'
   # todo - configure this for production once everything is set up
 when :aws_production, :background_production
   branch = fetch :branch
