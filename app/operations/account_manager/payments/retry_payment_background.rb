@@ -2,15 +2,15 @@
 
 class AccountManager::Payments::RetryPaymentBackground < AccountManager::Base
 
-  attr_accessor :payment, :payment_order, :payment_mode
+  attr_accessor :payment, :payment_order, :payment_mode, :options
 
-  def initialize(payment, options)
+  def initialize
     # self.payment = payment
     # self.payment_mode = options[:payment_mode]
   end
 
   def self.call(payment, options)
-    payment_id = payment_order
+    payment_id = payment
     if payment_id.present? and payment_id.is_a?(Payment)
       payment_id = payment_id.id
     end
