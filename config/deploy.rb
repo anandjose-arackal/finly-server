@@ -1,8 +1,8 @@
 # config valid only for current version of Capistrano
 lock '3.10.2'
 
-if [:itzcash_production, "itzcash_production"].include?(fetch(:stage))
-  load_secure_storage((fetch(:stage)&.to_s == "itzcash_production" ? :production : :development))
+if ['aws_production', 'background_production'].include?(fetch(:stage)&.to_s)
+  load_secure_storage(:production)
 end
 
 set :application, 'finly-server'
@@ -12,19 +12,29 @@ set :repo_url, 'ssh://git@altssh.bitbucket.org:443/finlycore/finly-server.git'
 set :branch, ENV['BRANCH'] || :staging
 
 case fetch(:stage)
-  when :itzcash_production
-    branch = fetch :branch
-    unless ['staging', :staging].include?(branch)
-      raise 'This branch cannot be deploy to production. Please select the correct branch'
-    end
-    set :deploy_to, '/home/viveka/app'
-    set :rails_env, 'production'
-  when :itzcash
-    set :deploy_to, '/usr/local/app'
-    set :rails_env, 'itzcash_uat'
-  when :staging, :development, :combined_development, :insights, :development_2, :demo_2
-    set :deploy_to, '/home/centos/app'
-    set :rails_env, 'staging'
+when :itzcash_production
+  raise 'Cannot deploy this to itzcash. Deploy it to AWS instead'
+
+  # branch = fetch :branch
+  # unless ['staging', :staging].include?(branch)
+  #   raise 'This branch cannot be deploy to production. Please select the correct branch'
+  # end
+  # set :deploy_to, '/home/viveka/app'
+  # set :rails_env, 'production'
+  # todo - configure this for production once everything is set up
+when :aws_production, :background_production
+  branch = fetch :branch
+  unless ['staging', :staging].include?(branch)
+    raise 'This branch cannot be deploy to production. Please select the correct branch'
+  end
+  set :deploy_to, '/home/centos/app'
+  set :rails_env, 'production'
+when :itzcash
+  set :deploy_to, '/usr/local/app'
+  set :rails_env, 'itzcash_uat'
+when :staging, :development, :combined_development, :insights, :development_2, :demo_2
+  set :deploy_to, '/home/centos/app'
+  set :rails_env, 'staging'
 end
 
 set :pty, false
@@ -41,10 +51,10 @@ set :keep_releases, 5
 
 # setting up rollbar environment variables for deploy tracking
 set :rollbar_token, 'ca504254626b4bf69eb1a1ec0b3aea23'
-set :rollbar_env, Proc.new { fetch :stage }
-set :rollbar_role, Proc.new { :app }
+set :rollbar_env, Proc.new {fetch :stage}
+set :rollbar_role, Proc.new {:app}
 
-set :puma_rackup, -> { File.join(current_path, 'config.ru') }
+set :puma_rackup, -> {File.join(current_path, 'config.ru')}
 set :puma_state, "#{shared_path}/tmp/pids/puma.state"
 set :puma_pid, "#{shared_path}/tmp/pids/puma.pid"
 set :puma_bind, "unix://#{shared_path}/tmp/sockets/puma.sock" #accept array for multi-bind

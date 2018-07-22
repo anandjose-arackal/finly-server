@@ -69,21 +69,38 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
+  config.action_mailer.perform_deliveries = true
+  config.action_mailer.raise_delivery_errors = true
+
   ################### SETTINGS FOR SENDGRID ##########################
-  config.action_mailer.default_url_options = { host: "www.finly.io" }
+  config.action_mailer.default_url_options = { host: 'www.finly.io' }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-    address:              'mail2.itzcash.com',
-    port:                 25,
-    domain:               'www.finly.io'
-#    user_name:            'finly@itzcash.com',
-    # password:             '',
-    # ssl:                  true,
-    # tls:                  true,
-#    authentication:       :none,
-    # enable_starttls_auto: true,
-    # :openssl_verify_mode  => 'none'
+      address:              'smtp.sendgrid.net',
+      port:                 587,
+      domain:               'www.finly.io',
+      user_name:            'vivekagb',
+      password:             'idAr5APhk61X',
+      # ssl:                  true,
+      # tls:                  true,
+      authentication:       :plain,
+      enable_starttls_auto: true,
+      :openssl_verify_mode  => 'none'
   }
+
+  #   config.action_mailer.delivery_method = :smtp
+#   config.action_mailer.smtp_settings = {
+#     address:              'mail2.itzcash.com',
+#     port:                 25,
+#     domain:               'www.finly.io'
+# #    user_name:            'finly@itzcash.com',
+#     # password:             '',
+#     # ssl:                  true,
+#     # tls:                  true,
+# #    authentication:       :none,
+#     # enable_starttls_auto: true,
+#     # :openssl_verify_mode  => 'none'
+#   }
 
 
   #####################################################################
@@ -106,6 +123,20 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  config.paperclip_defaults = {:url => "/images/:class/:attachment/:id_partition/:style/:filename",
-                               :path => "/images/:class/:attachment/:id_partition/:style/:filename"}
+  # config.paperclip_defaults = {:url => "/images/:class/:attachment/:id_partition/:style/:filename",
+  #                              :path => "/images/:class/:attachment/:id_partition/:style/:filename"}
+
+  ###################### SETTINGS FOR USING S3 FOR ALL ATTACHMENTS ########################
+  config.paperclip_defaults = {
+      storage: :s3,
+      s3_region: ENV["aws_region_name"],
+      s3_credentials: {
+          s3_host_name: ENV["s3_host_name"],
+          bucket: ENV["s3_attachment_bucket_name"],
+          s3_region: ENV["aws_region_name"],
+          access_key_id: ENV["aws_access_key_id"],
+          secret_access_key: ENV["aws_secret_access_key"]
+      }
+  }
+  #########################################################################################
 end

@@ -55,7 +55,7 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
 
   def post_process
     # handle the various error cases here
-    # case 500
+    # case 200
     case self.response.status
       when 404
         add_message :error, "The service is temporarily down. Please try again later"
