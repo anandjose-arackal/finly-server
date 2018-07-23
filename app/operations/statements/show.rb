@@ -195,7 +195,8 @@ class Statements::Show < Statements::Base
         when PaymentPurpose.id_for(:corporate_balance_load)
           merchant = 'Corporate Balance Load'
         when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:balance_clearance),
-            PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit), PaymentPurpose.id_for(:payroll), PaymentPurpose.id_for(:balance_clearance_outside_finly)
+            PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit), PaymentPurpose.id_for(:payroll), PaymentPurpose.id_for(:balance_clearance_outside_finly),
+            PaymentPurpose.id_for(:cash_advance)
           if finly_transaction.payment.blank?
             if finly_transaction.associated_transaction.class.name == CompanyTransaction.name
               merchant = finly_transaction.associated_transaction.merchant_name
@@ -203,24 +204,34 @@ class Statements::Show < Statements::Base
           else
             if finly_transaction.payment.initiating_account == finly_transaction.finly_account and finly_transaction.payment.receiving_account.present?
               merchant = prefix
-              if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
-                merchant += "#{finly_transaction.payment.receiving_account&.user&.name}'s "
-              end
-              if [BankAccount].include? finly_transaction.payment.receiving_account.class
-                merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
-              end
+              # if [UserWallet, Card].include? finly_transaction.payment.receiving_account.class
+              #   # merchant += "#{finly_transaction.payment.receiving_account&.user&.name}'s "
+              #   merchant = ""
+              # end
+              # if [BankAccount].include? finly_transaction.payment.receiving_account.class
+              #   # merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
+              #   merchant = ""
+              # end
               merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.receiving_account)}"
             elsif finly_transaction.payment.receiving_account == finly_transaction.finly_account and finly_transaction.payment.initiating_account.present?
               merchant = prefix
-              if [UserWallet, Card].include? finly_transaction.payment.initiating_account.class
-                merchant += "#{finly_transaction.payment.initiating_account&.user&.name}'s "
-              end
-              if [BankAccount].include? finly_transaction.payment.receiving_account.class
-                merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
-              end
+              # if [UserWallet, Card].include? finly_transaction.payment.initiating_account.class
+              #   # merchant += "#{finly_transaction.payment.initiating_account&.user&.name}'s "
+              #   merchant = ""
+              # end
+              # if [BankAccount].include? finly_transaction.payment.receiving_account.class
+              #   # merchant += "#{finly_transaction.payment.receiving_account&.account_owner&.name}'s "
+              #   merchant = ""
+              # end
               merchant += "#{AccountManagerUtils.name_for(finly_transaction.payment.initiating_account)}"
             end
           end
+        when PaymentPurpose.id_for(:corporate_account_reload), PaymentPurpose.id_for(:payment_receivable), PaymentPurpose.id_for(:invoice), PaymentPurpose.id_for(:finly_money_reload)
+          merchant = "Virtual Account: "
+          if finly_transaction.associated_transaction&.virtual_account&.name.present?
+            merchant += "#{finly_transaction.associated_transaction&.virtual_account&.name} - "
+          end
+          merchant += finly_transaction.associated_transaction&.virtual_account&.account_number
       end
       merchant
     end

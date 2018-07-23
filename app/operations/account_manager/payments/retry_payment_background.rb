@@ -1,16 +1,30 @@
 # will retry a single payment synchronously when requested
 
-class AccountManager::Payments::RetryPayment < AccountManager::Base
+class AccountManager::Payments::RetryPaymentBackground < AccountManager::Base
 
-  attr_accessor :payment, :payment_order, :payment_mode
+  attr_accessor :payment, :payment_order, :payment_mode, :options
 
-  def initialize(payment, options)
-    self.payment = payment
-    self.payment_mode = options[:payment_mode]
+  def initialize
+    # self.payment = payment
+    # self.payment_mode = options[:payment_mode]
   end
 
   def self.call(payment, options)
-    self.new(payment, options).run
+    payment_id = payment
+    if payment_id.present? and payment_id.is_a?(Payment)
+      payment_id = payment_id.id
+    end
+    self.new.perform(payment_id, options)
+  end
+
+  def perform(payment_id, options, request_store_hash=nil)
+    load_request_store request_store_hash
+    if options.present? and options.is_a?(Hash)
+      options = options.with_indifferent_access
+    end
+    self.payment = Payment.unscoped.find_by_id(payment_id)
+    self.options = options
+    self.run
   end
 
   def init

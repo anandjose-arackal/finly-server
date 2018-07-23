@@ -80,7 +80,7 @@ class Event::EPaymentOrderDownload::Create < Event::EPaymentOrderDownload::Base
     end
 
     def download_url
-      Constants::BASE_ASSETS_URL + self.download_url_val
+      self.download_url_val
     end
 
     def button_name

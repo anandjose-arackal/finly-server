@@ -34,6 +34,7 @@
 #
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -896,20 +897,20 @@ class Expense < ActiveRecord::Base
   def reimbursable_amount_value
     return 0 unless reimbursable
     return amount&.value.to_f unless has_tds?
-    return amount&.value.to_f unless tds_amount.present?
-    precision_value(amount&.value.to_f - tds_amount&.value.to_f)
+    # return amount&.value.to_f unless tds_amount.present?
+    return amount.value.to_f unless tds_slab.present?
+    tds_amount = tds_slab.tds * amount&.value.to_f / 100
+    precision_value(amount&.value.to_f - tds_amount)
   end
   # alias_method :reimbursable_amount, :reimbursable_amount_value
 
   def reimbursable_amount
-    return Amount.new(value: 0, currency_id: amount.currency_id) unless reimbursable
-    return amount unless has_tds?
-    return amount unless tds_amount.present?
-    return Amount.new(value: (precision_value(amount.value - tds_amount.value)), currency_id: amount.currency_id)
+    value = reimbursable ? reimbursable_amount_value : 0
+    Amount.new(value: value, currency_id: amount.currency_id)
   end
 
   def compute_gst_amount
-    return unless has_gst?
+    return unless has_gst? and self.gst_percentage.present?
 
     gst_amount_value = self.amount.value * self.gst_percentage / 100
     set_gst_amount(gst_amount_value)
