@@ -1,9 +1,10 @@
 class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
   include AASM
-  attr_accessor :po_state, :purchase_order, :user
+  attr_accessor :po_state, :purchase_order, :user, :violations_present
 
-  def initialize(purchase_order, user)
+  def initialize(purchase_order, violations_present, user)
     self.purchase_order = purchase_order
+    self.violations_present = violations_present
     self.aasm.current_state = self.purchase_order.status.name.to_sym
     self.user = user
   end
