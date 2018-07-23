@@ -27,11 +27,9 @@ class UpdateBookingFields < ActiveRecord::Migration
     add_column :booking_car_rentals, :pickup_city_id, :integer, references: 'Location', index: true, foreign_key: true, null: false
     add_column :booking_car_rentals, :drop_city_id, :integer, references: 'Location', index: true, foreign_key: true, null: false
     add_column :booking_car_rentals, :drop_address, :text
-    add_column :booking_car_rentals, :pickup_address, :text
     add_column :booking_car_rentals, :drop_address, :text
     add_column :booking_car_rentals, :pickup_datetime, :datetime, index: true
     add_column :booking_car_rentals, :drop_datetime, :datetime, index: true
-    add_column :booking_car_rentals, :drop_address, :text
     add_column :booking_car_rentals, :rental_company, :string
     add_column :booking_car_rentals, :description, :text
     add_column :booking_car_rentals, :cost_id, :integer, references: 'Amount', index: true, foreign_key: true
@@ -75,6 +73,7 @@ class UpdateBookingFields < ActiveRecord::Migration
     remove_column :booking_hotels , :reservation_end_date
     remove_column :booking_hotels , :start_time
     remove_column :booking_hotels , :end_time
+    remove_column :booking_hotels, :hotel_rating
     add_column :booking_hotels, :location_id,:integer, references: 'Location', index: true, foreign_key: true, null: false
     add_column :booking_hotels, :checkin_datetime, :datetime
     add_column :booking_hotels, :checkout_datetime, :datetime
@@ -83,15 +82,24 @@ class UpdateBookingFields < ActiveRecord::Migration
     add_column :booking_hotels, :cost_id, :integer, references: 'Amount', index: true, foreign_key: true
 
     add_column :booking_restaurants, :location_id,:integer, references: 'Location', index: true, foreign_key: true, null: false
-    # + restaurant_address
-    # + reservation_datetime
-    # + number_of_guests
-    # + description
-    #
-    # - reservation_destination
-    # - reservation_date
-    # - reservation_time
-    # - start_time              :text(65535)
-    # - end_time                :text(65535)
+    add_column :booking_restaurants, :restaurant_address, :text
+    add_column :booking_restaurants, :reservation_datetime, :datetime
+    add_column :booking_restaurants, :number_of_guests, :integer
+    add_column :booking_restaurants, :description, :text
+    remove_column :booking_restaurants, :restaurant_rating
+    remove_column :booking_restaurants, :reservation_destination
+    remove_column :booking_restaurants, :reservation_date
+    remove_column :booking_restaurants, :reservation_time
+    remove_column :booking_restaurants, :start_time
+    remove_column :booking_restaurants, :end_time
+
+    add_column :booking_customs, :booking_details, :text
+    add_column :booking_customs, :description, :text
+    add_column :booking_customs, :cost_id, :integer, references: 'Amount', index: true, foreign_key: true
+    remove_column :booking_customs, :journey_date
+    remove_column :booking_customs, :journey_destination
+    remove_column :booking_customs, :journey_source
+    remove_column :booking_customs, :start_time
+    remove_column :booking_customs, :end_time
   end
 end

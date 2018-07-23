@@ -2,28 +2,51 @@
 #
 # Table name: booking_flights
 #
-#  id                  :integer          not null, primary key
-#  departure_date      :date
-#  pnr                 :string(255)
-#  airline             :string(255)
-#  journey_destination :string(255)
-#  journey_source      :string(255)
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  parent_id           :integer
-#  parent_type         :string(255)
-#  journey_date        :date
-#  booking_class       :string(255)
-#  stops               :string(255)
-#  ticket_number       :string(255)
-#  start_time          :text(65535)
-#  end_time            :text(65535)
+#  id                 :integer          not null, primary key
+#  pnr                :string(255)
+#  airline            :string(255)
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  parent_id          :integer
+#  parent_type        :string(255)
+#  stops              :string(255)
+#  ticket_number      :string(255)
+#  from_id            :integer          not null
+#  to_id              :integer          not null
+#  departure_datetime :datetime
+#  arrival_datetime   :datetime
+#  description        :text(65535)
+#  terminal           :string(255)
+#  cost_id            :integer
+#  booking_class_id   :integer
 #
 
 class BookingFlight < ActiveRecord::Base
   belongs_to :parent, polymorphic: true
+  belongs_to :booking_class, class_name: 'BookingFlightClass'
+  belongs_to :cost, class_name: 'Amount'
+  belongs_to :from, class_name: 'Location'
+  belongs_to :to, class_name: 'Location'
 
   validates :from, presence: true
   validates :to, presence: true
   validates :departure_datetime, presence: true
+
+  def as_json(options={})
+    {
+        id: id,
+        pnr: pnr,
+        airline: airline,
+        stops: stops,
+        ticket_number: ticket_number,
+        from: from_id,
+        to: to_id,
+        departure_datetime: departure_datetime,
+        arrival_datetime: arrival_datetime,
+        description: description,
+        terminal: terminal,
+        cost: cost,
+        booking_class: booking_class
+    }
+  end
 end

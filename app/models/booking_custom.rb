@@ -2,23 +2,26 @@
 #
 # Table name: booking_customs
 #
-#  id                  :integer          not null, primary key
-#  journey_date        :date
-#  journey_destination :string(255)
-#  journey_source      :string(255)
-#  parent_id           :integer
-#  parent_type         :string(255)
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  start_time          :text(65535)
-#  end_time            :text(65535)
+#  id              :integer          not null, primary key
+#  parent_id       :integer
+#  parent_type     :string(255)
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  booking_details :text(65535)
+#  description     :text(65535)
+#  cost_id         :integer
 #
 
 class BookingCustom < ActiveRecord::Base
-  validates :journey_source, presence: true
-  validates :journey_destination, presence: true
-  validates :journey_date, presence: true
-
   belongs_to :parent, polymorphic: true
+  belongs_to :cost, class_name: 'Amount'
 
+  def as_json(options={})
+    {
+        id: id,
+        booking_details: booking_details,
+        description: description,
+        cost: cost
+    }
+  end
 end

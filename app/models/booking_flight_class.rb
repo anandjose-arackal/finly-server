@@ -1,8 +1,25 @@
+# == Schema Information
+#
+# Table name: booking_flight_classes
+#
+#  id         :integer          not null, primary key
+#  name       :string(255)      not null
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#
+
 class BookingFlightClass < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:economy, :premium_economy, :first, :business]
+    [:economy, :business]
+  end
+
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
   end
 
 end

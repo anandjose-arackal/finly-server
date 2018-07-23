@@ -2,26 +2,41 @@
 #
 # Table name: booking_buses
 #
-#  id                  :integer          not null, primary key
-#  journey_source      :string(255)
-#  journey_destination :string(255)
-#  journey_date        :date
-#  departure_time      :string(255)
-#  created_at          :datetime         not null
-#  updated_at          :datetime         not null
-#  parent_id           :integer
-#  parent_type         :string(255)
-#  boarding_point      :string(255)
-#  booking_class       :string(255)
-#  start_time          :text(65535)
-#  end_time            :text(65535)
+#  id                 :integer          not null, primary key
+#  created_at         :datetime         not null
+#  updated_at         :datetime         not null
+#  parent_id          :integer
+#  parent_type        :string(255)
+#  booking_class      :string(255)
+#  from_id            :integer          not null
+#  to_id              :integer          not null
+#  departure_datetime :datetime         not null
+#  arrival_datetime   :datetime
+#  cost_id            :integer
+#  boarding_point     :text(65535)
+#  drop_point         :text(65535)
+#  description        :text(65535)
 #
 
 class BookingBus < ActiveRecord::Base
-  validates :journey_source, presence: true
-  validates :journey_destination, presence: true
-  validates :journey_date, presence: true
-
   belongs_to :parent, polymorphic: true
+  belongs_to :cost, class_name: 'Amount'
+  belongs_to :from, class_name: 'Location'
+  belongs_to :to, class_name: 'Location'
+
+  def as_json(options = {})
+    {
+        id: id,
+        booking_class: booking_class,
+        from: from,
+        to: to,
+        departure_datetime: departure_datetime,
+        arrival_datetime: arrival_datetime,
+        cost: cost,
+        boarding_point: boarding_point,
+        drop_point: drop_point,
+        description: description
+    }
+  end
 end
 

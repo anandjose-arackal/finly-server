@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180718080340) do
+ActiveRecord::Schema.define(version: 20180720135911) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -602,89 +602,94 @@ ActiveRecord::Schema.define(version: 20180718080340) do
   add_index "booking_attachments", ["user_id"], name: "index_booking_attachments_on_user_id", using: :btree
 
   create_table "booking_buses", force: :cascade do |t|
-    t.string   "journey_source",      limit: 255
-    t.string   "journey_destination", limit: 255
-    t.date     "journey_date"
-    t.string   "departure_time",      limit: 255
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.string   "boarding_point",      limit: 255
-    t.string   "booking_class",       limit: 255
-    t.text     "start_time",          limit: 65535
-    t.text     "end_time",            limit: 65535
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.integer  "parent_id",          limit: 4
+    t.string   "parent_type",        limit: 255
+    t.string   "booking_class",      limit: 255
+    t.integer  "from_id",            limit: 4,     null: false
+    t.integer  "to_id",              limit: 4,     null: false
+    t.datetime "departure_datetime",               null: false
+    t.datetime "arrival_datetime"
+    t.integer  "cost_id",            limit: 4
+    t.text     "boarding_point",     limit: 65535
+    t.text     "drop_point",         limit: 65535
+    t.text     "description",        limit: 65535
   end
 
   add_index "booking_buses", ["parent_type", "parent_id"], name: "index_booking_buses_on_parent_type_and_parent_id", using: :btree
 
   create_table "booking_car_rentals", force: :cascade do |t|
-    t.string   "journey_source",         limit: 255
-    t.string   "journey_destination",    limit: 255
-    t.text     "pickup_address",         limit: 65535
-    t.date     "journey_date"
-    t.string   "pickup_time",            limit: 255
-    t.date     "reservation_start_date"
-    t.date     "reservation_end_date"
-    t.string   "car_type",               limit: 255
-    t.string   "car_number",             limit: 255
-    t.datetime "created_at",                           null: false
-    t.datetime "updated_at",                           null: false
-    t.integer  "parent_id",              limit: 4
-    t.string   "parent_type",            limit: 255
-    t.text     "start_time",             limit: 65535
-    t.text     "end_time",               limit: 65535
+    t.text     "pickup_address", limit: 65535
+    t.string   "car_type",       limit: 255
+    t.string   "car_number",     limit: 255
+    t.datetime "created_at",                   null: false
+    t.datetime "updated_at",                   null: false
+    t.integer  "parent_id",      limit: 4
+    t.string   "parent_type",    limit: 255
+    t.integer  "pickup_city_id", limit: 4,     null: false
+    t.integer  "drop_city_id",   limit: 4,     null: false
+    t.text     "drop_address",   limit: 65535
+    t.string   "rental_company", limit: 255
+    t.text     "description",    limit: 65535
+    t.integer  "cost_id",        limit: 4
   end
 
   add_index "booking_car_rentals", ["parent_type", "parent_id"], name: "index_booking_car_rentals_on_parent_type_and_parent_id", using: :btree
 
   create_table "booking_customs", force: :cascade do |t|
-    t.date     "journey_date"
-    t.string   "journey_destination", limit: 255
-    t.string   "journey_source",      limit: 255
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-    t.text     "start_time",          limit: 65535
-    t.text     "end_time",            limit: 65535
+    t.integer  "parent_id",       limit: 4
+    t.string   "parent_type",     limit: 255
+    t.datetime "created_at",                    null: false
+    t.datetime "updated_at",                    null: false
+    t.text     "booking_details", limit: 65535
+    t.text     "description",     limit: 65535
+    t.integer  "cost_id",         limit: 4
   end
 
   add_index "booking_customs", ["parent_type", "parent_id"], name: "index_booking_customs_on_parent_type_and_parent_id", using: :btree
 
+  create_table "booking_flight_classes", force: :cascade do |t|
+    t.string   "name",       limit: 255, null: false
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "booking_flight_classes", ["name"], name: "index_booking_flight_classes_on_name", using: :btree
+
   create_table "booking_flights", force: :cascade do |t|
-    t.date     "departure_date"
-    t.string   "pnr",                 limit: 255
-    t.string   "airline",             limit: 255
-    t.string   "journey_destination", limit: 255
-    t.string   "journey_source",      limit: 255
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-    t.integer  "parent_id",           limit: 4
-    t.string   "parent_type",         limit: 255
-    t.date     "journey_date"
-    t.string   "booking_class",       limit: 255
-    t.string   "stops",               limit: 255
-    t.string   "ticket_number",       limit: 255
-    t.text     "start_time",          limit: 65535
-    t.text     "end_time",            limit: 65535
+    t.string   "pnr",                limit: 255
+    t.string   "airline",            limit: 255
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+    t.integer  "parent_id",          limit: 4
+    t.string   "parent_type",        limit: 255
+    t.string   "stops",              limit: 255
+    t.string   "ticket_number",      limit: 255
+    t.integer  "from_id",            limit: 4,     null: false
+    t.integer  "to_id",              limit: 4,     null: false
+    t.datetime "departure_datetime"
+    t.datetime "arrival_datetime"
+    t.text     "description",        limit: 65535
+    t.string   "terminal",           limit: 255
+    t.integer  "cost_id",            limit: 4
+    t.integer  "booking_class_id",   limit: 4
   end
 
   add_index "booking_flights", ["parent_type", "parent_id"], name: "index_booking_flights_on_parent_type_and_parent_id", using: :btree
 
   create_table "booking_hotels", force: :cascade do |t|
-    t.string   "reservation_destination", limit: 255
-    t.date     "reservation_start_date"
-    t.string   "reservation_time",        limit: 255
-    t.date     "reservation_end_date"
-    t.string   "hotel_name",              limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.integer  "parent_id",               limit: 4
-    t.string   "parent_type",             limit: 255
-    t.string   "hotel_rating",            limit: 255
-    t.text     "start_time",              limit: 65535
-    t.text     "end_time",                limit: 65535
+    t.string   "hotel_name",        limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "parent_id",         limit: 4
+    t.string   "parent_type",       limit: 255
+    t.integer  "location_id",       limit: 4,     null: false
+    t.datetime "checkin_datetime"
+    t.datetime "checkout_datetime"
+    t.text     "description",       limit: 65535
+    t.text     "hotel_address",     limit: 65535
+    t.integer  "cost_id",           limit: 4
   end
 
   add_index "booking_hotels", ["parent_type", "parent_id"], name: "index_booking_hotels_on_parent_type_and_parent_id", using: :btree
@@ -702,17 +707,16 @@ ActiveRecord::Schema.define(version: 20180718080340) do
   add_index "booking_requests", ["booking_type_id"], name: "index_booking_requests_on_booking_type_id", using: :btree
 
   create_table "booking_restaurants", force: :cascade do |t|
-    t.string   "reservation_destination", limit: 255
-    t.date     "reservation_date"
-    t.string   "reservation_time",        limit: 255
-    t.string   "restaurant_name",         limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-    t.integer  "parent_id",               limit: 4
-    t.string   "parent_type",             limit: 255
-    t.string   "restaurant_rating",       limit: 255
-    t.text     "start_time",              limit: 65535
-    t.text     "end_time",                limit: 65535
+    t.string   "restaurant_name",      limit: 255
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+    t.integer  "parent_id",            limit: 4
+    t.string   "parent_type",          limit: 255
+    t.integer  "location_id",          limit: 4,     null: false
+    t.text     "restaurant_address",   limit: 65535
+    t.datetime "reservation_datetime"
+    t.integer  "number_of_guests",     limit: 4
+    t.text     "description",          limit: 65535
   end
 
   add_index "booking_restaurants", ["parent_type", "parent_id"], name: "index_booking_restaurants_on_parent_type_and_parent_id", using: :btree
@@ -724,20 +728,22 @@ ActiveRecord::Schema.define(version: 20180718080340) do
   end
 
   create_table "booking_trains", force: :cascade do |t|
-    t.string   "journey_source",        limit: 255
-    t.string   "journey_destination",   limit: 255
-    t.date     "journey_date"
-    t.string   "departure_time",        limit: 255
-    t.string   "train_number",          limit: 255
-    t.string   "pnr",                   limit: 255
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-    t.integer  "parent_id",             limit: 4
-    t.string   "parent_type",           limit: 255
-    t.string   "booking_class",         limit: 255
-    t.string   "boarding_station_name", limit: 255
-    t.text     "start_time",            limit: 65535
-    t.text     "end_time",              limit: 65535
+    t.string   "train_number",        limit: 255
+    t.string   "pnr",                 limit: 255
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
+    t.string   "booking_class",       limit: 255
+    t.integer  "boarding_city_id",    limit: 4,   null: false
+    t.string   "boarding_station",    limit: 255
+    t.integer  "destination_city_id", limit: 4,   null: false
+    t.string   "destination_station", limit: 255
+    t.datetime "departure_datetime"
+    t.datetime "arrival_datetime"
+    t.string   "description",         limit: 255
+    t.string   "seat_number",         limit: 255
+    t.integer  "cost_id",             limit: 4
   end
 
   add_index "booking_trains", ["parent_type", "parent_id"], name: "index_booking_trains_on_parent_type_and_parent_id", using: :btree
@@ -3385,6 +3391,7 @@ ActiveRecord::Schema.define(version: 20180718080340) do
     t.datetime "updated_at",                       null: false
     t.text     "source",             limit: 65535
     t.text     "source_description", limit: 65535
+    t.string   "referrer",           limit: 255
   end
 
   create_table "product_combinations", force: :cascade do |t|

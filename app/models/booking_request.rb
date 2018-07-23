@@ -57,7 +57,7 @@ class BookingRequest < ActiveRecord::Base
         booking_hotel: booking_hotel,
         booking_restaurant: booking_restaurant,
         booking_train: booking_train,
-        booking_custom: booking_custom,
+        booking_custom: booking_custom
     }
   end
 

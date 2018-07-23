@@ -38,22 +38,22 @@ class TravelRequests::BookingRequests::Create < TravelRequests::BookingRequests:
     params.require(:booking_request).permit(
         :booking_type_id, :note,
         booking_flight_attributes: [
-            :from, :to, :departure_datetime, :arrival_datetime, :booking_class_id, :stops, :airline, :description
+            :from, :to, :departure_datetime, :description
         ],
         booking_car_rental_attributes: [
-            :from, :to, :pickup_datetime, :drop_datetime, :pickup_address, :drop_address, :car_type, :rental_company, :description
+            :from, :to, :pickup_datetime, :drop_datetime, :pickup_address, :drop_address, :description
         ],
         booking_train_attributes: [
-            :from, :to, :departure_datetime, :arrival_datetime, :description
+            :from, :to, :departure_datetime, :description
         ],
         booking_bus_attributes: [
-            :from, :to,:departure_datetime, :arrival_datetime, :description
+            :from, :to,:departure_datetime, :description
         ],
         booking_hotel_attributes: [
-            :area, :city, :hotel_rating, :checkin_datetime, :checkout_datetime, :description
+            :location, :checkin_datetime, :checkout_datetime, :description
         ],
         booking_restaurant_attributes: [
-            :area, :city, :restaurant_rating, :reservation_time, :reservation_date, :restaurant_name, :number_of_guests, :description
+            :location, :reservation_datetime, :restaurant_name, :number_of_guests, :description
         ],
         booking_custom_attributes: [
             :booking_details, :description
