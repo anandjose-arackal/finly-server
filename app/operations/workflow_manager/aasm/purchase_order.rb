@@ -1,4 +1,7 @@
 class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
+  # If policy not present auto approve
+  #
+
   include AASM
   attr_accessor :po_state, :purchase_order, :user, :violations_present
 
@@ -7,6 +10,7 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
     self.violations_present = violations_present
     self.aasm.current_state = self.purchase_order.status.name.to_sym
     self.user = user
+    self.policy = purchase_order.policy
   end
 
   aasm :whiny_transitions => false do
@@ -44,7 +48,7 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
       transitions :from => [:approved, :sent_to_vendor], :to => [:closed]
     end
 
-    after_all_transitions :create_trail
+    after_all_transitions :change_state
   end
 
   private
@@ -61,9 +65,17 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
   end
 
   def approvers_not_present?
-    #  Get next approve
-    a = true
-    debugger
-    a
+    if self.policy.present?
+
+    else
+      false
+    end
+  end
+
+
+  def next_level
+    levels = self.policy.levels.with_entity_type(purchase_order.class.name)
+
+
   end
 end

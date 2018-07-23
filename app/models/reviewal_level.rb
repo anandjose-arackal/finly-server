@@ -19,4 +19,8 @@ class ReviewalLevel < ActiveRecord::Base
   validates :policy_id, presence: true
   validates :level_number, presence: true
   validates :associated_entity_type, presence: true
+
+  scope :with_entity_type, -> (type) {
+    where(associated_entity_type: type)
+  }
 end

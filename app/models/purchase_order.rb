@@ -36,6 +36,7 @@
 #  controlling_user_role_id     :integer
 #  controlling_for_user_id      :integer
 #  controlling_for_user_role_id :integer
+#  policy_id                    :integer
 #
 
 class PurchaseOrder < ActiveRecord::Base

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180723105055) do
+ActiveRecord::Schema.define(version: 20180723125433) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3760,6 +3760,7 @@ ActiveRecord::Schema.define(version: 20180723105055) do
     t.integer  "controlling_user_role_id",     limit: 4
     t.integer  "controlling_for_user_id",      limit: 4
     t.integer  "controlling_for_user_role_id", limit: 4
+    t.integer  "policy_id",                    limit: 4
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
@@ -3768,6 +3769,7 @@ ActiveRecord::Schema.define(version: 20180723105055) do
   add_index "purchase_orders", ["discount_amount_id"], name: "index_purchase_orders_on_discount_amount_id", using: :btree
   add_index "purchase_orders", ["location_id"], name: "index_purchase_orders_on_location_id", using: :btree
   add_index "purchase_orders", ["payment_term_id"], name: "index_purchase_orders_on_payment_term_id", using: :btree
+  add_index "purchase_orders", ["policy_id"], name: "index_purchase_orders_on_policy_id", using: :btree
   add_index "purchase_orders", ["procurement_id"], name: "index_purchase_orders_on_procurement_id", using: :btree
   add_index "purchase_orders", ["procurement_term_id"], name: "index_purchase_orders_on_procurement_term_id", using: :btree
   add_index "purchase_orders", ["purchase_order_status_id"], name: "index_purchase_orders_on_purchase_order_status_id", using: :btree
@@ -5271,6 +5273,7 @@ ActiveRecord::Schema.define(version: 20180723105055) do
   add_foreign_key "purchase_order_items", "purchase_orders"
   add_foreign_key "purchase_orders", "companies"
   add_foreign_key "purchase_orders", "payment_terms"
+  add_foreign_key "purchase_orders", "policies"
   add_foreign_key "purchase_orders", "procurement_terms"
   add_foreign_key "purchase_orders", "procurements"
   add_foreign_key "purchase_orders", "purchase_order_statuses"
