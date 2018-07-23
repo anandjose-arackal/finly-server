@@ -12,6 +12,7 @@
 #
 
 class BookingRequest < ActiveRecord::Base
+  include SoftDeletable
 
   belongs_to :booking_type
   belongs_to :booking_status

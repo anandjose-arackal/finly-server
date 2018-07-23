@@ -13,8 +13,10 @@
 #
 
 class BookingCustom < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :parent, polymorphic: true
-  belongs_to :cost, class_name: 'Amount'
+  belongs_to :cost, class_name: 'Amount', dependent: :destroy
 
   def as_json(options={})
     {

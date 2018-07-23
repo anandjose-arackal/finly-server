@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180720135911) do
+ActiveRecord::Schema.define(version: 20180723073009) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -4029,11 +4029,10 @@ ActiveRecord::Schema.define(version: 20180720135911) do
   add_index "travel_request_comments", ["user_id"], name: "index_travel_request_comments_on_user_id", using: :btree
 
   create_table "travel_request_destinations", force: :cascade do |t|
-    t.string   "name",              limit: 255
     t.integer  "travel_request_id", limit: 4
-    t.datetime "created_at",                    null: false
-    t.datetime "updated_at",                    null: false
-    t.string   "map_id",            limit: 255
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+    t.integer  "location_id",       limit: 4
   end
 
   add_index "travel_request_destinations", ["travel_request_id"], name: "index_travel_request_destinations_on_travel_request_id", using: :btree

@@ -13,7 +13,7 @@ end
 
 json.destinations do
   json.array! @result.destinations do |destination|
-    json.extract! destination
+    json.extract! destination, :id, :location
     json.booking_requests destination.booking_requests
   end
 end

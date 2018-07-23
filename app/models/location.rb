@@ -16,6 +16,7 @@
 #
 
 class Location < ActiveRecord::Base
+  include SoftDeletable
 
   belongs_to :locatable, polymorphic: true
 

@@ -20,5 +20,7 @@
 
 class BookingCarRental < ActiveRecord::Base
   belongs_to :parent, polymorphic: true
-  belongs_to :cost, class_name: 'Amount'
+  belongs_to :cost, class_name: 'Amount', dependent: :destroy
+  belongs_to :pickup_city, class_name: 'Location', dependent: :destroy
+  belongs_to :drop_city, class_name: 'Location', dependent: :destroy
 end

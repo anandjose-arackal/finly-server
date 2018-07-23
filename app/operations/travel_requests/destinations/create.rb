@@ -22,7 +22,6 @@ class TravelRequests::Destinations::Create < TravelRequests::Base
   def validate
     unless self.destination.valid?
       add_message :error, self.destination.errors.full_messages
-      return
     end
   end
 
@@ -33,7 +32,7 @@ class TravelRequests::Destinations::Create < TravelRequests::Base
   protected
 
   def strong_params
-    params.require(:destination).permit(:name, :map_id)
+    params.require(:destination).permit(location_attributes: [:name, :address, :latitude, :longitude, :maps_id])
   end
 
 end

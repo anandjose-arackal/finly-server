@@ -19,10 +19,12 @@
 #
 
 class BookingBus < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :parent, polymorphic: true
-  belongs_to :cost, class_name: 'Amount'
-  belongs_to :from, class_name: 'Location'
-  belongs_to :to, class_name: 'Location'
+  belongs_to :cost, class_name: 'Amount', dependent: :destroy
+  belongs_to :from, class_name: 'Location', dependent: :destroy
+  belongs_to :to, class_name: 'Location', dependent: :destroy
 
   def as_json(options = {})
     {

@@ -8,7 +8,6 @@
 #  updated_at        :datetime         not null
 #  parent_id         :integer
 #  parent_type       :string(255)
-#  hotel_rating      :string(255)
 #  location_id       :integer          not null
 #  checkin_datetime  :datetime
 #  checkout_datetime :datetime

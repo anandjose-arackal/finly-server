@@ -8,7 +8,6 @@
 #  updated_at           :datetime         not null
 #  parent_id            :integer
 #  parent_type          :string(255)
-#  restaurant_rating    :string(255)
 #  location_id          :integer          not null
 #  restaurant_address   :text(65535)
 #  reservation_datetime :datetime
@@ -17,8 +16,10 @@
 #
 
 class BookingRestaurant < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :parent, polymorphic: true
-  belongs_to :location
+  belongs_to :location, dependent: :destroy
 
   def as_json(options={})
     {

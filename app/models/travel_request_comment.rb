@@ -18,6 +18,8 @@
 #
 
 class TravelRequestComment < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :travel_request
   belongs_to :user
   belongs_to :action, class_name: "TravelRequestCommentAction"

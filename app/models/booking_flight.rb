@@ -22,11 +22,13 @@
 #
 
 class BookingFlight < ActiveRecord::Base
+  include SoftDeletable
+
   belongs_to :parent, polymorphic: true
   belongs_to :booking_class, class_name: 'BookingFlightClass'
-  belongs_to :cost, class_name: 'Amount'
-  belongs_to :from, class_name: 'Location'
-  belongs_to :to, class_name: 'Location'
+  belongs_to :cost, class_name: 'Amount', dependent: :destroy
+  belongs_to :from, class_name: 'Location', dependent: :destroy
+  belongs_to :to, class_name: 'Location', dependent: :destroy
 
   accepts_nested_attributes_for :from
   accepts_nested_attributes_for :to
