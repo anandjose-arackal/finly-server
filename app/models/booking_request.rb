@@ -45,7 +45,9 @@ class BookingRequest < ActiveRecord::Base
   # validates :travel_request_destination_id, presence: true
   validate :at_least_one_type
 
-  def as_json(options={})
+  scope :with_id, ->(id) {where id: id}
+
+  def as_json(options = {})
     {
         id: id,
         booking_type: booking_type,
@@ -66,36 +68,36 @@ class BookingRequest < ActiveRecord::Base
 
   def at_least_one_type
     case self.booking_type_id
-      when BookingType.id_for(:flight)
-        if self.booking_flight.nil?
-          errors.add(:booking_request, "needs to have an associated flight booking")
-        end
-      when BookingType.id_for(:hotel)
-        if self.booking_hotel.nil?
-          errors.add(:booking_request, "needs to have an associated hotel booking")
-        end
-      when BookingType.id_for(:restaurant)
-        if self.booking_restaurant.nil?
-          errors.add(:booking_request, "needs to have an associated restaurant booking")
-        end
-      when BookingType.id_for(:bus)
-        if self.booking_bus.nil?
-          errors.add(:booking_request, "needs to have an associated bus booking")
-        end
-      when BookingType.id_for(:train)
-        if self.booking_train.nil?
-          errors.add(:booking_request, "needs to have an associated trail booking")
-        end
-      when BookingType.id_for(:car_rental)
-        if self.booking_car_rental.nil?
-          errors.add(:booking_request, "needs to have an associated car rental booking")
-        end
-      when BookingType.id_for(:custom)
-        if self.booking_custom.nil?
-          errors.add(:booking_request, "needs to have an associated custom booking")
-        end
-      else
-        errors.add(:expense, "type is invalid")
+    when BookingType.id_for(:flight)
+      if self.booking_flight.nil?
+        errors.add(:booking_request, "needs to have an associated flight booking")
+      end
+    when BookingType.id_for(:hotel)
+      if self.booking_hotel.nil?
+        errors.add(:booking_request, "needs to have an associated hotel booking")
+      end
+    when BookingType.id_for(:restaurant)
+      if self.booking_restaurant.nil?
+        errors.add(:booking_request, "needs to have an associated restaurant booking")
+      end
+    when BookingType.id_for(:bus)
+      if self.booking_bus.nil?
+        errors.add(:booking_request, "needs to have an associated bus booking")
+      end
+    when BookingType.id_for(:train)
+      if self.booking_train.nil?
+        errors.add(:booking_request, "needs to have an associated trail booking")
+      end
+    when BookingType.id_for(:car_rental)
+      if self.booking_car_rental.nil?
+        errors.add(:booking_request, "needs to have an associated car rental booking")
+      end
+    when BookingType.id_for(:custom)
+      if self.booking_custom.nil?
+        errors.add(:booking_request, "needs to have an associated custom booking")
+      end
+    else
+      errors.add(:expense, "type is invalid")
     end
   end
 end

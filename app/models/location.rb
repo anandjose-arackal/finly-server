@@ -27,4 +27,16 @@ class Location < ActiveRecord::Base
   scope :with_id, -> (id) { where id: id }
   scope :with_order, -> (order){ where order: order }
 
+  def as_json(options={})
+    {
+        id: id,
+        latitude: latitude,
+        longitude: longitude,
+        name: name,
+        address: address,
+        maps_id: maps_id,
+        order: order
+    }
+  end
+
 end
