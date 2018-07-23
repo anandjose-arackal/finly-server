@@ -38,22 +38,28 @@ class TravelRequests::BookingRequests::Create < TravelRequests::BookingRequests:
     params.require(:booking_request).permit(
         :booking_type_id, :note,
         booking_flight_attributes: [
-            :from, :to, :departure_datetime, :description
+            {from_attributes: [:name, :address, :maps_id]}, {to_attributes: [:name, :address, :maps_id]},
+            :departure_datetime, :description
         ],
         booking_car_rental_attributes: [
-            :from, :to, :pickup_datetime, :drop_datetime, :pickup_address, :drop_address, :description
+            {from_attributes: [:name, :address, :maps_id]}, {to_attributes: [:name, :address, :maps_id]},
+            :pickup_datetime, :drop_datetime, :pickup_address, :drop_address, :description
         ],
         booking_train_attributes: [
-            :from, :to, :departure_datetime, :description
+            {from_attributes: [:name, :address, :maps_id]}, {to_attributes: [:name, :address, :maps_id]},
+            :departure_datetime, :description
         ],
         booking_bus_attributes: [
-            :from, :to,:departure_datetime, :description
+            {from_attributes: [:name, :address, :maps_id]}, {to_attributes: [:name, :address, :maps_id]},
+            :departure_datetime, :description
         ],
         booking_hotel_attributes: [
-            :location, :checkin_datetime, :checkout_datetime, :description
+            {location_attributes: [:name, :address, :maps_id]}, :checkin_datetime, :checkout_datetime,
+            :description
         ],
         booking_restaurant_attributes: [
-            :location, :reservation_datetime, :restaurant_name, :number_of_guests, :description
+            {location_attributes: [:name, :address, :maps_id]}, :reservation_datetime, :restaurant_name,
+            :number_of_guests, :description
         ],
         booking_custom_attributes: [
             :booking_details, :description

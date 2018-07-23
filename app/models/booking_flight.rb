@@ -28,9 +28,14 @@ class BookingFlight < ActiveRecord::Base
   belongs_to :from, class_name: 'Location'
   belongs_to :to, class_name: 'Location'
 
+  accepts_nested_attributes_for :from
+  accepts_nested_attributes_for :to
+  accepts_nested_attributes_for :cost
+
   validates :from, presence: true
   validates :to, presence: true
   validates :departure_datetime, presence: true
+
 
   def as_json(options={})
     {
