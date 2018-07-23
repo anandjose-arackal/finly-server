@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180719105712) do
+ActiveRecord::Schema.define(version: 20180723105055) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2725,6 +2725,18 @@ ActiveRecord::Schema.define(version: 20180719105712) do
     t.datetime "updated_at",             null: false
   end
 
+  create_table "level_reviewer_mappings", force: :cascade do |t|
+    t.integer  "level_id",    limit: 4
+    t.integer  "reviewer_id", limit: 4
+    t.decimal  "threshold",             precision: 20, scale: 5, default: 0.0
+    t.boolean  "exception",                                      default: false
+    t.datetime "created_at",                                                     null: false
+    t.datetime "updated_at",                                                     null: false
+  end
+
+  add_index "level_reviewer_mappings", ["level_id"], name: "index_level_reviewer_mappings_on_level_id", using: :btree
+  add_index "level_reviewer_mappings", ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id", using: :btree
+
   create_table "locations", force: :cascade do |t|
     t.integer  "locatable_id",   limit: 4
     t.string   "locatable_type", limit: 255
@@ -3557,6 +3569,7 @@ ActiveRecord::Schema.define(version: 20180719105712) do
     t.datetime "updated_at",                       null: false
     t.text     "source",             limit: 65535
     t.text     "source_description", limit: 65535
+    t.string   "referrer",           limit: 255
   end
 
   create_table "procurement_attachments", force: :cascade do |t|
@@ -4190,6 +4203,16 @@ ActiveRecord::Schema.define(version: 20180719105712) do
     t.text   "source",             limit: 65535
     t.text   "source_description", limit: 65535
   end
+
+  create_table "reviewal_levels", force: :cascade do |t|
+    t.integer  "level_number",           limit: 4
+    t.integer  "policy_id",              limit: 4
+    t.string   "associated_entity_type", limit: 255
+    t.datetime "created_at",                         null: false
+    t.datetime "updated_at",                         null: false
+  end
+
+  add_index "reviewal_levels", ["policy_id"], name: "index_reviewal_levels_on_policy_id", using: :btree
 
   create_table "rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -5278,6 +5301,7 @@ ActiveRecord::Schema.define(version: 20180719105712) do
   add_foreign_key "reports", "report_processor_group_mappings"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
+  add_foreign_key "reviewal_levels", "policies"
   add_foreign_key "tally_configurations", "companies"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"

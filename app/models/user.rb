@@ -184,6 +184,7 @@ class User < ActiveRecord::Base
   has_many :budgets, as: :budgetable
   # has_many :budgets, as: :budgetable
   has_many :procurements
+  has_many :level_reviewer_mappings
 
 
 
