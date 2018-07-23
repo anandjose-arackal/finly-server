@@ -59,6 +59,16 @@ class Mobile::V2::ReportsController < ApplicationController
     respond
   end
 
+  def destroy
+    @result = Report::Destroy.(current_user, params)
+    @result.config[:mobile_api] = true
+    if @result.success?
+      respond response: :success
+    else
+      respond response: :failure
+    end
+  end
+
   def comment
     if params[:content].present? and (params[:content] == "" or params[:content] == 'nil')
       params[:content] = nil
