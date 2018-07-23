@@ -681,7 +681,7 @@
 #                                                         PATCH  /money_request/:id(.:format)                                                                 money_request#update
 #                                                         PUT    /money_request/:id(.:format)                                                                 money_request#update
 #                                                         DELETE /money_request/:id(.:format)                                                                 money_request#destroy
-#                                              create_sso POST   /oauth/sso_login(.:format)                                                                   token#create_sso
+#                                              create_sso POST   /oauth/sso_login(.:format)                                                                   oauth/token#create_sso
 #                                   travel_request_review PATCH  /travel_requests/:travel_request_id/review(.:format)                                         travel_requests#review
 #                                         travel_requests GET    /travel_requests(.:format)                                                                   travel_requests#index
 #                                                         POST   /travel_requests(.:format)                                                                   travel_requests#create

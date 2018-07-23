@@ -27,28 +27,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
 
   # this method will handle the SSO Token decryption method of login and return the same tokens that the create action returns
   def create_sso
-    @user = User.find 18
-    binding_params = {user: @user, auth_grant: @auth_grant, token: @token}
-    view = ActionView::Base.new(ActionController::Base.view_paths, binding_params)
-    render json: JSON.parse(view.render(file: 'oauth/token/create_sso.json.jbuilder')), status: 200
 
-    # extracting the email from the params
-    data = params[:data]
-    if data.blank?
-      return
-    end
-    email, timestamp, request_encrypted_hash = extract_email_from_encrypted_data(data)
-    if email.blank? || timestamp.blank?
-      return
-    end
-    # now implementing the SHA512 for the email and timestamp with the given key to check if
-    # this particular user can be authenticated and logged into Finly
-    finly_encrypted_hash = sha512_encrypted_email(email, timestamp)
-    if finly_encrypted_hash == request_encrypted_hash
-      # i.e. this is a successful login attempt, generate token and return the
-      # access token and the refresh token for this particular user's login
-      # todo - generate access and refresh token
-    end
   end
 
   protected
@@ -136,25 +115,10 @@ class Oauth::TokenController < Doorkeeper::TokensController
         @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       elsif scopes.include?('admin')
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
+      elsif scopes.include?('darwinbox')
+        @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       end
     end
-  end
-
-  def extract_email_from_encrypted_data(data)
-    base64_decrypted = Base64.decode64(data)
-    xor_decoded = XorEncryptorDecryptor.encrypt_decrypt(base64_decrypted, Constants::XOR_KEY)
-    base64_decoded_again = Base64.decode64(xor_decoded)
-    parsed_payload = JSON.parse(base64_decoded_again)
-    email = parsed_payload["email"]
-    timestamp = parsed_payload["timestamp"]
-    request_encrypted_hash = parsed_payload["hash"]
-    [email, timestamp, request_encrypted_hash]
-  end
-
-  def sha512_encrypted_email(email, timestamp)
-    key = Constants::SHA512_KEY # extracting the encryption key for this particular company
-    concatenated_string = email.to_s + key.to_s + timestamp.to_s
-    encrypted_string = Digest::SHA512.hexdigest(concatenated_string)
   end
 
 end

@@ -13,14 +13,18 @@ Doorkeeper.configure do
 
   resource_owner_from_credentials do |routes|
     u = nil
+    scopes = params.dig(:scope)&.split(' ')
     if params[:username].blank? or params[:password].blank?
-      false
+      if params[:password].blank? && !(['darwinbox'].include?(scopes.first))
+        false
+      end
     else
-      scopes = params.dig(:scope)&.split(' ')
       if scopes.size == 1 and ['web', 'mobile', 'chrome', 'api'].include?(scopes.first)
         u = User.find_for_database_authentication(:username => params[:username])
       elsif (scopes.size == 1 and scopes.include?('admin')) or (scopes.include?('admin_bypass') and scopes.include?('web') and scopes.size == 2)
         u = AdminUser.find_for_database_authentication(:username => params[:username])
+      elsif scopes.size == 1 and ['darwinbox'].include?(scopes.first)
+        u = User.find_for_database_authentication(username: params[:username])
       end
       if u && u.valid_password?(params[:password])
         if scopes.include?('admin_bypass')
