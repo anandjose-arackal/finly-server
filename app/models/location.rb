@@ -21,7 +21,7 @@ class Location < ActiveRecord::Base
 
   default_scope { order(order: :asc) }
 
-  validates :order, presence: true
+  # validates :order, presence: true
 
   scope :with_id, -> (id) { where id: id }
   scope :with_order, -> (order){ where order: order }

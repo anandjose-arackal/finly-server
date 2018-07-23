@@ -22,13 +22,13 @@ class TravelRequests::BookingRequests::Create < TravelRequests::BookingRequests:
 
   def validate
     unless self.booking_request.valid?
-      add_message :error, self.booking_request.messages[:error]
+      add_message :error, self.booking_request.errors.full_messages
     end
   end
 
   def process
     unless self.booking_request.save
-      add_message :error, self.booking_request.messages[:error]
+      add_message :error, self.booking_request.errors.full_messages
     end
   end
 
