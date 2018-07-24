@@ -55,7 +55,7 @@ class TravelRequests::BookingRequests::Create < TravelRequests::BookingRequests:
         ],
         booking_hotel_attributes: [
             {location_attributes: [:name, :address, :latitude, :longitude, :maps_id]}, :checkin_datetime, :checkout_datetime,
-            :description
+            :number_of_guests, :description
         ],
         booking_restaurant_attributes: [
             {location_attributes: [:name, :address, :latitude, :longitude, :maps_id]}, :reservation_datetime, :restaurant_name,
@@ -65,52 +65,9 @@ class TravelRequests::BookingRequests::Create < TravelRequests::BookingRequests:
             :booking_details, :description
         ],
         travel_members_attributes: [
-            :title, :first_name, :middle_name, :last_name, :is_adult, :age, :email, :mobile_number, :gender
+            :title, :first_name, :last_name, :age, :email, :mobile_number, :gender
         ]
     )
   end
-
-  # def strong_params
-  #   params.require(:booking_request).permit(
-  #       :booking_type_id, :note,
-  #       booking_flight_attributes: [
-  #           :id, :journey_date, :journey_source, :journey_destination,
-  #           :booking_class, :start_time, :end_time, :stops
-  #       ],
-  #       booking_car_rental_attributes: [
-  #           :id, :journey_source, :journey_destination, :journey_date,
-  #           :pickup_time, :reservation_start_date, :reservation_end_date,
-  #           :start_time, :end_time,
-  #           :car_type, :pickup_time, :pickup_address
-  #       ],
-  #       booking_train_attributes: [
-  #           :id, :booking_class,
-  #           :journey_source, :journey_destination, :journey_date,
-  #           :start_time, :end_time,
-  #       ],
-  #       booking_bus_attributes: [
-  #           :id, :booking_class,
-  #           :journey_source, :journey_destination, :journey_date,
-  #           :start_time, :end_time,
-  #       ],
-  #       booking_hotel_attributes: [
-  #           :id, :hotel_rating,
-  #           :reservation_start_date, :reservation_end_date, :reservation_destination,
-  #           :start_time, :end_time,
-  #       ],
-  #       booking_restaurant_attributes: [
-  #           :id, :restaurant_rating,
-  #           :reservation_destination, :reservation_time, :reservation_date, :restaurant_name,
-  #           :start_time, :end_time,
-  #       ],
-  #       booking_custom_attributes: [
-  #           :id, :journey_source, :journey_destination, :journey_date,
-  #           :start_time, :end_time,
-  #       ],
-  #       travel_members_attributes: [
-  #           :id, :title, :first_name, :middle_name, :last_name, :child, :age, :email, :mobile_number, :gender, :_destroy
-  #       ]
-  #   )
-  # end
 
 end

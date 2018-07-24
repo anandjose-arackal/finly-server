@@ -24,6 +24,11 @@ class BookingHotel < ActiveRecord::Base
   belongs_to :cost, class_name: 'Amount', dependent: :destroy
   belongs_to :location, dependent: :destroy
 
+  accepts_nested_attributes_for :location
+  accepts_nested_attributes_for :cost
+
+  validates :location, presence: true
+
   def as_json(options = {})
     {
         id: id,

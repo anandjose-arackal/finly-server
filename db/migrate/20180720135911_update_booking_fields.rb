@@ -79,6 +79,7 @@ class UpdateBookingFields < ActiveRecord::Migration
     add_column :booking_hotels, :checkout_datetime, :datetime
     add_column :booking_hotels, :description, :text
     add_column :booking_hotels, :hotel_address, :text
+    add_column :booking_hotels, :number_of_guests, :integer
     add_column :booking_hotels, :cost_id, :integer, references: 'Amount', index: true, foreign_key: true
 
     add_column :booking_restaurants, :location_id,:integer, references: 'Location', index: true, foreign_key: true, null: false
