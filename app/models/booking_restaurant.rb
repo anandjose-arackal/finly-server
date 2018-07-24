@@ -22,13 +22,19 @@ class BookingRestaurant < ActiveRecord::Base
   belongs_to :parent, polymorphic: true
   belongs_to :location, dependent: :destroy
 
+  accepts_nested_attributes_for :location
+
+  validates :location, presence: true
+  validates :restaurant_name, presence: true
+  validates :number_of_guests, presence: true
+
   def as_json(options={})
     {
         id: id,
         restaurant_name: restaurant_name,
         location: location,
         restaurant_address: restaurant_address,
-        reservation_datetime: reservation_datetime,
+        reservation_datetime: DateUtils.datetime_formatted(reservation_datetime),
         number_of_guests: number_of_guests,
         description: description
     }
