@@ -1,6 +1,6 @@
 class UpdateBookingFields < ActiveRecord::Migration
   def change
-    remove_column :booking_flights, :booking_class
+    # remove_column :booking_flights, :booking_class
     remove_column :booking_flights, :departure_date
     remove_column :booking_flights, :journey_destination
     remove_column :booking_flights, :journey_source
