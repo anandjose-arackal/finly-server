@@ -16,6 +16,7 @@
 #  boarding_point     :text(65535)
 #  drop_point         :text(65535)
 #  description        :text(65535)
+#  is_deleted         :boolean          default(FALSE)
 #
 
 require 'test_helper'

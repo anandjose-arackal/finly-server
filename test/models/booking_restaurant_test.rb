@@ -13,6 +13,7 @@
 #  reservation_datetime :datetime
 #  number_of_guests     :integer
 #  description          :text(65535)
+#  is_deleted           :boolean          default(FALSE)
 #
 
 require 'test_helper'

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180723080258) do
+ActiveRecord::Schema.define(version: 20180724052150) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -741,9 +741,9 @@ ActiveRecord::Schema.define(version: 20180723080258) do
     t.integer  "parent_id",           limit: 4
     t.string   "parent_type",         limit: 255
     t.string   "booking_class",       limit: 255
-    t.integer  "boarding_city_id",    limit: 4,                   null: false
+    t.integer  "from_id",             limit: 4,                   null: false
     t.string   "boarding_station",    limit: 255
-    t.integer  "destination_city_id", limit: 4,                   null: false
+    t.integer  "to_id",               limit: 4,                   null: false
     t.string   "destination_station", limit: 255
     t.datetime "departure_datetime"
     t.datetime "arrival_datetime"

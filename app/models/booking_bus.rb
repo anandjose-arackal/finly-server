@@ -16,6 +16,7 @@
 #  boarding_point     :text(65535)
 #  drop_point         :text(65535)
 #  description        :text(65535)
+#  is_deleted         :boolean          default(FALSE)
 #
 
 class BookingBus < ActiveRecord::Base
@@ -26,13 +27,21 @@ class BookingBus < ActiveRecord::Base
   belongs_to :from, class_name: 'Location', dependent: :destroy
   belongs_to :to, class_name: 'Location', dependent: :destroy
 
+  accepts_nested_attributes_for :from
+  accepts_nested_attributes_for :to
+  accepts_nested_attributes_for :cost
+
+  validates :from, presence: true
+  validates :to, presence: true
+  validates :departure_datetime, presence: true
+
   def as_json(options = {})
     {
         id: id,
         booking_class: booking_class,
         from: from,
         to: to,
-        departure_datetime: departure_datetime,
+        departure_datetime: DateUtils.datetime_formatted(departure_datetime),
         arrival_datetime: arrival_datetime,
         cost: cost,
         boarding_point: boarding_point,

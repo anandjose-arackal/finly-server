@@ -10,15 +10,16 @@
 #  parent_id           :integer
 #  parent_type         :string(255)
 #  booking_class       :string(255)
-#  boarding_city_id    :integer          not null
+#  from_id             :integer          not null
 #  boarding_station    :string(255)
-#  destination_city_id :integer          not null
+#  to_id               :integer          not null
 #  destination_station :string(255)
 #  departure_datetime  :datetime
 #  arrival_datetime    :datetime
 #  description         :string(255)
 #  seat_number         :string(255)
 #  cost_id             :integer
+#  is_deleted          :boolean          default(FALSE)
 #
 
 class BookingTrain < ActiveRecord::Base
@@ -26,8 +27,16 @@ class BookingTrain < ActiveRecord::Base
 
   belongs_to :parent, polymorphic: true
   belongs_to :cost, class_name: 'Amount', dependent: :destroy
-  belongs_to :boarding_city, class_name: 'Location', dependent: :destroy
-  belongs_to :destination_city, class_name: 'Location', dependent: :destroy
+  belongs_to :from, class_name: 'Location', dependent: :destroy
+  belongs_to :to, class_name: 'Location', dependent: :destroy
+
+  accepts_nested_attributes_for :from
+  accepts_nested_attributes_for :to
+  accepts_nested_attributes_for :cost
+
+  validates :from, presence: true
+  validates :to, presence: true
+  validates :departure_datetime, presence: true
 
   def as_json(options={})
     {
@@ -35,11 +44,11 @@ class BookingTrain < ActiveRecord::Base
         train_number: train_number,
         pnr: pnr,
         booking_class: booking_class,
-        boarding_city: boarding_city,
+        from: from,
         boarding_station: boarding_station,
-        destination_city: destination_city,
+        to: to,
         destination_station: destination_station,
-        departure_datetime: departure_datetime,
+        departure_datetime: DateUtils.datetime_formatted(departure_datetime),
         arrival_datetime: arrival_datetime,
         description: description,
         seat_number: seat_number,

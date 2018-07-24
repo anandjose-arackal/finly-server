@@ -10,15 +10,16 @@
 #  parent_id           :integer
 #  parent_type         :string(255)
 #  booking_class       :string(255)
-#  boarding_city_id    :integer          not null
+#  from_id             :integer          not null
 #  boarding_station    :string(255)
-#  destination_city_id :integer          not null
+#  to_id               :integer          not null
 #  destination_station :string(255)
 #  departure_datetime  :datetime
 #  arrival_datetime    :datetime
 #  description         :string(255)
 #  seat_number         :string(255)
 #  cost_id             :integer
+#  is_deleted          :boolean          default(FALSE)
 #
 
 require 'test_helper'

@@ -19,6 +19,7 @@
 #  terminal           :string(255)
 #  cost_id            :integer
 #  booking_class_id   :integer
+#  is_deleted         :boolean          default(FALSE)
 #
 
 require 'test_helper'

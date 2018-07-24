@@ -14,6 +14,7 @@
 #  description       :text(65535)
 #  hotel_address     :text(65535)
 #  cost_id           :integer
+#  is_deleted        :boolean          default(FALSE)
 #
 
 require 'test_helper'

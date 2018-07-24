@@ -10,6 +10,7 @@
 #  booking_details :text(65535)
 #  description     :text(65535)
 #  cost_id         :integer
+#  is_deleted      :boolean          default(FALSE)
 #
 
 class BookingCustom < ActiveRecord::Base
