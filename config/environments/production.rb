@@ -10,6 +10,28 @@ Rails.application.configure do
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
   config.logstasher.enabled = true
+  config.lograge.enabled = true
+  # config.lograge.keep_original_rails_log = true
+
+  config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/lograge_#{Rails.env}.log"
+
+  config.lograge.custom_payload do |controller|
+    user = controller.current_user rescue nil
+    hash = {}
+    if user.present?
+      hash[:user_id] = user&.id
+      hash[:user_name] = (user&.name rescue nil)
+      hash[:user_email] = user&.email
+      hash[:user_mobile_number] = user&.mobile_number
+      hash[:current_app] = current_app
+      hash[:current_device] = current_device
+      hash[:company_name] = (current_company&.name rescue nil)
+      hash[:company_id] = (current_company&.id rescue nil)
+      view = (params&.dig(:view) rescue nil)
+      hash[:current_view] = view
+    end
+    hash
+  end
 
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
