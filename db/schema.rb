@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180720124958) do
+ActiveRecord::Schema.define(version: 20180724042223) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1240,6 +1240,7 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.string   "registered_mobile_number",         limit: 255
     t.string   "bank_type",                        limit: 255
     t.integer  "default_card_expense_category_id", limit: 4
+    t.boolean  "darwinbox_sso_enabled",                          default: false
   end
 
   add_index "company_configurations", ["company_id"], name: "index_company_configurations_on_company_id", using: :btree
@@ -2095,22 +2096,23 @@ ActiveRecord::Schema.define(version: 20180720124958) do
   end
 
   create_table "finly_transactions", force: :cascade do |t|
-    t.integer  "finly_account_id",            limit: 4,   null: false
-    t.string   "finly_account_type",          limit: 255, null: false
-    t.integer  "transaction_type_id",         limit: 4,   null: false
-    t.integer  "amount_id",                   limit: 4,   null: false
-    t.string   "transaction_reference_id",    limit: 255, null: false
-    t.integer  "status_id",                   limit: 4,   null: false
-    t.integer  "payment_purpose_id",          limit: 4,   null: false
-    t.integer  "opening_balance_id",          limit: 4
-    t.integer  "closing_balance_id",          limit: 4
-    t.integer  "associated_transaction_id",   limit: 4
-    t.string   "associated_transaction_type", limit: 255
-    t.integer  "payment_id",                  limit: 4
-    t.integer  "company_id",                  limit: 4
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
+    t.integer  "finly_account_id",               limit: 4,   null: false
+    t.string   "finly_account_type",             limit: 255, null: false
+    t.integer  "transaction_type_id",            limit: 4,   null: false
+    t.integer  "amount_id",                      limit: 4,   null: false
+    t.string   "transaction_reference_id",       limit: 255, null: false
+    t.integer  "status_id",                      limit: 4,   null: false
+    t.integer  "payment_purpose_id",             limit: 4,   null: false
+    t.integer  "opening_balance_id",             limit: 4
+    t.integer  "closing_balance_id",             limit: 4
+    t.integer  "associated_transaction_id",      limit: 4
+    t.string   "associated_transaction_type",    limit: 255
+    t.integer  "payment_id",                     limit: 4
+    t.integer  "company_id",                     limit: 4
+    t.datetime "created_at",                                 null: false
+    t.datetime "updated_at",                                 null: false
     t.datetime "date"
+    t.integer  "original_payment_for_refund_id", limit: 4
   end
 
   add_index "finly_transactions", ["amount_id"], name: "index_finly_transactions_on_amount_id", using: :btree
@@ -3175,38 +3177,39 @@ ActiveRecord::Schema.define(version: 20180720124958) do
   end
 
   create_table "payments", force: :cascade do |t|
-    t.integer  "amount_id",               limit: 4,                     null: false
-    t.date     "date",                                                  null: false
-    t.integer  "payment_type_id",         limit: 4,                     null: false
-    t.integer  "initiating_user_id",      limit: 4
-    t.integer  "receiving_user_id",       limit: 4
-    t.text     "note",                    limit: 65535
-    t.datetime "created_at",                                            null: false
-    t.datetime "updated_at",                                            null: false
-    t.integer  "initiating_account_id",   limit: 4
-    t.string   "initiating_account_type", limit: 255
-    t.integer  "receiving_account_id",    limit: 4
-    t.string   "receiving_account_type",  limit: 255
-    t.integer  "payment_order_id",        limit: 4
-    t.integer  "payment_status_id",       limit: 4,                     null: false
-    t.string   "initiating_user_type",    limit: 255
-    t.string   "receiving_user_type",     limit: 255
-    t.integer  "payment_purpose_id",      limit: 4
-    t.integer  "reference_resource_id",   limit: 4
-    t.string   "reference_resource_type", limit: 255
-    t.string   "application",             limit: 255
-    t.string   "payment_mode",            limit: 255
-    t.string   "reference_id",            limit: 255,                   null: false
-    t.integer  "retry_count",             limit: 4,     default: 0
-    t.integer  "invoice_id",              limit: 4
-    t.string   "parent_type",             limit: 255
-    t.integer  "parent_id",               limit: 4
-    t.text     "post_operation",          limit: 65535
-    t.text     "post_operation_payload",  limit: 65535
-    t.integer  "category_id",             limit: 4
-    t.boolean  "api_initiated",                         default: false
+    t.integer  "amount_id",                      limit: 4,                     null: false
+    t.date     "date",                                                         null: false
+    t.integer  "payment_type_id",                limit: 4,                     null: false
+    t.integer  "initiating_user_id",             limit: 4
+    t.integer  "receiving_user_id",              limit: 4
+    t.text     "note",                           limit: 65535
+    t.datetime "created_at",                                                   null: false
+    t.datetime "updated_at",                                                   null: false
+    t.integer  "initiating_account_id",          limit: 4
+    t.string   "initiating_account_type",        limit: 255
+    t.integer  "receiving_account_id",           limit: 4
+    t.string   "receiving_account_type",         limit: 255
+    t.integer  "payment_order_id",               limit: 4
+    t.integer  "payment_status_id",              limit: 4,                     null: false
+    t.string   "initiating_user_type",           limit: 255
+    t.string   "receiving_user_type",            limit: 255
+    t.integer  "payment_purpose_id",             limit: 4
+    t.integer  "reference_resource_id",          limit: 4
+    t.string   "reference_resource_type",        limit: 255
+    t.string   "application",                    limit: 255
+    t.string   "payment_mode",                   limit: 255
+    t.string   "reference_id",                   limit: 255,                   null: false
+    t.integer  "retry_count",                    limit: 4,     default: 0
+    t.integer  "invoice_id",                     limit: 4
+    t.string   "parent_type",                    limit: 255
+    t.integer  "parent_id",                      limit: 4
+    t.text     "post_operation",                 limit: 65535
+    t.text     "post_operation_payload",         limit: 65535
+    t.integer  "category_id",                    limit: 4
+    t.boolean  "api_initiated",                                default: false
     t.date     "scheduled_at"
     t.date     "processed_at"
+    t.integer  "original_payment_for_refund_id", limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
