@@ -98,6 +98,17 @@ class TravelRequests::Show < TravelRequests::Base
       false
     end
 
+    def grouped_requests(destination)
+      val = {}
+      destination.booking_requests.each do |booking_request|
+        if val[booking_request.booking_type_id].nil?
+          val[booking_request.booking_type_id] = []
+        end
+        val[booking_request.booking_type_id] << booking_request
+      end
+      val
+    end
+
   end
 
 end

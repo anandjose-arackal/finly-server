@@ -14,7 +14,7 @@ end
 json.destinations do
   json.array! @result.destinations do |destination|
     json.extract! destination, :id, :location
-    json.booking_requests destination.booking_requests
+    json.booking_requests @result.grouped_requests(destination)
   end
 end
 

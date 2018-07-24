@@ -39,6 +39,9 @@ class BookingRequest < ActiveRecord::Base
 
   accepts_nested_attributes_for :travel_members, allow_destroy: true
 
+  scope :sort_by_type, -> { order booking_type_id: :asc }
+  scope :group_by_type, -> { group :booking_type_id }
+
   delegate :flight?, :train?, :bus?, :car_rental?, :hotel?, :restaurant?, to: :booking_type
 
   # validates :booking_type_id, presence: true
