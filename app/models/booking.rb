@@ -32,7 +32,7 @@ class Booking < ActiveRecord::Base
   has_one :booking_hotel, as: :parent, dependent: :destroy
   has_one :booking_restaurant, as: :parent, dependent: :destroy
   has_one :booking_train, as: :parent, dependent: :destroy
-  has_one :booking_custom, as: :parent, dependent: :destroy
+  has_one :booking_other, as: :parent, dependent: :destroy
 
   accepts_nested_attributes_for :booking_car_rental, allow_destroy: true
   accepts_nested_attributes_for :booking_bus, allow_destroy: true
@@ -40,7 +40,7 @@ class Booking < ActiveRecord::Base
   accepts_nested_attributes_for :booking_hotel, allow_destroy: true
   accepts_nested_attributes_for :booking_restaurant, allow_destroy: true
   accepts_nested_attributes_for :booking_train, allow_destroy: true
-  accepts_nested_attributes_for :booking_custom, allow_destroy: true
+  accepts_nested_attributes_for :booking_other, allow_destroy: true
   accepts_nested_attributes_for :travel_members, allow_destroy: true
 
 

@@ -13,7 +13,7 @@
 #  is_deleted      :boolean          default(FALSE)
 #
 
-class BookingCustom < ActiveRecord::Base
+class BookingOther < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :parent, polymorphic: true

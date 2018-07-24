@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180724052150) do
+ActiveRecord::Schema.define(version: 20180724143410) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -638,19 +638,6 @@ ActiveRecord::Schema.define(version: 20180724052150) do
 
   add_index "booking_car_rentals", ["parent_type", "parent_id"], name: "index_booking_car_rentals_on_parent_type_and_parent_id", using: :btree
 
-  create_table "booking_customs", force: :cascade do |t|
-    t.integer  "parent_id",       limit: 4
-    t.string   "parent_type",     limit: 255
-    t.datetime "created_at",                                    null: false
-    t.datetime "updated_at",                                    null: false
-    t.text     "booking_details", limit: 65535
-    t.text     "description",     limit: 65535
-    t.integer  "cost_id",         limit: 4
-    t.boolean  "is_deleted",                    default: false
-  end
-
-  add_index "booking_customs", ["parent_type", "parent_id"], name: "index_booking_customs_on_parent_type_and_parent_id", using: :btree
-
   create_table "booking_flight_classes", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
     t.datetime "created_at",             null: false
@@ -694,9 +681,23 @@ ActiveRecord::Schema.define(version: 20180724052150) do
     t.text     "hotel_address",     limit: 65535
     t.integer  "cost_id",           limit: 4
     t.boolean  "is_deleted",                      default: false
+    t.integer  "number_of_guests",  limit: 4
   end
 
   add_index "booking_hotels", ["parent_type", "parent_id"], name: "index_booking_hotels_on_parent_type_and_parent_id", using: :btree
+
+  create_table "booking_others", force: :cascade do |t|
+    t.integer  "parent_id",       limit: 4
+    t.string   "parent_type",     limit: 255
+    t.datetime "created_at",                                    null: false
+    t.datetime "updated_at",                                    null: false
+    t.text     "booking_details", limit: 65535
+    t.text     "description",     limit: 65535
+    t.integer  "cost_id",         limit: 4
+    t.boolean  "is_deleted",                    default: false
+  end
+
+  add_index "booking_others", ["parent_type", "parent_id"], name: "index_booking_others_on_parent_type_and_parent_id", using: :btree
 
   create_table "booking_requests", force: :cascade do |t|
     t.integer  "booking_status_id",             limit: 4

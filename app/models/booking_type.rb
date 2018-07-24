@@ -12,7 +12,7 @@ class BookingType < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:flight, :car_rental, :bus, :train, :hotel, :restaurant]
+    [:flight, :car_rental, :bus, :train, :hotel, :restaurant, :others]
   end
 
   def flight?

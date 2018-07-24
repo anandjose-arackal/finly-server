@@ -27,7 +27,7 @@ class BookingRequest < ActiveRecord::Base
   has_one :booking_hotel, as: :parent, dependent: :destroy
   has_one :booking_restaurant, as: :parent, dependent: :destroy
   has_one :booking_train, as: :parent, dependent: :destroy
-  has_one :booking_custom, as: :parent, dependent: :destroy
+  has_one :booking_other, as: :parent, dependent: :destroy
 
   accepts_nested_attributes_for :booking_car_rental, allow_destroy: true
   accepts_nested_attributes_for :booking_bus, allow_destroy: true
@@ -35,7 +35,7 @@ class BookingRequest < ActiveRecord::Base
   accepts_nested_attributes_for :booking_hotel, allow_destroy: true
   accepts_nested_attributes_for :booking_restaurant, allow_destroy: true
   accepts_nested_attributes_for :booking_train, allow_destroy: true
-  accepts_nested_attributes_for :booking_custom, allow_destroy: true
+  accepts_nested_attributes_for :booking_other, allow_destroy: true
 
   accepts_nested_attributes_for :travel_members, allow_destroy: true
 
@@ -64,7 +64,7 @@ class BookingRequest < ActiveRecord::Base
         booking_hotel: booking_hotel,
         booking_restaurant: booking_restaurant,
         booking_train: booking_train,
-        booking_custom: booking_custom
+        booking_other: booking_other
     }
   end
 
@@ -97,7 +97,7 @@ class BookingRequest < ActiveRecord::Base
         errors.add(:booking_request, "needs to have an associated car rental booking")
       end
     when BookingType.id_for(:custom)
-      if self.booking_custom.nil?
+      if self.booking_other.nil?
         errors.add(:booking_request, "needs to have an associated custom booking")
       end
     else
