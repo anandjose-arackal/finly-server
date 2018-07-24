@@ -12,23 +12,26 @@ Rails.application.configure do
   config.logstasher.enabled = true
   config.lograge.enabled = true
   # config.lograge.keep_original_rails_log = true
+  # config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/lograge_#{Rails.env}.log"
+  config.lograge.custom_options = lambda do |event|
+    {
+        exception: event.payload[:exception], # ["ExceptionClass", "the message"]
+        exception_object: event.payload[:exception_object] # the exception instance
+    }
+  end
 
-  config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/lograge_#{Rails.env}.log"
 
   config.lograge.custom_payload do |controller|
-    user = controller.current_user rescue nil
-    hash = {}
+    user = controller.current_user
+    hash = {params: controller.params, current_app: controller.current_app, current_device: controller.current_device}
     if user.present?
       hash[:user_id] = user&.id
       hash[:user_name] = (user&.name rescue nil)
       hash[:user_email] = user&.email
       hash[:user_mobile_number] = user&.mobile_number
-      hash[:current_app] = current_app
-      hash[:current_device] = current_device
-      hash[:company_name] = (current_company&.name rescue nil)
-      hash[:company_id] = (current_company&.id rescue nil)
-      view = (params&.dig(:view) rescue nil)
-      hash[:current_view] = view
+      hash[:company_name] = (controller.current_company&.name rescue nil)
+      hash[:company_id] = (controller.current_company&.id rescue nil)
+      hash[:current_view] = (controller.params&.dig(:view) rescue nil)
     end
     hash
   end
