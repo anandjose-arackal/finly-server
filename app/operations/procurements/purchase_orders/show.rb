@@ -38,19 +38,33 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     def get_actions
       actions = {}
 
-
       if document_owner? && (self.purchase_order.open? || self.purchase_order.retracted? || self.purchase_order.rejected?)
-        actions[:submit] = {url: Rails.application.routes.url_helpers.procure_purchase_order_submit_path(purchase_order_id: purchase_order.id)}
+        actions[:submit] = {
+            url: Rails.application.routes.url_helpers.procure_purchase_order_submit_path(purchase_order_id: purchase_order.id),
+            method: "PUT"
+        }
       end
 
       if purchase_order.approved? && (user_in_level? || document_owner?)
-        actions[:send_mail] = {url: Rails.application.routes.url_helpers.procure_configs_send_mail_path}
-        actions[:close] = {url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id)}
+        actions[:send_mail] = {
+            url: Rails.application.routes.url_helpers.procure_configs_send_mail_path,
+            method: "PUT"
+        }
+        actions[:close] = {
+            url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
+            method: "PUT"
+        }
       end
 
       if user_in_level? && purchase_order.processing?
-        actions[:approve] = {url: Rails.application.routes.url_helpers.procure_purchase_order_approve_path(purchase_order_id: purchase_order.id)}
-        actions[:reject] = {url: Rails.application.routes.url_helpers.procure_purchase_order_reject_path(purchase_order_id: purchase_order.id)}
+        actions[:approve] = {
+            url: Rails.application.routes.url_helpers.procure_purchase_order_approve_path(purchase_order_id: purchase_order.id),
+            method: "PUT"
+        }
+        actions[:reject] = {
+            url: Rails.application.routes.url_helpers.procure_purchase_order_reject_path(purchase_order_id: purchase_order.id),
+            method: "PUT"
+        }
       end
 
       actions
