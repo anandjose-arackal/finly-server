@@ -52,8 +52,7 @@ class YesBankApi::Base < BaseHandler
   def process
     p = self.path
     begin
-      puts "Posting Path: #{p}"
-      puts "Post Params: #{self.template}"
+      Sidekiq.logger.info({path: p , params: self.template})
 
       self.response = self.connection.post do |req|
         req.url p
@@ -220,7 +219,7 @@ class YesBankApi::Base < BaseHandler
         client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
         verify: verify
     }
-    logger = Logger.new $stderr
+    logger = Sidekiq.logger
     logger.level = Logger::INFO
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|
       # builder.use Faraday::Request::UrlEncoded
