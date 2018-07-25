@@ -48,6 +48,14 @@ class YesBankApi::Base < BaseHandler
     end
   end
 
+  def file_logger_base_params
+    {}
+  end
+
+   def file_logger_params(logger_params)
+     file_logger_base_params.merge logger_params
+   end
+
   # because this is common for all Yes Bank API calls
   def process
     p = self.path
@@ -63,9 +71,9 @@ class YesBankApi::Base < BaseHandler
       post_params_hash = (Hash.from_xml(template) rescue nil)
       response_hash = (Hash.from_xml(self.response.body) rescue nil)
       status_code = self.response.status rescue nil
-      file_logger.info({path: p, post_params: post_params_hash, response: response_hash, status: status_code, success: true})
+      file_logger.info(file_logger_params({path: p, post_params: post_params_hash, response: response_hash, status: status_code, success: true}))
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
-      file_logger.warn({path: p, post_params: post_params_hash, success: false, failure_reason: 'Timeout'})
+      file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, failure_reason: 'Timeout'}))
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
@@ -204,7 +212,7 @@ class YesBankApi::Base < BaseHandler
       #     }
       # }
     rescue Faraday::ResourceNotFound
-      file_logger.warn({path: p, post_params: post_params_hash, success: false, failure_reason: 'Resource Not Found'})
+      file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, failure_reason: 'Resource Not Found'}))
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
@@ -213,7 +221,7 @@ class YesBankApi::Base < BaseHandler
       e.backtrace.each do |line|
         stack_trace += "\n#{line}"
       end
-      file_logger.warn({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false})
+      file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false}))
     end
   end
 

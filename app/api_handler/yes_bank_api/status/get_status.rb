@@ -21,6 +21,16 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
     'get_status'
   end
 
+  def file_logger_base_params
+    {
+        company_id: params&.dig(:company_id),
+        company_name: Company.find_by(id: params&.dig(:company_id))&.name,
+        unique_reference_number: params&.dig(:unique_request_number),
+        transfer_type: params&.dig(:transfer_type),
+        action: 'get_status'
+    }
+  end
+
   def pre_validate
     if params.blank?
       add_message :error, "Invalid parameters"
