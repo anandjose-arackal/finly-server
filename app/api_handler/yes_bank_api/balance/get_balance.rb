@@ -20,7 +20,7 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
   end
 
   def file_logger_base_params
-    {company_id: self.company&.id, company_name: self.company&.name}
+    {company_id: self.company&.id, company_name: self.company&.name, action: 'get_balance'}
   end
 
   def pre_validate

@@ -23,7 +23,9 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
   end
 
   def file_logger_base_params
-    self.transfer_request.as_json
+    request = self.transfer_request.as_json
+    request[:action] = 'bank_transfer'
+    request
   end
 
   def pre_validate
