@@ -681,6 +681,7 @@
 #                                                         PATCH  /money_request/:id(.:format)                                                                 money_request#update
 #                                                         PUT    /money_request/:id(.:format)                                                                 money_request#update
 #                                                         DELETE /money_request/:id(.:format)                                                                 money_request#destroy
+#                                              create_sso POST   /oauth/sso_login(.:format)                                                                   oauth/token#create_sso
 #                                   travel_request_review PATCH  /travel_requests/:travel_request_id/review(.:format)                                         travel_requests#review
 #                                         travel_requests GET    /travel_requests(.:format)                                                                   travel_requests#index
 #                                                         POST   /travel_requests(.:format)                                                                   travel_requests#create
@@ -2384,6 +2385,10 @@ end
     post 'comment' => 'money_request#comment', as: :comment
   end
 
+  ############ Darwinbox SSO LOGIN APIs START ####################
+  post 'oauth/sso_login', to: 'darwinbox_sso/token#create', as: :darwinbox_create_sso
+  ######################################################
+
 
   ######################### TRAVEL REQUESTS API START ##########################
 
@@ -2866,9 +2871,6 @@ end
       get 'show_credit_account', to: 'company_configurations#show_credit_account'
 
       # resources :company_branches
-
-
-
     end
     get 'inventory_line_items/count', to: 'inventory_line_items#count', as: :inventory_line_items_count
     resources :inventory_line_items

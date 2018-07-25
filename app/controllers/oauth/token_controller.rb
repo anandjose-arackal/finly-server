@@ -25,6 +25,7 @@ class Oauth::TokenController < Doorkeeper::TokensController
     handle_token_exception e
   end
 
+
   protected
   def verify_company_status(user)
     company = user&.company rescue nil
@@ -110,6 +111,8 @@ class Oauth::TokenController < Doorkeeper::TokensController
         @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       elsif scopes.include?('admin')
         @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
+      elsif scopes.include?('darwinbox')
+        @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
       end
     end
   end
