@@ -19,6 +19,10 @@ class YesBankApi::Balance::GetBalance < YesBankApi::Base
     'get_balance'
   end
 
+  def file_logger_base_params
+    {company_id: self.company&.id, company_name: self.company&.name, action: 'get_balance'}
+  end
+
   def pre_validate
     if self.company.blank?
       add_message :error, "Invalid parameters"

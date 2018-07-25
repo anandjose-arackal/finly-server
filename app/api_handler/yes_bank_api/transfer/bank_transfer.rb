@@ -22,6 +22,12 @@ class YesBankApi::Transfer::BankTransfer < YesBankApi::Base
     'transfer'
   end
 
+  def file_logger_base_params
+    request = self.transfer_request.as_json
+    request[:action] = 'bank_transfer'
+    request
+  end
+
   def pre_validate
     if transfer_request.blank?
       add_message :error, "Invalid parameters"
