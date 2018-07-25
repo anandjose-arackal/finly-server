@@ -51,7 +51,7 @@ class YesBankApi::Base < BaseHandler
   # because this is common for all Yes Bank API calls
   def process
     p = self.path
-    file_logger = LogStashLogger.new(type: :file, path: 'log/yes_bank_api.log', sync: true)
+    file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_yes_bank_api.log', sync: true)
     begin
       self.response = self.connection.post do |req|
         req.url p

@@ -19,7 +19,7 @@ class BalanceMsgQueuePoller
     # initializing the log file that will hold the errors if necessary
     error_logger = Logger.new("#{Rails.root}/log/balance_msg_queue_errors.log")
     poller = Aws::SQS::QueuePoller.new(queue_url, {client: sqs_client})
-    file_logger = LogStashLogger.new(type: :file, path: 'log/transaction_poller.log', sync: true)
+    file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_balance_poller.log', sync: true)
 
     ######################## AWS Code to extract the messages from the queue ###################
 
