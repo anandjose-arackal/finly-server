@@ -40,7 +40,7 @@ class BalanceMsgQueuePoller
         @result = Card::Balance::Update.(balance_update_params)
 
         log_params[:operation_success] = true
-        file_logger.warn(log_params)
+        file_logger.info(log_params)
 
       rescue => error
         error_logger.error("Following history entry : #{message.body} couldn't be created because of the following errors: #{error.message}")

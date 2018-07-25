@@ -65,7 +65,7 @@ class YesBankApi::Base < BaseHandler
       status_code = self.response.status rescue nil
       file_logger.info({path: p, post_params: post_params_hash, response: response_hash, status: status_code, success: true})
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
-      file_logger.info({path: p, post_params: post_params_hash, success: false, failure_reason: 'Timeout'})
+      file_logger.warn({path: p, post_params: post_params_hash, success: false, failure_reason: 'Timeout'})
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
@@ -204,7 +204,7 @@ class YesBankApi::Base < BaseHandler
       #     }
       # }
     rescue Faraday::ResourceNotFound
-      file_logger.info({path: p, post_params: post_params_hash, success: false, failure_reason: 'Resource Not Found'})
+      file_logger.warn({path: p, post_params: post_params_hash, success: false, failure_reason: 'Resource Not Found'})
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
@@ -213,7 +213,7 @@ class YesBankApi::Base < BaseHandler
       e.backtrace.each do |line|
         stack_trace += "\n#{line}"
       end
-      file_logger.info({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false})
+      file_logger.warn({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false})
     end
   end
 

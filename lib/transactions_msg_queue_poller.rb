@@ -180,7 +180,7 @@ class TransactionsMsgQueuePoller
       elsif @result&.success? and @result&.transaction.present?
 
         log_params[:operation_success] = true
-        file_logger.warn(log_params)
+        file_logger.info(log_params)
 
       end
     end
