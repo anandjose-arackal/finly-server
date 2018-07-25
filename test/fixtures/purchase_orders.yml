@@ -37,6 +37,7 @@
 #  controlling_for_user_id      :integer
 #  controlling_for_user_role_id :integer
 #  policy_id                    :integer
+#  controlling_level_id         :integer
 #
 
 # Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html

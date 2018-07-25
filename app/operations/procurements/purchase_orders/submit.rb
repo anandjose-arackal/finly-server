@@ -13,9 +13,16 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
   end
 
   def process
-    params[:purchase_order] = self.purchase_order
+    params[:document] = self.purchase_order
     params[:aasm_event] = 'submit'
     params[:violation_present] = false
-    op = WorkflowManager::PurchaseOrder.(current_user, params)
+    op = WorkflowManager::Base.(current_user, params)
+    unless op.success?
+      add_message :error, op.messages[:error]
+    end
+  end
+
+  def post_process
+    add_message :success, 'Successfully submitted purchase order'
   end
 end

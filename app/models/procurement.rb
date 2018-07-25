@@ -34,4 +34,6 @@ class Procurement < ActiveRecord::Base
   has_many :status_tags, through: :procurement_status_taggables
 
   default_scope { order(updated_at: :desc) }
+
+  scope :with_ids, -> (ids) {where id: ids}
 end

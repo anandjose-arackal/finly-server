@@ -30,4 +30,19 @@ class Procure::PurchaseOrdersController < ApplicationController
     @result = Procurements::PurchaseOrders::Submit.(current_user, params)
     respond
   end
+
+  def approve
+    @result = Procurements::PurchaseOrders::Approve.(current_user, params)
+    respond
+  end
+
+  def reject
+    @result = Procurements::PurchaseOrders::Reject.(current_user, params)
+    respond
+  end
+
+  def close
+    @result = Procurements::PurchaseOrders::Close.(current_user, params)
+    respond
+  end
 end

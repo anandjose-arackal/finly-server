@@ -3,18 +3,18 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
   #
 
   include AASM
-  attr_accessor :po_state, :purchase_order, :user, :violations_present
+  attr_accessor :po_state, :purchase_order, :user, :violations_present, :policy, :next_level
 
   def initialize(purchase_order, violations_present, user)
     self.purchase_order = purchase_order
     self.violations_present = violations_present
     self.aasm.current_state = self.purchase_order.status.name.to_sym
     self.user = user
-    self.policy = purchase_order.policy
+    self.policy = self.purchase_order.policy
   end
 
   aasm :whiny_transitions => false do
-    state :open
+    state :open, initial: true, :before_enter => :set_state
     state :retracted
     state :processing
     state :approved
@@ -29,7 +29,8 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
     end
 
     event :approve do
-      transitions :from => :processing, :to => [:processing, :approved]
+      transitions :from => :processing, :to => :approved, guard: :approvers_not_present?
+      transitions :from => :processing, :to => :processing
     end
 
     event :reject do
@@ -48,34 +49,45 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
       transitions :from => [:approved, :sent_to_vendor], :to => [:closed]
     end
 
-    after_all_transitions :change_state
+    after_all_events :change_state
+    # after_all_transitions :log_status_change
+    # success :change_state
   end
 
   private
 
-  def aasm_ensure_initial_state
-    self.aasm_state = self.po_state
+  def set_state
+    aasm.current_state = self.po_state
   end
 
-  def check_controlling_user
-    true
-  end
-
-  def create_trail
+  def change_state
+    # Change state of purchase order
+    purchase_order_status_id = ::PurchaseOrderStatus.id_for(self.aasm.current_state)
+    update_params = {
+        purchase_order_status_id: purchase_order_status_id,
+        controlling_level_id: self.next_level&.id
+    }
+    self.purchase_order.update(update_params)
   end
 
   def approvers_not_present?
     if self.policy.present?
-
+      self.next_level = get_next_level
+      if self.next_level.present?
+        return false
+      else
+        return true
+      end
     else
-      false
+      true
     end
   end
 
+  def get_next_level
+    # total_amount = purchase_order.total_amount
+    current_level = ReviewalLevel.with_id(purchase_order.controlling_level_id).first
+    level_number = current_level.present? ? (current_level.level_number + 1) : 1
 
-  def next_level
-    levels = self.policy.levels.with_entity_type(purchase_order.class.name)
-
-
+    next_level = self.policy.levels.with_entity_type(purchase_order.class.name).with_level_number(level_number).first
   end
 end

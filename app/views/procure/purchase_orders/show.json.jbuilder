@@ -4,6 +4,12 @@ json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type
 json.vendor do
   json.extract! @result.purchase_order.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
 end
+
+json.actions @result.actions
+
+json.status do
+  json.extract! @result.purchase_order&.status, :id, :name
+end
 json.total_before_tax do
   json.id @result.purchase_order.total_before_tax&.id
   json.value @result.purchase_order.total_before_tax&.value

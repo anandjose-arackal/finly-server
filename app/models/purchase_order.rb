@@ -37,6 +37,7 @@
 #  controlling_for_user_id      :integer
 #  controlling_for_user_role_id :integer
 #  policy_id                    :integer
+#  controlling_level_id         :integer
 #
 
 class PurchaseOrder < ActiveRecord::Base
@@ -60,6 +61,8 @@ class PurchaseOrder < ActiveRecord::Base
   belongs_to :total_after_tax, class_name: "Amount"
   belongs_to :discount_amount, class_name: "Amount", autosave: true
   belongs_to :balance_amount, class_name: "Amount", autosave: true
+  belongs_to :policy
+  belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 
@@ -67,6 +70,8 @@ class PurchaseOrder < ActiveRecord::Base
   has_many :extra_charges, class_name: "ProcurementCharge", as: "Chargable"
 
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+
+  delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, to: :status
 
   accepts_nested_attributes_for :items, allow_destroy: true
   accepts_nested_attributes_for :total_before_tax, :tax_amount, :total_after_tax, :discount_amount, :balance_amount
@@ -76,9 +81,10 @@ class PurchaseOrder < ActiveRecord::Base
   # validates :items, presence: true
   scope :document_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
 
+  scope :with_user_id, -> (user_ids) { where user_id: user_ids }
+  scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
 
   before_save :calculate_line_items
-
 
   private
 

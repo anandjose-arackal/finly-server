@@ -13,4 +13,36 @@ class PurchaseOrderStatus < ActiveRecord::Base
   def self.values
     %w( open retracted processing approved rejected auto_approved sent_to_vendor closed )
   end
+
+  def open?
+    self.id == PurchaseOrderStatus.id_for(:open)
+  end
+
+  def retracted?
+    self.id == PurchaseOrderStatus.id_for(:retracted)
+  end
+
+  def rejected?
+    self.id == PurchaseOrderStatus.id_for(:rejected)
+  end
+
+  def processing?
+    self.id == PurchaseOrderStatus.id_for(:processing)
+  end
+
+  def approved?
+    self.id == PurchaseOrderStatus.id_for(:approved)
+  end
+
+  def auto_approved?
+    self.id == PurchaseOrderStatus.id_for(:auto_approved)
+  end
+
+  def sent_to_vendor?
+    self.id == PurchaseOrderStatus.id_for(:sent_to_vendor)
+  end
+
+  def closed?
+    self.id == PurchaseOrderStatus.id_for(:closed)
+  end
 end

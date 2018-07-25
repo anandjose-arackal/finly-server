@@ -3761,6 +3761,7 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.integer  "controlling_for_user_id",      limit: 4
     t.integer  "controlling_for_user_role_id", limit: 4
     t.integer  "policy_id",                    limit: 4
+    t.integer  "controlling_level_id",         limit: 4
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree

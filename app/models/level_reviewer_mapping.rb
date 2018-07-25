@@ -18,7 +18,7 @@ class LevelReviewerMapping < ActiveRecord::Base
   validates :level_id, presence: true
   validates :reviewer_id, presence: true
 
-  scope :with_threshold, -> (threshold) {
-    where(threshold < threshold)
+  scope :with_threshold, -> (amount) {
+    where('threshold <= ?', amount)
   }
 end

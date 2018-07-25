@@ -1349,6 +1349,8 @@
 #                                                         PUT    /procure/procurements/:id(.:format)                                                          procure/procurements#update
 #                                                         DELETE /procure/procurements/:id(.:format)                                                          procure/procurements#destroy
 #                        procure_purchase_order_send_mail POST   /procure/purchase_orders/:purchase_order_id/send_mail(.:format)                              procure/purchase_orders#send_mail
+#                           procure_purchase_order_submit PUT    /procure/purchase_orders/:purchase_order_id/submit(.:format)                                 procure/purchase_orders#submit
+#                          procure_purchase_order_approve PUT    /procure/purchase_orders/:purchase_order_id/approve(.:format)                                procure/purchase_orders#approve
 #                                 procure_purchase_orders GET    /procure/purchase_orders(.:format)                                                           procure/purchase_orders#index
 #                                                         POST   /procure/purchase_orders(.:format)                                                           procure/purchase_orders#create
 #                              new_procure_purchase_order GET    /procure/purchase_orders/new(.:format)                                                       procure/purchase_orders#new
@@ -1365,6 +1367,7 @@
 #                                                         PATCH  /procure/inward_documents/:id(.:format)                                                      procure/inward_documents#update
 #                                                         PUT    /procure/inward_documents/:id(.:format)                                                      procure/inward_documents#update
 #                                                         DELETE /procure/inward_documents/:id(.:format)                                                      procure/inward_documents#destroy
+#                                         procure_payment GET    /procure/payments/:id(.:format)                                                              procure/payments#show
 #                                     procure_attachments POST   /procure/attachments(.:format)                                                               procure/attachments#create
 #                                  procure_create_from_po POST   /procure/inward_invoices/create_from_po(.:format)                                            procure/inward_invoices#create_from_po
 #                                 procure_inward_invoices GET    /procure/inward_invoices(.:format)                                                           procure/inward_invoices#index
@@ -1410,6 +1413,8 @@
 #                      procure_configs_doc_number_configs GET    /procure/configs/doc_number_configs(.:format)                                                procure/configs/doc_number_configs#index
 #                       procure_configs_doc_number_config PATCH  /procure/configs/doc_number_configs/:id(.:format)                                            procure/configs/doc_number_configs#update
 #                                                         PUT    /procure/configs/doc_number_configs/:id(.:format)                                            procure/configs/doc_number_configs#update
+#                               procure_configs_send_mail POST   /procure/configs/send_mail(.:format)                                                         procure/configs/mailer#send_mail
+#                                        procure_comments POST   /procure/comments(.:format)                                                                  procure/comments#create
 #
 
 #                               crono_web        /crono                                                      Crono::Web
@@ -3021,6 +3026,9 @@ end
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
       put 'submit', to: 'purchase_orders#submit'
+      put 'approve', to: 'purchase_orders#approve'
+      put 'reject', to: 'purchase_orders#reject'
+      put 'close', to: 'purchase_orders#close'
 
     end
 
@@ -3044,14 +3052,24 @@ end
       resources :terms
       resources :doc_number_configs, only: [:index, :update]
       post 'send_mail', to: 'mailer#send_mail'
+
     end
 
     resources :comments, only: [:create]
+  end
 
+  ## Procurement APIs end   ##########################################
+
+
+  ######## Reviewal Workflow ##########
+  resources :reviewal_levels do
+    post 'approvers', to: 'reviewers#create'
   end
 
 
-  ## Procurement APIs end   ##########################################
+  ######## Reviewal Workflow End ##########
+
+
 
 
 
