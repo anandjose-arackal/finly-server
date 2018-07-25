@@ -152,6 +152,7 @@ gem 'bullet', '5.4.2', :group => 'development'
 gem 'logstasher', '1.2.2'
 gem 'lograge', '0.10.0'
 gem 'sidekiq-logstash', '0.3.0'
+gem 'logstash-logger', '0.26.1'
 
 gem 'ancestry', '3.0.2'
 

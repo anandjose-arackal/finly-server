@@ -51,10 +51,8 @@ class YesBankApi::Base < BaseHandler
   # because this is common for all Yes Bank API calls
   def process
     p = self.path
+    file_logger = LogStashLogger.new(type: :file, path: 'log/yes_bank_api.log', sync: true)
     begin
-      puts "Posting Path: #{p}"
-      puts "Post Params: #{self.template}"
-
       self.response = self.connection.post do |req|
         req.url p
         req.headers['Content-Type'] = 'application/xml'
@@ -62,7 +60,12 @@ class YesBankApi::Base < BaseHandler
         req.headers['X-IBM-Client-Secret'] = client_secret
         req.body = template
       end
+      post_params_hash = (Hash.from_xml(template) rescue nil)
+      response_hash = (Hash.from_xml(self.response.body) rescue nil)
+      status_code = self.response.status rescue nil
+      file_logger.info({path: p, post_params: post_params_hash, response: response_hash, status: status_code, success: true})
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
+      file_logger.info({path: p, post_params: post_params_hash, success: false, failure_reason: 'Timeout'})
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
@@ -201,6 +204,7 @@ class YesBankApi::Base < BaseHandler
       #     }
       # }
     rescue Faraday::ResourceNotFound
+      file_logger.info({path: p, post_params: post_params_hash, success: false, failure_reason: 'Resource Not Found'})
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
