@@ -25,8 +25,7 @@ class YesBankApi::Status::GetStatus < YesBankApi::Base
     {
         company_id: params&.dig(:company_id),
         company_name: Company.find_by(id: params&.dig(:company_id))&.name,
-        request_reference_number: params&.dig(:request_reference_number),
-        unique_request_number: params&.dig(:unique_request_number),
+        unique_reference_number: params&.dig(:unique_request_number),
         transfer_type: params&.dig(:transfer_type),
         action: 'get_status'
     }
