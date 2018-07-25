@@ -47,4 +47,18 @@ class TransferRequest < NonPersistentModel
     ref
   end
 
+  def as_json(options={})
+    {
+        beneficiary_account_number: beneficiary_account_number,
+        beneficiary_name: beneficiary_name,
+        ifsc: ifsc,
+        transfer_type: transfer_type,
+        transfer_amount: transfer_amount,
+        transfer_currency_code: transfer_currency,
+        unique_reference_number: unique_reference_number,
+        company_id: company_id,
+        company_name: company&.name
+    }
+  end
+
 end
