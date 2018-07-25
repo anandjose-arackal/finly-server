@@ -3063,7 +3063,7 @@ end
 
   ######## Reviewal Workflow ##########
   resources :reviewal_levels do
-    post 'approvers', to: 'reviewers#create'
+    post 'reviewers', to: 'reviewers#create'
   end
 
 
