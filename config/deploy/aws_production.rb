@@ -7,9 +7,9 @@
 # server 'example.com', user: 'deploy', roles: %w{app web}, other_property: :other_value
 # server 'db.example.com', user: 'deploy', roles: %w{db}
 
-# server '35.154.174.176', user: 'centos', roles: %w{web app db}
-# server '13.126.1.248', user: 'centos', roles: %w{web app}
-# server '13.232.130.44', user: 'centos', roles: %w{web app}
+server '35.154.174.176', user: 'centos', roles: %w{web app db}
+server '13.126.1.248', user: 'centos', roles: %w{web app}
+server '13.232.130.44', user: 'centos', roles: %w{web app}
 server '13.232.176.84', user: 'centos', roles: %w{sidekiq_app crono_role poller_role}
 
 set :stage, 'production'
