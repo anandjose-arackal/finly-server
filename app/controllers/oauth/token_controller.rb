@@ -25,10 +25,6 @@ class Oauth::TokenController < Doorkeeper::TokensController
     handle_token_exception e
   end
 
-  # this method will handle the SSO Token decryption method of login and return the same tokens that the create action returns
-  def create_sso
-
-  end
 
   protected
   def verify_company_status(user)

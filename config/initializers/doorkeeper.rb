@@ -13,11 +13,10 @@ Doorkeeper.configure do
 
   resource_owner_from_credentials do |routes|
     u = nil
-    scopes = params.dig(:scope)&.split(' ')
-    if params[:username].blank? or params[:password].blank?
-      if params[:password].blank? && !(['darwinbox'].include?(scopes.first))
-        false
-      end
+    # scopes = params.dig(:scope)&.split(' ')
+    scopes = ['darwinbox'] # todo - hard coding the scope for testing
+    if (params[:username].blank?) || (params[:password].blank? && !(['darwinbox'].include?(scopes.first))) # todo - change this
+      false
     else
       if scopes.size == 1 and ['web', 'mobile', 'chrome', 'api'].include?(scopes.first)
         u = User.find_for_database_authentication(:username => params[:username])
@@ -41,6 +40,7 @@ Doorkeeper.configure do
         u
       end
     end
+    u
   end
 
   # If you want to restrict access to the web interface for adding oauth authorized applications, you need to declare the block below.

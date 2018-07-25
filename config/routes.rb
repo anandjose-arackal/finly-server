@@ -2385,8 +2385,8 @@ end
     post 'comment' => 'money_request#comment', as: :comment
   end
 
-  ############ SSO LOGIN APIs START ####################
-  post 'oauth/sso_login', to: 'oauth/token#create_sso', as: :create_sso
+  ############ Darwinbox SSO LOGIN APIs START ####################
+  post 'oauth/sso_login', to: 'darwinbox_sso/token#create', as: :darwinbox_create_sso
   ######################################################
 
 
