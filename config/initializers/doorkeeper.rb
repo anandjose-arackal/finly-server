@@ -13,9 +13,9 @@ Doorkeeper.configure do
 
   resource_owner_from_credentials do |routes|
     u = nil
-    # scopes = params.dig(:scope)&.split(' ')
-    scopes = ['darwinbox'] # todo - hard coding the scope for testing
-    if (params[:username].blank?) || (params[:password].blank? && !(['darwinbox'].include?(scopes.first))) # todo - change this
+    scopes = params.dig(:scope)&.split(' ')
+    # scopes = ['darwinbox'] # todo - hard coding the scope for testing
+    if (params[:username].blank?) || (params[:password].blank? && !(['darwinbox'].include?(scopes.first)))
       false
     else
       if scopes.size == 1 and ['web', 'mobile', 'chrome', 'api'].include?(scopes.first)

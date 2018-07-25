@@ -26,9 +26,7 @@ class DarwinboxSso::TokenController < Oauth::TokenController
       # access token and the refresh token for this particular user's login
       response = authorize_response
       headers.merge! response.headers
-      debugger
       self.status = response.status
-
       if self.status == 200
         @auth_grant = response
         @token = response.token
@@ -48,12 +46,19 @@ class DarwinboxSso::TokenController < Oauth::TokenController
   protected
 
   def on_create_success(response)
-    render_json 'oauth/token/create_sso.json.jbuilder', response.status
+    params[:request] = request
+    params[:application] = 'web'
+    # self.response.set_cookie 'access_token', {:value => response.token.token, :httponly => true}
+    # self.response.set_cookie 'refresh_token', {:value => response.token.refresh_token, :httponly => true}
+    cookies["access_token"] = {:value => @token.token, :httponly => true, :expires => 15.days.from_now}
+    cookies["refresh_token"] = {:value => @token.refresh_token, :httponly => true, :expires => 15.days.from_now}
+
+    # render json: {}, status: 200
+    render_json 'darwinbox/token/create.json.jbuilder', response.status
   end
 
   def auth_scope
     :darwinbox
-    # :web
   end
 
   def extract_email_from_encrypted_data(data)
