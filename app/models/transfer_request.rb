@@ -54,7 +54,7 @@ class TransferRequest < NonPersistentModel
         ifsc: ifsc,
         transfer_type: transfer_type,
         transfer_amount: transfer_amount,
-        transfer_currency_code: transfer_currency,
+        transfer_currency_code: transfer_currency_code,
         unique_reference_number: unique_reference_number,
         company_id: company_id,
         company_name: company&.name
