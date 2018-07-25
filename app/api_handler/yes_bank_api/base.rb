@@ -208,6 +208,12 @@ class YesBankApi::Base < BaseHandler
       self.resource_not_found = true
       add_message :error, "The service is temporarily down. Please try again later"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
+    rescue Exception => e
+      stack_trace = e.message
+      e.backtrace.each do |line|
+        stack_trace += "\n#{line}"
+      end
+      file_logger.info({path: p, post_params: post_params_hash, failure_reason: 'Crash', stack_trace: stack_trace, success: false})
     end
   end
 
@@ -224,12 +230,12 @@ class YesBankApi::Base < BaseHandler
         client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
         verify: verify
     }
-    logger = Logger.new $stderr
-    logger.level = Logger::INFO
+    # logger = Logger.new $stderr
+    # logger.level = Logger::INFO
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|
       # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params
-      faraday.response :logger, logger # log requests to STDOUT
+      # faraday.response :logger, logger # log requests to STDOUT
       faraday.options[:timeout] = 60 # time out is 60 seconds
       faraday.use Faraday::Request::BasicAuthentication, auth_username, auth_password # use basic authentication
       faraday.use FaradayMiddleware::FollowRedirects, limit: 5
