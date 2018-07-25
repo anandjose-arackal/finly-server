@@ -19,6 +19,7 @@ class BalanceMsgQueuePoller
     # initializing the log file that will hold the errors if necessary
     error_logger = Logger.new("#{Rails.root}/log/balance_msg_queue_errors.log")
     poller = Aws::SQS::QueuePoller.new(queue_url, {client: sqs_client})
+    file_logger = LogStashLogger.new(type: :file, path: 'log/transaction_poller.log', sync: true)
 
     ######################## AWS Code to extract the messages from the queue ###################
 
@@ -31,18 +32,38 @@ class BalanceMsgQueuePoller
                                amount_attributes: {value: data[2], currency_id: 1},
                                timestamp: data[3]
                               }
+      log_params = balance_update_params.deep_dup
 
       @rescued = false
       @result = nil
       begin
         @result = Card::Balance::Update.(balance_update_params)
+
+        log_params[:operation_success] = true
+        file_logger.warn(log_params)
+
       rescue => error
         error_logger.error("Following history entry : #{message.body} couldn't be created because of the following errors: #{error.message}")
+
+        stack_trace = error.message
+        error.backtrace.each do |line|
+          stack_trace += "\n#{line}"
+        end
+        log_params[:operation_success] = false
+        log_params[:failure_reason] = error.message
+        log_params[:stacktrace] = stack_trace
+        file_logger.warn(log_params)
+
       end
 
       # if the balance history wasn't created also log it in the log file
       if @result&.failure? || @result.balance_history.nil?
         error_logger.error("Following history entry : #{message.body} couldn't be created because the operation failed due to the following errors: #{@result.messages[:error]}")
+
+        log_params[:operation_success] = false
+        log_params[:failure_reason] = (@result.messages[:error] || 'Unknown error')
+        file_logger.warn(log_params)
+
       end
     end
   end
