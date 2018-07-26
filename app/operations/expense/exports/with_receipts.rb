@@ -26,7 +26,7 @@ class Expense::Exports::WithReceipts < Expense::Exports::Base
     expenses.each do |expense|
       contents << retrieve_data(preferences, expense.report, expense, self.cf_data)
       expense.receipts&.each do |receipt|
-        self.files << {name: receipt.export_image_file_name, path: receipt.image.path}
+        self.files << {name: receipt.export_image_file_name, url: receipt.image.url}
       end
     end
     case params[:type]
