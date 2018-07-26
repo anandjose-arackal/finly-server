@@ -44,7 +44,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
             method: "PUT"
         }
         actions[:update] = {
-            url: Rails.application.routes.url_helpers.procure_purchase_order_path(purchase_order_id: purchase_order.id),
+            url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
             method: "PUT"
         }
       end
