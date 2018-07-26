@@ -85,3 +85,15 @@ json.policies do
     json.extract! policy, :id, :name
   end
 end
+
+json.reviewal_chain do
+  json.array! @result.reviewal_chain do |item|
+    json.level_number item[:level_number]
+    json.reviewers do
+      json.array! item[:reviewers] do |reviewer|
+        json.extract! reviewer, :id, :exception, :threshold
+        json.reviewer_details reviewer.reviewer.as_json
+      end
+    end
+  end
+end

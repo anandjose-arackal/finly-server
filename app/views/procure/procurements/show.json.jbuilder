@@ -197,3 +197,5 @@ json.comments do
     end
   end
 end
+
+json.actions @result.actions

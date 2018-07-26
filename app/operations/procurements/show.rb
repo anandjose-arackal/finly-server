@@ -17,7 +17,7 @@ class Procurements::Show < Procurements::Base
   class Procurements::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
     attr_accessor :procurement, :purchase_order, :invoices, :inward_documents, :procurement_trail, :locations,
                   :payment_terms, :bill_of_supplies, :delivery_challans,
-                  :procurement_terms, :policies, :e_way_bills, :status_tags
+                  :procurement_terms, :policies, :e_way_bills, :status_tags, :actions
 
     def init
       self.procurement = params[:procurement]
@@ -35,12 +35,40 @@ class Procurements::Show < Procurements::Base
       self.payment_terms = user.company.payment_terms
       self.procurement_terms = user.company.procurement_terms
       self.status_tags = self.procurement.status_tags
+      self.actions = get_actions
 
       policies_op = Policy::Index.(user, view: params[:view])
       if policies_op.success?
         self.policies = policies_op.policies
       end
 
+    end
+
+    def get_actions
+      actions = {}
+      if purchase_order.present?
+        if (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner?)
+          actions[:add_document] = true
+        end
+      end
+      actions
+    end
+
+    def document_owner?
+      purchase_order.user_id == user.id
+    end
+
+    def user_in_level?
+      current_level = purchase_order.level
+      amount = purchase_order&.balance_amount&.value || 0
+
+      if current_level.present?
+        if current_level.level_reviewer_mappings.with_threshold(amount).pluck(:reviewer_id).include? user.id
+          return true
+        end
+      end
+
+      false
     end
 
     def get_procurement_trail

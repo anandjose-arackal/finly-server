@@ -26,12 +26,12 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_order, :actions, :chain_of_approvals, :policies
+    attr_accessor :purchase_order, :actions, :reviewal_chain, :policies
 
     def init
       self.purchase_order = params[:purchase_order]
       self.actions = get_actions
-      self.chain_of_approvals = get_chain_of_approvals
+      self.reviewal_chain = get_reviewal_chain
       self.policies = user.company.policies.with_application(:vp)
     end
 
@@ -82,8 +82,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       actions
     end
 
-    def get_chain_of_approvals
-
+    def get_reviewal_chain
+      params[:reviewal_document] = purchase_order
+      op = ::ReviewalManager::ReviewalChain.(user, params)
+      op.chain
     end
 
     def document_owner?
