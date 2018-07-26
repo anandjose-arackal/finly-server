@@ -3026,6 +3026,7 @@ end
     resources :purchase_orders do
       post 'send_mail', to: 'purchase_orders#send_mail'
       put 'submit', to: 'purchase_orders#submit'
+      put 'retract', to: 'purchase_orders#retract'
       put 'approve', to: 'purchase_orders#approve'
       put 'reject', to: 'purchase_orders#reject'
       put 'close', to: 'purchase_orders#close'

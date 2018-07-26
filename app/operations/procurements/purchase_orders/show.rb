@@ -43,6 +43,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
             url: Rails.application.routes.url_helpers.procure_purchase_order_submit_path(purchase_order_id: purchase_order.id),
             method: "PUT"
         }
+        actions[:retract] = {
+            url: Rails.application.routes.url_helpers.procure_purchase_order_retract_path(purchase_order_id: purchase_order.id),
+            method: "PUT"
+        }
       end
 
       if (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner?)

@@ -31,6 +31,11 @@ class Procure::PurchaseOrdersController < ApplicationController
     respond
   end
 
+  def retract
+    @result = Procurements::PurchaseOrders::Retract.(current_user, params)
+    respond
+  end
+
   def approve
     @result = Procurements::PurchaseOrders::Approve.(current_user, params)
     respond
