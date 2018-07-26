@@ -198,6 +198,8 @@ class Exporter < BaseOperation::BasePresenter::SuccessPresenter
             stream.write IO.read(file_details[:path])
           elsif file_details[:file_contents].present?
             stream.write file_details[:file_contents]
+          elsif file_details[:url].present?
+            stream.write(open(file_details[:url]).read)
           end
 
         end
