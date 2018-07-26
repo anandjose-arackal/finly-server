@@ -26,13 +26,13 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_order, :actions, :chain_of_approvals
+    attr_accessor :purchase_order, :actions, :chain_of_approvals, :policies
 
     def init
       self.purchase_order = params[:purchase_order]
       self.actions = get_actions
       self.chain_of_approvals = get_chain_of_approvals
-      # self.policies =
+      self.policies = user.company.policies.with_application(:vp)
     end
 
     def get_actions
