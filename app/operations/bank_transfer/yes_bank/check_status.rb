@@ -41,7 +41,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
   def process
     params = {
         request_reference_number: bank_transaction.unique_request_number,
-        company_id: bank_transaction.company_id
+        company_id: bank_transaction.company_id,
+        unique_request_number: bank_transaction.unique_request_number,
+        transfer_type: bank_transaction.transfer_type
     }
     op = YesBankApi::Status::GetStatus.(params)
     if op.success?
@@ -99,6 +101,8 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     # trigger event for sending mailer to the receiver of the payment
     if self.payment.completed?
       op = Event::EBankPaymentRequest::EPayment::CreditConfirm.(payment.initiating_user, payment: self.payment)
+      execute_callback(self.payment)
+    elsif payment.failed?
       execute_callback(self.payment)
     end
   end
@@ -185,8 +189,12 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
             receiving_account_id: payment.receiving_account&.id,
             receiving_account_number: payment.receiving_account&.account_number,
             receiving_account_ifsc: payment.receiving_account&.ifsc
-        }
+        },
+        bank_reference_number: payment.reference_resource&.bank_reference_number
     }
+    if payment.failed?
+      post_params[:errors] = payment.system_messages.errors.pluck(:content).to_sentence
+    end
     # this particular type of payment will always have an initiating user because it is a vendor payment / reimbursement payment
     company = payment.initiating_user&.company
     op = Webhook::Process.(nil, {company: company, body: post_params, web_hook_event_id: WebHookEvent.id_for('vendor_payments.credit_confirmation')})

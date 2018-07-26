@@ -46,7 +46,7 @@ class BankTransfer::Vendors::Import < BankTransfer::Vendors::Base
       vendor = YesBankVendor.new(vendor_data)
       if vendor.save
         # check if the vendor has any default bank accounts, if not make the first one default
-        if vendor.bank_accounts.default_accouns.empty?
+        if vendor.bank_accounts.default_accounts.empty?
           vendor.bank_accounts.first&.update(default_account: true)
         end
         self.result_hash[index] << "Success!"

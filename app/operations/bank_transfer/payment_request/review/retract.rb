@@ -1,5 +1,13 @@
 class BankTransfer::PaymentRequest::Review::Retract < BankTransfer::PaymentRequest::Review::Base
 
+  def personalizer
+    {
+        validate: {
+            before: Personalizer::Process.new([:bank_transfer, :payment_request, :review, :retract], :validate, self)
+        }
+    }
+  end
+
   def authorized_user_types
     [:vendor_payments_initiator]
   end

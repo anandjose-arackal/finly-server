@@ -33,7 +33,7 @@ class MoneyRequestTrack < ActiveRecord::Base
   belongs_to :modified_user_role, class_name: 'UserRole'
   belongs_to :payment
 
-  default_scope { order('created_at ASC') }
+  default_scope { order('money_request_tracks.created_at ASC') }
 
   scope :created_before, ->(time) { where 'created_at < ?', time }
   scope :without_take_control_action, -> { where.not money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:take_control) }

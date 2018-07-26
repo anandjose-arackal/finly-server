@@ -45,9 +45,7 @@
 #  receiving_account_id   :integer
 #  receiving_account_type :string(255)
 #  note                   :text(65535)
-#  procurement_id         :integer
 #  remaining_amount_id    :integer
-#  invoice_type_id        :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -68,7 +66,6 @@ class Invoice < ActiveRecord::Base
   belongs_to :taxable_amount, class_name: "Amount"
   belongs_to :category
   belongs_to :cost_center
-  belongs_to :tds_slab, class_name: TdsRatesList
   belongs_to :created_by, class_name: "User"
   belongs_to :company
   belongs_to :invoice_status, class_name: "InwardInvoiceStatus"
@@ -78,6 +75,8 @@ class Invoice < ActiveRecord::Base
   belongs_to :procurement, class_name: "Procurement"
   belongs_to :remaining_amount, class_name: "Amount"
   belongs_to :invoice_type, class_name: "InwardInvoiceType"
+  belongs_to :gst_type
+  belongs_to :tds_slab, class_name: 'TdsRatesList'
 
   # because multiple payments can be made against one invoice
   has_many :payments

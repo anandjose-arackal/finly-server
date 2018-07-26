@@ -61,6 +61,10 @@ class CustomField < ActiveRecord::Base
     where(field_configuration_id: drop_down_field_config_ids)
   }
 
+  scope :with_field_key, ->(key) { where field_key: key }
+
+  before_save :set_field_key
+
   def set_value(value, save = true)
     if value.blank?
       if self.value.present?
@@ -197,6 +201,10 @@ class CustomField < ActiveRecord::Base
         json["#{field_configuration.field_type.name.to_sym}_field_value"] = self.value
     end
     json
+  end
+
+  def set_field_key
+    self.field_key = self.field_configuration.field_key
   end
 
 end

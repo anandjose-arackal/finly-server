@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180723125433) do
+ActiveRecord::Schema.define(version: 20180720124958) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -564,52 +564,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.datetime "updated_at",             null: false
   end
 
-  create_table "bill_of_supplies", force: :cascade do |t|
-    t.integer  "company_id",             limit: 4
-    t.integer  "user_id",                limit: 4
-    t.integer  "procurement_id",         limit: 4
-    t.integer  "location_id",            limit: 4
-    t.integer  "delivery_location_id",   limit: 4
-    t.integer  "vendor_id",              limit: 4
-    t.integer  "payment_term_id",        limit: 4
-    t.integer  "procurement_term_id",    limit: 4
-    t.integer  "document_status_id",     limit: 4
-    t.string   "doc_number",             limit: 255
-    t.boolean  "override_doc_number"
-    t.string   "prefix",                 limit: 255
-    t.string   "sequence_start",         limit: 255
-    t.date     "date"
-    t.date     "bill_date"
-    t.date     "transaction_date"
-    t.date     "due_date"
-    t.boolean  "roundoff_total_enabled"
-    t.decimal  "roundoff_amount",                    precision: 10, scale: 5
-    t.integer  "transaction_amount_id",  limit: 4
-    t.integer  "total_before_tax_id",    limit: 4
-    t.integer  "tax_amount_id",          limit: 4
-    t.integer  "total_after_tax_id",     limit: 4
-    t.integer  "discount_amount_id",     limit: 4
-    t.integer  "balance_amount_id",      limit: 4
-    t.datetime "created_at",                                                  null: false
-    t.datetime "updated_at",                                                  null: false
-  end
-
-  add_index "bill_of_supplies", ["balance_amount_id"], name: "index_bill_of_supplies_on_balance_amount_id", using: :btree
-  add_index "bill_of_supplies", ["company_id"], name: "index_bill_of_supplies_on_company_id", using: :btree
-  add_index "bill_of_supplies", ["delivery_location_id"], name: "index_bill_of_supplies_on_delivery_location_id", using: :btree
-  add_index "bill_of_supplies", ["discount_amount_id"], name: "index_bill_of_supplies_on_discount_amount_id", using: :btree
-  add_index "bill_of_supplies", ["document_status_id"], name: "index_bill_of_supplies_on_document_status_id", using: :btree
-  add_index "bill_of_supplies", ["location_id"], name: "index_bill_of_supplies_on_location_id", using: :btree
-  add_index "bill_of_supplies", ["payment_term_id"], name: "index_bill_of_supplies_on_payment_term_id", using: :btree
-  add_index "bill_of_supplies", ["procurement_id"], name: "index_bill_of_supplies_on_procurement_id", using: :btree
-  add_index "bill_of_supplies", ["procurement_term_id"], name: "index_bill_of_supplies_on_procurement_term_id", using: :btree
-  add_index "bill_of_supplies", ["tax_amount_id"], name: "index_bill_of_supplies_on_tax_amount_id", using: :btree
-  add_index "bill_of_supplies", ["total_after_tax_id"], name: "index_bill_of_supplies_on_total_after_tax_id", using: :btree
-  add_index "bill_of_supplies", ["total_before_tax_id"], name: "index_bill_of_supplies_on_total_before_tax_id", using: :btree
-  add_index "bill_of_supplies", ["transaction_amount_id"], name: "index_bill_of_supplies_on_transaction_amount_id", using: :btree
-  add_index "bill_of_supplies", ["user_id"], name: "index_bill_of_supplies_on_user_id", using: :btree
-  add_index "bill_of_supplies", ["vendor_id"], name: "index_bill_of_supplies_on_vendor_id", using: :btree
-
   create_table "booking_attachments", force: :cascade do |t|
     t.string   "attachment_file_name",    limit: 255
     t.string   "attachment_content_type", limit: 255
@@ -805,12 +759,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
 
   add_index "branch_locations", ["company_id"], name: "index_branch_locations_on_company_id", using: :btree
   add_index "branch_locations", ["state_id"], name: "index_branch_locations_on_state_id", using: :btree
-
-  create_table "budget_periods", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
 
   create_table "budget_rules", force: :cascade do |t|
     t.integer  "category_id",          limit: 4
@@ -1259,20 +1207,22 @@ ActiveRecord::Schema.define(version: 20180723125433) do
   add_index "company_balance_histories", ["wallet_withdrawal_to_wallet_id"], name: "index_wal_2_wal_on_company_history", using: :btree
 
   create_table "company_branches", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.string   "pan",        limit: 255
-    t.string   "gst",        limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-    t.integer  "company_id", limit: 4
-    t.string   "address_1",  limit: 255
-    t.string   "address_2",  limit: 255
-    t.string   "city",       limit: 255
-    t.integer  "state_id",   limit: 4
-    t.string   "country",    limit: 255
-    t.string   "pin",        limit: 255
+    t.integer  "collect_company_detail_id", limit: 4
+    t.string   "name",                      limit: 255
+    t.string   "pan",                       limit: 255
+    t.string   "gst",                       limit: 255
+    t.datetime "created_at",                            null: false
+    t.datetime "updated_at",                            null: false
+    t.integer  "company_id",                limit: 4
+    t.string   "address_1",                 limit: 255
+    t.string   "address_2",                 limit: 255
+    t.string   "city",                      limit: 255
+    t.integer  "state_id",                  limit: 4
+    t.string   "country",                   limit: 255
+    t.string   "pin",                       limit: 255
   end
 
+  add_index "company_branches", ["collect_company_detail_id"], name: "index_company_branches_on_collect_company_detail_id", using: :btree
   add_index "company_branches", ["company_id"], name: "index_company_branches_on_company_id", using: :btree
 
   create_table "company_configurations", force: :cascade do |t|
@@ -1499,177 +1449,177 @@ ActiveRecord::Schema.define(version: 20180723125433) do
 
   create_table "currency_conversion_rates", force: :cascade do |t|
     t.date     "date",                                null: false
-    t.decimal  "INR",        precision: 10, scale: 5
-    t.decimal  "USD",        precision: 10, scale: 5
-    t.decimal  "GBP",        precision: 10, scale: 5
-    t.decimal  "EUR",        precision: 10, scale: 5
-    t.decimal  "CAD",        precision: 10, scale: 5
-    t.decimal  "HRK",        precision: 10, scale: 5
-    t.decimal  "RUB",        precision: 10, scale: 5
-    t.decimal  "BGN",        precision: 10, scale: 5
-    t.decimal  "BRL",        precision: 10, scale: 5
-    t.decimal  "CHF",        precision: 10, scale: 5
-    t.decimal  "CNY",        precision: 10, scale: 5
-    t.decimal  "CZK",        precision: 10, scale: 5
-    t.decimal  "DKK",        precision: 10, scale: 5
-    t.decimal  "HKD",        precision: 10, scale: 5
-    t.decimal  "HUF",        precision: 10, scale: 5
-    t.decimal  "IDR",        precision: 10, scale: 5
-    t.decimal  "ILS",        precision: 10, scale: 5
-    t.decimal  "JPY",        precision: 10, scale: 5
-    t.decimal  "KRW",        precision: 10, scale: 5
-    t.decimal  "MXN",        precision: 10, scale: 5
-    t.decimal  "MYR",        precision: 10, scale: 5
-    t.decimal  "NOK",        precision: 10, scale: 5
-    t.decimal  "NZD",        precision: 10, scale: 5
-    t.decimal  "PHP",        precision: 10, scale: 5
-    t.decimal  "PLN",        precision: 10, scale: 5
-    t.decimal  "RON",        precision: 10, scale: 5
-    t.decimal  "SEK",        precision: 10, scale: 5
-    t.decimal  "SGD",        precision: 10, scale: 5
-    t.decimal  "THB",        precision: 10, scale: 5
-    t.decimal  "TRY",        precision: 10, scale: 5
-    t.decimal  "ZAR",        precision: 10, scale: 5
-    t.decimal  "AUD",        precision: 10, scale: 5
+    t.decimal  "INR",        precision: 20, scale: 5
+    t.decimal  "USD",        precision: 20, scale: 5
+    t.decimal  "GBP",        precision: 20, scale: 5
+    t.decimal  "EUR",        precision: 20, scale: 5
+    t.decimal  "CAD",        precision: 20, scale: 5
+    t.decimal  "HRK",        precision: 20, scale: 5
+    t.decimal  "RUB",        precision: 20, scale: 5
+    t.decimal  "BGN",        precision: 20, scale: 5
+    t.decimal  "BRL",        precision: 20, scale: 5
+    t.decimal  "CHF",        precision: 20, scale: 5
+    t.decimal  "CNY",        precision: 20, scale: 5
+    t.decimal  "CZK",        precision: 20, scale: 5
+    t.decimal  "DKK",        precision: 20, scale: 5
+    t.decimal  "HKD",        precision: 20, scale: 5
+    t.decimal  "HUF",        precision: 20, scale: 5
+    t.decimal  "IDR",        precision: 20, scale: 5
+    t.decimal  "ILS",        precision: 20, scale: 5
+    t.decimal  "JPY",        precision: 20, scale: 5
+    t.decimal  "KRW",        precision: 20, scale: 5
+    t.decimal  "MXN",        precision: 20, scale: 5
+    t.decimal  "MYR",        precision: 20, scale: 5
+    t.decimal  "NOK",        precision: 20, scale: 5
+    t.decimal  "NZD",        precision: 20, scale: 5
+    t.decimal  "PHP",        precision: 20, scale: 5
+    t.decimal  "PLN",        precision: 20, scale: 5
+    t.decimal  "RON",        precision: 20, scale: 5
+    t.decimal  "SEK",        precision: 20, scale: 5
+    t.decimal  "SGD",        precision: 20, scale: 5
+    t.decimal  "THB",        precision: 20, scale: 5
+    t.decimal  "TRY",        precision: 20, scale: 5
+    t.decimal  "ZAR",        precision: 20, scale: 5
+    t.decimal  "AUD",        precision: 20, scale: 5
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
-    t.decimal  "AED",        precision: 10, scale: 5
-    t.decimal  "AFN",        precision: 10, scale: 5
-    t.decimal  "ALL",        precision: 10, scale: 5
-    t.decimal  "AMD",        precision: 10, scale: 5
-    t.decimal  "ANG",        precision: 10, scale: 5
-    t.decimal  "AOA",        precision: 10, scale: 5
-    t.decimal  "ARS",        precision: 10, scale: 5
-    t.decimal  "AWG",        precision: 10, scale: 5
-    t.decimal  "AZN",        precision: 10, scale: 5
-    t.decimal  "BAM",        precision: 10, scale: 5
-    t.decimal  "BBD",        precision: 10, scale: 5
-    t.decimal  "BDT",        precision: 10, scale: 5
-    t.decimal  "BHD",        precision: 10, scale: 5
-    t.decimal  "BIF",        precision: 10, scale: 5
-    t.decimal  "BMD",        precision: 10, scale: 5
-    t.decimal  "BND",        precision: 10, scale: 5
-    t.decimal  "BOB",        precision: 10, scale: 5
-    t.decimal  "BSD",        precision: 10, scale: 5
-    t.decimal  "BTC",        precision: 10, scale: 5
-    t.decimal  "BTN",        precision: 10, scale: 5
-    t.decimal  "BWP",        precision: 10, scale: 5
-    t.decimal  "BYN",        precision: 10, scale: 5
-    t.decimal  "BYR",        precision: 10, scale: 5
-    t.decimal  "BZD",        precision: 10, scale: 5
-    t.decimal  "CDF",        precision: 10, scale: 5
-    t.decimal  "CLF",        precision: 10, scale: 5
-    t.decimal  "CLP",        precision: 10, scale: 5
-    t.decimal  "COP",        precision: 10, scale: 5
-    t.decimal  "CRC",        precision: 10, scale: 5
-    t.decimal  "CUC",        precision: 10, scale: 5
-    t.decimal  "CUP",        precision: 10, scale: 5
-    t.decimal  "CVE",        precision: 10, scale: 5
-    t.decimal  "DJF",        precision: 10, scale: 5
-    t.decimal  "DOP",        precision: 10, scale: 5
-    t.decimal  "DZD",        precision: 10, scale: 5
+    t.decimal  "AED",        precision: 20, scale: 5
+    t.decimal  "AFN",        precision: 20, scale: 5
+    t.decimal  "ALL",        precision: 20, scale: 5
+    t.decimal  "AMD",        precision: 20, scale: 5
+    t.decimal  "ANG",        precision: 20, scale: 5
+    t.decimal  "AOA",        precision: 20, scale: 5
+    t.decimal  "ARS",        precision: 20, scale: 5
+    t.decimal  "AWG",        precision: 20, scale: 5
+    t.decimal  "AZN",        precision: 20, scale: 5
+    t.decimal  "BAM",        precision: 20, scale: 5
+    t.decimal  "BBD",        precision: 20, scale: 5
+    t.decimal  "BDT",        precision: 20, scale: 5
+    t.decimal  "BHD",        precision: 20, scale: 5
+    t.decimal  "BIF",        precision: 20, scale: 5
+    t.decimal  "BMD",        precision: 20, scale: 5
+    t.decimal  "BND",        precision: 20, scale: 5
+    t.decimal  "BOB",        precision: 20, scale: 5
+    t.decimal  "BSD",        precision: 20, scale: 5
+    t.decimal  "BTC",        precision: 20, scale: 5
+    t.decimal  "BTN",        precision: 20, scale: 5
+    t.decimal  "BWP",        precision: 20, scale: 5
+    t.decimal  "BYN",        precision: 20, scale: 5
+    t.decimal  "BYR",        precision: 20, scale: 5
+    t.decimal  "BZD",        precision: 20, scale: 5
+    t.decimal  "CDF",        precision: 20, scale: 5
+    t.decimal  "CLF",        precision: 20, scale: 5
+    t.decimal  "CLP",        precision: 20, scale: 5
+    t.decimal  "COP",        precision: 20, scale: 5
+    t.decimal  "CRC",        precision: 20, scale: 5
+    t.decimal  "CUC",        precision: 20, scale: 5
+    t.decimal  "CUP",        precision: 20, scale: 5
+    t.decimal  "CVE",        precision: 20, scale: 5
+    t.decimal  "DJF",        precision: 20, scale: 5
+    t.decimal  "DOP",        precision: 20, scale: 5
+    t.decimal  "DZD",        precision: 20, scale: 5
     t.decimal  "EEK",        precision: 10, scale: 5
-    t.decimal  "EGP",        precision: 10, scale: 5
-    t.decimal  "ERN",        precision: 10, scale: 5
-    t.decimal  "ETB",        precision: 10, scale: 5
-    t.decimal  "FJD",        precision: 10, scale: 5
-    t.decimal  "FKP",        precision: 10, scale: 5
-    t.decimal  "GEL",        precision: 10, scale: 5
-    t.decimal  "GGP",        precision: 10, scale: 5
-    t.decimal  "GHS",        precision: 10, scale: 5
-    t.decimal  "GIP",        precision: 10, scale: 5
-    t.decimal  "GMD",        precision: 10, scale: 5
-    t.decimal  "GNF",        precision: 10, scale: 5
-    t.decimal  "GTQ",        precision: 10, scale: 5
-    t.decimal  "GYD",        precision: 10, scale: 5
-    t.decimal  "HNL",        precision: 10, scale: 5
-    t.decimal  "HTG",        precision: 10, scale: 5
-    t.decimal  "IMP",        precision: 10, scale: 5
-    t.decimal  "IQD",        precision: 10, scale: 5
-    t.decimal  "IRR",        precision: 10, scale: 5
-    t.decimal  "ISK",        precision: 10, scale: 5
-    t.decimal  "JEP",        precision: 10, scale: 5
-    t.decimal  "JMD",        precision: 10, scale: 5
-    t.decimal  "JOD",        precision: 10, scale: 5
-    t.decimal  "KES",        precision: 10, scale: 5
-    t.decimal  "KGS",        precision: 10, scale: 5
-    t.decimal  "KHR",        precision: 10, scale: 5
-    t.decimal  "KMF",        precision: 10, scale: 5
-    t.decimal  "KPW",        precision: 10, scale: 5
-    t.decimal  "KWD",        precision: 10, scale: 5
-    t.decimal  "KYD",        precision: 10, scale: 5
-    t.decimal  "KZT",        precision: 10, scale: 5
-    t.decimal  "LAK",        precision: 10, scale: 5
-    t.decimal  "LBP",        precision: 10, scale: 5
-    t.decimal  "LKR",        precision: 10, scale: 5
-    t.decimal  "LRD",        precision: 10, scale: 5
-    t.decimal  "LSL",        precision: 10, scale: 5
-    t.decimal  "LTL",        precision: 10, scale: 5
-    t.decimal  "LVL",        precision: 10, scale: 5
-    t.decimal  "LYD",        precision: 10, scale: 5
-    t.decimal  "MAD",        precision: 10, scale: 5
-    t.decimal  "MDL",        precision: 10, scale: 5
-    t.decimal  "MGA",        precision: 10, scale: 5
-    t.decimal  "MKD",        precision: 10, scale: 5
-    t.decimal  "MMK",        precision: 10, scale: 5
-    t.decimal  "MNT",        precision: 10, scale: 5
-    t.decimal  "MOP",        precision: 10, scale: 5
-    t.decimal  "MRO",        precision: 10, scale: 5
-    t.decimal  "MUR",        precision: 10, scale: 5
-    t.decimal  "MVR",        precision: 10, scale: 5
-    t.decimal  "MWK",        precision: 10, scale: 5
-    t.decimal  "MZN",        precision: 10, scale: 5
-    t.decimal  "NAD",        precision: 10, scale: 5
-    t.decimal  "NGN",        precision: 10, scale: 5
-    t.decimal  "NIO",        precision: 10, scale: 5
-    t.decimal  "NPR",        precision: 10, scale: 5
-    t.decimal  "OMR",        precision: 10, scale: 5
-    t.decimal  "PAB",        precision: 10, scale: 5
-    t.decimal  "PEN",        precision: 10, scale: 5
-    t.decimal  "PGK",        precision: 10, scale: 5
-    t.decimal  "PKR",        precision: 10, scale: 5
-    t.decimal  "PYG",        precision: 10, scale: 5
-    t.decimal  "QAR",        precision: 10, scale: 5
-    t.decimal  "RSD",        precision: 10, scale: 5
-    t.decimal  "RWF",        precision: 10, scale: 5
-    t.decimal  "SAR",        precision: 10, scale: 5
-    t.decimal  "SBD",        precision: 10, scale: 5
-    t.decimal  "SCR",        precision: 10, scale: 5
-    t.decimal  "SDG",        precision: 10, scale: 5
-    t.decimal  "SHP",        precision: 10, scale: 5
-    t.decimal  "SLL",        precision: 10, scale: 5
-    t.decimal  "SOS",        precision: 10, scale: 5
-    t.decimal  "SRD",        precision: 10, scale: 5
-    t.decimal  "STD",        precision: 10, scale: 5
-    t.decimal  "SVC",        precision: 10, scale: 5
-    t.decimal  "SYP",        precision: 10, scale: 5
-    t.decimal  "SZL",        precision: 10, scale: 5
-    t.decimal  "TJS",        precision: 10, scale: 5
-    t.decimal  "TMT",        precision: 10, scale: 5
-    t.decimal  "TND",        precision: 10, scale: 5
-    t.decimal  "TOP",        precision: 10, scale: 5
-    t.decimal  "TTD",        precision: 10, scale: 5
-    t.decimal  "TWD",        precision: 10, scale: 5
-    t.decimal  "TZS",        precision: 10, scale: 5
-    t.decimal  "UAH",        precision: 10, scale: 5
-    t.decimal  "UGX",        precision: 10, scale: 5
-    t.decimal  "UYU",        precision: 10, scale: 5
-    t.decimal  "UZS",        precision: 10, scale: 5
-    t.decimal  "VEF",        precision: 10, scale: 5
-    t.decimal  "VND",        precision: 10, scale: 5
-    t.decimal  "VUV",        precision: 10, scale: 5
-    t.decimal  "WST",        precision: 10, scale: 5
-    t.decimal  "XAF",        precision: 10, scale: 5
-    t.decimal  "XAG",        precision: 10, scale: 5
-    t.decimal  "XAU",        precision: 10, scale: 5
-    t.decimal  "XCD",        precision: 10, scale: 5
-    t.decimal  "XDR",        precision: 10, scale: 5
-    t.decimal  "XOF",        precision: 10, scale: 5
-    t.decimal  "XPF",        precision: 10, scale: 5
-    t.decimal  "YER",        precision: 10, scale: 5
-    t.decimal  "ZMK",        precision: 10, scale: 5
-    t.decimal  "ZMW",        precision: 10, scale: 5
-    t.decimal  "ZWL",        precision: 10, scale: 5
+    t.decimal  "EGP",        precision: 20, scale: 5
+    t.decimal  "ERN",        precision: 20, scale: 5
+    t.decimal  "ETB",        precision: 20, scale: 5
+    t.decimal  "FJD",        precision: 20, scale: 5
+    t.decimal  "FKP",        precision: 20, scale: 5
+    t.decimal  "GEL",        precision: 20, scale: 5
+    t.decimal  "GGP",        precision: 20, scale: 5
+    t.decimal  "GHS",        precision: 20, scale: 5
+    t.decimal  "GIP",        precision: 20, scale: 5
+    t.decimal  "GMD",        precision: 20, scale: 5
+    t.decimal  "GNF",        precision: 20, scale: 5
+    t.decimal  "GTQ",        precision: 20, scale: 5
+    t.decimal  "GYD",        precision: 20, scale: 5
+    t.decimal  "HNL",        precision: 20, scale: 5
+    t.decimal  "HTG",        precision: 20, scale: 5
+    t.decimal  "IMP",        precision: 20, scale: 5
+    t.decimal  "IQD",        precision: 20, scale: 5
+    t.decimal  "IRR",        precision: 20, scale: 5
+    t.decimal  "ISK",        precision: 20, scale: 5
+    t.decimal  "JEP",        precision: 20, scale: 5
+    t.decimal  "JMD",        precision: 20, scale: 5
+    t.decimal  "JOD",        precision: 20, scale: 5
+    t.decimal  "KES",        precision: 20, scale: 5
+    t.decimal  "KGS",        precision: 20, scale: 5
+    t.decimal  "KHR",        precision: 20, scale: 5
+    t.decimal  "KMF",        precision: 20, scale: 5
+    t.decimal  "KPW",        precision: 20, scale: 5
+    t.decimal  "KWD",        precision: 20, scale: 5
+    t.decimal  "KYD",        precision: 20, scale: 5
+    t.decimal  "KZT",        precision: 20, scale: 5
+    t.decimal  "LAK",        precision: 20, scale: 5
+    t.decimal  "LBP",        precision: 20, scale: 5
+    t.decimal  "LKR",        precision: 20, scale: 5
+    t.decimal  "LRD",        precision: 20, scale: 5
+    t.decimal  "LSL",        precision: 20, scale: 5
+    t.decimal  "LTL",        precision: 20, scale: 5
+    t.decimal  "LVL",        precision: 20, scale: 5
+    t.decimal  "LYD",        precision: 20, scale: 5
+    t.decimal  "MAD",        precision: 20, scale: 5
+    t.decimal  "MDL",        precision: 20, scale: 5
+    t.decimal  "MGA",        precision: 20, scale: 5
+    t.decimal  "MKD",        precision: 20, scale: 5
+    t.decimal  "MMK",        precision: 20, scale: 5
+    t.decimal  "MNT",        precision: 20, scale: 5
+    t.decimal  "MOP",        precision: 20, scale: 5
+    t.decimal  "MRO",        precision: 20, scale: 5
+    t.decimal  "MUR",        precision: 20, scale: 5
+    t.decimal  "MVR",        precision: 20, scale: 5
+    t.decimal  "MWK",        precision: 20, scale: 5
+    t.decimal  "MZN",        precision: 20, scale: 5
+    t.decimal  "NAD",        precision: 20, scale: 5
+    t.decimal  "NGN",        precision: 20, scale: 5
+    t.decimal  "NIO",        precision: 20, scale: 5
+    t.decimal  "NPR",        precision: 20, scale: 5
+    t.decimal  "OMR",        precision: 20, scale: 5
+    t.decimal  "PAB",        precision: 20, scale: 5
+    t.decimal  "PEN",        precision: 20, scale: 5
+    t.decimal  "PGK",        precision: 20, scale: 5
+    t.decimal  "PKR",        precision: 20, scale: 5
+    t.decimal  "PYG",        precision: 20, scale: 5
+    t.decimal  "QAR",        precision: 20, scale: 5
+    t.decimal  "RSD",        precision: 20, scale: 5
+    t.decimal  "RWF",        precision: 20, scale: 5
+    t.decimal  "SAR",        precision: 20, scale: 5
+    t.decimal  "SBD",        precision: 20, scale: 5
+    t.decimal  "SCR",        precision: 20, scale: 5
+    t.decimal  "SDG",        precision: 20, scale: 5
+    t.decimal  "SHP",        precision: 20, scale: 5
+    t.decimal  "SLL",        precision: 20, scale: 5
+    t.decimal  "SOS",        precision: 20, scale: 5
+    t.decimal  "SRD",        precision: 20, scale: 5
+    t.decimal  "STD",        precision: 20, scale: 5
+    t.decimal  "SVC",        precision: 20, scale: 5
+    t.decimal  "SYP",        precision: 20, scale: 5
+    t.decimal  "SZL",        precision: 20, scale: 5
+    t.decimal  "TJS",        precision: 20, scale: 5
+    t.decimal  "TMT",        precision: 20, scale: 5
+    t.decimal  "TND",        precision: 20, scale: 5
+    t.decimal  "TOP",        precision: 20, scale: 5
+    t.decimal  "TTD",        precision: 20, scale: 5
+    t.decimal  "TWD",        precision: 20, scale: 5
+    t.decimal  "TZS",        precision: 20, scale: 5
+    t.decimal  "UAH",        precision: 20, scale: 5
+    t.decimal  "UGX",        precision: 20, scale: 5
+    t.decimal  "UYU",        precision: 20, scale: 5
+    t.decimal  "UZS",        precision: 20, scale: 5
+    t.decimal  "VEF",        precision: 20, scale: 5
+    t.decimal  "VND",        precision: 20, scale: 5
+    t.decimal  "VUV",        precision: 20, scale: 5
+    t.decimal  "WST",        precision: 20, scale: 5
+    t.decimal  "XAF",        precision: 20, scale: 5
+    t.decimal  "XAG",        precision: 20, scale: 5
+    t.decimal  "XAU",        precision: 20, scale: 5
+    t.decimal  "XCD",        precision: 20, scale: 5
+    t.decimal  "XDR",        precision: 20, scale: 5
+    t.decimal  "XOF",        precision: 20, scale: 5
+    t.decimal  "XPF",        precision: 20, scale: 5
+    t.decimal  "YER",        precision: 20, scale: 5
+    t.decimal  "ZMK",        precision: 20, scale: 5
+    t.decimal  "ZMW",        precision: 20, scale: 5
+    t.decimal  "ZWL",        precision: 20, scale: 5
   end
 
   add_index "currency_conversion_rates", ["date"], name: "index_currency_conversion_rates_on_date", using: :btree
@@ -1744,51 +1694,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.boolean  "is_deleted",                  default: false
   end
 
-  create_table "delivery_challans", force: :cascade do |t|
-    t.integer  "company_id",             limit: 4
-    t.integer  "user_id",                limit: 4
-    t.integer  "procurement_id",         limit: 4
-    t.integer  "location_id",            limit: 4
-    t.integer  "delivery_location_id",   limit: 4
-    t.integer  "vendor_id",              limit: 4
-    t.integer  "payment_term_id",        limit: 4
-    t.integer  "procurement_term_id",    limit: 4
-    t.integer  "document_status_id",     limit: 4
-    t.string   "doc_number",             limit: 255
-    t.boolean  "override_doc_number"
-    t.string   "prefix",                 limit: 255
-    t.string   "sequence_start",         limit: 255
-    t.date     "date"
-    t.date     "challan_date"
-    t.date     "due_date"
-    t.boolean  "roundoff_total_enabled"
-    t.decimal  "roundoff_amount",                    precision: 10, scale: 5
-    t.integer  "transaction_amount_id",  limit: 4
-    t.integer  "total_before_tax_id",    limit: 4
-    t.integer  "tax_amount_id",          limit: 4
-    t.integer  "total_after_tax_id",     limit: 4
-    t.integer  "discount_amount_id",     limit: 4
-    t.integer  "balance_amount_id",      limit: 4
-    t.datetime "created_at",                                                  null: false
-    t.datetime "updated_at",                                                  null: false
-  end
-
-  add_index "delivery_challans", ["balance_amount_id"], name: "index_delivery_challans_on_balance_amount_id", using: :btree
-  add_index "delivery_challans", ["company_id"], name: "index_delivery_challans_on_company_id", using: :btree
-  add_index "delivery_challans", ["delivery_location_id"], name: "index_delivery_challans_on_delivery_location_id", using: :btree
-  add_index "delivery_challans", ["discount_amount_id"], name: "index_delivery_challans_on_discount_amount_id", using: :btree
-  add_index "delivery_challans", ["document_status_id"], name: "index_delivery_challans_on_document_status_id", using: :btree
-  add_index "delivery_challans", ["location_id"], name: "index_delivery_challans_on_location_id", using: :btree
-  add_index "delivery_challans", ["payment_term_id"], name: "index_delivery_challans_on_payment_term_id", using: :btree
-  add_index "delivery_challans", ["procurement_id"], name: "index_delivery_challans_on_procurement_id", using: :btree
-  add_index "delivery_challans", ["procurement_term_id"], name: "index_delivery_challans_on_procurement_term_id", using: :btree
-  add_index "delivery_challans", ["tax_amount_id"], name: "index_delivery_challans_on_tax_amount_id", using: :btree
-  add_index "delivery_challans", ["total_after_tax_id"], name: "index_delivery_challans_on_total_after_tax_id", using: :btree
-  add_index "delivery_challans", ["total_before_tax_id"], name: "index_delivery_challans_on_total_before_tax_id", using: :btree
-  add_index "delivery_challans", ["transaction_amount_id"], name: "index_delivery_challans_on_transaction_amount_id", using: :btree
-  add_index "delivery_challans", ["user_id"], name: "index_delivery_challans_on_user_id", using: :btree
-  add_index "delivery_challans", ["vendor_id"], name: "index_delivery_challans_on_vendor_id", using: :btree
-
   create_table "desktop_users", force: :cascade do |t|
     t.string   "email",      limit: 255, null: false
     t.string   "country",    limit: 255, null: false
@@ -1839,64 +1744,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
 
   add_index "distances", ["physical_unit_id"], name: "index_distances_on_physical_unit_id", using: :btree
 
-  create_table "document_items", force: :cascade do |t|
-    t.integer  "parent_document_id",     limit: 4,                                          null: false
-    t.string   "parent_document_type",   limit: 255,                                        null: false
-    t.integer  "inventory_line_item_id", limit: 4
-    t.string   "description",            limit: 255
-    t.string   "hsn_sac",                limit: 255
-    t.decimal  "quantity",                           precision: 20, scale: 5
-    t.decimal  "rate",                               precision: 20, scale: 5
-    t.decimal  "tax",                                precision: 20, scale: 5, default: 0.0
-    t.decimal  "tds",                                precision: 20, scale: 5, default: 0.0
-    t.decimal  "discount",                           precision: 20, scale: 5, default: 0.0
-    t.integer  "tax_amount_id",          limit: 4
-    t.integer  "tds_amount_id",          limit: 4
-    t.integer  "discount_amount_id",     limit: 4
-    t.integer  "total_amount_id",        limit: 4
-    t.date     "delivery_date"
-    t.string   "comment",                limit: 255
-    t.datetime "created_at",                                                                null: false
-    t.datetime "updated_at",                                                                null: false
-    t.integer  "purchase_order_item_id", limit: 4
-    t.string   "product_id",             limit: 255
-  end
-
-  add_index "document_items", ["discount_amount_id"], name: "index_document_items_on_discount_amount_id", using: :btree
-  add_index "document_items", ["inventory_line_item_id"], name: "index_document_items_on_inventory_line_item_id", using: :btree
-  add_index "document_items", ["parent_document_type", "parent_document_id"], name: "indx_doc_items_on_parent_doc_type_and_parent_doc_id", using: :btree
-  add_index "document_items", ["purchase_order_item_id"], name: "index_document_items_on_purchase_order_item_id", using: :btree
-  add_index "document_items", ["tax_amount_id"], name: "index_document_items_on_tax_amount_id", using: :btree
-  add_index "document_items", ["tds_amount_id"], name: "index_document_items_on_tds_amount_id", using: :btree
-  add_index "document_items", ["total_amount_id"], name: "index_document_items_on_total_amount_id", using: :btree
-
-  create_table "document_number_config_types", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.text     "description", limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  create_table "document_number_configs", force: :cascade do |t|
-    t.string   "prefix",                         limit: 255
-    t.string   "sequence_start",                 limit: 255
-    t.integer  "company_id",                     limit: 4
-    t.integer  "document_number_config_type_id", limit: 4
-    t.integer  "purpose_id",                     limit: 4
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
-  end
-
-  add_index "document_number_configs", ["company_id"], name: "index_document_number_configs_on_company_id", using: :btree
-  add_index "document_number_configs", ["document_number_config_type_id"], name: "index_document_number_configs_on_document_number_config_type_id", using: :btree
-  add_index "document_number_configs", ["purpose_id"], name: "index_document_number_configs_on_purpose_id", using: :btree
-
-  create_table "document_statuses", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
   create_table "duplicate_expense_mappings", force: :cascade do |t|
     t.integer  "expense_id",           limit: 4, null: false
     t.integer  "duplicate_expense_id", limit: 4, null: false
@@ -1905,41 +1752,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
   end
 
   add_index "duplicate_expense_mappings", ["expense_id"], name: "index_duplicate_expense_mappings_on_expense_id", using: :btree
-
-  create_table "e_way_bills", force: :cascade do |t|
-    t.integer  "company_id",                limit: 4
-    t.integer  "user_id",                   limit: 4
-    t.integer  "procurement_id",            limit: 4
-    t.integer  "location_id",               limit: 4
-    t.integer  "delivery_location_id",      limit: 4
-    t.integer  "vendor_id",                 limit: 4
-    t.integer  "payment_term_id",           limit: 4
-    t.integer  "procurement_term_id",       limit: 4
-    t.string   "doc_number",                limit: 255
-    t.date     "date"
-    t.string   "generated_by",              limit: 255
-    t.datetime "valid_from"
-    t.datetime "valid_to"
-    t.string   "ref_doc_name",              limit: 255
-    t.string   "ref_doc_date",              limit: 255
-    t.integer  "amount_id",                 limit: 4
-    t.string   "hsn_code",                  limit: 255
-    t.string   "reason_for_transportation", limit: 255
-    t.string   "mode",                      limit: 255
-    t.string   "vehicle_number",            limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-  end
-
-  add_index "e_way_bills", ["amount_id"], name: "index_e_way_bills_on_amount_id", using: :btree
-  add_index "e_way_bills", ["company_id"], name: "index_e_way_bills_on_company_id", using: :btree
-  add_index "e_way_bills", ["delivery_location_id"], name: "index_e_way_bills_on_delivery_location_id", using: :btree
-  add_index "e_way_bills", ["location_id"], name: "index_e_way_bills_on_location_id", using: :btree
-  add_index "e_way_bills", ["payment_term_id"], name: "index_e_way_bills_on_payment_term_id", using: :btree
-  add_index "e_way_bills", ["procurement_id"], name: "index_e_way_bills_on_procurement_id", using: :btree
-  add_index "e_way_bills", ["procurement_term_id"], name: "index_e_way_bills_on_procurement_term_id", using: :btree
-  add_index "e_way_bills", ["user_id"], name: "index_e_way_bills_on_user_id", using: :btree
-  add_index "e_way_bills", ["vendor_id"], name: "index_e_way_bills_on_vendor_id", using: :btree
 
   create_table "email_authorizations", force: :cascade do |t|
     t.integer "user_id",           limit: 4
@@ -2125,6 +1937,7 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.boolean  "travel_request",                         default: false
     t.boolean  "budgeting_system",                       default: false
     t.boolean  "em_tax_tracking",                        default: false
+    t.boolean  "two_factor_authentication",              default: false
   end
 
   add_index "feature_subscriptions", ["subscribable_id"], name: "index_feature_subscriptions_on_subscribable_id", using: :btree
@@ -2566,7 +2379,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.integer  "receiving_account_id",   limit: 4
     t.string   "receiving_account_type", limit: 255
     t.text     "note",                   limit: 65535
-    t.integer  "procurement_id",         limit: 4
     t.integer  "remaining_amount_id",    limit: 4
     t.integer  "invoice_type_id",        limit: 4
   end
@@ -2574,43 +2386,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
   add_index "invoices", ["discount_type_id"], name: "index_invoices_on_discount_type_id", using: :btree
   add_index "invoices", ["tax_type_id"], name: "index_invoices_on_tax_type_id", using: :btree
-
-  create_table "inward_document_items", force: :cascade do |t|
-    t.integer  "purchase_order_item_id", limit: 4
-    t.integer  "inward_document_id",     limit: 4
-    t.integer  "inventory_line_item_id", limit: 4
-    t.string   "product_id",             limit: 255
-    t.string   "description",            limit: 255
-    t.decimal  "quantity",                           precision: 10
-    t.decimal  "delivered",                          precision: 10
-    t.decimal  "accepted",                           precision: 10
-    t.decimal  "rejected",                           precision: 10
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
-  end
-
-  add_index "inward_document_items", ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id", using: :btree
-  add_index "inward_document_items", ["inward_document_id"], name: "index_inward_document_items_on_inward_document_id", using: :btree
-  add_index "inward_document_items", ["purchase_order_item_id"], name: "index_inward_document_items_on_purchase_order_item_id", using: :btree
-
-  create_table "inward_documents", force: :cascade do |t|
-    t.integer  "company_id",                  limit: 4
-    t.integer  "procurement_id",              limit: 4
-    t.integer  "vendor_id",                   limit: 4
-    t.string   "doc_number",                  limit: 255
-    t.string   "override_doc_number",         limit: 255
-    t.string   "prefix",                      limit: 255
-    t.date     "delivery_date"
-    t.string   "transported_name",            limit: 255
-    t.string   "transporter_document_number", limit: 255
-    t.string   "vehicle_number",              limit: 255
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-  end
-
-  add_index "inward_documents", ["company_id"], name: "index_inward_documents_on_company_id", using: :btree
-  add_index "inward_documents", ["procurement_id"], name: "index_inward_documents_on_procurement_id", using: :btree
-  add_index "inward_documents", ["vendor_id"], name: "index_inward_documents_on_vendor_id", using: :btree
 
   create_table "inward_invoice_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -2724,18 +2499,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
   end
-
-  create_table "level_reviewer_mappings", force: :cascade do |t|
-    t.integer  "level_id",    limit: 4
-    t.integer  "reviewer_id", limit: 4
-    t.decimal  "threshold",             precision: 20, scale: 5, default: 0.0
-    t.boolean  "exception",                                      default: false
-    t.datetime "created_at",                                                     null: false
-    t.datetime "updated_at",                                                     null: false
-  end
-
-  add_index "level_reviewer_mappings", ["level_id"], name: "index_level_reviewer_mappings_on_level_id", using: :btree
-  add_index "level_reviewer_mappings", ["reviewer_id"], name: "index_level_reviewer_mappings_on_reviewer_id", using: :btree
 
   create_table "locations", force: :cascade do |t|
     t.integer  "locatable_id",   limit: 4
@@ -3234,8 +2997,8 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.boolean  "roundoff_total_enabled"
     t.string   "memo",                    limit: 255
     t.text     "customer_memo",           limit: 65535
-    t.integer  "payment_term_id",         limit: 4
     t.text     "reminders",               limit: 65535
+    t.integer  "payment_term_id",         limit: 4
     t.integer  "user_id",                 limit: 4
     t.integer  "outward_invoice_type_id", limit: 4,                              default: 1
     t.text     "terms",                   limit: 65535
@@ -3260,6 +3023,7 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.text     "options",     limit: 65535
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
+    t.boolean  "default"
   end
 
   add_index "payment_file_configurations", ["company_id"], name: "index_payment_file_configurations_on_company_id", using: :btree
@@ -3440,8 +3204,8 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.text     "post_operation",          limit: 65535
     t.text     "post_operation_payload",  limit: 65535
     t.integer  "category_id",             limit: 4
-    t.date     "scheduled_at"
     t.boolean  "api_initiated",                         default: false
+    t.date     "scheduled_at"
     t.date     "processed_at"
   end
 
@@ -3572,103 +3336,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.string   "referrer",           limit: 255
   end
 
-  create_table "procurement_attachments", force: :cascade do |t|
-    t.string   "file_file_name",            limit: 255
-    t.string   "file_content_type",         limit: 255
-    t.integer  "file_file_size",            limit: 4
-    t.datetime "file_updated_at"
-    t.string   "name",                      limit: 255
-    t.integer  "company_id",                limit: 4
-    t.text     "description",               limit: 65535
-    t.integer  "procurement_document_id",   limit: 4
-    t.string   "procurement_document_type", limit: 255
-    t.datetime "created_at",                              null: false
-    t.datetime "updated_at",                              null: false
-  end
-
-  create_table "procurement_charges", force: :cascade do |t|
-    t.integer  "charge_type",     limit: 4
-    t.string   "description",     limit: 255
-    t.integer  "amount_id",       limit: 4
-    t.boolean  "taxable"
-    t.decimal  "tax",                         precision: 10
-    t.integer  "tax_amount_id",   limit: 4
-    t.integer  "total_amount_id", limit: 4
-    t.integer  "chargable_id",    limit: 4
-    t.string   "chargable_type",  limit: 255
-    t.datetime "created_at",                                 null: false
-    t.datetime "updated_at",                                 null: false
-  end
-
-  add_index "procurement_charges", ["amount_id"], name: "index_procurement_charges_on_amount_id", using: :btree
-  add_index "procurement_charges", ["chargable_type", "chargable_id"], name: "index_procurement_charges_on_chargable_type_and_chargable_id", using: :btree
-  add_index "procurement_charges", ["tax_amount_id"], name: "index_procurement_charges_on_tax_amount_id", using: :btree
-  add_index "procurement_charges", ["total_amount_id"], name: "index_procurement_charges_on_total_amount_id", using: :btree
-
-  create_table "procurement_comments", force: :cascade do |t|
-    t.text     "body",                    limit: 65535
-    t.integer  "user_id",                 limit: 4
-    t.integer  "parent_commentable_id",   limit: 4
-    t.string   "parent_commentable_type", limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
-  end
-
-  add_index "procurement_comments", ["parent_commentable_type", "parent_commentable_id"], name: "indx_prcurmnt_cmments_on_prnt_cmmentble_typ_n_prnt_cmmentble_id", using: :btree
-  add_index "procurement_comments", ["user_id"], name: "index_procurement_comments_on_user_id", using: :btree
-
-  create_table "procurement_status_taggables", force: :cascade do |t|
-    t.integer  "procurement_id", limit: 4
-    t.integer  "status_tag_id",  limit: 4
-    t.datetime "created_at",               null: false
-    t.datetime "updated_at",               null: false
-  end
-
-  add_index "procurement_status_taggables", ["procurement_id"], name: "index_procurement_status_taggables_on_procurement_id", using: :btree
-  add_index "procurement_status_taggables", ["status_tag_id"], name: "index_procurement_status_taggables_on_status_tag_id", using: :btree
-
-  create_table "procurement_statuses", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.text     "description", limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  create_table "procurement_terms", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.text     "description", limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-    t.integer  "company_id",  limit: 4
-  end
-
-  add_index "procurement_terms", ["company_id"], name: "index_procurement_terms_on_company_id", using: :btree
-
-  create_table "procurement_tracks", force: :cascade do |t|
-    t.string   "name",        limit: 255
-    t.text     "description", limit: 65535
-    t.datetime "created_at",                null: false
-    t.datetime "updated_at",                null: false
-  end
-
-  create_table "procurements", force: :cascade do |t|
-    t.string   "name",                  limit: 255
-    t.integer  "procurement_track_id",  limit: 4
-    t.integer  "procurement_status_id", limit: 4
-    t.integer  "vendor_id",             limit: 4
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
-    t.integer  "user_id",               limit: 4
-    t.integer  "company_id",            limit: 4
-    t.text     "note",                  limit: 65535
-  end
-
-  add_index "procurements", ["company_id"], name: "index_procurements_on_company_id", using: :btree
-  add_index "procurements", ["procurement_status_id"], name: "index_procurements_on_procurement_status_id", using: :btree
-  add_index "procurements", ["procurement_track_id"], name: "index_procurements_on_procurement_track_id", using: :btree
-  add_index "procurements", ["user_id"], name: "index_procurements_on_user_id", using: :btree
-  add_index "procurements", ["vendor_id"], name: "index_procurements_on_vendor_id", using: :btree
-
   create_table "product_combinations", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -3688,98 +3355,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.string   "product",              limit: 255
     t.string   "prepaid_cards",        limit: 255
   end
-
-  create_table "purchase_order_items", force: :cascade do |t|
-    t.integer  "purchase_order_id",      limit: 4
-    t.integer  "inventory_line_item_id", limit: 4
-    t.string   "product_id",             limit: 255
-    t.string   "description",            limit: 255
-    t.string   "hsn_sac",                limit: 255
-    t.integer  "quantity",               limit: 4
-    t.decimal  "rate",                               precision: 20, scale: 5
-    t.decimal  "tax",                                precision: 20, scale: 5
-    t.decimal  "tds",                                precision: 20, scale: 5
-    t.decimal  "discount",                           precision: 20, scale: 5
-    t.integer  "tax_amount_id",          limit: 4
-    t.integer  "tds_amount_id",          limit: 4
-    t.integer  "discount_amount_id",     limit: 4
-    t.integer  "total_amount_id",        limit: 4
-    t.date     "delivery_date"
-    t.string   "comment",                limit: 255
-    t.datetime "created_at",                                                              null: false
-    t.datetime "updated_at",                                                              null: false
-    t.integer  "delivered",              limit: 4,                            default: 0
-    t.integer  "accepted",               limit: 4,                            default: 0
-    t.integer  "rejected",               limit: 4,                            default: 0
-  end
-
-  add_index "purchase_order_items", ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id", using: :btree
-  add_index "purchase_order_items", ["inventory_line_item_id"], name: "index_purchase_order_items_on_inventory_line_item_id", using: :btree
-  add_index "purchase_order_items", ["purchase_order_id"], name: "index_purchase_order_items_on_purchase_order_id", using: :btree
-  add_index "purchase_order_items", ["tax_amount_id"], name: "index_purchase_order_items_on_tax_amount_id", using: :btree
-  add_index "purchase_order_items", ["tds_amount_id"], name: "index_purchase_order_items_on_tds_amount_id", using: :btree
-  add_index "purchase_order_items", ["total_amount_id"], name: "index_purchase_order_items_on_total_amount_id", using: :btree
-
-  create_table "purchase_order_statuses", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "purchase_orders", force: :cascade do |t|
-    t.integer  "company_id",                   limit: 4
-    t.integer  "procurement_id",               limit: 4
-    t.integer  "location_id",                  limit: 4
-    t.integer  "delivery_location_id",         limit: 4
-    t.integer  "vendor_id",                    limit: 4
-    t.integer  "payment_term_id",              limit: 4
-    t.integer  "procurement_term_id",          limit: 4
-    t.integer  "purchase_order_status_id",     limit: 4
-    t.string   "indent_number",                limit: 255
-    t.date     "indent_date"
-    t.string   "po_number",                    limit: 255
-    t.boolean  "override_po_number"
-    t.string   "prefix",                       limit: 255
-    t.string   "sequence_start",               limit: 255
-    t.date     "delivery_date"
-    t.integer  "gst_type_id",                  limit: 4
-    t.boolean  "inclusive_of_taxes"
-    t.boolean  "roundoff_total_enabled"
-    t.decimal  "roundoff_amount",                            precision: 10, scale: 5
-    t.integer  "transaction_amount_id",        limit: 4
-    t.integer  "total_before_tax_id",          limit: 4
-    t.integer  "tax_amount_id",                limit: 4
-    t.integer  "total_after_tax_id",           limit: 4
-    t.integer  "discount_amount_id",           limit: 4
-    t.integer  "balance_amount_id",            limit: 4
-    t.datetime "created_at",                                                          null: false
-    t.datetime "updated_at",                                                          null: false
-    t.integer  "user_id",                      limit: 4
-    t.text     "procurement_term_text",        limit: 65535
-    t.integer  "controlling_user_id",          limit: 4
-    t.integer  "controlling_user_role_id",     limit: 4
-    t.integer  "controlling_for_user_id",      limit: 4
-    t.integer  "controlling_for_user_role_id", limit: 4
-    t.integer  "policy_id",                    limit: 4
-    t.integer  "controlling_level_id",         limit: 4
-  end
-
-  add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
-  add_index "purchase_orders", ["company_id"], name: "index_purchase_orders_on_company_id", using: :btree
-  add_index "purchase_orders", ["delivery_location_id"], name: "index_purchase_orders_on_delivery_location_id", using: :btree
-  add_index "purchase_orders", ["discount_amount_id"], name: "index_purchase_orders_on_discount_amount_id", using: :btree
-  add_index "purchase_orders", ["location_id"], name: "index_purchase_orders_on_location_id", using: :btree
-  add_index "purchase_orders", ["payment_term_id"], name: "index_purchase_orders_on_payment_term_id", using: :btree
-  add_index "purchase_orders", ["policy_id"], name: "index_purchase_orders_on_policy_id", using: :btree
-  add_index "purchase_orders", ["procurement_id"], name: "index_purchase_orders_on_procurement_id", using: :btree
-  add_index "purchase_orders", ["procurement_term_id"], name: "index_purchase_orders_on_procurement_term_id", using: :btree
-  add_index "purchase_orders", ["purchase_order_status_id"], name: "index_purchase_orders_on_purchase_order_status_id", using: :btree
-  add_index "purchase_orders", ["tax_amount_id"], name: "index_purchase_orders_on_tax_amount_id", using: :btree
-  add_index "purchase_orders", ["total_after_tax_id"], name: "index_purchase_orders_on_total_after_tax_id", using: :btree
-  add_index "purchase_orders", ["total_before_tax_id"], name: "index_purchase_orders_on_total_before_tax_id", using: :btree
-  add_index "purchase_orders", ["transaction_amount_id"], name: "index_purchase_orders_on_transaction_amount_id", using: :btree
-  add_index "purchase_orders", ["user_id"], name: "index_purchase_orders_on_user_id", using: :btree
-  add_index "purchase_orders", ["vendor_id"], name: "index_purchase_orders_on_vendor_id", using: :btree
 
   create_table "purposes", force: :cascade do |t|
     t.string   "name",       limit: 255
@@ -4207,16 +3782,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.text   "source_description", limit: 65535
   end
 
-  create_table "reviewal_levels", force: :cascade do |t|
-    t.integer  "level_number",           limit: 4
-    t.integer  "policy_id",              limit: 4
-    t.string   "associated_entity_type", limit: 255
-    t.datetime "created_at",                         null: false
-    t.datetime "updated_at",                         null: false
-  end
-
-  add_index "reviewal_levels", ["policy_id"], name: "index_reviewal_levels_on_policy_id", using: :btree
-
   create_table "rule_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -4239,17 +3804,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
     t.string   "code",       limit: 255, null: false
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
-  end
-
-  create_table "status_tags", force: :cascade do |t|
-    t.string   "name",            limit: 255
-    t.string   "display_name",    limit: 255
-    t.string   "description",     limit: 255
-    t.string   "font_icon",       limit: 255
-    t.string   "font_icon_color", limit: 255
-    t.string   "icon_path",       limit: 255
-    t.datetime "created_at",                  null: false
-    t.datetime "updated_at",                  null: false
   end
 
   create_table "system_logs", force: :cascade do |t|
@@ -5067,12 +4621,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
   add_foreign_key "bank_payment_request_trails", "bank_payment_requests"
   add_foreign_key "bank_transactions", "amounts"
   add_foreign_key "bank_transactions", "companies"
-  add_foreign_key "bill_of_supplies", "companies"
-  add_foreign_key "bill_of_supplies", "document_statuses"
-  add_foreign_key "bill_of_supplies", "payment_terms"
-  add_foreign_key "bill_of_supplies", "procurement_terms"
-  add_foreign_key "bill_of_supplies", "procurements"
-  add_foreign_key "bill_of_supplies", "users"
   add_foreign_key "booking_attachments", "bookings"
   add_foreign_key "booking_attachments", "companies"
   add_foreign_key "booking_attachments", "users"
@@ -5116,6 +4664,7 @@ ActiveRecord::Schema.define(version: 20180723125433) do
   add_foreign_key "company_agreement_tracks", "agreements"
   add_foreign_key "company_agreement_tracks", "users"
   add_foreign_key "company_balance_histories", "companies"
+  add_foreign_key "company_branches", "collect_company_details"
   add_foreign_key "company_branches", "companies"
   add_foreign_key "company_configurations", "companies"
   add_foreign_key "company_configurations", "contacts"
@@ -5130,25 +4679,8 @@ ActiveRecord::Schema.define(version: 20180723125433) do
   add_foreign_key "customer_account_transactions", "customer_accounts"
   add_foreign_key "customer_accounts", "customers"
   add_foreign_key "customer_attachments", "customers"
-  add_foreign_key "delivery_challans", "companies"
-  add_foreign_key "delivery_challans", "document_statuses"
-  add_foreign_key "delivery_challans", "payment_terms"
-  add_foreign_key "delivery_challans", "procurement_terms"
-  add_foreign_key "delivery_challans", "procurements"
-  add_foreign_key "delivery_challans", "users"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
-  add_foreign_key "document_items", "inventory_line_items"
-  add_foreign_key "document_items", "purchase_order_items"
-  add_foreign_key "document_number_configs", "companies"
-  add_foreign_key "document_number_configs", "document_number_config_types"
-  add_foreign_key "document_number_configs", "purposes"
-  add_foreign_key "e_way_bills", "amounts"
-  add_foreign_key "e_way_bills", "companies"
-  add_foreign_key "e_way_bills", "payment_terms"
-  add_foreign_key "e_way_bills", "procurement_terms"
-  add_foreign_key "e_way_bills", "procurements"
-  add_foreign_key "e_way_bills", "users"
   add_foreign_key "email_authorizations", "users"
   add_foreign_key "expense_data_extracts", "amounts"
   add_foreign_key "expense_data_extracts", "categories"
@@ -5189,11 +4721,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
   add_foreign_key "invoice_number_configs", "invoice_number_config_types"
   add_foreign_key "invoice_number_configs", "purposes"
   add_foreign_key "invoices", "addresses"
-  add_foreign_key "inward_document_items", "inventory_line_items"
-  add_foreign_key "inward_document_items", "inward_documents"
-  add_foreign_key "inward_document_items", "purchase_order_items"
-  add_foreign_key "inward_documents", "companies"
-  add_foreign_key "inward_documents", "procurements"
   add_foreign_key "itz_cash_company_accounts", "companies"
   add_foreign_key "itz_cash_dmt_beneficiaries", "itz_cash_dmt_senders"
   add_foreign_key "itz_cash_dmt_senders", "users"
@@ -5261,24 +4788,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
   add_foreign_key "policy_configurations", "policies"
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
-  add_foreign_key "procurement_charges", "amounts"
-  add_foreign_key "procurement_comments", "users"
-  add_foreign_key "procurement_status_taggables", "procurements"
-  add_foreign_key "procurement_status_taggables", "status_tags"
-  add_foreign_key "procurement_terms", "companies"
-  add_foreign_key "procurements", "companies"
-  add_foreign_key "procurements", "procurement_statuses"
-  add_foreign_key "procurements", "procurement_tracks"
-  add_foreign_key "procurements", "users"
-  add_foreign_key "purchase_order_items", "inventory_line_items"
-  add_foreign_key "purchase_order_items", "purchase_orders"
-  add_foreign_key "purchase_orders", "companies"
-  add_foreign_key "purchase_orders", "payment_terms"
-  add_foreign_key "purchase_orders", "policies"
-  add_foreign_key "purchase_orders", "procurement_terms"
-  add_foreign_key "purchase_orders", "procurements"
-  add_foreign_key "purchase_orders", "purchase_order_statuses"
-  add_foreign_key "purchase_orders", "users"
   add_foreign_key "quickbooks_configurations", "quickbooks_payment_types"
   add_foreign_key "quickbooks_configurations", "users"
   add_foreign_key "quickbooks_departments", "companies"
@@ -5305,7 +4814,6 @@ ActiveRecord::Schema.define(version: 20180723125433) do
   add_foreign_key "reports", "report_processor_group_mappings"
   add_foreign_key "reports", "report_statuses"
   add_foreign_key "reports", "users"
-  add_foreign_key "reviewal_levels", "policies"
   add_foreign_key "tally_configurations", "companies"
   add_foreign_key "time_expenses", "expenses"
   add_foreign_key "time_objects", "physical_units"

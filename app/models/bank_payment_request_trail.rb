@@ -36,6 +36,7 @@ class BankPaymentRequestTrail < ActiveRecord::Base
   scope :with_action_user, -> (action_user_id) {
     where action_user_id: action_user_id
   }
+  scope :with_action_user_role, ->(role_id) { where action_user_role_id: role_id }
   scope :trails_for_approval_chain, -> {
     # this scope should essentially just return the approvers and the take control / approve and forward actions
     # first find the latest submit action trail

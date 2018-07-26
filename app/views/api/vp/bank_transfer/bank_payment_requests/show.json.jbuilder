@@ -69,7 +69,7 @@ json.payments do
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
-        json.gst_type_id invoice.gst_type
+        json.gst_type_id invoice.gst_type_id
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
         json.discount_amount precision_value invoice.discount_amount&.value
@@ -176,7 +176,7 @@ json.payments_verified do
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
-        json.gst_type_id invoice.gst_type
+        json.gst_type_id invoice.gst_type_id
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
         json.discount_amount precision_value invoice.discount_amount&.value
@@ -280,7 +280,7 @@ json.payments_unverified do
         json.tds_amount precision_value invoice.tds_amount&.value
         json.tax precision_value invoice.tax
         json.tds precision_value invoice.tds
-        json.gst_type_id invoice.gst_type
+        json.gst_type_id invoice.gst_type_id
         json.tax_type_id invoice.tax_type_id
         json.tds_type_id invoice.tds_type_id
         json.discount_amount precision_value invoice.discount_amount&.value
