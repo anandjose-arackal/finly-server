@@ -43,8 +43,8 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
             url: Rails.application.routes.url_helpers.procure_purchase_order_submit_path(purchase_order_id: purchase_order.id),
             method: "PUT"
         }
-        actions[:retract] = {
-            url: Rails.application.routes.url_helpers.procure_purchase_order_retract_path(purchase_order_id: purchase_order.id),
+        actions[:update] = {
+            url: Rails.application.routes.url_helpers.procure_purchase_order_path(purchase_order_id: purchase_order.id),
             method: "PUT"
         }
       end
@@ -60,15 +60,23 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
         }
       end
 
-      if user_in_level? && purchase_order.processing?
-        actions[:approve] = {
-            url: Rails.application.routes.url_helpers.procure_purchase_order_approve_path(purchase_order_id: purchase_order.id),
-            method: "PUT"
-        }
-        actions[:reject] = {
-            url: Rails.application.routes.url_helpers.procure_purchase_order_reject_path(purchase_order_id: purchase_order.id),
-            method: "PUT"
-        }
+      if purchase_order.processing?
+        if user_in_level?
+          actions[:approve] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_approve_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
+          actions[:reject] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_reject_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
+        end
+        if document_owner?
+          actions[:retract] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_retract_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
+        end
       end
 
       actions
