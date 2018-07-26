@@ -87,6 +87,83 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  def current_app
+    # Check header to identify app
+    header_app = request.headers['App']
+    if header_app.present?
+      case header_app
+      when 'ap', :ap
+        return :ap
+      when 'ft', :ft
+        return :ft
+      when 'vp', :vp
+        return :vp
+      when 'em', :em
+        return :em
+      when 'fc', :fc
+        return :fc
+      end
+    end
+    # todo Referrer is jugaad as disburse is using expense management endpoints.
+    path = nil
+    path = URI(request.referrer).path if request.referrer.present?
+    path = request.path if path.blank?
+    if path.is_a?(String)
+      if path.starts_with?('/admin')
+        return :ap
+      elsif path.starts_with?('/payments')
+        return :vp
+      elsif path.starts_with?('/disburse')
+        return :ft
+      elsif path.starts_with?('/collect')
+        return :fc
+      end
+    end
+    :em
+  end
+
+  def current_device
+    path = request.path
+    if path.is_a?(String)
+      if path.starts_with?('/api')
+        return :api
+      elsif path.starts_with?('/mobile')
+        return :mobile
+      elsif path.starts_with?('/desktop')
+        # todo desktop login
+        return :desktop
+      end
+    end
+    :web
+  end
+
+  def current_user
+    if RequestStore.store[:current_user].present?
+      if RequestStore.store[:current_company].present? or RequestStore.store[:current_user].class.name != 'User'
+        return RequestStore.store[:current_user]
+      end
+    end
+    @curr_user = nil
+    if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
+      scopes = doorkeeper_token[:scopes]
+      if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome')or scopes.include?('api')
+        @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
+      elsif scopes.include?('admin')
+        @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
+      end
+    end
+    RequestStoreUtil.set_current_user @curr_user
+    if @curr_user.class.name == 'User'
+      RequestStoreUtil.set_current_company @curr_user&.company
+    end
+    @curr_user
+  end
+
+  def current_company
+    current_user
+    RequestStore.store[:current_company]
+  end
+
   protected
   def respond_success_failure
     respond response: (@result.success? ? :success : :failure)
@@ -166,56 +243,6 @@ class ApplicationController < ActionController::Base
     RequestStoreUtil.set_current_device current_device
   end
 
-  def current_app
-    # Check header to identify app
-    header_app = request.headers['App']
-    if header_app.present?
-      case header_app
-        when 'ap', :ap
-          return :ap
-        when 'ft', :ft
-          return :ft
-        when 'vp', :vp
-          return :vp
-        when 'em', :em
-          return :em
-        when 'fc', :fc
-          return :fc
-      end
-    end
-    # todo Referrer is jugaad as disburse is using expense management endpoints.
-    path = nil
-    path = URI(request.referrer).path if request.referrer.present?
-    path = request.path if path.blank?
-    if path.is_a?(String)
-      if path.starts_with?('/admin')
-        return :ap
-      elsif path.starts_with?('/payments')
-        return :vp
-      elsif path.starts_with?('/disburse')
-        return :ft
-      elsif path.starts_with?('/collect')
-        return :fc
-      end
-    end
-    :em
-  end
-
-  def current_device
-    path = request.path
-    if path.is_a?(String)
-      if path.starts_with?('/api')
-        return :api
-      elsif path.starts_with?('/mobile')
-        return :mobile
-      elsif path.starts_with?('/desktop')
-        # todo desktop login
-        return :desktop
-      end
-    end
-    :web
-  end
-
   def respond_failure(message=nil)
     messages = nil
     messages = [message] unless message.blank? or message.is_a?(Array)
@@ -256,33 +283,6 @@ class ApplicationController < ActionController::Base
     if current_user.present?
       RequestStoreUtil.set_authorized_scopes scopes
     end
-  end
-
-  def current_user
-    if RequestStore.store[:current_user].present?
-      if RequestStore.store[:current_company].present? or RequestStore.store[:current_user].class.name != 'User'
-        return RequestStore.store[:current_user]
-      end
-    end
-    @curr_user = nil
-    if doorkeeper_token.present? and doorkeeper_token&.resource_owner_id&.present?
-      scopes = doorkeeper_token[:scopes]
-      if scopes.include?('web') or scopes.include?('mobile') or scopes.include?('chrome')or scopes.include?('api')
-        @curr_user ||= User.find_by(id: doorkeeper_token[:resource_owner_id])
-      elsif scopes.include?('admin')
-        @curr_user ||= AdminUser.find_by(id: doorkeeper_token[:resource_owner_id])
-      end
-    end
-    RequestStoreUtil.set_current_user @curr_user
-    if @curr_user.class.name == 'User'
-      RequestStoreUtil.set_current_company @curr_user&.company
-    end
-    @curr_user
-  end
-
-  def current_company
-    current_user
-    RequestStore.store[:current_company]
   end
 
   def set_tokens_in_header

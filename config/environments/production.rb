@@ -10,6 +10,31 @@ Rails.application.configure do
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
   config.logstasher.enabled = true
+  config.lograge.enabled = true
+  # config.lograge.keep_original_rails_log = true
+  # config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/lograge_#{Rails.env}.log"
+  config.lograge.custom_options = lambda do |event|
+    {
+        exception: event.payload[:exception], # ["ExceptionClass", "the message"]
+        exception_object: event.payload[:exception_object] # the exception instance
+    }
+  end
+
+
+  config.lograge.custom_payload do |controller|
+    user = controller.current_user
+    hash = {params: controller.params, current_app: controller.current_app, current_device: controller.current_device}
+    if user.present?
+      hash[:user_id] = user&.id
+      hash[:user_name] = (user&.name rescue nil)
+      hash[:user_email] = user&.email
+      hash[:user_mobile_number] = user&.mobile_number
+      hash[:company_name] = (controller.current_company&.name rescue nil)
+      hash[:company_id] = (controller.current_company&.id rescue nil)
+      hash[:current_view] = (controller.params&.dig(:view) rescue nil)
+    end
+    hash
+  end
 
   # Full error reports are disabled and caching is turned on.
   config.consider_all_requests_local       = false
@@ -51,7 +76,7 @@ Rails.application.configure do
 
   # Use the lowest log level to ensure availability of diagnostic information
   # when problems arise.
-  config.log_level = :debug
+  config.log_level = :info
 
   # Prepend all log lines with the following tags.
   # config.log_tags = [ :subdomain, :uuid ]

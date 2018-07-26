@@ -19,7 +19,13 @@ class Personalizer::Adapters::Company104::Report104::Approve104::PreProcess < Pe
       party_account_name = expense.custom_fields.with_field_key('tally_party_name')&.first&.value&.value
       if party_account_name.blank?
         add_message :error, "Please fill in the tally party account name for #{expense.merchant_name}"
+        return
       end
+    end
+    tally_custom_field = self.report.custom_fields.with_field_key('tally_cost_center')&.first
+    tally_cost_center = tally_custom_field&.value&.value
+    if tally_custom_field.present? and tally_cost_center.blank?
+      add_message :error, "Please fill in the tally cost center for this report"
     end
   end
 

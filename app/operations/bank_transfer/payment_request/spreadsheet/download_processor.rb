@@ -43,7 +43,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
           next if file.blank?
           name_splits = attachment.attached_file_file_name&.split('.')
           extension = (name_splits.present? and name_splits.size > 1) ? ".#{name_splits&.last}" : ''
-          files << {name: "#{file_name_prefix}_#{count}#{extension}", path: file.path}
+          files << {name: "#{file_name_prefix}_#{count}#{extension}", url: file.url}
           count += 1
         end
         bpr.payment_order&.payments&.each do |payment|
@@ -54,7 +54,7 @@ class BankTransfer::PaymentRequest::Spreadsheet::DownloadProcessor < BackgroundO
             next if file.blank?
             name_splits = attachment.attached_file_file_name&.split('.')
             extension = (name_splits.present? and name_splits.size > 1) ? ".#{name_splits&.last}" : ''
-            files << {name: "#{file_name_prefix}_payment_#{count}#{extension}", path: file.path}
+            files << {name: "#{file_name_prefix}_payment_#{count}#{extension}", url: file.url}
             count += 1
           end
         end

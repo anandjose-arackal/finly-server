@@ -38,9 +38,9 @@ class StaticPagesController < ApplicationController
     @agreement = {}
     @agreement[:updated_at] = agreement.file_updated_at.strftime "%d %B %Y"
     @agreement[:content] = nil
-    content_path = agreement&.file&.path
+    content_path = agreement&.file&.url
     if content_path.present?
-      @agreement[:content] = File.read(content_path)
+      @agreement[:content]  = open(content_path).read
     end
     @agreement
   end
