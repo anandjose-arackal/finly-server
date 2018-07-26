@@ -84,6 +84,8 @@ class IndividualKyc < ActiveRecord::Base
   scope :without_id, -> (id) { where.not id: id }
   scope :include_tracks, -> { includes :tracks }
 
+  default_scope { order submitted_on: :asc }
+
   CONTENT_TYPES = {content_type: %w(image/jpg image/jpeg image/png)}
   IMAGE_STYLE = { original: ['100%', :jpg], thumb: ['500x500>', :jpg], large: ['2160x2160>', :jpg], normal: ['1080x1080>', :jpg] }
 
