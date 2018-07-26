@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180720124958) do
+ActiveRecord::Schema.define(version: 20180613071130) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -586,14 +586,12 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.string   "journey_destination", limit: 255
     t.date     "journey_date"
     t.string   "departure_time",      limit: 255
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
     t.integer  "parent_id",           limit: 4
     t.string   "parent_type",         limit: 255
     t.string   "boarding_point",      limit: 255
     t.string   "booking_class",       limit: 255
-    t.text     "start_time",          limit: 65535
-    t.text     "end_time",            limit: 65535
   end
 
   add_index "booking_buses", ["parent_type", "parent_id"], name: "index_booking_buses_on_parent_type_and_parent_id", using: :btree
@@ -612,8 +610,6 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.datetime "updated_at",                           null: false
     t.integer  "parent_id",              limit: 4
     t.string   "parent_type",            limit: 255
-    t.text     "start_time",             limit: 65535
-    t.text     "end_time",               limit: 65535
   end
 
   add_index "booking_car_rentals", ["parent_type", "parent_id"], name: "index_booking_car_rentals_on_parent_type_and_parent_id", using: :btree
@@ -624,10 +620,8 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.string   "journey_source",      limit: 255
     t.integer  "parent_id",           limit: 4
     t.string   "parent_type",         limit: 255
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
-    t.text     "start_time",          limit: 65535
-    t.text     "end_time",            limit: 65535
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
   end
 
   add_index "booking_customs", ["parent_type", "parent_id"], name: "index_booking_customs_on_parent_type_and_parent_id", using: :btree
@@ -638,16 +632,14 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.string   "airline",             limit: 255
     t.string   "journey_destination", limit: 255
     t.string   "journey_source",      limit: 255
-    t.datetime "created_at",                        null: false
-    t.datetime "updated_at",                        null: false
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
     t.integer  "parent_id",           limit: 4
     t.string   "parent_type",         limit: 255
     t.date     "journey_date"
     t.string   "booking_class",       limit: 255
     t.string   "stops",               limit: 255
     t.string   "ticket_number",       limit: 255
-    t.text     "start_time",          limit: 65535
-    t.text     "end_time",            limit: 65535
   end
 
   add_index "booking_flights", ["parent_type", "parent_id"], name: "index_booking_flights_on_parent_type_and_parent_id", using: :btree
@@ -658,13 +650,11 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.string   "reservation_time",        limit: 255
     t.date     "reservation_end_date"
     t.string   "hotel_name",              limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
     t.integer  "parent_id",               limit: 4
     t.string   "parent_type",             limit: 255
     t.string   "hotel_rating",            limit: 255
-    t.text     "start_time",              limit: 65535
-    t.text     "end_time",                limit: 65535
   end
 
   add_index "booking_hotels", ["parent_type", "parent_id"], name: "index_booking_hotels_on_parent_type_and_parent_id", using: :btree
@@ -686,13 +676,11 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.date     "reservation_date"
     t.string   "reservation_time",        limit: 255
     t.string   "restaurant_name",         limit: 255
-    t.datetime "created_at",                            null: false
-    t.datetime "updated_at",                            null: false
+    t.datetime "created_at",                          null: false
+    t.datetime "updated_at",                          null: false
     t.integer  "parent_id",               limit: 4
     t.string   "parent_type",             limit: 255
     t.string   "restaurant_rating",       limit: 255
-    t.text     "start_time",              limit: 65535
-    t.text     "end_time",                limit: 65535
   end
 
   add_index "booking_restaurants", ["parent_type", "parent_id"], name: "index_booking_restaurants_on_parent_type_and_parent_id", using: :btree
@@ -710,14 +698,12 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.string   "departure_time",        limit: 255
     t.string   "train_number",          limit: 255
     t.string   "pnr",                   limit: 255
-    t.datetime "created_at",                          null: false
-    t.datetime "updated_at",                          null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
     t.integer  "parent_id",             limit: 4
     t.string   "parent_type",           limit: 255
     t.string   "booking_class",         limit: 255
     t.string   "boarding_station_name", limit: 255
-    t.text     "start_time",            limit: 65535
-    t.text     "end_time",              limit: 65535
   end
 
   add_index "booking_trains", ["parent_type", "parent_id"], name: "index_booking_trains_on_parent_type_and_parent_id", using: :btree
@@ -1449,177 +1435,177 @@ ActiveRecord::Schema.define(version: 20180720124958) do
 
   create_table "currency_conversion_rates", force: :cascade do |t|
     t.date     "date",                                null: false
-    t.decimal  "INR",        precision: 20, scale: 5
-    t.decimal  "USD",        precision: 20, scale: 5
-    t.decimal  "GBP",        precision: 20, scale: 5
-    t.decimal  "EUR",        precision: 20, scale: 5
-    t.decimal  "CAD",        precision: 20, scale: 5
-    t.decimal  "HRK",        precision: 20, scale: 5
-    t.decimal  "RUB",        precision: 20, scale: 5
-    t.decimal  "BGN",        precision: 20, scale: 5
-    t.decimal  "BRL",        precision: 20, scale: 5
-    t.decimal  "CHF",        precision: 20, scale: 5
-    t.decimal  "CNY",        precision: 20, scale: 5
-    t.decimal  "CZK",        precision: 20, scale: 5
-    t.decimal  "DKK",        precision: 20, scale: 5
-    t.decimal  "HKD",        precision: 20, scale: 5
-    t.decimal  "HUF",        precision: 20, scale: 5
-    t.decimal  "IDR",        precision: 20, scale: 5
-    t.decimal  "ILS",        precision: 20, scale: 5
-    t.decimal  "JPY",        precision: 20, scale: 5
-    t.decimal  "KRW",        precision: 20, scale: 5
-    t.decimal  "MXN",        precision: 20, scale: 5
-    t.decimal  "MYR",        precision: 20, scale: 5
-    t.decimal  "NOK",        precision: 20, scale: 5
-    t.decimal  "NZD",        precision: 20, scale: 5
-    t.decimal  "PHP",        precision: 20, scale: 5
-    t.decimal  "PLN",        precision: 20, scale: 5
-    t.decimal  "RON",        precision: 20, scale: 5
-    t.decimal  "SEK",        precision: 20, scale: 5
-    t.decimal  "SGD",        precision: 20, scale: 5
-    t.decimal  "THB",        precision: 20, scale: 5
-    t.decimal  "TRY",        precision: 20, scale: 5
-    t.decimal  "ZAR",        precision: 20, scale: 5
-    t.decimal  "AUD",        precision: 20, scale: 5
+    t.decimal  "INR",        precision: 10, scale: 5
+    t.decimal  "USD",        precision: 10, scale: 5
+    t.decimal  "GBP",        precision: 10, scale: 5
+    t.decimal  "EUR",        precision: 10, scale: 5
+    t.decimal  "CAD",        precision: 10, scale: 5
+    t.decimal  "HRK",        precision: 10, scale: 5
+    t.decimal  "RUB",        precision: 10, scale: 5
+    t.decimal  "BGN",        precision: 10, scale: 5
+    t.decimal  "BRL",        precision: 10, scale: 5
+    t.decimal  "CHF",        precision: 10, scale: 5
+    t.decimal  "CNY",        precision: 10, scale: 5
+    t.decimal  "CZK",        precision: 10, scale: 5
+    t.decimal  "DKK",        precision: 10, scale: 5
+    t.decimal  "HKD",        precision: 10, scale: 5
+    t.decimal  "HUF",        precision: 10, scale: 5
+    t.decimal  "IDR",        precision: 10, scale: 5
+    t.decimal  "ILS",        precision: 10, scale: 5
+    t.decimal  "JPY",        precision: 10, scale: 5
+    t.decimal  "KRW",        precision: 10, scale: 5
+    t.decimal  "MXN",        precision: 10, scale: 5
+    t.decimal  "MYR",        precision: 10, scale: 5
+    t.decimal  "NOK",        precision: 10, scale: 5
+    t.decimal  "NZD",        precision: 10, scale: 5
+    t.decimal  "PHP",        precision: 10, scale: 5
+    t.decimal  "PLN",        precision: 10, scale: 5
+    t.decimal  "RON",        precision: 10, scale: 5
+    t.decimal  "SEK",        precision: 10, scale: 5
+    t.decimal  "SGD",        precision: 10, scale: 5
+    t.decimal  "THB",        precision: 10, scale: 5
+    t.decimal  "TRY",        precision: 10, scale: 5
+    t.decimal  "ZAR",        precision: 10, scale: 5
+    t.decimal  "AUD",        precision: 10, scale: 5
     t.datetime "created_at",                          null: false
     t.datetime "updated_at",                          null: false
-    t.decimal  "AED",        precision: 20, scale: 5
-    t.decimal  "AFN",        precision: 20, scale: 5
-    t.decimal  "ALL",        precision: 20, scale: 5
-    t.decimal  "AMD",        precision: 20, scale: 5
-    t.decimal  "ANG",        precision: 20, scale: 5
-    t.decimal  "AOA",        precision: 20, scale: 5
-    t.decimal  "ARS",        precision: 20, scale: 5
-    t.decimal  "AWG",        precision: 20, scale: 5
-    t.decimal  "AZN",        precision: 20, scale: 5
-    t.decimal  "BAM",        precision: 20, scale: 5
-    t.decimal  "BBD",        precision: 20, scale: 5
-    t.decimal  "BDT",        precision: 20, scale: 5
-    t.decimal  "BHD",        precision: 20, scale: 5
-    t.decimal  "BIF",        precision: 20, scale: 5
-    t.decimal  "BMD",        precision: 20, scale: 5
-    t.decimal  "BND",        precision: 20, scale: 5
-    t.decimal  "BOB",        precision: 20, scale: 5
-    t.decimal  "BSD",        precision: 20, scale: 5
-    t.decimal  "BTC",        precision: 20, scale: 5
-    t.decimal  "BTN",        precision: 20, scale: 5
-    t.decimal  "BWP",        precision: 20, scale: 5
-    t.decimal  "BYN",        precision: 20, scale: 5
-    t.decimal  "BYR",        precision: 20, scale: 5
-    t.decimal  "BZD",        precision: 20, scale: 5
-    t.decimal  "CDF",        precision: 20, scale: 5
-    t.decimal  "CLF",        precision: 20, scale: 5
-    t.decimal  "CLP",        precision: 20, scale: 5
-    t.decimal  "COP",        precision: 20, scale: 5
-    t.decimal  "CRC",        precision: 20, scale: 5
-    t.decimal  "CUC",        precision: 20, scale: 5
-    t.decimal  "CUP",        precision: 20, scale: 5
-    t.decimal  "CVE",        precision: 20, scale: 5
-    t.decimal  "DJF",        precision: 20, scale: 5
-    t.decimal  "DOP",        precision: 20, scale: 5
-    t.decimal  "DZD",        precision: 20, scale: 5
+    t.decimal  "AED",        precision: 10, scale: 5
+    t.decimal  "AFN",        precision: 10, scale: 5
+    t.decimal  "ALL",        precision: 10, scale: 5
+    t.decimal  "AMD",        precision: 10, scale: 5
+    t.decimal  "ANG",        precision: 10, scale: 5
+    t.decimal  "AOA",        precision: 10, scale: 5
+    t.decimal  "ARS",        precision: 10, scale: 5
+    t.decimal  "AWG",        precision: 10, scale: 5
+    t.decimal  "AZN",        precision: 10, scale: 5
+    t.decimal  "BAM",        precision: 10, scale: 5
+    t.decimal  "BBD",        precision: 10, scale: 5
+    t.decimal  "BDT",        precision: 10, scale: 5
+    t.decimal  "BHD",        precision: 10, scale: 5
+    t.decimal  "BIF",        precision: 10, scale: 5
+    t.decimal  "BMD",        precision: 10, scale: 5
+    t.decimal  "BND",        precision: 10, scale: 5
+    t.decimal  "BOB",        precision: 10, scale: 5
+    t.decimal  "BSD",        precision: 10, scale: 5
+    t.decimal  "BTC",        precision: 10, scale: 5
+    t.decimal  "BTN",        precision: 10, scale: 5
+    t.decimal  "BWP",        precision: 10, scale: 5
+    t.decimal  "BYN",        precision: 10, scale: 5
+    t.decimal  "BYR",        precision: 10, scale: 5
+    t.decimal  "BZD",        precision: 10, scale: 5
+    t.decimal  "CDF",        precision: 10, scale: 5
+    t.decimal  "CLF",        precision: 10, scale: 5
+    t.decimal  "CLP",        precision: 10, scale: 5
+    t.decimal  "COP",        precision: 10, scale: 5
+    t.decimal  "CRC",        precision: 10, scale: 5
+    t.decimal  "CUC",        precision: 10, scale: 5
+    t.decimal  "CUP",        precision: 10, scale: 5
+    t.decimal  "CVE",        precision: 10, scale: 5
+    t.decimal  "DJF",        precision: 10, scale: 5
+    t.decimal  "DOP",        precision: 10, scale: 5
+    t.decimal  "DZD",        precision: 10, scale: 5
     t.decimal  "EEK",        precision: 10, scale: 5
-    t.decimal  "EGP",        precision: 20, scale: 5
-    t.decimal  "ERN",        precision: 20, scale: 5
-    t.decimal  "ETB",        precision: 20, scale: 5
-    t.decimal  "FJD",        precision: 20, scale: 5
-    t.decimal  "FKP",        precision: 20, scale: 5
-    t.decimal  "GEL",        precision: 20, scale: 5
-    t.decimal  "GGP",        precision: 20, scale: 5
-    t.decimal  "GHS",        precision: 20, scale: 5
-    t.decimal  "GIP",        precision: 20, scale: 5
-    t.decimal  "GMD",        precision: 20, scale: 5
-    t.decimal  "GNF",        precision: 20, scale: 5
-    t.decimal  "GTQ",        precision: 20, scale: 5
-    t.decimal  "GYD",        precision: 20, scale: 5
-    t.decimal  "HNL",        precision: 20, scale: 5
-    t.decimal  "HTG",        precision: 20, scale: 5
-    t.decimal  "IMP",        precision: 20, scale: 5
-    t.decimal  "IQD",        precision: 20, scale: 5
-    t.decimal  "IRR",        precision: 20, scale: 5
-    t.decimal  "ISK",        precision: 20, scale: 5
-    t.decimal  "JEP",        precision: 20, scale: 5
-    t.decimal  "JMD",        precision: 20, scale: 5
-    t.decimal  "JOD",        precision: 20, scale: 5
-    t.decimal  "KES",        precision: 20, scale: 5
-    t.decimal  "KGS",        precision: 20, scale: 5
-    t.decimal  "KHR",        precision: 20, scale: 5
-    t.decimal  "KMF",        precision: 20, scale: 5
-    t.decimal  "KPW",        precision: 20, scale: 5
-    t.decimal  "KWD",        precision: 20, scale: 5
-    t.decimal  "KYD",        precision: 20, scale: 5
-    t.decimal  "KZT",        precision: 20, scale: 5
-    t.decimal  "LAK",        precision: 20, scale: 5
-    t.decimal  "LBP",        precision: 20, scale: 5
-    t.decimal  "LKR",        precision: 20, scale: 5
-    t.decimal  "LRD",        precision: 20, scale: 5
-    t.decimal  "LSL",        precision: 20, scale: 5
-    t.decimal  "LTL",        precision: 20, scale: 5
-    t.decimal  "LVL",        precision: 20, scale: 5
-    t.decimal  "LYD",        precision: 20, scale: 5
-    t.decimal  "MAD",        precision: 20, scale: 5
-    t.decimal  "MDL",        precision: 20, scale: 5
-    t.decimal  "MGA",        precision: 20, scale: 5
-    t.decimal  "MKD",        precision: 20, scale: 5
-    t.decimal  "MMK",        precision: 20, scale: 5
-    t.decimal  "MNT",        precision: 20, scale: 5
-    t.decimal  "MOP",        precision: 20, scale: 5
-    t.decimal  "MRO",        precision: 20, scale: 5
-    t.decimal  "MUR",        precision: 20, scale: 5
-    t.decimal  "MVR",        precision: 20, scale: 5
-    t.decimal  "MWK",        precision: 20, scale: 5
-    t.decimal  "MZN",        precision: 20, scale: 5
-    t.decimal  "NAD",        precision: 20, scale: 5
-    t.decimal  "NGN",        precision: 20, scale: 5
-    t.decimal  "NIO",        precision: 20, scale: 5
-    t.decimal  "NPR",        precision: 20, scale: 5
-    t.decimal  "OMR",        precision: 20, scale: 5
-    t.decimal  "PAB",        precision: 20, scale: 5
-    t.decimal  "PEN",        precision: 20, scale: 5
-    t.decimal  "PGK",        precision: 20, scale: 5
-    t.decimal  "PKR",        precision: 20, scale: 5
-    t.decimal  "PYG",        precision: 20, scale: 5
-    t.decimal  "QAR",        precision: 20, scale: 5
-    t.decimal  "RSD",        precision: 20, scale: 5
-    t.decimal  "RWF",        precision: 20, scale: 5
-    t.decimal  "SAR",        precision: 20, scale: 5
-    t.decimal  "SBD",        precision: 20, scale: 5
-    t.decimal  "SCR",        precision: 20, scale: 5
-    t.decimal  "SDG",        precision: 20, scale: 5
-    t.decimal  "SHP",        precision: 20, scale: 5
-    t.decimal  "SLL",        precision: 20, scale: 5
-    t.decimal  "SOS",        precision: 20, scale: 5
-    t.decimal  "SRD",        precision: 20, scale: 5
-    t.decimal  "STD",        precision: 20, scale: 5
-    t.decimal  "SVC",        precision: 20, scale: 5
-    t.decimal  "SYP",        precision: 20, scale: 5
-    t.decimal  "SZL",        precision: 20, scale: 5
-    t.decimal  "TJS",        precision: 20, scale: 5
-    t.decimal  "TMT",        precision: 20, scale: 5
-    t.decimal  "TND",        precision: 20, scale: 5
-    t.decimal  "TOP",        precision: 20, scale: 5
-    t.decimal  "TTD",        precision: 20, scale: 5
-    t.decimal  "TWD",        precision: 20, scale: 5
-    t.decimal  "TZS",        precision: 20, scale: 5
-    t.decimal  "UAH",        precision: 20, scale: 5
-    t.decimal  "UGX",        precision: 20, scale: 5
-    t.decimal  "UYU",        precision: 20, scale: 5
-    t.decimal  "UZS",        precision: 20, scale: 5
-    t.decimal  "VEF",        precision: 20, scale: 5
-    t.decimal  "VND",        precision: 20, scale: 5
-    t.decimal  "VUV",        precision: 20, scale: 5
-    t.decimal  "WST",        precision: 20, scale: 5
-    t.decimal  "XAF",        precision: 20, scale: 5
-    t.decimal  "XAG",        precision: 20, scale: 5
-    t.decimal  "XAU",        precision: 20, scale: 5
-    t.decimal  "XCD",        precision: 20, scale: 5
-    t.decimal  "XDR",        precision: 20, scale: 5
-    t.decimal  "XOF",        precision: 20, scale: 5
-    t.decimal  "XPF",        precision: 20, scale: 5
-    t.decimal  "YER",        precision: 20, scale: 5
-    t.decimal  "ZMK",        precision: 20, scale: 5
-    t.decimal  "ZMW",        precision: 20, scale: 5
-    t.decimal  "ZWL",        precision: 20, scale: 5
+    t.decimal  "EGP",        precision: 10, scale: 5
+    t.decimal  "ERN",        precision: 10, scale: 5
+    t.decimal  "ETB",        precision: 10, scale: 5
+    t.decimal  "FJD",        precision: 10, scale: 5
+    t.decimal  "FKP",        precision: 10, scale: 5
+    t.decimal  "GEL",        precision: 10, scale: 5
+    t.decimal  "GGP",        precision: 10, scale: 5
+    t.decimal  "GHS",        precision: 10, scale: 5
+    t.decimal  "GIP",        precision: 10, scale: 5
+    t.decimal  "GMD",        precision: 10, scale: 5
+    t.decimal  "GNF",        precision: 10, scale: 5
+    t.decimal  "GTQ",        precision: 10, scale: 5
+    t.decimal  "GYD",        precision: 10, scale: 5
+    t.decimal  "HNL",        precision: 10, scale: 5
+    t.decimal  "HTG",        precision: 10, scale: 5
+    t.decimal  "IMP",        precision: 10, scale: 5
+    t.decimal  "IQD",        precision: 10, scale: 5
+    t.decimal  "IRR",        precision: 10, scale: 5
+    t.decimal  "ISK",        precision: 10, scale: 5
+    t.decimal  "JEP",        precision: 10, scale: 5
+    t.decimal  "JMD",        precision: 10, scale: 5
+    t.decimal  "JOD",        precision: 10, scale: 5
+    t.decimal  "KES",        precision: 10, scale: 5
+    t.decimal  "KGS",        precision: 10, scale: 5
+    t.decimal  "KHR",        precision: 10, scale: 5
+    t.decimal  "KMF",        precision: 10, scale: 5
+    t.decimal  "KPW",        precision: 10, scale: 5
+    t.decimal  "KWD",        precision: 10, scale: 5
+    t.decimal  "KYD",        precision: 10, scale: 5
+    t.decimal  "KZT",        precision: 10, scale: 5
+    t.decimal  "LAK",        precision: 10, scale: 5
+    t.decimal  "LBP",        precision: 10, scale: 5
+    t.decimal  "LKR",        precision: 10, scale: 5
+    t.decimal  "LRD",        precision: 10, scale: 5
+    t.decimal  "LSL",        precision: 10, scale: 5
+    t.decimal  "LTL",        precision: 10, scale: 5
+    t.decimal  "LVL",        precision: 10, scale: 5
+    t.decimal  "LYD",        precision: 10, scale: 5
+    t.decimal  "MAD",        precision: 10, scale: 5
+    t.decimal  "MDL",        precision: 10, scale: 5
+    t.decimal  "MGA",        precision: 10, scale: 5
+    t.decimal  "MKD",        precision: 10, scale: 5
+    t.decimal  "MMK",        precision: 10, scale: 5
+    t.decimal  "MNT",        precision: 10, scale: 5
+    t.decimal  "MOP",        precision: 10, scale: 5
+    t.decimal  "MRO",        precision: 10, scale: 5
+    t.decimal  "MUR",        precision: 10, scale: 5
+    t.decimal  "MVR",        precision: 10, scale: 5
+    t.decimal  "MWK",        precision: 10, scale: 5
+    t.decimal  "MZN",        precision: 10, scale: 5
+    t.decimal  "NAD",        precision: 10, scale: 5
+    t.decimal  "NGN",        precision: 10, scale: 5
+    t.decimal  "NIO",        precision: 10, scale: 5
+    t.decimal  "NPR",        precision: 10, scale: 5
+    t.decimal  "OMR",        precision: 10, scale: 5
+    t.decimal  "PAB",        precision: 10, scale: 5
+    t.decimal  "PEN",        precision: 10, scale: 5
+    t.decimal  "PGK",        precision: 10, scale: 5
+    t.decimal  "PKR",        precision: 10, scale: 5
+    t.decimal  "PYG",        precision: 10, scale: 5
+    t.decimal  "QAR",        precision: 10, scale: 5
+    t.decimal  "RSD",        precision: 10, scale: 5
+    t.decimal  "RWF",        precision: 10, scale: 5
+    t.decimal  "SAR",        precision: 10, scale: 5
+    t.decimal  "SBD",        precision: 10, scale: 5
+    t.decimal  "SCR",        precision: 10, scale: 5
+    t.decimal  "SDG",        precision: 10, scale: 5
+    t.decimal  "SHP",        precision: 10, scale: 5
+    t.decimal  "SLL",        precision: 10, scale: 5
+    t.decimal  "SOS",        precision: 10, scale: 5
+    t.decimal  "SRD",        precision: 10, scale: 5
+    t.decimal  "STD",        precision: 10, scale: 5
+    t.decimal  "SVC",        precision: 10, scale: 5
+    t.decimal  "SYP",        precision: 10, scale: 5
+    t.decimal  "SZL",        precision: 10, scale: 5
+    t.decimal  "TJS",        precision: 10, scale: 5
+    t.decimal  "TMT",        precision: 10, scale: 5
+    t.decimal  "TND",        precision: 10, scale: 5
+    t.decimal  "TOP",        precision: 10, scale: 5
+    t.decimal  "TTD",        precision: 10, scale: 5
+    t.decimal  "TWD",        precision: 10, scale: 5
+    t.decimal  "TZS",        precision: 10, scale: 5
+    t.decimal  "UAH",        precision: 10, scale: 5
+    t.decimal  "UGX",        precision: 10, scale: 5
+    t.decimal  "UYU",        precision: 10, scale: 5
+    t.decimal  "UZS",        precision: 10, scale: 5
+    t.decimal  "VEF",        precision: 10, scale: 5
+    t.decimal  "VND",        precision: 10, scale: 5
+    t.decimal  "VUV",        precision: 10, scale: 5
+    t.decimal  "WST",        precision: 10, scale: 5
+    t.decimal  "XAF",        precision: 10, scale: 5
+    t.decimal  "XAG",        precision: 10, scale: 5
+    t.decimal  "XAU",        precision: 10, scale: 5
+    t.decimal  "XCD",        precision: 10, scale: 5
+    t.decimal  "XDR",        precision: 10, scale: 5
+    t.decimal  "XOF",        precision: 10, scale: 5
+    t.decimal  "XPF",        precision: 10, scale: 5
+    t.decimal  "YER",        precision: 10, scale: 5
+    t.decimal  "ZMK",        precision: 10, scale: 5
+    t.decimal  "ZMW",        precision: 10, scale: 5
+    t.decimal  "ZWL",        precision: 10, scale: 5
   end
 
   add_index "currency_conversion_rates", ["date"], name: "index_currency_conversion_rates_on_date", using: :btree
@@ -1634,7 +1620,6 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.string   "value_type",             limit: 255
     t.integer  "dependent_parent_id",    limit: 4
     t.string   "dependent_parent_type",  limit: 255
-    t.string   "field_key",              limit: 255
   end
 
   add_index "custom_fields", ["field_configuration_id"], name: "index_custom_fields_on_field_configuration_id", using: :btree
@@ -1885,7 +1870,6 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.integer  "tds_amount_id",          limit: 4
     t.integer  "gst_type_id",            limit: 4
     t.integer  "tds_slab_id",            limit: 4
-    t.integer  "gst_amount_id",          limit: 4
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -1994,7 +1978,6 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.integer  "parent_id",               limit: 4
     t.string   "parent_type",             limit: 255
     t.boolean  "root_field",                          default: true
-    t.string   "field_key",               limit: 255
   end
 
   add_index "field_configurations", ["company_id"], name: "index_field_configurations_on_company_id", using: :btree
@@ -2133,14 +2116,6 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.datetime "updated_at",             null: false
     t.string   "state_code", limit: 255
   end
-
-  create_table "gst_types", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  add_index "gst_types", ["name"], name: "index_gst_types_on_name", using: :btree
 
   create_table "individual_kyc_track_actions", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false
@@ -2340,7 +2315,7 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.integer  "address_id",             limit: 4
     t.date     "date"
     t.date     "due_date"
-    t.text     "invoice_number",         limit: 65535
+    t.string   "invoice_number",         limit: 255
     t.integer  "tax_type_id",            limit: 4
     t.decimal  "discount",                             precision: 64, scale: 12
     t.integer  "discount_type_id",       limit: 4
@@ -2380,7 +2355,6 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.string   "receiving_account_type", limit: 255
     t.text     "note",                   limit: 65535
     t.integer  "remaining_amount_id",    limit: 4
-    t.integer  "invoice_type_id",        limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -2388,12 +2362,6 @@ ActiveRecord::Schema.define(version: 20180720124958) do
   add_index "invoices", ["tax_type_id"], name: "index_invoices_on_tax_type_id", using: :btree
 
   create_table "inward_invoice_statuses", force: :cascade do |t|
-    t.string   "name",       limit: 255
-    t.datetime "created_at",             null: false
-    t.datetime "updated_at",             null: false
-  end
-
-  create_table "inward_invoice_types", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
     t.datetime "updated_at",             null: false
@@ -3023,7 +2991,6 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.text     "options",     limit: 65535
     t.datetime "created_at",                null: false
     t.datetime "updated_at",                null: false
-    t.boolean  "default"
   end
 
   add_index "payment_file_configurations", ["company_id"], name: "index_payment_file_configurations_on_company_id", using: :btree
@@ -3333,7 +3300,6 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.datetime "updated_at",                       null: false
     t.text     "source",             limit: 65535
     t.text     "source_description", limit: 65535
-    t.string   "referrer",           limit: 255
   end
 
   create_table "product_combinations", force: :cascade do |t|
@@ -3759,8 +3725,6 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.integer  "sync_status_id",                     limit: 4
     t.integer  "sync_type_id",                       limit: 4
     t.integer  "report_processor_group_mapping_id",  limit: 4
-    t.integer  "travel_request_id",                  limit: 4
-    t.integer  "money_request_id",                   limit: 4
   end
 
   add_index "reports", ["controlling_for_user_id"], name: "index_reports_on_controlling_for_user_id", using: :btree
@@ -3954,18 +3918,16 @@ ActiveRecord::Schema.define(version: 20180720124958) do
   end
 
   create_table "travel_request_comments", force: :cascade do |t|
-    t.integer  "travel_request_id",  limit: 4
-    t.text     "content",            limit: 65535
-    t.integer  "user_id",            limit: 4
-    t.text     "note",               limit: 65535
-    t.text     "previous_value",     limit: 65535
-    t.text     "new_value",          limit: 65535
-    t.text     "edited_field",       limit: 65535
-    t.datetime "created_at",                       null: false
-    t.datetime "updated_at",                       null: false
-    t.integer  "action_id",          limit: 4
-    t.integer  "booking_id",         limit: 4
-    t.integer  "booking_request_id", limit: 4
+    t.integer  "travel_request_id", limit: 4
+    t.text     "content",           limit: 65535
+    t.integer  "user_id",           limit: 4
+    t.text     "note",              limit: 65535
+    t.text     "previous_value",    limit: 65535
+    t.text     "new_value",         limit: 65535
+    t.text     "edited_field",      limit: 65535
+    t.datetime "created_at",                      null: false
+    t.datetime "updated_at",                      null: false
+    t.integer  "action_id",         limit: 4
   end
 
   add_index "travel_request_comments", ["travel_request_id"], name: "index_travel_request_comments_on_travel_request_id", using: :btree
@@ -4033,8 +3995,6 @@ ActiveRecord::Schema.define(version: 20180720124958) do
     t.boolean  "is_deleted",                                               default: false
     t.text     "rejection_note",               limit: 65535
     t.boolean  "auto_approved"
-    t.integer  "report_id",                    limit: 4
-    t.integer  "money_request_id",             limit: 4
   end
 
   add_index "travel_requests", ["company_id"], name: "index_travel_requests_on_company_id", using: :btree

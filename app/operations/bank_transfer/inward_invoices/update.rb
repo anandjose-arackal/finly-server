@@ -24,6 +24,14 @@ class BankTransfer::InwardInvoices::Update < BankTransfer::InwardInvoices::Base
     if inward_invoice_params&.dig(:freight_amount_attributes).present?
       inward_invoice_params[:freight_amount_attributes][:id] = self.inward_invoice&.freight_amount&.id
     end
+    if inward_invoice_params&.dig(:advance_amount_attributes).present?
+      inward_invoice_params[:advance_amount_attributes][:id] = self.inward_invoice&.advance_amount&.id
+    end
+
+    # setting the inclusive of taxes explicitly here because if unchecked it doesn't send anything from the frontend
+    if self.inward_invoice_params[:inclusive_of_taxes].blank?
+      self.inward_invoice_params[:inclusive_of_taxes] = false
+    end
 
     if self.inward_invoice_params&.dig(:invoice_attachments_attributes)
       # only if the actual attached file is present, do you even make it save
