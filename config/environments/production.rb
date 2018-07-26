@@ -10,6 +10,10 @@ Rails.application.configure do
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
   config.logstasher.enabled = true
+  config.logstasher.field_renaming = {
+      error: :exception,
+  }
+
   config.lograge.enabled = true
   # config.lograge.keep_original_rails_log = true
   # config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/lograge_#{Rails.env}.log"
