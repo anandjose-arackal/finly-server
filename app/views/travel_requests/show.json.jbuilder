@@ -1,4 +1,4 @@
-json.extract! @result.travel_request, :id, :name, :memo, :submitted_at, :status, :policy
+json.travel_request @result.travel_request
 
 json.manager_name @result.manager&.name
 json.travel_manager_name @result.travel_manager&.name

@@ -13,7 +13,7 @@ class BookingStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:processing, :confirmed, :cancelled] # todo write migration to seed
+    [:option, :processing, :confirmed, :cancelled]
 
   end
 end
