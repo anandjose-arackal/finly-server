@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: booking_customs
+# Table name: booking_others
 #
 #  id              :integer          not null, primary key
 #  parent_id       :integer

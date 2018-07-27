@@ -42,7 +42,7 @@ class TravelRequests::BookingRequests::Create < TravelRequests::BookingRequests:
             :departure_datetime, :description
         ],
         booking_car_rental_attributes: [
-            {from_attributes: [:name, :address, :latitude, :longitude, :maps_id]}, {to_attributes: [:name, :address, :maps_id]},
+            {pickup_city_attributes: [:name, :address, :latitude, :longitude, :maps_id]}, {drop_city_attributes: [:name, :address, :maps_id]},
             :pickup_datetime, :drop_datetime, :pickup_address, :drop_address, :description
         ],
         booking_train_attributes: [
@@ -61,7 +61,7 @@ class TravelRequests::BookingRequests::Create < TravelRequests::BookingRequests:
             {location_attributes: [:name, :address, :latitude, :longitude, :maps_id]}, :reservation_datetime, :restaurant_name,
             :number_of_guests, :description
         ],
-        booking_custom_attributes: [
+        booking_other_attributes: [
             :booking_details, :description
         ],
         travel_members_attributes: [

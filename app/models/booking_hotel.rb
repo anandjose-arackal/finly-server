@@ -15,6 +15,7 @@
 #  hotel_address     :text(65535)
 #  cost_id           :integer
 #  is_deleted        :boolean          default(FALSE)
+#  number_of_guests  :integer
 #
 
 class BookingHotel < ActiveRecord::Base
