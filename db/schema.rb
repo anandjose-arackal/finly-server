@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180723125433) do
+ActiveRecord::Schema.define(version: 20180727071142) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1869,6 +1869,21 @@ ActiveRecord::Schema.define(version: 20180723125433) do
   add_index "document_items", ["tax_amount_id"], name: "index_document_items_on_tax_amount_id", using: :btree
   add_index "document_items", ["tds_amount_id"], name: "index_document_items_on_tds_amount_id", using: :btree
   add_index "document_items", ["total_amount_id"], name: "index_document_items_on_total_amount_id", using: :btree
+
+  create_table "document_level_reviewer_mappings", force: :cascade do |t|
+    t.integer  "policy_id",                       limit: 4
+    t.integer  "level_id",                        limit: 4
+    t.integer  "reviewer_id",                     limit: 4
+    t.integer  "document_reviewer_mappable_id",   limit: 4,   null: false
+    t.string   "document_reviewer_mappable_type", limit: 255, null: false
+    t.datetime "created_at",                                  null: false
+    t.datetime "updated_at",                                  null: false
+  end
+
+  add_index "document_level_reviewer_mappings", ["document_reviewer_mappable_type", "document_reviewer_mappable_id"], name: "indx_doc_lvl_rvwr_mpng_on_doc_rvwr_mpble_tp_n_doc_rvwr_mpble_id", using: :btree
+  add_index "document_level_reviewer_mappings", ["level_id"], name: "index_document_level_reviewer_mappings_on_level_id", using: :btree
+  add_index "document_level_reviewer_mappings", ["policy_id"], name: "index_document_level_reviewer_mappings_on_policy_id", using: :btree
+  add_index "document_level_reviewer_mappings", ["reviewer_id"], name: "index_document_level_reviewer_mappings_on_reviewer_id", using: :btree
 
   create_table "document_number_config_types", force: :cascade do |t|
     t.string   "name",        limit: 255
@@ -5140,6 +5155,7 @@ ActiveRecord::Schema.define(version: 20180723125433) do
   add_foreign_key "distances", "physical_units"
   add_foreign_key "document_items", "inventory_line_items"
   add_foreign_key "document_items", "purchase_order_items"
+  add_foreign_key "document_level_reviewer_mappings", "policies"
   add_foreign_key "document_number_configs", "companies"
   add_foreign_key "document_number_configs", "document_number_config_types"
   add_foreign_key "document_number_configs", "purposes"

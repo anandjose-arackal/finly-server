@@ -43,10 +43,15 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
             url: Rails.application.routes.url_helpers.procure_purchase_order_submit_path(purchase_order_id: purchase_order.id),
             method: "PUT"
         }
-        actions[:update] = {
+        actions[:save] = {
             url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
             method: "PUT"
         }
+        actions[:delete] = {
+            url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
+            method: "DELETE"
+        }
+        actions[:policy_editable] = true
       end
 
       if (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner?)
@@ -68,6 +73,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
           }
           actions[:reject] = {
               url: Rails.application.routes.url_helpers.procure_purchase_order_reject_path(purchase_order_id: purchase_order.id),
+              method: "PUT"
+          }
+          actions[:save] = {
+              url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
               method: "PUT"
           }
         end

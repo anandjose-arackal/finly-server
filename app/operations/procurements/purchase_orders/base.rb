@@ -15,7 +15,10 @@ class Procurements::PurchaseOrders::Base < BaseOperation
             :id, :_destroy, :product_id, :description, :hsn_sac, :quantity, :rate, :tax, :tds, :discount, :delivery_date, :comment,
             :inventory_line_item_id
         ],
-        attachments: []
+        attachments: [],
+        document_reviewer_mappings: [
+            :level_id, :reviewer_id
+        ]
         # tax_amount_attributes: [:value, :currency_id]
     )
   end

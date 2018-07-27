@@ -64,6 +64,8 @@ class PurchaseOrder < ActiveRecord::Base
   belongs_to :policy
   belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
+  has_many :document_level_reviewers, class_name: 'DocumentLevelReviewerMapping', polymorphic: true
+
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 
   has_many :items, class_name: "PurchaseOrderItem", dependent: :destroy

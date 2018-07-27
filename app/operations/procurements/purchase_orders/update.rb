@@ -1,12 +1,14 @@
 class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :procurement, :purchase_order_params, :po_old_attachments,
-                :po_current_attachments
+                :po_current_attachments, :document_reviewer_mappings_params
 
   def init
     self.purchase_order_params = purchase_order_parameters
     # self.procurement = user.company.procurements.find_by params[:procurement_id]
     purchase_order_id = params[:id] || params[:purchase_order_id]
     self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
+    self.document_reviewer_mappings_params = purchase_order_params[:document_reviewer_mappings]
+    purchase_order_params.delete(:document_reviewer_mappings)
   end
 
   def validate
@@ -31,7 +33,17 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     if purchase_order.valid?
       purchase_order.save
       purchase_order.save
-      add_message :success, 'Successfully updated purchase order'
+
+
+      # For setting level specific reviewers from reviewal chain for a document
+      params[:document] = purchase_order
+      params[:document_reviewer_mappings] = document_reviewer_mappings_params
+
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewerMappings::Create.(user, params)
+
+      unless document_reviewer_mappings_op.success?
+        debugger
+      end
     else
       add_message :error, purchase_order.errors.full_messages
       return
@@ -41,5 +53,9 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     self.po_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
 
     self.po_current_attachments.update_all(procurement_document_id: purchase_order.id, procurement_document_type: purchase_order.class.name)
+  end
+
+  def post_process
+    add_message :success, 'Successfully updated purchase order'
   end
 end
