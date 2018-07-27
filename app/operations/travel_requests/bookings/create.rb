@@ -1,23 +1,37 @@
 class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
   attr_accessor :travel_request, :booking_request, :booking, :booking_parameters, :booking_attachments
 
+  def authorized_user_types
+    [:travel_manager]
+  end
+
   def init
     self.booking_parameters = booking_params
 
-    self.travel_request = TravelRequest.find(params[:travel_request_id]) # todo scope to company
-    self.booking_request = ::BookingRequest.find(params[:booking_request_id])
-
-    # todo set created by user
-
+    if params&.dig(:booking_request_id).present?
+      booking_request_presenter = TravelRequests::BookingRequests::Show.(user, booking_request_id: params&.dig(:booking_request_id))
+      unless booking_request_presenter.success?
+        add_message :error, booking_request_presenter.messages[:error]
+        return
+      end
+      self.booking_request = booking_request_presenter.booking_request
+      self.destination = self.booking_request.destination
+    else
+      destination_presenter = TravelRequests::Destinations::Show.(user, {
+          travel_request_id: params[:travel_request_id],
+          id: params[:destination_id],
+          view: params[:view]
+      })
+      unless destination_presenter.success?
+        add_message :error, destination_presenter.messages[:error]
+        return
+      end
+      self.destination = destination_presenter.destination
+    end
   end
 
   def validate
-    if travel_request.blank?
-      add_message :error, 'Travel Request not found'
-    end
-    if booking_request.blank?
-      add_message :error, 'Booking Request not found'
-    end
+    # Nothing to validate
   end
 
   def pre_process

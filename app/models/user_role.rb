@@ -22,6 +22,7 @@ class UserRole < ActiveRecord::Base
   scope :manager, -> { where(id: UserRole.id_for(:manager)) }
   scope :employee, -> { where(id: UserRole.id_for(:employee)) }
   scope :auditor, -> { where(id: UserRole.id_for(:auditor)) }
+  scope :travel_manager, -> { where(id: UserRole.id_for(:travel_manager)) }
 
   VALUES = {
       admin: 1,
