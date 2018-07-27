@@ -35,9 +35,9 @@ class Receipt::ReceiptEmails::ProcessEmail < Receipt::ReceiptEmails::Base
     subject = self.receipt_email.subject
 
     if self.receipt_email.raw_html.present?
-      html_body = File.read(self.receipt_email.raw_html.path)
+      html_body = open(self.receipt_email.raw_html.url).read
     elsif self.receipt_email.original_source.present?
-      email = Mail.read_from_string(File.read(self.receipt_email.original_source.path))
+      email = Mail.read_from_string(open(self.receipt_email.original_source.url).read)
       html_body = email.html_part.body.decoded
     end
 
