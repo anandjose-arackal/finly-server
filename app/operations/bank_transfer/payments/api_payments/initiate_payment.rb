@@ -56,7 +56,6 @@ class BankTransfer::Payments::ApiPayments::InitiatePayment < BankTransfer::Payme
     self.payment_mode = params[:mode]
     create_beneficiary
     create_bank_payment_request
-    debugger
   end
 
   def process
