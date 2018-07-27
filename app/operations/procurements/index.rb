@@ -27,7 +27,11 @@ class Procurements::Index < Procurements::Base
       procurement_ids.push(user.company.purchase_orders.with_controlling_level_ids(level_ids).pluck(:procurement_id))
     end
 
-    self.procurements = user.company.procurements.with_ids(procurement_ids)
+    if user.vendor_payment_admin?
+      procurement_ids.push(user.company.purchase_orders.pluck(:procurement_id))
+    end
+
+    self.procurements = user.company.procurements.with_ids(procurement_ids.uniq)
   end
 
   def success

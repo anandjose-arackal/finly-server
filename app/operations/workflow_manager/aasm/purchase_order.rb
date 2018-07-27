@@ -24,8 +24,8 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
     state :closed
 
     event :submit do
-      transitions from: [:open, :retracted], to: :auto_approved, guard: :approvers_not_present?
-      transitions :from => [:open, :retracted], :to => :processing
+      transitions from: [:open, :retracted, :rejected], to: :auto_approved, guard: :approvers_not_present?
+      transitions :from => [:open, :retracted, :rejected], :to => :processing
     end
 
     event :approve do
