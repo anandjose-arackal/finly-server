@@ -5,7 +5,12 @@ class ImportUtil
   JUNK_CHARACTER_LIST = %w(<html> </html> <b> </b> <u> </u> <i> </i> mailto :)
 
   def self.open_spreadsheet(file)
-    case File.extname(file.original_filename)
+    if file.is_a?(File)
+      file_name = File.extname(file)
+    else
+      file_name = File.extname(file.original_filename)
+    end
+    case file_name
       when '.csv' then
         Roo::CSV.new(file.path)
       when '.xls' then
