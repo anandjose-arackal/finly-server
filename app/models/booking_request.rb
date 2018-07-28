@@ -64,7 +64,9 @@ class BookingRequest < ActiveRecord::Base
         booking_hotel: booking_hotel,
         booking_restaurant: booking_restaurant,
         booking_train: booking_train,
-        booking_other: booking_other
+        booking_other: booking_other,
+        bookings_options: bookings.booking_options,
+        bookings: bookings.confirmed_bookings
     }
   end
 

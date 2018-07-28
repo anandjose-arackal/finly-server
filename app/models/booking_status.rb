@@ -13,7 +13,7 @@ class BookingStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:option, :processing, :confirmed, :cancelled]
+    [:booking_option, :processing, :confirmed, :cancelled]
 
   end
 end

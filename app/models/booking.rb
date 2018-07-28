@@ -51,4 +51,25 @@ class Booking < ActiveRecord::Base
   validates :booking_status_id, presence: true
   validates :booking_type_id, presence: true
   validates :created_by_user_id, presence: true
+
+  scope :booking_options, -> { where booking_status_id: BookingStatus.id_for(:booking_option) }
+  scope :confirmed_bookings, -> { where.not booking_status_id: BookingStatus.id_for(:booking_option) }
+
+  def as_json(options = {})
+    {
+        id: id,
+        booking_type: booking_type,
+        note: note,
+        booking_status: booking_status,
+        travel_members: travel_members,
+        booking_car_rental: booking_car_rental,
+        booking_bus: booking_bus,
+        booking_flight: booking_flight,
+        booking_hotel: booking_hotel,
+        booking_restaurant: booking_restaurant,
+        booking_train: booking_train,
+        booking_other: booking_other
+    }
+  end
+
 end
