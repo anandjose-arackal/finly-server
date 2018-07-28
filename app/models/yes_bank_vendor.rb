@@ -32,8 +32,8 @@ class YesBankVendor < ActiveRecord::Base
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
 
-
-  has_many :budgets, as: :budgetable
+  has_many :budget_entity_mappings, as: :budgetable
+  has_many :budgets, through: :budget_entity_mappings
 
   accepts_nested_attributes_for :bank_accounts
   accepts_nested_attributes_for :vendor_attachments, allow_destroy: true

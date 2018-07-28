@@ -55,6 +55,9 @@
 
 
 
+
+
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -180,11 +183,12 @@ class User < ActiveRecord::Base
   has_many :outward_invoice_attachments
 
   #Budgets
+
+  # many-to-many mapping between user and budget
+  has_many :budget_entity_mappings, as: :budgetable
+  has_many :budgets, through: :budget_entity_mappings
+
   has_many :owned_budgets, class_name: 'Budget'
-  has_many :budgets, as: :budgetable
-  # has_many :budgets, as: :budgetable
-
-
 
   has_one :individual_kyc, dependent: :destroy
   has_one :itz_cash_dmt_sender

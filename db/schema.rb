@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180724052224) do
+ActiveRecord::Schema.define(version: 20180728125918) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -759,6 +759,16 @@ ActiveRecord::Schema.define(version: 20180724052224) do
 
   add_index "branch_locations", ["company_id"], name: "index_branch_locations_on_company_id", using: :btree
   add_index "branch_locations", ["state_id"], name: "index_branch_locations_on_state_id", using: :btree
+
+  create_table "budget_entity_mappings", force: :cascade do |t|
+    t.integer  "budget_id",       limit: 4
+    t.integer  "budgetable_id",   limit: 4
+    t.string   "budgetable_type", limit: 255
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "budget_entity_mappings", ["budget_id"], name: "index_budget_entity_mappings_on_budget_id", using: :btree
 
   create_table "budget_rules", force: :cascade do |t|
     t.integer  "category_id",          limit: 4
@@ -4633,6 +4643,7 @@ ActiveRecord::Schema.define(version: 20180724052224) do
   add_foreign_key "bookings", "booking_types"
   add_foreign_key "branch_locations", "companies"
   add_foreign_key "branch_locations", "states"
+  add_foreign_key "budget_entity_mappings", "budgets"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "categories"
   add_foreign_key "budget_rules", "periods"

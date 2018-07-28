@@ -75,8 +75,8 @@ class Company < ActiveRecord::Base
   has_many :outward_invoices
   has_many :outward_invoice_attachments
 
-  has_many :budgets
-
+  has_many :budget_entity_mappings, as: :budgetable
+  has_many :budgets, through: :budget_entity_mappings
 
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"

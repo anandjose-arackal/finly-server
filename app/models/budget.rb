@@ -27,15 +27,16 @@ class Budget < ActiveRecord::Base
   belongs_to :budget_amount, class_name: "Amount"
   belongs_to :spent_amount, class_name: "Amount"
 
-  belongs_to :budgetable, polymorphic: true
+  has_many :budget_entity_mappings
+  has_many :budgetables, through: :budget_entity_mappings
 
   accepts_nested_attributes_for :budget_amount
 
   validates :name, presence: true
   validates :start_date, presence: true
   validates :end_date, presence: true
-  validates :budgetable_id, presence: true
-  validates :budgetable_type, presence: true
+  # validates :budgetable_id, presence: true
+  # validates :budgetable_type, presence: true
   # validates :period_id, presence: true
 
   scope :with_id, -> (ids) {where id: ids}
