@@ -10,6 +10,7 @@
 #  booking_type_id               :integer
 #  note                          :text(65535)
 #  is_deleted                    :boolean          default(FALSE)
+#  travel_request_id             :integer          not null
 #
 
 class BookingRequest < ActiveRecord::Base
@@ -18,6 +19,7 @@ class BookingRequest < ActiveRecord::Base
   belongs_to :booking_type
   belongs_to :booking_status
   belongs_to :travel_request_destination
+  belongs_to :travel_request
   has_many :bookings, dependent: :destroy
   has_many :travel_members, dependent: :destroy
 

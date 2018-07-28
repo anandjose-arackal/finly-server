@@ -51,7 +51,7 @@ class TravelRequests::Show < TravelRequests::Base
     end
 
     def actions
-      actions = {}
+      actions = {editable: editable, destroyable: destroyable}
       # todo associated_users
       if (travel_request.open? || travel_request.retracted? || travel_request.rejected?) && travel_request.user_id == user.id
         actions[:submit] = {method: "patch", type: 2, url: Rails.application.routes.url_helpers.travel_request_review_path(self.travel_request)}

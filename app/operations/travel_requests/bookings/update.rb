@@ -3,27 +3,12 @@ class TravelRequests::Bookings::Update < TravelRequests::Bookings::Base
                 :booking_attachments, :booking_old_attachments
 
   def init
-    self.booking_parameters = booking_params
-
-    self.travel_request = TravelRequest.find_by(id: params[:travel_request_id]) # todo scope to company
-    self.booking_request = ::BookingRequest.find_by(id: params[:booking_request_id])
-
-    unless booking_request.present?
-      add_message :error, 'Booking Request not found'
+    booking_presenter = TravelRequests::Bookings::Show.(user, params)
+    unless booking_presenter.success?
+      add_message :error, booking_presenter.messages[:error]
       return
     end
-    self.booking = booking_request.bookings.find_by(id: booking_parameters[:id])
-
-  end
-
-  def validate
-    if travel_request.blank?
-      add_message :error, 'Travel Request not found'
-    end
-
-    unless booking.present?
-      add_message :error, 'Booking not found'
-    end
+    self.booking = booking_presenter.booking
   end
 
   def pre_process
@@ -50,4 +35,5 @@ class TravelRequests::Bookings::Update < TravelRequests::Bookings::Base
       add_message :error, self.booking.errors.full_messages
     end
   end
+
 end

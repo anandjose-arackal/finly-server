@@ -5,12 +5,6 @@ json.travel_manager_name @result.travel_manager&.name
 json.controlling_user_name @result.travel_request&.controlling_user&.name
 json.owner_name @result.travel_request&.user&.name
 
-# json.current_user current_user
-json.actions do
-  json.editable @result.editable
-  json.destroyable @result.destroyable
-end
-
 json.destinations do
   json.array! @result.destinations do |destination|
     json.extract! destination, :id, :location
@@ -19,7 +13,7 @@ json.destinations do
 end
 
 json.actions @result.actions
-json.policies current_user.policies
+json.policies @result.travel_request.user.policies
 
 json.comments do
   json.array!(@result.travel_request.comments) do |comment|

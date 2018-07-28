@@ -2,23 +2,12 @@ class TravelRequests::Bookings::Destroy < TravelRequests::Bookings::Base
   attr_accessor :booking
 
   def init
-    # self.booking_parameters = booking_params
-
-    # self.travel_request = TravelRequest.find_by(id: params[:travel_request_id]) # todo scope to company
-    booking_id = params[:id] || params[:booking_id]
-    
-    self.booking = ::Booking.find_by(id: booking_id)
-
-  end
-
-  def validate
-    unless booking.present?
-      add_message :error, 'Booking not found'
+    booking_presenter = TravelRequests::Bookings::Show.(user, params)
+    unless booking_presenter.success?
+      add_message :error, booking_presenter.messages[:error]
+      return
     end
-  end
-
-  def pre_process
-
+    self.booking = booking_presenter.booking
   end
 
   def process
@@ -28,7 +17,7 @@ class TravelRequests::Bookings::Destroy < TravelRequests::Bookings::Base
   end
 
   def post_process
-    add_message :success, 'Deleted Booking'
+    add_message :success, 'Removed the booking'
   end
 
   def success

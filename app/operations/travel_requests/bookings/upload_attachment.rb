@@ -10,7 +10,6 @@ class TravelRequests::Bookings::UploadAttachment < TravelRequests::Bookings::Bas
   end
 
   def init
-
     self.attachment_parameters = attachment_params
   end
 
@@ -18,13 +17,9 @@ class TravelRequests::Bookings::UploadAttachment < TravelRequests::Bookings::Bas
 
   end
 
-  def pre_process
-
-    self.attachment_parameters[:user_id] = user.id
-  end
-
   def process
-    self.booking_attachment = user.company.booking_attachments.build(attachment_parameters)
+    self.booking_attachment = user.booking_attachments.build(attachment_parameters)
+    self.booking_attachment.company = user.company
 
     unless booking_attachment.save
       add_message :error, booking_attachment.errors.full_messages
