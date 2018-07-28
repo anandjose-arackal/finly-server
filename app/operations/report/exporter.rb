@@ -17,7 +17,7 @@ class Report::Exporter < Report::Show
       self.report.expenses.each do |expense|
         expense.receipts.each do |receipt|
           if receipt.is_pdf?
-            Magick::ImageList.new(receipt.image.path) do
+            Magick::ImageList.new(receipt.image.url) do
               self.quality = 95
               self.density = '300'
               self.colorspace = Magick::RGBColorspace
@@ -29,8 +29,8 @@ class Report::Exporter < Report::Show
               receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path}
             end
           else
-            path = receipt.image.path
-            receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path}
+            url = receipt.image.url
+            receipts << {merchant: expense.merchant_name, amount: expense.amount_value, url: url}
           end
         end
       end
