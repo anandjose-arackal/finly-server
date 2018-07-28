@@ -17,7 +17,7 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
     end
 
     unless travel_request.user_id == user.id
-      add_message :error, "Only owner can submit a Payment order"
+      add_message :error, "Only owner can submit a Travel Request"
       return false
     end
   end
@@ -50,15 +50,15 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
     # if there is a manager after all
     submitted_at = DateTime.now
     if travel_request.update_attributes status_id: TravelRequestStatus.id_for(:processing),
-                                              controlling_user_id: manager&.id,
-                                              controlling_user_role_id: manager_role_id,
-                                              submitted_at: submitted_at
+                                        controlling_user_id: manager&.id,
+                                        controlling_user_role_id: manager_role_id,
+                                        submitted_at: submitted_at
 
       travel_request.travel_request_trails.create action_user: user,
-                                                              action_user_role_id: UserRole.id_for(:employee),
-                                                              action_id: TravelRequestTrailAction.id_for(:submit),
-                                                              modified_user_id: manager&.id,
-                                                              modified_user_role_id: manager_role_id
+                                                  action_user_role_id: UserRole.id_for(:employee),
+                                                  action_id: TravelRequestTrailAction.id_for(:submit),
+                                                  modified_user_id: manager&.id,
+                                                  modified_user_role_id: manager_role_id
       return true
     end
     add_message :error, travel_request.errors.full_messages
@@ -67,7 +67,7 @@ class TravelRequests::Review::Submit < TravelRequests::Review::Base
   def post_process
     # add comment
     travel_request.comments.create user_id: user.id,
-                                         action_id: BankPaymentRequestCommentAction.id_for(:submit)
+                                   action_id: BankPaymentRequestCommentAction.id_for(:submit)
     # Event::EBankPaymentRequest::Submit.(user, travel_request: travel_request)
     add_message :success, "Travel request successfully submitted!"
   end

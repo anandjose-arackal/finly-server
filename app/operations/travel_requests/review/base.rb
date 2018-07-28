@@ -10,7 +10,12 @@ class TravelRequests::Review::Base < TravelRequests::Base
 
   def init
     id = params[:id] || params[:travel_request_id]
-    self.travel_request = TravelRequests::Index.(user, params).travel_requests.find_by(id: id) rescue nil
+    show_presenter = TravelRequests::Show.(user, params)
+    unless show_presenter.success?
+      add_message :error, show_presenter.messages[:error]
+      return
+    end
+    self.travel_request = show_presenter.travel_request
   end
 
   def validate
