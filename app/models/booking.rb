@@ -47,4 +47,8 @@ class Booking < ActiveRecord::Base
   delegate :flight?, :train?, :bus?, :car_rental?, :hotel?, :restaurant?, to: :booking_type
 
   accepts_nested_attributes_for :travel_members, allow_destroy: true
+
+  validates :booking_status_id, presence: true
+  validates :booking_type_id, presence: true
+  validates :created_by_user_id, presence: true
 end

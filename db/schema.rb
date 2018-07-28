@@ -3230,38 +3230,39 @@ ActiveRecord::Schema.define(version: 20180727132208) do
   end
 
   create_table "payments", force: :cascade do |t|
-    t.integer  "amount_id",               limit: 4,                     null: false
-    t.date     "date",                                                  null: false
-    t.integer  "payment_type_id",         limit: 4,                     null: false
-    t.integer  "initiating_user_id",      limit: 4
-    t.integer  "receiving_user_id",       limit: 4
-    t.text     "note",                    limit: 65535
-    t.datetime "created_at",                                            null: false
-    t.datetime "updated_at",                                            null: false
-    t.integer  "initiating_account_id",   limit: 4
-    t.string   "initiating_account_type", limit: 255
-    t.integer  "receiving_account_id",    limit: 4
-    t.string   "receiving_account_type",  limit: 255
-    t.integer  "payment_order_id",        limit: 4
-    t.integer  "payment_status_id",       limit: 4,                     null: false
-    t.string   "initiating_user_type",    limit: 255
-    t.string   "receiving_user_type",     limit: 255
-    t.integer  "payment_purpose_id",      limit: 4
-    t.integer  "reference_resource_id",   limit: 4
-    t.string   "reference_resource_type", limit: 255
-    t.string   "application",             limit: 255
-    t.string   "payment_mode",            limit: 255
-    t.string   "reference_id",            limit: 255,                   null: false
-    t.integer  "retry_count",             limit: 4,     default: 0
-    t.integer  "invoice_id",              limit: 4
-    t.string   "parent_type",             limit: 255
-    t.integer  "parent_id",               limit: 4
-    t.text     "post_operation",          limit: 65535
-    t.text     "post_operation_payload",  limit: 65535
-    t.integer  "category_id",             limit: 4
+    t.integer  "amount_id",                      limit: 4,                     null: false
+    t.date     "date",                                                         null: false
+    t.integer  "payment_type_id",                limit: 4,                     null: false
+    t.integer  "initiating_user_id",             limit: 4
+    t.integer  "receiving_user_id",              limit: 4
+    t.text     "note",                           limit: 65535
+    t.datetime "created_at",                                                   null: false
+    t.datetime "updated_at",                                                   null: false
+    t.integer  "initiating_account_id",          limit: 4
+    t.string   "initiating_account_type",        limit: 255
+    t.integer  "receiving_account_id",           limit: 4
+    t.string   "receiving_account_type",         limit: 255
+    t.integer  "payment_order_id",               limit: 4
+    t.integer  "payment_status_id",              limit: 4,                     null: false
+    t.string   "initiating_user_type",           limit: 255
+    t.string   "receiving_user_type",            limit: 255
+    t.integer  "payment_purpose_id",             limit: 4
+    t.integer  "reference_resource_id",          limit: 4
+    t.string   "reference_resource_type",        limit: 255
+    t.string   "application",                    limit: 255
+    t.string   "payment_mode",                   limit: 255
+    t.string   "reference_id",                   limit: 255,                   null: false
+    t.integer  "retry_count",                    limit: 4,     default: 0
+    t.integer  "invoice_id",                     limit: 4
+    t.string   "parent_type",                    limit: 255
+    t.integer  "parent_id",                      limit: 4
+    t.text     "post_operation",                 limit: 65535
+    t.text     "post_operation_payload",         limit: 65535
+    t.integer  "category_id",                    limit: 4
     t.date     "scheduled_at"
     t.date     "processed_at"
-    t.boolean  "api_initiated",                         default: false
+    t.boolean  "api_initiated",                                default: false
+    t.integer  "original_payment_for_refund_id", limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree

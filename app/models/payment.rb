@@ -2,40 +2,42 @@
 #
 # Table name: payments
 #
-#  id                      :integer          not null, primary key
-#  amount_id               :integer          not null
-#  date                    :date             not null
-#  payment_type_id         :integer          not null
-#  initiating_user_id      :integer
-#  receiving_user_id       :integer
-#  note                    :text(65535)
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  initiating_account_id   :integer
-#  initiating_account_type :string(255)
-#  receiving_account_id    :integer
-#  receiving_account_type  :string(255)
-#  payment_order_id        :integer
-#  payment_status_id       :integer          not null
-#  initiating_user_type    :string(255)
-#  receiving_user_type     :string(255)
-#  payment_purpose_id      :integer
-#  reference_resource_id   :integer
-#  reference_resource_type :string(255)
-#  application             :string(255)
-#  payment_mode            :string(255)
-#  reference_id            :string(255)      not null
-#  retry_count             :integer          default(0)
-#  invoice_id              :integer
-#  parent_type             :string(255)
-#  parent_id               :integer
-#  post_operation          :text(65535)
-#  post_operation_payload  :text(65535)
-#  category_id             :integer
-#  api_initiated           :boolean          default(FALSE)
-#  scheduled_at            :date
-#  processed_at            :date
+#  id                             :integer          not null, primary key
+#  amount_id                      :integer          not null
+#  date                           :date             not null
+#  payment_type_id                :integer          not null
+#  initiating_user_id             :integer
+#  receiving_user_id              :integer
+#  note                           :text(65535)
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#  initiating_account_id          :integer
+#  initiating_account_type        :string(255)
+#  receiving_account_id           :integer
+#  receiving_account_type         :string(255)
+#  payment_order_id               :integer
+#  payment_status_id              :integer          not null
+#  initiating_user_type           :string(255)
+#  receiving_user_type            :string(255)
+#  payment_purpose_id             :integer
+#  reference_resource_id          :integer
+#  reference_resource_type        :string(255)
+#  application                    :string(255)
+#  payment_mode                   :string(255)
+#  reference_id                   :string(255)      not null
+#  retry_count                    :integer          default(0)
+#  invoice_id                     :integer
+#  parent_type                    :string(255)
+#  parent_id                      :integer
+#  post_operation                 :text(65535)
+#  post_operation_payload         :text(65535)
+#  category_id                    :integer
+#  api_initiated                  :boolean          default(FALSE)
+#  scheduled_at                   :date
+#  processed_at                   :date
+#  original_payment_for_refund_id :integer
 #
+
 
 
 
@@ -63,6 +65,7 @@ class Payment < ActiveRecord::Base
   belongs_to :initiating_user, polymorphic: true
   belongs_to :receiving_user, polymorphic: true
   belongs_to :reference_resource, polymorphic: true
+  belongs_to :original_payment_for_refund, class_name: "Payment"
   has_many :reimbursed_reports, class_name: 'Report', foreign_key: :reimbursement_id
   has_many :cash_in_hand_settled_reports, class_name: 'Report', foreign_key: :cash_in_hand_deduction_id
   has_many :report_tracks

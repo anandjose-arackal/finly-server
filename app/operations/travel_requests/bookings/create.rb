@@ -1,5 +1,5 @@
 class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
-  attr_accessor :travel_request, :booking_request, :booking, :booking_parameters, :booking_attachments
+  attr_accessor :travel_request, :booking_request, :booking, :booking_parameters, :booking_attachments, :destination
 
   def authorized_user_types
     [:travel_manager]
@@ -9,13 +9,13 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
     self.booking_parameters = booking_params
 
     if params&.dig(:booking_request_id).present?
-      booking_request_presenter = TravelRequests::BookingRequests::Show.(user, booking_request_id: params&.dig(:booking_request_id))
+      booking_request_presenter = TravelRequests::BookingRequests::Show.(user, params)
       unless booking_request_presenter.success?
         add_message :error, booking_request_presenter.messages[:error]
         return
       end
       self.booking_request = booking_request_presenter.booking_request
-      self.destination = self.booking_request.destination
+      self.destination = booking_request_presenter.destination
     else
       destination_presenter = TravelRequests::Destinations::Show.(user, {
           travel_request_id: params[:travel_request_id],
