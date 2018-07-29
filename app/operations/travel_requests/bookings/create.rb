@@ -9,7 +9,12 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
     self.booking_parameters = booking_params
 
     if params&.dig(:parent_booking_id).present?
-      parent_booking_presenter = TravelRequests::Bookings::Show.(user, params)
+      parent_booking_presenter = TravelRequests::Bookings::Show.(user, {
+          id: params&.dig(:parent_booking_id),
+          travel_request_id: params[:travel_request_id],
+          destination_id: params[:destination_id],
+          view: params&.dig(:view)
+      })
       unless parent_booking_presenter.success?
         add_message :error, parent_booking_presenter.messages[:error]
         return

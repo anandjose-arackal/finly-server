@@ -21,16 +21,16 @@ class TravelRequests::Bookings::Show < TravelRequests::Bookings::Base
   end
 
   def init
-    if params&.dig(:booking_request_id).present?
-      booking_request_presenter = TravelRequests::BookingRequests::Show.(user, params)
-      unless booking_request_presenter.success?
-        add_message :error, booking_request_presenter.messages[:error]
-        return
-      end
-      self.booking_request = booking_request_presenter.booking_request
-      self.destination = booking_request_presenter.destination
-      self.travel_request = booking_request_presenter.travel_request
-    else
+    # if params&.dig(:booking_request_id).present?
+    #   booking_request_presenter = TravelRequests::BookingRequests::Show.(user, params)
+    #   unless booking_request_presenter.success?
+    #     add_message :error, booking_request_presenter.messages[:error]
+    #     return
+    #   end
+    #   self.booking_request = booking_request_presenter.booking_request
+    #   self.destination = booking_request_presenter.destination
+    #   self.travel_request = booking_request_presenter.travel_request
+    # else
       destination_presenter = TravelRequests::Destinations::Show.(user, {
           travel_request_id: params[:travel_request_id],
           id: params[:destination_id],
@@ -42,9 +42,9 @@ class TravelRequests::Bookings::Show < TravelRequests::Bookings::Base
       end
       self.destination = destination_presenter.destination
       self.travel_request = destination_presenter.travel_request
-    end
-    id = (params[:booking_request_id] or params[:id])
-    self.booking = self.destination.bookings.with_id(id)
+    # end
+    id = (params[:booking_id] or params[:id])
+    self.booking = self.destination.bookings.with_id(id)&.first
   end
 
   def validate

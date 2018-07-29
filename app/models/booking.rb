@@ -70,6 +70,8 @@ class Booking < ActiveRecord::Base
   scope :rejected, -> {where booking_status_id: BookingStatus.id_for(:rejected)}
   scope :cancelled, -> {where booking_status_id: BookingStatus.id_for(:cancelled)}
   scope :processing, -> {where booking_status_id: BookingStatus.id_for(:processing)}
+  scope :confirmed, -> {where booking_status_id: BookingStatus.id_for(:confirmed)}
+  scope :without_parent, -> {where parent_booking_id: nil}
 
   def booking_type_object
     case booking_type_id

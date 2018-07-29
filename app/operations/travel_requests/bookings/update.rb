@@ -9,11 +9,12 @@ class TravelRequests::Bookings::Update < TravelRequests::Bookings::Base
       return
     end
     self.booking = booking_presenter.booking
+    self.booking_parameters = booking_params
   end
 
   def pre_process
     # Extracting booking attachments from params
-    self.booking_attachments = user.company.booking_attachments.with_id(booking_parameters[:booking_attachments])
+    self.booking_attachments = user.booking_attachments.with_id(booking_parameters[:booking_attachments])
 
     self.booking_old_attachments = booking.attachments
 
