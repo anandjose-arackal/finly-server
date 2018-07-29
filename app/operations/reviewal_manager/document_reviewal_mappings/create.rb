@@ -8,7 +8,7 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
 
   def validate
     unless document.present?
-      add_message :error, 'Docuemnt not found'
+      add_message :error, 'Document not found'
     end
 
     # check if reviewer present in company
@@ -17,13 +17,14 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
 
   def process
     mappings_params[:document_reviewer_mappings].each do |mapping_params|
-      mapping_params[:policy_id] = document.policy_id
-      mapping = document.document_level_reviewer_mappings.find_or_initialize_by(level_id: mapping_params[:level_id])
+      reviewer_id = mapping_params[:reviewer_id]
+      mapping_params.delete(:reviewer_id)
+      mapping = document.document_level_reviewer_mappings.find_or_initialize_by(mapping_params)
 
-      if mapping_params[:reviewer_id].present?
-        mapping.reviewer_id = mapping_params[:reviewer_id]
+      if reviewer_id.present?
+        mapping.reviewer_id = reviewer_id
         unless mapping.save
-          add_message :error, "Couldn't create mapping reviewer level mapping for level_id: #{mapping_params[:level_id]}, reviewer_id: #{mapping_params[:reviewer_id]}"
+          add_message :error, "Couldn't create mapping reviewer level mapping for level_id: #{mapping_params[:level_id]}, reviewer_id: #{reviewer_id}"
         end
       else
         mapping.destroy if mapping.persisted?
