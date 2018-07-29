@@ -5,7 +5,6 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     self.document = params[:reviewal_document]
     self.chain = []
     self.document_types = ['PurchaseOrder']
-
     self.policy = document&.policy
   end
 
@@ -29,10 +28,16 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
     levels.each do |level|
       mappings = level.level_reviewer_mappings
 
+      selected_reviewer = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id).first
       level_data = {
           level_number: level.level_number,
-          reviewers: mappings
+          reviewers: mappings,
       }
+      if selected_reviewer.present?
+
+        level_data[:selected_reviewer] = selected_reviewer.reviewer
+      end
+
 
       chain.push(level_data)
     end

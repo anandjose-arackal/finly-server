@@ -3047,20 +3047,17 @@ end
     resources :e_way_bills
     resources :bill_of_supplies
 
-
     # Organization Account Settings for procurements
     namespace :configs do
       resources :terms
       resources :doc_number_configs, only: [:index, :update]
       post 'send_mail', to: 'mailer#send_mail'
-
     end
 
     resources :comments, only: [:create]
   end
 
   ## Procurement APIs end   ##########################################
-
 
   ######## Reviewal Workflow ##########
   resources :reviewal_levels do

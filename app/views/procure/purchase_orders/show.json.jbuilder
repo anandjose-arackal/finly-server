@@ -89,6 +89,7 @@ end
 json.reviewal_chain do
   json.array! @result.reviewal_chain do |item|
     json.level_number item[:level_number]
+    json.selected_reviewer item[:selected_reviewer]&.as_json
     json.reviewers do
       json.array! item[:reviewers] do |reviewer|
         json.extract! reviewer, :id, :exception, :threshold

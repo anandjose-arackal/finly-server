@@ -64,13 +64,12 @@ class PurchaseOrder < ActiveRecord::Base
   belongs_to :policy
   belongs_to :level, class_name: 'ReviewalLevel', foreign_key: :controlling_level_id
 
-  has_many :document_level_reviewers, class_name: 'DocumentLevelReviewerMapping', polymorphic: true
+  has_many :document_level_reviewer_mappings, as: :document_reviewer_mappable
 
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
 
   has_many :items, class_name: "PurchaseOrderItem", dependent: :destroy
   has_many :extra_charges, class_name: "ProcurementCharge", as: "Chargable"
-
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, to: :status

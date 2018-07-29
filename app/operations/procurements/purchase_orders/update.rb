@@ -31,24 +31,24 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
     # self.purchase_order = procurement.build_purchse_order(purchase_order_params)
     purchase_order.assign_attributes(purchase_order_params)
     if purchase_order.valid?
-      purchase_order.save
-      purchase_order.save
 
 
       # For setting level specific reviewers from reviewal chain for a document
-      params[:document] = purchase_order
+      params[:reviewal_document] = self.purchase_order
       params[:document_reviewer_mappings] = document_reviewer_mappings_params
 
-      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewerMappings::Create.(user, params)
-
+      document_reviewer_mappings_op = ::ReviewalManager::DocumentReviewalMappings::Create.(user, params)
       unless document_reviewer_mappings_op.success?
-        debugger
+        add_message :error, "Couldn't set reviewer for the level "
+        return
       end
+
+      purchase_order.save
+      purchase_order.save
     else
       add_message :error, purchase_order.errors.full_messages
       return
     end
-
 
     self.po_old_attachments.update_all(procurement_document_id: nil, procurement_document_type: nil)
 
