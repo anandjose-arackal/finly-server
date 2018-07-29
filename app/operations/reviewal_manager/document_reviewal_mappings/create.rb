@@ -18,10 +18,15 @@ class ReviewalManager::DocumentReviewalMappings::Create < ReviewalManager::Docum
   def process
     mappings_params[:document_reviewer_mappings].each do |mapping_params|
       mapping_params[:policy_id] = document.policy_id
-      mapping = document.document_level_reviewer_mappings.find_or_initialize_by(mapping_params[:level_id])
-      mapping.reviewer_id = mapping_params[:reviewer_id]
-      unless mapping.save
-        add_message :error, "Couldn't create mapping reviewer level mapping for level_id: #{mapping_params[:level_id]}, reviewer_id: #{mapping_params[:reviewer_id]}"
+      mapping = document.document_level_reviewer_mappings.find_or_initialize_by(level_id: mapping_params[:level_id])
+
+      if mapping_params[:reviewer_id].present?
+        mapping.reviewer_id = mapping_params[:reviewer_id]
+        unless mapping.save
+          add_message :error, "Couldn't create mapping reviewer level mapping for level_id: #{mapping_params[:level_id]}, reviewer_id: #{mapping_params[:reviewer_id]}"
+        end
+      else
+        mapping.destroy if mapping.persisted?
       end
     end
   end
