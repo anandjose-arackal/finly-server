@@ -9,11 +9,30 @@
 #
 
 class BookingStatus < ActiveRecord::Base
-
   include Seedable
 
   def self.values
-    [:booking_option, :processing, :confirmed, :cancelled]
-
+    [:request, :rejected, :option, :processing, :confirmed, :cancelled]
   end
+
+  def request?
+    id == BookingStatus.id_for(:request)
+  end
+
+  def option?
+    id ==  BookingStatus.id_for(:option)
+  end
+
+  def confirmed?
+    BookingStatus.id_for(:confirmed)
+  end
+
+  def processing?
+    BookingStatus.id_for(:processing)
+  end
+
+  def cancelled?
+    BookingStatus.id_for(:cancelled)
+  end
+
 end

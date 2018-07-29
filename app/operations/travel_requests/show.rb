@@ -98,13 +98,13 @@ class TravelRequests::Show < TravelRequests::Base
       false
     end
 
-    def grouped_requests(destination)
+    def grouped_bookings(destination)
       val = {}
-      destination.booking_requests.each do |booking_request|
-        if val[booking_request.booking_type_id].nil?
-          val[booking_request.booking_type_id] = []
+      destination.bookings.each do |booking|
+        if val[booking.booking_type&.name].nil?
+          val[booking.booking_type&.name] = []
         end
-        val[booking_request.booking_type_id] << booking_request
+        val[booking.booking_type&.name] << booking
       end
       val
     end

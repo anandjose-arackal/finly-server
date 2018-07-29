@@ -2392,7 +2392,7 @@ Rails.application.routes.draw do
 
     resources :destinations, controller: 'travel_request_destinations', only: [:create, :update, :destroy]
     resources :destinations do
-      resources :booking_requests, controller: 'travel_request_booking_requests', only: [:create, :update, :destroy]
+      # resources :booking_requests, controller: 'travel_request_booking_requests', only: [:create, :update, :destroy]
       resources :bookings, controller: 'travel_request_bookings', only: [:create, :update, :destroy]
     end
   end

@@ -8,7 +8,7 @@ json.owner_name @result.travel_request&.user&.name
 json.destinations do
   json.array! @result.destinations do |destination|
     json.extract! destination, :id, :location
-    json.booking_requests @result.grouped_requests(destination)
+    json.booking @result.grouped_bookings(destination)
   end
 end
 

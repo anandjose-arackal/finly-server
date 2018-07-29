@@ -13,8 +13,8 @@ class TravelRequestDestination < ActiveRecord::Base
 
   belongs_to :location, dependent: :destroy
   belongs_to :travel_request
-  has_many :booking_requests, dependent: :destroy
-  has_many :bookings
+  # has_many :booking_requests, dependent: :destroy
+  has_many :bookings, foreign_key: :destination_id, dependent: :destroy
 
   validates :travel_request_id, presence: true
   validates :location, presence: true

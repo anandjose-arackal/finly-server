@@ -1,21 +1,22 @@
 class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
-  attr_accessor :travel_request, :booking_request, :booking, :booking_parameters, :booking_attachments, :destination
+  attr_accessor :travel_request, :booking, :parent_booking, :booking_parameters, :booking_attachments, :destination, :travel_request
 
   def authorized_user_types
-    [:travel_manager]
+    [:employee, :travel_manager]
   end
 
   def init
     self.booking_parameters = booking_params
 
-    if params&.dig(:booking_request_id).present?
-      booking_request_presenter = TravelRequests::BookingRequests::Show.(user, params)
-      unless booking_request_presenter.success?
-        add_message :error, booking_request_presenter.messages[:error]
+    if params&.dig(:parent_booking_id).present?
+      parent_booking_presenter = TravelRequests::Bookings::Show.(user, params)
+      unless parent_booking_presenter.success?
+        add_message :error, parent_booking_presenter.messages[:error]
         return
       end
-      self.booking_request = booking_request_presenter.booking_request
-      self.destination = booking_request_presenter.destination
+      self.parent_booking = parent_booking_presenter.booking
+      self.destination = parent_booking_presenter.destination
+      self.travel_request = parent_booking_presenter.travel_request
     else
       destination_presenter = TravelRequests::Destinations::Show.(user, {
           travel_request_id: params[:travel_request_id],
@@ -27,6 +28,7 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
         return
       end
       self.destination = destination_presenter.destination
+      self.travel_request = destination_presenter.travel_request
     end
   end
 
@@ -43,8 +45,11 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
   end
 
   def process
-    self.booking = booking_request.bookings.build(booking_parameters)
+    self.booking = self.destination.bookings.build(booking_parameters)
+    self.booking.parent_booking = self.parent_booking
+    self.booking.travel_request = self.travel_request
     self.booking.created_by_user = user
+
     if self.booking.valid?
       self.booking.save
       add_message :success, 'Successfully Added Booking'

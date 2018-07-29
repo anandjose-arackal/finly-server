@@ -12,18 +12,21 @@
 #  created_by_user_id :integer
 #  travel_request_id  :integer          not null
 #  destination_id     :integer          not null
+#  parent_booking_id  :integer
 #
 
 class Booking < ActiveRecord::Base
-  validates :booking_type_id, presence: true
-  validates :booking_request_id, presence: true
 
   belongs_to :booking_type
-  belongs_to :booking_request
-  belongs_to :destination, class_name: 'TravelRequestDestination'
-  belongs_to :travel_request_comment
   belongs_to :booking_status
+  # belongs_to :booking_request
+  belongs_to :destination, class_name: 'TravelRequestDestination', dependent: :destroy
+  belongs_to :travel_request, dependent: :destroy
+  belongs_to :travel_request_comment, dependent: :destroy
   belongs_to :created_by_user, class_name: 'User'
+
+  has_many :bookings, foreign_key: :parent_booking_id
+  belongs_to :parent_booking, class_name: 'Booking'
 
   has_many :travel_members, dependent: :destroy
 
@@ -46,33 +49,98 @@ class Booking < ActiveRecord::Base
   accepts_nested_attributes_for :booking_other, allow_destroy: true
   accepts_nested_attributes_for :travel_members, allow_destroy: true
 
-
   delegate :flight?, :train?, :bus?, :car_rental?, :hotel?, :restaurant?, to: :booking_type
+  delegate :request?, :option?, :confirmed?, :processing?, :cancelled?, :rejected?, to: :booking_status
 
   accepts_nested_attributes_for :travel_members, allow_destroy: true
 
+  validates :booking_type_id, presence: true
   validates :booking_status_id, presence: true
   validates :booking_type_id, presence: true
   validates :created_by_user_id, presence: true
+  validates :travel_request_id, presence: true
+  # validates :booking_request_id, presence: true
+  validate :at_least_one_type
 
-  scope :booking_options, -> { where booking_status_id: BookingStatus.id_for(:booking_option) }
-  scope :confirmed_bookings, -> { where.not booking_status_id: BookingStatus.id_for(:booking_option) }
+  scope :with_id, ->(id) {where id: id}
+  scope :sort_by_type, -> {order booking_type_id: :asc}
+  scope :group_by_type, -> {group :booking_type_id}
+  scope :requests, -> {where booking_status_id: BookingStatus.ids_for(:request)}
+  scope :options, -> {where booking_status_id: BookingStatus.id_for(:option)}
+  scope :rejected, -> {where booking_status_id: BookingStatus.id_for(:rejected)}
+  scope :cancelled, -> {where booking_status_id: BookingStatus.id_for(:cancelled)}
+  scope :processing, -> {where booking_status_id: BookingStatus.id_for(:processing)}
+
+  def booking_type_object
+    case booking_type_id
+    when BookingType.id_for(:flight)
+      return booking_flight
+    when BookingType.id_for(:bus)
+      return booking_bus
+    when BookingType.id_for(:train)
+      return booking_train
+    when BookingType.id_for(:car_rental)
+      return booking_car_rental
+    when BookingType.id_for(:hotel)
+      return booking_hotel
+    when BookingType.id_for(:restaurant)
+      return booking_restaurant
+    when BookingType.id_for(:others)
+      return booking_other
+    end
+  end
 
   def as_json(options = {})
-    {
+    data = {
         id: id,
         booking_type: booking_type,
         note: note,
         booking_status: booking_status,
         travel_members: travel_members,
-        booking_car_rental: booking_car_rental,
-        booking_bus: booking_bus,
-        booking_flight: booking_flight,
-        booking_hotel: booking_hotel,
-        booking_restaurant: booking_restaurant,
-        booking_train: booking_train,
-        booking_other: booking_other
     }
+    data[booking_type&.name] = booking_type_object
+    if self.request?
+      data[:options] = self.bookings.options
+      data[:confirmed] = self.bookings.confirmed
+    end
+    data
+  end
+
+  private
+
+  def at_least_one_type
+    case self.booking_type_id
+    when BookingType.id_for(:flight)
+      if self.booking_flight.nil?
+        errors.add(:booking, "needs to have an associated flight booking")
+      end
+    when BookingType.id_for(:hotel)
+      if self.booking_hotel.nil?
+        errors.add(:booking, "needs to have an associated hotel booking")
+      end
+    when BookingType.id_for(:restaurant)
+      if self.booking_restaurant.nil?
+        errors.add(:booking, "needs to have an associated restaurant booking")
+      end
+    when BookingType.id_for(:bus)
+      if self.booking_bus.nil?
+        errors.add(:booking, "needs to have an associated bus booking")
+      end
+    when BookingType.id_for(:train)
+      if self.booking_train.nil?
+        errors.add(:booking, "needs to have an associated trail booking")
+      end
+    when BookingType.id_for(:car_rental)
+      if self.booking_car_rental.nil?
+        errors.add(:booking, "needs to have an associated car rental booking")
+      end
+    when BookingType.id_for(:custom)
+      if self.booking_other.nil?
+        errors.add(:booking, "needs to have an associated custom booking")
+      end
+    else
+      errors.add(:booking, "type is invalid")
+    end
   end
 
 end
