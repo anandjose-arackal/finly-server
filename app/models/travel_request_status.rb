@@ -13,7 +13,8 @@ class TravelRequestStatus < ActiveRecord::Base
   include Seedable
 
   def self.values
-    [:open, :processing, :retracted, :rejected, :booked, :cancelled, :booking_pending, :change_requested, :completed, :approved]
+    [:open, :processing, :retracted, :rejected, :booked, :cancelled, :booking_pending,
+     :selection_requested, :selection_processing, :selection_confirmed, :booking_confirmed, :completed, :approved]
   end
 
   def open?

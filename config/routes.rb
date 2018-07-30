@@ -2394,6 +2394,9 @@ Rails.application.routes.draw do
     resources :destinations do
       # resources :booking_requests, controller: 'travel_request_booking_requests', only: [:create, :update, :destroy]
       resources :bookings, controller: 'travel_request_bookings', only: [:create, :update, :destroy]
+      resources :bookings do
+        patch 'select_option', to: 'travel_request_bookings#select_option'
+      end
     end
   end
   post 'bookings/upload_attachment', to: 'bookings#upload_attachment'

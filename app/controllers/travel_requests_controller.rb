@@ -79,6 +79,12 @@ class TravelRequestsController < ApplicationController
         operation = TravelRequests::Review::FinishBooking.new(current_user, params)
       when 8, '8'
         operation = TravelRequests::Review::RetractBooking.new(current_user, params)
+      when 9, '9'
+        operation = TravelRequests::Review::RequestSelection.new(current_user, params)
+      when 10, '10'
+        operation = TravelRequests::Review::ConfirmSelection.new(current_user, params)
+      when 11, '11'
+        operation = TravelRequests::Review::ConfirmBooking.new(current_user, params)
       else
         # do nothing?
     end

@@ -71,6 +71,7 @@ class Booking < ActiveRecord::Base
   scope :cancelled, -> {where booking_status_id: BookingStatus.id_for(:cancelled)}
   scope :processing, -> {where booking_status_id: BookingStatus.id_for(:processing)}
   scope :confirmed, -> {where booking_status_id: BookingStatus.id_for(:confirmed)}
+  scope :selected_for_booking, -> {where booking_status_id: BookingStatus.id_for(:selected_for_booking)}
   scope :without_parent, -> {where parent_booking_id: nil}
 
   def booking_type_object
@@ -103,6 +104,7 @@ class Booking < ActiveRecord::Base
     data[booking_type&.name] = booking_type_object
     if self.request?
       data[:options] = self.bookings.options
+      data[:selected_for_booking] = self.bookings.selected_for_booking
       data[:confirmed] = self.bookings.confirmed
     end
     data

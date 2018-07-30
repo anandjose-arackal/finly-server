@@ -27,7 +27,6 @@
 #
 
 class TravelRequest < ActiveRecord::Base
-
   include SoftDeletable
 
   belongs_to :user
@@ -49,45 +48,22 @@ class TravelRequest < ActiveRecord::Base
 
   delegate :open?, :processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?, to: :status
 
-  validates :status_id, presence: true, unless: :open?
-  validates :user_id, presence: true, unless: :open?
-  validates :name, presence: true, unless: :open?
+  validates :status_id, presence: true#, unless: :open?
+  validates :user_id, presence: true#, unless: :open?
+  validates :name, presence: true#, unless: :open?
 
   default_scope {order(created_at: :desc)}
 
   scope :with_id, ->(id) {where id: id}
-  scope :not_open, -> {
-    where.not(status_id: TravelRequestStatus.id_for(:open))
-  }
-
+  scope :not_open, -> { where.not(status_id: TravelRequestStatus.id_for(:open)) }
   scope :non_owner, -> (user_id) {where.not user_id: user_id}
-
-  scope :open, -> {
-    where(status_id: TravelRequestStatus.id_for(:open))
-  }
-
-  scope :approved, -> {
-    where(status_id: TravelRequestStatus.id_for(:approved))
-  }
-
-  scope :processing, -> {
-    where(status_id: TravelRequestStatus.id_for(:processing))
-  }
-
-  scope :with_user, -> (user_id) {
-    where user_id: user_id
-  }
-
-  scope :with_policy, -> (policy_id) {
-    where policy_id: policy_id
-  }
-
-  scope :with_controlling_user_role_id, -> (role_id) {
-    where controlling_user_role_id: role_id
-  }
-  scope :with_controlling_user_id, -> (user_id) {
-    where controlling_user_id: user_id
-  }
+  scope :open, -> { where(status_id: TravelRequestStatus.id_for(:open)) }
+  scope :approved, -> { where(status_id: TravelRequestStatus.id_for(:approved)) }
+  scope :processing, -> { where(status_id: TravelRequestStatus.id_for(:processing)) }
+  scope :with_user, -> (user_id) { where user_id: user_id }
+  scope :with_policy, -> (policy_id) { where policy_id: policy_id }
+  scope :with_controlling_user_role_id, -> (role_id) { where controlling_user_role_id: role_id }
+  scope :with_controlling_user_id, -> (user_id) { where controlling_user_id: user_id }
 
 
   def can_submit?
@@ -139,7 +115,5 @@ class TravelRequest < ActiveRecord::Base
         destinations: destinations
     }
   end
-
-  private
 
 end
