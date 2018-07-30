@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180730075024) do
+ActiveRecord::Schema.define(version: 20180730082235) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -817,6 +817,9 @@ ActiveRecord::Schema.define(version: 20180730075024) do
     t.datetime "updated_at",                                   null: false
     t.integer  "user_id",          limit: 4
     t.integer  "company_id",       limit: 4
+    t.boolean  "purchase_order"
+    t.boolean  "payment"
+    t.boolean  "expense"
   end
 
   add_index "budgets", ["budget_amount_id"], name: "index_budgets_on_budget_amount_id", using: :btree
@@ -2145,6 +2148,7 @@ ActiveRecord::Schema.define(version: 20180730075024) do
     t.datetime "created_at",                              null: false
     t.datetime "updated_at",                              null: false
     t.datetime "date"
+    t.integer  "sequence_number",             limit: 4
   end
 
   add_index "finly_transactions", ["amount_id"], name: "index_finly_transactions_on_amount_id", using: :btree

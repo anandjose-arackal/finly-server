@@ -16,6 +16,9 @@
 #  updated_at       :datetime         not null
 #  user_id          :integer
 #  company_id       :integer
+#  purchase_order   :boolean
+#  payment          :boolean
+#  expense          :boolean
 #
 
 require 'test_helper'
