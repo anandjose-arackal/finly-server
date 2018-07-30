@@ -21,6 +21,7 @@
 
 
 
+
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -57,6 +58,7 @@ class Policy < ActiveRecord::Base
   delegate :budget_rules_count, to: :budget_rules
 
   has_many :field_configurations, as: :configurable
+  has_many :levels, class_name: 'ReviewalLevel'
 
   validates :company_id, presence: true
   validate :one_default_per_company

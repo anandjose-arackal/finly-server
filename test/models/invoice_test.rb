@@ -45,6 +45,7 @@
 #  receiving_account_id   :integer
 #  receiving_account_type :string(255)
 #  note                   :text(65535)
+#  procurement_id         :integer
 #  remaining_amount_id    :integer
 #  invoice_type_id        :integer
 #

@@ -35,6 +35,7 @@ class MoneyRequest::MarkAsCredited < MoneyRequest::Base
                                   money_request_tracking_action_id: MoneyRequestTrackingAction.id_for(:credited),
                                   status_id: MoneyRequestStatus.id_for(:credited),
                                   payment: self.payment
+
     end
   end
 

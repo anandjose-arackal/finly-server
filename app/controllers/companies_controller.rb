@@ -24,4 +24,8 @@ class CompaniesController < ApplicationController
     @result = Company::LoadOptions.(current_user, params)
     respond
   end
+
+  def categories_and_custom_fields
+
+  end
 end

@@ -41,4 +41,6 @@ class BankTransfer::BankAccountsController < ApplicationController
       respond response: :failure, message: @result.messages[:error]
     end
   end
+
+
 end

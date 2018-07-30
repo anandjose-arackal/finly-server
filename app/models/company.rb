@@ -74,9 +74,17 @@ class Company < ActiveRecord::Base
   has_many :customers
   has_many :outward_invoices
   has_many :outward_invoice_attachments
+  has_many :inward_invoices, class_name: "Invoice"
 
   has_many :budget_entity_mappings, as: :budgetable
   has_many :budgets, through: :budget_entity_mappings
+  has_many :procurements
+  has_many :procurement_terms
+  has_many :procurement_attachments
+  has_many :document_number_configs
+  has_many :purchase_orders
+  has_many :inward_documents # purchase order inward documents
+
 
   has_many :booking_attachments
   has_many :locations, class_name: "BranchLocation"
