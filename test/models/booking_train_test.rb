@@ -14,12 +14,14 @@
 #  boarding_station    :string(255)
 #  to_id               :integer          not null
 #  destination_station :string(255)
-#  departure_datetime  :datetime
-#  arrival_datetime    :datetime
 #  description         :string(255)
 #  seat_number         :string(255)
 #  cost_id             :integer
 #  is_deleted          :boolean          default(FALSE)
+#  departure_date      :date
+#  departure_time      :time
+#  arrival_date        :date
+#  arrival_time        :time
 #
 
 require 'test_helper'

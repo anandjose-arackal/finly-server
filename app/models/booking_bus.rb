@@ -2,21 +2,23 @@
 #
 # Table name: booking_buses
 #
-#  id                 :integer          not null, primary key
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  parent_id          :integer
-#  parent_type        :string(255)
-#  booking_class      :string(255)
-#  from_id            :integer          not null
-#  to_id              :integer          not null
-#  departure_datetime :datetime         not null
-#  arrival_datetime   :datetime
-#  cost_id            :integer
-#  boarding_point     :text(65535)
-#  drop_point         :text(65535)
-#  description        :text(65535)
-#  is_deleted         :boolean          default(FALSE)
+#  id             :integer          not null, primary key
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  parent_id      :integer
+#  parent_type    :string(255)
+#  booking_class  :string(255)
+#  from_id        :integer          not null
+#  to_id          :integer          not null
+#  cost_id        :integer
+#  boarding_point :text(65535)
+#  drop_point     :text(65535)
+#  description    :text(65535)
+#  is_deleted     :boolean          default(FALSE)
+#  departure_date :date
+#  departure_time :time
+#  arrival_date   :date
+#  arrival_time   :time
 #
 
 class BookingBus < ActiveRecord::Base
@@ -33,7 +35,8 @@ class BookingBus < ActiveRecord::Base
 
   validates :from, presence: true
   validates :to, presence: true
-  validates :departure_datetime, presence: true
+  validates :departure_date, presence: true
+  validates :departure_time, presence: true
 
   def as_json(options = {})
     {
@@ -41,8 +44,10 @@ class BookingBus < ActiveRecord::Base
         booking_class: booking_class,
         from: from,
         to: to,
-        departure_datetime: DateUtils.datetime_formatted(departure_datetime),
-        arrival_datetime: arrival_datetime,
+        departure_date: DateUtils.date_formatted(departure_date),
+        departure_time: DateUtils.time_formatted(departure_time),
+        arrival_date: DateUtils.date_formatted(arrival_date),
+        arrival_time: DateUtils.time_formatted(arrival_time),
         cost: cost,
         boarding_point: boarding_point,
         drop_point: drop_point,

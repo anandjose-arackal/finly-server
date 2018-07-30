@@ -43,6 +43,16 @@ class DateUtils
     end
   end
 
+  def self.time_formatted(time)
+    return time if time.blank?
+    if time.is_a?(String)
+      time = parse_datetime time
+    end
+    return time if time.blank?
+    return time unless time.is_a?(Time) or time.is_a?(DateTime) or time.is_a?(ActiveSupport::TimeWithZone)
+    time.strftime('%I:%M%P')
+  end
+
   def self.datetime_formatted(datetime)
     return datetime if datetime.blank?
     if datetime.is_a?(String)

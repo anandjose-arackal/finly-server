@@ -14,12 +14,14 @@
 #  boarding_station    :string(255)
 #  to_id               :integer          not null
 #  destination_station :string(255)
-#  departure_datetime  :datetime
-#  arrival_datetime    :datetime
 #  description         :string(255)
 #  seat_number         :string(255)
 #  cost_id             :integer
 #  is_deleted          :boolean          default(FALSE)
+#  departure_date      :date
+#  departure_time      :time
+#  arrival_date        :date
+#  arrival_time        :time
 #
 
 class BookingTrain < ActiveRecord::Base
@@ -36,7 +38,8 @@ class BookingTrain < ActiveRecord::Base
 
   validates :from, presence: true
   validates :to, presence: true
-  validates :departure_datetime, presence: true
+  validates :departure_date, presence: true
+  validates :departure_time, presence: true
 
   def as_json(options={})
     {
@@ -48,8 +51,10 @@ class BookingTrain < ActiveRecord::Base
         boarding_station: boarding_station,
         to: to,
         destination_station: destination_station,
-        departure_datetime: DateUtils.datetime_formatted(departure_datetime),
-        arrival_datetime: arrival_datetime,
+        departure_date: DateUtils.date_formatted(departure_date),
+        departure_time: DateUtils.time_formatted(departure_time),
+        arrival_date: DateUtils.date_formatted(arrival_date),
+        arrival_time: DateUtils.time_formatted(arrival_time),
         description: description,
         seat_number: seat_number,
         cost: cost

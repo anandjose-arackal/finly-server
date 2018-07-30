@@ -2,21 +2,23 @@
 #
 # Table name: booking_buses
 #
-#  id                 :integer          not null, primary key
-#  created_at         :datetime         not null
-#  updated_at         :datetime         not null
-#  parent_id          :integer
-#  parent_type        :string(255)
-#  booking_class      :string(255)
-#  from_id            :integer          not null
-#  to_id              :integer          not null
-#  departure_datetime :datetime         not null
-#  arrival_datetime   :datetime
-#  cost_id            :integer
-#  boarding_point     :text(65535)
-#  drop_point         :text(65535)
-#  description        :text(65535)
-#  is_deleted         :boolean          default(FALSE)
+#  id             :integer          not null, primary key
+#  created_at     :datetime         not null
+#  updated_at     :datetime         not null
+#  parent_id      :integer
+#  parent_type    :string(255)
+#  booking_class  :string(255)
+#  from_id        :integer          not null
+#  to_id          :integer          not null
+#  cost_id        :integer
+#  boarding_point :text(65535)
+#  drop_point     :text(65535)
+#  description    :text(65535)
+#  is_deleted     :boolean          default(FALSE)
+#  departure_date :date
+#  departure_time :time
+#  arrival_date   :date
+#  arrival_time   :time
 #
 
 require 'test_helper'

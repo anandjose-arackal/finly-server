@@ -19,8 +19,7 @@ class User::Team::Review::NextReviewer < BaseOperation
   end
 
   def process
-    reviewer_for = params&.dig(:reviewer_for)
-    if reviewer_for == :money_request or obj.is_a?(MoneyRequest)
+    if obj.is_a?(MoneyRequest)
       next_reviewer(:money_request, obj)
     elsif obj.is_a?(Report)
       next_reviewer(:report, obj)

@@ -16,6 +16,10 @@
 #  rental_company :string(255)
 #  description    :text(65535)
 #  cost_id        :integer
+#  pickup_date    :date
+#  pickup_time    :time
+#  drop_date      :date
+#  drop_time      :time
 #
 
 require 'test_helper'

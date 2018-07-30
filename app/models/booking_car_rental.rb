@@ -16,6 +16,10 @@
 #  rental_company :string(255)
 #  description    :text(65535)
 #  cost_id        :integer
+#  pickup_date    :date
+#  pickup_time    :time
+#  drop_date      :date
+#  drop_time      :time
 #
 
 class BookingCarRental < ActiveRecord::Base
@@ -23,4 +27,9 @@ class BookingCarRental < ActiveRecord::Base
   belongs_to :cost, class_name: 'Amount', dependent: :destroy
   belongs_to :pickup_city, class_name: 'Location', dependent: :destroy
   belongs_to :drop_city, class_name: 'Location', dependent: :destroy
+
+  validates :pickup_date, presence: true
+  validates :drop_date, presence: true
+  validates :pickup_city_id, presence: true
+  validates :drop_city_id, presence: true
 end
