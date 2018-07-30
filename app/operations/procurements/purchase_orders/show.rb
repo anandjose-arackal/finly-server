@@ -15,7 +15,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     if self.purchase_order.po_number.blank?
       op = Procurements::DocumentNumbers::Generate.(user, {document: self.purchase_order})
       if op.success?
-        self.po_number = op.document_number
+        self.purchase_order.po_number = op.document_number
       end
     end
   end

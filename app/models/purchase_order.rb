@@ -80,14 +80,26 @@ class PurchaseOrder < ActiveRecord::Base
 
   validates :purchase_order_status_id, presence: true
   # validates :items, presence: true
-  scope :document_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
+  scope :document_number_generated_in_finly, -> { where override_po_number: [false, nil] }
 
   scope :with_user_id, -> (user_ids) { where user_id: user_ids }
   scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
 
+  # Used for generating document number
+  scope :valid, -> {
+    ids = pluck(:id)
+    ids = PurchaseOrderItem.where(purchase_order_id: ids).pluck(:purchase_order_id)
+    where(id: ids)
+  }
+
+
+
   before_save :calculate_line_items
 
+
   private
+
+
 
   def calculate_line_items
     total_before_tax_amount = 0

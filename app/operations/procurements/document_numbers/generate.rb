@@ -17,7 +17,7 @@ class Procurements::DocumentNumbers::Generate < Procurements::DocumentNumbers::B
       self.number_config_type_id = DocumentNumberConfigType.id_for(:purchase_order)
       self.document_type = :purchase_order
       # self.number_config = DocumentNumberConfig.with_company_id(company.id).with_config_type_id(number_config_type_id)
-    elsif self.invoice.is_a?(InwardDocument)
+    elsif self.document.is_a?(InwardDocument)
       self.number_config_type_id = DocumentNumberConfigType.id_for(:inward_document)
       self.document_type = :inward_document
       # self.number_config = DocumentNumberConfig.with_company_id(company.id).with_config_type_id(number_config_type_id)
@@ -37,69 +37,47 @@ class Procurements::DocumentNumbers::Generate < Procurements::DocumentNumbers::B
   end
 
   def process
-    iteration = 1
-    loop do
-      self.document_number = ""
-      if self.number_config.prefix.present?
-        self.document_number = self.number_config.prefix
-      end
+    self.document_number = ""
+    if self.number_config.prefix.present?
+      self.document_number = self.number_config.prefix || ""
+    end
 
-      #todo add valid
-      case self.document_type
-        when :purchase_order
-          # last_document = user.company.purchase_orders.document_number_generated_in_finly.valid.reorder(created_at: :desc).first
-          last_document = user.company.purchase_orders.document_number_generated_in_finly.reorder(created_at: :desc).first
+    case self.document_type
+      when :purchase_order
+        # todo add valid
+        # last_document = user.company.purchase_orders.document_number_generated_in_finly.valid.reorder(created_at: :desc).first
+        last_document = user.company.purchase_orders.document_number_generated_in_finly.valid.reorder(created_at: :desc).first
 
-          if self.number_config.sequence_start.present?
-            if last_document.present? && last_document.created_at > self.number_config.updated_at
-              prefix = last_document.prefix || self.number_config.prefix
-              numeric_section = last_document.po_number.gsub(prefix, '')
-              new_numeral = numeric_section
-              iteration.times do
-                new_numeral = new_numeral.succ
-              end
-              self.document_number += new_numeral.to_s
-            elsif (last_document.present? && last_document.created_at <= self.number_config.updated_at) || last_document.blank?
-              numeric_section = self.number_config.sequence_start
-              new_numeral = numeric_section
-              iteration.times do
-                new_numeral = new_numeral.succ
-              end
-              self.document_number += new_numeral.to_s
+        if self.number_config.sequence_start.present?
+          if last_document.present? && last_document.created_at > self.number_config.updated_at
+            self.document_number = last_document.po_number || (self.document_number + self.number_config.sequence_start)
+            self.document_number = self.document_number.succ
+          elsif (last_document.present? && last_document.created_at <= self.number_config.updated_at) || last_document.blank?
+            self.document_number = self.number_config.prefix + self.number_config.sequence_start
+            self.document_number = self.document_number.succ
+          end
+        end
+      when :inward_document
+        # last_document = user.company.inward_documents.document_number_generated_in_finly.valid.reorder(created_at: :desc).first
+        last_document = user.company.inward_documents.document_number_generated_in_finly.reorder(created_at: :desc).first
+        if self.number_config.sequence_start.present?
+          if last_document.present? && last_document.created_at > self.number_config.updated_at
+            prefix = last_document.prefix || self.number_config.prefix
+            numeric_section = last_document.document_number.gsub(prefix, '')
+            new_numeral = numeric_section
+            iteration.times do
+              new_numeral = new_numeral.succ
             end
-          end
-          if user.company.purchase_order.find_by(po_number: self.document_number)
-            iteration += 1
-          else
-            break
-          end
-        when :inward_document
-          # last_document = user.company.inward_documents.document_number_generated_in_finly.valid.reorder(created_at: :desc).first
-          last_document = user.company.inward_documents.document_number_generated_in_finly.reorder(created_at: :desc).first
-          if self.number_config.sequence_start.present?
-            if last_document.present? && last_document.created_at > self.number_config.updated_at
-              prefix = last_document.prefix || self.number_config.prefix
-              numeric_section = last_document.document_number.gsub(prefix, '')
-              new_numeral = numeric_section
-              iteration.times do
-                new_numeral = new_numeral.succ
-              end
-              self.document_number += new_numeral.to_s
-            elsif (last_document.present? && last_document.created_at <= self.number_config.updated_at) || last_document.blank?
-              numeric_section = self.number_config.sequence_start
-              new_numeral = numeric_section
-              iteration.times do
-                new_numeral = new_numeral.succ
-              end
-              self.document_number += new_numeral.to_s
+            self.document_number += new_numeral.to_s
+          elsif (last_document.present? && last_document.created_at <= self.number_config.updated_at) || last_document.blank?
+            numeric_section = self.number_config.sequence_start
+            new_numeral = numeric_section
+            iteration.times do
+              new_numeral = new_numeral.succ
             end
+            self.document_number += new_numeral.to_s
           end
-          if user.company.inward_documents.find_by(document_number: self.document_number)
-            iteration += 1
-          else
-            break
-          end
-      end
+        end
     end
   end
 
