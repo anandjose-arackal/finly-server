@@ -53,7 +53,7 @@ class Procurements::DocumentNumbers::Generate < Procurements::DocumentNumbers::B
             self.document_number = last_document.po_number || (self.document_number + self.number_config.sequence_start)
             self.document_number = self.document_number.succ
           elsif (last_document.present? && last_document.created_at <= self.number_config.updated_at) || last_document.blank?
-            self.document_number = self.number_config.prefix + self.number_config.sequence_start
+            self.document_number = self.document_number + self.number_config.sequence_start
             self.document_number = self.document_number.succ
           end
         end
