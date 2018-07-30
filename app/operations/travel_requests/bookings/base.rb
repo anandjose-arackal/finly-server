@@ -33,7 +33,7 @@ class TravelRequests::Bookings::Base < TravelRequests::Base
          booking_hotel_attributes: [
              :id, {location_attributes: [:id, :name, :address, :latitude, :longitude, :maps_id]},
              :checkin_datetime, :checkout_datetime,
-             :number_of_guests, :description, :hotel_name, :hotel_address,
+               :number_of_guests, :description, :hotel_name, :hotel_address,
              {cost_attributes: [:id, :value, :currency_id]}
          ],
          booking_restaurant_attributes: [
