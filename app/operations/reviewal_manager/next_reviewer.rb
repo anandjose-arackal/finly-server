@@ -1,6 +1,7 @@
 class ReviewalManager::NextReviewers < ReviewalManager::Base
   attr_accessor :document, :document_types, :document_class_name, :next_reviewer, :policy, :levels
 
+
   def init
     self.document = params[:reviewal_document]
     self.next_reviewer = nil

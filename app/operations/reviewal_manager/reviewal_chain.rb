@@ -1,11 +1,16 @@
 class ReviewalManager::ReviewalChain < ReviewalManager::Base
   attr_accessor :document, :document_types, :document_class_name, :chain, :policy, :levels
 
+  # In params
+  # policy_id needs to be present
   def init
     self.document = params[:reviewal_document]
     self.chain = []
     self.document_types = ['PurchaseOrder']
-    self.policy = document&.policy
+    policy_id = params[:policy_id]
+
+    self.policy = ::Policy::Index.(user, params).policies.with_id(policy_id).first rescue nil
+    self.policy = user.company.policies.with_application(:vp).with_id(policy_id).first rescue nil
   end
 
   def validate

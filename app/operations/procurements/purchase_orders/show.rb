@@ -26,13 +26,27 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   end
 
   class Procurements::PurchaseOrders::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :purchase_order, :actions, :reviewal_chain, :policies
+    attr_accessor :purchase_order, :actions, :reviewal_chains, :policies
 
     def init
       self.purchase_order = params[:purchase_order]
       self.actions = get_actions
-      self.reviewal_chain = get_reviewal_chain
-      self.policies = user.company.policies.with_application(:vp)
+
+      # todo has to be scoped to policy the user is a part of
+      self.policies = user.policies.with_application(:vp)
+
+      self.reviewal_chains = []
+      params[:reviewal_document] = purchase_order
+
+      policies.each do |policy|
+        params[:policy_id] = policy.id
+        chain = {
+            policy_id: policy.id,
+            reviewal_chain: get_reviewal_chain
+        }
+        self.reviewal_chains.push(chain)
+      end
+
     end
 
     def get_actions
@@ -92,7 +106,6 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
     end
 
     def get_reviewal_chain
-      params[:reviewal_document] = purchase_order
       op = ::ReviewalManager::ReviewalChain.(user, params)
       op.chain
     end
