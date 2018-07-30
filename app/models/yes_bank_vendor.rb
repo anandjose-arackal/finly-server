@@ -35,6 +35,8 @@ class YesBankVendor < ActiveRecord::Base
   has_many :budget_entity_mappings, as: :budgetable
   has_many :budgets, through: :budget_entity_mappings
 
+  has_many :budget_trails, as: :vendor
+
   accepts_nested_attributes_for :bank_accounts
   accepts_nested_attributes_for :vendor_attachments, allow_destroy: true
 

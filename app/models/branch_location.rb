@@ -21,6 +21,7 @@ class BranchLocation < ActiveRecord::Base
   belongs_to :company
   belongs_to :state
 
+  has_many :budget_trails, as: :location
 
   def address
     address = ""

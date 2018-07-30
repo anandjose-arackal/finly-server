@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180728125918) do
+ActiveRecord::Schema.define(version: 20180730075024) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -788,6 +788,20 @@ ActiveRecord::Schema.define(version: 20180728125918) do
   add_index "budget_rules", ["period_id"], name: "index_budget_rules_on_period_id", using: :btree
   add_index "budget_rules", ["policy_id"], name: "index_budget_rules_on_policy_id", using: :btree
   add_index "budget_rules", ["rule_type_id"], name: "index_budget_rules_on_rule_type_id", using: :btree
+
+  create_table "budget_trails", force: :cascade do |t|
+    t.integer  "entity_id",      limit: 4
+    t.string   "entity_type",    limit: 255
+    t.integer  "category_id",    limit: 4
+    t.integer  "cost_center_id", limit: 4
+    t.integer  "location_id",    limit: 4
+    t.integer  "vendor_id",      limit: 4
+    t.integer  "amount_id",      limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.integer  "user_id",        limit: 4
+    t.integer  "department_id",  limit: 4
+  end
 
   create_table "budgets", force: :cascade do |t|
     t.string   "name",             limit: 255
@@ -1704,6 +1718,15 @@ ActiveRecord::Schema.define(version: 20180728125918) do
     t.boolean  "active",                      default: true
     t.boolean  "is_deleted",                  default: false
   end
+
+  create_table "departments", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "company_id", limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "departments", ["company_id"], name: "index_departments_on_company_id", using: :btree
 
   create_table "desktop_users", force: :cascade do |t|
     t.string   "email",      limit: 255, null: false
@@ -4692,6 +4715,7 @@ ActiveRecord::Schema.define(version: 20180728125918) do
   add_foreign_key "customer_account_transactions", "customer_accounts"
   add_foreign_key "customer_accounts", "customers"
   add_foreign_key "customer_attachments", "customers"
+  add_foreign_key "departments", "companies"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
   add_foreign_key "email_authorizations", "users"
