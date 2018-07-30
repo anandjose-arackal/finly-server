@@ -6,6 +6,7 @@ class TravelRequests::Bookings::Create < TravelRequests::Bookings::Base
   end
 
   def init
+    params[:booking][:booking_status_id] = BookingStatus.id_for(params[:status])
     self.booking_parameters = booking_params
 
     if params&.dig(:parent_booking_id).present?
