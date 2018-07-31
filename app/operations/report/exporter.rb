@@ -34,6 +34,9 @@ class Report::Exporter < Report::Show
             end
           else
             url = receipt.image.url
+            if url.starts_with?('//')
+              url = "https:#{url}"
+            end
             receipts << {merchant: expense.merchant_name, amount: expense.amount_value, url: url}
           end
         end
