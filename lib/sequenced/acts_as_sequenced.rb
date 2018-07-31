@@ -46,7 +46,7 @@ module Sequenced
           mattr_accessor :sequenced_options, instance_accessor: false
           self.sequenced_options = []
 
-          before_save :set_sequential_ids
+          before_save :set_sequential_ids, if: Proc.new {|model| model.generate_sequential_id?}
         end
 
         options = DEFAULT_OPTIONS.merge(options)
@@ -73,6 +73,10 @@ module Sequenced
     end
 
     module InstanceMethods
+      def generate_sequential_id?
+        true
+      end
+
       def set_sequential_ids
         self.class.base_class.sequenced_options.each do |options|
           Sequenced::Generator.new(self, options).set

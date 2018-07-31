@@ -25,11 +25,7 @@ module Sequenced
       return if id_set? || skip?
       return if @sequenced_editable and record.send(:"#{column}").present?
       lock_table
-      id = next_id.to_s
-      if id.length < @min_sequence_length
-        id = id.rjust(@min_sequence_length, '0')
-      end
-      record.send(:"#{column}=", "#{@prefix}#{id}")
+      record.send(:"#{column}=", "#{@prefix}#{next_id}")
     end
 
     def id_set?
@@ -41,9 +37,13 @@ module Sequenced
     end
 
     def next_id
-      next_id_in_sequence.tap do |id|
-        id += 1 until unique?(id)
-      end
+      seq = next_id_in_sequence
+      seq += 1 until unique?(format_id(seq))
+      format_id(seq)
+    end
+
+    def format_id(id)
+      "#{@prefix}#{id.to_s.rjust(@min_sequence_length, '0')}"
     end
 
     def next_id_in_sequence
@@ -54,6 +54,7 @@ module Sequenced
     end
 
     def unique?(id)
+      return false unless id.present?
       build_scope(*scope) do
         rel = base_relation
         rel = rel.where("NOT id = ?", record.id) if record.persisted?
@@ -82,7 +83,7 @@ module Sequenced
       build_scope(*scope) do
         base_relation.
             where("#{column.to_s} IS NOT NULL").
-            order("#{column.to_s} DESC")
+            order("created_at DESC")
       end.first
     end
 
