@@ -1,4 +1,11 @@
 json.extract! @result.budget, :id, :name, :budgetable_id, :budgetable_type
+
+json.applicable_entities do
+  json.purchase_order @result.budget.purcahse_order
+  json.payment @result.budget.payment
+  json.expense @result.budget.expense
+end
+
 # json.period do
 #   json.extract! @result.budget.period, :id, :name
 # end

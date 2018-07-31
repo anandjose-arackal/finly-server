@@ -28,4 +28,10 @@ class BudgetTrail < ActiveRecord::Base
   belongs_to :department
   belongs_to :user
 
+  scope :within_date, -> (start_date, end_date) {
+
+  }
+
+  scope :joins_amount, -> { joins(:amount) }
+
 end

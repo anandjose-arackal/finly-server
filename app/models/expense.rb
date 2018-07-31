@@ -36,6 +36,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -56,6 +57,9 @@ class Expense < ActiveRecord::Base
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy
+
+  # link to budget trails table
+  has_many :budget_trails, as: :entity
 
   has_many :duplicate_expense_mappings, foreign_key: :expense_id, dependent: :destroy
   has_many :duplicate_expenses, through: :duplicate_expense_mappings

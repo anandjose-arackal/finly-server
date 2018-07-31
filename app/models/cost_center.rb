@@ -17,8 +17,8 @@ class CostCenter < ActiveRecord::Base
 
   belongs_to :company
 
-  has_many :budget_entity_mappings, as: :budgetable
-  has_many :budgets, through: :budget_entity_mappings
+  has_many :budget_criteria_mappings, as: :budgetable
+  has_many :budgets, through: :budget_criteria_mappings
 
   has_many :budget_trails
 

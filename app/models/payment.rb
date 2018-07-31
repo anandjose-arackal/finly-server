@@ -2,40 +2,43 @@
 #
 # Table name: payments
 #
-#  id                      :integer          not null, primary key
-#  amount_id               :integer          not null
-#  date                    :date             not null
-#  payment_type_id         :integer          not null
-#  initiating_user_id      :integer
-#  receiving_user_id       :integer
-#  note                    :text(65535)
-#  created_at              :datetime         not null
-#  updated_at              :datetime         not null
-#  initiating_account_id   :integer
-#  initiating_account_type :string(255)
-#  receiving_account_id    :integer
-#  receiving_account_type  :string(255)
-#  payment_order_id        :integer
-#  payment_status_id       :integer          not null
-#  initiating_user_type    :string(255)
-#  receiving_user_type     :string(255)
-#  payment_purpose_id      :integer
-#  reference_resource_id   :integer
-#  reference_resource_type :string(255)
-#  application             :string(255)
-#  payment_mode            :string(255)
-#  reference_id            :string(255)      not null
-#  retry_count             :integer          default(0)
-#  invoice_id              :integer
-#  parent_type             :string(255)
-#  parent_id               :integer
-#  post_operation          :text(65535)
-#  post_operation_payload  :text(65535)
-#  category_id             :integer
-#  scheduled_at            :date
-#  api_initiated           :boolean          default(FALSE)
-#  processed_at            :date
+#  id                             :integer          not null, primary key
+#  amount_id                      :integer          not null
+#  date                           :date             not null
+#  payment_type_id                :integer          not null
+#  initiating_user_id             :integer
+#  receiving_user_id              :integer
+#  note                           :text(65535)
+#  created_at                     :datetime         not null
+#  updated_at                     :datetime         not null
+#  initiating_account_id          :integer
+#  initiating_account_type        :string(255)
+#  receiving_account_id           :integer
+#  receiving_account_type         :string(255)
+#  payment_order_id               :integer
+#  payment_status_id              :integer          not null
+#  initiating_user_type           :string(255)
+#  receiving_user_type            :string(255)
+#  payment_purpose_id             :integer
+#  reference_resource_id          :integer
+#  reference_resource_type        :string(255)
+#  application                    :string(255)
+#  payment_mode                   :string(255)
+#  reference_id                   :string(255)      not null
+#  retry_count                    :integer          default(0)
+#  invoice_id                     :integer
+#  parent_type                    :string(255)
+#  parent_id                      :integer
+#  post_operation                 :text(65535)
+#  post_operation_payload         :text(65535)
+#  category_id                    :integer
+#  api_initiated                  :boolean          default(FALSE)
+#  scheduled_at                   :date
+#  processed_at                   :date
+#  original_payment_for_refund_id :integer
+#  cost_center_id                 :integer
 #
+
 
 
 
@@ -70,6 +73,9 @@ class Payment < ActiveRecord::Base
 
   # From Procurement Workflow
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+
+  # link to budget trails table
+  has_many :budget_trails, as: :entity
 
   has_one :payment, as: :reference_resource
 

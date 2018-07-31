@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: budget_entity_mappings
+# Table name: budget_criteria_mappings
 #
 #  id              :integer          not null, primary key
 #  budget_id       :integer
@@ -10,9 +10,9 @@
 #  updated_at      :datetime         not null
 #
 
-class BudgetEntityMapping < ActiveRecord::Base
+class BudgetCriteriaMapping < ActiveRecord::Base
 
   # many-to-many mapping between budgets and entities
   belongs_to :budget
-  belongs_to :budgetable, polymorphic: true # this will be the reference to the object for whom a budget can be applied
+  belongs_to :budgetable, polymorphic: true # this will be the reference to the object for whom a budget can be applied (i.e. a criterion)
 end

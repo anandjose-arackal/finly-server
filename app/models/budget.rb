@@ -30,8 +30,14 @@ class Budget < ActiveRecord::Base
   belongs_to :budget_amount, class_name: "Amount"
   belongs_to :spent_amount, class_name: "Amount"
 
-  has_many :budget_entity_mappings
-  has_many :budgetables, through: :budget_entity_mappings
+  has_many :budget_criteria_mappings
+  has_many :budgetables, through: :budget_criteria_mappings
+  has_many :budgetable_vendors, through: :budget_criteria_mappings, source: :budgetable, source_type: 'YesBankVendor'
+  has_many :budgetable_cost_centers, through: :budget_criteria_mappings, source: :budgetable, source_type: 'CostCenter'
+  has_many :budgetable_categories, through: :budget_criteria_mappings, source: :budgetable, source_type: 'Category'
+  has_many :budgetable_locations, through: :budget_criteria_mappings, source: :budgetable, source_type: 'BranchLocation'
+  has_many :budgetable_users, through: :budget_criteria_mappings, source: :budgetable, source_type: 'User'
+  # has_many :budgetable_departments, through: :budget_criteria_mappings, source: :budgetable, source_type: 'Department'
 
   accepts_nested_attributes_for :budget_amount
 
@@ -44,6 +50,7 @@ class Budget < ActiveRecord::Base
 
   scope :with_id, -> (ids) {where id: ids}
 
+  # todo - change this to reflect the new structure
   scope :with_budgetable_user_id, -> (ids) {where budgetable_id: ids, budgetable_type: "User"}
   scope :with_budgetable_category_id, -> (ids) {where budgetable_id: ids, budgetable_type: "Category"}
   scope :with_budgetable_yes_bank_vendor_id, -> (ids) {where budgetable_id: ids, budgetable_type: "YesBankVendor"}

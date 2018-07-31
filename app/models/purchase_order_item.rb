@@ -36,7 +36,8 @@ class PurchaseOrderItem < ActiveRecord::Base
   belongs_to :discount_amount, class_name: "Amount"
   belongs_to :total_amount, class_name: "Amount"
 
-
+  # link to budget trails table
+  has_many :budget_trails, as: :entity
 
   accepts_nested_attributes_for :tax_amount, :discount_amount,
                                 :total_amount

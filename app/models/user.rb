@@ -55,6 +55,7 @@
 
 
 
+
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -182,8 +183,8 @@ class User < ActiveRecord::Base
   #Budgets
 
   # many-to-many mapping between user and budget
-  has_many :budget_entity_mappings, as: :budgetable
-  has_many :budgets, through: :budget_entity_mappings
+  has_many :budget_criteria_mappings, as: :budgetable
+  has_many :budgets, through: :budget_criteria_mappings
 
   has_many :owned_budgets, class_name: 'Budget'
 

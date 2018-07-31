@@ -1,6 +1,6 @@
 # == Schema Information
 #
-# Table name: budget_entity_mappings
+# Table name: budget_criteria_mappings
 #
 #  id              :integer          not null, primary key
 #  budget_id       :integer
