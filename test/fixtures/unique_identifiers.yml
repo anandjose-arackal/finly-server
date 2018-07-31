@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  prefix: MyString
+  sequence_start: 1
+  purpose_id: 
+  company_id: 
+
+two:
+  prefix: MyString
+  sequence_start: 1
+  purpose_id: 
+  company_id: 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180730161144) do
+ActiveRecord::Schema.define(version: 20180731084516) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -4137,6 +4137,18 @@ ActiveRecord::Schema.define(version: 20180730161144) do
   add_index "travel_requests", ["status_id"], name: "index_travel_requests_on_status_id", using: :btree
   add_index "travel_requests", ["user_id"], name: "index_travel_requests_on_user_id", using: :btree
 
+  create_table "unique_identifiers", force: :cascade do |t|
+    t.string   "prefix",         limit: 255, null: false
+    t.integer  "sequence_start", limit: 4,   null: false
+    t.integer  "purpose_id",     limit: 4,   null: false
+    t.integer  "company_id",     limit: 4,   null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  add_index "unique_identifiers", ["company_id"], name: "index_unique_identifiers_on_company_id", using: :btree
+  add_index "unique_identifiers", ["purpose_id"], name: "index_unique_identifiers_on_purpose_id", using: :btree
+
   create_table "user_balance_histories", force: :cascade do |t|
     t.date     "date"
     t.integer  "user_id",                    limit: 4
@@ -4934,6 +4946,8 @@ ActiveRecord::Schema.define(version: 20180730161144) do
   add_foreign_key "travel_request_trails", "travel_requests"
   add_foreign_key "travel_requests", "policies"
   add_foreign_key "travel_requests", "users"
+  add_foreign_key "unique_identifiers", "companies"
+  add_foreign_key "unique_identifiers", "purposes"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
   add_foreign_key "user_group_item_mappings", "user_group_items"

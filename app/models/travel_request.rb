@@ -25,9 +25,10 @@
 #  trip_id                      :string(255)
 #  purpose_of_travel            :text(65535)
 #
-
 class TravelRequest < ActiveRecord::Base
-  include SoftDeletable
+  include SoftDeletable, Sequenced::ActsAsSequenced
+
+  acts_as_sequenced column: :trip_id, purpose: :travel_request, editable: false
 
   belongs_to :user
   belongs_to :policy

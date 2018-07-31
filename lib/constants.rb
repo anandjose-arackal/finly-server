@@ -7,6 +7,8 @@ module Constants
   VALID_DECIMAL =/[\-\+]?[0-9]*(\.[0-9]+)?/i
   VALID_IFSC = /[A-Za-z]{4}[a-zA-Z0-9]{7}/i
 
+  ENDING_NUMBERS = /\d+$/
+
   OTP_RESEND_INTERVAL = 60
 
   # todo - needs to be edited once we get the account details.
