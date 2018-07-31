@@ -36,7 +36,8 @@ class ReviewalManager::ReviewalChain < ReviewalManager::Base
       selected_reviewer = document.document_level_reviewer_mappings.with_level_ids(level.id).with_policy_ids(policy.id).first
       level_data = {
           level_number: level.level_number,
-          reviewers: mappings,
+          level_id: level.id,
+          reviewers: mappings
       }
       if selected_reviewer.present?
 
