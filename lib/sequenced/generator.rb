@@ -38,8 +38,8 @@ module Sequenced
 
     def next_id
       seq = next_id_in_sequence
-      seq += 1 until unique?(format_id(seq))
-      format_id(seq)
+      seq += 1 until (formatted_id = unique?(format_id(seq)))
+      formatted_id
     end
 
     def format_id(id)
