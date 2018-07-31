@@ -4,4 +4,8 @@ class UniqueIdentifier < ActiveRecord::Base
 
   scope :with_company_id, ->(id) { where company_id: id }
   scope :with_purpose_id, ->(id) { where purpose_id: id }
+
+  validates :purpose, presence: true
+  validates :company_id, presence: true
+  validates :sequence_start, presence: true
 end

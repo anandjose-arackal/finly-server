@@ -4139,7 +4139,7 @@ ActiveRecord::Schema.define(version: 20180731084516) do
 
   create_table "unique_identifiers", force: :cascade do |t|
     t.string   "prefix",         limit: 255, null: false
-    t.integer  "sequence_start", limit: 4,   null: false
+    t.string   "sequence_start", limit: 255, null: false
     t.integer  "purpose_id",     limit: 4,   null: false
     t.integer  "company_id",     limit: 4,   null: false
     t.datetime "created_at",                 null: false

@@ -17,6 +17,7 @@ module Sequenced
       @sequenced_editable = options[:editable]
       @config = UniqueIdentifier.with_company_id(record.company_id).with_purpose_id(Purpose.id_for(options[:purpose]))&.first
       @start_at ||= @config&.sequence_start
+      @min_sequence_length = @config&.sequence_start&.length || 1
       @prefix = @config&.prefix || ''
     end
 
@@ -24,7 +25,11 @@ module Sequenced
       return if id_set? || skip?
       return if @sequenced_editable and record.send(:"#{column}").present?
       lock_table
-      record.send(:"#{column}=", "#{@prefix}#{next_id}")
+      id = next_id.to_s
+      if id.length < @min_sequence_length
+        id = id.rjust(@min_sequence_length, '0')
+      end
+      record.send(:"#{column}=", "#{@prefix}#{id}")
     end
 
     def id_set?
