@@ -17,7 +17,11 @@ class Report::Exporter < Report::Show
       self.report.expenses.each do |expense|
         expense.receipts.each do |receipt|
           if receipt.is_pdf?
-            Magick::ImageList.new(receipt.image.url) do
+            url = receipt.image.url
+            if url.starts_with?('//')
+              url = "https:#{url}"
+            end
+            Magick::ImageList.new(url) do
               self.quality = 95
               self.density = '300'
               self.colorspace = Magick::RGBColorspace
