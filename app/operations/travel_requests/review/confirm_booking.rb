@@ -19,6 +19,18 @@ class TravelRequests::Review::ConfirmBooking < TravelRequests::Review::Base
       add_message :error, 'You cannot perform this action at the moment'
       return
     end
+    unless travel_manager_view?
+      add_message :error, 'You cannot perform this action at the moment'
+      return
+    end
+    unless user.travel_manager?
+      add_message :error, 'You cannot perform this action at the moment'
+      return
+    end
+    unless travel_request.booking_pending? or travel_request.selection_confirmed?
+      add_message :error, 'You cannot perform this action at the moment'
+      return
+    end
     # todo status validation
     # validate if necessary booking requests with unselected options are available
   end

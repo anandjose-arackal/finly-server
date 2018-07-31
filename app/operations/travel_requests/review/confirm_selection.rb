@@ -12,6 +12,15 @@ class TravelRequests::Review::ConfirmSelection < TravelRequests::Review::Base
   def validate
     unless self.travel_request.controlling_user_id == user.id
       add_message :error, 'You cannot perform this action at the moment'
+      return
+    end
+    unless manager_view? or personal_view?
+      add_message :error, 'You cannot perform this action at the moment'
+      return
+    end
+    unless self.travel_request.selection_processing? or self.travel_request.selection_requested?
+      add_message :error,  'You cannot perform this action at the moment'
+      return
     end
   end
 

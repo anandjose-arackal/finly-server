@@ -14,7 +14,8 @@ class TravelRequestStatus < ActiveRecord::Base
 
   def self.values
     [:open, :processing, :retracted, :rejected, :booked, :cancelled, :booking_pending,
-     :selection_requested, :selection_processing, :selection_confirmed, :booking_confirmed, :completed, :approved]
+     :selection_requested, :selection_processing, :selection_confirmed, :selection_rejected,
+     :booking_confirmed, :completed, :approved]
   end
 
   def open?
