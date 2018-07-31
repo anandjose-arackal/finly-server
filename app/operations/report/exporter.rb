@@ -17,11 +17,14 @@ class Report::Exporter < Report::Show
       self.report.expenses.each do |expense|
         expense.receipts.each do |receipt|
           if receipt.is_pdf?
-            url = receipt.image.url
-            if url.starts_with?('//')
-              url = "https:#{url}"
+
+            # As ImageMagick was throwing an exception while trying to read the file from S3, resorted to this alternate.
+            tempfile = Tempfile.new('temp_export')
+            open(tempfile.path, 'wb') do |file|
+              file << open(receipt.image.url).read
             end
-            Magick::ImageList.new(url) do
+
+            Magick::ImageList.new(tempfile.path) do
               self.quality = 95
               self.density = '300'
               self.colorspace = Magick::RGBColorspace
@@ -32,11 +35,9 @@ class Report::Exporter < Report::Show
               img.write(path)
               receipts << {merchant: expense.merchant_name, amount: expense.amount_value, path: path}
             end
+            tempfile.delete
           else
             url = receipt.image.url
-            if url.starts_with?('//')
-              url = "https:#{url}"
-            end
             receipts << {merchant: expense.merchant_name, amount: expense.amount_value, url: url}
           end
         end
