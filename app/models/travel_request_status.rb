@@ -49,6 +49,22 @@ class TravelRequestStatus < ActiveRecord::Base
     self.id == TravelRequestStatus.id_for(:completed)
   end
 
+  def selection_requested?
+    self.id == TravelRequestStatus.id_for(:selection_requested)
+  end
+
+  def selection_processing?
+    self.id == TravelRequestStatus.id_for(:selection_processing)
+  end
+
+  def selection_confirmed?
+    self.id == TravelRequestStatus.id_for(:selection_confirmed)
+  end
+
+  def booking_confirmed?
+    self.id == TravelRequestStatus.id_for(:booking_confirmed?)
+  end
+
   def as_json(options={})
     {
         id: id,

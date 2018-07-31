@@ -46,7 +46,8 @@ class TravelRequest < ActiveRecord::Base
 
   accepts_nested_attributes_for :destinations, allow_destroy: true
 
-  delegate :open?, :processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?, to: :status
+  delegate :open?, :processing?, :approved?, :booked?, :booking_pending?, :rejected?, :retracted?,
+           :selection_requested?, :selection_processing?, :selection_confirmed?, :booking_confirmed?, to: :status
 
   validates :status_id, presence: true#, unless: :open?
   validates :user_id, presence: true#, unless: :open?
