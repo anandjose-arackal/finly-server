@@ -14,6 +14,14 @@ end
 
 json.actions @result.actions
 json.policies @result.travel_request.user.policies
+json.editable @result.editable
+json.destroyable @result.destroyable
+json.can_select_options @result.can_select_options?
+json.can_add_request @result.can_add_request?
+json.can_add_options @result.can_add_options?
+json.can_add_booking @result.can_add_booking?
+json.can_cancel_booking @result.can_cancel_booking?
+
 
 json.comments do
   json.array!(@result.travel_request.comments) do |comment|
