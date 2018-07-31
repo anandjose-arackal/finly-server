@@ -1,6 +1,6 @@
 class BudgetsProcessor::Calculate::PaymentAdapter < BudgetsProcessor::BaseAdapter
 
-  attr_accessor
+
 
   def vendors_total
     vendors = budget.budgetable_vendors
@@ -63,5 +63,5 @@ class BudgetsProcessor::Calculate::PaymentAdapter < BudgetsProcessor::BaseAdapte
   end
 
   # todo - department
-  
+
 end

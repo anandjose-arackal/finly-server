@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180731030943) do
+ActiveRecord::Schema.define(version: 20180731140707) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3816,6 +3816,7 @@ ActiveRecord::Schema.define(version: 20180731030943) do
     t.integer  "controlling_for_user_role_id", limit: 4
     t.integer  "policy_id",                    limit: 4
     t.integer  "controlling_level_id",         limit: 4
+    t.integer  "department_id",                limit: 4
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree

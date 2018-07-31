@@ -38,6 +38,7 @@
 #  controlling_for_user_role_id :integer
 #  policy_id                    :integer
 #  controlling_level_id         :integer
+#  department_id                :integer
 #
 
 class PurchaseOrder < ActiveRecord::Base
@@ -50,6 +51,7 @@ class PurchaseOrder < ActiveRecord::Base
   belongs_to :payment_term
   belongs_to :procurement_term
   belongs_to :status, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
+  belongs_to :department
 
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_for_user, class_name: 'User'
