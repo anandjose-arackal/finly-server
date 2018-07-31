@@ -25,7 +25,7 @@ module Sequenced
       return if id_set? || skip?
       return if @sequenced_editable and record.send(:"#{column}").present?
       lock_table
-      record.send(:"#{column}=", "#{@prefix}#{next_id}")
+      record.send(:"#{column}=", next_id)
     end
 
     def id_set?
@@ -38,8 +38,8 @@ module Sequenced
 
     def next_id
       seq = next_id_in_sequence
-      seq += 1 until (formatted_id = unique?(format_id(seq)))
-      formatted_id
+      seq += 1 until unique?(format_id(seq))
+      format_id(seq)
     end
 
     def format_id(id)
@@ -49,7 +49,7 @@ module Sequenced
     def next_id_in_sequence
       start_at = self.start_at.respond_to?(:call) ? self.start_at.call(record) : self.start_at
       return start_at unless (last_record = find_last_record)
-      last_sequence_value = last_record.send(column).scan(Constants::ENDING_NUMBERS).first&.to_i
+      last_sequence_value = last_record.send(column).scan(Constants::ENDING_NUMBERS).first&.to_i || 0
       max(last_sequence_value + 1, start_at)
     end
 
