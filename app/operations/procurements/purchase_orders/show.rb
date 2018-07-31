@@ -66,6 +66,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
             method: "DELETE"
         }
         actions[:policy_editable] = true
+        actions[:document_editable] = true
       end
 
       if (purchase_order.approved? || purchase_order.auto_approved?) && (user_in_level? || document_owner?)
@@ -77,6 +78,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
             url: Rails.application.routes.url_helpers.procure_purchase_order_close_path(purchase_order_id: purchase_order.id),
             method: "PUT"
         }
+        actions[:document_editable] = false
       end
 
       if purchase_order.processing?
@@ -93,12 +95,14 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
               url: Rails.application.routes.url_helpers.procure_purchase_order_path(id: purchase_order.id),
               method: "PUT"
           }
+          actions[:document_editable] = true
         end
         if document_owner?
           actions[:retract] = {
               url: Rails.application.routes.url_helpers.procure_purchase_order_retract_path(purchase_order_id: purchase_order.id),
               method: "PUT"
           }
+          actions[:document_editable] = false
         end
       end
 

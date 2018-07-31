@@ -153,6 +153,8 @@ class PurchaseOrder < ActiveRecord::Base
           item.total_amount = Amount.new(value: item_total_amount, currency_id: 1)
         end
 
+
+
         # end
       end
     end
@@ -168,7 +170,6 @@ class PurchaseOrder < ActiveRecord::Base
     else
       self.total_after_tax = Amount.new(value: total_after_tax_amount, currency_id: 1)
     end
-
     # if self.total_amount.present?
     #   self.total_amount.value = total_amount
     # else
@@ -178,6 +179,12 @@ class PurchaseOrder < ActiveRecord::Base
       self.discount_amount.value = discount_amount
     else
       self.build_discount_amount(value: discount_amount, currency_id: 1)
+    end
+
+    if self.tax_amount.present?
+      self.tax_amount.value = tax_amount
+    else
+      self.build_tax_amount(value: tax_amount, currency_id: 1)
     end
 
     if self.balance_amount.present?

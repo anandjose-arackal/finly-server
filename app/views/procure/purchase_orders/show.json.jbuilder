@@ -71,7 +71,7 @@ json.comments do
   json.array! @result.purchase_order.comments do |comment|
     json.extract! comment, :id, :body
     json.created_at comment.created_at.strftime("%b %d, %y")
-    json.created_at_time comment.created_at.strftime("%i:%m%p")
+    json.created_at_time comment.created_at.strftime("%I:%m%p")
     json.user do
       json.name comment.user&.name
 
