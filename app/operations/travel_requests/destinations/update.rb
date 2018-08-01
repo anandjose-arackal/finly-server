@@ -24,7 +24,7 @@ class TravelRequests::Destinations::Update < TravelRequests::Base
   protected
 
   def strong_params
-    params.require(:destination).permit(:name, :map_id)
+    params.require(:destination).permit(location_attributes:[ :name, :maps_id])
   end
 
 end
