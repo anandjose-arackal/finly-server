@@ -94,47 +94,44 @@ class Settlement::SReport::Processing::Init < Settlement::SReport::Processing::B
     if not params&.dig(:init_all) and params&.dig(:report_id).present?
       self.reports = self.reports.with_id(params&.dig(:report_id))
     end
-    user_ids = self.reports.pluck(:user_id).uniq
-    users_map = User.with_id(user_ids).index_by(&:id)
-    totals = {} #self.reports.group_user_id.expenses_total
-    user_ids.each do |user_id|
-      # Map which is of the format {currency_id1:[*report_ids*], currency_id2: [*report_ids*]}
-      report_currency_map = {}
-      user_reports = self.reports.with_user(user_id)
-      user_reports.includes_policy.map do |report|
-        if report_currency_map[report.policy.settlement_currency.country_code].nil?
-          report_currency_map[report.policy.settlement_currency.country_code] = []
-        end
-        report_currency_map[report.policy.settlement_currency.country_code] << report.id
-      end
-      report_currency_map.each do |settlement_currency_code, report_ids|
-        currency_reports = user_reports.with_id(report_ids)
-        currency_report_ids = currency_reports.pluck(:id)
-        expenses = Expense.with_report_id(currency_report_ids).sum_amount(settlement_currency_code)
-        reimbursements = Expense.with_report_id(currency_report_ids).sum_reimbursements(settlement_currency_code)
-        if totals[user_id].nil?
-          totals[user_id] = {}
-        end
-        totals[user_id][settlement_currency_code] = {expenses: expenses, reimbursements: reimbursements, reports: currency_reports}
-      end
-    end
+
 
     self.user_reports = []
     self.reimbursement_total = {}
     self.expenses_total = {}
     self.user_count = 0
+
+    user_ids = self.reports.pluck(:user_id).uniq
+    users_map = User.with_id(user_ids).index_by(&:id)
     user_ids.each do |user_id|
       self.user_count += 1
-      totals[user_id].each do |currency_code, total|
-        self.reimbursement_total[currency_code] = 0 if self.reimbursement_total[currency_code].nil?
-        self.reimbursement_total[currency_code] += (totals[user_id][currency_code][:reimbursements] || 0)
-        self.expenses_total[currency_code] = 0 if self.expenses_total[currency_code].nil?
-        self.expenses_total[currency_code] += totals[user_id][currency_code][:expenses]
-        user_reports << {
+
+      # Map which is of the format {currency_id1:[*report_ids*], currency_id2: [*report_ids*]}
+      report_currency_map = {}
+      user_reports = self.reports.with_user(user_id)
+      user_reports.includes_policy.map do |report|
+        if report_currency_map[report.policy.settlement_currency].nil?
+          report_currency_map[report.policy.settlement_currency] = []
+        end
+        report_currency_map[report.policy.settlement_currency] << report.id
+      end
+      report_currency_map.each do |settlement_currency, report_ids|
+        settlement_currency_code = settlement_currency.country_code
+        currency_reports = user_reports.with_id(report_ids)
+        currency_report_ids = currency_reports.pluck(:id)
+        expenses = Expense.with_report_id(currency_report_ids).sum_amount(settlement_currency_code)
+        reimbursements = Expense.with_report_id(currency_report_ids).sum_reimbursements(settlement_currency_code)
+
+        self.reimbursement_total[settlement_currency_code] = 0 if self.reimbursement_total[settlement_currency_code].nil?
+        self.reimbursement_total[settlement_currency_code] += expenses
+        self.expenses_total[settlement_currency_code] = 0 if self.expenses_total[settlement_currency_code].nil?
+        self.expenses_total[settlement_currency_code] += reimbursements
+
+        self.user_reports << {
             user: users_map[user_id],
-            expenses_total: totals[user_id][currency_code][:expenses],
-            reimbursement_total: totals[user_id][currency_code][:reimbursements],
-            reports: totals[user_id][currency_code][:reports],
+            expenses_total: Amount.new(value: expenses, currency: settlement_currency),
+            reimbursement_total: Amount.new(value: reimbursements, currency: settlement_currency),
+            reports: currency_reports,
             has_errors: false
         }
       end
