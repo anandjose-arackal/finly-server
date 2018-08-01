@@ -54,16 +54,17 @@ class BudgetRule < ActiveRecord::Base
 
   has_paper_trail
 
-  scope :warning_rules, -> {
-    where rule_type_id: RuleType.warning_rule_id
-  }
+  scope :warning_rules, -> { where rule_type_id: RuleType.warning_rule_id }
 
-  scope :blocking_rules, -> {
-    where rule_type_id: RuleType.blocking_rule_id
-  }
+  scope :blocking_rules, -> { where rule_type_id: RuleType.blocking_rule_id }
 
   def include_reimbursable_expenses?
     self.include_reimbursable
+  end
+
+  # Amount currency is always picked up from base currency of the policy
+  def amount
+    Amount.new(value: super.value, currency_id: self.policy.base_currency_id)
   end
 
   def rule_in_words
