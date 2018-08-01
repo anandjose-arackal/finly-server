@@ -21,6 +21,7 @@
 
 
 
+
 # expense_type_id: contains details about whether the budget is scoped to a particular
 # type of expense or not
 # 1 - Manual, 2 - Card, 3 - Distance, 4 - Time, 5 - Per Diem

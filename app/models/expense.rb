@@ -34,7 +34,6 @@
 #
 
 
-
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -361,14 +360,14 @@ class Expense < ActiveRecord::Base
                                        {per_diem_expense: [per_diem: [:configurable, rate: [:currency]], custom_fields: [:field_configuration]]},
                                        {amount: [:currency]}, :expense_status)}
   scope :includes_amount, -> {includes :amount}
-  scope :sum_amounts, -> {includes_amount.sum('amounts.INR')}
+  scope :sum_amounts, -> (currency_code = :INR) {includes_amount.sum("amounts.#{currency_code}")}
   scope :includes_tds_amount, -> {includes :tds_amount}
-  scope :sum_tds_amounts, -> do
+  scope :sum_tds_amounts, -> (currency_code = :INR) do
     amount_ids = pluck(:tds_amount_id)
-    Amount.with_id(amount_ids).sum_INR
+    Amount.with_id(amount_ids).sum(currency_code)
   end
-  scope :sum_reimbursements, -> { reimbursable.sum_amounts - reimbursable.sum_tds_amounts }
-  scope :with_expense_tax_type_id, -> (id){ where expense_tax_type_id: id }
+  scope :sum_reimbursements, -> (currency_code = :INR){reimbursable.sum_amounts(currency_code) - reimbursable.sum_tds_amounts(currency_code)}
+  scope :with_expense_tax_type_id, -> (id) {where expense_tax_type_id: id}
 
 
   scope :user_budget_expenses, -> (from, to) {
@@ -902,6 +901,7 @@ class Expense < ActiveRecord::Base
     tds_amount = tds_slab.tds * amount&.value.to_f / 100
     precision_value(amount&.value.to_f - tds_amount)
   end
+
   # alias_method :reimbursable_amount, :reimbursable_amount_value
 
   def reimbursable_amount
