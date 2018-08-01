@@ -105,8 +105,6 @@ class Expense::Manual::Create < Expense::Manual::Base
       expense.update_other_currencies
     end
 
-    debugger
-
     Expense::Manual::Duplicate::ProcessDuplicate.(user, expense: self.expense)
 
     # add comment in report if expense is added within report
