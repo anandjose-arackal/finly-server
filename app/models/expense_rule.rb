@@ -57,6 +57,11 @@ class ExpenseRule < ActiveRecord::Base
     where rule_type_id: RuleType.blocking_rule_id
   }
 
+  # Amount currency is always picked up from base currency of the policy
+  def greater_than_amount
+    Amount.new(value: super.value, currency_id: self.policy.base_currency_id)
+  end
+
   def rule_in_words
     rule_in_words = "Expenses"
     if self.category_id
