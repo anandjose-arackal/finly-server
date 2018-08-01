@@ -24,7 +24,11 @@
 #  to_date                      :date
 #  trip_id                      :string(255)
 #  purpose_of_travel            :text(65535)
+#  approved_at                  :datetime
+#  selection_requested_at       :datetime
+#  booking_confirmed_at         :datetime
 #
+
 class TravelRequest < ActiveRecord::Base
   include SoftDeletable, Sequenced::ActsAsSequenced
 

@@ -3,7 +3,14 @@ json.travel_request @result.travel_request
 json.manager_name @result.manager&.name
 json.travel_manager_name @result.travel_manager&.name
 json.controlling_user_name @result.travel_request&.controlling_user&.name
-json.owner_name @result.travel_request&.user&.name
+json.owner do
+  owner = @result.travel_request.user
+  json.first_name owner.first_name
+  json.last_name owner.last_name
+  json.gender owner.profile.gender
+  json.age DateUtils.age(owner.profile.date_of_birth)
+  json.salutation owner.profile.salutation_status
+end
 
 json.destinations do
   json.array! @result.destinations do |destination|
