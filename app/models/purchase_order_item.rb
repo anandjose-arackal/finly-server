@@ -24,6 +24,8 @@
 #  delivered              :integer          default(0)
 #  accepted               :integer          default(0)
 #  rejected               :integer          default(0)
+#  category_id            :integer
+#  cost_center_id         :integer
 #
 
 class PurchaseOrderItem < ActiveRecord::Base
@@ -35,11 +37,37 @@ class PurchaseOrderItem < ActiveRecord::Base
   belongs_to :tax_amount, class_name: "Amount"
   belongs_to :discount_amount, class_name: "Amount"
   belongs_to :total_amount, class_name: "Amount"
+  belongs_to :category
+  belongs_to :cost_center
 
   # link to budget trails table
   has_many :budget_trails, as: :entity
 
   accepts_nested_attributes_for :tax_amount, :discount_amount,
                                 :total_amount
+
+  scope :with_id, -> (ids) {
+    where(id: ids)
+  }
+
+  after_save do
+    # we will be saving this particular entry to the BudgetTrail model
+    id = self.id
+    budget_trail = BudgetTrail.find_by(entity_type: "PurchaseOrder", entity_id: id)
+    if budget_trail
+      # handle update of this particular LineItem
+      budget_trail.update(
+                      category_id: self.category_id,
+                      cost_center_id: self.cost_center_id,
+                      amount_attributes: {
+                          id: budget_trail.amount.id,
+                          value: self.total_amount&.value
+                      }
+      )
+    else
+      # handle creation of this line item
+
+    end
+  end
 
 end

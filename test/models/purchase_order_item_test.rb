@@ -24,6 +24,8 @@
 #  delivered              :integer          default(0)
 #  accepted               :integer          default(0)
 #  rejected               :integer          default(0)
+#  category_id            :integer
+#  cost_center_id         :integer
 #
 
 require 'test_helper'

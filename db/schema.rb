@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180731140707) do
+ActiveRecord::Schema.define(version: 20180801080233) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -3765,6 +3765,8 @@ ActiveRecord::Schema.define(version: 20180731140707) do
     t.integer  "delivered",              limit: 4,                            default: 0
     t.integer  "accepted",               limit: 4,                            default: 0
     t.integer  "rejected",               limit: 4,                            default: 0
+    t.integer  "category_id",            limit: 4
+    t.integer  "cost_center_id",         limit: 4
   end
 
   add_index "purchase_order_items", ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id", using: :btree
