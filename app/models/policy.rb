@@ -16,11 +16,6 @@
 #
 
 
-
-
-
-
-
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -43,15 +38,15 @@ class Policy < ActiveRecord::Base
 
   has_many :per_diems, as: :configurable
 
-  scope :default, -> { where default: true }
-  scope :non_default, -> { where default: false }
-  scope :company, ->(company_id) { where company_id: company_id }
-  scope :by_name, ->(name) { where name: name }
-  scope :with_id, -> (id) { where id: id }
-  scope :without_id, ->(id) { where.not id: id }
-  scope :not_deleted, -> { where is_deleted: false }
-  scope :find_from_id, -> (id) { find_by(id: id) }
-  scope :with_application, -> (application) { where application: application }
+  scope :default, -> {where default: true}
+  scope :non_default, -> {where default: false}
+  scope :company, ->(company_id) {where company_id: company_id}
+  scope :by_name, ->(name) {where name: name}
+  scope :with_id, -> (id) {where id: id}
+  scope :without_id, ->(id) {where.not id: id}
+  scope :not_deleted, -> {where is_deleted: false}
+  scope :find_from_id, -> (id) {find_by(id: id)}
+  scope :with_application, -> (application) {where application: application}
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
@@ -63,9 +58,12 @@ class Policy < ActiveRecord::Base
 
   has_paper_trail
 
+  # Set base currency ID as INR unless set explicitly
+  before_save {self.base_currency_id = Currency.id_for(:INR) if self.base_currency_id.blank?}
+
   after_create :initialize_expense_configs
 
-  default_scope { order('policies.created_at ASC') }
+  default_scope {order('policies.created_at ASC')}
 
   def admins
     admin_mapping_ids = self.user_mapping.admin.pluck(:user_id)
@@ -100,7 +98,7 @@ class Policy < ActiveRecord::Base
     self.per_diem_expense_config.enabled
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         name: name
