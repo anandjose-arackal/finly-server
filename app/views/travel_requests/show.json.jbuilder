@@ -10,6 +10,8 @@ json.owner do
   json.gender owner.profile.gender
   json.age DateUtils.age(owner.profile.date_of_birth)
   json.salutation owner.profile.salutation_status
+  json.email owner.email
+  json.mobile_number owner.mobile_number
 end
 
 json.destinations do

@@ -15,7 +15,7 @@ class TravelRequests::Destinations::Destroy < TravelRequests::Base
       add_message :error, 'Destination could not be found'
       return
     end
-    if self.destination.booking_requests.present?
+    if self.destination.bookings.present?
       add_message :error, 'Please clear all booking requests to delete a destination'
       return
     end
