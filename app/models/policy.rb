@@ -20,7 +20,8 @@ class Policy < ActiveRecord::Base
   include SoftDeletable
 
   belongs_to :company
-  belongs_to :base_currency, class_name: "Currency"
+  belongs_to :base_currency, class_name: 'Currency'
+  belongs_to :settlement_currency, class_name: 'Currency'
   has_one :configuration, class_name: 'PolicyConfiguration', dependent: :destroy
   has_many :user_mapping, class_name: 'PolicyUserMapping', dependent: :destroy
   has_many :users, through: :user_mapping
