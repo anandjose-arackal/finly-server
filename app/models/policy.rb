@@ -17,7 +17,6 @@
 #
 
 
-
 class Policy < ActiveRecord::Base
   include SoftDeletable
 
@@ -50,6 +49,7 @@ class Policy < ActiveRecord::Base
   scope :not_deleted, -> {where is_deleted: false}
   scope :find_from_id, -> (id) {find_by(id: id)}
   scope :with_application, -> (application) {where application: application}
+  scope :without_settlement_currency_id, ->(currency_id) {where.not settlement_currency_id: currency_id}
 
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules

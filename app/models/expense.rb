@@ -327,7 +327,7 @@ class Expense < ActiveRecord::Base
   scope :unverified, -> {where expense_status_id: ExpenseStatus.ids_for([:unreported, :unsubmitted, :rejected, :submitted])}
 
   scope :joins_amount, -> {joins(:amount)}
-  scope :sum_amount, -> {joins_amount.sum(:INR)}
+  scope :sum_amount, -> (currency_code = :INR) {joins_amount.sum(currency_code)}
 
   scope :joins_card_expenses, -> {only_card_expenses.joins(:card_expense)}
   scope :pluck_card_transaction_id, -> {joins_card_expenses.pluck('card_expense.card_transaction_id')}
@@ -366,7 +366,7 @@ class Expense < ActiveRecord::Base
     amount_ids = pluck(:tds_amount_id)
     Amount.with_id(amount_ids).sum(currency_code)
   end
-  scope :sum_reimbursements, -> (currency_code = :INR){reimbursable.sum_amounts(currency_code) - reimbursable.sum_tds_amounts(currency_code)}
+  scope :sum_reimbursements, -> (currency_code = :INR) {reimbursable.sum_amounts(currency_code) - reimbursable.sum_tds_amounts(currency_code)}
   scope :with_expense_tax_type_id, -> (id) {where expense_tax_type_id: id}
 
 
