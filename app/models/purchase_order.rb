@@ -182,8 +182,16 @@ class PurchaseOrder < ActiveRecord::Base
   end
 
   def budget_trail_entry
-    self.items.each do |item|
-      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.save_trail(item)
+    if PurchaseOrderStatus.ids_for([:approved, :auto_approved, :sent_to_vendor, :closed]).include?(self.status_id)
+      self.items.each do |item|
+        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.save_trail(item)
+      end
+    else
+      # i.e. if the purchase order changed statuses to something other than the above, it will destroy
+      # all the line item entries in the budget trail model for this particular purchase order
+      self.items.each do |item|
+        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.destroy_trail(item)
+      end
     end
   end
 

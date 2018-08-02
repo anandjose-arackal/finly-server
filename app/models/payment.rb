@@ -477,7 +477,12 @@ class Payment < ActiveRecord::Base
   end
 
   def budget_trail_entry
-    BudgetsCalculator::Calculate::PaymentBudgetsProcessor.save_trail(self)
+    if payment.completed? || payment.processing?
+      BudgetsCalculator::Calculate::PaymentBudgetsProcessor.save_trail(self)
+    else
+      # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object
+      BudgetsCalculator::Calculate::PaymentBudgetsProcessor.destroy_trail(self)
+    end
   end
 
   def budget_trail_destroy

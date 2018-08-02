@@ -21,6 +21,7 @@ class BudgetsCalculator::Calculate::PaymentBudgetsProcessor < BudgetsCalculator:
     super()
   end
 
+  # this is a safe delete, i.e. if the this payment doesn't exist in the budget_trail table, it gracefully exits
   def self.destroy_trail(payment)
     budget_trail = BudgetTrail.find_by(entity_type: "Payment", entity_id: payment.id)
     budget_trail&.destroy

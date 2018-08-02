@@ -56,8 +56,12 @@ class PurchaseOrderItem < ActiveRecord::Base
   private
 
   def budget_trail_entry
-    # calling the trail saving processor method that will take care of saving the budget trail
-    BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.save_trail(self)
+    if PurchaseOrderStatus.ids_for([:approved, :auto_approved, :sent_to_vendor, :closed]).include?(self.purchase_order&.status_id)
+      # calling the trail saving processor method that will take care of saving the budget trail
+      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.save_trail(self)
+    else
+      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.destroy_trail(self)
+    end
   end
 
   def budget_trail_destroy

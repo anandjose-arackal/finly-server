@@ -245,6 +245,10 @@ class Report < ActiveRecord::Base
 
   before_destroy :clear_expenses
 
+  after_save :budget_trail_entry
+
+  after_destroy :budget_trail_destroy
+
   attr_accessor :cache_users
 
   def self.get_default_name(user)
@@ -498,6 +502,25 @@ class Report < ActiveRecord::Base
         receipt.parent_id = receipt.parent_type = nil
         receipt.save
       end
+    end
+  end
+
+  def budget_trail_entry
+    # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
+    if [ReportStatus.ids_for([:approved, :settled, :settlement_confirmed, :closed])].include?(self.report_status_id)
+      self.expenses.each do |expense|
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.save_trail(expense)
+      end
+    else
+      self.expenses.each do |expense|
+        BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.destroy_trail(expense)
+      end
+    end
+  end
+
+  def budget_trail_destroy
+    self.expenses.each do |expense|
+      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.destroy_trail(expense)
     end
   end
 
