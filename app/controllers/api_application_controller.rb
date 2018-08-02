@@ -1,6 +1,6 @@
 class ApiApplicationController < ApplicationController
 
-  before_action { block_foreign_hosts(WhitelistedIpType.id_for(:api)) }
+  before_action { block_foreign_hosts(WhitelistedIpType.id_for(:api)) if Rails.env.production? }
 
   before_action -> { finly_authorize! :web}
   before_action :validate_user_admin
