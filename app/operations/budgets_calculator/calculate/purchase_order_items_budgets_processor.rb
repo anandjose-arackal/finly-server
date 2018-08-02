@@ -1,0 +1,31 @@
+class BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor < BudgetsCalculator::Calculate::BudgetsProcessor
+
+  def self.save_trail(purchase_order_item)
+    trail = BudgetTrail.find_by(entity_type: "PurchaseOrderItem", entity_id: purchase_order_item.id)
+    if trail.present?
+      trail_id = trail.id
+    else
+      trail_id = nil
+    end
+    self.trail_hash = {
+        id: trail_id,
+        entity: purchase_order_item,
+        category_id: purchase_order_item.category_id,
+        cost_center_id: purchase_order_item.cost_center_id,
+        user_id: purchase_order_item.purchase_order.user_id,
+        location_id: purchase_order_item.purchase_order.location_id,
+        department_id: purchase_order_item.purchase_order.department_id,
+        amount_attributes: {
+            value: purchase_order_item.total_amount&.id,
+            currency_id: purchase_order_item.total_amount&.currency_id
+        }
+    }
+    super()
+  end
+
+  def self.destroy_trail(purchase_order_item)
+    budget_trail = BudgetTrail.find_by(entity_type: "PurchaseOrderItem", entity_id: purchase_order_item.id)
+    budget_trail&.destroy
+  end
+
+end

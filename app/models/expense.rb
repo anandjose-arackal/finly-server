@@ -121,6 +121,8 @@ class Expense < ActiveRecord::Base
     compute_tds_amount
   end
 
+  after_save :budget_trail_entry
+
   default_scope {order('expenses.created_at DESC')}
 
   scope :with_id, -> (ids) {where id: ids}
@@ -1039,5 +1041,13 @@ class Expense < ActiveRecord::Base
         errors.add(:amount, "can't be less than or equal to 0")
       end
     end
+  end
+
+  def budget_trail_entry
+    BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.save_trail(self)
+  end
+
+  def budget_trail_destroy
+    BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.destroy_trail(self)
   end
 end

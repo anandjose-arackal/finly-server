@@ -50,24 +50,18 @@ class PurchaseOrderItem < ActiveRecord::Base
     where(id: ids)
   }
 
-  after_save do
-    # we will be saving this particular entry to the BudgetTrail model
-    id = self.id
-    budget_trail = BudgetTrail.find_by(entity_type: "PurchaseOrder", entity_id: id)
-    if budget_trail
-      # handle update of this particular LineItem
-      budget_trail.update(
-                      category_id: self.category_id,
-                      cost_center_id: self.cost_center_id,
-                      amount_attributes: {
-                          id: budget_trail.amount.id,
-                          value: self.total_amount&.value
-                      }
-      )
-    else
-      # handle creation of this line item
+  after_save :budget_trail_entry
+  after_destroy :budget_trail_destroy
 
-    end
+  private
+
+  def budget_trail_entry
+    # calling the trail saving processor method that will take care of saving the budget trail
+    BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.save_trail(self)
+  end
+
+  def budget_trail_destroy
+    BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.destroy_trail(self)
   end
 
 end

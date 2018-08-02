@@ -29,9 +29,30 @@ class BudgetTrail < ActiveRecord::Base
   belongs_to :user
 
   scope :within_date, -> (start_date, end_date) {
-
+    where('date >= ? AND date <= ?', start_date, end_date)
   }
 
   scope :joins_amount, -> { joins(:amount) }
+  scope :with_users, -> (user_ids) {
+    where(user_id: user_ids)
+  }
+  scope :with_departments, -> (department_ids) {
+    where(department_id: department_ids)
+  }
+  scope :with_locations, -> (location_ids) {
+    where(location_id: location_ids)
+  }
+  scope :with_vendors, -> (vendor_ids) {
+    where(vendor_id: vendor_ids)
+  }
+  scope :with_categories, -> (category_ids) {
+    where(category_id: category_ids)
+  }
+  scope :with_cost_centers, -> (cost_center_ids) {
+    where(cost_center_id: cost_center_ids)
+  }
+  scope :with_budgetable_entities, -> (budgetable_entities) {
+    where(entity_type: budgetable_entities)
+  }
 
 end

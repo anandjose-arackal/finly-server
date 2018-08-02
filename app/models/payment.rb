@@ -305,11 +305,9 @@ class Payment < ActiveRecord::Base
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)
   end
 
-  before_save do
-    # recalculating the amount or net amount for this particular
-    # payment from the details inside the invoice
+  after_save :budget_trail_entry
 
-  end
+  after_destroy :budget_trail_destroy
 
   def initiating_account_type_name
     name = "#{initiating_user&.name&.to_s}'s "
@@ -476,5 +474,13 @@ class Payment < ActiveRecord::Base
         errors.add(:receiving_user_id, "cannot be blank")
       end
     end
+  end
+
+  def budget_trail_entry
+    BudgetsCalculator::Calculate::PaymentBudgetsProcessor.save_trail(self)
+  end
+
+  def budget_trail_destroy
+    BudgetsCalculator::Calculate::PaymentBudgetsProcessor.destroy_trail(self)
   end
 end

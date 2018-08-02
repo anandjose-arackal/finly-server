@@ -88,6 +88,8 @@ class PurchaseOrder < ActiveRecord::Base
   scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
 
   before_save :calculate_line_items
+  after_save :budget_trail_entry
+  after_destroy :budget_trail_destroy
 
   private
 
@@ -177,5 +179,17 @@ class PurchaseOrder < ActiveRecord::Base
     end
 
     # self.save
+  end
+
+  def budget_trail_entry
+    self.items.each do |item|
+      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.save_trail(item)
+    end
+  end
+
+  def budget_trail_destroy
+    self.items.each do |item|
+      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.destroy_trail(item)
+    end
   end
 end
