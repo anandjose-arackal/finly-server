@@ -24,6 +24,7 @@ class TimeExpenseConfig < ActiveRecord::Base
   validates :policy_id, presence: true
 
   def rate
+    return nil if super.nil?
     Amount.new(value: super.value, currency: policy.base_currency)
   end
 

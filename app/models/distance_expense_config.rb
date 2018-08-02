@@ -24,6 +24,7 @@ class DistanceExpenseConfig < ActiveRecord::Base
   accepts_nested_attributes_for :rate
 
   def rate
+    return nil if super.nil?
     Amount.new(value: super.value, currency: policy.base_currency)
   end
 

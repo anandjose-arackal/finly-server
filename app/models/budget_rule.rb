@@ -65,6 +65,7 @@ class BudgetRule < ActiveRecord::Base
 
   # Amount currency is always picked up from base currency of the policy
   def amount
+    return nil if super.nil?
     Amount.new(value: super.value, currency_id: self.policy.base_currency_id)
   end
 

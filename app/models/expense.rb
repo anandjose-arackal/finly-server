@@ -91,7 +91,7 @@ class Expense < ActiveRecord::Base
   validates :category_id, presence: true
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
-  validates :usage_date_type, allow_nil: true, :inclusion=> { :in => ['hotel', nil] }
+  validates :usage_date_type, allow_nil: true, :inclusion => {:in => ['hotel', nil]}
   validate :validate_usage_dates
   validate :no_future_date
   validate :valid_expense_type
@@ -187,6 +187,9 @@ class Expense < ActiveRecord::Base
   scope :with_user_id, ->(user_id) {where user_id: user_id}
   scope :with_user_or_report, ->(user_id, report_id) {where 'user_id IN (?) OR report_id IN (?)', user_id, report_id}
   scope :date_before, -> (date) {where 'date < ?', date}
+  scope :without_usage_date_type, -> {where usage_date_type: nil}
+  scope :with_usage_date_type, -> {where.not usage_date_type: nil}
+  scope :usage_date_within, ->(start_date, end_date) {where.not('usage_date_start > ? OR usage_date_end < ? ', end_date, start_date)}
   # scope :with_user_for_admin, ->(user_ids) { where('user_id IN (?) AND expense_type_id = ? AND expense_status_id = ?', user_ids, ExpenseType.card_expense_id, ExpenseStatus.submitted_id).uniq }
   scope :filter_expense_type_id, ->(type_id) do
     type_id = [type_id] unless type_id.is_a?(Array)
@@ -958,6 +961,15 @@ class Expense < ActiveRecord::Base
     end
   end
 
+  def usage_days
+    return nil unless usage_date_type.present?
+    days = (usage_date_start.to_date..usage_date_end.to_date).to_a
+    unless usage_date_end.to_date == usage_date_start.to_date
+      days.pop
+    end
+    days
+  end
+
   private
 
   # cannot add an expense with future date
@@ -1042,4 +1054,5 @@ class Expense < ActiveRecord::Base
       return
     end
   end
+
 end

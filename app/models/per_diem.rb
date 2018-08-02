@@ -33,6 +33,7 @@ class PerDiem < ActiveRecord::Base
   scope :find_from_id, -> (id) {where(id: id).first}
 
   def rate
+    return nil if super.nil?
     Amount.new(value: super.value, currency: configurable.base_currency)
   end
 

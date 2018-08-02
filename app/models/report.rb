@@ -104,6 +104,7 @@ class Report < ActiveRecord::Base
   scope :settled, -> {where report_status_id: ReportStatus.settled_id}
   scope :settlement_confirmed, -> {where report_status_id: ReportStatus.settlement_confirmed_id}
   scope :processing, -> {where report_status_id: ReportStatus.processing_id}
+  scope :processing_and_above, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id,ReportStatus.processing_id]}
   scope :processed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.approved_id, ReportStatus.closed_id]}
   scope :completed, -> {where report_status_id: [ReportStatus.settled_id, ReportStatus.settlement_confirmed_id, ReportStatus.closed_id]}
   scope :accounted, -> {where accounted: true}
