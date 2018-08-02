@@ -37,6 +37,7 @@
 
 
 
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -1045,14 +1046,14 @@ class Expense < ActiveRecord::Base
 
   def budget_trail_entry
     # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
-    if [ReportStatus.ids_for([:approved, :settled, :settlement_confirmed, :closed])].include?(self.report&.report_status_id)
-      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.save_trail(self)
+    if ReportStatus.ids_for([:approved, :settled, :settlement_confirmed, :closed]).include?(self.report&.report_status_id)
+      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
     else
-      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.destroy_trail(self)
+      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
     end
   end
 
   def budget_trail_destroy
-    BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.destroy_trail(self)
+    BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
   end
 end

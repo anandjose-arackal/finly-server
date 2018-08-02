@@ -14,5 +14,5 @@ class BudgetCriteriaMapping < ActiveRecord::Base
 
   # many-to-many mapping between budgets and entities
   belongs_to :budget
-  belongs_to :budgetable, polymorphic: true # this will be the reference to the object for whom a budget can be applied (i.e. a criterion)
+  belongs_to :budgetable, polymorphic: true # this will be the reference to the object for whom a budget can be applied (i.e. a criterion - like category, cost center, vendor etc.)
 end

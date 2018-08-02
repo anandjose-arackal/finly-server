@@ -28,6 +28,8 @@ class BudgetTrail < ActiveRecord::Base
   belongs_to :department
   belongs_to :user
 
+  accepts_nested_attributes_for :amount
+
   scope :within_date, -> (start_date, end_date) {
     where('date >= ? AND date <= ?', start_date, end_date)
   }
@@ -53,6 +55,10 @@ class BudgetTrail < ActiveRecord::Base
   }
   scope :with_budgetable_entities, -> (budgetable_entities) {
     where(entity_type: budgetable_entities)
+  }
+  # more or less the same as with_budgetable_entities
+  scope :with_entity_type, -> (entity_types) {
+    where(entity_type: entity_types)
   }
 
 end

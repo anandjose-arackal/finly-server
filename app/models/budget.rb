@@ -50,6 +50,16 @@ class Budget < ActiveRecord::Base
 
   scope :with_id, -> (ids) {where id: ids}
 
+  scope :applicable_to_purchase_orders, -> {
+    where purchase_order: true
+  }
+  scope :applicable_to_expenses, -> {
+    where expense: true
+  }
+  scope :applicable_to_payments, -> {
+    where payment: true
+  }
+
   # todo - change this to reflect the new structure
   scope :with_budgetable_user_id, -> (ids) {where budgetable_id: ids, budgetable_type: "User"}
   scope :with_budgetable_category_id, -> (ids) {where budgetable_id: ids, budgetable_type: "Category"}

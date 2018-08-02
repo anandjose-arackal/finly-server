@@ -1,6 +1,8 @@
-class BudgetsCalculator::Calculate::ExpenseBudgetsProcessor < BudgetsCalculator::BudgetsProcessor
+class BudgetsCalculator::Calculate::ExpenseBudgetsProcessor < BudgetsCalculator::Calculate::BudgetsProcessor
 
-  def self.save_trail(expense)
+  attr_accessor :trail_hash
+
+  def save_trail(expense)
     trail = BudgetTrail.find_by(entity_type: "Expense", entity_id: expense.id)
     if trail.present?
       trail_id = trail.id
@@ -24,7 +26,7 @@ class BudgetsCalculator::Calculate::ExpenseBudgetsProcessor < BudgetsCalculator:
   end
 
   # this is a safe delete, i.e. if the this payment doesn't exist in the budget_trail table, it gracefully exits
-  def self.destroy_trail(expense)
+  def destroy_trail(expense)
     budget_trail = BudgetTrail.find_by(entity_type: "Expense", entity_id: expense.id)
     budget_trail&.destroy
   end
