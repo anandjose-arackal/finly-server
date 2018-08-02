@@ -468,18 +468,18 @@ class Expense < ActiveRecord::Base
       return self.amount.value
     when ExpenseType.id_for(:distance)
       if distance_expense&.distance.present?
-        rate = policy.distance_expense_config.rate_value# rescue nil
+        rate = policy.distance_expense_config.rate_value # rescue nil
         amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
         return amount
       end
     when ExpenseType.id_for(:time)
-      rate = policy.time_expense_config.rate_value# rescue nil
+      rate = policy.time_expense_config.rate_value # rescue nil
       amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
       return amount
     when ExpenseType.id_for(:per_diem)
       per_diem = self.per_diem_expense.per_diem
       if policy.per_diems.include?(per_diem)
-        rate = self.per_diem_expense.per_diem.rate_value# rescue nil
+        rate = self.per_diem_expense.per_diem.rate_value # rescue nil
         amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
         return amount
       else
@@ -517,26 +517,20 @@ class Expense < ActiveRecord::Base
       end
       return "#{policy_name} - #{per_diem_name}"
     else
-      if self.report.nil?
-        if self.distance_expense?
-          return "#{self.distance_expense.distance_value} KM"
-        elsif self.time_expense?
-          return "#{self.time_expense.time_object_value} Hours"
+      if self.distance_expense?
+        rate = ''
+        if (not self.report.nil?) and report.policy.distance_expense_config.rate_value.present?
+          rate = simple ? " @ " : " at "
+          rate += "#{report.policy.base_currency.symbol}#{report.policy.distance_expense_config.rate_value} #{report.policy.base_currency.country_code} per KM"
         end
-      else
-        if self.distance_expense?
-          if simple
-            return "#{self.distance_expense.distance_value} KM at #{report.policy.base_currency.symbol}#{report.policy.distance_expense_config.rate_value} #{report.policy.base_currency.country_code} per KM"
-          else
-            return "#{self.distance_expense.distance_value} KM @ #{report.policy.base_currency.symbol}#{report.policy.distance_expense_config.rate_value} #{report.policy.base_currency.country_code} per KM"
-          end
-        elsif self.time_expense?
-          if simple
-            return "#{self.time_expense.time_object_value} Hours @ #{report.policy.base_currency.symbol}#{report.policy.time_expense_config.rate_value} #{report.policy.base_currency.country_code} per Hour"
-          else
-            return "#{self.time_expense.time_object_value} Hours at #{report.policy.base_currency.symbol}#{report.policy.time_expense_config.rate_value} #{report.policy.base_currency.country_code} per Hour"
-          end
+        return "#{self.distance_expense.distance_value} KM#{rate}"
+      elsif self.time_expense?
+        rate = ''
+        if (not self.report.nil?) and report.policy.time_expense_config.rate_value.present?
+          rate = simple ? " @ " : " at "
+          rate += "#{report.policy.base_currency.symbol}#{report.policy.time_expense_config.rate_value} #{report.policy.base_currency.country_code} per Hour"
         end
+        return "#{self.time_expense.time_object_value} Hours#{rate}"
       end
     end
   end
