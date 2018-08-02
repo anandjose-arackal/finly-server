@@ -91,6 +91,8 @@ class Expense < ActiveRecord::Base
   validates :category_id, presence: true
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
+  validates :usage_date_type, allow_nil: true, :inclusion=> { :in => ['checkin', nil] }
+  validate :validate_usage_dates
   validate :no_future_date
   validate :valid_expense_type
   validate :valid_amount_value
@@ -1027,6 +1029,17 @@ class Expense < ActiveRecord::Base
       elsif self.amount.value < 0
         errors.add(:amount, "can't be less than or equal to 0")
       end
+    end
+  end
+
+  def validate_usage_dates
+    if (usage_date_start.present? or usage_date_end.present?) and usage_date_type.blank?
+      errors.add :usage_date_type, 'has not been defined'
+      return
+    end
+    if usage_date_type.present? and usage_date_start.blank?
+      errors.add :usage_dates, 'have not been defined'
+      return
     end
   end
 end
