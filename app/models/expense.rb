@@ -91,7 +91,7 @@ class Expense < ActiveRecord::Base
   validates :category_id, presence: true
   validates :expense_type_id, presence: true
   validates :user_id, presence: true
-  validates :usage_date_type, allow_nil: true, :inclusion=> { :in => ['checkin', nil] }
+  validates :usage_date_type, allow_nil: true, :inclusion=> { :in => ['hotel', nil] }
   validate :validate_usage_dates
   validate :no_future_date
   validate :valid_expense_type
