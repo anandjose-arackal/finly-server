@@ -243,7 +243,7 @@ class Report::Violation < Report::Base
     else
       total_expenses += number_with_precision(expenses.reimbursable.with_date_range(start_date, end_date).filter_category_id(category&.id).joins(:amount).sum(base_currency_code.to_sym), :precision => 2).to_f
     end
-    if total_expenses > rule.amount.send(base_currency_code.to_sym)
+    if total_expenses > rule.amount.value
       return true
     end
     false

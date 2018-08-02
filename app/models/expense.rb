@@ -468,18 +468,18 @@ class Expense < ActiveRecord::Base
       return self.amount.value
     when ExpenseType.id_for(:distance)
       if distance_expense&.distance.present?
-        rate = policy.distance_expense_config.rate_value rescue nil
+        rate = policy.distance_expense_config.rate_value# rescue nil
         amount = rate.blank? ? 0 : (self.distance_expense.distance.value * rate)
         return amount
       end
     when ExpenseType.id_for(:time)
-      rate = policy.time_expense_config.rate_value rescue nil
+      rate = policy.time_expense_config.rate_value# rescue nil
       amount = rate.blank? ? 0 : (self.time_expense.time_object.value * rate)
       return amount
     when ExpenseType.id_for(:per_diem)
       per_diem = self.per_diem_expense.per_diem
       if policy.per_diems.include?(per_diem)
-        rate = self.per_diem_expense.per_diem.rate_value rescue nil
+        rate = self.per_diem_expense.per_diem.rate_value# rescue nil
         amount = rate.blank? ? 0 : (self.per_diem_expense.quantity * rate)
         return amount
       else
@@ -526,15 +526,15 @@ class Expense < ActiveRecord::Base
       else
         if self.distance_expense?
           if simple
-            return "#{self.distance_expense.distance_value} KM at INR#{report.policy.distance_expense_config.rate_value} per KM"
+            return "#{self.distance_expense.distance_value} KM at #{report.policy.base_currency.symbol}#{report.policy.distance_expense_config.rate_value} #{report.policy.base_currency.country_code} per KM"
           else
-            return "#{self.distance_expense.distance_value} KM @ ₹#{report.policy.distance_expense_config.rate_value} per KM"
+            return "#{self.distance_expense.distance_value} KM @ #{report.policy.base_currency.symbol}#{report.policy.distance_expense_config.rate_value} #{report.policy.base_currency.country_code} per KM"
           end
         elsif self.time_expense?
           if simple
-            return "#{self.time_expense.time_object_value} Hours @ ₹#{report.policy.time_expense_config.rate_value} per Hour"
+            return "#{self.time_expense.time_object_value} Hours @ #{report.policy.base_currency.symbol}#{report.policy.time_expense_config.rate_value} #{report.policy.base_currency.country_code} per Hour"
           else
-            return "#{self.time_expense.time_object_value} Hours at INR#{report.policy.time_expense_config.rate_value} per Hour"
+            return "#{self.time_expense.time_object_value} Hours at #{report.policy.base_currency.symbol}#{report.policy.time_expense_config.rate_value} #{report.policy.base_currency.country_code} per Hour"
           end
         end
       end

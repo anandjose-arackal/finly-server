@@ -23,6 +23,10 @@ class DistanceExpenseConfig < ActiveRecord::Base
 
   accepts_nested_attributes_for :rate
 
+  def rate
+    Amount.new(value: super.value, currency: policy.base_currency)
+  end
+
   def default_category_name
     if self.default_category_id
       return Category.find(default_category_id).name
@@ -33,7 +37,7 @@ class DistanceExpenseConfig < ActiveRecord::Base
 
   def rate_value
     if self.enabled
-      return self.rate.INR#send(self.policy.base_currency.country_code)
+      return self.rate.value
     else
       return nil
     end

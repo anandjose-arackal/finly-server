@@ -12,18 +12,18 @@
 #                rate_per_hour: conversion rate for time
 #               }
 # per_diem_config:{ enabled: true or false
-                #   per_diems: [{
-                #             name:
-                #             rate:
-                #            },
-                #            {
-                #             name:
-                #             rate:
-                #            },
-                #            .
-                #            .
-                #            .]
-                # }
+#   per_diems: [{
+#             name:
+#             rate:
+#            },
+#            {
+#             name:
+#             rate:
+#            },
+#            .
+#            .
+#            .]
+# }
 
 
 class ExpenseTypes::Show < ExpenseTypes::Base
@@ -42,8 +42,8 @@ class ExpenseTypes::Show < ExpenseTypes::Base
 
   def init
     self.company = user.company
-        policies = Policy::Index.(user, view: 'admin').policies rescue []
-        self.policy = policies.find_by(id: params[:policy_id]) rescue nil
+    policies = Policy::Index.(user, view: 'admin').policies rescue []
+    self.policy = policies.find_by(id: params[:policy_id]) rescue nil
     self.distance_config = self.time_config = self.per_diem_config = {}
   end
 
@@ -60,44 +60,46 @@ class ExpenseTypes::Show < ExpenseTypes::Base
                               default_category_id: policy.distance_expense_config.default_category_id,
                               default_category_name: policy.distance_expense_config.default_category_name
 
-                             }
+      }
     else
       self.distance_config = {enabled: false,
                               rate_per_km: policy.distance_expense_config.rate_value,
                               default_category_id: policy.distance_expense_config.default_category_id,
                               default_category_name: policy.distance_expense_config.default_category_name
-                              }
+      }
     end
     if policy.time_expense_config.enabled
       self.time_config = {enabled: true,
                           rate_per_hour: policy.time_expense_config.rate_value,
                           default_category_id: policy.time_expense_config.default_category_id,
                           default_category_name: policy.time_expense_config.default_category_name
-                          }
+      }
     else
       self.time_config = {enabled: false,
                           rate_per_hour: policy.time_expense_config.rate_value,
                           default_category_id: policy.time_expense_config.default_category_id,
                           default_category_name: policy.time_expense_config.default_category_name
 
-                          }
+      }
     end
     if policy.per_diem_expense_config.enabled
       self.per_diem_config = {enabled: true}
       self.per_diem_config[:per_diems] = []
       policy.per_diems.active.each do |per_diem|
-        self.per_diem_config[:per_diems] << {name: per_diem.name,
-                                             rate: per_diem.rate_value,
-                                             id: per_diem.id
-                                            }
+        self.per_diem_config[:per_diems] << {
+            name: per_diem.name,
+            rate: per_diem.rate_value,
+            id: per_diem.id
+        }
       end
     else
       self.per_diem_config = {enabled: false}
       self.per_diem_config[:per_diems] = []
       policy.per_diems.active.each do |per_diem|
-        self.per_diem_config[:per_diems] << {name: per_diem.name,
-                                             rate: per_diem.rate_value,
-                                             id: per_diem.id
+        self.per_diem_config[:per_diems] << {
+            name: per_diem.name,
+            rate: per_diem.rate_value,
+            id: per_diem.id
         }
       end
     end

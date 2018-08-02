@@ -32,6 +32,10 @@ class PerDiem < ActiveRecord::Base
   scope :with_id, -> (id) {where id: id}
   scope :find_from_id, -> (id) {where(id: id).first}
 
+  def rate
+    Amount.new(value: super.value, currency: configurable.base_currency)
+  end
+
   def per_diem_name
     self.name
   end
