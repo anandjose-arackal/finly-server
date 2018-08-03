@@ -15,11 +15,7 @@ class Card::Show < Card::Base
     cards = Card::Index.(user, params)&.cards rescue nil
     id = (params[:id] or params[:card_id])
     if cards.present?
-      if id&.downcase&.starts_with?('s')
-        self.card = cards.with_proxy(id)&.first
-      else
-        self.card = cards.find_by(id: id)
-      end
+      self.card = cards.with_id_or_proxy(id)&.first
     end
   end
 
