@@ -17,6 +17,10 @@ class Card::Show < Card::Base
     if cards.present?
       self.card = cards.with_id_or_proxy(id)&.first
     end
+    if self.card.present?
+      Itzcash::AccountDetails.(user, card: self.card)
+      self.card.reload
+    end
   end
 
   def validate
