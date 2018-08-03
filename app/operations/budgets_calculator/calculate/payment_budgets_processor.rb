@@ -15,7 +15,7 @@ class BudgetsCalculator::Calculate::PaymentBudgetsProcessor < BudgetsCalculator:
         vendor_id: (payment.receiving_account_id if payment.receiving_account_type == "YesBankVendor"),
         amount_attributes: {
             value: payment.amount.value,
-            currency_id: payment.currency_id
+            currency_id: payment.amount.currency_id
         }
     }
     super()
