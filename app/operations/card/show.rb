@@ -13,8 +13,13 @@ class Card::Show < Card::Base
 
   def init
     cards = Card::Index.(user, params)&.cards rescue nil
+    id = (params[:id] or params[:card_id])
     if cards.present?
-      self.card = cards.find_by(id: (params[:id] or params[:card_id]))
+      if id&.downcase&.starts_with?('s')
+        self.card = cards.with_proxy(id)&.first
+      else
+        self.card = cards.find_by(id: id)
+      end
     end
   end
 
