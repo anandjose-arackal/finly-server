@@ -1,0 +1,23 @@
+# == Schema Information
+#
+# Table name: user_pockets
+#
+#  id                  :integer          not null, primary key
+#  name                :string(255)
+#  balance_id          :integer
+#  user_pocket_type_id :integer
+#  created_at          :datetime         not null
+#  updated_at          :datetime         not null
+#
+
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  balance_id: 1
+  user_pocket_type_id: 1
+
+two:
+  name: MyString
+  balance_id: 1
+  user_pocket_type_id: 1

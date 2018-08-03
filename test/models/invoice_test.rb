@@ -47,6 +47,7 @@
 #  note                   :text(65535)
 #  remaining_amount_id    :integer
 #  invoice_type_id        :integer
+#  procurement_id         :integer
 #
 
 require 'test_helper'
