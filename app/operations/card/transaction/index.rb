@@ -17,7 +17,8 @@ class Card::Transaction::Index < BaseOperation
 
     if selected_card.blank?
       if params[:card_id].present? or params[:id].present?
-        self.selected_card = Card::Index.(user, params).cards.find_by(id: (params[:card_id] or params[:id])) rescue nil
+        self.selected_card = Card::Show.(user, params).card rescue nil
+        # self.selected_card = Card::Index.(user, params).cards.find_by(id: (params[:card_id] or params[:id])) rescue nil
       end
     end
 
