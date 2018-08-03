@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  vehicle_name: MyString
+  rate_id: 1
+  policy_id: 
+  distance_unit_id: 1
+
+two:
+  vehicle_name: MyString
+  rate_id: 1
+  policy_id: 
+  distance_unit_id: 1

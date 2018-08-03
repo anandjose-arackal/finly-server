@@ -29,19 +29,12 @@ class DistanceExpenseConfig < ActiveRecord::Base
   end
 
   def default_category_name
-    if self.default_category_id
-      return Category.find(default_category_id).name
-    else
-      ''
-    end
+    default_category&.name || ''
   end
 
   def rate_value
-    if self.enabled
-      return self.rate.value
-    else
-      return nil
-    end
+    return self.rate.value if self.enabled
+    nil
   end
 
   private

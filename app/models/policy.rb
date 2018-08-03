@@ -39,6 +39,7 @@ class Policy < ActiveRecord::Base
   has_one :per_diem_expense_config
 
   has_many :per_diems, as: :configurable
+  has_many :vehicle_rates
 
   scope :default, -> {where default: true}
   scope :non_default, -> {where default: false}

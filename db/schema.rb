@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180802101727) do
+ActiveRecord::Schema.define(version: 20180803132254) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -1808,6 +1808,9 @@ ActiveRecord::Schema.define(version: 20180802101727) do
     t.decimal  "odometer_reading_end",                        precision: 10, scale: 2
     t.integer  "odometer_reading_receipt_start_id", limit: 4
     t.integer  "odometer_reading_receipt_end_id",   limit: 4
+    t.integer  "vehicle_rate_id",                   limit: 4
+    t.integer  "distance_rate_id",                  limit: 4
+    t.integer  "distance_unit_id",                  limit: 4
   end
 
   add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
@@ -4446,6 +4449,21 @@ ActiveRecord::Schema.define(version: 20180802101727) do
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
 
+  create_table "vehicle_rates", force: :cascade do |t|
+    t.string   "vehicle_name",     limit: 255,                 null: false
+    t.integer  "rate_id",          limit: 4,                   null: false
+    t.integer  "distance_unit_id", limit: 4,                   null: false
+    t.integer  "policy_id",        limit: 4
+    t.boolean  "is_deleted",                   default: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+  end
+
+  add_index "vehicle_rates", ["distance_unit_id"], name: "index_vehicle_rates_on_distance_unit_id", using: :btree
+  add_index "vehicle_rates", ["is_deleted"], name: "index_vehicle_rates_on_is_deleted", using: :btree
+  add_index "vehicle_rates", ["policy_id"], name: "index_vehicle_rates_on_policy_id", using: :btree
+  add_index "vehicle_rates", ["rate_id"], name: "index_vehicle_rates_on_rate_id", using: :btree
+
   create_table "vendor_account_transactions", force: :cascade do |t|
     t.integer  "vendor_account_id",   limit: 4
     t.integer  "transaction_type_id", limit: 4
@@ -4978,6 +4996,7 @@ ActiveRecord::Schema.define(version: 20180802101727) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
+  add_foreign_key "vehicle_rates", "policies"
   add_foreign_key "vendor_account_transactions", "amounts"
   add_foreign_key "vendor_account_transactions", "payments"
   add_foreign_key "vendor_account_transactions", "vendor_accounts"

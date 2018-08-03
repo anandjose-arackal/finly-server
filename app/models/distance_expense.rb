@@ -27,6 +27,10 @@ class DistanceExpense < ActiveRecord::Base
   belongs_to :type, class_name: 'DistanceExpenseType'
   belongs_to :odometer_reading_receipt_start, class_name: 'Receipt'
   belongs_to :odometer_reading_receipt_end, class_name: 'Receipt'
+  belongs_to :vehicle_rate
+  belongs_to :distance_rate, class_name: 'Amount'
+  belongs_to :distance_unit, class_name: 'PhysicalUnit'
+
 
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :locations
@@ -35,6 +39,7 @@ class DistanceExpense < ActiveRecord::Base
 
   # validates :distance, presence: true
   validate :distance_presence
+  # validates :
 
   delegate :distance_value, to: :distance, allow_nil: true
   delegate :maps_distance_value, to: :distance, allow_nil: true
