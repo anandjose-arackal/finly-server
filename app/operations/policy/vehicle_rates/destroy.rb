@@ -1,4 +1,4 @@
-class Policy::VehicleRates::Create < BaseOperation
+class Policy::VehicleRates::Destroy < BaseOperation
   attr_accessor :vehicle_rate
 
   def authorized_user_types
