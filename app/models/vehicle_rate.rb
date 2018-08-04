@@ -20,8 +20,10 @@ class VehicleRate < ActiveRecord::Base
   belongs_to :distance_unit, class_name: 'PhysicalUnit'
 
   validates :policy_id, presence: true
-  # validates :rate_id, presence: true
+  validates :rate, presence: true
   validates :distance_unit_id, presence: true
+
+  accepts_nested_attributes_for :rate
 
   def rate
     return nil if super.nil?
@@ -37,5 +39,6 @@ class VehicleRate < ActiveRecord::Base
         policy: policy
     }
   end
+
 
 end

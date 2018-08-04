@@ -43,7 +43,7 @@ class Policy::Show < Policy::Base
 
   def init
     id = (params[:policy_id] or params[:id])
-    self.policy = Policy::Index.(user, params).policies.with_id(id).first rescue nil
+    self.policy = Policy::Index.(user, params).policies.with_id(id)&.first
     self.mappings = []
     self.policy_users = self.policy&.users || []
   end
