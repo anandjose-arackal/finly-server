@@ -1,14 +1,14 @@
 class CreateVehicleRates < ActiveRecord::Migration
   def change
-    # create_table :vehicle_rates do |t|
-    #   t.string :vehicle_name, null: false
-    #   t.integer :rate_id, references: 'Amount', index: true, null: false, foreign_key: true
-    #   t.integer :distance_unit_id, references: 'PhysicalUnit', index: true, foreign_key: true, null: false
-    #   t.references :policy, index: true, foreign_key: true, null: true
-    #   t.boolean :is_deleted, index: true, default: false
-    #
-    #   t.timestamps null: false
-    # end
+    create_table :vehicle_rates do |t|
+      t.string :vehicle_name, null: false
+      t.integer :rate_id, references: 'Amount', index: true, null: false, foreign_key: true
+      t.integer :distance_unit_id, references: 'PhysicalUnit', index: true, foreign_key: true, null: false
+      t.references :policy, index: true, foreign_key: true, null: true
+      t.boolean :is_deleted, index: true, default: false
+
+      t.timestamps null: false
+    end
     DistanceExpenseConfig.all.each do |distance_expense_config|
       next unless distance_expense_config.enabled and distance_expense_config.rate&.value.present?
       vehicle_rate = VehicleRate.new(
