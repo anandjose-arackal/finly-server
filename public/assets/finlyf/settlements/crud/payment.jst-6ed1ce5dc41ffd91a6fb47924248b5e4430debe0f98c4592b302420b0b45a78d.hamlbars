@@ -1,6 +1,0 @@
-<div class="col-sm-2">{{item.date}}</div>
-<div class="col-sm-2">{{item.payment_type}}</div>
-<div class="col-sm-2">{{item.initiating_user}}</div>
-<div class="col-sm-2">{{item.receiving_user}}</div>
-<div class="col-sm-2">&#8377;&nbsp;{{item.total_amount}}</div>
-<div class="col-sm-2">{{#if item.note}}{{item.note}}{{else}}--{{/if}}</div>

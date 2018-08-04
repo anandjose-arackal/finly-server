@@ -1,7 +1,0 @@
-<div class="row no-margin no-padding">
-  <div class="col-sm-6 no-padding">
-    <ul class="nav navbar-nav">
-      <li><button class="btn-primary btn-sm btn btn-employee-statement" data-user-id="{{item.id}}">My Statements</button></li> 
-    </ul>   
-  </div>
-</div>
