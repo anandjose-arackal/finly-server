@@ -18,7 +18,7 @@ class Card::Show < Card::Base
       self.card = cards.with_id_or_proxy(id)&.first
     end
     if self.card.present?
-      Object.const_get('Itzcash::AccountDetails').(user, card: self.card)
+      ItzCash::AccountDetails.(user, card: self.card)
       self.card.reload
     end
   end
