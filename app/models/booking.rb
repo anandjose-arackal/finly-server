@@ -105,7 +105,7 @@ class Booking < ActiveRecord::Base
     if self.request?
       data[:options] = self.bookings.options
       data[:selected_for_booking] = self.bookings.selected_for_booking
-      data[:confirmed] = self.bookings.confirmed
+      data[:confirmed] = self.bookings.confirmed&.first
     end
     data
   end
