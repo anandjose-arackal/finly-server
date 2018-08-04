@@ -2563,6 +2563,8 @@ end
   get 'about', to: 'home#about'
   get 'resources', to: 'home#resources'
 
+  get 'currencies', to: 'expenses#currencies'
+
 
   #Filters/Autocomplete
   get 'autocomplete/merchant'
