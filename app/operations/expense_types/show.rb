@@ -36,7 +36,7 @@ class ExpenseTypes::Show < ExpenseTypes::Base
 
   def pre_validate
     if user.blank? || params.blank?
-      add_message :error, "Invalid parameters"
+      add_message :error, 'Invalid parameters'
     end
   end
 
@@ -55,30 +55,33 @@ class ExpenseTypes::Show < ExpenseTypes::Base
 
   def process
     if policy.distance_expense_config.enabled
-      self.distance_config = {enabled: true,
-                              rate_per_km: policy.distance_expense_config.rate_value,
-                              default_category_id: policy.distance_expense_config.default_category_id,
-                              default_category_name: policy.distance_expense_config.default_category_name
-
+      self.distance_config = {
+          enabled: true,
+          default_category_id: policy.distance_expense_config.default_category_id,
+          default_category_name: policy.distance_expense_config.default_category_name,
+          vehicle_rates: policy.vehicle_rates
       }
     else
-      self.distance_config = {enabled: false,
-                              rate_per_km: policy.distance_expense_config.rate_value,
-                              default_category_id: policy.distance_expense_config.default_category_id,
-                              default_category_name: policy.distance_expense_config.default_category_name
+      self.distance_config = {
+          enabled: false,
+          rate_per_km: policy.distance_expense_config.rate_value,
+          default_category_id: policy.distance_expense_config.default_category_id,
+          default_category_name: policy.distance_expense_config.default_category_name
       }
     end
     if policy.time_expense_config.enabled
-      self.time_config = {enabled: true,
-                          rate_per_hour: policy.time_expense_config.rate_value,
-                          default_category_id: policy.time_expense_config.default_category_id,
-                          default_category_name: policy.time_expense_config.default_category_name
+      self.time_config = {
+          enabled: true,
+          rate_per_hour: policy.time_expense_config.rate_value,
+          default_category_id: policy.time_expense_config.default_category_id,
+          default_category_name: policy.time_expense_config.default_category_name
       }
     else
-      self.time_config = {enabled: false,
-                          rate_per_hour: policy.time_expense_config.rate_value,
-                          default_category_id: policy.time_expense_config.default_category_id,
-                          default_category_name: policy.time_expense_config.default_category_name
+      self.time_config = {
+          enabled: false,
+          rate_per_hour: policy.time_expense_config.rate_value,
+          default_category_id: policy.time_expense_config.default_category_id,
+          default_category_name: policy.time_expense_config.default_category_name
 
       }
     end

@@ -31,7 +31,11 @@
 #  gst_type_id            :integer
 #  tds_slab_id            :integer
 #  gst_amount_id          :integer
+#  usage_date_start       :datetime
+#  usage_date_end         :datetime
+#  usage_date_type        :string(255)
 #
+
 
 
 class Expense < ActiveRecord::Base

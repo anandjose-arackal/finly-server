@@ -118,6 +118,13 @@ class Category < ActiveRecord::Base
     gl_code || name
   end
 
+  def as_json(options={})
+    {
+        id: id,
+        name: name
+    }
+  end
+
   private
 
   # def at_least_one_application
