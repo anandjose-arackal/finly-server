@@ -1,3 +1,4 @@
 json.name @result.policy.name
-json.policy_admin (current_user.policy_admin?(@result.policy) or current_user.admin?) && params[:view] == 'admin'
+json.base_currency @result.policy.base_currency
+json.settlement_currency @result.policy.settlement_currency
 json.description @result.policy.description
