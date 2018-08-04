@@ -9,4 +9,10 @@
 #
 
 class UserPocketType < ActiveRecord::Base
+
+  include Seedable
+
+  def self.values
+    %w(bank_transfer card_transfer cash atm_withdrawals credit_card)
+  end
 end

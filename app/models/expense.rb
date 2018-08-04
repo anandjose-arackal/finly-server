@@ -31,7 +31,9 @@
 #  gst_type_id            :integer
 #  tds_slab_id            :integer
 #  gst_amount_id          :integer
+#  spent_from_id          :integer
 #
+
 
 
 
@@ -53,6 +55,7 @@ class Expense < ActiveRecord::Base
   belongs_to :expense_tax_type
   belongs_to :gst_type
   belongs_to :tds_slab, class_name: 'TdsRatesList'
+  belongs_to :spent_from, class_name: "UserPocket"
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy
@@ -370,7 +373,9 @@ class Expense < ActiveRecord::Base
   end
   scope :sum_reimbursements, -> { reimbursable.sum_amounts - reimbursable.sum_tds_amounts }
   scope :with_expense_tax_type_id, -> (id){ where expense_tax_type_id: id }
-
+  scope :with_spent_from_id, -> (spent_from_id) {
+    where spent_from_id: spent_from_id
+  }
 
   scope :user_budget_expenses, -> (from, to) {
 
