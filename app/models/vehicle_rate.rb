@@ -20,7 +20,7 @@ class VehicleRate < ActiveRecord::Base
   belongs_to :distance_unit, class_name: 'PhysicalUnit'
 
   validates :policy_id, presence: true
-  validates :rate_id, presence: true
+  # validates :rate_id, presence: true
   validates :distance_unit_id, presence: true
 
   def rate
