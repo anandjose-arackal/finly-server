@@ -25,12 +25,14 @@ class VehicleRate < ActiveRecord::Base
 
   accepts_nested_attributes_for :rate
 
+  scope :with_id, -> (id) {where id: id}
+
   def rate
     return nil if super.nil?
     Amount.new(value: super.value, currency_id: policy.base_currency_id)
   end
 
-  def as_json(options={})
+  def as_json(options = {})
     {
         id: id,
         vehicle_name: vehicle_name,
