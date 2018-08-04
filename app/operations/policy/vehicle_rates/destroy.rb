@@ -23,7 +23,7 @@ class Policy::VehicleRates::Destroy < BaseOperation
       return
     end
     policy = policy_presenter.policy
-    self.vehicle_rate = policy.vehicle_rates.with_id(params[:id])
+    self.vehicle_rate = policy.vehicle_rates.with_id(params[:id])&.first
   end
 
   def validate
