@@ -528,9 +528,9 @@ class Expense < ActiveRecord::Base
     else
       if self.distance_expense?
         rate = ''
-        if (not self.report.nil?) and report.policy.distance_expense_config.rate_value.present?
+        if distance_expense.vehicle_rate.present?
           rate = simple ? " @ " : " at "
-          rate += "#{report.policy.base_currency.symbol}#{report.policy.distance_expense_config.rate_value} #{report.policy.base_currency.country_code} per KM"
+          rate += "#{report.policy.base_currency.symbol}#{distance_expense.vehicle_rate&.rate&.value} #{report.policy.base_currency.country_code} per KM"
         end
         return "#{self.distance_expense.distance_value} KM#{rate}"
       elsif self.time_expense?
