@@ -387,7 +387,15 @@ class Report::Violation < Report::Base
     message = "Expenses are not enabled for the selected policy. Please change the policy of the report or remove the expense"
     case expense.expense_type_id
     when ExpenseType.id_for(:distance)
-      unless report.policy.distance_expense_config.enabled
+      # unless report.policy.distance_expense_config.enabled
+      #   self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Distance #{message}"}
+      #   return
+      # end
+      if report.policy.distance_expense_config.enabled
+        unless report.policy == expense.distance_epxense&.vehicle_rate&.policy
+          self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Some Distance Expenses do not belong to the selected policy"}
+        end
+      else
         self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Distance #{message}"}
         return
       end
