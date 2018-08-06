@@ -6,4 +6,13 @@ module Paperclip
       false
     end
   end
+  module ClassMethods
+    def has_attached_file(name, options = {})
+      # As s3 pdf's don't open up correctly if content_disposition is set as attachment for PDFs
+      unless lambda {|a| a.instance.content_type =~ %r{\.(pdf)$}i}
+        options.merge({s3_headers: {content_disposition: 'attachment'}})
+      end
+      HasAttachedFile.define_on(self, name, options)
+    end
+  end
 end
