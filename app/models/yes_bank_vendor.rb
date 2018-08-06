@@ -31,7 +31,11 @@ class YesBankVendor < ActiveRecord::Base
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
+  has_one :cancelled_cheque_attachment, class_name: "VendorAttachment"
+  has_one :pan_attachment, class_name: "VendorAttachment"
+  has_one :gstin_certificate_attachment, class_name: "VendorAttachment"
   has_one :vendor_account, foreign_key: :vendor_id
+
 
   has_many :budgets, as: :budgetable
 

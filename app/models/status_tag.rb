@@ -17,6 +17,8 @@ class StatusTag < ActiveRecord::Base
   include Seedable
   def self.values
     [
+        {name: "po_processing", display_name: "PO Processing", description: "Purchase Order is Being Processed", font_icon: "hourglass-half", font_icon_color: "yellow", icon_path: ""},
+        {name: "po_approved", display_name: "PO Approved", description: "Purchase Order has been Approved", font_icon: "check-circle", font_icon_color: "green", icon_path: ""},
         {name: "po_sent", display_name: "PO Sent", description: "Purchase Order Sent to Vendor", font_icon: "paper-plane", font_icon_color: "green", icon_path: ""},
         {name: "invoice_received", display_name: "Invoice Received", description: "Invoice Received from Vendor", font_icon: "arrow-circle-down", font_icon_color: "green", icon_path: ""},
         {name: "payment_processing", display_name: "Payment Processing", description: "Payment Being Processed", font_icon: "rupee", font_icon_color: "yellow", icon_path: ""},

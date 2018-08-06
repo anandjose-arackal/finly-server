@@ -25,9 +25,15 @@ class Procurements::PurchaseOrders::Create < Procurements::PurchaseOrders::Base
 
     if purchase_order.valid?
       purchase_order.save
-      add_message :success, 'Successfully created purchase order'
+      purchase_order.trails.create action_user: user,
+                                   action_id: TrailAction.id_for(:create)
+
     else
       add_message :error, purchase_order.errors.full_messages
     end
+  end
+
+  def post_process
+    add_message :success, 'Successfully created purchase order'
   end
 end

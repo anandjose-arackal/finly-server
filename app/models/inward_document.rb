@@ -27,6 +27,8 @@ class InwardDocument < ActiveRecord::Base
   has_many :attachments, class_name: "ProcurementAttachment", as: :procurement_document
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
 
+  has_many :trails, as: :parent
+
   accepts_nested_attributes_for :items
 
 

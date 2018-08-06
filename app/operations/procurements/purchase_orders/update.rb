@@ -45,6 +45,16 @@ class Procurements::PurchaseOrders::Update < Procurements::PurchaseOrders::Base
 
       purchase_order.save
       purchase_order.save
+
+      unless purchase_order.user == user
+        # If updated by anyone other document owner
+        purchase_order.trails.create action_user: user,
+                                     action_id: TrailAction.id_for(:update),
+                                     action_level: purchase_order.trails.last.action_level
+      end
+
+      # Create track
+
     else
       add_message :error, purchase_order.errors.full_messages
       return

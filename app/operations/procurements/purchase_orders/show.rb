@@ -1,7 +1,7 @@
 class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
   attr_accessor :purchase_order, :policies
   def init
-    purchase_order_id = params[:id] || params[:purchase_order_params]
+    purchase_order_id = params[:id] || params[:purchase_order_id]
     self.purchase_order = PurchaseOrder.find_by id: purchase_order_id
   end
 
@@ -33,7 +33,7 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
       self.actions = get_actions
 
       # todo has to be scoped to policy the user is a part of
-      self.policies = user.policies.with_application(:vp)
+      self.policies = purchase_order.user.policies.with_application(:vp)
 
       self.reviewal_chains = []
       params[:reviewal_document] = purchase_order
@@ -51,6 +51,10 @@ class Procurements::PurchaseOrders::Show < Procurements::PurchaseOrders::Base
 
     def get_actions
       actions = {}
+
+      if purchase_order.items.count > 0
+        actions[:show_comments] = true
+      end
 
       if document_owner? && (self.purchase_order.open? || self.purchase_order.retracted? || self.purchase_order.rejected?)
         actions[:submit] = {

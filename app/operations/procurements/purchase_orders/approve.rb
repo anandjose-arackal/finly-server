@@ -19,10 +19,14 @@ class Procurements::PurchaseOrders::Approve < Procurements::PurchaseOrders::Base
     op = WorkflowManager::Base.(current_user, params)
     unless op.success?
       add_message :error, op.messages[:error]
+      return
     end
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process
+    Event::EPurchaseOrder::Approve.(user, purchase_order: purchase_order, workflow_output: workflow_output)
     add_message :success, 'Successfully Approved Purchase Order'
   end
 end

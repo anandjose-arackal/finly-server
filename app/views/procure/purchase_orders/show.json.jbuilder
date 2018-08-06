@@ -66,7 +66,6 @@ json.attachments do
   end
 end
 
-
 json.comments do
   json.array! @result.purchase_order.comments do |comment|
     json.extract! comment, :id, :body

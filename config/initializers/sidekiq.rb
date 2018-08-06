@@ -1,4 +1,5 @@
-Sidekiq::Logstash.setup
+Sidekiq::Logstash.setup if Rails.env.production?
+
 if Rails.env.production?
   Sidekiq.configure_server do |config|
     config.redis = {url: 'redis://172.33.155.100:6379/12', password: '6*JR*nzgYgd*OStzdz!u'}

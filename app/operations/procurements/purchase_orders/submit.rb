@@ -20,9 +20,13 @@ class Procurements::PurchaseOrders::Submit < Procurements::PurchaseOrders::Base
     unless op.success?
       add_message :error, op.messages[:error]
     end
+
+    self.workflow_output = op.workflow_output
   end
 
   def post_process
     add_message :success, 'Successfully submitted purchase order'
+
+    Event::EPurchaseOrder::Submit.(user, {purchase_order: purchase_order, workflow_output: workflow_output})
   end
 end

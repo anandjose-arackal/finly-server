@@ -71,6 +71,9 @@ class PurchaseOrder < ActiveRecord::Base
   has_many :items, class_name: "PurchaseOrderItem", dependent: :destroy
   has_many :extra_charges, class_name: "ProcurementCharge", as: "Chargable"
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+  has_many :custom_fields, as: :parent
+
+  has_many :trails, as: :parent
 
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, to: :status
 
@@ -96,10 +99,7 @@ class PurchaseOrder < ActiveRecord::Base
 
   before_save :calculate_line_items
 
-
   private
-
-
 
   def calculate_line_items
     total_before_tax_amount = 0

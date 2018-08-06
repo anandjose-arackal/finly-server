@@ -16,17 +16,16 @@ class WorkflowManager::Base < BaseOperation
   end
 
   def validate
-
-  end
-
-  def process
     # Check if it can run
+    # doable events are all the events which are possible at the current state; provided by AASM
     doable_events = self.aasm_document.aasm.events.map(&:name)
     unless doable_events.include?(self.aasm_event.to_sym)
       add_message :error, 'Cannot perform this action at this state'
       return
     end
+  end
 
+  def process
     # Run event
     action = self.aasm_document.send(self.aasm_event)
     unless action
@@ -35,7 +34,30 @@ class WorkflowManager::Base < BaseOperation
     end
 
     # Create Trail
+    document.trails.create action_user: user,
+                           action_id: TrailAction.id_for(aasm_event),
+                           action_level_id: aasm_document.current_level&.id,
+                           modified_level_id: aasm_document.next_level&.id
 
     # Return Data to referrer
+  end
+
+  def success
+    params[:workflow_output] = {
+        action_user: user,
+        action_id: TrailAction.id_for(aasm_event),
+        action_level_id: aasm_document.current_level&.id,
+        modified_level_id: aasm_document.next_level&.id
+    }
+
+   WorkflowManager::Base::BasePresenter.new(user, params, messages)
+  end
+
+  class WorkflowManager::Base::BasePresenter < BaseOperation::BasePresenter::SuccessPresenter
+    attr_accessor :workflow_output
+
+    def init
+      self.workflow_output = params[:workflow_output]
+    end
   end
 end

@@ -28,7 +28,6 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
   def process
     self.invoice = self.procurement.invoices.build(self.invoice_params)
 
-
     self.invoice.company_id = user.company.id
     if self.invoice.save
       InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
@@ -76,11 +75,14 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
           hsn_sac: item.hsn_sac,
           description: item.description,
           gst_type_id: self.purchase_order.gst_type_id,
+          comment: item.comment
       }
     end
     invoice_params = {
       receiving_account: receiving_account,
       gst_type_id: self.purchase_order.gst_type_id,
+      location_id: self.purchase_order.location_id,
+      delivery_location_id: self.purchase_order.delivery_location_id,
       invoice_items_attributes: invoice_items_attributes
     }
   end

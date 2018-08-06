@@ -3,7 +3,7 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
   #
 
   include AASM
-  attr_accessor :po_state, :purchase_order, :user, :violations_present, :policy, :next_level
+  attr_accessor :po_state, :purchase_order, :user, :violations_present, :policy, :current_level, :next_level
 
   def initialize(purchase_order, violations_present, user)
     self.purchase_order = purchase_order
@@ -11,6 +11,7 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
     self.aasm.current_state = self.purchase_order.status.name.to_sym
     self.user = user
     self.policy = self.purchase_order.policy
+    set_levels
   end
 
   aasm :whiny_transitions => false do
@@ -61,6 +62,16 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
   end
 
   def change_state
+    # reset levels
+    if [:retract, :reject].include?(aasm.current_event)
+      self.next_level = nil
+    end
+
+    if [:retract].include?(aasm.current_event)
+      self.current_level = nil
+    end
+
+
     # Change state of purchase order
     purchase_order_status_id = ::PurchaseOrderStatus.id_for(self.aasm.current_state)
     update_params = {
@@ -72,7 +83,6 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
 
   def approvers_not_present?
     if self.policy.present?
-      self.next_level = get_next_level
       if self.next_level.present?
         return false
       else
@@ -83,11 +93,12 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
     end
   end
 
-  def get_next_level
+  def set_levels
     # total_amount = purchase_order.total_amount
-    current_level = ReviewalLevel.with_id(purchase_order.controlling_level_id).first
+    self.current_level = ReviewalLevel.with_id(purchase_order.controlling_level_id).first
     level_number = current_level.present? ? (current_level.level_number + 1) : 1
 
-    next_level = self.policy.levels.with_entity_type(purchase_order.class.name).with_level_number(level_number).first
+
+    self.next_level = self.policy.levels.with_entity_type(purchase_order.class.name).with_level_number(level_number).first
   end
 end

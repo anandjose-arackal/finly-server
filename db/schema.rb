@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180730072157) do
+ActiveRecord::Schema.define(version: 20180804131417) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2491,6 +2491,7 @@ ActiveRecord::Schema.define(version: 20180730072157) do
     t.string   "parent_id",              limit: 255
     t.integer  "inventory_line_item_id", limit: 4
     t.text     "item_info",              limit: 65535
+    t.string   "comment",                limit: 255
   end
 
   add_index "invoice_line_items", ["category_id"], name: "index_invoice_line_items_on_category_id", using: :btree
@@ -2584,6 +2585,8 @@ ActiveRecord::Schema.define(version: 20180730072157) do
     t.integer  "procurement_id",         limit: 4
     t.integer  "remaining_amount_id",    limit: 4
     t.integer  "invoice_type_id",        limit: 4
+    t.integer  "location_id",            limit: 4
+    t.integer  "delivery_location_id",   limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
@@ -2596,12 +2599,14 @@ ActiveRecord::Schema.define(version: 20180730072157) do
     t.integer  "inventory_line_item_id", limit: 4
     t.string   "product_id",             limit: 255
     t.string   "description",            limit: 255
-    t.decimal  "quantity",                           precision: 10
-    t.decimal  "delivered",                          precision: 10
-    t.decimal  "accepted",                           precision: 10
-    t.decimal  "rejected",                           precision: 10
-    t.datetime "created_at",                                        null: false
-    t.datetime "updated_at",                                        null: false
+    t.decimal  "quantity",                           precision: 20, scale: 5
+    t.decimal  "delivered",                          precision: 20, scale: 5
+    t.decimal  "accepted",                           precision: 20, scale: 5
+    t.decimal  "rejected",                           precision: 20, scale: 5
+    t.datetime "created_at",                                                  null: false
+    t.datetime "updated_at",                                                  null: false
+    t.string   "comment",                limit: 255
+    t.decimal  "previously_delivered",               precision: 20, scale: 5
   end
 
   add_index "inward_document_items", ["inventory_line_item_id"], name: "index_inward_document_items_on_inventory_line_item_id", using: :btree
@@ -4359,6 +4364,30 @@ ActiveRecord::Schema.define(version: 20180730072157) do
   end
 
   add_index "time_objects", ["physical_unit_id"], name: "index_time_objects_on_physical_unit_id", using: :btree
+
+  create_table "trail_actions", force: :cascade do |t|
+    t.string "name", limit: 255
+  end
+
+  create_table "trails", force: :cascade do |t|
+    t.integer  "parent_id",           limit: 4
+    t.string   "parent_type",         limit: 255
+    t.integer  "action_user_id",      limit: 4
+    t.integer  "action_id",           limit: 4
+    t.integer  "action_user_role_id", limit: 4
+    t.integer  "action_level_id",     limit: 4
+    t.integer  "modified_level_id",   limit: 4
+    t.text     "note",                limit: 65535
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "trails", ["action_id"], name: "index_trails_on_action_id", using: :btree
+  add_index "trails", ["action_level_id"], name: "index_trails_on_action_level_id", using: :btree
+  add_index "trails", ["action_user_id"], name: "index_trails_on_action_user_id", using: :btree
+  add_index "trails", ["action_user_role_id"], name: "index_trails_on_action_user_role_id", using: :btree
+  add_index "trails", ["modified_level_id"], name: "index_trails_on_modified_level_id", using: :btree
+  add_index "trails", ["parent_type", "parent_id"], name: "index_trails_on_parent_type_and_parent_id", using: :btree
 
   create_table "transaction_statuses", force: :cascade do |t|
     t.string   "name",       limit: 255, null: false

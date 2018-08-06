@@ -48,6 +48,8 @@
 #  procurement_id         :integer
 #  remaining_amount_id    :integer
 #  invoice_type_id        :integer
+#  location_id            :integer
+#  delivery_location_id   :integer
 #
 
 #  gst_type_id: 1 - IGST
@@ -73,6 +75,8 @@ class Invoice < ActiveRecord::Base
   belongs_to :invoice_status, class_name: "InwardInvoiceStatus"
   belongs_to :receiving_account, polymorphic: true
   belongs_to :vendor, class_name: "YesBankVendor"
+  belongs_to :location, class_name: 'BranchLocation'
+  belongs_to :delivery_location, class_name: 'BranchLocation'
 
   belongs_to :procurement, class_name: "Procurement"
   belongs_to :remaining_amount, class_name: "Amount"
