@@ -113,7 +113,7 @@ class BankTransfer::Payments::ApiPayments::InitiatePaymentBackground < Backgroun
       return ba
     else
       ba = BankAccount.non_deleted.find_by(account_number: order_details[:account_number]&.strip, ifsc: order_details[:ifsc]&.strip,
-                                           company_id: self.company_id,
+                                           company_id: self.company_id, name: params[:name]&.strip,
                                            account_owner_type: YesBankVendor.name) # default for API initiations are 2, because they're always for vendors
       vendor = ba&.account_owner || YesBankVendor.find_or_create_by(name: order_details[:name], company_id: self.company_id)
       ba&.update(is_deleted: false) # i.e. if the bank account already exists, mark it as non deleted
