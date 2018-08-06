@@ -85,7 +85,7 @@ views:
         url: requests
         id: requests
       <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      - name: <span class="superscript">Company</span> Travel Requests
+      - name: <span class="superscript">Company</span> Trips
         url: travel_requests
         id: travel_requests
       <% end %>
@@ -95,12 +95,10 @@ views:
       #  - name: <span class="superscript">Company</span> Money Requests
       #    url: requests
       #    id: requests
-      #  <% # if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      #  - name: <span class="superscript">Company</span> Travel Requests
+      #  - name: <span class="superscript">Company</span> Trips
       #    url: travel_requests
       #    id: travel_requests
-      #  <% # end %>
-#      - name: <span class="superscript">Company</span> Travel Requests
+#      - name: <span class="superscript">Company</span> Trips
 #        url: travel_requests
 #        id: travel_requests
       - name: <span class="superscript">Company</span> Employees
@@ -150,14 +148,14 @@ views:
       # - name: <span class="superscript">Company</span> Money Requests
       #   url: requests
       #   id: requests
-#      - name: <span class="superscript">Company</span> Travel Requests
+#      - name: <span class="superscript">Company</span> Trips
 #        url: travel_requests
 #        id: travel_requests
       - name: <span class="superscript">Company</span> Money Requests
         url: requests
         id: requests
       <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      - name: <span class="superscript">Company</span> Travel Requests
+      - name: <span class="superscript">Company</span> Trips
         url: travel_requests
         id: travel_requests
       <% end %>
@@ -168,7 +166,7 @@ views:
       #    url: requests
       #    id: requests
       #  <% # if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      #  - name: <span class="superscript">Company</span> Travel Requests
+      #  - name: <span class="superscript">Company</span> Trips
       #    url: travel_requests
       #    id: travel_requests
       #  <% # end %>
@@ -198,7 +196,7 @@ views:
   travel_manager:
     menus:
       navbar:
-#      - name: <span class="superscript">Team</span> Travel Requests
+#      - name: <span class="superscript">Team</span> Trips
 #        url: travel_requests
 #        id: travel_requests
       <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
@@ -220,14 +218,14 @@ views:
       # - name: <span class="superscript">Team</span> Money Requests
       #   url: requests
       #   id: requests
-#      - name: <span class="superscript">Team</span> Travel Requests
+#      - name: <span class="superscript">Team</span> Trips
 #        url: travel_requests
 #        id: travel_requests
       - name: <span class="superscript">Team</span> Money Requests
         url: requests
         id: requests
       <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      - name: <span class="superscript">Team</span> Travel Requests
+      - name: <span class="superscript">Team</span> Trips
         url: travel_requests
         id: travel_requests
       <% end %>
@@ -259,14 +257,14 @@ views:
       # - name: <span class="superscript">Team</span> Money Requests
       #   url: requests
       #   id: requests
-#      - name: <span class="superscript">Team</span> Travel Requests
+#      - name: <span class="superscript">Team</span> Trips
 #        url: travel_requests
 #        id: travel_requests
       - name: <span class="superscript">Team</span> Money Requests
         url: requests
         id: requests
       <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      - name: <span class="superscript">Team</span> Travel Requests
+      - name: <span class="superscript">Team</span> Trips
         url: travel_requests
         id: travel_requests
       <% end %>
@@ -287,7 +285,7 @@ views:
     menus:
       navbar:
       <% if current_company.travel_desk_enabled? && current_user.travel_desk_enabled? %>
-      - name: <span class="superscript">Company</span> Travel Requests
+      - name: <span class="superscript">Company</span> Trips
         url: travel_requests
         id: travel_requests
       <% end %>
