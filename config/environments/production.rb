@@ -162,13 +162,13 @@ Rails.application.configure do
       storage: :s3,
       s3_region: ENV["aws_region_name"],
       s3_credentials: {
-          s3_host_name: 's3.ap-south-1.amazonaws.com',
-          bucket: 'finly-images',
-          s3_region: 'ap-south-1',
-          access_key_id: 'AKIAIIGMDMIVVJVRIGQQ',
-          secret_access_key: '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'
+          s3_host_name: ENV["s3_host_name"],
+          bucket: ENV["s3_attachment_bucket_name"],
+          s3_region: ENV["aws_region_name"],
+          access_key_id: ENV["aws_access_key_id"],
+          secret_access_key: ENV["aws_secret_access_key"]
       },
-      :s3_protocol => :https
+      :s3_protocol => :https,
   }
   #########################################################################################
 end
