@@ -10,6 +10,10 @@ class Policy::Show < Policy::Base
       self.policy_users = params[:policy_users]
     end
 
+    def policy_custom_fields
+      self.policy.field_configurations.filter_dropdowns
+    end
+
     def company_managers
       policy.company.managers.signed_up
     end
