@@ -392,7 +392,7 @@ class Report::Violation < Report::Base
       #   return
       # end
       if report.policy.distance_expense_config.enabled
-        unless report.policy == expense.distance_epxense&.vehicle_rate&.policy
+        unless report.policy == expense.distance_expense&.vehicle_rate&.policy
           self.warning_messages[expense.id]['expense_blocking'] << {type: 'incompatible', message: "Some Distance Expenses do not belong to the selected policy"}
         end
       else
