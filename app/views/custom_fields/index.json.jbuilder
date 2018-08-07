@@ -9,10 +9,7 @@ json.array! @result.field_configurations do |field_configuration|
   json.configurable do
     json.type field_configuration.configurable_type
     if field_configuration.configurable&.class&.name == 'Policy'
-      json.policy do
-        json.id field_configuration.configurable.id
-        json.name field_configuration.configurable.name
-      end
+      json.policies field_configuration.policies
     end
   end
 end
