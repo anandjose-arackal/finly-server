@@ -37,9 +37,15 @@ class Policy::Rules::Base < Policy::Base
 
   def rule_parameters
     if params[:expense_rule]
-      params.require(:expense_rule).permit(:expense_rule_id, :category_id, :days_after, :expense_rule_type_id, :rule_type_id, :policy_id, greater_than_amount_attributes: [:value, :currency_id])
+      params.require(:expense_rule).permit(:expense_rule_id, :category_id, :days_after,
+                                           :expense_rule_type_id, :rule_type_id, :policy_id,
+                                           {greater_than_amount_attributes: [:value, :currency_id]},
+                                           {budget_rule_field_mappings_attributes: [:field_configuration_id, :field_drop_down_item_id]})
     elsif params[:budget_rule]
-      params.require(:budget_rule).permit(:budget_rule_id, :category_id, :period_id, :rule_type_id, :policy_id, :include_reimbursable, amount_attributes: [:value, :currency_id])
+      params.require(:budget_rule).permit(:budget_rule_id, :category_id, :period_id, :rule_type_id,
+                                          :policy_id, :include_reimbursable,
+                                          {amount_attributes: [:value, :currency_id]},
+                                          {budget_rule_field_mappings_attributes: [:field_configuration_id, :field_drop_down_item_id]})
     end
   end
 
