@@ -27,7 +27,7 @@ Rails.application.configure do
 
   config.lograge.custom_payload do |controller|
     user = controller.current_user
-    hash = { params: controller.params }
+    hash = {params: controller.params}
     hash[:current_app] = (controller.current_app rescue nil)
     hash[:current_device] = (controller.current_device rescue nil)
     if user.present?
@@ -43,7 +43,7 @@ Rails.application.configure do
   end
 
   # Full error reports are disabled and caching is turned on.
-  config.consider_all_requests_local       = false
+  config.consider_all_requests_local = false
   config.action_controller.perform_caching = true
 
   # Enable Rack::Cache to put a simple HTTP cache in front of your application
@@ -104,34 +104,34 @@ Rails.application.configure do
   config.action_mailer.raise_delivery_errors = true
 
   ################### SETTINGS FOR SENDGRID ##########################
-  config.action_mailer.default_url_options = { host: 'www.finly.io' }
+  config.action_mailer.default_url_options = {host: 'www.finly.io'}
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
-      address:              'smtp.sendgrid.net',
-      port:                 587,
-      domain:               'www.finly.io',
-      user_name:            'vivekagb',
-      password:             'idAr5APhk61X',
+      address: 'smtp.sendgrid.net',
+      port: 587,
+      domain: 'www.finly.io',
+      user_name: 'vivekagb',
+      password: 'idAr5APhk61X',
       # ssl:                  true,
       # tls:                  true,
-      authentication:       :plain,
+      authentication: :plain,
       enable_starttls_auto: true,
-      :openssl_verify_mode  => 'none'
+      :openssl_verify_mode => 'none'
   }
 
   #   config.action_mailer.delivery_method = :smtp
-#   config.action_mailer.smtp_settings = {
-#     address:              'mail2.itzcash.com',
-#     port:                 25,
-#     domain:               'www.finly.io'
-# #    user_name:            'finly@itzcash.com',
-#     # password:             '',
-#     # ssl:                  true,
-#     # tls:                  true,
-# #    authentication:       :none,
-#     # enable_starttls_auto: true,
-#     # :openssl_verify_mode  => 'none'
-#   }
+  #   config.action_mailer.smtp_settings = {
+  #     address:              'mail2.itzcash.com',
+  #     port:                 25,
+  #     domain:               'www.finly.io'
+  # #    user_name:            'finly@itzcash.com',
+  #     # password:             '',
+  #     # ssl:                  true,
+  #     # tls:                  true,
+  # #    authentication:       :none,
+  #     # enable_starttls_auto: true,
+  #     # :openssl_verify_mode  => 'none'
+  #   }
 
 
   #####################################################################

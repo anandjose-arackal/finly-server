@@ -35,8 +35,12 @@ class BudgetRule < ActiveRecord::Base
   belongs_to :period
   belongs_to :policy
   belongs_to :rule_type
+  has_many :budget_rule_field_mappings
+  has_many :field_drop_down_items, through: :budget_rule_field_mappings
+  has_many :field_configurations, through: :budget_rule_field_mappings
 
   accepts_nested_attributes_for :amount
+  accepts_nested_attributes_for :budget_rule_field_mappings
 
   # delegate :period, to: :period
   delegate :type, to: :rule_type
@@ -103,6 +107,23 @@ class BudgetRule < ActiveRecord::Base
     end
     if self.category_id
       rule_in_words += " belonging to category " + self.category_name
+    end
+    if self.budget_rule_field_mappings.present?
+      field_config_map = {}
+      self.budget_rule_field_mappings.each do |mapping|
+        if field_config_map[mapping.field_configuration.name].nil?
+          field_config_map[mapping.field_configuration.name] = []
+        end
+        field_config_map[mapping.field_configuration.name] << mapping.field_drop_down_item.name
+      end
+      field_config_map.each do |field_name, field_values|
+        rule_in_words += " having #{field_name} "
+        if field_values.size > 1
+          rule_in_words += " in #{field_values.join(', ')}"
+        else
+          rule_in_words += " as #{field_values.first}"
+        end
+      end
     end
     if self.amount_id
       rule_in_words += " should not exceed #{self.amount.currency.symbol}#{self.amount_value.to_s} #{self.amount.currency.country_code}"
