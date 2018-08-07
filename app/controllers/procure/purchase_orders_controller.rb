@@ -1,4 +1,5 @@
 class Procure::PurchaseOrdersController < ApplicationController
+  before_action :set_tokens_in_header, only: [:download]
   before_action -> { finly_authorize! :web }
 
   def show
@@ -49,5 +50,21 @@ class Procure::PurchaseOrdersController < ApplicationController
   def close
     @result = Procurements::PurchaseOrders::Close.(current_user, params)
     respond
+  end
+
+  def download
+    @result = Procurements::PurchaseOrders::Show.(current_user, params)
+    @purchase_order = @result.purchase_order
+    @company = @purchase_order.company
+    respond_to do |format|
+      format.pdf {
+          render pdf: "PO-#{@result.purchase_order.po_number}",
+                 layout: "pdf.html.erb",
+                 print_media_type: true,
+                 margin: { :bottom => 5 }
+                 # footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }}
+      }
+      format.html {}
+    end
   end
 end

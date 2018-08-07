@@ -15,6 +15,8 @@
 
 class VendorAttachment < ActiveRecord::Base
 
+  # Types: [:pan, gstin, cancelled_cheque]
+
   belongs_to :yes_bank_vendor
 
   include Attachable
@@ -23,4 +25,9 @@ class VendorAttachment < ActiveRecord::Base
 
   has_attached_file :attached_file, styles: lambda { |a| a.instance.check_file_type(a) }, default_url: '/assets/:style/missing.png'
   validates_attachment :attached_file, content_type: CONTENT_TYPES
+
+  scope :pan_attachment, -> { where type: 'pan' }
+  scope :gstin_attachment, -> { where type: 'gstin' }
+  scope :cancelled_cheque_attachment, -> { where type: 'cancelled_cheque' }
+  scope :no_type_attachments, -> {where type: nil}
 end
