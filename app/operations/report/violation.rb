@@ -196,7 +196,7 @@ class Report::Violation < Report::Base
     end
   end
 
-  def budget_violation?(expense, rule, start_date, end_date, category = nil)
+  def budget_violation?(expense, rule, start_date, end_date, category, field_drop_down_item_ids)
     user = expense.user
     report = expense.report
     total_expenses = 0
@@ -216,6 +216,13 @@ class Report::Violation < Report::Base
       expenses = expenses.only_per_diem_expenses
     else
       # do nothing
+    end
+    if field_drop_down_item_ids.present?
+      reports = Report.with_id(expenses.pluck(:report_id))
+      field_drop_down_item_ids&.each do |id|
+        reports = reports.filter_custom_drop_down_selection(id)
+      end
+      expenses = expenses.with_report_id(reports.pluck(:id))
     end
     # Expenses with different usage_date ranges from expense date
     total_expenses += number_with_precision(expenses.without_usage_date_type.with_date_range(start_date, end_date)
@@ -327,7 +334,11 @@ class Report::Violation < Report::Base
           else
             category = nil
           end
-          if budget_violation?(expense, rule, start_date, end_date, category)
+          field_drop_down_item_ids = nil
+          if rule.budget_rule_field_mappings.present?
+            field_drop_down_item_ids = rule.budget_rule_field_mappings.pluck(:field_drop_down_item_id)
+          end
+          if budget_violation?(expense, rule, start_date, end_date, category, field_drop_down_item_ids)
             if rule.type == 'Warning'
               case rule.expense_type_id
               when 1

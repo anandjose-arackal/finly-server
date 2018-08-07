@@ -377,6 +377,12 @@ class Expense < ActiveRecord::Base
   end
   scope :sum_reimbursements, -> (currency_code = :INR) {reimbursable.sum_amounts(currency_code) - reimbursable.sum_tds_amounts(currency_code)}
   scope :with_expense_tax_type_id, -> (id) {where expense_tax_type_id: id}
+  scope :filter_custom_drop_down_selection, ->(drop_down_item_id) do
+    drop_down_selection_ids = FieldDropDownSelection.with_value(drop_down_item_id).pluck(:id)
+    configs = CustomField.with_drop_down_selection(drop_down_selection_ids).includes_parent.with_parent_report
+    expense_ids = configs.map {|item| item.parent&.id}
+    with_id(expense_ids)
+  end
 
 
   scope :user_budget_expenses, -> (from, to) {
