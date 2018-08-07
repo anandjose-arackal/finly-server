@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180729150152) do
+ActiveRecord::Schema.define(version: 20180807084800) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -602,20 +602,22 @@ ActiveRecord::Schema.define(version: 20180729150152) do
   add_index "booking_attachments", ["user_id"], name: "index_booking_attachments_on_user_id", using: :btree
 
   create_table "booking_buses", force: :cascade do |t|
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
-    t.integer  "parent_id",          limit: 4
-    t.string   "parent_type",        limit: 255
-    t.string   "booking_class",      limit: 255
-    t.integer  "from_id",            limit: 4,                     null: false
-    t.integer  "to_id",              limit: 4,                     null: false
-    t.datetime "departure_datetime",                               null: false
-    t.datetime "arrival_datetime"
-    t.integer  "cost_id",            limit: 4
-    t.text     "boarding_point",     limit: 65535
-    t.text     "drop_point",         limit: 65535
-    t.text     "description",        limit: 65535
-    t.boolean  "is_deleted",                       default: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+    t.integer  "parent_id",      limit: 4
+    t.string   "parent_type",    limit: 255
+    t.string   "booking_class",  limit: 255
+    t.integer  "from_id",        limit: 4,                     null: false
+    t.integer  "to_id",          limit: 4,                     null: false
+    t.integer  "cost_id",        limit: 4
+    t.text     "boarding_point", limit: 65535
+    t.text     "drop_point",     limit: 65535
+    t.text     "description",    limit: 65535
+    t.boolean  "is_deleted",                   default: false
+    t.date     "departure_date"
+    t.time     "departure_time"
+    t.date     "arrival_date"
+    t.time     "arrival_time"
   end
 
   add_index "booking_buses", ["parent_type", "parent_id"], name: "index_booking_buses_on_parent_type_and_parent_id", using: :btree
@@ -634,6 +636,10 @@ ActiveRecord::Schema.define(version: 20180729150152) do
     t.string   "rental_company", limit: 255
     t.text     "description",    limit: 65535
     t.integer  "cost_id",        limit: 4
+    t.date     "pickup_date"
+    t.time     "pickup_time"
+    t.date     "drop_date"
+    t.time     "drop_time"
   end
 
   add_index "booking_car_rentals", ["parent_type", "parent_id"], name: "index_booking_car_rentals_on_parent_type_and_parent_id", using: :btree
@@ -647,41 +653,45 @@ ActiveRecord::Schema.define(version: 20180729150152) do
   add_index "booking_flight_classes", ["name"], name: "index_booking_flight_classes_on_name", using: :btree
 
   create_table "booking_flights", force: :cascade do |t|
-    t.string   "pnr",                limit: 255
-    t.string   "airline",            limit: 255
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
-    t.integer  "parent_id",          limit: 4
-    t.string   "parent_type",        limit: 255
-    t.string   "stops",              limit: 255
-    t.string   "ticket_number",      limit: 255
-    t.integer  "from_id",            limit: 4,                     null: false
-    t.integer  "to_id",              limit: 4,                     null: false
-    t.datetime "departure_datetime"
-    t.datetime "arrival_datetime"
-    t.text     "description",        limit: 65535
-    t.string   "terminal",           limit: 255
-    t.integer  "cost_id",            limit: 4
-    t.integer  "booking_class_id",   limit: 4
-    t.boolean  "is_deleted",                       default: false
+    t.string   "pnr",              limit: 255
+    t.string   "airline",          limit: 255
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.integer  "parent_id",        limit: 4
+    t.string   "parent_type",      limit: 255
+    t.string   "stops",            limit: 255
+    t.string   "ticket_number",    limit: 255
+    t.integer  "from_id",          limit: 4,                     null: false
+    t.integer  "to_id",            limit: 4,                     null: false
+    t.text     "description",      limit: 65535
+    t.string   "terminal",         limit: 255
+    t.integer  "cost_id",          limit: 4
+    t.integer  "booking_class_id", limit: 4
+    t.boolean  "is_deleted",                     default: false
+    t.date     "departure_date"
+    t.time     "departure_time"
+    t.date     "arrival_date"
+    t.time     "arrival_time"
   end
 
   add_index "booking_flights", ["parent_type", "parent_id"], name: "index_booking_flights_on_parent_type_and_parent_id", using: :btree
 
   create_table "booking_hotels", force: :cascade do |t|
-    t.string   "hotel_name",        limit: 255
-    t.datetime "created_at",                                      null: false
-    t.datetime "updated_at",                                      null: false
-    t.integer  "parent_id",         limit: 4
-    t.string   "parent_type",       limit: 255
-    t.integer  "location_id",       limit: 4,                     null: false
-    t.datetime "checkin_datetime"
-    t.datetime "checkout_datetime"
-    t.text     "description",       limit: 65535
-    t.text     "hotel_address",     limit: 65535
-    t.integer  "cost_id",           limit: 4
-    t.boolean  "is_deleted",                      default: false
-    t.integer  "number_of_guests",  limit: 4
+    t.string   "hotel_name",       limit: 255
+    t.datetime "created_at",                                     null: false
+    t.datetime "updated_at",                                     null: false
+    t.integer  "parent_id",        limit: 4
+    t.string   "parent_type",      limit: 255
+    t.integer  "location_id",      limit: 4,                     null: false
+    t.text     "description",      limit: 65535
+    t.text     "hotel_address",    limit: 65535
+    t.integer  "cost_id",          limit: 4
+    t.boolean  "is_deleted",                     default: false
+    t.integer  "number_of_guests", limit: 4
+    t.date     "checkin_date"
+    t.time     "checkin_time"
+    t.date     "checkout_date"
+    t.time     "checkout_time"
   end
 
   add_index "booking_hotels", ["parent_type", "parent_id"], name: "index_booking_hotels_on_parent_type_and_parent_id", using: :btree
@@ -714,17 +724,18 @@ ActiveRecord::Schema.define(version: 20180729150152) do
   add_index "booking_requests", ["booking_type_id"], name: "index_booking_requests_on_booking_type_id", using: :btree
 
   create_table "booking_restaurants", force: :cascade do |t|
-    t.string   "restaurant_name",      limit: 255
-    t.datetime "created_at",                                         null: false
-    t.datetime "updated_at",                                         null: false
-    t.integer  "parent_id",            limit: 4
-    t.string   "parent_type",          limit: 255
-    t.integer  "location_id",          limit: 4,                     null: false
-    t.text     "restaurant_address",   limit: 65535
-    t.datetime "reservation_datetime"
-    t.integer  "number_of_guests",     limit: 4
-    t.text     "description",          limit: 65535
-    t.boolean  "is_deleted",                         default: false
+    t.string   "restaurant_name",    limit: 255
+    t.datetime "created_at",                                       null: false
+    t.datetime "updated_at",                                       null: false
+    t.integer  "parent_id",          limit: 4
+    t.string   "parent_type",        limit: 255
+    t.integer  "location_id",        limit: 4,                     null: false
+    t.text     "restaurant_address", limit: 65535
+    t.integer  "number_of_guests",   limit: 4
+    t.text     "description",        limit: 65535
+    t.boolean  "is_deleted",                       default: false
+    t.date     "reservation_date"
+    t.time     "reservation_time"
   end
 
   add_index "booking_restaurants", ["parent_type", "parent_id"], name: "index_booking_restaurants_on_parent_type_and_parent_id", using: :btree
@@ -747,12 +758,14 @@ ActiveRecord::Schema.define(version: 20180729150152) do
     t.string   "boarding_station",    limit: 255
     t.integer  "to_id",               limit: 4,                   null: false
     t.string   "destination_station", limit: 255
-    t.datetime "departure_datetime"
-    t.datetime "arrival_datetime"
     t.string   "description",         limit: 255
     t.string   "seat_number",         limit: 255
     t.integer  "cost_id",             limit: 4
     t.boolean  "is_deleted",                      default: false
+    t.date     "departure_date"
+    t.time     "departure_time"
+    t.date     "arrival_date"
+    t.time     "arrival_time"
   end
 
   add_index "booking_trains", ["parent_type", "parent_id"], name: "index_booking_trains_on_parent_type_and_parent_id", using: :btree
@@ -797,6 +810,18 @@ ActiveRecord::Schema.define(version: 20180729150152) do
 
   add_index "branch_locations", ["company_id"], name: "index_branch_locations_on_company_id", using: :btree
   add_index "branch_locations", ["state_id"], name: "index_branch_locations_on_state_id", using: :btree
+
+  create_table "budget_rule_field_mappings", force: :cascade do |t|
+    t.integer  "budget_rule_id",          limit: 4, null: false
+    t.integer  "field_configuration_id",  limit: 4, null: false
+    t.integer  "field_drop_down_item_id", limit: 4, null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "budget_rule_field_mappings", ["budget_rule_id"], name: "index_budget_rule_field_mappings_on_budget_rule_id", using: :btree
+  add_index "budget_rule_field_mappings", ["field_configuration_id"], name: "index_budget_rule_field_mappings_on_field_configuration_id", using: :btree
+  add_index "budget_rule_field_mappings", ["field_drop_down_item_id"], name: "index_budget_rule_field_mappings_on_field_drop_down_item_id", using: :btree
 
   create_table "budget_rules", force: :cascade do |t|
     t.integer  "category_id",          limit: 4
@@ -1795,6 +1820,9 @@ ActiveRecord::Schema.define(version: 20180729150152) do
     t.decimal  "odometer_reading_end",                        precision: 10, scale: 2
     t.integer  "odometer_reading_receipt_start_id", limit: 4
     t.integer  "odometer_reading_receipt_end_id",   limit: 4
+    t.integer  "vehicle_rate_id",                   limit: 4
+    t.integer  "distance_rate_id",                  limit: 4
+    t.integer  "distance_unit_id",                  limit: 4
   end
 
   add_index "distance_expenses", ["expense_id"], name: "index_distance_expenses_on_expense_id", using: :btree
@@ -1950,6 +1978,9 @@ ActiveRecord::Schema.define(version: 20180729150152) do
     t.integer  "gst_type_id",            limit: 4
     t.integer  "tds_slab_id",            limit: 4
     t.integer  "gst_amount_id",          limit: 4
+    t.datetime "usage_date_start"
+    t.datetime "usage_date_end"
+    t.string   "usage_date_type",        limit: 255
   end
 
   add_index "expenses", ["amount_id"], name: "index_expenses_on_amount_id", using: :btree
@@ -3328,16 +3359,17 @@ ActiveRecord::Schema.define(version: 20180729150152) do
   end
 
   create_table "policies", force: :cascade do |t|
-    t.string   "name",             limit: 255
-    t.integer  "company_id",       limit: 4
-    t.integer  "owner_id",         limit: 4
-    t.datetime "created_at",                                     null: false
-    t.datetime "updated_at",                                     null: false
-    t.boolean  "default",                        default: false, null: false
-    t.boolean  "is_deleted",                     default: false, null: false
-    t.text     "description",      limit: 65535
-    t.integer  "base_currency_id", limit: 4,     default: 1
-    t.string   "application",      limit: 255
+    t.string   "name",                   limit: 255
+    t.integer  "company_id",             limit: 4
+    t.integer  "owner_id",               limit: 4
+    t.datetime "created_at",                                           null: false
+    t.datetime "updated_at",                                           null: false
+    t.boolean  "default",                              default: false, null: false
+    t.boolean  "is_deleted",                           default: false, null: false
+    t.text     "description",            limit: 65535
+    t.integer  "base_currency_id",       limit: 4,     default: 1
+    t.string   "application",            limit: 255
+    t.integer  "settlement_currency_id", limit: 4,     default: 1,     null: false
   end
 
   add_index "policies", ["company_id"], name: "index_policies_on_company_id", using: :btree
@@ -4110,6 +4142,9 @@ ActiveRecord::Schema.define(version: 20180729150152) do
     t.date     "to_date"
     t.string   "trip_id",                      limit: 255
     t.text     "purpose_of_travel",            limit: 65535
+    t.datetime "approved_at"
+    t.datetime "selection_requested_at"
+    t.datetime "booking_confirmed_at"
   end
 
   add_index "travel_requests", ["company_id"], name: "index_travel_requests_on_company_id", using: :btree
@@ -4120,6 +4155,18 @@ ActiveRecord::Schema.define(version: 20180729150152) do
   add_index "travel_requests", ["policy_id"], name: "index_travel_requests_on_policy_id", using: :btree
   add_index "travel_requests", ["status_id"], name: "index_travel_requests_on_status_id", using: :btree
   add_index "travel_requests", ["user_id"], name: "index_travel_requests_on_user_id", using: :btree
+
+  create_table "unique_identifiers", force: :cascade do |t|
+    t.string   "prefix",         limit: 255, null: false
+    t.string   "sequence_start", limit: 255, null: false
+    t.integer  "purpose_id",     limit: 4,   null: false
+    t.integer  "company_id",     limit: 4,   null: false
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+  end
+
+  add_index "unique_identifiers", ["company_id"], name: "index_unique_identifiers_on_company_id", using: :btree
+  add_index "unique_identifiers", ["purpose_id"], name: "index_unique_identifiers_on_purpose_id", using: :btree
 
   create_table "user_balance_histories", force: :cascade do |t|
     t.date     "date"
@@ -4200,18 +4247,20 @@ ActiveRecord::Schema.define(version: 20180729150152) do
   add_index "user_login_tracks", ["user_id"], name: "index_user_login_tracks_on_user_id", using: :btree
 
   create_table "user_manager_mappings", force: :cascade do |t|
-    t.integer  "user_id",                limit: 4
-    t.integer  "manager_id",             limit: 4
-    t.integer  "finance_manager_id",     limit: 4
-    t.integer  "approves_to_id",         limit: 4
-    t.integer  "approves_finance_to_id", limit: 4
-    t.integer  "greater_than_amount_id", limit: 4
-    t.boolean  "default",                          default: false, null: false
-    t.datetime "created_at",                                       null: false
-    t.datetime "updated_at",                                       null: false
-    t.integer  "policy_id",              limit: 4,                 null: false
-    t.integer  "purpose_id",             limit: 4
-    t.integer  "travel_manager_id",      limit: 4
+    t.integer  "user_id",                       limit: 4
+    t.integer  "manager_id",                    limit: 4
+    t.integer  "finance_manager_id",            limit: 4
+    t.integer  "approves_to_id",                limit: 4
+    t.integer  "approves_finance_to_id",        limit: 4
+    t.integer  "greater_than_amount_id",        limit: 4
+    t.boolean  "default",                                 default: false, null: false
+    t.datetime "created_at",                                              null: false
+    t.datetime "updated_at",                                              null: false
+    t.integer  "policy_id",                     limit: 4,                 null: false
+    t.integer  "purpose_id",                    limit: 4
+    t.integer  "travel_manager_id",             limit: 4
+    t.integer  "travel_booking_selector_id",    limit: 4
+    t.integer  "travel_booking_approves_to_id", limit: 4
   end
 
   add_index "user_manager_mappings", ["approves_finance_to_id"], name: "index_user_manager_mappings_on_approves_finance_to_id", using: :btree
@@ -4411,6 +4460,21 @@ ActiveRecord::Schema.define(version: 20180729150152) do
   add_index "users", ["invitations_count"], name: "index_users_on_invitations_count", using: :btree
   add_index "users", ["invited_by_id"], name: "index_users_on_invited_by_id", using: :btree
   add_index "users", ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, using: :btree
+
+  create_table "vehicle_rates", force: :cascade do |t|
+    t.string   "vehicle_name",     limit: 255,                 null: false
+    t.integer  "rate_id",          limit: 4,                   null: false
+    t.integer  "distance_unit_id", limit: 4,                   null: false
+    t.integer  "policy_id",        limit: 4
+    t.boolean  "is_deleted",                   default: false
+    t.datetime "created_at",                                   null: false
+    t.datetime "updated_at",                                   null: false
+  end
+
+  add_index "vehicle_rates", ["distance_unit_id"], name: "index_vehicle_rates_on_distance_unit_id", using: :btree
+  add_index "vehicle_rates", ["is_deleted"], name: "index_vehicle_rates_on_is_deleted", using: :btree
+  add_index "vehicle_rates", ["policy_id"], name: "index_vehicle_rates_on_policy_id", using: :btree
+  add_index "vehicle_rates", ["rate_id"], name: "index_vehicle_rates_on_rate_id", using: :btree
 
   create_table "vendor_account_transactions", force: :cascade do |t|
     t.integer  "vendor_account_id",   limit: 4
@@ -4711,6 +4775,9 @@ ActiveRecord::Schema.define(version: 20180729150152) do
   add_foreign_key "bookings", "booking_types"
   add_foreign_key "branch_locations", "companies"
   add_foreign_key "branch_locations", "states"
+  add_foreign_key "budget_rule_field_mappings", "budget_rules"
+  add_foreign_key "budget_rule_field_mappings", "field_configurations"
+  add_foreign_key "budget_rule_field_mappings", "field_drop_down_items"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "categories"
   add_foreign_key "budget_rules", "periods"
@@ -4916,6 +4983,8 @@ ActiveRecord::Schema.define(version: 20180729150152) do
   add_foreign_key "travel_request_trails", "travel_requests"
   add_foreign_key "travel_requests", "policies"
   add_foreign_key "travel_requests", "users"
+  add_foreign_key "unique_identifiers", "companies"
+  add_foreign_key "unique_identifiers", "purposes"
   add_foreign_key "user_balance_histories", "companies"
   add_foreign_key "user_balance_histories", "users"
   add_foreign_key "user_group_item_mappings", "user_group_items"
@@ -4942,6 +5011,7 @@ ActiveRecord::Schema.define(version: 20180729150152) do
   add_foreign_key "user_wallet_tracks", "user_wallets"
   add_foreign_key "user_wallets", "users"
   add_foreign_key "users", "companies"
+  add_foreign_key "vehicle_rates", "policies"
   add_foreign_key "vendor_account_transactions", "amounts"
   add_foreign_key "vendor_account_transactions", "payments"
   add_foreign_key "vendor_account_transactions", "vendor_accounts"
