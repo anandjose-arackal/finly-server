@@ -61,6 +61,7 @@ class FieldConfiguration < ActiveRecord::Base
   accepts_nested_attributes_for :custom_fields
   accepts_nested_attributes_for :multiselect_items
   accepts_nested_attributes_for :field_parent_mappings
+  accepts_nested_attributes_for :policy_field_mappings
 
   scope :with_id, -> (id) {where id: id}
 
