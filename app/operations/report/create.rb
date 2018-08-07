@@ -1,4 +1,3 @@
-# action to create a new report.
 # params:
 # name: optional, if creating a report with a name
 # expense_ids: ids of the expenses that the report is to be created with
