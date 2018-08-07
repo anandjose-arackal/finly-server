@@ -29,7 +29,7 @@ class TimeExpenseConfig < ActiveRecord::Base
   end
 
   def default_category_name
-    default_category.name || ''
+    default_category&.name || ''
   end
 
   def rate_value
