@@ -26,6 +26,7 @@ class VehicleRate < ActiveRecord::Base
   accepts_nested_attributes_for :rate
 
   scope :with_id, -> (id) {where id: id}
+  scope :with_policy_id, ->(id) {where policy_id: id}
 
   def rate
     return nil if super.nil?

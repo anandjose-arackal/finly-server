@@ -125,7 +125,8 @@ class Expense::Base < BaseOperation
   # end
 
   class Expense::Base::Presenter < BaseOperation::BasePresenter::SuccessPresenter
-    attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted, :conversion_rate, :em_tax_tracking, :tds_slabs
+    attr_accessor :expense, :violation, :editable, :view, :per_diems, :converted,
+                  :conversion_rate, :em_tax_tracking, :tds_slabs, :vehicle_rates
 
     def init
       self.expense = params[:expense]
@@ -133,8 +134,17 @@ class Expense::Base < BaseOperation
       self.violation = retrieve_violation
       self.editable = retrieve_editable
       self.per_diems = retrieve_per_diems(expense)
+      self.vehicle_rates = retrieve_vehicle_rates(expense)
       self.converted = expense.converted?
       self.conversion_rate = expense.conversion_rate
+    end
+
+    def retrieve_vehicle_rates(expense)
+      if expense.report.nil?
+        user.vehicle_rates_list
+      else
+        expense.report.policy.vehicle_rates
+      end
     end
 
     def retrieve_per_diems(expense)

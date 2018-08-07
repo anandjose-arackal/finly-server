@@ -16,7 +16,11 @@ json.distance do
     json.type @result.expense.distance_expense&.type
     json.value @result.expense.distance_value
     json.maps_distance_value @result.expense.maps_distance_value
-    json.rate_value @result.expense.distance_rate_value
+
+    json.vehicle_rate @result.expense.distance_expense.vehicle_rate
+    json.distance_rate @result.expense.distance_expense.distance_rate
+    json.distance_unit @result.expense.distance_expense.distance_unit
+
     json.odometer_reading_start @result.expense.distance_expense&.odometer_reading_start
     json.odometer_reading_end @result.expense.distance_expense&.odometer_reading_end
     json.odometer_reading_receipt_start @result.start_receipt
@@ -28,6 +32,8 @@ json.time do
   json.value @result.expense.time_value
   json.rate_value @result.expense.time_rate_value
 end
+
+json.vehicle_rates @result.vehicle_rates
 
 json.per_diem do
   json.name @result.expense.per_diem_name
