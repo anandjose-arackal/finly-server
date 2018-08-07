@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180803132254) do
+ActiveRecord::Schema.define(version: 20180807113808) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -810,6 +810,18 @@ ActiveRecord::Schema.define(version: 20180803132254) do
 
   add_index "branch_locations", ["company_id"], name: "index_branch_locations_on_company_id", using: :btree
   add_index "branch_locations", ["state_id"], name: "index_branch_locations_on_state_id", using: :btree
+
+  create_table "budget_rule_field_mappings", force: :cascade do |t|
+    t.integer  "budget_rule_id",          limit: 4, null: false
+    t.integer  "field_configuration_id",  limit: 4, null: false
+    t.integer  "field_drop_down_item_id", limit: 4, null: false
+    t.datetime "created_at",                        null: false
+    t.datetime "updated_at",                        null: false
+  end
+
+  add_index "budget_rule_field_mappings", ["budget_rule_id"], name: "index_budget_rule_field_mappings_on_budget_rule_id", using: :btree
+  add_index "budget_rule_field_mappings", ["field_configuration_id"], name: "index_budget_rule_field_mappings_on_field_configuration_id", using: :btree
+  add_index "budget_rule_field_mappings", ["field_drop_down_item_id"], name: "index_budget_rule_field_mappings_on_field_drop_down_item_id", using: :btree
 
   create_table "budget_rules", force: :cascade do |t|
     t.integer  "category_id",          limit: 4
@@ -3381,6 +3393,16 @@ ActiveRecord::Schema.define(version: 20180803132254) do
   add_index "policy_configurations", ["report_currency_id"], name: "index_policy_configurations_on_report_currency_id", using: :btree
   add_index "policy_configurations", ["technical_contact_id"], name: "index_policy_configurations_on_technical_contact_id", using: :btree
 
+  create_table "policy_field_mappings", force: :cascade do |t|
+    t.integer  "field_configuration_id", limit: 4, null: false
+    t.integer  "policy_id",              limit: 4, null: false
+    t.datetime "created_at",                       null: false
+    t.datetime "updated_at",                       null: false
+  end
+
+  add_index "policy_field_mappings", ["field_configuration_id"], name: "index_policy_field_mappings_on_field_configuration_id", using: :btree
+  add_index "policy_field_mappings", ["policy_id"], name: "index_policy_field_mappings_on_policy_id", using: :btree
+
   create_table "policy_user_mappings", force: :cascade do |t|
     t.integer  "user_id",    limit: 4,                 null: false
     t.integer  "policy_id",  limit: 4,                 null: false
@@ -4763,6 +4785,9 @@ ActiveRecord::Schema.define(version: 20180803132254) do
   add_foreign_key "bookings", "booking_types"
   add_foreign_key "branch_locations", "companies"
   add_foreign_key "branch_locations", "states"
+  add_foreign_key "budget_rule_field_mappings", "budget_rules"
+  add_foreign_key "budget_rule_field_mappings", "field_configurations"
+  add_foreign_key "budget_rule_field_mappings", "field_drop_down_items"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "categories"
   add_foreign_key "budget_rules", "periods"
@@ -4922,6 +4947,8 @@ ActiveRecord::Schema.define(version: 20180803132254) do
   add_foreign_key "per_diem_expenses", "per_diems"
   add_foreign_key "policies", "companies"
   add_foreign_key "policy_configurations", "policies"
+  add_foreign_key "policy_field_mappings", "field_configurations"
+  add_foreign_key "policy_field_mappings", "policies"
   add_foreign_key "policy_user_mappings", "policies"
   add_foreign_key "policy_user_mappings", "users"
   add_foreign_key "policy_user_roles", "policies"

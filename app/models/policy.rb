@@ -56,7 +56,9 @@ class Policy < ActiveRecord::Base
   delegate :expense_rules_count, to: :expense_rules
   delegate :budget_rules_count, to: :budget_rules
 
-  has_many :field_configurations, as: :configurable
+  # has_many :field_configurations, as: :configurable
+  has_many :policy_field_mappings
+  has_many :field_configurations, through: :policy_field_mappings
 
   validates :company_id, presence: true
   validate :one_default_per_company

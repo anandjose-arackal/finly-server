@@ -37,18 +37,20 @@ class FieldConfiguration < ActiveRecord::Base
   # Applicable for User, Policy, Company
   belongs_to :configurable, polymorphic: true
   has_many :drop_down_items, class_name: 'FieldDropDownItem'
-  has_many :multiselect_items, class_name: "FieldMultiselectItem"
+  has_many :multiselect_items, class_name: 'FieldMultiselectItem'
   has_many :custom_fields
   belongs_to :default_value, polymorphic: true
   belongs_to :external_reference, polymorphic: true
   belongs_to :parent, polymorphic: true
+  has_many :policy_field_mappings
+  has_many :policies, through: :policy_field_mappings
 
   validates :field_name, presence: true
   validates :enabled, presence: true
   validates :field_type_id, presence: true
   validates :company_id, presence: true
   # validates :field_parent_type_id, presence: true
-  validates :configurable_id, presence: true
+  # validates :configurable_id, presence: true
   validates_uniqueness_of :field_key, :allow_blank => true, :scope => [:company_id], :case_sensitive => false
   validates :configurable_type, presence: true, :inclusion => {:in => ['Policy', 'Company']} #, 'User']}
   validates :default_value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiSelectSelection']}
