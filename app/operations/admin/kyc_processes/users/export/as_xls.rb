@@ -45,7 +45,7 @@ class Admin::KycProcesses::Users::Export::AsXls < Admin::KycProcesses::Users::Ba
       profile = user.profile
       date = (kyc.submitted_on or Date.today).strftime('%d%m%Y')
       dob = profile.date_of_birth.strftime('%d%m%Y')
-      serial_id = kyc&.user&.cards&.first&.proxy
+      serial_id = kyc&.user&.cards&.last&.proxy
       self.contents << [
           user.company.name,
           date,
