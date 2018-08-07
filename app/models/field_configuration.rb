@@ -55,6 +55,7 @@ class FieldConfiguration < ActiveRecord::Base
   validates :configurable_type, presence: true, :inclusion => {:in => ['Policy', 'Company']} #, 'User']}
   validates :default_value_type, :inclusion => {:in => [nil, 'FieldAmount', 'FieldBoolean', 'FieldDate', 'FieldDateTime', 'FieldDecimal', 'FieldDropDownSelection', 'FieldNumber', 'FieldText', 'FieldMultiSelectSelection']}
   validate :validate_config
+  validate :field_parent_type_presence
 
   accepts_nested_attributes_for :drop_down_items
   accepts_nested_attributes_for :custom_fields
@@ -211,6 +212,15 @@ class FieldConfiguration < ActiveRecord::Base
   def validate_parent
     if !self.root_field && self.parent.blank?
       errors.add(:field_configuration, "cannot set a non-root custom field without a parent")
+    end
+  end
+
+  def field_parent_type_presence
+    if self.field_parent_mappings.blank?
+      errors.add(:field_configuration, "has not defined a parent")
+    end
+    if self.configurable_type&.downcase == 'policy' and self.policy_field_mappings.blank?
+      errors.add(:at_least, "one policy is required to create a custom field")
     end
   end
 
