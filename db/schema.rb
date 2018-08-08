@@ -806,6 +806,16 @@ ActiveRecord::Schema.define(version: 20180807095330) do
   add_index "branch_locations", ["company_id"], name: "index_branch_locations_on_company_id", using: :btree
   add_index "branch_locations", ["state_id"], name: "index_branch_locations_on_state_id", using: :btree
 
+  create_table "budget_criteria_mappings", force: :cascade do |t|
+    t.integer  "budget_id",       limit: 4
+    t.integer  "budgetable_id",   limit: 4
+    t.string   "budgetable_type", limit: 255
+    t.datetime "created_at",                  null: false
+    t.datetime "updated_at",                  null: false
+  end
+
+  add_index "budget_criteria_mappings", ["budget_id"], name: "index_budget_criteria_mappings_on_budget_id", using: :btree
+
   create_table "budget_periods", force: :cascade do |t|
     t.string   "name",       limit: 255
     t.datetime "created_at",             null: false
@@ -831,6 +841,21 @@ ActiveRecord::Schema.define(version: 20180807095330) do
   add_index "budget_rules", ["policy_id"], name: "index_budget_rules_on_policy_id", using: :btree
   add_index "budget_rules", ["rule_type_id"], name: "index_budget_rules_on_rule_type_id", using: :btree
 
+  create_table "budget_trails", force: :cascade do |t|
+    t.integer  "entity_id",      limit: 4
+    t.string   "entity_type",    limit: 255
+    t.integer  "category_id",    limit: 4
+    t.integer  "cost_center_id", limit: 4
+    t.integer  "location_id",    limit: 4
+    t.integer  "vendor_id",      limit: 4
+    t.integer  "amount_id",      limit: 4
+    t.datetime "created_at",                 null: false
+    t.datetime "updated_at",                 null: false
+    t.integer  "user_id",        limit: 4
+    t.integer  "department_id",  limit: 4
+    t.date     "date"
+  end
+
   create_table "budgets", force: :cascade do |t|
     t.string   "name",             limit: 255
     t.integer  "period_id",        limit: 4
@@ -845,6 +870,9 @@ ActiveRecord::Schema.define(version: 20180807095330) do
     t.datetime "updated_at",                                   null: false
     t.integer  "user_id",          limit: 4
     t.integer  "company_id",       limit: 4
+    t.boolean  "purchase_order"
+    t.boolean  "payment"
+    t.boolean  "expense"
   end
 
   add_index "budgets", ["budget_amount_id"], name: "index_budgets_on_budget_amount_id", using: :btree
@@ -1788,6 +1816,15 @@ ActiveRecord::Schema.define(version: 20180807095330) do
   add_index "delivery_challans", ["transaction_amount_id"], name: "index_delivery_challans_on_transaction_amount_id", using: :btree
   add_index "delivery_challans", ["user_id"], name: "index_delivery_challans_on_user_id", using: :btree
   add_index "delivery_challans", ["vendor_id"], name: "index_delivery_challans_on_vendor_id", using: :btree
+
+  create_table "departments", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.integer  "company_id", limit: 4
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
+  end
+
+  add_index "departments", ["company_id"], name: "index_departments_on_company_id", using: :btree
 
   create_table "desktop_users", force: :cascade do |t|
     t.string   "email",      limit: 255, null: false
@@ -3467,6 +3504,7 @@ ActiveRecord::Schema.define(version: 20180807095330) do
     t.boolean  "api_initiated",                                default: false
     t.date     "processed_at"
     t.integer  "original_payment_for_refund_id", limit: 4
+    t.integer  "cost_center_id",                 limit: 4
   end
 
   add_index "payments", ["amount_id"], name: "index_payments_on_amount_id", using: :btree
@@ -3735,6 +3773,8 @@ ActiveRecord::Schema.define(version: 20180807095330) do
     t.integer  "delivered",              limit: 4,                            default: 0
     t.integer  "accepted",               limit: 4,                            default: 0
     t.integer  "rejected",               limit: 4,                            default: 0
+    t.integer  "category_id",            limit: 4
+    t.integer  "cost_center_id",         limit: 4
   end
 
   add_index "purchase_order_items", ["discount_amount_id"], name: "index_purchase_order_items_on_discount_amount_id", using: :btree
@@ -3786,6 +3826,7 @@ ActiveRecord::Schema.define(version: 20180807095330) do
     t.integer  "controlling_for_user_role_id", limit: 4
     t.integer  "policy_id",                    limit: 4
     t.integer  "controlling_level_id",         limit: 4
+    t.integer  "department_id",                limit: 4
   end
 
   add_index "purchase_orders", ["balance_amount_id"], name: "index_purchase_orders_on_balance_amount_id", using: :btree
@@ -5132,6 +5173,7 @@ ActiveRecord::Schema.define(version: 20180807095330) do
   add_foreign_key "bookings", "booking_types"
   add_foreign_key "branch_locations", "companies"
   add_foreign_key "branch_locations", "states"
+  add_foreign_key "budget_criteria_mappings", "budgets"
   add_foreign_key "budget_rules", "amounts"
   add_foreign_key "budget_rules", "categories"
   add_foreign_key "budget_rules", "periods"
@@ -5185,6 +5227,7 @@ ActiveRecord::Schema.define(version: 20180807095330) do
   add_foreign_key "delivery_challans", "procurement_terms"
   add_foreign_key "delivery_challans", "procurements"
   add_foreign_key "delivery_challans", "users"
+  add_foreign_key "departments", "companies"
   add_foreign_key "distance_expenses", "expenses"
   add_foreign_key "distances", "physical_units"
   add_foreign_key "document_items", "inventory_line_items"
