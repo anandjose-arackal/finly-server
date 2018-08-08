@@ -98,7 +98,7 @@ class Company::Transaction::Show < Company::Base
       end
 
       company_transaction = company.company_transactions.create request_id: t[:request_id], merchant_name: t[:merchant_name],
-                                                                transaction_date: DateUtils.datetime_in_ist(t[:transaction_date]),
+                                                                transaction_date: t[:transaction_date],
                                                                 transaction_amount_attributes: {value: t[:transaction_amount], currency_id: 1},
                                                                 transaction_type: t[:transaction_type],
                                                                 transaction_id: t[:transaction_id],

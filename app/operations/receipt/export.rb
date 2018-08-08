@@ -30,7 +30,7 @@ class Receipt::Export < Receipt::Base
   def process
     self.files = []
     self.receipts&.each do |receipt|
-      self.files << {name: receipt.export_image_file_name, path: receipt.image.path}
+      self.files << {name: receipt.export_image_file_name, url: receipt.image.url}
     end
   end
 

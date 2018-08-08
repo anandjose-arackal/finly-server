@@ -43,6 +43,11 @@ class ItzCashCardProgram < ActiveRecord::Base
           name: "HDFC (PIN at POS)",
           bank: "HDFC",
           product_code: "HDFFPD"
+      },
+      {
+          name: "Jotun Reward Card",
+          bank: "HDFC",
+          product_code: "FNHREW"
       }
   ]
 
