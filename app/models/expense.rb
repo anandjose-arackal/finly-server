@@ -35,6 +35,9 @@
 
 
 
+
+
+
 class Expense < ActiveRecord::Base
   include SoftDeletable
   include MathUtil
@@ -55,6 +58,9 @@ class Expense < ActiveRecord::Base
 
   has_many :receipts, as: :parent
   has_many :system_messages, as: :messagable, dependent: :destroy
+
+  # link to budget trails table
+  has_many :budget_trails, as: :entity
 
   has_many :duplicate_expense_mappings, foreign_key: :expense_id, dependent: :destroy
   has_many :duplicate_expenses, through: :duplicate_expense_mappings
@@ -115,6 +121,8 @@ class Expense < ActiveRecord::Base
     compute_gst_amount
     compute_tds_amount
   end
+
+  after_save :budget_trail_entry
 
   default_scope {order('expenses.created_at DESC')}
 
@@ -906,7 +914,8 @@ class Expense < ActiveRecord::Base
 
   def reimbursable_amount
     value = reimbursable ? reimbursable_amount_value : 0
-    Amount.new(value: value, currency_id: amount.currency_id)
+    currency_id = amount&.currency_id || Currency.id_for(:INR)
+    Amount.new(value: value, currency_id: currency_id)
   end
 
   def compute_gst_amount
@@ -1033,5 +1042,18 @@ class Expense < ActiveRecord::Base
         errors.add(:amount, "can't be less than or equal to 0")
       end
     end
+  end
+
+  def budget_trail_entry
+    # if this expense was somehow removed from a report, or the report was updated in anyway, we update its entry in the BudgetTrail model
+    if ReportStatus.ids_for([:approved, :settled, :settlement_confirmed, :closed]).include?(self.report&.report_status_id)
+      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.save_trail(self)
+    else
+      BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
+    end
+  end
+
+  def budget_trail_destroy
+    BudgetsCalculator::Calculate::ExpenseBudgetsProcessor.new.destroy_trail(self)
   end
 end

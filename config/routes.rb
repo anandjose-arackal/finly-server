@@ -1350,7 +1350,10 @@
 #                                                         DELETE /procure/procurements/:id(.:format)                                                          procure/procurements#destroy
 #                        procure_purchase_order_send_mail POST   /procure/purchase_orders/:purchase_order_id/send_mail(.:format)                              procure/purchase_orders#send_mail
 #                           procure_purchase_order_submit PUT    /procure/purchase_orders/:purchase_order_id/submit(.:format)                                 procure/purchase_orders#submit
+#                          procure_purchase_order_retract PUT    /procure/purchase_orders/:purchase_order_id/retract(.:format)                                procure/purchase_orders#retract
 #                          procure_purchase_order_approve PUT    /procure/purchase_orders/:purchase_order_id/approve(.:format)                                procure/purchase_orders#approve
+#                           procure_purchase_order_reject PUT    /procure/purchase_orders/:purchase_order_id/reject(.:format)                                 procure/purchase_orders#reject
+#                            procure_purchase_order_close PUT    /procure/purchase_orders/:purchase_order_id/close(.:format)                                  procure/purchase_orders#close
 #                                 procure_purchase_orders GET    /procure/purchase_orders(.:format)                                                           procure/purchase_orders#index
 #                                                         POST   /procure/purchase_orders(.:format)                                                           procure/purchase_orders#create
 #                              new_procure_purchase_order GET    /procure/purchase_orders/new(.:format)                                                       procure/purchase_orders#new
@@ -1415,6 +1418,15 @@
 #                                                         PUT    /procure/configs/doc_number_configs/:id(.:format)                                            procure/configs/doc_number_configs#update
 #                               procure_configs_send_mail POST   /procure/configs/send_mail(.:format)                                                         procure/configs/mailer#send_mail
 #                                        procure_comments POST   /procure/comments(.:format)                                                                  procure/comments#create
+#                                reviewal_level_reviewers POST   /reviewal_levels/:reviewal_level_id/reviewers(.:format)                                      reviewers#create
+#                                         reviewal_levels GET    /reviewal_levels(.:format)                                                                   reviewal_levels#index
+#                                                         POST   /reviewal_levels(.:format)                                                                   reviewal_levels#create
+#                                      new_reviewal_level GET    /reviewal_levels/new(.:format)                                                               reviewal_levels#new
+#                                     edit_reviewal_level GET    /reviewal_levels/:id/edit(.:format)                                                          reviewal_levels#edit
+#                                          reviewal_level GET    /reviewal_levels/:id(.:format)                                                               reviewal_levels#show
+#                                                         PATCH  /reviewal_levels/:id(.:format)                                                               reviewal_levels#update
+#                                                         PUT    /reviewal_levels/:id(.:format)                                                               reviewal_levels#update
+#                                                         DELETE /reviewal_levels/:id(.:format)                                                               reviewal_levels#destroy
 #
 
 #                               crono_web        /crono                                                      Crono::Web

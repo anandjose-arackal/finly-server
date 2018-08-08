@@ -25,7 +25,6 @@ class Budgets::Show < Budgets::Base
   def success
     params[:budget] = self.budget
     Budgets::Show::ShowPresenter.new(user, params, messages)
-
   end
 
   class Budgets::Show::ShowPresenter < BaseOperation::BasePresenter::SuccessPresenter

@@ -25,7 +25,8 @@ class CustomField::FieldConfigurations::DependentIndex < CustomField::FieldConfi
   end
 
   def process
-    self.dependent_field_configurations = self.drop_down_parent.dependent_field_configurations
+    # the below variable will be an array by default
+    self.dependent_field_configurations = self.drop_down_parent.dependent_field_configurations.non_deleted
   end
 
   def success

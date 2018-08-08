@@ -59,8 +59,17 @@ class YesBankApi::Base < BaseHandler
   # because this is common for all Yes Bank API calls
   def process
     p = self.path
-    file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_yes_bank_api.log', sync: true)
+    if Rails.env.production?
+      file_logger = LogStashLogger.new(type: :file, path: 'log/logstash_yes_bank_api.log', sync: true)
+    end
     begin
+
+      # printing posting path and params unless it's production environment
+      unless Rails.env.production?
+        puts "Posting Path: #{p}"
+        puts "Post Params: #{self.template}"
+      end
+
       self.response = self.connection.post do |req|
         req.url p
         req.headers['Content-Type'] = 'application/xml'
@@ -68,12 +77,17 @@ class YesBankApi::Base < BaseHandler
         req.headers['X-IBM-Client-Secret'] = client_secret
         req.body = template
       end
-      post_params_hash = (Hash.from_xml(template) rescue nil)
-      response_hash = (Hash.from_xml(self.response.body) rescue nil)
-      status_code = self.response.status rescue nil
-      file_logger.info(file_logger_params({path: p, post_params: post_params_hash, response: response_hash, status: status_code, success: true}))
+
+      if Rails.env.production?
+        post_params_hash = (Hash.from_xml(template) rescue nil)
+        response_hash = (Hash.from_xml(self.response.body) rescue nil)
+        status_code = self.response.status rescue nil
+        file_logger.info(file_logger_params({path: p, post_params: post_params_hash, response: response_hash, status: status_code, success: true}))
+      end
     rescue Faraday::TimeoutError, Faraday::ConnectionFailed
-      file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, failure_reason: 'Timeout'}))
+      if Rails.env.production?
+        file_logger.warn(file_logger_params({path: p, post_params: post_params_hash, success: false, failure_reason: 'Timeout'}))
+      end
       self.timeout = true
       add_message :error, "Request timed out. Please try again"
       self.transfer_status_id = BankTransferStatus.id_for(:failed)
@@ -104,7 +118,7 @@ class YesBankApi::Base < BaseHandler
       end
     # temporary - rescue SSL error to simulate various cases
     # rescue Faraday::SSLError
-    #   # simulating different cases
+    #   simulating different cases
     #   puts "WE GOT HERE EVERYBODY! LOOKS LIKE THIS IS GONNA BE A GOOD RIDE!"
       # self.response.status_code = 500
       # self.parsed_response = {
@@ -238,12 +252,14 @@ class YesBankApi::Base < BaseHandler
         client_key: OpenSSL::PKey::RSA.new(File.read(ENV['HOME'] + '/certificates/finly.key')),
         verify: verify
     }
-    # logger = Logger.new $stderr
-    # logger.level = Logger::INFO
+    logger = Logger.new $stderr
+    logger.level = Logger::DEBUG
     self.connection = Faraday.new(:url => url, ssl: ssl_options) do |faraday|
       # builder.use Faraday::Request::UrlEncoded
       faraday.request :url_encoded # form-encode POST params
-      # faraday.response :logger, logger # log requests to STDOUT
+      unless Rails.env.production?
+        faraday.response :logger, logger # log requests to STDOUT
+      end
       faraday.options[:timeout] = 60 # time out is 60 seconds
       faraday.use Faraday::Request::BasicAuthentication, auth_username, auth_password # use basic authentication
       faraday.use FaradayMiddleware::FollowRedirects, limit: 5

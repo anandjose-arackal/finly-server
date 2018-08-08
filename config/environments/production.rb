@@ -10,6 +10,10 @@ Rails.application.configure do
   # Rake tasks automatically ignore this option for performance.
   config.eager_load = true
   config.logstasher.enabled = true
+  config.logstasher.field_renaming = {
+      error: :exception,
+  }
+
   config.lograge.enabled = true
   # config.lograge.keep_original_rails_log = true
   # config.lograge.logger = ActiveSupport::Logger.new "#{Rails.root}/log/lograge_#{Rails.env}.log"
@@ -23,7 +27,9 @@ Rails.application.configure do
 
   config.lograge.custom_payload do |controller|
     user = controller.current_user
-    hash = {params: controller.params, current_app: controller.current_app, current_device: controller.current_device}
+    hash = { params: controller.params }
+    hash[:current_app] = (controller.current_app rescue nil)
+    hash[:current_device] = (controller.current_device rescue nil)
     if user.present?
       hash[:user_id] = user&.id
       hash[:user_name] = (user&.name rescue nil)

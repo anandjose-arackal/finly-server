@@ -56,7 +56,6 @@
 
 
 
-
 class User < ActiveRecord::Base
   include OperationCallbacks
   # Include default devise modules. Others available are:
@@ -182,9 +181,13 @@ class User < ActiveRecord::Base
   has_many :outward_invoice_attachments
 
   #Budgets
+
+  # many-to-many mapping between user and budget
+  has_many :budget_criteria_mappings, as: :budgetable
+  has_many :budgets, through: :budget_criteria_mappings
+
   has_many :owned_budgets, class_name: 'Budget'
-  has_many :budgets, as: :budgetable
-  # has_many :budgets, as: :budgetable
+
   has_many :procurements
   has_many :level_reviewer_mappings
 
@@ -211,9 +214,9 @@ class User < ActiveRecord::Base
 
   validates :company_id, presence: true
   validates :email, uniqueness: {allow_blank: true, case_sensitive: false}
-  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
-  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
-  validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9 ]+\Z/}, length: {maximum: 30}
+  validates :first_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
+  validates :last_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
+  validates :mothers_maiden_name, presence: true, format: {allow_blank: true, with: /\A[a-zA-Z0-9\. ]+\Z/}, length: {maximum: 30}
   validates :mobile_number, presence: true, format: {allow_blank: true, with: Constants::VALID_MOBILE_NUMBER}, uniqueness: true
   validates :user_panel_subscription, presence: true
 

@@ -38,6 +38,7 @@
 #  controlling_for_user_role_id :integer
 #  policy_id                    :integer
 #  controlling_level_id         :integer
+#  department_id                :integer
 #
 
 class PurchaseOrder < ActiveRecord::Base
@@ -50,6 +51,7 @@ class PurchaseOrder < ActiveRecord::Base
   belongs_to :payment_term
   belongs_to :procurement_term
   belongs_to :status, class_name: 'PurchaseOrderStatus', foreign_key: :purchase_order_status_id
+  belongs_to :department
 
   belongs_to :controlling_user, class_name: 'User'
   belongs_to :controlling_for_user, class_name: 'User'
@@ -96,6 +98,8 @@ class PurchaseOrder < ActiveRecord::Base
   }
 
   before_save :calculate_line_items
+  after_save :budget_trail_entry
+  after_destroy :budget_trail_destroy
 
   def all_items_shipped?
     shipped = true
@@ -205,5 +209,25 @@ class PurchaseOrder < ActiveRecord::Base
     end
 
     # self.save
+  end
+
+  def budget_trail_entry
+    if PurchaseOrderStatus.ids_for([:approved, :auto_approved, :sent_to_vendor, :closed]).include?(self.status_id)
+      self.items.each do |item|
+        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(item)
+      end
+    else
+      # i.e. if the purchase order changed statuses to something other than the above, it will destroy
+      # all the line item entries in the budget trail model for this particular purchase order
+      self.items.each do |item|
+        BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
+      end
+    end
+  end
+
+  def budget_trail_destroy
+    self.items.each do |item|
+      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(item)
+    end
   end
 end

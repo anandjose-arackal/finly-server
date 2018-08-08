@@ -19,7 +19,7 @@ module Constants
   end
 
   # todo - to be removed once companies are done mirating from HDFC to RBL
-  MIGRATING_COMPANIES = [37, 5]
+  MIGRATING_COMPANIES = [51, 48, 81]
 
   PRODUCT_DEMO_EMAIL_ID = ['veekshith.rai@finly.io', 'anushrut.khare@finly.io', 'venu.reddy@finly.io']
   # PRODUCT_DEMO_EMAIL_ID = ['sreeram.nr@finly.io', 'kumar.abinash@finly.io']
@@ -61,7 +61,9 @@ module Constants
 
   WELCOME_MESSAGE_AUTH_KEY = "126829AkHzInaT57ed5ec4"
 
-  CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+  # CURRENCY_LAYER_ACCESS_KEY = "149cdc66258ab026ca6d0c4841827503"
+  # using the below one because the above one's monthly quota was crossed
+  CURRENCY_LAYER_ACCESS_KEY = "5ca7968931344d3315596dc05a7249d1"
 
   # PayU Payment Gateway URL
   if Rails.env.production?

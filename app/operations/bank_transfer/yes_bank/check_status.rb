@@ -117,8 +117,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
 
     op = AccountManager::Payments::PaymentProcessor.(user, {payment_request: payment_request})
     if op.success?
+      refund_payment = op.payment_order.payments.first
       self.bank_transaction.update(refunded: true)
-      # add system message indicating that this is a refund
+      refund_payment&.update(original_payment_for_refund_id: self.payment.id)
     else
       # op.payment_order.destroy
       add_message :error, op.messages[:error]
@@ -127,8 +128,9 @@ class BankTransfer::YesBank::CheckStatus < BankTransfer::YesBank::Base
     if self.payment.invoice.present?
       self.payment.invoice.update_invoice_status
     end
-    # also update the status of the payment order from here
+    # also update the status and processed amount of the payment order from here
     self.payment.payment_order.update_order_status
+    self.payment.payment_order.update_processed_amount
   end
 
   def handle_successful_transaction

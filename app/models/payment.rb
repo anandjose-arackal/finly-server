@@ -32,10 +32,11 @@
 #  post_operation                 :text(65535)
 #  post_operation_payload         :text(65535)
 #  category_id                    :integer
-#  scheduled_at                   :date
 #  api_initiated                  :boolean          default(FALSE)
+#  scheduled_at                   :date
 #  processed_at                   :date
 #  original_payment_for_refund_id :integer
+#  cost_center_id                 :integer
 #
 
 
@@ -70,6 +71,9 @@ class Payment < ActiveRecord::Base
 
   # From Procurement Workflow
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+
+  # link to budget trails table
+  has_many :budget_trails, as: :entity
 
   has_one :payment, as: :reference_resource
 
@@ -299,11 +303,9 @@ class Payment < ActiveRecord::Base
     self.reference_id = Generator.reference_id_for(initiating_account, receiving_account, date)
   end
 
-  before_save do
-    # recalculating the amount or net amount for this particular
-    # payment from the details inside the invoice
+  after_save :budget_trail_entry
 
-  end
+  after_destroy :budget_trail_destroy
 
   def initiating_account_type_name
     name = "#{initiating_user&.name&.to_s}'s "
@@ -470,5 +472,18 @@ class Payment < ActiveRecord::Base
         errors.add(:receiving_user_id, "cannot be blank")
       end
     end
+  end
+
+  def budget_trail_entry
+    if payment.completed? || payment.processing?
+      BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(self)
+    else
+      # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object
+      BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
+    end
+  end
+
+  def budget_trail_destroy
+    BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.destroy_trail(self)
   end
 end

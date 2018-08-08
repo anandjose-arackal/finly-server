@@ -24,6 +24,8 @@
 #  delivered              :integer          default(0)
 #  accepted               :integer          default(0)
 #  rejected               :integer          default(0)
+#  category_id            :integer
+#  cost_center_id         :integer
 #
 
 class PurchaseOrderItem < ActiveRecord::Base
@@ -35,7 +37,35 @@ class PurchaseOrderItem < ActiveRecord::Base
   belongs_to :tax_amount, class_name: "Amount"
   belongs_to :discount_amount, class_name: "Amount"
   belongs_to :total_amount, class_name: "Amount"
+  belongs_to :category
+  belongs_to :cost_center
+
+  # link to budget trails table
+  has_many :budget_trails, as: :entity
 
   accepts_nested_attributes_for :tax_amount, :discount_amount,
                                 :total_amount
+
+  scope :with_id, -> (ids) {
+    where(id: ids)
+  }
+
+  after_save :budget_trail_entry
+  after_destroy :budget_trail_destroy
+
+  private
+
+  def budget_trail_entry
+    if PurchaseOrderStatus.ids_for([:approved, :auto_approved, :sent_to_vendor, :closed]).include?(self.purchase_order&.status_id)
+      # calling the trail saving processor method that will take care of saving the budget trail
+      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.save_trail(self)
+    else
+      BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
+    end
+  end
+
+  def budget_trail_destroy
+    BudgetsCalculator::Calculate::PurchaseOrderItemsBudgetsProcessor.new.destroy_trail(self)
+  end
+
 end

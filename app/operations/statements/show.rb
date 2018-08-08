@@ -194,6 +194,11 @@ class Statements::Show < Statements::Base
           end
         when PaymentPurpose.id_for(:corporate_balance_load)
           merchant = 'Corporate Balance Load'
+        when PaymentPurpose.id_for(:corporate_balance_refund)
+          refund_payment = finly_transaction.payment
+          original_payment = refund_payment.original_payment_for_refund
+          original_beneficiary = original_payment&.receiving_user&.name
+          merchant = "Refund for #{original_beneficiary}'s payment. Payment ID: #{original_payment.id}" if original_beneficiary.present?
         when PaymentPurpose.id_for(:advance_outside_finly), PaymentPurpose.id_for(:reimbursement_outside_finly), PaymentPurpose.id_for(:advance), PaymentPurpose.id_for(:balance_clearance),
             PaymentPurpose.id_for(:reimbursement), PaymentPurpose.id_for(:medical_benefit), PaymentPurpose.id_for(:meal_benefit), PaymentPurpose.id_for(:payroll), PaymentPurpose.id_for(:balance_clearance_outside_finly),
             PaymentPurpose.id_for(:cash_advance)

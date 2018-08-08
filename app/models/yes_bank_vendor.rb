@@ -35,9 +35,13 @@ class YesBankVendor < ActiveRecord::Base
   # has_one :cancelled_cheque_attachment, class_name: "VendorAttachment", dependent: :destroy
   # has_one :pan_attachment, class_name: "VendorAttachment", dependent: :destroy
   # has_one :gstin_certificate_attachment, class_name: "VendorAttachment", dependent: :destroy
+
   has_one :vendor_account, foreign_key: :vendor_id
 
-  has_many :budgets, as: :budgetable
+  has_many :budget_criteria_mappings, as: :budgetable
+  has_many :budgets, through: :budget_criteria_mappings
+
+  has_many :budget_trails, as: :vendor
 
   accepts_nested_attributes_for :bank_accounts
   accepts_nested_attributes_for :vendor_attachments, allow_destroy: true
