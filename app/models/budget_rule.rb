@@ -74,7 +74,7 @@ class BudgetRule < ActiveRecord::Base
     Amount.new(value: super.value, currency_id: self.policy.base_currency_id)
   end
 
-  def rule_in_words
+  def rule_in_words(options={})
     case self.expense_type_id
       when 1
         type = "of Cash"
@@ -111,10 +111,10 @@ class BudgetRule < ActiveRecord::Base
     if self.budget_rule_field_mappings.present?
       field_config_map = {}
       self.budget_rule_field_mappings.each do |mapping|
-        if field_config_map[mapping.field_configuration.name].nil?
-          field_config_map[mapping.field_configuration.name] = []
+        if field_config_map[mapping.field_configuration.field_name].nil?
+          field_config_map[mapping.field_configuration.field_name] = []
         end
-        field_config_map[mapping.field_configuration.name] << mapping.field_drop_down_item.name
+        field_config_map[mapping.field_configuration.field_name] << mapping.field_drop_down_item.name
       end
       field_config_map.each do |field_name, field_values|
         rule_in_words += " having #{field_name} "
@@ -126,7 +126,15 @@ class BudgetRule < ActiveRecord::Base
       end
     end
     if self.amount_id
-      rule_in_words += " should not exceed #{self.amount.currency.symbol}#{self.amount_value.to_s} #{self.amount.currency.country_code}"
+      if options&.dig(:violation)
+        rule_in_words += " have exceeded"
+      else
+        rule_in_words += " should not exceed"
+      end
+      rule_in_words += " #{self.amount.currency.symbol}#{self.amount_value.to_s} #{self.amount.currency.country_code}"
+      if options&.dig(:exceeded_by)
+        rule_in_words += " by #{self.amount.currency.symbol}#{options&.dig(:exceeded_by)} #{self.amount.currency.country_code}"
+      end
     end
     rule_in_words
   end
@@ -140,7 +148,8 @@ class BudgetRule < ActiveRecord::Base
   def no_duplicates
     # checking against all budget rules in the respective policy
     self.policy.budget_rules.exclude_deleted.each do |rule|
-      if not rule.id == self.id and rule.amount_value == self.amount_value and rule.category_id == self.category_id and rule.period_id == self.period_id and rule.rule_type_id == self.rule_type_id
+      if not rule.id == self.id and rule.amount_value == self.amount_value and
+          rule.category_id == self.category_id and rule.period_id == self.period_id and rule.rule_type_id == self.rule_type_id
         errors.add(:rules, 'already exists. Please try again.')
       end
     end
