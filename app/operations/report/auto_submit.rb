@@ -1,5 +1,5 @@
 class Report::AutoSubmit < Report::Base
-  attr_accessor :processing_expenses, :auto_submit_config, :selected_user, :report
+  attr_accessor :processing_expenses, :auto_submit_config, :selected_user, :report, :has_violations
 
   def pre_validate
     if params[:user].blank? and params[:user_id].blank? and params[:id].blank?
@@ -76,9 +76,9 @@ class Report::AutoSubmit < Report::Base
     violations = Report::Violation.(nil, report: report)
     violations_present = false
     violations.each do |key, value|
-      if value['expense_blocking'].present? or value['budget_blocking'].present?
-        violations_present = true
-      end
+      blocking_violations_present ||= (value['expense_blocking'].present? or value['budget_blocking'].present?)
+      self.has_violations ||= (blocking_violations_present or  value['budget_warning'].present? or value['expense_warning'].present?)
+      break if blocking_violations_present
     end
     if violations_present
       add_message :error, 'Reports with blocking violations cannot be submitted'
@@ -86,7 +86,7 @@ class Report::AutoSubmit < Report::Base
   end
 
   def submit_report
-    presenter = User::Team::Review::NextReviewer.(report)
+    presenter = User::Team::Review::NextReviewer.(report, has_violations: self.has_violations)
     manager = presenter.user
     manager_role_id = presenter.role_id
 
