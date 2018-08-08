@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180806125348) do
+ActiveRecord::Schema.define(version: 20180807095330) do
 
   create_table "active_admin_comments", force: :cascade do |t|
     t.string   "namespace",     limit: 255
@@ -2588,10 +2588,12 @@ ActiveRecord::Schema.define(version: 20180806125348) do
     t.integer  "invoice_type_id",        limit: 4
     t.integer  "location_id",            limit: 4
     t.integer  "delivery_location_id",   limit: 4
+    t.integer  "payment_term_id",        limit: 4
   end
 
   add_index "invoices", ["address_id"], name: "index_invoices_on_address_id", using: :btree
   add_index "invoices", ["discount_type_id"], name: "index_invoices_on_discount_type_id", using: :btree
+  add_index "invoices", ["payment_term_id"], name: "index_invoices_on_payment_term_id", using: :btree
   add_index "invoices", ["tax_type_id"], name: "index_invoices_on_tax_type_id", using: :btree
 
   create_table "inward_document_items", force: :cascade do |t|
@@ -5237,6 +5239,7 @@ ActiveRecord::Schema.define(version: 20180806125348) do
   add_foreign_key "invoice_number_configs", "invoice_number_config_types"
   add_foreign_key "invoice_number_configs", "purposes"
   add_foreign_key "invoices", "addresses"
+  add_foreign_key "invoices", "payment_terms"
   add_foreign_key "inward_document_items", "inventory_line_items"
   add_foreign_key "inward_document_items", "inward_documents"
   add_foreign_key "inward_document_items", "purchase_order_items"

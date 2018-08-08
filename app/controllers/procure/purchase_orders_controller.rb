@@ -61,10 +61,18 @@ class Procure::PurchaseOrdersController < ApplicationController
           render pdf: "PO-#{@result.purchase_order.po_number}",
                  layout: "pdf.html.erb",
                  print_media_type: true,
-                 margin: { :bottom => 5 }
-                 # footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }}
+                 margin: { :bottom => 5 },
+                 footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }}
+                 # header: { html: { template: 'export/header_pagination.html.erb' }}
       }
-      format.html {}
+      format.html {
+        render pdf: "PO-#{@result.purchase_order.po_number}",
+                 layout: "pdf.html.erb",
+                 print_media_type: true,
+                 margin: { :bottom => 5 },
+                 footer: { html: { template: 'invoice_mailer/invoice_footer.html.erb' }}
+                 # header: { html: { template: 'export/header_pagination.html.erb' }}
+      }
     end
   end
 end

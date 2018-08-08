@@ -95,11 +95,22 @@ class PurchaseOrder < ActiveRecord::Base
     where(id: ids)
   }
 
-
-
   before_save :calculate_line_items
 
+  def all_items_shipped?
+    shipped = true
+    self.items.each do |item|
+      unless item.quantity == item.delivered
+        shipped = false
+        break
+      end
+    end
+    shipped
+  end
+
   private
+
+
 
   def calculate_line_items
     total_before_tax_amount = 0

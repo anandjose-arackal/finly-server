@@ -50,6 +50,7 @@
 #  invoice_type_id        :integer
 #  location_id            :integer
 #  delivery_location_id   :integer
+#  payment_term_id        :integer
 #
 
 #  gst_type_id: 1 - IGST

@@ -2,6 +2,14 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
 
   attr_accessor :procurement, :purchase_order, :invoice_params, :invoice
 
+  def personalizer
+    {
+        validate: {
+            after: Personalizer::Process.new([:procure_inward_invoices, :create_from_p_o], :validate, self)
+        }
+    }
+  end
+
   def init
     id = params[:id] || params[:procurement_id]
     self.procurement = user.company.procurements.find_by(id: id)
@@ -31,11 +39,13 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
     self.invoice.company_id = user.company.id
     if self.invoice.save
       InvoiceLineItemsCalculationUtils.new.calculate_tax_and_discounts(self.invoice_params, nil, self.invoice)
-      self.invoice.vendor_id = self.procurement.vendor_id
       self.invoice.save
 
+
       status_tag = StatusTag.find_by(id: StatusTag.id_for(:invoice_received))
-      procurement.status_tags << status_tag
+      unless procurement.status_tags.include? status_tag
+        procurement.status_tags << status_tag
+      end
     else
       add_message :error, self.invoice.errors.full_messages
     end
@@ -79,11 +89,17 @@ class Procurements::ProcureInwardInvoices::CreateFromPO < Procurements::ProcureI
       }
     end
     invoice_params = {
+      vendor_id: self.purchase_order.vendor_id,
+      created_by_user_id: user.id,
+      invoice_type_id: ::InwardInvoiceType.id_for(:tax_invoice),
+      payment_term_id: self.purchase_order.payment_term_id,
+      due_date: self.purchase_order.delivery_date,
       receiving_account: receiving_account,
       gst_type_id: self.purchase_order.gst_type_id,
       location_id: self.purchase_order.location_id,
       delivery_location_id: self.purchase_order.delivery_location_id,
       invoice_items_attributes: invoice_items_attributes
+
     }
   end
 end

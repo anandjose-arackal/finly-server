@@ -36,9 +36,13 @@ json.actions do
   json.destroyable invoice.unpaid?
 end
 
+if invoice.vendor.present?
+  json.vendor invoice.vendor.as_json
+end
+
 json.invoice do
   # conditionally set the original amount as invoice amount is there are line items
-  json.id invoice.id
+  json.extract! invoice, :id, :invoice_number, :payment_term_id
   if invoice&.invoice_items.present?
     json.original_amount precision_value invoice.amount&.value
   else
@@ -105,6 +109,7 @@ json.invoice do
   # invoice items
   json.invoice_items do
     json.array!(invoice.invoice_items) do |item|
+      json.comment item.comment
       json.rate item.rate
       json.quantity item.quantity
       json.tax item.tax

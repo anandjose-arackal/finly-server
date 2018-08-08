@@ -71,7 +71,6 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
       self.current_level = nil
     end
 
-
     # Change state of purchase order
     purchase_order_status_id = ::PurchaseOrderStatus.id_for(self.aasm.current_state)
     update_params = {
@@ -84,7 +83,11 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
   def approvers_not_present?
     if self.policy.present?
       if self.next_level.present?
-        return false
+        if self.next_level.level_reviewer_mappings.with_threshold(self.purchase_order.balance_amount.value).present?
+          return false
+        else
+          return true
+        end
       else
         return true
       end
@@ -97,7 +100,6 @@ class WorkflowManager::Aasm::PurchaseOrder < WorkflowManager::Aasm::Base
     # total_amount = purchase_order.total_amount
     self.current_level = ReviewalLevel.with_id(purchase_order.controlling_level_id).first
     level_number = current_level.present? ? (current_level.level_number + 1) : 1
-
 
     self.next_level = self.policy.levels.with_entity_type(purchase_order.class.name).with_level_number(level_number).first
   end
