@@ -302,7 +302,7 @@ module Constants
     if Rails.env.production?
       SHA512_KEY = ''
     else
-      SHA512_KEY = 'cfd7586120ddbcc9ffdcd24123a59720'
+      SHA512_KEY = '4150fb44a955a5ff0711f9a1c631a3ed'
     end
   end
 
