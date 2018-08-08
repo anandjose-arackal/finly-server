@@ -34,7 +34,7 @@ class UserManagerMapping < ActiveRecord::Base
   belongs_to :approves_to, class_name: 'User'
   belongs_to :approves_finance_to, class_name: 'User'
   belongs_to :travel_manager, class_name: 'User'
-  belongs_to :travel_selector, class_name: 'User'
+  # belongs_to :travel_selector, class_name: 'User'
   belongs_to :travel_approves_to, class_name: 'User'
   belongs_to :greater_than_amount, class_name: 'Amount'
   belongs_to :policy
