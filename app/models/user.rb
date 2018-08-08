@@ -114,6 +114,7 @@ class User < ActiveRecord::Base
   has_many :admin_summary_mail_configs, dependent: :destroy
   has_many :manager_summary_mail_configs, dependent: :destroy
   has_many :payment_receivables, foreign_key: :initiating_user_id
+  has_many :user_pockets
 
 
   has_many :bank_accounts, as: :account_owner, dependent: :destroy
