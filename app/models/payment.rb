@@ -49,9 +49,6 @@
 
 
 
-
-
-
 class Payment < ActiveRecord::Base
   include PostOperationExecution
 
@@ -479,7 +476,7 @@ class Payment < ActiveRecord::Base
   end
 
   def budget_trail_entry
-    if payment.completed? || payment.processing?
+    if self.completed? || self.processing?
       BudgetsCalculator::Calculate::PaymentBudgetsProcessor.new.save_trail(self)
     else
       # i.e. anytime this payment is updated and it moves to a failed state etc. destroy the respectie trail object

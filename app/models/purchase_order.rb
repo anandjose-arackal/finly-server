@@ -73,6 +73,9 @@ class PurchaseOrder < ActiveRecord::Base
   has_many :items, class_name: "PurchaseOrderItem", dependent: :destroy
   has_many :extra_charges, class_name: "ProcurementCharge", as: "Chargable"
   has_many :comments, class_name: 'ProcurementComment', as: :parent_commentable
+  has_many :custom_fields, as: :parent
+
+  has_many :trails, as: :parent
 
   delegate :open?, :retracted?, :rejected?, :processing?, :approved?, :auto_approved?, :sent_to_vendor?, :closed?, to: :status
 
@@ -82,16 +85,36 @@ class PurchaseOrder < ActiveRecord::Base
 
   validates :purchase_order_status_id, presence: true
   # validates :items, presence: true
-  scope :document_number_generated_in_finly, -> { where override_invoice_number: [false, nil] }
+  scope :document_number_generated_in_finly, -> { where override_po_number: [false, nil] }
 
   scope :with_user_id, -> (user_ids) { where user_id: user_ids }
   scope :with_controlling_level_ids, -> (level_ids) { where controlling_level_id: level_ids }
+
+  # Used for generating document number
+  scope :valid, -> {
+    ids = pluck(:id)
+    ids = PurchaseOrderItem.where(purchase_order_id: ids).pluck(:purchase_order_id)
+    where(id: ids)
+  }
 
   before_save :calculate_line_items
   after_save :budget_trail_entry
   after_destroy :budget_trail_destroy
 
+  def all_items_shipped?
+    shipped = true
+    self.items.each do |item|
+      unless item.quantity == item.delivered
+        shipped = false
+        break
+      end
+    end
+    shipped
+  end
+
   private
+
+
 
   def calculate_line_items
     total_before_tax_amount = 0
@@ -145,6 +168,8 @@ class PurchaseOrder < ActiveRecord::Base
           item.total_amount = Amount.new(value: item_total_amount, currency_id: 1)
         end
 
+
+
         # end
       end
     end
@@ -160,7 +185,6 @@ class PurchaseOrder < ActiveRecord::Base
     else
       self.total_after_tax = Amount.new(value: total_after_tax_amount, currency_id: 1)
     end
-
     # if self.total_amount.present?
     #   self.total_amount.value = total_amount
     # else
@@ -170,6 +194,12 @@ class PurchaseOrder < ActiveRecord::Base
       self.discount_amount.value = discount_amount
     else
       self.build_discount_amount(value: discount_amount, currency_id: 1)
+    end
+
+    if self.tax_amount.present?
+      self.tax_amount.value = tax_amount
+    else
+      self.build_tax_amount(value: tax_amount, currency_id: 1)
     end
 
     if self.balance_amount.present?

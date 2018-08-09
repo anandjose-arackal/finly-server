@@ -1,6 +1,6 @@
 json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
               :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
-              :payment_term_id, :procurement_term_text, :policy_id
+              :payment_term_id, :procurement_term_text, :policy_id, :department_id
 json.vendor do
   json.extract! @result.purchase_order.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
 end
@@ -66,12 +66,11 @@ json.attachments do
   end
 end
 
-
 json.comments do
   json.array! @result.purchase_order.comments do |comment|
     json.extract! comment, :id, :body
     json.created_at comment.created_at.strftime("%b %d, %y")
-    json.created_at_time comment.created_at.strftime("%i:%m%p")
+    json.created_at_time comment.created_at.strftime("%I:%m%p")
     json.user do
       json.name comment.user&.name
 
@@ -86,12 +85,19 @@ json.policies do
   end
 end
 
+json.departments do
+  json.array! @result.departments do |department|
+    json.extract! department, :id, :name
+  end
+end
+
 json.reviewal_chains do
   json.array! @result.reviewal_chains do |chain|
     json.policy_id chain[:policy_id]
     json.reviewal_chain do
       json.array! chain[:reviewal_chain] do |item|
         json.level_number item[:level_number]
+        json.level_id item[:level_id]
         json.selected_reviewer item[:selected_reviewer]&.as_json
         json.reviewers do
           json.array! item[:reviewers] do |reviewer|

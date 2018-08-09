@@ -1,15 +1,16 @@
+inward_document = @result.inward_document
 json.extract! @result.inward_document, :id, :doc_number, :delivery_date
 
 if @result.inward_document.vendor.present?
   json.vendor do
-    json.extract! document.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
+    json.extract! inward_document.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
   end
 end
 
 
 json.items do
   json.array! @result.inward_document.items do |item|
-    json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :quantity, :delivered, :accepted, :rejected
+    json.extract! item, :id, :inventory_line_item_id, :product_id, :description, :quantity, :delivered, :accepted, :rejected, :previously_delivered, :comment
   end
 end
 
@@ -23,9 +24,11 @@ json.attachments do
 end
 
 json.purchase_order do
-  json.extract! @result.purchase_order, :id, :po_number, :delivery_date, :gst_type_id,
+  json.extract! @result.purchase_order, :id, :po_number, :gst_type_id,
                 :inclusive_of_taxes, :roundoff_total_enabled, :roundoff_amount, :location_id, :delivery_location_id,
                 :payment_term_id
+  json.created_at @result.purchase_order.created_at.strftime "%b-%d-%Y"
+  json.delivery_date @result.purchase_order.delivery_date&.strftime "%b-%d-%Y"
   json.vendor do
     json.extract! @result.purchase_order.vendor, :id, :name, :email, :mobile_number, :authorized, :description, :pan, :gst, :state
   end
@@ -102,5 +105,11 @@ json.comments do
 
       json.id comment.user&.id
     end
+  end
+end
+
+json.actions do
+  if inward_document.items.length > 0
+    json.show_comments true
   end
 end

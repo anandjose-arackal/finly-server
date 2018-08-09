@@ -147,6 +147,4 @@ class InvoiceLineItemsCalculationUtils
     self.gross_amount = TaxCalculationUtils.inclusive_tax_amount(self.after_discount_amount, (item.tax))
     self.tax_amount = self.after_discount_amount - self.gross_amount
   end
-
-
 end

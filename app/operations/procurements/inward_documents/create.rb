@@ -1,10 +1,11 @@
 class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Base
-  attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order
+  attr_accessor :inward_document, :procurement, :inward_document_params, :purchase_order, :inward_document_create_params
   def init
     procurement_id = params[:procurement_id]
     self.procurement = user.company.procurements.find_by id: procurement_id
     # self.inward_document_params = inward_document_parameters
     self.purchase_order = self.procurement&.purchase_order
+    self.inward_document_create_params = create_inward_document_params
   end
 
   def validate
@@ -14,13 +15,34 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
   end
 
   def process
-    self.inward_document = self.procurement.inward_documents.build
+    self.inward_document = self.procurement.inward_documents.build inward_document_create_params
     inward_document.save
+
+    # Create Trail for Inward Document
+    inward_document.trails.create action_user_id: user.id,
+                                  action_id: ::TrailAction.id_for(:create)
 
     for item in purchase_order.items
       inward_item_params = inward_document_item_params(item)
       inward_document_item = inward_document.items.build(inward_item_params)
       inward_document_item.save
+    end
+
+  end
+
+  def post_process
+    # Update Status Tags for Procurement
+    #   Find if all items are shipped
+    if self.purchase_order.all_items_shipped?
+      old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
+      status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
+      self.procurement.status_tags.delete(old_status_tag)
+      self.procurement.status_tags << status_tag
+    else
+      status_tag = StatusTag.find_by(id: StatusTag.id_for(:receiving_shipment))
+      old_status_tag = StatusTag.find_by(id: StatusTag.id_for(:shipment_received))
+      self.procurement.status_tags.delete(old_status_tag)
+      self.procurement.status_tags << status_tag
     end
   end
 
@@ -48,12 +70,19 @@ class Procurements::InwardDocuments::Create < Procurements::InwardDocuments::Bas
         product_id: po_item.product_id,
         description: po_item.description,
         quantity: po_item.quantity,
-        delivered: po_item.delivered,
-        accepted: po_item.accepted,
-        rejected: po_item.rejected
+        previously_delivered: po_item.delivered,
+        delivered: 0,
+        accepted: 0,
+        rejected: 0
     }
   end
 
+  def create_inward_document_params
+    {
+        company_id: procurement.company.id,
+        vendor_id: purchase_order&.vendor&.id
+    }
 
+  end
 end
 

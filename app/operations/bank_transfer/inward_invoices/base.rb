@@ -19,14 +19,14 @@ class BankTransfer::InwardInvoices::Base < BankTransfer::Base
   end
 
   def invoice_attributes
-    params.require(:invoice).permit(:note, :tax, :gst_type_id, :tds, :tds_type_id, :category_id, :cost_center_id, :tds_slab_id,
-                                     :tax_type_id, :discount, :date, :discount_type_id, :due_date, :roundoff_amount,
+    params.require(:invoice).permit(:note, :tax, :gst_type_id, :tds, :tds_type_id, :category_id, :cost_center_id, :tds_slab_id, :payment_term_id,
+                                     :tax_type_id, :discount, :date, :discount_type_id, :due_date, :roundoff_amount, :location_id, :delivery_location_id,
                                      :invoice_number, :inclusive_of_taxes, :advance, :advance_type_id, :receiving_account_id, :vendor_id,
                                      original_amount_attributes: [:value, :currency_id],
                                      freight_amount_attributes: [:value, :currency_id],
                                      advance_amount_attributes: [:value, :currency_id],
                                      invoice_attachments_attributes: [:attached_file, :description, :remove_file],
-                                     invoice_items_attributes: [:quantity, :rate, :tax, :discount, :category_id, :description, :id, :remove_line_item, :hsn_sac],
+                                     invoice_items_attributes: [:quantity, :rate, :tax, :discount, :category_id, :description, :id, :remove_line_item, :hsn_sac, :comment],
                                      custom_fields: [])
   end
 

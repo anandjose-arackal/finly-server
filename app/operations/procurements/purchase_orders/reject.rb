@@ -20,9 +20,11 @@ class Procurements::PurchaseOrders::Reject < Procurements::PurchaseOrders::Base
     unless op.success?
       add_message :error, op.messages[:error]
     end
+    self.workflow_output = op.workflow_output
   end
 
   def post_process
+    Event::EPurchaseOrder::Reject.(user, purchase_order: purchase_order, workflow_output: workflow_output)
     add_message :success, 'Successfully Rejected Purchase Order'
   end
 end

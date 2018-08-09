@@ -21,7 +21,6 @@
 #  created_by_id  :integer
 #  vendor_type_id :integer
 #
-
 class YesBankVendor < ActiveRecord::Base
   belongs_to :company
   belongs_to :state_code, class_name: "GstStateCode"
@@ -32,6 +31,11 @@ class YesBankVendor < ActiveRecord::Base
   has_many :receiving_payments, as: :receiving_user, class_name: 'Payment'
   has_many :vendor_attachments
 
+  # Requirement first shared by olx
+  # has_one :cancelled_cheque_attachment, class_name: "VendorAttachment", dependent: :destroy
+  # has_one :pan_attachment, class_name: "VendorAttachment", dependent: :destroy
+  # has_one :gstin_certificate_attachment, class_name: "VendorAttachment", dependent: :destroy
+
   has_one :vendor_account, foreign_key: :vendor_id
 
   has_many :budget_criteria_mappings, as: :budgetable
@@ -41,6 +45,9 @@ class YesBankVendor < ActiveRecord::Base
 
   accepts_nested_attributes_for :bank_accounts
   accepts_nested_attributes_for :vendor_attachments, allow_destroy: true
+  # accepts_nested_attributes_for :pan_attachment, allow_destroy: true
+  # accepts_nested_attributes_for :gstin_certificate_attachment, allow_destroy: true
+  # accepts_nested_attributes_for :cancelled_cheque_attachment, allow_destroy: true
 
   scope :including_bank_accounts, -> {joins(:bank_accounts)}
   scope :non_deleted, -> { where is_deleted: [false, nil]}
@@ -89,5 +96,4 @@ class YesBankVendor < ActiveRecord::Base
         bank_accounts: bank_accounts
     }
   end
-
 end

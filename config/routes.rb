@@ -3042,7 +3042,7 @@ end
       put 'approve', to: 'purchase_orders#approve'
       put 'reject', to: 'purchase_orders#reject'
       put 'close', to: 'purchase_orders#close'
-
+      get 'download_pdf', to: 'purchase_orders#download', as: :download
     end
 
     resources :inward_documents do
